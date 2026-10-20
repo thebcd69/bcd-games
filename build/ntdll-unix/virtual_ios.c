@@ -118,6 +118,7 @@ extern kern_return_t vm_protect(mach_port_t target_task, vm_address_t address,
 #include "wine/rbtree.h"
 #include "unix_private.h"
 #include "ios_wow.h"
+#include "ios_mixed.h"
 #include "wine/debug.h"
 
 /* ml648: the Mono-bridge alias table is defined further down, but the anon-alias
@@ -6333,6 +6334,81 @@ void ios_jit_sync_write(void *addr, size_t size)
         char *jit_rw_dest = (char *)ios_jit_rw_base_global + pool_offset + off;
         memcpy(jit_rw_dest, addr, size);
     }
+}
+
+/* A sub-page protect is not a write to every byte on the rounded page.
+ * ntdll's ARM64EC code updates its globals in the pool copy, while a guest
+ * patches the original PE copy. D2R protects the 8-byte
+ * pWow64PrepareForException slot; copying its whole page also zeroed the live
+ * pResetToConsistentState/notification callbacks beside it. Sync the requested
+ * bytes of writable ntdll data only. Other modules and executable sections
+ * retain the existing loader/IAT synchronization path. */
+static int ios_sync_ntdll_data_patch( const void *image, size_t image_size,
+                                     const void *requested, size_t length,
+                                     const void *page, size_t page_size,
+                                     void *pool_page, void *owner, const void *ntdll_entry )
+{
+    const IMAGE_DOS_HEADER *dos = image;
+    const IMAGE_NT_HEADERS64 *nt;
+    const IMAGE_SECTION_HEADER *sec;
+    uintptr_t req = (uintptr_t)requested, pe = (uintptr_t)image, pg = (uintptr_t)page;
+    size_t off, section_offset, i, pos;
+    unsigned char *dst;
+    const unsigned char *src = requested;
+    /* Identify the current ntdll through the loader's dispatcher registry,
+     * before reading headers: another module may have protected its headers. */
+    if (!ntdll_entry || (uintptr_t)ntdll_entry < pe ||
+        (uintptr_t)ntdll_entry - pe >= image_size || !length) return 0;
+    if (req < pe || req - pe >= image_size || length > image_size - (req - pe)) return 0;
+    if (req < pg || req - pg >= page_size || length > page_size - (req - pg)) return 0;
+    if (image_size < sizeof(*dos) || dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew < 0)
+        return 0;
+    off = dos->e_lfanew;
+    if (off > image_size || sizeof(*nt) > image_size - off) return 0;
+    nt = (const IMAGE_NT_HEADERS64 *)((const char *)image + off);
+    if (nt->Signature != IMAGE_NT_SIGNATURE || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+        return 0;
+    section_offset = off + FIELD_OFFSET( IMAGE_NT_HEADERS64, OptionalHeader );
+    if (nt->FileHeader.SizeOfOptionalHeader > image_size - section_offset) return 0;
+    section_offset += nt->FileHeader.SizeOfOptionalHeader;
+    if (nt->FileHeader.NumberOfSections > (image_size - section_offset) / sizeof(*sec)) return 0;
+    sec = (const IMAGE_SECTION_HEADER *)((const char *)image + section_offset);
+    off = req - pe;
+    for (i = 0; i < nt->FileHeader.NumberOfSections; i++)
+    {
+        size_t lo = sec[i].VirtualAddress, n = sec[i].Misc.VirtualSize;
+        if (memcmp( sec[i].Name, ".data\0\0\0", IMAGE_SIZEOF_SHORT_NAME ) ||
+            !(sec[i].Characteristics & IMAGE_SCN_MEM_WRITE) ||
+            (sec[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) || off < lo || off - lo >= n ||
+            length > n - (off - lo)) continue;
+
+        dst = (unsigned char *)pool_page + (req - pg);
+        /* Translate complete, aligned pointer slots only. A byte patch must
+         * not overwrite/translate neighbouring bytes of a live variable. */
+        for (pos = 0; pos < length;)
+        {
+            size_t part = min( sizeof(uint64_t) - ((req + pos) & 7), length - pos );
+            uint64_t before, value;
+            if (part == sizeof(value))
+            {
+                memcpy( &before, dst + pos, sizeof(before) );
+                memcpy( &value, src + pos, sizeof(value) );
+                if (value != before && value && !ios_va_is_x86_code( value ))
+                    value = (uintptr_t)ios_jit_translate_addr_for_owner( (void *)(uintptr_t)value, owner );
+                memcpy( dst + pos, &value, sizeof(value) );
+            }
+            else memcpy( dst + pos, src + pos, part );
+            pos += part;
+        }
+        {
+            static unsigned reports;
+            if (__atomic_fetch_add( &reports, 1, __ATOMIC_RELAXED ) < 24)
+                dprintf( 2, "[ntdll-data-sync] requested %p+0x%lx of page %p+0x%lx; neighbouring live globals preserved (owner=%p)\n",
+                         requested, (unsigned long)length, page, (unsigned long)page_size, owner );
+        }
+        return 1;
+    }
+    return 0;
 }
 
 /* madeira-bcd: RtlPcToFileHeader must know JIT-pool aliases.
@@ -16809,9 +16885,40 @@ static int ios_no_plain_exec( void )
     return cached;
 }
 
+/* Pagefile-backed section views in the x64 emulator must retain their shared
+ * backing. Copying an executable view into the JIT pool disconnects it from a
+ * writable sibling view: code emitted through the sibling is then invisible
+ * to FEX. Guest execute permission stays in Wine's page table; the host only
+ * needs to read the x64 bytes. Native EC allocations and images keep the pool
+ * path. File-backed sections are deliberately outside this change. */
+static int ios_guest_section_is_host_data( const void *base, size_t size )
+{
+#ifdef WINE_IOS
+    struct file_view *view;
+
+    if (!arm64ec_view || ios_alloc_ec_code || ios_wow_in_window( base )) return 0;
+    if (!(view = find_view( base, 0 ))) return 0;
+    if (!(view->protect & (SEC_COMMIT | SEC_RESERVE))) return 0;
+    if (view->protect & (SEC_FILE | SEC_IMAGE | VPROT_ARM64EC | VPROT_SYSTEM)) return 0;
+    return ios_x64_image_view_covers( (uintptr_t)view->base, view->size, (uintptr_t)base, size );
+#else
+    return 0;
+#endif
+}
+
 static inline int mprotect_exec( void *base, size_t size, int unix_prot )
 {
 #ifdef WINE_IOS
+    if ((unix_prot & PROT_EXEC) && ios_guest_section_is_host_data( base, size ))
+    {
+        static unsigned int section_n;
+        if (section_n++ < 24 && !ios_in_mach_exc)
+            dprintf( 2, "[guest-section] %p+0x%lx: preserving shared backing for translated code\n",
+                     base, (unsigned long)size );
+        unix_prot &= ~PROT_EXEC;
+        if (!unix_prot) unix_prot = PROT_READ;
+    }
+
     /* iOS-Madeira ml1030: A 32-BIT IMAGE PAGE IS DATA TO THE HOST — SO STOP
      * ROUTING ITS WRITE REQUESTS THROUGH THE EXECUTABLE MACHINERY.
      *
@@ -31664,6 +31771,13 @@ NTSTATUS WINAPI NtProtectVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T 
                     uintptr_t pool_offset = (uintptr_t)ios_jit_mappings[idx].jit_base
                                           - (uintptr_t)ios_jit_rx_base_global;
                     char *jit_rw_dest = (char *)ios_jit_rw_base_global + pool_offset + off;
+                    {
+                        const struct ios_ntdll_funcs *funcs = ios_cur_ntdll_funcs();
+                        const void *entry = funcs ? funcs->KiUserExceptionDispatcher : pKiUserExceptionDispatcher;
+                        if (ios_sync_ntdll_data_patch( (const void *)pe_start, pe_end - pe_start,
+                                ios_jit_reverse_translate_addr( ios_patch_requested ), ios_patch_length,
+                                base, size, jit_rw_dest, sync_peb, ios_jit_reverse_translate_addr( entry ) )) break;
+                    }
                     /* iOS-Madeira ml1199: words the pointer translation below must leave alone.
                      *
                      * That translation rewrites every 8-byte word whose value lies inside ANY

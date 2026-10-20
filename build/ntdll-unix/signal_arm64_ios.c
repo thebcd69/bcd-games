@@ -1513,6 +1513,51 @@ done:
              why, written, total, path );
 }
 
+/* The exception server serializes these updates. FEX uses one host trap stub
+ * for many guest breakpoints: a repeated host PC alone is not a stuck guest.
+ * The thread key is its stable registered TEB, not a transient Mach send right.
+ * Only trust guest RIP progress for breakpoint traps whose x28 is the thread's
+ * registered FEX frame. Unknown/native faults retain the original thresholds. */
+struct ios_fault_loop_state
+{
+    uint64_t page, pc, addr, guest_rip, guest_frame;
+    uintptr_t thread;
+    unsigned exception, count, page_count;
+};
+
+static unsigned ios_fault_loop_tick( struct ios_fault_loop_state *s, uintptr_t thread,
+                                    unsigned exception, uint64_t pc, uint64_t addr,
+                                    uintptr_t frame, uintptr_t x28, uint64_t guest_rip )
+{
+    uint64_t page = addr & ~0x3fffull;
+    uint64_t verified_frame = exception == EXC_BREAKPOINT && frame && frame == x28 && guest_rip ? frame : 0;
+    uint64_t rip = verified_frame ? guest_rip : 0;
+
+    if (!page) page = 1; /* NULL accesses must still reach the breaker. */
+    if (s->thread != thread || s->exception != exception || s->page != page ||
+        s->pc != pc || s->guest_frame != verified_frame)
+    {
+        *s = (struct ios_fault_loop_state){ .page = page, .pc = pc, .addr = addr,
+              .guest_rip = rip, .guest_frame = verified_frame, .thread = thread, .exception = exception };
+        return 0;
+    }
+    if (rip && rip != s->guest_rip)
+    {
+        /* A guest exception at another instruction is execution progress,
+         * not an unhandled host-fault storm. Do not count it toward either
+         * abort threshold; continue through the normal exception delivery. */
+        s->count = 0;
+        s->page_count = 0;
+    }
+    else if (addr != s->addr)
+    {
+        s->count = ++s->page_count >= 20000 ? 49 : 0;
+    }
+    s->addr = addr;
+    s->guest_rip = rip;
+    return ++s->count;
+}
+
 static void *ios_mach_exception_thread( void *arg )
 {
     mach_port_t port = (mach_port_t)(uintptr_t)arg;
@@ -4920,50 +4965,31 @@ skip_reclaim_band: ;
                      * eating an entire run, and dumps the region layout around it so the
                      * owner can be identified and the real fix aimed correctly. */
                     {
-                        static volatile uint64_t stuck_page;
-                        static volatile uint64_t stuck_pc;
-                        static volatile uint32_t stuck_n;
-                        /* ml876: exact faulting ADDRESS, and a page-level storm
-                         * counter. ml871-875 killed a UE 5.4 game thread here on
-                         * every run: an SDK dll walked its import table with the
-                         * classic VirtualProtect(entry,RW) / write / VirtualProtect
-                         * (page,RO) pattern; on 16 KB host pages the RO of one 4 KB
-                         * guest page strips W from the neighbour the guest had just
-                         * made RW, [wr-strip] heals it and the thread advances to
-                         * the NEXT entry -- a different address every time. Same
-                         * (page,pc) 50x is therefore NOT "zero progress". Livelock
-                         * = the SAME address re-faulting (ml261 sp-16 push, ml385
-                         * NULL write, ml557 un-stuck heal); key on it. Keep a much
-                         * larger page-level ceiling as the storm safety net. */
-                        static volatile uint64_t stuck_addr;
-                        static volatile uint32_t stuck_page_n;
-                        uint64_t fpage = (uint64_t)fault_addr & ~0x3fffull;
-                        /* ml385: NULL-page faults keyed as 1, not 0 — `if (fpage &&`
-                         * excluded them entirely and a NULL-write loop in
-                         * server_ioctl_file ran 3.3M times with no breaker
-                         * (StikDebug's 8-stop kill was the only breaker, and it
-                         * had detached). */
-                        if (!fpage) fpage = 1;
-
-                        if (fpage == stuck_page && fault_pc_check == stuck_pc &&
-                            (uint64_t)fault_addr != stuck_addr)
+                        static struct ios_fault_loop_state stuck;
+                        unsigned previous_page_count = stuck.page_count;
+                        uint64_t previous_guest_rip = stuck.guest_rip;
+                        unsigned n = ios_fault_loop_tick( &stuck, thread_teb, req->exception,
+                                fault_pc_check, (uint64_t)fault_addr,
+                                (uintptr_t)fex_state_q, state.__x[28], state_rip_q );
+                        uint64_t fpage = stuck.page;
+                        if (n == 1 && stuck.guest_frame && previous_guest_rip &&
+                            previous_guest_rip != stuck.guest_rip)
                         {
-                            /* ml876: same page+pc but a NEW address = progress.
-                             * Restart the exact-address count; keep the page
-                             * storm count (ceiling 20000, logged every 1000). */
-                            uint32_t pn = __sync_add_and_fetch(&stuck_page_n, 1);
-                            stuck_addr = (uint64_t)fault_addr;
-                            stuck_n = 0;
-                            if ((pn % 1000) == 0)
-                                dprintf(STDERR_FILENO,
-                                    "[fault-stuck] ml876 page 0x%llx pc 0x%llx: %u faults, addresses advancing (last 0x%llx)\n",
-                                    (unsigned long long)fpage, (unsigned long long)fault_pc_check, pn,
-                                    (unsigned long long)fault_addr);
-                            if (pn >= 20000) stuck_n = 49;   /* storm ceiling: next fault breaks */
+                            static unsigned progress_reports;
+                            if (progress_reports++ < 16)
+                                dprintf(2, "[fault-progress] host pc=0x%llx guest RIP 0x%llx -> 0x%llx; normal exception delivery retained\n",
+                                        (unsigned long long)fault_pc_check,
+                                        (unsigned long long)previous_guest_rip,
+                                        (unsigned long long)stuck.guest_rip);
                         }
-                        if (fpage == stuck_page && fault_pc_check == stuck_pc)
+                        if (stuck.page_count && stuck.page_count != previous_page_count &&
+                            !(stuck.page_count % 1000))
+                            dprintf(STDERR_FILENO,
+                                "[fault-stuck] ml876 page 0x%llx pc 0x%llx: %u faults, addresses advancing (last 0x%llx)\n",
+                                (unsigned long long)fpage, (unsigned long long)fault_pc_check,
+                                stuck.page_count, (unsigned long long)fault_addr);
+                        if (n)
                         {
-                            uint32_t n = __sync_add_and_fetch(&stuck_n, 1);
                             /* ml385 LOOP BREAKER: same page AND same pc 50 times
                              * with zero progress is a livelock, not a recoverable
                              * fault (guard/watch pages resolve in 1-3). Divert the
@@ -4985,7 +5011,7 @@ skip_reclaim_band: ;
                                 thread_set_state( thread, ARM_THREAD_STATE64,
                                                   (thread_state_t)&state, count );
                                 handled = 1;
-                                stuck_n = 0;
+                                stuck.count = 0;
                             }
                             /* ml369: was 2048, which NEVER fired — the
                              * debugger script kills the app after 8
@@ -5031,14 +5057,7 @@ skip_reclaim_band: ;
                                 }
                             }
                         }
-                        else
-                        {
-                            stuck_page = fpage;
-                            stuck_pc = fault_pc_check;
-                            stuck_addr = (uint64_t)fault_addr;
-                            stuck_n = 0;
-                            stuck_page_n = 0;
-                        }
+
                     }
 
                     if (cnt <= 50 || first_seen || (cnt % 500) == 0)

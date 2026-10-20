@@ -66,7 +66,7 @@ esac
 #   netprofm
 #       the Network List Manager, for services a launcher starts in a game
 #       session
-GAME_MODULES="msvcr70 msvcr71 msvcr80 msvcr90 msvcr100 msvcrt20 msvcrt40 msvcirt
+GAME_MODULES="sfc sfc_os tbs msvcr70 msvcr71 msvcr80 msvcr90 msvcr100 msvcrt20 msvcrt40 msvcirt
     msvcp60 msvcp70 msvcp71 msvcp80 msvcp90 msvcp100 msvcp120
     vcomp vcomp90 vcomp100 vcomp110 vcomp120 vcomp140
     d3d10 d3d10_1 avifil32 msvfw32
