@@ -30,7 +30,9 @@ struct SteamDownloadProgress: Equatable, Sendable {
 /// Follows Steam's content protocol: the account's depot key and the
 /// manifest request code come from the CM connection, which issues them only
 /// to an account that owns the depot; manifests and chunks come from content
-/// servers over HTTPS. Nothing here alters the downloaded files.
+/// servers over the scheme Valve's directory gives each one (HTTPS, or plain
+/// HTTP where the server has no TLS listener). Nothing here alters the
+/// downloaded files.
 ///
 /// Behaviour:
 /// - All manifests are fetched first, so progress covers the whole install.
@@ -412,6 +414,15 @@ final class DepotDownloader {
 
     // MARK: - Chunks
 
+    /// SHA-1 of a chunk's content once it is decoded, compared against the
+    /// manifest entry's digest.
+    nonisolated static func sha1(_ data: Data) -> Data {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        guard !data.isEmpty else { return Data(digest) }
+        _ = data.withUnsafeBytes { CC_SHA1($0.baseAddress, CC_LONG($0.count), &digest) }
+        return Data(digest)
+    }
+
     /// A chunk's ID is the SHA-1 of its uncompressed bytes. When a file
     /// already had content (an update, or a resume without a journal), bytes
     /// that already match are kept instead of downloaded again.
@@ -444,7 +455,13 @@ final class DepotDownloader {
                 let data = try ContentDecryptor.processChunk(encryptedData: encrypted, depotKey: plan.key,
                                                              expectedCRC: chunk.crc,
                                                              expectedSize: Int(chunk.uncompressedSize))
-                guard data.count == Int(chunk.uncompressedSize) else { throw SteamError.checksumMismatch }
+                // The manifest names the decoded chunk, so this checks the
+                // content itself, not just its Adler-32 — the stronger half of
+                // what makes a plain-HTTP answer safe to accept. A chunk that
+                // fails it is retried on another server like any other bad one.
+                guard data.count == Int(chunk.uncompressedSize), Self.sha1(data) == chunk.sha else {
+                    throw SteamError.checksumMismatch
+                }
                 try write(data, to: path, offset: chunk.offset)
                 plan.health.recordSuccess(host)
                 return
@@ -650,17 +667,36 @@ final class DepotDownloader {
 
     // MARK: - CDN Discovery + Auth
 
+    /// The transport a content server offers. `https_support` picks which one
+    /// to use; it does not say whether the server may be used at all.
+    enum ServerScheme: String { case https, http }
+
     /// Content server discovery via the public Web API
     /// (IContentServerDirectoryService/GetServersForSteamPipe). No account
     /// token is attached; the directory does not require one.
-    enum ServerEligibility: Equatable { case usable, noHTTPS, other }
+    enum ServerEligibility: Equatable {
+        case usable(ServerScheme)
+        /// `https_support` names a transport this code does not know.
+        case unknownHTTPS
+        /// Proxy-only entry, or restricted to other apps.
+        case other
+    }
 
     /// Directory fields as served by GetServersForSteamPipe: https_support
     /// ("mandatory", "optional", "unavailable"), use_as_proxy, and an optional
     /// allowed_app_ids restriction.
+    ///
+    /// "unavailable" means the host has no usable TLS listener, not that it is
+    /// unusable: Valve's own client fetches from such a host over plain HTTP.
     nonisolated static func serverEligibility(_ server: [String: Any], appID: UInt32) -> ServerEligibility {
-        if let https = (server["https_support"] as? String)?.lowercased(), https != "mandatory", https != "optional" {
-            return .noHTTPS
+        let support = (server["https_support"] as? String)?.lowercased()
+        let scheme: ServerScheme
+        if support == nil || support == "mandatory" || support == "optional" {
+            scheme = .https
+        } else if support == "unavailable" {
+            scheme = .http
+        } else {
+            return .unknownHTTPS
         }
         if (server["use_as_proxy"] as? Bool) == true || (server["use_as_proxy"] as? NSNumber)?.boolValue == true {
             return .other
@@ -669,7 +705,7 @@ final class DepotDownloader {
            !allowed.contains(where: { ($0 as? NSNumber)?.uint32Value == appID || ($0 as? String) == String(appID) }) {
             return .other
         }
-        return .usable
+        return .usable(scheme)
     }
 
     private func contentServers(appID: UInt32) async throws -> [String] {
@@ -687,23 +723,33 @@ final class DepotDownloader {
                   let servers = resp["servers"] as? [[String: Any]] else {
                 throw SteamError.chunkDownloadFailed("Content directory returned unexpected data")
             }
-            // In the directory's order. The directory marks some CDN servers
-            // https_support "unavailable"; requesting them over HTTPS fails the
-            // TLS handshake (NSURLError -1200). Such servers, proxy-only entries
-            // and servers restricted to other apps are skipped.
-            var skippedHTTP = 0, skippedOther = 0
+            // In the directory's order. A server marked https_support
+            // "unavailable" has no TLS listener and is fetched over plain HTTP;
+            // "mandatory" or "optional" over HTTPS. Proxy-only entries and
+            // servers restricted to other apps are skipped. Every rejection is
+            // named at trace level, so a region whose nodes are all refused says
+            // which reason refused them.
+            var skippedUnknown = 0, skippedOther = 0, skippedHost = 0
             for server in servers {
                 let host = (server["vhost"] as? String) ?? (server["host"] as? String) ?? ""
-                guard Self.usableContentHost(host) else { skippedOther += 1; continue }
-                switch Self.serverEligibility(server, appID: appID) {
-                case .usable: break
-                case .noHTTPS: skippedHTTP += 1; continue
-                case .other: skippedOther += 1; continue
+                guard Self.usableContentHost(host) else {
+                    skippedHost += 1
+                    SteamLog.trace("[steam-cdn] rejected host=\(host) reason=host-not-allowed")
+                    continue
                 }
-                let entry = "https://\(host)"
-                if !hosts.contains(entry) { hosts.append(entry) }
+                switch Self.serverEligibility(server, appID: appID) {
+                case .usable(let scheme):
+                    let entry = "\(scheme.rawValue)://\(host)"
+                    if !hosts.contains(entry) { hosts.append(entry) }
+                case .unknownHTTPS:
+                    skippedUnknown += 1
+                    SteamLog.trace("[steam-cdn] rejected host=\(host) reason=unknown-https-support")
+                case .other:
+                    skippedOther += 1
+                    SteamLog.trace("[steam-cdn] rejected host=\(host) reason=proxy-or-other-app")
+                }
             }
-            SteamLog.event("[steam-cdn] offered=\(servers.count) usable=\(hosts.count) skipped-no-https=\(skippedHTTP) skipped-other=\(skippedOther)")
+            SteamLog.event("[steam-cdn] offered=\(servers.count) usable=\(hosts.count) skipped-unknown-https=\(skippedUnknown) skipped-other=\(skippedOther) skipped-host=\(skippedHost)")
         } catch is CancellationError {
             throw CancellationError()
         } catch {
@@ -714,11 +760,13 @@ final class DepotDownloader {
         return hosts
     }
 
+    /// A directory entry has to be a host name and nothing else: no scheme,
+    /// port, path, wildcard, space or local cache. Valve's directory also names
+    /// third-party hosts, so the name itself is not restricted to Valve's
+    /// domains.
     nonisolated static func usableContentHost(_ host: String) -> Bool {
-        guard host.contains("."), !host.contains(" "), !host.contains("/"), !host.contains("*"),
-              !host.contains("lancache"), !host.contains(":") else { return false }
-        return host.hasSuffix(".steamcontent.com") || host.hasSuffix(".akamaized.net") ||
-            host.hasSuffix(".steampipe.steamcontent.com") || host.hasSuffix(".steamstatic.com")
+        host.contains(".") && !host.contains(" ") && !host.contains("/") && !host.contains("*") &&
+            !host.contains("lancache") && !host.contains(":")
     }
 
     /// Unified-service GetCDNAuthToken → "?auth=…" query fragment for this

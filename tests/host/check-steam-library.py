@@ -9,8 +9,8 @@ or the openssl command, and libssl/liblzma/zlib development files.
 
 Part A is static: licence headers, the Xcode project, no program names, the
 only token path (SteamSignIn's Keychain item), no account data in a log line, no
-engine or pool change, Info.plist permitting only the background download task,
-and that the sources do not say they are
+engine or pool change, Info.plist permitting the background download task and
+plain-HTTP content servers, and that the sources do not say they are
 ports of another project.
 
 Part B builds the production Swift (protocol messages, message codec, app-info
@@ -149,6 +149,13 @@ require(len(permitted) == 1 and re.findall(r'<string>([^<]*)</string>', permitte
         == ['$(PRODUCT_BUNDLE_IDENTIFIER).download.*', '$(PRODUCT_BUNDLE_IDENTIFIER).pairing.*'],
         "Info.plist permits only the bundle's own .download.* (background downloads) and .pairing.* (JIT pairing) tasks")
 require('UIBackgroundModes' not in info, 'Info.plist asks for no background mode')
+# Some content servers in Valve's directory have no HTTPS listener; Valve's own
+# client reaches them over plain HTTP. On iOS 10+ any of the newer global ATS
+# keys makes NSAllowsArbitraryLoads be ignored, so none of them may appear.
+require(re.search(r'<key>NSAppTransportSecurity</key>\s*<dict>\s*<key>NSAllowsArbitraryLoads</key>\s*<true/>\s*</dict>', info)
+        and not any(k in info for k in ('NSAllowsArbitraryLoadsInWebContent', 'NSAllowsArbitraryLoadsForMedia',
+                                        'NSAllowsLocalNetworking')),
+        'Info.plist permits plain-HTTP content servers, and carries no key that would cancel that')
 background = sources['SteamDownloadBackground.swift']
 require('hasSuffix(".download.*")' in background and '+ "queue"' in background and 'BGContinuedProcessingTaskRequest(identifier: identifier' in background,
         'the continued-processing task uses the permitted identifier, made concrete')
@@ -877,14 +884,23 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
             SteamInstallFiles.safeFolderName("a\\b\\Last") == "Last" && SteamInstallFiles.safeFolderName("..") == "app" && SteamInstallFiles.safeFolderName("") == "app" &&
             SteamInstallFiles.safeFolderName("c:") == "app", "install folders are one safe component")
     require(DepotDownloader.usableContentHost("cache1.steamcontent.com") && DepotDownloader.usableContentHost("a.b.akamaized.net") &&
-            !DepotDownloader.usableContentHost("evil.example.com") && !DepotDownloader.usableContentHost("x.steamcontent.com:8080") &&
-            !DepotDownloader.usableContentHost("a b.steamcontent.com") && !DepotDownloader.usableContentHost("lancache.steamcontent.com"), "content hosts are Valve's, on the standard port")
+            DepotDownloader.usableContentHost("xz.pphimalayanrt.com") && DepotDownloader.usableContentHost("dl.steam.clngaa.com") &&
+            DepotDownloader.usableContentHost("st.dl.eccdnx.com") &&
+            !DepotDownloader.usableContentHost("x.steamcontent.com:8080") &&
+            !DepotDownloader.usableContentHost("a b.steamcontent.com") &&
+            !DepotDownloader.usableContentHost("evil.example.com/chunk") &&
+            !DepotDownloader.usableContentHost("*.steamcontent.com") &&
+            !DepotDownloader.usableContentHost("lancache.steamcontent.com"), "a content host is a bare host name, Valve's or third-party")
     let server: [String: Any] = ["https_support": "unavailable"]
-    require(DepotDownloader.serverEligibility(server, appID: 1) == .noHTTPS &&
+    require(DepotDownloader.serverEligibility(server, appID: 1) == .usable(.http) &&
             DepotDownloader.serverEligibility(["use_as_proxy": true], appID: 1) == .other &&
+            DepotDownloader.serverEligibility(["use_as_proxy": true, "https_support": "unavailable"], appID: 1) == .other &&
             DepotDownloader.serverEligibility(["allowed_app_ids": [5]], appID: 1) == .other &&
-            DepotDownloader.serverEligibility(["allowed_app_ids": [1], "https_support": "mandatory"], appID: 1) == .usable &&
-            DepotDownloader.serverEligibility([:], appID: 1) == .usable, "content server eligibility")
+            DepotDownloader.serverEligibility(["allowed_app_ids": [1], "https_support": "mandatory"], appID: 1) == .usable(.https) &&
+            DepotDownloader.serverEligibility(["https_support": "nonsense"], appID: 1) == .unknownHTTPS &&
+            DepotDownloader.serverEligibility([:], appID: 1) == .usable(.https), "content server eligibility")
+    require(DepotDownloader.sha1(Data("abc".utf8)) == hexData("a9993e364706816aba3e25717850c26c9cd0d89d") &&
+            DepotDownloader.sha1(Data()) == Data(repeating: 0, count: 20), "a chunk digest is its content's SHA-1")
     let health = ContentHostHealth()
     for _ in 0..<3 { health.recordFailure("https://bad", reason: "x") }
     require(health.order(["https://bad", "https://good"], seed: 0).first == "https://good", "a server that keeps failing moves to the back of the rotation")
