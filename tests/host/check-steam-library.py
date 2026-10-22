@@ -142,7 +142,10 @@ for path in library_swift:
             bad = re.search(r'\\\((account|accountName|name|token|password|signIn|refresh|steamID|steamid|path|folder)\b', line)
             require(bad is None, f'{path}: no account data or path in "{line.strip()[:70]}"')
 require('MadeiraConfig' not in sources['SteamOwnedLibrary.swift'] and 'SteamSignIn.flag("MADEIRA_STEAM_LIBRARY", default: true)' in sources['SteamOwnedLibrary.swift'],
-        'one switch, MADEIRA_STEAM_LIBRARY, on by default')
+        'the library switch, MADEIRA_STEAM_LIBRARY, is on by default')
+require('SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false)' in sources['SteamOwnedLibrary.swift']
+        and 'DepotDownloader(session: session, verifyChunkSHA1: Self.chunkSHA1)' in sources['SteamOwnedLibrary.swift'],
+        'chunk SHA-1 verification is off unless MADEIRA_STEAM_CHUNK_SHA1 is set')
 info = (app / 'Info.plist').read_text()
 permitted = re.findall(r'<key>BGTaskSchedulerPermittedIdentifiers</key>\s*<array>(.*?)</array>', info, re.S)
 require(len(permitted) == 1 and re.findall(r'<string>([^<]*)</string>', permitted[0])
@@ -206,6 +209,9 @@ require(sources['SteamInstall.swift'].count(f'"{relative_root}/steamapps"') == 1
 downloader = sources['SwiftSteam/Content/DepotDownloader.swift']
 require('SteamLog.event("[steam-depot] install begin' in downloader and 'depot-key refused' in downloader, 'the download logs App IDs and depot IDs')
 require(not re.search(r'LibraryFlags|MADEIRA_STEAM_[A-Z_]+', downloader), 'the downloader has no switches of its own')
+require('init(session: SteamCMSession, verifyChunkSHA1: Bool = false)' in downloader
+        and 'if verifySHA1, Self.sha1(data) != chunk.sha' in downloader,
+        'chunk SHA-1 verification runs only when its owner turns it on')
 dock = (app / 'MadeiraDock.swift').read_text()
 require('static func validate(_ game: DockGame' in dock and 'game.installed' in dock, "Dock's validation reads the install record (StateFlags)")
 

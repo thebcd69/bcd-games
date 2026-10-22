@@ -180,6 +180,11 @@ final class SteamOwnedLibrary: ObservableObject {
     /// downloaded game starts through it).
     static var enabled: Bool { MadeiraDock.enabled && SteamSignIn.flag("MADEIRA_STEAM_LIBRARY", default: true) }
 
+    /// `env.MADEIRA_STEAM_CHUNK_SHA1 = 1`: also check each decoded chunk
+    /// against the SHA-1 the manifest names it by, not only its size and
+    /// Adler-32. Off by default.
+    static var chunkSHA1: Bool { SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false) }
+
     @Published private(set) var signedIn = false
     @Published private(set) var owned: [SteamOwnedGame] = []
     @Published private(set) var refreshing = false
@@ -207,7 +212,7 @@ final class SteamOwnedLibrary: ObservableObject {
     private lazy var gate = SteamConnectionGate(close: { [session] in await session.suspend() },
                                                 reopen: { [session] in session.resume() })
     private lazy var fetcher = SteamLibraryFetcher(session: session)
-    private lazy var downloader = DepotDownloader(session: session)
+    private lazy var downloader = DepotDownloader(session: session, verifyChunkSHA1: Self.chunkSHA1)
     private var started = false
     /// Which account the cached list belongs to: a SHA-256 of the account name,
     /// so the cache file holds no name.

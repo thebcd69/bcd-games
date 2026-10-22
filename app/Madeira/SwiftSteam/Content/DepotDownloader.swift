@@ -69,8 +69,14 @@ final class DepotDownloader {
     /// to fetch from, as `https://host` or `http://host:port` URLs.
     var contentHosts: ((_ appID: UInt32) async throws -> [String])?
 
-    init(session: SteamCMSession) {
+    /// Also check a decoded chunk against the SHA-1 the manifest names it by,
+    /// not only its size and Adler-32. The owner decides this; the downloader
+    /// reads no settings of its own.
+    private let verifyChunkSHA1: Bool
+
+    init(session: SteamCMSession, verifyChunkSHA1: Bool = false) {
         self.session = session
+        self.verifyChunkSHA1 = verifyChunkSHA1
     }
 
     // MARK: - Public API
@@ -180,6 +186,7 @@ final class DepotDownloader {
             let paths = prepared.paths[index]
             let existing = prepared.existing[index]
             let maximum = maxConcurrentChunks, attempts = attemptsPerChunk
+            let verifySHA1 = verifyChunkSHA1
             try await withThrowingTaskGroup(of: (UInt64, UInt64).self) { group in
                 var next = 0
                 func enqueue() {
@@ -190,7 +197,8 @@ final class DepotDownloader {
                     let verify = existing[item.file]
                     group.addTask {
                         if verify, Self.chunkAlreadyPresent(chunk, path: path) { return (item.key, UInt64(chunk.compressedSize)) }
-                        try await Self.fetchChunk(chunk, plan: plan, path: path, attempts: attempts, seed: item.file &+ item.chunk)
+                        try await Self.fetchChunk(chunk, plan: plan, path: path, attempts: attempts,
+                                                  seed: item.file &+ item.chunk, verifySHA1: verifySHA1)
                         return (item.key, UInt64(chunk.compressedSize))
                     }
                 }
@@ -414,8 +422,8 @@ final class DepotDownloader {
 
     // MARK: - Chunks
 
-    /// SHA-1 of a chunk's content once it is decoded, compared against the
-    /// manifest entry's digest.
+    /// SHA-1 of a chunk's content once it is decoded, for the optional check
+    /// against the manifest entry's digest.
     nonisolated static func sha1(_ data: Data) -> Data {
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
         guard !data.isEmpty else { return Data(digest) }
@@ -442,7 +450,8 @@ final class DepotDownloader {
     }
 
     private nonisolated static func fetchChunk(_ chunk: DepotManifest.ChunkEntry, plan: DepotPlan,
-                                               path: String, attempts: Int, seed: Int) async throws {
+                                               path: String, attempts: Int, seed: Int,
+                                               verifySHA1: Bool) async throws {
         var lastError: Error = SteamError.chunkDownloadFailed("None of Steam's content servers answered.")
         for attempt in 0..<max(1, attempts) {
             try Task.checkCancellation()
@@ -455,11 +464,12 @@ final class DepotDownloader {
                 let data = try ContentDecryptor.processChunk(encryptedData: encrypted, depotKey: plan.key,
                                                              expectedCRC: chunk.crc,
                                                              expectedSize: Int(chunk.uncompressedSize))
-                // The manifest names the decoded chunk, so this checks the
-                // content itself, not just its Adler-32 — the stronger half of
-                // what makes a plain-HTTP answer safe to accept. A chunk that
-                // fails it is retried on another server like any other bad one.
-                guard data.count == Int(chunk.uncompressedSize), Self.sha1(data) == chunk.sha else {
+                guard data.count == Int(chunk.uncompressedSize) else { throw SteamError.checksumMismatch }
+                // Optional, off by default. The manifest names the decoded
+                // chunk, so this checks the content itself, not just its
+                // Adler-32. A chunk that fails it is retried on another server
+                // like any other bad one.
+                if verifySHA1, Self.sha1(data) != chunk.sha {
                     throw SteamError.checksumMismatch
                 }
                 try write(data, to: path, offset: chunk.offset)
