@@ -180,9 +180,9 @@ final class SteamOwnedLibrary: ObservableObject {
     /// downloaded game starts through it).
     static var enabled: Bool { MadeiraDock.enabled && SteamSignIn.flag("MADEIRA_STEAM_LIBRARY", default: true) }
 
-    /// `env.MADEIRA_STEAM_CHUNK_SHA1 = 1`: also check each decoded chunk
-    /// against the SHA-1 the manifest names it by, not only its size and
-    /// Adler-32. Off by default.
+    /// `env.MADEIRA_STEAM_CHUNK_SHA1 = 1`: also check chunks fetched over
+    /// HTTPS against the SHA-1 the manifest names them by, not only their size
+    /// and Adler-32. Plain-HTTP chunks are always checked. Off by default.
     static var chunkSHA1: Bool { SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false) }
 
     @Published private(set) var signedIn = false

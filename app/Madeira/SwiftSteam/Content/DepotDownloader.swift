@@ -69,9 +69,9 @@ final class DepotDownloader {
     /// to fetch from, as `https://host` or `http://host:port` URLs.
     var contentHosts: ((_ appID: UInt32) async throws -> [String])?
 
-    /// Also check a decoded chunk against the SHA-1 the manifest names it by,
-    /// not only its size and Adler-32. The owner decides this; the downloader
-    /// reads no settings of its own.
+    /// Also check HTTPS chunks against the SHA-1 the manifest names them by,
+    /// not only their size and Adler-32; plain-HTTP chunks are always checked.
+    /// The owner decides this; the downloader reads no settings of its own.
     private let verifyChunkSHA1: Bool
 
     init(session: SteamCMSession, verifyChunkSHA1: Bool = false) {
@@ -465,11 +465,12 @@ final class DepotDownloader {
                                                              expectedCRC: chunk.crc,
                                                              expectedSize: Int(chunk.uncompressedSize))
                 guard data.count == Int(chunk.uncompressedSize) else { throw SteamError.checksumMismatch }
-                // Optional, off by default. The manifest names the decoded
+                // Plain HTTP always gets this check; HTTPS only when the
+                // owner's switch asks for it. The manifest names the decoded
                 // chunk, so this checks the content itself, not just its
                 // Adler-32. A chunk that fails it is retried on another server
                 // like any other bad one.
-                if verifySHA1, Self.sha1(data) != chunk.sha {
+                if (verifySHA1 || host.hasPrefix("http://")), Self.sha1(data) != chunk.sha {
                     throw SteamError.checksumMismatch
                 }
                 try write(data, to: path, offset: chunk.offset)
@@ -523,8 +524,14 @@ final class DepotDownloader {
     private func fetchManifest(depotID: UInt32, appID: UInt32, manifestGID: UInt64,
                                key: Data, hosts: [String]) async throws -> DepotManifest {
         let requestCode = try await manifestRequestCode(depotID: depotID, appID: appID, manifestGID: manifestGID)
+        // The manifest carries the SHA-1s the chunks are checked against, so
+        // fetch it over HTTPS whenever an HTTPS server exists (the fallback
+        // always is one). Plain-HTTP hosts serve the chunks themselves; host
+        // tests, which have only local HTTP servers, still use them here.
+        let httpsHosts = hosts.filter { $0.hasPrefix("https://") }
+        let manifestHosts = httpsHosts.isEmpty ? hosts : httpsHosts
         var lastError: Error = SteamError.manifestFetchFailed("None of the content servers sent it.")
-        for host in hosts.prefix(6) {
+        for host in manifestHosts.prefix(6) {
             try Task.checkCancellation()
             let auth = await cdnAuthFragment(depotID: depotID, appID: appID, host: host)
             let code = requestCode == 0 ? "" : "/\(requestCode)"
@@ -718,6 +725,20 @@ final class DepotDownloader {
         return .usable(scheme)
     }
 
+    /// The hosts Info.plist allows over plain HTTP. It is the same exception
+    /// list ATS enforces, so the directory cannot send the downloader to a
+    /// host the app would refuse at request time: an unknown plain-HTTP host
+    /// is skipped and named at trace, and becomes usable when Info.plist
+    /// lists it. Exact host names only (no wildcards).
+    nonisolated static let plainHTTPHosts: Set<String> = {
+        guard let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity") as? [String: Any],
+              let domains = ats["NSExceptionDomains"] as? [String: Any] else { return [] }
+        return Set(domains.compactMap { host, rule in
+            guard (rule as? [String: Any])?["NSExceptionAllowsInsecureHTTPLoads"] as? Bool == true else { return nil }
+            return host.lowercased()
+        })
+    }()
+
     private func contentServers(appID: UInt32) async throws -> [String] {
         var hosts: [String] = []
         do {
@@ -749,6 +770,11 @@ final class DepotDownloader {
                 }
                 switch Self.serverEligibility(server, appID: appID) {
                 case .usable(let scheme):
+                    if scheme == .http, !Self.plainHTTPHosts.contains(host.lowercased()) {
+                        skippedHost += 1
+                        SteamLog.trace("[steam-cdn] rejected host=\(host) reason=no-ats-exception")
+                        continue
+                    }
                     let entry = "\(scheme.rawValue)://\(host)"
                     if !hosts.contains(entry) { hosts.append(entry) }
                 case .unknownHTTPS:

@@ -40,6 +40,7 @@ import io
 import json
 import lzma
 import os
+import plistlib
 import random
 import re
 import shutil
@@ -152,13 +153,19 @@ require(len(permitted) == 1 and re.findall(r'<string>([^<]*)</string>', permitte
         == ['$(PRODUCT_BUNDLE_IDENTIFIER).download.*', '$(PRODUCT_BUNDLE_IDENTIFIER).pairing.*'],
         "Info.plist permits only the bundle's own .download.* (background downloads) and .pairing.* (JIT pairing) tasks")
 require('UIBackgroundModes' not in info, 'Info.plist asks for no background mode')
-# Some content servers in Valve's directory have no HTTPS listener; Valve's own
-# client reaches them over plain HTTP. On iOS 10+ any of the newer global ATS
-# keys makes NSAllowsArbitraryLoads be ignored, so none of them may appear.
-require(re.search(r'<key>NSAppTransportSecurity</key>\s*<dict>\s*<key>NSAllowsArbitraryLoads</key>\s*<true/>\s*</dict>', info)
-        and not any(k in info for k in ('NSAllowsArbitraryLoadsInWebContent', 'NSAllowsArbitraryLoadsForMedia',
-                                        'NSAllowsLocalNetworking')),
-        'Info.plist permits plain-HTTP content servers, and carries no key that would cancel that')
+# Content servers Valve's directory offers without HTTPS are reached over plain
+# HTTP. Scope ATS to exactly those hosts: an app-wide arbitrary-loads exception
+# would cover every request the app makes.
+ats = plistlib.loads((app / 'Info.plist').read_bytes()).get('NSAppTransportSecurity', {})
+domains = ats.get('NSExceptionDomains', {})
+plain_http = {host for host, rule in domains.items()
+              if isinstance(rule, dict) and rule.get('NSExceptionAllowsInsecureHTTPLoads') is True}
+require('NSAllowsArbitraryLoads' not in ats
+        and not any(k in ats for k in ('NSAllowsArbitraryLoadsInWebContent', 'NSAllowsArbitraryLoadsForMedia',
+                                        'NSAllowsLocalNetworking'))
+        and plain_http == {'dl.steam.clngaa.com', 'edgenext.cdn.steampipe.steamcontent.com',
+                           'st.dl.eccdnx.com', 'xz.pphimalayanrt.com'},
+        'Info.plist permits plain HTTP only for the content servers that offer no HTTPS')
 background = sources['SteamDownloadBackground.swift']
 require('hasSuffix(".download.*")' in background and '+ "queue"' in background and 'BGContinuedProcessingTaskRequest(identifier: identifier' in background,
         'the continued-processing task uses the permitted identifier, made concrete')
@@ -210,8 +217,14 @@ downloader = sources['SwiftSteam/Content/DepotDownloader.swift']
 require('SteamLog.event("[steam-depot] install begin' in downloader and 'depot-key refused' in downloader, 'the download logs App IDs and depot IDs')
 require(not re.search(r'LibraryFlags|MADEIRA_STEAM_[A-Z_]+', downloader), 'the downloader has no switches of its own')
 require('init(session: SteamCMSession, verifyChunkSHA1: Bool = false)' in downloader
-        and 'if verifySHA1, Self.sha1(data) != chunk.sha' in downloader,
-        'chunk SHA-1 verification runs only when its owner turns it on')
+        and 'if (verifySHA1 || host.hasPrefix("http://")), Self.sha1(data) != chunk.sha' in downloader,
+        'plain-HTTP chunks always check their SHA-1; HTTPS does when the owner turns it on')
+require('NSAppTransportSecurity' in downloader and 'NSExceptionAllowsInsecureHTTPLoads' in downloader
+        and '!Self.plainHTTPHosts.contains(host.lowercased())' in downloader,
+        'the plain-HTTP host list is the Info.plist exception list')
+require('let httpsHosts = hosts.filter { $0.hasPrefix("https://") }' in downloader
+        and 'httpsHosts.isEmpty ? hosts : httpsHosts' in downloader,
+        'manifests prefer HTTPS so their chunk hashes are not taken from a plain-HTTP answer')
 dock = (app / 'MadeiraDock.swift').read_text()
 require('static func validate(_ game: DockGame' in dock and 'game.installed' in dock, "Dock's validation reads the install record (StateFlags)")
 

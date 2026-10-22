@@ -54,10 +54,36 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<!-- As of 2026-10-22, Valve's content directory marks these servers
+	     https_support "unavailable"; they are fetched over plain HTTP. Scoped exceptions
+	     instead of an app-wide arbitrary-loads exception, which would cover
+	     every request the app makes. Keep this list in step with the
+	     directory: the downloader skips any plain-HTTP host that is not here. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>dl.steam.clngaa.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>edgenext.cdn.steampipe.steamcontent.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>st.dl.eccdnx.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>xz.pphimalayanrt.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>NSBonjourServices</key>
 	<array>
