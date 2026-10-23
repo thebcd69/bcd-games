@@ -1402,6 +1402,67 @@ extern NTSTATUS unixcall_ios_get_fex_arena(void *args);          /* ml800, virtu
 
 static NTSTATUS ios_wrap_0(void *a) { return ios_wrap_unix_call(0, a, load_so_dll); }
 static NTSTATUS ios_wrap_1(void *a) { return ios_wrap_unix_call(1, a, unwind_builtin_dll); }
+/* Modified 2026-10-24: configure sampling before guest threads or signal handlers run. */
+int ios_recovery_log_sampling;
+
+static int ios_recovery_log_option( void )
+{
+    const char *e = getenv( "MADEIRA_RECOVERY_LOG_SAMPLE" );
+    return e && !strcmp( e, "1" );
+}
+
+/* Sample known instruction-recovery records; retain other exceptions and mixed writes. */
+static int ios_recovery_log_admit( const char *str, unsigned int len )
+{
+    static const char *tags[] = {
+        "Exception: Code: C000001D Address:", "Reconstructing context", "pc: ",
+        "Rethrowing onto guest stack: ", "Passing through exception"
+    };
+    static unsigned long long context[64], seen[5];
+    unsigned int i = 2, digits = 0, tid = 0, slot, kind;
+    unsigned long long key, n;
+
+    if (!__atomic_load_n( &ios_recovery_log_sampling, __ATOMIC_RELAXED )) return 1;
+    if (!str || len < 4 || str[0] != 'D' || str[1] != ' ') return 1;
+    while (i < len && digits < 8)
+    {
+        unsigned int c = (unsigned char)str[i], v;
+        if (c >= '0' && c <= '9') v = c - '0';
+        else if (c >= 'a' && c <= 'f') v = c - 'a' + 10;
+        else if (c >= 'A' && c <= 'F') v = c - 'A' + 10;
+        else break;
+        tid = (tid << 4) | v;
+        i++; digits++;
+    }
+    if (!digits || !tid || i >= len || str[i++] != ' ') return 1;
+    slot = (tid >> 2) & 63;
+    key = (unsigned long long)tid << 1;
+    if (str[len - 1] != '\n' || memchr( str, '\n', len - 1 ))
+    {
+        __atomic_store_n( &context[slot], key, __ATOMIC_RELAXED );
+        return 1;
+    }
+    if (len - i >= 17 && !memcmp( str + i, "Exception: Code: ", 17 ))
+    {
+        size_t prefix = strlen( tags[0] );
+        __atomic_store_n( &context[slot], key |
+                         (len - i >= prefix && !memcmp( str + i, tags[0], prefix )), __ATOMIC_RELAXED );
+    }
+    if (__atomic_load_n( &context[slot], __ATOMIC_RELAXED ) != (key | 1)) return 1;
+    for (kind = 0; kind < 5; kind++)
+    {
+        size_t size = strlen( tags[kind] );
+        if (len - i < size || memcmp( str + i, tags[kind], size )) continue;
+        if ((kind == 1 || kind == 4) && len - i != size + 1) continue;
+        n = __atomic_add_fetch( &seen[kind], 1, __ATOMIC_RELAXED );
+        if (n <= 16) return 1;
+        if (n == 17 || !(n % 1024))
+            dprintf( 2, "[recovery-log] kind=%u seen=%llu; keeping first 16 and every 1024th instruction-recovery record\n", kind, n );
+        return !(n % 1024);
+    }
+    return 1;
+}
+
 /* madeira-bcd: rtcs-cap v1. The PE ntdll (upstream's tracked binary) prints
  * "[rtcs] pre:" for every exception prepare_exception_arm64ec sees; its
  * 40-line cap (signal_arm64ec.c) only covers the block before the ERR. A
@@ -1491,6 +1552,11 @@ static NTSTATUS ios_wrap_2(void *a)
     {
         g_wine_unix_call_count++;
         return p->len;  /* what write() returns for the whole line */
+    }
+    if (!ios_recovery_log_admit( p->str, p->len ))
+    {
+        g_wine_unix_call_count++;
+        return p->len;
     }
     return ios_wrap_unix_call(2, a, unixcall_wine_dbg_write);
 }
@@ -4155,6 +4221,7 @@ DECLSPEC_EXPORT void wine_ios_child_main( int argc, char *argv[], int child_fd_s
  */
 DECLSPEC_EXPORT void __wine_main( int argc, char *argv[] )
 {
+    __atomic_store_n( &ios_recovery_log_sampling, ios_recovery_log_option(), __ATOMIC_RELAXED );
     main_argc = argc;
     main_argv = argv;
 

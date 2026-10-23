@@ -525,6 +525,13 @@ OVERLAY = {
                         "furniture, the V8 and Oilpan cages, the FEX arena), the largest free gap, and whether Red "
                         "Dead Redemption 2's 8960 MB reserve fits; 64 censuses at most. Logging only, changes no "
                         "placement; read at session start."},
+    "env.MADEIRA_RECOVERY_LOG_SAMPLE": {"category": "Debugging / logs",
+                "title": "Sample routine instruction recovery logs", "kind": "bool", "default": "0",
+                "note": "Default off: recovery diagnostics are unchanged. 1 keeps the first 16 and every 1024th "
+                        "recognised instruction-recovery debug record, and the first 8 and every 1024th known "
+                        "shared-HLT diagnostic bundle. Other exceptions and unknown records remain visible. "
+                        "Only log output changes; existing RTCS limits remain independent. Read before guest "
+                        "threads start. Restart BCD after changing it."},
     "env.MADEIRA_EC_HOOK_TRACE": {"category": "Debugging / logs", "title": "Log code patches the emulated copy misses",
                 "kind": "bool", "default": "1",
                 "note": "Default on, logging only. Compare executable PE sections and their pool copies before "

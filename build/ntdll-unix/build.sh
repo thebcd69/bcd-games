@@ -9,6 +9,8 @@ SDK=$(xcrun --sdk iphoneos --show-sdk-path)
 OBJ_DIR="$BUILD_DIR/obj"
 APP_LIB="$REPO_ROOT/app/Madeira/libntdll_unix.a"
 
+python3 "$REPO_ROOT/tools/patch-wine-globalroot.py" "$WINE_SRC/dlls/ntdll/unix/file.c"
+
 mkdir -p "$OBJ_DIR"
 
 SUCCEEDED=0

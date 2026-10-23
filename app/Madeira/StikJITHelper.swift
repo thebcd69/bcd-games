@@ -1419,27 +1419,37 @@ enum StikJITHelper {
                 + "; the pool stays one region", level: .error)
             return nil
         }
-        var plugs: [(vm_address_t, vm_size_t)] = []
-        for h in freeRuns(0x100000000, best.base, minSize: size) {
-            var a = h.base
-            if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* VM_FLAGS_FIXED */) == KERN_SUCCESS {
-                if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+        var placed: UnsafeMutableRawPointer?
+        // Other threads can change the free runs while the debugger allocates.
+        for attempt in 0..<3 {
+            var plugs: [(vm_address_t, vm_size_t)] = []
+            for h in freeRuns(0x100000000, best.base, minSize: size) {
+                var a = h.base
+                if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* VM_FLAGS_FIXED */) == KERN_SUCCESS {
+                    if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                }
             }
+            let got = requestRegion(Int(size))
+            for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
+            guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
+                LogStore.shared.log("[pool-split] the debugger did not allocate the second region (\(size >> 20)MB) — the pool "
+                    + "stays one region", level: .error)
+                return nil
+            }
+            let candidate = vm_address_t(bitPattern: p)
+            if candidate >= aEnd && candidate <= ceiling && size <= ceiling - candidate &&
+                !(aEnd < exeWindow.base + exeWindow.size && candidate > exeWindow.base) {
+                placed = p
+                break
+            }
+            let dkr = vm_deallocate(mach_task_self_, candidate, vm_size_t(size))
+            LogStore.shared.log(String(format: "[pool-split] attempt %d: second region at 0x%lx is outside the safe range; "
+                + "released (kr=%d)%@", attempt + 1, Int(bitPattern: candidate), dkr,
+                dkr == KERN_SUCCESS && attempt < 2 ? "; checking the lower free runs again" : "; the pool stays one region"), level: .error)
+            guard dkr == KERN_SUCCESS else { return nil }
         }
-        let got = requestRegion(Int(size))
-        for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
-        guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
-            LogStore.shared.log("[pool-split] the debugger did not allocate the second region (\(size >> 20)MB) — the pool "
-                + "stays one region", level: .error)
-            return nil
-        }
+        guard let p = placed else { return nil }
         let b = vm_address_t(bitPattern: p)
-        if b < aEnd || b + size > ceiling || (aEnd < exeWindow.base + exeWindow.size && b > exeWindow.base) {
-            let dkr = vm_deallocate(mach_task_self_, b, vm_size_t(size))
-            LogStore.shared.log(String(format: "[pool-split] the second region landed at 0x%lx, not in the run at 0x%lx — "
-                + "released (kr=%d); the pool stays one region", Int(b), Int(best.base), dkr), level: .error)
-            return nil
-        }
         // madeira-bcd pool-mid: the largest free run between the regions, when the
         // budget leaves 64MB for it, as a third debugger region M (see poolHole2).
         // Placed first-fit like B, every lower run that could take it plugged.

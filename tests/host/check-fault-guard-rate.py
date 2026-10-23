@@ -38,7 +38,7 @@ def check(what, cond, detail=''):
 # ---------------------------------------------------------------- source shape
 check('the switch is read once, by name, and is on only for a value that is not empty or 0',
       src.count('getenv( "MADEIRA_FAULT_GUARD_RATE" )') == 1 and "v = (e && e[0] && e[0] != '0') ? 1 : 0;" in src)
-mach_start = src.index('static struct { uint64_t thread, key; uint32_t n; uint64_t t0, p0; } redeliv[16];')
+mach_start = src.index('static struct { uint64_t thread, key, guest_rip; uint32_t n; uint64_t t0, p0; } redeliv[16];')
 mach_end = src.index('ios_redeliv_terminating = 1;', mach_start)
 mach = src[mach_start:mach_end]
 check('Mach path: a run records its start only with the switch', 'if (ios_fault_guard_rate_on()) ios_fgr_run_begin( &redeliv[rslot].t0, &redeliv[rslot].p0 );' in mach)

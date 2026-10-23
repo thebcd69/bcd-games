@@ -563,6 +563,12 @@ jobs:
       - name: Patch wine with the guest file trace
         run: python3 tools/patch-wine-file-trace.py wine/dlls/ntdll/unix/file.c
 
+      # GLOBALROOT-wrapped DOS paths must reach the drive resolver (Dungeons II metadata).
+      - name: Check and patch GLOBALROOT DOS paths
+        run: |
+          python3 tests/host/check-globalroot.py
+          python3 tools/patch-wine-globalroot.py wine/dlls/ntdll/unix/file.c
+
       - name: Check and patch opt-in app-local DLL reads
         run: |
           python3 tests/host/check-app-local-dll.py
@@ -1840,6 +1846,10 @@ jobs:
       - name: Check the build 591 engine fixes
         run: |
           python3 tests/host/check-fault-guard-rate.py
+          python3 tests/host/check-guest-fault-progress.py
+          python3 tests/host/check-page-fault-guard.py
+          python3 tests/host/check-recovery-log.py
+          python3 tests/host/check-pool-placement-retry.py
           python3 tests/host/check-user-va-gb.py
           python3 tests/host/check-create-view-conflict.py
           python3 tests/host/check-anon-cas-flush.py
