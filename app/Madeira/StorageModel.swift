@@ -10,6 +10,96 @@
 
 import SwiftUI
 
+/// A user-authorized SSD folder, exposed to Wine through a link in the local C:.
+/// The bookmark's scope stays open for native Wine/FEX file I/O, not just the picker.
+final class ExternalGameStorage {
+    static let shared = ExternalGameStorage()
+    private let key = "bcd.external-games.bookmark"
+    private let lock = NSRecursiveLock()
+    private var folder: URL?
+    private(set) var message = "Choose a folder on a connected SSD. Games there appear in C:\\External."
+
+    private var link: URL? { GameLibrary.driveC?.appendingPathComponent("External", isDirectory: true) }
+    var configured: Bool { UserDefaults.standard.data(forKey: key) != nil }
+
+    var freeBytes: Int64? {
+        lock.lock(); defer { lock.unlock() }
+        guard let folder, FileManager.default.fileExists(atPath: folder.path) else { return nil }
+        return (try? folder.resourceValues(forKeys: [.volumeAvailableCapacityKey]))?.volumeAvailableCapacity.map(Int64.init)
+    }
+
+    func restore() {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return }
+        do {
+            var stale = false
+            let url = try URL(resolvingBookmarkData: data, options: [.withoutUI], relativeTo: nil, bookmarkDataIsStale: &stale)
+            try connect(url)
+        } catch {
+            message = "External games unavailable. Reconnect the SSD and choose its folder again."
+        }
+    }
+
+    func connect(_ url: URL) throws {
+        lock.lock(); defer { lock.unlock() }
+        let opened = url.startAccessingSecurityScopedResource()
+        var retained = false
+        defer { if opened && !retained { url.stopAccessingSecurityScopedResource() } }
+        guard opened, let link, let drive = GameLibrary.driveC else {
+            throw failure("BCD couldn't access this folder. Choose it again in Files.")
+        }
+        let target = url.resolvingSymlinksInPath().standardizedFileURL
+        let local = drive.resolvingSymlinksInPath().standardizedFileURL.path
+        guard target.path != local, !target.path.hasPrefix(local + "/"), !local.hasPrefix(target.path + "/"),
+              (try target.resourceValues(forKeys: [.isDirectoryKey])).isDirectory == true else {
+            throw failure("Choose a separate games folder on the SSD, outside BCD's Windows drive.")
+        }
+        // Probe write access before changing the mount. Never overwrite a user's folder.
+        let probe = target.appendingPathComponent(".bcd-write-test-" + UUID().uuidString)
+        try Data().write(to: probe, options: .withoutOverwriting)
+        try FileManager.default.removeItem(at: probe)
+        let bookmark = try url.bookmarkData(options: [.minimalBookmark], includingResourceValuesForKeys: nil, relativeTo: nil)
+        try FileManager.default.createDirectory(at: drive, withIntermediateDirectories: true)
+        let previous = try? FileManager.default.destinationOfSymbolicLink(atPath: link.path)
+        if FileManager.default.fileExists(atPath: link.path) || previous != nil {
+            guard let previous, let folder,
+                  URL(fileURLWithPath: previous).standardizedFileURL.path == folder.resolvingSymlinksInPath().standardizedFileURL.path else {
+                throw failure("C:\\External already exists. Rename that folder in Files before connecting the SSD.")
+            }
+            try FileManager.default.removeItem(at: link)
+            do { try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target) }
+            catch {
+                try? FileManager.default.createSymbolicLink(atPath: link.path, withDestinationPath: previous)
+                throw error
+            }
+        } else {
+            try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+        }
+        if let folder { folder.stopAccessingSecurityScopedResource() }
+        folder = url
+        retained = true
+        UserDefaults.standard.set(bookmark, forKey: key)
+        message = "\(url.lastPathComponent) is connected as C:\\External. Keep the SSD connected while playing."
+    }
+
+    /// Accept only the authorized mount; links that escape either root stay rejected.
+    func relativePath(for url: URL, drive: URL) -> String? {
+        lock.lock(); defer { lock.unlock() }
+        let path = url.resolvingSymlinksInPath().standardizedFileURL.path
+        let root = drive.resolvingSymlinksInPath().standardizedFileURL.path
+        if path.hasPrefix(root + "/") { return String(path.dropFirst(root.count + 1)) }
+        guard let folder, let link,
+              link.resolvingSymlinksInPath().standardizedFileURL.path == folder.resolvingSymlinksInPath().standardizedFileURL.path else { return nil }
+        let external = folder.resolvingSymlinksInPath().standardizedFileURL.path
+        if path == external { return "External" }
+        guard path.hasPrefix(external + "/") else { return nil }
+        return "External/" + path.dropFirst(external.count + 1)
+    }
+
+    private func failure(_ text: String) -> NSError {
+        NSError(domain: "BCD.ExternalStorage", code: 1, userInfo: [NSLocalizedDescriptionKey: text])
+    }
+}
+
 struct StorageItem: Identifiable {
     let id: String
     let title: String

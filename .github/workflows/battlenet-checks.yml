@@ -1,0 +1,52 @@
+name: Battle.net integration checks
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'app/Madeira/BCDBattleNet/**'
+      - 'app/Madeira/BCDAccounts*'
+      - 'app/Madeira/BCDStore.swift'
+      - 'app/Madeira/BCDGamePage.swift'
+      - 'app/Madeira/BCDContent/BCDContentFetch.swift'
+      - 'app/Madeira/BCDContent/BCDContentEngine.swift'
+      - 'app/Madeira/BCDLiveStore.swift'
+      - 'app/Madeira/BCDGamePageLive.swift'
+      - 'tests/host/BCDBattleNetDownloadTests.swift'
+      - 'tests/host/check-battlenet.py'
+      - 'tests/host/battlenet-ios-stubs.swift'
+      - '.github/workflows/battlenet-checks.yml'
+permissions:
+  contents: read
+concurrency:
+  group: battlenet-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  account:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/host/check-battlenet.py --require-swift
+      - name: Check public WoW bootstrap metadata (no game payloads)
+        continue-on-error: true
+        run: python3 tests/host/check-battlenet.py --require-swift --live-metadata
+      - name: Typecheck account and download adapters against iOS SDK
+        run: |
+          xcrun --sdk iphoneos swiftc -typecheck -swift-version 5 -target arm64-apple-ios18.0 -sdk "$(xcrun --sdk iphoneos --show-sdk-path)" app/Madeira/BCDBattleNet/*.swift app/Madeira/BCDStore.swift app/Madeira/BCDContent/BCDContent{Plan,Codec,Journal,Fetch,Engine,Queue,Secrets}.swift tests/host/battlenet-ios-stubs.swift
+      - name: Shared content and GOG regression tests
+        run: |
+          python3 tests/host/check-content-engine.py --require-swift
+          python3 tests/host/check-gog.py --require-swift
+      - name: Parse iOS sources
+        run: |
+          xcrun swiftc -frontend -parse app/Madeira/BCDBattleNet/*.swift app/Madeira/BCDAccounts.swift app/Madeira/BCDAccountsLive.swift app/Madeira/BCDStore.swift app/Madeira/BCDLiveStore.swift app/Madeira/BCDGamePage.swift app/Madeira/BCDContent/BCDContentFetch.swift app/BCDPreview/BCDPreviewAccounts.swift
+      - name: Compile shared interface and preview backends
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import platform, runpy, subprocess
+          preview = runpy.run_path('tools/ui-preview.py')
+          sources = sorted(p for p in Path('app/Madeira').glob('BCD*.swift') if p.name not in preview['ENGINE_BOUND']) + sorted(Path('app/BCDPreview').glob('*.swift'))
+          sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-path'], text=True).strip()
+          subprocess.run(['xcrun', 'swiftc', '-target', platform.machine() + '-apple-ios18.0-simulator', '-sdk', sdk, '-parse-as-library', '-module-name', 'BCDPreview', '-Onone', '-o', '/tmp/bcd-preview-check'] + [str(p) for p in sources], check=True)
+          PY

@@ -288,9 +288,7 @@ private actor BCDContentRun {
             }
             writer.start(c)
             do {
-                var request = URLRequest(url: url)
-                request.timeoutInterval = 30
-                try await stream.fetch(request, into: writer)
+                try await source.fetch(chunk, url: url, into: writer, stream: stream)
                 try writer.finish()
                 health.succeeded(url)
                 return

@@ -70,6 +70,7 @@ extension BCDStore {
             BCDAccount(store: .steam, name: empty ? nil : "player", available: true),
             BCDAccount(store: .epic, name: nil, available: true),
             BCDAccount(store: .gog, name: nil, available: true),
+            BCDAccount(store: .battlenet, name: nil, available: true),
         ]
         store.system = BCDSystemStatus(jit: .on, memoryLimitBytes: 6_442_450_944, increasedMemoryLimit: true,
                                        controllerName: "DualSense", controllerBattery: 82,

@@ -66,6 +66,8 @@ struct BCDSteamSignInSheet: View {
     @Published private(set) var steam = BCDSteamAccount()
     @Published private(set) var signInProgress = BCDSteamSignIn()
     @Published private(set) var gogAccount = BCDAccount(store: .gog, name: nil, available: false)
+    @Published private(set) var battleNetAccount = BCDBnetAccount()
+    @Published private(set) var battleNetError: String?
     private var watching: Set<AnyCancellable> = []
 
     init() {
@@ -74,6 +76,7 @@ struct BCDSteamSignInSheet: View {
             SteamCloudSetting.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
             NotificationCenter.default.publisher(for: SteamSignIn.didChange).map { _ in () }.eraseToAnyPublisher(),
             BCDGOG.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
+            BCDBattleNet.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
         ]
         // objectWillChange fires before the value changes: read on the next turn of the main queue.
         Publishers.MergeMany(changes).receive(on: DispatchQueue.main)
@@ -99,6 +102,11 @@ struct BCDSteamSignInSheet: View {
         if progress != signInProgress { signInProgress = progress }
         let gog = BCDLiveStore.shared.gogAccount()
         if gog != gogAccount { gogAccount = gog }
+        BCDBattleNet.shared.start()
+        let battleNet = BCDLiveStore.shared.battleNetAccount()
+        let accountState = BCDBnetAccount(available: battleNet.available, accountName: battleNet.name)
+        if accountState != battleNetAccount { battleNetAccount = accountState }
+        battleNetError = BCDBattleNet.shared.error
     }
 
     private static func steamGuard(_ prompt: SteamGuardPrompt) -> BCDSteamGuard {
@@ -126,4 +134,6 @@ struct BCDSteamSignInSheet: View {
     /// GOG's own sign-in page and its sign-out, through the store's GOG hooks (gogAccountAction).
     func signInGOG() { BCDLiveStore.shared.signIn(.gog) }
     func signOutGOG() { BCDLiveStore.shared.signOut(.gog) }
+    func signInBattleNet() { BCDLiveStore.shared.signIn(.battlenet) }
+    func signOutBattleNet() { BCDLiveStore.shared.signOut(.battlenet) }
 }

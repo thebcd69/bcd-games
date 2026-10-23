@@ -72,6 +72,8 @@ import os
             account.$playtime.map { _ in () }.eraseToAnyPublisher(),
             SteamSignInModel.shared.$accountName.map { _ in () }.eraseToAnyPublisher(),
             gogChanges,
+            BCDBattleNet.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
+            battleNetChanges,
         ]
         // @Published sends before the value is stored: the rebuild runs a moment later, and at
         // most a few times a second while a download reports its progress.
@@ -121,6 +123,7 @@ import os
     /// The interface appeared (at start and after every session): what the classic library's
     /// Steam section does when it appears, then the lists and the device's state.
     func libraryAppeared() {
+        BCDBattleNet.shared.refresh()
         SteamGamesModel.shared.refresh()
         if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.start(); SteamOwnedLibrary.shared.reconcileSession() }
         rebuild()
@@ -131,6 +134,7 @@ import os
 
     /// BCD came back to the front.
     func becameActive() {
+        if LibraryModel.shared.current == nil { BCDBattleNet.shared.refresh() }
         SteamGamesModel.shared.refresh()
         if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.reconcileSession() }
         refreshSystem()
@@ -198,10 +202,11 @@ import os
             games.append(game)
         }
         gogMerge(&games)
+        battleNetMerge(&games)
         games.sort { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         if store.games != games { store.games = games }
 
-        let downloads = downloadList(names: names) + gogDownloads()
+        let downloads = downloadList(names: names) + gogDownloads() + battleNetDownloads()
         if store.downloads != downloads { store.downloads = downloads }
         let today = finished.filter { Calendar.current.isDateInToday($0.finished) }
         if store.finishedToday != today { store.finishedToday = today }
@@ -210,6 +215,7 @@ import os
             // Not in this build yet.
             BCDAccount(store: .epic, name: nil, available: false),
             gogAccount(),
+            battleNetAccount(),
         ]
         if store.accounts != accounts { store.accounts = accounts }
         noteSavesDiffer()
@@ -533,6 +539,12 @@ import os
     private func start(_ game: BCDGame) {
         guard let launch else { return }
         startingGame = game.id
+        if game.id.hasPrefix("battlenet.") {
+            let product = String(game.id.dropFirst(10))
+            if let entry = BCDBnetDownloads.shared.entry(product) { launch(entry) }
+            else { LibraryModel.shared.error = "WoW's program is missing. Uninstall this client and install it again." }
+            return
+        }
         if let entry = gogPlayEntry(game) { launch(entry); return }
         let library = LibraryModel.shared
         switch BCDLiveID.parse(game.id) {
@@ -572,6 +584,7 @@ import os
     }
 
     func install(_ game: BCDGame, place: BCDInstallPlace) {
+        if battleNetAction(.install, game.id) { return }
         if gog(.install, game.id) { return }
         // A game from Files is added, not installed. Epic: its downloads plug in here once the
         // engine has them (the store lists none of its games until then).
@@ -581,6 +594,7 @@ import os
     }
 
     func update(_ game: BCDGame) {
+        if battleNetAction(.update, game.id) { return }
         if gog(.update, game.id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         download(appID)
@@ -603,6 +617,7 @@ import os
     /// Steam's Check and repair files, for a game BCD downloaded itself (as its Game details page
     /// offers it): at once, as a download.
     func verify(_ game: BCDGame) {
+        if battleNetAction(.verify, game.id) { return }
         if gog(.verify, game.id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         guard let installed = SteamGamesModel.shared.games.first(where: { $0.id == appID }),
@@ -616,6 +631,7 @@ import os
     /// A Steam game BCD downloaded goes with its files (Game details › Uninstall); a game added
     /// from Files leaves the library, its files and saves staying in drive_c (Game details › Remove).
     func uninstall(_ game: BCDGame) {
+        if battleNetAction(.uninstall, game.id) { return }
         if gog(.uninstall, game.id) { return }
         switch BCDLiveID.parse(game.id) {
         case .steam(let appID)?:
@@ -636,12 +652,14 @@ import os
     }
 
     func pauseDownload(_ id: String) {
+        if battleNetAction(.pause, id) { return }
         if gog(.pause, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.pause(appID)
     }
 
     func resumeDownload(_ id: String) {
+        if battleNetAction(.resume, id) { return }
         if gog(.resume, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         download(appID)
@@ -650,6 +668,7 @@ import os
     /// As the classic download sheet's Cancel download: a first install loses its partial files,
     /// an update of an installed game is only stopped.
     func cancelDownload(_ id: String) {
+        if battleNetAction(.cancel, id) { return }
         if gog(.cancel, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.cancelInstall(appID, installed: SteamGamesModel.shared.games.contains { $0.id == appID })
@@ -661,12 +680,14 @@ import os
     func startDock(_ game: DockGame, _ compactPool: Bool) { settled { [weak self] in self?.dockStart?(game, compactPool) } }
 
     func signIn(_ front: BCDStoreFront) {
+        if front == .battlenet { BCDBattleNet.shared.signIn(); return }
         if gogAccountAction(signIn: true, front) { return }
         guard front == .steam else { return }   // Epic is not in this build yet: its sign-in plugs in here
         settled { [weak self] in self?.sheet = .steamSignIn }
     }
 
     func signOut(_ front: BCDStoreFront) {
+        if front == .battlenet { BCDBattleNet.shared.signOut(); return }
         if gogAccountAction(signIn: false, front) { return }
         guard front == .steam else { return }
         SteamSignInModel.shared.signOut()
@@ -677,6 +698,7 @@ import os
     func refreshLibrary() {
         Task { await SteamGamesModel.refreshAll() }
         gogRefresh()
+        BCDBattleNet.shared.refresh(force: true)
         rebuild()
     }
 }

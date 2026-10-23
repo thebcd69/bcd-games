@@ -55,6 +55,7 @@ import UniformTypeIdentifiers
         case .local(let id)?:
             return library.entries.first { $0.id == id } ?? (id == LibraryEntry.desktopID ? LibraryEntry.desktopEntry : nil)
         case nil:
+            if game.id.hasPrefix("battlenet.") { return BCDBnetDownloads.shared.entry(String(game.id.dropFirst(10))) }
             // An installed GOG game is the library entry its install made (BCDLiveStoreGOG).
             if let product = BCDLiveStore.gogProduct(game.id) {
                 guard BCDGOG.enabled, let id = BCDGOG.shared.installs[product]?.entryID else { return nil }
@@ -96,6 +97,11 @@ import UniformTypeIdentifiers
         if let id, steam.downloads[id] != nil, SteamGamesModel.shared.games.contains(where: { $0.id == id && $0.installed }) {
             d.updating = true
         }
+        if game.id.hasPrefix("battlenet."),
+           let record = BCDBnetDownloads.shared.installs[String(game.id.dropFirst(10))] {
+            // Missing executables must still allow removal of the managed install.
+            d.removal = .uninstall(frees: record.bytes)
+        }
         guard game.state.isInstalled, let entry = entry(for: game) else { return d }
         let desktop = entry.desktop == true
         let path = entry.windowsPath
@@ -105,7 +111,9 @@ import UniformTypeIdentifiers
         if d.lastPlayed == nil { d.lastPlayed = entry.lastPlayed }
         d.blockers = blockers(entry, appID: id)
         // GOG's runtimes the game's build names that BCD does not install yet.
-        d.storeNote = BCDLiveStore.shared.gogNote(game.id)
+        d.storeNote = game.store == .battlenet
+            ? "Use WoW's own login. Connecting Battle.net in BCD doesn't sign the game in; this client hasn't been verified on iPhone or iPad."
+            : BCDLiveStore.shared.gogNote(game.id)
         // The sections only while Options is open: nothing is built for what is not on screen.
         if settings {
             d.groups = [display(entry, profile), direct3D(entry, profile), compatibility(entry), controls(entry, profile)]
@@ -122,7 +130,7 @@ import UniformTypeIdentifiers
             if SteamOwnedLibrary.cloudEnabled { cloud(id, into: &d) }
             d.canRepair = SteamOwnedLibrary.enabled && managed && !downloading && steam.signedIn
             if managed && !downloading { d.removal = .uninstall(frees: entry.folderBytes ?? game.size) }
-        } else if game.store == .gog {
+        } else if game.store == .gog || game.id.hasPrefix("battlenet.") {
             // Uninstall deletes a GOG game's files through the store (BCDLiveStoreGOG).
             d.removal = .uninstall(frees: entry.folderBytes ?? game.size)
         } else if !desktop {

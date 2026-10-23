@@ -773,6 +773,15 @@ struct BCDGamePagePlan: Equatable {
             playable = !repairable
             notes.append(Note(text: reason, warning: true))
         case .notInstalled:
+            if game.store == .battlenet {
+                main = Choice(action: .install(.device), title: "Install", symbol: "arrow.down.circle.fill")
+                notes.append(Note(text: "Downloads the Windows 64-bit client in English. Assembly temporarily needs about twice the download size. Sign in inside WoW after starting it; iPhone/iPad compatibility hasn't been verified.", warning: false))
+                if let account = accounts.first(where: { $0.store == .battlenet }), account.name == nil {
+                    notes.append(Note(text: "Connect Battle.net before downloading.", warning: true,
+                                      fix: Choice(action: .signIn(.battlenet), title: "Sign in", symbol: "person.crop.circle")))
+                }
+                break
+            }
             main = Choice(action: .install(.device), title: "Install", symbol: "arrow.down.circle.fill")
             if system.freeExternalBytes != nil {
                 others.append(Choice(action: .install(.externalDrive), title: "External drive", symbol: "externaldrive"))

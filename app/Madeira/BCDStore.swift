@@ -15,12 +15,13 @@ import SwiftUI
 // MARK: - What the interface shows
 
 enum BCDStoreFront: String, CaseIterable, Codable, Hashable {
-    case steam, epic, gog, local
+    case steam, epic, gog, battlenet, local
     var title: String {
         switch self {
         case .steam: return "Steam"
         case .epic: return "Epic Games"
         case .gog: return "GOG"
+        case .battlenet: return "Battle.net"
         case .local: return "Local"
         }
     }
