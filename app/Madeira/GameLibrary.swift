@@ -112,13 +112,15 @@ enum GameLibrary {
             ) else { return }
 
             for entry in entries {
-                let values = try? entry.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
+                guard ExternalGameStorage.shared.relativePath(for: entry, drive: root) != nil else { continue }
+                let values = try? entry.resolvingSymlinksInPath().resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
                 if values?.isDirectory == true {
                     let lower = entry.lastPathComponent.lowercased()
                     if depth == 0 && skippedRoots.contains(lower) { continue }
                     if skippedAnywhere.contains(lower) { continue }
                     // The first directory below drive_c (or below Program Files) names the title.
-                    walk(entry, depth: depth + 1, title: title ?? titleFor(entry))
+                    let externalRoot = depth == 0 && entry.lastPathComponent == "External"
+                    walk(entry, depth: depth + 1, title: externalRoot ? nil : title ?? titleFor(entry))
                 } else if entry.pathExtension.lowercased() == "exe" {
                     if noiseNames.contains(entry.lastPathComponent.lowercased()) { continue }
                     guard let windows = windowsPath(for: entry, root: root) else { continue }

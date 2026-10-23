@@ -229,6 +229,7 @@ import os
         let isDesktop = entry.desktop == true
         var game = BCDGame(id: BCDLiveID.local(entry.id), title: isDesktop ? "Windows desktop" : entry.title,
                            store: .local, state: .ready, size: entry.folderBytes)
+        if entry.relativePath.hasPrefix("External/") { game.place = .externalDrive }
         game.lastPlayed = entry.lastPlayed
         game.thirtyTwoBit = entry.bits == 32
         if !isDesktop {

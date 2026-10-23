@@ -21,8 +21,10 @@ import Foundation
         path.isEmpty ? drive : drive.appendingPathComponent(path)
     }
 
-    /// Only what lies inside drive_c, links followed: a link out of it is not listed.
-    private func inside(_ url: URL) -> Bool { url.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") }
+    /// Only drive_c and the explicitly authorized SSD mount, with links resolved.
+    private func inside(_ url: URL) -> Bool {
+        ExternalGameStorage.shared.relativePath(for: url, drive: drive) != nil
+    }
 
     func list(_ folder: String) throws -> [BCDDriveItem] {
         let base = url(folder)

@@ -575,6 +575,19 @@ struct BCDStorageItem: Identifiable, Hashable {
     var addingGames: Bool { get }
     var addGamesMessage: String? { get }
     func addEveryGame()
+    var supportsExternalGames: Bool { get }
+    var externalGamesMessage: String? { get }
+    var externalGamesFree: Int64? { get }
+    var canConnectExternalGames: Bool { get }
+    func connectExternalGames(_ url: URL)
+}
+
+extension BCDStorageBackend {
+    var supportsExternalGames: Bool { false }
+    var externalGamesMessage: String? { nil }
+    var externalGamesFree: Int64? { nil }
+    var canConnectExternalGames: Bool { false }
+    func connectExternalGames(_ url: URL) {}
 }
 
 struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
@@ -584,10 +597,23 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
     @Environment(\.bcdLayout) private var layout
     @State private var backup: BCDShareItems?
     @State private var choosingBackup = false
+    @State private var choosingExternalGames = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             room
+            if backend.supportsExternalGames {
+                BCDSettingsGroup(title: "External SSD",
+                                 footer: "Connect a USB-C SSD and choose its games folder in Files. Open Add a game → External to add its programs. Windows and existing saves stay on this device. Store downloads still install on this device. Quit games before changing the connection, and keep the SSD connected while playing.") {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "external-games"),
+                                         title: "Choose or reconnect an SSD folder",
+                                         note: backend.externalGamesMessage, symbol: "externaldrive",
+                                         enabled: backend.canConnectExternalGames) { choosingExternalGames = true }
+                    if let free = backend.externalGamesFree {
+                        BCDSettingsInfoRow(title: "Free on external drive", value: BCDFormat.bytes(free))
+                    }
+                }
+            }
             BCDSettingsGroup(title: "Games", footer: games.isEmpty ? nil : "Largest first.") {
                 if games.isEmpty {
                     BCDSettingsInfoRow(title: "No games installed yet", value: "")
@@ -623,6 +649,10 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             model.ask(BCDSettingsConfirm(title: "Restore the saves in \(url.lastPathComponent)?",
                                          message: "Every file in C:\\users with the same name is replaced.",
                                          choices: [.init(title: "Restore", destructive: true) { backend.restoreSaves(from: url) }]))
+        }
+        .fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder]) { result in
+            guard case .success(let url) = result else { return }
+            backend.connectExternalGames(url)
         }
     }
 

@@ -447,6 +447,25 @@ struct BCDTouchEditorHost: View {
 // MARK: - Storage
 
 @MainActor final class BCDStorageLive: BCDStorageBackend {
+    let supportsExternalGames = true
+    @Published private(set) var externalGamesMessage: String? = ExternalGameStorage.shared.message
+    var externalGamesFree: Int64? { ExternalGameStorage.shared.freeBytes }
+    var canConnectExternalGames: Bool {
+        wine_process_is_running() == 0 && LibraryModel.shared.current == nil && !savesBusy && !addingGames && !model.busy
+    }
+
+    func connectExternalGames(_ url: URL) {
+        guard canConnectExternalGames else {
+            externalGamesMessage = "Quit the game and wait for storage tasks to finish before connecting a folder."
+            return
+        }
+        do {
+            try ExternalGameStorage.shared.connect(url)
+            externalGamesMessage = ExternalGameStorage.shared.message
+            refresh()
+        } catch { externalGamesMessage = error.localizedDescription }
+    }
+
     private let model = StorageModel()
     private var bag = Set<AnyCancellable>()
     @Published private(set) var deviceFree: Int64?

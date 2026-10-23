@@ -166,7 +166,7 @@ check("Add a game finds its live backend by its Objective-C name",
       and "BCDAddGameSource.backend = BCDAddGameSample()" in (R / "app/BCDPreview/BCDPreviewApp.swift").read_text())
 for what, needle in [
     ("drive_c's folders and programs (.exe, .bat, .cmd)", "LibraryModel.programExtensions.contains(file.pathExtension.lowercased())"),
-    ("... only what lies inside drive_c, links followed", 'url.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/")'),
+    ("... only drive_c and the authorized external games folder, links followed", 'ExternalGameStorage.shared.relativePath(for: url, drive: drive) != nil'),
     ("... folders first, then by name", "$0.folder != $1.folder ? $0.folder : $0.name.localizedStandardCompare($1.name) == .orderedAscending"),
     ("the program is read as the library reads one", "let entry = try LibraryModel.inspect(url(path))"),
     ("it is saved to the library with its name", "if !name.isEmpty { entry.title = name }\n        library.save(entry)"),

@@ -1256,6 +1256,10 @@ struct ContentView: View {
     /// applies the entry's launch profile and runs the same full sequence as the
     /// developer interface's buttons.
     private func launchLibraryEntry(_ entry: LibraryEntry) {
+        if entry.relativePath.hasPrefix("External/"), (try? LibraryModel.executable(entry.launchRelativePath)) == nil {
+            library.error = "This external game is unavailable. Connect the SSD, then choose its games folder in Settings › Storage."
+            return
+        }
         // madeira-bcd: what this device's GPU or CPU cannot run is refused here, before JIT is
         // asked for (DeviceCapability.swift); A14 and later devices always pass.
         if let refusal = DeviceCapability.libraryRefusal(entry) { library.error = refusal; return }

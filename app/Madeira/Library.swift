@@ -887,21 +887,20 @@ final class LibraryModel: ObservableObject {
     static let programExtensions: Set<String> = ["exe", "bat", "cmd"]
     static func executable(_ relative: String) throws -> URL {
         let url = drive.appendingPathComponent(relative).resolvingSymlinksInPath().standardizedFileURL
-        guard url.path.hasPrefix(drive.path + "/"), programExtensions.contains(url.pathExtension.lowercased()),
+        guard ExternalGameStorage.shared.relativePath(for: url, drive: drive) != nil, programExtensions.contains(url.pathExtension.lowercased()),
               FileManager.default.fileExists(atPath: url.path) else {
             throw LibraryError.message("Pick a program in drive_c: an .exe, .bat or .cmd file.")
         }
         return url
     }
     static func inspect(_ url: URL) throws -> LibraryEntry {
-        guard url.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") else {
+        guard let relative = ExternalGameStorage.shared.relativePath(for: url, drive: drive) else {
             throw LibraryError.message("Only programs inside drive_c can be added.")
         }
         if ["bat", "cmd"].contains(url.pathExtension.lowercased()) {
             // ml1163: a batch file has no PE header. Like every entry it starts
             // directly by default, as upstream starts every game; the details page
             // warns that Wine then stops when cmd.exe, its first process, exits.
-            let relative = String(url.resolvingSymlinksInPath().path.dropFirst(drive.path.count + 1))
             return LibraryEntry(title: url.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "_", with: " "),
                                 relativePath: relative, bits: 0)
         }
@@ -915,7 +914,6 @@ final class LibraryModel: ObservableObject {
         guard pe.count == 6, Array(pe.prefix(4)) == [0x50, 0x45, 0, 0] else { throw LibraryError.message("The file has no PE header.") }
         let machine = Int(pe[4]) | Int(pe[5]) << 8
         guard machine == 0x14c || machine == 0x8664 else { throw LibraryError.message("BCD runs x86 and x64 programs only.") }
-        let relative = String(url.resolvingSymlinksInPath().path.dropFirst(drive.path.count + 1))
         let name = url.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "_", with: " ")
         var entry = LibraryEntry(title: name, relativePath: relative, bits: machine == 0x14c ? 32 : 64)
         entry.graphicsAPI = graphicsImports(url)
@@ -1522,7 +1520,7 @@ private actor LibraryMetadataScanner {
     /// `countBytes: false` skips the size walk (a Steam game's size is its install record's).
     func scan(_ executable: URL, drive: URL, countBytes: Bool = true) -> (bytes: Int64?, api: String?) {
         let folder = executable.deletingLastPathComponent()
-        guard folder.path.hasPrefix(drive.path + "/"), !Task.isCancelled else { return (nil, nil) }
+        guard ExternalGameStorage.shared.relativePath(for: folder, drive: drive) != nil, !Task.isCancelled else { return (nil, nil) }
         let manager = FileManager.default
         // Executables commonly live below the installation root. Only ascend
         // conventional binary directories, never an arbitrary library parent.
@@ -1531,8 +1529,8 @@ private actor LibraryMetadataScanner {
         for _ in 0..<4 {
             guard binaryFolders.contains(installation.lastPathComponent.lowercased()) else { break }
             let parent = installation.deletingLastPathComponent()
-            guard parent.path.hasPrefix(drive.path + "/"),
-                  !["program files", "program files (x86)", "games", "common", "steamapps"].contains(parent.lastPathComponent.lowercased()) else { break }
+            guard ExternalGameStorage.shared.relativePath(for: parent, drive: drive) != nil,
+                  !["program files", "program files (x86)", "games", "common", "steamapps", "external"].contains(parent.lastPathComponent.lowercased()) else { break }
             installation = parent
         }
         var complete = true
@@ -1553,7 +1551,7 @@ private actor LibraryMetadataScanner {
         let siblings = (try? manager.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
         var local: [String: URL] = [:]
         for file in siblings where file.pathExtension.lowercased() == "dll" {
-            if file.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") { local[file.lastPathComponent.lowercased()] = file }
+            if ExternalGameStorage.shared.relativePath(for: file, drive: drive) != nil { local[file.lastPathComponent.lowercased()] = file }
         }
         var budget = 32 * 1024 * 1024
         var pending = [executable], visited = Set<String>(), apis = Set<String>()
@@ -1562,7 +1560,7 @@ private actor LibraryMetadataScanner {
         if LibraryModel.graphicsImports(executable) == nil {
             pending.insert(contentsOf: siblings.filter {
                 $0.pathExtension.lowercased() == "exe" && $0 != executable &&
-                $0.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/")
+                ExternalGameStorage.shared.relativePath(for: $0, drive: drive) != nil
             }.sorted { $0.path < $1.path }.prefix(8), at: 0)
         }
         while let file = pending.popLast(), visited.count < 64, !Task.isCancelled {
