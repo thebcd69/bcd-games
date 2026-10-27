@@ -120,6 +120,61 @@ final class MetalHostView: UIView {
     }
 }
 
+/// iPhone Duo's tabletop pose (madeira-bcd, 2026-10-24): while the device is partially folded with
+/// the fold across the screen (an active division region wider than tall), the game is laid out in
+/// the region above the fold and the touch controls in the region below it, the way a laptop splits
+/// screen and keyboard. Flat, closed, folded like a book, or on any other iPhone, both are nil and
+/// the game and the controls use the whole screen as before. Logged as [fold] when it changes.
+@MainActor final class FoldTabletop: ObservableObject {
+    static let shared = FoldTabletop()
+    /// The regions above and below the fold, in window (screen) points.
+    @Published private(set) var top: CGRect?
+    @Published private(set) var bottom: CGRect?
+    private var hinge: (any UIInteraction)?
+    private weak var host: UIView?
+
+    /// Follows the hinge from `view` (the game surface) from now on.
+    func attach(to view: UIView) {
+        host = view
+        if #available(iOS 27.1, *), hinge == nil {
+            let interaction = UIHingeInteraction { [weak self] _, _ in
+                self?.update()
+                // The fold's region settles a moment after the hinge reports.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    MainActor.assumeIsolated { self?.update() }
+                }
+            }
+            view.addInteraction(interaction)
+            hinge = interaction
+        }
+        update()
+    }
+
+    /// Reads the fold again; the game surface re-lays-out when it moved, and the controls follow
+    /// `bottom`.
+    func update() {
+        var above: CGRect?, below: CGRect?
+        if #available(iOS 27.1, *), let w = host?.window {
+            let b = w.bounds
+            for region in w.reservedRegions(kind: .division) where region.isActive {
+                let f = region.frame
+                guard f.width > f.height, f.width >= b.width / 2 else { continue }   // across, not like a book
+                let t = CGRect(x: b.minX, y: b.minY, width: b.width, height: f.minY - b.minY)
+                let u = CGRect(x: b.minX, y: f.maxY, width: b.width, height: b.maxY - f.maxY)
+                guard t.height >= 120, u.height >= 120 else { continue }
+                above = t; below = u
+                break
+            }
+        }
+        guard above != top || below != bottom else { return }
+        top = above
+        bottom = below
+        fputs("[fold] tabletop=\(above != nil ? 1 : 0) top=\(above ?? .zero) bottom=\(below ?? .zero)\n", stderr)
+        host?.setNeedsLayout()
+        MetalBackedView.refreshDisplayMode(reason: "fold")
+    }
+}
+
 // SwiftUI-hosted placeholder: geometry + touch input only.
 final class MetalBackedView: UIView {
     private static var layerRegistered = false
@@ -230,9 +285,17 @@ final class MetalBackedView: UIView {
     /// never skew input.
     private func gameRect() -> CGRect {
         let r = GameSurfaceLayout.rect(guest: guestSize(), aspect: drawableAspect(),
-                                       bounds: bounds, mode: effectiveDisplayMode())
+                                       bounds: surfaceArea, mode: effectiveDisplayMode())
         let base = CGRect(x: r.minX, y: r.minY, width: max(r.width, 1), height: max(r.height, 1))
         return BCDMagnifierCurrent.state.rect(base: base)   // madeira-bcd (round 604): the magnifier; at 1x (the default) this is `base` itself
+    }
+
+    /// Where the game may be laid out (view-local points): the whole view, or in iPhone Duo's
+    /// tabletop pose only the region above the fold (FoldTabletop).
+    private var surfaceArea: CGRect {
+        guard let top = FoldTabletop.shared.top, let w = window else { return bounds }
+        let r = convert(top, from: w).intersection(bounds)
+        return r.isEmpty ? bounds : r
     }
 
     private static var drawableObservation: NSKeyValueObservation?
@@ -303,11 +366,12 @@ final class MetalBackedView: UIView {
             host.removeFromSuperview()
             w.addSubview(host)
         }
+        FoldTabletop.shared.attach(to: self)
         applyDisplayMode(reason: "attach")
         // S2 desktop mode: the winios compositor renders the wine virtual
         // desktop aspect-fit inside THIS placeholder's area, exactly like
         // the games' Metal layer — never over the whole phone screen.
-        let full = convert(bounds, to: w)
+        let full = convert(surfaceArea, to: w)
         winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
         if !Self.layerRegistered {
             Self.layerRegistered = true
@@ -324,8 +388,9 @@ final class MetalBackedView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         if let w = window {
+            FoldTabletop.shared.update()
             applyDisplayMode(reason: "layout")
-            let full = convert(bounds, to: w)
+            let full = convert(surfaceArea, to: w)
             winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
         }
     }
@@ -355,7 +420,7 @@ final class MetalBackedView: UIView {
                                                                                        bounds: bounds, mode: effectiveDisplayMode()))
         }
         let g = GameSurfaceLayout.map(point: p, guest: guestSize(), aspect: drawableAspect(),
-                                      bounds: bounds, mode: effectiveDisplayMode())
+                                      bounds: surfaceArea, mode: effectiveDisplayMode())
         return (Int32(g.x), Int32(g.y))
     }
 
@@ -2710,7 +2775,9 @@ final class TouchControlsModel: ObservableObject {
     /// touch in the window. Nothing responded, and edit mode — whose branch
     /// captured everything — could never be entered to mask it.
     /// `topBar: false` in a library session, where BCD's in-game layer replaces the bar.
-    func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true) -> Bool {
+    /// `controlsArea`: where the controls are laid out when not the whole screen (FoldTabletop's
+    /// region below the fold); the editor always uses the whole screen.
+    func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true, controlsArea: CGRect? = nil) -> Bool {
         // Top bar: three 44pt buttons 10pt apart in play mode (controls, edit,
         // session: madeira-bcd), centred, 10pt down, plus the layout menu while
         // touch controls are on (ml1970), plus the keyboard button.
@@ -2721,10 +2788,11 @@ final class TouchControlsModel: ObservableObject {
         if topBar, CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
                           width: barW + 20, height: 68).contains(p) { return true }
         guard visible, !BCDTouchFeel.controlsHidden else { return false }   // madeira-bcd (round 604): hidden for want of a touch, every touch is the game's
+        let area = editing ? bounds : (controlsArea ?? bounds)
         for c in controls {
             let r = Self.diameter(c) / 2
-            let cx = CGFloat(c.nx) * bounds.width
-            let cy = CGFloat(c.ny) * bounds.height
+            let cx = area.minX + CGFloat(c.nx) * area.width
+            let cy = area.minY + CGFloat(c.ny) * area.height
             if hypot(p.x - cx, p.y - cy) <= r { return true }
         }
         return false
@@ -2774,12 +2842,13 @@ final class ControlsWindow: UIWindow {
                 library.performanceRect.contains(point) {   // the HUD's frame is zero except while the player moves it (BCDHUDHost)
                 return super.hitTest(point, with: event)
             }
-            guard m.hitsInteractive(point, in: bounds, topBar: false) else { return nil }
+            guard m.hitsInteractive(point, in: bounds, topBar: false,
+                                    controlsArea: FoldTabletop.shared.bottom) else { return nil }
             return super.hitTest(point, with: event)
         }
         // Portrait draws nothing here, so it must consume nothing.
         guard bounds.width > bounds.height else { return nil }
-        guard m.hitsInteractive(point, in: bounds) else { return nil }
+        guard m.hitsInteractive(point, in: bounds, controlsArea: FoldTabletop.shared.bottom) else { return nil }
         return super.hitTest(point, with: event)
     }
 }
@@ -2817,6 +2886,7 @@ struct TouchControlsOverlay: View {
     @ObservedObject private var m = TouchControlsModel.shared
     @ObservedObject private var library = LibraryModel.shared
     @ObservedObject private var feel = BCDTouchFeelModel.shared   // madeira-bcd (round 604): the controls hide when no finger has been on them for the time the player chose
+    @ObservedObject private var fold = FoldTabletop.shared
     @State private var pinchBase: Double?
 
     var body: some View {
@@ -2858,8 +2928,19 @@ struct TouchControlsOverlay: View {
         .persistentSystemOverlays(library.current != nil ? .hidden : .automatic)
     }
 
-    /// BCD's controls (BCDTouchLive.swift).
-    private func controls(_ screen: CGSize, session: Bool) -> some View { BCDTouchControlsLive(screen: screen, session: session) }
+    /// BCD's controls (BCDTouchLive.swift). In iPhone Duo's tabletop pose they are laid out in the
+    /// region below the fold (FoldTabletop), the game above it; the editor keeps the whole screen.
+    @ViewBuilder
+    private func controls(_ screen: CGSize, session: Bool) -> some View {
+        if let area = fold.bottom, !m.editing {
+            BCDTouchControlsLive(screen: area.size, session: session)
+                .frame(width: area.width, height: area.height)
+                .offset(x: area.minX, y: area.minY)
+                .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+        } else {
+            BCDTouchControlsLive(screen: screen, session: session)
+        }
+    }
 
     private func configureGamepad(landscape: Bool) {
         let ids = landscape && m.visible
