@@ -1,7 +1,7 @@
 {
   "format": 1,
-  "version": 14,
-  "generated": "2026-10-27",
+  "version": 15,
+  "generated": "2026-10-28",
   "rules": [
     {
       "id": "rdr2-steam",
@@ -2108,7 +2108,7 @@
     {
       "id": "marvels-spider-man-2",
       "title": "Marvel's Spider-Man 2",
-      "version": 5,
+      "version": 6,
       "match": {
         "steamAppIDs": [2651280],
         "steamFolders": ["marvel's spider-man 2"],
@@ -2127,15 +2127,21 @@
         "env.MADEIRA_SRV_FGETPATH = 1",
         "env.MADEIRA_LEAN_DIAG = 1",
         "env.MADEIRA_FREE_DELAY_MS = 0",
+        "env.MADEIRA_ECO_NATIVE = 1",
+        "env.FEX_TSOENABLED = 0",
+        "env.FEX_VECTORTSOENABLED = 0",
+        "env.FEX_MEMCPYSETTSOENABLED = 0",
         "env.WINEDEBUG = err+all,err-virtual,fixme-all",
         "mip0-full = 1",
         "quiet-log = 1",
         "pso-lazy-libs = 1",
         "fence-early = 2",
         "fence-poll-backoff = 64",
-        "swap-mb = 8192",
+        "fence-chain = 6",
+        "rp-carry = 1",
+        "swap-mb = 2048",
         "swap-mode = 2",
-        "swap-min-mb = 1"
+        "swap-min-mb = 16"
       ],
       "switches": {"avx": true, "nvidia": true, "wineVCRT": false, "fastSync": true, "fpsMode": 3, "display": "fit"},
       "notes": [
@@ -2176,7 +2182,14 @@
         "    polls/s (890,992/frame) spinning a core under iOS's 1.48 GHz clamp. Adds fence-early = 2 (build 618: publishes occlusion",
         "    queries at the shared event and defers CB retire), fence-poll-backoff = 64, pso-lazy-libs = 1, env.MADEIRA_SRV_FGETPATH = 1,",
         "    env.MADEIRA_LEAN_DIAG = 1, env.MADEIRA_FREE_DELAY_MS = 0, env.WINEDEBUG = err+all,err-virtual,fixme-all, and Rift Apart's",
-        "    fastSync / fpsMode switches."
+        "    fastSync / fpsMode switches.",
+        "  - Version 6 (owner's iPhone18,2, build 618, log 2026-10-27 23:35:54): owner-verified final configuration. In 23:35:54 FEX TSO",
+        "    emulation caused 14,800 [UNALIGNED-BACKPATCH] Mach exceptions and 807 [fex-smc] interval flushes, burning 6-8 W CPU power in",
+        "    the first 68 s until iOS CLTM clamped P-cores to 1.31-1.61 GHz, while fence-chain = 1 caused 268.2 GPU drains/frame (3.7 GB/frame",
+        "    attachment load/store traffic) and list-end closed 245 render passes. Turning off FEX TSO (env.FEX_TSOENABLED = 0,",
+        "    env.FEX_VECTORTSOENABLED = 0, env.FEX_MEMCPYSETTSOENABLED = 0), moving runtime helpers to E-cores (env.MADEIRA_ECO_NATIVE = 1),",
+        "    adding fence-chain = 6 and rp-carry = 1, and tuning the swap tier for 12 GB RAM (swap-mb = 2048, swap-mode = 2, swap-min-mb = 16)",
+        "    eliminated the stutters and ran cleanly on the owner's device (build 619 also fixes integer RTV blending in madeira_d3d12.c)."
       ]
     },
     {
