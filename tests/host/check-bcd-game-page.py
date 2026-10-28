@@ -217,6 +217,15 @@ fg_lines = [i for i, l in enumerate(fg) if "env.MADEIRA_FRAMEGEN" in l or 'Self.
 check("live: frame generation is offered and written only from iOS 26",
       fg_lines and all(any("if #available(iOS 26.0, *) {" in a for a in fg[max(0, i - 2):i]) for i in fg_lines),
       [fg[i].strip() for i in fg_lines])
+display = live[live.index("private func display("):live.index("// MARK: Direct3D")]
+check("live: Auto HDR follows frame generation in Display and is available before iOS 26",
+      display.index('Self.toggle("framegen"') < display.index('Self.toggle("auto-hdr"')
+      and '}\n        let autoHDRDefault' in display)
+check("live: Auto HDR follows the global default and saves explicit per-game on/off",
+      'profile.get("env.DXMT_AUTO_HDR").map { $0 == "1" } ?? autoHDRDefault' in display
+      and 'setLine(game, "env.DXMT_AUTO_HDR", on ? "1" : "0")' in live)
+check("preview: Auto HDR follows frame generation too",
+      sample.index('toggle("framegen"') < sample.index('toggle("auto-hdr"'))
 check("live: the page closes for the engine's notices, as the classic library closed Game details",
       all(f"library.${n}.dropFirst().map {{ $0 != nil }}" in live for n in ("current", "error", "restartNotice", "jitNotice", "cloudNotice")))
 

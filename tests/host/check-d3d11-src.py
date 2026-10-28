@@ -92,8 +92,9 @@ if b is not None and package is not None:
 m = (root / "app/Madeira/WineProcessBridge.m").read_text()
 blk = m[m.index('getenv("MADEIRA_D3D11_SRC")') - 200:]
 blk = blk[:blk.index("upstream's d3d11.dll stays")]
-check("WineProcessBridge links d3d11-src.dll as d3d11.dll only for MADEIRA_D3D11_SRC=1",
+check("WineProcessBridge links d3d11-src.dll for an explicit source selection or Auto HDR",
       "d3d11Src && d3d11Src[0] == '1'" in blk and '@"d3d11-src.dll"' in blk
+      and '|| autoHDR' in blk and 'BOOL autoHDR = hdr && !strcmp(hdr, "1");' in blk
       and 'stringByAppendingPathComponent:@"d3d11.dll"' in blk and "drive_c/windows/sysx64" in blk
       and "if (use_arm64ec) [dirs addObject:sys32Dir];" in blk)
 check("the switch block comes after the farms are relinked from the bundle",

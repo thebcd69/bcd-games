@@ -245,6 +245,7 @@ struct BCDSessionLayer: View {
                         .padding(.top, insets.top + 12)
                         .allowsHitTesting(false)
                 }
+
                 if hud.starting == nil && hud.showsMenuButton {
                     // The top right corner, at the screen's own edge (owner, 2026-10-19: it sat on the
                     // touch controls' RT). See BCDDraggable's `edge`.

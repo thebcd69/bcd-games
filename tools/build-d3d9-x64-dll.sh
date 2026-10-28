@@ -149,6 +149,12 @@ if command -v xcrun > /dev/null 2>&1 && xcrun -sdk macosx metal --version > /dev
     fi
 fi
 
+# A patched presenter must never reuse the old embedded present shader.
+bash "$R/tools/build-auto-hdr-shaders.sh" "$X" "$OUT/gen" || fail "Auto HDR shader failed"
+if grep -qF 'madeira-bcd: auto HDR' "$X/dxmt_command.metal"; then
+    METAL_NOTE="Auto HDR shader compiled from the patched source (Metal 3.1)"
+fi
+
 # DXMT's meson.build: compiler_args, the project defines, buildtype=release
 # (-O3, b_ndebug=if-release -> NDEBUG), C++20. -fmacro-prefix-map maps the source root away
 # as meson's '-fmacro-prefix-map=../=' does from its build directory. An arm64ec host is

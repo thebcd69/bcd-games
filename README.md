@@ -82,6 +82,7 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
   Those games run through Valve's own client, signed in with your account.
 - **Graphics:** Direct3D 9, 10 and 11 through DXMT; Direct3D 12 through BCD's runtime and
   Apple's Metal Shader Converter.
+  Source builds also include an opt-in [experimental Auto HDR mode](docs/auto-hdr.md) for SDR DXMT games.
 - **32-bit and 64-bit games**, controllers (DualSense with rumble, adaptive triggers and light
   bar; Xbox; Switch Pro; MFi), keyboard and mouse, and a controller-to-keyboard-and-mouse mode.
 - **Recommended settings that stay current:** every known game ships with tuned settings, and

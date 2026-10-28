@@ -93,6 +93,8 @@ import SwiftUI
                        note: "Direct3D 11 and 12 games draw at the resolution above, and Apple's MetalFX enlarges the picture by this much."),
                 toggle("framegen", "Frame generation (experimental)",
                        note: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time and a little delay."),
+                toggle("auto-hdr", "Auto HDR (experimental)",
+                       note: "Brighter highlights in Direct3D 9, 10 and 11 games on HDR displays. Menus and HUDs may brighten too. Adjusts to the screen's available brightness. Restart the game after changing it."),
             ], headline: resolution.value.replacingOccurrences(of: "x", with: " × ") + " · " + (fps.choices.first { $0.value == fps.value }?.label ?? "")),
             BCDGameSettingGroup(id: "direct3d", title: "Direct3D", symbol: "cube.transparent", settings: [
                 choice("anisotropy", "Direct3D 9 texture filtering", "0", [("0", "The game's choice"), ("2", "Up to 2×"), ("4", "Up to 4×"), ("8", "Up to 8×")]),
@@ -204,6 +206,10 @@ import SwiftUI
             }
             d.groups.insert(contentsOf: BCDGameSetupPage.sections(setup) + [BCDGameStartPage.group(start)], at: min(3, d.groups.count))
         }
+        if let i = d.groups.firstIndex(where: { $0.id == "display" }) {
+            d.groups[i].settings.append(BCDGameSetting(id: "hdr-calibration", title: "HDR calibration (advanced)", kind: .opens(.section("hdr-calibration"))))
+        }
+        d.groups.append(BCDHDRMenu.calibration(peak: "2", pattern: "0"))
         if !settings { d.groups = [] }
         d.sizeOnDisk = game.size
         d.lastPlayed = game.lastPlayed
@@ -438,7 +444,7 @@ struct BCDGamePreviewRoot: View {
     var body: some View {
         let parts = spec.split(separator: "-").map(String.init)
         let id = parts.count > 1 ? parts[1] : (UserDefaults.standard.string(forKey: "BCDGame") ?? "367520")
-        let what = parts.count > 2 ? parts[2] : ""
+        let what = parts.count > 2 ? parts.dropFirst(2).joined(separator: "-") : ""
         let panel: BCDGameOptionsPage? = switch what {
         case "options": .main
         case "cloud": .cloud
@@ -446,7 +452,7 @@ struct BCDGamePreviewRoot: View {
         case "tuning": .tuning
         case "config": .config
         case "findstore": .storeSearch
-        case "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds", "dlc", "help", "sound",
+        case "hdr-calibration", "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds", "dlc", "help", "sound",
              "windows", "components", "fex", "saveplace", "fixes", "desktop", "start": .group(what)   // the last seven: round 604 (BCDGameSetupPage.swift, BCDGameStart.swift)
         case _ where BCDInputPage.groupIDs.contains(what): .group(what)
         case "resolution", "fps", "scaling", "arguments", "installrequest": .setting(what)

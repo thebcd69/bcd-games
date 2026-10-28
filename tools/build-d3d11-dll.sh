@@ -64,6 +64,9 @@
 #   D3D11_NO_SHIP=1    build and check, but do not copy into the bundle
 #   MINGW=<dir>        llvm-mingw bin directory (default: the CI toolchain)
 #   JOBS=<n>           parallel compiles (default: CPU count)
+#   D3D11_AUTO_HDR=1   also build the experimental Auto HDR presenter/shader;
+#                     needs Xcode's Metal compiler, even when the pin has the
+#                     older context/ring fixes (their early exit is bypassed).
 # Run from the repository root.
 set -eu
 R="$(pwd)"
@@ -105,7 +108,8 @@ done
 if grep -qF "madeira-bcd: context state swap" "$D/src/d3d11/d3d11_context_impl.cpp" \
         && grep -qF "[small-rings] madeira-bcd" "$D/src/dxmt/dxmt_ring_bump_allocator.hpp" \
         && LC_ALL=C grep -aqF "$MARK" "$SHIP/d3d11.dll" \
-        && LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$SHIP/d3d11.dll"; then
+        && LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$SHIP/d3d11.dll" \
+        && [ "${D3D11_AUTO_HDR:-0}" != "1" ]; then
     [ "${D3D11_NO_SHIP:-0}" = "1" ] || rm -f "$DEST"
     echo "::notice::d3d11-src.dll not needed: DXMT $(git -C "$D" rev-parse --short HEAD 2>/dev/null || echo unknown) and upstream's committed d3d11.dll both carry SwapDeviceContextState and the opt-in small staging rings (env.DXMT_SMALL_RINGS); env.MADEIRA_D3D11_SRC = 1 keeps upstream's d3d11.dll"
     exit 0
@@ -202,6 +206,17 @@ python3 "$R/tools/patch-d3d11-src-small-rings.py" "$OUT/tree/src/dxmt" || {
     echo "::warning::tools/patch-d3d11-src-small-rings.py did not apply: d3d11-src.dll is built without small staging rings (env.DXMT_SMALL_RINGS has no effect)"
 }
 
+# Auto HDR is an additional opt-in experiment, so the pristine recipe check
+# keeps upstream's metadata and embedded shader. Only the private copy gets
+# the new presenter and its matching shader header. Enable in CI/builds with
+# D3D11_AUTO_HDR=1; games still opt in separately through their config.
+if [ "${D3D11_AUTO_HDR:-0}" = "1" ]; then
+    python3 "$R/tools/patch-dxmt-auto-hdr.py" --presenter-dir "$OUT/tree/src/dxmt" || fail "Auto HDR patch failed"
+    python3 "$R/tools/patch-dxmt-hdr-live.py" --presenter-dir "$OUT/tree/src/dxmt" || fail "Live HDR patch failed"
+    bash "$R/tools/build-auto-hdr-shaders.sh" "$OUT/tree/src/dxmt" "$OUT/tree/gen" || fail "Auto HDR shader failed"
+    METAL_NOTE="Auto HDR shader compiled from the patched source (Metal 3.1)"
+fi
+
 # DXMT's meson.build: compiler_args, the project defines, buildtype=release
 # (-O3, b_ndebug=if-release -> NDEBUG), C++20. -fmacro-prefix-map maps the
 # source root away as meson's '-fmacro-prefix-map=../=' does from its build
@@ -233,7 +248,7 @@ compile_one() {  # compile_one <root> <source> <object> <flag set>
     case "$set" in
         util)   inc=("${INC_UTIL[@]}") ;;
         parser) inc=("${INC_PARSER[@]}" -Wno-extern-c-compat -Wno-unknown-pragmas) ;;
-        dxmt)   inc=(-I"$root/src/dxmt" "${INC_DXMT[@]}") ;;
+        dxmt)   inc=(-I"$root/src/dxmt" -I"$root/gen" "${INC_DXMT[@]}") ;;
         d3d11)  inc=(-I"$root/src/d3d11" -I"$G" -I"$root/src/dxmt" -I"$D/src/airconv" -I"$D/src/winemetal" -I"$U" "${INC_BASE[@]}" -I"$OUT/gen") ;;
     esac
     case "$src" in
@@ -344,11 +359,21 @@ diff "$OUT/imports.upstream" "$OUT/imports.built" > "$OUT/imports.diff" \
     || { cat "$OUT/imports.diff"; fail "it imports from other DLLs than the committed d3d11.dll"; }
 "$READOBJ" --file-headers "$OUT/d3d11.dll" | grep -q "IMAGE_FILE_MACHINE_ARM64EC" || fail "the result is not an ARM64EC image"
 LC_ALL=C grep -aqF "$MARK" "$OUT/d3d11.dll" || fail "the SwapDeviceContextState patch is not in the result"
-LC_ALL=C grep -aqF "$MARK" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the patch marker: the submodule is not pristine"
+if ! LC_ALL=C grep -aqF "$MARK" "$SHIP/d3d11.dll"; then
+    LC_ALL=C grep -aqF "$MARK" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the patch marker: the submodule is not pristine"
+fi
 if [ -n "$SMALL_RINGS" ]; then
     LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$OUT/d3d11.dll" || fail "the small staging rings patch is not in the result"
 fi
-LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the small rings marker: the submodule is not pristine"
+if ! LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$SHIP/d3d11.dll"; then
+    LC_ALL=C grep -aqF "[small-rings] madeira-bcd" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the small rings marker: the submodule is not pristine"
+fi
+if [ "${D3D11_AUTO_HDR:-0}" = "1" ]; then
+    LC_ALL=C grep -aqF "[auto-hdr] requested" "$OUT/d3d11.dll" || fail "Auto HDR presenter is missing"
+    if LC_ALL=C grep -aqF "[auto-hdr] requested" "$OUT/plain/d3d11.dll"; then
+        fail "Auto HDR leaked into the pristine recipe check"
+    fi
+fi
 LC_ALL=C grep -aqF "$VER" "$OUT/d3d11.dll" || fail "the DXMT version string is not in the result"
 
 # The recipe check: the unpatched link against upstream's binary. Same

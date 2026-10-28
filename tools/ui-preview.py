@@ -42,6 +42,7 @@ PREVIEW = ROOT / "app" / "BCDPreview"
 BUNDLE_ID = "com.thebcd69.bcd.preview"
 # The interface files that need the engine stay out of the preview build.
 ENGINE_BOUND = {"BCDSetupView.swift", "BCDLiveStore.swift", "BCDLiveFrontEnd.swift", "BCDSettingsLive.swift", "BCDGamePageLive.swift", "BCDAddGameLive.swift", "BCDControllerHubLive.swift"}
+ENGINE_BOUND |= {"BCDHDRLive.swift"}
 DEFAULT_DEVICES = ["BCD iPhone 13 Pro", "BCD iPhone 14 Pro", "BCD iPhone 15", "iPhone 16 Pro Max",
                    "iPhone 17 Pro Max", "iPhone SE (3rd generation)", "iPad mini (A17 Pro)",
                    "iPad Air 11-inch (M2)", "iPad Pro 13-inch (M4)"]

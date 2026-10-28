@@ -66,6 +66,7 @@ enum BCDSessionRecorder {
         self.entry = entry
         started = Date()
         bcd_frame_stats_begin()
+        BCDHDRLive.began(entry)
         let process = ProcessInfo.processInfo
         thermalPeak = BCDHUDLive.thermalLevel(process.thermalState)
         lowPowerSeen = process.isLowPowerModeEnabled
@@ -88,6 +89,7 @@ enum BCDSessionRecorder {
     }
 
     func ended() {
+        BCDHDRLive.ended()
         BCDHUDState.shared.sessionEnded()
         guard started != nil else { return }
         LogStore.shared.log(summary(partial: false).line())
@@ -105,6 +107,7 @@ enum BCDSessionRecorder {
 
     private func lifecycle(background: Bool) {
         guard started != nil else { return }
+        BCDHDRLive.lifecycle(background)
         if background {
             // The line a log may end with if iOS closes the app in the background.
             LogStore.shared.log(summary(partial: true).line())

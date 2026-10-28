@@ -49,6 +49,20 @@ OVERLAY = {
                 "kind": "int", "default": "10",
                 "note": "Default 10 ms between pasted characters. Range 5-100 ms; use a longer interval for games "
                         "that miss fast text input. Enforced at delivery as well as queueing. Restart the session after changing it."},
+    "env.DXMT_AUTO_HDR": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Auto HDR (experimental)",
+                "kind": "bool", "default": "0", "sources": ["tools/patch-dxmt-auto-hdr.py"],
+                "note": "Expand bright SDR highlights on HDR-capable displays. Off by default; restart the game. "
+                        "DXMT games only. Automatically selects the source-built renderer for 64-bit Direct3D 10/11; "
+                        "requires a build with Auto HDR shaders. Leaves native HDR buffers alone; does not add Direct3D 12 HDR. "
+                        "White menus and HUDs can brighten too. The display's current headroom limits the effect."},
+    "env.DXMT_AUTO_HDR_PEAK": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Auto HDR highlight peak",
+                "kind": "text", "default": "2", "sources": ["tools/patch-dxmt-auto-hdr.py"],
+                "note": "Peak relative to SDR white (1–8, default 2). 1 keeps SDR brightness in a linear EDR layer. "
+                        "Limited to the display's current headroom; invalid values use 2. Requires Auto HDR; restart the game."},
+    "env.DXMT_AUTO_HDR_PATTERN": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Auto HDR startup calibration",
+                "kind": "text", "default": "0", "sources": ["app/Madeira/BCDHDR.m"],
+                "note": "Off (0), or reference bands for 10 or 30 seconds at the first supported DXMT frames. "
+                        "Returns to gameplay automatically. Requires Auto HDR; restart the game."},
     "env.MADEIRA_PIN_GRAPHICS_DLLS": {"category": "Memory & JIT pool", "title": "Keep graphics DLLs loaded",
                 "kind": "bool", "default": "0",
                 "note": "Default off. On a D3D12 device/probe call, pins already loaded D3D12, DXGI and Wine Metal "
@@ -1021,14 +1035,14 @@ OVERLAY = {
                         "Off (default): the registration is refused, as before. Set it in the game's own file; read "
                         "at session start."},
     # madeira-bcd: the opt-in source build of DXMT's 64-bit d3d11.dll (tools/build-d3d11-dll.sh).
-    "env.MADEIRA_D3D11_SRC": {"category": "Direct3D 9/10/11 (DXMT)", "title": "D3D11 built from DXMT source (context state swap)",
+    "env.MADEIRA_D3D11_SRC": {"category": "Direct3D 9/10/11 (DXMT)", "title": "D3D11 built from DXMT source",
                 "kind": "bool", "default": "0",
                 "note": "1: the game runs the 64-bit d3d11.dll the CI builds from the dxmt submodule (d3d11-src.dll): "
                         "upstream's DXMT d3d11 plus SwapDeviceContextState, which Wine's Direct2D (d2d1) calls and "
                         "upstream's aborts in (Rockstar Games Launcher exited with code 3). Off (default): upstream's "
                         "committed d3d11.dll. Set it in the game's own file, not for every game; read at session start. "
-                        "Since build 543 (the 2026-10-15 upstream merge) upstream's d3d11.dll has SwapDeviceContextState "
-                        "itself, no d3d11-src.dll is built and this switch changes nothing."},
+                        "Auto HDR builds also include the experimental present shader; enable Auto HDR separately. "
+                        "Without a source DLL in the build this switch keeps the committed DLL."},
     # madeira-bcd (2026-10-24): no Steam game identity for one game's session (WineProcessBridge.m).
     "env.MADEIRA_STEAM_IDENTITY": {"category": "Steam & Dock", "title": "No Steam game identity for this game",
                 "kind": "choice", "default": "",

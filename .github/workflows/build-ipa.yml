@@ -1283,9 +1283,12 @@ jobs:
       # tools/patch-d3d11-src-small-rings.py: 4 MB staging ring blocks for the
       # programs env.DXMT_SMALL_RINGS names (a failed patch only warns). Since
       # the 2026-10-15 upstream merge the pin and upstream's d3d11.dll carry
-      # both patches: the script says so and builds nothing.
+      # both patches. Auto HDR now makes this source DLL useful again: a private
+      # presenter/shader copy, selected only with env.MADEIRA_D3D11_SRC = 1.
       - name: Build d3d11-src.dll (DXMT d3d11 from source, SwapDeviceContextState)
         continue-on-error: true
+        env:
+          D3D11_AUTO_HDR: "1"
         run: bash tools/build-d3d11-dll.sh
 
       # madeira-bcd: DXMT's Direct3D 9 for 64-bit games (env.MADEIRA_D3D9_X64 = dxmt, off by default): the wiring, the opt-in
@@ -1596,6 +1599,9 @@ jobs:
       # build/dxmt-ios/shader-headers/ is gitignored and nothing generated it,
       # so airconv_context.cpp could not find air_msad.h / air_samplepos.h.
       # Mirrors the metalir + hexdump generators in dxmt/meson.build.
+      - name: Use public Metal threadgroup atomic API
+        run: python3 tools/patch-dxmt-metal-atomic.py
+
       - name: Generate DXMT shader headers
         shell: bash
         run: |
@@ -1701,6 +1707,17 @@ jobs:
 
       - name: Patch DXMT layer format
         run: python3 tools/patch-dxmt-layer-format.py
+
+      # Off by default. SDR highlight expansion through an RGBA16Float EDR
+      # layer, with real iOS headroom; before both native and i386 builds.
+      - name: Check DXMT Auto HDR
+        run: python3 tests/host/check-dxmt-auto-hdr.py
+
+      - name: Patch DXMT Auto HDR
+        run: python3 tools/patch-dxmt-auto-hdr.py
+
+      - name: Patch DXMT live HDR comparison and signal validation
+        run: python3 tools/patch-dxmt-hdr-live.py
 
       # A swapchain that goes fullscreen (Windowed = FALSE, SetFullscreenState(TRUE)) makes Windows' DXGI cover the
       # output with its window; DXMT's headless WSI only said "true". A fullscreen swapchain's window whose client

@@ -52,7 +52,7 @@ enum BCDHUDLayout: String, CaseIterable, Codable, Identifiable {
         case .pulse: return "One small number: the frame rate. A dot appears only if something is wrong."
         case .strip: return "One line: frame rate, frame time, memory against the iOS limit and heat."
         case .tune: return "Three short lines and a 15 second graph: frame rate and its 1% low, processor and graphics load, memory, heat."
-        case .report: return "The whole picture for a bug report: graphics API and size, frame rate with its lows, a 30 second graph, load, memory, the JIT pool, heat, battery and time."
+        case .report: return "The whole picture for a bug report: graphics API and size, frame rate with its lows, a 30 second graph, load, memory, the JIT pool, heat, battery, HDR output and time."
         case .custom: return "Your own list of readings, where you want them."
         }
     }
@@ -69,7 +69,7 @@ enum BCDHUDLayout: String, CaseIterable, Codable, Identifiable {
         case .pulse: return [.frames, .memory]
         case .strip: return [.frames, .memory]
         case .tune: return [.frames, .lows, .graph, .cpu, .gpu, .memory]
-        case .report: return [.frames, .lows, .graph, .cpu, .gpu, .memory, .jit, .swap, .battery]
+        case .report: return [.frames, .lows, .graph, .cpu, .gpu, .memory, .jit, .swap, .battery, .hdr]
         case .custom: return []
         }
     }
@@ -97,6 +97,8 @@ struct BCDHUDNeeds: OptionSet, Equatable {
     static let jit = BCDHUDNeeds(rawValue: 1 << 7)
     static let swap = BCDHUDNeeds(rawValue: 1 << 8)
     static let battery = BCDHUDNeeds(rawValue: 1 << 9)
+    /// Samples the game's output only for Report or a Custom HDR item.
+    static let hdr = BCDHUDNeeds(rawValue: 1 << 10)
 }
 
 // MARK: - Items (Custom)
@@ -112,7 +114,7 @@ enum BCDHUDItem: String, CaseIterable, Codable, Identifiable {
     // Heat and battery
     case thermal, lowPower, battery
     // Pipeline
-    case api, resolution, metalFX, frameGen, gpuName
+    case api, resolution, metalFX, frameGen, gpuName, hdr
     // Session
     case playTime, clock
 
@@ -130,7 +132,7 @@ enum BCDHUDItem: String, CaseIterable, Codable, Identifiable {
         case .gpu, .gpuMemory: return .graphics
         case .memUsed, .memory, .memFree, .memPeak, .compressed, .swap, .jit: return .memory
         case .thermal, .lowPower, .battery: return .heat
-        case .api, .resolution, .metalFX, .frameGen, .gpuName: return .pipeline
+        case .api, .resolution, .metalFX, .frameGen, .gpuName, .hdr: return .pipeline
         case .playTime, .clock: return .session
         }
     }
@@ -162,6 +164,7 @@ enum BCDHUDItem: String, CaseIterable, Codable, Identifiable {
         case .api: return "Graphics API"
         case .resolution: return "Resolution"
         case .metalFX: return "MetalFX"
+        case .hdr: return "HDR output"
         case .frameGen: return "Frame generation"
         case .gpuName: return "GPU shown to the game"
         case .playTime: return "Play time"
@@ -197,6 +200,7 @@ enum BCDHUDItem: String, CaseIterable, Codable, Identifiable {
         case .api: return "Direct3D version and 32 or 64 bit."
         case .resolution: return "The size the game draws at, and the size MetalFX makes of it."
         case .metalFX: return "The upscaling factor."
+        case .hdr: return "Sampled game peak and display headroom, relative to SDR white. Enables a small GPU probe."
         case .frameGen: return "Whether frame generation is on."
         case .gpuName: return "The graphics card name the game is told."
         case .playTime: return "Since the game started."
@@ -215,6 +219,7 @@ enum BCDHUDItem: String, CaseIterable, Codable, Identifiable {
         case .memUsed, .memory, .memFree, .memPeak, .compressed: return .memory
         case .swap: return .swap
         case .jit: return .jit
+        case .hdr: return .hdr
         case .battery: return .battery
         case .thermal, .lowPower, .api, .resolution, .metalFX, .frameGen, .gpuName, .playTime, .clock: return []
         }
@@ -351,7 +356,7 @@ struct BCDHUDCustom: Codable, Equatable {
             custom.graphSeconds = 15
             custom.dimWhenCalm = true
         case .report:
-            custom.items = [.api, .resolution, .fps, .frameMs, .low1, .low01, .frameGraph, .cpu, .gpu, .memory, .memPeak, .swap, .jit, .thermal,
+            custom.items = [.api, .resolution, .hdr, .fps, .frameMs, .low1, .low01, .frameGraph, .cpu, .gpu, .memory, .memPeak, .swap, .jit, .thermal,
                             .lowPower, .battery, .playTime]
             custom.shape = .list
             custom.size = .small
@@ -705,6 +710,8 @@ struct BCDHUDData: Equatable {
     var renderSize: String?
     var outputSize: String?
     var upscale: String?
+    var hdr: String?
+    var hdrTone: BCDHUDTone = .soft
     var frameGen: String?
     var gpuName: String?
     var playSeconds = 0
@@ -858,6 +865,7 @@ enum BCDHUDRows {
         if let gen = d.frameGen { pipeline.append(gen) }
         if let cap = d.cap { pipeline.append("cap " + String(format: "%.0f", cap)) }
         if !pipeline.isEmpty { rows.append(.line([BCDHUDSegment(text: pipeline.joined(separator: "  "), tone: .soft)])) }
+        if let hdr = d.hdr { rows.append(.line([BCDHUDSegment(text: hdr, tone: d.hdrTone)])) }
         // 2. The speed.
         var speed = [BCDHUDSegment(text: d.fps > 0 ? String(format: "%.0f FPS", d.fps) : "– FPS", tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))]
         if let ms = d.frameMs { speed.append(BCDHUDSegment(text: String(format: "avg %.1f", ms))) }
@@ -1031,6 +1039,8 @@ enum BCDHUDRows {
             return BCDHUDSegment(text: render, tone: .soft)
         case .metalFX:
             return d.upscale.map { BCDHUDSegment(text: $0, tone: .soft) }
+        case .hdr:
+            return d.hdr.map { BCDHUDSegment(text: $0, tone: d.hdrTone) }
         case .frameGen:
             return d.frameGen.map { BCDHUDSegment(text: $0, tone: .soft) }
         case .gpuName:

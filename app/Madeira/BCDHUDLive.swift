@@ -152,6 +152,7 @@ final class BCDHUDState: ObservableObject {
     private var lows: (low1: Double?, low01: Double?, worst: Double?, stutters: Int?) = (nil, nil, nil, nil)
     private var lastClear: [Int] = []
     private var pipeline = Pipeline()
+    private var hdrReading = BCDHDRReading()
 
     private struct Pipeline {
         var api: String?, renderSize: String?, outputSize: String?, upscale: String?, frameGen: String?, gpuName: String?
@@ -181,6 +182,7 @@ final class BCDHUDState: ObservableObject {
     func stop() {
         timer?.invalidate()
         timer = nil
+        BCDHDRLive.measure(false)
         if gpuOn { madeira_gpu_meter_enable(0); gpuOn = false }
         if batteryOn { UIDevice.current.isBatteryMonitoringEnabled = false; batteryOn = false }
         frames.removeAll()
@@ -209,6 +211,7 @@ final class BCDHUDState: ObservableObject {
     private func configure() {
         setup = state.setup
         needs = setup.needs
+        BCDHDRLive.measure(needs.contains(.hdr))
         interval = needs.contains(.graph) ? 0.25 : 0.5
         feed.places = setup.places
         feed.shapeKey = "\(setup.layout.rawValue)\(setup.layout == .custom ? setup.custom.shape.rawValue : "")"
@@ -322,6 +325,11 @@ final class BCDHUDState: ObservableObject {
             let level = UIDevice.current.batteryLevel
             if level >= 0 { d.batteryPercent = Int((level * 100).rounded()) }
         }
+        if needs.contains(.hdr) {
+            hdrReading = BCDHDRLive.reading()
+            d.hdr = hdrReading.hudText
+            d.hdrTone = hdrReading.confirmed ? .good : .soft
+        }
         d.api = pipeline.api; d.renderSize = pipeline.renderSize; d.outputSize = pipeline.outputSize
         d.upscale = pipeline.upscale; d.frameGen = pipeline.frameGen; d.gpuName = pipeline.gpuName
         d.playSeconds = max(0, Int(Date().timeIntervalSince(model.launchStartedAt)))
@@ -367,6 +375,21 @@ final class BCDHUDState: ObservableObject {
         if let battery = d.batteryPercent { parts.append("batt=\(battery)") }
         parts.append("t=" + BCDHUDRows.clockTime(seconds: d.playSeconds))
         LogStore.shared.log("[hud] " + parts.joined(separator: " "))
+        if needs.contains(.hdr) {
+            var evidence = ["fps": String(format: "%.2f", d.fps), "thermal": String(d.thermal),
+                            "low_power": d.lowPower ? "1" : "0", "layout": setup.layout.rawValue, "fps_window_s": "1", "frame_ms_window_s": "0.5",
+                            "api": d.api ?? "unknown", "render_size": d.renderSize ?? "unknown",
+                            "output_size": d.outputSize ?? d.renderSize ?? "unknown", "framegen": d.frameGen ?? "off",
+                            "metalfx": d.upscale ?? "off"]
+            if let cap = d.cap { evidence["fps_cap"] = String(format: "%.0f", cap) }
+            if let battery = d.batteryPercent { evidence["battery_percent"] = String(battery) }
+            if let ms = d.frameMs { evidence["frame_ms"] = String(format: "%.3f", ms) }
+            if let low = d.low1 { evidence["low1_fps"] = String(format: "%.2f", low) }
+            if let gpu = d.gpuPercent { evidence["gpu_percent"] = String(format: "%.1f", gpu) }
+            if let cpu = d.cpuTotal { evidence["cpu_percent"] = String(format: "%.1f", cpu) }
+            if let memory = d.footprintMB { evidence["memory_mb"] = String(memory) }
+            BCDHDRLive.record(hdrReading, performance: evidence)
+        }
     }
 
     // MARK: Counters

@@ -181,6 +181,7 @@ enum BCDPreviewSessionSamples {
         d.cpuTotal = 41; d.cpuTop = 96; d.gpuPercent = 63; d.gpuMs = 10.8
         d.footprintMB = 3174; d.limitMB = 5800; d.peakMB = 3410; d.compressedMB = 480; d.swapMB = 420; d.jitUsedMB = 410; d.jitTotalMB = 1024
         d.thermal = 1; d.lowPower = false; d.batteryPercent = 82
+        d.hdr = "Auto HDR · sampled 1.72× / display 2.60×"; d.hdrTone = .good
         d.api = "D3D11 64"; d.renderSize = "1408x648"; d.outputSize = "2816x1296"; d.upscale = "MetalFX 2x"
         d.playSeconds = 2530; d.clock = "21:05"; d.build = "602"
         d.graph = hudGraph
@@ -239,6 +240,8 @@ enum BCDPreviewSessionSamples {
     private var fps = "1", scale = "fit", overlay = true
     var hudSetup = BCDHUDSetup(layout: .strip)
     private var eco = false, padMode = "keys", padAPI = "xinput"
+    private var hdr = BCDHDRReading(requested: true, enabled: true, measuring: true, prepared: true, valid: true,
+                                    edr: true, linear: true, format: 115, appliedFlags: 9, samples: 2304, above: 184, peak: 1.72, headroom: 2.6)
     private var pointer = "absolute", speed = 2.0, sync = "1"
     /// Round 604's input choices (BCDInputMenu.swift): the look is the app's preferences, the rest is kept here.
     var input = BCDInputProfile(lines: ["touchlook": BCDInputPrefs.shared.lines(BCDTouchLookModel.feature, game: BCDInputPrefs.everyone)])
@@ -298,6 +301,7 @@ enum BCDPreviewSessionSamples {
             } else {
                 out += BCDHUDMenu.sections(hudSetup, screen: .landscape)
             }
+            out.append(BCDHDRMenu.section(hdr))
             out.append(BCDMenuSection(id: "eco", title: "Battery & heat", rows: [
                 BCDMenuRow(id: "eco", title: "Eco mode",
                            detail: "The game's threads run on the efficiency cores: the phone stays cooler, the game runs slower. Handy while a game loads; off again for play.",
@@ -386,6 +390,7 @@ enum BCDPreviewSessionSamples {
     }
 
     func toggle(_ row: String, _ on: Bool) {
+
         if BCDInputMenu.handles(row) { return changeInput(row, on ? "1" : "0") }
         if BCDHUDMenu.owns(row) { hudSetup = BCDHUDMenu.toggle(row, on, hudSetup).setup; return }
         switch row {
@@ -395,6 +400,11 @@ enum BCDPreviewSessionSamples {
         }
     }
     func choose(_ row: String, _ value: String) {
+        if row == "hdr.view" {
+            hdr.enabled = value == "hdr"; hdr.appliedFlags = hdr.enabled ? 9 : 8
+            hdr.peak = hdr.enabled ? 1.72 : 1; hdr.above = hdr.enabled ? 184 : 0
+            menu?.changed(); return
+        }
         if BCDInputMenu.handles(row) { return changeInput(row, value) }
         if BCDHUDMenu.owns(row) { hudSetup = BCDHUDMenu.choose(row, value, hudSetup, screen: .landscape).setup; return }
         switch row {

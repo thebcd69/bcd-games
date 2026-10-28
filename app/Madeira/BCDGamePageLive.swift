@@ -130,6 +130,9 @@ import UniformTypeIdentifiers
         if settings {
             d.groups = [display(entry, profile), direct3D(entry, profile), compatibility(entry), controls(entry, profile), gyro(entry)]
             d.groups.insert(contentsOf: setupGroups(game, entry, profile), at: 3)   // round 604: BCDGameSetup/BCDGamePageLiveSetup.swift (Windows, Components, CPU translation, Game fixes, Wine desktop)
+            d.groups.append(BCDHDRMenu.calibration(
+                peak: profile.get("env.DXMT_AUTO_HDR_PEAK") ?? MadeiraConfig.get("env.DXMT_AUTO_HDR_PEAK") ?? "2",
+                pattern: profile.get("env.DXMT_AUTO_HDR_PATTERN") ?? MadeiraConfig.get("env.DXMT_AUTO_HDR_PATTERN") ?? "0"))
             if let binds = binds(entry) { d.groups.append(binds) }
             if !desktop { d.groups += inputGroups(entry) }   // round 604: BCDInputPage.swift (turbo and macros, ...)
             if let launch = launch(entry) { d.groups.append(launch) }
@@ -266,6 +269,12 @@ import UniformTypeIdentifiers
             settings.append(Self.toggle("framegen", "Frame generation (experimental)", profile.get("env.MADEIRA_FRAMEGEN") == "1",
                                         note: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. The frame-rate limit is ignored while it is on."))
         }
+        let autoHDRDefault = MadeiraConfig.get("env.DXMT_AUTO_HDR") == "1"
+        let autoHDR = profile.get("env.DXMT_AUTO_HDR").map { $0 == "1" } ?? autoHDRDefault
+        settings.append(Self.toggle("auto-hdr", "Auto HDR (experimental)", autoHDR, default: autoHDRDefault,
+                                    note: "Brighter highlights in Direct3D 9, 10 and 11 games on HDR displays. Menus and HUDs may brighten too. Adjusts to the screen's available brightness. Restart the game after changing it."))
+        settings.append(BCDGameSetting(id: "hdr-calibration", title: "HDR calibration (advanced)",
+            kind: .opens(.section("hdr-calibration")), note: "Highlight ceiling and an optional reference pattern at launch."))
         return BCDGameSettingGroup(id: "display", title: "Display", symbol: "display", settings: settings,
                                    headline: entry.resolution.replacingOccurrences(of: "x", with: " × ") + " · " + fps)
     }
@@ -931,6 +940,11 @@ import UniformTypeIdentifiers
                 BCDGyroStore.set(entry.windowsPath, setting, value)
                 BCDGyroLive.shared.refresh()
             }
+        case "hdr-peak": setLine(game, "env.DXMT_AUTO_HDR_PEAK", value)
+        case "hdr-pattern": setLine(game, "env.DXMT_AUTO_HDR_PATTERN", value)
+        case "auto-hdr":
+            // Write an explicit off so this game's switch overrides a global on.
+            setLine(game, "env.DXMT_AUTO_HDR", on ? "1" : "0")
         case "anisotropy": change(game) { $0.anisotropyLimit = Int(value).flatMap { $0 == 0 ? nil : $0 } }
         case "nvidia": entry(for: game).map { LibraryPrefs.setNvidia(on, for: $0.windowsPath) }
         case "avx": entry(for: game).map { LibraryPrefs.setAVX(on, for: $0.windowsPath) }

@@ -22,6 +22,7 @@
 #include "BCDCab.h"
 // BCD: the frame-time ring the present path writes (tools/patch-winemetal-frame-ring.py), read by the HUD and the session summary.
 #include "BCDFrameRing.h"
+#include "BCDHDR.h"
 
 // Wine file-based logging (server_ios.c)
 void wine_log_set_file(const char *path);

@@ -49,6 +49,7 @@ with tempfile.TemporaryDirectory() as tmp:
                 ok = False
     if ok:
         wm = (t / "dxmt/src/winemetal/unix/winemetal_unix.c").read_text()
+        header = (t / "dxmt/src/dxmt/dxmt_presenter.hpp").read_text()
         cache = (t / "dxmt/src/winemetal/unix/cache.c").read_text()
         conv = (t / "dxmt/src/airconv/nt/dxbc_converter_base.cpp").read_text()
         ctx = (t / "dxmt/src/airconv/airconv_context.cpp").read_text()
@@ -56,6 +57,9 @@ with tempfile.TemporaryDirectory() as tmp:
         ctl = wm[wm.index("static NTSTATUS _madeira_ctl(void *args) {"):]
         ctl_ops = re.findall(r"^\s*case (\d+):", ctl[:ctl.index("\n}\n")], re.M)
         for what, cond in [
+            ("HDR metadata and presenter members are declared once across both patch rounds",
+             all(header.count(field) == 1 for field in ("float auto_hdr_peak;", "uint32_t auto_hdr_flags;",
+                    "uint32_t auto_hdr_revision;", "bool auto_hdr_requested_ = false;", "float auto_hdr_peak_ = 2.0f;"))),
             ("cache salt for every converter experiment",
              all(n in cache for n in ("MADEIRA_TGSM_SYNC", "MADEIRA_SAMPLE_L_BIAS", "MADEIRA_PRECISE_MATH",
                                       "MADEIRA_BOUNDS_EXTRA", "MADEIRA_PS_CLAMP"))

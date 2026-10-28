@@ -70,6 +70,7 @@ struct BCDSessionLiveLayer: View {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.refresh() }
             .store(in: &watchers)
+
     }
 
     func appeared() {
@@ -341,6 +342,8 @@ struct BCDSessionLiveLayer: View {
         padMode = BCDLivePadMode.mode(of: LibraryModel.shared.activeEntry)
         // An upload's progress shows while the menu is open.
         steam.$cloudQuit.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.menu?.changed() }.store(in: &watchers)
+        NotificationCenter.default.publisher(for: BCDHDRLive.changed).receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.menu?.changed() }.store(in: &watchers)
     }
 
     func dispose() {
@@ -465,6 +468,7 @@ struct BCDSessionLiveLayer: View {
             ]))
         }
         // The performance HUD: Off, 1 to 4 or Custom, and where it sits (BCDHUDMenu.swift).
+        out.append(BCDHDRMenu.section(BCDHDRLive.reading()))
         out += BCDHUDMenu.sections(BCDHUDState.shared.setup, screen: hudScreen)
         out.append(BCDMenuSection(id: "eco", title: "Battery & heat", rows: [
             BCDMenuRow(id: "eco", title: "Eco mode",
@@ -647,6 +651,7 @@ struct BCDSessionLiveLayer: View {
     }
 
     func choose(_ row: String, _ value: String) {
+        if BCDHDRLive.choose(row, value) { return }
         if BCDMenuMore.handles(row) { return BCDMenuMore.choose(row, value) { [weak self] in self?.menu?.changed() } }   // madeira-bcd (round 604)
         if BCDInputMenu.handles(row) { return BCDInputMenuLive.change(row, value, entry: model.activeEntry) }   // madeira-bcd (2026-10-25, round 604)
         if BCDHUDMenu.owns(row) { return applyHUD(BCDHUDMenu.choose(row, value, BCDHUDState.shared.setup, screen: hudScreen)) }
@@ -1193,8 +1198,13 @@ struct BCDDeskSessionMenu: View {
     private var fit = DisplayFit.current
     private var fence = FPSOverlayFenceMode.current
     private var logWatch: AnyCancellable?
+    private var hdrWatch: AnyCancellable?
 
-    init(onClose: @escaping () -> Void) { self.onClose = onClose }
+    init(onClose: @escaping () -> Void) {
+        self.onClose = onClose
+        hdrWatch = NotificationCenter.default.publisher(for: BCDHDRLive.changed).receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.menu?.changed() }
+    }
 
     var title: String { session.title.isEmpty ? "This session" : session.title }
     var subtitle: String { "Playing" }
@@ -1221,6 +1231,7 @@ struct BCDDeskSessionMenu: View {
                                kind: .choice(DisplayFit.allCases.map { BCDChoice(id: $0.rawValue, title: $0 == .fit ? "Fit" : "Stretch") }, selected: fit.rawValue)),
                     BCDMenuRow(id: "overlay", title: "Performance overlay", kind: .toggle(session.showPerformance)),
                 ]),
+                BCDHDRMenu.section(BCDHDRLive.reading()),
                 BCDMenuSection(id: "eco", title: "Battery & heat", rows: [
                     BCDMenuRow(id: "eco", title: "Eco mode",
                                detail: "The game's threads run on the efficiency cores: cooler and slower. It does not limit the frame rate. Handy while a game loads; off again for play.",
@@ -1303,6 +1314,7 @@ struct BCDDeskSessionMenu: View {
     }
 
     func choose(_ row: String, _ value: String) {
+        if BCDHDRLive.choose(row, value) { return }
         switch row {
         case "fps":
             guard let raw = Int32(value), let next = FrameLimit(rawValue: raw) else { return }

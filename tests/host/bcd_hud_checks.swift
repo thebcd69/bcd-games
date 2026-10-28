@@ -195,12 +195,15 @@ func texts(_ plan: BCDHUDPlan?) -> [[String]] {
         let p3 = BCDHUDRows.plan(layout: .tune, custom: .default, data: d, width: 400)
         check("layout 3 is three lines and a graph", texts(p3) == [["60 FPS", "1% 52", "16.6 ms"], ["CPU 41%", "GPU 63%"], ["3.1/5.8 GB", "Cool"], ["<graph>"]], "\(texts(p3))")
         if case .graph(let g)? = p3?.rows.last { check("layout 3's graph is at most 60 buckets (15 s)", g.values.count == 60 && g.height <= 40 && g.width <= 150) }
+        d.hdr = "Auto HDR · sampled 1.72× / display 2.60×"; d.hdrTone = .good
+        check("only Report requests HDR sampling among presets", BCDHUDLayout.presets.filter { $0.needs.contains(.hdr) } == [.report])
+        check("Custom HDR requests the same probe", BCDHUDItem.hdr.needs == .hdr)
         let p4 = BCDHUDRows.plan(layout: .report, custom: .default, data: d, width: 400)
-        check("layout 4 is the seven rows of the design",
-              texts(p4) == [["D3D11 64  1408x648 > MetalFX 2x  cap 60"], ["60 FPS", "avg 16.6", "1% 52", "0.1% 38"], ["<graph>"],
+        check("layout 4 includes HDR output alongside the seven report rows",
+              texts(p4) == [["D3D11 64  1408x648 > MetalFX 2x  cap 60"], ["Auto HDR · sampled 1.72× / display 2.60×"], ["60 FPS", "avg 16.6", "1% 52", "0.1% 38"], ["<graph>"],
                             ["CPU 41% (top 78%)", "GPU 63% 9.8 ms"], ["Mem 3.1/5.8 GB", "peak 3.4", "swap 0.4"],
                             ["JIT 410/1024", "Cool", "LPM off", "78%"], ["42:10", "build 602"]], "\(texts(p4))")
-        if case .graph(let g)? = p4?.rows[2] { check("layout 4's graph is at most 120 buckets and 200 pt wide", g.values.count == 120 && g.width <= 200) }
+        if case .graph(let g)? = p4?.rows[3] { check("layout 4's graph is at most 120 buckets and 200 pt wide", g.values.count == 120 && g.width <= 200) }
         var bare = BCDHUDData()
         bare.fps = 0
         check("with nothing measured yet no layout crashes or lies: dashes",

@@ -6,6 +6,7 @@
 #import <os/log.h>
 #import <pthread.h>
 #import "WineProcessBridge.h"
+#import "BCDHDR.h"
 /* AVFoundation: AVAudioSession activation for the Tier-2 audio driver
  * (audio_null_ios.c RemoteIO backend). AudioToolbox: pulls the framework
  * in via autolink — the static-lib driver code can't autolink itself. */
@@ -1978,6 +1979,8 @@ static void *wine_process_thread(void *arg) {
             }
         }
 
+        bcd_hdr_begin(); // session environment is applied; keep the HUD's probe request
+
         // Redirect stderr AND stdout to log file so Wine debug output (WINEDEBUG)
         // and the guest program's printf are both captured.
         {
@@ -2346,7 +2349,10 @@ static void *wine_process_thread(void *arg) {
              * bundle every session, so dropping the line restores upstream's). */
             {
                 const char *d3d11Src = getenv("MADEIRA_D3D11_SRC");
-                if (d3d11Src && d3d11Src[0] == '1') {
+                const char *hdr = getenv("DXMT_AUTO_HDR");
+                BOOL autoHDR = hdr && !strcmp(hdr, "1");
+                // The Display toggle selects its matching source presenter automatically.
+                if ((d3d11Src && d3d11Src[0] == '1') || autoHDR) {
                     NSString *ecDir = [bundlePath stringByAppendingPathComponent:@"arm64ec-windows"];
                     NSString *srcDll = [ecDir stringByAppendingPathComponent:@"d3d11-src.dll"];
                     if ([fm fileExistsAtPath:srcDll]) {
@@ -2358,10 +2364,11 @@ static void *wine_process_thread(void *arg) {
                             [fm removeItemAtPath:dst error:nil];
                             [fm createSymbolicLinkAtPath:dst withDestinationPath:srcDll error:nil];
                         }
-                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_D3D11_SRC=1: d3d11.dll -> d3d11-src.dll (DXMT source build with SwapDeviceContextState; %s)\n",
-                                use_arm64ec ? "system32 + sysx64" : "sysx64 only");
+                        dprintf(STDERR_FILENO, "[WineProc] %s: d3d11.dll -> d3d11-src.dll (DXMT source build with SwapDeviceContextState; %s)\n",
+                                autoHDR ? "DXMT_AUTO_HDR=1" : "MADEIRA_D3D11_SRC=1", use_arm64ec ? "system32 + sysx64" : "sysx64 only");
                     } else {
-                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_D3D11_SRC=1 but this build has no d3d11-src.dll -- upstream's d3d11.dll stays\n");
+                        dprintf(STDERR_FILENO, "[WineProc] %s but this build has no d3d11-src.dll -- upstream's d3d11.dll stays\n",
+                                autoHDR ? "DXMT_AUTO_HDR=1" : "MADEIRA_D3D11_SRC=1");
                     }
                 }
             }
@@ -3148,6 +3155,7 @@ static void *wine_process_thread(void *arg) {
 static void wine_session_end(void)
 {
     if (__atomic_exchange_n(&g_session_end_claim, 1, __ATOMIC_ACQ_REL)) return;
+    bcd_hdr_reset();
     g_wine_running = 0;
     wine_progname_restore();
     /* ml1184: these belong to the launch that just ended; a later session in this app
@@ -3157,6 +3165,7 @@ static void wine_session_end(void)
     unsetenv("FEX_X87REDUCEDPRECISION");   /* ml1184 */
     unsetenv("MADEIRA_DINPUT_PAD");        /* ml1240 */
     unsetenv("MADEIRA_FEX_AVX"); unsetenv("MADEIRA_FRAMEGEN");   /* ml1184 */
+    unsetenv("DXMT_AUTO_HDR"); unsetenv("DXMT_AUTO_HDR_PEAK"); unsetenv("DXMT_AUTO_HDR_PATTERN"); /* Auto HDR belongs to this session. */
     unsetenv("DXMT_ENABLE_NVEXT"); unsetenv("DXMT_WSI_MONITOR_IDENTITY"); unsetenv("DXMT_WSI_MODE_TABLE");
     /* madeira-bcd: Horizon Zero Dawn's per-game switches must not reach a later game
      * of this app run (GTA V Enhanced runs without them). */

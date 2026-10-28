@@ -134,8 +134,13 @@ bare = Path.home() / "madeira-local/kaynak/dxmt.git"
 tmp = tempfile.TemporaryDirectory(prefix="bcd-hud-dxmt-")
 base = Path(tmp.name)
 if (R / "dxmt/src/winemetal/unix/winemetal_unix.c").is_file():
-    shutil.copytree(R / "dxmt/src", base / "dxmt/src")
-    dxmt_src = base / "dxmt"
+    # Check the pin, including in a checkout where the build patches ran.
+    (base / "dxmt").mkdir()
+    a = subprocess.Popen(["git", "-C", str(R / "dxmt"), "archive", "HEAD", "src"], stdout=subprocess.PIPE)
+    t = subprocess.run(["tar", "-x", "-C", str(base / "dxmt")], stdin=a.stdout)
+    a.wait()
+    if a.returncode == 0 and t.returncode == 0:
+        dxmt_src = base / "dxmt"
 elif len(pin) >= 3 and bare.is_dir():
     (base / "dxmt").mkdir()
     a = subprocess.Popen(["git", "-C", str(bare), "archive", pin[2], "src"], stdout=subprocess.PIPE)
