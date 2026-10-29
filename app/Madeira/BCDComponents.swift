@@ -335,7 +335,7 @@ struct BCDGameStatusLine: View {
         switch game.state {
         case .ready: return BCDStyle.mint
         case .downloading, .installing, .queued: return BCDStyle.lavender
-        case .updateAvailable: return Color(red: 1, green: 0.76, blue: 0.29)
+        case .updateAvailable: return BCDStyle.amber
         case .broken: return BCDStyle.alert
         case .notInstalled: return nil
         }

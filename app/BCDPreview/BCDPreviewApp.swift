@@ -36,6 +36,7 @@ struct BCDPreviewApp: App {
 
     init() {
         let defaults = UserDefaults.standard
+        if let theme = defaults.string(forKey: "BCDTheme") { BCDThemeStore.shared.select(theme) }
         let actions = BCDPreviewActions()
         BCDUpdateChecker.shared.usePreviewSample()
         // -BCDLook graphite,green,playstation,ring: the touch controls' look (round 604; body, colour when pressed, symbols, how a press shows).

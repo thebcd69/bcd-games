@@ -31,6 +31,7 @@ with tempfile.TemporaryDirectory(prefix="bcd-preview-cache-check-") as tmp:
     art = base / "art"
     for folder in (app, samples, sdk, art / "620", base / "bin"):
         folder.mkdir(parents=True)
+    (app / "BCDThemes.json").write_text("[]")
     source = app / "BCDCacheCheck.swift"
     source.write_text("let value = 1\n")
     (samples / "Sample.swift").write_text("let sample = 1\n")
@@ -110,6 +111,7 @@ with tempfile.TemporaryDirectory(prefix="bcd-preview-cache-check-") as tmp:
         assert len(attempts) == 3
 
         mutations = [
+            lambda: (app / "BCDThemes.json").write_text('[ {"version":1} ]'),
             lambda: (samples / "Sample.swift").write_text("let sample = 2"),
             lambda: (app / "Assets.xcassets/BCDLogo.imageset/Contents.json").write_text('{"new":1}'),
             lambda: (sdk / "SDKSettings.json").write_text('{"Version":"2"}'),

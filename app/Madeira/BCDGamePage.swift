@@ -1961,7 +1961,7 @@ private struct BCDGamePageMetrics {
 
 /// The warm amber of the warnings, as the shell's JIT and memory chips use it.
 enum BCDGameColors {
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 }
 
 /// The hints along the bottom: each button's glyph and what it does here.

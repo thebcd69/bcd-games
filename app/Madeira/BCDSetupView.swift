@@ -164,7 +164,7 @@ struct OnboardingView: View {
                     Image(systemName: "checkmark").font(.system(size: 12, weight: .heavy)).foregroundStyle(BCDStyle.mint)
                 } else {
                     Circle().fill(BCDStyle.glow)
-                    Text("\(number)").font(.system(size: 13, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                    Text("\(number)").font(.system(size: 13, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
                 }
             }
             .frame(width: 26, height: 26).alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 5 }

@@ -157,7 +157,7 @@ struct BCDTouchEditor: View {
                 actions.done()
             } label: {
                 Text("Done")
-                    .font(BCDStyle.label(15)).foregroundStyle(.white)
+                    .font(BCDStyle.label(15)).foregroundStyle(BCDStyle.onAccent)
                     .padding(.horizontal, 18).frame(height: 36)
                     .background(Capsule().fill(BCDStyle.glow))
             }

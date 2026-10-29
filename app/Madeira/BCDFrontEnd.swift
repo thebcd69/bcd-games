@@ -186,7 +186,7 @@ struct BCDFrontEnd: View {
     private var badge: some View {
         Text("\(store.downloads.count)")
             .font(.system(size: 11, weight: .heavy, design: .rounded))
-            .foregroundStyle(.white)
+            .foregroundStyle(BCDStyle.onAccent)
             .frame(minWidth: 18, minHeight: 18)
             .background(BCDStyle.glow, in: Capsule())
     }
@@ -206,11 +206,11 @@ struct BCDFrontEnd: View {
             BCDUpdateChip { settingsSection = .updates; showSettings = true }
             if layout != .phonePortrait || system.jit != .on {
                 BCDStatusChip(text: system.jit == .on ? "JIT on" : system.jit == .waiting ? "JIT…" : "JIT off",
-                              color: system.jit == .on ? BCDStyle.mint : Color(red: 1, green: 0.76, blue: 0.29))
+                              color: system.jit == .on ? BCDStyle.mint : BCDStyle.amber)
             }
             if layout == .pad, let limit = system.memoryLimitBytes {
                 BCDStatusChip(text: "Memory \(BCDFormat.bytes(limit))",
-                              color: system.increasedMemoryLimit ? BCDStyle.mint : Color(red: 1, green: 0.76, blue: 0.29))
+                              color: system.increasedMemoryLimit ? BCDStyle.mint : BCDStyle.amber)
             }
             if layout != .phonePortrait, let name = system.controllerName {
                 HStack(spacing: 6) {

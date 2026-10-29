@@ -11,7 +11,7 @@ import Foundation
 
 /// Settings' sections, in the order the list shows them.
 enum BCDSettingsSection: String, CaseIterable, Identifiable {
-    case accounts, jit, dock, memory, graphics, controls, storage, dotnet, vcruntime, gecko, logs, feedback, all, developer, updates, about
+    case accounts, jit, dock, memory, graphics, appearance, controls, storage, dotnet, vcruntime, gecko, logs, feedback, all, developer, updates, about
 
     var id: String { rawValue }
 
@@ -22,6 +22,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "BCD Dock"
         case .memory: return "Memory & performance"
         case .graphics: return "Graphics"
+        case .appearance: return "Appearance"
         case .controls: return "Controls"
         case .storage: return "Storage"
         case .dotnet: return ".NET Framework"
@@ -44,6 +45,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "Valve's client for your Steam games"
         case .memory: return "Limits, the swap file, sync and eco mode"
         case .graphics: return "Resolution, frame cap and the display"
+        case .appearance: return "App colors and saved profiles"
         case .controls: return "Touch controls, pointer and controllers"
         case .storage: return "What BCD keeps on this device"
         case .dotnet: return "Wine Mono for games made with .NET"
@@ -65,6 +67,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "shippingbox.fill"
         case .memory: return "memorychip"
         case .graphics: return "display"
+        case .appearance: return "paintpalette.fill"
         case .controls: return "gamecontroller.fill"
         case .storage: return "internaldrive.fill"
         case .dotnet: return "cube.fill"

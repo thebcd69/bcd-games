@@ -564,7 +564,7 @@ private struct BCDPadTableCard: View {
 }
 
 private enum BCDPadParts {
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 }
 
 /// A control's mark, as the bottom bar's hints draw a button.

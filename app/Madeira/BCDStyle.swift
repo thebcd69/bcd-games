@@ -4,25 +4,27 @@
 
 import SwiftUI
 
-/// BCD's look (2026-10-18): the night-violet ground and the violet-to-fuchsia light of
-/// the BCD logo, rounded heavy type, and soft glowing cards. The setup screens use it
-/// first; the new library screens will share it.
+/// Shared semantic palette. The historical color names remain as aliases so every BCD
+/// screen follows the selected profile, including panels hosted in their own windows.
 enum BCDStyle {
-    static let ground = Color(red: 0.043, green: 0.031, blue: 0.086)        // #0B0816
-    static let groundTop = Color(red: 0.102, green: 0.059, blue: 0.200)     // #1A0F33
-    static let surface = Color(red: 0.102, green: 0.078, blue: 0.188)       // #1A1430
-    static let surfaceRaised = Color(red: 0.137, green: 0.106, blue: 0.247) // #231B3F
-    static let stroke = Color(red: 0.184, green: 0.137, blue: 0.314)        // #2F2350
-    static let text = Color(red: 0.957, green: 0.945, blue: 1.0)            // #F4F1FF
-    static let textSoft = Color(red: 0.718, green: 0.682, blue: 0.812)      // #B7AECF
-    static let violet = Color(red: 0.486, green: 0.227, blue: 0.929)        // #7C3AED
-    static let fuchsia = Color(red: 0.851, green: 0.275, blue: 0.937)       // #D946EF
-    static let lavender = Color(red: 0.788, green: 0.718, blue: 1.0)        // #C9B7FF
-    static let mint = Color(red: 0.204, green: 0.827, blue: 0.600)          // #34D399
-    static let alert = Color(red: 1.0, green: 0.459, blue: 0.533)           // #FF7588
+    static var ground: Color { BCDThemeStore.shared.color("ground") }
+    static var groundTop: Color { BCDThemeStore.shared.color("groundTop") }
+    static var surface: Color { BCDThemeStore.shared.color("surface") }
+    static var surfaceRaised: Color { BCDThemeStore.shared.color("surfaceRaised") }
+    static var stroke: Color { BCDThemeStore.shared.color("stroke") }
+    static var text: Color { BCDThemeStore.shared.color("text") }
+    static var textSoft: Color { BCDThemeStore.shared.color("textSoft") }
+    static var violet: Color { BCDThemeStore.shared.color("accent") }
+    static var fuchsia: Color { BCDThemeStore.shared.color("accentSecondary") }
+    static var lavender: Color { BCDThemeStore.shared.color("accentSoft") }
+    static var mint: Color { BCDThemeStore.shared.color("success") }
+    static var alert: Color { BCDThemeStore.shared.color("danger") }
+    static var amber: Color { BCDThemeStore.shared.color("warning") }
+    static var panel: Color { BCDThemeStore.shared.color("panel") }
+    static var onAccent: Color { BCDThemeStore.shared.color("onAccent") }
 
-    static let glow = LinearGradient(colors: [violet, fuchsia], startPoint: .leading, endPoint: .trailing)
-    static let backdrop = LinearGradient(colors: [groundTop, ground, ground], startPoint: .top, endPoint: .bottom)
+    static var glow: LinearGradient { LinearGradient(colors: [violet, fuchsia], startPoint: .leading, endPoint: .trailing) }
+    static var backdrop: LinearGradient { LinearGradient(colors: [groundTop, ground, ground], startPoint: .top, endPoint: .bottom) }
 
     static func title(_ size: CGFloat = 32) -> Font { .system(size: size, weight: .heavy, design: .rounded) }
     static func heading(_ size: CGFloat = 19) -> Font { .system(size: size, weight: .bold, design: .rounded) }
@@ -66,7 +68,7 @@ struct BCDPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(BCDStyle.label(17))
-            .foregroundStyle(.white)
+            .foregroundStyle(BCDStyle.onAccent)
             .frame(maxWidth: .infinity, minHeight: 54)
             .background(BCDStyle.glow, in: Capsule())
             .shadow(color: BCDStyle.fuchsia.opacity(configuration.isPressed ? 0.15 : 0.35), radius: 14, y: 4)

@@ -280,7 +280,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                 Image(uiImage: image).resizable().scaledToFill()
             } else if let initial = name?.first {
                 Circle().fill(BCDStyle.glow)
-                Text(String(initial).uppercased()).font(.system(size: 22, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                Text(String(initial).uppercased()).font(.system(size: 22, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
             } else {
                 Circle().fill(BCDStyle.surfaceRaised)
                 Image(systemName: "person.fill").font(.system(size: 22, weight: .semibold)).foregroundStyle(BCDStyle.textSoft)

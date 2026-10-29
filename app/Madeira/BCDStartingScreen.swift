@@ -266,7 +266,7 @@ struct BCDStartingScreen: View {
                 Image(systemName: symbol).font(.system(size: 13, weight: .bold))
                 Text(title).font(BCDStyle.label(13)).lineLimit(1)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(primary || on ? BCDStyle.onAccent : .white)
             .padding(.horizontal, 13).frame(minHeight: 36)
             .background {
                 if primary || on { Capsule().fill(BCDStyle.glow) } else { Capsule().fill(Color.white.opacity(0.14)) }

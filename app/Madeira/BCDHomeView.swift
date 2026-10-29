@@ -101,7 +101,7 @@ struct BCDHomeView: View {
                             // While its Play turns JIT on first, as the classic Play button said so.
                             let waiting = store.startingJIT == game.id
                             Label(waiting ? "Turning on JIT…" : "Play", systemImage: waiting ? "bolt.fill" : "play.fill")
-                                .font(BCDStyle.label(14)).foregroundStyle(.white)
+                                .font(BCDStyle.label(14)).foregroundStyle(BCDStyle.onAccent)
                                 .padding(.horizontal, 14).padding(.vertical, compact ? 5 : 7)
                                 .background(BCDStyle.glow, in: Capsule())
                             Text(heroDetail(game)).font(BCDStyle.body(13)).foregroundStyle(BCDStyle.text.opacity(0.9))

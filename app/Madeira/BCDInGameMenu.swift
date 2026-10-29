@@ -243,7 +243,7 @@ struct BCDInGameMenu: View {
             if primary {
                 Button { activate(row) } label: {
                     Label(row.title, systemImage: row.symbol ?? "play.fill")
-                        .font(BCDStyle.label(17)).foregroundStyle(.white)
+                        .font(BCDStyle.label(17)).foregroundStyle(BCDStyle.onAccent)
                         .frame(maxWidth: .infinity, minHeight: 50)
                         .background(BCDStyle.glow, in: Capsule())
                         .shadow(color: BCDStyle.fuchsia.opacity(0.3), radius: 10, y: 3)

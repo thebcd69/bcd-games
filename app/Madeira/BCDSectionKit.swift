@@ -13,7 +13,7 @@ import UIKit
 /// acts (docs/BCD-UI-ARCHITECTURE.md, "Performance").
 enum BCDSectionKit {
     /// The warm amber BCD uses for "needs a look" (the status chips use the same).
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 
     enum Tone {
         case good, warn, bad, info, soft
@@ -338,7 +338,7 @@ extension BCDSectionKit {
                                 Image(systemName: "checkmark").font(.system(size: 11, weight: .heavy)).foregroundStyle(BCDStyle.mint)
                             } else {
                                 Circle().fill(BCDStyle.glow)
-                                Text("\(index + 1)").font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                                Text("\(index + 1)").font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
                             }
                         }
                         .frame(width: 24, height: 24)

@@ -31,6 +31,7 @@ struct MadeiraApp: App {
         WindowGroup {
             // BCD's interface (BCDLiveFrontEnd, shown by ContentView) is the app's only interface.
             ContentView()
+                .tint(BCDStyle.lavender)
                 .modifier(ClaimGamepadEvents())
                 .onAppear {
                     GamepadInput.shared.start()

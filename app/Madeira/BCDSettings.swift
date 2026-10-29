@@ -783,6 +783,7 @@ struct BCDSettingsDetail: View {
         case .gecko: Self.gecko(model.backends.gecko)
         case .memory: Self.memory(model.backends.memory)
         case .graphics: Self.graphics(model.backends.graphics)
+        case .appearance: BCDAppearanceSettings()
         case .controls: Self.controls(model.backends.controls)
         case .storage: Self.storage(model.backends.storage)
         case .dotnet: Self.dotNet(model.backends.dotNet)
@@ -1091,7 +1092,7 @@ struct BCDSettingsNotice: View {
 
 enum BCDSettingsColor {
     /// Warnings: a change that needs a restart, an entitlement that is missing.
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 }
 
 /// What Settings says about a change that applies from BCD's next start.

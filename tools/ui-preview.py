@@ -184,6 +184,7 @@ def _build(out):
     if partial.exists():
         info.update(plistlib.loads(partial.read_bytes()))
     (app / "Info.plist").write_bytes(plistlib.dumps(info))
+    shutil.copy2(APP / "BCDThemes.json", app / "BCDThemes.json")
     fetch_art()
     for folder in sorted(ART_CACHE.glob("*")):
         if not folder.is_dir():
@@ -239,6 +240,7 @@ def _build_key():
         add(str(path.relative_to(ROOT)), path.read_bytes())
     for name in ("BCDLogo.imageset", "AppIcon.appiconset"):
         add(name, _tree_digest(APP / "Assets.xcassets" / name))
+    add("BCDThemes.json", (APP / "BCDThemes.json").read_bytes())
     # Store pictures are resources of the signed preview, not compiler inputs.
     for path in sorted(ART_CACHE.glob("*/*")):
         if path.name in ART_FILES and path.is_file():
