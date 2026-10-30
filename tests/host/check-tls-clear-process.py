@@ -141,6 +141,22 @@ typedef int NTSTATUS;
 #define TLS_MINIMUM_AVAILABLE 64
 #define HandleToULong(h) ((ULONG)(ULONG_PTR)(h))
 #define WINAPI
+#include <time.h>
+/* ios_tls_diag_util.h (included by the header): the PEB fields it reads, and fakes for the Mach read and the clock. The fake read is a
+ * plain copy: every address the production code reads in this harness (the fake PEBs, the TEB cells) is a real object here, and a PEB's
+ * LdrData is NULL, so the module walk ends at once ("nw.dll not found"). */
+typedef struct { void *LdrData; ULONG TlsBitmapBits[2]; ULONG TlsExpansionBitmapBits[32]; } PEB;
+typedef unsigned long mach_vm_size_t;
+typedef unsigned long long mach_vm_address_t;
+#define KERN_SUCCESS 0
+#define mach_task_self() 0
+#define mach_vm_read_overwrite(task, addr, len, buf, got) \
+    ((void)(task), memcpy( (void *)(uintptr_t)(buf), (const void *)(uintptr_t)(addr), (len) ), *(got) = (len), 0)
+#ifndef CLOCK_UPTIME_RAW
+#define CLOCK_UPTIME_RAW 8
+#endif
+#define clock_gettime_nsec_np(clock) ((unsigned long long)(clock) * 0 + 1000000000ULL)
+unsigned long long ios_tls_diag_seq_counter;   /* defined in virtual_ios.c, just above the function; the harness has only the function */
 struct list { struct list *next, *prev; };
 #define LIST_ENTRY(elem, type, field) ((type *)((char *)(elem) - offsetof(type, field)))
 #define LIST_FOR_EACH_ENTRY(elem, list, type, field) \
@@ -163,7 +179,7 @@ static struct list teb_list = { &teb_list, &teb_list };
 static int virtual_mutex;
 #define server_enter_uninterrupted_section(m, s) ((void)(m), (void)(s))
 #define server_leave_uninterrupted_section(m, s) ((void)(m), (void)(s))
-static struct { ULONG TlsExpansionBitmapBits[32]; } fake_peb, *peb = &fake_peb;
+static PEB fake_peb, *peb = &fake_peb;
 static TEB *cur_teb;
 #define NtCurrentTeb() (cur_teb)
 
@@ -176,7 +192,7 @@ static WOW_TEB wows[NT];
 #define NEXP 1024
 static void *exp64[NT][NEXP];
 static ULONG exp32[NT][NEXP];
-static int PA = 1, PB = 2, PC = 3;   /* three processes: A (the caller's), B (32-bit), C (64-bit) */
+static PEB PA, PB, PC;   /* three processes: A (the caller's), B (32-bit), C (64-bit); real PEB objects, so the diagnostic reads of them are valid */
 
 static void build(int caller_peb_null)
 {
@@ -271,7 +287,7 @@ else:
             check('switch off: every cell of every thread ends exactly as the original function leaves it, and the same return values',
                   orig.stdout == default.stdout and 'rets=0,0,0,0,c000000d,0,' in default.stdout, orig.stdout + '\n' + default.stdout)
             check('the original run prints no line (it has none)', orig.stderr == '', orig.stderr)
-            lines = [l for l in default.stderr.splitlines() if l.startswith('[tls-cross-clear] rev=ajan7-arkham')]
+            lines = [l for l in default.stderr.splitlines() if l.startswith('[tls-cross-clear] seq=') and ' rev=ajan7-arkham ' in l]
             # the threads: tid 0100 (the caller) and 0104 are process A's; 0108 and 010c are B's (32-bit TEBs); 0110 is C's (64-bit)
             check('switch off: a live cell of another process is logged as CLEARED, with the index, both thread ids, the PEBs, the width and the old value',
                   any('TlsFree(5) by tid 0100' in l and 'CLEARED' in l and 'tid 0108' in l and '32-bit' in l and 'was 0x6000006' in l for l in lines)
@@ -280,8 +296,15 @@ else:
                   not any('tid 0104' in l.split('live cell of')[1] for l in lines) and not any('TlsFree(7)' in l and ('tid 010c' in l.split('live cell of')[1] or 'tid 0110' in l.split('live cell of')[1]) for l in lines)
                   and not any('SPARED' in l for l in lines), default.stderr)
             check('switch off: the expansion cells are logged under their full index (64 + n)', any('TlsFree(67)' in l for l in lines) and any('TlsFree(73)' in l for l in lines), default.stderr)
-            lines_on = [l for l in on.stderr.splitlines() if l.startswith('[tls-cross-clear] rev=ajan7-arkham')]
+            lines_on = [l for l in on.stderr.splitlines() if l.startswith('[tls-cross-clear] seq=') and ' rev=ajan7-arkham ' in l]
             check('switch on: the same events are logged as SPARED, none as CLEARED', lines_on and all('SPARED' in l for l in lines_on) and len(lines_on) == len(lines), on.stderr)
+            # [TLS_CLEAR_DONE] is written after the store, once per CLEARED line, and reads the cell back; a SPARED cell is never written
+            done = [l for l in default.stderr.splitlines() if l.startswith('[TLS_CLEAR_DONE] seq=')]
+            cleared = [l for l in lines if ' CLEARED ' in l]
+            check('switch off: each CLEARED line is followed by one [TLS_CLEAR_DONE] (note_seq = its seq) that reads the cell back as zero',
+                  cleared and len(done) == len(cleared) and all(('note_seq=%s ' % c.split()[1].split('=')[1]) in d and '(zero)' in d
+                                                                for c, d in zip(cleared, done)), default.stderr)
+            check('switch on: nothing is written, so no [TLS_CLEAR_DONE]', '[TLS_CLEAR_DONE]' not in on.stderr, on.stderr)
             c5 = {l.split()[0]: l for l in on.stdout.splitlines() if l.startswith('t')}
             # tebs: t0, t1 = process A; t2, t3 = B; t4 = C. cells for index 5 / 7 and expansion 3 / 9 after the five calls
             check('switch on: the caller\'s process (both threads) is cleared as before',

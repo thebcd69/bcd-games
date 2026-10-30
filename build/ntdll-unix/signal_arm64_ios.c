@@ -1817,6 +1817,9 @@ done:
 /* ajan7-arkham: [wow-null32], a 32-bit guest's use of the NULL page: registers, stack and the thread's TLS cells with module+RVA
  * (see ios_wow_null_diag.h). Failure path only, capped. Uses the helpers of ios_av_args_diag.h. */
 #include "ios_wow_null_diag.h"
+/* [nw-tls]: the TLS key, the faulting thread's cell and the Slot::Get object of a NULL-page AV in a process with nw.dll (see ios_nw_tls_diag.h).
+ * Failure path only, once per faulting TID, only for a guest instruction inside one function of the analysed nw.dll. Uses ios_av_args_pc_is_jit of ios_av_args_diag.h. */
+#include "ios_nw_tls_diag.h"
 /* ajan18-bnet-cef (build 597): [int3-x86], an OPT-IN report for a 32-bit guest's int3 (env.MADEIRA_INT3_X86_DUMP = 1, set by Battle.net's launcher
  * entry only): the stack, the code, the module list and libcef.dll's CodeView record, to name the CHECK that kills Battle.net's Chromium renderers
  * (see ios_int3_x86_diag.h). Uses ios_av_args_read and the module helpers of ios_wow_null_diag.h. */
@@ -6538,6 +6541,11 @@ skip_reclaim_band: ;
                 if (cnt <= 5 || terminal_pc ||
                     (cnt <= 20000 ? (cnt % 100) == 0 : (cnt % 100000) == 0))
                 {
+                    /* [nw-tls] labels (see ios_nw_tls_diag.h): seq and monotonic t taken at the START of the handling of this exception,
+                     * before the first line of its report and before every diagnostic call below (ios_ajan2_fault_diag, ios_av_args_diag,
+                     * ios_x87_int64_diag, ios_wow_null_diag, ...). They are not the exact moment of the AV (that was earlier). */
+                    unsigned long long nw_fault_seq = ios_tls_diag_seq();
+                    unsigned long long nw_fault_t = ios_tls_diag_now_ns();
                     uint64_t fault_pc = fault_pc_check;
                     dprintf(STDERR_FILENO, "[mach_exc] UNHANDLED #%d pc=%p addr=%p x18=%p type=%d lr=%p sp=%p x16=%p x17=%p\n",
                         cnt, (void*)(uintptr_t)fault_pc, (void*)fault_addr,
@@ -6797,6 +6805,9 @@ skip_reclaim_band: ;
                     /* ajan7-arkham: [wow-null32], the NULL page of a 32-bit guest (Wine Mono in BmLauncher.exe, Batman: Arkham City GOTY);
                      * see ios_wow_null_diag.h. */
                     ios_wow_null_diag( &state, thread_teb, req->exception, fault_addr );
+                    /* [nw-tls]: TLS key / cell / Slot::Get object, NULL-class faults in a guest function of nw.dll; see ios_nw_tls_diag.h.
+                     * nw_fault_seq / nw_fault_t were taken at the start of this report (top of the block), not here. */
+                    ios_nw_tls_diag( &state, thread_teb, req->exception, fault_addr, nw_fault_seq, nw_fault_t );
                     /* madeira-bcd [fault-full]: every register, and the host code
                      * that led up to the faulting instruction (JIT blocks compute
                      * the address a few instructions earlier), for the first two

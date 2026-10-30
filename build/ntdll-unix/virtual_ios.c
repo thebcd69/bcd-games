@@ -27539,6 +27539,8 @@ NTSTATUS WINAPI NtSetLdtEntries( ULONG sel1, ULONG entry1_low, ULONG entry1_high
  *           virtual_clear_tls_index
  */
 #include "ios_tls_clear.h"
+/* the one sequence counter of [tls-cross-clear] and [nw-tls] (declared in ios_tls_diag_util.h) */
+unsigned long long ios_tls_diag_seq_counter;
 NTSTATUS virtual_clear_tls_index( ULONG index )
 {
     struct ntdll_thread_data *thread_data;
@@ -27550,6 +27552,14 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
     void *caller_peb = caller_teb ? caller_teb->Peb : NULL;
     unsigned caller_tid = caller_teb ? HandleToULong( caller_teb->ClientId.UniqueThread ) : 0;
     int own_only = ios_tls_clear_own_process_only();
+    struct ios_tls_clear_pass pass;
+#ifdef _WIN64
+    int caller_32 = caller_teb && get_wow_teb( caller_teb ) != NULL;     /* log only */
+#else
+    int caller_32 = 1;
+#endif
+
+    memset( &pass, 0, sizeof(pass) );
 
     if (index < TLS_MINIMUM_AVAILABLE)
     {
@@ -27558,14 +27568,17 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
         {
             TEB *teb = CONTAINING_RECORD( thread_data, TEB, GdiTebBatch );
             int foreign = ios_tls_clear_is_foreign( teb->Peb, caller_peb );
+            struct ios_tls_clear_pending pend = { 0 };
 #ifdef _WIN64
             WOW_TEB *wow_teb = get_wow_teb( teb );
             if (foreign)
             {
                 ULONG_PTR old = wow_teb ? wow_teb->TlsSlots[index] : (ULONG_PTR)teb->TlsSlots[index];
 
-                if (old) ios_tls_clear_note( own_only, index, caller_tid, caller_peb, HandleToULong( teb->ClientId.UniqueThread ),
-                                             teb->Peb, wow_teb != NULL, old );
+                if (old) ios_tls_clear_note( &pass, &pend, own_only, index, caller_tid, caller_peb, caller_32,
+                                             HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, teb,
+                                             wow_teb ? (const void *)&wow_teb->TlsSlots[index] : (const void *)&teb->TlsSlots[index],
+                                             wow_teb != NULL, old );
                 if (own_only) continue;
             }
             if (wow_teb) wow_teb->TlsSlots[index] = 0;
@@ -27573,13 +27586,14 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
 #else
             if (foreign)
             {
-                if (teb->TlsSlots[index]) ios_tls_clear_note( own_only, index, caller_tid, caller_peb,
-                                                              HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, 1,
-                                                              (ULONG_PTR)teb->TlsSlots[index] );
+                if (teb->TlsSlots[index]) ios_tls_clear_note( &pass, &pend, own_only, index, caller_tid, caller_peb, caller_32,
+                                                              HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, teb,
+                                                              &teb->TlsSlots[index], 1, (ULONG_PTR)teb->TlsSlots[index] );
                 if (own_only) continue;
             }
 #endif
             teb->TlsSlots[index] = 0;
+            ios_tls_clear_done( &pend );
         }
         server_leave_uninterrupted_section( &virtual_mutex, &sigset );
     }
@@ -27593,6 +27607,7 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
         {
             TEB *teb = CONTAINING_RECORD( thread_data, TEB, GdiTebBatch );
             int foreign = ios_tls_clear_is_foreign( teb->Peb, caller_peb );
+            struct ios_tls_clear_pending pend = { 0 };
 #ifdef _WIN64
             WOW_TEB *wow_teb = get_wow_teb( teb );
             if (wow_teb)
@@ -27608,12 +27623,13 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
 #endif
                     if (foreign)
                     {
-                        if (((ULONG *)slots)[index]) ios_tls_clear_note( own_only, index + TLS_MINIMUM_AVAILABLE, caller_tid, caller_peb,
-                                                                         HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, 1,
-                                                                         ((ULONG *)slots)[index] );
+                        if (((ULONG *)slots)[index]) ios_tls_clear_note( &pass, &pend, own_only, index + TLS_MINIMUM_AVAILABLE, caller_tid, caller_peb, caller_32,
+                                                                         HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, teb,
+                                                                         &((ULONG *)slots)[index], 1, ((ULONG *)slots)[index] );
                         if (own_only) continue;
                     }
                     ((ULONG *)slots)[index] = 0;
+                    ios_tls_clear_done( &pend );
                 }
             }
             else
@@ -27622,12 +27638,14 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
             {
                 if (foreign)
                 {
-                    if (teb->TlsExpansionSlots[index]) ios_tls_clear_note( own_only, index + TLS_MINIMUM_AVAILABLE, caller_tid, caller_peb,
-                                                                           HandleToULong( teb->ClientId.UniqueThread ), teb->Peb,
-                                                                           0, (ULONG_PTR)teb->TlsExpansionSlots[index] );
+                    if (teb->TlsExpansionSlots[index]) ios_tls_clear_note( &pass, &pend, own_only, index + TLS_MINIMUM_AVAILABLE, caller_tid, caller_peb, caller_32,
+                                                                           HandleToULong( teb->ClientId.UniqueThread ), teb->Peb, teb,
+                                                                           &teb->TlsExpansionSlots[index], 0,
+                                                                           (ULONG_PTR)teb->TlsExpansionSlots[index] );
                     if (own_only) continue;
                 }
                 teb->TlsExpansionSlots[index] = 0;
+                ios_tls_clear_done( &pend );
             }
         }
         server_leave_uninterrupted_section( &virtual_mutex, &sigset );
