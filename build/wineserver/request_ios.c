@@ -429,6 +429,38 @@ static void ios_req_census( struct thread *thread, enum request req )
     }
 }
 
+#ifdef WINE_IOS
+/* madeira-bcd (round 624, agent E1 S9; Far Cry 3's updater says "Cannot find essential information in the registry", 0AME71, 8N7HRS,
+ * A7587D, and no line says which key): env.MADEIRA_REG_TRACE = 1 prints every registry request that failed (open or create a key, read
+ * or enumerate a value, enumerate a key) as Wine's own request and reply trace, each line tagged "[reg-miss] ", 400 requests a session
+ * at most. Off unless set (one getenv); log only, the reply is the same. */
+static int ios_reg_trace_want( enum request req, unsigned int error )
+{
+    static int mode = -1, said;
+
+    if (mode < 0)
+    {
+        const char *e = getenv( "MADEIRA_REG_TRACE" );
+        mode = e && e[0] == '1' && !e[1];
+    }
+    if (!mode || !error) return 0;
+    switch (req)
+    {
+    case REQ_open_key: case REQ_create_key: case REQ_get_key_value: case REQ_enum_key: case REQ_enum_key_value: break;
+    default: return 0;
+    }
+    return __atomic_add_fetch( &said, 1, __ATOMIC_RELAXED ) <= 400;
+}
+
+static void ios_reg_trace( enum request req, const union generic_reply *reply )
+{
+    fputs( "[reg-miss] ", stderr );
+    trace_request();
+    fputs( "[reg-miss] ", stderr );
+    trace_reply( req, reply );
+}
+#endif
+
 /* call a request handler */
 static void call_req_handler( struct thread *thread )
 {
@@ -455,6 +487,9 @@ static void call_req_handler( struct thread *thread )
             reply.reply_header.error = current->error;
             reply.reply_header.reply_size = current->reply_size;
             if (debug_level) trace_reply( req, &reply );
+#ifdef WINE_IOS
+            else if (ios_reg_trace_want( req, current->error )) ios_reg_trace( req, &reply );   /* madeira-bcd: [reg-miss] */
+#endif
             send_reply( &reply );
         }
         else
@@ -572,6 +607,7 @@ static int ios_srv_run_direct( struct thread *thread, union generic_reply *reply
             reply->reply_header.error = current->error;
             reply->reply_header.reply_size = current->reply_size;
             if (debug_level) trace_reply( req, reply );
+            else if (ios_reg_trace_want( req, current->error )) ios_reg_trace( req, reply );   /* madeira-bcd: [reg-miss] */
             if (current->reply_size) memcpy( reply_data, current->reply_data, current->reply_size );
             free( current->reply_data );
             current->reply_data = NULL;
@@ -1273,7 +1309,8 @@ static void acquire_lock(void)
 #endif
     if (bind( fd, (struct sockaddr *)&addr, slen ) == -1)
     {
-        if ((errno == EEXIST) || (errno == EADDRINUSE))
+        int bind_errno = errno;
+        if ((bind_errno == EEXIST) || (bind_errno == EADDRINUSE))
         {
             if (got_lock)
                 fatal_error( "couldn't bind to the socket even though we hold the lock\n" );
@@ -1283,8 +1320,45 @@ static void acquire_lock(void)
             exit(2); /* we didn't get the lock, exit with special status */
 #endif
         }
-        fatal_error( "bind: %s\n", strerror( errno ));
+#ifdef WINE_IOS
+        /* madeira-bcd (round 624, agent D2 S1; RM4C0R, AQZ3E2, 3DX90K and BioShock 2 on Discord, all LiveContainer installs): iOS refused
+         * the Unix socket ("[Wine] FATAL: bind: Operation not permitted"), the server thread ended and the session sat on a black screen.
+         * The name is relative to the process's working directory, which another thread may have changed: if it is not the server
+         * directory, go back there and try once more. If that fails too, carry on without the master socket: BCD never accepts a
+         * client through it (the first client and every child connect through a socketpair, WineProcessBridge.m / process_ios.c), and
+         * close_master_socket() is NULL-safe. This branch ended the server before; a working session never reaches it. */
+        {
+            char cwd[1024];
+            struct stat here, dir;
+            int same = 0, retried = 0;
+
+            if (!getcwd( cwd, sizeof(cwd) )) strcpy( cwd, "(getcwd failed)" );
+            same = server_dir_fd != -1 && stat( ".", &here ) == 0 && fstat( server_dir_fd, &dir ) == 0 &&
+                   here.st_ino == dir.st_ino && here.st_dev == dir.st_dev;
+            ws_log( "[wineserver] bind(%s) failed errno=%d (%s): cwd=%s server_dir=%s same-dir=%d access-w=%d got_lock=%d rev=r624",
+                    server_socket_name, bind_errno, strerror( bind_errno ), cwd, server_dir, same, access( ".", W_OK ) == 0, got_lock );
+            if (!same && got_lock && server_dir_fd != -1 && fchdir( server_dir_fd ) == 0)
+            {
+                retried = 1;
+                unlink( server_socket_name );
+                if (bind( fd, (struct sockaddr *)&addr, slen ) != -1)
+                {
+                    ws_log( "[wineserver] bind(%s) succeeded in the server directory rev=r624", server_socket_name );
+                    goto ios_bound;
+                }
+                bind_errno = errno;
+            }
+            ws_log( "[wineserver] %s (errno=%d); continuing without the master socket (BCD's clients connect through socketpairs) rev=r624",
+                    retried ? "the retry in the server directory failed too" : "no retry", bind_errno );
+        }
+        close( fd );
+        return;
+#endif
+        fatal_error( "bind: %s\n", strerror( bind_errno ));
     }
+#ifdef WINE_IOS
+ios_bound:
+#endif
     atexit( socket_cleanup );
     chmod( server_socket_name, 0600 );  /* make sure no other user can connect */
     if (listen( fd, 5 ) == -1) fatal_error( "listen: %s\n", strerror( errno ));

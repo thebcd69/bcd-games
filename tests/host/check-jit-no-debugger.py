@@ -123,7 +123,7 @@ check("the pool request asks P_TRACED, and only asks JITNoDebuggerPool with CS_D
       and "defer { releaseNoDebuggerEntries() }" in pool)
 check("it arms the trap fallback whenever nothing is traced and the pool is the debugger's",
       'if !debuggerAttached && !noDebugger && MadeiraConfig.flag("MADEIRA_JIT_TRAP_FALLBACK") {' in pool
-      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(poolSize)"))
+      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(poolSize, attempt: attempt)"))
 check("no exit() in the pool request: a failure refuses the launch and keeps BCD up",
       "exit(" not in code(pool) and "Killing in 10s" not in pool and "exiting now" not in pool)
 check("an unanswered request reads P_TRACED again before calling it 'no debugger'",
@@ -133,8 +133,10 @@ check("no direct region request or vm_remap left in StikJITHelper outside the tw
       counts == {"jit26_prepare_region(": 1, "vm_remap(": 1, "requestRegion(": 6, "remapRW(": 8}, str(counts))
 request = braced(stik, "private static func requestRegion(")
 remap = braced(stik, "private static func remapRW(")
-check("their debugger branches are the pool's old calls, unchanged",
-      "guard noDebugger else { return jit26_prepare_region(nil, size) }" in request
+# round 624 (agent R S2): the debugger branch records the request first (BCDBrkTrail, an fsynced file line) and still makes the same call
+check("their debugger branches are the pool's old calls, unchanged (the request recorded first, round 624)",
+      "guard noDebugger else {" in request and "return jit26_prepare_region(nil, size)" in request
+      and request.index("BCDBrkTrail.begin(site: site, size: size, attempt: attempt)") < request.index("return jit26_prepare_region(nil, size)")
       and "return vm_remap(mach_task_self_, &address, size, 0, flags, mach_task_self_, rx, 0, &cur, &max, VM_INHERIT_NONE)" in remap
       and "if let region = noDebuggerEntries[rx] {" in remap)
 detach = braced(stik, "static func detachDebugger()")

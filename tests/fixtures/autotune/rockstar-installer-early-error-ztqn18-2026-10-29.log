@@ -1,0 +1,144 @@
+[19:13:58.687] [INFO] Checking entitlements...
+[19:13:58.688] [INFO] [build] v0.1.614 (614)
+[19:13:58.689] [INFO] [device] model=iPad13,4 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7538MB available=8170MB cores=8
+[19:13:58.689] [INFO] [device] address-map=[0x1006d0000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:13:58.702] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2388@1.7195876288659795x max-fps=120 utc-offset=-04:00 free-disk=21GB stikdebug-url=0
+[19:13:58.706] [INFO] [device] gpu="Apple M1 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:14:14.350] [INFO] Requesting JIT with Built-in StikJIT...
+[19:14:15.887] [INFO] [bcd] library launch Rockstar-Games-Launcher.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:14:15.916] [INFO] Running full Wine sequence...
+[19:14:15.916] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1006d0000,0x8000000000) 512GB available=8157MB low-power=0 thermal=nominal
+[19:14:15.927] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:14:15.927] [INFO] Allocating 896MB JIT pool via debugger...
+[19:14:15.927] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:14:15.928] [INFO] [jit-debugger] attached=1 at the pool request
+[19:14:15.931] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:14:17.311] [INFO] RX pool at 0x11bd78000
+[19:14:17.338] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.478s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7570 MB + phys_footprint=621 MB = 8192 MB (hw.memsize says 7538 MB)
+ml985: preferred base 0x140000000+0xa0000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 7 .text pages executable (copy @0x11bd7c000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11be20000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[ec-hook] #1 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d42b5+0x3: rva 0x142b5, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 6a 40 b9 e0 03 17 aa 51 16 00 94 e4 03 00 aa e2 | pool before sync: 2f 02 14 e0 03 17 aa 51 16 00 94 e4 03 00 aa e2 | jump -> 0 (-) bytes there: -
+[ec-hook] #2 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d42ec+0x4: rva 0x142ec, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 15 aa 43 16 00 94 e4 03 00 aa | pool before sync: 4a 2f 02 14 e0 03 15 aa 43 16 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #3 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d4418+0x4: rva 0x14418, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 54 6a 40 b9 e0 03 13 aa f8 15 00 94 e4 03 00 aa | pool before sync: 04 2f 02 14 e0 03 13 aa f8 15 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #4 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d4450+0x4: rva 0x14450, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 55 6a 40 b9 e0 03 13 aa ea 15 00 94 e4 03 00 aa | pool before sync: fb 2e 02 14 e0 03 13 aa ea 15 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #5 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d42b5+0x3: rva 0x142b5, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 6a 40 b9 e0 03 17 aa 51 16 00 94 e4 03 00 aa e2 | pool before sync: 2f 02 14 e0 03 17 aa 51 16 00 94 e4 03 00 aa e2 | jump -> 0 (-) bytes there: -
+[ec-hook] #6 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d42ec+0x4: rva 0x142ec, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 15 aa 43 16 00 94 e4 03 00 aa | pool before sync: 4a 2f 02 14 e0 03 15 aa 43 16 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #7 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d4418+0x4: rva 0x14418, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 54 6a 40 b9 e0 03 13 aa f8 15 00 94 e4 03 00 aa | pool before sync: 04 2f 02 14 e0 03 13 aa f8 15 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #8 scope=difference view=difference tid=0024 image 0x1164c0000 (pool copy 0x11bd7c000) 0x1164d4450+0x4: rva 0x14450, section #0 '.text' rva 0x10000+0x1addc chars 0x60000020 (R-X CODE) | PE bytes: 55 6a 40 b9 e0 03 13 aa ea 15 00 94 e4 03 00 aa | pool before sync: fb 2e 02 14 e0 03 13 aa ea 15 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11bf38000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11bfe0000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[footprint] rev=ml358 phys=631 MB (peak 631) internal=630 MB compressed=0 MB external=91 MB reusable=9 MB (cycle=1)
+[copy-verify] shell32.dll: OK, 30 .text pages executable (copy @0x11c160000)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x11ca44000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  2.019s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\"" (fd=74, unixdir=76, dup_unixdir=80) cwd=L"C:\\External\\Grand Theft Auto IV\\Redistributables\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x11df50000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x11dfb4000)
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x11e048000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x11e0ac000)
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  2.093s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\" " (fd=90, unixdir=91, dup_unixdir=95) cwd=L"C:\\External\\Grand Theft Auto IV\\Redistributables\\"
+[Wine child thread] calling wine_ios_child_main...
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=172
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=175
+002c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=79
+[ec-hook] #1 scope=other-jump view=pool tid=0034 image 0x148100000 (pool copy 0x11e69c000) 0x148117101+0x7: rva 0x17101, section #0 '.text' rva 0x10000+0x90d4 chars 0x60000020 (R-X CODE) | PE bytes: e9 0f 36 44 6a 40 b9 42 00 00 d0 42 00 29 91 43 | pool before sync: e9 0f 36 05 24 01 14 42 00 00 d0 42 00 29 91 43 | jump -> 0x142706715 (no pool copy) bytes there: -
+[ec-hook] #2 scope=other-jump view=pool tid=0034 image 0x148100000 (pool copy 0x11e69c000) 0x148117101+0x7: rva 0x17101, section #0 '.text' rva 0x10000+0x90d4 chars 0x60000020 (R-X CODE) | PE bytes: e9 0f 36 44 6a 40 b9 42 00 00 d0 42 00 29 91 43 | pool before sync: e9 0f 36 05 24 01 14 42 00 00 d0 42 00 29 91 43 | jump -> 0x142706715 (no pool copy) bytes there: -
+[Wine ntdll/server] process_exit_wrapper(0)
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  2.141s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\External\\Grand Theft Auto IV\\Redistributables\\Rockstar-Games-Launcher.exe\"" (fd=38, unixdir=84, dup_unixdir=87) cwd=L"C:\\External\\Grand Theft Auto IV\\Redistributables\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x11ee24000)
+[footprint] rev=ml358 phys=700 MB (peak 700) internal=699 MB compressed=0 MB external=147 MB reusable=9 MB (cycle=2)
+[phase] spawn:L"C:\\External\\Grand Theft Auto IV\\Redistributables\\Rockstar-Games-Launcher.exe" t+  5.002s rev=ml526
+003c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\External\\Grand Theft Auto IV\\Redistributables\\Rockstar-Games-Launcher.exe\" " (fd=79, unixdir=107, dup_unixdir=130) cwd=L"C:\\External\\Grand Theft Auto IV\\Redistributables\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x51a5000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml957: ? backing 0x140000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+003c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=354
+003c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=86
+[Wine ntdll/server] process_exit_wrapper(0)
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 2 child process(es) it started still run (services.exe rockstar-games-launcher.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[guest-log] madeira-bcd text-log mirror: every line, 4000 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[guest-log] file <container>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] #1 tid=004c [rpm-sink] alive rev=ml492
+D 4C Load module Rockstar-Games-Launcher.exe (rockstar-games-launcher.exe-f51c9f60a5cda264): 140000000
+D 4C Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FBC20000
+D 4C Load module COMDLG32.dll (comdlg32.dll-bb3453125056fbd5): 71FA160000
+D 4C Load module shell32.dll (shell32.dll-a220962968ad1278): 71F97E0000
+D 4C Load module shlwapi.dll (shlwapi.dll-ce1cdcc1d59e3a45): 71F9730000
+D 4C Load module shcore.dll (shcore.dll-3f5429270fe01a6d): 71F96B0000
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x11de6c000)
+004c:err:win:ios_child_desktop_fixup [child-desktop] pid=0048 peb=0x107cac000 tid=004c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10022 msg_window=0x10024
+D 4C Load module gdiplus.dll (gdiplus.dll-9e10e44f0c88eb20): 71F86C0000
+D 4C Load module mlang.dll (mlang.dll-c9ca3bb38c68f055): 71F8620000
+D 4C Load module windowscodecs.dll (windowscodecs.dll-5f3613b68f058a67): 71F7F80000
+D 4C Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71F7EE0000
+[nls-getptr] type=11 id=10000 peb=0x107cac000
+[win-name] #3 hwnd=0x1002c class='' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x10028 class='' text="Rockstar Games Launcher Installer" rev=ml853
+[win-name] #5 hwnd=0x10028 class='' text="Rockstar Games Launcher Installer" rev=ml853
+D 4C Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71F7DC0000
+D 4C Load module msacm32.dll (msacm32.dll-6badd8b32a7d355b): 71F7D30000
+004c:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+004c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[footprint] rev=ml358 phys=936 MB (peak 936) internal=935 MB compressed=0 MB external=188 MB reusable=9 MB (cycle=3)
+[phase] spawn:L"C:\\windows\\system32\\rpcss.exe" t+  6.077s rev=ml526
+0054:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\rpcss.exe" (fd=159, unixdir=160, dup_unixdir=164) cwd=L"C:\\External\\Grand Theft Auto IV\\Redistributables\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x107e70000
+[nls-getptr] type=11 id=437 peb=0x107e70000
+[nls-getptr] type=11 id=20127 peb=0x107e70000
+[nls-getptr] type=11 id=10000 peb=0x107cac000
+[win-name] #17 hwnd=0x10040 class='' text="&Yes" rev=ml853
+[win-name] #18 hwnd=0x10040 class='' text="&Yes" rev=ml853
+[win-name] #20 hwnd=0x10042 class='' text="&No" rev=ml853
+[win-name] #44 hwnd=0x10052 class='' text="Help" rev=ml853
+[win-name] #45 hwnd=0x10052 class='' text="Help" rev=ml853
+[win-name] #50 hwnd=0x10038 class='' text="Rockstar Games Launcher" rev=ml853
+[win-name] #52 hwnd=0x10054 class='' text="An error has occurred. Please make sure all instances of the Rockstar Games Launcher have been closed and try again. If you continue to see this error, please visit: https://support.rockstargames.com" rev=ml853
+[win-name] #53 hwnd=0x10048 class='' text="OK" rev=ml853
+[win-name] #54 hwnd=0x10038 class='' text="Rockstar Games Launcher" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x107cac000
+[xp-names] m241956 "wine-x18-exc"
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=956 MB (peak 956) internal=955 MB compressed=0 MB external=194 MB reusable=9 MB (cycle=4)
+[footprint] rev=ml358 phys=956 MB (peak 956) internal=955 MB compressed=0 MB external=194 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=956 MB (peak 956) internal=955 MB compressed=0 MB external=194 MB reusable=9 MB (cycle=6)
+[19:14:34.401] [INFO] [session] length=18s partial=1 play=0s frames=0 stalls=0/0s peak=956MB limit=8191MB thermal=nominal lpm=0 res=1144x800 cap=60 game=Redistributables
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ffe9040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[19:14:47.421] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=1 iter=71 gen=1 threads=32 resident=1158MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ffe9040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=1 iter=190 gen=1 threads=28 resident=1159MB dbg=DEBUGGED rev=ml525
+[19:15:17.524] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ffe9040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=36)
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=37)
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=38)
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=39)
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=40)
+[freeze] alive t+90s beats=3 gaps=1 iter=309 gen=1 threads=27 resident=1159MB dbg=DEBUGGED rev=ml525
+[19:15:47.617] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[footprint] rev=ml358 phys=953 MB (peak 956) internal=951 MB compressed=0 MB external=195 MB reusable=11 MB (cycle=41)

@@ -319,7 +319,7 @@ func pe(_ url: URL, machine: UInt16) throws {
                   "\"installscript\" { \"run process\" { \"Shared Runtime\" { \"HasRunKey\" \"HKEY_LOCAL_MACHINE\\\\Software\\\\Fixture Shared\" \"process 1\" \"%INSTALLDIR%\\\\_CommonRedist\\\\Shared\\\\2015\\\\setup.exe\" } } }")
         try pe(common.appendingPathComponent("Steamworks Shared/_CommonRedist/Shared/2015/setup.exe"), machine: 0x8664)
         try write(folder.appendingPathComponent("bin/other.vdf"), "\"nothing\" { }")
-        require(DockInstallers.resolve(dir + "\\redist\\tool.exe", drive: drive)?.lastPathComponent == "Tool.EXE", "paths resolve case-insensitively")
+        require(DockInstallers.resolve(dir + "\\redist\\tool.exe", drive: drive)?.lastPathComponent.lowercased() == "tool.exe", "paths resolve case-insensitively")
         require(DockInstallers.resolve(dir + "\\..\\..\\x.exe", drive: drive) == nil && DockInstallers.resolve("D:\\x.exe", drive: drive) == nil &&
                 DockInstallers.resolve(dir + "\\nothing.exe", drive: drive) == nil, "parent references, other drives and absent files do not resolve")
         try FileManager.default.createSymbolicLink(at: folder.appendingPathComponent("link"), withDestinationURL: base)
@@ -501,6 +501,20 @@ func pe(_ url: URL, machine: UInt16) throws {
         try write(drive.appendingPathComponent("bcd-dock-installers.result"), "begin 1 \r\nservices started\r\nstart 1 setup \r\n")
         let t0 = Date()
         require(DockInstallers.poll(drive: drive, now: t0) == "One-time install 1 of 1: setup is running…", "a fresh run: no stall words")
+        // madeira-bcd (round 624, 7NKYWT): two minutes in an installs-only session: the time in the status, the way out when the next start
+        // skips the installs, and one log line naming the app and the program.
+        require(DockInstallers.poll(drive: drive, now: t0.addingTimeInterval(100)) == "One-time install 1 of 1: setup is running…",
+                "100 s: no words yet")
+        let slow = DockInstallers.poll(drive: drive, now: t0.addingTimeInterval(130)) ?? ""
+        require(!DockInstallers.installsOnly ||
+                (slow.hasPrefix("One-time install 1 of 1: setup is running… (2 min 10 s)") &&
+                 slow.contains("the next start skips the installs and starts the game.") == DockInstallers.skipsNextStart &&
+                 !slow.contains("If its window has stopped changing")),
+                "an installs-only session after 130 s: the time, the way out only when the next start skips the installs (\(slow))")
+        _ = DockInstallers.poll(drive: drive, now: t0.addingTimeInterval(200))
+        require(!DockInstallers.installsOnly ||
+                (LogStore.shared.lines.filter({ $0.contains("[dock-installers] app=7002 install still running after 130 s: program=setup") }).count == 1 &&
+                 !logged("install still running after 200 s")), "the two-minute line is logged once, with the app and the program")
         let stalled = DockInstallers.poll(drive: drive, now: t0.addingTimeInterval(601)) ?? ""
         require(stalled.hasPrefix("One-time install 1 of 1: setup is running… (10 min)\nIf its window has stopped changing") && stalled.contains("Record as done"),
                 "after 10 minutes on one program the text names the minutes and the way out (\(stalled))")

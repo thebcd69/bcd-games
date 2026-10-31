@@ -280,15 +280,17 @@ check("a downloaded list may set them, with the one value each and nothing else"
 # --- the lists and auto-tune ---------------------------------------------------------------------------------------------
 recs = json.loads((root / "recommended/recommendations.json").read_text())
 with_d8 = [r["id"] for r in recs["rules"] if "MADEIRA_D3D8" in json.dumps(r["config"])]
-check("only the four Direct3D 8 games of the logs carry env.MADEIRA_D3D8 = d3d9, each from build 602 only, after the standard line",
-      with_d8 == ["grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2"]
+# round 624 (agent D2): Red Faction's launcher (8R8V3Z) is the fifth.
+check("only the five Direct3D 8 games of the logs carry env.MADEIRA_D3D8 = d3d9, each from build 602 only, after the standard line",
+      with_d8 == ["grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2", "red-faction"]
       and all(next(r for r in recs["rules"] if r["id"] == i)["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602}] for i in with_d8))
 matches = {r["id"]: r["match"] for r in recs["rules"] if r["id"] in with_d8}
-check("their matches are the games' Steam App IDs (12100, 223470, 219150, 12150), install folders and programs",
+check("their matches are the games' Steam App IDs (12100, 223470, 219150, 12150, 20530), install folders and programs",
       matches == {"grand-theft-auto-iii": {"steamAppIDs": [12100], "steamFolders": ["grand theft auto 3"], "programs": [{"name": "gta3.exe"}]},
                   "postal-2": {"steamAppIDs": [223470], "steamFolders": ["postal2complete"], "programs": [{"name": "postal2.exe"}]},
                   "hotline-miami": {"steamAppIDs": [219150], "steamFolders": ["hotline_miami"], "programs": [{"name": "hotlinemiami_original.exe"}]},
-                  "max-payne-2": {"steamAppIDs": [12150], "steamFolders": ["max payne 2 the fall of max payne"], "programs": [{"name": "maxpayne2.exe"}]}})
+                  "max-payne-2": {"steamAppIDs": [12150], "steamFolders": ["max payne 2 the fall of max payne"], "programs": [{"name": "maxpayne2.exe"}]},
+                  "red-faction": {"steamAppIDs": [20530], "steamFolders": ["red faction"], "programs": [{"name": "redfaction.exe"}]}})
 check("no list sets env.MADEIRA_DDRAW (no log shows a 2D DirectDraw game that fails: the ddraw failures in the logs are probes of D3D9 and D3D11 games)",
       not any("MADEIRA_DDRAW" in json.dumps(r["config"]) for r in recs["rules"]))
 working = {"rdr2-steam", "rdr2-other", "gta5e-steam", "gta5e-other", "gta5l-steam", "gta5l-other", "ghost-of-tsushima", "god-of-war", "horizon-zero-dawn",
@@ -299,8 +301,9 @@ spec = __import__("importlib.util").util.spec_from_file_location("autotune_rules
 mod = __import__("importlib.util").util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 rule = next(r for r in mod.RULES if r["id"] == "d3d8-to-d3d9")
-check("auto-tune's rule adds the one line, needs the GL failure and a loaded d3d8.dll, is the four games' alone and stops once the bridge linked (or lacked) the DLL",
-      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 13
+# round 624 (agent D2): Red Faction's launcher (8R8V3Z) joins with its three lines, 16 in all.
+check("auto-tune's rule adds the one line, needs the GL failure and a loaded d3d8.dll, is the five games' alone and stops once the bridge linked (or lacked) the DLL",
+      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 16
       and {"has": ["(d3d8.dll-", "Load module"]} in rule["all"] and {"has": ["wined3d_adapter_gl_init Failed to get a GL context"]} in rule["all"]
       and {"has": ["MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll"]} in rule["none"] and "noFix" not in rule and "fixedIn" not in rule)
 fx = root / "tests/fixtures/autotune"
@@ -316,7 +319,8 @@ def rule_matches(r, text):
             and not any(signal_hits(text, x) for x in r.get("none", [])))
 
 
-for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-miami-d3d8-2026-10-21", "exited-early"), ("gta-iii-d3d8-2026-10-24", "exited-early")):
+for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-miami-d3d8-2026-10-21", "exited-early"), ("gta-iii-d3d8-2026-10-24", "exited-early"),
+                           ("red-faction-d3d8-2026-10-29", "exited-early")):
     expect = json.loads((fx / (name + ".expect")).read_text())
     log = (fx / (name + ".log")).read_text()
     check(f"{name}: the fixture proposes the line ({expect['outcome']}, stage {expect['stage']})",
@@ -332,7 +336,7 @@ for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-mi
           not re.search(r"/var/mobile/Containers|/Users/(?!<user>)|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}|\b(?:\d{1,3}\.){3}\d{1,3}\b", log))
 others = [p.name[:-7] for p in fx.glob("*.expect") if "d3d8-to-d3d9" in json.loads(p.read_text()).get("matched", [])]
 check("no other fixture matches it (Vice City, Hitman, Peggle, the D3D9 and D3D11 games): %s" % others,
-      sorted(others) == ["gta-iii-d3d8-2026-10-24", "hotline-miami-d3d8-2026-10-21", "postal-2-d3d8-2026-10-24"])
+      sorted(others) == ["gta-iii-d3d8-2026-10-24", "hotline-miami-d3d8-2026-10-21", "postal-2-d3d8-2026-10-24", "red-faction-d3d8-2026-10-29"])
 catalog_ok = '"env.MADEIRA_D3D8"' in (root / "build/tools/gen-config-catalog.py").read_text()
 check("the rule's key is in the settings catalog's overlay", catalog_ok)
 

@@ -46,6 +46,7 @@ harness = r'''
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define ucontext_t fake_ucontext_t   /* macOS's <stdlib.h> already pulls in <sys/_types/_ucontext.h>; the fake mimics Darwin arm64's layout */
 typedef struct { uint64_t __x[29], __fp, __lr, __sp, __pc; } ss_t;
 typedef struct { __uint128_t __v[32]; } ns_t;
 typedef struct { ss_t __ss; ns_t __ns; } mctx_t;
@@ -57,6 +58,9 @@ static int ios_ld_setvec(ucontext_t *ctx, int rt, uintptr_t a, int bytes) { memc
 struct mach_header_64 { uint32_t magic; };
 static struct mach_header_64 fake_header;
 static const void *_dyld_get_image_header(unsigned i) { (void)i; return &fake_header; }
+/* Round 624 part 7 (e0bfa119): ios_pc_in_app_text asks dladdr for the image that holds the function first. The stand-in answers with the same fake image. */
+typedef struct { const char *dli_fname; void *dli_fbase; const char *dli_sname; void *dli_saddr; } Dl_info;
+static int dladdr(const void *addr, Dl_info *info) { (void)addr; memset(info, 0, sizeof *info); info->dli_fbase = &fake_header; return 1; }
 static uint8_t *getsegmentdata(const struct mach_header_64 *mh, const char *name, unsigned long *size)
 { (void)name; *size = 0x1000000; return (uint8_t *)mh; }
 static uint64_t ios_app_text_lo, ios_app_text_hi;

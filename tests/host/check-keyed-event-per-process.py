@@ -223,8 +223,13 @@ for path in list((root / 'build').rglob('*.c')) + list((root / 'build').rglob('*
         continue
     if 'MADEIRA_KEYED_EVENT_PER_PROCESS' in text:
         readers.append(str(path.relative_to(root)))
-check('only the header and the loader name the switch in the C sources, the app and the lists: no list, launcher entry or app code sets it',
-      sorted(readers) == ['build/ntdll-unix/ios_keyed_event.h', 'build/ntdll-unix/loader_ios.c'], str(sorted(readers)))
+# round 624: the list policy may accept the key (0 or 1), and the list may set it for Control alone, whose every log is this crash (5 of 5).
+check('only the header and the loader name the switch in the C sources and the app (besides the list policy): no launcher entry or app code sets it',
+      set(readers) - {'recommended/recommendations.json', 'app/Madeira/GameRecommendationsList.swift'}
+      == {'build/ntdll-unix/ios_keyed_event.h', 'build/ntdll-unix/loader_ios.c'}, str(sorted(readers)))
+recs = json.loads((root / 'recommended/recommendations.json').read_text())
+setters = sorted(r['id'] for r in recs['rules'] if 'MADEIRA_KEYED_EVENT_PER_PROCESS' in json.dumps(r.get('config', [])) + json.dumps(r.get('smallRAMConfig', [])))
+check('in the list only the rule of Control sets it (a game that never ran past this crash)', setters in ([], ['control']), str(setters))
 spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
@@ -234,14 +239,38 @@ check('auto-tune has the rule with exactly the one line, no retry first, after t
       and rule.get('outcomes') == ['crashed'])
 if rule:
     flat = json.dumps(rule['all'])
-    check('the rule needs the fault in the ARM64EC ntdll\'s RunOnce walk and Wine\'s unhandled read message, and is off once the line is in force',
-          'ntdll.dll+0x68008' in flat and 'Unhandled page fault on read access to' in flat
+    anyof = json.dumps(rule.get('any', []))
+    check('the rule needs the fault in one of the two RunOnce waiter loops of the ARM64EC ntdll (+0x68008, +0x680a8) and Wine\'s unhandled read '
+          'message or the c0000024 the release returned (round 624), and is off once the line is in force',
+          '"[mach_exc] pc PE: ntdll.dll+0x680"' in flat and 'Unhandled page fault on read access to' in anyof and '[fault-full] x0=c0000024 x1=' in anyof
           and 'MADEIRA_KEYED_EVENT_PER_PROCESS=1' in json.dumps(rule['none']))
-for name in ('control-runonce-keyed-event-2026-10-23', 'slay-the-spire-2-runonce-keyed-event-2026-10-22'):
+for name in ('control-runonce-keyed-event-2026-10-23', 'slay-the-spire-2-runonce-keyed-event-2026-10-22',
+             'control-launcher-child-runonce-2026-10-29', 'spider-man-remastered-runonce-keyed-event-2026-10-28',
+             'mechabellum-runonce-failpath-2026-10-29'):
     exp = root / 'tests/fixtures/autotune' / (name + '.expect')
     data = json.loads(exp.read_text()) if exp.is_file() else {}
     check('fixture %s proposes the line' % name,
           data.get('next') == ['env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1'] and data.get('matched') == ['runonce-stale-waiter-keyed-event'])
+
+# ---------------------------------------------------------------- 4b. the rule's offsets are still the two loops of the committed ntdll
+# round 624 (agent B): the rule names ntdll.dll+0x68008 / +0x680a8, offsets of the ARM64EC ntdll.dll committed since build 579; a rebuilt
+# ntdll can move them silently (the fixtures are old logs). Both must still be `ldr x19, [x1]` (0xf9400033), the load of the waiter list.
+def pe_word_at_rva(path, rva):
+    import struct
+    d = path.read_bytes()
+    pe = struct.unpack_from('<I', d, 0x3c)[0]
+    nsec = struct.unpack_from('<H', d, pe + 6)[0]
+    opt = struct.unpack_from('<H', d, pe + 20)[0]
+    sec = pe + 24 + opt
+    for i in range(nsec):
+        vsize, va, raw_size, raw_off = struct.unpack_from('<IIII', d, sec + i * 40 + 8)   # VirtualSize, VirtualAddress, SizeOfRawData, PointerToRawData
+        if va <= rva < va + max(vsize, raw_size):
+            return struct.unpack_from('<I', d, raw_off + rva - va)[0]
+    return None
+ntdll = root / 'app/Madeira/arm64ec-windows/ntdll.dll'
+words = [pe_word_at_rva(ntdll, rva) if ntdll.is_file() else None for rva in (0x68008, 0x680a8)]
+check('the committed ARM64EC ntdll.dll still has `ldr x19, [x1]` at +0x68008 and +0x680a8 (the rule\'s two loops)',
+      words == [0xf9400033, 0xf9400033], str([hex(w) if w is not None else None for w in words]))
 
 # ---------------------------------------------------------------- 5. catalog and CI
 catalog = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()

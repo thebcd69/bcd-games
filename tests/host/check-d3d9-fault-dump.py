@@ -103,9 +103,11 @@ if ds:
             lines.append((ln, None))
 d = dict(lines)
 check("Darksiders II's list sets env.MADEIRA_D3D9_LAST = 1 from build 597", ("env.MADEIRA_D3D9_LAST = 1", 597) in lines, str(lines))
-others = [r["id"] for r in rules if r.get("id") not in ("darksiders-ii-deathinitive", "fallout-new-vegas") and any(
+# Round 624 (agent A): Fallout 3 (seven logs, the same Gamebryo render path) carries New Vegas's lines, this one from build 598.
+others = [r["id"] for r in rules if r.get("id") not in ("darksiders-ii-deathinitive", "fallout-new-vegas", "fallout-3") and any(
     "MADEIRA_D3D9_LAST" in (ln["line"] if isinstance(ln, dict) else ln) for ln in r.get("config", []))]
-check("no other list sets it (Fallout: New Vegas's carries it too since build 598: four logs end in a NULL object of its own code)", not others, str(others))
+check("no other list sets it (Fallout: New Vegas's carries it too since build 598: four logs end in a NULL object of its own code; Fallout 3 since round 624)",
+      not others, str(others))
 swift = (root / "app/Madeira/GameRecommendationsList.swift").read_text()
 check("the list policy knows the three names (the diagnostics) and takes 0 or 1 for the two switches, a count of 1000-100000 for the limit",
       all('"%s"' % n in swift for n in ("MADEIRA_D3D9_LAST", "MADEIRA_FILE_TRACE", "MADEIRA_FILE_TRACE_LIMIT"))

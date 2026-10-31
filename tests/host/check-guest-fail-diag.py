@@ -66,7 +66,10 @@ block = signal_src[begin:end_]
 check('the helpers sit before the Mach exception thread', begin < end_)
 
 call = 'ios_ajan2_fault_diag( &state, thread_teb, req->exception, fault_addr );'
-check('one call site', signal_src.count(call) == 1 and signal_src.count('ios_ajan2_fault_diag(') == 2)
+# round 624 (agent N S9): ios_noexec_note (in this block) hands the same NoExec signature to the shared report too
+noexec = function(block, 'static void ios_noexec_note(')
+check('one call site, plus the NoExec note of round 624', signal_src.count(call) == 1 and signal_src.count('ios_ajan2_fault_diag(') == 3
+      and noexec.count('ios_ajan2_fault_diag( st, teb, EXC_BAD_ACCESS, 0 );') == 1)
 site = signal_src.index(call)
 unhandled = signal_src.rindex('"[mach_exc] UNHANDLED #%d', 0, site)
 check('the call is inside the UNHANDLED report, after [ec-fault-regs] and before [fault-full]',
@@ -85,7 +88,8 @@ check('no raw dereference of a guest or host address (reads are mach_vm_read_ove
       not raw_deref and block.count('mach_vm_read_overwrite(') == 2, str(raw_deref))
 check('only the failure signatures are reported',
       'fault_addr == 0xd4400000UL' in block and 'prev == 0x52800001' in block and 'insn == 0xf9400021' in block
-      and 'if (rip < 0x0000800000000000ULL) return;' in block and block.count('ios_ajan2_pc_is_jit( pc )') == 3)
+      and 'if (rip < 0x0000800000000000ULL) return;' in block and block.count('ios_ajan2_pc_is_jit( pc )') == 4
+      and noexec.count('ios_ajan2_pc_is_jit( pc )') == 1)   # round 624: the NoExec note's own test
 
 entry = function(block, 'static void ios_ajan2_entry_fail(')
 badrip = function(block, 'static void ios_ajan2_badrip(')
@@ -199,7 +203,10 @@ typedef struct { uint64_t __x[29]; uint64_t __fp, __lr, __sp, __pc; } fake_arm_t
 #undef __darwin_arm_thread_state64_get_sp
 #define __darwin_arm_thread_state64_get_pc(ts) ((ts).__pc)
 #define __darwin_arm_thread_state64_get_sp(ts) ((ts).__sp)
-typedef struct { char pad[0x60]; void *Peb; } TEB;
+/* round 624 (agent N S9): ios_noexec_note sits in this block and reads TEB.ClientId; the real layout keeps ClientId at 0x40, Peb at 0x60 */
+typedef struct { char pad0[0x40]; struct { void *UniqueProcess, *UniqueThread; } ClientId; char pad1[0x60 - 0x50]; void *Peb; } TEB;
+typedef unsigned long ULONG_PTR;
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 typedef struct { uint64_t pLdrInitializeThunk, pKiUserExceptionDispatcher, pKiUserApcDispatcher,
                  pKiUserCallbackDispatcher, pRtlUserThreadStart, ntdll_handle; } SYSTEM_DLL_INIT_BLOCK;
 SYSTEM_DLL_INIT_BLOCK *pLdrSystemDllInitBlock;

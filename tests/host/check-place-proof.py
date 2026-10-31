@@ -104,6 +104,7 @@ static void *anon_mmap_tryfixed( void *start, size_t size, int prot, int flags )
     return start;
 }
 static int ios_jit_pool_intersects( void *p, size_t s ) { (void)p; (void)s; return 0; }
+static void ios_va_owners_report( const char *why ) { (void)why; }   /* round 624 (agent R S9): the [va-owners] report, log only */
 static uint64_t fake_ns = 1000000000ull;
 static int fake_clock_gettime( int clk, struct timespec *ts )
 { (void)clk; ts->tv_sec = fake_ns / 1000000000ull; ts->tv_nsec = fake_ns % 1000000000ull; return 0; }

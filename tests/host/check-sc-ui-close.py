@@ -9,6 +9,7 @@ log limits. The external Helper binary is never executed.
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[2]
@@ -217,6 +218,10 @@ ctor_tail:
 .section .note.GNU-stack,"",@progbits
 '''
     c, asm = folder / 'test.c', folder / 'probe.S'
+    if sys.platform == 'darwin':   # Mach-O: leading underscore on C-visible symbols, no ELF-only section
+        for n in ('probe_after_call', 'probe', 'ctor_tail', 'original_ctor'):
+            probe = re.sub(r'(?<![\w.])' + n + r'\b', '_' + n, probe)
+        probe = probe.replace('.section .note.GNU-stack,"",@progbits', '')
     c.write_text(source); asm.write_text(probe)
     binary = folder / 'test'
     subprocess.run(['cc', '-std=gnu11', '-O1', '-Wall', '-fsanitize=address,undefined',

@@ -1,0 +1,1893 @@
+[23:53:14.971] [INFO] Checking entitlements...
+[23:53:14.971] [INFO] [build] v0.1.622 (622)
+[23:53:14.972] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11443MB available=12268MB cores=9
+[23:53:14.972] [INFO] [device] address-map=[0x10427c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[23:53:14.985] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:53:17.538] [INFO] Requesting JIT with Built-in StikJIT...
+[23:53:23.218] [INFO] [bcd] library launch Grand Theft Auto IV: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[23:53:23.229] [INFO] [dock-launch] image-retire=1
+[23:53:23.229] [INFO] [dock-launch] image-map-guard=1
+[23:53:23.308] [INFO] [dock-installers] app=12210 results reason=next-start succeeded=2 failed=0 recorded-values=4 services=started ended=1 statuses=240240=0,101093031=0
+[23:53:23.413] [INFO] [dock-installers] app=12210 program=240240 file=Social-Club-Setup.exe status=done key=HKLM\Software\Rockstar Games\Steam\SDK recorded=1 minimum=1 machine=0x8664
+[23:53:23.446] [INFO] [dock-installers] app=12210 program=101093031 file=Rockstar-Games-Launcher.exe status=done key=HKLM\Software\Rockstar Games\Steam\Launcher recorded=1 minimum=1 machine=0x8664
+[23:53:23.447] [INFO] [dock-installers] app=12210 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[23:53:23.447] [INFO] [madeira-dock] starting the host for app 12210; Valve's client authenticates and authorizes the launch
+[23:53:23.455] [INFO] Running full Wine sequence...
+[23:53:23.455] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10427c000,0x8000000000) 512GB available=12229MB low-power=0 thermal=nominal
+[23:53:23.459] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:53:23.459] [INFO] Allocating 896MB JIT pool via debugger...
+[23:53:23.459] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:53:23.459] [INFO] [jit-debugger] attached=1 at the pool request
+[23:53:23.461] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:53:24.074] [INFO] RX pool at 0x148000000
+[23:53:24.089] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.675s rev=ml526
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7a00000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=11658 MB + phys_footprint=629 MB = 12288 MB (hw.memsize says 11443 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=642 MB (peak 642) internal=636 MB compressed=0 MB external=82 MB reusable=10 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x73fffe0000
+[gdi-shared] session table 0x7100f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.010s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11de10000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11de10000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11de10000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11de18000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11de18000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11de1c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.058s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11DE10000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FE600000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 73FC180000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 73FC100000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 73FBFF0000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 73FBF30000
+[free-delay] #1 release of 0x71055f0000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7d05400000
+[xp-names] m3420112 "wine-x18-exc"
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x73f8170000-0x73f81ab029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x73f81b0000-0x73f81b0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73F8160000
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x73f8170000-0x73f81ab029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x73f81b0000-0x73f81b0f90
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[hwinput] keyboard focus: program (responder)
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000258 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=957 MB (peak 957) internal=952 MB compressed=0 MB external=156 MB reusable=17 MB (cycle=2)
+[footprint] rev=ml358 phys=1006 MB (peak 1006) internal=1000 MB compressed=0 MB external=157 MB reusable=17 MB (cycle=3)
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #92 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #94 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #99 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1033 MB (peak 1033) internal=1027 MB compressed=0 MB external=157 MB reusable=17 MB (cycle=4)
+[footprint] rev=ml358 phys=1046 MB (peak 1046) internal=1040 MB compressed=0 MB external=157 MB reusable=17 MB (cycle=5)
+[footprint] rev=ml358 phys=1046 MB (peak 1046) internal=1041 MB compressed=0 MB external=157 MB reusable=17 MB (cycle=6)
+[file-wfail] ml669 #122 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+ 12.009s rev=ml526
+00b0:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\"" (fd=501, unixdir=502, dup_unixdir=506) cwd=L"C:\\windows\\system32"
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe" t+ 12.315s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe\"" (fd=497, unixdir=498, dup_unixdir=546) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV"
+[free-delay] #2 release of 0x7118400000+0x100000 held for 2000 ms (1 in flight)
+[23:53:35.955] [INFO] [dock-report] game-scm=2
+[23:53:35.955] [INFO] [dock-report] launch-client-discovery-published=1
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+ 12.576s rev=ml526
+00d0:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -skipPatcherCheck -steamAppId=12210 -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\" @args.txt" (fd=574, unixdir=576, dup_unixdir=580) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\"
+[23:53:37.085] [INFO] [dock-report] launch-game-running=1
+[free-delay] #3 release of 0x711c0a0000+0xf10000 held for 2000 ms (1 in flight)
+[store-noalias] #1 rev=ml348 addr=0x12a3079d8 insn=0xd90000c8 pc=0x1681b00d4 NO pool/anon alias | region 0x12a304000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x12a3079d8 hostpc=0x1681b00d4 hinsn=0xd90000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x12a425df3 pc=0x1681b00d4 addr=0x12a3079d8 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a304000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1681b00d4 addr=0x12a3079d8 x18=0x7115b90000 type=1 lr=0x168ff4274 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12a425df3 (PE 0x12a425df3) -- NO pool copy for this address (identity translate)
+[fault-host] 1681affd4: f2a5682a f2c0002a f907798a d287d0aa f2a56bea f2c0002a f907758a f940038a
+[fault-host] 1681afff4: f9077d8a d280000a f907818a 9100056b f907738b 1400000c 00000000 14000002
+[fault-host] 1681b0014: d61f0140 5800024a d63f0140 00000000 00000000 2bc48d08 00000001 ffffffb0
+[fault-host] 1681b0034: ffffffff 14000002 d61f0140 5800010a d63f0140 00000000 00000000 2b412d4e
+[fault-host] 1681b0054: 00000001 ffffffd0 ffffffff 68ff420c 00000001 0000018c 00000000 2b5f3e65
+[fault-host] 1681b0074: 00000001 00000025 00000000 00000007 00000028 00000000 00000000 05800180
+[mach_exc] insn_stream PC-12..PC+8: f2a54606 f2c00026 d503201f [d90000c8] d2972e46 f2a548c6 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7115b90000 TEB=0x7115b90000 TEB[0x58]=0x7118f4b350 *(gs_cached+0x58)=0x7118f4b350
+[store-noalias] #2 rev=ml348 addr=0x12a3079d8 insn=0xd90000c8 pc=0x1681b00d4 NO pool/anon alias | region 0x12a304000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x12a3079d8 hostpc=0x1681b00d4 hinsn=0xd90000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x12a425df3 pc=0x1681b00d4 addr=0x12a3079d8 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a304000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1681b00d4 addr=0x12a3079d8 x18=0x7115b90000 type=1 lr=0x168ff4274 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12a425df3 (PE 0x12a425df3) -- NO pool copy for this address (identity translate)
+[fault-host] 1681b0034: ffffffff 14000002 d61f0140 5800010a d63f0140 00000000 00000000 2b412d4e
+[fault-host] 1681b0054: 00000001 ffffffd0 ffffffff 68ff420c 00000001 0000018c 00000000 2b5f3e65
+[fault-host] 1681b0074: 00000001 00000025 00000000 00000007 00000028 00000000 00000000 05800180
+[fault-host] 1681b0094: 06895454 00005043 d503201f 000000c8 10ffffea f900038a b945eb8b 3400004b
+[fault-host] 1681b00b4: d4395fc0 d28743e8 f2a56888 f2c00028 d28f3b06 f2a54606 f2c00026 d503201f
+[fault-host] 1681b00d4: d90000c8 d2972e46 f2a548c6 f2c00026 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: f2a54606 f2c00026 d503201f [d90000c8] d2972e46 f2a548c6 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7115b90000 TEB=0x7115b90000 TEB[0x58]=0x7118f4b350 *(gs_cached+0x58)=0x7118f4b350
+ml998: [wr-strip-declined] 0x12a3079d8 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a200000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x104000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x1681b00d4 RX from -32, 64 of 64 bytes: c0 5f 39 d4 e8 43 87 d2 88 68 a5 f2 28 00 c0 f2 06 3b 8f d2 06 46 a5 f2 26 00 c0 f2 1f 20 03 d5 c8 00 00 d9 46 2e 97 d2 c6 48 a5 f2 26 00 c0 f2 1f 20 03 d5 df 00 00 99 8b 73 47 f9 6c 09 40 92 
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x1681b00d4 (not an anon-JIT page)
+D D8 Handled self-modifying code: pc: 1681B00D4 fault: 12A3079D8
+[store-noalias] #3 rev=ml348 addr=0x12a2d913d insn=0xb80000c8 pc=0x1681e077c NO pool/anon alias | region 0x12a2d8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f21d0000 (pc=0x1681e077c x18=0x0 registry=0x7115b90000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=WRITE p1=0x12a2d913d hostpc=0x1681e077c hinsn=0xb80000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x12b36cb3b pc=0x1681e077c addr=0x12a2d913d kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a2d8000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x1681e077c addr=0x12a2d913d x18=0x0 type=1 lr=0x168ff4274 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12b36cb3b (PE 0x12b36cb3b) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: f2a545a6 f2c00026 d5033bbf [b80000c8] d2951366 f2a54906 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7115b90000 TEB=0x7115b90000 TEB[0x58]=0x7118f4b350 *(gs_cached+0x58)=0x7118f4b350
+[store-noalias] #4 rev=ml348 addr=0x12a2d913d insn=0xb80000c8 pc=0x1681e077c NO pool/anon alias | region 0x12a2d8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f21d0000 (pc=0x1681e077c x18=0x0 registry=0x7115b90000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #4 p0=WRITE p1=0x12a2d913d hostpc=0x1681e077c hinsn=0xb80000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x12b36cb3b pc=0x1681e077c addr=0x12a2d913d kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a2d8000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x1681e077c addr=0x12a2d913d x18=0x0 type=1 lr=0x168ff4274 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12b36cb3b (PE 0x12b36cb3b) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: f2a545a6 f2c00026 d5033bbf [b80000c8] d2951366 f2a54906 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+00d8:err:seh:bus_handler BUS #2: pc=0x1681e077c addr=0x12a2d913d x16=0x150ef99a4 x17=0x73f21cff20 x18=0x0 lr=0x168ff4274 insn=0xb80000c8 branch@lr-4=0xd63f0040
+ml998: [wr-strip-declined] 0x12a2d913d vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a200000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0xd8000
+ml998: [wr-strip-declined]   neighbours prev=0x25 this=0x25 next=0x25
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x1681e077c RX from -32, 64 of 64 bytes: 66 4a a5 f2 26 00 c0 f2 c8 00 40 99 1f 20 03 d5 a6 27 92 d2 a6 45 a5 f2 26 00 c0 f2 bf 3b 03 d5 c8 00 00 b8 66 13 95 d2 06 49 a5 f2 26 00 c0 f2 c8 00 40 d9 1f 20 03 d5 06 29 84 52 a6 03 06 8b 
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x1681e077c (not an anon-JIT page)
+D D8 Handled self-modifying code: pc: 1681E077C fault: 12A2D913D
+[store-noalias] #5 rev=ml348 addr=0x12a47e69c insn=0x19000028 pc=0x1681e918c NO pool/anon alias | region 0x12a47c000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f21d0000 (pc=0x1681e918c x18=0x0 registry=0x7115b90000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #5 p0=WRITE p1=0x12a47e69c hostpc=0x1681e918c hinsn=0x19000028 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x12a301508 pc=0x1681e918c addr=0x12a47e69c kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a47c000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x1681e918c addr=0x12a47e69c x18=0x0 type=1 lr=0x1681e8754 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12a301508 (PE 0x12a301508) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: d94103a1 d503201f 19400108 [19000028] 994203a6 d503201f 510004c6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0x12a47e69c insn=0x19000028 pc=0x1681e918c NO pool/anon alias | region 0x12a47c000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x12a47e69c hostpc=0x1681e918c hinsn=0x19000028 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x167ff4000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x12a301508 pc=0x1681e918c addr=0x12a47e69c kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a47c000+0x4000 rev=ml555
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x1681e918c RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 a8 83 41 d9 1f 20 03 d5 a1 03 41 d9 1f 20 03 d5 08 01 40 19 28 00 00 19 a6 03 42 99 1f 20 03 d5 c6 04 00 51 1f 20 03 d5 a6 03 02 99 a6 03 41 d9 1f 20 03 d5 
+00d8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x1681e918c (not an anon-JIT page)
+D D8 Handled self-modifying code: pc: 1681E918C fault: 12A47E69C
+[store-noalias] #7 rev=ml348 addr=0x12b2932d0 insn=0x38000028 pc=0x1681e918c NO pool/anon alias | region 0x12b290000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x12b2932d0 insn=0x38000028 pc=0x1681e918c NO pool/anon alias | region 0x12b290000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+D D8 Handled self-modifying code: pc: 1681E918C fault: 12B2932D0
+ml998: [wr-strip-declined] 0x12a29a919 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a200000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x98000
+ml998: [wr-strip-declined]   neighbours prev=0x25 this=0x25 next=0x2d
+D D8 Handled self-modifying code: pc: 1682095AC fault: 12A29A919
+ml998: [wr-strip-declined] 0x12a3fd2f3 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a200000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1fc000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x25
+D D8 Handled self-modifying code: pc: 168208E04 fault: 12A3FD2F3
+D D8 Handled self-modifying code: pc: 168208E04 fault: 12A4187B5
+D D8 Handled self-modifying code: pc: 168208E04 fault: 12A472FE4
+D D8 Handled self-modifying code: pc: 1682095AC fault: 12A47E69C
+D D8 Handled self-modifying code: pc: 1682095AC fault: 12A665F97
+D D8 Handled self-modifying code: pc: 1682095AC fault: 12BC7756B
+D D8 Handled self-modifying code: pc: 168209FD8 fault: 12A53A472
+D D8 Handled self-modifying code: pc: 1682E6D38 fault: 12A2A3C2B
+D D8 Handled self-modifying code: pc: 1682EA20C fault: 12C0F29F8
+D D8 Handled self-modifying code: pc: 1682ED844 fault: 12A2CCEFF
+D D8 Handled self-modifying code: pc: 1682EDDEC fault: 12BBF863D
+D D8 Handled self-modifying code: pc: 1682EEA18 fault: 12A667C27
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+00d8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 14.702s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=630, unixdir=631, dup_unixdir=635) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x153428000)
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12A2CD22C
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12A2E4510
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12A2FBA29
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12A42C814
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12A477AA5
+D D8 Handled self-modifying code: pc: 1683203AC fault: 12B04B6E3
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A220523
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A233CB3
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A23CD65
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A2839DE
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A2892D6
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A2C40E8
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A2D8582
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A2F8285
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A302ADB
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A304A38
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A31BB1B
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A31CB12
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A34100D
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A360C9E
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12A3C8A35
+D D8 Handled self-modifying code: pc: 16832815C fault: 12A4746E1
+D D8 Handled self-modifying code: pc: 168327BB4 fault: 12B182182
+[mach_exc] UNHANDLED #100 pc=0x16832815c addr=0x12bb15690 x18=0x0 type=1 lr=0x168327924 sp=0x73f21d0000 x16=0x150ef99a4 x17=0x73f21cff20
+[guest-code] rev=ml333 pool_rip=0x12a287775 (PE 0x12a287775) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: d94103a1 d503201f 19400108 [38000028] 994203a6 d503201f 510004c6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[guest-log] file <container>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] svc #1 tid=00ec [rpm-sink] alive rev=ml492
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=launcher.exe tid=00d8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7d50810000
+D EC Handled self-modifying code: pc: 16702696C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 167028150 fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 167028150 fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 167028150 fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+D EC Handled self-modifying code: pc: 16702764C fault: 12C944F03
+[mach_exc] UNHANDLED #200 pc=0x167032488 addr=0x12c945d7a x18=0x0 type=1 lr=0x167ff0274 sp=0x73efbb0000 x16=0x1534819a4 x17=0x73efbaff20
+[guest-code] rev=ml333 pool_rip=0x12c92e177 (PE 0x12c92e177) -- NO pool copy for this address (identity translate)
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 15.037s rev=ml526
+00c8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\"" (fd=668, unixdir=669, dup_unixdir=673) cwd=L"C:\\windows\\system32\\"
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x157178000)
+[free-delay] #4 release of 0x7123a40000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x7123b40000+0x200000 held for 2000 ms (3 in flight)
+[free-delay] #6 release of 0x7123d40000+0x400000 held for 2000 ms (4 in flight)
+D 100 Handled self-modifying code: pc: 166023FA0 fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 1660258B8 fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 1660258B8 fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 1660258B8 fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+D 100 Handled self-modifying code: pc: 166024D4C fault: 12D1F4F03
+[guest-log] file <container>/Documents/wine/drive_c/ProgramData/Rockstar Games/Launcher/svc_events.json
+[guest-log] svc #2 tid=00ec {"metrics":[{"name":"BG_SVC","data":"\"id\":0,\"lce\":4","time":134377196188330000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\":14","time":134377176646420000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\":38,\"gle\":1722","time":134377176646420000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\": [truncated]
+[guest-log] svc #3 tid=00ec \":4,\"ere\":14","time":134373557223550000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\":38,\"gle\":1722","time":134373557223560000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\":38,\"gle\":1722","time":134373557223560000},{"name":"BG_SVC_CRIT","data":"\"id\":4,\"ere\":26","time":1343735572235600 [truncated]
+[free-delay] #7 release of 0x7127960000+0x110000 held for 2000 ms (5 in flight)
+00ec:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=15738
+[unwind] term ml661 begin rip=73efef0690 rsp=71205efed8 window=[71205efed8..7120defed8) max=32
+[unwind] term ml661 #00 pc=73efef0690 rsp=71205efed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=71205eff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=71205eff60: d0ff5e20 71000000 b49d972c 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=12c995b29 rsp=71205efee0  <no module — STOP>
+[unwind] term ml661 end
+00ec:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=15756
+00ec:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=634
+[Wine ntdll/server] process_exit_wrapper(0)
+[alloc-fail] ml814 #3 status=c0000018 hint=0x73f2ac2000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=launcher.exe tid=00d8 size=0x1000 type=0x3000 prot=0x40 hint=0x73f2ac2000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x73f2ac3000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=launcher.exe tid=00d8 size=0x1000 type=0x3000 prot=0x40 hint=0x73f2ac3000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x73f2ac4000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=launcher.exe tid=00d8 size=0x1000 type=0x3000 prot=0x40 hint=0x73f2ac4000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x73f2ac5000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=launcher.exe tid=00d8 size=0x1000 type=0x3000 prot=0x40 hint=0x73f2ac5000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x73f2ac6000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x73f2ac7000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x73f2ac8000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x73f2ac9000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x73f2aca000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x73f2acb000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x73f2acc000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x73f2acd000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x73f2ace000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x73f2acf000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x73f4da2000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x73f4da3000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x73f4da4000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x73f4da5000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x73f4da6000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x73f4da7000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x73f4da8000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x73f4da9000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x73f4daa000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x73f4dab000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x73f4dac000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x73f4dad000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x73f4dae000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x73f4daf000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x73f56a1000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x73f56a2000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x73f56a3000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x73f56a4000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x73f56a5000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x73f56a6000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x73f56a7000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x73f56a8000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x73f56a9000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x73f56aa000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x73f56ab000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x73f56ac000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x73f56ad000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x73f56ae000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x73f56af000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x73f56b4000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x73f56b5000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x73f56b6000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x73f56b7000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x73f56b8000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x73f56b9000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x73f56ba000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x73f56bb000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x73f56bc000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x73f56bd000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x73f56be000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x73f56bf000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x73f56c1000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x73f56c2000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x73f56c3000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x73f56c4000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x73f56c5000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x73f56c6000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x73f56c7000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[alloc-fail] ml814 #128 status=c0000018 hint=0x73f78b9000 size=0x1000 type=0x3000 protect=0x40 tid=00d8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[guest-code] rev=ml333 pool_rip=0x12b23f2dc (PE 0x12b23f2dc) -- NO pool copy for this address (identity translate)
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+011c:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[free-delay] #8 release of 0x71332b0000+0x110000 held for 2000 ms (6 in flight)
+[unixlib] opengl32 (GL-absent stub table) (module 0x73e8890000) -> 64-bit table (0x10704c758)
+E 108 [iOS-xins] tracker=0x1561ecbc8 WININET.dll sec=0x73e7c40000-0x73e7c7b029
+E 108 [iOS-xins] tracker=0x1561ecbc8 WININET.dll sec=0x73e7c80000-0x73e7c80f90
+D 108 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73E7C30000
+E 108 [iOS-xins] tracker=0x1561ecbc8 WININET.dll sec=0x73e7c40000-0x73e7c7b029
+E 108 [iOS-xins] tracker=0x1561ecbc8 WININET.dll sec=0x73e7c80000-0x73e7c80f90
+E 108 [img-map] ml710 #25 intervals-only WININET.dll base=0x73e7c30000
+0108:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[guest-code] rev=ml333 pool_rip=0x12d1f5925 (PE 0x12d1f5925) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x12d1f5925 (PE 0x12d1f5925) -- NO pool copy for this address (identity translate)
+0108:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[guest-code] rev=ml333 pool_rip=0x12d1e16f6 (PE 0x12d1e16f6) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x12d1e16f6 (PE 0x12d1e16f6) -- NO pool copy for this address (identity translate)
+[mach_exc] UNHANDLED #1000 pc=0x16608368c addr=0x12d34963b x18=0x7115af0000 type=1 lr=0x166083464 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] UNHANDLED #1100 pc=0x16608368c addr=0x12d349703 x18=0x7115af0000 type=1 lr=0x166083464 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] UNHANDLED #1200 pc=0x16608368c addr=0x12d349828 x18=0x7115af0000 type=1 lr=0x166083464 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] UNHANDLED #1300 pc=0x166083aa4 addr=0x12d34993b x18=0x7115af0000 type=1 lr=0x166083464 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D366FD9
+0108:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[mach_exc] UNHANDLED #2000 pc=0x1660dc28c addr=0x12d1dced3 x18=0x7115af0000 type=1 lr=0x1660dc0a4 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[win-name] #32 hwnd=0x10064 class='' text="RGSCSystemTray" rev=ml853
+[win-name] #36 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #42 hwnd=0x1007a class='' text="Default IME" rev=ml853
+D 108 Handled inline self-modifying code: pc: 16614B7E4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16614BB34 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16614BD64 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16614BF94 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 16614C1C4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 16614C3F4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 16614C624 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 16614C854 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 16614CA84 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 16614CCB4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 16614CEE4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 16614D114 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 16614D344 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 16614D574 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 16614D7A4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 16614D9D4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 16614DC04 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16614DE34 fault: 12D364836
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[rb-tex] madeira-bcd new readback #1: fmt 80 500x400 level 0 (texture 500x400, 1 mips)
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F403
+D 108 Handled inline self-modifying code: pc: 16620CBA4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16620CDD4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16620D004 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16620D234 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 16620D464 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 16620D694 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 16620D8C4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 16620DAF4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 16620DD24 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 16620DF54 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 16620E184 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 16620E3B4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 16620E5E4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 16620E814 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 16620EA44 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 16620EC74 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 16620EEA4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D34930E
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F842
+D 108 Handled inline self-modifying code: pc: 1662D8EB4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 1662D9F74 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 1662DB864 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1662DC414 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 1662DC644 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 1662DC874 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 1662DCE94 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 1662DD0C4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1662DD2F4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 1662DD524 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 1662DD754 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 1662DD984 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 1662DDBB4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 1662DDDE4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 1662DE014 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 1662DE244 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 1662DE534 rip: 12D363954 fault: 12D36277F
+[guest-log] #1 tid=00e0 [2026-10-29 03:53:40.252] [ ERROR ] [bgsvc] [folderfix] Folder permissions operation failed
+[launch-view] dismissed reason=game-window logs=0
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D3498E7
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34FEE6
+D 108 Handled inline self-modifying code: pc: 16639A6D4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16639A904 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16639AB34 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16639AD64 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 16639AF94 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 16639B1C4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 16639B3F4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 16639B624 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 16639B854 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 16639BA84 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 16639BCB4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 16639BEE4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 16639C114 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 16639C344 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 16639C574 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 16639C7A4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 16639C9D4 rip: 12D363954 fault: 12D36277F
+[footprint] rev=ml1060 fast phys=1953 MB compressed=0 MB
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D366B64
+D 108 Handled self-modifying code: pc: 166134174 fault: 12D21E72C
+[footprint] rev=ml1060 fast phys=1981 MB compressed=0 MB
+D 108 Handled inline self-modifying code: pc: 1664705D4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166470804 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166470A34 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166471214 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166472064 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166473024 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 1664759D4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166475C04 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166475E34 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166476064 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166476294 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 1664764C4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 1664766F4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166476924 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166476B54 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166476D84 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166476FB4 rip: 12D363954 fault: 12D36277F
+[footprint] rev=ml1060 fast phys=2003 MB compressed=0 MB
+[mach_exc] UNHANDLED #19500 pc=0x16608368c addr=0x12d349bdc x18=0x7115af0000 type=1 lr=0x16649dbc4 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] UNHANDLED #19600 pc=0x16608368c addr=0x12d349d9f x18=0x7115af0000 type=1 lr=0x16649dbc4 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] UNHANDLED #19700 pc=0x166086314 addr=0x12d366a66 x18=0x7115af0000 type=1 lr=0x166086090 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: f8bfc0c1 d503201f d5033bbf [f83f6828] 910243a6 d503201f 889ffcdf
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19800 pc=0x16608368c addr=0x12d366d15 x18=0x7115af0000 type=1 lr=0x166fec274 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19900 pc=0x16608368c addr=0x12d366ec2 x18=0x7115af0000 type=1 lr=0x166fec274 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #20000 pc=0x1660dc28c addr=0x12d1dc9b1 x18=0x7115af0000 type=1 lr=0x1660dc0a4 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 108 Handled self-modifying code: pc: 1660DC774 fault: 12D34E845
+D 108 Handled inline self-modifying code: pc: 166545354 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166545584 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 1665457B4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1665459E4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166545C14 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166545E44 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166546074 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 1665462A4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1665464D4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166546704 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166546934 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166546B64 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166546D94 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166546FC4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 1665471F4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166547424 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166547654 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D21A022
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F5DD
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D3498FB
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34FEF6
+D 108 Handled self-modifying code: pc: 1660DC774 fault: 12D1D721F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D21A032
+D 108 Handled self-modifying code: pc: 1660DC774 fault: 12D34F5F5
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D34990B
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34FF0A
+D 108 Handled inline self-modifying code: pc: 16691ECD4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16691EF04 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16691F134 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16691F364 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 16691F594 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 16691FCF4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166920E14 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 1669212C4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1669214F4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166921724 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166921954 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166921B84 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166921DB4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166921FE4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166922214 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166922444 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166922674 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D366B84
+D 108 Handled self-modifying code: pc: 1669E1034 fault: 12D1DBAEE
+D 108 Handled inline self-modifying code: pc: 1669E52F4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 1669E5524 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 1669E5754 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1669E5984 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 1669E5BB4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 1669E5DE4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 1669E6014 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 1669E6354 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1669E6734 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 1669E6964 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 1669E6B94 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 1669E6DC4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 1669E6FF4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 1669E7224 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 1669E7454 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 1669E7684 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 1669E78B4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F02A
+D 108 Handled inline self-modifying code: pc: 166AA4554 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166AA4784 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166AA49B4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166AA4BE4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166AA4E14 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166AA5044 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166AA5274 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166AA54A4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166AA56D4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166AA5904 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166AA5B34 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166AA5D64 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166AA5F94 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166AA61C4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166AA63F4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166AA6624 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166AA6854 rip: 12D363954 fault: 12D36277F
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D21A05D
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F67D
+D 108 Handled inline self-modifying code: pc: 166B65A44 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166B65C74 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166B65EA4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166B660D4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166B66304 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166B66534 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166B66764 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166B66994 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166B66BC4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166B66DF4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166B67024 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166B67254 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166B67484 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166B676B4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166B678E4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166B67B14 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166B67D44 rip: 12D363954 fault: 12D36277F
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0168:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D3496D3
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34FBEE
+D 108 Handled inline self-modifying code: pc: 166C30D64 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166C30F94 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166C311C4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166C313F4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166C31624 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166C31854 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166C31A84 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166C31CB4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166C31EE4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166C32114 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166C32344 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166C32574 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166C327A4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166C329D4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166C32C04 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166C32E34 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166C33064 rip: 12D363954 fault: 12D36277F
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=17% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5e1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=112 x8=0x0 x18=0x0 sp=0x16c5e1040
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D349D0D
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D366EDE
+D 108 Handled inline self-modifying code: pc: 166CF9D14 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166CF9F44 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166CFA174 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166CFA3A4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166CFA5D4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166CFA804 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166CFAA34 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166CFAC64 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166CFAE94 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166CFB0C4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166CFB2F4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166CFB524 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166CFB754 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166CFB984 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166CFBBB4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166CFBDE4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166CFC014 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D1DC9C1
+D 108 Handled self-modifying code: pc: 166083AA4 fault: 12D3487B3
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34F6BD
+D 108 Handled inline self-modifying code: pc: 166E84584 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166E847B4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166E849E4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166E84C14 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166E84E44 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166E85074 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166E852A4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166E854D4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166E85704 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166E85934 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166E85B64 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166E85D94 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166E85FC4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166E861F4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166E86424 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166E86654 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166E86884 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D34970F
+D 108 Handled self-modifying code: pc: 1660DC28C fault: 12D34FD4B
+D 108 Handled inline self-modifying code: pc: 166F4BAB4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 166F4BCE4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 166F4BF14 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 166F4C144 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 166F4C374 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 166F4C5A4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 166F4C7D4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 166F4CA04 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 166F4CC34 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 166F4CE64 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 166F4D094 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 166F4D2C4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 166F4D4F4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 166F4D724 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 166F4D954 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 166F4DB84 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 166F4DDB4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 16608368C fault: 12D349D45
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366FDD
+D 108 Handled inline self-modifying code: pc: 15E0437D4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E043B24 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E043D54 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E043F84 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E0441B4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E0443E4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E044614 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E044844 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E044A74 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E044CA4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E044ED4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E045104 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E045334 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E045564 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E045794 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E0459C4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E045BF4 rip: 12D363954 fault: 12D36277F
+[footprint] rev=ml1060 fast phys=2080 MB compressed=0 MB
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D1DCEE7
+D 108 Handled inline self-modifying code: pc: 15E132244 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E132474 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E1326A4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E1328D4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E132B04 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E132D34 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E132F64 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E133194 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E1333C4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E134E64 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E135D64 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E136B84 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E136DB4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E136FE4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E137214 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E137444 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E137674 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E144734 fault: 12D1F5B8C
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F4C3
+D 108 Handled inline self-modifying code: pc: 15E1FFDD4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E200004 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E200234 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E200464 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E200694 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E2008C4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E200AF4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E200D24 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E200F54 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E201184 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E2013B4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E2015E4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E201814 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E201A44 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E201C74 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E201EA4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E2020D4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349430
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F9BD
+D 108 Handled inline self-modifying code: pc: 15E2C5864 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E2C5A94 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E2C5CC4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E2C5EF4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E2C6124 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E2C6354 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E2C6584 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E2C67B4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E2C69E4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E2C6C14 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E2C6E44 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E2C7074 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E2C72A4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E2C74D4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E2C7704 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E2C7934 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E2C7B64 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349A27
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366B90
+D 108 Handled inline self-modifying code: pc: 15E395B94 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E395DC4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E395FF4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E396224 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E396454 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E396684 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E3968B4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E396AE4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E396D14 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E396F44 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E397174 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E3973A4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E3975D4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E397804 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E397A34 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E397C64 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E397E94 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366DE7
+D 108 Handled self-modifying code: pc: 15E465924 fault: 12D1F5BEE
+D 108 Handled inline self-modifying code: pc: 15E469234 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E469464 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E469694 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E4698C4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E469AF4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E469D24 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E469F54 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E46A184 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E46A3B4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E46A5E4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E46A814 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E46AA44 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E46AC74 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E46AEA4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E46B0D4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E46B304 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E46B534 rip: 12D363954 fault: 12D36277F
+[footprint] rev=ml1060 fast phys=2115 MB compressed=0 MB
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F2FE
+D 108 Handled inline self-modifying code: pc: 15E53B944 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E53BB74 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E53BDA4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E53BFD4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E53C204 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E53C434 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E53C664 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E53C894 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E53CAC4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E53CCF4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E53CF24 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E53D154 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E53D384 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E53D5B4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E53D7E4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E53DA14 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E53DC44 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3491B0
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F76E
+D 108 Handled inline self-modifying code: pc: 15E606C44 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E606E74 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E6070A4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E6072D4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E607504 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E607734 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E607964 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E607B94 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E607DC4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E607FF4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E608224 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E608454 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E608684 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E6088B4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E608AE4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E608D14 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E608F44 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3497E4
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FDC3
+D 108 Handled inline self-modifying code: pc: 15E6CB1D4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E6CB404 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E6CB634 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E6CB864 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E6CBA94 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E6CBCC4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E6CBEF4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E6CC124 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E6CC354 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E6CC584 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E6CC7B4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E6CC9E4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E6CCC14 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E6CCE44 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E6CD164 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E6CEB14 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E6CFBC4 rip: 12D363954 fault: 12D36277F
+[mach_exc] UNHANDLED #100000 pc=0x15e06e87c addr=0x12d349ba0 x18=0x7115af0000 type=1 lr=0x15e6e97c4 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 108 Handled self-modifying code: pc: 15E06EC94 fault: 12D349F3B
+D 108 Handled self-modifying code: pc: 15E787EA4 fault: 12D1F5B45
+D 108 Handled inline self-modifying code: pc: 15E797994 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E797BC4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E797DF4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E798024 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E798254 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E798484 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E7986B4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E7988E4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E798B14 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E798D44 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E798F74 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E7991A4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E7993D4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E799604 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E799834 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E799A64 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E799C94 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D21A045
+D 108 Handled inline self-modifying code: pc: 15E8640F4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E864324 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E864554 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E864784 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E8649B4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E864BE4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E864E14 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E865044 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E865274 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E8654A4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E8656D4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E865904 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E865B34 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E865D64 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E865F94 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E8661C4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E8663F4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E878554 fault: 12D1F5C20
+D 108 Handled self-modifying code: pc: 15DFF11C4 fault: 12D34F550
+D 108 Handled inline self-modifying code: pc: 15E936984 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15E936BB4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15E936DE4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15E937014 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15E937244 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15E937474 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15E9376A4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15E9378D4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15E937B04 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15E937D34 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15E937F64 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15E938194 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15E9383C4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15E9385F4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15E938824 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15E938A54 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15E938C84 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349555
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FA35
+D 108 Handled inline self-modifying code: pc: 15EA02084 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EA022B4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EA024E4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EA02714 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EA02944 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EA02B74 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EA02DA4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EA02FD4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EA03204 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EA03434 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EA03664 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EA03894 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EA03AC4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EA03CF4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EA03F24 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EA04154 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EA04384 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349A9B
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366D29
+D 108 Handled inline self-modifying code: pc: 15EACC294 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EACC4C4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EACC6F4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EACC924 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EACCB54 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EACCD84 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EACCFB4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EACD1E4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EACD414 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EACD644 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EACD874 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EACDAA4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EACDCD4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EACDF04 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EACE134 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EACE364 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EACE594 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366ECA
+D 108 Handled inline self-modifying code: pc: 15EB995D4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EB99804 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EB99A34 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EB99C64 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EB99E94 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EB9A0C4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EB9A2F4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EB9A524 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EB9A754 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EB9A984 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EB9ABB4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EB9ADE4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EB9B014 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EB9B244 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EB9B474 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EB9B6A4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EB9B8D4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F3BB
+D 108 Handled inline self-modifying code: pc: 15EC697E4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EC69A14 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EC69C44 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EC69E74 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EC6A0A4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EC6A2D4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EC6A504 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EC6A734 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EC6A964 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EC6AB94 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EC6ADC4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EC6AFF4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EC6B224 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EC6B454 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EC6B684 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EC6B8B4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EC6BAE4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3492BA
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F7EE
+D 108 Handled inline self-modifying code: pc: 15ED2EB74 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15ED2EDA4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15ED2EFD4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15ED2F204 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15ED2F434 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15ED2F664 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15ED2F894 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15ED2FAC4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15ED2FCF4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15ED2FF24 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15ED30154 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15ED30384 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15ED305B4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15ED307E4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15ED30A14 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15ED30C44 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15ED30E74 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3498AF
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FE6D
+D 108 Handled inline self-modifying code: pc: 15EDF7014 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EDF7244 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EDF7474 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EDF76A4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EDF78D4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EDF7B04 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EDF7D34 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EDF7F64 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EDF8194 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EDF83C4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EDF85F4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EDF8824 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EDF8A54 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EDF8C84 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EDF8EB4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EDF90E4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EDF9314 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366A60
+D 108 Handled self-modifying code: pc: 15EEBFE44 fault: 12D1F5C07
+D 108 Handled inline self-modifying code: pc: 15EED0164 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EED0394 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EED05C4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EED07F4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EED0A24 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EED0C54 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EED0E84 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EED10B4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EED12E4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EED1514 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EED1744 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EED1974 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EED1BA4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EED1DD4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EED2004 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EED2234 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EED2464 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFF11C4 fault: 12D34D14B
+D 108 Handled inline self-modifying code: pc: 15EFA13E4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15EFA1614 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15EFA1844 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15EFA1A74 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15EFA1CA4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15EFA1ED4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15EFA2104 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15EFA2334 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15EFA2564 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15EFA2794 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15EFA29C4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15EFA2BF4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15EFA2E24 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15EFA3054 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15EFA3284 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15EFA34B4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15EFA36E4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15EFB5B8C fault: 12D1F7830
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F585
+D 108 Handled inline self-modifying code: pc: 15F071AA4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F071CD4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F071F04 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F072134 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F072364 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F072594 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F0727C4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F0729F4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F072C24 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F072E54 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F073084 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F0732B4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F0734E4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F073714 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F073944 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F073B74 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F073DA4 rip: 12D363954 fault: 12D36277F
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=86 resident=2323MB dbg=DEBUGGED rev=ml525
+[23:53:54.171] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349575
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FA55
+D 108 Handled inline self-modifying code: pc: 15F1426B4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F1428E4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F142B14 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F142D44 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F142F74 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F1431A4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F1433D4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F143604 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F143834 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F143A64 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F143C94 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F143EC4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F1440F4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F144324 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F144554 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F144784 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F1449B4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349AA3
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366D31
+D 108 Handled inline self-modifying code: pc: 15F210704 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F210934 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F210B64 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F210D94 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F210FC4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F2111F4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F211424 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F211654 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F211884 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F211AB4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F211CE4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F211F14 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F212144 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F212374 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F2125A4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F2127D4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F212A04 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06EC94 fault: 12D366E8F
+D 108 Handled inline self-modifying code: pc: 15F2DF634 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F2DF864 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F2DFA94 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F2DFCC4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F2DFEF4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F2E0124 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F2E0354 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F2E0584 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F2E07B4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F2E09E4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F2E0C14 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F2E0E44 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F2E1074 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F2E12A4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F2E14D4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F2E1704 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F2E1934 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F397
+D 108 Handled inline self-modifying code: pc: 15F3AE394 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F3AE5C4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F3AE7F4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F3AEA24 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F3AEC54 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F3AEE84 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F3AF0B4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F3AF2E4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F3AF514 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F3AF744 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F3AF974 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F3AFBA4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F3AFDD4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F3B0004 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F3B0234 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F3B0464 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F3B0694 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D34928A
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F7BE
+D 108 Handled inline self-modifying code: pc: 15F47A294 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F47A4C4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F47A6F4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F47A924 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F47AB54 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F47AD84 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F47AFB4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F47B1E4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F47B414 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F47B644 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F47B874 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F47BAA4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F47BCD4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F47BF04 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F47C134 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F47C364 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F47C594 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349820
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FDFF
+D 108 Handled inline self-modifying code: pc: 15F5483A4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F5485D4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F548804 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F548A34 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F548C64 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F548E94 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F5490C4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F5492F4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F549524 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F549754 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F549984 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F549BB4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F549DE4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F54A014 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F54A244 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F54A474 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F54A6A4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349FA0
+D 108 Handled self-modifying code: pc: 15E017A74 fault: 12D1F5BA4
+D 108 Handled inline self-modifying code: pc: 15F616724 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F616954 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F616B84 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F616DB4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F616FE4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F617214 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F617444 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F617674 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F6178A4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F617AD4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F617D04 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F617F34 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F618164 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F618394 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F6185C4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F6187F4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F618A24 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34C000
+D 108 Handled inline self-modifying code: pc: 15F6E49A4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F6E4BD4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F6E4E04 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F6E5034 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F6E5264 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F6E5494 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F6E56C4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F6E58F4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F6E5B24 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F6E5D54 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F6E5F84 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F6E61B4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F6E63E4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F6E6614 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F6E6844 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F6E6A74 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F6E6CA4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15F6F71F4 fault: 12D1F5C3C
+D 108 Handled self-modifying code: pc: 15DFF11C4 fault: 12D34F550
+D 108 Handled inline self-modifying code: pc: 15F7B3264 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F7B3494 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F7B36C4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F7B38F4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F7B3B24 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F7B3D54 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F7B3F84 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F7B41B4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F7B43E4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F7B4614 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F7B4844 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F7B4A74 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F7B4CA4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F7B4ED4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F7B5104 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F7B5334 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F7B5564 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3494DD
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FA21
+D 108 Handled inline self-modifying code: pc: 15F8820A4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F8822D4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F882504 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F882734 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F882964 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F882B94 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F882DC4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F882FF4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F883224 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F883454 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F883684 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F8838B4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F883AE4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F883D14 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F883F44 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F884174 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F8843A4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349A77
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366D05
+D 108 Handled inline self-modifying code: pc: 15F9493B4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15F9495E4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15F949814 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15F949A44 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15F949C74 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15F949EA4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15F94A0D4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15F94A304 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15F94A534 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15F94A764 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15F94A994 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15F94ABC4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15F94ADF4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15F94B024 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15F94B254 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15F94B484 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15F94B6B4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366E6B
+D 108 Handled self-modifying code: pc: 15FA0E6B4 fault: 12D1F618A
+D 108 Handled inline self-modifying code: pc: 15FA11D04 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FA11F34 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FA12164 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FA12394 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FA125C4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FA127F4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FA12A24 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FA12C54 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FA12E84 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FA130B4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FA132E4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FA13514 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FA13744 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FA13974 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FA13BA4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FA13DD4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FA14004 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F342
+D 108 Handled inline self-modifying code: pc: 15FADA8C4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FADAAF4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FADAD24 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FADAF54 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FADB184 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FADB3B4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FADB5E4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FADB814 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FADBA44 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FADBC74 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FADBEA4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FADC0D4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FADC304 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FADC534 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FADC764 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FADC994 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FADCBC4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3491E4
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F7A2
+D 108 Handled inline self-modifying code: pc: 15FBA3214 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FBA3444 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FBA3674 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FBA38A4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FBA3AD4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FBA3D04 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FBA3F34 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FBA4164 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FBA4394 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FBA45C4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FBA47F4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FBA4A24 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FBA4C54 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FBA4E84 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FBA50B4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FBA52E4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FBA5514 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349808
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FDE7
+D 108 Handled inline self-modifying code: pc: 15FC6BB64 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FC6BD94 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FC6BFC4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FC6C1F4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FC6C424 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FC6C654 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FC6C884 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FC6CAB4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FC6CCE4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FC6CF14 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FC6D144 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FC6D374 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FC6D5A4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FC6D7D4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FC6DA04 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FC6DC34 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FC6DE64 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349F8C
+D 108 Handled self-modifying code: pc: 15FD24744 fault: 12D1F5B5F
+D 108 Handled inline self-modifying code: pc: 15FD34694 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FD348C4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FD34AF4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FD34D24 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FD34F54 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FD35184 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FD353B4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FD355E4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FD35814 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FD35A44 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FD35C74 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FD35EA4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FD360D4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FD36304 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FD36534 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FD36764 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FD36994 rip: 12D363954 fault: 12D36277F
+[mach_exc] UNHANDLED #200000 pc=0x15e06e87c addr=0x12d366ef6 x18=0x7115af0000 type=1 lr=0x166fec274 sp=0x73ea0e0000 x16=0x155d459a4 x17=0x73ea0dff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 108 Handled self-modifying code: pc: 15DFF11C4 fault: 12D21A655
+D 108 Handled inline self-modifying code: pc: 15FDFCFE4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FDFD214 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FDFD444 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FDFD674 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FDFD8A4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FDFDAD4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FDFDD04 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FDFDF34 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FDFE164 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FDFE394 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FDFE5C4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FDFE7F4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FDFEA24 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FDFEC54 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FDFEE84 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FDFF0B4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FDFF2E4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15FE11224 fault: 12D1F5C20
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F52F
+D 108 Handled inline self-modifying code: pc: 15FEC5934 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FEC5B64 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FEC5D94 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FEC5FC4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FEC61F4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FEC6424 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FEC6654 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FEC6884 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FEC6AB4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FEC6CE4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FEC6F14 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FEC7144 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FEC7374 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FEC75A4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FEC77D4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FEC7A04 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FEC7C34 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D3494D5
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34FA19
+D 108 Handled inline self-modifying code: pc: 15FF8FAA4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 15FF8FCD4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 15FF8FF04 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 15FF90134 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 15FF90364 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 15FF90594 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 15FF907C4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 15FF909F4 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 15FF90C24 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 15FF90E54 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 15FF91084 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 15FF912B4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 15FF914E4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 15FF91714 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 15FF91944 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 15FF91B74 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 15FF91DA4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349A6F
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366CFD
+[av-detail] ml613 #212992 p0=WRITE p1=0x12d1f5bfc hostpc=0x15e030da4 hinsn=0x39000028 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 108 Handled inline self-modifying code: pc: 160056CC4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 160056EF4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 160057124 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 160057354 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 160057584 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 1600577B4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 1600579E4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 160057C14 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 160057E44 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 160058074 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 1600582A4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 1600584D4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 160058704 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 160058934 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 160058B64 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 160058D94 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 160058FC4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366E63
+D 108 Handled self-modifying code: pc: 16011C1A4 fault: 12D1F6182
+D 108 Handled inline self-modifying code: pc: 16011F7F4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16011FA24 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16011FC54 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16011FE84 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 1601200B4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 1601202E4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 160120514 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 160120744 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 160120974 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 160120BA4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 160120DD4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 160121004 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 160121234 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 160121464 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 160121694 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 1601218C4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 160121AF4 rip: 12D363954 fault: 12D36277F
+[av-detail] ml613 #217088 p0=WRITE p1=0x12d3492fa hostpc=0x15e06e87c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 108 Handled self-modifying code: pc: 15DFF11C4 fault: 12D34F346
+D 108 Handled inline self-modifying code: pc: 1601E52B4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 1601E54E4 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 1601E5714 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1601E5944 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 1601E5B74 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 1601E5DA4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 1601E5FD4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 1601E6204 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1601E6434 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 1601E6664 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 1601E6894 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 1601E6AC4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 1601E6CF4 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 1601E6F24 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 1601E7154 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 1601E7384 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 1601E75B4 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349286
+[av-detail] ml613 #221184 p0=WRITE p1=0x12d3498af hostpc=0x15e06e87c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F7B6
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D349A97
+[av-detail] ml613 #225280 p0=WRITE p1=0x12d1dcecb hostpc=0x15dfec50c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D366D1D
+D 108 Handled inline self-modifying code: pc: 160378D44 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 160378F74 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 1603791A4 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1603793D4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 160379604 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 160379834 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 160379A64 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 160379C94 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 160379EC4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 16037A0F4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 16037A324 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 16037A554 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 16037A784 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 16037A9B4 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 16037ABE4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 16037AE14 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 16037B044 rip: 12D363954 fault: 12D36277F
+D 108 Handled self-modifying code: pc: 15E06E87C fault: 12D366E83
+[av-detail] ml613 #229376 p0=WRITE p1=0x12d34f565 hostpc=0x15dfec50c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 108 Handled inline self-modifying code: pc: 16043AAD4 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 16043AD04 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 16043AF34 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 16043B164 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 16043B394 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 16043B5C4 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 16043B7F4 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 16043BA24 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 16043BC54 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 16043BE84 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 16043C0B4 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 16043C2E4 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 16043C514 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 16043C744 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 16043C974 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 16043CBA4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 16043CDD4 rip: 12D363954 fault: 12D36277F
+[fault_rip] cnt=231500 rip=0x12d1f5bc4 pc=0x15e06e87c addr=0x12d349cf1 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12d348000+0x8000 rev=ml555
+[fault_rip] cnt=232000 rip=0x12d22c98b pc=0x15dfec50c addr=0x12d1dcef3 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12d1d4000+0x10000 rev=ml555
+D 108 Handled self-modifying code: pc: 15DFEC50C fault: 12D34F3A3
+[fault_rip] cnt=232500 rip=0x12d22c98b pc=0x15dfec50c addr=0x12d34f52f kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12d34c000+0x4000 rev=ml555
+[fault_rip] cnt=233000 rip=0x12d22c98b pc=0x15dfec50c addr=0x12d34fa89 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12d34c000+0x4000 rev=ml555
+[av-detail] ml613 #233472 p0=WRITE p1=0x12d34fbfe hostpc=0x15dfec50c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=10 base=0x15dfec000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=233500 rip=0x12d22c98b pc=0x15dfec50c addr=0x12d366ec2 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12d364000+0x4000 rev=ml555
+D 108 Handled inline self-modifying code: pc: 160503224 rip: 12D363954 fault: 12D36273F
+D 108 Handled inline self-modifying code: pc: 160503454 rip: 12D363954 fault: 12D362743
+D 108 Handled inline self-modifying code: pc: 160503684 rip: 12D363954 fault: 12D362747
+D 108 Handled inline self-modifying code: pc: 1605038B4 rip: 12D363954 fault: 12D36274B
+D 108 Handled inline self-modifying code: pc: 160503AE4 rip: 12D363954 fault: 12D36274F
+D 108 Handled inline self-modifying code: pc: 160503D14 rip: 12D363954 fault: 12D362753
+D 108 Handled inline self-modifying code: pc: 160503F44 rip: 12D363954 fault: 12D362757
+D 108 Handled inline self-modifying code: pc: 160504174 rip: 12D363954 fault: 12D36275B
+D 108 Handled inline self-modifying code: pc: 1605043A4 rip: 12D363954 fault: 12D36275F
+D 108 Handled inline self-modifying code: pc: 1605045D4 rip: 12D363954 fault: 12D362763
+D 108 Handled inline self-modifying code: pc: 160504804 rip: 12D363954 fault: 12D362767
+D 108 Handled inline self-modifying code: pc: 160504A34 rip: 12D363954 fault: 12D36276B
+D 108 Handled inline self-modifying code: pc: 160504C64 rip: 12D363954 fault: 12D36276F
+D 108 Handled inline self-modifying code: pc: 160504E94 rip: 12D363954 fault: 12D362773
+D 108 Handled inline self-modifying code: pc: 1605050C4 rip: 12D363954 fault: 12D362777
+D 108 Handled inline self-modifying code: pc: 1605052F4 rip: 12D363954 fault: 12D36277B
+D 108 Handled inline self-modifying code: pc: 160505524 rip: 12D363954 fault: 12D36277F
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 35.743s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" stop" (fd=380, unixdir=382, dup_unixdir=402) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x15513c000)
+D 1AC Handled self-modifying code: pc: 16702695C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 167028140 fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 167028140 fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 167028140 fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+D 1AC Handled self-modifying code: pc: 16702763C fault: 120F14F03
+01ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=237859
+01ac:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=400
+[Wine ntdll/server] process_exit_wrapper(0)
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+ 36.224s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -skipPatcherCheck -steamAppId=12210 -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\" @args.txt -upgrade" (fd=374, unixdir=379, dup_unixdir=400) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+00d8:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=579
+00d0:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=541
+0100:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x15bd38000)
+01c8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\ThirdParty\\Crashpad\\RockstarErrorHandler.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\ThirdParty\\Crashpad\\RockstarErrorHandler.exe\" \"--attachment=attachment_RockstarXboxHelper.log=C:\\users\\mobile\\Documents\\Rockstar Games\\Launcher\\RockstarXboxHelper.log\" \"--attachment=attachment_launcher.log=C:\\users\\mobile\\AppDa"...
+D 1C8 Handled self-modifying code: pc: 1661A80D4 fault: 12E2879D8
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x1661d877c RX from -32, 64 of 64 bytes: 66 c9 a5 f2 26 00 c0 f2 c8 00 40 99 1f 20 03 d5 a6 27 92 d2 a6 c4 a5 f2 26 00 c0 f2 bf 3b 03 d5 c8 00 00 b8 66 13 95 d2 06 c8 a5 f2 26 00 c0 f2 c8 00 40 d9 1f 20 03 d5 06 29 84 52 a6 03 06 8b 
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x1661d877c (not an anon-JIT page)
+D 1C8 Handled self-modifying code: pc: 1661D877C fault: 12E25913D
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x1661e118c RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 a8 83 41 d9 1f 20 03 d5 a1 03 41 d9 1f 20 03 d5 08 01 40 19 28 00 00 19 a6 03 42 99 1f 20 03 d5 c6 04 00 51 1f 20 03 d5 a6 03 02 99 a6 03 41 d9 1f 20 03 d5 
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x1661e118c (not an anon-JIT page)
+D 1C8 Handled self-modifying code: pc: 1661E118C fault: 12E3FE69C
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x1661e118c RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 a8 83 41 d9 1f 20 03 d5 a1 03 41 d9 1f 20 03 d5 08 01 40 19 28 00 00 38 a6 03 42 99 1f 20 03 d5 c6 04 00 51 1f 20 03 d5 a6 03 02 99 a6 03 41 d9 1f 20 03 d5 
+01c8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x1661e118c (not an anon-JIT page)
+D 1C8 Handled self-modifying code: pc: 1661E118C fault: 12F2132D0
+D 1C8 Handled self-modifying code: pc: 1662015AC fault: 12E21A919
+D 1C8 Handled self-modifying code: pc: 166200E04 fault: 12E37D2F3
+D 1C8 Handled self-modifying code: pc: 166200E04 fault: 12E3987B5
+D 1C8 Handled self-modifying code: pc: 166200E04 fault: 12E3F2FE4
+D 1C8 Handled self-modifying code: pc: 1662015AC fault: 12E3FE69C
+D 1C8 Handled self-modifying code: pc: 1662015AC fault: 12E5E5F97
+D 1C8 Handled self-modifying code: pc: 1662015AC fault: 12FBF756B
+D 1C8 Handled self-modifying code: pc: 166201FD8 fault: 12E4BA472
+[guest-log] #2 tid=01d0 [2026-10-29 03:54:01.804] [ ERROR ] [Main ] [shell] Could not do OpenProcess on parent process.
+D 1C8 Handled self-modifying code: pc: 1662E1308 fault: 12E223C2B
+D 1C8 Handled self-modifying code: pc: 1662E47DC fault: 1300729F8
+D 1C8 Handled self-modifying code: pc: 1662E7E14 fault: 12E24CEFF
+D 1C8 Handled self-modifying code: pc: 1662E83BC fault: 12FB7863D
+D 1C8 Handled self-modifying code: pc: 1662E8FE8 fault: 12E5E7C27
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 38.367s rev=ml526
+01c8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=581, unixdir=584, dup_unixdir=589) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12E24D22C
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12E264510
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12E27BA29
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12E3AC814
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12E3F7AA5
+D 1C8 Handled self-modifying code: pc: 16631A97C fault: 12EFCB6E3
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E1A0523
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E1B3CB3
+[fault_rip] cnt=234000 rip=0x12e207775 pc=0x16632272c addr=0x12e1bcd65 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12e1bc000+0xc000 rev=ml555
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E1BCD65
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E2039DE
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E2092D6
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E2440E8
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E258582
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E278285
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E282ADB
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E284A38
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E29BB1B
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E29CB12
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E2C100D
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E2E0C9E
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12E348A35
+D 1C8 Handled self-modifying code: pc: 16632272C fault: 12E3F46E1
+D 1C8 Handled self-modifying code: pc: 166322184 fault: 12F102182
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x73e2b20000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nt-fail] #12 NtAllocateVirtualMemoryEx status=c0000017 proc=rockstarservice.exe tid=01dc size=0x1000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[nt-fail] #13 NtAllocateVirtualMemoryEx status=c0000017 proc=rockstarservice.exe tid=01dc size=0x800000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x73e2690000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x73e25c0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] EXHAUSTED (image 0x73e1bb0000+0x980000): want=0x984000 bump=0x15b1c000/0x23000000 tail_resv=0xd414000 freelist=162 — FAILING the load (was: silent BUS loop)
+[nt-fail] #14 NtMapViewOfSection status=c0000017 proc=rockstarservice.exe tid=01dc size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x30 off=0x0 hits=1 rev=ajan5-rockstar
+[nt-fail] #15 NtAllocateVirtualMemory status=c000000d proc=launcher.exe tid=01c8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=2 rev=ajan5-rockstar
+[steer] #3 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7d6a400000
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x155038000)
+01dc:err:module:loader_init Importing dlls for L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" failed, status c0000135
+01dc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=242921
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=588
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[23:54:02.458] [INFO] [dock-game-end] rockstarservice.exe ended with status 0xc0000135; the session goes on for now (game-still-runs)
+0050:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #57 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #58 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\gameoverlayrenderer64.dll" 0x73e1620000+0x1ac000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #192 status=c0000018 hint=0x73efa3b000 size=0x1000 type=0x3000 protect=0x40 tid=01c8 | STAGE=none err=1 at 0x100000000+0x1b0000
+[guest-log] #3 tid=01d0 [2026-10-29 03:54:04.312] [WARNING] [Main ] [svc] Error starting service! (attempt 1 / 3, exit code 3221225781)
+01e0:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[unixlib] opengl32 (GL-absent stub table) (module 0x73e0380000) -> 64-bit table (0x10704c758)
+[footprint] rev=ml1060 fast phys=2252 MB compressed=0 MB
+01c8:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=16 x8=0x0 x18=0x0 sp=0x16c5e1040
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=2478 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2509 MB compressed=0 MB
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 43.866s rev=ml526
+01c8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=488, unixdir=498, dup_unixdir=545) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x13ee00000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=437 peb=0x10b854000
+[jit-pool] EXHAUSTED (image 0x73de420000+0x980000): want=0x984000 bump=0x15b1c000/0x23000000 tail_resv=0xd414000 freelist=181 — FAILING the load (was: silent BUS loop)
+[nt-fail] #16 NtMapViewOfSection status=c0000017 proc=rockstarservice.exe tid=0248 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x30 off=0x0 hits=2 rev=ajan5-rockstar
+0248:err:module:load_dll [dll-missing] rev=ml336 #1 L"SHELL32.dll" status=c0000017 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0248:err:module:loader_init Importing dlls for L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" failed, status c0000135
+0248:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=246871
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=543
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[guest-log] #4 tid=01d0 [2026-10-29 03:54:07.567] [WARNING] [Main ] [svc] Error starting service! (attempt 2 / 3, exit code 3221225781)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5e1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=2539 MB compressed=0 MB
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 50.135s rev=ml526
+01c8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=381, unixdir=383, dup_unixdir=499) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x13f0b0000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=1252 peb=0x10b830000
+[nls-getptr] type=11 id=437 peb=0x10b830000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x154bec000)
+[nls-getptr] type=11 id=20127 peb=0x10b830000
+[nls-getptr] type=11 id=1252 peb=0x10b830000
+[nls-getptr] type=11 id=437 peb=0x10b830000
+[jit-pool] EXHAUSTED (image 0x73dcd00000+0x980000): want=0x984000 bump=0x15b1c000/0x23000000 tail_resv=0xd414000 freelist=202 — FAILING the load (was: silent BUS loop)
+[nt-fail] #17 NtMapViewOfSection status=c0000017 proc=rockstarservice.exe tid=0250 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x30 off=0x0 hits=3 rev=ajan5-rockstar
+0250:err:module:load_dll [dll-missing] rev=ml336 #1 L"SHELL32.dll" status=c0000017 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 250 Load module cryptbase.dll (cryptbase.dll-e47fe560728c2647): 73DCD20000
+D 250 Load module ole32.dll (ole32.dll-424c26e02d7b7d0d): 73DCC00000
+D 250 Load module combase.dll (combase.dll-87add9b7d0a5b955): 73DCB50000
+D 250 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): 73DCA60000
+D 250 Load module coml2.dll (coml2.dll-735614df14a136bf): 73DC9D0000
+0250:err:module:loader_init Importing dlls for L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" failed, status c0000135
+0250:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=250108
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=498
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[guest-log] #5 tid=01d0 [2026-10-29 03:54:13.838] [ ERROR ] [Main ] [svc] Error starting service! (exit code 3221225781)
+[guest-log] #6 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] ************************************************************************
+[guest-log] #8 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] * Category:  1   (ERROR_CATEGORY_LAUNCHER)
+[guest-log] #9 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] * Code:      135 (0x87)
+[guest-log] #10 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] * Extra:
+[guest-log] #11 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] * Localised: Failed to connect to the Rockstar Games Library Service. If you continue to see this message, please contact Rockstar Games Customer Support at https://support.rockstargames.com.
+[guest-log] #12 tid=01d0 [2026-10-29 03:54:13.841] [ ERROR ] [Main ] [error] ************************************************************************
+[guest-log] #13 tid=01d0 [2026-10-29 03:54:13.844] [ ERROR ] [Main ] [launcher] Displaying error message: Failed to connect to the Rockstar Games Library Service. If you continue to see this message, please contact Rockstar Games Customer Support at https://support.rockstargames.com.
+[rb-tex] madeira-bcd new readback #758: fmt 80 940x318 level 0 (texture 940x318, 1 mips)
+[win-name] #78 hwnd=0x10088 class='' text="Error" rev=ml853
+[win-name] #79 hwnd=0x10088 class='' text="Error" rev=ml853
+[win-name] #80 hwnd=0x10088 class='' text="Error" rev=ml853
+[footprint] rev=ml1060 fast phys=2563 MB compressed=0 MB
+[win-name] #81 hwnd=0x10088 class='' text="Error" rev=ml853
+[23:54:24.249] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=80 resident=2896MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16c5e1040
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=1024 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[23:54:54.401] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=79 resident=2873MB dbg=DEBUGGED rev=ml525
+D 1C8 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 73DC850000
+[win-name] #82 hwnd=0x10088 class='' text="Error" rev=ml853
+[23:55:24.504] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=79 resident=2863MB dbg=DEBUGGED rev=ml525
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=2048 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[23:55:54.618] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=79 resident=2880MB dbg=DEBUGGED rev=ml525
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=3072 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[23:56:24.793] [INFO] detach-wait: presents=0 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=79 resident=2866MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=4096 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[23:56:54.930] [INFO] detach-wait: presents=0 running=1 elapsed=210s
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=79 resident=2885MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+[23:57:25.052] [INFO] detach-wait: presents=0 running=1 elapsed=240s
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=80 resident=2871MB dbg=DEBUGGED rev=ml525
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=5120 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5e1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16c5e1040
+[23:57:55.161] [INFO] detach-wait: presents=0 running=1 elapsed=271s
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=78 resident=2890MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16c5e1040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5e1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=6144 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[win-name] #83 hwnd=0x4005e class='' text="Rockstar Games Launcher" rev=ml853
+[win-name] #84 hwnd=0x10088 class='' text="Error" rev=ml853
+[thread-stacks] port=0xd133 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16c5e1040
+[thread-stacks] port=0x1e533 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c2140e0 x18=0x0 sp=0x13befe9d0
+[thread-stacks] port=0x1e373 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c2480e0 x18=0x0 sp=0x13c0fe9d0
+[thread-stacks] port=0x1781b "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x13c6feb40
+[thread-stacks] port=0x111eb "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x11a775881 x18=0x0 sp=0x16c3b2ad0
+[thread-stacks] port=0x8efb "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=8 x8=0x11a774c81 x18=0x0 sp=0x16bdaeb30
+[thread-stacks] port=0x183bb "" pc=?`?+0x0 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x0
+[23:58:25.325] [INFO] detach-wait: presents=0 running=1 elapsed=301s
+[freeze] alive t+301s beats=10 gaps=0 iter=1190 gen=1 threads=80 resident=2874MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5e1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10b8bc000 modules=31 first=RockstarService.exe@0x12d1d0000
+[thread-sample] ml876 b2 "" teb=0x7115a90000 cpu=8% RUN pc=libsystem_platform.dylib`_platform_memmove+0xb4 lr=Madeira`copy_rect_32+0x1a8 sp=0x120d1e720 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2557 MB (peak 2571) internal=2411 MB compressed=0 MB external=458 MB reusable=17 MB (cycle=153)
+[footprint] rev=ml358 phys=2557 MB (peak 2571) internal=2415 MB compressed=0 MB external=458 MB reusable=17 MB (cycle=154)
+[footprint] rev=ml358 phys=2525 MB (peak 2571) internal=2386 MB compressed=0 MB external=458 MB reusable=17 MB (cycle=155)
+[footprint] rev=ml358 phys=2526 MB (peak 2571) internal=2390 MB compressed=0 MB external=458 MB reusable=17 MB (cycle=156)
+[footprint] rev=ml358 phys=2526 MB (peak 2571) internal=2394 MB compressed=0 MB external=458 MB reusable=17 MB (cycle=157)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=2527 MB (peak 2571) internal=2398 MB compressed=0 MB external=468 MB reusable=17 MB (cycle=158)
+[23:58:42.769] [INFO] [session] length=319s partial=1 play=0s frames=0 stalls=0/0s peak=2572MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=Grand Theft Auto IV: The Complete Edition

@@ -1,0 +1,172 @@
+[01:46:22.379] [INFO] Checking entitlements...
+[01:46:22.380] [INFO] [build] v0.1.622 (622)
+[01:46:22.380] [INFO] [device] model=iPhone17,2 idiom=phone os=iOS Version 27.2 (Build 24B115) ram=7622MB available=6124MB cores=6
+[01:46:22.380] [INFO] [device] address-map=[0x100a3c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[01:46:22.394] [INFO] [device] gpu="Apple A18 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:46:32.699] [INFO] Requesting JIT with Built-in StikJIT...
+[01:46:44.937] [INFO] [bcd] library launch PES2018.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[01:46:44.959] [INFO] Running full Wine sequence...
+[01:46:44.960] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100a3c000,0x8000000000) 512GB available=6106MB low-power=0 thermal=nominal
+[01:46:44.968] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[01:46:44.968] [INFO] Allocating 1152MB JIT pool via debugger...
+[01:46:44.969] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:46:44.969] [INFO] [jit-debugger] attached=1 at the pool request
+[01:46:44.971] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[01:46:44.972] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 512MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[01:46:45.777] [INFO] RX pool at 0x120000000
+[01:46:45.795] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.868s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5584 MB + phys_footprint=559 MB = 6144 MB (hw.memsize says 7622 MB)
+ml985: map_image_view size=0xdba7000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[footprint] rev=ml358 phys=780 MB (peak 780) internal=778 MB compressed=0 MB external=180 MB reusable=9 MB (cycle=1)
+[copy-verify] PES2018.exe: OK, 9873 .text pages executable (copy @0x120006000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x12dbb0000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x12dcea000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x12e104000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x12e238000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x12e300000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+D 24 Load module PES2018.exe (pes2018.exe-37aada144d0f68ba): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE2C0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FE240000
+D 24 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FE130000
+D 24 Load module anselsdk64.dll (anselsdk64.dll-00240f1cbe6e83d1): 71FE080000
+[copy-verify] comctl32.dll: OK, 35 .text pages executable (copy @0x12f5b8000)
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x12f73c000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x12f860000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x12f914000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x12fa08000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x130d74000)
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e6b917460836b36): 71FA5A0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FA500000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71FA450000
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71FA4B0000
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 71FA4A0000
+[store-noalias] #1 rev=ml348 addr=0x71fbbed2a3 insn=0xf8000101 pc=0x13f0323fc NO pool/anon alias | region 0x71fbbec000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x71fbbed2a3 hostpc=0x13f0323fc hinsn=0xf8000101 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fbbeebf9 pc=0x13f0323fc addr=0x71fbbed2a3 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x71fbbec000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x13f0323fc addr=0x71fbbed2a3 x18=0x0 type=1 lr=0x13fffc274 sp=0x71fe3b0000 x16=0x12dc099a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x131d08bf9 (PE 0x71fbbeebf9): 0f b3 e2 66 0f c1 d0 66 0f ba ea 09 66 0f ba f2
+[fault-host] 13f0322fc: 53081d0a 2b06615f 11013d06 b3401cc8 53003c06 9a9f37e7 b3513ccf b34100ef
+[fault-host] 13f03231c: b3623ccf b35200ef b3733ccf b36300ef b3403ccf 93cfe5e6 b3403cc0 53001f66
+[fault-host] 13f03233c: b3403cc0 52160006 b3403cc0 5281dd46 72a0aa86 8b060100 53081f6a 6b08615f
+[fault-host] 13f03235c: 4b080366 b3401cdb 53001c26 b3403cc0 92401006 b4000146 92401006 9a9f27e7
+[fault-host] 13f03237c: 53001c0e b37800ee b37721ce b36e45ce b35c21ce 9ac625c6 b3401cc0 53001d08
+[fault-host] 13f03239c: aa0003e6 33081c06 13867cc6 b3401cc0 8b080e66 d94000c0 d503201f 52840ca6
+[mach_exc] insn_stream PC-12..PC+8: f9000f80 d61f0160 d5033bbf [f8000101] d28003ea 5ac01106 cb060146
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x70210894f0 *(gs_cached+0x58)=0x70210894f0
+[store-noalias] #2 rev=ml348 addr=0x71fbbed2a3 insn=0xf8000101 pc=0x13f0323fc NO pool/anon alias | region 0x71fbbec000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x71fbbed2a3 hostpc=0x13f0323fc hinsn=0xf8000101 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fbbeebf9 pc=0x13f0323fc addr=0x71fbbed2a3 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x71fbbec000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x13f0323fc addr=0x71fbbed2a3 x18=0x0 type=1 lr=0x13fffc274 sp=0x71fe3b0000 x16=0x12dc099a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x131d08bf9 (PE 0x71fbbeebf9): 0f b3 e2 66 0f c1 d0 66 0f ba ea 09 66 0f ba f2
+[fault-host] 13f03235c: 4b080366 b3401cdb 53001c26 b3403cc0 92401006 b4000146 92401006 9a9f27e7
+[fault-host] 13f03237c: 53001c0e b37800ee b37721ce b36e45ce b35c21ce 9ac625c6 b3401cc0 53001d08
+[fault-host] 13f03239c: aa0003e6 33081c06 13867cc6 b3401cc0 8b080e66 d94000c0 d503201f 52840ca6
+[fault-host] 13f0323bc: 72a75c46 ca060000 ca140018 ab140009 aa0903e0 d500401f a94a2f8a 8a00116b
+[fault-host] 13f0323dc: 8b0b014a a940294b cb00014a b400006a f945b38b f9000f80 d61f0160 d5033bbf
+[fault-host] 13f0323fc: f8000101 d28003ea 5ac01106 cb060146 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: f9000f80 d61f0160 d5033bbf [f8000101] d28003ea 5ac01106 cb060146
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x70210894f0 *(gs_cached+0x58)=0x70210894f0
+ml998: [wr-strip-declined] 0x71fbbed2a3 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x71face0000+0xf12000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0xf0c000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x21
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x13f0323fc RX from -32, 64 of 64 bytes: 4a 01 0b 8b 4b 29 40 a9 4a 01 00 cb 6a 00 00 b4 8b b3 45 f9 80 0f 00 f9 60 01 1f d6 bf 3b 03 d5 01 01 00 f8 ea 03 80 d2 06 11 c0 5a 46 01 06 cb 1f 01 08 6a 00 00 86 9a 66 0f 40 92 27 00 80 52 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x13f0323fc (not an anon-JIT page)
+[store-noalias] #3 rev=ml348 addr=0x71fbbed2a3 insn=0xf8000101 pc=0x13f0323fc NO pool/anon alias | region 0x71fbbec000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x71fbbed2a3 hostpc=0x13f0323fc hinsn=0xf8000101 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x13f0323fc RX from -32, 64 of 64 bytes: 4a 01 0b 8b 4b 29 40 a9 4a 01 00 cb 6a 00 00 b4 8b b3 45 f9 80 0f 00 f9 60 01 1f d6 bf 3b 03 d5 01 01 00 f8 ea 03 80 d2 06 11 c0 5a 46 01 06 cb 1f 01 08 6a 00 00 86 9a 66 0f 40 92 27 00 80 52 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x13f0323fc (not an anon-JIT page)
+D 24 Load module XInput9_1_0.dll (xinput9_1_0.dll-356a14f2ff866963): 71FA410000
+[nls-extra] c_1256.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-extra] c_1251.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=1254 peb=0x71ffff0000
+[nls-extra] c_1254.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-extra] c_1250.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-extra] c_1253.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-extra] c_1257.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=1255 peb=0x71ffff0000
+[nls-extra] c_1255.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=932 peb=0x71ffff0000
+[nls-extra] c_932.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=949 peb=0x71ffff0000
+[nls-extra] c_949.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=874 peb=0x71ffff0000
+[nls-extra] c_874.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=1258 peb=0x71ffff0000
+[nls-extra] c_1258.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[nls-getptr] type=11 id=936 peb=0x71ffff0000
+[nls-extra] c_936.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)
+[xp-names] m1591369 "wine-x18-exc"
+[free-delay] #1 release of 0x70216f0000+0x100000 held for 2000 ms (1 in flight)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"EXTRA.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"EXTRA\\EXTRA.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"Language.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"Steam_CEG.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"GameOverlayRenderer64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #2 release of 0x7022010000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7022410000+0x7f0000 held for 2000 ms (3 in flight)
+[free-delay] #1 reservation at 0x7022800000+0x400000: 1 held release(s) from 0x7022410000 (0x7f0000 bytes) freed at once (2 in flight)
+[int3-guest] guest_rip=0x14d86777b x28=0x7c00801140 read=1 rev=ml554
+[int3-guest]   GUEST RAX=0x000000006e6b6e55 RCX=0x00000000204d5241 RDX=0x0000000000555043 RBX=0x00000000206e776f rev=ml578
+[int3-guest]   GUEST RSP=0x000000702080f7c0 RBP=0x000000702080f990 RSI=0x0000000000000000 RDI=0x0000000140000000 rev=ml578
+[int3-guest]   GUEST R8=0x0000000080000002 R9=0x0000000000000000 R10=0x0000000080000002 R11=0x0000000000000000 rev=ml578
+[int3-guest]   GUEST R12=0x000000014bca528f R13=0x0000000000000001 R14=0x000000702080f990 R15=0x00000001459dedea rev=ml578
+[int3-guest]   HOST x0 =0x00000000204d5241 x1 =0x0000000000555043 x2 =0x0000000080000002 x3 =0x0000000000000000
+[int3-guest]   ASCII x0 = "ARM ...."  <== text in a register
+[int3-guest]   ASCII x1 = "CPU....."  <== text in a register
+[int3-guest]   ASCII x8 = "Unkn...."  <== text in a register
+[int3-guest]   ASCII x9 = "ARM ...."  <== text in a register
+[int3-guest]   ASCII x24 = "Unk....."  <== text in a register
+[int3-guest]   ASCII x27 = "own ...."  <== text in a register
+[store-undecoded] #1 rev=ml350 insn=0xd4200000 pc=0x13fffc52c addr=0x13fffc52c rw_addr=0x701fffc52c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=3 rip=0x14d86777b pc=0x13fffc52c addr=0x13fffc52c kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x13fffc000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x13fffc52c addr=0x13fffc52c x18=0x71fffe0000 type=6 lr=0x13fffc274 sp=0x71fe3b0000 x16=0x12dc099a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x12d86d77b (PE 0x14d86777b): 49 89 06 4c 89 04 24 48 8d a4 24 f8 ff ff ff e9
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d44 4c9f2d48 4c9f2d4c [d4200000] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x70210894f0 *(gs_cached+0x58)=0x70210894f0
+0024:err:seh:NtRaiseException Unhandled exception code 80000003 flags 0 addr 0x14d86777a
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000003) syscalls=0 unix_calls=1059
+[unwind] term ml661 begin rip=14d86777b rsp=702080f7c0 window=[702080f7c0..702100f7c0) max=32
+[unwind] term ml661 #00 pc=14d86777b rsp=702080f7c0  PES2018.exe+0xd86777b
+[unwind] term ml662 #00 nv: rbx=206e776f rbp=702080f990 rsi=0 rdi=140000000 r12=14bca528f r13=1 r14=702080f990 r15=1459dedea
+[unwind] term ml662   rbp=702080f990: 556e6b6e 00000000 50691b2e 01000000 00000000 00000000 02000080 00000000
+[unwind] term ml662   rdi=140000000: 4d5a9000 03000000 04000000 ffff0000 b8000000 00000000 40000000 00000000
+[unwind] term ml661 #01 pc=80000002 rsp=702080f7c8  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-2147483645)
+[WineProc] Wine exited with code -2147483645 (caught by longjmp)
+[WineProc] stopping wineserver...
+[01:46:47.958] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=972MB limit=6143MB thermal=nominal lpm=0 api=D3D11/64 res=1280x720 mfx=1.5 cap=60 game=PES2018
+[frontend] returned to library
+[footprint] rev=ml358 phys=976 MB (peak 976) internal=974 MB compressed=0 MB external=270 MB reusable=8 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=975 MB compressed=0 MB
+[01:46:49.862] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=271 MB reusable=8 MB (cycle=3)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=271 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc7d040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=12)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=13)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=14)
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=12 resident=1257MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=978 MB (peak 978) internal=976 MB compressed=0 MB external=272 MB reusable=8 MB (cycle=16)
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=978 MB compressed=0 MB external=289 MB reusable=8 MB (cycle=17)

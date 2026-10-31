@@ -204,7 +204,11 @@ extension BCDEpic {
                        : BCDEpicSignedLaunch.withoutEpicArguments(entry.arguments)
         var flags: BCDEpicHostRequest.Flags = []
         if Self.flag("BCD_EPIC_TREE", entry: entry) { flags.insert(.tree) }
-        if entry.startServices == true { flags.insert(.services) }
+        // madeira-bcd (round 624, agent R S24): Epic's GTA V needs Windows' service manager for Rockstar's launcher; env.BCD_EPIC_SERVICES = 0 in the
+        // game's config turns it off, = 1 turns it on for any game (as "Start Windows services first" does).
+        if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true || BCDEpicRules.startsRockstarLauncher(record.exceptionID)) {
+            flags.insert(.services)
+        }
         let request = BCDEpicHostRequest(program: entry.launchWindowsPath, workingFolder: entry.launchDirectory,
                                          arguments: BCDEpicSignedLaunch.tail(gameArguments: game, epic: epic), ovt: ovtWindows,
                                          root: record.root.windowsPath(), flags: flags)
@@ -249,7 +253,7 @@ extension BCDEpic {
         // A report that says the host failed before it started the game, or none at all after a session that ended at once (the host did not run).
         let short = Date().timeIntervalSince(LibraryModel.shared.launchStartedAt) < 20
         if report?.failedBeforeStart == true || (report == nil && short), LibraryModel.shared.error == nil {
-            tell("BCD couldn't start this game signed in to Epic. Press Play to try again.")
+            tell(BCDEpicHostFiles.notStartedWords)   // round 624 (Discord forum item 7): not about signing in to Epic
         }
         guard let secrets = auditSecrets else { return }
         auditSecrets = nil

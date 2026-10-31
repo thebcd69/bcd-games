@@ -1,0 +1,238 @@
+[15:53:24.121] [INFO] Checking entitlements...
+[15:53:24.122] [INFO] [build] v0.1.623 (623)
+[15:53:24.122] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B5099f) ram=15389MB available=16362MB cores=10
+[15:53:24.123] [INFO] [device] address-map=[0x102eb4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[15:53:24.137] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:53:33.690] [INFO] [bcd] library launch Fallout 4: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[15:53:33.690] [INFO] Requesting JIT with Built-in StikJIT...
+[15:53:35.064] [INFO] [dock-launch] image-retire=1
+[15:53:35.065] [INFO] [dock-launch] image-map-guard=1
+[15:53:35.072] [INFO] [dock-installers] app=377160 scripts=0 programs=0
+[15:53:35.073] [INFO] [madeira-dock] starting the host for app 377160; Valve's client authenticates and authorizes the launch
+[15:53:35.084] [INFO] Running full Wine sequence...
+[15:53:35.084] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102eb4000,0x8000000000) 512GB available=16336MB low-power=0 thermal=nominal
+[15:53:35.088] [INFO] Allocating 1024MB JIT pool (BRK will suspend process)...
+[15:53:35.088] [INFO] Allocating 1024MB JIT pool via debugger...
+[15:53:35.088] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:53:35.088] [INFO] [jit-debugger] attached=1 at the pool request
+[15:53:35.090] [ERR] ml1036: no hole fits a 1024MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:53:35.722] [INFO] RX pool at 0x148000000
+[15:53:35.736] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.698s rev=ml526
+[WineProc] MADEIRA_OPTIN_DLLS: mfasfsrcsnk.dll -> mfasfsrcsnk-optin.dll (Wine's mfasfsrcsnk.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[15:53:36.248] [Wine init_process] reply_pipe=42, sending init_first_thread...
+ml992: os_proc_available_memory=15748 MB + phys_footprint=635 MB = 16384 MB (hw.memsize says 15389 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=647 MB (peak 647) internal=645 MB compressed=0 MB external=94 MB reusable=16 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x71a4f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x71a5250000+0x1760000 (file off 8796093022208 MB): 23 MB in 1 extents, peak 23 MB, 0 refused
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.348s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a0e000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149e28000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.396s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11CBB0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[nls-getptr] type=11 id=437 peb=0x10f3ac000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7024000000+0xc000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[xp-names] m440378 "wine-x18-exc"
+[swap] ml1077 backed 0x71ad5f0000+0x1010000 (file off 8796093022231 MB): 39 MB in 2 extents, peak 39 MB, 0 refused
+[swap] ml1077 backed 0x71ae600000+0x1010000 (file off 8796093022247 MB): 55 MB in 3 extents, peak 55 MB, 0 refused
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=997 MB (peak 997) internal=1018 MB compressed=0 MB external=165 MB reusable=16 MB (cycle=2)
+[swap] ml1077 stats: 23 MB file-backed now (peak 55), 1 extents, file used 0 of 4096 MB, backs 3 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 23 MB in use (peak 55), 3 takes, 0 guarded, 0 MB lost to a full free list
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #1 release of 0x71b5b20000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71b6320000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x71b72f0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x71b82c0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x71b9290000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x71ba260000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x71bb230000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x71bc200000+0xfd0000 held for 2000 ms (8 in flight)
+[footprint] rev=ml358 phys=1113 MB (peak 1113) internal=1134 MB compressed=0 MB external=168 MB reusable=16 MB (cycle=3)
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #76 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1129 MB (peak 1129) internal=1150 MB compressed=0 MB external=168 MB reusable=19 MB (cycle=4)
+[footprint] rev=ml358 phys=1119 MB (peak 1129) internal=1140 MB compressed=0 MB external=168 MB reusable=19 MB (cycle=5)
+[spawn-swap] env.MADEIRA_SPAWN_SWAP: L"Fallout4Launcher.exe" starts as Fallout4.exe (command line rewritten)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout 4\\Fallout4.exe" t+ 10.081s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x425a000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[nls-getptr] type=11 id=1252 peb=0x10f37c000
+[nls-getptr] type=11 id=437 peb=0x10f37c000
+[nls-getptr] type=11 id=20127 peb=0x10f37c000
+[nls-getptr] type=11 id=1252 peb=0x10f37c000
+[nls-getptr] type=11 id=437 peb=0x10f37c000
+[copy-verify] wldap32.dll: OK, 20 .text pages executable (copy @0x157864000)
+[file-wfail] ml669 #79 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x39000 type=0x2000 protect=0x4 tid=00a8 | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x39000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[copy-verify] psapi.dll: OK, 1 .text pages executable (copy @0x15af94000)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=fallout4.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c43800000
+[swap] ml1077 backed 0x71b74f0000+0x1860000 (file off 8796093022263 MB): 47 MB in 2 extents, peak 55 MB, 0 refused
+[footprint] rev=ml358 phys=1421 MB (peak 1421) internal=1443 MB compressed=0 MB external=209 MB reusable=19 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #80 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[15:53:46.746] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml1060 fast phys=1422 MB compressed=0 MB
+[jumbo#1] +0ms tid=16d663000 wtid=00a8 peb=0x10f37c000 nrip=0x71f5067690 grip=0x155cd7050 size=0x80000000 (2048 MB) hint=0x0 -> 0x73ffff0000 st=0x0 | granted=2048 MB ok=1 fail=0
+[swap] ml1077 backed 0x73ffff0000+0x5500000 (file off 8796093022287 MB): 108 MB in 2 extents, peak 108 MB, 0 refused
+[steer] #3 size=0x20000000 reserved_total=512MB armed=va-pressure -> above ceiling 0x7c45c00000
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x40010000) and no V8 cage was asked for; its first page stays a guard
+[steer] #4 size=0x4000000 reserved_total=512MB armed=va-pressure -> above ceiling 0x7c65c00000
+[steer] #5 size=0x20040000 reserved_total=1024MB armed=va-pressure -> above ceiling 0x7c6a110000
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5632000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5632000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5633000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5633000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5634000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5634000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5635000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5635000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5636000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5637000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5638000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f5639000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=fallout4.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5639000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f563a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f563b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f563c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f563d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f563e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f563f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7024000000+0x40000000
+[steer] #6 size=0x20000000 reserved_total=1536MB armed=va-pressure -> above ceiling 0x7c8b000000
+[win-name] #33 hwnd=0x10060 class='' text="Default IME" rev=ml853
+[win-name] #34 hwnd=0x1005e class='' text="Fallout4" rev=ml853
+[win-name] #35 hwnd=0x1005e class='' text="Fallout4" rev=ml853
+[steer] #7 size=0x2000000 reserved_total=1536MB armed=va-pressure -> above ceiling 0x7cbc800000
+[launch-view] dismissed reason=game-window logs=0
+[steer] #8 size=0x4000000 reserved_total=1536MB armed=va-pressure -> above ceiling 0x7cbec00000
+[footprint] rev=ml1060 fast phys=3140 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=3419 MB compressed=0 MB
+D 14C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73FEA90000
+D 14C Load module mpr.dll (mpr.dll-09cefd52a3669014): 73FEA00000
+[footprint] rev=ml1060 fast phys=3458 MB compressed=0 MB
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=0000000000000444 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[swap] ml1077 backed 0x74059d0000+0x1000000 (file off 8796093022247 MB): 124 MB in 3 extents, peak 124 MB, 0 refused
+[footprint] rev=ml1060 fast phys=3519 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=3616 MB compressed=0 MB
+[hwinput] keyboard focus: program (responder)
+[swap] ml1077 backed 0x7411450000+0xc00000 (file off 8796093022404 MB): 200 MB in 8 extents, peak 200 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d91d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x1213f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=13 x8=0x0 x18=0x0 sp=0x16d91d020
+D D0 Load module wmadmod.dll (wmadmod.dll-b61cdd66da820314): 73FEDE0000
+D D0 Load module msdmo.dll (msdmo.dll-9d75278473b53453): 73FE760000
+D D0 Load module winegstreamer.dll (winegstreamer.dll-08f40f4568fa23da): 73FE670000
+D D0 Load module mf.dll (mf.dll-2bc51e1e469a3496): 73FE590000
+[swap] ml1077 backed 0x7269620000+0x1c90000 (file off 0 MB): 228 MB in 9 extents, peak 228 MB, 0 refused
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[15:54:05.904] [INFO] detach-wait: presents=823 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=91 resident=3925MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0x1213f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=28 x8=0x0 x18=0x0 sp=0x16d91d020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d91d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 backed 0x726dc80000+0x1c90000 (file off 0 MB): 228 MB in 9 extents, peak 228 MB, 0 refused
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=90 resident=4008MB dbg=DEBUGGED rev=ml525
+[15:54:35.984] [INFO] detach-wait: presents=2620 running=1 elapsed=60s
+[swap] ml1077 backed 0x7413040000+0xab0000 (file off 0 MB): 211 MB in 9 extents, peak 228 MB, 0 refused
+[swap] ml1077 backed 0x7413040000+0xab0000 (file off 0 MB): 211 MB in 9 extents, peak 228 MB, 0 refused
+[swap] ml1077 backed 0x7413470000+0xab0000 (file off 0 MB): 211 MB in 9 extents, peak 228 MB, 0 refused
+[thread-stacks] port=0x1213f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=19 x8=0x0 x18=0x0 sp=0x16d91d020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d91d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[steer] #27 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7d95b90000
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[spin] ml1140 15:54:43.056 look 1: x64->EC 18238498/s, 98% of the sampled calls for 4 s go to ntdll.dll+0x71aac (0x71f56b1aac)
+[spin] ml1140 thread 00ec teb=0x7245a30000 cpu=94% host pc=0x162bde384 (FEX code or native) lr=0x162bddde4 sp=0x73ff690000 x23=0x724deeea10 | guest RIP exact=0x1417ae5a1 (fallout4.exe+0x17ae5a1) State.rip=0x14165d588
+[spin] ml1140   RAX=0x7c45ceb8c0 RCX=0x147c RDX=0x7c45d0b8c0 RBX=0x0 RSP=0x724deeea10 RBP=0x0 RSI=0x7408585570 RDI=0x74085867c0 R8=0x147d R9=0x724a6686c0 R10=0x9c0 R11=0x0 R12=0x724deeeb30 R13=0xc2eac6621e R14=0x720b90d2c0 R15=0x74085853f0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): 04 12 00 00 48 8b 86 48 12 00 00 c7 04 88 ff ff ff ff 48 8b 86 40 12 00 00 4c 89 34 c8 48 85 ff 74 07 0f ae f0 33 c0 87 07 8b 96 00 10 00 00 8b 86 00 11 00 00 3b d0 0f 84 b5 00 00 00 66 90 8d 4a 01 8b c2 f0 0f b1 8e 00 10 00 00 74 15 8b 96 00 10 00 00 8b 86 00 11 00 00 3b d0 75 e1 e9 8f 00 00 00 8b c2 25 ff 01 00 00 4c 8b 34 c6 4c 89 74 24 60 48 c7 04 c6 00 00 00 00 0f ae f0 44 8b
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x724deeea10: sp+0x58=fallout4.exe+0x17ade6a(call rel32) sp+0xa8=fallout4.exe+0x17af68f(call rel32) sp+0x108=fallout4.exe+0x17afa30(call rel32) sp+0x168=fallout4.exe+0xbebcba(call rel32) sp+0x208=fallout4.exe+0xbef3c7(call rel32)
+[spin] ml1140   first stack qwords: 0 0 0 0 74085853f0 c2eac6621e 724deeeb30 720b90d2c0
+[steer] #28 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7d99b90000
+[steer] #29 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7d9db90000
+[steer] #30 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7da1b90000
+[steer] #31 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7da5b90000
+[steer] #32 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7da9b90000
+[steer] #33 size=0x2150000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7d4c810000
+[steer] #34 size=0x4000000 reserved_total=1848MB armed=va-pressure -> above ceiling 0x7dadb90000
+[footprint] rev=ml358 phys=5643 MB (peak 5643) internal=4382 MB compressed=0 MB external=259 MB reusable=19 MB (cycle=36)
+[footprint] rev=ml1060 fast phys=5703 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=5721 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=5745 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=5767 MB compressed=0 MB
+[footprint] rev=ml358 phys=5764 MB (peak 5764) internal=4390 MB compressed=0 MB external=259 MB reusable=19 MB (cycle=37)
+[ios_audio] ml1230 pacing stream=0x1237c9400 lead 60 ms: client wrote 10.05 s of audio in 10.00 s (100.5%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1536..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=5732 MB (peak 5764) internal=4368 MB compressed=0 MB external=259 MB reusable=19 MB (cycle=38)
+[footprint] rev=ml1060 fast phys=5807 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=5831 MB compressed=0 MB
+[footprint] rev=ml358 phys=5815 MB (peak 5815) internal=4421 MB compressed=0 MB external=270 MB reusable=19 MB (cycle=39)
+[footprint] rev=ml358 phys=5784 MB (peak 5815) internal=4392 MB compressed=0 MB external=270 MB reusable=19 MB (cycle=40)
+[thread-stacks] port=0x1213f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=45 x8=0x0 x18=0x0 sp=0x16d91d020
+[footprint] rev=ml358 phys=5794 MB (peak 5815) internal=4368 MB compressed=0 MB external=270 MB reusable=19 MB (cycle=41)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[15:54:58.741] [INFO] [session] length=83s partial=1 play=68s frames=3957 avg=58.0 low1=56.7 low01=7.5 worst=1087ms stalls=0/0s peak=5834MB limit=16383MB thermal=nominal lpm=0 api=D3D11/D3D9/DirectDraw/64 res=2752x2064 cap=60 game=Fallout 4

@@ -1,0 +1,160 @@
+[20:07:58.034] [INFO] Checking entitlements...
+[20:07:58.034] [INFO] [build] v0.1.622 (622)
+[20:07:58.035] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=11443MB available=12263MB cores=9
+[20:07:58.035] [INFO] [device] address-map=[0x100e4c000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[20:07:58.045] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:08:00.519] [INFO] Requesting JIT with Built-in StikJIT...
+[20:08:01.860] [INFO] [bcd] library launch FactoryGameSteam.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:08:01.883] [INFO] Running full Wine sequence...
+[20:08:01.883] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100e4c000,0x8000000000) 512GB available=12245MB low-power=0 thermal=nominal
+[20:08:01.889] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:08:01.889] [INFO] Allocating 896MB JIT pool via debugger...
+[20:08:01.889] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:08:01.889] [INFO] [jit-debugger] attached=1 at the pool request
+[20:08:01.891] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 608MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:08:02.546] [INFO] RX pool at 0x148000000
+[20:08:02.562] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.714s rev=ml526
+[hwinput] keyboard focus: program (poll)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[20:08:02.794] [vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11622 MB + phys_footprint=665 MB = 12288 MB (hw.memsize says 11443 MB)
+ml985: preferred base 0x140000000+0x37000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x38000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\FactoryGameSteam.exe" 0x1180f0000+0x37000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x1180f0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x1180f0000+0x14000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x118104000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x118104000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x118110000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14813e000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148558000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14868c000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148754000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=670 MB compressed=0 MB external=88 MB reusable=7 MB (cycle=1)
+D 24 Load module FactoryGameSteam.exe (factorygamesteam.exe-c333305c4af7c8d7): 1180F0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a58000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[steam-api] steam_api found no running Steam; process 0020 sees:
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x14a040000)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x14a174000)
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14a218000)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14a33c000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0024 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=factorygamesteam.exe tid=0024 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m460480 "wine-x18-exc"
+[phase] spawn:L"C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-Win64-Shipping.exe" t+  1.574s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-Win64-Shipping.exe\" FactoryGame " (fd=93, unixdir=94, dup_unixdir=117) cwd=L"C:\\External\\PC drm free\\Games\\Satisfactory\\"
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14ad6c000)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x14dad0000)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-MoviePlayerProxy-Win64-Shipping.dll" 0x71f0fd0000+0x17000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-AudioMixer-Win64-Shipping.dll" 0x71f0ec0000+0x10e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-AudioMixerCore-Win64-Shipping.dll" 0x71f0e90000+0x21000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-SignalProcessing-Win64-Shipping.dll" 0x71f0d60000+0x124000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-AudioPlatformConfiguration-Win64-Shipping.dll" 0x71f0d40000+0x1a000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\External\\PC drm free\\Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameSteam-UELibSampleRate-Win64-Shipping.dll" 0x71f0bc0000+0x180000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[footprint] rev=ml358 phys=995 MB (peak 995) internal=985 MB compressed=0 MB external=158 MB reusable=7 MB (cycle=2)
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000064 status=00000000 native_pc=000000023C93CAE8 is_ec=0 -> returned rip=000000023C93CAE8 rsp=000000011EE9FA00 flags=00100001
+[bigres] tid=002c #1 size=0x20010000 (512 MB) type=0x102000 prot=0x1 hint=0x0 peb=0x108550000 total=512 MB
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/FactoryGame/Saved/Logs/FactoryGame-backup-2026.10.24-20.43.31.log
+[guest-log] #1 tid=002c LogInit: Display: Running engine for game: FactoryGame
+[guest-log] #2 tid=002c LogInit: Display: Project file not found: C:/External/PC drm free/Games/Satisfactory/FactoryGame/FactoryGame.uproject
+[guest-log] #3 tid=002c LogInit: Display: 	Attempting to find via project info helper.
+[guest-log] #4 tid=002c LogIoDispatcher: Display: Reading toc: ../../../FactoryGame/Content/Paks/global.utoc
+[guest-log] #5 tid=002c LogIoDispatcher: Display: Toc loaded : ../../../FactoryGame/Content/Paks/global.utoc, Id=ffffffffffffffff, Order=0, EntryCount=1, SignatureHash=2BCCA68ABCEA61F218855750583ED9BD881A72A0
+[guest-log] #6 tid=002c LogIoDispatcher: Display: Mounting container '../../../FactoryGame/Content/Paks/global.utoc' in location slot 0
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "................................."
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "LogWindows: Custom abort handler registered for crash reporting..."
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "................................."
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "......................................................................i"
+[footprint] rev=ml358 phys=1336 MB (peak 1336) internal=1326 MB compressed=0 MB external=159 MB reusable=7 MB (cycle=3)
+[footprint] rev=ml358 phys=1338 MB (peak 1338) internal=1328 MB compressed=0 MB external=159 MB reusable=7 MB (cycle=4)
+LogAudio: Display: Pre-Initializing Audio Device Manager...
+[guest-log] #54 tid=005c LogAudio: Display: Pre-Initializing Audio Device Manager...
+[guest-log] #59 tid=005c LogAudio: Display: AudioInfo: 'PCM' Registered
+[guest-log] #60 tid=005c LogAudio: Display: AudioInfo: 'BINKA' Registered
+[guest-log] #61 tid=005c LogAudio: Display: AudioInfo: 'RADA' Registered
+[guest-log] #62 tid=005c LogAudio: Display: Audio Device Manager Pre-Initialized
+[footprint] rev=ml358 phys=1388 MB (peak 1388) internal=1378 MB compressed=0 MB external=159 MB reusable=7 MB (cycle=5)
+[footprint] rev=ml358 phys=1388 MB (peak 1388) internal=1378 MB compressed=0 MB external=159 MB reusable=7 MB (cycle=6)
+[guest-log] #63 tid=005c LogPluginManager: Mounting Engine plugin OnlineServicesOSSAdapter
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f40d040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] #64 tid=005c LogWmfMedia: Failed to load mfplay.dll
+[free-delay] #1 release of 0x703ae20000+0x400000 held for 2000 ms (1 in flight)
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703B4C1D60, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703B4C1D60, feature level 0xb000, create)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=38 resident=1833MB dbg=DEBUGGED rev=ml525
+[20:08:32.719] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[nls-getptr] type=11 id=10000 peb=0x108550000
+[nls-getptr] type=11 id=10000 peb=0x108550000
+[nls-getptr] type=11 id=10000 peb=0x108550000
+[nls-getptr] type=11 id=10000 peb=0x108550000
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 2C Load module FactoryGameSteam-WindowsPlatformFeatures-Win64-Shipping.dll (factorygamesteam-windowsplatformfeatures-win64-shipping.dll-098765413b971c01): 71DF8C0000
+[win-name] #4 hwnd=0x2002c class='' text="SplashScreenGuard" rev=ml853
+[win-name] #5 hwnd=0x2002c class='' text="SplashScreenGuard" rev=ml853
+D 98 Load module windowscodecs.dll (windowscodecs.dll-5f3613b68f058a67): 71DF1E0000
+[free-delay] #2 release of 0x7045a40000+0xfd0000 held for 2000 ms (1 in flight)
+[win-name] #10 hwnd=0x1004a class='' text="Default IME" rev=ml853
+[win-name] #11 hwnd=0x10048 class='' text="SplashScreen" rev=ml853
+D 2C Load module msctf.dll (msctf.dll-b02e387aee96819f): 71DF130000
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[launch-view] dismissed reason=surface logs=0
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703B4C20D0, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703B4C20D0, feature level 0xc000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+D 2C Load module amd_fidelityfx_upscaler_dx12.dll (amd_fidelityfx_upscaler_dx12.dll-bd306302acdfd1bc): 71DDA50000
+D 2C Load module amd_fidelityfx_framegeneration_dx12.dll (amd_fidelityfx_framegeneration_dx12.dll-46d499ce06c16d54): 71DB5D0000
+D 70 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71DB440000
+[footprint] rev=ml358 phys=2266 MB (peak 2266) internal=2125 MB compressed=0 MB external=174 MB reusable=7 MB (cycle=18)
+LogEOSSDK: Error: LogEOSAuth: LaunchAccountPortalWithPlatformBrowser: Failed to launch with platform browser: Failed launching URL
+[nls-getptr] type=11 id=10000 peb=0x108550000
+[win-name] #18 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[win-name] #25 hwnd=0x10062 class='' text="&Yes" rev=ml853
+[win-name] #68 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #69 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #70 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #71 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #72 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #73 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #74 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #75 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #77 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #78 hwnd=0x10058 class='' text="Error" rev=ml853
+[win-name] #80 hwnd=0x10076 class='' text="EOS_Auth_Login returned EOS_UnexpectedError" rev=ml853
+[win-name] #84 hwnd=0x1006a class='' text="OK" rev=ml853
+[win-name] #85 hwnd=0x10058 class='' text="Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x108550000
+[footprint] rev=ml358 phys=2266 MB (peak 2266) internal=2125 MB compressed=0 MB external=174 MB reusable=7 MB (cycle=19)
+[footprint] rev=ml358 phys=2265 MB (peak 2266) internal=2124 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=20)
+[footprint] rev=ml358 phys=2265 MB (peak 2266) internal=2124 MB compressed=0 MB external=174 MB reusable=7 MB (cycle=21)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f40d040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2265 MB (peak 2266) internal=2124 MB compressed=0 MB external=174 MB reusable=7 MB (cycle=22)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=2265 MB (peak 2266) internal=2124 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=23)
+[20:08:48.633] [INFO] [session] length=46s partial=1 play=0s frames=0 stalls=0/0s peak=2309MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=FactoryGameSteam

@@ -89,6 +89,9 @@ static void madeira_msgbox_origin( const MSGBOXPARAMSW *mb )
     __ENDTRY
 }
 #else
+/* madeira-bcd: no scan outside i386. The 64-bit user32.dll BCD ships (app/Madeira/arm64ec-windows/user32.dll) is a committed binary that
+ * no step builds from this source, so a 64-bit scan here would never run (round 624: Khazan's box is a 64-bit process's; its evidence is
+ * the unix side's [sub-floor-image] line and the box's own [win-name] line). */
 static void madeira_msgbox_origin( const MSGBOXPARAMSW *mb ) { }
 #endif
 '''

@@ -64,7 +64,13 @@ def rejected(function, message):
 for name in ('mf.dll', 'mfplat.dll', 'kernel32.dll'):
     module = PE(root / 'app/Madeira/arm64ec-windows' / name)
     assert module.exports() and module.imports()
-rejected(lambda: check(root / 'app/Madeira/arm64ec-windows'), 'missing required wmvcore.dll')
+# The bundle without the two media DLLs is rejected. (Those two are built by the workflow, not committed: a tree that has already been
+# built holds them, so the real folder is not used as it is; a folder of links to its other files is the same bundle without them.)
+with tempfile.TemporaryDirectory(prefix='madeira-media-bundle-') as tmp:
+    for p in (root / 'app/Madeira/arm64ec-windows').iterdir():
+        if p.is_file() and p.name.lower() not in ('wmvcore.dll', 'winegstreamer.dll'):
+            (Path(tmp) / p.name).symlink_to(p)
+    rejected(lambda: check(Path(tmp)), 'missing required wmvcore.dll')
 
 reader = ('WMCreateReader', 'WMCreateSyncReader', 'WMCreateProfileManager')
 backend = ('winegstreamer_create_wm_sync_reader',)

@@ -223,6 +223,8 @@ final class MetalBackedView: UIView {
     /// The present counter when the current library session started (see
     /// drawableAspect); LibraryModel.begin sets it.
     static var presentCountAtLaunch: UInt64 = 0
+    /// Round 625 (owner's item 18): fingers that touched the game view since the session started (LibraryModel.watchNoInputHint).
+    static var touchesSinceLaunch = 0
 
     /// The rect (view-local points) the guest surface occupies. The
     /// window-level host view gets THIS frame, not our full bounds, and touch
@@ -620,6 +622,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        Self.touchesSinceLaunch += touches.count   // madeira-bcd (round 625): the no-input hint stays away once the player has touched the game
         BCDTouchFeelModel.shared.gameTouched()   // madeira-bcd (round 604): a touch brings back touch controls that auto-hid (before the pad overlay's filter below drops it); nothing with auto-hide off
         guard let touches = BCDTouchExtras.filter(self, touches, .began) else { return }   // madeira-bcd (round 604): aim mode, touch gestures, the Pencil; one static flag when off
         if HardwareInput.shared.interceptTouches(touches, event, .began) { return }
@@ -1891,12 +1894,12 @@ struct ContentView: View {
                 }
             }
 
-            winios_phase("pool-alloc-begin")
+            winiosPhase("pool-alloc-begin")
             logStore.log("Allocating \(poolSizeMB)MB JIT pool (BRK will suspend process)...")
             let t0 = CFAbsoluteTimeGetCurrent()
             let pool = StikJITHelper.allocatePool(poolSize: poolSizeMB * 1024 * 1024)
             let elapsed = CFAbsoluteTimeGetCurrent() - t0
-            winios_phase("pool-ready")
+            winiosPhase("pool-ready")
             logStore.log("BRK suspension lasted \(String(format: "%.2f", elapsed))s")
 
             // Arena carver self-test. bcd.cfg arena-test holds
@@ -2146,7 +2149,7 @@ struct ContentView: View {
                 logStore.log("[early-detach] rev=ml524 DISABLED — debugger stays attached all run")
             }
 
-            winios_phase("detach-done")
+            winiosPhase("detach-done")
 
             // The Madeira JIT shortcut turned Cellular Data off or connected LocalDevVPN
             // for this JIT (JITNetwork.swift). The pool is mapped and the debugger is
@@ -2156,7 +2159,7 @@ struct ContentView: View {
 
             // Step 2: Start wineserver
             self.startWineserver()
-            winios_phase("wineserver-up")
+            winiosPhase("wineserver-up")
 
             // Step 3: Start Wine.
 
@@ -2172,7 +2175,21 @@ struct ContentView: View {
             } else {
                 Thread.sleep(forTimeInterval: 2.0)
             }
-            winios_phase("wine-start")
+            // madeira-bcd (round 624, agent D2 S1; RM4C0R, AQZ3E2, 3DX90K): the server thread ended before it was ready (a fatal error,
+            // which WineServerBridge.m now reports). Starting Wine would wait on it for ever on a black screen: say why instead, as the
+            // JIT-pool failure above does. Only when the server is gone; a running server is waited for as before.
+            if wineserver_is_ready() == 0, wineserver_is_running() == 0 {
+                let why = String(cString: wineserver_fatal_message())
+                logStore.log("[launch] the Wine server stopped before it was ready: " + (why.isEmpty ? "no message" : why), level: .error)
+                logStore.uiPaused = false
+                DispatchQueue.main.async { ws_log_quiet = 0; heartbeat.invalidate() }
+                DispatchQueue.main.async {
+                    LibraryModel.shared.launchFailed("The Wine server could not start (" + (why.isEmpty ? "no reason given" : why) + "). Close BCD "
+                        + "completely (swipe it away in the app switcher), open it again and start the game; if it happens again, send the log.")
+                }
+                return
+            }
+            winiosPhase("wine-start")
             self.startWineProcess()
 
             // Step 4: Wait for Wine to finish instead of fixed timer
@@ -2931,8 +2948,11 @@ extension ControlAction {
 /// when the first program initialises it, whether the GDI handle table is a section a 32-bit program
 /// can map inside its own guest window (wine dlls/win32u/gdiobj.c, gdi_shared_use_section). Left to
 /// that default the table is private host memory, and 32-bit gdi32 truncates its address and faults
-/// on its first GDI handle. The Dock asks for the section the same way (startDock). Only the
-/// library's Desktop: a game started "In a Wine desktop" keeps the default.
+/// on its first GDI handle. The Dock asks for the section the same way (startDock). The library's
+/// Desktop, and (round 624, Hotline Miami's GOG launcher KXYG7M) a 32-bit program started "In a Wine
+/// desktop": its session also starts 64-bit (explorer /desktop), so with the default table the program
+/// faulted on its first GDI handle on every first start (auto-tune's gdi-table-32bit-child fixed it after
+/// one failure, and Reset to Recommended lost that again). A 64-bit program in that mode keeps the default.
 /// env.MADEIRA_GDI_SHARED_SECTION = 0 in the Desktop's Game config or in bcd.cfg, which the bridge
 /// exports after this, turns it off.
 enum DesktopGDISection {
@@ -2941,15 +2961,40 @@ enum DesktopGDISection {
 
     /// For every library start, before the session starts: the log line to write, or nil.
     static func apply(_ entry: LibraryEntry) -> String? {
-        if entry.desktop == true {
+        let shell = applyShell(entry)
+        if entry.desktop == true || (entry.runsInDesktop && entry.bits == 32) {
             setenv("MADEIRA_GDI_SHARED_SECTION", "1", 1)
             setByDesktop = true
-            return "[bcd] Desktop: section-backed GDI table for the 32-bit programs started here "
+            return "[bcd] " + (entry.desktop == true ? "Desktop" : "Wine-desktop start of a 32-bit program")
+                + ": section-backed GDI table for the 32-bit programs started here "
                 + "(MADEIRA_GDI_SHARED_SECTION=1; env.MADEIRA_GDI_SHARED_SECTION = 0 in its Game config turns it off)"
+                + (shell ?? "")
         }
         if setByDesktop {
             unsetenv("MADEIRA_GDI_SHARED_SECTION")
             setByDesktop = false
+        }
+        return nil
+    }
+
+    /// madeira-bcd (round 624, Discord forum item 4: a player's WoW private server on the Windows desktop, whose worldserver.exe
+    /// console never showed and whose context-menu start ran in C:\windows\): the library's Desktop, and only it, shows the console
+    /// window of a console program started there (conhost keeps its window unless the program asked for none, as on Windows:
+    /// MADEIRA_CONSOLE_WINDOW=1) and starts a program opened from explorer's context menu in its own folder (MADEIRA_DESKTOP_CWD=1,
+    /// build/ntdll-unix/process_ios.c desktop_cwd_apply). Another library start clears both; = 0 in the Desktop's Game config wins.
+    private static var shellByDesktop = false
+    private static func applyShell(_ entry: LibraryEntry) -> String? {
+        if entry.desktop == true {
+            setenv("MADEIRA_CONSOLE_WINDOW", "1", 1)
+            setenv("MADEIRA_DESKTOP_CWD", "1", 1)
+            shellByDesktop = true
+            return "; console programs started here keep their console window and a program opened from explorer's context menu "
+                + "starts in its own folder (MADEIRA_CONSOLE_WINDOW=1, MADEIRA_DESKTOP_CWD=1; = 0 in its Game config turns either off)"
+        }
+        if shellByDesktop {
+            unsetenv("MADEIRA_CONSOLE_WINDOW")
+            unsetenv("MADEIRA_DESKTOP_CWD")
+            shellByDesktop = false
         }
         return nil
     }

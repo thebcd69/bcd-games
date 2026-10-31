@@ -50,8 +50,14 @@ assert flag > 0x0800, 'above the per-mapping flags that exist'
 # --- the mark in map_image_into_view ------------------------------------------
 mapper = function(native, 'static NTSTATUS map_image_into_view(')
 mark = mapper.index('view->protect |= VPROT_X64DATA;')
-cond_start = mapper.rindex('if (ios_x64_image_nocopy_enabled()', 0, mark)
+# round 625 (owner's item 22, agent E1 S14-b): one guard for both marks; inside it the switch, else the image that can never fit
+cond_start = mapper.rindex('if (!ios_map_resource_view && !ios_wow_base() &&', 0, mark)
 cond = mapper[cond_start:mark]
+branch = mapper[cond_start:mapper.index('#endif', cond_start)]
+assert branch.count('view->protect |= VPROT_X64DATA;') == 2, 'two marks under the one guard'
+assert branch.index('if (ios_x64_image_nocopy_enabled())') < branch.index('else if (ios_x64_image_copy_can_never_fit( total_size ))'), \
+    'the switch first, then the fallback'
+assert 'NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off' in branch, 'the fallback says so in its [x64-image] line'
 for need in ('!ios_map_resource_view', '!ios_wow_base()', 'nt->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64',
              'nt->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC', '!(view->protect & VPROT_ARM64EC)',
              '!image_info->is_hybrid', '!image_info->wine_builtin'):
@@ -77,7 +83,8 @@ assert 'ios_jit_copy_refused' not in block, 'a dropped bit is not a refusal'
 assert '!ios_in_mach_exc' in block, 'silent on the Mach exception thread (ml374)'
 
 helper = function(native, 'static int ios_x64_image_is_host_data(')
-assert 'ios_x64_image_nocopy_enabled()' in helper
+# round 625: the view's mark alone decides (only the switch or the fallback sets it), so a fallback image drops EXEC like a switched one
+assert 'ios_x64_image_nocopy_enabled()' not in helper
 # build 423: a host-page rounded request for the last section runs past a 4 KB
 # aligned SizeOfImage; the view must be found by its start, not by the range
 assert 'find_view( base, 0 )' in helper and 'find_view( base, size )' not in helper
@@ -149,9 +156,45 @@ with tempfile.TemporaryDirectory() as d:
         assert out == str(want), (case, out)
 print('PASS: MADEIRA_X64_IMAGE_NOCOPY is on for exactly "1"')
 
+# --- round 625: the fallback, compiled ---------------------------------------------
+never = function(native, 'static int ios_x64_image_copy_can_never_fit(')
+nprog = r'''
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+static size_t ios_jit_pool_size_global;
+static const char *fake_auto, *fake_size;
+static const char *fake_getenv(const char *n) { return !strcmp(n, "MADEIRA_X64_IMAGE_NOCOPY_AUTO") ? fake_auto : !strcmp(n, "WINE_IOS_JIT_SIZE") ? fake_size : NULL; }
+#define getenv fake_getenv
+''' + never + r'''
+int main(void)
+{
+    fake_auto = @AUTO@; fake_size = @SIZE@; ios_jit_pool_size_global = @POOL@;
+    printf("%d %d %d %d\n", ios_x64_image_copy_can_never_fit( 0x241c0000u ), ios_x64_image_copy_can_never_fit( 0x35735000u ),
+           ios_x64_image_copy_can_never_fit( 0x23000000u ), ios_x64_image_copy_can_never_fit( 0x1c000000u ));
+    return 0;
+}
+'''
+with tempfile.TemporaryDirectory() as d:
+    # (MADEIRA_X64_IMAGE_NOCOPY_AUTO, WINE_IOS_JIT_SIZE, the published pool) -> mgs4.exe 578 MB, Slay the Spire 2 853 MB, the pool's own size, 448 MB
+    for auto, size, pool, want in (('NULL', 'NULL', '0x23000000u', '1 1 0 0'),        # 560 MB pool: only what is larger than the whole pool
+                                   ('NULL', '"23000000"', '0', '1 1 0 0'),             # before the pool's first use: the app's size
+                                   ('NULL', 'NULL', '0x27000000u', '0 1 0 0'),         # a 624 MB pool holds mgs4.exe: it keeps its copy
+                                   ('"0"', 'NULL', '0x23000000u', '0 0 0 0'),          # turned off
+                                   ('"1"', 'NULL', '0x23000000u', '1 1 0 0'),          # any other value: on
+                                   ('NULL', 'NULL', '0', '0 0 0 0')):                  # no pool known: nothing
+        src = Path(d) / 'nf.c'
+        src.write_text(nprog.replace('@AUTO@', auto).replace('@SIZE@', size).replace('@POOL@', pool))
+        exe = Path(d) / 'nf'
+        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-o', str(exe), str(src)], check=True)
+        out = subprocess.run([str(exe)], capture_output=True, text=True, check=True).stdout.strip()
+        assert out == want, (auto, size, pool, out)
+print('PASS: an image larger than the whole JIT pool runs from its file (round 625); every image an empty pool could hold keeps its copy')
+
 # --- catalog and CI -----------------------------------------------------------
 gen = (root / 'build/tools/gen-config-catalog.py').read_text()
 assert '"env.MADEIRA_X64_IMAGE_NOCOPY"' in gen, 'catalog overlay'
+assert '"env.MADEIRA_X64_IMAGE_NOCOPY_AUTO"' in gen, 'catalog overlay of the round 625 fallback switch'
 swift = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()
 assert 'env.MADEIRA_X64_IMAGE_NOCOPY' in swift, 'generated catalog carries the key'
 yml = (root / '.github/workflows/build-ipa.yml').read_text()

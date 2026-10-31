@@ -1,0 +1,223 @@
+[10:41:11.807] [INFO] Checking entitlements...
+[10:41:11.807] [INFO] [build] v0.1.592 (592)
+[10:41:11.808] [INFO] [device] model=iPhone17,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7682MB available=6125MB cores=6
+[10:41:11.808] [INFO] [device] address-map=[0x1002e0000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[10:41:11.827] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:09:09.070] [INFO] Requesting JIT with Built-in StikJIT...
+[11:09:10.937] [INFO] [bcd] library launch Spider-Man.exe: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[11:09:10.938] [INFO] Session log: logs/Spider-Man.exe-2026-10-23_11-09-10.txt
+[11:09:10.960] [INFO] Running full Wine sequence...
+[11:09:10.960] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1002e0000,0x8000000000) 512GB available=6101MB low-power=0 thermal=nominal
+[11:09:10.966] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:09:10.966] [INFO] Allocating 896MB JIT pool via debugger...
+[11:09:10.966] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:09:10.967] [INFO] [jit-debugger] attached=1 at the pool request
+[11:09:10.969] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:09:11.862] [INFO] RX pool at 0x148000000
+[11:09:11.881] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.974s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5461 MB + phys_footprint=682 MB = 6144 MB (hw.memsize says 7682 MB)
+ml985: map_image_view size=0x8604000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0x8604000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8604000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] Spider-Man.exe: OK, 3580 .text pages executable (copy @0x148006000)
+[footprint] rev=ml358 phys=950 MB (peak 950) internal=947 MB compressed=3 MB external=105 MB reusable=5 MB (cycle=1)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x15060c000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x150746000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x150b60000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x150c94000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x150d5c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+D 24 Load module Spider-Man.exe (spider-man.exe-84bcd96adcf434d0): 123760000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module steam_api64.dll (steam_api64.dll-386d6e10b02354ee): 71FE180000
+D 24 Load module IPHLPAPI.DLL (iphlpapi.dll-af2b7f72e65b7df1): 71FE0E0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE030000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDFB0000
+[copy-verify] winhttp.dll: OK, 8 .text pages executable (copy @0x1525fc000)
+[copy-verify] jsproxy.dll: OK, 1 .text pages executable (copy @0x1526b0000)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x152754000)
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x152888000)
+[copy-verify] propsys.dll: OK, 3 .text pages executable (copy @0x1533d0000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[xp-names] m3994861 "wine-x18-exc"
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000000B8 status=00000000 native_pc=00000071FFD32DAC is_ec=1 -> returned rip=00000071FFD32DAC rsp=0000007028CB0000 flags=00100003
+[swap] ml1077 backed 0x7038010000+0x7fc00000 (whole reservation, ml1257) (file off 0 MB): 2044 MB in 1 extents, peak 2044 MB, 0 refused
+[jumbo#1] +0ms tid=17011f000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0x7fc00000 (2044 MB) hint=0x0 -> 0x7038010000 st=0x0 | granted=2044 MB ok=1 fail=0
+[steer] #1 size=0x153ff000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c0ca10000
+[steer] #2 size=0x3c0e000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c21e10000
+[steer] #3 size=0x4633000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c25a20000
+[steer] #4 size=0x25c9000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c2a060000
+[swap] ml1077 backed 0x702a5c0000+0x1000000 (whole reservation, ml1257) (file off 2044 MB): 2060 MB in 2 extents, peak 2060 MB, 0 refused
+[steer] #5 size=0x33c00000 reserved_total=1167MB armed=va-pressure -> above ceiling 0x7c2c630000
+[swap] ml1077 backed 0x70b7c10000+0x40000000 (whole reservation, ml1257) (file off 2060 MB): 3084 MB in 3 extents, peak 3084 MB, 0 refused
+[steer] #6 size=0x2a800000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7c61610000
+[steer] #7 size=0x2010000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7c8be10000
+[steer] #8 size=0x2010000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7c8e800000
+[swap] ml1077 backed 0x702f910000+0x400000 (whole reservation, ml1257) (file off 3084 MB): 3088 MB in 4 extents, peak 3088 MB, 0 refused
+[swap] ml1077 backed 0x702fd10000+0x800000 (whole reservation, ml1257) (file off 3088 MB): 3096 MB in 5 extents, peak 3096 MB, 0 refused
+[phase] spawn:L"C:\\Marvels.Spider.Man.Remastered.v3.618.0.0\\Marvels.Spider.Man.Remastered.v3.618.0.0\\crs-handler.exe" t+  2.762s rev=ml526
+ml957: ? backing 0x11d900000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #3 hwnd=0x1002c class='' text="Default IME" rev=ml853
+[copy-verify] wintrust.dll: OK, 6 .text pages executable (copy @0x156108000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x70f8410000+0xfd0000 (whole reservation, ml1257) (file off 3096 MB): 3111 MB in 6 extents, peak 3111 MB, 0 refused
+[free-delay] #1 release of 0x7035fd0000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7036fd0000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70367d0000+0x800000 held for 2000 ms (3 in flight)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Marvel's Spider-Man Remastered/Marvel's Spider-Man Remastered.log
+[guest-log] #1 tid=0024 08:09:14:320 (00000036) > [Render] Enumerating adapters:
+[guest-log] #2 tid=0024 08:09:14:320 (00000036) > [Render] 	Adapter 0:
+[guest-log] #3 tid=0024 08:09:14:320 (00000036) > [Monitor] 		Description             : Apple A18 GPU
+[guest-log] #4 tid=0024 08:09:14:320 (00000036) > [Monitor] 		Vendor                  : nVidia (10de)
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[madeira-d3d12] command queue: type 0
+ml985: map_image_view size=0x46b6000 base=0x6ffff6be0000 info_base=0x180000000 map_addr=0x6ffff6be0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[guest-log] #28 tid=0024 08:09:14:710 (00000036) > [Validate Settings] The requested display mode (ResX:1424 ResY:656 Hz:60 3D:0 Exclusive: false, HDR: false) was not available, finding the best alternative...
+[guest-log] #29 tid=0024 08:09:14:710 (00000036) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #30 tid=0024 08:09:14:711 (00000036) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #31 tid=0024 08:09:14:711 (00000036) > [Validate Settings] Could not find any display mode...
+[win-name] #7 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[win-name] #8 hwnd=0x10036 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[footprint] rev=ml358 phys=1563 MB (peak 1563) internal=1432 MB compressed=129 MB external=198 MB reusable=3 MB (cycle=2)
+[free-delay] #4 release of 0x70f7c10000+0x800000 held for 2000 ms (4 in flight)
+[win-name] #13 hwnd=0x10036 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[win-name] #19 hwnd=0x10036 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[swap] ml1077 stats: 3111 MB file-backed now (peak 3111), 6 extents, file used 3111 of 131072 MB, backs 6 releases 0 unbacks 0 refused 0 | coverage broad: disk 9 MB of 6192 cap, reservations 6, holes 34, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml1060 fast phys=1707 MB compressed=166 MB
+[footprint] rev=ml358 phys=1711 MB (peak 1711) internal=1542 MB compressed=166 MB external=202 MB reusable=3 MB (cycle=3)
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=1712 MB (peak 1712) internal=1543 MB compressed=166 MB external=203 MB reusable=3 MB (cycle=4)
+[footprint] rev=ml358 phys=1715 MB (peak 1715) internal=1547 MB compressed=165 MB external=203 MB reusable=2 MB (cycle=5)
+[win-name] #20 hwnd=0x10036 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[guest-log] #38 tid=0024 08:09:22:701 (00000036) > [Validate Settings] The requested display mode (ResX:1424 ResY:656 Hz:60 3D:0 Exclusive: false, HDR: false) was not available, finding the best alternative...
+[guest-log] #39 tid=0024 08:09:22:701 (00000036) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #40 tid=0024 08:09:22:701 (00000036) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #41 tid=0024 08:09:22:701 (00000036) > [Validate Settings] Could not find any display mode...
+[footprint] rev=ml358 phys=1713 MB (peak 1715) internal=1545 MB compressed=165 MB external=203 MB reusable=3 MB (cycle=6)
+[guest-log] #42 tid=0024 08:09:22:731 (00000036) > [NxApp] Querying GPU Driver Info...
+[win-name] #23 hwnd=0x10050 class='' text="Default IME" rev=ml853
+[win-name] #24 hwnd=0x20038 class='' text="Marvel's Spider-Man Remastered v3.618.0.0" rev=ml853
+[win-name] #25 hwnd=0x20038 class='' text="Marvel's Spider-Man Remastered v3.618.0.0" rev=ml853
+[win-name] #26 hwnd=0x20038 class='' text="Marvel's Spider-Man Remastered v3.618.0.0" rev=ml853
+[win-name] #32 hwnd=0x20038 class='' text="Marvel's Spider-Man Remastered v3.618.0.0" rev=ml853
+[win-name] #33 hwnd=0x20038 class='' text="Marvel's Spider-Man Remastered v3.618.0.0" rev=ml853
+[swap-diag] #1 layer 0x10bc2ac40: drawable 800x600 format 80 -> 1160x536 format 70, set on the iOS main thread (dispatch_sync) ...
+[free-delay] #5 release of 0x7037640000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #6 release of 0x7037540000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x7037440000+0x100000 held for 2000 ms (3 in flight)
+[free-delay] #8 release of 0x7037310000+0x100000 held for 2000 ms (4 in flight)
+[madeira-d3d12] command queue: type 3
+[footprint] rev=ml1060 fast phys=1895 MB compressed=192 MB
+[steer] #9 size=0x8000000 reserved_total=2647MB armed=va-pressure -> above ceiling 0x7ce7400000
+[swap] ml1077 backed 0x718f510000+0x6000000 (whole reservation, ml1257) (file off 5218 MB): 5298 MB in 22 extents, peak 5298 MB, 0 refused
+[steer] #10 size=0x5000000 reserved_total=2647MB armed=va-pressure -> above ceiling 0x7cef400000
+[footprint] rev=ml1060 fast phys=1944 MB compressed=194 MB
+[guest-log] #59 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057a78000)
+[guest-log] #60 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057ad8000)
+[guest-log] #61 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057b38000)
+[guest-log] #62 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057b98000)
+[guest-log] #63 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057bf8000)
+[guest-log] #64 tid=0024 [madeira-d3d12] ml1151 ClearUnorderedAccessViewUint value 0x1 exact: resource 'Resource' 12 bytes, range +0 len 12 (gpu 0x10057c58000)
+[footprint] rev=ml1060 fast phys=2272 MB compressed=347 MB
+[steer] #11 size=0xb714000 reserved_total=2647MB armed=va-pressure -> above ceiling 0x7cf6c10000
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"hkCompatFormats.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=2418 MB compressed=359 MB
+[steer] #12 size=0x18000000 reserved_total=3031MB armed=va-pressure -> above ceiling 0x7d1ec10000
+[steer] #13 size=0x4000000 reserved_total=3031MB armed=va-pressure -> above ceiling 0x7d36c10000
+D 184 Load module wbemprox.dll (wbemprox.dll-32727b2744fb579d): 71F2420000
+D 184 Load module winspool.drv (winspool.drv-1d86ae048b0921a6): 71F22F0000
+D 184 Load module compstui.dll (compstui.dll-6caceb67ab4f8333): 71F2250000
+[footprint] rev=ml1060 fast phys=2523 MB compressed=356 MB
+D 24 Load module xaudio2_8.dll (xaudio2_8.dll-6d69cf073a3abd5f): 71F21A0000
+[swap] ml1077 backed 0x71a6ce0000+0x40000000 (whole reservation, ml1257) (file off 5346 MB): 6363 MB in 26 extents, peak 6363 MB, 0 refused
+[swap] ml1077 backed 0x71ebce0000+0x4000000 (whole reservation, ml1257) (file off 6370 MB): 6427 MB in 27 extents, peak 6427 MB, 0 refused
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[swap] ml1077 backed 0x73ffff0000+0x4000000 (whole reservation, ml1257) (file off 6434 MB): 6491 MB in 28 extents, peak 6491 MB, 0 refused
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x120000) and no V8 cage was asked for; its first page stays a guard
+[framegen] interpolator ready: 1160x536 fmt 70, motion search on 145x67
+[11:09:24.599] [INFO] Game is presenting (#1, splash) — early detach in 20s
+D 1C8 Load module secur32.dll (secur32.dll-f6ff7e0cf92170a6): 73FFF60000
+01c8:err:module:load_dll [dll-missing] rev=ml336 #8 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+01c8:err:module:load_dll [dll-missing] rev=ml336 #9 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 1C8 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 73FFED0000
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000150D74110 flags=1 nparams=4 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000150D74110 flags=1 nparams=4 tid=0024 hit=2
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000150D74110 flags=1 nparams=4 tid=0024 hit=3
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000150D74110 flags=1 nparams=4 tid=0024 hit=4
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1703d9280 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x11fb51c00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x11f997400 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[rb-tex] madeira-bcd new readback #1: fmt 55 368x164 level 0 (texture 368x164, 1 mips)
+[ios_audio] ml1230 pacing stream=0x1213f6500 lead 60 ms: client wrote 8.98 s of audio in 10.00 s (89.8%) over 260 wakes; device short 1109.3 ms in 52 of 469 passes (largest pass 1024 frames); ring 0..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[11:09:42.092] [INFO] detach-wait: presents=327 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=113 resident=1716MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x11fb51c00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x11f997400 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[11:09:44.627] [OK] Early detach: game presenting and settled
+[11:09:46.633] [INFO] Detaching debugger...
+[ios_audio] ml1230 pacing stream=0x1213f6500 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 185 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2048..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1703d9280 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=110 resident=1452MB dbg=DEBUGGED rev=ml525
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[rb-tex] madeira-bcd new readback #796: fmt 20 256x256 level 0 (texture 256x256, 1 mips)
+[swap] ml1077 backed 0x722dce0000+0x530000 (whole reservation, ml1257) (file off 5160 MB): 6447 MB in 28 extents, peak 6519 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1703d9280 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=5793 MB compressed=3489 MB
+[footprint] rev=ml1060 fast phys=5833 MB compressed=3578 MB
+[footprint] rev=ml1060 fast phys=5885 MB compressed=3549 MB
+[steer] #14 size=0x36c0000 reserved_total=3031MB armed=va-pressure -> above ceiling 0x7d68800000
+[footprint] rev=ml1060 fast phys=5941 MB compressed=3556 MB
+[freeze] alive t+90s beats=3 gaps=0 iter=356 gen=1 threads=109 resident=1105MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 backed 0x721ea80000+0x8000000 (whole reservation, ml1257) (file off 6498 MB): 6544 MB in 23 extents, peak 6544 MB, 0 refused
+[mip0] r#13201 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13210 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13219 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13228 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13317 256x256x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 9 levels) -> 9 level(s)
+[mip0] r#13326 256x256x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 9 levels) -> 9 level(s)
+[mip0] r#13335 256x256x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 9 levels) -> 9 level(s)
+[mip0] r#13344 256x256x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 9 levels) -> 9 level(s)
+[mip0] r#13445 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13454 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13463 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[mip0] r#13472 128x128x1 dx10 flags 0x5 placed: MipLevels 0 (D3D12: the full chain, 8 levels) -> 8 level(s)
+[footprint] rev=ml1060 fast phys=5978 MB compressed=3571 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1703d9280 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x11f997400 lead 60 ms: client wrote 9.95 s of audio in 10.00 s (99.5%) over 233 wakes; device short 35.3 ms in 2 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x11fb51c00 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 233 wakes; device short 35.3 ms in 2 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml358 phys=5925 MB (peak 5994) internal=199 MB compressed=3555 MB external=914 MB reusable=0 MB (cycle=56)
+[footprint] rev=ml1060 fast phys=6002 MB compressed=3608 MB
+[ios_audio] ml1230 pacing stream=0x1213f6500 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 169 wakes; device short 21.3 ms in 1 of 469 passes (largest pass 1024 frames); ring 2048..4096 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml358 phys=5990 MB (peak 5994) internal=223 MB compressed=3530 MB external=893 MB reusable=0 MB (cycle=57)
+[footprint] rev=ml358 phys=5970 MB (peak 5994) internal=274 MB compressed=3492 MB external=907 MB reusable=0 MB (cycle=58)
+[freeze] alive t+120s beats=4 gaps=0 iter=474 gen=1 threads=109 resident=1141MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=6064 MB (peak 6064) internal=235 MB compressed=3550 MB external=897 MB reusable=0 MB (cycle=59)
+[ios_audio] ml1230 pacing stream=0x11f997400 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x11fb51c00 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1529MB: tex-RT=8MB/3 (peak 8) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=311MB/7822 (peak 311) tex-MSAA=0MB/0 (peak 0) buf-private=0MB/0 (peak 0) buf-shared=1209MB/20 (peak 1337)
+[footprint] rev=ml358 phys=5999 MB (peak 6064) internal=114 MB compressed=3676 MB external=831 MB reusable=0 MB (cycle=60)
+[ios_audio] ml1230 pacing stream=0x1213f6500 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 208 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 1024..4096 frames; worst late wake 0.1 ms; clamped 0 samples
+[swap] ml1077 stats: 6416 MB file-backed now (peak 6544), 22 extents, file used 6498 of 131072 MB, backs 75 releases 53 unbacks 0 refused 0 | coverage broad: disk 453 MB of 6192 cap, reservations 75, holes 1416, disk-full refusals 0 | ml1258 churn: 2 sizes, 573 blocks left anonymous
+[footprint] rev=ml358 phys=6070 MB (peak 6070) internal=198 MB compressed=3594 MB external=887 MB reusable=0 MB (cycle=61)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1529MB: tex-RT=8MB/3 (peak 8) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=311MB/7824 (peak 311) tex-MSAA=0MB/0 (peak 0) buf-private=0MB/0 (peak 0) buf-shared=1209MB/20 (peak 1337)

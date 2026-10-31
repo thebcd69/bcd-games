@@ -1,0 +1,241 @@
+[15:08:48.247] [INFO] Checking entitlements...
+[15:08:48.248] [INFO] [build] v0.1.623 (623)
+[15:08:48.248] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B5099f) ram=15389MB available=16362MB cores=10
+[15:08:48.248] [INFO] [device] address-map=[0x104168000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[15:08:48.268] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:08:49.602] [INFO] [bcd] library launch Metal Gear Solid Ground Zeroes: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[15:08:49.603] [INFO] Requesting JIT with Built-in StikJIT...
+[15:09:07.560] [INFO] [dock-launch] image-retire=1
+[15:09:07.561] [INFO] [dock-launch] image-map-guard=1
+[15:09:07.569] [INFO] [dock-installers] app=311340 scripts=0 programs=0
+[15:09:07.570] [INFO] [madeira-dock] starting the host for app 311340; Valve's client authenticates and authorizes the launch
+[15:09:07.581] [INFO] Running full Wine sequence...
+[15:09:07.582] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104168000,0x8000000000) 512GB available=16353MB low-power=0 thermal=nominal
+[15:09:07.587] [INFO] Allocating 1024MB JIT pool (BRK will suspend process)...
+[15:09:07.587] [INFO] Allocating 1024MB JIT pool via debugger...
+[15:09:07.587] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:09:07.587] [INFO] [jit-debugger] attached=1 at the pool request
+[15:09:07.589] [ERR] ml1036: no hole fits a 1024MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:09:08.203] [INFO] RX pool at 0x148000000
+[15:09:08.217] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.677s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=15779 MB + phys_footprint=604 MB = 16384 MB (hw.memsize says 15389 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x71a3f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=615 MB (peak 615) internal=614 MB compressed=0 MB external=91 MB reusable=6 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.287s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=100, unixdir=101, dup_unixdir=105) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x11e1d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a0e000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149e28000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.335s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=129, unixdir=131, dup_unixdir=136) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11E1D0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[nls-getptr] type=11 id=437 peb=0x10b6d4000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x71a8600000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71a8700000+0x200000 held for 2000 ms (2 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7023000000+0xc000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[swap] ml1077 backed 0x71ab680000+0x1010000 (file off 8796093022208 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x71ac690000+0x1010000 (file off 8796093022224 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+[xp-names] m408866 "wine-x18-exc"
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000200 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #3 release of 0x71af3b0000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x71afbb0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x71b1380000+0xfd0000 held for 2000 ms (5 in flight)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=971 MB (peak 971) internal=969 MB compressed=0 MB external=161 MB reusable=6 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 0 of 4096 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 0 MB in use (peak 32), 2 takes, 0 guarded, 0 MB lost to a full free list
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002BC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #6 release of 0x71b2350000+0xfd0000 held for 2000 ms (4 in flight)
+[footprint] rev=ml358 phys=1075 MB (peak 1075) internal=1074 MB compressed=0 MB external=165 MB reusable=6 MB (cycle=3)
+[file-wfail] ml669 #79 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #80 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1090 MB (peak 1090) internal=1089 MB compressed=0 MB external=165 MB reusable=6 MB (cycle=4)
+[footprint] rev=ml358 phys=1080 MB (peak 1090) internal=1079 MB compressed=0 MB external=165 MB reusable=6 MB (cycle=5)
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe" t+ 10.156s rev=ml526
+[session-log] Steam game MgsGroundZeroes.exe: logs/MgsGroundZeroes.exe-2026-10-29_15-09-17.txt
+0088:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe\"" (fd=367, unixdir=368, dup_unixdir=447) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes"
+[Wine child thread] calling wine_ios_child_main...
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files (x86)/Steam/steamapps/common/Metal Gear Solid Ground Zeroes/MgsGroundZeroes.exe') = 0x0
+ml957: ? backing 0x12c400000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+00a8:err:module:alloc_tls_slot [tls-life] ml704 slot=0 module=L"MgsGroundZeroes.exe" base=000000012C400000 callbacks=000000012D96D640 rawsize=80 zerofill=0
+[nls-getptr] type=11 id=1252 peb=0x1102ec000
+[nls-getptr] type=11 id=437 peb=0x1102ec000
+[nls-getptr] type=11 id=20127 peb=0x1102ec000
+E A8 [iOS-xins] tracker=0x154008bc8 MgsGroundZeroes.exe sec=0x12e49b000-0x12e50c250
+D A8 Load module MgsGroundZeroes.exe (mgsgroundzeroes.exe-82e78cd7ae68284b): 12C400000
+[nls-getptr] type=11 id=1252 peb=0x1102ec000
+[nls-getptr] type=11 id=437 peb=0x1102ec000
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x155700000)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x75000 type=0x2000 protect=0x4 tid=00a8 | STAGE=fixed-map err=3 at 0x180000000+0x78000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=mgsgroundzeroes.exe tid=00a8 size=0x75000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #7 release of 0x71ad5a0000+0x100000 held for 2000 ms (1 in flight)
+[swap] ml1077 backed 0x71b82f0000+0x1ff0000 (file off 8796093022240 MB): 31 MB in 1 extents, peak 32 MB, 0 refused
+D A8 Load module imagehlp.dll (imagehlp.dll-8b18f6ce1e04a189): 71F08B0000
+D A8 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71F0820000
+D A8 Load module tier0_s64.dll (tier0_s64.dll-46fed3100444d04b): 71F0680000
+D A8 Load module vstdlib_s64.dll (vstdlib_s64.dll-0805e0d24f89e963): 71F05B0000
+D A8 Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 71F0520000
+D A8 Load module Secur32.dll (secur32.dll-f6ff7e0cf92170a6): 71F0490000
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=mgsgroundzeroes.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c44c00000
+[file-wfail] ml669 #81 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1307 MB (peak 1307) internal=1305 MB compressed=0 MB external=207 MB reusable=6 MB (cycle=6)
+[footprint] rev=ml1060 fast phys=1307 MB compressed=0 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #8 release of 0x71b0660000+0x120000 held for 2000 ms (2 in flight)
+[swap] ml1077 backed 0x71b82f0000+0x1560000 (file off 8796093022240 MB): 21 MB in 1 extents, peak 32 MB, 0 refused
+[15:09:19.836] [INFO] [dock-report] launch-game-running=1
+[free-delay] #1 reservation at 0x71b2400000+0x400000: 1 held release(s) from 0x71b2380000 (0x7f0000 bytes) freed at once (3 in flight)
+[free-delay] #2 reservation at 0x71b8800000+0x400000: 1 held release(s) from 0x71b86f0000 (0x7f0000 bytes) freed at once (4 in flight)
+00a8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe" t+ 12.503s rev=ml526
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\MgsGroundZeroes.exe\"" (fd=476, unixdir=477, dup_unixdir=481) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metal Gear Solid Ground Zeroes\\"
+[Wine child thread] calling wine_ios_child_main...
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files (x86)/Steam/steamapps/common/Metal Gear Solid Ground Zeroes/MgsGroundZeroes.exe') = 0x0
+ml957: ? backing 0x12e510000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x15b0ec000)
+Assertion failed: (!status), function server_init_process_done, file server_ios.c, line 6286.
+[av-detail] ml613 #1 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x0 addr=0x0 x18=0x0 type=1 lr=0x15b16ec50 sp=0x16c3ad4a0 x16=0x0 x17=0x15b156884
+[ec-fault-regs] x8=0x0 x9=0x15b144678 x10=0x15b16a470 x11=0x15b171460 x0=0xffffffffffffffff x2=0x0 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x0
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffe0000 TEB[0x58]=0x71a38519c0 *(gs_cached+0x58)=0x0
+[av-detail] ml613 #2 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x0 addr=0x0 x18=0x71ffe40000 type=1 lr=0x15b16ec50 sp=0x16c3abd40 x16=0x16c3ab940 x17=0x15b156884
+[ec-fault-regs] x8=0x0 x9=0x15b144678 x10=0x15b16a470 x11=0x15b171460 x0=0xffffffffffffffff x2=0x0 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x0
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffe0000 TEB[0x58]=0x71a38519c0 *(gs_cached+0x58)=0x0
+[av-detail] ml613 #3 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #4 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #5 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #6 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #19 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #20 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #21 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #22 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #23 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #24 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[store-noalias] #1 rev=ml348 addr=0x16c32bca0 insn=0xa9be53f3 pc=0x15b147eac NO pool/anon alias | region 0x16c328000+0x4000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[fault_rip] cnt=3 rip=0x0 pc=0x15b147eac addr=0x16c32bca0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x16c328000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x15b147eac addr=0x16c32bca0 x18=0x0 type=1 lr=0x15b14c2fc sp=0x16c32bcc0 x16=0x0 x17=0x15b156884
+[ec-fault-regs] x8=0xc0000005 x9=0x40000039 x10=0x15b16a470 x11=0x15b171460 x0=0x16c32c270 x2=0x16c32c740 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x0
+[mach_exc] insn_stream PC-12..PC+8: f945ee10 d63f0200 d65f03c0 [a9be53f3] f9000bfe aa0103f4 2a1f03e1
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffe0000 TEB[0x58]=0x71a38519c0 *(gs_cached+0x58)=0x0
+00b0:err:seh:bus_handler BUS->AV: unreadable target addr=0x16c32bca0 pc=0x15b147eac rw=1 rev=ml420
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=10161
+[unwind] term ml661 begin rip=71f5070690 rsp=71b237fef8 window=[71b237fef8..71b2b7fef8) max=32
+[unwind] term ml661 #00 pc=71f5070690 rsp=71b237fef8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=71b04952c0 rbp=71b237ffd0 rsi=71b04952c0 rdi=71b04952b8 r12=71b04952c0 r13=0 r14=0 r15=71b04a1450
+[unwind] term ml662   rbx=71b04952c0: 0000c0ce 23130a00 0000c0ce 23130a00 0000c0ce 23130a00 0000c0ce 23130a00
+[unwind] term ml662   rbp=71b237ffd0: 00000000 00000000 20631b54 01000000 d8adb653 01000000 00000000 00000000
+[unwind] term ml661 #01 pc=12d133d78 rsp=71b237ff00  (exe)+0xd33d78
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=10210
+[unwind] term ml661 begin rip=153b8616c rsp=71b237fc00 window=[71b237fc00..71b2b7fc00) max=32
+[unwind] term ml661 #00 pc=153b8616c rsp=71b237fc00  <no module — STOP>
+[unwind] term ml661 end
+00a8:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=440
+[Wine ntdll/server] process_exit_wrapper(0)
+[footprint] rev=ml1060 fast phys=1368 MB compressed=0 MB
+[file-wfail] ml669 #83 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #84 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[15:09:26.582] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=10647
+[unwind] term ml661 begin rip=14a0611d4 rsp=71a66bfdb8 window=[71a66bfdb8..71a6ebfdb8) max=32
+[unwind] term ml661 #00 pc=14a0611d4 rsp=71a66bfdb8  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=104
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=135
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[15:09:27.082] [INFO] [dock-report] probe-result=0
+[15:09:28.086] [INFO] [madeira-dock] host finished (result 0)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c6f5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xd60f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c6f5020
+[15:09:38.403] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=18 resident=1412MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xd60f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c6f5020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c6f5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[15:10:08.560] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=18 resident=1412MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xd60f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c6f5020
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=31)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c6f5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=32)
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=33)
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=34)
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=35)
+[hwinput] keyboard focus: program (responder)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1204 MB (peak 1369) internal=1202 MB compressed=0 MB external=203 MB reusable=6 MB (cycle=36)
+[15:10:20.703] [INFO] [session] length=73s partial=1 play=0s frames=0 stalls=0/0s peak=1370MB limit=16383MB thermal=nominal lpm=0 api=D3D11/64 res=1112x832 cap=60 game=METAL GEAR SOLID V: GROUND ZEROES

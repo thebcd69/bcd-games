@@ -976,6 +976,71 @@ struct BCDVCRuntimeSettings<Backend: BCDVCRuntimeBackend>: View {
     }
 }
 
+/// Round 625 (the owner's item 26): Microsoft's 32-bit MFC (VCRuntime.x86), under the 64-bit runtime on the Visual C++ page. A 32-bit
+/// game gets it only when its config says env.MADEIRA_MFC32 = 1 (auto-tune adds that after the start it fails; WineProcessBridge.m
+/// madeira_mfc32), so a game that runs today without it is not touched.
+struct BCDMFC32Settings<Backend: BCDVCRuntimeBackend>: View {
+    @ObservedObject var backend: Backend
+    @EnvironmentObject private var model: BCDSettingsModel
+
+    var body: some View {
+        BCDSettingsGroup(title: "MFC, 32-bit",
+                         footer: "A few 32-bit games and their plug-ins need Microsoft's MFC (mfc140u.dll). BCD fetches Microsoft's 32-bit package, about 14 MB, keeps only its four MFC DLLs exactly as Microsoft ships them, and gives them to a game whose config says env.MADEIRA_MFC32 = 1 (auto-tune adds it after a start that fails for it).") {
+            BCDSettingsInfoRow(title: "On this device", note: versionNote, value: backend.source == .none ? "Not installed" : "Downloaded",
+                               valueColor: backend.source == .none ? BCDStyle.textSoft : BCDStyle.mint)
+            switch backend.state {
+            case .downloading(let received, let expected):
+                progress(expected > 0 ? Double(received) / Double(expected) : 0,
+                         expected > 0 ? "\(BCDFormat.bytes(received)) of \(BCDFormat.bytes(expected))" : "Starting the download…")
+                BCDSettingsActionRow(id: BCDSettingsID.control(.vcruntime, "mfc32-cancel"), title: "Cancel the download", symbol: "xmark") {
+                    backend.cancel()
+                }
+            case .installing(let fraction):
+                progress(fraction, "Unpacking and checking the files…")
+            case .missing, .installed:
+                if backend.source == .none {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.vcruntime, "mfc32-download"),
+                                         title: backend.lastError == nil ? "Accept and download" : "Try again",
+                                         note: "Downloading means you accept Microsoft's license terms for the runtime (above).",
+                                         symbol: "arrow.down.circle.fill") { backend.install() }
+                } else {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.vcruntime, "mfc32-reinstall"), title: "Download it again",
+                                         note: "Replaces this copy only once the new one has passed every check.",
+                                         symbol: "arrow.clockwise") { backend.install() }
+                }
+                if case .installed = backend.state {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.vcruntime, "mfc32-remove"), title: "Remove the 32-bit MFC",
+                                         symbol: "trash", destructive: true) {
+                        model.ask(BCDSettingsConfirm(title: "Remove the 32-bit MFC?",
+                                                     message: "32-bit games that need it will not start until it is downloaded again.",
+                                                     choices: [.init(title: "Remove", destructive: true) { backend.remove() }]))
+                    }
+                }
+            }
+            if let error = backend.lastError {
+                Text(error).font(BCDStyle.body(13.5)).foregroundStyle(BCDStyle.alert)
+                    .padding(.horizontal, 14).padding(.vertical, 11)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .onAppear { backend.refresh() }
+    }
+
+    private var versionNote: String? {
+        guard case .installed(let version) = backend.state, !version.isEmpty else { return nil }
+        return "Version \(version), from Microsoft."
+    }
+
+    private func progress(_ fraction: Double, _ line: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            BCDProgressBar(fraction: fraction)
+            Text(line).font(BCDStyle.body(13.5)).foregroundStyle(BCDStyle.textSoft).monospacedDigit()
+        }
+        .padding(.horizontal, 14).padding(.vertical, 12)
+    }
+}
+
 // MARK: - Logs
 
 struct BCDLogFile: Identifiable, Hashable {
@@ -983,6 +1048,7 @@ struct BCDLogFile: Identifiable, Hashable {
     var name: String          // its file name
     var date: Date
     var bytes: Int64
+    var hasGame = true        // round 624 (agent N S6): a game's session is in it (LogUpload.hasGame); false: BCD's own start-up only
 }
 
 struct BCDSentLog: Identifiable, Hashable {
@@ -1141,6 +1207,20 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
     }
 
     private func confirmSend(_ log: BCDLogFile) {
+        // Round 624 (agent N S6): the newest log of a fresh start holds no game; the game played last is in another log: offer that one first.
+        let items = backend.recent.map { BCDLogChoice.Item(name: $0.name, modified: $0.date, hasGame: $0.hasGame) }
+        if !log.hasGame, items.first?.name == log.name, let i = BCDLogChoice.gameLogToOffer(items, now: Date()) {
+            let game = backend.recent[i]
+            model.ask(BCDSettingsConfirm(title: "Send \(BCDSettingsText.logName(log.name))?",
+                                         message: "This log holds only what BCD did since it was opened again; no game ran in it. The game you played "
+                                            + "is in \u{201C}\(BCDSettingsText.logName(game.name))\u{201D} (\(BCDFormat.dateTime(game.date)))."
+                                            + (backend.sendLogAdvice.map { "\n\n" + $0 } ?? ""),
+                                         choices: [.init(title: "Send \(BCDSettingsText.logName(game.name))") {
+                                                       BCDLogComment.ask(for: URL(fileURLWithPath: game.id)) { backend.send(game, comment: $0) } },
+                                                   .init(title: "Send this log anyway") {
+                                                       BCDLogComment.ask(for: URL(fileURLWithPath: log.id)) { backend.send(log, comment: $0) } }]))
+            return
+        }
         // An install without the increased memory limit: the setup is the usual cause, so say what fixes it
         // first (MemoryRights.swift, through the live backend); sending is still possible.
         model.ask(BCDSettingsConfirm(title: "Send \(BCDSettingsText.logName(log.name))?",

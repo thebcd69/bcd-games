@@ -51,6 +51,9 @@ def block(text, header):
 onboarding = (app / 'Onboarding.swift').read_text()
 # BCD's setup screens (2026-10-18): BCD's own look and wording, in their own file.
 setup = (app / 'BCDSetupView.swift').read_text()
+# Round 624 (agent N S10): the done page says how a Steam game starts
+require('note("To play a Steam game: open it in your library, tap Install, then Play.", symbol: "arrow.down.circle")' in setup,
+        'the done page says how to start a Steam game (Install, then Play)')
 library = (app / 'Library.swift').read_text()
 content = (app / 'ContentView.swift').read_text()
 project = (root / 'app/Madeira.xcodeproj/project.pbxproj').read_text()
@@ -113,7 +116,7 @@ require(model.count(stamp) == 2 and stamp in block(model, 'func finish()') and s
         and 'removeObject' not in onboarding and 'set(false' not in onboarding and 'set(0' not in onboarding,
         'only finishing or skipping stores the setup revision; nothing clears it')
 require('static var enabled: Bool { OnboardingRules.enabled }' in model, 'the model uses the rules switch')
-require('.fullScreenCover(isPresented: $onboarding.presented) { OnboardingView() }' in front,
+require('.fullScreenCover(isPresented: $onboarding.presented, onDismiss: BCDPresentation.didClose) { OnboardingView() }' in front,
         "BCD's interface: setup is presented over it")
 require('onboarding.presentIfNeeded()' in front,
         "BCD's interface: setup is considered when it appears")

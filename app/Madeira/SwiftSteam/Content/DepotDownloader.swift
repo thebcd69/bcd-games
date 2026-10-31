@@ -383,6 +383,20 @@ final class DepotDownloader {
         let fm = FileManager.default
         var result = Prepared()
         var folded: [String: String] = [:]   // lowercased relative dir -> first spelling
+        // madeira-bcd (round 624, Discord forum item 10): the folds start from the folders already on disk (SteamInstallFiles).
+        var listings: [String: [String]] = [:]
+        var caseNotes = 0
+        func onDisk(_ relativeDir: String) -> [String] {
+            if let cached = listings[relativeDir] { return cached }
+            let url = relativeDir.isEmpty ? installURL : installURL.appendingPathComponent(relativeDir, isDirectory: true)
+            let found = (try? fm.contentsOfDirectory(atPath: url.path)) ?? []
+            listings[relativeDir] = found
+            return found
+        }
+        func caseNote(_ text: String) {
+            caseNotes += 1
+            if caseNotes <= 16 { SteamLog.event("[install] \(text)") }
+        }
         let journalNames = Set(plans.map { "depot_\($0.depotID)_\($0.manifestGID).journal" })
         // A journal for an older manifest describes different file contents.
         for name in (try? fm.contentsOfDirectory(atPath: journalDir.path)) ?? [] where !journalNames.contains(name) {
@@ -399,7 +413,7 @@ final class DepotDownloader {
             for (fileIndex, file) in plan.manifest.files.enumerated() {
                 // Symlinks (flag 0x200) have no Windows meaning here; skip them.
                 guard file.flags & 0x200 == 0,
-                      let relative = SteamInstallFiles.safeRelativePath(file.filename, folded: &folded) else {
+                      let relative = SteamInstallFiles.safeRelativePath(file.filename, folded: &folded, existing: onDisk, note: caseNote) else {
                     if file.flags & 0x200 == 0 { SteamLog.trace("rejected manifest path in depot \(plan.depotID)") }
                     paths.append(""); existing.append(false); continue
                 }

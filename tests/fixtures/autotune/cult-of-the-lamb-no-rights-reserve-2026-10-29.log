@@ -1,0 +1,292 @@
+[17:00:23.914] [INFO] Checking entitlements...
+[17:00:23.915] [INFO] [build] v0.1.622 (622)
+[17:00:23.915] [INFO] [device] model=iPhone15,3 idiom=phone os=iOS Version 26.6 (Build 23G71) ram=5636MB available=3054MB cores=6
+[17:00:23.916] [INFO] [device] address-map=[0x104964000,0x458000000) 17GB increased-memory=0 extended-va=0
+[17:00:23.936] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:01:02.169] [INFO] Requesting JIT with StikDebug...
+[17:01:02.214] [INFO] Opening StikDebug to enable JIT...
+[17:01:07.013] [INFO] [bcd] library launch Cult Of The Lamb.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[17:01:07.036] [INFO] Running full Wine sequence...
+[17:01:07.037] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104964000,0x458000000) 17GB available=3049MB low-power=0 thermal=nominal
+[17:01:07.046] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:01:07.047] [INFO] Allocating 896MB JIT pool via debugger...
+[17:01:07.047] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:01:07.048] [INFO] [jit-debugger] attached=1 at the pool request
+[17:01:11.034] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  4.098s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[17:01:11.604] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=40, sending init_first_thread...
+[17:01:11.604] [Wine init_process] reply_pipe=40, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=2136 MB + phys_footprint=935 MB = 3072 MB (hw.memsize says 5636 MB)
+ml985: preferred base 0x140000000+0xa8000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa8000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] WindowsPlayer.exe: OK, 4 .text pages executable (copy @0x300004000)
+[footprint] rev=ml358 phys=937 MB (peak 937) internal=915 MB compressed=21 MB external=62 MB reusable=0 MB (cycle=1)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3000ac000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=437 peb=0x457ff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x3001e6000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x300600000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x300734000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x3007fc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x457ff0000
+D 24 Load module Cult Of The Lamb.exe (cult of the lamb.exe-e5d276af0a39cdcc): 11E7C0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 457CD0000
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=437 peb=0x457ff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-5694e47efd732bf4): 4553F0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 4551D0000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 4550E0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 455030000
+[footprint] rev=ml358 phys=1044 MB (peak 1044) internal=976 MB compressed=67 MB external=71 MB reusable=0 MB (cycle=2)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x303408000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x3034bc000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x303540000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x303624000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x3036a8000)
+[footprint] rev=ml358 phys=1065 MB (peak 1065) internal=1000 MB compressed=63 MB external=89 MB reusable=0 MB (cycle=3)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x30402c000)
+D 24 Load module ws2_32.dll (ws2_32.dll-590ada9b52e97b01): 4536C0000
+D 24 Load module bcrypt.dll (bcrypt.dll-5a6e36eeb1a98b0b): 453630000
+D 24 Load module HID.DLL (hid.dll-c3a5177fc021edec): 4535A0000
+D 24 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): 453470000
+D 24 Load module dwmapi.dll (dwmapi.dll-760d02687737907f): 4533E0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x453c30000) -> 64-bit table (0x107734758)
+[footprint] rev=ml358 phys=1080 MB (peak 1080) internal=1017 MB compressed=61 MB external=99 MB reusable=0 MB (cycle=4)
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 453330000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x1ffff000 reserved_total=511MB armed=va-pressure -> FAILED, falling back 0x0
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #2 size=0x1ffff000 reserved_total=1023MB armed=va-pressure -> FAILED, falling back 0x0
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #3 size=0x1ffff000 reserved_total=1535MB armed=va-pressure -> FAILED, falling back 0x0
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #4 size=0x1ffff000 reserved_total=2047MB armed=va-pressure -> FAILED, falling back 0x0
+[mmap-place] ml1027 NO GAP FITS size=0x20010000 after 115353 regions (ceiling=0x458000000 walk_stopped_at=0x458000000 tail=0 MB gaps_seen=0, largest gap 512 MB, walk 131 ms) -- the map really is full for this size
+[alloc-fail] ml814 #1 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x45574b420 pc=0x337129e08 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x337129e08 addr=0x0 x18=0x457fe0000 type=1 lr=0x337ffc354 sp=0x4572b0000 x16=0x45574b420 x17=0x45574b420
+[guest-code] rev=ml333 pool_rip=0x300e5c420 (PE 0x45574b420): 48 81 e2 00 00 00 f0 4c 8b d1 4c 8b c2 49 c1 e8
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x337129e08; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RBX=0x4570ad420 = UnityPlayer.dll+0x1cbd420 [RBX]=UnityPlayer.dll+0x1991ae8
+[av-args]   R10=0x45709bdb0 = UnityPlayer.dll+0x1cabdb0 [R10]=UnityPlayer.dll+0x1991a68
+[fault-host] 337129d08: 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d61f0160 37ffc20c
+[fault-host] 337129d28: 00000003 00000000 00000090 00000000 55751e90 00000004 0000000b 00000000
+[fault-host] 337129d48: 00000004 00000028 00000000 00000000 05800180 00002131 00000270 10ffffea
+[fault-host] 337129d68: f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000af9 f81f8efa f10082e9
+[fault-host] 337129d88: aa1703f8 aa0903f7 aa0003fb aa0303f9 9105e006 d94000c0 d503201f 2a0203fa
+[fault-host] 337129da8: d9400008 d503201f d9420106 d503201f d2930ea7 f2aaae87 f2c00087 f81f8ee7
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 6f00e400 52800000 [3d800100] 3d800500 3d800900 3d800d00
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x1137cfb40 *(gs_cached+0x58)=0x1137cfb40
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x45574b420 pc=0x337129e08 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x337129e08 addr=0x0 x18=0x457fe0000 type=1 lr=0x337ffc354 sp=0x4572b0000 x16=0x45574b420 x17=0x45574b420
+[guest-code] rev=ml333 pool_rip=0x300e5c420 (PE 0x45574b420): 48 81 e2 00 00 00 f0 4c 8b d1 4c 8b c2 49 c1 e8
+[fault-host] 337129d68: f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000af9 f81f8efa f10082e9
+[fault-host] 337129d88: aa1703f8 aa0903f7 aa0003fb aa0303f9 9105e006 d94000c0 d503201f 2a0203fa
+[fault-host] 337129da8: d9400008 d503201f d9420106 d503201f d2930ea7 f2aaae87 f2c00087 f81f8ee7
+[fault-host] 337129dc8: a94a2f8a 8a06116b 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86
+[fault-host] 337129de8: d63f0160 10fffbaa f900038a b945eb8b 3400004b d4395fc0 6f00e400 52800000
+[fault-host] 337129e08: 3d800100 3d800500 3d800900 3d800d00 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 6f00e400 52800000 [3d800100] 3d800500 3d800900 3d800d00
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x1137cfb40 *(gs_cached+0x58)=0x1137cfb40
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x45574b420 in image 0x4553f0000: rva 0x35b420, section #0 '.text' rva 0x1000+0x187a793 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x337129e08 RX from -32, 64 of 64 bytes: 60 01 3f d6 aa fb ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 00 e4 00 6f 00 00 80 52 00 01 80 3d 00 05 80 3d 00 09 80 3d 00 0d 80 3d 00 11 80 3d 1f 20 03 d5 00 01 05 d9 00 61 00 91 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x337129e08 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x45574987a RX from -32, 64 of 64 bytes: 57 48 83 ec 20 48 8b d9 49 8b f1 48 8b 89 78 01 00 00 41 8b f8 48 8b 01 ff 50 20 0f 57 c0 33 c9 0f 11 00 0f 11 40 10 0f 11 40 20 0f 11 40 30 0f 11 40 40 48 89 48 50 48 8d 48 18 48 89 49 08 48 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x45574987a (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #5 size=0x1ffff000 reserved_total=2559MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=2 rev=ajan5-rockstar
+[store-noalias] #3 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x337129e08 RX from -32, 64 of 64 bytes: 60 01 3f d6 aa fb ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 00 e4 00 6f 00 00 80 52 00 01 80 3d 00 05 80 3d 00 09 80 3d 00 0d 80 3d 00 11 80 3d 1f 20 03 d5 00 01 05 d9 00 61 00 91 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x337129e08 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x45574987a RX from -32, 64 of 64 bytes: 57 48 83 ec 20 48 8b d9 49 8b f1 48 8b 89 78 01 00 00 41 8b f8 48 8b 01 ff 50 20 0f 57 c0 33 c9 0f 11 00 0f 11 40 10 0f 11 40 20 0f 11 40 30 0f 11 40 40 48 89 48 50 48 8d 48 18 48 89 49 08 48 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x45574987a (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #6 size=0x1ffff000 reserved_total=3071MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #3 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=3 rev=ajan5-rockstar
+[store-noalias] #4 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[steer] #7 size=0x1ffff000 reserved_total=3583MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #4 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=4 rev=ajan5-rockstar
+[store-noalias] #5 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[steer] #8 size=0x1ffff000 reserved_total=4095MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #5 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #6 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[alloc-fail] ml814 #6 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #7 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[alloc-fail] ml814 #7 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #8 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e08 NO pool/anon alias | region 0x104964000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[alloc-fail] ml814 #8 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #9 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #10 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #11 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #12 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #13 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[steer] #17 size=0x1ffff000 reserved_total=8703MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #14 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[steer] #18 size=0x1ffff000 reserved_total=9215MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #15 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #19 size=0x1ffff000 reserved_total=9727MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #16 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=16 rev=ajan5-rockstar
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #20 size=0x1ffff000 reserved_total=10239MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #17 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #21 size=0x1ffff000 reserved_total=10751MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #18 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #19 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #22 size=0x1ffff000 reserved_total=11263MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #19 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #20 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #23 size=0x1ffff000 reserved_total=11775MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #20 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #21 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #24 size=0x1ffff000 reserved_total=12287MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #21 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #22 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[alloc-fail] ml814 #22 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #23 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[alloc-fail] ml814 #23 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #24 p0=WRITE p1=0x0 hostpc=0x337129e08 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[alloc-fail] ml814 #24 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #25 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #26 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #27 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #28 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #29 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #30 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #31 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #32 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #33 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #34 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #35 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #36 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #37 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #38 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #39 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #40 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #41 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #42 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #43 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #44 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #45 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #46 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #47 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #48 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #49 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #50 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #51 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #52 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #53 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #54 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #55 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #56 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #57 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #58 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #59 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #60 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #61 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #62 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #63 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #64 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=64 rev=ajan5-rockstar
+[alloc-fail] ml814 #128 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=128 rev=ajan5-rockstar
+[alloc-fail] ml814 #192 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[xp-names] m104584 "wine-x18-exc"
+[alloc-fail] ml814 #256 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=256 rev=ajan5-rockstar
+[redeliv] 256 identical redeliveries pc=0x337129e08 addr=0x0 — storm forming rev=ml461
+[alloc-fail] ml814 #320 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #384 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #448 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #512 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=512 rev=ajan5-rockstar
+[alloc-fail] ml814 #576 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #640 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #704 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #768 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #832 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #896 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #960 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #1024 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #12 NtAllocateVirtualMemory status=c0000017 proc=cult of the lamb.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1024 rev=ajan5-rockstar
+[alloc-fail] ml814 #1088 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 120c00000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[fault_rip] cnt=3 rip=0x456c35c4c pc=0x337008030 addr=0x120403000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x120400000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x337008030 addr=0x120403000 x18=0x457fe0000 type=1 lr=0x337135354 sp=0x4572b0000 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302346c4c (PE 0x456c35c4c): 41 83 ce ff 48 8d 05 c9 13 46 00 4a 8b 04 f8 48
+[mach_exc] insn_stream PC-12..PC+8: 540000c2 9274cc84 d14004a5 [190000bf] eb05009f 54ffffa1 f94002e4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x1137cfb40 *(gs_cached+0x58)=0x1137cfb40
+[fault_rip] cnt=4 rip=0x456c35c4c pc=0x337008030 addr=0x120403000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x120400000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x337008030 addr=0x120403000 x18=0x457fe0000 type=1 lr=0x337135354 sp=0x4572b0000 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302346c4c (PE 0x456c35c4c): 41 83 ce ff 48 8d 05 c9 13 46 00 4a 8b 04 f8 48
+[mach_exc] insn_stream PC-12..PC+8: 540000c2 9274cc84 d14004a5 [190000bf] eb05009f 54ffffa1 f94002e4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x120403000 pc=0x337008030 rw=1 rev=ml420
+[fault_rip] cnt=5 rip=0x456bf0348 pc=0x300107eac addr=0x120403e40 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x120400000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x300107eac addr=0x120403e40 x18=0x0 type=1 lr=0x30010c2fc sp=0x120403e60 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302301348 (PE 0x456bf0348): 41 c6 03 00 4d 3b d3 f2 75 ef 4c 8b 14 24 4c 8b
+[mach_exc] insn_stream PC-12..PC+8: f945ee10 d63f0200 d65f03c0 [a9be53f3] f9000bfe aa0103f4 2a1f03e1
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault_rip] cnt=6 rip=0x456bf0348 pc=0x300107eac addr=0x120403e40 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x120400000+0x4000 rev=ml555
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x120403e40 pc=0x300107eac rw=1 rev=ml420
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[17:01:19.537] [INFO] [session] length=12s play=0s frames=0 stalls=0/0s peak=1088MB limit=3071MB thermal=nominal lpm=0 api=D3D11/D3D12/OpenGL/Vulkan/64 res=1424x656 cap=60 game=Cult of the Lamb
+[frontend] returned to library
+[footprint] rev=ml358 phys=1091 MB (peak 1091) internal=1018 MB compressed=71 MB external=99 MB reusable=0 MB (cycle=5)
+[17:01:21.239] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1091 MB (peak 1091) internal=1018 MB compressed=71 MB external=99 MB reusable=0 MB (cycle=6)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=990 MB compressed=109 MB external=101 MB reusable=0 MB (cycle=9)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=990 MB compressed=109 MB external=101 MB reusable=0 MB (cycle=10)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=990 MB compressed=109 MB external=101 MB reusable=0 MB (cycle=11)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd55040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=990 MB compressed=109 MB external=101 MB reusable=0 MB (cycle=12)
+[footprint] rev=ml358 phys=1108 MB (peak 1108) internal=997 MB compressed=109 MB external=122 MB reusable=0 MB (cycle=13)
+[footprint] rev=ml358 phys=1102 MB (peak 1108) internal=991 MB compressed=109 MB external=128 MB reusable=4 MB (cycle=14)

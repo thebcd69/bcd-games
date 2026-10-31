@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Exercise the actual read-only pool failure census under both capacities
 and parallel failures. The diagnostic cannot grant allocations or change
-the existing free list, owner records, cursor or reuse grace."""
+the existing free list, owner records, cursor or reuse grace.
+Round 624 (agent R S19): a second line names the five largest free runs and how
+many are 1 MB or more (3D66DG: 356 MB free, the largest run 0.58 MB short)."""
 from pathlib import Path
 import os
 import subprocess
@@ -22,8 +24,11 @@ hole = body('static size_t ios_pool_hole_between(') + '\n' + body('static size_t
 assert 'ios_pool_holes_between( ios_jit_pool_size_global, jit_pool_offset, ios_jit_tail_reserved,' in census, \
     'the census leaves pool-mid\'s second hole out of the virgin room too'
 assert source.count('ios_pool_failure_census( alloc_size );') == 1
-site = source[source.index('ios_pool_failure_census( alloc_size );') - 80:][:160]
-assert 'if (offset == (size_t)-1)' in site
+# the census runs inside the image path's failure block (round 624 put the EXHAUSTED-line budget at the top of that block)
+call = source.index('ios_pool_failure_census( alloc_size );')
+block = source.rindex('            if (offset == (size_t)-1)\n            {\n', 0, call)
+assert call - block < 1500 and '\n            }' not in source[block:call], 'the census must stay inside the failure block'
+assert source.index('[jit-pool] EXHAUSTED (image', call) - call < 1500
 for mutation in ('mprotect(', 'munmap(', 'madvise(', 'ios_pool_alloc_range(', 'ios_pool_recycle_code_range(',
                  'malloc(', 'ios_pool_ledger[', 'ios_tail_carves['):
     assert mutation not in census
@@ -93,14 +98,24 @@ int main(int argc, char **argv)
         jit_pool_offset = 720 * MB; /* already beyond the hole */
         ios_jit_low_size_global = 0;
         ios_jit_low_reserved = 0;
+    } else if (which == 3) {
+        /* round 624: tenths of a MB; a run of 8.94 MB (3D66DG's largest, 9.52 MB wanted) reads 8.9M; a run under 1 MB is not counted */
+        ios_pool_freelist[0].size = 0x8f0000; ios_pool_freelist[1].size = 0x30000; ios_pool_freelist[2].size = 0x31c000;
+        ios_pool_freelist[3].size = 0x100000;
+        ios_pool_failure_census(0x984000);
+        assert(lines == 2 && strstr(output, "[pool-capacity] runs: largest 8.9M 3.1M 1.0M 0.1M 0.0M; 3 of 4 runs >= 1M (bookkeeping only)\n"));
+        assert(strstr(output, "failed_want=0x984000 entries=4 ") && strstr(output, "raw_size_fit=0"));
+        puts("PASS: the five largest runs in tenths of a MB");
+        return 0;
     }
     size_t before[] = {ios_jit_pool_size_global, jit_pool_offset, ios_jit_tail_reserved,
         ios_jit_hole_off_eff, ios_jit_hole_end_eff, ios_jit_low_reserved, ios_jit_low_size_global};
     struct ios_pool_free saved[8];
     memcpy(saved, ios_pool_freelist, sizeof(saved));
     ios_pool_failure_census(6 * MB);
-    assert(lines == 1);
+    assert(lines == 2);
     assert(strstr(output, "free_bytes=0xb80000 largest=0x800000"));
+    assert(strstr(output, "\n[pool-capacity] runs: largest 8.0M 2.0M 1.0M 0.5M 0.0M; 3 of 4 runs >= 1M (bookkeeping only)\n"));
     assert(strstr(output, "aged_bytes=0xa80000 aged_largest=0x800000"));
     assert(strstr(output, "raw_size_fit=1 aged_size_fit=1 poison_marked_bytes=0x800000"));
     if (which == 0) assert(strstr(output, "main_virgin=0xe000000 c_virgin=0x500000 c_image_virgin=0x100000"));
@@ -113,11 +128,11 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < 12; ++i)
         assert(pthread_create(&workers[i], NULL, fail, (void *)((i + 1) * 0x4000)) == 0);
     for (unsigned i = 0; i < 12; ++i) assert(pthread_join(workers[i], NULL) == 0);
-    assert(lines == 8 && !memcmp(saved, ios_pool_freelist, sizeof(saved)) && ios_pool_free_count == 4);
+    assert(lines == 16 && !memcmp(saved, ios_pool_freelist, sizeof(saved)) && ios_pool_free_count == 4);
     size_t after[] = {ios_jit_pool_size_global, jit_pool_offset, ios_jit_tail_reserved,
         ios_jit_hole_off_eff, ios_jit_hole_end_eff, ios_jit_low_reserved, ios_jit_low_size_global};
     assert(!memcmp(before, after, sizeof(before)));
-    puts("PASS: capacity, hole, code reserve, grace, poisoned ranges, underflow and bounded parallel census");
+    puts("PASS: capacity, hole, code reserve, grace, poisoned ranges, underflow and bounded parallel census; the five largest runs");
 }
 '''
 with tempfile.TemporaryDirectory(prefix='pool-failure-census-') as directory:
@@ -128,5 +143,5 @@ with tempfile.TemporaryDirectory(prefix='pool-failure-census-') as directory:
     subprocess.run([os.environ.get('CC', 'cc'), '-std=c11', '-Wall', '-Wextra', '-Werror',
                     '-fsanitize=address,undefined', '-fno-sanitize-recover=all',
                     str(unit), '-pthread', '-o', str(exe)], check=True)
-    for case in range(3):
+    for case in range(4):
         subprocess.run([str(exe), str(case)], check=True)

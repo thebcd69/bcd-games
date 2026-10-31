@@ -107,6 +107,9 @@ CLIENT_SECRET = "daafbccc737745039dffe53d94fc76cf"
 
 # ---- source checks ------------------------------------------------------------------------
 pbx = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
+_start = (EPIC / "BCDEpicStart.swift").read_text()
+check("tell(BCDEpicHostFiles.notStartedWords)" in _start and "couldn't start this game signed in to Epic" not in _start,
+      "round 624 (Discord forum item 7): a host that stopped before the game shows BCD Host's words, not an Epic sign-in message")
 check(sorted(p.name for p in EPIC.glob("*.swift")) == sorted(FILES), "app/Madeira/BCDEpic holds exactly Epic's files",
       sorted(p.name for p in EPIC.glob("*.swift")))
 sources = {}
@@ -408,6 +411,9 @@ check(start.count("BCDEpicAudit.run(") == 1 and "Task.detached(priority: .utilit
       "the container search runs once per signed-in session, off the main thread, and the values it looks for are forgotten at once")
 check('flags.insert(.tree)' in start and 'flags.insert(.services)' in start and 'entry.startServices == true' in start and "root: record.root.windowsPath()" in start,
       "the request asks for the tree wait (env.BCD_EPIC_TREE), services.exe when the entry starts services, and names the install root")
+check('if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true || BCDEpicRules.startsRockstarLauncher(record.exceptionID)) {' in start
+      and start.count('flags.insert(.services)') == 1,
+      "round 624 (R S24): services.exe also for Epic's GTA V (Rockstar's launcher needs the service manager); env.BCD_EPIC_SERVICES = 0 turns it off")
 check('Self.flag("BCD_EPIC_SIGNIN", entry: entry)' in start and 'Self.flag("BCD_EPIC_HOST", entry: entry)' in start and 'Self.flag("BCD_EPIC_TREE", entry: entry)' in start,
       "each M2 switch is read for the game (its own config first, then bcd.cfg)")
 fac2 = code(sources["BCDEpic.swift"])

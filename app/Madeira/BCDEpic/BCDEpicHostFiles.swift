@@ -103,6 +103,14 @@ struct BCDEpicHostReport: Equatable {
     var failedBeforeStart: Bool { (values["error"] ?? 0) != 0 && (values["stage"] ?? 0) < 6 }
 }
 
+extension BCDEpicHostFiles {
+    /// madeira-bcd (round 624, Discord forum item 7): what the player reads when BCD Host stopped before the game started, or did not
+    /// run at all. Epic had already given this start its sign-in (the exchange code's request succeeded, or no session would have run),
+    /// so it is not about Epic: the old words ("BCD couldn't start this game signed in to Epic") had players sign out and in again.
+    static let notStartedWords = "BCD Host stopped before the game started; your Epic sign-in is fine. Press Play to try again, and if it "
+        + "happens again, send the log from Settings › Logs."
+}
+
 enum BCDEpicHostFiles {
     enum Problem: Error, Equatable {
         case folder

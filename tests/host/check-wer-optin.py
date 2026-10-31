@@ -44,7 +44,8 @@ wer = wer[:wer.index('\nfi\n') + 4]
 check('it is built only where no wer.dll ships, and MADEIRA_WER_BUILD=0 skips it',
       '"${MADEIRA_WER_BUILD:-1}" != 0' in wer and '! shipped wer' in wer and
       'targets="$targets dlls/wer/arm64ec-windows/wer.dll"; WER=wer' in wer)
-check('the guard "nothing to build" counts it', '$FBT$WER' in build and '"nothing to build"' in build)
+guard = re.search(r'\[ -n "\$todo((?:\$[A-Z]+)+)" \] \|\| \{ echo "nothing to build"; exit 0; \}', build)   # the variables in any order (round 624 added ZMP and DCO)
+check('the guard "nothing to build" counts it', bool(guard) and '$WER' in re.findall(r'\$[A-Z]+', guard.group(1)))
 ship = build[build.index('if [ -n "$WER" ]; then'):]
 ship = ship[:ship.index('\nfi\n') + 4]
 check('it ships as wer-optin.dll, stripped and padded like the others, and never as wer.dll',
@@ -85,8 +86,8 @@ rule = rule[:rule.index('\n    },\n')]
 check('auto-tune adds the line after a "Library wer.dll ... not found" failure and not again once it ran',
       '"lines": ["env.MADEIRA_WER = 1"]' in rule and 'err:module:import_dll Library wer.dll' in rule and
       '"none": [s("MADEIRA_WER=1: wer.dll -> wer-optin.dll")]' in rule)
-check('a fixture proves it', any(root.glob('tests/fixtures/autotune/hello-neighbor-*.expect')) and
-      'env.MADEIRA_WER = 1' in next(root.glob('tests/fixtures/autotune/hello-neighbor-*.expect')).read_text())
+# (round 624 part 13 added two more Hello Neighbor fixtures, for the SHA extension: any of them may come first)
+check('a fixture proves it', any('env.MADEIRA_WER = 1' in f.read_text() for f in root.glob('tests/fixtures/autotune/hello-neighbor-*.expect')))
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'run: python3 tests/host/check-wer-optin.py' in wf)
 check('no game list sets it ahead of a failure',

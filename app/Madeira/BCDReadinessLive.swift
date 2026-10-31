@@ -31,11 +31,12 @@ import Foundation
         guard Self.enabled, let root = BCDGraphicsDefaults.folder(of: entry) else { return nil }
         let signature = BCDGraphicsDefaults.folderSignature(root, target: LibraryModel.drive.appendingPathComponent(entry.launchRelativePath))
         if let scan = scans[root.path], scan.signature == signature {
-            return BCDReadiness.note(BCDReadiness.evaluate(modules: scan.modules, files: scan.files, provided: Self.provided()))
+            return BCDReadiness.note(BCDReadiness.evaluate(modules: scan.modules, files: scan.files, provided: Self.provided(), complete: scan.complete,
+                                                           mainFile: Self.mainFile(entry)))
         }
         guard !running.contains(root.path) else { return nil }
         running.insert(root.path)
-        let title = entry.title
+        let title = entry.title, main = Self.mainFile(entry)
         DispatchQueue.global(qos: .utility).async {
             let result = BCDReadiness.scan(root)
             DispatchQueue.main.async { [weak self] in
@@ -43,7 +44,8 @@ import Foundation
                     guard let self else { return }
                     self.running.remove(root.path)
                     self.scans[root.path] = Scan(signature: signature, modules: result.modules, files: result.files, complete: result.complete)
-                    let findings = BCDReadiness.evaluate(modules: result.modules, files: result.files, provided: Self.provided())
+                    let findings = BCDReadiness.evaluate(modules: result.modules, files: result.files, provided: Self.provided(),
+                                                         complete: result.complete, mainFile: main)
                     LogStore.shared.log(BCDReadiness.logLine(game: title, modules: result.modules.count, findings: findings)
                                         + (result.complete ? "" : " (the scan stopped at its limit)"))
                     if !findings.isEmpty { changed() }
@@ -64,6 +66,7 @@ import Foundation
     static func provided() -> BCDReadinessProvided {
         var p = BCDReadinessProvided()
         p.vcRuntimeX64 = VCRuntime.shared.isAvailable
+        p.vcRuntimeX86 = VCRuntime.x86.isAvailable   // round 625 (the owner's item 26)
         p.wineMono = WineMonoModel.available
         let drive = LibraryModel.drive
         let fm = FileManager.default
@@ -74,6 +77,17 @@ import Foundation
         p.xna = has(runtimes + "xna.txt") || has("windows/Microsoft.NET/assembly/GAC_32/Microsoft.Xna.Framework")
             || has("windows/assembly/GAC_32/Microsoft.Xna.Framework")
         p.directX2010 = has(runtimes + "dx2010.txt")
+        // Round 624 (agent N S12/S13): the install's memory rights and the device's address map, for the Unity and 32-bit notes.
+        let rights = EntitlementStatus.check()
+        p.increasedMemory = rights.increasedMemory
+        p.extendedVA = rights.extendedVA
+        var low: UInt64 = 0, high: UInt64 = 0
+        if jit_task_map_range(&low, &high) { p.mapGB = Int(high >> 30) }
         return p
+    }
+
+    /// The launched program's file name, lowercased (round 624, agent N S13: the 32-bit note looks at that program only).
+    static func mainFile(_ entry: LibraryEntry) -> String {
+        URL(fileURLWithPath: entry.launchRelativePath).lastPathComponent.lowercased()
     }
 }

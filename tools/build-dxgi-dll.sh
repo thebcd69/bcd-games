@@ -77,6 +77,13 @@ REV="$(git -C "$D" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 cp "$G/dxgi_factory.cpp" "$OUT/src/dxgi_factory.cpp"
 python3 "$R/tools/patch-dxgi-factory7.py" "$OUT/src/dxgi_factory.cpp" || fail "tools/patch-dxgi-factory7.py did not apply"
 python3 "$R/tools/patch-dxgi-x64-entry.py" "$OUT/src/dxgi_factory.cpp" || fail "tools/patch-dxgi-x64-entry.py did not apply"
+# Opt-in for one game (round 624, Slay the Spire 2): a composition swap chain served on the game's window under
+# env.MADEIRA_DXGI_COMPOSITION = 1. A missed anchor must not cost every game dxgi-src.dll: the copy keeps today's answer.
+COMPOSITION=" + opt-in composition swap chains"
+python3 "$R/tools/patch-dxgi-composition.py" "$OUT/src/dxgi_factory.cpp" || {
+    COMPOSITION=""
+    echo "::warning::tools/patch-dxgi-composition.py did not apply: dxgi-src.dll is built without composition swap chains (env.MADEIRA_DXGI_COMPOSITION has no effect)"
+}
 # The adapter with the D3DKMT UMD version (run-time switch MADEIRA_KMT_ADAPTER), also on a copy,
 # and with video-memory budget-change events (run-time switch MADEIRA_DXGI_BUDGET_EVENTS).
 cp "$G/dxgi_adapter.cpp" "$OUT/src/dxgi_adapter.cpp"
@@ -175,6 +182,9 @@ fi
 if [ -n "$BUDGET_EVENTS" ]; then
     LC_ALL=C grep -aq "\[budget-event\] registered cookie=" "$OUT/dxgi.dll" || fail "the budget events patch is not in the result"
 fi
+if [ -n "$COMPOSITION" ]; then
+    LC_ALL=C grep -aq "MADEIRA_DXGI_COMPOSITION" "$OUT/dxgi.dll" || fail "the composition swap chain patch is not in the result"
+fi
 python3 "$R/tests/host/check-x64-graphics-entry.py" --factory "$OUT/dxgi.dll" || fail "the x64 factory entries failed validation"
 
 # The recipe check: the unpatched link against upstream's binary. Same
@@ -196,4 +206,4 @@ if [ "${DXGI_NO_SHIP:-0}" = "1" ]; then
     exit 0
 fi
 cp "$OUT/dxgi.dll" "$DEST.tmp" && mv -f "$DEST.tmp" "$DEST" || fail "copying into the bundle failed"
-echo "::notice::dxgi-src.dll built from DXMT $REV with IDXGIFactory7 + EnumAdapterByLuid + the D3DKMT UMD version$BUDGET_EVENTS ($(wc -c < "$DEST" | tr -d ' ') bytes, exports = upstream's) and shipped next to upstream's dxgi.dll, which stays the default (env.MADEIRA_DXGI_SRC = 1 selects it); the recipe $MATCH"
+echo "::notice::dxgi-src.dll built from DXMT $REV with IDXGIFactory7 + EnumAdapterByLuid + the D3DKMT UMD version$BUDGET_EVENTS$COMPOSITION ($(wc -c < "$DEST" | tr -d ' ') bytes, exports = upstream's) and shipped next to upstream's dxgi.dll, which stays the default (env.MADEIRA_DXGI_SRC = 1 selects it); the recipe $MATCH"

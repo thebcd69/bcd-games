@@ -62,6 +62,14 @@ for folder in ('tools', 'app', 'tests'):
             except UnicodeDecodeError:
                 continue
             if p.name != 'check-spawn-cwd-log.py' and 'creating child thread for' in text:
+                # Round 624: auto-tune's signals are substrings of one line (nwjs-gpu-media-dlls-fatal reads the child's command line);
+                # they stay in step as long as none names a field of the line's tail (fd=, unixdir=, dup_unixdir=, cwd=).
+                if p.name in ('autotune_rules.py', 'AutoTuneRules.generated.swift'):
+                    for m in re.finditer(r'creating child thread for', text):
+                        near = text[m.start():m.start() + 200]
+                        if any(f in near.split('\n')[0] for f in ('fd=', 'unixdir=', 'cwd=')):
+                            raise SystemExit('%s: a signal reads the spawn line\'s tail; keep it in step with the cwd field' % p)
+                    continue
                 raise SystemExit('%s matches the spawn line; keep its pattern in step with the new field' % p)
 
 print('check-spawn-cwd-log: ok (spawn line ends in cwd=%s, 5 conversions, 5 arguments)')

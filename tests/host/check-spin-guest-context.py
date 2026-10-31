@@ -67,7 +67,7 @@ static int fake_read( uint64_t addr, uint64_t size, void *out, mach_vm_size_t *o
 
 struct fake_state { uint64_t __x[29]; uint64_t __fp; };
 
-static void run( uint64_t exact, uint64_t rsp )
+static void run( uint64_t exact, uint64_t rsp, uint64_t griprip, int ok2 )
 {
     struct fake_state st;
     memset( &st, 0, sizeof(st) );
@@ -81,21 +81,26 @@ int main( void )
 {
     /* readable: rip-192 .. rip+64 and 1024 bytes of stack */
     fputs( "CASE readable\n", stderr );
-    run( MEM_BASE + 0x1000, MEM_BASE + 0x2000 );
+    run( MEM_BASE + 0x1000, MEM_BASE + 0x2000, MEM_BASE + 0x1000 - 0x404, 1 );   /* Forza Horizon 4: State.rip 0x404 before the spin */
     /* code window below the readable memory */
     fputs( "CASE code-unreadable\n", stderr );
-    run( MEM_BASE + 100, MEM_BASE + 0x2000 );
+    run( MEM_BASE + 100, MEM_BASE + 0x2000, 0, 0 );
     /* rsp at the end of the readable memory: 1024 bytes do not fit */
     fputs( "CASE stack-unreadable\n", stderr );
-    run( MEM_BASE + 0x1000, MEM_BASE + MEM_SIZE - 64 );
+    run( MEM_BASE + 0x1000, MEM_BASE + MEM_SIZE - 64, 0, 0 );
     /* rsp implausible */
     fputs( "CASE stack-implausible\n", stderr );
-    run( MEM_BASE + 0x1000, 0x1234 );
+    run( MEM_BASE + 0x1000, 0x1234, 0, 0 );
     /* rip below 192: nothing is read for the code window */
     fputs( "CASE rip-small\n", stderr );
     reads = 0;
-    run( 100, MEM_BASE + 0x2000 );
+    run( 100, MEM_BASE + 0x2000, 0, 0 );
     printf( "reads=%d\n", reads );
+    /* round 624: State.rip not read -> the function window is the 1 KB before rip; State.rip 3 KB before rip -> also that */
+    fputs( "CASE fn-no-griprip\n", stderr );
+    run( MEM_BASE + 0x1000, MEM_BASE + 0x2000, 0, 0 );
+    fputs( "CASE fn-far-griprip\n", stderr );
+    run( MEM_BASE + 0x1000, MEM_BASE + 0x2000, MEM_BASE + 0x1000 - 0xc00, 1 );
     return 0;
 }
 """
@@ -116,9 +121,9 @@ with tempfile.TemporaryDirectory() as t:
                 runs.append(cur_run)
             elif cur_run is not None:
                 cur_run.append(ln)
-        check("five runs reported", len(runs) == 5, "got %d" % len(runs))
-        if len(runs) == 5:
-            rd, cu, su, si, rs = runs
+        check("seven runs reported", len(runs) == 7, "got %d" % len(runs))
+        if len(runs) == 7:
+            rd, cu, su, si, rs, fng, fnf = runs
             code = [x for x in rd if x.startswith("[spin]   guest code @")]
             stack = [x for x in rd if x.startswith("[spin]   guest stack x23+")]
             check("readable: 8 code lines of 32 bytes, the first at rip-192", len(code) == 8 and
@@ -128,7 +133,7 @@ with tempfile.TemporaryDirectory() as t:
             check("readable: the code bytes are the fake memory's bytes", code[0].split(": ", 1)[1].split()[0] == "%02x" % (((0x10000 + 0x1000 - 192) * 7 + 3) & 0xff))
             check("readable: 32 stack lines of 4 words, offsets 0x000..0x3e0", len(stack) == 32 and stack[0].startswith("[spin]   guest stack x23+0x000: ")
                   and stack[-1].startswith("[spin]   guest stack x23+0x3e0: ") and all(len(x.split(": ", 1)[1].split()) == 4 for x in stack))
-            regs = [x for x in rd if x.startswith("[spin]   guest regs")]
+            regs = [x for x in rd if x.startswith("[spin]   guest regs (host numbers)")]
             check("readable: one registers line, x23, x29 (the fp) and x20 as set", len(regs) == 1 and "x23=0x12000" in regs[0]
                   and "x29=0x7037eef010" in regs[0] and "x20=0x2000" in regs[0] and "x8=0x1111" in regs[0])
             check("code window unreadable: said so, nothing else for the code", any("guest code @0x%x: UNREADABLE" % (0x10000 + 100 - 192) in x for x in cu)
@@ -138,7 +143,26 @@ with tempfile.TemporaryDirectory() as t:
             check("stack implausible: said so, no stack line", any("guest stack x23=0x1234: not readable" in x for x in si)
                   and not any(x.startswith("[spin]   guest stack x23+") for x in si))
             check("rip below 192: the code window is reported unreadable without a read", any("UNREADABLE" in x for x in rs))
-        check("the reads of the last case: the code window is not read, only the stack is", "reads=1" in p.stdout, p.stdout[-300:])
+            # round 624: the function window
+            fn = [x for x in rd if x.startswith("[spin]   guest fn @0x")]
+            start = 0x10000 + 0x1000 - 0x404 - 0x10
+            total = 0x404 + 0x10 + 64
+            check("fn window (State.rip known): starts at State.rip-0x10 and covers to rip+64 in 32-byte lines",
+                  len(fn) == (total + 31) // 32 and fn[0].startswith("[spin]   guest fn @0x%x: " % start)
+                  and sum(len(x.split(": ", 1)[1].split()) for x in fn) == total, "%d lines" % len(fn))
+            check("fn window: its bytes are the fake memory's bytes", fn[0].split(": ", 1)[1].split()[0] == "%02x" % ((start * 7 + 3) & 0xff))
+            x86 = [x for x in rd if x.startswith("[spin]   guest regs (x86 names")]
+            check("one x86-named registers line: RSP=x23, RBP=fp, RAX=x8, R13=x20", len(x86) == 1 and "RSP=0x12000" in x86[0]
+                  and "RBP=0x7037eef010" in x86[0] and "RAX=0x1111" in x86[0] and "R13=0x2000" in x86[0])
+            fn2 = [x for x in fng if x.startswith("[spin]   guest fn @0x")]
+            check("fn window without State.rip: the 1 KB before rip to rip+64", len(fn2) == (1024 + 64) // 32
+                  and fn2[0].startswith("[spin]   guest fn @0x%x: " % (0x10000 + 0x1000 - 1024)))
+            fn3 = [x for x in fnf if x.startswith("[spin]   guest fn @0x")]
+            check("fn window with State.rip 3 KB before rip: the 1 KB fallback, never more than 2048 bytes",
+                  len(fn3) == (1024 + 64) // 32 and fn3[0].startswith("[spin]   guest fn @0x%x: " % (0x10000 + 0x1000 - 1024)))
+            check("fn window unreadable or rip small: said so, no byte line", any("guest fn @0x" in x and "UNREADABLE" in x for x in cu)
+                  and any("guest fn @0x0: UNREADABLE" in x for x in rs) and not any(x.startswith("[spin]   guest fn @0x") and "UNREADABLE" not in x for x in cu + rs))
+        check("the reads of the rip-small case: neither code window is read, only the stack is", "reads=1" in p.stdout, p.stdout[-300:])
 
 # ------------------------------------------------------------------ 2. wiring
 exact_blk = src[src.index("{   /* the guest bytes at the real RIP name the loop */"):e]
@@ -147,7 +171,8 @@ check("the region is inside `if (exact)` after the 32-byte dump", exact_blk.inde
 check("guest memory is read only through mach_vm_read_overwrite (no dereference of a guest pointer, no PE export)",
       "mach_vm_read_overwrite" in region and "*(uint64_t *)" not in region and "ios_native_rip_from_hostpc" not in region
       and "ios_guest_module_for" not in region)
-check("the sizes are bounded (256 code bytes, 128 stack words)", "uint8_t cw[256]" in region and "uint64_t sw[128]" in region)
+check("the sizes are bounded (256 code bytes, 128 stack words, a 2048-byte function window)", "uint8_t cw[256]" in region and "uint64_t sw[128]" in region
+      and "uint8_t fw[2048]" in region and "fn <= sizeof(fw)" in region)
 check("the earlier 32-byte dump and the block header dump are unchanged", "[spin]   guest bytes @0x%llx: %s\\n" in src
       and "[spin]     block hdr: %016llx %016llx %016llx %016llx %016llx %016llx\\n" in src)
 

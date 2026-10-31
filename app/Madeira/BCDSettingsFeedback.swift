@@ -81,6 +81,7 @@ struct BCDFeedbackLog: Hashable {
     var name: String
     var date: Date
     var bytes: Int64
+    var hasGame = true        // round 624 (agent N S6): false: BCD's own start-up only, and no game log of the last day
 }
 
 @MainActor protocol BCDFeedbackBackend: ObservableObject {
@@ -236,7 +237,9 @@ struct BCDFeedbackSettings<Backend: BCDFeedbackBackend>: View {
     private var attachRow: some View {
         let log = backend.newestLog
         let note = log.map {
-            "\(BCDSettingsText.logName($0.name)) · \(BCDFormat.dateTime($0.date)) · \(BCDFormat.bytes($0.bytes)). Sent first and cleaned on this device, as in Logs (a performance trace, if you recorded one, goes along); its code goes with your message."
+            "\(BCDSettingsText.logName($0.name)) · \(BCDFormat.dateTime($0.date)) · \(BCDFormat.bytes($0.bytes))"
+                + ($0.hasGame ? "" : ": no game ran in it")
+                + ". Sent first and cleaned on this device, as in Logs (a performance trace, if you recorded one, goes along); its code goes with your message."
         } ?? "No log yet. One appears once a game has run."
         return BCDSettingsToggleRow(id: BCDSettingsID.control(.feedback, "log"), title: "Attach my newest log", note: note,
                                     isOn: log != nil && draft.attachLog, enabled: log != nil && !sending) { draft.attachLog = $0 }

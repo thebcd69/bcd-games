@@ -100,6 +100,30 @@ func sample() -> BCDSessionSummary {
         check("a log last written before the session began counts no time", BCDCrashRules.offer(marker: marker(), endedAt: now - 99999, now: now, enabled: true)?.minutes == 0)
         check("a minute is 'minute', not 'minutes'", BCDCrashOffer(title: "X", minutes: 1, background: false).message.contains("after about 1 minute.")
               && BCDCrashOffer(title: "X", minutes: 0, background: false).message.hasPrefix("BCD closed while X was running."))
+        // round 624 (agent N S14, FWXFQ1): a start that went to the background within seconds of Play
+        check("a start left for the background after 3 s is not asked about",
+              BCDCrashRules.offer(marker: marker(background: true, startedAgo: 100, changedAgo: 97), endedAt: nil, now: now, enabled: true) == nil)
+        let left40 = BCDCrashRules.offer(marker: marker(background: true, startedAgo: 100, changedAgo: 60), endedAt: nil, now: now, enabled: true)
+        check("... after 40 s it is, with the words of a start that was left",
+              left40?.seconds == 40
+              && left40?.message.hasPrefix("BCD went to the background 40 seconds after you pressed Play, while Hollow Knight was still starting.") == true
+              && left40?.message.contains("Stay in BCD until the game's picture shows.") == true
+              && left40?.message.contains("takes out folder paths, user names, e-mail and IP addresses") == true, left40?.message ?? "nil")
+        let front3 = BCDCrashRules.offer(marker: marker(startedAgo: 100, changedAgo: 97), endedAt: now - 97, now: now, enabled: true)
+        check("a 3-second session that closed in front is asked about, with the words it had",
+              front3?.seconds == 3 && front3?.message.hasPrefix("BCD closed while Hollow Knight was running.") == true, front3?.message ?? "nil")
+        let left20 = BCDCrashRules.offer(marker: marker(background: true, startedAgo: 100, changedAgo: 80), endedAt: nil, now: now, enabled: true)
+        let left90 = BCDCrashRules.offer(marker: marker(background: true, startedAgo: 100, changedAgo: 10), endedAt: nil, now: now, enabled: true)
+        check("exactly 20 s in the background is asked about; exactly 90 s has the background words it had",
+              left20?.seconds == 20 && left20?.message.hasPrefix("BCD went to the background 20 seconds") == true
+              && left90?.seconds == 90 && left90?.message.hasPrefix("BCD was closed while it was in the background and Hollow Knight was running after about 1 minute.") == true,
+              "\(left20?.message ?? "nil") | \(left90?.message ?? "nil")")
+        check("an offer made without its seconds keeps the words it had",
+              BCDCrashOffer(title: "X", minutes: 0, background: true).message.hasPrefix("BCD was closed while it was in the background and X was running."))
+        check("the [session] line says why nothing is asked: a start left within 20 s, turned off, too old",
+              BCDCrashRules.notAsking(marker: marker(background: true, startedAgo: 100, changedAgo: 97), now: now, enabled: true) == "it went to the background within 20 s of the start"
+              && BCDCrashRules.notAsking(marker: marker(), now: now, enabled: false) == "turned off"
+              && BCDCrashRules.notAsking(marker: marker(startedAgo: 8 * 86400), now: now, enabled: true) == "too old")
         let data = try? JSONEncoder().encode(marker())
         check("the marker is a small JSON file that reads back",
               data.flatMap { try? JSONDecoder().decode(BCDSessionMarker.self, from: $0) } == marker() && (data?.count ?? 9999) < 400)
@@ -140,6 +164,20 @@ func sample() -> BCDSessionSummary {
               && BCDScreenshotRules.uploadFloorQuality == 0.4 && BCDScreenshotRules.maxSendBytes == 160 * 1024
               && BCDScreenshotRules.keptMaxBytes == 4 << 20 && BCDScreenshotRules.uploadTargetBytes < BCDScreenshotRules.maxSendBytes)
         check("160 MB of free memory to draw one", BCDScreenshotRules.minFreeMB == 160)
+
+        // ---- round 624 (agent R S5, RT83GE/6D6ZZS): the failed run's last lines in the new log ------------------------------------------
+        let whole = (1...100).map { "line \($0)" }.joined(separator: "\n") + "\n"
+        let fromStart = BCDPrevTail.lines(Data(whole.utf8), offset: 0)
+        check("the last 60 lines of a file read from its start", fromStart.count == 60 && fromStart.first == "line 41" && fromStart.last == "line 100",
+              "\(fromStart.first ?? "") .. \(fromStart.last ?? "")")
+        let cut = BCDPrevTail.lines(Data(("ne 7\nline 8\nline 9\r\n").utf8), offset: 4096)
+        check("a first line cut by a read from the middle is dropped, and a CR at a line end goes", cut == ["line 8", "line 9"], "\(cut)")
+        let atBoundary = BCDPrevTail.lines(Data(("\nline 8\n").utf8), offset: 4096)
+        check("...unless the read starts at a line break", atBoundary == ["line 8"], "\(atBoundary)")
+        let long = BCDPrevTail.lines(Data((String(repeating: "x", count: 1000) + "\n").utf8), offset: 0)
+        check("a line is cut to 400 characters", long.count == 1 && long[0].count == 400)
+        check("an empty file gives nothing", BCDPrevTail.lines(Data(), offset: 0).isEmpty)
+        check("the read is the last 64 KB", BCDPrevTail.maxBytes == 65536 && BCDPrevTail.maxLines == 60)
 
         print(failures == 0 ? "bcd_session_checks: PASS" : "bcd_session_checks: \(failures) FAILED")
         exit(failures == 0 ? 0 : 1)

@@ -4,7 +4,8 @@
 // them, hands their memory entries over and exits. Memory owned by an exited
 // task is billed to no process's footprint (runs 2-6 of MemoryHostTest.m), so
 // the tier can map guest data from it at RAM speed. A dispatch memory-pressure
-// source feeds the tier's guard, which stops taking pool memory under pressure.
+// source feeds the tier's guard, which stops taking pool memory at the system's
+// critical level.
 
 #import <Foundation/Foundation.h>
 #import "MemoryHostProtocol.h"
@@ -38,14 +39,51 @@ void madeira_pool_set_pressure(int level);
 - (void)extensionReady:(int)pid available:(uint64_t)available {}
 @end
 
+// <dispatch/private.h> (WebKit asks for them too): BCD's own limit, at its warning mark and past it.
+#define MP_MEMORYPRESSURE_PROC_LIMIT_WARN     0x10
+#define MP_MEMORYPRESSURE_PROC_LIMIT_CRITICAL 0x20
+
+// madeira-bcd (round 625, the owner's decision 38 b): env.MADEIRA_POOL_MORE = 1 (bcd.cfg or the game's
+// config; WineProcessBridge.m sets this before MadeiraMemoryPoolStart) takes the changes below; without it
+// the source is the one of build 624 and before, for every player who uses helper memory today.
+int MadeiraMemoryPoolMore;
+
+// madeira-bcd: a source that asks for the system's levels only is sent BCD's own
+// limit warning as DISPATCH_MEMORYPRESSURE_CRITICAL (xnu memorystatus_warn_process),
+// and no "normal" after it. Persona 3 Reload, build 622: "CRITICAL" at 5.3 GB, 80%
+// of BCD's 6.7 GB, and the pool took nothing more until iOS closed BCD. Asking for
+// the process-limit events too makes the kernel send those under their own bits;
+// they are logged and never close the guard, which is there for the SYSTEM's RAM.
 static void MPStartPressureSource(void) {
     static dispatch_source_t source;
+    static BOOL split;
+    const unsigned long system = DISPATCH_MEMORYPRESSURE_NORMAL | DISPATCH_MEMORYPRESSURE_WARN | DISPATCH_MEMORYPRESSURE_CRITICAL;
+    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+    if (!MadeiraMemoryPoolMore) {   /* as before round 625: the system's levels, and any of them closes the guard */
+        source = dispatch_source_create(DISPATCH_SOURCE_TYPE_MEMORYPRESSURE, 0, system, queue);
+        dispatch_source_set_event_handler(source, ^{
+            unsigned long level = dispatch_source_get_data(source);
+            madeira_pool_set_pressure(level & DISPATCH_MEMORYPRESSURE_CRITICAL ? 2 : level & DISPATCH_MEMORYPRESSURE_WARN ? 1 : 0);
+        });
+        dispatch_resume(source);
+        return;
+    }
     source = dispatch_source_create(DISPATCH_SOURCE_TYPE_MEMORYPRESSURE, 0,
-                                    DISPATCH_MEMORYPRESSURE_NORMAL | DISPATCH_MEMORYPRESSURE_WARN | DISPATCH_MEMORYPRESSURE_CRITICAL,
-                                    dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0));
+                                    system | MP_MEMORYPRESSURE_PROC_LIMIT_WARN | MP_MEMORYPRESSURE_PROC_LIMIT_CRITICAL, queue);
+    split = source != nil;
+    if (!source) source = dispatch_source_create(DISPATCH_SOURCE_TYPE_MEMORYPRESSURE, 0, system, queue);
+    if (!source) { fprintf(stderr, "[swap] ml1150 pool: no memory-pressure source; the guard measures free memory only\n"); return; }
+    fprintf(stderr, "[swap] ml1150 pool: memory-pressure source %s\n",
+            split ? "with BCD's own limit events apart" : "for the system's levels only (a CRITICAL may be BCD's own limit: logged as a warning)");
     dispatch_source_set_event_handler(source, ^{
         unsigned long level = dispatch_source_get_data(source);
-        madeira_pool_set_pressure(level & DISPATCH_MEMORYPRESSURE_CRITICAL ? 2 : level & DISPATCH_MEMORYPRESSURE_WARN ? 1 : 0);
+        if (level & (MP_MEMORYPRESSURE_PROC_LIMIT_WARN | MP_MEMORYPRESSURE_PROC_LIMIT_CRITICAL)) {
+            fprintf(stderr, "[swap] ml1150 pool: BCD is at its own limit's %s mark; the pool goes on taking\n",
+                    level & MP_MEMORYPRESSURE_PROC_LIMIT_CRITICAL ? "critical" : "warning");
+            return;
+        }
+        int system_level = level & DISPATCH_MEMORYPRESSURE_CRITICAL ? 2 : level & DISPATCH_MEMORYPRESSURE_WARN ? 1 : 0;
+        madeira_pool_set_pressure(!split && system_level == 2 ? 1 : system_level);
     });
     dispatch_resume(source);
 }

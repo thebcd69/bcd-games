@@ -16,6 +16,8 @@ import SwiftUI
 /// A modifier of its own: ContentView's chain of alerts is at the type checker's limit.
 /// The offer is only ever set by AutoTune's analysis, which runs only while it is on.
 struct AutoTuneAlert: ViewModifier {
+    /// Round 625 (owner's item 20): the verdicts that name an install limit (build/tools/autotune_rules.py); no Send Log button for them.
+    static let installLimits: Set<String> = ["wow-window-no-address-space", "reserve-no-address-space-without-rights"]
     @ObservedObject private var offers = AutoTuneOffers.shared
     @ObservedObject private var library = LibraryModel.shared
     @ObservedObject private var gate = AutoTuneAlertGate.shared
@@ -33,8 +35,11 @@ struct AutoTuneAlert: ViewModifier {
                         exit(0)
                     }
                 }
-                // madeira-bcd FORK-ONLY: a search that ended without a fix sends its log in one tap.
+                // madeira-bcd FORK-ONLY: a search that ended without a fix sends its log in one tap. Round 625 (owner's item 20, N-S15): not
+                // for an install limit (V71SS6, 9Z31S2: the players sent the log right after reading "add the limit with GetMoreRam"); every
+                // such log reads the same and the alert already says what to do. Settings › Logs and the game's page still send any log.
                 if ["stuck", "gave-up", "known"].contains(offer.state.status),
+                   !(offer.state.status == "known" && Self.installLimits.contains(offer.state.known ?? "")),
                    let name = offer.state.attempts.last?.log, let log = LogUpload.log(named: name) {
                     Button("Send Log") {
                         offers.offer = nil

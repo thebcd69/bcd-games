@@ -1,0 +1,353 @@
+[13:22:45.836] [INFO] Checking entitlements...
+[13:22:45.836] [INFO] [build] v0.1.623 (623)
+[13:22:45.837] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 18.5 (Build 22F76) ram=5665MB available=4079MB cores=6
+[13:22:45.837] [INFO] [device] address-map=[0x1024ac000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[13:22:45.838] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 18: TXM restricts JIT memory only from iOS 26); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[13:22:45.858] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[13:22:49.440] [INFO] Requesting JIT with StikDebug...
+[13:22:49.452] [INFO] Opening StikDebug to enable JIT...
+[13:22:54.721] [INFO] [bcd] library launch Hotline Miami 2: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[13:22:54.733] [INFO] [dock-launch] image-retire=1
+[13:22:54.733] [INFO] [dock-launch] image-map-guard=1
+[13:22:54.739] [INFO] [dock-installers] app=274170 scripts=0 programs=0
+[13:22:54.740] [INFO] [madeira-dock] starting the host for app 274170; Valve's client authenticates and authorizes the launch
+[13:22:54.752] [INFO] Running full Wine sequence...
+[13:22:54.752] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1024ac000,0xfc0000000) 63GB available=4058MB low-power=0 thermal=nominal
+[13:22:54.821] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[13:22:54.821] [INFO] Allocating 896MB JIT pool via debugger...
+[13:22:54.822] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[13:22:54.822] [INFO] [jit-debugger] attached=1 at the pool request
+[13:22:58.275] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  3.566s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+ml992: os_proc_available_memory=3128 MB + phys_footprint=967 MB = 4096 MB (hw.memsize says 5665 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x1178f0000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=978 MB compressed=0 MB external=78 MB reusable=10 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  4.120s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x116740000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3018d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x301aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  4.193s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 116740000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m750351 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x301e68bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301e68bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FB8F70000
+E 4C [iOS-xins] tracker=0x301e68bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301e68bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0xfb8f70000
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=1368 MB (peak 1368) internal=1367 MB compressed=0 MB external=143 MB reusable=11 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000114 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1552 MB (peak 1552) internal=1550 MB compressed=0 MB external=151 MB reusable=11 MB (cycle=3)
+[file-wfail] ml669 #61 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #62 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1554 MB (peak 1554) internal=1553 MB compressed=0 MB external=152 MB reusable=11 MB (cycle=4)
+[footprint] rev=ml358 phys=1569 MB (peak 1569) internal=1567 MB compressed=0 MB external=152 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=1569 MB (peak 1569) internal=1568 MB compressed=0 MB external=152 MB reusable=11 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hotline Miami 2\\HotlineMiami2.exe" t+ 16.143s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0094:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hotline Miami 2\\HotlineMiami2.exe\"" (fd=355, unixdir=360, dup_unixdir=449) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hotline Miami 2"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+[nls-getptr] type=11 id=1252 peb=0x400310000
+[nls-getptr] type=11 id=437 peb=0x400310000
+00a8:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x13fbd0000+0x3bc000 (libwow64fex.dll) → pool 0x309b81000 used=0x9f45000/0x38000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x13fbd0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-split] libwow64fex.dll 0x13fbd0000+0x1dc000 prot=r-x: EXEC was granted in place although the pool copy 0x309b81000 exists -- taken back, the pool copy runs it [wow-cpu-pool]
+[13:23:11.253] [INFO] [dock-report] launch-client-discovery-published=1
+[file-wfail] ml669 #87 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=20127 peb=0x400310000
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c000000d proc=hotlinemiami2.exe tid=00a8 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[unixlib] libwow64fex.dll (module 0x13fbd0000) -> 64-bit table (0x105284d00)
+[nls-getptr] type=11 id=1252 peb=0x400310000
+[nls-getptr] type=11 id=437 peb=0x400310000
+ml957: ? backing 0x47bb88000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47b030000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-split] libwow64fex.dll 0x13fbd0000+0x1dc000 prot=r-x: EXEC was granted in place although the pool copy 0x309b81000 exists -- taken back, the pool copy runs it [wow-cpu-pool]
+[store-noalias] #1 rev=ml348 addr=0xb6f0145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb6f010000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0xb6f0145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0xfb96e645d pc=0x337ffc134 addr=0xb6f0145d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb6f010000+0x200000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x337ffc134 addr=0xb6f0145d0 x18=0xfbfe90000 type=1 lr=0xfb96e645d sp=0xfb6790000 x16=0x337ffc108 x17=0x134800000
+[guest-code] rev=ml333 pool_rip=0x306a6245d (PE 0xfb96e645d): 48 8b 5c 24 30 a9 7f ff ff ff 0f 94 c0 48 83 c4
+[fault-host] 337ffc034: f94bc54a f940195c 910003e0 f902e380 d53bd068 927df108 f9446508 f94bc508
+[fault-host] 337ffc054: f940191c b9440b88 d51b4208 91070388 4cdf2d00 4cdf2d04 4cdf2d08 4cdf2d0c
+[fault-host] 337ffc074: a9420388 a9436f81 a9447797 a9456b99 a9460f82 a9471784 a9485393 a9495b95
+[fault-host] 337ffc094: 29426389 f9400f8c 3500194b 1400002c f9401a3c d53bd068 927df108 f9446508
+[fault-host] 337ffc0b4: f94bc508 f940191c b9440b88 d51b4208 91070388 4cdf2d00 4cdf2d04 4cdf2d08
+[fault-host] 337ffc0d4: 4cdf2d0c a9420388 a9436f81 a9447797 a9456b99 a9460f82 a9471784 a9485393
+[mach_exc] insn_stream PC-12..PC+8: a94a2f8a 8a09116b 8b0b014a [a9402d4d] cb09016b b50000ab b400008d
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbfe90000 TEB=0xfbfe90000 TEB[0x58]=0x12a668f40 *(gs_cached+0x58)=0x12a668f40
+[store-noalias] #2 rev=ml348 addr=0xb7c4145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb7c410000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0xb7c4145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0xfb96e645d pc=0x337ffc134 addr=0xb7c4145d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb7c410000+0x200000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x337ffc134 addr=0xb7c4145d0 x18=0xfbfe50000 type=1 lr=0xfb96e645d sp=0xfb65b0000 x16=0x337ffc108 x17=0x137480000
+[guest-code] rev=ml333 pool_rip=0x306a6245d (PE 0xfb96e645d): 48 8b 5c 24 30 a9 7f ff ff ff 0f 94 c0 48 83 c4
+[fault-host] 337ffc094: 29426389 f9400f8c 3500194b 1400002c f9401a3c d53bd068 927df108 f9446508
+[fault-host] 337ffc0b4: f94bc508 f940191c b9440b88 d51b4208 91070388 4cdf2d00 4cdf2d04 4cdf2d08
+[fault-host] 337ffc0d4: 4cdf2d0c a9420388 a9436f81 a9447797 a9456b99 a9460f82 a9471784 a9485393
+[fault-host] 337ffc0f4: a9495b95 29426389 f9400f8c 3500162b 14000013 f9401a3c f9000f89 f9076389
+[fault-host] 337ffc114: f940062a 910003f7 9100015f 394fe38a 3500016a a94a2f8a 8a09116b 8b0b014a
+[fault-host] 337ffc134: a9402d4d cb09016b b50000ab b400008d 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: a94a2f8a 8a09116b 8b0b014a [a9402d4d] cb09016b b50000ab b400008d
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbfe50000 TEB=0xfbfe50000 TEB[0x58]=0x12a92fb90 *(gs_cached+0x58)=0x12a92fb90
+[store-noalias] #3 rev=ml348 addr=0xb6f0145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb6f010000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0xb6f0145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0xfb96e645d pc=0x337ffc134 addr=0xb6f0145d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb6f010000+0x200000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x337ffc134 addr=0xb6f0145d0 x18=0xfbfe90000 type=1 lr=0xfb96e645d sp=0xfb6790000 x16=0x337ffc108 x17=0x134800000
+[guest-code] rev=ml333 pool_rip=0x306a6245d (PE 0xfb96e645d): 48 8b 5c 24 30 a9 7f ff ff ff 0f 94 c0 48 83 c4
+[mach_exc] insn_stream PC-12..PC+8: a94a2f8a 8a09116b 8b0b014a [a9402d4d] cb09016b b50000ab b400008d
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbfe90000 TEB=0xfbfe90000 TEB[0x58]=0x12a668f40 *(gs_cached+0x58)=0x12a668f40
+[store-noalias] #4 rev=ml348 addr=0xb7c4145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb7c410000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0xb7c4145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0xfb96e645d pc=0x337ffc134 addr=0xb7c4145d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb7c410000+0x200000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x337ffc134 addr=0xb7c4145d0 x18=0xfbfe50000 type=1 lr=0xfb96e645d sp=0xfb65b0000 x16=0x337ffc108 x17=0x137480000
+[guest-code] rev=ml333 pool_rip=0x306a6245d (PE 0xfb96e645d): 48 8b 5c 24 30 a9 7f ff ff ff 0f 94 c0 48 83 c4
+0090:err:seh:bus_handler BUS->AV: unreadable target addr=0xb6f0145d0 pc=0x337ffc134 rw=0 rev=ml420
+[mach_exc] insn_stream PC-12..PC+8: a94a2f8a 8a09116b 8b0b014a [a9402d4d] cb09016b b50000ab b400008d
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+0090:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x337ffc134 RX from -32, 64 of 64 bytes: 2a 06 40 f9 f7 03 00 91 5f 01 00 91 8a e3 4f 39 6a 01 00 35 8a 2f 4a a9 6b 11 09 8a 4a 01 0b 8b 4d 2d 40 a9 6b 01 09 cb ab 00 00 b5 8d 00 00 b4 a0 01 5f d6 1f 20 03 d5 1f 20 03 d5 8c 0f 40 f9 
+0090:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x337ffc134 (not an anon-JIT page)
+00a0:err:seh:bus_handler BUS->AV: unreadable target addr=0xb7c4145d0 pc=0x337ffc134 rw=0 rev=ml420
+00a0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x337ffc134 RX from -32, 64 of 64 bytes: 2a 06 40 f9 f7 03 00 91 5f 01 00 91 8a e3 4f 39 6a 01 00 35 8a 2f 4a a9 6b 11 09 8a 4a 01 0b 8b 4d 2d 40 a9 6b 01 09 cb ab 00 00 b5 8d 00 00 b4 a0 01 5f d6 1f 20 03 d5 1f 20 03 d5 8c 0f 40 f9 
+00a0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x337ffc134 (not an anon-JIT page)
+ml957: ? backing 0x47abe8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47a818000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[store-noalias] #5 rev=ml348 addr=0xb489a3ab0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb48810000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0xb489a3ab0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0xfbb7593ab pc=0x337ffc134 addr=0xb489a3ab0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb48810000+0x200000 [first] rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x337ffc134 addr=0xb489a3ab0 x18=0xfbff60000 type=1 lr=0xfbb7593ab sp=0xfb8ee0000 x16=0x337ffc108 x17=0x126510000
+[guest-code] rev=ml333 pool_rip=0x3042b03ab (PE 0xfbb7593ab): ff 15 47 f0 7c 00 66 0f 2f f0 73 b9 8b ab a8 00
+[mach_exc] insn_stream PC-12..PC+8: a94a2f8a 8a09116b 8b0b014a [a9402d4d] cb09016b b50000ab b400008d
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0xb489a3ab0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb48810000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0xb489a3ab0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0xfbb7593ab pc=0x337ffc134 addr=0xb489a3ab0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb48810000+0x200000 rev=ml555
+0050:err:seh:bus_handler BUS->AV: unreadable target addr=0xb489a3ab0 pc=0x337ffc134 rw=0 rev=ml420
+0050:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x337ffc134 RX from -32, 64 of 64 bytes: 2a 06 40 f9 f7 03 00 91 5f 01 00 91 8a e3 4f 39 6a 01 00 35 8a 2f 4a a9 6b 11 09 8a 4a 01 0b 8b 4d 2d 40 a9 6b 01 09 cb ab 00 00 b5 8d 00 00 b4 a0 01 5f d6 1f 20 03 d5 1f 20 03 d5 8c 0f 40 f9 
+0050:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x337ffc134 (not an anon-JIT page)
+[store-noalias] #7 rev=ml348 addr=0xb798145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb79810000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0xb798145d0 insn=0xa9402d4d pc=0x337ffc134 NO pool/anon alias | region 0xb79810000+0x200000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+009c:err:seh:bus_handler BUS->AV: unreadable target addr=0xb798145d0 pc=0x337ffc134 rw=0 rev=ml420
+009c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x337ffc134 RX from -32, 64 of 64 bytes: 2a 06 40 f9 f7 03 00 91 5f 01 00 91 8a e3 4f 39 6a 01 00 35 8a 2f 4a a9 6b 11 09 8a 4a 01 0b 8b 4d 2d 40 a9 6b 01 09 cb ab 00 00 b5 8d 00 00 b4 a0 01 5f d6 1f 20 03 d5 1f 20 03 d5 8c 0f 40 f9 
+009c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x337ffc134 (not an anon-JIT page)
+0094:err:seh:bus_handler BUS->AV: unreadable target addr=0xb704345d0 pc=0x337ffc134 rw=0 rev=ml420
+0088:err:seh:bus_handler BUS->AV: unreadable target addr=0xb664745d0 pc=0x337ffc134 rw=0 rev=ml420
+ml957: ? backing 0x47a580000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[reserved-area] #1 MAP_FIXED over our own reservation refused: 0x402e00000+0x84000 errno=12 (Cannot allocate memory) | OCCUPIED 0x402e00000+0x10000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #1 detail: 0x84000 bytes bottom-up; 9 candidate(s) refused [0x402e00000 0x402e10000 0x402e20000 0x402e30000 0x402e40000 0x402e50000 0x402e60000 0x402e70000 0x402e80000]; kernel regions across the first refused range (p/m = protection/maximum): 0x402e00000+0x10000 0/0; 0x402e10000+0x10000 0/0; 0x402e20000+0x10000 0/0; 0x402e30000+0x10000 0/0; 0x402e40000+0x10000 0/0; 0x402e50000+0x10000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x402e90000: free 0x402e90000..0x402f04000; 0x402f04000+0x50fc000 0/7 (it took the mapping)
+[nls-getptr] type=11 id=20127 peb=0x400310000
+[reserved-area] #2 MAP_FIXED over our own reservation refused: 0x402e00000+0x14000 errno=12 (Cannot allocate memory) | OCCUPIED 0x402e00000+0x10000 prot=0/0 shared=0 | the retry placed it (18 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #2 detail: 0x14000 bytes bottom-up; 18 candidate(s) refused [0x402e00000 0x402e10000 0x402e20000 0x402e30000 0x402e40000 0x402e50000 0x402e60000 0x402e70000 0x402e80000 0x402e90000 0x402ea0000 0x402eb0000 0x402ec0000 0x402ed0000 0x402ee0000]; kernel regions across the first refused range (p/m = protection/maximum): 0x402e00000+0x10000 0/0; 0x402e10000+0x4000 0/0; last candidate tried after a refusal, before it was mapped: 0x402f20000: free 0x402f20000..0x402f24000; 0x402f24000+0x50dc000 0/7 (it took the mapping)
+[reserved-area] #1 MAP_FIXED over our own reservation refused: 0x402e00000+0x100000 errno=12 (Cannot allocate memory) | OCCUPIED 0x402e00000+0x10000 prot=0/0 shared=0 | the retry placed it (3 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #1 detail: 0x100000 bytes bottom-up (>= 1 MB, own budget); 3 candidate(s) refused [0x402e00000 0x402e10000 0x402e20000]; kernel regions across the first refused range (p/m = protection/maximum): 0x402e00000+0x10000 0/0; 0x402e10000+0x4000 0/0; 0x402e14000+0xc000 0/0; 0x402e20000+0x4000 0/0; 0x402e24000+0xc000 0/0; 0x402e30000+0x4000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x402f40000: 0x402f40000+0x50c0000 0/7 (it took the mapping)
+006c:err:seh:bus_handler BUS->AV: unreadable target addr=0xb51c4f020 pc=0x337ffc134 rw=0 rev=ml420
+[av-detail] ml613 #19 p0=READ p1=0xb42d27aa0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0xb42d27aa0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+004c:err:seh:bus_handler BUS->AV: unreadable target addr=0xb42d27aa0 pc=0x337ffc134 rw=0 rev=ml420
+[unixlib] opengl32 (GL-absent stub table) (module 0x47ac70000) -> wow64 table (0x10528cd00)
+ml957: ? backing 0x478b0c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x30a4a0000)
+ml957: ? backing 0x478ad4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #90 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[av-detail] ml613 #21 p0=READ p1=0xb4bc145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #22 p0=READ p1=0xb4bc145d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+0058:err:seh:bus_handler BUS->AV: unreadable target addr=0xb4bc145d0 pc=0x337ffc134 rw=0 rev=ml420
+[av-detail] ml613 #23 p0=READ p1=0xb400445d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=23 rip=0xfb96e645d pc=0x337ffc134 addr=0xb400445d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb40020000+0x200000 rev=ml555
+[av-detail] ml613 #24 p0=READ p1=0xb400445d0 hostpc=0x337ffc134 hinsn=0xa9402d4d rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=24 rip=0xfb96e645d pc=0x337ffc134 addr=0xb400445d0 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb40020000+0x200000 rev=ml555
+0038:err:seh:bus_handler BUS->AV: unreadable target addr=0xb400445d0 pc=0x337ffc134 rw=0 rev=ml420
+[13:23:12.738] [INFO] [dock-report] launch-game-running=1
+[guest-stk] lr 0x309ca0ce4 = libwow64fex.dll+0x11fce4
+[stale-heal]   3 slot(s) in the copy of 0x13fbd0000 (libwow64fex.dll) -> 0x309a63294 for peb=0x400310000 (owner=0x0 mapper=0x400310000)
+[win-name] #31 hwnd=0x10060 class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x2005a class='' text="Hotline Miami 2: Wrong Number" rev=ml853
+[win-name] #33 hwnd=0x2005a class='' text="Hotline Miami 2: Wrong Number" rev=ml853
+[win-name] #39 hwnd=0x2005a class='' text="Hotline Miami 2: Wrong Number" rev=ml853
+ml957: ? backing 0x47849c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #40 hwnd=0x2005a class='' text="Hotline Miami 2: Wrong Number" rev=ml853
+[win-name] #41 hwnd=0x2005a class='' text="Hotline Miami 2: Wrong Number" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[win-name] #43 hwnd=0x1006a class='' text="SDLHelperWindowInputMsgWindow" rev=ml853
+ml957: ? backing 0x4782fc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x4782d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x478294000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fault_rip] cnt=25 rip=0xfbbb0f458 pc=0x337ffc134 addr=0xb74824580 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb74810000+0x200000 [first] rev=ml555
+[fault_rip] cnt=26 rip=0xfbbb0f458 pc=0x337ffc134 addr=0xb74824580 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0xb74810000+0x200000 rev=ml555
+0098:err:seh:bus_handler BUS->AV: unreadable target addr=0xb74824580 pc=0x337ffc134 rw=0 rev=ml420
+[laa] ml1070 SPILL #1: no room below guest 2 GB for 0x2b3000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #2: no room below guest 2 GB for 0x2d000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #3: no room below guest 2 GB for 0x2b3000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #4: no room below guest 2 GB for 0x2d000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #5: no room below guest 2 GB for 0x2b3000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #6: no room below guest 2 GB for 0x2d000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #7: no room below guest 2 GB for 0x2d000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #8: no room below guest 2 GB for 0x2b3000 bytes (top-down, start=guest 0x110000) — falling back to the whole window
+[stale-heal]   1 slot(s) in the copy of 0x13fbd0000 (libwow64fex.dll) -> 0x30a0a3ea4 for peb=0x400310000 (owner=0x0 mapper=0x400310000)
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=43 skips=43 | seen=0x400110000..0x4ffff0001 views=152 maxgap=0x7fee0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 7 range(s) that fit (first 0x40efe0000), largest free 0x7fee0000 over 65 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=43 skips=43 | seen=0x400110000..0x4ffff0001 views=153 maxgap=0x7fee0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 6 range(s) that fit (first 0x40efe0000), largest free 0x7fee0000 over 64 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=43 skips=43 | seen=0x400110000..0x4ffff0001 views=153 maxgap=0x7f920000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 7 range(s) that fit (first 0x40efe0000), largest free 0x7f920000 over 64 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=46 skips=46 | seen=0x400110000..0x4ffff0001 views=152 maxgap=0x7fee0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 7 range(s) that fit (first 0x40efe0000), largest free 0x7fee0000 over 65 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=45 skips=45 | seen=0x400110000..0x4ffff0001 views=153 maxgap=0x7f3a0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 7 range(s) that fit (first 0x417fc0000), largest free 0x7f3a0000 over 66 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=45 skips=45 | seen=0x400110000..0x4ffff0001 views=170 maxgap=0x7fee0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 5 range(s) that fit (first 0x41f750000), largest free 0x7fee0000 over 69 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f5020 NATIVE (no FEX state) sp-cand=[ ]
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x2b4000 (align 0x10000): the free-range table holds 6 range(s) that fit (first 0x41fce0000), largest free 0x7ee20000 over 71 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thread-stacks] port=0xc007 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16e0f5020
+[thread-stacks]   pc is PE code: libwow64fex.dll+0xe7848 (base=0x13fbd0000 va=0x13fcb7848)
+[thread-stacks]   pc is PE code: libwow64fex.dll+0xb2c0c (base=0x13fbd0000 va=0x13fc82c0c)
+[va-scan] window room 0x400110000..0x4ffff0001 for 0x30000 (align 0x10000): the free-range table holds 17 range(s) that fit (first 0x402e00000), largest free 0x7fee0000 over 70 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=47 skips=46 | seen=0x400110000..0x4ffff0001 views=177 maxgap=0x7fbf0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D 110 Load module d3dcompiler_43.dll (d3dcompiler_43.dll-bbc7a17ad1eab082): 4FE8A0000
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=49 skips=49 | seen=0x400110000..0x4ffff0001 views=176 maxgap=0x7e8a0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D 110 Load module wined3d.dll (wined3d.dll-e5228e6d43288f1d): 4FE360000
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2d000 align=0x10000 top-down tries=166 skips=157 | seen=0x400110000..0x4ffff0001 views=183 maxgap=0x7feec000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4fff10000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D 110 Load module d3dcompiler_43.dll (d3dcompiler_43.dll-bbc7a17ad1eab082): 4FF670000
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=50 skips=49 | seen=0x400110000..0x4ffff0001 views=176 maxgap=0x7f670000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D 110 Load module wined3d.dll (wined3d.dll-e5228e6d43288f1d): 4FE0A0000
+D 110 Load module d3dcompiler_43.dll (d3dcompiler_43.dll-bbc7a17ad1eab082): 4FE320000
+[reserved-area] #61 detail: 0x2b4000 bytes top-down (>= 1 MB, own budget); 33 candidate(s) refused [0x47e7e0000 0x47e7d0000 0x47e7c0000 0x47e7b0000 0x47e7a0000 0x47e790000 0x47e780000 0x47e770000 0x47e760000 0x47e750000 0x47e740000 0x47e730000 0x47e720000 0x47e710000 0x47e700000]; kernel regions across the first refused range (p/m = protection/maximum): 0x47e7e0000+0x24000 0/0; 0x47e804000+0x10000 0/0; 0x47e814000+0x10000 0/0; 0x47e824000+0x10000 0/0; 0x47e834000+0x10000 0/0; 0x47e844000+0x10000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x47e5e0000: 0x47e5e0000+0x4000 0/0; 0x47e5e4000+0xc000 0/0; 0x47e5f0000+0x4000 0/0; 0x47e5f4000+0xc000 0/0; 0x47e600000+0x4000 0/0; 0x47e604000+0xc000 0/0; more (it was refused too) | last resort: remap not tried: the range holds a kernel region no munmap removes (0x47e7e0000+0x220000, prot 0/0)
+[reserved-area] #62 MAP_FIXED over our own reservation refused: 0x4ffc20000+0x2b4000 errno=12 (Cannot allocate memory) | OCCUPIED 0x4ffc20000+0x20000 prot=0/0 shared=0 | NOT placed (33 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #62 detail: 0x2b4000 bytes top-down (>= 1 MB, own budget); 33 candidate(s) refused [0x4ffc20000 0x4ffc10000 0x4ffc00000 0x4ffbf0000 0x4ffbe0000 0x4ffbd0000 0x4ffbc0000 0x4ffbb0000 0x4ffba0000 0x4ffb90000 0x4ffb80000 0x4ffb70000 0x4ffb60000 0x4ffb50000 0x4ffb40000]; kernel regions across the first refused range (p/m = protection/maximum): 0x4ffc20000+0x20000 0/0; 0x4ffc40000+0x30000 0/0; 0x4ffc70000+0x30000 0/0; 0x4ffca0000+0x4000 0/0; 0x4ffca4000+0x10000 0/0; 0x4ffcb4000+0x10000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x4ffa20000: 0x4ffa20000+0x4000 0/0; 0x4ffa24000+0xc000 0/0; 0x4ffa30000+0x4000 0/0; 0x4ffa34000+0xc000 0/0; 0x4ffa40000+0x4000 0/0; 0x4ffa44000+0xc000 0/0; more (it was refused too) | last resort: remap not tried: the range holds a kernel region no munmap removes (0x4ffc20000+0x280000, prot 0/0)
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2b3000 align=0x10000 top-down tries=51 skips=51 | seen=0x400110000..0x4ffff0001 views=176 maxgap=0x7e320000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4ffc20000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[reserved-area] #63 MAP_FIXED over our own reservation refused: 0x4ffc20000+0x2b4000 errno=12 (Cannot allocate memory) | OCCUPIED 0x4ffc20000+0x20000 prot=0/0 shared=0 | the retry placed it past the kernel's fixed regions (11 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #63 skip: 11 step(s) past kernel regions no MAP_FIXED replaces and no munmap removes (maximum protection none), the last 0x4fe0a0000+0x274000; the placement took a range beyond it (11 refused in all) rev=ajan58-skip
+[reserved-area] #63 detail: 0x2b4000 bytes top-down (>= 1 MB, own budget); 11 candidate(s) refused [0x4ffc20000 0x4ff960000 0x4ff6a0000 0x4ff3e0000 0x4ff120000 0x4fee60000 0x4feba0000 0x4fe8e0000 0x4fe620000 0x4fe360000 0x4fe060000]; kernel regions across the first refused range (p/m = protection/maximum): 0x4ffc20000+0x20000 0/0; 0x4ffc40000+0x30000 0/0; 0x4ffc70000+0x30000 0/0; 0x4ffca0000+0x4000 0/0; 0x4ffca4000+0x10000 0/0; 0x4ffcb4000+0x10000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x4fdde0000: 0x4fdde0000+0x280000 0/7; free 0x4fe060000..0x4fe094000 (it took the mapping)
+D 110 Load module wined3d.dll (wined3d.dll-e5228e6d43288f1d): 4FDDE0000
+[va-scan] FAILED window=0x400110000..0x4ffff0001 size=0x2d000 align=0x10000 top-down tries=175 skips=165 | seen=0x400110000..0x4ffff0001 views=183 maxgap=0x7feec000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x4fff10000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[nt-fail] #3 NtMapViewOfSection status=c0000017 proc=hotlinemiami2.exe tid=0110 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0xffffffff h=0x248 off=0x0 hits=1 rev=ajan5-rockstar
+0110:err:module:load_dll [dll-missing] ml718 UNCAPPED L"d3dcompiler_43.dll" status=c0000017 (subsystem dependency)
+0110:err:module:load_dll [dll-missing] rev=ml336 #11 L"d3dcompiler_43.dll" status=c0000017 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[fault_rip] cnt=27 rip=0x0 pc=0x330a48da0 addr=0x400000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x400000000+0x110000 rev=ml555
+[fault_rip] cnt=28 rip=0x0 pc=0x330a48da0 addr=0x400000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x400000000+0x110000 rev=ml555
+0110:err:seh:bus_handler BUS->AV: unreadable target addr=0x400000000 pc=0x330a48da0 rw=0 rev=ml420
+[wow-null32] rev=ajan7-arkham #1 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x330a48da0; EAX=0x0 ECX=0x47c6090 EDX=0x33 EBX=0xfefe3c8 ESI=0x78617fd8 EDI=0x45d EBP=0x177bfd00 ESP=0x177bfaa4 (58 modules in the PEB32 list)
+[wow-null32]   registers that point into a module: ESI=0x78617fd8(d3d9-emulated.dll+0x167fd8)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:0 +04:fefe3e8 +08:6ca33381 +0c:2f57e40 +10:fefe3c8 +14:482fc28 +18:30431e8 +1c:ffff0200 +20:3 +24:2f5dcb0 +28:fd20e70 +2c:0 +30:0 +34:0 +38:ff091a0 +3c:2f5dde8
+[wow-null32]   TEB32=0x1a2000 PEB32=0x311000 TlsBitmapBits=0x0007ffffffffffff TlsExpansionSlots=0x0; 7 cell(s) hold a value: [19]=0xfef7c28 [22]=0x7bedcabc(kernel32.dll+0xcabc) [23]=0x7bedcabc(kernel32.dll+0xcabc) [24]=0xfd23cf0 [28]=0x4860af0 [30]=0x4860b18 [47]=0xfd23d50
+[wow-null32]   44 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 20 21 25 26 27 29 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 48 49 50
+[alloc-fail] ml814 #2 status=c0000018 hint=0x4ffeeffee size=0x1 type=0x2000 protect=0x1 tid=0110 | STAGE=none err=3 at 0x4fff10000+0x30000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=hotlinemiami2.exe tid=0110 size=0x1 type=0x2000 prot=0x1 hint=0x4ffeeffee zb=0xffffffff hits=1 rev=ajan5-rockstar
+wine: Unhandled page fault on read access to 00000000 at address 0129C410 (thread 0110), starting debugger...
+0110:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=10685
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=448
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[13:23:20.755] [INFO] [dock-game-end] hotlinemiami2.exe ended with status 0xc0000005; the session goes on for now (grace)
+[file-wfail] ml669 #96 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #97 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[wow-stack-free] #1 the dead thread 00fc's 32-bit stack (guest 0x15ab0000) is in window 0x400000000 (gone), the thread freeing its TEB is in window 0x0: the old address 0x15ab0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-window] TEB block 0x4001c0000 dropped, not pooled: it belongs to a guest window that is no longer live
+[13:23:27.106] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=11141
+[unwind] term ml661 begin rip=3020611d4 rsp=120e9fdb8 window=[120e9fdb8..12169fdb8) max=32
+[unwind] term ml661 #00 pc=3020611d4 rsp=120e9fdb8  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=11149
+[unwind] term ml661 begin rip=30195216c rsp=120e9fc10 window=[120e9fc10..12169fc10) max=32
+[unwind] term ml661 #00 pc=30195216c rsp=120e9fc10  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[13:23:27.752] [INFO] [dock-report] probe-result=0
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=30 resident=2425MB dbg=DEBUGGED rev=ml525
+[13:23:28.466] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[13:23:29.115] [INFO] [madeira-dock] host finished (result 0)
+[13:23:30.761] [INFO] [dock-game-end] hotlinemiami2.exe ended with status 0xc0000005 after 9 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[13:23:31.256] [INFO] [session] length=36s play=0s frames=0 stalls=0/0s peak=2322MB limit=4095MB thermal=nominal lpm=0 res=1424x656 cap=60 game=Hotline Miami 2: Wrong Number
+[13:23:31.273] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[13:23:32.999] [INFO] Detaching debugger...
+[thread-stacks] port=0xc007 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16e0f5020
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=libsystem_platform.dylib`_platform_memset+0x8c lr=CoreFoundation`<redacted>+0x84 sp=0x16e180290 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f5020 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=2283 MB (peak 2321) internal=2279 MB compressed=0 MB external=177 MB reusable=12 MB (cycle=27)
+[footprint] rev=ml358 phys=2283 MB (peak 2321) internal=2279 MB compressed=0 MB external=177 MB reusable=12 MB (cycle=28)
+[footprint] rev=ml358 phys=2289 MB (peak 2321) internal=2280 MB compressed=0 MB external=190 MB reusable=13 MB (cycle=29)
+[footprint] rev=ml358 phys=2289 MB (peak 2321) internal=2281 MB compressed=0 MB external=191 MB reusable=13 MB (cycle=30)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=31 resident=2486MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc007 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16e0f5020
+[footprint] rev=ml358 phys=2289 MB (peak 2321) internal=2281 MB compressed=0 MB external=191 MB reusable=13 MB (cycle=31)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f5020 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=2291 MB (peak 2321) internal=2283 MB compressed=0 MB external=191 MB reusable=14 MB (cycle=32)

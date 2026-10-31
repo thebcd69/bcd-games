@@ -122,6 +122,13 @@ enum BCDEpicRules {
                            argument: "-nobattleye", reason: gtaReason),
     ]
 
+    /// madeira-bcd (round 624, agent R S24; 7Z8VKR, TV6H06): Epic's GTA V (both editions) starts Rockstar's launcher, which installs and starts
+    /// a Windows service (RockstarService.exe); without the service manager every start failed ("Unable to open SC manager! (1722)" five times,
+    /// "RockstarService.exe install/start" exit 1). The Dock does the same for the Steam copies (env.MADEIRA_DOCK_GAME_SCM).
+    static func startsRockstarLauncher(_ exceptionID: String?) -> Bool {
+        exceptionID == "gta5-enhanced" || exceptionID == "gta5-legacy"
+    }
+
     static let gtaReason = "This game's anti-cheat (BattlEye) guards only GTA Online. BCD starts the game with its own -nobattleye option, so Story Mode plays and GTA Online stays off."
 
     /// The exception a build falls under: its launch program and the files beside it match an item, and BattlEye (or what that item allows)

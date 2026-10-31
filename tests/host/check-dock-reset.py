@@ -113,9 +113,10 @@ check('if allSucceeded { return "One-time installs completed successfully. Close
       'allSucceeded = total > 0 && succeeded == total' in installers and 'allSucceeded = false' in installers,
       'the alert in the owner\'s words when every install succeeded; otherwise the count and the failed ones')
 check(re.search(r'if DockInstallers\.installsOnly, running, !offered, let finished = DockInstallers\.finishedAt,\s*'
-                r'Date\(\)\.timeIntervalSince\(finished\) >= 45 \{\s*offered = true', view) is not None,
+                r'Date\(\)\.timeIntervalSince\(finished\) >= Double\(DockInstallers\.restartOfferDelay\) \{\s*offered = true', view) is not None
+      and 'nonisolated static let restartOfferDelay = 45' in installers,
       'a session an installer\'s program keeps open: the restart is offered 45 s after the installs (after a registry save)')
-check('restartHint: DockInstallers.installsOnly ? DockInstallers.closingWords : nil' in (app / 'BCDSessionLive.swift').read_text(encoding='utf-8') and
+check('restartHint: DockInstallers.installsOnly ? DockInstallers.closingCountdown() : nil' in (app / 'BCDSessionLive.swift').read_text(encoding='utf-8') and
       'if let restartHint { return' in screen,
       'the starting screen says the session closes (no restart before Wine has saved the registry)')
 check('restartWords' not in library and 'restartWords' not in screen, 'only the end of the session asks for the restart')

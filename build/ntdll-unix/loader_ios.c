@@ -2120,6 +2120,10 @@ static NTSTATUS open_main_image( UNICODE_STRING *nt_name, void **module, SECTION
 }
 
 
+/* madeira-bcd (round 624, agent D1 S8): the loader step the app is in (IOS_PHASE, build/ntdll-unix/shims/wine_ios_exit.h), named by the
+ * early fault reporter of build/wineserver/early_fault_ios.h when the app dies before BCD's own fault handlers are installed. */
+const char *volatile ios_loader_phase = "boot";
+
 /***********************************************************************
  *           load_main_exe
  */
@@ -2130,6 +2134,7 @@ NTSTATUS load_main_exe( UNICODE_STRING *nt_name, USHORT load_machine, void **mod
     SIZE_T size;
     USHORT search_machine;
 
+    IOS_PHASE( "load-main-exe" );
     status = open_main_image( nt_name, module, &main_image_info, loadorder, load_machine );
     if (status != STATUS_DLL_NOT_FOUND) return status;
 

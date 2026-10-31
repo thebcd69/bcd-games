@@ -166,7 +166,7 @@ import os
         let running = ProcessInfo.processInfo.environment["MADEIRA_FRAMEGEN"].map { $0 != "0" && !$0.isEmpty } ?? false
         var rows = [BCDMenuRow(id: "mm.fgen",
                                title: "Frame generation",
-                               detail: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. It is read when the game starts.",
+                               detail: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. It is read when the game starts. Turn it off if the game runs below about 40 FPS without it: it waits for screen buffers and can hold such a game at 20 FPS.",
                                kind: .choice([BCDChoice(id: "", title: "Off"), BCDChoice(id: "1", title: "MetalFX 2×")], selected: wanted ? "1" : ""))]
         if wanted != running {
             rows.append(BCDMenuRow(id: "mm.fgen.note", title: "It applies the next time this game starts.", symbol: "arrow.clockwise.circle", kind: .note(.warm)))

@@ -49,12 +49,18 @@ fn = fn[:fn.index("\n}\n")]
 check("the region has no write, create, delete or terminate call",
       not re.search(r"NtSetValueKey|NtCreateKey|NtDeleteKey|NtDeleteValueKey|NtWriteVirtualMemory|NtTerminate|NtSuspend|NtSetInformation",
                     region))
-check("the hook is in NtRaiseException's WINE_IOS code, for a first-chance exception, before send_debug_event",
-      "if (rec && first_chance && ios_steam_api_message( rec )) ios_steam_api_diag();" in fn and
+check("the hook is in NtRaiseException's WINE_IOS code, for a first-chance exception, before send_debug_event (round 624: 1 runs the "
+      "no-Steam report, 2 the once-a-Dock-session state-A report)",
+      "if (rec && first_chance)\n    {\n        int steam = ios_steam_api_message( rec );\n        if (steam == 1) ios_steam_api_diag();\n"
+      "        else if (steam == 2) ios_steam_api_ok();\n    }" in fn and
       fn.index("ios_steam_api_message( rec )") < fn.index("status = send_debug_event(") and
       fn.rfind("#ifdef WINE_IOS", 0, fn.index("ios_steam_api_message( rec )")) >
       fn.rfind("#endif", 0, fn.index("ios_steam_api_message( rec )")))
 check("the report is capped at two per process", "if (InterlockedIncrement( &told ) > 2) return;" in region)
+diag = region[region.index("static void ios_sd_report_body( void )"):]
+check("round 624: no machine key is opened with KEY_WOW64_32KEY (the wineserver makes it the 64-bit view in a 64-bit process); the "
+      "32-bit view is the literal Wow6432Node path", "KEY_WOW64_32KEY" not in diag
+      and 'machine_steam32[] = "\\\\Registry\\\\Machine\\\\Software\\\\Wow6432Node\\\\Valve\\\\Steam";' in diag)
 check("the account id is only reported as zero / not zero",
       '"HKCU ActiveProcess ActiveUser", 1, NULL' in region and 'v ? "not zero" : "zero"' in region)
 check("the workflow runs this check", "python3 tests/host/check-steam-api-diag.py" in workflow)
@@ -111,6 +117,18 @@ typedef struct { HANDLE UniqueProcess, UniqueThread; } CLIENT_ID;
 typedef struct { NTSTATUS ExitStatus; void *Peb; ULONG_PTR Affinity; LONG Priority; ULONG_PTR Pid, Parent; } PROCESS_BASIC_INFORMATION;
 typedef struct { ULONG ExceptionCode, ExceptionFlags; void *ExceptionRecord, *ExceptionAddress; ULONG NumberParameters;
                  ULONG_PTR ExceptionInformation[15]; } EXCEPTION_RECORD;
+typedef union { long long QuadPart; } LARGE_INTEGER;
+typedef struct { LARGE_INTEGER LastWriteTime; ULONG TitleIndex, NameLength; WCHAR Name[1]; } KEY_BASIC_INFORMATION;
+typedef struct { UNICODE_STRING ObjectName, ObjectTypeName; } DIRECTORY_BASIC_INFORMATION;
+typedef struct { LARGE_INTEGER CreationTime, LastAccessTime, LastWriteTime, ChangeTime; ULONG FileAttributes; } FILE_BASIC_INFORMATION;
+typedef struct { LARGE_INTEGER CreateTime, ExitTime, KernelTime, UserTime; } KERNEL_USER_TIMES;
+typedef unsigned char BOOLEAN;
+#define TRUE 1
+#define KeyBasicInformation 0
+#define DIRECTORY_QUERY 1
+#define ProcessTimes 4
+#define ProcessImageFileName 27
+#define NOW 133000000000000000LL
 #define KEY_QUERY_VALUE 1
 #define KEY_WOW64_64KEY 0x100
 #define KEY_WOW64_32KEY 0x200
@@ -145,11 +163,21 @@ static NTSTATUS NtOpenKey(HANDLE *key, ACCESS_MASK access, const OBJECT_ATTRIBUT
     path[n] = 0;
     if (!scenario_full) return 0xc0000034;
     if (!strstr(path, "\\Valve\\Steam")) return 0xc0000034;
-    if (strstr(path, "\\Registry\\Machine") && !(access & (KEY_WOW64_32KEY | KEY_WOW64_64KEY))) return 0xc0000034;
-    if (strstr(path, "\\Registry\\Machine") && (access & KEY_WOW64_64KEY)) return 0xc0000034;   /* Dock wrote the 32-bit view */
+    /* round 624: what a 64-bit process gets. The wineserver turns KEY_WOW64_32KEY into the 64-bit view for a process that is not WoW64,
+     * and the Dock wrote the 32-bit view, i.e. the literal Wow6432Node child; the 64-bit view has no Valve\Steam key. */
+    if (strstr(path, "\\Registry\\Machine") && !strstr(path, "\\Wow6432Node\\")) return 0xc0000034;
+    if (strstr(path, "\\Registry\\Machine") && !(access & KEY_WOW64_64KEY)) return 0xc0000034;   /* the report must ask for the literal path */
     last_path = strstr(path, "ActiveProcess") ? "active" : strstr(path, "\\Registry\\User") ? "user" : "machine";
     *key = (HANDLE)path; return 0;
 }
+static NTSTATUS NtQueryKey(HANDLE key, int cls, void *out, ULONG len, ULONG *got)
+{
+    KEY_BASIC_INFORMATION *info = out; const char *path = key; (void)len; (void)got;
+    if (cls != KeyBasicInformation) return 0xc000000d;
+    info->LastWriteTime.QuadPart = NOW - (strstr(path, "Wow6432Node") ? 15000000LL : strstr(path, "ActiveProcess") ? 25000000LL : 9990000000LL);
+    return 0;
+}
+static NTSTATUS NtQuerySystemTime(LARGE_INTEGER *now) { now->QuadPart = NOW; return 0; }
 static NTSTATUS NtClose(HANDLE h) { (void)h; return 0; }
 static NTSTATUS NtQueryValueKey(HANDLE key, const UNICODE_STRING *name, int cls, void *out, ULONG len, ULONG *got)
 {
@@ -166,14 +194,62 @@ static NTSTATUS NtQueryValueKey(HANDLE key, const UNICODE_STRING *name, int cls,
         if (!strcmp(v, "ActiveUser")) DW(123456789u);       /* a made-up account id: must never be printed */
         if (!strcmp(v, "SteamClientDll64")) SZ("C:\\Program Files (x86)\\Steam\\steamclient64.dll");
     }
-    else if (!strcmp(last_path, "user") && !strcmp(v, "SteamPath")) SZ("C:\\Program Files (x86)\\Steam");
+    else if (!strcmp(last_path, "user") && !strcmp(v, "SteamPath")) SZ("c:/program files (x86)/steam");
+    else if (!strcmp(last_path, "user") && !strcmp(v, "SteamExe")) SZ("c:/program files (x86)/steam/steam.exe");
+    else if (!strcmp(last_path, "user") && !strcmp(v, "Language")) SZ("english");
     else if (!strcmp(last_path, "machine") && !strcmp(v, "SteamPID")) DW(52);
     return 0xc0000034;
 }
 static NTSTATUS NtOpenProcess(HANDLE *h, ACCESS_MASK a, const OBJECT_ATTRIBUTES *attr, const CLIENT_ID *id)
 { (void)attr; (void)a; if (!scenario_full || HandleToULong(id->UniqueProcess) != 52) return 0xc0000008; *h = (HANDLE)1; return 0; }
+static WCHAR image_name[64];
 static NTSTATUS NtQueryInformationProcess(HANDLE h, int cls, void *out, ULONG len, ULONG *got)
-{ PROCESS_BASIC_INFORMATION *p = out; (void)h; (void)cls; (void)len; (void)got; p->ExitStatus = 259; return 0; }
+{
+    (void)h; (void)len; (void)got;
+    if (cls == ProcessBasicInformation) { PROCESS_BASIC_INFORMATION *p = out; p->ExitStatus = 259; return 0; }
+    if (cls == ProcessImageFileName)
+    {
+        static const char name[] = "\\??\\C:\\Program Files (x86)\\Steam\\steam.exe";
+        UNICODE_STRING *us = out; size_t k;
+        for (k = 0; name[k]; k++) image_name[k] = (unsigned char)name[k];
+        us->Buffer = image_name; us->Length = us->MaximumLength = (USHORT)(k * 2); return 0;
+    }
+    if (cls == ProcessTimes) { KERNEL_USER_TIMES *kt = out; kt->CreateTime.QuadPart = NOW - 600000000LL; return 0; }
+    return 0xc0000003;
+}
+/* \BaseNamedObjects in the full scenario: two names with "steam" in any case, two without. Empty: a directory with nothing. */
+static const char *const obj_names[][2] = { { "SessionImmersiveColorMutex", "Mutant" }, { "Steam3Master_SharedMemFile", "Section" },
+                                            { "STEAM_DIPC_CONSUME", "Semaphore" }, { "some_event", "Event" } };
+static NTSTATUS NtOpenDirectoryObject(HANDLE *h, ACCESS_MASK a, const OBJECT_ATTRIBUTES *attr)
+{
+    char name[64]; size_t i, n = attr->ObjectName->Length / 2; (void)a;
+    for (i = 0; i < n; i++) name[i] = (char)attr->ObjectName->Buffer[i];
+    name[n] = 0;
+    if (strcmp(name, "\\BaseNamedObjects")) return 0xc0000034;
+    *h = (HANDLE)3; return 0;
+}
+static NTSTATUS NtQueryDirectoryObject(HANDLE h, DIRECTORY_BASIC_INFORMATION *buf, ULONG size, BOOLEAN single, BOOLEAN restart,
+                                       ULONG *context, ULONG *ret)
+{
+    ULONG index = restart ? 0 : *context; WCHAR *pool = (WCHAR *)(buf + 2); size_t k; (void)h; (void)ret;
+    if (!single || size < 600) return 0xc0000004;
+    if (!scenario_full || index >= 4) return 0x8000001a;      /* STATUS_NO_MORE_ENTRIES */
+    for (k = 0; obj_names[index][0][k]; k++) pool[k] = (unsigned char)obj_names[index][0][k];
+    buf->ObjectName.Buffer = pool; buf->ObjectName.Length = (USHORT)(k * 2); pool += k + 1;
+    for (k = 0; obj_names[index][1][k]; k++) pool[k] = (unsigned char)obj_names[index][1][k];
+    buf->ObjectTypeName.Buffer = pool; buf->ObjectTypeName.Length = (USHORT)(k * 2);
+    *context = index + 1; return 0;
+}
+static char last_file[200];
+static NTSTATUS NtQueryAttributesFile(const OBJECT_ATTRIBUTES *attr, FILE_BASIC_INFORMATION *info)
+{
+    size_t i, n = attr->ObjectName->Length / 2; (void)info;
+    for (i = 0; i < n && i < sizeof(last_file) - 1; i++) last_file[i] = (char)attr->ObjectName->Buffer[i];
+    last_file[i] = 0;
+    static const char prefix[] = "\\??\\c:\\program files (x86)\\steam\\";
+    if (strchr(last_file, '/') || strncmp(last_file, prefix, sizeof(prefix) - 1)) return 0xc000003b;  /* a bad path */
+    return strstr(last_file, "\\steamclient64.dll") || strstr(last_file, "\\steam.exe") ? 0 : 0xc0000034;
+}
 static NTSTATUS object_open(const OBJECT_ATTRIBUTES *attr, int consume_only)
 {
     static char name[160]; size_t i, n = attr->ObjectName->Length / 2;
@@ -265,6 +341,23 @@ int main(int argc, char **argv)
         fflush(stdout); printf("--- end\n");
         return 0;
     }
+    if (argc > 1 && !strcmp(argv[1], "ok"))
+    {
+        /* round 624: steam_api found Steam. Outside a Dock session nothing; in one, one report a session (64- and 32-bit paths share it) */
+        static const char ok_line[] = "00d8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API] SteamAPI_Init(): Loaded 'C:\\Program Files (x86)\\Steam\\steamclient64.dll' OK..\"\n";
+        dup2(1, 2);
+        scenario_full = 1;
+        unsetenv("MADEIRA_DOCK_SESSION");
+        ios_steam_api_dbg_hook(ok_line, (unsigned)strlen(ok_line));
+        fflush(stdout); printf("--- dock\n"); fflush(stdout);
+        setenv("MADEIRA_DOCK_SESSION", "1", 1);
+        ios_steam_api_dbg_hook(ok_line, (unsigned)strlen(ok_line));
+        ios_steam_api_dbg_hook(ok_line, (unsigned)strlen(ok_line));
+        if (message("[S_API] SteamAPI_Init(): Loaded 'C:\\Program Files (x86)\\Steam\\steamclient.dll' OK.. (32-bit, padding)", DBG_PRINTEXCEPTION_C, 2) == 2)
+            ios_steam_api_ok();
+        fflush(stdout); printf("--- end\n");
+        return 0;
+    }
     if (argc > 1 && !strcmp(argv[1], "hook-mix"))
     {
         /* the 32-bit path's first report counts against the same two */
@@ -296,7 +389,7 @@ with tempfile.TemporaryDirectory() as t:
             return p.stdout
         m = run("message")
         check("the test accepts steam_api's text and nothing else: " + m.strip(),
-              m.splitlines()[0] == "steam=1 loaded=0 other=0 code=0 params=0" and
+              m.splitlines()[0] == "steam=1 loaded=2 other=0 code=0 params=0" and
               m.splitlines()[1] == "null=0 bad_pointer=0 short=0 long=0")
         check("the older wording ([S_API FAIL] ... unable to locate a running instance of Steam) is accepted for the 32-bit and 64-bit "
               "steamclient names, and nothing near it is: " + m.splitlines()[2],
@@ -310,13 +403,28 @@ with tempfile.TemporaryDirectory() as t:
         one = out.split("found no running Steam", 2)[1]
         check("the pid, the client DLL, the paths and the process are reported",
               "HKCU ActiveProcess pid: DWORD 52" in one and "steamclient64.dll" in one and
-              'HKCU Steam SteamPath: SZ "C:\\Program Files (x86)\\Steam"' in one and
-              "HKLM(32) Steam SteamPID: DWORD 52" in one and
+              'HKCU Steam SteamPath: SZ "c:/program files (x86)/steam"' in one and
+              "HKLM Wow6432Node Steam SteamPID: DWORD 52" in one and
               "OpenProcess(52): opens, exit status 259 (259 = still running)" in one)
+        check("round 624: the 32-bit view is read by its literal Wow6432Node path and the 64-bit view is labelled as such (KEY_WOW64_32KEY "
+              "was the 64-bit key in a 64-bit process); the new HKCU values; nothing says HKLM(32) any more",
+              "HKLM 64-bit view Steam SteamPID: key not opened" in one and 'HKCU Steam SteamExe: SZ "c:/program files (x86)/steam/steam.exe"' in one
+              and 'HKCU Steam Language: SZ "english"' in one and "HKCU Steam SteamPID: no value" in one and "HKLM(32)" not in out)
+        check("the keys' last-write times, the Steam process's image and age",
+              "HKLM Wow6432Node Valve\\Steam: last written 1500 ms ago" in one and "HKCU Valve\\Steam\\ActiveProcess: last written 2500 ms ago" in one
+              and "HKLM 64-bit view Valve\\Steam: key not opened" in one
+              and "process 52 image: \\??\\C:\\Program Files (x86)\\Steam\\steam.exe" in one and "process 52 started 60000 ms ago" in one)
+        check("every \\BaseNamedObjects name with steam in it (any case) is listed with its type, the others are only counted",
+              "object \\BaseNamedObjects\\Steam3Master_SharedMemFile (Section)" in one and "object \\BaseNamedObjects\\STEAM_DIPC_CONSUME (Semaphore)" in one
+              and "SessionImmersiveColorMutex" not in one and "some_event" not in one
+              and "\\BaseNamedObjects: 4 objects, 2 with steam in the name" in one)
+        check("the client files under SteamPath (its forward slashes made backslashes): present or missing",
+              "file <SteamPath>\\steamclient64.dll: present" in one and "file <SteamPath>\\steam.exe: present" in one
+              and "file <SteamPath>\\steamclient.dll: missing, status 0xc0000034" in one and "file <SteamPath>\\Steam.dll: missing, status 0xc0000034" in one)
         check("the account id is reported only as not zero, never as a number",
               "ActiveUser: DWORD, not zero" in one and "123456789" not in out)
         check("a missing value or key, and the objects, are reported by name",
-              "HKLM(32) Steam InstallPath: no value" in one and "HKLM(64) Steam InstallPath: key not opened" in one and
+              "HKLM Wow6432Node Steam InstallPath: no value" in one and "HKLM 64-bit view Steam InstallPath: key not opened" in one and
               "STEAM_DIPC_CONSUME: opens" in one and "STEAM_DIPC_PRODUCE: not opened" in one)
         out = run("hook")
         before, after = out.split("--- nothing above this line\n")
@@ -327,12 +435,21 @@ with tempfile.TemporaryDirectory() as t:
               rep.count("[steam-api] steam_api found no running Steam; process 00d4 sees:") == 2 and "err:seh" not in rep
               and "HKCU ActiveProcess pid: DWORD 52" in rep and "STEAM_DIPC_CONSUME: opens" in rep
               and "123456789" not in rep and "ActiveUser: DWORD, not zero" in rep)
+        out = run("ok")
+        before_dock, rest = out.split("--- dock\n")
+        st = rest.split("--- end")[0]
+        check("round 624: when steam_api found Steam, nothing outside a Dock session; in one, one state-A report a session, raw, with "
+              "the same lines (the 64- and 32-bit paths share it)", before_dock.strip() == ""
+              and st.count("[steam-api] steam_api found Steam (state A, once a session); process 00d4 sees:") == 1
+              and "found no running Steam" not in st and "HKLM Wow6432Node Steam SteamPID: DWORD 52" in st and "err:seh" not in st)
         out = run("hook-mix")
         check("the 32-bit path and the hook share the two reports", out.split("--- end")[0].count("found no running Steam") == 2)
         out = run("empty")
         one = out.split("found no running Steam", 2)[1]
-        check("an empty registry: every key says it is not opened, no process line, objects not found",
-              one.count("key not opened, status 0xc0000034") == 7 and "OpenProcess" not in one and
-              one.count("not opened, status 0xc0000034") == 9)
+        check("an empty registry: every key says it is not opened (11 values, 4 key ages), no process line, objects not found, an empty "
+              "object directory, no file lines (no SteamPath)",
+              one.count("key not opened, status 0xc0000034") == 15 and "OpenProcess" not in one and
+              one.count("not opened, status 0xc0000034") == 17 and "\\BaseNamedObjects: 0 objects, 0 with steam in the name" in one
+              and "file <SteamPath>" not in one)
 print("PASS: steam api diag" if ok else "FAILED: steam api diag")
 sys.exit(0 if ok else 1)

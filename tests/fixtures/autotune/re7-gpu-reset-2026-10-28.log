@@ -1,0 +1,351 @@
+[21:18:23.849] [INFO] Checking entitlements...
+[21:18:23.849] [INFO] [build] v0.1.622 (622)
+[21:18:23.850] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=11722MB available=8172MB cores=6
+[21:18:23.850] [INFO] [device] address-map=[0x100cd8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[21:18:23.863] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:18:28.365] [INFO] Requesting JIT with Built-in StikJIT...
+[21:18:35.418] [INFO] [bcd] library launch RESIDENT EVIL 7 biohazard: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[21:18:35.433] [INFO] [dock-launch] image-retire=1
+[21:18:35.433] [INFO] [dock-launch] image-map-guard=1
+[21:18:35.440] [INFO] [dock-installers] app=418370 scripts=0 programs=0
+[21:18:35.441] [INFO] [madeira-dock] starting the host for app 418370; Valve's client authenticates and authorizes the launch
+[21:18:35.452] [INFO] Running full Wine sequence...
+[21:18:35.453] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100cd8000,0x8000000000) 512GB available=8144MB low-power=0 thermal=nominal
+[21:18:35.485] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[21:18:35.485] [INFO] Allocating 896MB JIT pool via debugger...
+[21:18:35.485] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:18:35.485] [INFO] [jit-debugger] attached=1 at the pool request
+[21:18:35.487] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:18:36.235] [INFO] RX pool at 0x148000000
+[21:18:36.253] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.803s rev=ml526
+[WineProc] MADEIRA_OPTIN_DLLS: mfasfsrcsnk.dll -> mfasfsrcsnk-optin.dll (Wine's mfasfsrcsnk.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[21:18:36.549] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=7506 MB + phys_footprint=685 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=694 MB (peak 694) internal=696 MB compressed=0 MB external=74 MB reusable=9 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.290s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x11a740000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.369s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11A740000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c610000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702c710000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702c910000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702cd10000+0x800000 held for 2000 ms (4 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m3244239 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000200 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1037 MB (peak 1037) internal=1038 MB compressed=0 MB external=148 MB reusable=9 MB (cycle=2)
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002BC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1110 MB (peak 1110) internal=1112 MB compressed=0 MB external=151 MB reusable=9 MB (cycle=3)
+[file-wfail] ml669 #54 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #55 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #56 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #57 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1116 MB compressed=0 MB external=151 MB reusable=9 MB (cycle=4)
+[footprint] rev=ml358 phys=1137 MB (peak 1137) internal=1136 MB compressed=0 MB external=151 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=1174 MB (peak 1174) internal=1173 MB compressed=0 MB external=150 MB reusable=9 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\RESIDENT EVIL 7 biohazard\\re7.exe" t+ 15.318s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\RESIDENT EVIL 7 biohazard\\re7.exe\"" (fd=445, unixdir=446, dup_unixdir=450) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\RESIDENT EVIL 7 biohazard"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x9a37000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x9a37000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x9a38000 rev=ajan5-motor
+[21:18:50.953] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=1252 peb=0x116d2c000
+[nls-getptr] type=11 id=437 peb=0x116d2c000
+[nls-getptr] type=11 id=20127 peb=0x116d2c000
+[nls-getptr] type=11 id=1252 peb=0x116d2c000
+[nls-getptr] type=11 id=437 peb=0x116d2c000
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x15c944000)
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x38000 type=0x2000 protect=0x4 tid=00ac | STAGE=fixed-map err=3 at 0x180000000+0x38000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x38000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #5 release of 0x703d810000+0x100000 held for 2000 ms (1 in flight)
+[copy-verify] vstdlib_s64.dll: OK, 20 .text pages executable (copy @0x1609ef000)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=re7.exe tid=00ac size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=1638 MB compressed=0 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #76 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #6 release of 0x703fb10000+0x120000 held for 2000 ms (2 in flight)
+[bigres] tid=00ac #1 size=0x18600017 (390 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x116d2c000 total=390 MB
+[bigres] tid=00ac #2 size=0x34400017 (836 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x116d2c000 total=1226 MB
+[footprint] rev=ml1060 fast phys=1724 MB compressed=0 MB
+[21:18:54.453] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml1060 fast phys=1811 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1894 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1931 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1970 MB compressed=0 MB
+[nt-fail] #4 NtAllocateVirtualMemoryEx status=c0000017 proc=re7.exe tid=00ac size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[nt-fail] #5 NtAllocateVirtualMemoryEx status=c0000017 proc=re7.exe tid=00ac size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[nt-fail] #6 NtAllocateVirtualMemoryEx status=c0000017 proc=re7.exe tid=00ac size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f955040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16f126230
+[thread-stacks] port=0x1803 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=48 x8=0x1fe8cebac x18=0x0 sp=0x16f238c60
+[thread-stacks] port=0x2503 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fe8cebac x18=0x0 sp=0x16f2c6ac0
+[win-name] #31 hwnd=0x10062 class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x1005a class='' text="RESIDENT EVIL 7 biohazard" rev=ml853
+[thread-stacks] port=0x2d03 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x10fc9b501 x18=0x0 sp=0x16f352b30
+[thread-stacks] port=0x5203 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x1fe8cebac x18=0x0 sp=0x16f468560
+[thread-stacks] port=0xb303 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fe8cebac x18=0x0 sp=0x16f6964a0
+[win-name] #35 hwnd=0x1005a class='' text="RESIDENT EVIL 7 biohazard" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x116d2c000
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=1 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f955040
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f55f2000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f55f3000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f55f4000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f4000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f55f5000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f5000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f55f6000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f55f7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f55f8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f55f9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f9000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f55fa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f55fb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f55fc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f55fd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f55fe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f55ff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #12 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f6458000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #13 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f6aff000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f78c7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f78c8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f78c9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f78ca000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f78cb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f78cc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f78cd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f78ce000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f78cf000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f852f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f8558000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f8559000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f855a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f855b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f855c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f855d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f855e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f855f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f8699000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f869a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #14 NtAllocateVirtualMemory status=c0000018 proc=re7.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f869d000 zb=0x0 hits=64 rev=ajan5-rockstar
+[launch-view] dismissed reason=game-window logs=0
+00ac:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=0000007037EB1770, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007037EB1770, feature level 0xb000, create)
+[win-name] #42 hwnd=0x10070 class='' text="DIEmWin" rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=30 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=30 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[rb-tex] madeira-bcd new readback #1: fmt 252 716x806 level 0 (texture 716x806, 1 mips)
+D 108 Load module mf.dll (mf.dll-2bc51e1e469a3496): 71EE540000
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=62 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=106 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=150 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[hwinput] keyboard focus: program (responder)
+[21:19:06.363] [INFO] detach-wait: presents=497 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=94 resident=2634MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x17c959c00 lead 60 ms: client wrote 10.05 s of audio in 10.00 s (100.5%) over 1006 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=7 x8=0x0 x18=0x0 sp=0x16f955040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f955040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x17c959c00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 999 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: program (app active)
+D 1A8 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71EE3F0000
+D 1A8 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71EE330000
+D 1A8 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 71EE250000
+E 1A8 [iOS-xins] tracker=0x15b92cbc8 WININET.dll sec=0x71ee050000-0x71ee08b029
+E 1A8 [iOS-xins] tracker=0x15b92cbc8 WININET.dll sec=0x71ee090000-0x71ee090f90
+D 1A8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71EE040000
+D 1A8 Load module mpr.dll (mpr.dll-09cefd52a3669014): 71EDFB0000
+E 1A8 [iOS-xins] tracker=0x15b92cbc8 WININET.dll sec=0x71ee050000-0x71ee08b029
+E 1A8 [iOS-xins] tracker=0x15b92cbc8 WININET.dll sec=0x71ee090000-0x71ee090f90
+[21:19:36.461] [INFO] detach-wait: presents=2249 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=95 resident=2543MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=10 x8=0x0 x18=0x0 sp=0x16f955040
+[ios_audio] ml1230 pacing stream=0x13b852a00 lead 60 ms: client wrote 10.05 s of audio in 10.00 s (100.5%) over 1006 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x13b852a00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 999 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x13b852a00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 1001 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[21:20:06.530] [INFO] detach-wait: presents=4045 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=93 resident=2545MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x13b852a00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 1000 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[21:20:36.617] [INFO] detach-wait: presents=5841 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=92 resident=2538MB dbg=DEBUGGED rev=ml525
+[21:21:06.731] [INFO] detach-wait: presents=7607 running=1 elapsed=150s
+[freeze] alive t+150s beats=5 gaps=0 iter=595 gen=1 threads=93 resident=2540MB dbg=DEBUGGED rev=ml525
+[21:21:36.835] [INFO] detach-wait: presents=9396 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=93 resident=2540MB dbg=DEBUGGED rev=ml525
+[21:22:37.015] [INFO] detach-wait: presents=12963 running=1 elapsed=240s
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=94 resident=2543MB dbg=DEBUGGED rev=ml525
+[21:23:07.129] [INFO] detach-wait: presents=14731 running=1 elapsed=270s
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=93 resident=2541MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml1060 fast phys=4309 MB compressed=433 MB
+[footprint] rev=ml1060 fast phys=4348 MB compressed=433 MB
+[footprint] rev=ml1060 fast phys=4423 MB compressed=442 MB
+[footprint] rev=ml1060 fast phys=4556 MB compressed=492 MB
+[footprint] rev=ml1060 fast phys=4590 MB compressed=529 MB
+[footprint] rev=ml1060 fast phys=4615 MB compressed=569 MB
+[21:23:37.235] [INFO] detach-wait: presents=16494 running=1 elapsed=300s
+[freeze] alive t+301s beats=10 gaps=0 iter=1190 gen=1 threads=96 resident=2748MB dbg=DEBUGGED rev=ml525
+[21:24:07.321] [INFO] detach-wait: presents=18283 running=1 elapsed=331s
+[freeze] alive t+331s beats=11 gaps=0 iter=1309 gen=1 threads=95 resident=2744MB dbg=DEBUGGED rev=ml525
+[free-delay] #28672 release of 0x70b98b0000+0x210000 held for 2000 ms (54 in flight)
+[free-delay] #29696 release of 0x70db400000+0x390000 held for 2000 ms (57 in flight)
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=10 x8=0x0 x18=0x0 sp=0x16f955040
+[free-delay] #30720 release of 0x70d5180000+0x390000 held for 2000 ms (57 in flight)
+[ios_audio] ml1230 pacing stream=0x10fc2bd00 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 1001 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[free-delay] #31744 release of 0x70bcc00000+0x210000 held for 2000 ms (57 in flight)
+[free-delay] #32768 release of 0x70dbb20000+0x390000 held for 2000 ms (56 in flight)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f955040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x10fc2bd00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 1000 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[free-delay] #33792 release of 0x70cde20000+0x390000 held for 2000 ms (56 in flight)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88004 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88042 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88093 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88123 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f955040
+[21:24:37.436] [INFO] detach-wait: presents=19862 running=1 elapsed=361s
+[freeze] alive t+361s beats=12 gaps=0 iter=1428 gen=1 threads=95 resident=2776MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x10fc2bd00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 1001 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+err:   Device error at frame 19860: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d74e0 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19860: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d6280 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19861: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d6160 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19861: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d52f0 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f955040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x10fc2bd00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 1000 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+err:   Device error at frame 19862: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d4c00 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19862: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d4330 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19863: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d4f00 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19863: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d7e10 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88147 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-stacks] port=0xcb43 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f955040
+[thread-stacks] port=0x1cd03 "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16f2cc0e0 x18=0x0 sp=0x170f5e9d0
+[thread-stacks] port=0xcc0f "AURemoteIO::IOThread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16f4f6cf0
+[thread-stacks] port=0x1e933 "audio_client_timer" pc=libsystem_kernel.dylib`mach_wait_until+0x8 run=3 susp=0 cpu=3 x8=0x5dc0 x18=0x0 sp=0x1340ff9a0
+[thread-stacks] port=0x1be4b "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=8 x8=0x16f2d40e0 x18=0x0 sp=0x1342fe9d0
+[thread-stacks] port=0x20a9f "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fe92fc0
+[thread-stacks] port=0x15ab3 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x10fc9b501 x18=0x0 sp=0x170dfab30
+[ios_audio] ml1230 pacing stream=0x10fc2bd00 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 1000 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1856..3328 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: elsewhere (app inactive)
+err:   Device error at frame 19864: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d7390 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19864: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d5680 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19865: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d5590 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19865: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x70c96d7450 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+[21:25:04.281] [INFO] [session] length=388s partial=1 play=367s frames=19864 avg=58.7 low1=42.3 low01=30.6 worst=10014ms stalls=3/28s peak=4628MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Resident Evil 7 Biohazard
+[footprint] rev=ml358 phys=4571 MB (peak 4617) internal=2560 MB compressed=610 MB external=255 MB reusable=0 MB (cycle=193)
+[21:25:07.570] [INFO] detach-wait: presents=19868 running=1 elapsed=391s
+[freeze] alive t+391s beats=13 gaps=0 iter=1547 gen=1 threads=95 resident=2813MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=4568 MB (peak 4617) internal=2557 MB compressed=610 MB external=255 MB reusable=0 MB (cycle=194)
+[footprint] rev=ml358 phys=4547 MB (peak 4617) internal=2537 MB compressed=610 MB external=255 MB reusable=0 MB (cycle=195)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f955040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=4567 MB (peak 4617) internal=2557 MB compressed=610 MB external=255 MB reusable=0 MB (cycle=196)
+[footprint] rev=ml358 phys=4567 MB (peak 4617) internal=2557 MB compressed=610 MB external=255 MB reusable=0 MB (cycle=197)
+err:   Device error at frame 19866: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x11731ef10 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19866: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x11731f870 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19867: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x11731f180 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 19867: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x11731f8d0 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=88171 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[ios_audio] ml1230 pacing stream=0x13b851000 lead 60 ms: client wrote 0.06 s of audio in 19.45 s (0.3%) over 6 wakes; device short 0.0 ms in 0 of 0 passes (largest pass 0 frames); ring 0..2880 frames; worst late wake 18690.8 ms; clamped 0 samples
+[freeze] GAP #1  18.8s (wall 18.8s) — started t+397.9s, ended t+416.7s; threads=97 resident=2752MB dbg=DEBUGGED gen=1 cause=unexplained-FREEZE rev=ml525
+[footprint] rev=ml358 phys=4648 MB (peak 4648) internal=2506 MB compressed=632 MB external=238 MB reusable=6 MB (cycle=198)

@@ -1,0 +1,229 @@
+[01:55:29.513] [INFO] Checking entitlements...
+[01:55:29.514] [INFO] [build] v0.1.622 (622)
+[01:55:29.514] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 18.5 (Build 22F76) ram=5665MB available=4078MB cores=6
+[01:55:29.515] [INFO] [device] address-map=[0x1025d4000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[01:55:29.516] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 18: TXM restricts JIT memory only from iOS 26); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[01:55:29.539] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[02:09:34.974] [INFO] Requesting JIT with StikDebug...
+[02:09:34.993] [INFO] Opening StikDebug to enable JIT...
+[02:09:49.653] [INFO] [bcd] library launch Metro 2033 Redux: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[02:09:49.729] [INFO] [dock-launch] image-retire=1
+[02:09:49.730] [INFO] [dock-launch] image-map-guard=1
+[02:09:49.749] [INFO] [dock-installers] app=286690 scripts=0 programs=0
+[02:09:49.752] [INFO] [madeira-dock] starting the host for app 286690; Valve's client authenticates and authorizes the launch
+[02:09:49.776] [INFO] Running full Wine sequence...
+[02:09:49.777] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1025d4000,0xfc0000000) 63GB available=4025MB low-power=0 thermal=nominal
+[02:09:49.917] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[02:09:49.917] [INFO] Allocating 896MB JIT pool via debugger...
+[02:09:49.918] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[02:09:49.919] [INFO] [jit-debugger] attached=1 at the pool request
+[02:09:53.213] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  3.593s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[02:09:54.444] [Wine init_process] reply_pipe=46, sending init_first_thread...
+ml992: os_proc_available_memory=3112 MB + phys_footprint=983 MB = 4096 MB (hw.memsize says 5665 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[footprint] rev=ml358 phys=996 MB (peak 996) internal=995 MB compressed=0 MB external=82 MB reusable=31 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x11b5a0000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  5.233s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=103, unixdir=104, dup_unixdir=108) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x118730000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x301aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m456358 "wine-x18-exc"
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  5.437s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=132, unixdir=134, dup_unixdir=139) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 118730000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=437 peb=0x10d7f8000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml358 phys=1176 MB (peak 1176) internal=1176 MB compressed=0 MB external=141 MB reusable=31 MB (cycle=2)
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #23 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1354 MB (peak 1354) internal=1351 MB compressed=1 MB external=153 MB reusable=20 MB (cycle=3)
+[file-wfail] ml669 #24 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #25 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #26 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[dns] madeira-bcd begin #2 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #3 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #4 "test.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #5 "ipv6check-http.steamserver.net" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #6 "api.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1441 MB (peak 1441) internal=1437 MB compressed=2 MB external=156 MB reusable=10 MB (cycle=4)
+[dns] madeira-bcd begin #12 "cmp1-fra1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #13 "p2p-fra2.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #14 "avatars.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #15 "clientconfig.akamai.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1490 MB (peak 1490) internal=1486 MB compressed=2 MB external=156 MB reusable=4 MB (cycle=5)
+[footprint] rev=ml358 phys=1491 MB (peak 1491) internal=1487 MB compressed=2 MB external=156 MB reusable=3 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metro 2033 Redux\\metro.exe" t+ 17.650s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metro 2033 Redux\\metro.exe\"" (fd=375, unixdir=376, dup_unixdir=468) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Metro 2033 Redux"
+[Wine child thread] calling wine_ios_child_main...
+[footprint] rev=ml358 phys=1481 MB (peak 1491) internal=1478 MB compressed=2 MB external=156 MB reusable=3 MB (cycle=7)
+ml957: ? backing 0xd31c00000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x10d780000
+[nls-getptr] type=11 id=437 peb=0x10d780000
+[nls-getptr] type=11 id=20127 peb=0x10d780000
+[nls-getptr] type=11 id=1252 peb=0x10d780000
+[nls-getptr] type=11 id=437 peb=0x10d780000
+[copy-verify] d3dx11_43.dll: OK, 5 .text pages executable (copy @0x30c61c000)
+[unixlib] opengl32 (GL-absent stub table) (module 0xfb48b0000) -> 64-bit table (0x1053a4758)
+[file-wfail] ml669 #89 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x39000 type=0x2000 protect=0x4 tid=00ac | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x39000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x311710000)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=fixed-map err=1 at 0xffff70000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=metro.exe tid=00ac size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml358 phys=1723 MB (peak 1723) internal=1718 MB compressed=2 MB external=209 MB reusable=3 MB (cycle=8)
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #90 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[02:10:09.775] [INFO] [dock-report] launch-game-running=1
+[jumbo#1] +0ms tid=16df43000 wtid=00ac peb=0x10d780000 nrip=0xfb6490970 grip=0x30b02b050 size=0x40010000 (1024 MB) hint=0x0 -> 0x370000000 st=0x0 | granted=1024 MB ok=1 fail=0
+[alloc-fail] ml814 #4 status=c0000018 hint=0xfb63f2000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb63f2000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0xfb63f3000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb63f3000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0xfb63f4000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb63f4000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0xfb63f5000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb63f5000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #8 status=c0000018 hint=0xfb63f6000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0xfb63f7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0xfb63f8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0xfb63f9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb63f9000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #12 status=c0000018 hint=0xfb63fa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0xfb63fb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0xfb63fc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0xfb63fd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0xfb63fe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0xfb63ff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0xfb6778000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #19 status=c0000018 hint=0xfb6779000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb6779000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #20 status=c0000018 hint=0xfb677a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0xfb677b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0xfb677c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0xfb677d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0xfb677e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0xfb677f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0xfb6784000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0xfb6785000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0xfb6786000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0xfb6787000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0xfb6788000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0xfb6789000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0xfb678a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0xfb678b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0xfb678c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0xfb678d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb678d000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #36 status=c0000018 hint=0xfb678e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0xfb678f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0xfb7257000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0xfb7258000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0xfb7259000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0xfb725a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0xfb725b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0xfb725c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0xfb725d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0xfb725e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0xfb725f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0xfb78f7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0xfb78f8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0xfb78f9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0xfb78fa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0xfb78fb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0xfb78fc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0xfb78fd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0xfb78fe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0xfb78ff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0xfb7f97000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0xfb7f98000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0xfb7f99000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0xfb7f9a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0xfb7f9b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0xfb7f9c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0xfb7f9d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0xfb7f9e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0xfb7f9f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=metro.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0xfb86c9000 zb=0x0 hits=64 rev=ajan5-rockstar
+[win-name] #31 hwnd=0x10062 class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x1005e class='' text="Metro Redux" rev=ml853
+[win-name] #33 hwnd=0x1005e class='' text="Metro Redux" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[win-name] #38 hwnd=0x1006a class='' text="DIEmWin" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+D AC Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): FAECD0000
+[dns] madeira-bcd begin #16 "cpeds.deepsilver.com" "11701" family=0 flags=0x0 type=1
+D AC Load module NVSDK_TESS_wrapper.dll (nvsdk_tess_wrapper.dll-c852e0aed8cf64c3): FAEC20000
+D AC Load module MSVCR110.dll (msvcr110.dll-8c3cb779b66f38d9): FAEAC0000
+D AC Load module MSVCP110.dll (msvcp110.dll-27343560254eb1ff): FAE9A0000
+[win-name] #41 hwnd=0x1005e class='' text="Metro Redux" rev=ml853
+[footprint] rev=ml358 phys=1960 MB (peak 1960) internal=1772 MB compressed=185 MB external=233 MB reusable=2 MB (cycle=9)
+D 10C Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): FAE8D0000
+011c:err:module:load_dll [dll-missing] rev=ml336 #3 L"LightFX.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D AC Load module d3d12.dll (d3d12.dll-d660d8a141d715bd): FAE2F0000
+[madeira-d3d12] D3D12CreateDevice(adapter=00000001384A2440, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[footprint] rev=ml1060 fast phys=2453 MB compressed=597 MB
+[dns] madeira-bcd begin #17 "cpauth.deepsilver.com" "11701" family=0 flags=0x0 type=1
+[footprint] rev=ml1060 fast phys=3588 MB compressed=694 MB

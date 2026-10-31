@@ -46,13 +46,27 @@ enum SteamSignIn {
         notifyChange()
     }
 
-    /// Stores a sign-in. Returns false when the Keychain did not keep it.
+    /// Stores a sign-in. Returns false when the Keychain did not keep it (lastStoreStatus then says what the Keychain answered).
     static func store(accountName: String, refreshToken: String, accessToken: String) -> Bool {
         let store = SteamTokenStore()
-        store.saveTokens(accountName: accountName, refreshToken: refreshToken, accessToken: accessToken, steamID: 0)
+        lastStoreStatus = store.saveTokens(accountName: accountName, refreshToken: refreshToken, accessToken: accessToken, steamID: 0)
         let saved = store.loadTokens()?.refreshToken == refreshToken
         notifyChange()
         return saved
+    }
+    /// madeira-bcd (round 624, Discord W8): the Keychain's answer to the last store.
+    static var lastStoreStatus: OSStatus = 0
+
+    /// What a failed store says (round 624, Discord W8: a TrollStore install's Steam sign-in failed with this sentence and no way out).
+    /// -34018 (errSecMissingEntitlement) is an install that was not signed for the person (no Keychain access group).
+    static func keychainFailureText(_ status: OSStatus) -> String {
+        if status == -34018 {
+            return "Steam signed you in, but BCD couldn't store the sign-in: this install of BCD has no Keychain access (error -34018). That "
+                + "happens with an install that was not signed for you (TrollStore, for example). Install BCD with SideStore, AltStore or "
+                + "Sideloadly (your own Apple ID), then sign in again."
+        }
+        return "Steam signed you in, but BCD couldn't store the sign-in in this device's Keychain (error \(status)). Make sure this device "
+            + "is unlocked, then try again."
     }
 
     /// Pure check behind `credentialsForDock()` (host-tested).
@@ -209,8 +223,8 @@ final class SteamSignInModel: ObservableObject {
         signInTask = nil; qr.onNewChallenge = nil
         qrImage = nil; qrLink = nil; guardPrompt = nil; signInBusy = false
         guard SteamSignIn.store(accountName: account, refreshToken: refresh, accessToken: access) else {
-            signInError = "Steam signed you in, but BCD couldn't store the sign-in in this device's Keychain. Check how the app is signed, then try again."
-            SteamLog.event("[steam-signin] sign-in keychain-store failed method=\(method)")
+            signInError = SteamSignIn.keychainFailureText(SteamSignIn.lastStoreStatus)
+            SteamLog.event("[steam-signin] sign-in keychain-store failed method=\(method) status=\(SteamSignIn.lastStoreStatus)")
             return
         }
         signInError = nil

@@ -92,10 +92,32 @@ func require(_ condition: @autoclosure () -> Bool, _ label: String) {
         require(R.message(exitCode: -2)?.contains("0xFFFFFFFE") == true, "a negative code reads as the 32-bit value")
         require(!(R.message(exitCode: 3) ?? "").contains("GTA"), "no game names")
 
+        // Round 624 (agent E1 S12-b, S13-d): an NTSTATUS exit names what the log already knows (ExitWords).
+        typealias X = ExitWords
+        let grid = "0024:err:module:loader_init \"other.dll\" failed to initialize, aborting\n0024:err:module:loader_init \"steam_api.dll\" failed to initialize, aborting\n"
+        require(X.failedLibrary(inTail: grid) == "steam_api.dll", "GRID 2 (26MVCW): the last library whose start failed")
+        require(X.failedLibrary(inTail: "loader_init \"x.dll\" is fine\n") == nil && X.failedLibrary(inTail: "") == nil, "no such line: no name")
+        require(X.libraryStart("steam_api.dll") == "The game quit with Windows error 0xC0000142 (a program library failed to start). Windows could not "
+                + "start steam_api.dll. To report the problem, export the diagnostic log.", "0xC0000142 with the name")
+        require(X.libraryStart(nil) == "The game quit with Windows error 0xC0000142 (a program library failed to start). To report the problem, "
+                + "export the diagnostic log.", "0xC0000142 without a name: the kind, no guess")
+        let hog = "[OK] ml1040: executable window [0x140000000,+128MB) held since image load\n[OK] [exe-window] executable window widened to "
+            + "[0x140000000,+448MB) for this game (exe-window-mb)\nml985: map_image_view size=0x4b000 base=0x140000000 info_base=0x140000000\n"
+            + "ml985: map_image_view size=0x1c3ad000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23\n"
+        require(X.fixedProgramMiB(inTail: hog) == 452 && X.windowMB(inTail: hog) == 448, "Hogwarts Legacy (GBQRKH): a 452 MB program, a 448 MB window")
+        require(X.windowTooSmall(programMiB: 452, windowMB: 448) == "The game quit with Windows error 0xC0000018 (conflicting addresses). The "
+                + "game's program is 452 MB and needs that much room at its fixed address, but its settings keep 448 MB for it. Set exe-window-mb "
+                + "to 512 in the game's settings, or tap Reset to Recommended after updating BCD.", "...and the words say so, with 512")
+        require(X.windowTooSmall(programMiB: 419, windowMB: 128)?.contains("Set exe-window-mb to 448") == true, "Dead Space (2023): 448")
+        require(X.windowTooSmall(programMiB: 300, windowMB: 448) == nil, "a program that fits: no such words (the conflict is something else)")
+        require(X.fixedProgramMiB(inTail: "ml985: map_image_view size=0x1c3ad000 base=0x180000000 info_base=0x180000000\n") == nil,
+                "a program at another base: not this case")
+        require(X.windowMB(inTail: "[0x140000000,+abcMB)") == nil && X.fixedProgramMiB(inTail: "") == nil, "unreadable lines: nothing")
+
         // Round 579: a Steam game started without Dock that found no Steam (SteamStartHint), text only.
         typealias H = SteamStartHint
         require(H.applies(directSteamStart: true, quitRequested: false, seconds: 2), "direct start, ended by itself in 2 s: the log is read")
-        require(!H.applies(directSteamStart: false, quitRequested: false, seconds: 2), "a BCD Dock session or a game added by hand: never")
+        require(!H.applies(directSteamStart: false, quitRequested: false, seconds: 2), "a BCD Dock session (no local program): never")
         require(!H.applies(directSteamStart: true, quitRequested: true, seconds: 2), "the player quit: never")
         require(!H.applies(directSteamStart: true, quitRequested: false, seconds: H.maxSeconds + 1), "a long session: never (the game ran)")
         require(H.applies(directSteamStart: true, quitRequested: false, seconds: H.maxSeconds), "exactly the limit still reads the log")
@@ -124,6 +146,32 @@ func require(_ condition: @autoclosure () -> Bool, _ label: String) {
         require(said([start, "SteamAPI_Init() failed."], chunk: 7), "lines cut across chunks of 7 bytes are put back together")
         require(said([start, "SteamAPI_Init() failed."], chunk: 1), "byte by byte")
         require(said([start, "SteamAPI_Init() failed."]) == said([start, "SteamAPI_Init() failed."], chunk: 13), "the chunk size changes nothing")
+        // Round 624 (agent C S8, Mafia: Definitive Edition 49T3ST): a program added by hand that ended by itself is read too, with its own words.
+        require(H.applies(directSteamStart: false, localProgram: true, quitRequested: false, seconds: 3),
+                "a program added by hand that ended by itself in 3 s: the log is read")
+        require(!H.applies(directSteamStart: false, localProgram: true, quitRequested: true, seconds: 3)
+                && !H.applies(directSteamStart: false, localProgram: true, quitRequested: false, seconds: H.maxSeconds + 1),
+                "...not when the player quit, nor after a long session")
+        func saidLocal(_ lines: [String]) -> Bool {
+            var scan = H.LogScan(local: true)
+            scan.feed(Array((lines.joined(separator: "\n") + "\n").utf8)); scan.finish()
+            return scan.said
+        }
+        let mafia = ["[23:00:49.674] [INFO] [bcd-ui] play local",
+                     "[23:00:49.679] [INFO] [bcd] library launch mafiadefinitiveedition.exe: avx=1 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off",
+                     "0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API FAIL] SteamAPI_Init() failed; SteamAPI_IsSteamRunning() failed..\"",
+                     "[steam-api] steam_api found no running Steam; process 0020 sees:"]
+        require(saidLocal(mafia), "49T3ST's own lines: a program added by hand said it found no Steam")
+        require(!said(mafia), "...which the direct-start scan does not read (no direct-start line)")
+        require(!saidLocal(mafia + ["wine: Unhandled page fault on read access to 0000003C at address 0000003C (thread 0024)"]),
+                "a crash after the Steam line is the likelier end: no Steam words (Hello Neighbor TAW359)")
+        require(!saidLocal([mafia[1], "[18:10:02.000] [INFO] [epic-launch] start app=gta5", mafia[2]]),
+                "an Epic start (its launcher probes Steam itself): no Steam words")
+        require(!saidLocal([mafia[2], "x"]), "a Steam line before any library launch: no")
+        require(saidLocal([mafia[2], mafia[1], mafia[3]]) && !saidLocal([mafia[1], mafia[2], mafia[1], "ready"]),
+                "the LAST library launch counts")
+        require(H.localText.contains("Steam tab") && H.localText.contains("If this copy needs Steam") && !H.localText.contains("Mafia"),
+                "the words for a program added by hand: the Steam tab, conditional, no game name")
         var noEnd = H.LogScan()
         noEnd.feed(Array((start + "\nSteamAPI_Init() failed.").utf8)); noEnd.finish()
         require(noEnd.said, "a last line without a newline is read at the end")
@@ -458,14 +506,23 @@ report = block(library, 'private func exitReport() -> String?')
 require('guard !quitRequested, MadeiraConfig.flag("MADEIRA_EXIT_REPORT") else { return nil }' in report and 'SessionEndRules.message(exitCode: code)' in report
         and report.index('wine_crash_exit_status(&status)') < report.index('SessionEndRules.message'),
         'the exit report: a Windows error keeps its own words; a plain code gets the new ones; Quit and MADEIRA_EXIT_REPORT=0 stay silent')
+require('if status == 0xC0000142 || status == 0xC0000018 {' in report and 'return ExitWords.libraryStart(name)' in report
+        and report.index('StikJITHelper.exeWindowWidenFailedMB') < report.index('if status == 0xC0000142 || status == 0xC0000018 {')
+        < report.index('let kind = status == 0xC0000005'),
+        'round 624: 0xC0000142 names the library, 0xC0000018 the program and window, after the widen-failed case and before the plain words')
 fin = block(library, 'private func finish()')
-say = block(library, 'private func sayNoSteam(replacing report: String?)')
+say = block(library, 'private func sayNoSteam(replacing report: String?, local: Bool = false)')
 require('SteamStartHint.applies(directSteamStart: activeEntry?.startsSteamGameDirectly == true' in fin and 'sawProcess,' in fin
         and fin.index('SteamStartHint.applies') < fin.index('current = nil; activeEntry = nil'),
         'finish(): the hint is asked only after a session that ran, for a direct Steam start, before the entry is cleared')
+require('let localProgram = activeEntry != nil && activeEntry?.steamAppID == nil && activeEntry?.desktop != true' in fin
+        and 'localProgram: localProgram,' in fin and 'sayNoSteam(replacing: report, local: localProgram)' in fin
+        and fin.index('let localProgram') < fin.index('SteamStartHint.applies'),
+        'finish() (round 624, 49T3ST): a program added by hand (no Steam app, not the desktop) is asked too, and says which it was')
 require('DispatchQueue.global(qos: .utility).async' in say and 'guard let self, self.error == report else { return }' in say
-        and 'SteamStartHint.logSaysNoSteam(log)' in say and say.index('logSaysNoSteam') < say.index('DispatchQueue.main.async'),
-        'the log is read off the main queue; the alert changes only if nothing else took it meanwhile')
+        and 'SteamStartHint.logSaysNoSteam(log, local: local)' in say and say.index('logSaysNoSteam') < say.index('DispatchQueue.main.async')
+        and 'self.error = local ? ' not in say and 'self.error = SteamStartHint.localText' in say and 'self.error = SteamStartHint.text' in say,
+        'the log is read off the main queue; the alert changes only if nothing else took it meanwhile; each kind of start gets its own words')
 require('SteamStartHint' not in watch and 'SteamStartHint' not in report, 'the watch and the exit report are as they were')
 require('endedByWatch = nil' in block(library, 'func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil)'),
         'a new session forgets the last one\'s watch state')

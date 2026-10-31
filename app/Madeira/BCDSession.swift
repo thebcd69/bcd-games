@@ -214,6 +214,9 @@ enum BCDSessionCommand: Equatable {
 struct BCDSessionLayer: View {
     @ObservedObject var hud: BCDSessionHUDModel
     let actions: BCDSessionHUDActions
+    /// Where the menu button is (its own report) and on which screen size, so the session line keeps clear of it
+    /// (BCDSessionLinePlace); a frame from before a turn of the device counts for nothing.
+    @State private var menuButton = (frame: CGRect.zero, viewport: CGSize.zero)
 
     var body: some View {
         GeometryReader { geo in
@@ -234,22 +237,24 @@ struct BCDSessionLayer: View {
                     BCDHUDHost(feed: performance, viewport: geo.size, insets: insets, report: { actions.overlayFrame($0) })
                 }
                 if !hud.message.isEmpty {
+                    let place = BCDSessionLinePlace.of(viewport: geo.size, top: insets.top + 12,
+                                                       button: menuButton.viewport == geo.size ? menuButton.frame : .zero)
                     Text(hud.message)
                         .font(BCDStyle.label(13)).foregroundStyle(BCDStyle.text)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16).padding(.vertical, 9)
                         .background(BCDSessionStyle.panel.opacity(0.92), in: Capsule())
                         .overlay(Capsule().strokeBorder(BCDStyle.stroke, lineWidth: 1))
-                        .frame(maxWidth: min(520, geo.size.width - 40))
+                        .frame(maxWidth: place.width)
                         .frame(maxWidth: .infinity)
-                        .padding(.top, insets.top + 12)
+                        .padding(.top, place.top)
                         .allowsHitTesting(false)
                 }
                 if hud.starting == nil && hud.showsMenuButton {
                     // The top right corner, at the screen's own edge (owner, 2026-10-19: it sat on the
                     // touch controls' RT). See BCDDraggable's `edge`.
                     BCDDraggable(key: "bcdMenuButton", start: CGPoint(x: 1, y: 0), viewport: geo.size,
-                                 insets: insets, edge: true, report: { actions.menuButtonFrame($0) }) { dragging in
+                                 insets: insets, edge: true, report: { menuButton = ($0, geo.size); actions.menuButtonFrame($0) }) { dragging in
                         BCDMenuButton(dragging: dragging) { actions.openMenu() }
                     }
                 }
@@ -268,6 +273,25 @@ struct BCDSessionLayer: View {
     }
 
     static func insets(_ geo: GeometryProxy) -> EdgeInsets { BCDSessionInsets.of(geo) }
+}
+
+/// Where the session line sits: centred at the top, at most 520 pt wide and 20 pt in from each side, as it always was. When the
+/// menu button is beside it (an upright phone: the button's corner reaches into the line's width; round 624, a long line ran under
+/// it), the line ends 8 pt short of the button; when that would leave it under 200 pt (the button dragged near the middle), it
+/// goes 8 pt below the button instead. A phone held sideways and an iPad keep the old place: the button is clear of 520 pt there.
+enum BCDSessionLinePlace {
+    /// How far below its top the line can reach: five lines of 13 pt and its padding.
+    static let reach: CGFloat = 120
+
+    static func of(viewport: CGSize, top: CGFloat, button: CGRect) -> (width: CGFloat, top: CGFloat) {
+        let width = min(520, viewport.width - 40)
+        guard button.width > 0, button.height > 0, button.minY < top + reach, button.maxY > top else { return (width, top) }
+        let middle = viewport.width / 2
+        let room = button.midX >= middle ? button.minX - 8 - middle : middle - button.maxX - 8
+        if 2 * room >= width { return (width, top) }
+        if 2 * room >= 200 { return (2 * room, top) }
+        return (width, button.maxY + 8)
+    }
 }
 
 /// The safe area as the window has it. SwiftUI hands zero insets to a view inside one that

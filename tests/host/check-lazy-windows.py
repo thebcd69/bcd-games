@@ -136,6 +136,9 @@ int win32u_wow_session; void *ios_win32u_session_peb;
 static int teardowns;
 int ios_thread_registry_range_busy( uintptr_t base, uintptr_t size ) { (void)base; (void)size; return 0; }
 int ios_thread_registry_end_dead_range( uintptr_t base, uintptr_t size, void *dead_peb, int *kept ) { (void)base; (void)size; (void)dead_peb; if (kept) *kept = 0; return 0; }   /* wow-reap (build 593), signal_arm64_ios.c */
+/* round 624: the "already have one" line of ios_wow_window_reserve_once names the slot's process state (signal_arm64_ios.c) */
+int ios_peb_is_dead( const void *peb ) { (void)peb; return 0; }
+int ios_peb_is_live_child( const void *peb ) { (void)peb; return 0; }
 static int ios_wow_window_teardown( ULONG_PTR base, void *dead_peb, unsigned guard_owned )
 { (void)base; (void)dead_peb; (void)guard_owned; teardowns++; return 1; }
 

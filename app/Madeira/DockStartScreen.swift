@@ -363,7 +363,9 @@ final class DockStartScreen: ObservableObject {
             if current.result != nil {
                 exitObserved = true
                 if let words = DockStartStatus.failure(result: current.result, words: current.failure, launching: model.launching) {
-                    failure = words
+                    // round 624 (agent N S1): only the host's generic words (it gave none of its own) get the install's note; a sign-in or licence
+                    // text keeps its words
+                    failure = current.failure == nil && MemoryRights.lacking ? words + "\n\n" + MemoryRights.failureNote : words
                     LogStore.shared.log("[dock-status] host-ended result=\(current.result ?? 0) starting=\(model.launching ? 1 : 0)", level: .error)
                     MainActor.assumeIsolated { MadeiraDock.cleanup() }
                 }

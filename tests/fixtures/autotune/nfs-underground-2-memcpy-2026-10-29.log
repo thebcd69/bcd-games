@@ -1,0 +1,225 @@
+[17:39:18.432] [INFO] Checking entitlements...
+[17:39:18.432] [INFO] [build] v0.1.623 (623)
+[17:39:18.433] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8165MB cores=6
+[17:39:18.433] [INFO] [device] address-map=[0x10462c000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[17:39:18.455] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:39:19.938] [INFO] Requesting JIT with Built-in StikJIT...
+[17:39:21.930] [INFO] [bcd] library launch SPEED2.EXE: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[17:39:21.933] [INFO] Session log: logs/SPEED2.EXE-2026-10-29_17-39-21.txt
+[17:39:21.963] [INFO] Running full Wine sequence...
+[17:39:21.964] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10462c000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[17:39:21.972] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:39:21.972] [INFO] Allocating 896MB JIT pool via debugger...
+[17:39:21.973] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:39:21.973] [INFO] [jit-debugger] attached=1 at the pool request
+[17:39:21.975] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[17:39:22.682] [INFO] RX pool at 0x148000000
+[17:39:22.699] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.777s rev=ml526
+[WineProc] Target exe: C:\games\Need for Speed - Underground 2\SPEED2.EXE (bundle=aarch64-windows)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[WineProc] argv[1] = C:\games\Need for Speed - Underground 2\SPEED2.EXE
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[17:39:23.437] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7581 MB + phys_footprint=610 MB = 8192 MB (hw.memsize says 11722 MB)
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/games/Need for Speed - Underground 2/SPEED2.EXE') = 0x0
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 225 .text pages executable (copy @0x148007000)
+ml957: ? backing 0x7100930000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x14853c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x148654000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x1486c9000 used=0xa8d000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x1486c9000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148a8c000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148bb0000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[footprint] rev=ml358 phys=634 MB (peak 634) internal=633 MB compressed=0 MB external=84 MB reusable=5 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80000000 options=0x00000020 unix=/usr/local/share/fex-emu/AppConfig/SPEED2.EXE.json name=\??\unix\usr\local\share\fex-emu\AppConfig\SPEED2.EXE.json
+[free-delay] #1 release of 0x70a3a40000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70a3b40000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70a3d40000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x70a4140000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x70a4940000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x70a5910000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x70a68e0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x70a78b0000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x107404d00)
+D 24 Load module SPEED2.EXE (speed2.exe-a8057de82094f8f2): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module advapi32.dll (advapi32.dll-e40424e11a1bfe07): 717BBF0000
+ml957: ? backing 0x717bbd8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module sechost.dll (sechost.dll-b367444c07a2c08e): 717BBC0000
+ml957: ? backing 0x717a6d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a36c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a2f0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148f60000)
+ml957: ? backing 0x717a2a4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148f6b000)
+ml957: ? backing 0x717a158000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x70ab940000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148f8b000)
+ml957: ? backing 0x717a128000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[unixlib] opengl32 (GL-absent stub table) (module 0x717b5d0000) -> wow64 table (0x10740cd00)
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148fab000)
+ml957: ? backing 0x7179ef8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L".\\modloader\\modupdater.asi" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L".\\modloader\\modloader.asi" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x1485ab294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+D 24 Load module NFSUnderground2.WidescreenFix.asi (nfsunderground2.widescreenfix.asi-e12e4b8c2ccb1ae5): 7179DB0000
+D 24 Load module d3d9-emulated.dll (d3d9-emulated.dll-cd2cb233127cb3d3): 7179A50000
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148fc9000)
+ml957: ? backing 0x7179a3c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module winemetal.dll (winemetal.dll-5ddc5096148b014d): 7179A30000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+[win-name] #5 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+[swap] ml1077 backed 0x7106300000+0x810000 (file off 0 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[swap] ml1077 backed 0x7106b10000+0x810000 (file off 8 MB): 16 MB in 2 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x7107320000+0x810000 (file off 16 MB): 24 MB in 3 extents, peak 24 MB, 0 refused
+[swap] ml1077 backed 0x7107b30000+0x810000 (file off 24 MB): 32 MB in 4 extents, peak 32 MB, 0 refused
+[swap] ml1077 backed 0x7108340000+0x810000 (file off 32 MB): 40 MB in 5 extents, peak 40 MB, 0 refused
+[swap] ml1077 backed 0x7108b50000+0x810000 (file off 40 MB): 48 MB in 6 extents, peak 48 MB, 0 refused
+[win-name] #11 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+[win-name] #13 hwnd=0x1003e class='' text="DIEmWin" rev=ml853
+[xp-names] m564864 "wine-x18-exc"
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x148fde000)
+ml957: ? backing 0x7179a10000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbfcb18f): 71799F0000
+D 24 Load module oleaut32.dll (oleaut32.dll-ed26e11610cd4cf3): 7179930000
+D 24 Load module version.dll (version.dll-f3fe55759b333ec4): 7179910000
+[17:39:24.263] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[rb-tex] madeira-bcd new readback #1: fmt 80 256x256 level 0 (texture 256x256, 6 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 80 128x128 level 1 (texture 256x256, 6 mips)
+[rb-tex] madeira-bcd new readback #3: fmt 80 64x64 level 2 (texture 256x256, 6 mips)
+[rb-tex] madeira-bcd new readback #4: fmt 80 32x32 level 3 (texture 256x256, 6 mips)
+[rb-tex] madeira-bcd new readback #5: fmt 80 16x16 level 4 (texture 256x256, 6 mips)
+[rb-tex] madeira-bcd new readback #6: fmt 80 8x8 level 5 (texture 256x256, 6 mips)
+[launch-view] dismissed reason=present logs=0
+[stp-emul] ml629 #1 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710aebbfe4 rw=0x0 rw_end=0x7001004003)
+[stp-emul] ml629 #1 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebbfe4 rw=0x0 base 0x710aebbfe4 -> 0x710aebc004 (writeback)
+[stp-emul] ml629 #2 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc004 rw=0x7001004004 base 0x710aebc004 -> 0x710aebc024 (writeback)
+[stp-emul] ml629 #3 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc024 rw=0x7001004024 base 0x710aebc024 -> 0x710aebc044 (writeback)
+[stp-emul] ml629 #4 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc044 rw=0x7001004044 base 0x710aebc044 -> 0x710aebc064 (writeback)
+[stp-emul] ml629 #5 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc064 rw=0x7001004064 base 0x710aebc064 -> 0x710aebc084 (writeback)
+[stp-emul] ml629 #6 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc084 rw=0x7001004084 base 0x710aebc084 -> 0x710aebc0a4 (writeback)
+[stp-emul] ml629 #7 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc0a4 rw=0x70010040a4 base 0x710aebc0a4 -> 0x710aebc0c4 (writeback)
+[stp-emul] ml629 #8 insn=0xac810421 mode=post off=+32 Rt=q1 Rt2=q1 Rn=x1 addr=0x710aebc0c4 rw=0x70010040c4 base 0x710aebc0c4 -> 0x710aebc0e4 (writeback)
+[stp-emul] ml629 #2 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710aeabfe4 rw=0x0 rw_end=0x7001008003)
+[rb-tex] madeira-bcd new readback #37: fmt 80 640x480 level 0 (texture 640x480, 1 mips)
+[footprint] rev=ml358 phys=1151 MB (peak 1151) internal=947 MB compressed=0 MB external=123 MB reusable=5 MB (cycle=2)
+[rb-tex] madeira-bcd new readback #42: fmt 80 768x512 level 0 (texture 768x512, 1 mips)
+[swap] ml1077 stats: 90 MB file-backed now (peak 90), 10 extents, file used 90 of 4096 MB, backs 10 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 90 MB (peak 90), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 10 guarded, 0 MB lost to a full free list
+[footprint] rev=ml358 phys=1156 MB (peak 1156) internal=952 MB compressed=0 MB external=124 MB reusable=5 MB (cycle=3)
+[swap] ml1077 backed 0x7116960000+0x810000 (file off 98 MB): 106 MB in 12 extents, peak 106 MB, 0 refused
+[footprint] rev=ml358 phys=1155 MB (peak 1156) internal=951 MB compressed=0 MB external=124 MB reusable=5 MB (cycle=4)
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=1156 MB (peak 1156) internal=953 MB compressed=0 MB external=124 MB reusable=5 MB (cycle=5)
+[footprint] rev=ml358 phys=1157 MB (peak 1157) internal=955 MB compressed=0 MB external=124 MB reusable=5 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x13ce81600 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 1189 wakes; device short 0.0 ms in 0 of 467 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 backed 0x7107320000+0x810000 (file off 24 MB): 90 MB in 10 extents, peak 106 MB, 0 refused
+[swap] ml1077 backed 0x7107b30000+0x810000 (file off 16 MB): 98 MB in 11 extents, peak 106 MB, 0 refused
+[swap] ml1077 backed 0x7115270000+0x810000 (file off 82 MB): 106 MB in 12 extents, peak 106 MB, 0 refused
+[rb-tex] madeira-bcd new readback #62: fmt 80 512x512 level 0 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #63: fmt 80 256x256 level 1 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #64: fmt 80 128x128 level 2 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #65: fmt 80 64x64 level 3 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #66: fmt 80 32x32 level 4 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #67: fmt 80 16x16 level 5 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #68: fmt 80 8x8 level 6 (texture 512x512, 7 mips)
+[swap] ml1077 backed 0x7117550000+0x810000 (file off 106 MB): 114 MB in 13 extents, peak 114 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ba89020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x717ffd0000 modules=9 first=SPEED2.EXE@0x7100400000
+[ios_audio] ml1230 pacing stream=0x13ce81600 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1190 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 modmap peb=0x717ffd0000 modules=9 first=SPEED2.EXE@0x7100400000
+[17:39:44.485] [OK] Early detach: game presenting and settled
+[stp-emul] ml629 #3 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710ad83fe4 rw=0x700100ffe4 rw_end=0x0)
+[stp-emul] ml629 #4 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710aeabfe4 rw=0x0 rw_end=0x7001008003)
+[ios_audio] ml1066 create_stream by 'SPEED2.EXE' flow=0 share=0 flags=0x800c0000 duration=800000 period=100000 fmt tag=0xfffe ch=2 rate=48000 bits=32 align=8
+[swap] ml1077 backed 0x711c530000+0x7540000 (file off 122 MB): 239 MB in 15 extents, peak 239 MB, 0 refused
+[17:39:46.487] [INFO] Detaching debugger...
+[store-noalias] #1 rev=ml348 addr=0x71b59ce990 insn=0xac810420 pc=0x16a937320 NO pool/anon alias | region 0x71b0000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x71b59ce990 hostpc=0x16a937320 hinsn=0xac810420 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16a937320 addr=0x71b59ce990 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x71b0000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16a937320 addr=0x71b59ce990 x18=0x717ffc0000 type=1 lr=0x16a9c7ebc sp=0x70a391f350 x16=0x1485a1e94 x17=0x70a391f2b0
+[x86-fault] #1 a 32-bit guest faulted at guest 0xb59ce990 in the block that starts at guest 0xfff8d40c (ntdll.dll+0x4d40c), window 0x7100000000, 50 modules in the PEB32 list; EAX=0xadc ECX=0x2b7 EDX=0xb59ce990 EBX=0xaf88524 ESI=0xac9b4a4 EDI=0xb59ce990 EBP=0x0 ESP=0x113f840
+[x86-fault]   modules (name=base/size): SPEED2.EXE=0x400000/0x532000 ntdll.dll=0xfff40000/0xaa000 kernel32.dll=0x7bed0000/0x58000 kernelbase.dll=0x7bc40000/0x27f000 advapi32.dll=0x7bbf0000/0x33000 sechost.dll=0x7bbc0000/0x1b000
+[x86-fault]   stack words that point into a module: +0x008=007210ce(SPEED2.EXE+0x3210ce) +0x024=00735529(SPEED2.EXE+0x335529) +0x050=007358e3(SPEED2.EXE+0x3358e3) +0x054=0082c500(SPEED2.EXE+0x42c500) +0x064=004609fd(SPEED2.EXE+0x609fd) +0x068=0082c500(SPEED2.EXE+0x42c500) +0x078=0083579c(SPEED2.EXE+0x43579c) +0x07c=008654a8(SPEED2.EXE+0x4654a8) +0x08c=00734e6c(SPEED2.EXE+0x334e6c) +0x090=0082c694(SPEED2.EXE+0x42c694) +0x0ac=0077265b(SPEED2.EXE+0x37265b) +0x0b4=00473bd9(SPEED2.EXE+0x73bd9) +0x0bc=00464bc7(SPEED2.EXE+0x64bc7) +0x0c8=00469cdf(SPEED2.EXE+0x69cdf) +0x0d0=00463bc7(SPEED2.EXE+0x63bc7) +0x0d8=00458871(SPEED2.EXE+0x58871) +0x0e4=0060a7a8(SPEED2.EXE+0x20a7a8) +0x0f8=0077a0ec(SPEED2.EXE+0x37a0ec) +0x100=0057f957(SPEED2.EXE+0x17f957) +0x10c=0082d648(SPEED2.EXE+0x42d648) +0x118=006e6962(SPEED2.EXE+0x2e6962) +0x11c=008283b4(SPEED2.EXE+0x4283b4) +0x120=007b6c24(SPEED2.EXE+0x3b6c24) +0x124=006f55f2(SPEED2.EXE+0x2f55f2)
+[x86-fault]   stack words that point into a module (34): +0x128=008283b8(SPEED2.EXE+0x4283b8) +0x12c=0044060b(SPEED2.EXE+0x4060b) +0x130=0083579c(SPEED2.EXE+0x43579c) +0x138=0083579c(SPEED2.EXE+0x43579c) +0x140=00575379(SPEED2.EXE+0x175379) +0x144=00575390(SPEED2.EXE+0x175390) +0x168=004e4942(SPEED2.EXE+0xe4942) +0x16c=008a3288(SPEED2.EXE+0x4a3288) +0x170=00490164(SPEED2.EXE+0x90164) +0x17c=00639f7b(SPEED2.EXE+0x239f7b)
+[guest-code] rev=ml333 pool_rip=0xfff8d40c (PE 0xfff8d40c) -- NO pool copy for this address (identity translate)
+[fault-host] 16a937220: 0000007d 00000000 0000001e 00000028 00000000 00000000 03800180 10545331
+[fault-host] 16a937240: 81431034 03804500 0d8f7854 230a2363 80455102 8b235403 0a23630f 00000023
+[fault-host] 16a937260: 00000380 10ffffe0 f9000380 f90f639f 91003118 b8784a67 51001108 b8284a6a
+[fault-host] 16a937280: 91003118 b8784a6a 51001108 b8284a6b 91003118 b8784a6b aa0703e4 aa0b03e5
+[fault-host] 16a9372a0: 53027ce7 52800014 b943d395 f9459f81 710002bf 1a9f07e0 f860303f b943df96
+[fault-host] 16a9372c0: f945ab81 710002df 1a9f07e0 f860303f 8b150177 8b16014c 398feb8f aa0703e0
+[mach_exc] insn_stream PC-12..PC+8: d1002000 b7f800e0 acc10440 [ac810420] acc10440 ac810420 d1004000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x1487cc5f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x1487cc57c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x1487cc574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x71b59ce990 insn=0xac810420 pc=0x16a937320 NO pool/anon alias | region 0x71b0000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x71b59ce990 hostpc=0x16a937320 hinsn=0xac810420 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16a937320 addr=0x71b59ce990 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x71b0000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16a937320 addr=0x71b59ce990 x18=0x717ffc0000 type=1 lr=0x16a9c7ebc sp=0x70a391f350 x16=0x1485a1e94 x17=0x70a391f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d40c (PE 0xfff8d40c) -- NO pool copy for this address (identity translate)
+[fault-host] 16a937280: 91003118 b8784a6a 51001108 b8284a6b 91003118 b8784a6b aa0703e4 aa0b03e5
+[fault-host] 16a9372a0: 53027ce7 52800014 b943d395 f9459f81 710002bf 1a9f07e0 f860303f b943df96
+[fault-host] 16a9372c0: f945ab81 710002df 1a9f07e0 f860303f 8b150177 8b16014c 398feb8f aa0703e0
+[fault-host] 16a9372e0: aa1703e1 aa0c03e2 8b214261 8b224262 370804af b40003c0 cb020023 b6f80043
+[fault-host] 16a937300: cb0303e3 d1008063 b7f802a3 d1002000 b7f80220 d1002000 b7f800e0 acc10440
+[fault-host] 16a937320: ac810420 acc10440 ac810420 d1004000 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d1002000 b7f800e0 acc10440 [ac810420] acc10440 ac810420 d1004000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x1487cc5f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x1487cc57c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x1487cc574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x71b59ce990 pc=0x16a937320 rw=1 rev=ml420
+wine: Unhandled page fault on write access to B59CE990 at address 0071FEE1 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000005) syscalls=0 unix_calls=2501
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=2504
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[17:39:48.465] [INFO] [session] length=26s play=24s frames=1388 avg=58.3 low1=33.3 low01=6.2 worst=191ms stalls=0/0s peak=1233MB limit=8191MB thermal=nominal lpm=0 api=D3D10/D3D11/D3D12/D3D8/D3D9/DirectDraw/32 res=1408x648 cap=60 game=Need For Speed Underground 2
+[17:39:48.474] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1194 MB (peak 1223) internal=1021 MB compressed=0 MB external=266 MB reusable=5 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=29 resident=1293MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1197 MB (peak 1223) internal=1024 MB compressed=0 MB external=273 MB reusable=5 MB (cycle=16)
+[footprint] rev=ml358 phys=1196 MB (peak 1223) internal=1025 MB compressed=0 MB external=276 MB reusable=5 MB (cycle=17)
+[footprint] rev=ml358 phys=1196 MB (peak 1223) internal=1025 MB compressed=0 MB external=277 MB reusable=5 MB (cycle=18)
+[footprint] rev=ml358 phys=1190 MB (peak 1223) internal=1025 MB compressed=0 MB external=277 MB reusable=5 MB (cycle=19)
+[footprint] rev=ml358 phys=1191 MB (peak 1223) internal=1025 MB compressed=0 MB external=279 MB reusable=5 MB (cycle=20)

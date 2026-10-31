@@ -1,0 +1,516 @@
+[19:26:19.799] [INFO] Checking entitlements...
+[19:26:19.800] [INFO] [build] v0.1.622 (622)
+[19:26:19.800] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=6125MB cores=6
+[19:26:19.800] [INFO] [device] address-map=[0x104ce4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:26:19.815] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:26:36.839] [INFO] [bcd] library launch Grand Theft Auto V: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:26:36.840] [INFO] Requesting JIT with Built-in StikJIT...
+[19:26:40.216] [INFO] [dock-launch] image-retire=1
+[19:26:40.217] [INFO] [dock-launch] image-map-guard=1
+[19:26:40.333] [INFO] [dock-installers] app=271590 program=240240 file=Social-Club-Setup.exe status=done key=HKLM\Software\Rockstar Games\Steam\SDK recorded=1 minimum=1 machine=0x8664
+[19:26:40.363] [INFO] [dock-installers] app=271590 program=101093031 file=Rockstar-Games-Launcher.exe status=done key=HKLM\Software\Rockstar Games\Steam\Launcher recorded=1 minimum=1 machine=0x8664
+[19:26:40.363] [INFO] [dock-installers] app=271590 scripts=2 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[19:26:40.364] [INFO] [madeira-dock] starting the host for app 271590; Valve's client authenticates and authorizes the launch
+[19:26:40.374] [INFO] Running full Wine sequence...
+[19:26:40.374] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104ce4000,0x8000000000) 512GB available=8151MB low-power=0 thermal=nominal
+[19:26:40.380] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:26:40.380] [INFO] Allocating 896MB JIT pool via debugger...
+[19:26:40.380] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:26:40.380] [INFO] [jit-debugger] attached=1 at the pool request
+[19:26:40.382] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:26:41.085] [INFO] RX pool at 0x148000000
+[19:26:41.851] [INFO] Detaching debugger...
+[19:26:43.048] [INFO] [session] length=2s partial=1 play=0s frames=0 stalls=0/0s peak=1190MB limit=6143MB thermal=nominal lpm=0 res=1408x648 cap=40 game=Grand Theft Auto V Legacy
+[phase] wine-start             t+  2.790s rev=ml526
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7a00000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7000 MB + phys_footprint=1191 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[hwinput] keyboard focus: program (app active)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1199 MB compressed=0 MB external=77 MB reusable=3 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x73fffe0000
+[gdi-shared] session table 0x7101450000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  3.324s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=101, unixdir=102, dup_unixdir=106) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11c240000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11c240000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11c240000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11c248000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11c248000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11c24c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  3.397s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=130, unixdir=132, dup_unixdir=137) cwd=L"C:\\windows\\"
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11C240000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FE600000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 73FC180000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 73FC100000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 73FBFF0000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 73FBF30000
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m165429 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7100000000+0x100000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7d05400000
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\crashhandler64.dll" 0x73f8370000+0x1af000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000200 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[nt-fail] #2 NtMapViewOfSection status=c0000135 proc=dockhost.exe tid=0050 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x2b4 off=0x0 hits=1 rev=ajan5-rockstar
+[nt-fail] #3 NtMapViewOfSection status=c0000135 proc=dockhost.exe tid=0050 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x2b4 off=0x0 hits=2 rev=ajan5-rockstar
+[nt-fail] #4 NtMapViewOfSection status=c0000135 proc=dockhost.exe tid=0050 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x2b4 off=0x0 hits=3 rev=ajan5-rockstar
+[nt-fail] #5 NtMapViewOfSection status=c0000135 proc=dockhost.exe tid=0050 size=0x0 type=0x0 prot=0x20 hint=0x0 zb=0x0 h=0x2b4 off=0x0 hits=4 rev=ajan5-rockstar
+0050:err:module:load_dll [dll-missing] rev=ml336 #18 L"video64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=1464 MB (peak 1464) internal=1463 MB compressed=0 MB external=150 MB reusable=3 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002BC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #1 release of 0x7110c80000+0x800000 held for 2000 ms (1 in flight)
+[footprint] rev=ml358 phys=1545 MB (peak 1545) internal=1543 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=3)
+[file-wfail] ml669 #79 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #80 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #81 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #83 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1583 MB (peak 1583) internal=1581 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=4)
+[footprint] rev=ml358 phys=1573 MB (peak 1583) internal=1571 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=5)
+[file-wfail] ml669 #84 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+ 12.580s rev=ml526
+00a4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\"" (fd=451, unixdir=452, dup_unixdir=456) cwd=L"C:\\windows\\system32"
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\PlayGTAV.exe" t+ 12.904s rev=ml526
+[session-log] Steam game PlayGTAV.exe: logs/PlayGTAV.exe-2026-10-28_19-26-53.txt
+[child-args] env.MADEIRA_CHILD_ARGS: appended "-nobattleye" to the command line
+0088:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\PlayGTAV.exe\" -StraightIntoFreemode -nobattleye" (fd=366, unixdir=367, dup_unixdir=494) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V"
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\PlayGTAV.exe" 0x124e40000+0x8c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[19:26:53.375] [INFO] [dock-report] game-scm=2
+[19:26:53.375] [INFO] [dock-report] launch-client-discovery-published=1
+[copy-verify] msvcp140.dll: OK, 32 .text pages executable (copy @0x150610000)
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+ 13.206s rev=ml526
+00c4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -skipPatcherCheck -steamAppId=271590 -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\" -StraightIntoFreemode -nobattleye @args.txt" (fd=512, unixdir=513, dup_unixdir=517) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\"
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" 0x12a440000+0x2014000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[footprint] rev=ml358 phys=1719 MB (peak 1719) internal=1718 MB compressed=0 MB external=196 MB reusable=3 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #19 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #20 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #21 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #22 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #2 release of 0x71196b0000+0xf10000 held for 2000 ms (1 in flight)
+[19:26:54.875] [INFO] [dock-report] launch-game-running=1
+[store-noalias] #1 rev=ml348 addr=0x12a5479d8 insn=0xd90000c8 pc=0x132dc8e14 NO pool/anon alias | region 0x12a544000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x12a5479d8 hostpc=0x132dc8e14 hinsn=0xd90000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x12a665df3 pc=0x132dc8e14 addr=0x12a5479d8 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a544000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x132dc8e14 addr=0x12a5479d8 x18=0x7117d40000 type=1 lr=0x132c08274 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12a665df3 (PE 0x12a665df3) -- NO pool copy for this address (identity translate)
+[fault-host] 132dc8d14: f2a56caa f2c0002a f907798a d287d0aa f2a5706a f2c0002a f907758a f940038a
+[fault-host] 132dc8d34: f9077d8a d280000a f907818a 9100056b f907738b 1400000c 00000000 14000002
+[fault-host] 132dc8d54: d61f0140 5800024a d63f0140 00000000 00000000 2be88d08 00000001 ffffffb0
+[fault-host] 132dc8d74: ffffffff 14000002 d61f0140 5800010a d63f0140 00000000 00000000 2b652d4e
+[fault-host] 132dc8d94: 00000001 ffffffd0 ffffffff 32c0820c 00000001 0000018c 00000000 2b833e65
+[fault-host] 132dc8db4: 00000001 00000025 00000000 00000007 00000028 00000000 00000000 05800180
+[mach_exc] insn_stream PC-12..PC+8: f2a54a86 f2c00026 d503201f [d90000c8] d2972e46 f2a54d46 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7117d40000 TEB=0x7117d40000 TEB[0x58]=0x711856ce10 *(gs_cached+0x58)=0x711856ce10
+[store-noalias] #2 rev=ml348 addr=0x12a5479d8 insn=0xd90000c8 pc=0x132dc8e14 NO pool/anon alias | region 0x12a544000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x12a5479d8 hostpc=0x132dc8e14 hinsn=0xd90000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x12a665df3 pc=0x132dc8e14 addr=0x12a5479d8 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a544000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x132dc8e14 addr=0x12a5479d8 x18=0x7117d40000 type=1 lr=0x132c08274 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12a665df3 (PE 0x12a665df3) -- NO pool copy for this address (identity translate)
+[fault-host] 132dc8d74: ffffffff 14000002 d61f0140 5800010a d63f0140 00000000 00000000 2b652d4e
+[fault-host] 132dc8d94: 00000001 ffffffd0 ffffffff 32c0820c 00000001 0000018c 00000000 2b833e65
+[fault-host] 132dc8db4: 00000001 00000025 00000000 00000007 00000028 00000000 00000000 05800180
+[fault-host] 132dc8dd4: 06895454 00005043 d503201f 000000c8 10ffffea f900038a b945eb8b 3400004b
+[fault-host] 132dc8df4: d4395fc0 d28743e8 f2a56d08 f2c00028 d28f3b06 f2a54a86 f2c00026 d503201f
+[fault-host] 132dc8e14: d90000c8 d2972e46 f2a54d46 f2c00026 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: f2a54a86 f2c00026 d503201f [d90000c8] d2972e46 f2a54d46 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7117d40000 TEB=0x7117d40000 TEB[0x58]=0x711856ce10 *(gs_cached+0x58)=0x711856ce10
+ml998: [wr-strip-declined] 0x12a5479d8 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a440000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x104000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x132dc8e14 RX from -32, 64 of 64 bytes: c0 5f 39 d4 e8 43 87 d2 08 6d a5 f2 28 00 c0 f2 06 3b 8f d2 86 4a a5 f2 26 00 c0 f2 1f 20 03 d5 c8 00 00 d9 46 2e 97 d2 46 4d a5 f2 26 00 c0 f2 1f 20 03 d5 df 00 00 99 8b 73 47 f9 6c 09 40 92 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x132dc8e14 (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 132DC8E14 fault: 12A5479D8
+[store-noalias] #3 rev=ml348 addr=0x12a51913d insn=0xb80000c8 pc=0x132df94bc NO pool/anon alias | region 0x12a518000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x12a51913d hostpc=0x132df94bc hinsn=0xb80000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x12b5acb3b pc=0x132df94bc addr=0x12a51913d kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a518000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x132df94bc addr=0x12a51913d x18=0x0 type=1 lr=0x132c08274 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12b5acb3b (PE 0x12b5acb3b) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: f2a54a26 f2c00026 d5033bbf [b80000c8] d2951366 f2a54d86 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7117d40000 TEB=0x7117d40000 TEB[0x58]=0x711856ce10 *(gs_cached+0x58)=0x711856ce10
+[store-noalias] #4 rev=ml348 addr=0x12a51913d insn=0xb80000c8 pc=0x132df94bc NO pool/anon alias | region 0x12a518000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x12a51913d hostpc=0x132df94bc hinsn=0xb80000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x12b5acb3b pc=0x132df94bc addr=0x12a51913d kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a518000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x132df94bc addr=0x12a51913d x18=0x0 type=1 lr=0x132c08274 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12b5acb3b (PE 0x12b5acb3b) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: f2a54a26 f2c00026 d5033bbf [b80000c8] d2951366 f2a54d86 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+ml998: [wr-strip-declined] 0x12a51913d vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a440000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0xd8000
+ml998: [wr-strip-declined]   neighbours prev=0x25 this=0x25 next=0x25
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x132df94bc RX from -32, 64 of 64 bytes: e6 4e a5 f2 26 00 c0 f2 c8 00 40 99 1f 20 03 d5 a6 27 92 d2 26 4a a5 f2 26 00 c0 f2 bf 3b 03 d5 c8 00 00 b8 66 13 95 d2 86 4d a5 f2 26 00 c0 f2 c8 00 40 d9 1f 20 03 d5 06 29 84 52 a6 03 06 8b 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x132df94bc (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 132DF94BC fault: 12A51913D
+[store-noalias] #5 rev=ml348 addr=0x12a6be69c insn=0x19000028 pc=0x132e01ecc NO pool/anon alias | region 0x12a6bc000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x12a6be69c hostpc=0x132e01ecc hinsn=0x19000028 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x12a541508 pc=0x132e01ecc addr=0x12a6be69c kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a6bc000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x132e01ecc addr=0x12a6be69c x18=0x0 type=1 lr=0x132e01494 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12a541508 (PE 0x12a541508) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: d94103a1 d503201f 19400108 [19000028] 994203a6 d503201f 510004c6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0x12a6be69c insn=0x19000028 pc=0x132e01ecc NO pool/anon alias | region 0x12a6bc000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x12a6be69c hostpc=0x132e01ecc hinsn=0x19000028 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x132c0c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x12a541508 pc=0x132e01ecc addr=0x12a6be69c kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12a6bc000+0x4000 rev=ml555
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x132e01ecc RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 a8 83 41 d9 1f 20 03 d5 a1 03 41 d9 1f 20 03 d5 08 01 40 19 28 00 00 19 a6 03 42 99 1f 20 03 d5 c6 04 00 51 1f 20 03 d5 a6 03 02 99 a6 03 41 d9 1f 20 03 d5 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x132e01ecc (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 132E01ECC fault: 12A6BE69C
+[store-noalias] #7 rev=ml348 addr=0x12b4d32d0 insn=0x38000028 pc=0x132e01ecc NO pool/anon alias | region 0x12b4d0000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x12b4d32d0 insn=0x38000028 pc=0x132e01ecc NO pool/anon alias | region 0x12b4d0000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+D CC Handled self-modifying code: pc: 132E01ECC fault: 12B4D32D0
+ml998: [wr-strip-declined] 0x12a4da919 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a440000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x98000
+ml998: [wr-strip-declined]   neighbours prev=0x25 this=0x25 next=0x2d
+D CC Handled self-modifying code: pc: 132E222EC fault: 12A4DA919
+ml998: [wr-strip-declined] 0x12a63d2f3 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x12a440000+0x2014000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1fc000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x25
+D CC Handled self-modifying code: pc: 132E21B44 fault: 12A63D2F3
+D CC Handled self-modifying code: pc: 132E21B44 fault: 12A6587B5
+D CC Handled self-modifying code: pc: 132E21B44 fault: 12A6B2FE4
+D CC Handled self-modifying code: pc: 132E222EC fault: 12A6BE69C
+D CC Handled self-modifying code: pc: 132E222EC fault: 12A8A5F97
+D CC Handled self-modifying code: pc: 132E222EC fault: 12BEB756B
+D CC Handled self-modifying code: pc: 132E22D18 fault: 12A77A472
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\ThirdParty\\Steam\\steam_api64.dll" 0x73f2120000+0x4d000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D CC Handled self-modifying code: pc: 132F03518 fault: 12A4E3C2B
+D CC Handled self-modifying code: pc: 132F069EC fault: 12C3329F8
+D CC Handled self-modifying code: pc: 132F0A024 fault: 12A50CEFF
+D CC Handled self-modifying code: pc: 132F0A5CC fault: 12BE3863D
+D CC Handled self-modifying code: pc: 132F0B1F8 fault: 12A8A7C27
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 15.454s rev=ml526
+00cc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=567, unixdir=568, dup_unixdir=572) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x12c860000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1534cc000)
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12A50D22C
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12A524510
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12A53BA29
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12A66C814
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12A6B7AA5
+D CC Handled self-modifying code: pc: 132F3D01C fault: 12B28B6E3
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A460523
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A473CB3
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A47CD65
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A4C39DE
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A4C92D6
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A5040E8
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A518582
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A538285
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A542ADB
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A544A38
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A55BB1B
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A55CB12
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A58100D
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A5A0C9E
+D CC Handled self-modifying code: pc: 132F44824 fault: 12A608A35
+D CC Handled self-modifying code: pc: 132F44DCC fault: 12A6B46E1
+D CC Handled self-modifying code: pc: 132F44824 fault: 12B3C2182
+[mach_exc] UNHANDLED #100 pc=0x132f44dcc addr=0x12bd55690 x18=0x0 type=1 lr=0x132f44594 sp=0x73f3c70000 x16=0x150f9d9a4 x17=0x73f3c6ff20
+[guest-code] rev=ml333 pool_rip=0x12a4c7775 (PE 0x12a4c7775) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: d94103a1 d503201f 19400108 [38000028] 994203a6 d503201f 510004c6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[guest-log] file <container>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] svc #1 tid=00e0 [rpm-sink] alive rev=ml492
+[steam-api] steam_api found no running Steam; process 00c8 sees:
+[steam-api] steam_api found no running Steam; process 00c8 sees:
+[free-delay] #3 release of 0x7128d50000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7129650000+0x200000 held for 2000 ms (3 in flight)
+[free-delay] #5 release of 0x712a050000+0x400000 held for 2000 ms (4 in flight)
+[free-delay] #6 release of 0x712a450000+0x800000 held for 2000 ms (5 in flight)
+[free-delay] #7 release of 0x712ac50000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #8 release of 0x712bc20000+0xfd0000 held for 2000 ms (7 in flight)
+[mach_exc] UNHANDLED #200 pc=0x132f3d01c addr=0x12a6b7aa5 x18=0x0 type=1 lr=0x132f3c7e4 sp=0x73f1660000 x16=0x150f9d9a4 x17=0x73f165ff20
+[guest-code] rev=ml333 pool_rip=0x12b55821f (PE 0x12b55821f) -- NO pool copy for this address (identity translate)
+00e4:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[guest-code] rev=ml333 pool_rip=0x12a4bc30b (PE 0x12a4bc30b) -- NO pool copy for this address (identity translate)
+[unixlib] opengl32 (GL-absent stub table) (module 0x73eea40000) -> 64-bit table (0x107ab4758)
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x15701c000)
+D E0 Handled self-modifying code: pc: 133C4696C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C48150 fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C48150 fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C48150 fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+D E0 Handled self-modifying code: pc: 133C4764C fault: 12C884F03
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 15.890s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\"" (fd=768, unixdir=769, dup_unixdir=773) cwd=L"C:\\windows\\system32\\"
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x12fd10000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=1252 peb=0x10c278000
+[nls-getptr] type=11 id=437 peb=0x10c278000
+[nls-getptr] type=11 id=20127 peb=0x10c278000
+[nls-getptr] type=11 id=1252 peb=0x10c278000
+[nls-getptr] type=11 id=437 peb=0x10c278000
+00cc:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #32 hwnd=0x10066 class='' text="RGSCSystemTray" rev=ml853
+[win-name] #36 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+[win-name] #42 hwnd=0x1007c class='' text="Default IME" rev=ml853
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Rockstar Games/Launcher/launcher.log
+[guest-log] #1 tid=00d4 [2026-10-28 18:26:56.524] [ ERROR ] [Main ] [launcher] Steam is not initialized
+[guest-log] #2 tid=00d4 [2026-10-28 18:26:56.525] [ ERROR ] [Main ] [error] ************************************************************************
+[guest-log] #5 tid=00d4 [2026-10-28 18:26:56.525] [ ERROR ] [Main ] [error] * Code:      113 (LAUNCHER_ERR_STEAM_FAILED)
+[win-name] #45 hwnd=0x1007e class='' text="UiWindow" rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[rb-tex] madeira-bcd new readback #1: fmt 80 940x318 level 0 (texture 940x318, 1 mips)
+[win-name] #46 hwnd=0x1007e class='' text="Erreur" rev=ml853
+[win-name] #50 hwnd=0x1007e class='' text="Erreur" rev=ml853
+[win-name] #51 hwnd=0x1007e class='' text="Erreur" rev=ml853
+[win-name] #52 hwnd=0x1007e class='' text="Erreur" rev=ml853
+D 14C Handled self-modifying code: pc: 134C4BFA0 fault: 12FD34F03
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x134c4cd4c RX from -32, 64 of 64 bytes: e8 03 09 aa a6 d3 01 91 1f 20 03 d5 c8 fc 9f 88 66 e0 89 d2 66 fa a5 f2 26 00 c0 f2 bf 3b 03 d5 df 68 3f b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 46 fd a5 f2 26 00 c0 f2 e6 8e 1f f8 
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x134c4cd4c (not an anon-JIT page)
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x134c4cd4c RX from -32, 64 of 64 bytes: e8 03 09 aa a6 d3 01 91 1f 20 03 d5 c8 fc 9f 88 66 e0 89 d2 66 fa a5 f2 26 00 c0 f2 bf 3b 03 d5 df 68 3f b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 46 fd a5 f2 26 00 c0 f2 e6 8e 1f f8 
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x134c4cd4c (not an anon-JIT page)
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x134c4cd4c RX from -32, 64 of 64 bytes: e8 03 09 aa a6 d3 01 91 1f 20 03 d5 c8 fc 9f 88 66 e0 89 d2 66 fa a5 f2 26 00 c0 f2 bf 3b 03 d5 df 68 3f b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 46 fd a5 f2 26 00 c0 f2 e6 8e 1f f8 
+014c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x134c4cd4c (not an anon-JIT page)
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4D8B8 fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4D8B8 fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4D8B8 fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+D 14C Handled self-modifying code: pc: 134C4CD4C fault: 12FD34F03
+[guest-log] svc #12 tid=00e0 [2026-10-28 18:26:56.264] [   220] [   E0] Checking if service is running...
+[guest-log] svc #14 tid=00e0 [2026-10-28 18:26:56.265] [   220] [   E0] Starting service...
+00e0:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=15614
+[unwind] term ml661 begin rip=73f1990690 rsp=711fd2fed8 window=[711fd2fed8..712052fed8) max=32
+[unwind] term ml661 #00 pc=73f1990690 rsp=711fd2fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=711fd2ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=711fd2ff60: d0ffd21f 71000000 b49d8b2c 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=12c8d5b29 rsp=711fd2fee0  <no module — STOP>
+[unwind] term ml661 end
+00e0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=15632
+[unwind] term ml661 begin rip=15354a2fc rsp=711fd2fd28 window=[711fd2fd28..712052fd28) max=32
+[unwind] term ml661 #00 pc=15354a2fc rsp=711fd2fd28  <no module — STOP>
+[unwind] term ml661 end
+00e0:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=571
+[Wine ntdll/server] process_exit_wrapper(0)
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 160 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 73EB7B0000
+[launch-view] dismissed reason=game-window logs=0
+D 160 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 73EB6D0000
+D 160 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73EB4C0000
+D 160 Load module mpr.dll (mpr.dll-09cefd52a3669014): 73EB430000
+D 160 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 73EB390000
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[guest-code] rev=ml333 pool_rip=0x12fe91d10 (PE 0x12fe91d10) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x12fd35925 (PE 0x12fd35925) -- NO pool copy for this address (identity translate)
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[guest-code] rev=ml333 pool_rip=0x12fd216f6 (PE 0x12fd216f6) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x12fd216f6 (PE 0x12fd216f6) -- NO pool copy for this address (identity translate)
+[mach_exc] UNHANDLED #1000 pc=0x134cab37c addr=0x12fe8956d x18=0x71333b0000 type=1 lr=0x134cab154 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] UNHANDLED #1100 pc=0x134cab37c addr=0x12fe896e7 x18=0x71333b0000 type=1 lr=0x134cab154 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] UNHANDLED #1200 pc=0x134cab37c addr=0x12fe8980c x18=0x71333b0000 type=1 lr=0x134cab154 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] UNHANDLED #1300 pc=0x134cab37c addr=0x12fe8991f x18=0x71333b0000 type=1 lr=0x134cab154 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FEA6FD9
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[mach_exc] UNHANDLED #2000 pc=0x134d03f7c addr=0x12fd1cb77 x18=0x71333b0000 type=1 lr=0x134d03d94 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+D 160 Handled self-modifying code: pc: 134D75B24 fault: 12FEA4836
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F403
+[footprint] rev=ml1060 fast phys=2358 MB compressed=0 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100ca5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+[guest-log] svc #24 tid=0160 [2026-10-28 18:26:56.698] [   328] [  14C] Checking if service is installed...
+[guest-log] svc #26 tid=0160 [2026-10-28 18:26:56.703] [   328] [  14C] Checking if service is running...
+[guest-log] svc #28 tid=0160 [2026-10-28 18:26:56.704] [   328] [  14C] Checking if service is correctly configured...
+[guest-log] svc #30 tid=0160 [2026-10-28 18:26:56.705] [   328] [  14C] Running as a service...
+[guest-log] svc #33 tid=0160 [2026-10-28 18:26:56.707] [   328] [  14C] Initing subsystem: DiagSubsystem
+[guest-log] svc #34 tid=0160 [2026-10-28 18:26:56.707] [   328] [  14C] Initing subsystem: HandshakeSubsystem
+[guest-log] svc #35 tid=0160 [2026-10-28 18:26:56.707] [   328] [  14C] Initing subsystem: PatchSubsystem
+[guest-log] svc #36 tid=0160 [2026-10-28 18:26:56.707] [   328] [  14C] Initing subsystem: PreqSubsystem
+[guest-log] svc #37 tid=0160 [2026-10-28 18:26:56.714] [   328] [  170] Setting state to SERVICE_RUNNING (4)
+[guest-log] svc #38 tid=0160 [2026-10-28 18:26:56.769] [   328] [  160] Connected from 200
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE89302
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F836
+[19:27:13.272] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=78 resident=2646MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml1060 fast phys=2379 MB compressed=0 MB
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE898FB
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8FEFA
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100ca5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x7117d40000 cpu=2% RUN pc=libsystem_platform.dylib`_platform_memmove+0x58 lr=Madeira`_MTLBuffer_updateContents+0x11c sp=0x12919fc70 NATIVE (unresolved: hostPC outside block) sp-cand=[ Launcher.exe+0x7071c0 Launcher.exe+0x1045d Launcher.exe+0x1ac7fb8 ]
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FEA6B88
+[footprint] rev=ml1060 fast phys=2396 MB compressed=0 MB
+D 160 Handled self-modifying code: pc: 134D6FCA4 fault: 12FD1BD7E
+D CC Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 73EB1D0000
+[mach_exc] UNHANDLED #19400 pc=0x134cab37c addr=0x12fe89f94 x18=0x71333b0000 type=1 lr=0x1350834c4 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] UNHANDLED #19500 pc=0x134cab37c addr=0x12fea6c1b x18=0x71333b0000 type=1 lr=0x134c10274 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19600 pc=0x134cab37c addr=0x12fea6e07 x18=0x71333b0000 type=1 lr=0x134c10274 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19700 pc=0x134cab37c addr=0x12fea6ffd x18=0x71333b0000 type=1 lr=0x134c10274 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19800 pc=0x134d03f7c addr=0x12fd1d730 x18=0x71333b0000 type=1 lr=0x134d03d94 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19900 pc=0x134d04464 addr=0x12fe8e17a x18=0x71333b0000 type=1 lr=0x134d03d94 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: f8bfc0c1 d503201f 38bfc108 [39000028] 910083a6 b8bfc0c6 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F03A
+[mach_exc] UNHANDLED #20000 pc=0x134d03f7c addr=0x12fe8f0c3 x18=0x71333b0000 type=1 lr=0x134d03d94 sp=0x73ebae0000 x16=0x1571099a4 x17=0x73ebadff20
+[mach_exc] insn_stream PC-12..PC+8: b8bfc108 d503201f d5033bbf [b83f6828] 910083a6 b8bfc0c8 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[footprint] rev=ml1060 fast phys=2514 MB compressed=0 MB
+[19:27:43.345] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=79 resident=2700MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FD5A658
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F68D
+[av-detail] ml613 #24576 p0=WRITE p1=0x12fe8f88a hostpc=0x134d03f7c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100ca5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE896E3
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8FBFE
+[av-detail] ml613 #28672 p0=WRITE p1=0x12fea6cfd hostpc=0x134d03f7c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+[footprint] rev=ml1060 fast phys=2531 MB compressed=0 MB
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE89D1D
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FEA6EEE
+[19:28:13.440] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=77 resident=2752MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100ca5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=2548 MB compressed=0 MB
+[av-detail] ml613 #32768 p0=WRITE p1=0x12fd3553a hostpc=0x13536277c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 160 Handled self-modifying code: pc: 134D04464 fault: 12FD1CEC4
+[footprint] rev=ml1060 fast phys=2659 MB compressed=0 MB
+[win-name] #53 hwnd=0x1007e class='' text="Erreur" rev=ml853
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+D 160 Handled self-modifying code: pc: 13541D63C fault: 12FD35B4E
+[av-detail] ml613 #36864 p0=WRITE p1=0x12fe894c5 hostpc=0x134cab37c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F4A3
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100ca5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #36 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE89414
+[av-detail] ml613 #40960 p0=WRITE p1=0x12fe89cd1 hostpc=0x134cab37c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FE8F9A1
+0160:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[footprint] rev=ml358 phys=2490 MB (peak 2659) internal=2466 MB compressed=0 MB external=308 MB reusable=4 MB (cycle=60)
+[19:28:43.574] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[thread-stacks] port=0x15013 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7100ca5040
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=80 resident=2779MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2490 MB (peak 2659) internal=2467 MB compressed=0 MB external=308 MB reusable=4 MB (cycle=61)
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #37 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #38 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0174:err:seh:NtGetContextThread [ec-getctx] ml715 #39 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D 160 Handled self-modifying code: pc: 134CAB37C fault: 12FE89A0B
+[fault_rip] cnt=44000 rip=0x12fd35bc4 pc=0x134cab37c addr=0x12fe89a5f kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fe88000+0x8000 rev=ml555
+[fault_rip] cnt=44500 rip=0x12fd35bc4 pc=0x134cab37c addr=0x12fea6eee kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fea4000+0x4000 rev=ml555
+[av-detail] ml613 #45056 p0=WRITE p1=0x12fd1d971 hostpc=0x134d03f7c hinsn=0xb83f6828 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=9 base=0x134c14000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=45000 rip=0x12fd11910 pc=0x134d03f7c addr=0x12fe8f43f kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fe8c000+0x4000 rev=ml555
+[fault_rip] cnt=45500 rip=0x12fd11910 pc=0x134d03f7c addr=0x12fe8f999 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fe8c000+0x4000 rev=ml555
+D 160 Handled self-modifying code: pc: 134D03F7C fault: 12FEA6B74
+[fault_rip] cnt=46000 rip=0x12fd11910 pc=0x134d04464 addr=0x12fea6cf0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fea4000+0x4000 rev=ml555
+[fault_rip] cnt=46500 rip=0x12fea3954 pc=0x1356451f4 addr=0x12fea277f kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x12fea0000+0x8000 rev=ml555
+[footprint] rev=ml358 phys=2491 MB (peak 2659) internal=2467 MB compressed=0 MB external=308 MB reusable=4 MB (cycle=62)
+[footprint] rev=ml358 phys=2491 MB (peak 2659) internal=2467 MB compressed=0 MB external=308 MB reusable=4 MB (cycle=63)
+[footprint] rev=ml358 phys=2492 MB (peak 2659) internal=2467 MB compressed=0 MB external=308 MB reusable=4 MB (cycle=64)
+[footprint] rev=ml358 phys=2490 MB (peak 2659) internal=2466 MB compressed=0 MB external=308 MB reusable=5 MB (cycle=65)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[19:28:55.225] [INFO] [session] length=134s partial=1 play=0s frames=0 stalls=0/0s peak=2702MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=40 game=Grand Theft Auto V Legacy

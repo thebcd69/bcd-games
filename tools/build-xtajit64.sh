@@ -207,6 +207,9 @@ else
 fi
 # Opt-in, whichever pin: MADEIRA_MONO_BP_UNLOCKED_MISS=1 (round 623).
 python3 "$R/tools/patch-fex-ios-mono-bp-unlocked-miss.py" "$R/FEX/FEXCore/Source/Interface/Core/Core.cpp"
+# Opt-in, whichever pin (round 624, agent A S7; Borderlands GOTY Enhanced V0FQAS): the alias table has room for 1024 image copies,
+# the limit in force stays 256 unless env.MADEIRA_FEX_ALIAS_MAX names more; the miss line says how full the table is.
+python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"
 build
 git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp
 git -C FEX/External/rpmalloc checkout -- rpmalloc/rpmalloc.c

@@ -218,6 +218,23 @@ struct AutoTuneEngineChecks {
         x = AutoTuneEngine.advance(x, report: report("killed", stage: 4, matched: ["swap-12gb-more"]), rules: rules,
                                    userKeys: [], fingerprint: "o", log: nil)
         expect(x.status == "stuck", "an upgrade needs a line auto-tune kept: it never adds a first swap-mb on its own")
+        // Round 625 (the owner's decision 38 b; Horizon Zero Dawn NFFPKV, its next log C7X0G9: "killed ... status stuck"): with the
+        // player's own swap file the swap tier is skipped, and helper memory whose guard closed at BCD's limit warning is next.
+        let pool = "helper-memory-guard-closed-at-limit"
+        expect(rules.first { $0.id == pool }.map { $0.lines == ["env.MADEIRA_POOL_MORE = 1"] && $0.priority == 52 && $0.noRetry == true
+                                                    && $0.outcomes == ["killed"] && $0.memoryMinPct == 85 } == true,
+               "the helper-memory rule: the key, after the swap tier's first lines, killed at 85 % or more, no retry")
+        var hm = AutoTuneState(retried: true)
+        hm = AutoTuneEngine.advance(hm, report: report("killed", stage: 5, seconds: 90,
+                                                       matched: ["swap-12gb-memory-kill-sure", "swap-12gb-memory-kill", pool, "swap-12gb-more"]),
+                                    rules: rules, userKeys: ["swap-mb", "swap-mode", "swap-min-mb"], fingerprint: "hm", log: nil)
+        expect(hm.status == "trying" && hm.candidateRule == pool && hm.candidate == ["env.MADEIRA_POOL_MORE = 1"],
+               "the player's own swap file: helper memory takes more next, not stuck (\(hm.status), \(hm.candidateRule ?? "-"))")
+        var hm2 = AutoTuneState(retried: true)
+        hm2 = AutoTuneEngine.advance(hm2, report: report("killed", stage: 5, seconds: 90, matched: ["swap-12gb-memory-kill", pool]),
+                                     rules: rules, userKeys: [], fingerprint: "hm2", log: nil)
+        expect(hm2.candidate == ["swap-mb = 6144", "swap-mode = 2", "swap-min-mb = 1"],
+               "without a swap file of the player's the swap step still comes first")
 
         // 15b. A failure that comes back the same every start (a noRetry rule, the JIT pool filling up):
         // no unchanged retry; nocopy first, then the split pool (Counter-Strike 2, 2026-10-20).
@@ -725,6 +742,37 @@ struct AutoTuneEngineChecks {
                                        userKeys: [], fingerprint: "l7", log: nil, listValues: ["env.MADEIRA_X64_IMAGE_NOCOPY": "1"])
             expect(l.status == "stuck", "any other rule still treats the list's keys as the user's")
 
+            // Round 625 (owner's item 21, agent E1 S13-c; Hogwarts Legacy GBQRKH): the two window rules may raise the list's exe-window-mb after their
+            // own failure (a crash or an early exit, not only a memory kill), only to a larger number, never a user's key.
+            let win = report("crashed", stage: 2, matched: ["exe-window-fixed-base"])
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: win, rules: rules, userKeys: [], fingerprint: "w1", log: nil,
+                                       listValues: ["exe-window-mb": "448"])
+            expect(l.candidate == ["exe-window-mb = 512"] && l.candidateRule == "exe-window-fixed-base",
+                   "the list's 448 MB window is raised to 512 after the crash it causes (\(l.candidate ?? []))")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: report("exited-early", stage: 2, matched: ["exe-window-fixed-base"]), rules: rules,
+                                       userKeys: [], fingerprint: "w2", log: nil, listValues: ["exe-window-mb": "448"])
+            expect(l.candidate == ["exe-window-mb = 512"], "an early exit with the same failure: raised too")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: win, rules: rules, userKeys: [], fingerprint: "w3", log: nil,
+                                       listValues: ["exe-window-mb": "512"])
+            expect(l.status == "stuck" && l.candidate == nil, "a list that already has 512: nothing new")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: win, rules: rules, userKeys: [], fingerprint: "w4", log: nil,
+                                       listValues: ["exe-window-mb": "592"])
+            expect(l.status == "stuck", "a list with a larger window is never lowered")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: win, rules: rules, userKeys: ["exe-window-mb"], fingerprint: "w5", log: nil,
+                                       listValues: ["exe-window-mb": "448"])
+            expect(l.status == "stuck", "the user's own exe-window-mb keeps the rule out")
+            var bigWin = report("crashed", stage: 2, matched: ["exe-window-fixed-base-large"])
+            bigWin.fixedExeMB = 575
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: bigWin, rules: rules, userKeys: [], fingerprint: "w6", log: nil,
+                                       listValues: ["exe-window-mb": "512"])
+            expect(l.candidate == ["exe-window-mb = 592"], "the large rule compares the window it would write (575 MiB: 592) with the list's 512")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: report("crashed", stage: 2, matched: ["x64-image-nocopy"]), rules: rules,
+                                       userKeys: [], fingerprint: "w7", log: nil, listValues: ["env.MADEIRA_X64_IMAGE_NOCOPY": "1"])
+            expect(l.status == "stuck", "a rule without the mark still treats the list's keys as the user's")
+            expect(Set(rules.filter { $0.listUpgradeFailure == true }.map(\.id)) == ["exe-window-fixed-base", "exe-window-fixed-base-large"]
+                   && rules.filter { $0.listUpgradeFailure == true }.allSatisfy { $0.listUpgrade == true },
+                   "only the two window rules carry the failure mark, both with listUpgrade")
+
             // (c) A failure no setting changes: the retry is not spent, and the advice does not promise a build.
             let ceg = "dock-ceg-result-55", mina = "metal-texture-double-release"
             var c = AutoTuneEngine.advance(AutoTuneState(), report: report("exited-early", stage: 2, matched: [ceg], dock: true), rules: rules,
@@ -845,6 +893,261 @@ struct AutoTuneEngineChecks {
             let sc = AutoTuneEngine.advance(AutoTuneState(), report: report("crashed", stage: 5, matched: ["sc-pa-pools-missing", "x64-image-nocopy", "pool-split-exhausted"]),
                                             rules: rules, userKeys: [], fingerprint: "s1", log: nil)
             expect(sc.candidateRule == "sc-pa-pools-missing" && sc.candidate == ["env.MADEIRA_SC_PA_POOLS = 2"], "...tried before the pool rules")
+        }
+
+        // 14b. Round 624 verdicts (agents B, D2, E1), with the facts set by hand.
+        do {
+            // (a) a launcher's child crashed before the game presented (Control FGTGM8: Control.exe exited 0, control_dx11.exe died)
+            var lc = AutoTuneLogFacts(); lc.stage = 2; lc.aliveSeconds = 11; lc.cleanMainExit = true; lc.childrenPending = true; lc.childUnhandled = 1
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 11), lc) == "crashed",
+                   "a launcher's child that crashed before a frame: crashed (Control FGTGM8)")
+            var lp = lc; lp.stage = 4; lp.aliveSeconds = 120
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 120), lp) == "ran",
+                   "...not once the game presented (Fallout 4 C5Y6PW: early helper errors, then play)")
+            var ln = lc; ln.childrenPending = false
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 11), ln) == "exited-early",
+                   "...nor without the launcher's \"main process exited but\" line (the old teardown guard)")
+            var lk = lc; lk.childUnhandled = 0
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 11), lk) == "exited-early",
+                   "...nor when the child left no crash evidence")
+            // (b) "I closed it" after a freeze in BCD's own lock with zero frames (Cult of the Lamb VHRFNE)
+            var fz = AutoTuneLogFacts(); fz.stage = 3; fz.fexlockStuck = 2; fz.presentsCounted = true; fz.presentsLogged = 0
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), fz) == "hung",
+                   "\"I closed it\" after a freeze in BCD's own lock with no frame: hung (VHRFNE)")
+            var fzp = fz; fzp.presentsLogged = 50
+            var fzn = fz; fzn.presentsCounted = nil
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), fzp) == "inconclusive"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), fzn) == "inconclusive",
+                   "...with frames, or without the Dock's frame counter: nothing learned, as before")
+            // (c) a start-up burst kill (Metro 2033 Redux Y1H618: 1960 MB slow, 3689 MB fast, limit 4096)
+            var bk = AutoTuneLogFacts(); bk.stage = 3; bk.limitMB = 4096; bk.lastSlowFootprintMB = 1960; bk.lastFootprintMB = 3689; bk.lastFootprintFast = true
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "froze"), bk) == "killed"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true), bk) == "killed",
+                   "a start-up burst at 90 % of the limit, 1.9 x the slow line: killed, whatever the answer (Y1H618)")
+            var bs = bk; bs.lastFootprintFast = false
+            var bl = bk; bl.lastFootprintMB = 2500
+            var bp = bk; bp.lastSlowFootprintMB = 3000
+            var b4 = bk; b4.stage = 4
+            var bf = bk; bf.freezeGaps = 1
+            expect([bs, bl, bp, b4, bf].allSatisfy { AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "froze"), $0) == "hung" },
+                   "...not from a slow line, below 80 %, a plateau, after a frame or with a freeze the app saw: \"it froze\" stays hung")
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), bk) == "inconclusive",
+                   "...and \"I closed it\" is still the player's")
+            // (d) alive two minutes after a few frames, 10 s or less of play (WRC 9 JDJ8KE: 122 s, play 4 s, 32 frames)
+            var wr = AutoTuneLogFacts(); wr.stage = 3; wr.aliveSeconds = 122; wr.sessionPlaySeconds = 4; wr.presentsCounted = true; wr.presentsLogged = 32
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 122), wr) == "hung", "a loading screen that stayed two minutes: hung (WRC 9)")
+            var wp = wr; wp.sessionPlaySeconds = 60
+            var w4 = wr; w4.stage = 4
+            var wy = wr; wy.aliveSeconds = 90
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 122), wp) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 122), w4) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 90), wy) == "exited-early",
+                   "...not with a minute of play, at stage 4, or before two minutes")
+            // (e) a Dock game whose steam_api found no Steam and that showed an error box: crashed at any stage (Portal 2 HZE5E9)
+            var st = AutoTuneLogFacts(); st.stage = 4; st.aliveSeconds = 30; st.dock = true; st.steamNotFound = true; st.dialogs = ["Engine Error"]
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 30), st) == "crashed", "a Dock game with no Steam and an error box: crashed (Portal 2)")
+            var sn = st; sn.dock = false
+            var sd = st; sd.dialogs = []
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 30), sn) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 30), sd) == "ran",
+                   "...not outside the Dock (the Rockstar launcher's own probe), nor without a box")
+            // (f) Unreal Engine 4's own crash window is crash evidence (Gal*Gun 2 B2B7BR: the window was open, no exit status, scored "ran")
+            let ueSigs = AutoTuneEngine.signals(rules)
+            let ueScan = AutoTuneLogScanner(signals: ueSigs)
+            ueScan.feed(Data("[win-name] #100 hwnd=0x1008a class='' text=\"The UE4-GalGun2 Game has crashed and will close\" rev=ml853\n".utf8))
+            ueScan.finish()
+            var ue = ueScan.facts; ue.stage = 4; ue.aliveSeconds = 139
+            expect(ueScan.facts.runtimeErrorDialog && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 139), ue) == "crashed",
+                   "UE4's \"... has crashed and will close\" window counts as the program's own crash box: crashed, not ran (B2B7BR)")
+            let titleScan = AutoTuneLogScanner(signals: ueSigs)
+            titleScan.feed(Data("[win-name] #5 hwnd=0x10052 class='' text=\"Gal*Gun 2 \" rev=ml853\n".utf8))
+            titleScan.finish()
+            expect(!titleScan.facts.runtimeErrorDialog, "...and the game's own window title is not")
+            // (g) the Rockstar Launcher's own error line with no game frame is a failure (agent R S29: AX6XNN "ran, ok" with 113)
+            var lf = AutoTuneLogFacts(); lf.stage = 3; lf.aliveSeconds = 120; lf.dock = true; lf.presentsCounted = true; lf.presentsLogged = 0
+            lf.launcherErrors = 1
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 120), lf) == "crashed",
+                   "a Launcher error (LAUNCHER_ERR_) and no game frame: crashed, not ran (AX6XNN)")
+            var lfq = lf; lfq.quitRequested = true; lfq.launcherErrorBeforeQuit = true; lfq.crashEvidenceAtQuit = 0
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 30), lfq) == "crashed",
+                   "...also when the player closed it after the error (5T9WRM)")
+            var lfp = lf; lfp.stage = 4; lfp.presentsLogged = 900
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 120), lfp) == "ran",
+                   "...not once the game drew frames")
+            var lfc = lf; lfc.stage = 5; lfc.aliveSeconds = 663
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 663), lfc) == "crashed",
+                   "...also when the clock raised the stage but the Dock's counter stayed at 0 (RXTG8X, 663 s)")
+            let leScan = AutoTuneLogScanner(signals: ueSigs)
+            leScan.feed(Data("[guest-log] #5 tid=00d4 [2026-10-28 18:26:56.525] [ ERROR ] [Main ] [error] * Code:      113 (LAUNCHER_ERR_STEAM_FAILED)\n".utf8))
+            leScan.finish()
+            expect(leScan.facts.launcherErrors == 1, "the scanner counts the Launcher's error line")
+            // (h) frames, then the Dock's counter flat for three readings with a FEX lock held: frozen (agent C S7, Kerbal Space Program 2G3Q3V:
+            // 3474 frames, then the same number for 5 minutes; scored "ran"/"quit" and the cause rule was never read)
+            var fk = AutoTuneLogFacts(); fk.stage = 5; fk.aliveSeconds = 421; fk.dock = true; fk.fexlockStuck = 2; fk.presentsCounted = true
+            fk.presentsLogged = 3474; fk.presentsLast = 3474; fk.presentsFlat = 3; fk.frameSeen = true
+            expect(fk.lockFreeze && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 421), fk) == "hung",
+                   "frames, then a counter flat for 90 s with a FEX lock held: hung, not ran (2G3Q3V)")
+            var fkq = fk; fkq.quitRequested = true; fkq.lockFreezeAtQuit = true; fkq.crashEvidenceAtQuit = 0
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 421), fkq) == "hung"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true), fkq) == "hung",
+                   "...also when the player closed the frozen game (the quit came after the freeze), killed or not")
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), fk) == "hung",
+                   "...and \"I closed it\" after such a freeze is a hang too")
+            var fk2 = fk; fk2.presentsFlat = 2
+            var fkn = fk; fkn.fexlockStuck = 0
+            var fkl = fkq; fkl.lockFreezeAtQuit = false
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 421), fk2) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 421), fkn) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 421), fkl) == "quit",
+                   "...not with 60 s of a flat counter, without the stuck lock, or when the freeze came only after the player's quit")
+            let fkScan = AutoTuneLogScanner(signals: ueSigs)
+            var fkLines = "[fexlock] STUCK write-wait on mutex 0x7c304e0108 word=c0010000 | owner teb=71fff00000 tid=00a8\n"
+            for n in [0, 1740, 3474, 3474, 3474, 3474] { fkLines += "[INFO] detach-wait: presents=\(n) running=1 elapsed=30s\n" }
+            fkScan.feed(Data(fkLines.utf8))
+            let flatBefore = fkScan.facts.lockFreeze
+            fkScan.feed(Data("[INFO] detach-wait: presents=3600 running=1 elapsed=210s\n".utf8))
+            fkScan.finish()
+            expect(flatBefore && !fkScan.facts.lockFreeze && fkScan.facts.presentsFlat == 0,
+                   "the scanner sees the flat run (three repeats) and forgets it when the counter moves again")
+            // (i) round 624, RETRO-1 R4 (WRC 9 JDJ8KE/WV1P7T): a [spin] report and a counter flat for 60 s after frames is a freeze like (h); the
+            // player's Close 75-80 s into it is a hang, not a quit
+            var sp = AutoTuneLogFacts(); sp.stage = 3; sp.aliveSeconds = 200; sp.dock = true; sp.spinReports = 1; sp.presentsCounted = true
+            sp.presentsLogged = 34; sp.presentsLast = 34; sp.presentsFlat = 2; sp.frameSeen = true
+            var spq = sp; spq.quitRequested = true; spq.spinFreezeAtQuit = true; spq.crashEvidenceAtQuit = 0
+            expect(sp.spinFreeze && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 200), spq) == "hung",
+                   "a [spin] report and a frame counter flat for 60 s, then Close: hung, not quit (WRC 9 JDJ8KE)")
+            var spr = spq; spr.spinFreezeAtQuit = false
+            var spn = spq; spn.spinReports = 0; spn.spinFreezeAtQuit = false
+            var sp1 = sp; sp1.presentsFlat = 1
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 200), spr) == "quit"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, quitRequested: true, seconds: 200), spn) == "quit"
+                   && !sp1.spinFreeze,
+                   "...not when the counter still moved at the quit, without a spin report (CS:S W69RYK), or after one flat reading")
+            let spScan = AutoTuneLogScanner(signals: ueSigs)
+            var spLines = "[spin] ml1140 23:33:20.967 look 1: x64->EC 12486246/s, 100% of the sampled calls for 4 s go to d3d11.dll+0x6be54\n"
+            for n in [0, 34, 34, 34] { spLines += "[INFO] detach-wait: presents=\(n) running=1 elapsed=30s\n" }
+            spLines += "[INFO] [frontend] graceful close requested\n[INFO] detach-wait: presents=40 running=1 elapsed=150s\n"
+            spScan.feed(Data(spLines.utf8)); spScan.finish()
+            expect(spScan.facts.spinReports == 1 && spScan.facts.spinFreezeAtQuit && !spScan.facts.spinFreeze,
+                   "the scanner counts the spin look and keeps the freeze as it stood at the quit line")
+            // (j) round 624, RETRO-2 RQ3 (Ghost of Tsushima JKJA9Q): a helper's error exit before the first frame, then the game drew and reached
+            // stage 4: not the game's crash; an error exit after a frame still is
+            var he = AutoTuneLogFacts(); he.stage = 5; he.aliveSeconds = 600; he.errorExits = 1; he.frameSeen = true; he.presentsCounted = true
+            he.presentsLogged = 30000; he.lastErrorExitAfterFrame = false
+            var hf = he; hf.lastErrorExitAfterFrame = true
+            var h3 = he; h3.stage = 3; h3.presentsLogged = 100
+            var hu = he; hu.unhandled = 1
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 600), he) == "ran",
+                   "a helper's error exit before the first frame, then 10 minutes of play: ran, not crashed (JKJA9Q)")
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 600), hf) == "crashed"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 600), h3) == "crashed"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 600), hu) == "crashed",
+                   "...an error exit after a frame, a session below stage 4, or an unhandled exception still is a crash")
+            let heScan = AutoTuneLogScanner(signals: ueSigs)
+            heScan.feed(Data(("0030:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0\n"
+                              + "[INFO] detach-wait: presents=900 running=1 elapsed=30s\n").utf8))
+            let beforeFrame = heScan.facts.errorExits == 1 && !heScan.facts.lastErrorExitAfterFrame
+            heScan.feed(Data("0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0\n".utf8))
+            heScan.finish()
+            expect(beforeFrame && heScan.facts.errorExits == 2 && heScan.facts.lastErrorExitAfterFrame,
+                   "the scanner notes whether the last error exit came after a frame")
+            // (k) round 624, Farming Simulator 22 on Discord: an unhandled host fault with no TEB, no frame for 695 s: hung, not ran by the clock
+            var nt = AutoTuneLogFacts(); nt.stage = 5; nt.aliveSeconds = 695; nt.dock = true; nt.machFaultNoTeb = 1; nt.presentsCounted = true
+            nt.presentsLogged = 0
+            var nts = nt; nts.aliveSeconds = 73; nts.stage = 2
+            var ntf = nt; ntf.presentsLogged = 500; ntf.frameSeen = true
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 695), nt) == "hung",
+                   "an unhandled no-TEB fault and no frame for 695 s: hung (FS22)")
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 73), nts) == "exited-early"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 695), ntf) == "ran",
+                   "...not a session that ended within two minutes (MGS PFDA0D, 73 s), nor one that drew frames")
+            let ntScan = AutoTuneLogScanner(signals: ueSigs)
+            ntScan.feed(Data(("[mach_exc] UNHANDLED #12400 pc=0x13e994024 addr=0x71f75f7c80 x18=0x0 type=1 lr=0x13f2e0354\n"
+                              + "[mach_exc] UNHANDLED #1 pc=0x13e346788 addr=0x71f3b68000 x18=0x71fffc0000 type=1 lr=0x13f2e0354\n").utf8))
+            let notYet = ntScan.facts.machFaultNoTeb == 0
+            ntScan.feed(Data("[mach_exc] UNHANDLED #1 pc=0x14d2241d8 addr=0x57e x18=0x0 type=1 lr=0x14d209864 sp=0x717ae5e3f0\n".utf8))
+            ntScan.finish()
+            expect(notYet && ntScan.facts.machFaultNoTeb == 1,
+                   "the scanner counts only the first unhandled fault with x18 0 (not #12400, not one with a TEB in x18: Watch Dogs 2)")
+            // (l) round 624, RETRO-2 RQ1: a noFix rule marked evaluateWhenRan speaks for a session scored ran; without the flag, or with kept
+            // lines, the session stays "ok"/"found"
+            let ran = AutoTuneRule(id: "test-ran-nofix", lines: [], priority: 3, all: [AutoTuneSignal(has: ["only in the test"])],
+                                   reason: "the test's reason", noFix: true, evaluateWhenRan: true)
+            var plain = ran; plain.id = "test-ran-plain"; plain.evaluateWhenRan = nil
+            let tr = rules + [ran, plain]
+            let tsig = AutoTuneEngine.signals(tr)
+            let rr = AutoTuneReport(outcome: "ran", stage: 5, seconds: 314, presents: 0, peakMB: nil, dock: true, d3d12: false, ramMB: 11695,
+                                    matched: [], evidence: [], build: 624)
+            let counts = tsig.map { sig in sig.has == ["only in the test"] ? 1 : 0 }
+            expect(AutoTuneEngine.matches(ran, report: rr, counts: counts, signals: tsig) && !AutoTuneEngine.matches(plain, report: rr, counts: counts, signals: tsig),
+                   "a played session matches a flagged noFix rule, not an unflagged one")
+            var kr = rr; kr.matched = [ran.id]
+            let ks = AutoTuneEngine.advance(AutoTuneState(), report: kr, rules: tr, userKeys: [], fingerprint: "r", log: nil)
+            expect(ks.status == "known" && ks.known == ran.id && ks.knownNoFix == true && ks.knownFixedIn == nil && ks.candidate == nil,
+                   "...and the verdict says what it was (known), nothing is tried")
+            var pr = rr; pr.matched = [plain.id]
+            let ps = AutoTuneEngine.advance(AutoTuneState(), report: pr, rules: tr, userKeys: [], fingerprint: "r", log: nil)
+            var keptState = AutoTuneState(); keptState.kept = ["env.MADEIRA_CAGE_RELEASE = 1"]; keptState.fingerprint = "r"
+            let kept = AutoTuneEngine.advance(keptState, report: kr, rules: tr, userKeys: [], fingerprint: "r", log: nil)
+            expect(ps.status == "ok" && kept.status == "found", "...not for an unflagged rule (ok), nor when auto-tune kept lines (found)")
+            // (n) round 624 (Fallout 4 voices, WRSNC8): a ranOnly rule speaks for a played session only; a failed session with the same
+            // lines keeps its own verdict
+            var only = ran; only.id = "test-ran-only"; only.ranOnly = true
+            let failedReport = AutoTuneReport(outcome: "crashed", stage: 4, seconds: 90, presents: 300, peakMB: nil, dock: true, d3d12: false,
+                                              ramMB: 15389, matched: [], evidence: [], build: 624)
+            expect(AutoTuneEngine.matches(only, report: rr, counts: counts, signals: tsig)
+                   && !AutoTuneEngine.matches(only, report: failedReport, counts: counts, signals: tsig)
+                   && AutoTuneEngine.matches(ran, report: failedReport, counts: counts, signals: tsig),
+                   "a ranOnly rule matches a played session and not a failed one (an evaluateWhenRan rule without it matches both)")
+            // (m) round 624, agent D3 S5-3 (Sekiro XJ8YM3, Cloudpunk F88RB4 with 2 GB free; Sekiro ZJYGS9 with 4 GB): a swap file is sized to the
+            // free storage; with too little no swap attempt is made and the state says why
+            expect(AutoTuneEngine.swapRoomMB(freeGB: 0) == 0 && AutoTuneEngine.swapRoomMB(freeGB: 2) == 0 && AutoTuneEngine.swapRoomMB(freeGB: 3) == 1536
+                   && AutoTuneEngine.swapRoomMB(freeGB: 4) == 2560 && AutoTuneEngine.swapRoomMB(freeGB: 8) == 6656,
+                   "the swap room: all but 1.5 GB of the free storage, nothing under 1 GB")
+            var sr = AutoTuneReport(outcome: "killed", stage: 3, seconds: 60, presents: 0, peakMB: 4052, dock: false, d3d12: false, ramMB: 5665,
+                                    matched: [], evidence: [], build: 624)
+            sr.freeDiskGB = 3
+            expect(AutoTuneEngine.resolve(["swap-mb = 3072", "swap-mode = 2"], report: sr) == ["swap-mb = 1536", "swap-mode = 2"],
+                   "a swap line is clamped to the room, the other lines are left as they are")
+            var srn = sr; srn.freeDiskGB = nil
+            expect(AutoTuneEngine.resolve(["swap-mb = 3072", "swap-mode = 2"], report: srn) == ["swap-mb = 3072", "swap-mode = 2"],
+                   "...and left alone when the free storage is not known")
+            let swapRule = AutoTuneRule(id: "test-swap", lines: ["swap-mb = 3072", "swap-mode = 2", "swap-min-mb = 1"], priority: 40,
+                                        all: [AutoTuneSignal(has: ["only in the swap test"])], reason: "test")
+            let swapUp = AutoTuneRule(id: "test-swap-more", lines: ["swap-mb = 6144"], priority: 41, all: [AutoTuneSignal(has: ["only in the swap test"])],
+                                      upgrade: true, noRetry: true, reason: "test")
+            var r2 = sr; r2.freeDiskGB = 2; r2.matched = [swapRule.id]
+            var st0 = AutoTuneState(); st0.retried = true; st0.fingerprint = "s"
+            let s2 = AutoTuneEngine.advance(st0, report: r2, rules: rules + [swapRule, swapUp], userKeys: [], fingerprint: "s", log: nil)
+            expect(s2.status == "stuck" && s2.lowDiskGB == 2 && s2.candidate == nil && (s2.lowDiskNote ?? "").contains("this device has 2 GB free"),
+                   "2 GB free: no swap attempt, stuck, and the note says why")
+            var r4 = sr; r4.freeDiskGB = 4; r4.matched = [swapRule.id]
+            let s4 = AutoTuneEngine.advance(st0, report: r4, rules: rules + [swapRule, swapUp], userKeys: [], fingerprint: "s", log: nil)
+            expect(s4.status == "trying" && s4.lowDiskGB == nil && s4.candidate == ["swap-mb = 2560", "swap-mode = 2", "swap-min-mb = 1"],
+                   "4 GB free: the swap file of 2560 MB")
+            var stk = st0; stk.kept = ["swap-mb = 2560"]
+            var ru = sr; ru.freeDiskGB = 4; ru.matched = [swapUp.id]
+            let su = AutoTuneEngine.advance(stk, report: ru, rules: rules + [swapRule, swapUp], userKeys: [], fingerprint: "s", log: nil)
+            expect(su.status == "stuck" && su.lowDiskGB == 4, "a larger swap file the room cannot hold over the kept one is no attempt either")
+        }
+
+        // 14b. Round 624 (agent E1 S5b): a "stuck" verdict says why each matched rule was passed over; the choice itself is the same,
+        // and the note belongs to that session only.
+        do {
+            var st = AutoTuneState(); st.retried = true; st.fingerprint = "w"; st.tried = [cage]
+            var rp = report("crashed", stage: 3, matched: [cage, spill])
+            rp.freeDiskGB = nil
+            let stuck = AutoTuneEngine.advance(st, report: rp, rules: rules, userKeys: ["env.MADEIRA_THREAD_STACK_SPILL"], fingerprint: "w", log: nil)
+            expect(stuck.status == "stuck" && stuck.candidate == nil, "the tried rule and a rule whose key the user set: stuck, as before")
+            expect(stuck.skippedNote == "\(cage) (tried), \(spill) (a key you set)", "...and the note names both and why (\(stuck.skippedNote ?? "nil"))")
+            let listed = AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "w"), report: report("crashed", stage: 3, matched: [spill]),
+                                                rules: rules, userKeys: [], fingerprint: "w", log: nil,
+                                                listValues: ["env.MADEIRA_THREAD_STACK_SPILL": "1"])
+            expect(listed.status == "stuck" && listed.skippedNote == "\(spill) (a key of the recommended list)",
+                   "a key of the recommended list is named as such (\(listed.skippedNote ?? "nil"))")
+            let trying = AutoTuneEngine.advance(stuck, report: report("crashed", stage: 3, matched: [jumbo]), rules: rules, userKeys: [],
+                                                fingerprint: "w", log: nil)
+            expect(trying.skippedNote == nil, "the next session's verdict does not carry the note of the one before")
         }
 
         // 15. State survives JSON (the app saves it between sessions).

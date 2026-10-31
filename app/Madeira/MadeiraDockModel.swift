@@ -132,7 +132,7 @@ final class MadeiraDockModel: ObservableObject {
                 // session of one-time installs open after its batch ended. The wineserver writes
                 // the registry to disk every 30 s, so 45 s after the batch a restart loses nothing.
                 if DockInstallers.installsOnly, running, !offered, let finished = DockInstallers.finishedAt,
-                   Date().timeIntervalSince(finished) >= 45 {
+                   Date().timeIntervalSince(finished) >= Double(DockInstallers.restartOfferDelay) {
                     offered = true
                     let ended = DockInstallers.poll(drive: MadeiraDock.drive) ?? "Done with the one-time installs."
                     status = ended + "\n" + DockInstallers.restartWords

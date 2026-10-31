@@ -111,7 +111,9 @@ check("the i386 farm's cache key is unchanged: wine revision, dxmt revision, and
 # the i386 farm (both games are 32-bit); it is checked by tests/host/check-dxmt-d3d9-custom-driver.py.
 _d3d9_patches = sorted(p.name for p in (root / "tools").glob("patch-dxmt-d3d9*")) + sorted(p.name for p in (root / "tools").glob("patch-wine-d3d9*"))
 check("no tools/patch-dxmt-*.py or tools/patch-wine-*.py file belongs to this change (the key hashes them: the i386 farm would be rebuilt)",
-      not (root / "tools/patch-dxmt-d3d9-x64.py").exists() and _d3d9_patches == ["patch-dxmt-d3d9-custom-driver.py"])
+      not (root / "tools/patch-dxmt-d3d9-x64.py").exists()
+      # round 624 (agent D2 S16): the Direct3D 9 query park measurement is a separate change of its own (check-gpu-time-wow64.py)
+      and _d3d9_patches == ["patch-dxmt-d3d9-custom-driver.py", "patch-dxmt-d3d9-query-park.py"])
 i386 = (root / "build/wine-i386/build.sh").read_text()
 check("the i386 build still installs the shim as d3d9.dll and the emulated frontend as d3d9-emulated.dll, from its own build-pe-i386 tree",
       '"$STRIP" -o "$DEST/d3d9.dll" build-pe-i386/src/d3d9shim/d3d9shim.dll' in i386
@@ -163,8 +165,13 @@ recs = json.loads((root / "recommended/recommendations.json").read_text())
 carry = [r["id"] for r in recs["rules"] if "MADEIRA_D3D9_X64" in json.dumps(r["config"])]
 # 2026-10-24 (ajan23/loglar): MudRunner and Indivisible crash on the NULL result of the failed Direct3DCreate9 as well; their lists carry the line from build 598.
 # Round 602 (ajan41): PICO PARK, Don't Starve Together and A Hat in Time (their own programs fail the same probe) carry the line too, from build 602.
-check("only Darksiders II Deathinitive Edition's, MudRunner's, Indivisible's, Counter-Strike: Source's and (round 602) PICO PARK's, Don't Starve Together's and A Hat in Time's lists carry the line",
-      carry == ["darksiders-ii-deathinitive", "mudrunner", "indivisible", "counter-strike-source", "pico-park", "dont-starve-together", "a-hat-in-time"])
+# Round 624 (agent C): No More Room in Hell's 64-bit Source engine (8E0JH6, Z6VXH7, ZSY2WM) carries the line from build 598, as Counter-Strike: Source.
+check("only Darksiders II Deathinitive Edition's, MudRunner's, Indivisible's, Counter-Strike: Source's, (round 602) PICO PARK's, Don't Starve Together's and A Hat in Time's and (round 624) No More Room in Hell's lists carry the line",
+      carry == ["darksiders-ii-deathinitive", "mudrunner", "indivisible", "counter-strike-source", "pico-park", "dont-starve-together", "a-hat-in-time",
+                "no-more-room-in-hell", "outlast"])
+_nm = next(r for r in recs["rules"] if r["id"] == "no-more-room-in-hell")
+check("no-more-room-in-hell: the line is from build 598 only, after the standard line",
+      _nm["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}] and _nm["version"] == 1)
 for _id in ("pico-park", "dont-starve-together", "a-hat-in-time"):
     r_ = next(r for r in recs["rules"] if r["id"] == _id)
     check(f"{_id}: the line is from build 602 only, after the standard line", r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 602}] and r_["version"] == 1)
@@ -189,7 +196,9 @@ check("its match is Steam 388410, the folder and darksiders2.exe; the line is fr
 # (env.MADEIRA_D3D9 = emulated, the shim's own default), MudRunner and Indivisible their own lines; none of them names the 64-bit variable.
 others = [r["id"] for r in recs["rules"] if r["id"] not in ("darksiders-ii-deathinitive", "fallout-new-vegas", "resident-evil-6", "resident-evil-revelations-2", "mudrunner", "indivisible", "counter-strike-source",
                                                            "pico-park", "dont-starve-together", "a-hat-in-time",
-                                                           "grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2")   # the last four: env.MADEIRA_D3D8 = d3d9
+                                                           "grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2",   # these four and red-faction: env.MADEIRA_D3D8 = d3d9
+                                                           "red-faction", "no-more-room-in-hell", "outlast",
+                                                           "fallout-3")   # round 624: Fallout 3 carries New Vegas's D3D9 last-calls ring
           and "d3d9" in json.dumps(r["config"]).lower()]
 check("no other list names d3d9 (the Direct3D 9 default of build 602 comes from the game's folder, BCDGraphicsDefaults.swift, not from a list)", others == [])
 print("note: the list's own version is not bumped here (the release does it); the rule's lines carry minBuild 595, so older builds skip it")

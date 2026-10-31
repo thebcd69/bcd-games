@@ -344,7 +344,7 @@ check('Fallout 4 list: Steam 377160, folder "fallout 4", the launcher and the ga
       str(fo4 and fo4['match']))
 swap_lines = [c for c in (fo4 or {}).get('config', []) if isinstance(c, dict)]
 check('the swap line is Fallout4Launcher.exe=Fallout4.exe with minBuild 598; the standard line stays',
-      swap_lines == [{'line': 'env.MADEIRA_SPAWN_SWAP = Fallout4Launcher.exe=Fallout4.exe', 'minBuild': 598}]
+      [c for c in swap_lines if 'MADEIRA_SPAWN_SWAP' in c['line']] == [{'line': 'env.MADEIRA_SPAWN_SWAP = Fallout4Launcher.exe=Fallout4.exe', 'minBuild': 598}]   # v2 (round 624) adds the WMA line
       and 'env.MADEIRA_EC_HOOK_TRACE = 0' in (fo4 or {}).get('config', []))
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the policy lists the name and checks the value: two .exe names, ASCII, no path',

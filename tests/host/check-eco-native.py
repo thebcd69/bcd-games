@@ -114,8 +114,14 @@ with tempfile.TemporaryDirectory(prefix="madeira-eco-native-") as t:
               "one [eco-native] line per thread")
 
 warm = func_body(virt, "static void *ios_pool_warmer_thread( void *arg )")
-check(warm.split("\n")[3].strip() == '{ extern void ios_eco_native_self( const char *who ); ios_eco_native_self( "pool-warmer" ); }   /* madeira-bcd eco-native */',
-      "the warmer moves itself before its first cycle")
+eco_line = '{ extern void ios_eco_native_self( const char *who ); ios_eco_native_self( "pool-warmer" ); }   /* madeira-bcd eco-native */'
+warm_lines = [l.strip() for l in warm.split("\n")]
+before_eco = warm_lines[:warm_lines.index(eco_line)] if eco_line in warm_lines else None
+# round 624 (agent D2 S20): a declaration (physmap_at90) may precede it; nothing that runs may
+check(before_eco is not None and "for (;;)" in warm_lines and warm_lines.index(eco_line) < warm_lines.index("for (;;)")
+      and all(l in ("", "{") or l.startswith(("static void *ios_pool_warmer_thread(", "unsigned ", "int ", "/*", "*"))
+              for l in before_eco),
+      "the warmer moves itself before its first cycle (only declarations and comments before it)")
 heal = func_body(sig, "static void *ios_stale_va_scanner( void *arg )")
 check('ios_eco_native_self( "wine-stale-heal" );' in heal and heal.index("ios_eco_native_self") < heal.index("for (;;)"),
       "the healer moves itself before its loop")

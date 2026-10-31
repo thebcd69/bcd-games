@@ -28,7 +28,10 @@
  * ----------------------------------------------------------------------------------------------
  *  1. the headline: what happened, the faulting address (an access violation: the guest address read or written), the address of the block
  *     (the guest rip of the translated block that faulted: the instruction is within its first bytes) or of the int3, with module+RVA, and
- *     the eight registers; then the registers that point into a module;
+ *     the eight registers; then the registers that point into a module. For an access violation the faulting instruction's EIP is the
+ *     exact one from FEX's block table (round 624, A-S12: the block address alone was FEX's State.rip, only the last block the dispatcher
+ *     entered; a note line says when it could not be resolved); with no EBP chain the code before up to 8 call-preceded return addresses of
+ *     the program image on the stack ("stk#N") is printed;
  *  2. for an access violation, the fault address minus each register (a 0xAAAAAAAA there names a pattern, a small delta a stale pointer);
  *  3. the thread facts: TEB32 and PEB32, the stack range and depth, LastErrorValue and LastStatusValue, the TLS bitmap; the modules;
  *  4. the PE identity of the module the address is in: TimeDateStamp, SizeOfImage, CheckSum, the sections (identifies the exact build of the
@@ -37,6 +40,17 @@
  *  6. the code: 256 bytes before the block's address and 160 after it, and 64 bytes before every return address of the chain;
  *  7. 96 bytes at EAX, ECX, EDX, EBX, ESI, EDI and EBP when they point into the stack or heap, as dwords with module+RVA (the objects the
  *     failing function was handed).
+ *  Round 624 (agents E1 S17 and D2 S8; Unreal Gold EQ6DMS/X3HYP5, Need for Speed: Underground 2 B1MR64), for an access violation:
+ *  8. the Wine views around the fault address and around EBP, ESI, EDI, EBX, ECX and EDX when they point into the window (at most 6 places,
+ *     "[fault-rgn]" lines: the view, the views below and above, their history), from ios_dump_fault_region_report (virtual_ios.c), which only
+ *     tries the memory lock;
+ *  9. the WoW64 allocations and frees before the fault (virtual_ios.c keeps the last 64 while the switch is on): whether the address was ever
+ *     allocated, freed, or only computed;
+ * 10. the places in the program's image that hold the fault address as a dword (at most 16): the structure the pointer came from.
+ *  A write to a READABLE page (the write protection of translated code, a guard page; FEX and the guest handle both) takes no report of the
+ *  three: the report is for the wild pointers a program follows, whose pages are not readable. Besides the [rsp-trunc] block of the Mach
+ *  exception thread (the first 12 events of a process) the report is also reached from the signal path's "BUS->AV: unreadable target"
+ *  branch, where a game's real wall can come thousands of events later (EQ6DMS: about event 17,400).
  *
  * WHAT IT NEVER DOES
  * ------------------
@@ -62,6 +76,7 @@
 #define IOS_X86F_OBJ_BYTES    96
 #define IOS_X86F_FRAMES       24
 #define IOS_X86F_SITES        12
+#define IOS_X86F_STACK_SITES  8
 
 /* env.MADEIRA_X86_FAULT_DUMP = 1 turns the report on; anything else (or nothing) leaves it off. Read once. */
 static int ios_x86_fault_enabled( void )
@@ -129,13 +144,70 @@ static void ios_x86f_object( uint64_t win, const char *reg, uint32_t v, const st
     }
 }
 
+/* round 624 (E1 S17 a2): the Wine views around a guest address of the window (virtual_ios.c; the memory lock is only tried there). */
+static void ios_x86f_views( uint64_t win, const char *what, uint32_t v )
+{
+    extern int ios_dump_fault_region_report( void *addr );
+
+    dprintf( STDERR_FILENO, "[x86-fault]   views around %s=0x%08x:\n", what, v );
+    if (!ios_dump_fault_region_report( (void *)(uintptr_t)(win + v) ))
+        dprintf( STDERR_FILENO, "[x86-fault]     the memory lock was busy: not read\n" );
+}
+
+/* round 624 (D2 S8 d3): the places in the program's image (the first module of the PEB32 list) that hold `value` as an aligned dword, at most
+ * 16, read 2 KB at a time through the fault-safe reader (what is not there is skipped). */
+static void ios_x86f_scan_image( uint64_t win, const struct ios_wn32_mod *mods, unsigned nmods, uint32_t value )
+{
+    uint32_t page[0x800 / 4], at, end, hits = 0;   /* 2 KB a read: the report also runs on the 50 KB signal stack */
+    char line[700];
+    size_t l = 0;
+    unsigned k, pages = 0;
+
+    if (!nmods || value < 0x10000 || mods[0].size < 0x1000 || mods[0].size > 0x4000000u) return;   /* an image of 64 MB at most */
+    at = mods[0].base & ~0x7ffu;
+    end = mods[0].base + mods[0].size;
+    line[0] = 0;
+    for (; at < end && hits < 16; at += 0x800)
+    {
+        if (!ios_av_args_read( win + at, page, sizeof(page) )) continue;
+        pages++;
+        for (k = 0; k < sizeof(page) / 4 && hits < 16; k++)
+        {
+            if (page[k] != value || at + k * 4 < mods[0].base || at + k * 4 >= end) continue;
+            hits++;
+            if (l + 40 < sizeof(line)) l += (size_t)snprintf( line + l, sizeof(line) - l, " %s+0x%x", mods[0].name, at + k * 4 - mods[0].base );
+        }
+    }
+    dprintf( STDERR_FILENO, "[x86-fault]   the image %s holds the fault address 0x%08x as a dword at %u place(s)%s:%s (%u of its 2 KB blocks read)\n",
+             mods[0].name, value, hits, hits >= 16 ? " (the first 16)" : "", hits ? line : " none", pages );
+}
+
+/* 1 when the 8 bytes before `ret` end in a call instruction (E8 rel32, or FF /2: call r/m32), i.e. `ret` looks like a return address */
+static int ios_x86f_call_before( uint64_t win, uint32_t ret )
+{
+    uint8_t b[8];
+    unsigned len;
+
+    if (ret < 0x10008 || !ios_av_args_read( win + ret - 8, b, 8 )) return 0;
+    if (b[3] == 0xe8) return 1;
+    for (len = 2; len <= 7; len++)
+        if (b[8 - len] == 0xff && ((b[9 - len] >> 3) & 7) == 2) return 1;
+    return 0;
+}
+
 /* The report. gregs: the 8 registers in the order RAX RCX RDX RBX RSP RBP RSI RDI (32-bit values in the low halves); eip: the guest address
  * of the int3 or of the block that faulted; fault_addr: the guest address of the access (-1 for an int3); write: 1 for a store, 0 for a
  * load, -1 when not known. */
-static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thread_teb, const uint64_t *gregs, uint64_t eip64,
-                                  int64_t fault_addr, int write )
+static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t thread_teb, const uint64_t *gregs, uint64_t eip64,
+                                     int64_t fault_addr, int write, int resolve )
 {
+    extern uint64_t ios_native_rip_from_hostpc( uint64_t, uint64_t, const char ** );
     static volatile int reports;
+    uint64_t state_rip = 0;
+    const char *why = "";
+    uint8_t sv[IOS_X86F_STACK_DWORDS * 4] = { 0 };
+    unsigned got = 0;
+    int from_stack = 0;
     uint64_t base = st->__x[19], teb32_host = 0;
     uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, teb32, peb32 = 0, stack[IOS_X86F_STACK_DWORDS], i;
     int32_t woff = 0;
@@ -151,7 +223,24 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
      * when it lies in this window */
     if (st->__x[18] >= base && st->__x[18] - base < 0x100000000ULL) thread_teb = (uintptr_t)st->__x[18];
     if (!thread_teb) return;
+    if (fault_addr >= 0)
+    {
+        uint8_t probe;
+
+        /* round 624 (E1 S17 a1): a readable page is the write protection of translated code or a guard page: not one of the three */
+        if (ios_av_args_read( base + (uint64_t)fault_addr, &probe, 1 )) return;
+    }
     if ((num = __sync_add_and_fetch( &reports, 1 )) > IOS_X86F_MAX_REPORTS) return;
+
+    if (resolve && fault_addr >= 0)
+    {
+        uint64_t bb = 0, exact = 0;
+
+        if (st->__x[28] >= 0x10000 && ios_av_args_read( st->__x[28], &bb, 8 ) && bb >= 0x10000)
+            exact = ios_native_rip_from_hostpc( bb, __darwin_arm_thread_state64_get_pc( *st ), &why );
+        else why = "x28 not readable";
+        if (exact >= 0x10000 && exact <= 0xffffffffULL) { state_rip = eip64; eip64 = exact; }
+    }
 
     eax = (uint32_t)gregs[0]; ecx = (uint32_t)gregs[1]; edx = (uint32_t)gregs[2]; ebx = (uint32_t)gregs[3];
     esp = (uint32_t)gregs[4]; ebp = (uint32_t)gregs[5]; esi = (uint32_t)gregs[6]; edi = (uint32_t)gregs[7];
@@ -169,7 +258,14 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
         nmods = ios_wn32_modules( base, peb32, mods, 96 );
     ios_i3x_where( mods, nmods, eip, w, sizeof(w) );
 
-    if (fault_addr >= 0)
+    if (fault_addr >= 0 && state_rip)
+        dprintf( STDERR_FILENO,
+                 "[x86-fault] #%d a 32-bit guest faulted %s guest 0x%08x at EIP 0x%08x (%s) [exact: the block table of FEX for host pc 0x%llx; State.rip=0x%08x is only "
+                 "the last block entry], window 0x%llx, %u modules in the PEB32 list; EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
+                 num, write < 0 ? "at" : (write ? "writing" : "reading"), (uint32_t)fault_addr, eip, w[0] ? w : "no module",
+                 (unsigned long long)__darwin_arm_thread_state64_get_pc( *st ), (uint32_t)state_rip, (unsigned long long)base, nmods,
+                 eax, ecx, edx, ebx, esi, edi, ebp, esp );
+    else if (fault_addr >= 0)
         dprintf( STDERR_FILENO,
                  "[x86-fault] #%d a 32-bit guest faulted %s guest 0x%08x in the block that starts at guest 0x%08x (%s), window 0x%llx, %u modules in "
                  "the PEB32 list; EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
@@ -180,6 +276,10 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
                  "[x86-fault] #%d a 32-bit guest executed int3 at guest 0x%08x (%s), window 0x%llx, %u modules in the PEB32 list; "
                  "EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
                  num, eip, w[0] ? w : "no module", (unsigned long long)base, nmods, eax, ecx, edx, ebx, esi, edi, ebp, esp );
+
+    if (resolve && fault_addr >= 0 && !state_rip)
+        dprintf( STDERR_FILENO, "[x86-fault]   note: the block above is FEX's State.rip (0x%08x), only the entry of the last block the dispatcher entered; "
+                 "the exact EIP could not be resolved (%s); FEX's own \"D <tid> pc: .. eip: ..\" line below names it\n", (uint32_t)eip64, why );
 
     /* registers that point into a module, and (for an access) the fault address minus each register */
     {
@@ -246,8 +346,7 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
 
     /* the stack from ESP: raw rows, then the dwords that point into a module */
     {
-        uint8_t sv[IOS_X86F_STACK_DWORDS * 4];
-        unsigned got = esp >= 0x10000 ? ios_i3x_read( base + esp, (uint8_t *)stack, sv, sizeof(sv) ) : 0;
+        got = esp >= 0x10000 ? ios_i3x_read( base + esp, (uint8_t *)stack, sv, sizeof(sv) ) : 0;
 
         if (!got) dprintf( STDERR_FILENO, "[x86-fault]   guest stack at ESP=0x%x is not readable\n", esp );
         else
@@ -302,12 +401,19 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
     }
 
     /* the code around the address and before the first return addresses (rows of 32 bytes, "[x86-fault]   code <what> <offset>: ...") */
-    ios_x86f_code( base, fault_addr >= 0 ? "block" : "int3", eip, IOS_X86F_CODE_BEFORE, IOS_X86F_CODE_AFTER, mods, nmods );
+    if (!nsite && nmods && got)
+    {
+        for (i = 0; i < IOS_X86F_STACK_DWORDS && nsite < IOS_X86F_STACK_SITES; i++)
+            if (sv[i * 4] && stack[i] >= mods[0].base && stack[i] - mods[0].base < mods[0].size && ios_x86f_call_before( base, stack[i] ))
+                sites[nsite++] = stack[i];
+        from_stack = nsite != 0;
+    }
+    ios_x86f_code( base, fault_addr >= 0 ? (state_rip ? "eip" : "block") : "int3", eip, IOS_X86F_CODE_BEFORE, IOS_X86F_CODE_AFTER, mods, nmods );
     for (k = 0; k < nsite; k++)
     {
         char tag[24];
 
-        snprintf( tag, sizeof(tag), "ret#%u", k );
+        snprintf( tag, sizeof(tag), "%s#%u", from_stack ? "stk" : "ret", k );
         ios_x86f_code( base, tag, sites[k], 64, 8, mods, nmods );
     }
 
@@ -319,7 +425,37 @@ static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thre
     ios_x86f_object( base, "ESI", esi, mods, nmods );
     ios_x86f_object( base, "EDI", edi, mods, nmods );
     ios_x86f_object( base, "EBP", ebp, mods, nmods );
+
+    /* round 624 (E1 S17 a2, D2 S8 d2 and d3): for an access violation, the views around the fault and the pointers, the allocations before it
+     * and the places of the image that hold the address */
+    if (fault_addr >= 0)
+    {
+        extern void ios_x86f_alloc_ring_dump( uint32_t fault );
+        const struct { const char *name; uint32_t v; } at[] =
+            { { "fault", (uint32_t)fault_addr }, { "EBP", ebp }, { "ESI", esi }, { "EDI", edi }, { "EBX", ebx }, { "ECX", ecx }, { "EDX", edx } };
+        uint32_t seen[6];
+        unsigned nseen = 0, j;
+
+        for (k = 0; k < sizeof(at) / sizeof(at[0]) && nseen < 6; k++)
+        {
+            uint32_t pg = at[k].v & ~0x3fffu;
+
+            if (at[k].v < 0x10000 || at[k].v > 0xfffe0000u) continue;
+            for (j = 0; j < nseen && seen[j] != pg; j++) ;
+            if (j < nseen) continue;            /* one place a page */
+            seen[nseen++] = pg;
+            ios_x86f_views( base, at[k].name, at[k].v );
+        }
+        ios_x86f_alloc_ring_dump( (uint32_t)fault_addr );
+        ios_x86f_scan_image( base, mods, nmods, (uint32_t)fault_addr );
+    }
     dprintf( STDERR_FILENO, "[x86-fault]   end of report #%d\n", num );
+}
+
+static void ios_x86_fault_report( const arm_thread_state64_t *st, uintptr_t thread_teb, const uint64_t *gregs, uint64_t eip64,
+                                  int64_t fault_addr, int write )
+{
+    ios_x86_fault_report_ex( st, thread_teb, gregs, eip64, fault_addr, write, 0 );
 }
 
 /* The int3 call: gregs is FEX's guest register file (RAX RCX RDX RBX RSP RBP RSI RDI ...); grip the address after the int3. */
@@ -332,7 +468,10 @@ static void ios_x86_fault_int3( const arm_thread_state64_t *st, uintptr_t thread
 /* The access-violation call: the faulting thread's host state (x4 x7 x5 x6 x8 x9 x10 x11 are EAX ECX EDX EBX ESP EBP ESI EDI of a 32-bit
  * guest in JIT code), the guest rip of the translated block (State.rip) and the host address of the access (the window base plus the guest
  * address). */
-static void ios_x86_fault_av( const arm_thread_state64_t *st, uintptr_t thread_teb, uint64_t block_rip, uint64_t host_addr, int write )
+/* round 624: never inlined, so the report's frame (about 8 KB) exists only while it runs: bus_handler calls it on the 50 KB signal stack, and
+ * its own frame stays what it was (1184 bytes) for every other BUS signal. */
+static __attribute__((noinline)) void ios_x86_fault_av( const arm_thread_state64_t *st, uintptr_t thread_teb, uint64_t block_rip,
+                                                        uint64_t host_addr, int write )
 {
     static volatile uint64_t last_rip, last_addr;
     uint64_t base = st->__x[19], g[8];
@@ -345,7 +484,7 @@ static void ios_x86_fault_av( const arm_thread_state64_t *st, uintptr_t thread_t
     guest_addr = (int64_t)(host_addr - base);
     g[0] = st->__x[4]; g[1] = st->__x[7]; g[2] = st->__x[5]; g[3] = st->__x[6];
     g[4] = st->__x[8]; g[5] = st->__x[9]; g[6] = st->__x[10]; g[7] = st->__x[11];
-    ios_x86_fault_report( st, thread_teb, g, block_rip, guest_addr, write );
+    ios_x86_fault_report_ex( st, thread_teb, g, block_rip, guest_addr, write, 1 );
 }
 
 #endif

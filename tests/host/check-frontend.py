@@ -287,6 +287,18 @@ expect(script.hasPrefix("@echo off\r\n") && script.contains("start \"\" \"C:\\wi
        && script.hasSuffix("start \"\" \"C:\\Games\\Some Game\\bin\\game.exe\" -windowed\r\n"), "services batch: services, cd, start the game")
 expect(svc.launchArguments == "/desktop=shell,1280x720 cmd /c \"C:\\bcd-games\\\(svc.id.uuidString).bat\"",
        "services: the desktop runs the batch, which carries the arguments")
+// Round 625 (owner's item 25): the EA app's and Battle.net's entries set Wine's PunkBuster stubs to start on demand, only when the key
+// exists; a name outside [A-Za-z0-9_] is dropped; every other entry's batch is byte for byte what it was.
+expect(svc.demandStartServices == nil && !script.contains("reg "), "no list: no reg line, the batch as before")
+var quiet = svc; quiet.demandStartServices = ["PnkBstrA", "PnkBstrB", "bad name", "x&y"]
+let quietScript = quiet.servicesScript ?? ""
+let pnkA = "reg query \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrA\" >nul 2>&1 && reg add \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrA\" /v Start /t REG_DWORD /d 3 /f >nul\r\n"
+let pnkB = pnkA.replacingOccurrences(of: "PnkBstrA", with: "PnkBstrB")
+expect(quietScript.contains(pnkA) && quietScript.contains(pnkB) && !quietScript.contains("bad name") && !quietScript.contains("x&y")
+       && quietScript.components(separatedBy: "reg add").count == 3
+       && quietScript.range(of: pnkB)!.upperBound <= quietScript.range(of: "start \"\" \"C:\\windows\\system32\\services.exe\"")!.lowerBound
+       && quietScript.replacingOccurrences(of: pnkA, with: "").replacingOccurrences(of: pnkB, with: "") == script,
+       "the two stubs on demand before services.exe, nothing else changed (\(quietScript))")
 var svcBat = bat; svcBat.startServices = true; svcBat.launchMode = nil
 expect(svcBat.servicesScript?.hasSuffix("call \"C:\\Games\\Tool\\run game.bat\" fast\r\n") == true
        && svcBat.launchArguments == "/c \"C:\\bcd-games\\\(svcBat.id.uuidString).bat\"", "services + .bat: CALLed from the batch")

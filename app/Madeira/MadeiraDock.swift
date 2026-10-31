@@ -294,7 +294,7 @@ enum MadeiraDock {
                 return "Steam still reports this account as playing in another session. Quit the game on your other device (if you just closed it, allow a few minutes), then start it again."
             }
             if result == 45 || result == 48, let error = fields["launch-client-error"].flatMap(Int.init),
-               let reason = Self.launchRefusal(error, waited: result == 48) {
+               let reason = Self.launchRefusal(error, waited: result == 48, installLacksMemory: MemoryRights.lacking) {
                 return reason
             }
             return "The Steam launch from BCD Dock failed (code \(result)). Export the log, then try again."
@@ -302,7 +302,7 @@ enum MadeiraDock {
 
         /// Valve's own launch refusal (EAppUpdateError) in words. Numbers only
         /// come from the host report; nothing here changes what Steam decided.
-        static func launchRefusal(_ error: Int, waited: Bool) -> String? {
+        static func launchRefusal(_ error: Int, waited: Bool, installLacksMemory: Bool = false) -> String? {
             switch error {
             case 5: return "Steam couldn't confirm that the signed-in account has a license for this game."
             case 6, 21: return "To start this game, Steam has to reach its servers, and it couldn't. Check your connection, then try again."
@@ -319,6 +319,14 @@ enum MadeiraDock {
             case 25: return "Steam lists this game as not released yet."
             case 26: return "Steam lists this game as unavailable in your region."
             case 35: return "Steam reports this account as playing in another session. Quit the game on your other device, then start it here again."
+            // Round 624 (agent N S13; QH4XFC, V71SS6, 9Z31S2): the 32-bit program's 4 GB address window was refused ("[wow-window] refused");
+            // 58 of 61 logs with this error are installs without the limit. With the limit the generic words stay (other causes).
+            case 46:
+                return installLacksMemory
+                    ? "BCD couldn't start this game's program: it needs more address space than this install has, because it lacks the increased "
+                        + "memory limit (32-bit games need the most). Add the limit with GetMoreRam (with SideStore or LiveContainer), or sign BCD with "
+                        + "a paid developer account."
+                    : nil
             default: return nil
             }
         }
@@ -347,6 +355,9 @@ enum MadeiraDock {
         "ceg-finished-jobs", "ceg-result", "ceg-disabled", "ceg-unsupported-client",
         "ceg-scm", "ceg-scm-started", "ceg-scm-error", "ceg-service-registered", "ceg-service-install", "ceg-service-stop", "ceg-scm-stopped",
         "game-scm", "game-scm-timeout", "launch-keep-alive",
+        // round 624 (Steam 113; tools/patch-dock-steam-readback.py): the published values read back while the game starts (bits:
+        // 1 pid, 2 ActiveUser, 4 SteamPID intact, 8 a read failed), the wait loop's longest gap, the experiments' writes.
+        "launch-discovery-readback", "launch-loop-gap-ms", "launch-discovery-readback-running", "launch-discovery-reasserted",
         // The host's own account of the launch (madeira-dock src/launch.c): when it published the Steam client
         // for the game to find, asked Valve's client to start it, saw it run, saw it end, and gave the
         // registry values back. A Rockstar launcher that says "Steam failed to initialize" while the host

@@ -61,6 +61,7 @@ struct BCDSessionLiveLayer: View {
             model.$liveLogs.map { _ in () }.eraseToAnyPublisher(),
             model.$launchLogs.map { _ in () }.eraseToAnyPublisher(),
             model.$launchSlow.map { _ in () }.eraseToAnyPublisher(),
+            model.$launchVerySlow.map { _ in () }.eraseToAnyPublisher(),
             model.$current.map { _ in () }.eraseToAnyPublisher(),
             dock.$failure.map { _ in () }.eraseToAnyPublisher(),
             dock.$holding.map { _ in () }.eraseToAnyPublisher(),
@@ -141,7 +142,7 @@ struct BCDSessionLiveLayer: View {
             let read = BCDDockStart.read(MadeiraDock.pollReport().fields, installers: DockInstallers.script != nil,
                                          installerProgress: progress, installsFinished: DockInstallers.finishedAt != nil,
                                          waited: Date().timeIntervalSince(hostDue),
-                                         restartHint: DockInstallers.installsOnly ? DockInstallers.closingWords : nil)
+                                         restartHint: DockInstallers.installsOnly ? DockInstallers.closingCountdown() : nil)
             info.step = read.step
             info.steps = BCDDockStart.steps
             info.notes = read.notes
@@ -152,10 +153,24 @@ struct BCDSessionLiveLayer: View {
             }
         } else {
             info.step = wine_process_is_running() != 0 ? .loading : .starting
-            if model.launchSlow {
+            if model.launchVerySlow {
+                // madeira-bcd (round 624, agent D2 S1 / Discord W1): ten minutes without a frame is not a slow first start.
+                info.notes.append(BCDStartNote(id: "very-slow", text: "Nothing has been drawn for 10 minutes. If the game's own loading "
+                                               + "picture is not showing, close BCD completely (swipe it away in the app switcher), open it "
+                                               + "again and start the game; if it happens again, send the log.", tone: .warm))
+            } else if model.launchSlow {
                 info.notes.append(BCDStartNote(id: "slow", text: "This is taking longer than usual. A game's first start can take a few minutes.",
                                                tone: .warm))
             }
+        }
+        // madeira-bcd (round 624, agent D2 S2; YX66TX): the first start of a Windows desktop that is the library's only entry says, once, how a
+        // game gets there (BCDDesktopHint, armed by the library's start).
+        if BCDDesktopHint.armed, model.activeEntry?.desktop == true {
+            info.notes.append(BCDStartNote(id: "desktop-empty", text: BCDDesktopHint.text))
+        }
+        // madeira-bcd (round 624, agent N S14; FWXFQ1): a start left for another app within seconds is paused by iOS and may be closed.
+        if dock.failure == nil && info.seconds < BCDCrashRules.shortStart {
+            info.notes.append(BCDStartNote(id: "stay-in-front", text: "Stay in BCD until the game's picture shows. iOS pauses a game that is started and then left."))
         }
         info.canShowDesktop = dock.holding && dock.failure == nil
         info.canShowGame = model.launchSlow && !dock.holding
@@ -273,6 +288,24 @@ struct BCDSessionLiveLayer: View {
         return entries.enumerated().map { index, entry in
             BCDLogLine(id: index, text: entry.lastRaw.trimmingCharacters(in: .whitespacesAndNewlines), error: entry.level == .error)
         }
+    }
+}
+
+/// madeira-bcd (round 624, agent D2 S2; YX66TX: a new install opened the Windows desktop, its library's only entry, and tapped around an empty
+/// desktop): the desktop's first start on an install whose library holds nothing else shows one note on the starting screen. Text only.
+@MainActor enum BCDDesktopHint {
+    static let flag = "bcd.desktop-hint-shown"
+    static let text = "The Windows desktop starts empty. To play a game, add it to the library or sign in to Steam. To run a program yourself: "
+        + "Start, Run, Browse, then pick its .exe (your files are on the drive named C:)."
+    /// This session shows the note.
+    private(set) static var armed = false
+
+    /// The library's start of the Windows desktop: `games` is the number of cards in the library, the desktop's own included.
+    static func arm(games: Int, defaults: UserDefaults = .standard) {
+        armed = false
+        guard games <= 1, !defaults.bool(forKey: flag) else { return }
+        defaults.set(true, forKey: flag)
+        armed = true
     }
 }
 

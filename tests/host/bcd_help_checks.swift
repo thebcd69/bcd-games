@@ -161,8 +161,50 @@ func readiness() {
     check("... and with it, nothing is missing", ids([module("a.dll", true, ["mfc140u.dll", "mfc140.dll"])], vc).isEmpty)
     check("... except an MFC file Microsoft's x64 copy does not hold (the debug one), which BCD cannot supply",
           BCDReadiness.evaluate(modules: [module("a.dll", true, ["mfc140ud.dll"])], files: [], provided: vc).map { ($0.id, $0.fixable) }.first! == ("mfc64", false))
-    check("a 32-bit MFC game has no fix", BCDReadiness.evaluate(modules: [module("muv-luv_pf.exe", false, ["mfc140u.dll"])], files: [], provided: vc).map { ($0.id, $0.fixable) }.first! == ("mfc32", false))
+    // Round 625 (the owner's item 26): the 32-bit MFC is downloadable (Settings › Visual C++ › MFC, 32-bit); a game takes it with env.MADEIRA_MFC32 = 1.
+    let mfc32 = BCDReadiness.evaluate(modules: [module("muv-luv_pf.exe", false, ["mfc140u.dll"])], files: [], provided: vc)
+    check("a 32-bit MFC game without the 32-bit MFC is told to download it (the 64-bit runtime does not count)",
+          mfc32.map { ($0.id, $0.fixable) }.first! == ("mfc32", true) && mfc32[0].text.contains("Download the 32-bit MFC in Settings › Visual C++ first"))
+    var vc32 = vc; vc32.vcRuntimeX86 = true
+    check("... and with it, nothing is missing (the four DLLs of Microsoft's 32-bit package)",
+          ids([module("muv-luv_pf.exe", false, ["mfc140u.dll", "mfc140.dll", "mfcm140.dll", "mfcm140u.dll"])], vc32).isEmpty)
+    check("... except an MFC file the package does not hold (the debug one), which BCD cannot supply",
+          BCDReadiness.evaluate(modules: [module("a.exe", false, ["mfc140ud.dll"])], files: [], provided: vc32).map { ($0.id, $0.fixable) }.first! == ("mfc32", false)
+          && BCDReadiness.evaluate(modules: [module("a.exe", false, ["mfc140ud.dll"])], files: [], provided: none).map { ($0.id, $0.fixable) }.first! == ("mfc32", false))
+    // Round 624 (agent N S12/S12b/S13): a Unity game on an install without the limit or on a small map, a 32-bit game without the limit and extended VA
+    var noRights = BCDReadinessProvided(); noRights.increasedMemory = false; noRights.extendedVA = false
+    var smallMap = BCDReadinessProvided(); smallMap.mapGB = 17
+    var bigMap = BCDReadinessProvided(); bigMap.mapGB = 512
+    let unityFiles: Set<String> = ["unityplayer.dll", "game.exe"]
+    let noRightsUnity = BCDReadiness.evaluate(modules: [], files: unityFiles, provided: noRights)
+    check("a Unity game on an install without the limit gets a note with no fix; on a 17 GB map another; on 512 GB or by default none",
+          noRightsUnity.map(\.id) == ["unity-no-rights"] && noRightsUnity.first?.fixable == false
+          && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: smallMap).map(\.id) == ["unity-small-map"]
+          && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: bigMap).isEmpty
+          && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: BCDReadinessProvided()).isEmpty
+          && BCDReadiness.evaluate(modules: [], files: ["game.exe"], provided: noRights).isEmpty)
+    let wow32 = BCDReadiness.evaluate(modules: [module("Game.exe", false, [])], files: [], provided: noRights, mainFile: "game.exe")
+    check("a 32-bit launched program on an install without the limit and extended VA gets the window note; a 64-bit one, a helper, or rights do not",
+          wow32.map(\.id) == ["wow-window"] && wow32.first?.fixable == false
+          && BCDReadiness.evaluate(modules: [module("Game.exe", true, [])], files: [], provided: noRights, mainFile: "game.exe").isEmpty
+          && BCDReadiness.evaluate(modules: [module("Helper.exe", false, []), module("Game.exe", true, [])], files: [], provided: noRights,
+                                   mainFile: "game.exe").isEmpty
+          && BCDReadiness.evaluate(modules: [module("Game.exe", false, [])], files: [], provided: BCDReadinessProvided(), mainFile: "game.exe").isEmpty
+          && BCDReadiness.evaluate(modules: [module("Game.exe", false, [])], files: [], provided: noRights).isEmpty)
+    check("the log line names the Unity note as one with no fix",
+          BCDReadiness.logLine(game: "U", modules: 0, findings: noRightsUnity).hasSuffix("unity-no-rights(no fix)"))
     check("a game that carries its own MFC file is fine", ids([module("a.exe", false, ["mfc140u.dll"])], files: ["mfc140u.dll"]).isEmpty)
+    // Round 624 (agent E1 S1, Aliens: Colonial Marines VMJ4WV): Valve's steam_api missing from the game's own copy (c0000135 before any window).
+    let noSteamAPI = BCDReadiness.evaluate(modules: [module("ACM.exe", false, ["kernel32.dll", "steam_api.dll"])], files: [], provided: none)
+    check("a program that imports steam_api.dll from a folder without it: the copy is incomplete, no fix BCD offers",
+          noSteamAPI.map { ($0.id, $0.fixable) }.first! == ("steamapi", false) && noSteamAPI[0].text.contains("ACM.exe needs steam_api.dll")
+          && noSteamAPI[0].text.contains("install the game again"))
+    check("... steam_api64.dll the same; the file anywhere in the folder tree: nothing",
+          ids([module("g.exe", true, ["steam_api64.dll"])]) == ["steamapi"]
+          && ids([module("g.exe", true, ["steam_api64.dll"])], files: ["steam_api64.dll"]).isEmpty
+          && ids([module("g.exe", false, ["steam_api.dll"])], files: ["steam_api.dll"]).isEmpty)
+    check("... and a scan that stopped at its limit calls nothing missing (the file may not have been reached)",
+          BCDReadiness.evaluate(modules: [module("g.exe", true, ["steam_api64.dll"])], files: [], provided: none, complete: false).isEmpty)
     check(".NET without Wine Mono says to download it; with it, nothing", ids([module("g.exe", false, ["mscoree.dll"])]) == ["mono"]
           && ids([module("g.exe", false, ["mscoree.dll"])], { var p = none; p.wineMono = true; return p }()).isEmpty)
     check("OpenAL, PhysX and the 2010 DirectX files each point at their Start menu runtime",
@@ -173,7 +215,7 @@ func readiness() {
     check("a 32-bit DirectX file BCD already has (xactengine2_0, d3dx9_43) is not flagged", ids([module("g.exe", false, ["xactengine2_0.dll", "d3dx9_43.dll", "xinput1_3.dll"])]).isEmpty)
     check("XNA: the game's folder names the framework and the runtime is missing", ids([], files: ["microsoft.xna.framework.dll"]) == ["xna"]
           && ids([], files: ["microsoft.xna.framework.dll"], { var p = none; p.xna = true; return p }()).isEmpty)
-    let findings = BCDReadiness.evaluate(modules: [module("a.exe", false, ["mfc140u.dll", "openal32.dll", "physxloader.dll"])], files: [], provided: none)
+    let findings = BCDReadiness.evaluate(modules: [module("a.exe", false, ["mfc140ud.dll", "openal32.dll", "physxloader.dll"])], files: [], provided: none)
     check("what can be fixed comes first; the note shows two and counts the rest", findings.first?.fixable == true && findings.last?.fixable == false
           && BCDReadiness.note(findings)!.hasSuffix("(1 more in the log.)") && BCDReadiness.note([]) == nil, BCDReadiness.note(findings) ?? "nil")
     check("a finding is reported once even when ten programs import the same file",

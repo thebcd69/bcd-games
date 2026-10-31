@@ -42,7 +42,10 @@ def function(signature):
 vhs = source[source.index('struct ios_vhs_rec\n{'):source.index('static void ios_vh_note( char kind, const struct file_view *view )')]
 note_fn = function('static void ios_vh_note( char kind, const struct file_view *view )')
 delete_fn = function('static void delete_view( struct file_view *view )')
-dump_fn = function('void ios_dump_fault_region( void *addr )')
+# round 624 (agents E1 S17, D2 S8): the lines moved into ios_fault_region_lines, shared by ios_dump_fault_region (the storm gate and the lock,
+# as before) and the 32-bit fault report's variant (the lock only tried)
+dump_fn = function('static void ios_fault_region_lines( void *addr )\n{')
+dump_wrap = function('void ios_dump_fault_region( void *addr )\n{')
 ring = source[source.index('#define IOS_MAP_RING 256'):source.index('static NTSTATUS map_file_into_view_ex( struct file_view *view, int fd, size_t start, size_t size,\n                                       off_t offset, unsigned int vprot, BOOL removable,\n                                       BOOL for_image )\n{')]
 
 # ---- source shape --------------------------------------------------------------------------------------------------
@@ -57,7 +60,9 @@ check('delete_view marks a deleted file view in the provenance ring, and only a 
       and 'static void ios_map_note_unmapped( const void *base, size_t size );' in source[:source.index('static void delete_view( struct file_view *view )')])
 check('the fault report names the views below and above before the histories, inside the "no Wine view" branch',
       dump_fn.index('NO wine view') < dump_fn.index('below = find_view( (char *)addr - 1, 1 );') < dump_fn.index('above = find_view_range( addr, 0x100000 );')
-      < dump_fn.index('ios_vh_dump( addr );') < dump_fn.index('ios_vhs_dump( addr, 0x40000, 10 );') < dump_fn.index('mutex_unlock( &virtual_mutex );'))
+      < dump_fn.index('ios_vh_dump( addr );') < dump_fn.index('ios_vhs_dump( addr, 0x40000, 10 );')
+      and dump_wrap.index('if (!ios_storm_gate( &fr_storm )) return;') < dump_wrap.index('mutex_lock( &virtual_mutex );')
+      < dump_wrap.index('ios_fault_region_lines( addr );') < dump_wrap.index('mutex_unlock( &virtual_mutex );'))
 check('the neighbour lines say whether the fault is exactly one past the end of the view below', 'the fault is exactly one past its end' in dump_fn)
 check('the provenance ring has the flag, a new record clears it, and the description says the view is gone',
       'int unmapped;' in ring and 'ios_map_ring[slot].unmapped = 0;' in ring and 'THAT VIEW IS GONE (unmapped since)' in ring)

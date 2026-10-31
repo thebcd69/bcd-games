@@ -1,6 +1,7 @@
 /* Wrapper: include original main.c but add iOS logging around init */
 #include <os/log.h>
 #include "wine_log_ios.h"
+#include "early_fault_ios.h"   /* madeira-bcd (round 624, agent D1 S8): [early-fault] */
 #define main wineserver_main_original
 #include "main.c"
 #undef main
@@ -41,6 +42,7 @@ int wineserver_main(int argc, char *argv[])
     ws_log("[wineserver] init_signals...");
     set_current_time();
     init_signals();
+    ios_early_fault_install();   /* round 624 (D1-S8): [early-fault] until signal_init_process() takes over; hands over to what init_signals() installed */
     ws_log("[wineserver] init_memory...");
     init_memory();
     ws_log("[wineserver] load_intl_file + init_directories...");

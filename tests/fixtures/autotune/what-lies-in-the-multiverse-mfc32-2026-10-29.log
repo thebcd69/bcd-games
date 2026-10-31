@@ -1,0 +1,162 @@
+[08:54:36.692] [INFO] Checking entitlements...
+[08:54:36.692] [INFO] [build] v0.1.623 (623)
+[08:54:36.693] [INFO] [device] model=iPhone17,4 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6122MB cores=6
+[08:54:36.693] [INFO] [device] address-map=[0x104510000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[08:54:36.709] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[08:55:36.240] [INFO] Requesting JIT with Built-in StikJIT...
+[08:55:37.920] [INFO] [bcd] library launch What Lies in the Multiverse.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[08:55:37.955] [INFO] Running full Wine sequence...
+[08:55:37.955] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104510000,0x8000000000) 512GB available=6091MB low-power=0 thermal=nominal
+[08:55:37.962] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[08:55:37.963] [INFO] Allocating 896MB JIT pool via debugger...
+[08:55:37.963] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[08:55:37.963] [INFO] [jit-debugger] attached=1 at the pool request
+[08:55:37.966] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[08:55:38.737] [INFO] RX pool at 0x148000000
+[08:55:38.757] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.862s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5520 MB + phys_footprint=623 MB = 6144 MB (hw.memsize says 7655 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[footprint] rev=ml358 phys=683 MB (peak 683) internal=681 MB compressed=0 MB external=117 MB reusable=34 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7023120000+0x100000 held for 2000 ms (1 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x1072e8d00)
+D 24 Load module What Lies in the Multiverse.exe (what lies in the multiverse.exe-68fde6d95dc6af12): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[file-fail] ml665 #54 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\GOG Games\What Lies in the Multiverse\WININET.dll
+E 24 [iOS-xins] tracker=0x148510e50 WININET.dll sec=0x717bbc1000-0x717bbf4f6c
+D 24 Load module WININET.dll (wininet.dll-7ed1ba985c393969): 717BBC0000
+D 24 Load module mpr.dll (mpr.dll-09c67d52a3c9dbd6): 717BB90000
+ml957: ? backing 0x717b8d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b650000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a87c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a3d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a118000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148a46000)
+ml957: ? backing 0x7179fe8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7023570000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[free-delay] #2 release of 0x7104630000+0x100000 held for 2000 ms (2 in flight)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148a57000)
+ml957: ? backing 0x7179fac000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148a6b000)
+ml957: ? backing 0x7179ee8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x148a8a000)
+ml957: ? backing 0x7179e60000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #3 release of 0x7023ff0000+0x100000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7109f80000+0x800000 held for 2000 ms (4 in flight)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148ab1000)
+ml957: ? backing 0x7179944000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148ace000)
+ml957: ? backing 0x7179738000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module NekoPresence.dll (nekopresence.dll-fdef7ba3eaadc240): 71796F0000
+D 24 Load module MSVCP140.dll (msvcp140.dll-fd9176e91dc73921): 7179610000
+D 24 Load module vcruntime140.dll (vcruntime140.dll-3d820f467022e2d7): 71795F0000
+D 24 Load module concrt140.dll (concrt140.dll-7f70d053658941c8): 71795C0000
+[xp-names] m3943077 "wine-x18-exc"
+Audio group 1 -> Loading...
+[free-delay] #5 release of 0x70287f0000+0x100000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7110bb0000+0x800000 held for 2000 ms (6 in flight)
+Audio group 2 -> Loading...
+Calling scr_update_texts...
+[free-delay] #7 release of 0x702a2f0000+0x100000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7114010000+0x800000 held for 2000 ms (8 in flight)
+D 24 Load module CChromaEditorLibrary.dll (cchromaeditorlibrary.dll-84438c11fc8bb5db): 7179580000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"mfc140u.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library mfc140u.dll (which is needed by L"C:\\GOG Games\\What Lies in the Multiverse\\CChromaEditorLibrary.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\GOG Games\\What Lies in the Multiverse\\CChromaEditorLibrary.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"libCChromaEditorLibrary.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"CChromaEditorLibrary_x64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"libCChromaEditorLibrary_x64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"CChromaEditorLibrary_arm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"libCChromaEditorLibrary_arm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"CChromaEditorLibrary_arm64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #9 L"libCChromaEditorLibrary_arm64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #10 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #12 hwnd=0x10056 class='' text="Copy" rev=ml853
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445b2ada): 7179540000
+[win-name] #13 hwnd=0x10056 class='' text="Copy" rev=ml853
+[win-name] #14 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #16 hwnd=0x10058 class='' text="Clear" rev=ml853
+[win-name] #18 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #22 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #26 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #30 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #31 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[launch-view] dismissed reason=surface logs=0
+[guest-stk] sp+0x188 0x1481a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x1b0 0x14836e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x1c0 0x1481a7a0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x3c8 0x1482945f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x428 0x14829457c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x548 0x148294574 = libwow64fex.dll+0x103574
+[footprint] rev=ml358 phys=1125 MB (peak 1125) internal=800 MB compressed=320 MB external=122 MB reusable=5 MB (cycle=2)
+[footprint] rev=ml358 phys=1122 MB (peak 1125) internal=800 MB compressed=320 MB external=122 MB reusable=5 MB (cycle=3)
+[footprint] rev=ml358 phys=1122 MB (peak 1125) internal=800 MB compressed=320 MB external=122 MB reusable=5 MB (cycle=4)
+[footprint] rev=ml358 phys=1122 MB (peak 1125) internal=800 MB compressed=320 MB external=122 MB reusable=5 MB (cycle=5)
+[footprint] rev=ml358 phys=1123 MB (peak 1125) internal=801 MB compressed=320 MB external=122 MB reusable=5 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x12c4d6f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[win-name] #35 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #36 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #37 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #38 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #39 hwnd=0x10054 class='' text="Code Error" rev=ml853
+[win-name] #40 hwnd=0x10054 class='' text="Code Error" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=1029
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=1031
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[08:55:51.456] [INFO] [session] length=13s play=0s frames=0 stalls=0/0s peak=1125MB limit=6143MB thermal=nominal lpm=0 api=D3D11/32 res=1424x656 cap=60 game=What Lies in the Multiverse
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[08:55:53.237] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c235020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1117 MB (peak 1152) internal=795 MB compressed=320 MB external=123 MB reusable=19 MB (cycle=13)
+[footprint] rev=ml358 phys=1117 MB (peak 1152) internal=795 MB compressed=320 MB external=123 MB reusable=19 MB (cycle=14)
+[footprint] rev=ml358 phys=1117 MB (peak 1152) internal=795 MB compressed=320 MB external=123 MB reusable=19 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=23 resident=940MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1118 MB (peak 1152) internal=796 MB compressed=319 MB external=124 MB reusable=19 MB (cycle=16)
+[footprint] rev=ml358 phys=1118 MB (peak 1152) internal=796 MB compressed=319 MB external=124 MB reusable=19 MB (cycle=17)
+[footprint] rev=ml358 phys=1118 MB (peak 1152) internal=796 MB compressed=319 MB external=124 MB reusable=19 MB (cycle=18)

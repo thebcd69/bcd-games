@@ -51,13 +51,17 @@ ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=
 [win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
 [win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
 [phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  5.001s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
 [Wine child thread] calling wine_ios_child_main...
 [copy-verify] ?: OK, 2 .text pages executable (copy @0x149837000)
+ml957: ? backing 0x11b150000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
 [copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
 [copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
 [copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
 [file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
 [phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  5.073s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
 [Wine child thread] calling wine_ios_child_main...
 [copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
 D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11B150000
@@ -106,6 +110,7 @@ D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
 [footprint] rev=ml358 phys=1206 MB (peak 1215) internal=1186 MB compressed=18 MB external=140 MB reusable=10 MB (cycle=5)
 [phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\MDK 2 HD\\mdk2hd.exe" t+ 13.026s rev=ml526
 [wow-window] session armed: a 32-bit process is expected
+0088:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\MDK 2 HD\\mdk2hd.exe\"" (fd=364, unixdir=366, dup_unixdir=398) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\MDK 2 HD"
 [Wine child thread] calling wine_ios_child_main...
 [wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f5730000, then OCCUPIED 0x71f5730000+0x40000 prot=3/7 shared=0 (0xa8d0000 of the range is not free))
 [wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
@@ -127,6 +132,7 @@ ml957: libwow64fex.dll backing 0x71f5300000+0x4000 W RESTORED (section declares 
 [nls-getptr] type=11 id=850 peb=0x7900310000
 [nls-getptr] type=11 id=20127 peb=0x7900310000
 [pool-section-reach] ? .data: the RW mprotect of this section reaches 0x10034000 bytes past its copy (copy 0x152415000, ends 0x152470000) -- NOT clamped: those pool pages lose EXEC for good (set env.MADEIRA_POOL_CLAMP_SECTIONS=1) rev=ajan5-motor
+ml957: ? backing 0x7910000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
 [pool-poison] HANDED OUT NON-EXEC off=0xa474000 +0x0 va=0x152474000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
 [pool-poison] HANDED OUT NON-EXEC off=0xa478000 +0x0 va=0x152478000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
 [pool-poison] HANDED OUT NON-EXEC off=0xa47c000 +0x0 va=0x15247c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
@@ -190,6 +196,7 @@ I AC [iOS] CompileBlock: REFUSING low/invalid RIP=0x0
 [fault_rip] cnt=1 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
 [mach_exc] UNHANDLED #1 pc=0x0 addr=0x0 x18=0x7900300000 type=1 lr=0x16dff81d8 sp=0x12388f350 x16=0x12388ea30 x17=0x151abf314
 [guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xe0f7b8 x9=0x580 x10=0xc00000bb x11=0x0 x0=0x0 x2=0x36 | teb=0x7900300000 peb=0x7900310000 peb->EcCodeBitMap=0x0
 [mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
 [exit-stk] sp+0x48: 0x151ce05f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
 [exit-stk] sp+0xa8: 0x151ce057c = libwow64fex.dll+0x10357c copy_owner=0x0
@@ -199,6 +206,7 @@ I AC [iOS] CompileBlock: REFUSING low/invalid RIP=0x0
 [fault_rip] cnt=2 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
 [mach_exc] UNHANDLED #2 pc=0x0 addr=0x0 x18=0x7900300000 type=1 lr=0x16dff81d8 sp=0x12388f350 x16=0x12388ea30 x17=0x151abf314
 [guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xe0f7b8 x9=0x580 x10=0xc00000bb x11=0x0 x0=0x0 x2=0x36 | teb=0x7900300000 peb=0x7900310000 peb->EcCodeBitMap=0x0
 [mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
 [exit-stk] sp+0x48: 0x151ce05f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
 [exit-stk] sp+0xa8: 0x151ce057c = libwow64fex.dll+0x10357c copy_owner=0x0
@@ -233,10 +241,13 @@ I AC [iOS] CompileBlock: REFUSING low/invalid RIP=0x0
 [unwind] term ml661 begin rip=14995216c rsp=702a68fbd0 window=[702a68fbd0..702ae8fbd0) max=32
 [unwind] term ml661 #00 pc=14995216c rsp=702a68fbd0  <no module — STOP>
 [unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
 [Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
 [Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
 [footprint] rev=ml358 phys=1128 MB (peak 1362) internal=1119 MB compressed=7 MB external=163 MB reusable=11 MB (cycle=17)
 [Wine ntdll/server] process_exit_wrapper(0)
 [Wine ntdll/server] process_exit_wrapper(0)
+[20:18:26.767] [INFO] [madeira-dock] host finished (result 0)
 [hwinput] keyboard focus: elsewhere (app inactive)
 [footprint] rev=ml358 phys=1128 MB (peak 1362) internal=1119 MB compressed=7 MB external=163 MB reusable=11 MB (cycle=18)

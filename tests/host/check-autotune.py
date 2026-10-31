@@ -170,6 +170,11 @@ for name in ("exportLayer", "sessionBegan", "sessionEnded", "recoverUnfinishedSe
     body = code_lines(glue[glue.index("{", i) + 1:])
     check(f"AutoTune.{name} starts with `guard enabled`", body[0].startswith("guard enabled"), body[0])
 check("the offer is published only by the analysis", glue.count("AutoTuneOffers.shared.offer =") == 2)
+# Round 624 (Ghost of Tsushima JKJA9Q/VQ9SBA): a memory kill with nothing left to try names the game's own graphics settings, before the export hint.
+stuck = glue[glue.index('case "stuck", "gave-up":'):glue.index('case "known":', glue.index('case "stuck", "gave-up":'))]
+check("a stuck/gave-up memory kill tells the player to lower the game's own graphics (round 624)",
+      'if report.outcome == "killed" {' in stuck and "iOS closed the game at its memory limit. Set the game's own graphics to the lowest preset" in stuck
+      and stuck.index("lowest preset") < stuck.index("Export the auto-tune report"))
 bridge = (APP / "WineProcessBridge.m").read_text()
 check("WineProcessBridge.m still echoes the game's lines the way AutoTune.echo expects them (an attempt whose "
       "lines are missing from its log counts for nothing)",
@@ -233,8 +238,8 @@ known = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog)) | set(cat.OVER
 NOT_FROM_LAYER = {"metalfx-upscale", "fps-limit", "env.MADEIRA_PAD_MODE", "pool", "wx", "usd-time", "d3d9", "metal-validation"}
 LINE = re.compile(r"^([A-Za-z0-9._-]+) = (\S.*)$")
 FIELDS = {"id", "lines", "priority", "all", "any", "none", "outcomes", "session", "api", "ramMinMB", "ramMaxMB",
-          "minStage", "maxStage", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "noRetry", "reason",
-          "evidence", "fixedIn", "noFix"}
+          "minStage", "maxStage", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "listUpgradeFailure", "noRetry", "reason",
+          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly"}
 ids = [r["id"] for r in rules]
 check("rule ids are unique", len(ids) == len(set(ids)))
 for r in rules:
@@ -251,6 +256,12 @@ for r in rules:
             bad.append("a noFix rule has \"lines\": [], noFix true and no upgrade or retry flag")
     elif not r.get("lines"):
         bad.append("no lines")
+    if "evaluateWhenRan" in r and (r["evaluateWhenRan"] is not True or not r.get("noFix")):
+        # Round 624 (RETRO-2 RQ1): only a noFix rule may speak for a session scored ran/quit (it changes the text, never a setting).
+        bad.append("evaluateWhenRan is true and only on a noFix rule")
+    if "ranOnly" in r and (r["ranOnly"] is not True or r.get("evaluateWhenRan") is not True):
+        # Round 624 (Fallout 4 voices): ranOnly narrows an evaluateWhenRan rule to sessions that played.
+        bad.append("ranOnly is true and only on an evaluateWhenRan rule")
     if r.get("exeMinMB") is not None and r.get("exeMaxMB") is not None and r["exeMinMB"] > r["exeMaxMB"]:
         bad.append("exeMinMB above exeMaxMB")
     for k in ("memoryMinPct",):
@@ -291,6 +302,11 @@ SCRUB = re.compile(r"/var/mobile/Containers/(?:Data|Shared)/[^ ]*[0-9A-F]{8}-|(?
                    r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|/Users/(?!<user>)")
 dirty = [p.name for p in logs if SCRUB.search(p.read_text(errors="ignore"))]
 check("fixtures are scrubbed (no container path, user name or e-mail address)", not dirty, str(dirty))
+# A player's install folder named like a web site (a download site's name) never reaches a public fixture; tools/autotune-fixture.py
+# writes C:\Games\... instead (round 624). Same pattern as the tool's SITE_FOLDER.
+SITE_FOLDER = re.compile(r"(?i)(?:(?<=\\)|(?<=[^:/]/))[^\\/\s\"'<>|:*?]+\.(?:com|org|to|ru|me|io|cc|xyz|info|site|games|vip|club)(?=[\\/])")
+site = [p.name for p in logs if SITE_FOLDER.search(p.read_text(errors="ignore"))]
+check("fixtures carry no install folder named like a web site", not site, str(site))
 proved = set()
 for p in FIX.glob("*.expect"):
     proved.update(json.loads(p.read_text()).get("matched", [])[:1])

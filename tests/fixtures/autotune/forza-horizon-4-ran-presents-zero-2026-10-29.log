@@ -1,0 +1,213 @@
+[17:59:59.476] [INFO] Checking entitlements...
+[17:59:59.477] [INFO] [build] v0.1.623 (623)
+[17:59:59.477] [INFO] [device] model=iPad17,1 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11524MB available=12265MB cores=9
+[17:59:59.477] [INFO] [device] address-map=[0x1042d4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[17:59:59.490] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[18:00:30.246] [INFO] [bcd] library launch ForzaHorizon4: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[18:00:30.246] [INFO] Requesting JIT with Built-in StikJIT...
+[18:00:31.722] [INFO] [dock-launch] image-retire=1
+[18:00:31.722] [INFO] [dock-launch] image-map-guard=1
+[18:00:31.729] [INFO] [dock-installers] app=1293830 scripts=0 programs=0
+[18:00:31.729] [INFO] [madeira-dock] starting the host for app 1293830; Valve's client authenticates and authorizes the launch
+[18:00:31.739] [INFO] Running full Wine sequence...
+[18:00:31.739] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1042d4000,0x8000000000) 512GB available=12241MB low-power=0 thermal=nominal
+[18:00:31.744] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[18:00:31.744] [INFO] Allocating 896MB JIT pool via debugger...
+[18:00:31.744] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[18:00:31.744] [INFO] [jit-debugger] attached=1 at the pool request
+[18:00:31.746] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[18:00:32.373] [INFO] RX pool at 0x148000000
+[18:00:32.388] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.694s rev=ml526
+[WineProc] MADEIRA_OPTIN_DLLS: gamingtcui.dll -> gamingtcui-optin.dll (Wine's gamingtcui.dll for this game)
+[WineProc] MADEIRA_OPTIN_DLLS: dxva2.dll -> dxva2-optin.dll (Wine's dxva2.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[18:00:32.653] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=11666 MB + phys_footprint=621 MB = 12288 MB (hw.memsize says 11524 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=630 MB (peak 630) internal=628 MB compressed=0 MB external=120 MB reusable=19 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.118s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x125720000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x125720000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x125720000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x125728000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x125728000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x12572c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149d88000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.184s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 125720000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[nls-getptr] type=11 id=437 peb=0x110744000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7028650000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m2284988 "wine-x18-exc"
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[free-delay] #2 release of 0x702d2f0000+0x400000 held for 2000 ms (2 in flight)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=858 MB (peak 858) internal=856 MB compressed=0 MB external=189 MB reusable=19 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=000000000000020C status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002CC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=998 MB (peak 998) internal=996 MB compressed=0 MB external=198 MB reusable=19 MB (cycle=3)
+[file-wfail] ml669 #59 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #66 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #70 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1039 MB (peak 1039) internal=1037 MB compressed=0 MB external=198 MB reusable=19 MB (cycle=4)
+[free-delay] #3 release of 0x70366f0000+0xfd0000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x7038010000+0xfd0000 held for 2000 ms (2 in flight)
+[footprint] rev=ml358 phys=1062 MB (peak 1062) internal=1060 MB compressed=0 MB external=198 MB reusable=19 MB (cycle=5)
+[free-delay] #5 release of 0x7038fe0000+0xfd0000 held for 2000 ms (2 in flight)
+[footprint] rev=ml358 phys=1052 MB (peak 1062) internal=1049 MB compressed=0 MB external=198 MB reusable=19 MB (cycle=6)
+[free-delay] #6 release of 0x70366f0000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x7038010000+0xfd0000 held for 2000 ms (3 in flight)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\ForzaHorizon4.exe" t+ 11.243s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\ForzaHorizon4.exe\"" (fd=370, unixdir=371, dup_unixdir=480) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x9b11000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x9b11000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x9b14000 rev=ajan5-motor
+[nls-getptr] type=11 id=1252 peb=0x110738000
+[nls-getptr] type=11 id=437 peb=0x110738000
+[nls-getptr] type=11 id=20127 peb=0x110738000
+[nls-getptr] type=11 id=1252 peb=0x110738000
+[nls-getptr] type=11 id=437 peb=0x110738000
+[18:00:43.238] [INFO] [dock-report] launch-client-discovery-published=1
+[copy-verify] jsproxy.dll: OK, 1 .text pages executable (copy @0x1505dc000)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\PartyXboxLive.dll" 0x71f2910000+0x101000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\bink2w64.dll" 0x71f2890000+0x7b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\amd_ags_x64.dll" 0x71f5950000+0x21000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+ml985: map_image_view size=0x7f14000 base=0x6fffef660000 info_base=0x180000000 map_addr=0x6fffef660000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\libcef.dll" 0x71e9cc0000+0x7f14000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D B0 Load module libcef.dll (libcef.dll-8abc98e20995ab42): 71E9CC0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\chrome_elf.dll" 0x71e9780000+0x101000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] d3d11.dll: OK, 121 .text pages executable (copy @0x152a97000)
+E B0 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71e8150000-0x71e818b029
+E B0 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71e8190000-0x71e8190f90
+D B0 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71E8140000
+E B0 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71e8150000-0x71e818b029
+E B0 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71e8190000-0x71e8190f90
+D B0 Load module ncrypt.dll (ncrypt.dll-3873da50498c047a): 71E8030000
+D B0 Load module CRYPTUI.dll (cryptui.dll-c195465c74a6d67d): 71E7EB0000
+D B0 Load module dhcpcsvc.dll (dhcpcsvc.dll-ddd225dc767891f4): 71E7E30000
+D B0 Load module wevtapi.dll (wevtapi.dll-544933955cc3a368): 71E7DB0000
+D B0 Load module ESENT.dll (esent.dll-ba010a2abfddc376): 71E7D30000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\ForzaHorizon4\\xrnm.dll" 0x71e7cc0000+0x65000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D B0 Load module xrnm.dll (xrnm.dll-19a1e759cecdd54d): 71E7CC0000
+[free-delay] #8 release of 0x703a200000+0xfd0000 held for 2000 ms (4 in flight)
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+00b0:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b0:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[unixlib] opengl32 (GL-absent stub table) (module 0x71e8a90000) -> 64-bit table (0x1070b4d00)
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml1060 fast phys=1478 MB compressed=0 MB
+[18:00:45.238] [INFO] [dock-report] launch-game-running=1
+00b0:fixme:ver:GetPackagesByPackageFamily (L"Microsoft.VCLibs.140.00_8wekyb3d8bbwe" 0000007037EBEF48 0000000000000000 0000007037EBEF6C 0000000000000000): stub
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c471020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`lstat+0x8 run=1 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16bb28e00
+[thread-stacks] port=0xa203 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x203784edc x18=0x0 sp=0x16befaac0
+[thread-stacks] port=0xc523 "com.apple.NSURLConnectionLoader" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c4fdcb0
+[thread-stacks] port=0x11d0b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16bbb2b40
+[thread-stacks] port=0x11c13 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x113682d81 x18=0x0 sp=0x16bc3eb30
+[thread-stacks] port=0x1310b "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x203784edc x18=0x0 sp=0x16bcc8c60
+[thread-stacks] port=0x7933 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c471020
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=40 resident=1756MB dbg=DEBUGGED rev=ml525
+[18:01:02.544] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[thread-stacks] port=0x7933 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c471020
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16c4717d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x59e30000e91b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16c4717d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x59e30000e91b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=41 resident=1754MB dbg=DEBUGGED rev=ml525
+[18:01:32.655] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=41 resident=1752MB dbg=DEBUGGED rev=ml525
+[18:02:02.803] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=41 resident=1752MB dbg=DEBUGGED rev=ml525
+[18:02:32.885] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=40 resident=1752MB dbg=DEBUGGED rev=ml525
+[18:03:02.993] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[18:03:33.043] [INFO] detach-wait: presents=0 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=41 resident=1752MB dbg=DEBUGGED rev=ml525
+[18:04:03.116] [INFO] detach-wait: presents=0 running=1 elapsed=210s
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=40 resident=1752MB dbg=DEBUGGED rev=ml525
+[18:04:33.262] [INFO] detach-wait: presents=0 running=1 elapsed=240s
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=41 resident=1752MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c471020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x7933 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c471020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c471020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[18:05:03.373] [INFO] detach-wait: presents=0 running=1 elapsed=270s
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=41 resident=1752MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x7933 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c471020
+[launch-view] dismissed reason=show-desktop logs=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c471020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: program (app active)
+[thread-stacks] port=0x7933 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c471020
+[thread-stacks] port=0x1168b "CJobMgr::m_WorkThreadPool:2" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bf080e0 x18=0x0 sp=0x13528e9d0
+[thread-stacks] port=0x25a3 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16bbbab40
+[thread-stacks] port=0x1157b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x11af74b81 x18=0x0 sp=0x16c3e6b30
+[thread-stacks] port=0xc7e3 "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x8627 x18=0x0 sp=0x16be6ec40
+[thread-stacks] port=0x13b23 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1101d81c1 x18=0x0 sp=0x16c756b30
+[thread-stacks] port=0x1382b "AudioSession - RootQueue" pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c7e2f20
+[18:05:33.468] [INFO] detach-wait: presents=0 running=1 elapsed=301s
+[freeze] alive t+301s beats=10 gaps=0 iter=1190 gen=1 threads=43 resident=1751MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1472 MB (peak 1478) internal=1469 MB compressed=0 MB external=262 MB reusable=19 MB (cycle=150)
+[footprint] rev=ml358 phys=1472 MB (peak 1478) internal=1469 MB compressed=0 MB external=262 MB reusable=19 MB (cycle=151)
+[footprint] rev=ml358 phys=1472 MB (peak 1478) internal=1469 MB compressed=0 MB external=262 MB reusable=19 MB (cycle=152)
+[footprint] rev=ml358 phys=1470 MB (peak 1478) internal=1467 MB compressed=0 MB external=262 MB reusable=19 MB (cycle=153)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1470 MB (peak 1478) internal=1467 MB compressed=0 MB external=262 MB reusable=19 MB (cycle=154)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1473 MB (peak 1478) internal=1470 MB compressed=0 MB external=263 MB reusable=19 MB (cycle=155)
+[18:05:44.916] [INFO] [session] length=313s partial=1 play=0s frames=0 stalls=0/0s peak=1488MB limit=12287MB thermal=nominal lpm=0 res=1160x800 cap=60 game=Forza Horizon 4

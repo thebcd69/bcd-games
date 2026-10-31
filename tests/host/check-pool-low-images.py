@@ -4,6 +4,10 @@
 Checks opt-in behavior, normal-pool preference, owner bookkeeping, executable
 page guards, WoW64 exclusion (including reclaimed C ranges), failure atomicity,
 retired-code reuse, fail-closed thread scans, and concurrent image/code allocations.
+Round 624 (agent R S19): a retired carve in the main pool's tail serves an image
+copy too when there is no region C (3D66DG, P9VHEA, HW9Q5Q); a head range the tail
+took stays with it; and the free list's capacity (256 of 1024 slots) rises to 1024
+only on this keyed failure path (WWNMC7: the transfer was refused by a full list).
 Mach queries use synthetic pages and thread states;
 this is an allocator test, not a device rendering test.
 """
@@ -68,11 +72,14 @@ fixture = r'''
 #define CHECK(c) do { if (!(c)) { fprintf(stderr, "failed line %d: %s\n", __LINE__, #c); exit(1); } } while (0)
 #define IOS_POOL_BIG_MIN (64u * 1024 * 1024)
 #define IOS_POOL_LEDGER_MAX 1024
-#define IOS_POOL_FREE_MAX 256
+#define IOS_POOL_FREE_SLOTS 1024
+#define IOS_POOL_FREE_DEFAULT 256
+static int ios_pool_free_cap = IOS_POOL_FREE_DEFAULT;
+#define IOS_POOL_FREE_MAX ios_pool_free_cap
 #define IOS_POOL_REUSE_GRACE_SEC 3
 struct ios_pool_free { size_t off, size; time_t freed_at; int advised; };
 struct ios_pool_alloc { size_t off, size; void *peb; };
-static struct ios_pool_free ios_pool_freelist[IOS_POOL_FREE_MAX];
+static struct ios_pool_free ios_pool_freelist[IOS_POOL_FREE_SLOTS];
 static struct ios_pool_alloc ios_pool_ledger[IOS_POOL_LEDGER_MAX];
 static int ios_pool_free_count, ios_pool_ledger_count, ios_pool_last_alloc_reused;
 static size_t jit_pool_offset, ios_jit_hole_off_eff, ios_jit_hole_end_eff;
@@ -165,8 +172,17 @@ static int mach_vm_region(mach_port_t task, mach_vm_address_t *address, mach_vm_
 {
     (void)task; (void)flavor; (void)count; *object = MACH_PORT_NULL;
     if (region_query_fail) return -1;
-    if (region_gap) *address += 0x4000; else *address = ios_jit_low_rx_global;
-    *size = region_empty ? 0 : ios_jit_low_size_global;
+    uintptr_t main_rx = (uintptr_t)ios_jit_rx_base_global;
+    if (*address >= main_rx && *address < main_rx + ios_jit_pool_size_global)
+    {   /* the main pool (round 624: its tail's carves) */
+        if (region_gap) *address += 0x4000; else *address = main_rx;
+        *size = region_empty ? 0 : ios_jit_pool_size_global;
+    }
+    else
+    {
+        if (region_gap) *address += 0x4000; else *address = ios_jit_low_rx_global;
+        *size = region_empty ? 0 : ios_jit_low_size_global;
+    }
     vm_region_basic_info_data_64_t *info = raw;
     info->protection = region_nonexec ? 0 : 5;
     info->max_protection = poisoned ? 3 : 7;
@@ -190,6 +206,7 @@ static void reset(void)
     ios_pool_big_size = ios_jit_hole_off_eff = ios_jit_hole_end_eff = ios_jit_tail_reserved = 0;
     wow = poisoned = 0;
     ios_tail_carve_n = 0;
+    ios_pool_free_cap = IOS_POOL_FREE_DEFAULT;
     task_query_fail = state_query_fail = 0; scanned_pc = 0;
     region_query_fail = region_gap = region_empty = region_nonexec = 0;
     owner = 1;
@@ -212,6 +229,27 @@ static void retired(size_t low_offset, size_t size, int age)
     ios_tail_carves[i].size = size;
     ios_tail_carves[i].free = 1;
     ios_tail_carves[i].freed_at = time(NULL) - age;
+}
+
+/* round 624 (R S19): a FEX buffer carved from the main pool's tail, at pool offset `pool_offset` */
+static void retired_tail(size_t pool_offset, size_t size, int age)
+{
+    unsigned i = ios_tail_carve_n++;
+    CHECK(i < IOS_TAIL_CARVE_MAX);
+    ios_tail_carves[i].off = pool_offset;
+    ios_tail_carves[i].size = size;
+    ios_tail_carves[i].free = 1;
+    ios_tail_carves[i].freed_at = time(NULL) - age;
+}
+
+/* no region C; the head bumped up to a 64 MB tail */
+static void reset_no_c(void)
+{
+    reset();
+    ios_jit_low_size_global = 0;
+    ios_jit_low_reserved = 0;
+    ios_jit_tail_reserved = 64 * MB;
+    jit_pool_offset = ios_jit_pool_size_global - 64 * MB;
 }
 
 static int code_won;
@@ -245,6 +283,60 @@ static void *competing_whole_image(void *arg)
     (void)arg;
     image_won = image(32 * MB);
     return NULL;
+}
+
+/* round 624 (R S19): the main pool's tail, without region C (3D66DG, P9VHEA, HW9Q5Q) */
+static void check_main_tail(size_t request)
+{
+    const size_t shell32 = 0x984000;   /* P9VHEA: a 9.5 MB copy, 16 MB buffers retired in the tail */
+    size_t tail_buf = ios_jit_pool_size_global - 32 * MB, head, expected;
+
+    /* the key off: nothing moves and the capacity stays */
+    unsetenv("MADEIRA_POOL_RECYCLE_IMAGES");
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30);
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1 && ios_pool_free_cap == IOS_POOL_FREE_DEFAULT);
+    setenv("MADEIRA_POOL_RECYCLE_IMAGES", "0", 1);
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1 && ios_pool_free_cap == IOS_POOL_FREE_DEFAULT);
+    setenv("MADEIRA_POOL_RECYCLE_IMAGES", "1", 1);
+
+    /* the copy lands in the retired buffer; the remainder goes on the image list; bump and tail budget unchanged */
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30);
+    head = jit_pool_offset;
+    CHECK(image(shell32) == tail_buf);
+    CHECK(!ios_tail_carve_n && ios_pool_free_count == 1);
+    CHECK(ios_pool_freelist[0].off == tail_buf + shell32 && ios_pool_freelist[0].size == 16 * MB - shell32);
+    CHECK(ios_pool_ledger_holds(tail_buf, shell32, (void *)1));
+    CHECK(jit_pool_offset == head && ios_jit_tail_reserved == 64 * MB);
+    /* HW9Q5Q: the next small copies come from that remainder, nothing more is taken from the tail */
+    retired_tail(tail_buf + 16 * MB, 16 * MB, 30);
+    CHECK(image(0x94000) == tail_buf + shell32 && ios_tail_carve_n == 1);
+
+    /* the smallest retired buffer that fits, a larger one untouched; region C's rule is unchanged next to it */
+    reset_no_c(); retired_tail(ios_jit_pool_size_global - 64 * MB, 32 * MB, 30); retired_tail(tail_buf, 16 * MB, 30);
+    CHECK(image(shell32) == tail_buf && ios_tail_carve_n == 1 && ios_tail_carves[0].size == 32 * MB);
+
+    /* refused: inside the grace, still in use, a thread in it, poisoned, WoW64, a head range the tail took (ml1039),
+     * one reaching past the pool's end, a tail of nothing, above 64 MB */
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 1);
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30); ios_tail_carves[0].free = 0;
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30); scanned_pc = (uintptr_t)ios_jit_rx_base_global + tail_buf + MB;
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30); poisoned = 1;
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(tail_buf, 16 * MB, 30); wow = 1;
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(100 * MB, 16 * MB, 30);
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(ios_jit_pool_size_global - 8 * MB, 16 * MB, 30);
+    no_allocation(shell32); CHECK(ios_tail_carve_n == 1);
+    reset_no_c(); ios_jit_tail_reserved = 0; retired_tail(tail_buf, 16 * MB, 30);
+    CHECK(!ios_pool_recycle_code_range(shell32) && ios_tail_carve_n == 1);
+    reset_no_c(); retired_tail(ios_jit_pool_size_global - 64 * MB, 64 * MB + 0x4000, 30);
+    CHECK(!ios_pool_recycle_code_range(shell32) && ios_tail_carve_n == 1);
+    (void)request; (void)expected;
+    puts("round 624: a retired buffer in the main tail serves an image copy only on the keyed failure path; the guards hold");
 }
 
 static void check_recycled(void)
@@ -335,7 +427,12 @@ static void check_recycled(void)
     reset(); retired(0, 64 * MB, 30);
     CHECK(!ios_pool_recycle_code_range(65 * MB));
     CHECK(!ios_pool_recycle_code_range(0) && !ios_pool_recycle_code_range(1));
-    reset(); retired(272 * MB, 32 * MB, 30); ios_pool_free_count = IOS_POOL_FREE_MAX;
+    /* round 624 (R S19, WWNMC7): a list full at the 256 a session starts with no longer refuses the transfer: this keyed failure
+     * raises the capacity to 1024 first; a list full at 1024 still refuses it */
+    reset(); retired(272 * MB, 32 * MB, 30); ios_pool_free_count = IOS_POOL_FREE_DEFAULT;
+    CHECK(ios_pool_free_cap == IOS_POOL_FREE_DEFAULT);
+    CHECK(ios_pool_recycle_code_range(request) && !ios_tail_carve_n && ios_pool_free_cap == IOS_POOL_FREE_SLOTS);
+    reset(); retired(272 * MB, 32 * MB, 30); ios_pool_free_count = IOS_POOL_FREE_SLOTS;
     CHECK(!ios_pool_recycle_code_range(request) && ios_tail_carve_n == 1);
     reset(); retired(272 * MB, 32 * MB, 30); ios_pool_ledger_count = IOS_POOL_LEDGER_MAX;
     CHECK(!ios_pool_recycle_code_range(request) && ios_tail_carve_n == 1);
@@ -385,6 +482,7 @@ static void check_recycled(void)
         CHECK(ios_pool_ledger_count == (image_won != (size_t)-1));
         CHECK(!ios_pool_free_count && !ios_tail_carve_n);
     }
+    check_main_tail(request);
     unsetenv("MADEIRA_POOL_RECYCLE_IMAGES");
     puts("retired-code image reuse: capacity, grace, PC/poison guards, owners, aliases, return-to-code and races passed");
 }

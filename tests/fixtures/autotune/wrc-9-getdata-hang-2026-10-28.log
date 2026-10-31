@@ -1,0 +1,320 @@
+[23:31:25.729] [INFO] Checking entitlements...
+[23:31:25.730] [INFO] [build] v0.1.622 (622)
+[23:31:25.730] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11695MB available=8170MB cores=6
+[23:31:25.731] [INFO] [device] address-map=[0x100968000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[23:31:25.758] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:32:50.063] [INFO] [bcd] library launch WRC 9 FIA World Rally Championship: avx=0 wine-vcrt=1 nvidia=1 game-config=1 metalfx=off
+[23:32:50.064] [INFO] Requesting JIT with Built-in StikJIT...
+[23:32:51.511] [INFO] [dock-launch] image-retire=1
+[23:32:51.511] [INFO] [dock-launch] image-map-guard=1
+[23:32:51.515] [INFO] [dock-installers] app=1267540 scripts=0 programs=0
+[23:32:51.516] [INFO] [madeira-dock] starting the host for app 1267540; Valve's client authenticates and authorizes the launch
+[23:32:51.525] [INFO] Running full Wine sequence...
+[23:32:51.526] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100968000,0x8000000000) 512GB available=8146MB low-power=0 thermal=nominal
+[23:32:51.530] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:32:51.530] [INFO] Allocating 896MB JIT pool via debugger...
+[23:32:51.530] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:32:51.530] [INFO] [jit-debugger] attached=1 at the pool request
+[23:32:51.531] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:32:52.283] [INFO] RX pool at 0x148000000
+[23:32:52.299] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.813s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[23:32:52.589] [Wine init_process] reply_pipe=42, sending init_first_thread...
+ml992: os_proc_available_memory=7509 MB + phys_footprint=682 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=691 MB (peak 691) internal=690 MB compressed=0 MB external=105 MB reusable=17 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.283s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x119c30000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.358s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 119C30000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m2924774 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=954 MB (peak 954) internal=953 MB compressed=0 MB external=175 MB reusable=17 MB (cycle=2)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[dns] madeira-bcd begin #2 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #3 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #4 "test.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #5 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[footprint] rev=ml358 phys=1099 MB (peak 1099) internal=1098 MB compressed=0 MB external=182 MB reusable=17 MB (cycle=3)
+[file-wfail] ml669 #24 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #25 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #26 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #27 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1103 MB (peak 1103) internal=1102 MB compressed=0 MB external=182 MB reusable=17 MB (cycle=4)
+[dns] madeira-bcd begin #6 "api.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #13 "cmp1-ams1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #14 "cmp1-fra2.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #15 "cmp2-fra2.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #16 "p2p-ams1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1143 MB (peak 1143) internal=1142 MB compressed=0 MB external=183 MB reusable=17 MB (cycle=5)
+[dns] madeira-bcd begin #17 "avatars.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1199 MB (peak 1199) internal=1198 MB compressed=0 MB external=183 MB reusable=17 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\WRC 9 FIA World Rally Championship\\WRC9.exe" t+ 14.539s rev=ml526
+00a4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\WRC 9 FIA World Rally Championship\\WRC9.exe\"" (fd=368, unixdir=369, dup_unixdir=391) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\WRC 9 FIA World Rally Championship"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x107eb0000
+[nls-getptr] type=11 id=437 peb=0x107eb0000
+[nls-getptr] type=11 id=20127 peb=0x107eb0000
+[nls-getptr] type=11 id=1252 peb=0x107eb0000
+[nls-getptr] type=11 id=437 peb=0x107eb0000
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x155230000)
+[copy-verify] uxtheme.dll: OK, 5 .text pages executable (copy @0x1579c4000)
+[file-wfail] ml669 #84 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x3a000 type=0x2000 protect=0x4 tid=00b4 | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x3a000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #1 release of 0x703ddf0000+0x100000 held for 2000 ms (1 in flight)
+00b4:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b4 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=wrc9.exe tid=00b4 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=1460 MB compressed=0 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #85 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #2 release of 0x7040150000+0x120000 held for 2000 ms (2 in flight)
+[23:33:08.026] [INFO] [dock-report] launch-game-running=1
+D B4 Load module windows.gaming.input.dll (windows.gaming.input.dll-3f9af7d1c92cbf48): 71EF440000
+[guest-log] file <container>/Documents/wine/drive_c/Program Files (x86)/Steam/steamapps/common/WRC 9 FIA World Rally Championship/WRC9.log
+[guest-log] #1 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\graphics\graphicsregister.cpp(111) : info : Init()
+[guest-log] #2 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\win32\playall\drivers\game\registersp4.cpp(26) : info : Registering game Win32 classes
+D B4 Load module steam_api64.dll (steam_api64.dll-38773e108c8539a9): 71EF280000
+D B4 Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc678e11f2): 71EF0D0000
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5572000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5572000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5573000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5573000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5574000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5574000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5575000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5575000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5576000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5577000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5578000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f5579000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5579000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f557a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f557b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f557c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f557d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f557e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f557f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f5978000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f5979000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5979000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f597a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f597b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f597c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f597d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f597e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f597f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f5984000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f5985000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f5986000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f5987000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f5988000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f5989000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f598a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f598b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f598c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f598d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f598d000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f598e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f598f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=wrc9.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f78c9000 zb=0x0 hits=64 rev=ajan5-rockstar
+[win-name] #33 hwnd=0x10068 class='' text="Default IME" rev=ml853
+[win-name] #34 hwnd=0x10060 class='' text="WRC9" rev=ml853
+[win-name] #35 hwnd=0x10060 class='' text="WRC9" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x107eb0000
+[guest-log] #3 tid=00b4 Thread : 0xb4 :     d:\svn_branch\playall\code\runtime\dx11\playall\drivers\graphics\videodevicedx11init.cpp(405) : info : [VideoDeviceDX11] Enumerating VideoAdapters
+[guest-log] #4 tid=00b4 Thread : 0xb4 :     d:\svn_branch\playall\code\runtime\dx11\playall\drivers\graphics\videodevicedx11init.cpp(422) : info : Adapter Apple A19 Pro GPU 1610612736 0 0
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[launch-view] dismissed reason=game-window logs=0
+D B4 Load module nvapi64.dll (nvapi64.dll-2214fbd4b3293f8b): 71EEF50000
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=2 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[jumbo#1] +0ms tid=16f81b000 wtid=00b4 peb=0x107eb0000 nrip=0x71f4d04f00 grip=0x15370f050 size=0x40000000 (1024 MB) hint=0x0 -> 0x704c2a0000 st=0x0 | granted=1024 MB ok=1 fail=0
+[free-delay] #3 release of 0x714c3c0000+0x160000 held for 2000 ms (2 in flight)
+D B4 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71EED30000
+[footprint] rev=ml1060 fast phys=1578 MB compressed=0 MB
+[win-name] #42 hwnd=0x10076 class='' text="DIEmWin" rev=ml853
+[win-name] #43 hwnd=0x10060 class='' text="WRC9" rev=ml853
+[win-name] #44 hwnd=0x10060 class='' text="WRC9" rev=ml853
+[free-delay] #4 release of 0x70463b0000+0x240000 held for 2000 ms (3 in flight)
+[footprint] rev=ml1060 fast phys=1747 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2103 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2150 MB compressed=0 MB
+[rb-tex] madeira-bcd new readback #1: fmt 115 1024x32 level 0 (texture 1024x32, 1 mips)
+[footprint] rev=ml1060 fast phys=2393 MB compressed=0 MB
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[footprint] rev=ml1060 fast phys=2440 MB compressed=0 MB
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+D B4 Load module audio_motors64.dll (audio_motors64.dll-9d473aa641b9163b): 71EE960000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[footprint] rev=ml1060 fast phys=2484 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2507 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2548 MB compressed=0 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fcc5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xedc3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16fcc5040
+[guest-log] #59 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_FREECAM_MOVE_FORWARD
+[guest-log] #60 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_FREECAM_MOVE_BACKWARD
+[guest-log] #61 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_FREECAM_MOVE_LEFT
+[guest-log] #62 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_FREECAM_MOVE_RIGHT
+[guest-log] #63 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_PHYSIC_INCREMENT
+[guest-log] #64 tid=00b4 Thread : 0xb4 : d:\svn_branch\playall\code\runtime\common\playall\common\input\inputmanager.cpp(703) : warning : Error trying to bind to unfound event ACTION_PHYSIC_DECREMENT
+[free-delay] #5 release of 0x7155750000+0x210000 held for 2000 ms (1 in flight)
+[free-delay] #6 release of 0x7155960000+0x210000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x7155b70000+0x210000 held for 2000 ms (3 in flight)
+[free-delay] #8 release of 0x7155d80000+0x210000 held for 2000 ms (4 in flight)
+[footprint] rev=ml1060 fast phys=2790 MB compressed=0 MB
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0120:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[spin] ml1140 23:33:20.967 look 1: x64->EC 12486246/s, 100% of the sampled calls for 4 s go to d3d11.dll+0x6be54 (0x15414ae54)
+[spin] ml1140 thread 00b4 teb=0x71fff00000 cpu=99% host pc=0x1538d8990 (ARM64EC image copy) lr=0x16627ab28 sp=0x703d80ea48 x23=0xffffff8f6125ae54 | guest RIP exact=0x0 (hostPC outside block) State.rip=0x15414ae54
+[spin] ml1140   RAX=0x1542d7180 RCX=0x7044f546f0 RDX=0x715780a4a0 RBX=0x7044f546f0 RSP=0x703d80ea48 RBP=0x0 RSI=0x703d80eb38 RDI=0x715780cb48 R8=0x703d80ea88 R9=0x10 R10=0x130000 R11=0x126effab8 R12=0x15 R13=0x12aa3e768 R14=0x0 R15=0x0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): 01 00 00 14 f4 03 00 aa e0 03 13 aa d5 ae 01 94 e0 03 14 aa 38 c8 04 94 20 00 20 d4 65 a3 16 00 ff 83 01 d1 f3 53 02 a9 f5 5b 03 a9 f9 6b 04 a9 fe 2b 00 f9 f3 03 00 aa e0 0a 80 52 e0 00 b0 72 c1 15 00 b4 f4 03 01 aa 42 00 00 b5 63 15 00 35 d5 0b 00 d0 f6 03 02 aa f9 03 04 2a b5 16 40 f9 e3 01 00 34 88 02 40 f9 4a 0b 00 d0 4a b1 17 91 0b 1d 40 f9 a8 02 40 f9 00 01 3f d6 e0 03 14 aa
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x703d80ea48: sp+0x0=wrc9.exe+0xc469b3(call indirect) sp+0x90=wrc9.exe+0xc46a95(call rel32) sp+0xd0=wrc9.exe+0x960bc1(call rel32) sp+0x100=wrc9.exe+0x81eddc(call indirect) sp+0x1e0=wrc9.exe+0x81ef70(call rel32) sp+0x230=wrc9.exe+0xe0a870(call rel32)
+[spin] ml1140   first stack qwords: 129c869b3 0 0 0 0 0 0 0
+[23:33:22.437] [INFO] detach-wait: presents=34 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=73 resident=2215MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xedc3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16fcc5040
+[wait-chain]   WAIT     "wine-x18-exc" cpu=1 run=3 api=mach_msg x0=0x16fcc57d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x121bb000146cf pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=1 run=3 api=mach_msg x0=0x16fcc57d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x121bb0001464b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x703d80ea48: sp+0x0=wrc9.exe+0xc469b3(call indirect) sp+0x90=wrc9.exe+0xc46a95(call rel32) sp+0xd0=wrc9.exe+0x960bc1(call rel32) sp+0x100=wrc9.exe+0x81eddc(call indirect) sp+0x1e0=wrc9.exe+0x81ef70(call rel32) sp+0x230=wrc9.exe+0xe0a870(call rel32)
+[spin] ml1140   first stack qwords: 129c869b3 0 0 0 0 0 0 0
+[spin] ml1140 thread 0118 teb=0x7042330000 cpu=100% host pc=0x165776174 (FEX code or native) lr=0x165773984 sp=0x71eeb30000 x23=0x71591efdb0 | guest RIP exact=0x129b5f42d (wrc9.exe+0xb1f42d) State.rip=0x129c22144
+[spin] ml1140   RAX=0xc5 RCX=0xeb0e363f RDX=0x1d4581 RBX=0x12a49a570 RSP=0x71591efdb0 RBP=0x71591efec0 RSI=0x7044c8a310 RDI=0x7cb3 R8=0xf2917e R9=0x1d4581c5 R10=0x71ef741d38 R11=0x0 R12=0x71ef740228 R13=0xa79e9c19 R14=0x0 R15=0x1
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): c2 41 8b c0 41 c1 e8 08 48 33 c8 0f b6 c1 8b 14 83 41 33 d0 8b c2 c1 ea 08 4c 33 c8 41 0f b6 c1 8b 0c 83 33 ca 48 83 ef 01 75 98 48 8b 3c 24 45 85 db 0f 8e 9b 00 00 00 41 0f b6 02 0f b6 d1 48 33 d0 c1 e9 08 44 8b 04 93 44 33 c1 41 83 fb 02 7c 45 41 0f b6 42 01 41 0f b6 c8 48 33 c8 41 c1 e8 08 8b 14 8b 41 33 d0 41 83 fb 03 7c 1d 41 0f b6 42 02 0f b6 ca 48 33 c8 c1 ea 08 8b 04 8b 48
+[spin] ml1140   no readable x86 stack (x23, sp and the frame's RSP: none readable; the TEB's stack is 0x71589f8000..0x71591f0000)
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=73 resident=2209MB dbg=DEBUGGED rev=ml525
+[23:33:52.518] [INFO] detach-wait: presents=34 running=1 elapsed=60s
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[dns] madeira-bcd begin #18 "p2p-ams1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[wait-chain]   WAIT     "wine-x18-exc" cpu=1 run=3 api=mach_msg x0=0x16fcc57d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x121bb00027f03 pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[cpu-prof]     0.6% of running (duty 5/400) "wine-x18-exc" port=0xedc3 guest=?+0x0 rip=0x0 hostPC=0x24c7cccd4
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[23:34:22.554] [INFO] detach-wait: presents=34 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=74 resident=2219MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fcc5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xedc3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16fcc5040
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=2705 MB (peak 2774) internal=1953 MB compressed=0 MB external=251 MB reusable=16 MB (cycle=56)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=2702 MB (peak 2774) internal=1948 MB compressed=0 MB external=251 MB reusable=17 MB (cycle=57)
+[footprint] rev=ml358 phys=2701 MB (peak 2774) internal=1948 MB compressed=0 MB external=251 MB reusable=17 MB (cycle=58)
+[ios_audio] ml1230 pacing stream=0x1220c1600 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=2701 MB (peak 2774) internal=1948 MB compressed=0 MB external=251 MB reusable=17 MB (cycle=59)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fcc5040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2701 MB (peak 2774) internal=1948 MB compressed=0 MB external=251 MB reusable=17 MB (cycle=60)
+[23:34:52.612] [INFO] detach-wait: presents=34 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=74 resident=2217MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xedc3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16fcc5040
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=2701 MB (peak 2774) internal=1948 MB compressed=0 MB external=251 MB reusable=17 MB (cycle=61)
+[23:34:54.134] [INFO] [session] length=122s partial=1 play=4s frames=32 avg=33.1 worst=2760ms stalls=1/3s peak=2791MB limit=8191MB thermal=nominal lpm=0 api=D3D11/D3D12/64 res=1408x648 cap=60 game=WRC 9 FIA World Rally Championship

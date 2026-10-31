@@ -1,0 +1,439 @@
+[06:23:46.350] [INFO] Checking entitlements...
+[06:23:46.350] [INFO] [build] v0.1.622 (622)
+[06:23:46.351] [INFO] [device] model=iPad17,1 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11524MB available=12265MB cores=9
+[06:23:46.351] [INFO] [device] address-map=[0x104e5c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[06:23:46.373] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[06:23:49.939] [INFO] Requesting JIT with Built-in StikJIT...
+[06:23:53.449] [INFO] [bcd] library launch Ghost of Tsushima DIRECTOR'S CUT: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=2.0
+[06:23:53.457] [INFO] [dock-launch] image-retire=1
+[06:23:53.457] [INFO] [dock-launch] image-map-guard=1
+[06:23:53.466] [INFO] [dock-installers] app=2215430 scripts=1 programs=0
+[06:23:53.467] [INFO] [madeira-dock] starting the host for app 2215430; Valve's client authenticates and authorizes the launch
+[06:23:53.475] [INFO] Running full Wine sequence...
+[06:23:53.475] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104e5c000,0x8000000000) 512GB available=12251MB low-power=0 thermal=fair
+[06:23:53.480] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[06:23:53.480] [INFO] Allocating 896MB JIT pool via debugger...
+[06:23:53.480] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[06:23:53.480] [INFO] [jit-debugger] attached=1 at the pool request
+[06:23:53.482] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[06:23:54.067] [INFO] RX pool at 0x148000000
+[06:23:54.082] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.664s rev=ml526
+[hwinput] keyboard focus: program (poll)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=11689 MB + phys_footprint=598 MB = 12288 MB (hw.memsize says 11524 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=604 MB (peak 604) internal=603 MB compressed=0 MB external=87 MB reusable=5 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023030000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.184s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x124b30000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x124b30000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x124b30000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x124b38000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x124b38000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x124b3c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.256s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 124B30000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m948306 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #1 release of 0x7023620000+0x100000 held for 2000 ms (1 in flight)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+[swap] ml1077 backed 0x702b2f0000+0x1010000 (file off 0 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x702c300000+0x1010000 (file off 16 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+[free-delay] #2 release of 0x70280c0000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7027fc0000+0x100000 held for 2000 ms (3 in flight)
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #4 release of 0x7029ed0000+0x100000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7029dd0000+0x100000 held for 2000 ms (5 in flight)
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[free-delay] #6 release of 0x702d410000+0x100000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x702d310000+0x100000 held for 2000 ms (7 in flight)
+[footprint] rev=ml358 phys=884 MB (peak 884) internal=884 MB compressed=0 MB external=164 MB reusable=5 MB (cycle=2)
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 32 of 4096 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 32), 0 MB kept in memory by swap-mb
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=980 MB (peak 980) internal=979 MB compressed=0 MB external=167 MB reusable=5 MB (cycle=3)
+[file-wfail] ml669 #46 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #47 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #48 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #49 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=167 MB reusable=5 MB (cycle=4)
+[footprint] rev=ml358 phys=1033 MB (peak 1033) internal=1032 MB compressed=0 MB external=167 MB reusable=5 MB (cycle=5)
+[free-delay] #8 release of 0x702ce20000+0x100000 held for 2000 ms (1 in flight)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\GhostOfTsushima.exe" t+ 10.694s rev=ml526
+[session-log] Steam game GhostOfTsushima.exe: logs/GhostOfTsushima.exe-2026-10-29_06-24-04.txt
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\GhostOfTsushima.exe\"" (fd=370, unixdir=371, dup_unixdir=435) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT"
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x15069c000)
+ml985: map_image_view size=0x46b6000 base=0x6ffff3b60000 info_base=0x180000000 map_addr=0x6ffff3b60000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[06:24:04.475] [INFO] [dock-report] launch-client-discovery-published=1
+[footprint] rev=ml358 phys=1233 MB (peak 1233) internal=1232 MB compressed=0 MB external=209 MB reusable=5 MB (cycle=6)
+[file-wfail] ml669 #50 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[jumbo#1] +0ms tid=16b25b000 wtid=00ac peb=0x10c5a4000 nrip=0x71f4d84f00 grip=0x0 size=0x40000000 (1024 MB) hint=0x4a972000000 -> 0x7172000000 st=0x0 | granted=1024 MB ok=1 fail=0
+[swap] ml1077 backed 0x7172000000+0x2000000 (file off 32 MB): 32 MB in 1 extents, peak 32 MB, 0 refused
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=ghostoftsushima.exe tid=00ac size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c52810000
+[file-wfail] ml669 #54 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f55f2000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f2000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f55f3000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f3000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f55f4000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f4000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f55f5000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f5000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f55f6000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f55f7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f55f8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f55f9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f9000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f55fa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f55fb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f55fc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f55fd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f55fe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f55ff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f5978000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f5979000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f5979000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f597a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f597b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f597c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f597d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f597e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f597f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f5984000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f5985000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f5986000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f5987000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f5988000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f5989000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f598a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f598b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f598c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f598d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f598d000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f598e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f598f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f78c7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f78c9000 zb=0x0 hits=64 rev=ajan5-rockstar
+[alloc-fail] ml814 #128 status=c0000018 hint=0x71fc284000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=ghostoftsushima.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71fc286000 zb=0x0 hits=128 rev=ajan5-rockstar
+[06:24:05.975] [INFO] [dock-report] launch-game-running=1
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-handler.exe" t+ 12.519s rev=ml526
+00ac:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\GhostOfTsushima.exe\" --captur"... (fd=518, unixdir=519, dup_unixdir=523) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\"
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x152d74000)
+[win-name] #33 hwnd=0x10064 class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-video.exe" t+ 12.889s rev=ml526
+00c4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-video.exe\" --pid=168 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Sucker Punch Productions\\Ghost of Tsushima DIRECTOR'S CUT\\crs\\temp\\<uuid>\\crash-re"... (fd=569, unixdir=570, dup_unixdir=574) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\"
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000154 status=00000000 native_pc=00000071F5662DAC is_ec=1 -> returned rip=00000071F5662DAC rsp=0000007044810000 flags=00100003
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=0000000000000154 status=00000000 native_pc=00000071EE081130 is_ec=0 -> returned rip=00000071EE081130 rsp=0000007044810000 flags=00100003
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00ac:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=0000000000000154 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[swap] ml1077 backed 0x7174000000+0x4000000 (file off 64 MB): 96 MB in 2 extents, peak 96 MB, 0 refused
+[nls-getptr] type=11 id=1252 peb=0x113e78000
+[nls-getptr] type=11 id=850 peb=0x113e78000
+[bigres] tid=00ac #1 size=0x22400000 (548 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x10c5a4000 total=548 MB
+[swap] ml1077 backed 0x70495b0000+0x22400000 (file off 128 MB): 644 MB in 3 extents, peak 644 MB, 0 refused
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x156548000)
+[swap] ml1077 backed 0x717a000000+0x2000000 (file off 676 MB): 676 MB in 4 extents, peak 676 MB, 0 refused
+00dc:err:module:import_dll Library EVR.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-video.exe") not found
+00dc:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\crs-video.exe" failed, status c0000135
+00dc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=12275
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=573
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+E CC [iOS-xins] tracker=0x152334bc8 WININET.dll sec=0x71e3bb0000-0x71e3beb029
+E CC [iOS-xins] tracker=0x152334bc8 WININET.dll sec=0x71e3bf0000-0x71e3bf0f90
+D CC Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71E3BA0000
+E CC [iOS-xins] tracker=0x152334bc8 WININET.dll sec=0x71e3bb0000-0x71e3beb029
+E CC [iOS-xins] tracker=0x152334bc8 WININET.dll sec=0x71e3bf0000-0x71e3bf0f90
+E CC [img-map] ml710 #39 intervals-only WININET.dll base=0x71e3ba0000
+[06:24:06.976] [INFO] [dock-game-end] crs-video.exe ended with status 0xc0000135; the session goes on for now (game-still-runs)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #5 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #6 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\sl.dlss.dll" 0x71e3790000+0x3b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\sl.dlss_g.dll" 0x71e3720000+0x6c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\sl.pcl.dll" 0x71e36f0000+0x29000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\sl.reflex.dll" 0x71e36c0000+0x2b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Ghost of Tsushima DIRECTOR'S CUT/Ghost of Tsushima DIRECTOR'S CUT.log
+[guest-log] #1 tid=00ac 06:24:08:510 (00000172) > [Render] Enumerating adapters:
+[guest-log] #2 tid=00ac 06:24:08:510 (00000172) > [Render] 	Adapter 0:
+[guest-log] #3 tid=00ac 06:24:08:510 (00000172) > [Monitor] 		Description             : Apple M5 GPU
+[guest-log] #4 tid=00ac 06:24:08:510 (00000172) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #5 tid=00ac 06:24:08:510 (00000172) > [Monitor] 		Device                  : 2544
+[guest-log] #6 tid=00ac 06:24:08:510 (00000172) > [Monitor] 		Sub system              : 0
+00ac:err:module:load_dll [dll-missing] rev=ml336 #7 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #8 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007048DC4610, feature level 0xb000, create)
+[guest-log] #24 tid=00ac 06:24:08:527 (00000172) > [NxApp] Querying GPU Driver Info...
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007048DC4610, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[guest-log] #32 tid=00ac 06:24:08:553 (00000172) > [Validate Settings] The requested display mode (ResX:1280 ResY:720 Hz:60 3D:0 Exclusive: false, HDR: false) was not available, finding the best alternative...
+[guest-log] #33 tid=00ac 06:24:08:553 (00000172) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #34 tid=00ac 06:24:08:553 (00000172) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #35 tid=00ac 06:24:08:553 (00000172) > [Validate Settings] Changed display mode. (ResX:952 ResY:656 Hz:60 3D:0 HDR:false)
+[guest-log] #36 tid=00ac 06:24:08:553 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[win-name] #37 hwnd=0x10070 class='' text="Default IME" rev=ml853
+[win-name] #38 hwnd=0x1006a class='' text="Ghost of Tsushima DIRECTOR'S CUT" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10c5a4000
+[nls-getptr] type=11 id=10000 peb=0x10c5a4000
+[footprint] rev=ml1060 fast phys=1909 MB compressed=0 MB
+[launch-view] dismissed reason=game-window logs=0
+[guest-log] #38 tid=00ac 06:24:12:101 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 3
+[swap-diag] #1 layer 0x1233d5020: drawable 0x0 format 80 -> 1904x1312 format 70, set on the iOS main thread (dispatch_sync) ...
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\dstorage.dll" 0x71e32c0000+0x36000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #9 L"dstoragecore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Ghost of Tsushima DIRECTOR'S CUT\\DStorageCore.dll" 0x71e3140000+0x17b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[footprint] rev=ml1060 fast phys=1978 MB compressed=0 MB
+[steer] #3 size=0x2010000 reserved_total=548MB armed=va-pressure -> above ceiling 0x7c90810000
+[madeira-d3d12] command queue: type 3
+00ac:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00ac hit=1
+00ac:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00ac hit=2
+00ac:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00ac hit=3
+[nls-getptr] type=11 id=10000 peb=0x10c5a4000
+[win-name] #112 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #113 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #114 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #115 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #116 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #117 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #118 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #119 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #121 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #122 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #125 hwnd=0x10098 class='' text="OK" rev=ml853
+[win-name] #126 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10c5a4000
+[footprint] rev=ml1060 fast phys=2476 MB compressed=0 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ba01040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16afa2230
+[thread-stacks] port=0xd03 "" pc=libsystem_c.dylib`memmem+0xa0 run=1 susp=0 cpu=1000 x8=0x65 x18=0x0 sp=0x16b0279b0
+[thread-stacks] port=0x3403 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=64 x8=0x1f4384edc x18=0x0 sp=0x16b2e4c60
+[thread-stacks] port=0x4d03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f4384edc x18=0x0 sp=0x16b3fa4a0
+[thread-stacks] port=0x4803 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f4384edc x18=0x0 sp=0x16b516ac0
+[thread-stacks] port=0x4a03 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16b5a2fc0
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16ba01040
+[win-name] #127 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #128 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #129 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #130 hwnd=0x10086 class='' text="GhostOfTsushima.exe - System Error" rev=ml853
+[footprint] rev=ml1060 fast phys=3176 MB compressed=0 MB
+[bigres] tid=00ac #2 size=0x39a00000 (922 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x10c5a4000 total=1470 MB
+D 20C Load module XAudio2_9.dll (xaudio2_9.dll-b31aa379071159e6): 71E2480000
+D 20C Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 71E23B0000
+D 20C Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71E2310000
+D 20C Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71E2290000
+D 20C Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71E21F0000
+[footprint] rev=ml1060 fast phys=3652 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=3674 MB compressed=0 MB
+[mip0] r#742 320x220x1 dx34 flags 0x4: MipLevels 0 (D3D12: the full chain, 9 levels) -> 1 level(s); GetDesc answers 0 (bcd.cfg mip0-full = 1 resolves it)
+[copy-verify] schannel.dll: OK, 1 .text pages executable (copy @0x15771c000)
+D 214 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71E2060000
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[rb-tex] madeira-bcd new readback #1: fmt 260 640x440 level 0 (texture 640x440, 1 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 13 640x440 level 0 (texture 640x440, 1 mips)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=124 resident=4262MB dbg=DEBUGGED rev=ml525
+[06:24:24.214] [INFO] detach-wait: presents=963 running=1 elapsed=30s
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=1 susp=0 cpu=30 x8=0x0 x18=0x0 sp=0x16ba01040
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: elsewhere (poll)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=3% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ba01040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[free-delay] #1024 release of 0x70e7350000+0xfd0000 held for 2000 ms (11 in flight)
+[bigres] tid=00ac #3 size=0x1d600000 (470 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x10c5a4000 total=1940 MB
+[swap] ml1077 backed 0x70ed290000+0x1d600000 (file off 2217 MB): 2576 MB in 40 extents, peak 2576 MB, 0 refused
+[swap] ml1077 backed 0x710a890000+0x9e00000 (file off 2687 MB): 2734 MB in 41 extents, peak 2734 MB, 0 refused
+[hwinput] keyboard focus: program (poll)
+[rb-tex] madeira-bcd new readback #5949: fmt 30 2048x2048 level 0 (texture 2048x2048, 1 mips)
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 stats: 2812 MB file-backed now (peak 2900), 77 extents, file used 2979 of 4096 MB, backs 988 releases 1074 unbacks 0 refused 0 | coverage classic: disk 2078 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2812 MB (peak 2900), 0 MB kept in memory by swap-mb
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=124 resident=2408MB dbg=DEBUGGED rev=ml525
+[bigres] tid=00ac #4 size=0x1d600000 (470 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x10c5a4000 total=2410 MB
+[swap] ml1077 backed 0x70ed290000+0x1d600000 (file off 2217 MB): 2579 MB in 91 extents, peak 2900 MB, 0 refused
+[swap] ml1077 backed 0x710a890000+0x9e00000 (file off 2687 MB): 2737 MB in 92 extents, peak 2900 MB, 0 refused
+[06:24:54.322] [INFO] detach-wait: presents=3806 running=1 elapsed=60s
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=39 x8=0x0 x18=0x0 sp=0x16ba01040
+[swap] ml1077 backed 0x7126600000+0x4400000 (file off 3031 MB): 3013 MB in 115 extents, peak 3013 MB, 0 refused
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=117 resident=3062MB dbg=DEBUGGED rev=ml525
+[06:25:24.408] [INFO] detach-wait: presents=5251 running=1 elapsed=90s
+[swap] ml1077 backed 0x71379d0000+0x1010000 (file off 3123 MB): 2947 MB in 106 extents, peak 3065 MB, 0 refused
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=117 resident=2931MB dbg=DEBUGGED rev=ml525
+[06:25:54.488] [INFO] detach-wait: presents=6111 running=1 elapsed=120s
+[swap] ml1077 stats: 2971 MB file-backed now (peak 3065), 106 extents, file used 3199 of 4096 MB, backs 1025 releases 1187 unbacks 0 refused 0 | coverage classic: disk 2266 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2971 MB (peak 3065), 0 MB kept in memory by swap-mb
+[steer] #4 size=0x2010000 reserved_total=2410MB armed=va-pressure -> above ceiling 0x7c97010000
+[freeze] alive t+150s beats=5 gaps=0 iter=595 gen=1 threads=117 resident=2903MB dbg=DEBUGGED rev=ml525
+[06:26:24.585] [INFO] detach-wait: presents=6947 running=1 elapsed=150s
+[freeze] alive t+180s beats=6 gaps=0 iter=714 gen=1 threads=116 resident=2812MB dbg=DEBUGGED rev=ml525
+[06:26:54.668] [INFO] detach-wait: presents=7721 running=1 elapsed=180s
+[swap] ml1077 stats: 2955 MB file-backed now (peak 3065), 105 extents, file used 3199 of 4096 MB, backs 1025 releases 1188 unbacks 0 refused 0 | coverage classic: disk 2260 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2955 MB (peak 3065), 0 MB kept in memory by swap-mb
+[swap] ml1077 stats: 2967 MB file-backed now (peak 3065), 106 extents, file used 3199 of 4096 MB, backs 1026 releases 1188 unbacks 0 refused 0 | coverage classic: disk 2275 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2967 MB (peak 3065), 0 MB kept in memory by swap-mb
+[steer] #5 size=0x4010000 reserved_total=2410MB armed=va-pressure -> above ceiling 0x7cce400000
+[swap] ml1077 stats: 2967 MB file-backed now (peak 3065), 106 extents, file used 3199 of 4096 MB, backs 1026 releases 1188 unbacks 0 refused 0 | coverage classic: disk 2276 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2967 MB (peak 3065), 0 MB kept in memory by swap-mb
+[guest-log] #59 tid=00ac 06:29:43:455 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #60 tid=00ac 06:29:44:694 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #61 tid=00ac 06:29:48:881 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #62 tid=00ac 06:29:50:646 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #63 tid=00ac 06:29:50:685 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #64 tid=00ac 06:29:50:686 (00000172) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[swap-diag] #1 layer 0x1233d5020: drawable 1904x1312 format 70 -> 1904x1312 format 70, set on the iOS main thread (dispatch_sync) ...
+[rb-tex] madeira-bcd new readback #24547: fmt 260 952x656 level 0 (texture 952x656, 1 mips)
+[rb-tex] madeira-bcd new readback #24548: fmt 13 952x656 level 0 (texture 952x656, 1 mips)
+[swap] ml1077 stats: 2967 MB file-backed now (peak 3065), 106 extents, file used 3199 of 4096 MB, backs 1027 releases 1189 unbacks 0 refused 0 | coverage classic: disk 2276 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2967 MB (peak 3065), 0 MB kept in memory by swap-mb
+[swap] ml1077 stats: 2955 MB file-backed now (peak 3065), 105 extents, file used 3199 of 4096 MB, backs 1028 releases 1191 unbacks 0 refused 0 | coverage classic: disk 2266 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2955 MB (peak 3065), 0 MB kept in memory by swap-mb
+[freeze] alive t+451s beats=15 gaps=0 iter=1785 gen=1 threads=114 resident=2264MB dbg=DEBUGGED rev=ml525
+[06:31:25.402] [INFO] detach-wait: presents=14487 running=1 elapsed=451s
+[footprint] rev=ml1060 fast phys=7839 MB compressed=1438 MB
+[footprint] rev=ml1060 fast phys=7871 MB compressed=1432 MB
+[footprint] rev=ml1060 fast phys=7933 MB compressed=1462 MB
+[freeze] alive t+481s beats=16 gaps=0 iter=1904 gen=1 threads=114 resident=2390MB dbg=DEBUGGED rev=ml525
+[06:31:55.444] [INFO] detach-wait: presents=15295 running=1 elapsed=481s
+[swap] ml1077 stats: 2979 MB file-backed now (peak 3065), 105 extents, file used 3268 of 4096 MB, backs 1036 releases 1199 unbacks 0 refused 0 | coverage classic: disk 2274 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2979 MB (peak 3065), 0 MB kept in memory by swap-mb
+[freeze] alive t+511s beats=17 gaps=0 iter=2023 gen=1 threads=115 resident=2421MB dbg=DEBUGGED rev=ml525
+[06:32:25.526] [INFO] detach-wait: presents=16066 running=1 elapsed=511s
+[thread-stacks] port=0x16063 "SubmitThread" pc=libsystem_platform.dylib`_platform_memmove+0xbc run=1 susp=0 cpu=77 x8=0x70e2a3b3a2 x18=0x703cf50000 sp=0x7023a1f770 teb=0x703cf50000 wtid=0160 teb+370=0x1
+[footprint] rev=ml1060 fast phys=7957 MB compressed=1454 MB
+[freeze] alive t+541s beats=18 gaps=0 iter=2142 gen=1 threads=116 resident=2444MB dbg=DEBUGGED rev=ml525
+[06:32:55.592] [INFO] detach-wait: presents=16805 running=1 elapsed=541s
+[swap] ml1077 stats: 2979 MB file-backed now (peak 3065), 105 extents, file used 3268 of 4096 MB, backs 1036 releases 1199 unbacks 0 refused 0 | coverage classic: disk 2274 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 2979 MB (peak 3065), 0 MB kept in memory by swap-mb
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=34 x8=0x0 x18=0x0 sp=0x16ba01040
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[freeze] alive t+571s beats=19 gaps=0 iter=2261 gen=1 threads=115 resident=2448MB dbg=DEBUGGED rev=ml525
+[06:33:25.651] [INFO] detach-wait: presents=17538 running=1 elapsed=571s
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ba01040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[steer] #6 size=0x8010000 reserved_total=2410MB armed=va-pressure -> above ceiling 0x7cf5000000
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=27 x8=0x0 x18=0x0 sp=0x16ba01040
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=7967 MB (peak 7978) internal=1894 MB compressed=1394 MB external=584 MB reusable=0 MB (cycle=294)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ba01040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=2% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b9ffcd0 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=7969 MB (peak 7978) internal=1895 MB compressed=1393 MB external=585 MB reusable=0 MB (cycle=295)
+[footprint] rev=ml358 phys=7967 MB (peak 7978) internal=1894 MB compressed=1393 MB external=585 MB reusable=0 MB (cycle=296)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=659MB: tex-RT=24MB/13 (peak 24) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/9 (peak 3) tex-sampled=0MB/3 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=477MB/62 (peak 477) buf-shared=154MB/145 (peak 264)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=659MB: tex-RT=24MB/13 (peak 24) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/9 (peak 3) tex-sampled=0MB/3 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=477MB/62 (peak 477) buf-shared=154MB/145 (peak 264)
+[footprint] rev=ml358 phys=7920 MB (peak 7978) internal=1895 MB compressed=1393 MB external=585 MB reusable=0 MB (cycle=297)
+[footprint] rev=ml1060 fast phys=7977 MB compressed=1392 MB
+[thread-stacks] port=0x9b07 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=33 x8=0x0 x18=0x0 sp=0x16ba01040
+[thread-stacks] port=0x1a4c3 "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x1ac33 x18=0x0 sp=0x177752c40
+[thread-stacks] port=0x20803 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=69 x8=0x1144f9501 x18=0x0 sp=0x7090f16b30
+[thread-stacks] port=0x1b493 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=48 x8=0x11455b401 x18=0x0 sp=0x171dceb30
+[thread-stacks] port=0x213cf "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x114559e01 x18=0x0 sp=0x70723d6ad0
+[thread-stacks] port=0x17e9f "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=4 susp=0 cpu=55 x8=0x1513 x18=0x0 sp=0x16b1ccd90
+[thread-stacks] port=0x2163f "wine_wininet_collect_connections" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x7076cffb00
+[footprint] rev=ml1060 fast phys=8029 MB compressed=1392 MB
+[freeze] alive t+601s beats=20 gaps=0 iter=2380 gen=1 threads=121 resident=2548MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=7940 MB (peak 7978) internal=1952 MB compressed=1397 MB external=597 MB reusable=0 MB (cycle=298)
+[06:33:55.744] [INFO] detach-wait: presents=18313 running=1 elapsed=601s
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[ios_audio] ml1230 pacing stream=0x123177e00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=659MB: tex-RT=24MB/13 (peak 24) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/9 (peak 3) tex-sampled=0MB/3 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=476MB/61 (peak 477) buf-shared=154MB/141 (peak 264)
+[footprint] rev=ml358 phys=7967 MB (peak 7978) internal=1741 MB compressed=1546 MB external=602 MB reusable=0 MB (cycle=299)
+[06:33:58.267] [INFO] [session] length=604s partial=1 play=582s frames=18428 avg=31.6 low1=15.9 low01=6.3 worst=393ms stalls=0/0s peak=8030MB limit=12287MB thermal=fair lpm=0 api=D3D11/D3D12/Vulkan/64 res=952x656 mfx=2 game=Ghost of Tsushima DIRECTOR'S CUT

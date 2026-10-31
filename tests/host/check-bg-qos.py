@@ -47,7 +47,10 @@ typedef struct { RTL_USER_PROCESS_PARAMETERS *ProcessParameters; } PEB;
 typedef struct { void *UniqueProcess, *UniqueThread; } CLIENT_ID;
 typedef struct { PEB *Peb; CLIENT_ID ClientId; } TEB;
 #define HandleToULong(h) ((unsigned long)(uintptr_t)(h))
-enum { QOS_CLASS_USER_INTERACTIVE = 0x21, QOS_CLASS_UTILITY = 0x11 };
+#define QOS_CLASS_USER_INTERACTIVE FAKE_QOS_CLASS_USER_INTERACTIVE   /* macOS's own <pthread.h> declares these names and the function below */
+#define QOS_CLASS_UTILITY FAKE_QOS_CLASS_UTILITY
+#define pthread_set_qos_class_self_np fake_pthread_set_qos_class_self_np
+enum { FAKE_QOS_CLASS_USER_INTERACTIVE = 0x21, FAKE_QOS_CLASS_UTILITY = 0x11 };
 static __thread TEB *cur_teb;
 static TEB *NtCurrentTeb( void ) { return cur_teb; }
 static uint64_t fake_ns = 5000000000ull;

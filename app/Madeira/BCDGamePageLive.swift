@@ -264,7 +264,7 @@ import UniformTypeIdentifiers
         // MetalFX frame interpolation needs iOS 26; below it the switch is not offered (check-frame-gen-ios26.py).
         if #available(iOS 26.0, *) {
             settings.append(Self.toggle("framegen", "Frame generation (experimental)", profile.get("env.MADEIRA_FRAMEGEN") == "1",
-                                        note: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. The frame-rate limit is ignored while it is on."))
+                                        note: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. The frame-rate limit is ignored while it is on. Turn it off if the game runs below about 40 FPS without it: it waits for screen buffers and can hold such a game at 20 FPS."))
         }
         return BCDGameSettingGroup(id: "display", title: "Display", symbol: "display", settings: settings,
                                    headline: entry.resolution.replacingOccurrences(of: "x", with: " × ") + " · " + fps)
@@ -326,7 +326,7 @@ import UniformTypeIdentifiers
         let cpus = [BCDGameChoice(value: "0", label: "This device's")] + [1, 2, 4, 6].map { BCDGameChoice(value: "\($0)", label: "\($0)") }
         return BCDGameSettingGroup(id: "compat", title: "Compatibility", symbol: "cpu", settings: [
             Self.toggle("avx", "AVX and AVX2", LibraryPrefs.avx(path),
-                        note: "For a 64-bit game that quits at start with an illegal instruction (c000001d) because it expects AVX. The emulator then emulates AVX, which is slower."),
+                        note: "For a 64-bit game that quits at start with an illegal instruction (c000001d), or says it needs AVX or that the processor does not meet its requirements, because it expects AVX. The emulator then emulates AVX, which is slower."),
             Self.toggle("x87", "Faster x87 math", entry.reducedX87,
                         note: "Less exact x87 floating-point math, which runs faster in older games. A change can need a restart of BCD."),
             BCDGameSetting(id: "cpus", title: "Processors the game sees", kind: .choice(cpus), value: String(entry.cpuCount ?? 0),
@@ -784,6 +784,7 @@ import UniformTypeIdentifiers
         case "found": status = "Found: " + state.kept.joined(separator: "; ")
         case "ok": status = "It played without changes."
         case "stuck": status = "No known fix fits the last failure (tried: \(state.triedSummary)). " + Self.reportAdvice
+                                 + (state.lowDiskNote.map { " " + $0 } ?? "")   // round 624 (agent D3 S5-3): no swap file for lack of storage
         case "gave-up": status = "Stopped after \(tuned.most) attempts. " + Self.reportAdvice
         case "known":
             status = "\(state.knownLead): \(state.knownReason ?? state.known ?? "a known problem")."
@@ -1192,6 +1193,9 @@ import UniformTypeIdentifiers
     func send(_ log: BCDGameLog, of game: BCDGame, comment: String, progress: @escaping (String) -> Void) async throws -> String {
         try await withCheckedThrowingContinuation { continuation in
             LogUpload.send(log.file, game: LogUpload.game(of: log.file), comment: comment, progress: progress) { result in
+                // madeira-bcd (round 624, agent R S13 / Discord W4: four players could not find or copy their code): the same alert a
+                // crash's Send Log shows, with the code and a Copy code button; the row's message stays as it was.
+                BCDCrashPrompt.report(result)
                 // A screenshot that went along says so after the code (LogUpload.lastShotNote).
                 continuation.resume(with: result.map { code in LogUpload.lastShotNote.map { code + ". " + $0 } ?? code })
             }

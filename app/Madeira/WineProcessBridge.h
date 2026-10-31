@@ -65,6 +65,20 @@ int madeira_live_user_processes(char *names, int len);
 // joined: call it off the main queue. 1 when it ended the session.
 int madeira_child_report(char *buf, int len);
 int wine_session_dock_game_ended(int32_t status);
+// wine_session_dock_game_quit (round 624): the same end for a game that ended with a status that is not a crash after the
+// player asked to close; the status is not made a crash status. Off the main queue. 1 when it ended the session.
+int wine_session_dock_game_quit(int32_t status);
+// wine_session_dock_game_left (round 625, N-S18): the same end for a game whose last program closed by itself with a status that is
+// not a crash before it drew a picture (the library's watch decides); not a crash status, not the player's quit.
+int wine_session_dock_game_left(int32_t status);
+
+// madeira-bcd (round 624, agent D2 S3 and S7; process_ios.c, virtual_ios.c): the Windows desktop's exit watch
+// (LibraryModel.watchDesktopExits, DesktopExitRules). madeira_child_ends_since: the processes that ended after the first `after`
+// ends, one tab-separated line each (<number> <status hex> <seconds lived> <gl> <helper> <path>), oldest first; returns the
+// `after` for the next call ((unsigned)-1 asks for the count alone, buf may be NULL). madeira_jit_pool_refusals: image copies
+// the JIT pool refused so far.
+unsigned int madeira_child_ends_since(unsigned int after, char *buf, int len);
+unsigned long madeira_jit_pool_refusals(void);
 
 // Steam S0 net-test VPN gate: write C:\madeira-continue.flag into the
 // prefix's drive_c so the paused winhttp-test.exe resumes to the Steam

@@ -52,6 +52,7 @@ ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=
 [win-name] #5 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
 [win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
 [phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  0.865s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
 [x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11c310000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
 [x64-image] #1 0x11c310000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
 [x64-image] #2 0x11c310000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
@@ -61,7 +62,9 @@ ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=
 [copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x124b64000)
 [copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x124bf8000)
 [file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
 [phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  0.909s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
 [Wine child thread] calling wine_ios_child_main...
 [copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x125c40000)
 D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11C310000
@@ -108,6 +111,7 @@ D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
 [footprint] rev=ml358 phys=943 MB (peak 943) internal=940 MB compressed=0 MB external=169 MB reusable=7 MB (cycle=5)
 [footprint] rev=ml358 phys=933 MB (peak 943) internal=930 MB compressed=0 MB external=169 MB reusable=7 MB (cycle=6)
 [phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS.exe" t+ 11.099s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS.exe\"" (fd=366, unixdir=367, dup_unixdir=385) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO"
 [Wine child thread] calling wine_ios_child_main...
 [nls-getptr] type=11 id=437 peb=0x109994000
 [file-wfail] ml669 #77 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
@@ -223,6 +227,8 @@ D B0 Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc67
 [nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=ffrs-win64-shipping.exe tid=00b0 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5988000 zb=0x0 hits=64 rev=ajan5-rockstar
 D B0 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71EE3A0000
 D B0 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 71EE2C0000
+[dns] madeira-bcd begin #22 "srv03.antitamper.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #22 "srv03.antitamper.net" = 0 after 148 ms (4 result(s))
 [store-noalias] #1 rev=ml348 addr=0xaf421756e8 insn=0xd9400026 pc=0x1353310cc NO alias and NO region (unmapped) — genuine bad pointer
 [av-detail] ml613 #1 p0=READ p1=0xaf421756e8 hostpc=0x1353310cc hinsn=0xd9400026 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=6 base=0x134dd0000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
 [fault_rip] cnt=1 rip=0x151f27f27 pc=0x1353310cc addr=0xaf421756e8 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
@@ -274,6 +280,7 @@ D B0 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 71EE2C0000
 [unwind] term ml661 begin rip=1290662fc rsp=7030f0fd28 window=[7030f0fd28..703170fd28) max=32
 [unwind] term ml661 #00 pc=1290662fc rsp=7030f0fd28  <no module — STOP>
 [unwind] term ml661 end
+00a8:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741819)
 [Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=383
 [Wine ntdll/server] process_exit_wrapper(-1073741819)
 [Wine child thread] child exited with code -1073741819
@@ -291,11 +298,14 @@ D B0 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 71EE2C0000
 [22:14:06.308] [INFO] [dock-game-end] ffrs.exe ended with status 0xc0000005; the session goes on for now (grace)
 [22:14:06.812] [INFO] [dock-game-end] ffrs-win64-shipping.exe ended with status 0xc0000005; the session goes on for now (grace)
 [22:14:07.808] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
 [Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
 [Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
 [Wine ntdll/server] process_exit_wrapper(0)
 [Wine ntdll/server] process_exit_wrapper(0)
 [22:14:08.810] [INFO] [dock-report] probe-result=0
+[22:14:09.893] [INFO] [madeira-dock] host finished (result 0)
 [footprint] rev=ml358 phys=1556 MB (peak 1734) internal=1553 MB compressed=0 MB external=254 MB reusable=7 MB (cycle=13)
 [22:14:11.811] [INFO] [dock-game-end] ffrs-win64-shipping.exe ended with status 0xc0000005 after 5 s, the host finished and nothing of the game runs: ending the session
 [WineProc] stopping wineserver...

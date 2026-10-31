@@ -1,0 +1,367 @@
+[10:14:13.251] [INFO] Checking entitlements...
+[10:14:13.252] [INFO] [build] v0.1.622 (622)
+[10:14:13.252] [INFO] [device] model=iPad17,3 idiom=pad os=iPadOS Version 27.0 (Build 24A437) ram=11443MB available=12259MB cores=9
+[10:14:13.252] [INFO] [device] address-map=[0x102b04000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[10:14:13.263] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:14:20.507] [INFO] [bcd] library launch Unreal Gold: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[10:14:20.517] [INFO] [dock-launch] image-retire=1
+[10:14:20.518] [INFO] [dock-launch] image-map-guard=1
+[10:14:20.530] [INFO] [dock-installers] app=13250 program=dxsetup file=DXSETUP.exe status=done key=HKCU\Software\Valve\Steam\Apps\13250 recorded=1 minimum=1 machine=0x14c
+[10:14:20.531] [INFO] [dock-installers] app=13250 scripts=1 programs=1 pending=0 done=1 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[10:14:20.531] [INFO] [madeira-dock] starting the host for app 13250; Valve's client authenticates and authorizes the launch
+[10:14:20.538] [INFO] Running full Wine sequence...
+[10:14:20.539] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102b04000,0x8000000000) 512GB available=12237MB low-power=0 thermal=nominal
+[10:14:20.542] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:14:20.542] [INFO] Allocating 896MB JIT pool via debugger...
+[10:14:20.542] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:14:20.542] [INFO] [jit-debugger] attached=1 at the pool request
+[10:14:20.544] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:14:22.209] [INFO] RX pool at 0x148000000
+[10:14:22.236] [INFO] Detaching debugger...
+[10:14:22.253] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.737s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=11633 MB + phys_footprint=654 MB = 12288 MB (hw.memsize says 11443 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7025f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=665 MB (peak 665) internal=664 MB compressed=0 MB external=118 MB reusable=14 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #5 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.114s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=97, unixdir=98, dup_unixdir=102) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x11ca00000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.168s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=126, unixdir=128, dup_unixdir=133) cwd=L"C:\\windows\\"
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11CA00000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m8424631 "wine-x18-exc"
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000104 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1029 MB (peak 1029) internal=1028 MB compressed=0 MB external=188 MB reusable=14 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[dns] madeira-bcd begin #2 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #3 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #4 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #5 "test.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #6 "api.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #12 "ext1-par1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #13 "cmp1-iad1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #14 "ye2.c.lencr.org" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #15 "p2p-par1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1113 MB (peak 1113) internal=1111 MB compressed=0 MB external=192 MB reusable=17 MB (cycle=3)
+[file-wfail] ml669 #67 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[dns] madeira-bcd begin #16 "clientconfig.akamai.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #68 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1175 MB (peak 1175) internal=1173 MB compressed=0 MB external=192 MB reusable=17 MB (cycle=4)
+[footprint] rev=ml358 phys=1165 MB (peak 1175) internal=1163 MB compressed=0 MB external=192 MB reusable=17 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\System\\Unreal.exe" t+ 11.339s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\system\\Unreal.exe\"" (fd=361, unixdir=362, dup_unixdir=390) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\system"
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f56b0000, then OCCUPIED 0x71f56b0000+0x40000 prot=3/7 shared=0 (0xa950000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+00b4:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f5280000+0x3bc000 (libwow64fex.dll) → pool 0x151b81000 used=0x9f45000/0x25000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f5280000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #69 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[unixlib] libwow64fex.dll (module 0x71f5280000) -> 64-bit table (0x1117d0758)
+[nls-getptr] type=11 id=850 peb=0x7900310000
+ml957: ? backing 0x797b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b558000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797aba0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+ml957: ? backing 0x797a968000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+E B4 [dep-off] promoting guest 0x1094f000+0x2000 to executable on an execute attempt (prot=0x2)
+ml957: ? backing 0x797a754000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[dns] madeira-bcd begin #17 "cacerts.digicert.com" "(null)" family=2 flags=0x0 type=0
+ml957: ? backing 0x7978f08000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x1524a0000)
+ml957: ? backing 0x7978d0c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7978cd4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=1269 MB (peak 1269) internal=1268 MB compressed=0 MB external=197 MB reusable=17 MB (cycle=6)
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x79ffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b4 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=unreal.exe tid=00b4 size=0x1 type=0x2000 prot=0x1 hint=0x79ffeeffee zb=0xffffffff hits=1 rev=ajan5-rockstar
+[10:14:33.039] [INFO] [dock-report] launch-game-running=1
+[free-delay] #1 release of 0x7904600000+0x120000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x703b810000+0xf10000 held for 2000 ms (2 in flight)
+[stale-heal]   3 slot(s) in the copy of 0x71f5280000 (libwow64fex.dll) -> 0x151a63294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[win-name] #46 hwnd=0x1006e class='' text="Unreal Log Window" rev=ml853
+[win-name] #47 hwnd=0x1006e class='' text="Unreal Log Window" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+ml957: ? backing 0x797a410000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #3 release of 0x7905700000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7906700000+0x800000 held for 2000 ms (4 in flight)
+[launch-view] dismissed reason=game-window logs=0
+00b4:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\System\\shaneDAY.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\System\\shaneDAY.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+ml957: ? backing 0x7910004000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D B4 Load module iphlpapi.dll (iphlpapi.dll-af232f72e6f79da5): 797A370000
+ml957: ? backing 0x797a350000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D B4 Load module dnsapi.dll (dnsapi.dll-2ed353fb7e8a9a28): 797A340000
+D B4 Load module nsi.dll (nsi.dll-4a95f0fb6cdba0c5): 797A320000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+D B4 Load module GlideDrv.dll (glidedrv.dll-7d93ec9876c6f046): 7908AD0000
+00b4:err:module:import_dll Library glide2x.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\System\\GlideDrv.dll") not found
+D B4 Load module GlideDrv.dll (glidedrv.dll-7d93ec9876c6f046): 7908B00000
+00b4:err:module:import_dll Library glide2x.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unreal Gold\\System\\GlideDrv.dll") not found
+D B4 Load module SoftDrv.dll (softdrv.dll-ce518a36efbb1e27): 7910D00000
+[free-delay] #5 release of 0x790a3d0000+0x104000 held for 2000 ms (3 in flight)
+E D8 [dep-off] promoting guest 0xffd000+0xf3000 to executable on an execute attempt (prot=0x4)
+E B4 [dep-off] promoting guest 0x70c5000+0x5000 to executable on an execute attempt (prot=0x8)
+[store-noalias] #1 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbcf210 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x79070c71fb hostpc=0x16bbcf210 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16bbcf210 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16bbcf210 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70b67a9 (PE 0x70b67a9) -- NO pool copy for this address (identity translate)
+[fault-host] 16bbcf110: d503201f 889fff04 51000484 528e2f94 72a0e194 8b344278 d503201f 889fff04
+[fault-host] 16bbcf130: 0b0500c4 ca05009b 2b05009a aa1a03e4 b8684a74 11001108 d500401f a94a0780
+[fault-host] 16bbcf150: 8a141021 8b010000 a9400001 cb140000 b4000060 f945b381 f9000f94 d65f0020
+[fault-host] 16bbcf170: 6bff8108 00000001 00000d30 00000000 070c6998 00000000 00000354 00000000
+[fault-host] 16bbcf190: 00000007 00000028 00000000 00000000 acc00180 f0000003 75000000 0594c054
+[fault-host] 16bbcf1b0: 01790000 c0540000 0000032c 000000d6 00000718 10ffffe0 f9000380 f90f639f
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x151c845f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7900300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbcf210 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x79070c71fb hostpc=0x16bbcf210 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16bbcf210 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16bbcf210 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70b67a9 (PE 0x70b67a9) -- NO pool copy for this address (identity translate)
+[fault-host] 16bbcf170: 6bff8108 00000001 00000d30 00000000 070c6998 00000000 00000354 00000000
+[fault-host] 16bbcf190: 00000007 00000028 00000000 00000000 acc00180 f0000003 75000000 0594c054
+[fault-host] 16bbcf1b0: 01790000 c0540000 0000032c 000000d6 00000718 10ffffe0 f9000380 f90f639f
+[fault-host] 16bbcf1d0: 528c2014 72a0e194 8b344278 b8bfc304 d503201f 0b040129 52800014 0b040084
+[fault-host] 16bbcf1f0: 528e3f75 72a0e195 8b354278 b8bfc316 d503201f 0b0402d6 8b354278 d5033bbf
+[fault-host] 16bbcf210: b83f6b16 aa1403e4 52802015 72a0fcf5 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x151c845f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x151c8457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x151c84574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7900300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+ml998: [wr-strip-declined] 0x79070c71fb vprot=0x21 { COMMITTED READ  } unix_prot=1
+ml998: [wr-strip-declined]   view 0x79070b0000+0x1c000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x14000
+ml998: [wr-strip-declined]   neighbours prev=0x21 this=0x21 next=0x29
+[store-noalias] #3 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd01f0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x79070c71fb hostpc=0x16bbd01f0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x16bbd01f0 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x16bbd01f0 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70c6fb5 (PE 0x70c6fb5) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x151c845f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x151c8457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x151c84574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7900300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #4 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd01f0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x79070c71fb hostpc=0x16bbd01f0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x16bbd01f0 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x16bbd01f0 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70c6fb5 (PE 0x70c6fb5) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+ml998: [wr-strip-declined] 0x79070c71fb vprot=0x21 { COMMITTED READ  } unix_prot=1
+ml998: [wr-strip-declined]   view 0x79070b0000+0x1c000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x14000
+ml998: [wr-strip-declined]   neighbours prev=0x21 this=0x21 next=0x29
+[store-noalias] #5 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd11d0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x79070c71fb hostpc=0x16bbd11d0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x0 pc=0x16bbd11d0 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x16bbd11d0 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70c6fb5 (PE 0x70c6fb5) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd11d0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x79070c71fb hostpc=0x16bbd11d0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x0 pc=0x16bbd11d0 addr=0x79070c71fb kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[store-noalias] #7 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd21b0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x79070c71fb insn=0xb83f6b16 pc=0x16bbd21b0 NO pool/anon alias | region 0x79070b0000+0x18000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+ml998: [wr-strip-declined] 0x79070c71fb vprot=0x21 { COMMITTED READ  } unix_prot=1
+ml998: [wr-strip-declined]   view 0x79070b0000+0x1c000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x14000
+ml998: [wr-strip-declined]   neighbours prev=0x21 this=0x21 next=0x29
+00b4:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x79070b0000: [......]  ('.'=materialises 'X'=fails; fault is at +0x171fb) rev=ml561
+ml998: [wr-strip-declined] 0x79070c71fb vprot=0x21 { COMMITTED READ  } unix_prot=1
+ml998: [wr-strip-declined]   view 0x79070b0000+0x1c000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x14000
+ml998: [wr-strip-declined]   neighbours prev=0x21 this=0x21 next=0x29
+00b4:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x79070b0000: [......]  ('.'=materialises 'X'=fails; fault is at +0x171fb) rev=ml561
+00b4:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x79070b0000: [......]  ('.'=materialises 'X'=fails; fault is at +0x171fb) rev=ml561
+00b4:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x79070b0000: [......]  ('.'=materialises 'X'=fails; fault is at +0x171fb) rev=ml561
+00b4:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x79070b0000: [......]  ('.'=materialises 'X'=fails; fault is at +0x171fb) rev=ml561
+[av-detail] ml613 #23 p0=WRITE p1=0x79070c71fb hostpc=0x16bbda0b0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #24 p0=WRITE p1=0x79070c71fb hostpc=0x16bbda0b0 hinsn=0xb83f6b16 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[mach_exc] UNHANDLED #100 pc=0x16bbffe00 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70c6fb5 (PE 0x70c6fb5) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 0b0402d6 8b354278 d5033bbf [b83f6b16] aa1403e4 52802015 72a0fcf5
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #200 pc=0x16bc31ae0 addr=0x79070c71fb x18=0x0 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[guest-code] rev=ml333 pool_rip=0x70c6fb5 (PE 0x70c6fb5) -- NO pool copy for this address (identity translate)
+D B4 Handled self-modifying code: pc: 16BB7986C fault: 79070C5CA0
+[guest-code] rev=ml333 pool_rip=0x70c5dec (PE 0x70c5dec) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x70c5e5c (PE 0x70c5e5c) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x70c5e5c (PE 0x70c5e5c) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x70c5e5c (PE 0x70c5e5c) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x70c5e5c (PE 0x70c5e5c) -- NO pool copy for this address (identity translate)
+[mach_exc] UNHANDLED #1000 pc=0x16bcdfa10 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] UNHANDLED #1100 pc=0x16bcf4870 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] UNHANDLED #1200 pc=0x16bd096d0 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] UNHANDLED #1300 pc=0x16bd1e530 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] UNHANDLED #2000 pc=0x16bdb09d0 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[av-detail] ml613 #4096 p0=WRITE p1=0x79070c5cb0 hostpc=0x16bf66a50 hinsn=0x889fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #8192 p0=WRITE p1=0x79070c5cb0 hostpc=0x1632da740 hinsn=0x889fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #12288 p0=WRITE p1=0x79070c5cb0 hostpc=0x163632740 hinsn=0x889fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=14500 rip=0x0 pc=0x163800ba0 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[fault_rip] cnt=15000 rip=0x0 pc=0x163869380 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[fault_rip] cnt=15500 rip=0x0 pc=0x1638d1b60 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[fault_rip] cnt=16000 rip=0x0 pc=0x16393a340 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[av-detail] ml613 #16384 p0=WRITE p1=0x79070c5cb0 hostpc=0x16398a740 hinsn=0x889fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=16500 rip=0x0 pc=0x1639a2b20 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #16900 pc=0x1639f64a0 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault_rip] cnt=17000 rip=0x0 pc=0x163a0b300 addr=0x79070c5cb0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x79070b0000+0x18000 rev=ml555
+[mach_exc] UNHANDLED #17000 pc=0x163a0b300 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #17100 pc=0x163a20160 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #17200 pc=0x163a34fc0 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #17300 pc=0x163a49e20 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #17400 pc=0x163a5ec80 addr=0x79070c5cb0 x18=0x7900300000 type=1 lr=0x16bff814c sp=0x1283ff350 x16=0x151a59e94 x17=0x1283ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 72a0e194 8b344278 d503201f [889fff07] 1105f534 8b344278 38bfc314
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+00b4:err:seh:bus_handler BUS->AV: unreadable target addr=0x7907e8007d pc=0x163a72a48 rw=0 rev=ml420
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/Program Files (x86)/Steam/steamapps/common/Unreal Gold/System/Unreal.log
+[guest-log] #1 tid=00b4 Warning: Failed to load 'GlideDrv': Can't find file for package 'GlideDrv'
+[guest-log] #2 tid=00b4 Warning: Failed to load 'Class GlideDrv.GlideRenderDevice': Can't find file for package 'GlideDrv'
+[free-delay] #6 release of 0x7026610000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #7 release of 0x7905f00000+0x800000 held for 2000 ms (5 in flight)
+[free-delay] #8 release of 0x702c8c0000+0x800000 held for 2000 ms (6 in flight)
+D B4 Handled self-modifying code: pc: 163A8B8DC fault: 79070C7854
+00b4:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Critical Error" / L"General protection fault!\r\n\r\nHistory: UFireTexture::ConstantTimeTick <- UTexture::Tick <- (FireTexture NaliFX.flames1) <- UTexture::Update <- URender::DrawFrame <- URender::DrawWorld <- UGameEngine::Draw <- UWindowsViewport::Repaint <- UWindowsClient::Tick <- ClientTick <- UGameEngine"...: main exe base 10900000 size 0x51000
+[win-name] #109 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #110 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #111 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #112 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #113 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #114 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #115 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #116 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #117 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #119 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #120 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #123 hwnd=0x10090 class='' text="OK" rev=ml853
+[win-name] #124 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dc41040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xeb23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dc41040
+[wow-stack-free] #1 the dead thread 00d0's 32-bit stack (guest 0x8bd0000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x8bd0000 is not a live view -> released at the old address (as before) rev=ajan11
+[win-name] #125 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #126 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #127 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[win-name] #128 hwnd=0x20082 class='' text="Critical Error" rev=ml853
+[guest-log] #3 tid=00b4 Exit: Executing UObject::StaticShutdownAfterError
+[guest-log] #4 tid=00b4 Exit: UGalaxyAudioSubsystem::ShutdownAfterError
+[guest-log] #5 tid=00b4 Exit: Executing UWindowsClient::ShutdownAfterError
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=18303
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=18305
+00b4:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=388
+[wow-window] slot 0 B=0x7900000000 released (owner peb=0x7900310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[10:14:52.413] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=42 resident=1636MB dbg=DEBUGGED rev=ml525
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1421 MB (peak 1427) internal=1419 MB compressed=0 MB external=199 MB reusable=16 MB (cycle=18)
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=18693
+[unwind] term ml661 begin rip=14a0611d4 rsp=702868fdb8 window=[702868fdb8..7028e8fdb8) max=32
+[unwind] term ml661 #00 pc=14a0611d4 rsp=702868fdb8  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=101
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=132
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[10:14:58.539] [INFO] [dock-report] launch-game-ended=1
+[10:14:58.539] [INFO] [dock-report] probe-result=0
+[footprint] rev=ml358 phys=1216 MB (peak 1427) internal=1215 MB compressed=0 MB external=196 MB reusable=16 MB (cycle=19)
+[10:14:59.055] [INFO] [madeira-dock] host finished (result 0)
+[footprint] rev=ml358 phys=1216 MB (peak 1427) internal=1215 MB compressed=0 MB external=196 MB reusable=16 MB (cycle=20)
+[footprint] rev=ml358 phys=1216 MB (peak 1427) internal=1215 MB compressed=0 MB external=196 MB reusable=16 MB (cycle=21)
+[thread-stacks] port=0xeb23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dc41040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dc41040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1215 MB (peak 1427) internal=1214 MB compressed=0 MB external=196 MB reusable=17 MB (cycle=22)
+[footprint] rev=ml358 phys=1215 MB (peak 1427) internal=1214 MB compressed=0 MB external=196 MB reusable=17 MB (cycle=23)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[10:15:08.393] [INFO] [session] length=47s partial=1 play=0s frames=0 stalls=0/0s peak=1480MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=Unreal Gold

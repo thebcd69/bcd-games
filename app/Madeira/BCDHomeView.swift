@@ -8,6 +8,12 @@ import SwiftUI
 /// device's room, and your recent games as covers that glow in their own colours.
 struct BCDHomeView: View {
     @EnvironmentObject private var store: BCDStore
+
+    /// Round 624 (agent N S10; 2FJV7P: "How do i start my game with steam"): a signed-in Steam account with games, none of them installed.
+    private var steamNothingInstalled: Bool {
+        let steam = store.games.filter { $0.store == .steam }
+        return store.accounts.contains { $0.store == .steam && $0.name != nil } && !steam.isEmpty && !steam.contains { $0.state.isInstalled }
+    }
     @Environment(\.bcdLayout) private var layout
     /// The controller's hint bar is up: the screen is 40 pt shorter (see `fit` and `downloadsCard`).
     @Environment(\.bcdHintBar) private var hintBar
@@ -120,7 +126,9 @@ struct BCDHomeView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     BCDEyebrow(text: "Start here")
                     Text("Pick a game to play").font(BCDStyle.title(28))
-                    Text("Your library shows every game you own, installed or not.")
+                    Text(steamNothingInstalled
+                         ? "Open a Steam game and tap Install: BCD downloads it itself. When it is done, tap Play."
+                         : "Your library shows every game you own, installed or not.")
                         .font(BCDStyle.body(15)).foregroundStyle(BCDStyle.textSoft)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -218,6 +226,12 @@ struct BCDHomeView: View {
                 Text("\(BCDFormat.bytes(free)) free on this device").font(BCDStyle.label(14))
                 if let total = store.system.totalDeviceBytes, total > 0 {
                     BCDProgressBar(fraction: 1 - Double(free) / Double(total))
+                }
+                if free < Int64(3) << 30 {   // round 624 (agent N S11, H0TBAZ with 1 GB free): the prefix, a swap file and a game's files need room
+                    Text("Very little space is left. iOS closes apps in the background when it needs room, and games need space to start. "
+                         + "Free some up before you play.")
+                        .font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             if let external = store.system.freeExternalBytes {

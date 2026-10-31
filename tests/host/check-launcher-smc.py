@@ -26,9 +26,14 @@ history_spec = importlib.util.spec_from_file_location('history', root / 'tools/p
 history = importlib.util.module_from_spec(history_spec)
 history_spec.loader.exec_module(history)
 history_sources = {name: (root/'FEX'/name).read_text() for name in history.EDITS}
-history_sources = history.patch(history_sources)
+# Since the 2026-10-15 merge the FEX pin carries the branch-history overlay inside its combined files, where the overlay's own
+# check ("partial or changed overlay") stops; build-xtajit64.sh does not run it on such a pin. Use the pin's files as they are.
+pin_has_history = all(history.MARKER in source for source in history_sources.values())
+if not pin_has_history:
+    history_sources = history.patch(history_sources)
 history_sources[history.MODULE] = overlay.patch(history_sources[history.MODULE])
-assert history.patch(history_sources) == history_sources
+if not pin_has_history:
+    assert history.patch(history_sources) == history_sources
 assert overlay.patch(history_sources[history.MODULE]) == history_sources[history.MODULE]
 for source in (module.replace(overlay.ANCHOR, 'changed-anchor'),
                patched.replace(overlay.ADD, overlay.MARKER)):
@@ -40,7 +45,9 @@ for source in (module.replace(overlay.ANCHOR, 'changed-anchor'),
         raise AssertionError('changed or partial policy accepted')
 assert patched.index(overlay.ADD) < patched.index('Context::CreateNewContext(')
 build = (root / 'tools/build-xtajit64.sh').read_text()
-assert build.index('patch-fex-ios-branch-history.py') < build.index('patch-fex-ios-launcher-smc.py')
+# build-xtajit64.sh names the launcher-smc overlay first in its branch for a pin that already carries the others; the order that matters is the
+# one of the older-pin sequence, which is the LAST place both appear.
+assert build.rindex('patch-fex-ios-branch-history.py') < build.rindex('patch-fex-ios-launcher-smc.py')
 assert "b'launcher-smc-v1 madeira-bcd' not in module" in (root / '.github/workflows/build-ipa.yml').read_text()
 config = (root / 'FEX/FEXCore/include/FEXCore/Config/Config.h').read_text()
 start = config.index('enum ConfigSMCChecks {')

@@ -36,6 +36,7 @@
  * including it here keeps both sides' definitions the same. */
 #include "Winios.h"
 #include "WiniosCursor.h"
+#include "winios_windowed.h"
 
 /* csops syscall — CS_DEBUGGED is the flag StikDebug JIT rides on. Declared by
  * hand for the same reason JITAllocator.c does: <sys/codesign.h> is not in the
@@ -457,6 +458,11 @@ static _Atomic(uint64_t) g_swap_drawable[WINIOS_SWAP_HWNDS];
 /* Counts how often a slot was taken: HWND values are reused (between sessions of one app run too), so driver_ios.c
  * tells a new window in a slot from the old one by this, not by the HWND alone. */
 static _Atomic(unsigned) g_swap_gen[WINIOS_SWAP_HWNDS];
+/* Round 625 (the owner's item 29): each slot's window style and outer size, (width << 32) | height (0 = not known yet), as
+ * driver_ios.c last saw them, and the slot + 1 of the shown swapchain window that changed last. winios_windowed_too_big. */
+static _Atomic(unsigned) g_swap_style[WINIOS_SWAP_HWNDS];
+static _Atomic(uint64_t) g_swap_size[WINIOS_SWAP_HWNDS];
+static _Atomic int g_swap_last_shown;
 
 /* The window's slot + 1, or 0 when no swapchain presents into it. */
 int winios_swapchain_hwnd(void *hwnd) {
@@ -510,6 +516,8 @@ void winios_note_swapchain_hwnd(void *hwnd) {
         if (atomic_compare_exchange_strong(&g_swap_hwnds[i], &empty, h)) {
             for (int k = 0; k < WINIOS_SWAP_KINDS; k++) atomic_store(&g_swap_said[i][k], 0);
             atomic_store(&g_swap_drawable[i], 0);
+            atomic_store(&g_swap_style[i], 0);
+            atomic_store(&g_swap_size[i], 0);
             atomic_fetch_add_explicit(&g_swap_gen[i], 1, memory_order_relaxed);
             fprintf(stderr, "[swap-win] hwnd=%p presents through a swapchain: its style, position, show, activation "
                             "and destruction are logged as [swap-win] lines\n", hwnd);
@@ -531,6 +539,18 @@ static int winios_forget_swapchain_hwnd(void *hwnd) {
 
 static void winios_swapchain_hwnds_reset(void) {
     for (int i = 0; i < WINIOS_SWAP_HWNDS; i++) atomic_store(&g_swap_hwnds[i], 0);
+    atomic_store(&g_swap_last_shown, 0);
+}
+
+/* driver_ios.c, on the window's thread (round 625, the owner's item 29): the window in `slot1` (winios_swapchain_hwnd) now has
+ * `style`, and, when `w` and `h` are not negative, that outer size; `shown` 1 makes it the window winios_windowed_too_big looks at,
+ * -1 leaves that as it is (a style change alone). Stores only. */
+void winios_swapchain_note_frame(int slot1, unsigned style, int w, int h, int shown) {
+    if (slot1 < 1 || slot1 > WINIOS_SWAP_HWNDS) return;
+    atomic_store_explicit(&g_swap_style[slot1 - 1], style, memory_order_relaxed);
+    if (w >= 0 && h >= 0)
+        atomic_store_explicit(&g_swap_size[slot1 - 1], ((uint64_t)(unsigned)w << 32) | (unsigned)h, memory_order_relaxed);
+    if (shown == 1) atomic_store_explicit(&g_swap_last_shown, slot1, memory_order_relaxed);
 }
 
 static void winios_remove_layer(HWND hwnd);   /* compositor, below */
@@ -1249,6 +1269,26 @@ static BOOL g_desk_rect_set;
 #define WINIOS_PX_TO_PT_Y (g_px_to_pt_y > 0 ? g_px_to_pt_y : g_px_to_pt)
 static CGRect g_comp_frame;              /* presentation area (window coords), from Swift */
 static BOOL g_comp_frame_set;
+
+/* Library.swift (round 625, the owner's item 29): 1 when this is a Windows desktop session (the compositor draws the windows,
+ * title bars included; in a game session BCD shows the swapchain's picture alone, so a frame is never seen), and the shown
+ * swapchain window that changed last still presents, has a title bar and is larger than the guest's screen. Its outer size and
+ * the screen's size in the four outputs. Main thread (the compositor's state is the main thread's). */
+int winios_windowed_too_big(int *win_w, int *win_h, int *scr_w, int *scr_h) {
+    int slot1 = atomic_load_explicit(&g_swap_last_shown, memory_order_relaxed), sw = 0, sh = 0;
+    uint64_t size;
+    unsigned style;
+    if (!g_compositor_view || g_comp_game) return 0;
+    if (slot1 < 1 || slot1 > WINIOS_SWAP_HWNDS || !atomic_load_explicit(&g_swap_hwnds[slot1 - 1], memory_order_relaxed)) return 0;
+    style = atomic_load_explicit(&g_swap_style[slot1 - 1], memory_order_relaxed);
+    size = atomic_load_explicit(&g_swap_size[slot1 - 1], memory_order_relaxed);
+    winios_screen_size(&sw, &sh);
+    if (win_w) *win_w = (int)(size >> 32);
+    if (win_h) *win_h = (int)(size & 0xffffffffu);
+    if (scr_w) *scr_w = sw;
+    if (scr_h) *scr_h = sh;
+    return winios_window_too_big(style, (int)(size >> 32), (int)(size & 0xffffffffu), sw, sh);
+}
 
 static CGRect winios_layer_rect(int x, int y, int w, int h) {
     CGFloat s = g_px_to_pt, sy = WINIOS_PX_TO_PT_Y;

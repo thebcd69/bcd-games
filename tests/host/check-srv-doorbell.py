@@ -41,7 +41,22 @@ harness = r'''
 #include <errno.h>
 #include <string.h>
 typedef int semaphore_t;
-static sem_t real_sem;
+/* macOS has neither sem_timedwait nor working unnamed sem_init: a counting semaphore on a mutex and a condition variable */
+typedef struct { pthread_mutex_t m; pthread_cond_t c; unsigned n; } fake_sem_t;
+static fake_sem_t real_sem = { PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, 0 };
+static int fake_sem_post(fake_sem_t *s) { pthread_mutex_lock(&s->m); s->n++; pthread_cond_signal(&s->c); pthread_mutex_unlock(&s->m); return 0; }
+static int fake_sem_timedwait(fake_sem_t *s, const struct timespec *ts)
+{
+    int r = 0;
+    pthread_mutex_lock(&s->m);
+    while (!s->n && !r) r = pthread_cond_timedwait(&s->c, &s->m, ts);
+    if (s->n) { s->n--; r = 0; }
+    pthread_mutex_unlock(&s->m);
+    if (r) { errno = r; return -1; }
+    return 0;
+}
+#define sem_post fake_sem_post
+#define sem_timedwait fake_sem_timedwait
 static semaphore_t ios_srv_wake_sem = 1;
 #define semaphore_signal(s) sem_post(&real_sem)
 /* build/madeira_cfg.h: no bcd.cfg here, so ios_srv_switch falls back to getenv
@@ -105,7 +120,6 @@ int main(void)
 {
     pthread_t c[NTHREADS], s;
     long k;
-    sem_init(&real_sem, 0, 0);
     ios_srv_wake_coalesce = 1;
     pthread_create(&s, NULL, server, NULL);
     for (k = 0; k < NTHREADS; k++) pthread_create(&c[k], NULL, client, (void *)k);

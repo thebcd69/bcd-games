@@ -1073,7 +1073,9 @@ check("the settings catalog's note for MADEIRA_WINE_VCRT still comes out the sam
       current is not None and catalog_note(rendered) == current, (catalog_note(rendered), current))
 fn_text = fn.group(0) if fn else ""
 check("the Swift side names the bridge's folder, marker and the workflow's fourteen DLLs, in its order",
-      'appendingPathComponent("VCRuntime", isDirectory: true)' in swift_src and 'appendingPathComponent("x86_64", isDirectory: true)' in swift_src
+      'appendingPathComponent("VCRuntime", isDirectory: true)' in swift_src
+      # round 625: the folder name is the package's (VCRuntimePackage.x64 "x86_64"; the 32-bit MFC's "x86", check-mfc32.py)
+      and 'root.appendingPathComponent(package.folderName, isDirectory: true)' in swift_src and 'folderName: "x86_64",' in swift_src
       and '@"VCRuntime/x86_64"' in fn_text and 'static let marker = "vcruntime140.dll"' in swift_src
       and '@"vcruntime140.dll"' in fn_text and 'Bundle.main.bundleURL.appendingPathComponent("x86_64-vcruntime"' in swift_src
       and re.findall(r'"(\w+\.dll)"', swift_src[swift_src.index("static let dllNames"):swift_src.index("static let marker")]) == WANT)
@@ -1088,8 +1090,9 @@ check("this check carries the LICENSE-BCD.md header", me[1:4] == ["#" + h[2:] fo
 literals = re.findall(r'"((?:[^"\\\n]|\\.)*)"', re.sub(r"(?m)^\s*//.*$", "", swift_src))
 check("no user-visible string says Madeira", not [s for s in literals if "madeira" in s.lower()],
       [s for s in literals if "madeira" in s.lower()])
-check("nothing else is downloaded and nothing is run: one URL, no process, no dlopen",
-      re.findall(r'URL\(string: "([^"]+)"\)', swift_src) == ["https://aka.ms/vs/17/release/vc_redist.x64.exe"]
+check("nothing else is downloaded and nothing is run: Microsoft's two links (x64; round 625 the 32-bit MFC's x86), no process, no dlopen",
+      re.findall(r'URL\(string: "([^"]+)"\)', swift_src) == ["https://aka.ms/vs/17/release/vc_redist.x64.exe",
+                                                           "https://aka.ms/vs/17/release/vc_redist.x86.exe"]
       and not re.search(r"\bProcess\(|posix_spawn|dlopen|NSTask|\bsystem\(", swift_src + cab_c))
 project = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
 sources = re.search(r"A3000002 /\* Sources \*/ = \{.*?files = \((.*?)\);", project, re.S).group(1)

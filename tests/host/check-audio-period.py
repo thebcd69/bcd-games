@@ -21,6 +21,7 @@ GetDevicePeriod answers 10 ms (minimum 5 ms) with no log line, as it always did.
      is called once per session after the env.* lines are exported, and publishes MADEIRA_AUDIO_IO_US only when it asked.
 """
 from pathlib import Path
+import json
 import os
 import shutil
 import subprocess
@@ -112,7 +113,12 @@ check("it is called once, after the observers (the env.* lines are exported by t
       bridge.count("madeira_audio_io_slice();") == 1 and bridge.index("madeira_engine_observers_install();   /* madeira-bcd") < bridge.index("madeira_audio_io_slice();"))
 check("the session setup is as it was: no preferred buffer duration there", bridge.count("setPreferredIOBufferDuration") == 2)
 text = (R / "recommended/recommendations.json").read_text() + (R / "build/tools/autotune_rules.py").read_text()
-check("no recommended list and no auto-tune rule sets either", "MADEIRA_AUDIO_IO_MS" not in text and "MADEIRA_AUDIO_PERIOD_MS" not in text)
+# Round 625 (owner's item 13, agent D1 S3-b): Dead Rising's list asks for a 5 ms IO buffer from build 625; no other list and no auto-tune rule.
+_recs = json.loads((R / "recommended/recommendations.json").read_text())
+_io = sorted(r["id"] for r in _recs["rules"] if "MADEIRA_AUDIO_IO_MS" in json.dumps(r))
+check("only Dead Rising's list sets the IO buffer (5 ms, build 625); no list sets the period and no auto-tune rule sets either",
+      _io == ["dead-rising"] and {"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == "dead-rising")["config"]
+      and "MADEIRA_AUDIO_PERIOD_MS" not in text and "MADEIRA_AUDIO_IO_MS" not in (R / "build/tools/autotune_rules.py").read_text())
 
 print("PASS: audio period" if ok else "FAIL: audio period")
 sys.exit(0 if ok else 1)

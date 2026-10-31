@@ -448,13 +448,14 @@ static pthread_mutex_t ios_child_lock = PTHREAD_MUTEX_INITIALIZER;
  * and the session never ended). Used only to decide whether anything still runs; the slot itself is released
  * as before. */
 #define IOS_CHILD_PATH 260
-static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; int used; void *peb; int exited; double exited_at; int noted; } ios_child_slots[IOS_CHILD_SLOTS];
+/* gl (round 624, agent D2 S3): the process made a real call into BCD's OpenGL stub table (ios_child_slot_gl_call). */
+static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; int used; void *peb; int exited; double exited_at; int noted; int gl; } ios_child_slots[IOS_CHILD_SLOTS];
 /* madeira-bcd (round 579, BCD Dock: the game died and the session stayed open): the last processes that ended, with the
  * status each ended with. The slots above are released when a child's boot thread returns (milliseconds after a healthy
  * exit), so the status has to live elsewhere: this ring keeps the last IOS_CHILD_ENDED ends (process_exit_wrapper,
  * through ios_child_slot_note_exit). Read by madeira_child_report (BCD Dock's game-end watch, Library.swift). */
 #define IOS_CHILD_ENDED 64
-static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; double ended_at; int status; } ios_child_ended[IOS_CHILD_ENDED];
+static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; double ended_at; int status; int gl; } ios_child_ended[IOS_CHILD_ENDED];
 static unsigned ios_child_ended_count;   /* ends ever noted; the ring holds the last IOS_CHILD_ENDED */
 /* spawns that found no free slot: processes this table cannot see (madeira_live_user_processes counts them as running) */
 static unsigned ios_child_untracked;
@@ -542,6 +543,7 @@ static int ios_child_slot_take( const UNICODE_STRING *image )
         ios_child_slots[i].used = 1;
         ios_child_slots[i].started = ios_child_now();
         ios_child_slots[i].noted = 0;
+        ios_child_slots[i].gl = 0;
         memcpy( ios_child_slots[i].name, name, n + 1 );
         ios_child_path_text( ios_child_slots[i].path, image );
         slot = i;
@@ -591,6 +593,20 @@ void ios_child_slot_exited( void *peb )
     pthread_mutex_unlock( &ios_child_lock );
 }
 
+/* madeira-bcd (round 624, agent D2 S3; Geometry Dash started from the Windows desktop, VDFZHN): the process with this PEB made a real
+ * wgl/gl call into BCD's OpenGL stub table (virtual_ios.c, ios_gl_stub_unix_call: there is no OpenGL, every such call fails). Kept
+ * with the process and with its end for the desktop's exit watch (madeira_child_ends_since). Loading opengl32.dll alone does not
+ * count: its DllMain makes only calls 0-2, which the stub table answers with success. No allocation, no logging. */
+void ios_child_slot_gl_call( void *peb )
+{
+    unsigned i;
+    if (!peb) return;
+    pthread_mutex_lock( &ios_child_lock );
+    for (i = 0; i < IOS_CHILD_SLOTS; i++)
+        if (ios_child_slots[i].used && ios_child_slots[i].peb == peb) ios_child_slots[i].gl = 1;
+    pthread_mutex_unlock( &ios_child_lock );
+}
+
 /* ajan11-wow64stack: the file name (lower case) of the child process with this PEB, for the one log line that says which Windows
  * process the storm guard ended. 1 and the name in `out`, or 0 (the table has no such process: out is "?"). Never the path. */
 int ios_child_slot_name( void *peb, char *out, size_t len )
@@ -636,6 +652,7 @@ int ios_child_slot_note_exit( void *peb, int status )
             ios_child_ended[at].started = ios_child_slots[i].started;
             ios_child_ended[at].ended_at = now;
             ios_child_ended[at].status = status;
+            ios_child_ended[at].gl = ios_child_slots[i].gl;
             ios_child_slots[i].noted = 1;
             noted = 1;
             break;
@@ -758,6 +775,38 @@ int madeira_child_report( char *buf, int len )
     buf[used] = 0;
     pthread_mutex_unlock( &ios_child_lock );
     return lines;
+}
+
+/* madeira-bcd (round 624, agent D2 S3 and S7): the processes that ended after the first `after` ends, for the Windows desktop's
+ * exit watch (LibraryModel.watchDesktopExits, DesktopExitRules in Library.swift): one line per end, oldest first, fields separated
+ * by tabs, the image path last:
+ *   <number of the end> <status in hex> <seconds it lived> <gl> <helper> <path>
+ * <gl> is 1 when the process made a real call into BCD's OpenGL stub table (ios_child_slot_gl_call); <helper> is the file-name
+ * rule above. Ends older than the ring (the last IOS_CHILD_ENDED) are gone. Returns the `after` for the next call: the number of
+ * ends so far, or the first end that did not fit in `buf`. An `after` past the count gives no line, so (unsigned)-1 asks for the
+ * count alone (buf may then be NULL). No allocation, no logging; madeira_child_report is unchanged. */
+unsigned int madeira_child_ends_since( unsigned int after, char *buf, int len )
+{
+    unsigned int i, first, next;
+    int used = 0;
+
+    if (buf && len > 0) buf[0] = 0;
+    pthread_mutex_lock( &ios_child_lock );
+    next = ios_child_ended_count;
+    first = next > IOS_CHILD_ENDED ? next - IOS_CHILD_ENDED : 0;
+    if (after > first) first = after;
+    for (i = first; buf && len > 0 && i < next; i++)
+    {
+        unsigned int at = i % IOS_CHILD_ENDED;
+        int room = len - used, n;
+        n = snprintf( buf + used, room, "%u\t%x\t%.1f\t%d\t%d\t%s\n", i, (unsigned int)ios_child_ended[at].status,
+                      ios_child_ended[at].ended_at - ios_child_ended[at].started, ios_child_ended[at].gl ? 1 : 0,
+                      ios_child_is_helper( ios_child_ended[at].name ), ios_child_ended[at].path );
+        if (n < 0 || n >= room) { buf[used] = 0; next = i; break; }   /* no room: this end and the rest next time */
+        used += n;
+    }
+    pthread_mutex_unlock( &ios_child_lock );
+    return next;
 }
 
 /* the machine of the child's main image, published to
@@ -1226,6 +1275,50 @@ static int ios_image_name_is( const WCHAR *image, int image_len, const char *nam
         if (c >= 'A' && c <= 'Z') c += 32;
         if (c != (WCHAR)name[k]) return 0;
     }
+    return 1;
+}
+
+/* madeira-bcd (round 624, Discord forum item 4: a player's WoW private server on BCD's Windows desktop): explorer's context menu
+ * "Open" (shell32's execute_verb: ShellExecuteEx without a directory) starts a program in explorer's own current directory,
+ * C:\windows\, where Windows (and explorer's own double-click, which passes the folder) starts it in its folder; worldserver.exe
+ * found none of its files there (the log: the double-clicked start cwd=L"C:\\WoTLK Emulator\\", the context-menu one
+ * cwd=L"C:\\windows\\"). The 64-bit shell32.dll is a prebuilt file, so this is done here: in a session of BCD's Windows desktop
+ * (env.MADEIRA_DESKTOP_CWD=1, which the app sets for that library entry only), a program that explorer.exe starts with the current
+ * directory C:\windows\ and whose file is a drive path outside the Windows folder starts in its own folder. Returns 1 when it did. */
+static int ios_wchar_prefix_ci( const WCHAR *s, int len, const char *prefix )
+{
+    int n = (int)strlen( prefix ), k;
+
+    if (!s || len < n) return 0;
+    for (k = 0; k < n; k++)
+    {
+        WCHAR c = s[k], d = (WCHAR)(unsigned char)prefix[k];
+        if (c >= 'A' && c <= 'Z') c += 32;
+        if (d >= 'A' && d <= 'Z') d += 32;
+        if (c != d) return 0;
+    }
+    return 1;
+}
+
+static int desktop_cwd_apply( RTL_USER_PROCESS_PARAMETERS *params, const RTL_USER_PROCESS_PARAMETERS *own, const char *on )
+{
+    static const char windir[] = "c:\\windows\\";
+    const WCHAR *image = params->ImagePathName.Buffer, *cwd = params->CurrentDirectory.DosPath.Buffer;
+    int image_len = params->ImagePathName.Length / sizeof(WCHAR), cwd_len = params->CurrentDirectory.DosPath.Length / sizeof(WCHAR);
+    int dir_len;
+    WCHAR *dir;
+
+    if (!on || on[0] != '1' || on[1] || !own || !image || image_len < 4) return 0;
+    if (!ios_image_name_is( own->ImagePathName.Buffer, own->ImagePathName.Length / sizeof(WCHAR), "explorer.exe" )) return 0;
+    if (cwd_len != (int)sizeof(windir) - 1 || !ios_wchar_prefix_ci( cwd, cwd_len, windir )) return 0;
+    for (dir_len = image_len; dir_len > 0 && image[dir_len - 1] != '\\'; dir_len--) ;
+    if (dir_len < 3 || image[1] != ':' || image[2] != '\\' || ios_wchar_prefix_ci( image, dir_len, windir )) return 0;
+    if (!(dir = malloc( (dir_len + 1) * sizeof(WCHAR) ))) return 0;
+    memcpy( dir, image, dir_len * sizeof(WCHAR) );
+    dir[dir_len] = 0;
+    params->CurrentDirectory.DosPath.Buffer = dir;   /* kept: one small leak per such start, as the command line rewrites below */
+    params->CurrentDirectory.DosPath.Length = dir_len * sizeof(WCHAR);
+    params->CurrentDirectory.DosPath.MaximumLength = (dir_len + 1) * sizeof(WCHAR);
     return 1;
 }
 
@@ -1975,6 +2068,19 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
 
         if (swap && *swap) spawn_swap_apply( swap, &path, params );
     }
+
+#ifdef WINE_IOS
+    /* 1 (BCD's Windows desktop sets it): a program explorer.exe opens with explorer's C:\windows\ as its current folder starts in
+     * its own folder (desktop_cwd_apply; madeira-bcd round 624, Discord forum item 4). Before the phase stamp and get_unix_curdir. */
+    if (desktop_cwd_apply( params, NtCurrentTeb()->Peb->ProcessParameters, getenv( "MADEIRA_DESKTOP_CWD" ) ))
+    {
+        static int desktop_cwd_n;
+        if (desktop_cwd_n++ < 16)
+            dprintf( 2, "[desktop-cwd] %s starts in its own folder %s, not in explorer's C:\\windows\\ "
+                        "(env.MADEIRA_DESKTOP_CWD=1, BCD's Windows desktop)\n",
+                     debugstr_us( &params->ImagePathName ), debugstr_us( &params->CurrentDirectory.DosPath ) );
+    }
+#endif
 
     /* ml526: stamp every accepted spawn on the startup timeline. This is the
      * boundary the coarse phase accounting could not see — steam.exe -> the
@@ -3210,6 +3316,27 @@ static void ios_unw_globals( const char *tag, uint64_t fn_start, uint64_t fn_end
 }
 
 /* Print the bounded unwind. `regs` is FEX's greg file (RAX,RCX,RDX,RBX,RSP,RBP,RSI,RDI,R8..R15). */
+/* madeira-bcd (round 624, agent E2 S2c; Slay the Spire 2 BMVD7C: the walk stopped at coreclr.dll's first frame): an x64 image that runs
+ * without a pool copy (MADEIRA_X64_IMAGE_NOCOPY) is in no JIT-pool table. Its PE header sits on a 64 KB boundary below pc: the nearest
+ * one, at most 1 GB down, names the frame if its image holds pc (fault-safe reads, termination path only). 0: none. */
+static uint64_t ios_unw_image_below( uint64_t pc, unsigned long long *size_out )
+{
+    uint64_t a = pc & ~0xffffULL, stop = pc > (1ULL << 30) + 0x10000 ? pc - (1ULL << 30) : 0x10000;
+
+    for (; a >= stop; a -= 0x10000)
+    {
+        unsigned char mz[2];
+        unsigned int e_lf = 0, sig = 0, soi = 0;
+
+        if (!ios_unw_read( a, mz, 2 ) || mz[0] != 'M' || mz[1] != 'Z') continue;
+        if (!ios_unw_rd32( a + 0x3c, &e_lf ) || e_lf >= 0x1000 || !ios_unw_rd32( a + e_lf, &sig ) || sig != 0x4550) continue;
+        if (!ios_unw_rd32( a + e_lf + 0x50, &soi ) || pc >= a + soi) return 0;   /* the nearest image below does not hold pc */
+        *size_out = soi;
+        return a;
+    }
+    return 0;
+}
+
 static void ios_unwind_dump( uint64_t rip, const uint64_t *gregs, const char *tag )
 {
     extern unsigned long long ios_jit_module_base_for_va( unsigned long long va, unsigned long long *size_out );
@@ -3235,6 +3362,8 @@ static void ios_unwind_dump( uint64_t rip, const uint64_t *gregs, const char *ta
         unsigned long long mbase = ios_jit_module_base_for_va( pc, &msz );
         const char *mname = "?";
         uint64_t next_pc = 0, fn_start = 0, fn_end = 0;
+
+        if (!mbase) mbase = ios_unw_image_below( pc, &msz );   /* madeira-bcd (round 624, E2 S2c): an image without a pool copy */
 
         if (mbase)
         {
@@ -3680,6 +3809,11 @@ static int ios_dump_guest_instruction( HANDLE handle, LONG exit_code, uint64_t r
     {
         dprintf( 2, "[guest-insn] #%u code=%08x rip=%#llx: no registered x64 text window\n",
                  report + 1, (unsigned)exit_code, (unsigned long long)rip );
+        /* madeira-bcd: the bytes at the fault as memory holds them NOW. A main image run
+         * from its PE VA (MADEIRA_X64_IMAGE_NOCOPY) has no window, and a self-decrypting
+         * protection leaves two readings: plaintext here means FEX ran a translation made
+         * before the decrypting store; ciphertext means that store never happened. */
+        if (rip >= 16) ios_guest_instruction_read( "CURRENT", rip - 16, 48, pe_bytes );
         return 0;
     }
     dprintf( 2, "[guest-insn] #%u code=%08x rip=%#llx image=%#llx rva=%#llx "
@@ -3755,6 +3889,122 @@ static void ios_term_oom_record( TEB *teb )
     if (!found)
         dprintf( 2, "[chromium-oom] at exit: no 0xE0000008 record in the top of the thread's stack [%#llx,%#llx)\n",
                  (unsigned long long)lo, (unsigned long long)hi );
+}
+
+/* madeira-bcd (round 624, agent E2 X1, Amnesia: The Dark Descent W0BX37): a 32-bit thread has no FEX state where the [term-stack] dump looks
+ * (TEB.ChpeV2CpuAreaInfo is the 64-bit emulator's), so 46 of 49 32-bit logs said only "no FEX state on this thread" and nothing named the code
+ * that ended the process. WoW64 keeps the thread's 32-bit registers in its CPU area, saved at the thread's last system call (this terminate
+ * call): print them, and the dwords of the guest stack that are return addresses (a call instruction right before them) with module+RVA from
+ * the PEB32's own module list. Log only: fault-safe Mach reads of the guest window, nothing written; inside [term-stack]'s cap of 24. */
+static int ios_t32_read( uint64_t addr, void *buf, size_t len )
+{
+    mach_vm_size_t got = 0;
+
+    return addr >= 0x10000 && addr < 0x800000000000ULL &&
+           mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)addr, len, (mach_vm_address_t)buf, &got ) == KERN_SUCCESS &&
+           got == len;
+}
+
+struct ios_t32_mod { uint32_t base, size; char name[24]; };
+
+/* The process's 32-bit modules from PEB32 -> PEB_LDR_DATA32.InLoadOrderModuleList (LDR_DATA_TABLE_ENTRY32: DllBase +0x18, SizeOfImage +0x20,
+ * BaseDllName +0x2c), at most `max`, as ios_wow_null_diag.h reads them. */
+static unsigned ios_t32_modules( uint64_t win, uint32_t peb32, struct ios_t32_mod *mods, unsigned max )
+{
+    uint32_t ldr = 0, head, e = 0;
+    unsigned n = 0, walked = 0;
+
+    if (!ios_t32_read( win + peb32 + 0x0c, &ldr, 4 ) || ldr < 0x10000) return 0;
+    head = ldr + 0x0c;
+    if (!ios_t32_read( win + head, &e, 4 )) return 0;
+    while (e >= 0x10000 && e != head && n < max && walked++ < 128)
+    {
+        uint32_t next = 0, nameptr = 0;
+        uint16_t namelen = 0;
+        struct ios_t32_mod *m = &mods[n];
+
+        if (!ios_t32_read( win + e + 0x18, &m->base, 4 ) || !ios_t32_read( win + e + 0x20, &m->size, 4 ) ||
+            !ios_t32_read( win + e, &next, 4 )) break;
+        m->name[0] = '?'; m->name[1] = 0;
+        if (ios_t32_read( win + e + 0x2c, &namelen, 2 ) && ios_t32_read( win + e + 0x2c + 4, &nameptr, 4 ) && nameptr >= 0x10000)
+        {
+            uint16_t w[23];
+            unsigned chars = namelen / 2, i;
+
+            if (chars > 22) chars = 22;
+            if (chars && ios_t32_read( win + nameptr, w, chars * 2 ))
+            {
+                for (i = 0; i < chars; i++) m->name[i] = w[i] > 0x20 && w[i] < 0x7f ? (char)w[i] : '?';
+                m->name[chars] = 0;
+            }
+        }
+        if (m->base) n++;
+        e = next;
+    }
+    return n;
+}
+
+/* 'C' when a direct call (E8 rel32) ends at guest address v, 'I' for an indirect call (FF /2 in its register, memory, SIB and displacement
+ * forms), ' ' when none does: a dword on the stack that is a real return address has a call right before it. */
+static char ios_t32_call_kind( uint64_t win, uint32_t v )
+{
+    uint8_t b[8];   /* b[k] = the byte at v - 8 + k */
+
+    if (v < 0x10008 || !ios_t32_read( win + v - 8, b, 8 )) return ' ';
+    if (b[3] == 0xe8) return 'C';                                                                      /* E8 rel32 */
+    if (b[6] == 0xff && (b[7] & 0x38) == 0x10 && ((b[7] & 0xc0) == 0xc0 ||
+        ((b[7] & 0xc0) == 0x00 && (b[7] & 7) != 4 && (b[7] & 7) != 5))) return 'I';                     /* FF D0+r, FF 10+r */
+    if (b[5] == 0xff && (b[6] & 0x38) == 0x10 && (b[6] & 0xc0) == 0x40 && (b[6] & 7) != 4) return 'I';  /* FF 50+r d8 */
+    if (b[5] == 0xff && (b[6] & 0x38) == 0x10 && (b[6] & 0xc0) == 0x00 && (b[6] & 7) == 4 && (b[7] & 7) != 5) return 'I'; /* FF 14 sib */
+    if (b[4] == 0xff && (b[5] & 0x38) == 0x10 && (b[5] & 0xc0) == 0x40 && (b[5] & 7) == 4) return 'I';  /* FF 54 sib d8 */
+    if (b[2] == 0xff && (b[3] & 0x38) == 0x10 && ((b[3] & 0xc7) == 0x05 ||
+        ((b[3] & 0xc0) == 0x80 && (b[3] & 7) != 4))) return 'I';                                         /* FF 15 d32, FF 90+r d32 */
+    if (b[1] == 0xff && (b[2] & 0x38) == 0x10 && (((b[2] & 0xc0) == 0x80 && (b[2] & 7) == 4) ||
+        ((b[2] & 0xc0) == 0x00 && (b[2] & 7) == 4 && (b[3] & 7) == 5))) return 'I';                     /* FF 94 sib d32, FF 14 sib d32 */
+    return ' ';
+}
+
+void ios_wow32_stack_dump( const char *tag )
+{
+    extern void *get_cpu_area( USHORT machine );
+    I386_CONTEXT *c = get_cpu_area( IMAGE_FILE_MACHINE_I386 );
+    TEB *teb = NtCurrentTeb();
+    struct ios_t32_mod mods[128];
+    uint32_t stack[256], peb32 = 0, teb32 = 0;
+    uint64_t win, teb32_host = 0;
+    unsigned nmods = 0, ndw = 0, i, k, shown = 0;
+    int32_t woff;
+
+    if (!c || !teb) return;
+    win = ios_wow_base_for_peb( teb->Peb );
+    woff = teb->WowTebOffset;
+    if (woff > 0) teb32_host = (uint64_t)(uintptr_t)teb + (uint64_t)woff;
+    if (teb32_host >= win && teb32_host - win < 0x100000000ULL) teb32 = (uint32_t)(teb32_host - win);
+    if (teb32 && ios_t32_read( teb32_host + 0x30, &peb32, 4 ) && peb32 >= 0x10000)
+        nmods = ios_t32_modules( win, peb32, mods, sizeof(mods) / sizeof(mods[0]) );
+    dprintf( 2, "[term-stack] 32-bit %s eip=%08x esp=%08x ebp=%08x eax=%08x ecx=%08x edx=%08x ebx=%08x esi=%08x edi=%08x "
+             "(WoW64's saved registers at this system call; window %#llx, teb32 %08x, %u modules)\n",
+             tag, (unsigned int)c->Eip, (unsigned int)c->Esp, (unsigned int)c->Ebp, (unsigned int)c->Eax, (unsigned int)c->Ecx,
+             (unsigned int)c->Edx, (unsigned int)c->Ebx, (unsigned int)c->Esi, (unsigned int)c->Edi, (unsigned long long)win,
+             (unsigned int)teb32, nmods );
+    if (c->Esp < 0x10000) return;
+    /* as much of 256 dwords as is readable, in 64-dword steps (the stack's top page may end the read early) */
+    for (k = 0; k < 4 && ios_t32_read( win + c->Esp + k * 256, stack + k * 64, 256 ); k++) ndw = (k + 1) * 64;
+    for (i = 0; i < ndw && shown < 12; i++)
+    {
+        uint32_t v = stack[i];
+        const struct ios_t32_mod *m = NULL;
+        char kind;
+
+        for (k = 0; k < nmods; k++)
+            if (v >= mods[k].base && v - mods[k].base < mods[k].size) { m = &mods[k]; break; }
+        if (!m) continue;
+        if ((kind = ios_t32_call_kind( win, v )) == ' ') continue;
+        dprintf( 2, "[term-stack] 32-bit sp+%03x: ret %08x %s+0x%x (%s call before it)\n", i * 4, (unsigned int)v, m->name,
+                 (unsigned int)(v - m->base), kind == 'C' ? "a direct" : "an indirect" );
+        shown++;
+    }
+    dprintf( 2, "[term-stack] 32-bit %s: %u of 256 stack dwords read, %u return address(es)\n", tag, ndw, shown );
 }
 #endif
 
@@ -3922,7 +4172,12 @@ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
                         if (!hits) dprintf(2, "[term-stack] no readable stack candidate produced hits\n");
                     }
                 }
-                else dprintf(2, "[term-stack] no FEX state on this thread (cpuarea=%p)\n", (void *)cpuarea);
+                else
+                {
+                    dprintf(2, "[term-stack] no FEX state on this thread (cpuarea=%p)\n", (void *)cpuarea);
+                    /* madeira-bcd (round 624, X1): a 32-bit thread's registers and return addresses (nothing for a 64-bit one) */
+                    ios_wow32_stack_dump( "terminate" );
+                }
             }
         }
     }

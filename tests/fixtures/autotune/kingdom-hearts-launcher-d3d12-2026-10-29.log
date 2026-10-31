@@ -1,0 +1,406 @@
+[01:05:30.726] [INFO] Checking entitlements...
+[01:05:30.726] [INFO] [build] v0.1.622 (622)
+[01:05:30.730] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8171MB cores=6
+[01:05:30.730] [INFO] [device] address-map=[0x102dd8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[01:05:30.755] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:05:47.860] [INFO] [dock-installers] app=1608070 choice=run
+[01:05:53.950] [INFO] Requesting JIT with Built-in StikJIT...
+[01:05:56.870] [INFO] [bcd] library launch KINGDOM HEARTS -HD 1.5+2.5 ReMIX-: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[01:05:56.883] [INFO] [dock-launch] image-retire=1
+[01:05:56.883] [INFO] [dock-launch] image-map-guard=1
+[01:05:56.887] [INFO] [dock-installers] app=2552430 scripts=0 programs=0
+[01:05:56.888] [INFO] [madeira-dock] starting the host for app 2552430; Valve's client authenticates and authorizes the launch
+[01:05:56.897] [INFO] Running full Wine sequence...
+[01:05:56.897] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102dd8000,0x8000000000) 512GB available=8141MB low-power=0 thermal=serious
+[01:05:56.901] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:05:56.901] [INFO] Allocating 896MB JIT pool via debugger...
+[01:05:56.901] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:05:56.901] [INFO] [jit-debugger] attached=1 at the pool request
+[01:05:56.903] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[01:05:57.598] [INFO] RX pool at 0x148000000
+[01:05:57.620] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.764s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7557 MB + phys_footprint=634 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=645 MB (peak 645) internal=646 MB compressed=0 MB external=98 MB reusable=19 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7024f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.269s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x11a480000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.351s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11A480000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7029610000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m2310657 "wine-x18-exc"
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=999 MB (peak 999) internal=999 MB compressed=0 MB external=170 MB reusable=19 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[dns] madeira-bcd begin #2 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #3 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #4 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #5 "test.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #6 "ipv6check-http.steamserver.net" "(null)" family=30 flags=0xc00 type=0
+[free-delay] #2 release of 0x7036bc0000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7038010000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7038fe0000+0xfd0000 held for 2000 ms (3 in flight)
+[dns] madeira-bcd begin #9 "cmp1-dfw2.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #10 "cmp1-lax1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #11 "cmp2-dfw2.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #12 "cmp2-lax1.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #13 "cmp1-atl3.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #14 "p2p-lax1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1104 MB (peak 1104) internal=1105 MB compressed=0 MB external=174 MB reusable=19 MB (cycle=3)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f5230000) -> 64-bit table (0x105ba8758)
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x20056 class='' text="WineD3D fake window" rev=ml853
+0050:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 000000703A1328F0.
+0050:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+[footprint] rev=ml358 phys=1107 MB (peak 1107) internal=1106 MB compressed=0 MB external=175 MB reusable=19 MB (cycle=4)
+[footprint] rev=ml358 phys=1098 MB (peak 1107) internal=1097 MB compressed=0 MB external=175 MB reusable=19 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe" t+ 10.190s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\KINGDOM HEARTS HD 1.5+2.5 ReMIX.exe\"" (fd=367, unixdir=368, dup_unixdir=431) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-"
+[Wine child thread] calling wine_ios_child_main...
+[hwinput] keyboard focus: elsewhere (poll)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x1538c0000)
+[file-wfail] ml669 #85 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x32000 type=0x2000 protect=0x4 tid=00a4 | STAGE=fixed-map err=3 at 0x180000000+0x34000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 remix.exe tid=00a4 size=0x32000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #5 release of 0x7030530000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a4 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=kingdom hearts hd 1.5+2.5 remix.exe tid=00a4 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml358 phys=1240 MB (peak 1240) internal=1239 MB compressed=0 MB external=212 MB reusable=19 MB (cycle=6)
+[file-wfail] ml669 #86 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[01:06:08.398] [INFO] [dock-report] launch-game-running=1
+[free-delay] #6 release of 0x7037e40000+0x120000 held for 2000 ms (2 in flight)
+00a4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\KINGDOM HEARTS HD 1.5+2.5 Launcher.exe" cmdline=L" "
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\KINGDOM HEARTS HD 1.5+2.5 Launcher.exe" t+ 11.509s rev=ml526
+[session-log] Steam game KINGDOM HEARTS HD 1.5+2.5 Launcher.exe: logs/KINGDOM HEARTS HD 1.5+2.5 Launcher.exe-2026-10-29_01-06-08.txt
+00a4:err:process:spawn_process spawn_process: creating child thread for L" " (fd=464, unixdir=465, dup_unixdir=469) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\"
+[Wine child thread] calling wine_ios_child_main...
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files (x86)/Steam/steamapps/common/KINGDOM HEARTS -HD 1.5+2.5 ReMIX-/KINGDOM HEARTS HD 1.5+2.5 Launcher.exe') = 0x0
+[shared-section] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\KINGDOM HEARTS -HD 1.5+2.5 ReMIX-\\KINGDOM HEARTS HD 1.5+2.5 Launcher.exe" section .shared rva=0x4d4000 size=0x1000 is not aligned to the 0x4000-byte host page: mapped private, its writes are not shared between processes (MADEIRA_SHARED_SECTION_PRIVATE=0 fails the load instead)
+[data-align] KINGDOM HEARTS HD 1.5+2.5 Launcher.exe shifted +0x1000 so .data lands on a 16KB page
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5222000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 remix.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5222000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5223000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 remix.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5223000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5224000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 remix.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5224000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5225000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5226000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5227000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5228000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f5229000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f522a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f522b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f522c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f522d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f522e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f522f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x157b64000)
+[copy-verify] concrt140.dll: OK, 5 .text pages executable (copy @0x15ae88000)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71ee360000) -> 64-bit table (0x105ba8758)
+[excl-store] ml1284 #1 insn=0x880bfd0a size=4 ea=0x703e2000d8 load-reg=9 delta=0 emulated
+[excl-store] ml1284 #2 insn=0x880afd09 size=4 ea=0x703e2000d8 load-reg=9 delta=-1 emulated
+[stp-emul] ml629 #1 insn=0xad028341 mode=offset off=+80 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e200940 rw=0x7013074940 base 0x703e200940 -> 0x703e200940 (no writeback)
+[stp-emul] ml629 #2 insn=0xad010341 mode=offset off=+32 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e200910 rw=0x7013074910 base 0x703e200910 -> 0x703e200910 (no writeback)
+[stp-emul] ml629 #3 insn=0xad000b40 mode=offset off=+0 Rt=q0 Rt2=q2 Rn=x26 addr=0x703e2008f0 rw=0x70130748f0 base 0x703e2008f0 -> 0x703e2008f0 (no writeback)
+[excl-store] ml1284 #3 insn=0x880bfd0a size=4 ea=0x703e2000d8 load-reg=9 delta=0 emulated
+[excl-store] ml1284 #4 insn=0x880afd09 size=4 ea=0x703e2000d8 load-reg=9 delta=-1 emulated
+[stp-emul] ml629 #4 insn=0xad028341 mode=offset off=+80 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e2009d0 rw=0x70130749d0 base 0x703e2009d0 -> 0x703e2009d0 (no writeback)
+[stp-emul] ml629 #5 insn=0xad010341 mode=offset off=+32 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e2009a0 rw=0x70130749a0 base 0x703e2009a0 -> 0x703e2009a0 (no writeback)
+[stp-emul] ml629 #6 insn=0xad000b40 mode=offset off=+0 Rt=q0 Rt2=q2 Rn=x26 addr=0x703e200980 rw=0x7013074980 base 0x703e200980 -> 0x703e200980 (no writeback)
+[excl-store] ml1284 #5 insn=0x880bfd0a size=4 ea=0x703e2000d8 load-reg=9 delta=0 emulated
+[excl-store] ml1284 #6 insn=0x880afd09 size=4 ea=0x703e2000d8 load-reg=9 delta=-1 emulated
+[stp-emul] ml629 #7 insn=0xad028341 mode=offset off=+80 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e200a60 rw=0x7013074a60 base 0x703e200a60 -> 0x703e200a60 (no writeback)
+[stp-emul] ml629 #8 insn=0xad010341 mode=offset off=+32 Rt=q1 Rt2=q0 Rn=x26 addr=0x703e200a30 rw=0x7013074a30 base 0x703e200a30 -> 0x703e200a30 (no writeback)
+[excl-store] ml1284 #7 insn=0x880bfd0a size=4 ea=0x703e2000d8 load-reg=9 delta=0 emulated
+[excl-store] ml1284 #8 insn=0x880afd09 size=4 ea=0x703e2000d8 load-reg=9 delta=-1 emulated
+[store-undecoded] #1 rev=ml350 insn=0x78038d8a pc=0x156ed3eb4 addr=0x703e230038 rw_addr=0x7013084038 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #1 p0=WRITE p1=0x703e230038 hostpc=0x156ed3eb4 hinsn=0x78038d8a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x156f2616c pc=0x156ed3eb4 addr=0x703e230038 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x703e230000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x156ed3eb4 addr=0x703e230038 x18=0x0 type=1 lr=0x156ed3e8c sp=0x7038a0f920 x16=0x1ffffff x17=0x55c6
+[fault-host] 156ed3db4: b90023e8 b90013eb f90007f5 b90003ec b9001bea 97ffec8e b0000528 39401ea9
+[fault-host] 156ed3dd4: 3946a108 37080129 361ffb48 52800060 aa1403e2 b00003e3 91100063 910003e4
+[fault-host] 156ed3df4: aa1f03e5 17ffffd2 361ffa48 f85f82a8 52800060 aa1403e2 aa1603e3 910003e4
+[fault-host] 156ed3e14: 52800105 f90003e8 17ffffc9 a9497bfb a9486bf9 a9475bf5 a94653f3 910283ff
+[fault-host] 156ed3e34: d65f03c0 d100c3ff a90153f3 f90013fe f140407f 52a00028 529fffe9 9a888068
+[fault-host] 156ed3e54: 9100a3e3 2a0103f4 0b090108 52bfffe9 aa0003f3 92701108 eb02011f f90017e8
+[mach_exc] insn_stream PC-12..PC+8: 79007c09 12103c09 d344fd0a [78038d8a] d101016a a9012808 927ced0a
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x703dac34a0 *(gs_cached+0x58)=0x703dac34a0
+[store-undecoded] #2 rev=ml350 insn=0x78038d8a pc=0x156ed3eb4 addr=0x703e230038 rw_addr=0x7013084038 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #2 p0=WRITE p1=0x703e230038 hostpc=0x156ed3eb4 hinsn=0x78038d8a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x156f2616c pc=0x156ed3eb4 addr=0x703e230038 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x703e230000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x156ed3eb4 addr=0x703e230038 x18=0x0 type=1 lr=0x156ed3e8c sp=0x7038a0f920 x16=0x1ffffff x17=0x55c6
+[fault-host] 156ed3e14: 52800105 f90003e8 17ffffc9 a9497bfb a9486bf9 a9475bf5 a94653f3 910283ff
+[fault-host] 156ed3e34: d65f03c0 d100c3ff a90153f3 f90013fe f140407f 52a00028 529fffe9 9a888068
+[fault-host] 156ed3e54: 9100a3e3 2a0103f4 0b090108 52bfffe9 aa0003f3 92701108 eb02011f f90017e8
+[fault-host] 156ed3e74: 9a82810a eb09005f 910023e2 9a893148 f90007e8 97ffec7b b4000760 f94007e8
+[fault-host] 156ed3e94: f94017eb aa0003ec 528028c9 f9001813 d100e108 79007c09 12103c09 d344fd0a
+[fault-host] 156ed3eb4: 78038d8a d101016a a9012808 927ced0a 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 79007c09 12103c09 d344fd0a [78038d8a] d101016a a9012808 927ced0a
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x703dac34a0 *(gs_cached+0x58)=0x703dac34a0
+00ac:err:mscoree:madeira_mono_env_defaults iOS-Madeira ml1282: MONO_THREADS_SUSPEND=coop MONO_DEBUG=keep-delegates
+E AC [mono-cfg] ml623 module=libmono-2.0-x86_64.dll base=0x71ec940000 xend=0x71ecc1a8f6 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+E AC [mono-cfg] ml623 module=libmono-2.0-x86_64.dll base=0x71ec940000 xend=0x71ecc1a8f6 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71ec2c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[swp-emul] ml626 #1 insn=0xf8fa833a size=8 Rs=x26 Rt=x26 addr=0x7030530bb0 rw=0x7013b08bb0 in=0x7030530dd0 old=0x7030530c03
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71ebd00000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #7 release of 0x7040c20000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x7040e20000+0x400000 held for 2000 ms (3 in flight)
+[alloc-fail] ml814 #18 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[file-wfail] ml669 #87 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml1060 fast phys=1485 MB compressed=0 MB
+[file-wfail] ml669 #88 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f0b02000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f0b03000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f0b04000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f0b05000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f0b06000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f0b07000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f0b08000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f0b09000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f0b0a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f0b0b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f0b0c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f0b0d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f0b0e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f0b0f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f0cbc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f0cbd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f0cbe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f0cbf000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f0fd1000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f0fd2000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f0fd3000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f0fd4000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f0fd5000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f0fd6000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f0fd7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f0fd8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f0fd9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f0fda000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f0fdb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f0fdc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f0fdd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f0fde000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f0fdf000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f117c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f117d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f117e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f117f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f377b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f377c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f377d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f377e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f377f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f47dd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f47de000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f47df000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f5222000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71e9880000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71e9800000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x71e97f0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71e9700000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nt-fail] #18 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x7030540000 zb=0x0 hits=1 rev=ajan5-rockstar
+[nt-fail] #19 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x7037f60000 zb=0x0 hits=2 rev=ajan5-rockstar
+[nt-fail] #20 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x7045850000 zb=0x0 hits=3 rev=ajan5-rockstar
+[nt-fail] #21 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x7045870000 zb=0x0 hits=4 rev=ajan5-rockstar
+D AC Load module windowscodecs.dll (windowscodecs.dll-5f3613b68f058a67): 71E8ED0000
+[nls-getptr] type=11 id=10000 peb=0x119d48000
+[nls-getptr] type=11 id=10000 peb=0x119d48000
+[nls-getptr] type=11 id=10001 peb=0x119d48000
+[nls-getptr] type=11 id=10000 peb=0x119d48000
+[nls-getptr] type=11 id=10000 peb=0x119d48000
+[win-name] #37 hwnd=0x1006e class='' text="Default IME" rev=ml853
+[ilonly-machine] an IL-only PE32 image (CLR flags=0x1, machine=0x14c) is not promoted to the native machine 0xaa64: its set has no mscoree.dll, so it runs as its own machine (WoW64) (it ended in c000007b before; tests/host/check-ilonly-machine.py)
+ml957: ? backing 0x71e8e90000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D AC Load module WineMono.Security.dll (winemono.security.dll-a9dc84ff51815632): 71E8E90000
+00ac:err:module:load_dll [dll-missing] rev=ml336 #29 L"C:\\windows\\mono\\mono-2.0\\lib/mono/aot-cache/amd64/WineMono.Security.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D AC Load module libmono-btls-shared.dll (libmono-btls-shared.dll-2a0ca5dfd38b485c): 71E8D20000
+D AC Load module WSOCK32.dll (wsock32.dll-baa9e16ae0127f28): 71E8C90000
+[footprint] rev=ml1060 fast phys=1510 MB compressed=0 MB
+[nt-fail] #22 NtAllocateVirtualMemory status=c0000018 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x7041080000 zb=0x0 hits=8 rev=ajan5-rockstar
+00ac:err:module:load_dll [dll-missing] rev=ml336 #30 L"C:\\windows\\Microsoft.NET\\Framework64\\v2.0.50727\\fusion.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+ml957: ? backing 0x71e8980000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D AC Load module System.Xml.dll (system.xml.dll-232312f8297d1425): 71E8980000
+00ac:err:module:load_dll [dll-missing] rev=ml336 #31 L"C:\\windows\\mono\\mono-2.0\\lib\\mono\\gac\\System.Xml\\4.0.0.0__b77a5c561934e089\\System.Xml.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #32 L"C:\\windows\\mono\\mono-2.0\\lib/mono/aot-cache/amd64/System.Xml.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nt-fail] #23 NtAllocateVirtualMemoryEx status=c0000017 proc=kingdom hearts hd 1.5+2.5 launcher.exe tid=00ac size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=1577 MB compressed=0 MB
+[win-name] #40 hwnd=0x10068 class='' text="KINGDOM HEARTS - HD 1.5+2.5 ReMIX -" rev=ml853
+[win-name] #44 hwnd=0x10068 class='' text="KINGDOM HEARTS - HD 1.5+2.5 ReMIX -" rev=ml853
+[win-name] #45 hwnd=0x10068 class='' text="KINGDOM HEARTS - HD 1.5+2.5 ReMIX -" rev=ml853
+[win-name] #46 hwnd=0x10068 class='' text="KINGDOM HEARTS - HD 1.5+2.5 ReMIX -" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x119d48000
+[footprint] rev=ml1060 fast phys=1604 MB compressed=0 MB
+00ac:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=0000000000000000, feature level 0xb000, probe)."
+[madeira-d3d12] D3D12CreateDevice(adapter=0000000000000000, feature level 0xb000, probe)
+00ac:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=000000704D73E510, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=000000704D73E510, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[win-name] #51 hwnd=0x10068 class='' text="KINGDOM HEARTS - HD 1.5+2.5 ReMIX -" rev=ml853
+[swap-diag] #1 layer 0x128051c80: drawable 0x0 format 80 -> 1152x648 format 80, set on the iOS main thread (dispatch_sync) ...
+D CC Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71E8760000
+[launch-view] dismissed reason=game-window logs=0
+[footprint] rev=ml1060 fast phys=2088 MB compressed=0 MB
+[win-name] #55 hwnd=0x1007c class='' text="DIEmWin" rev=ml853
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xd9400008 pc=0x16579efa0 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x0 hostpc=0x16579efa0 hinsn=0xd9400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=6 base=0x164ff4000 size=0x4000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x123d8f720 pc=0x16579efa0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x16579efa0 addr=0x0 x18=0x7046460000 type=1 lr=0x169ff4354 sp=0x71e88c0000 x16=0x123d8f720 x17=0x0
+[guest-code] rev=ml333 pool_rip=0x156b28720 (PE 0x123d8f720): 48 8b 4b f8 48 8b 01 ff 50 40 48 8b 4b f0 48 8b
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x16579efa0; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RSI=0x12407d418 = KINGDOM HEARTS HD 1.5+2.5 Launch+0x48d418 [RSI]=KINGDOM HEARTS HD 1.5+2.5 Launch+0x2716d8
+[av-args]   RDI=0x12407c750 = KINGDOM HEARTS HD 1.5+2.5 Launch+0x48c750 [RDI]=KINGDOM HEARTS HD 1.5+2.5 Launch+0x271888
+[av-args]   R8=0x123e616e0 = KINGDOM HEARTS HD 1.5+2.5 Launch+0x2716e0
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 d95f8360 d503201f [d9400008] d503201f d9440106 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7046460000 TEB=0x7046460000 TEB[0x58]=0x704dea9170 *(gs_cached+0x58)=0x704dea9170
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xd9400008 pc=0x16579efa0 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x0 hostpc=0x16579efa0 hinsn=0xd9400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=6 base=0x164ff4000 size=0x4000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x123d8f720 pc=0x16579efa0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x16579efa0 addr=0x0 x18=0x7046460000 type=1 lr=0x169ff4354 sp=0x71e88c0000 x16=0x123d8f720 x17=0x0
+[guest-code] rev=ml333 pool_rip=0x156b28720 (PE 0x123d8f720): 48 8b 4b f8 48 8b 01 ff 50 40 48 8b 4b f0 48 8b
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 d95f8360 d503201f [d9400008] d503201f d9440106 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+00cc:err:seh:segv_handler   [guest-rip-sec] rip=0x123d8f720 in image 0x123bf0000: rva 0x19f720, section #0 '.text' rva 0x1000+0x23a83c chars 0x60000020 (R-X CODE), vprot=0x25
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16579efa0 RX from -32, 64 of 64 bytes: 60 01 3f d6 6a e0 ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 60 83 5f d9 1f 20 03 d5 08 00 40 d9 1f 20 03 d5 06 01 44 d9 1f 20 03 d5 47 e5 9e d2 07 7b a4 f2 27 00 c0 f2 e7 8e 1f f8 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16579efa0 (not an anon-JIT page)
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x123d8f724 RX from -32, 64 of 64 bytes: 56 78 48 8d 4b f0 e8 e1 11 00 00 85 c0 79 0d 48 8b 4e 78 48 8b 01 ff 90 28 01 00 00 48 8b 4b f8 48 8b 01 ff 50 40 48 8b 4b f0 48 8b 01 45 33 c0 48 8b 53 f8 ff 50 50 89 ae 80 00 00 00 bd 01 00 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x123d8f724 (not an anon-JIT page)
+00cc:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7052290000 (== stack hi) ControlPc=71f0d22dd8 handler=00000071F0CE5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on read access to 0000000000000000 at address 0000000123D8F724 (thread 00cc), starting debugger...
+[footprint] rev=ml1060 fast phys=2476 MB compressed=0 MB
+00cc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=15781
+[unwind] term ml661 begin rip=1578241fc rsp=705228d398 window=[705228d398..7052a8d398) max=32
+[unwind] term ml661 #00 pc=1578241fc rsp=705228d398  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=468
+00a4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=15826
+[unwind] term ml661 begin rip=1525c51d4 rsp=70373bfe28 window=[70373bfe28..7037bbfe28) max=32
+[unwind] term ml661 #00 pc=1525c51d4 rsp=70373bfe28  <no module — STOP>
+[unwind] term ml661 end
+[store-noalias] #3 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x157192000 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+00a4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=15868
+[unwind] term ml661 begin rip=15205e16c rsp=70373bfc80 window=[70373bfc80..7037bbfc80) max=32
+[unwind] term ml661 #00 pc=15205e16c rsp=70373bfc80  <no module — STOP>
+[unwind] term ml661 end
+00a4:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=430
+[Wine ntdll/server] process_exit_wrapper(0)
+[file-wfail] ml669 #107 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #108 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[hwinput] keyboard focus: program (poll)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16da85040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x14c4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16da85040
+[store-noalias] #4 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x157192000 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #5 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x157192000 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #6 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x157192000 NO pool/anon alias | region 0x102dd8000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[01:06:20.900] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=103
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=134
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[01:06:21.399] [INFO] [dock-report] probe-result=0
+[01:06:21.672] [INFO] [madeira-dock] host finished (result 0)
+[01:06:27.733] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=30 resident=2211MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x14c4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16da85040
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16da857d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x1e6230000c75b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16da857d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x1e6230000c75b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16da857d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0x1e6230000c75b pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16da85040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[01:06:57.824] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=29 resident=2220MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x14c4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16da85040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16da85040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x14c4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16da85040
+[01:07:21.012] [INFO] [dock-game-end] kingdom hearts hd 1.5+2.5 launcher.exe ended with status 0xc0000005 after 6 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[01:07:21.586] [INFO] [session] length=84s play=0s frames=0 stalls=0/0s peak=2506MB limit=8191MB thermal=serious lpm=0 api=D3D11/D3D12/64 res=1408x648 cap=60 game=KINGDOM HEARTS -HD 1.5+2.5 ReMIX-
+[01:07:21.589] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=2300 MB (peak 2470) internal=1920 MB compressed=0 MB external=288 MB reusable=17 MB (cycle=43)
+[01:07:23.123] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=2299 MB (peak 2470) internal=1920 MB compressed=0 MB external=288 MB reusable=17 MB (cycle=44)
+[footprint] rev=ml358 phys=2299 MB (peak 2470) internal=1920 MB compressed=0 MB external=288 MB reusable=17 MB (cycle=45)
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=29 resident=2227MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2300 MB (peak 2470) internal=1921 MB compressed=0 MB external=288 MB reusable=17 MB (cycle=46)
+[footprint] rev=ml358 phys=2303 MB (peak 2470) internal=1924 MB compressed=0 MB external=297 MB reusable=17 MB (cycle=47)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16da85040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x119d48000 modules=79 first=KINGDOM HEARTS HD 1.5+2.5 Launcher.exe@0x123bf0000
+[thread-sample] ml876 modmap peb=0x119d48000 modules=79 first=KINGDOM HEARTS HD 1.5+2.5 Launcher.exe@0x123bf0000
+[thread-sample] ml876 b2 "" teb=0x7046450000 cpu=99% RUN pc=0x156ed1400 lr=0x156ecfd14 sp=0x7052a8fae0 NATIVE (unresolved: hostPC outside block) sp-cand=[ KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x48cab0 KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x4941f0 KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x48c750 ]
+[footprint] rev=ml358 phys=2325 MB (peak 2470) internal=1945 MB compressed=0 MB external=297 MB reusable=16 MB (cycle=48)
+.5 Launcher.exe+0x4941f0 KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x48c750 ]
+[01:07:33.367] [thread-sample] ml876 modmap peb=0x119d48000 modules=79 first=KINGDOM HEARTS HD 1.5+2.5 Launcher.exe@0x123bf0000
+[01:07:33.367] [thread-sample] ml876 b3 "" teb=0x7046450000 cpu=99% RUN pc=0x156f25fe0 lr=0x157640e54 sp=0x7052a8fc70 NATIVE (unresolved: hostPC outside block) sp-cand=[ KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x1aca83 KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x48cab0 KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x48c750 ntdll.dll+0x62dac KINGDOM HEARTS HD 1.5+2.5 Launcher.exe+0x4941f0 ]

@@ -275,3 +275,15 @@ enum BCDSettingsText {
         }
     }
 }
+
+/// Round 624 (agent N S6; RZTPBY, WMDK8B, H0TBAZ, 2FJV7P: 1-3 KB logs of an app start with no game in them): which log to offer first when the
+/// newest one holds no game.
+enum BCDLogChoice {
+    struct Item: Equatable { var name: String; var modified: Date; var hasGame: Bool }
+    /// `items` newest first. The index of the newest item that holds a game and is at most `maxAge` seconds older than `now`; nil when there is
+    /// none, or when the newest item has a game itself.
+    static func gameLogToOffer(_ items: [Item], now: Date, maxAge: TimeInterval = 86400) -> Int? {
+        guard let first = items.first, !first.hasGame else { return nil }
+        return items.indices.first { items[$0].hasGame && now.timeIntervalSince(items[$0].modified) <= maxAge }
+    }
+}

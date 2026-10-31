@@ -1,0 +1,326 @@
+[14:24:34.727] [INFO] Checking entitlements...
+[14:24:34.727] [INFO] [build] v0.1.622 (622)
+[14:24:34.727] [INFO] [device] model=iPhone18,3 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=7672MB available=6125MB cores=6
+[14:24:34.728] [INFO] [device] address-map=[0x104394000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[14:24:34.740] [INFO] [device] gpu="Apple A19 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[14:43:48.154] [INFO] Requesting JIT with Built-in StikJIT...
+[14:44:45.491] [INFO] [bcd] library launch Euro Truck Simulator 2: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:45:41.664] [INFO] [dock-launch] image-retire=1
+[14:45:41.664] [INFO] [dock-launch] image-map-guard=1
+[14:45:41.776] [INFO] [dock-installers] app=227300 scripts=0 programs=0
+[14:45:41.777] [INFO] [madeira-dock] starting the host for app 227300; Valve's client authenticates and authorizes the launch
+[14:45:41.787] [INFO] Running full Wine sequence...
+[14:45:41.788] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104394000,0x8000000000) 512GB available=6100MB low-power=0 thermal=nominal
+[14:45:41.794] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[14:45:41.794] [INFO] Allocating 896MB JIT pool via debugger...
+[14:45:41.794] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[14:45:41.795] [INFO] [jit-debugger] attached=1 at the pool request
+[14:45:41.796] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[14:45:42.475] [INFO] RX pool at 0x148000000
+[14:45:42.492] [INFO] Detaching debugger...
+[14:45:43.334] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=619MB limit=6143MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Euro Truck Simulator 2
+[phase] wine-start             t+  1.681s rev=ml526
+[shell-dir] user folders for madeira, mobile: 11 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=5524 MB + phys_footprint=619 MB = 6144 MB (hw.memsize says 7672 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[hwinput] keyboard focus: program (app active)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=625 MB (peak 625) internal=623 MB compressed=1 MB external=89 MB reusable=61 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.214s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=103, unixdir=104, dup_unixdir=108) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x123930000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.295s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=132, unixdir=134, dup_unixdir=139) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 123930000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7028610000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m175534 "wine-x18-exc"
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[file-wfail] ml669 #13 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #15 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #16 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=887 MB (peak 887) internal=885 MB compressed=1 MB external=163 MB reusable=46 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000234 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002E4 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1070 MB (peak 1070) internal=1069 MB compressed=1 MB external=170 MB reusable=46 MB (cycle=3)
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #91 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #95 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1077 MB (peak 1077) internal=1075 MB compressed=1 MB external=171 MB reusable=46 MB (cycle=4)
+[footprint] rev=ml358 phys=1110 MB (peak 1110) internal=1108 MB compressed=1 MB external=171 MB reusable=45 MB (cycle=5)
+[footprint] rev=ml358 phys=1111 MB (peak 1111) internal=1109 MB compressed=1 MB external=171 MB reusable=45 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Euro Truck Simulator 2\\bin\\win_x64\\eurotrucks2.exe" t+ 15.112s rev=ml526
+008c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Euro Truck Simulator 2\\bin\\win_x64\\eurotrucks2.exe\"" (fd=507, unixdir=508, dup_unixdir=512) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Euro Truck Simulator 2"
+[Wine child thread] calling wine_ios_child_main...
+[14:45:57.287] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=1252 peb=0x10b97c000
+[nls-getptr] type=11 id=437 peb=0x10b97c000
+[nls-getptr] type=11 id=20127 peb=0x10b97c000
+[nls-getptr] type=11 id=1252 peb=0x10b97c000
+[nls-getptr] type=11 id=437 peb=0x10b97c000
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x15707c000)
+[file-wfail] ml669 #138 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x39000 type=0x2000 protect=0x4 tid=00b4 | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x39000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #2 release of 0x70384c0000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b4 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=eurotrucks2.exe tid=00b4 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c42c00000
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #139 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #3 release of 0x7039040000+0x120000 held for 2000 ms (2 in flight)
+[steer] #3 size=0x8010000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c45c10000
+00b4:err:module:load_dll [dll-missing] rev=ml336 #3 L"dstoragecore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #4 release of 0x70492a0000+0x210000 held for 2000 ms (3 in flight)
+[bigres] tid=00b4 #1 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x10b97c000 total=256 MB
+[steer] #4 size=0x10010000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c62c10000
+[jumbo#1] +0ms tid=16bf97000 wtid=00b4 peb=0x10b97c000 nrip=0x12f23c8ca grip=0x0 size=0x60010000 (1536 MB) hint=0x0 -> 0x704af90000 st=0x0 | granted=1536 MB ok=1 fail=0
+[steer] #5 size=0x8010000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c76c10000
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5572000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5572000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5573000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5573000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5574000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5574000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5575000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5575000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5576000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5577000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5578000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f5579000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5579000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f557a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f557b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f557c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f557d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f557e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f557f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f6458000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f6aff000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f78c7000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f78c8000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f78c9000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f78ca000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f78cb000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f78cc000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f78cd000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f78ce000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f78cf000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f852f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f8558000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f8559000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f855a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f855b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f855c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f855d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f855e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f855f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f8699000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f869a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=eurotrucks2.exe tid=00b4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f869d000 zb=0x0 hits=64 rev=ajan5-rockstar
+[win-name] #32 hwnd=0x10060 class='' text="device_notify_window" rev=ml853
+[steer] #6 size=0x39a0000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c8b410000
+[steer] #7 size=0x3690000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c8edb0000
+[steer] #8 size=0x3690000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c92440000
+[steer] #9 size=0x3690000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7c95ad0000
+[14:45:59.289] [INFO] [dock-report] launch-game-running=1
+[free-delay] #5 release of 0x70b11e0000+0x170000 held for 2000 ms (4 in flight)
+[free-delay] #6 release of 0x70b2070000+0xf10000 held for 2000 ms (4 in flight)
+[free-delay] #7 release of 0x70b3750000+0x530000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x70b34b0000+0x2a0000 held for 2000 ms (3 in flight)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c325040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16ba6a220
+[thread-stacks] port=0xb76b "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x203ce6bac x18=0x0 sp=0x16be38560
+[thread-stacks] port=0x9823 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x203ce6bac x18=0x0 sp=0x16bb7eac0
+[thread-stacks] port=0x15913 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16bc0afc0
+[thread-stacks] port=0x4c3b "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x7c7b x18=0x0 sp=0x16baf2c40
+[thread-stacks] port=0x11413 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=88 x8=0x203ce6bac x18=0x0 sp=0x16bc94c60
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c325040
+[copy-verify] nvapi64.dll: OK, 45 .text pages executable (copy @0x15ad1a000)
+00b4:err:module:load_dll [dll-missing] rev=ml336 #4 L"atiadlxx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #5 L"atiadlxy.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #37 hwnd=0x10072 class='' text="Default IME" rev=ml853
+[win-name] #38 hwnd=0x2006a class='' text="Euro Truck Simulator 2" rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[win-name] #39 hwnd=0x2006a class='' text="Euro Truck Simulator 2" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10b97c000
+D B4 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71EEFD0000
+D B4 Load module tobii_gameintegration_x64.dll (tobii_gameintegration_x64.dll-d2d701065a879a99): 71EE7A0000
+D B4 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71EE6E0000
+D B4 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71EE6E0000
+D B4 Load module WINTRUST.DLL (wintrust.dll-f4c54b53ba879395): 71EE640000
+D B4 Load module msctf.dll (msctf.dll-b02e387aee96819f): 71EE590000
+[win-name] #44 hwnd=0x1007a class='' text="DIEmWin" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\winemenubuilder.exe" t+ 25.766s rev=ml526
+00b4:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\winemenubuilder.exe -w \"C:/users/mobile/Documents/Euro Truck Simulator 2/readme.rtf.lnk\"" (fd=1275, unixdir=1281, dup_unixdir=1284) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Euro Truck Simulator 2\\bin\\win_x64\\"
+[Wine child thread] calling wine_ios_child_main...
+0178:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=12514
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=1283
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[win-name] #45 hwnd=0x2006a class='' text="Euro Truck Simulator 2" rev=ml853
+[win-name] #46 hwnd=0x2006a class='' text="Euro Truck Simulator 2" rev=ml853
+[steer] #10 size=0x2800000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7ccc000000
+[steer] #11 size=0x2800000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7cce800000
+[footprint] rev=ml1060 fast phys=2129 MB compressed=528 MB
+[footprint] rev=ml1060 fast phys=2390 MB compressed=599 MB
+[tiny-win] hwnd=0x2006a style=94000000: the swapchain draws 1408x648 px into a window whose client area has stayed 132x38 for 3.5 s; env.MADEIRA_TINY_WINDOW_FIX = 1 sizes it to the screen
+[win-name] #47 hwnd=0x2006a class='' text="Euro Truck Simulator 2" rev=ml853
+[tiny-win] hwnd=0x2006a: sized to the virtual screen {0,0,1408,648} ok=1, client area now 1408x648 (try 1 of 2; MADEIRA_TINY_WINDOW_FIX=0 turns this off)
+[launch-view] dismissed reason=game-window logs=0
+[14:46:13.583] [INFO] detach-wait: presents=308 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=88 resident=1801MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml1060 fast phys=2418 MB compressed=591 MB
+[footprint] rev=ml1060 fast phys=2458 MB compressed=591 MB
+[footprint] rev=ml1060 fast phys=2503 MB compressed=591 MB
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.96 s of audio in 10.00 s (99.6%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=25 x8=0x0 x18=0x0 sp=0x16c325040
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml1060 fast phys=2571 MB compressed=586 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[steer] #12 size=0x2010000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7cd4400000
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c325040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[14:46:43.672] [INFO] detach-wait: presents=1968 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=88 resident=1881MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=23 x8=0x0 x18=0x0 sp=0x16c325040
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c325040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=22 x8=0x0 x18=0x0 sp=0x16c325040
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[14:47:13.783] [INFO] detach-wait: presents=3770 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=87 resident=1886MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c325040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=22 x8=0x0 x18=0x0 sp=0x16c325040
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[steer] #13 size=0x2800000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7cbf800000
+[steer] #14 size=0x2800000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7cc3800000
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[free-delay] #1024 release of 0x70cfc10000+0x230000 held for 2000 ms (43 in flight)
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c325040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[14:47:43.887] [INFO] detach-wait: presents=5545 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=88 resident=2368MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x10c23 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=13 x8=0x0 x18=0x0 sp=0x16c325040
+[thread-stacks] port=0x1be0b "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x1869f x18=0x0 sp=0x13bdffb00
+[thread-stacks] port=0x28bcb "FMOD nonblocking thread (0)" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bb840e0 x18=0x0 sp=0x11f0fe9d0
+[thread-stacks] port=0x20c63 "FMOD file thread" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x2710 x18=0x0 sp=0x11f6efb00
+[thread-stacks] port=0x14da3 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bb8c0e0 x18=0x0 sp=0x1229fe840
+[thread-stacks] port=0x8217 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bb900e0 x18=0x0 sp=0x13693e840
+[thread-stacks] port=0x1972f "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=19 x8=0x11a928301 x18=0x0 sp=0x16fd52b30
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=3429 MB (peak 3789) internal=2208 MB compressed=688 MB external=236 MB reusable=5 MB (cycle=62)
+[footprint] rev=ml358 phys=3569 MB (peak 3789) internal=2229 MB compressed=688 MB external=237 MB reusable=5 MB (cycle=63)
+[footprint] rev=ml358 phys=3506 MB (peak 3789) internal=2197 MB compressed=688 MB external=237 MB reusable=5 MB (cycle=64)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=3732 MB (peak 3789) internal=2383 MB compressed=680 MB external=237 MB reusable=5 MB (cycle=65)
+[rb-tex] madeira-bcd new readback #1: fmt 125 1x1 level 0 (texture 1x1, 1 mips)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=16 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=4738 MB (peak 4738) internal=2871 MB compressed=886 MB external=199 MB reusable=0 MB (cycle=66)
+[footprint] rev=ml1060 fast phys=5389 MB compressed=944 MB
+[footprint] rev=ml1060 fast phys=5489 MB compressed=951 MB
+[ios_audio] ml1230 pacing stream=0x120fd5f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml1060 fast phys=5708 MB compressed=972 MB
+[footprint] rev=ml1060 fast phys=5802 MB compressed=1090 MB
+[footprint] rev=ml358 phys=5897 MB (peak 5897) internal=3198 MB compressed=1161 MB external=30 MB reusable=0 MB (cycle=67)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=39 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=6083 MB compressed=1229 MB
+[footprint] rev=ml1060 fast phys=6117 MB compressed=1256 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=48 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=48 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=48 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=48 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=48 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0

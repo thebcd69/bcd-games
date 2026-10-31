@@ -89,8 +89,14 @@ for p in sorted(FIX.glob("*.log")):
     if signals_hold(p.read_text(errors="replace").split("\n")):
         hold.append(p.stem)
 TESTER, OWNER_546, OWNER_547 = "gta-v-legacy-gpu-reset-2026-10-23", "gta-v-legacy-2026-10-15-12-35-46", "gta-v-legacy-2026-10-15-13-37-35"
-check("the signals hold for the tester's log and the owner's build 546 log, and for no other fixture",
-      sorted(hold) == sorted([TESTER, OWNER_546]), "hold for: %s" % hold)
+# round 624 (agent R S8): GTA V Legacy 8PDF19 played five minutes before the same GPU reset; its fixture carries the signals, but the rule
+# reads failed sessions only (that one is scored ran, and gpu-dead-after-play speaks for it), so its verdict is not this rule's.
+PLAYED_8PDF19 = "gta-v-legacy-gpu-dead-played-2026-10-29"
+check("the signals hold for the tester's log and the owner's build 546 log, and for no other fixture (but 8PDF19, which played)",
+      sorted(hold) == sorted([TESTER, OWNER_546, PLAYED_8PDF19]), "hold for: %s" % hold)
+_p = json.loads((FIX / (PLAYED_8PDF19 + ".expect")).read_text())
+check("...and on 8PDF19 the rule does not match: the session played (ran), gpu-dead-after-play names it",
+      _p["outcome"] == "ran" and ID not in _p["matched"] and "gpu-dead-after-play" in _p["matched"], str(_p["matched"]))
 check("the owner's build 547 start that played (no GPU error) never holds",
       OWNER_547 not in hold and "Device error" not in (FIX / (OWNER_547 + ".log")).read_text())
 # The other Legacy fixtures (installs, launcher-only starts) and every other game's GPU error stay out; the one other
@@ -98,14 +104,18 @@ check("the owner's build 547 start that played (no GPU error) never holds",
 others_with_victim = [p.stem for p in FIX.glob("*.log")
                       if "kIOGPUCommandBufferCallbackErrorInnocentVictim" in p.read_text(errors="replace")
                       and p.stem not in (TESTER, OWNER_546)]
-check("a fixture with a victim line outside the two (a synthetic GPU-tier log) has fewer than four of them",
-      all(sum("kIOGPUCommandBufferCallbackErrorInnocentVictim" in l for l in (FIX / (n + ".log")).read_text().split("\n")) < 4
-          for n in others_with_victim), str(others_with_victim))
+# round 624: other games' GPU resets (Resident Evil 7, re7-gpu-reset, gpu-reset-any-game) have four victims and more; the rule's other
+# signals (GTA5.exe, the Dock, Direct3D 11) keep them out, which the hold list above proves.
+check("no other fixture with victim lines (another game's GPU reset, a synthetic GPU-tier log) carries the rule's signals",
+      [n for n in others_with_victim if n in hold] == [PLAYED_8PDF19] or [n for n in others_with_victim if n in hold] == [],
+      str([n for n in others_with_victim if n in hold]))
 
 # ---- the fixtures and their .expect ----------------------------------------------------------------------------------
 for name in (TESTER, OWNER_546):
     exp = json.loads((FIX / (name + ".expect")).read_text())
-    check(f"{name}: hung, the rule matched, nothing is next (known)", exp["outcome"] == "hung" and exp["matched"] == [ID]
+    # round 624: gpu-reset-any-game (26) joins the list after this rule; this rule stays first and decides
+    check(f"{name}: hung, the rule matched, nothing is next (known)", exp["outcome"] == "hung" and exp["matched"][:1] == [ID]
+          and set(exp["matched"]) <= {ID, "gpu-reset-any-game"}
           and exp["next"] == [] and exp["status"] == "known" and exp["end"].get("killed") is True)
 tester = (FIX / (TESTER + ".log")).read_text()
 check("the tester's fixture is Legacy on Dock, with the failure and without the line in force",

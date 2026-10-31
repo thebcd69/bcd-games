@@ -592,6 +592,7 @@ struct OnboardingView: View {
                 }
                 if model.steps.contains(.dockClient) {
                     note("Settings › Steam › BCD Dock shows the Steam games installed in BCD and launches them.", symbol: "shippingbox")
+                    note("To play a Steam game: open it in your library, tap Install, then Play.", symbol: "arrow.down.circle")   // round 624 (N S10)
                 }
                 if model.steps.contains(.wineMono) {
                     note("Settings › .NET Framework adds or removes Wine Mono.", symbol: "shippingbox.and.arrow.backward")

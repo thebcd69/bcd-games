@@ -82,6 +82,9 @@ int winios_compositor_set_hidden(int hidden);
  * session start clears the overlay. */
 void winios_note_game_metal_hwnd(void *hwnd);
 void winios_session_reset(void);
+/* Round 625 (the owner's item 29): 1 when the game's swapchain window has a title bar and is larger than the guest's screen
+ * (winios_windowed.h); the window's outer size and the screen's size in the outputs. */
+int winios_windowed_too_big(int *win_w, int *win_h, int *scr_w, int *scr_h);
 int winios_desktop_point_from_window(double wx, double wy, int *px, int *py);
 
 /* Top-level window census, for the starting screen of a Madeira Dock start

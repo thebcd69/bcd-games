@@ -97,8 +97,8 @@ for flag in ["--disable-gpl", "--disable-nonfree", "--disable-version3", "--disa
 for bad in ["h264", "hevc", "aac"]:
     assert not re.search(r"--enable-(decoder|parser)=[^\n]*\b%s\b" % bad, args), ("patent-encumbered decoder enabled", bad)
 pbx = (root / "app/Madeira.xcodeproj/project.pbxproj").read_text()
-phase = pbx[pbx.index("isa = PBXFrameworksBuildPhase;"):]
-phase = phase[:phase.index(");")]
+# The project has several targets; the app's Frameworks phase is the one that links libFEXCore.a.
+phase = next(p for p in re.findall(r"isa = PBXFrameworksBuildPhase;.*?\);", pbx, re.S) if "libFEXCore.a in Frameworks" in p)
 for fw in ["VideoToolbox", "CoreMedia", "CoreVideo", "AudioToolbox", "CoreFoundation"]:
     assert "/* %s.framework in Frameworks */" % fw in phase, ("framework not linked", fw)
 for lib in ["libavformat", "libavcodec", "libswresample", "libavutil"]:
@@ -1100,7 +1100,7 @@ with tempfile.TemporaryDirectory() as t:
     if mp3:
         args += [mp3]
     env = {k: v for k, v in os.environ.items() if not k.startswith("MADEIRA_")}
-    env["ASAN_OPTIONS"] = "detect_leaks=1"
+    env["ASAN_OPTIONS"] = "symbolize=0:detect_leaks=" + ("0" if sys.platform == "darwin" else "1")   # macOS ASan has no leak detector (it aborts at start-up)
     if mp3:
         # first pass: learn the stream's duration from the parser's own connect line
         probe = subprocess.run(args + ["0"], env=env, capture_output=True, text=True)

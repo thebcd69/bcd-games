@@ -223,6 +223,13 @@ struct BCDLibraryView: View {
             Text("There are no Windows games on this Steam account yet. Refresh reads the account's list again.")
                 .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true)
+        } else if steamShown, let steam, steam.name != nil, query.isEmpty,
+                  store.games.contains(where: { $0.store == .steam }),
+                  !store.games.contains(where: { $0.store == .steam && $0.state.isInstalled }) {
+            // round 624 (agent N S10, 2FJV7P): a Steam account with games, none installed: how a Steam game starts
+            Text("None of your Steam games is installed yet. Tap one, then Install; BCD downloads it from Steam and Play starts it with Valve's own Steam client.")
+                .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

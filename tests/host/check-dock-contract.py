@@ -43,7 +43,11 @@ for name, text in [('MadeiraDock.swift', dock), ('MadeiraDockModel.swift', view)
     # madeira-bcd (round 578): DockCEGService names Valve's own client service program, the one path Valve's installer
     # registers (SteamService.exe under the client's bin folder and Common Files\Steam); it is not a game's program
     # and nothing is decided by it (tests/host/check-dock-ceg-service.py).
-    require(names <= {'dockhost.exe', 'explorer.exe', 'steam.exe', '.exe', 'msiexec.exe', 'steamservice.exe'},
+    # madeira-bcd (d0f94231): DockInstallers.isDirectXSetup tells Microsoft's own DirectX End-User Runtime setup by its two file
+    # names (dxsetup.exe, dxwebsetup.exe); it is a Microsoft redistributable, not a game's program, and only a setup that already
+    # failed once in the game is acted on (tests/host/check-dock-installers.py).
+    require(names <= {'dockhost.exe', 'explorer.exe', 'steam.exe', '.exe', 'msiexec.exe', 'steamservice.exe',
+                      'dxsetup.exe', 'dxwebsetup.exe'},
             f'{name}: no program-name list ({sorted(names)})')
     for line in text.splitlines():
         if re.search(r'SteamLog\.(event|trace)|LogStore|print\(|NSLog', line):
@@ -110,6 +114,7 @@ enum SteamSignIn {
     static func flag(_ name: String, default fallback: Bool) -> Bool { getenv(name).map { String(cString: $0) != "0" } ?? fallback }
 }
 enum SteamLog { static func event(_ m: String) {}; static func trace(_ m: @autoclosure () -> String) {} }
+enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): MadeiraDock's result-46 words read it; the install has the limit here
 enum SteamRuntimeFiles {
     static let relativeRoot = "Program Files (x86)/Steam"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"

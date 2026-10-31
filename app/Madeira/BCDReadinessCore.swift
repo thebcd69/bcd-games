@@ -22,6 +22,9 @@ struct BCDReadinessModule: Equatable {
 struct BCDReadinessProvided: Equatable {
     /// Microsoft's Visual C++ 2015-2022 x64 copy (Settings › Visual C++, or bundled): it carries mfc140.dll and mfc140u.dll.
     var vcRuntimeX64 = false
+    /// Round 625 (the owner's item 26): Microsoft's 32-bit MFC (Settings › Visual C++ › MFC, 32-bit): mfc140.dll, mfc140u.dll,
+    /// mfcm140.dll and mfcm140u.dll, which a 32-bit game gets with env.MADEIRA_MFC32 = 1.
+    var vcRuntimeX86 = false
     /// Wine Mono (Settings › .NET Framework).
     var wineMono = false
     /// The Start menu's BCD Runtimes installers that have run (their markers in C:\ProgramData\BCD\Runtimes).
@@ -29,6 +32,12 @@ struct BCDReadinessProvided: Equatable {
     var physX = false
     var xna = false
     var directX2010 = false
+    /// Round 624 (agent N S12/S13): the install has the increased memory limit and extended VA (EntitlementStatus); true by default, so a caller
+    /// that does not know adds no finding.
+    var increasedMemory = true
+    var extendedVA = true
+    /// The device's task address map in GB (jit_task_map_range: 17, 63, 454, 512 ...); nil when unknown.
+    var mapGB: Int? = nil
 }
 
 struct BCDReadinessFinding: Equatable, Identifiable {
@@ -58,15 +67,26 @@ enum BCDReadiness {
         name.hasPrefix("mfc140") || name.hasPrefix("mfcm140")
     }
 
+    /// Round 625: what Microsoft's 32-bit package gives (VCRuntimePackage.x86).
+    static let mfc32Names: Set<String> = ["mfc140.dll", "mfc140u.dll", "mfcm140.dll", "mfcm140u.dll"]
+
     /// The findings for a game: `modules` are the program files that were read, `files` every file name (lowercased) found in the game's
-    /// folder tree (a DLL the game carries itself is found next to it, so it is not missing).
-    static func evaluate(modules: [BCDReadinessModule], files: Set<String>, provided: BCDReadinessProvided) -> [BCDReadinessFinding] {
+    /// folder tree (a DLL the game carries itself is found next to it, so it is not missing). `complete` is false when the scan stopped at
+    /// its limit: a file the game carries may then simply not have been reached, so nothing is called missing from the game's own copy.
+    static func evaluate(modules: [BCDReadinessModule], files: Set<String>, provided: BCDReadinessProvided,
+                         complete: Bool = true, mainFile: String? = nil) -> [BCDReadinessFinding] {
         var out: [BCDReadinessFinding] = []
         func add(_ id: String, _ text: String, fixable: Bool = true) {
             if !out.contains(where: { $0.id == id }) { out.append(BCDReadinessFinding(id: id, text: text, fixable: fixable)) }
         }
         for m in modules {
             for name in m.imports.sorted() {
+                // madeira-bcd (round 624, agent E1 S1, Aliens: Colonial Marines VMJ4WV): Valve's steam_api is part of the game's own copy, never
+                // of Windows or BCD; a program that imports it from a folder tree without it ends with 0xC0000135 before its first window.
+                if complete && (name == "steam_api.dll" || name == "steam_api64.dll") && !files.contains(name) {
+                    add("steamapi", "\(m.file) needs \(name), which is not in the game's folder. This copy of the game is incomplete: add the "
+                        + "missing file (or install the game again) and try again.", fixable: false)
+                }
                 if isMFC(name) && !files.contains(name) {
                     if m.is64 {
                         // Microsoft's own copy has mfc140.dll and mfc140u.dll; the other MFC files (debug, language, mfcm) it does not.
@@ -77,7 +97,15 @@ enum BCDReadiness {
                                 fixable: !provided.vcRuntimeX64)
                         }
                     } else {
-                        add("mfc32", "\(m.file) is a 32-bit program that wants \(name) (Microsoft's MFC). BCD does not carry the 32-bit one yet.", fixable: false)
+                        // Round 625 (the owner's item 26): the 32-bit package's four MFC DLLs, downloaded in Settings; the game takes them
+                        // with env.MADEIRA_MFC32 = 1 (auto-tune adds it after the start that fails for want of them).
+                        let carried = mfc32Names.contains(name)
+                        if !provided.vcRuntimeX86 || !carried {
+                            add("mfc32", carried
+                                ? "\(m.file) is a 32-bit program that wants \(name) (Microsoft's MFC). Download the 32-bit MFC in Settings › Visual C++ first."
+                                : "\(m.file) is a 32-bit program that wants \(name), which Microsoft's 32-bit MFC does not have. BCD cannot supply it.",
+                                fixable: carried)
+                        }
                     }
                 }
                 switch name {
@@ -94,6 +122,25 @@ enum BCDReadiness {
                     add("dx2010", "\(m.file) wants \(name), an older DirectX file. Install it from the Start menu: BCD Runtimes › DirectX June 2010.")
                 }
             }
+        }
+        // Round 624 (agent N S12/S12b): Unity asks for several 512 MB blocks of address space when it starts; an install without the limit has too
+        // little of it (28 of 28 such logs failed on it, 0 of 202 with the limit), and so does a small map. Nothing is blocked: a note.
+        if files.contains("unityplayer.dll") {
+            if !provided.increasedMemory {
+                add("unity-no-rights", "This is a Unity game. Unity asks for several 512 MB blocks of address space when it starts, and an install without the "
+                    + "increased memory limit has too little of it, so most Unity games stop at once here. Add the limit with GetMoreRam, or sign BCD "
+                    + "with a paid developer account.", fixable: false)
+            } else if let gb = provided.mapGB, gb < 40 {
+                add("unity-small-map", "This is a Unity game, and this device gives BCD only \(gb) GB of address space, even with the memory limit, "
+                    + "so most Unity games cannot start on it.", fixable: false)
+            }
+        }
+        // Round 624 (agent N S13): a 32-bit MAIN program needs a 4 GB block of address space of its own; an install without the limit and without
+        // extended VA has none (57 of 57 such starts were refused, "[wow-window] refused"). Only the launched program: a 64-bit game with 32-bit
+        // helpers is never flagged.
+        if !provided.increasedMemory && !provided.extendedVA, let main = mainFile, let m = modules.first(where: { $0.file.lowercased() == main }), !m.is64 {
+            add("wow-window", "\(m.file) is a 32-bit game, and 32-bit games need a 4 GB block of address space that this install does not have. "
+                + "Add the increased memory limit with GetMoreRam, or sign BCD with a paid developer account.", fixable: false)
         }
         // XNA is a set of .NET assemblies a game carries a reference to: the game's folder names them.
         if !provided.xna && files.contains("microsoft.xna.framework.dll") && !files.contains("xnafx40_redist.msi") {

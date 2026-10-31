@@ -113,6 +113,17 @@ FBT=""
 if [ "${MADEIRA_FIBER_TRACE_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/kernelbase/thread.c" ] && [ -f "$SHIP/kernelbase.dll" ]; then
     FBT=kernelbase
 fi
+# madeira-bcd (round 624, agent E2 S3): kernelbase-optin.dll is Wine's kernelbase built from this tree as it is pinned (no script
+# patches it), so the mirror's own changes to it run: dlls/kernelbase/process.c answers GetProcessMitigationPolicy with an empty
+# structure under env.MADEIRA_ZERO_MITIGATION_POLICY = 1 (Glyphica: Typing Survival's ChakraCore fails fast without it). The shipped
+# kernelbase.dll is a prebuilt file this script never replaces and that has none of the mirror's changes (its strings hold no
+# "MADEIRA_"; Glyphica failed the same way with the key set: 7611AG, build 600; J9JDBG, build 623). The variant ships NEXT TO it and
+# only a game whose file lists kernelbase in env.MADEIRA_OPTIN_DLLS runs it (WineProcessBridge.m's opt-in loop links it as
+# kernelbase.dll for that session; the next session's farm relink restores the shipped one). MADEIRA_ZMP_BUILD=0 skips it.
+ZMP=""
+if [ "${MADEIRA_ZMP_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/kernelbase/process.c" ] && [ -f "$SHIP/kernelbase.dll" ]; then
+    ZMP=kernelbase
+fi
 # madeira-bcd: a new file too. wer-optin.dll is Wine's own, unpatched wer.dll (Hello Neighbor's
 # UE4 executable imports it and exited at once with 0xc0000135, a tester's log, build 573). It is
 # NOT shipped as wer.dll: Wine's wer.dll has 68 unimplemented exports, so a program that loads
@@ -193,7 +204,16 @@ SDL=""
 if [ "${MADEIRA_SETUPAPI_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/setupapi/devinst.c" ] && [ -f "$SHIP/setupapi.dll" ]; then
     SDL=setupapi
 fi
-[ -n "$todo$XI$WGI$UCX$NTS$XSE$FBT$WER$WTY$OPT$SDL" ] || { echo "nothing to build"; exit 0; }
+# madeira-bcd (round 624, agent E2 S2b): dcomp-optin.dll, a patched copy of a DLL that IS shipped (the shipped dcomp.dll is Wine's
+# stub: every DCompositionCreateDevice answers E_NOTIMPL). tools/patch-wine-dcomp-null.py gives DCompositionCreateDevice a device
+# whose target and visual accept every call and draw nothing: Slay the Spire 2's Godot 4.5 hands its swap chain (served on the
+# game's window by dxgi-src.dll under env.MADEIRA_DXGI_COMPOSITION = 1) to a composition target and stops when that fails. Only
+# a game with env.MADEIRA_OPTIN_DLLS = dcomp gets it (WineProcessBridge.m's opt-in loop). MADEIRA_DCOMP_BUILD=0 skips it.
+DCO=""
+if [ "${MADEIRA_DCOMP_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/dcomp/device.c" ] && [ -f "$SHIP/dcomp.dll" ]; then
+    DCO=dcomp
+fi
+[ -n "$todo$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO" ] || { echo "nothing to build"; exit 0; }
 
 # The cached tree may have disabled winegstreamer because macOS has no
 # GStreamer headers. Only its real PE frontend is needed here; the iOS unix
@@ -329,6 +349,29 @@ if [ -n "$FBT" ]; then
     git -C "$R/wine" checkout -- $kbsrc
     rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
 fi
+# madeira-bcd: kernelbase-optin.dll (see ZMP above), from the restored tree (the fiber-trace block above put its five files back).
+# Only from a kernelbase the pin left as it is; verified to carry the switch's UTF-16 name and the shipped kernelbase.dll's exports
+# before it ships (tools/verify-kernelbase-optin.py). Its objects are removed afterwards like the fiber-trace block's.
+if [ -n "$ZMP" ]; then
+    kb="$B/dlls/kernelbase/arm64ec-windows/kernelbase.dll"
+    if git -C "$R/wine" diff --quiet -- dlls/kernelbase; then
+        rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
+        make -C "$B" -j"$JOBS" dlls/kernelbase/arm64ec-windows/kernelbase.dll > "$B.kernelbase-optin.log" 2>&1
+        if [ -f "$kb" ] && cp "$kb" "$SHIP/kernelbase-optin.dll.tmp" &&
+           "$MINGW/arm64ec-w64-mingw32-strip" --strip-debug "$SHIP/kernelbase-optin.dll.tmp" &&
+           python3 "$R/tools/verify-kernelbase-optin.py" "$SHIP/kernelbase-optin.dll.tmp" "$SHIP/kernelbase.dll"; then
+            mv "$SHIP/kernelbase-optin.dll.tmp" "$SHIP/kernelbase-optin.dll"
+            echo "::notice::kernelbase-optin.dll (the tree's kernelbase; env.MADEIRA_OPTIN_DLLS = kernelbase): built next to the shipped kernelbase.dll"
+        else
+            rm -f "$SHIP/kernelbase-optin.dll.tmp"
+            echo "::warning::kernelbase-optin.dll did not build or failed its check; not shipped (env.MADEIRA_OPTIN_DLLS = kernelbase does nothing)"
+            grep -m 10 "error" "$B.kernelbase-optin.log"
+        fi
+    else
+        echo "::warning::wine/dlls/kernelbase differs from the pin; kernelbase-optin.dll not built"
+    fi
+    rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
+fi
 # madeira-bcd: setupapi-optin.dll (see SDL above), from the restored tree. Stripped the way
 # build/wine-pe/build-modules.sh strips the shipped one (--strip-debug), padded to at least SizeOfImage
 # + 0x10000 like the other extra DLLs, and verified (the lock's marker, the shipped setupapi.dll's
@@ -366,6 +409,44 @@ PY
     fi
     git -C "$R/wine" checkout -- dlls/setupapi/devinst.c
     rm -f "$sa" "$B"/dlls/setupapi/arm64ec-windows/*.o
+fi
+# madeira-bcd: dcomp-optin.dll (see DCO above), from the restored tree. The patched device.c includes dcomp.h, which widl makes from
+# include/dcomp.idl (and its two imports) in a make of its own first: the object's dependencies were computed from the stub, so a
+# parallel make would not wait for them. Stripped and padded like setupapi-optin.dll, verified (the null compositor's marker, the
+# shipped dcomp.dll's exports) before it ships; the tree and the objects are restored afterwards.
+if [ -n "$DCO" ]; then
+    dc="$B/dlls/dcomp/arm64ec-windows/dcomp.dll"
+    dc_tmp="$SHIP/dcomp-optin.dll.tmp"
+    if python3 "$R/tools/patch-wine-dcomp-null.py" "$R/wine"; then
+        rm -f "$dc" "$B"/dlls/dcomp/arm64ec-windows/*.o
+        make -C "$B" include/dcomp.h include/dcompanimation.h include/dcomptypes.h > "$B.dcomp.log" 2>&1
+        make -C "$B" -j"$JOBS" dlls/dcomp/arm64ec-windows/dcomp.dll >> "$B.dcomp.log" 2>&1
+        if [ -f "$dc" ] && cp "$dc" "$dc_tmp" && "$MINGW/arm64ec-w64-mingw32-strip" --strip-debug "$dc_tmp"; then
+            python3 - "$dc_tmp" <<'PY'
+import struct, sys
+p = sys.argv[1]; d = open(p, 'rb').read()
+pe = struct.unpack_from('<I', d, 0x3c)[0]
+target = struct.unpack_from('<I', d, pe + 24 + 56)[0] + 0x10000
+if len(d) < target:
+    open(p, 'ab').write(b'\0' * (target - len(d)))
+PY
+            if python3 "$R/tools/patch-wine-dcomp-null.py" --verify "$dc_tmp" "$SHIP/dcomp.dll"; then
+                mv "$dc_tmp" "$SHIP/dcomp-optin.dll"
+                echo "::notice::dcomp-optin.dll (a DirectComposition device that draws nothing; linked as dcomp.dll only for a game with dcomp in env.MADEIRA_OPTIN_DLLS): built next to the shipped dcomp.dll"
+            else
+                rm -f "$dc_tmp"
+                echo "::warning::dcomp-optin.dll failed its check; not shipped (env.MADEIRA_OPTIN_DLLS = dcomp does nothing)"
+            fi
+        else
+            rm -f "$dc_tmp"
+            echo "::warning::dcomp-optin.dll did not build; env.MADEIRA_OPTIN_DLLS = dcomp does nothing"
+            grep -m 10 "error" "$B.dcomp.log"
+        fi
+    else
+        echo "::warning::the dcomp null-compositor patch did not apply; dcomp-optin.dll not shipped"
+    fi
+    git -C "$R/wine" checkout -- dlls/dcomp/device.c
+    rm -f "$dc" "$B"/dlls/dcomp/arm64ec-windows/*.o
 fi
 # madeira-bcd: ntdll-sync.dll (see NTS above), from the restored tree. First the
 # unpatched ntdll.dll, which must equal the shipped one apart from its time

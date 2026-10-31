@@ -1,0 +1,169 @@
+[03:26:00.185] [INFO] Checking entitlements...
+[03:26:00.186] [INFO] [build] v0.1.622 (622)
+[03:26:00.187] [INFO] [device] model=iPhone17,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7622MB available=6124MB cores=6
+[03:26:00.187] [INFO] [device] address-map=[0x100484000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[03:26:00.228] [INFO] [device] gpu="Apple A18 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[03:26:02.955] [INFO] [bcd] library launch setup.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[03:26:02.971] [INFO] Running full Wine sequence...
+[03:26:02.971] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100484000,0x8000000000) 512GB available=6118MB low-power=0 thermal=serious
+[03:26:02.999] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[03:26:03.000] [INFO] Allocating 896MB JIT pool via debugger...
+[03:26:03.000] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[03:26:03.000] [INFO] [jit-debugger] attached=1 at the pool request
+[03:26:03.002] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[03:26:06.847] [INFO] RX pool at 0x148000000
+[03:26:06.885] [INFO] Detaching debugger...
+[03:26:06.911] [INFO] Starting wineserver...
+[phase] wine-start             t+  3.958s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[03:26:07.332] [Wine init_process] reply_pipe=44, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5478 MB + phys_footprint=665 MB = 6144 MB (hw.memsize says 7622 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x27000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7027120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7027220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7027420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7027820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7028020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7028ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7029fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x702af90000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x10eaa4758)
+D 24 Load module setup.exe (setup.exe-74319994e186053f): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cb8bb0): 71FFF40000
+[footprint] rev=ml358 phys=688 MB (peak 688) internal=687 MB compressed=0 MB external=109 MB reusable=1 MB (cycle=1)
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d67fbe): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aae6d98): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module user32.dll (user32.dll-7d7be97280da4697): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5aba0342): 717B9F0000
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b378000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x702f020000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+ml957: ? backing 0x717a9c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x710040c000+0x10000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #3 hwnd=0x1002c class='' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x10028 class='' text="InnoSetupLdrWindow" rev=ml853
+[phase] spawn:L"C:\\users\\<user>\\AppData\\Local\\Temp\\is-GEJ6A.tmp\\setup.tmp" t+  4.715s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\users\\<user>\\AppData\\Local\\Temp\\is-GEJ6A.tmp\\setup.tmp\" /SL5=\"$10028,74752,0,C:\\ovl\\setup.exe\" " (fd=98, unixdir=100, dup_unixdir=106) cwd=L"C:\\ovl\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=borrowed
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+[file-fail] ml665 #63 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1492cc000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x149350000)
+[bigres] tid=002c #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=512 MB
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x1493e6000)
+ml957: ? backing 0x727b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x149407000)
+ml957: ? backing 0x727b378000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x149425000)
+ml957: ? backing 0x727a9c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10001 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10001 peb=0x7200310000
+[win-name] #6 hwnd=0x1005e class='' text="Default IME" rev=ml853
+002c:fixme:graphics:ShutdownBlockReasonCreate (00010056, L"\00d3\00f1\00f2\00e0\00ed\00ee\00e2\00ea\00e0..."): stub
+D 2C Load module shfolder.dll (shfolder.dll-36d8d5cbe4354dc2): 727A800000
+D 2C Load module isskin.dll (isskin.dll-731aa0912fd11249): 7210000000
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"MFC42.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:import_dll Library MFC42.DLL (which is needed by L"C:\\users\\<user>\\AppData\\Local\\Temp\\is-K1UN9.tmp\\isskin.dll") not found
+D 2C Load module IMAGEHLP.dll (imagehlp.dll-8b1026ce1ea841dc): 727A7E0000
+D 2C Load module WINMM.dll (winmm.dll-114377513642ee4b): 727A710000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x149443000)
+ml957: ? backing 0x727a6f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module msacm32.dll (msacm32.dll-6ba578b329606c5a): 727A6E0000
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\users\\<user>\\AppData\\Local\\Temp\\is-K1UN9.tmp\\isskin.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"\00ce\00f8\00e8\00e1\00ea\00e0" / L"Runtime Error (at 76:159):\r\n\r\nCould not call proc.": main exe base 00400000 size 0xc1000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[win-name] #19 hwnd=0x10074 class='' text="&Yes" rev=ml853
+[win-name] #20 hwnd=0x10074 class='' text="&Yes" rev=ml853
+[win-name] #23 hwnd=0x10076 class='' text="&No" rev=ml853
+[win-name] #74 hwnd=0x10088 class='' text="Runtime Error (at 76:159):????Could not call proc." rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[xp-names] m3779960 "wine-x18-exc"
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=792 MB (peak 792) internal=791 MB compressed=0 MB external=116 MB reusable=1 MB (cycle=2)
+[guest-stk] sp+0x368 0x1481a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x390 0x14836e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x3a0 0x1481a7a0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x5a8 0x1482945f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x608 0x14829457c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x728 0x148294574 = libwow64fex.dll+0x103574
+[hwinput] keyboard focus: program (program cursor)
+[footprint] rev=ml358 phys=792 MB (peak 792) internal=791 MB compressed=0 MB external=116 MB reusable=1 MB (cycle=3)
+D 2C Load module isskin.dll (isskin.dll-731aa0912fd11249): 7205C10000
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"MFC42.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:import_dll Library MFC42.DLL (which is needed by L"C:\\users\\<user>\\AppData\\Local\\Temp\\is-K1UN9.tmp\\isskin.dll") not found
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\users\\<user>\\AppData\\Local\\Temp\\is-K1UN9.tmp\\isskin.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"\00d3\00f1\00f2\00e0\00ed\00ee\00e2\00ea\00e0" / L"Runtime Error (at 86:113):\r\n\r\nCould not call proc.": main exe base 00400000 size 0xc1000
+[win-name] #143 hwnd=0x1008a class='' text="Runtime Error (at 86:113):????Could not call proc." rev=ml853
+[win-name] #144 hwnd=0x20076 class='' text="OK" rev=ml853
+[win-name] #145 hwnd=0x2006c class='' text="?????????" rev=ml853
+[footprint] rev=ml358 phys=792 MB (peak 792) internal=791 MB compressed=0 MB external=116 MB reusable=1 MB (cycle=4)
+[win-name] #146 hwnd=0x2006c class='' text="?????????" rev=ml853
+[win-name] #147 hwnd=0x2006c class='' text="?????????" rev=ml853
+[win-name] #148 hwnd=0x2006c class='' text="?????????" rev=ml853
+[win-name] #149 hwnd=0x2006c class='' text="?????????" rev=ml853
+[footprint] rev=ml358 phys=788 MB (peak 792) internal=788 MB compressed=0 MB external=116 MB reusable=1 MB (cycle=5)
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=484
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=484
+002c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=105
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=485
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=486
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[03:26:16.973] [INFO] [session] length=14s play=0s frames=0 stalls=0/0s peak=792MB limit=6143MB thermal=serious lpm=0 res=1408x648 cap=60 game=Overlord™: Raising Hell
+[frontend] returned to library
+[footprint] rev=ml358 phys=792 MB (peak 792) internal=791 MB compressed=0 MB external=117 MB reusable=1 MB (cycle=6)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[03:26:18.835] [INFO] Detaching debugger...
+[freeze] alive t+282s beats=1 gaps=1 iter=52 gen=1 threads=21 resident=27MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=734 MB (peak 792) internal=73 MB compressed=659 MB external=26 MB reusable=0 MB (cycle=8)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17011d040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=788 MB (peak 792) internal=131 MB compressed=656 MB external=44 MB reusable=0 MB (cycle=9)
+[footprint] rev=ml358 phys=788 MB (peak 792) internal=131 MB compressed=656 MB external=44 MB reusable=0 MB (cycle=10)
+[footprint] rev=ml358 phys=794 MB (peak 794) internal=138 MB compressed=655 MB external=61 MB reusable=0 MB (cycle=11)
+[footprint] rev=ml358 phys=794 MB (peak 794) internal=138 MB compressed=655 MB external=61 MB reusable=0 MB (cycle=12)
+[footprint] rev=ml358 phys=795 MB (peak 795) internal=139 MB compressed=655 MB external=63 MB reusable=0 MB (cycle=13)

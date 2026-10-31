@@ -162,6 +162,7 @@ enum SteamSignIn {
     static func flag(_ name: String, default fallback: Bool) -> Bool { getenv(name).map { String(cString: $0) != "0" } ?? fallback }
 }
 enum SteamLog { static func event(_ m: String) {}; static func trace(_ m: @autoclosure () -> String) {} }
+enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): MadeiraDock's result-46 words read it; the install has the limit here
 enum MadeiraConfig { static func get(_ key: String) -> String? { nil }; static func set(_ key: String, _ value: String?) {} }   // SteamLanguage (SteamAppInfo.swift)
 enum SteamRuntimeFiles {
     static let relativeRoot = "Program Files (x86)/Steam"

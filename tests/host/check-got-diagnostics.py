@@ -252,9 +252,9 @@ check("upload-guard walks descriptor tables (CBV / SRV ranges, never UAV)",
       "if (g_upload_guard && type == MADEIRA_IR_PARAM_TABLE)\n            mad_ug_note_table(" in SRC and
       "if (rs->ranges[ri].range_type != MADEIRA_IR_RANGE_CBV && rs->ranges[ri].range_type != MADEIRA_IR_RANGE_SRV) continue;" in SRC)
 fw = cut("static DWORD WINAPI mad_fence_worker(void *arg) {")
-fw_old = fw.index("} else {", fw.index("if (mad_fence_early_on() && !g_upload_guard &&"))
+fw_old = fw.index("} else {", fw.index("if (fe && !g_upload_guard && !mad_vis_job_pending("))
 check("fence worker: upload-guard verifies BEFORE the fence advances (fence-early never runs with upload-guard)",
-      "if (mad_fence_early_on() && !g_upload_guard &&" in fw and
+      "int fe = mad_fence_early_on();" in fw and "if (fe && !g_upload_guard && !mad_vis_job_pending(" in fw and
       fw.index("mad_ug_verify(d, job.serial);", fw_old) < fw.index("ID3D12Fence_Signal(job.fence, job.value);", fw_old))
 check("fence worker: a failed batch's serial is signalled on the CPU in strict mode",
       "if (g_fence_strict) MTLSharedEvent_signalValue(d->gpu_event, job.serial);" in fw)

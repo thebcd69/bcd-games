@@ -512,7 +512,8 @@ cond = cond[:cond.index('\nfi\n') + 4]
 check('the variant is built only where devinst.c and a shipped setupapi.dll are, and MADEIRA_SETUPAPI_BUILD=0 skips it',
       '"${MADEIRA_SETUPAPI_BUILD:-1}" != 0' in cond and '[ -f "$R/wine/dlls/setupapi/devinst.c" ]' in cond and
       '[ -f "$SHIP/setupapi.dll" ]' in cond and 'SDL=setupapi' in cond)
-check('the guard "nothing to build" counts it', '$WER$WTY$OPT$SDL" ]' in build)
+guard = re.search(r'\[ -n "\$todo((?:\$[A-Z]+)+)" \] \|\| \{ echo "nothing to build"; exit 0; \}', build)   # the variables in any order (round 624 added ZMP and DCO)
+check('the guard "nothing to build" counts it', bool(guard) and '$SDL' in re.findall(r'\$[A-Z]+', guard.group(1)))
 sdl = build[build.index('if [ -n "$SDL" ]; then'):]
 sdl = sdl[:sdl.index('\nfi\n') + 4]
 check('the build patches, builds setupapi, strips like build-modules.sh, pads, verifies, then ships as setupapi-optin.dll',

@@ -1,0 +1,24 @@
+{
+ "dialogs": [
+  "HorizonZeroDawnRemastered.exe - System Error",
+  "The PlayStation(R) PC SDK Runtime cannot start. (E-002)"
+ ],
+ "end": {
+  "killed": true
+ },
+ "matched": [
+  "swap-12gb-memory-kill-sure",
+  "swap-12gb-memory-kill",
+  "helper-memory-guard-closed-at-limit",
+  "swap-12gb-more"
+ ],
+ "next": [
+  "swap-mb = 6144",
+  "swap-mode = 2",
+  "swap-min-mb = 1"
+ ],
+ "note": "Horizon Zero Dawn Remastered, build 579, iPhone19,3 with an 8192 MB limit (Send Log NFFPKV; its next log C7X0G9 says killed at stage 5 after 90 s, status stuck: the player's own swap-mb skipped the swap tier): helper memory took 582 MB, then BCD's own limit warning reached its pressure source as CRITICAL and the guard refused 22 takes until iOS closed BCD at 8174 MB. With the player's swap-mb the next line is env.MADEIRA_POOL_MORE = 1 (rule helper-memory-guard-closed-at-limit, after the swap tier's first lines); not tried on a device yet",
+ "outcome": "killed",
+ "stage": 5,
+ "status": "trying"
+}

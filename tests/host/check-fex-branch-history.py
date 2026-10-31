@@ -22,25 +22,35 @@ spec = importlib.util.spec_from_file_location('overlay', root / 'tools/patch-fex
 overlay = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(overlay)
 sources = {name: (root / 'FEX' / name).read_text() for name in overlay.EDITS}
-patched = overlay.patch(sources)
-assert overlay.patch(patched) == patched
-for name, edits in overlay.EDITS.items():
-    changed = dict(sources)
-    changed[name] = changed[name].replace(edits[0][0], 'changed-anchor', 1)
-    try:
-        overlay.patch(changed)
-    except ValueError:
-        pass
-    else:
-        raise AssertionError('drift accepted: ' + name)
-    changed = dict(patched)
-    changed[name] = changed[name].replace(edits[0][1], overlay.MARKER, 1)
-    try:
-        overlay.patch(changed)
-    except ValueError:
-        pass
-    else:
-        raise AssertionError('partial overlay accepted: ' + name)
+# Since the 2026-10-15 merge the FEX pin already carries this overlay inside its combined files (the later ec-bitmap-cache overlay
+# adds a static_assert to the same block), where the script's own check ("partial or changed overlay") stops; build-xtajit64.sh does
+# not run the script on such a pin. Then the pin's files are the patched files and the script's behaviour is not under test here.
+already = all(overlay.MARKER in source for source in sources.values())
+patched = sources if already else overlay.patch(sources)
+if not already:
+    assert overlay.patch(patched) == patched
+    for name, edits in overlay.EDITS.items():
+        changed = dict(sources)
+        changed[name] = changed[name].replace(edits[0][0], 'changed-anchor', 1)
+        try:
+            overlay.patch(changed)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('drift accepted: ' + name)
+        changed = dict(patched)
+        changed[name] = changed[name].replace(edits[0][1], overlay.MARKER, 1)
+        try:
+            overlay.patch(changed)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('partial overlay accepted: ' + name)
+else:
+    # What the compiled fixture below uses must be what the pin ships: the emitter block and the module block verbatim.
+    assert overlay.BRANCH_ADD in patched[overlay.BRANCH], 'BranchOps.cpp no longer carries the recorder block the fixture compiles'
+    assert overlay.MODULE_ADD in patched[overlay.MODULE], 'Module.cpp no longer carries the layout export the fixture compiles'
+    assert overlay.FRAME_ADD in patched[overlay.FRAME], 'CoreState.h no longer carries the history struct the fixture compiles'
 
 script = (root / 'tools/build-xtajit64.sh').read_text()
 assert script.index('patch-fex-ios-rpmalloc-span8.py') < script.index('patch-fex-ios-branch-history.py')
@@ -172,7 +182,7 @@ with tempfile.TemporaryDirectory(prefix='fex-branch-history-') as directory:
             path = folder / 'words.bin'
             layout = json.loads(subprocess.check_output([str(binary),str(kind),str(path),str(hint)],text=True))
             assert layout['state']==1472 and layout['callback']==3792  # pinned old ABI stays fixed
-            assert layout['history']==3800 and layout['size']==4096
+            assert layout['history']==3800 and layout['size']>=3800+272 and layout['size']%8==0   # the frame has grown (later overlays append fields); the recorder only needs its own offset
             code = path.read_bytes()
             if kind==3:
                 assert not code

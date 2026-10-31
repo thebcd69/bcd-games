@@ -201,6 +201,27 @@ void madeira_d3d12_note_unimplemented(const char *iface, const char *method) {
     d3d12_log("[madeira-d3d12] unimplemented: %s::%s\n", iface, method);
 }
 
+/* madeira-bcd (round 624, agent B S15, the KINGDOM HEARTS HD 1.5+2.5 launcher 8X1X2V/7EHABT/S5EPGT): a method that refuses a call leaves
+ * the game holding a NULL object, and no line said which method refused. The first 4 refusals of each call site, then every 256th; log
+ * only (the value returned is unchanged). `what` is a string literal per site, compared by pointer. */
+static void mad_fail_log(const char *what, HRESULT hr, unsigned a, unsigned b) {
+    static const char *site[96];
+    static LONG count[96], nsite, total;
+    LONG t = InterlockedIncrement(&total), c;
+    int i, n = (int)nsite;
+    for (i = 0; i < n && site[i] != what; i++) ;
+    if (i == n) {
+        if (n < 96) { site[n] = what; nsite = n + 1; }
+        else i = 95;
+    }
+    c = InterlockedIncrement(&count[i]);
+    if (c <= 4 || (c & 255) == 0)
+        d3d12_log("[madeira-d3d12] FAILED %s -> 0x%08lx (%u, %u) [call #%ld here, #%ld in all]\n", what, (unsigned long)hr, a, b,
+                  (long)c, (long)t);
+}
+#define MAD_FAIL(what, hr, a, b) do { HRESULT mad_fail_hr_ = (hr); mad_fail_log((what), mad_fail_hr_, (unsigned)(a), (unsigned)(b)); \
+                                      return mad_fail_hr_; } while (0)
+
 /* ---- object model --------------------------------------------------------
  * One refcount and one interface id per object. QueryInterface accepts the
  * object's own iid plus the IUnknown/ID3D12Object/ID3D12DeviceChild ancestors
@@ -1846,7 +1867,7 @@ static HRESULT STDMETHODCALLTYPE alloc_Reset(ID3D12CommandAllocator *This) {
     /* Resetting storage a list is still recording into would pull the memory out
      * from under it. Refusing is what the API requires and what catches the bug
      * at the call site instead of later. */
-    if (a->recording) return E_FAIL;
+    if (a->recording) MAD_FAIL("alloc_Reset while recording", E_FAIL, a->recording, a->type);
     /* Storage is reused from here, so everything previously recorded from this
      * allocator becomes stale. */
     InterlockedIncrement(&a->generation);
@@ -2004,7 +2025,7 @@ static ULONG STDMETHODCALLTYPE list_Release(ID3D12GraphicsCommandList *This) {
 static void mad_list_wait_idle(struct mad_list *l);
 static HRESULT STDMETHODCALLTYPE list_Close(ID3D12GraphicsCommandList *This) {
     struct mad_list *l = (struct mad_list *)This;
-    if (l->closed) return E_FAIL;          /* double Close is a caller bug */
+    if (l->closed) MAD_FAIL("list_Close twice", E_FAIL, l->type, 0);   /* double Close is a caller bug */
     l->closed = 1;
     l->recorded_generation = l->alloc ? l->alloc->generation : 0;
     if (l->alloc) InterlockedDecrement(&l->alloc->recording);
@@ -2015,8 +2036,8 @@ static HRESULT STDMETHODCALLTYPE list_Reset(ID3D12GraphicsCommandList *This,
                                             ID3D12PipelineState *pso) {
     struct mad_list *l = (struct mad_list *)This;
     (void)pso;
-    if (!l->closed) return E_FAIL;         /* reset while recording */
-    if (!allocator) return E_INVALIDARG;
+    if (!l->closed) MAD_FAIL("list_Reset while recording", E_FAIL, l->type, 0);   /* reset while recording */
+    if (!allocator) MAD_FAIL("list_Reset null allocator", E_INVALIDARG, l->type, 0);
     if (l->inflight) mad_list_wait_idle(l);   /* ml1120: the submission worker still replays it */
     if (l->alloc != (struct mad_alloc *)allocator) {
         if (l->alloc) ID3D12CommandAllocator_Release((ID3D12CommandAllocator *)l->alloc);
@@ -11787,8 +11808,8 @@ static HRESULT STDMETHODCALLTYPE device_CreateCommandQueue(ID3D12Device *This,
 static HRESULT STDMETHODCALLTYPE device_CreateCommandAllocator(ID3D12Device *This,
         D3D12_COMMAND_LIST_TYPE type, REFIID riid, void **out) {
     (void)This;
-    if (!out) return E_INVALIDARG;
-    if (!mad_list_type_ok(type)) return E_NOTIMPL;
+    if (!out) MAD_FAIL("CreateCommandAllocator null out", E_INVALIDARG, type, 0);
+    if (!mad_list_type_ok(type)) MAD_FAIL("CreateCommandAllocator type", E_NOTIMPL, type, 0);
     struct mad_alloc *a = calloc(1, sizeof *a);
     if (!a) return E_OUTOFMEMORY;
     a->type = type;
@@ -11802,9 +11823,10 @@ static HRESULT STDMETHODCALLTYPE device_CreateCommandList(ID3D12Device *This, UI
         D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator *allocator,
         ID3D12PipelineState *pso, REFIID riid, void **out) {
     (void)This; (void)node; (void)pso;
-    if (!out || !allocator) return E_INVALIDARG;
-    if (!mad_list_type_ok(type)) return E_NOTIMPL;
-    if (((struct mad_alloc *)allocator)->type != type) return E_INVALIDARG;
+    if (!out || !allocator) MAD_FAIL("CreateCommandList null", E_INVALIDARG, type, !allocator);
+    if (!mad_list_type_ok(type)) MAD_FAIL("CreateCommandList type", E_NOTIMPL, type, 0);
+    if (((struct mad_alloc *)allocator)->type != type)
+        MAD_FAIL("CreateCommandList allocator type", E_INVALIDARG, type, ((struct mad_alloc *)allocator)->type);
     struct mad_list *l = calloc(1, sizeof *l);
     if (!l) return E_OUTOFMEMORY;
     l->type = type;
@@ -11823,7 +11845,7 @@ static HRESULT STDMETHODCALLTYPE device_CreateFence(ID3D12Device *This, UINT64 i
         D3D12_FENCE_FLAGS flags, REFIID riid, void **out) {
     (void)This;
     if (!out) return E_INVALIDARG;
-    if (flags != D3D12_FENCE_FLAG_NONE) return E_NOTIMPL;
+    if (flags != D3D12_FENCE_FLAG_NONE) MAD_FAIL("CreateFence flags", E_NOTIMPL, flags, 0);
     struct mad_fence *f = calloc(1, sizeof *f);
     if (!f) return E_OUTOFMEMORY;
     f->vtbl = &g_fence_vtbl; f->refs = 1; f->iid = &IID_ID3D12Fence; f->name = "Fence";
@@ -20402,8 +20424,8 @@ static HRESULT STDMETHODCALLTYPE device_CreateCommandList1(ID3D12Device10 *This,
         D3D12_COMMAND_LIST_TYPE type, D3D12_COMMAND_LIST_FLAGS flags, REFIID riid, void **out) {
     (void)node;
     if (!out) return E_INVALIDARG;
-    if (flags != D3D12_COMMAND_LIST_FLAG_NONE) return E_INVALIDARG;
-    if (!mad_list_type_ok(type)) return E_NOTIMPL;
+    if (flags != D3D12_COMMAND_LIST_FLAG_NONE) MAD_FAIL("CreateCommandList1 flags", E_INVALIDARG, flags, 0);
+    if (!mad_list_type_ok(type)) MAD_FAIL("CreateCommandList1 type", E_NOTIMPL, type, 0);
     struct mad_list *l = calloc(1, sizeof *l);
     if (!l) return E_OUTOFMEMORY;
     l->type = type;
@@ -21624,6 +21646,69 @@ static HRESULT swap_Present_inner(IDXGISwapChain4 *T, UINT sync, UINT flags) {
 }
 /* ml1121: the Metal half of Present; runs on the queue's worker (async) or on the caller. */
 static void mad_mheap_reclaim(struct mad_device *d, int all);
+/* madeira-bcd present-lum (bcd.cfg present-lum = 1, default 0; round 624, Animal Well 4S7NA9 / RK9NPZ / 37F86Z): "black screen with sound" cannot be told from
+ * "a dark scene waiting for input" from the log. At presents 2, 30, 120, 600 and 1800 of a swapchain, 16 one-texel copies (a 4x4 grid) of the frame about to be
+ * presented go into a small shared buffer in the present's own command buffer; when that command buffer has completed one line says how bright the frame was.
+ * Read-only: the copies come after the game's frame and change nothing that is presented. g_pl_lock: presents of two swapchains may run at once. */
+#define MAD_PL_PENDING 4
+struct mad_plum { obj_handle_t buf, cb; void *cpu; UINT64 present; UINT w, h, dxgi, pf, bpp; };
+static struct mad_plum g_pl_q[MAD_PL_PENDING]; static unsigned g_pl_n; static int g_pl_on = -1; static SRWLOCK g_pl_lock = SRWLOCK_INIT;
+static int mad_pl_wanted(UINT64 presents) {
+    if (g_pl_on < 0) { g_pl_on = mad_cfg_int_pe("present-lum", 0) ? 1 : 0;
+                       if (g_pl_on) d3d12_log("[present-lum] madeira-bcd DIAGNOSTIC present-lum = 1: the brightness of presents 2, 30, 120, 600 and 1800 of each swapchain\n"); }
+    return g_pl_on > 0 && (presents == 2 || presents == 30 || presents == 120 || presents == 600 || presents == 1800);
+}
+/* inside the present's open blit encoder, after the frame copy */
+static void mad_pl_encode(struct mad_swapchain *s, struct mad_resource *src, obj_handle_t enc, obj_handle_t cb) {
+    struct mad_plum *q; void *cpu = NULL; obj_handle_t buf; UINT i, bpp = mad_pf_texel_bytes(src->tex_pf);
+    AcquireSRWLockExclusive(&g_pl_lock);
+    if (g_pl_n >= MAD_PL_PENDING || s->fx_scaler || !src->texture || !src->width || !src->height || bpp > 16) {
+        d3d12_log("[present-lum] present #%llu (%ux%u dxgi %u pf %u): not probed (%s)\n", (unsigned long long)s->presents + 1, src->width, src->height,
+                  (unsigned)s->desc.Format, (unsigned)src->tex_pf, s->fx_scaler ? "MetalFX scaler" : g_pl_n >= MAD_PL_PENDING ? "earlier probes pending" : "format/size");
+        ReleaseSRWLockExclusive(&g_pl_lock);
+        return;
+    }
+    buf = mad_capbuf_alloc(s->queue->device, 16 * 16, &cpu);
+    if (!buf) { ReleaseSRWLockExclusive(&g_pl_lock); return; }
+    for (i = 0; i < 16; i++) {
+        struct wmtcmd_blit_copy_from_texture_to_buffer k;
+        memset(&k, 0, sizeof k);
+        k.type = WMTBlitCommandCopyFromTextureToBuffer;
+        k.src = src->texture; k.slice = 0; k.level = 0;
+        k.origin.x = (UINT64)src->width * (2 * (i % 4) + 1) / 8; k.origin.y = (UINT64)src->height * (2 * (i / 4) + 1) / 8; k.origin.z = 0;
+        k.size.width = 1; k.size.height = 1; k.size.depth = 1;
+        k.dst = buf; k.offset = (UINT64)i * 16; k.bytes_per_row = bpp; k.bytes_per_image = bpp;
+        MTLBlitCommandEncoder_encodeCommands(enc, (const struct wmtcmd_base *)&k);
+    }
+    q = &g_pl_q[g_pl_n++];
+    q->buf = buf; q->cpu = cpu; q->cb = cb; NSObject_retain(cb);
+    q->present = s->presents + 1; q->w = src->width; q->h = src->height; q->dxgi = (UINT)s->desc.Format; q->pf = (UINT)src->tex_pf; q->bpp = bpp;
+    ReleaseSRWLockExclusive(&g_pl_lock);
+}
+/* every present: log and free the probes whose command buffer has completed (oldest first) */
+static void mad_pl_poll(void) {
+    AcquireSRWLockExclusive(&g_pl_lock);
+    while (g_pl_n) {
+        struct mad_plum *q = &g_pl_q[0]; struct mad_capbuf t; unsigned i, nonblack = 0, nan = 0, mx[3] = { 0, 0, 0 }; unsigned long sum[3] = { 0, 0, 0 };
+        enum WMTCommandBufferStatus st = MTLCommandBuffer_status(q->cb);
+        if (st < WMTCommandBufferStatusCompleted) break;
+        if (st == WMTCommandBufferStatusCompleted) {
+            for (i = 0; i < 16; i++) {
+                unsigned char rgb[3]; unsigned k;
+                nan += (unsigned)mad_texel_rgb((const unsigned char *)q->cpu + i * 16, q->pf, q->bpp, 0.0f, 1.0f, rgb, 0);
+                for (k = 0; k < 3; k++) { sum[k] += rgb[k]; if (rgb[k] > mx[k]) mx[k] = rgb[k]; }
+                nonblack += rgb[0] || rgb[1] || rgb[2];
+            }
+            d3d12_log("[present-lum] present #%llu (%ux%u dxgi %u pf %u): 16 samples in a 4x4 grid, max rgb=(%u,%u,%u) avg rgb=(%lu,%lu,%lu) non-black=%u/16 nan-or-inf=%u"
+                      " (display values 0-255; float formats tone-mapped)\n", (unsigned long long)q->present, q->w, q->h, q->dxgi, q->pf, mx[0], mx[1], mx[2],
+                      sum[0] / 16, sum[1] / 16, sum[2] / 16, nonblack, nan);
+        } else d3d12_log("[present-lum] present #%llu: the present command buffer ended with status %d, no reading\n", (unsigned long long)q->present, (int)st);
+        memset(&t, 0, sizeof t); t.buf = q->buf; t.own = q->cpu; mad_capbuf_free(&t);
+        NSObject_release(q->cb);
+        memmove(&g_pl_q[0], &g_pl_q[1], (g_pl_n - 1) * sizeof g_pl_q[0]); g_pl_n--;
+    }
+    ReleaseSRWLockExclusive(&g_pl_lock);
+}
 static void mad_present_run(struct mad_swapchain *s, UINT idx) {
     struct mad_resource *src;
     obj_handle_t drawable, tex, cb, enc;
@@ -21636,6 +21721,7 @@ static void mad_present_run(struct mad_swapchain *s, UINT idx) {
     mad_device_flush_all(s->queue->device);          /* ml884: the frame's batch precedes the present */
     InterlockedExchangeAdd64(&g_xp.t_flush, mad_qpc() - tf); }
     mad_ffc_poll();   /* madeira-bcd fi-field-check: copies whose command buffer has completed */
+    if (g_pl_on != 0) mad_pl_poll();   /* madeira-bcd present-lum */
     {   /* ml1098: manual frame capture -- finish the frame that just ended, then see whether the UI asked for another */
         struct madeira_ctl_args a;
         if (g_capture_on) { mad_capture_finish(s->queue->device, g_capture_frame); if (g_capture_left) g_capture_left--; g_capture_on = 0; }
@@ -21783,6 +21869,7 @@ static void mad_present_run(struct mad_swapchain *s, UINT idx) {
             t2t.src_size.depth = 1;
             t2t.dst = tex;
             MTLBlitCommandEncoder_encodeCommands(enc, (const struct wmtcmd_base *)&t2t);
+            if (mad_pl_wanted(s->presents)) mad_pl_encode(s, src, enc, cb);   /* madeira-bcd present-lum: reads the game's frame, same command buffer, after the frame copy */
             MTLCommandEncoder_endEncoding(enc);
         }
         /* Submitted after the frame's own command buffers on the same queue,

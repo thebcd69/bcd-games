@@ -131,6 +131,15 @@ int main( int argc, char **argv )
     char l[96];
     const char *rs = "C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe";
 
+    /* round 624 (agent R S27, ZTQN18): Rockstar's launcher installer is mirrored like the service */
+    if (getenv( "GS_INSTALLER" ))
+    {
+        int il = open_file( dir, "installer.txt" );
+        image( "C:\\Users\\steamuser\\Downloads\\Rockstar-Games-Launcher.exe" ); put( il, "installer step one\n" );
+        image( "C:\\x\\Rockstar-Games-Launcher.exe.part" ); put( il, "not the installer\n" );
+        return 0;
+    }
+
     /* the Launcher uses the global budget (MADEIRA_GUEST_LOG_LIMIT=3 in the harness's env) */
     image( "C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" );
     for (i = 0; i < 5; i++) { snprintf( l, sizeof(l), "[ ERROR ] [Main ] [launcher] failure number %d\n", i ); put( rl, l ); }
@@ -191,6 +200,10 @@ int main( int argc, char **argv )
     assert any(l == "[guest-log] file %s/service.txt" % os.path.realpath(d) or l.endswith("/service.txt") for l in files), files
     assert not any(l.endswith("/notes.txt") for l in files)
     print("ok   the service's file is announced once: [guest-log] file <path>/service.txt; the image matches in any case, either slash")
+
+    il = mirrored({"GS_INSTALLER": "1"})[1]
+    assert any(re.match(r"\[guest-log\] svc #1 tid=\w+ installer step one$", l) for l in il) and not any("not the installer" in l for l in il), il
+    print("ok   round 624: Rockstar-Games-Launcher.exe (the installer) is mirrored like the service; a look-alike name is not")
 
     assert [l for l in mirrored({"MADEIRA_GUEST_LOG": "0"})[1] if "text-log mirror:" not in l] == []
     print("ok   MADEIRA_GUEST_LOG=0 turns the service off too")

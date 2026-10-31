@@ -473,6 +473,22 @@ NTSTATUS WINAPI NtUserInitializeClientPfnArrays( const ntuser_client_func_ptr *c
     pthread_mutex_unlock( &winproc_lock );
 
     pthread_once( &init_once, init_user );
+#ifdef WINE_IOS
+    /* madeira-bcd (round 624, Farming Simulator 22 on Discord, Epic start through BCD Host, build 622): a 64-bit pseudo-process's PEB is a
+     * copy of the session's FIRST PEB (loader_ios.c, ios_initial_peb). When that process never ran init_user (bcdhost.exe) and a later one
+     * did (the game's launcher stub), the copy carries Peb->GdiSharedHandleTable == NULL, and gdi32 faulted on the game's first handle
+     * (Handles[0x3a] read at 0x57e; the game never drew). Publish the session's table into this process's PEB too. Only when the field is
+     * NULL, which faults today: every working 64-bit process has it set and takes no branch. */
+    if (!NtCurrentTeb()->WowTebOffset && !NtCurrentTeb()->Peb->GdiSharedHandleTable)
+    {
+        static LONG told;
+        win32u_gdi_publish_shared();   /* gdiobj.c: the 64-bit branch stores the session's table; returns at once before gdi_init() */
+        if (NtCurrentTeb()->Peb->GdiSharedHandleTable && InterlockedIncrement( &told ) <= 8)
+            dprintf( 2, "[gdi-shared] peb=%p pid=%04x: this 64-bit process had no table pointer (its PEB was copied from the session's "
+                        "first one); published %p rev=r624\n", NtCurrentTeb()->Peb,
+                     (unsigned int)HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess ), NtCurrentTeb()->Peb->GdiSharedHandleTable );
+    }
+#endif
     return STATUS_SUCCESS;
 }
 

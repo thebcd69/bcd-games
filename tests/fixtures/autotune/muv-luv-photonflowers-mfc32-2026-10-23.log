@@ -1,0 +1,96 @@
+[07:56:08.023] [INFO] Checking entitlements...
+[07:56:08.023] [INFO] [build] v0.1.592 (592)
+[07:56:08.024] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8140MB cores=6
+[07:56:08.024] [INFO] [device] address-map=[0x1021f0000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[07:56:08.038] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[07:56:14.554] [INFO] Requesting JIT with Built-in StikJIT...
+[07:56:16.907] [INFO] [bcd] library launch Muv-Luv photonflowers: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[07:56:16.939] [INFO] Running full Wine sequence...
+[07:56:16.939] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1021f0000,0x8000000000) 512GB available=8136MB low-power=0 thermal=nominal
+[07:56:16.944] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[07:56:16.944] [INFO] Allocating 896MB JIT pool via debugger...
+[07:56:16.944] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[07:56:16.945] [INFO] [jit-debugger] attached=1 at the pool request
+[07:56:16.948] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[07:56:17.726] [INFO] RX pool at 0x148000000
+[07:56:17.744] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.735s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[07:56:18.957] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[07:56:18.957] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=889700
+ml992: os_proc_available_memory=7533 MB + phys_footprint=658 MB = 8192 MB (hw.memsize says 11722 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x25000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1488a0000)
+[footprint] rev=ml358 phys=670 MB (peak 670) internal=669 MB compressed=0 MB external=69 MB reusable=20 MB (cycle=1)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148924000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7025120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7025220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7025420000+0x400000 held for 2000 ms (3 in flight)
+[hwinput] keyboard focus: program (app active)
+[free-delay] #4 release of 0x7025820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7026020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7026ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7027fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7028f90000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x104b16e50)
+D 24 Load module Muv-Luv_PF.exe (muv-luv_pf.exe-49fc21c9174a60f2): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83f0a6da): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ed526f): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728a9540f2): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module steam_api.dll (steam_api.dll-b440cce9a0d22339): 717BBF0000
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40424e11a2360c7): 717BBA0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"mfc140u.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library mfc140u.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Muv-Luv photonflowers\\Ages3ResT.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"Ages3ResT.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library Ages3ResT.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Muv-Luv photonflowers\\Muv-Luv_PF.exe") not found
+D 24 Load module rpcrt4.dll (rpcrt4.dll-5ef0dc1801a483dd): 717AAD0000
+D 24 Load module cryptbase.dll (cryptbase.dll-e477656071aa5802): 717AAB0000
+D 24 Load module coml2.dll (coml2.dll-735e54df17874d53): 717AA80000
+D 24 Load module msacm32.dll (msacm32.dll-6ba578b3295b418a): 717AA50000
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"mfc140u.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library mfc140u.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Muv-Luv photonflowers\\Muv-Luv_PF.exe") not found
+D 24 Load module OLEAUT32.dll (oleaut32.dll-ed26e11610f5d5b2): 717A990000
+D 24 Load module MSVCP140.dll (msvcp140.dll-fd9176e91dffa063): 717A8B0000
+0024:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Muv-Luv photonflowers\\Muv-Luv_PF.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=188
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[07:56:19.439] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[footprint] rev=ml358 phys=736 MB (peak 736) internal=734 MB compressed=0 MB external=71 MB reusable=22 MB (cycle=2)
+[07:56:21.195] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=724 MB (peak 736) internal=721 MB compressed=0 MB external=71 MB reusable=23 MB (cycle=3)
+[footprint] rev=ml358 phys=722 MB (peak 736) internal=722 MB compressed=0 MB external=71 MB reusable=23 MB (cycle=4)
+[footprint] rev=ml358 phys=725 MB (peak 736) internal=725 MB compressed=0 MB external=72 MB reusable=23 MB (cycle=5)
+[footprint] rev=ml358 phys=726 MB (peak 736) internal=726 MB compressed=0 MB external=72 MB reusable=23 MB (cycle=6)
+[footprint] rev=ml358 phys=736 MB (peak 736) internal=735 MB compressed=0 MB external=73 MB reusable=23 MB (cycle=7)

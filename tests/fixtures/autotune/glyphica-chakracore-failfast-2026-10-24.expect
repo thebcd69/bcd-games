@@ -5,9 +5,10 @@
   "chakracore-cfg-policy-failfast"
  ],
  "next": [
-  "env.MADEIRA_ZERO_MITIGATION_POLICY = 1"
+  "env.MADEIRA_ZERO_MITIGATION_POLICY = 1",
+  "env.MADEIRA_OPTIN_DLLS = kernelbase"
  ],
- "note": "Glyphica: Typing Survival (Steam 2400160, neosphere.exe, the Sphere engine with ChakraCore.dll), build 592, iPad16,3: ChakraCore's static constructor reads the CFG policy Wine's stub never wrote and fails fast, exit c0000602 at stage 2. chakracore-cfg-policy-failfast proposes env.MADEIRA_ZERO_MITIGATION_POLICY = 1 (build 600). 777YHV; JAHWGD is the same session.",
+ "note": "Glyphica: Typing Survival (Steam 2400160, neosphere.exe, the Sphere engine with ChakraCore.dll), build 592, iPad16,3: ChakraCore's static constructor reads the CFG policy Wine's stub never wrote and fails fast, exit c0000602 at stage 2. chakracore-cfg-policy-failfast proposes env.MADEIRA_ZERO_MITIGATION_POLICY = 1 (build 600). 777YHV; JAHWGD is the same session. (round 624: with the fork's kernelbase, kernelbase-optin.dll, which reads the key)",
  "outcome": "crashed",
  "stage": 2,
  "status": "trying"

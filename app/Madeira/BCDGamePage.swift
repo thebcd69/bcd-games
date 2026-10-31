@@ -903,6 +903,10 @@ struct BCDGamePagePlan: Equatable {
             // it on no iOS version in the logs (126 logs on iOS 27, 6 on iOS 18.3/26.6.1), so a missing VA+ gets no note.
             if let limit = system.memoryLimitBytes, !system.increasedMemoryLimit {
                 notes.append(Note(text: "iOS gives BCD only \(BCDFormat.bytes(limit)) here: this install lacks the increased memory limit, so large games close early. Add it with GetMoreRam, or sign BCD with a paid developer account.", warning: true))
+            } else if let limit = system.memoryLimitBytes, limit <= Self.smallLimitBytes, (game.size ?? 0) >= Self.largeGameBytes {
+                // Round 625 (owner's item 19, agent D3 S5; Sekiro XJ8YM3/ZJYGS9, Cloudpunk F88RB4): even with the increased limit, a 6 GB iPhone
+                // lets apps use 4095 MB, and a large game may need more. Before Play, once on the page; text only.
+                notes.append(Note(text: "iOS lets apps use about \(BCDFormat.bytes(limit)) on this device, and large games can need more. If iOS closes this one, BCD tries a swap file next; it needs about 3 GB of free storage.", warning: false))
             }
             if case .differ(let count)? = details.cloud {
                 notes.append(Note(text: "Steam Cloud and this device disagree on \(BCDGameText.saves(count)). Pick the copies to keep in Options.", warning: true))
@@ -917,6 +921,10 @@ struct BCDGamePagePlan: Equatable {
         }
         self.notes = Array(notes.prefix(2))
     }
+
+    /// Round 625 (owner's item 19): the device class whose apps get about 4 GB (4.5 GiB or less) and a game that large (8 GiB or more).
+    static let smallLimitBytes: Int64 = 9 << 29
+    static let largeGameBytes: Int64 = 8 << 30
 
     private static func progress(_ state: BCDGameState, _ download: BCDDownload?) -> Progress {
         var fraction = download?.fraction ?? 0
@@ -1569,14 +1577,22 @@ struct BCDGamePage: View {
     }
 
     private func showOptions(_ page: BCDGameOptionsPage, focusing id: String? = nil) {
-        if options == .config && page != .config { model.configDraft = nil }
+        if options == .config && page != .config { keepConfigDraft() }
         withAnimation(.easeOut(duration: 0.18)) { options = page }
         focus.focused = id ?? BCDGameOptionsList.firstRow(page, model.details, game: model.game)
     }
 
+    /// madeira-bcd (round 624, Discord W3: a phone player's typed lines were lost on Back, though the owner's answer was "click Back,
+    /// it will save"): leaving the config page by Back, the controller's B or the close button keeps what was typed. Cancel and Save
+    /// clear the draft first (BCDGameConfigPage), so they are unchanged; a page left without a change has no draft.
+    private func keepConfigDraft() {
+        if let draft = model.configDraft { model.request(.saveConfig(draft)) }
+        model.configDraft = nil
+    }
+
     private func closeOptions() {
         guard options != nil else { return }
-        model.configDraft = nil
+        if options == .config { keepConfigDraft() } else { model.configDraft = nil }
         withAnimation(.easeOut(duration: 0.2)) { options = nil }
         focus.closeLayer(Self.panelLayer)
         model.showSettings(false)
@@ -2812,16 +2828,20 @@ private struct BCDGameConfigPage: View {
     @ObservedObject var model: BCDGamePageModel
     let done: () -> Void
     @Environment(\.verticalSizeClass) private var vertical
+    @Environment(\.horizontalSizeClass) private var horizontal
     @State private var draft = ""
     @State private var loaded = false
     @FocusState private var typing: Bool
+    /// Save and Cancel above the text where the keyboard would cover them: a phone on its side (feedback AQF0EA) and, round 624
+    /// (Discord W3), a phone held upright too (narrow: the keyboard covers the lower half there as well).
+    private var buttonsOnTop: Bool { vertical == .compact || horizontal == .compact }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Lines for this game alone, in the key = value form of BCD's own config. For this game they win over BCD's config, from its next start.")
                 .font(BCDStyle.body(14)).fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)
             // A phone on its side: the keyboard covers the lower half, so Save and Cancel go above the text (feedback AQF0EA).
-            if vertical == .compact { buttons }
+            if buttonsOnTop { buttons }
             TextEditor(text: $draft)
                 .font(.system(size: 14, design: .monospaced))
                 .textInputAutocapitalization(.never)
@@ -2837,7 +2857,7 @@ private struct BCDGameConfigPage: View {
                 .onChange(of: draft) { _, text in
                     if loaded, text != (model.backend?.configText(for: game) ?? "") { model.configDraft = text }
                 }
-            if vertical != .compact { buttons }
+            if !buttonsOnTop { buttons }
             Text("One setting a line; a line that starts with # is a note. For example: fence-chain = 6, dxmt = d3d11.mipClampBC=1, env.FEX_MULTIBLOCK = 1. An env.NAME = value line sets an environment variable for the game.")
                 .font(BCDStyle.body(12)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)

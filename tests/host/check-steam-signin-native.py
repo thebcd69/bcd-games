@@ -107,11 +107,16 @@ import FoundationNetworking
 #endif
 enum MadeiraConfig { static func get(_ key: String) -> String? { nil } }
 enum SteamLog { static func trace(_ m: @autoclosure () -> String) {}; static func event(_ m: String) {} }
+#if !canImport(Darwin)
+typealias OSStatus = Int32
+#endif
 final class SteamTokenStore {
     struct StoredTokens { var accountName: String; var refreshToken: String; var accessToken: String; var steamID: UInt64; var savedAt: Date }
     static var saved: StoredTokens?
-    func saveTokens(accountName: String, refreshToken: String, accessToken: String, steamID: UInt64) {
+    @discardableResult
+    func saveTokens(accountName: String, refreshToken: String, accessToken: String, steamID: UInt64) -> OSStatus {
         Self.saved = StoredTokens(accountName: accountName, refreshToken: refreshToken, accessToken: accessToken, steamID: steamID, savedAt: Date())
+        return 0
     }
     func loadTokens() -> StoredTokens? { Self.saved }
     func clearTokens() { Self.saved = nil }
@@ -277,8 +282,14 @@ func expectError(_ expected: SteamError, _ label: String, _ run: () async throws
         require(SteamSignIn.usable(accountName: "a", refreshToken: "opaque", now: now) != nil, "a token without claims is left to Steam")
         require(SteamSignIn.expiry(of: jwt(#"{"sub":"1"}"#)) == nil, "no exp claim, no expiry")
 
+        // round 624 (Discord W8): a Keychain refusal says why; -34018 is an install not signed for the person (TrollStore, for example)
+        let missing = SteamSignIn.keychainFailureText(-34018), other = SteamSignIn.keychainFailureText(-25308)
+        require(missing.contains("error -34018") && missing.contains("TrollStore") && missing.contains("SideStore, AltStore or Sideloadly")
+                && other.contains("(error -25308)") && other.contains("unlocked") && !other.contains("TrollStore"),
+                "a Keychain refusal names its error, and -34018 says how to install BCD instead")
         require(!SteamSignIn.isSignedIn && SteamSignIn.credentialsForDock() == nil, "signed out at start")
-        require(SteamSignIn.store(accountName: "a", refreshToken: live, accessToken: "x"), "store reports a kept sign-in")
+        require(SteamSignIn.store(accountName: "a", refreshToken: live, accessToken: "x") && SteamSignIn.lastStoreStatus == 0,
+                "store reports a kept sign-in, and the Keychain's answer")
         require(SteamSignIn.credentialsForDock()! == ("a", live) && SteamSignIn.accountName == "a" && SteamSignIn.isSignedIn, "credentialsForDock reads the store")
         SteamSignIn.signOut()
         require(SteamSignIn.credentialsForDock() == nil && !SteamSignIn.isSignedIn, "sign out removes it")

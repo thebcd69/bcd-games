@@ -45,7 +45,7 @@ opt = opt[:opt.index('\nfi\n') + 4]
 check('each is built only where no <name>.dll ships, and MADEIRA_OPTIN_BUILD=0 skips them',
       '"${MADEIRA_OPTIN_BUILD:-1}" != 0' in opt and 'shipped "$d" && continue' in opt and
       'targets="$targets dlls/$d/arm64ec-windows/$d.dll"; OPT="$OPT $d"' in opt)
-check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL)', '$WER$WTY$OPT$SDL" ]' in build)
+check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624)', '$WER$WTY$OPT$SDL$DCO" ]' in build)
 ship = build[build.index('for d in $OPT; do'):]
 ship = ship[:ship.index('\ndone\n') + 6]
 check('each ships as <name>-optin.dll, stripped and padded, never as <name>.dll',

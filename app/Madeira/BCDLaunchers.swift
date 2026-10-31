@@ -61,6 +61,10 @@ struct BCDLauncherSpec: Identifiable, Hashable {
     /// Lines only the installed launcher's session gets, after `sessionConfig`'s (its Open and its library tile), never its
     /// installer's: a layout of the address space the launcher's own program needs and its installer does not. Empty for most.
     var launcherOnlyConfig: [String] = []
+    /// Lines only the installer's session gets, after `sessionConfig`'s (round 625, the owner's item 27, agent N S5; Battle.net
+    /// Y0HFHB): the installer starts the launcher's browser itself, without `launcherArguments`, so a line that carries those words
+    /// to it (env.MADEIRA_CHILD_ARGS) belongs here and nowhere else. Empty for most.
+    var installerOnlyConfig: [String] = []
     /// The launcher program's session lines: `sessionConfig` and `launcherOnlyConfig`.
     var programSessionConfig: [String] { sessionConfig + launcherOnlyConfig }
     var launcherArguments = ""
@@ -79,6 +83,11 @@ struct BCDLauncherSpec: Identifiable, Hashable {
     var label: String { experimental ? "\(title) (experimental)" : title }
     /// A name that needs "the" in a sentence ("the EA app"); Battle.net does not.
     var needsArticle = false
+    /// Round 625 (owner's item 25, agent A S5; EA app setup H95G25): Windows services the session's batch sets to start on demand
+    /// (start type 3) before services.exe starts, when the prefix has them. Wine's PunkBuster stubs PnkBstrA/PnkBstrB autostart in
+    /// every session and each held one of the 32-bit 4 GB window slots for good: the EA app installer's custom-action host found
+    /// none left. On demand they still exist and start when a program asks for them. Empty for most.
+    var demandStartServices: [String] = []
     /// How a sentence names the launcher: "Battle.net", "the EA app".
     var named: String { needsArticle ? "the " + title : title }
     /// The same at the start of a sentence: "Battle.net", "The EA app".
@@ -170,7 +179,19 @@ struct BCDLauncherSpec: Identifiable, Hashable {
         // anonymous memory (map_image_view size=0x9f84000, ~159 MiB dirty per process: a PE section is mmapped only at 16 KB-aligned file
         // offsets), so a Chromium process that does not start is worth about 0.4 GB. Nothing beyond these four is shipped; every
         // further switch or line is a trial the owner runs first (ordered list: ajan33.md in intake/analysis/bnet-ram-2026-10-24).
-        launcherArguments: "--in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials --renderer-process-limit=2")
+        // Round 625 (the owner's item 27, agent N S5; Y0HFHB, build 614, iPad16,6): Battle.net-Setup.exe starts Battle.net.exe itself
+        // ("--detected-country=(NULL) --detected-region=US --runonstartup=true --setlanguage=frFR"), so the four switches below were not on its
+        // command line; that session had eleven 32-bit processes at 86 s and its 560 MB pool ran out ("[jit-pool] EXHAUSTED"). The installer's
+        // session now gives them to every Battle.net.exe it starts (env.MADEIRA_CHILD_ARGS appends them; Chromium's own subprocesses get them
+        // twice, and Chromium reads the last copy of a switch), and splits the JIT pool around the main thread's stack, which auto-tune
+        // proposes after such an exhausted pool (pool-split-exhausted). The installed launcher's start is unchanged.
+        installerOnlyConfig: ["env.MADEIRA_CHILD_ARGS = Battle.net.exe " + Self.battlenetChromiumSwitches, "pool-split = 1"],
+        launcherArguments: Self.battlenetChromiumSwitches,
+        demandStartServices: ["PnkBstrA", "PnkBstrB"])
+
+    /// Battle.net's four Chromium switches (above): the installed launcher's command line, and the installer's browser through
+    /// env.MADEIRA_CHILD_ARGS, from one place so the two cannot drift.
+    static let battlenetChromiumSwitches = "--in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials --renderer-process-limit=2"
 
     /// Electronic Arts' EA app. The address is the link on ea.com/ea-app (its Windows download), a
     /// direct file on EA's own distribution host. The EA app installs 64-bit into Program Files\Electronic Arts.
@@ -218,14 +239,18 @@ struct BCDLauncherSpec: Identifiable, Hashable {
         // (BackupRefPtr off, V8 --jitless, no proxy server, as for Social Club and Steam) and refuses its --type= children
         // (build/ntdll-unix/process_ios.c). env.MADEIRA_EA_CEF_CMDLINE = 0 leaves the command line alone, env.MADEIRA_EA_CEF_FLAGS adds
         // switches. Only this entry sets them; every other program takes the paths it took before.
+        // Round 624 (agent A S4, 7NKYWT and H95G25): the installer's managed custom-action hosts (SfxCA) stop on NULL+4; the 32-bit fault
+        // report (env.MADEIRA_X86_FAULT_DUMP = 1, log only, three reports at most; build/ntdll-unix/ios_x86_fault_diag.h) names the code
+        // and registers in the first run, not only after auto-tune's retry.
         sessionConfig: Self.commonSessionConfig + ["env.LC_ALL = en_US.UTF-8", "env.MADEIRA_APC_BUSY_QUEUE = 1",
                                                    "env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr,dxva2",
                                                    "env.MADEIRA_WOW_MIN_FREE_GB = 2",
                                                    "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1",
                                                    "env.MADEIRA_SPAWN_BLOCK = vc_redist-",
                                                    "env.MADEIRA_EA_CEF_FLAGS = --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows",
-                                                   "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1"],
-        launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true)
+                                                   "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1", "env.MADEIRA_X86_FAULT_DUMP = 1"],
+        launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true,
+        demandStartServices: ["PnkBstrA", "PnkBstrB"])
 }
 
 // MARK: - What a start looks like
@@ -247,12 +272,16 @@ struct BCDLauncherStart: Equatable {
     let startServices = true
     /// The launcher's own lines (BCDLauncherSpec.sessionConfig).
     let sessionConfig: [String]
+    /// Round 625: the services its batch sets to start on demand (BCDLauncherSpec.demandStartServices).
+    var demandStartServices: [String] = []
 
     static func installer(_ spec: BCDLauncherSpec) -> BCDLauncherStart {
-        BCDLauncherStart(windowsPath: spec.installerWindowsPath, arguments: spec.installerArguments, sessionConfig: spec.sessionConfig)
+        BCDLauncherStart(windowsPath: spec.installerWindowsPath, arguments: spec.installerArguments, sessionConfig: spec.sessionConfig + spec.installerOnlyConfig,
+                         demandStartServices: spec.demandStartServices)
     }
     static func program(_ spec: BCDLauncherSpec, relative: String) -> BCDLauncherStart {
-        BCDLauncherStart(windowsPath: BCDLauncherSpec.windowsPath(relative), arguments: spec.launcherArguments, sessionConfig: spec.programSessionConfig)
+        BCDLauncherStart(windowsPath: BCDLauncherSpec.windowsPath(relative), arguments: spec.launcherArguments, sessionConfig: spec.programSessionConfig,
+                         demandStartServices: spec.demandStartServices)
     }
 }
 

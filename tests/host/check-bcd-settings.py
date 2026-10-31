@@ -260,6 +260,18 @@ check(BCDSettingsText.realKey("env.FEX_TSOENABLED", known: ["env.MADEIRA_ONBOARD
 check(BCDSettingsText.matches("MADEIRA_PROMOTE", key: "env.MADEIRA_PROMOTE", title: "", note: "", category: "")
       && BCDSettingsText.matches("env.PROMOTE", key: "env.MADEIRA_PROMOTE", title: "", note: "", category: ""),
       "search finds an option by its real key and by its shown one")
+// Round 624 (agent N S6): which log to offer when the newest holds no game
+do {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    let app = BCDLogChoice.Item(name: "bcd-log.txt", modified: now, hasGame: false)
+    let game1h = BCDLogChoice.Item(name: "Game.exe-1.txt", modified: now.addingTimeInterval(-3600), hasGame: true)
+    let game25h = BCDLogChoice.Item(name: "Game.exe-2.txt", modified: now.addingTimeInterval(-25 * 3600), hasGame: true)
+    let appPrev = BCDLogChoice.Item(name: "bcd-log.prev.txt", modified: now.addingTimeInterval(-60), hasGame: false)
+    check(BCDLogChoice.gameLogToOffer([game1h, app], now: now) == nil && BCDLogChoice.gameLogToOffer([app, appPrev, game1h], now: now) == 2
+          && BCDLogChoice.gameLogToOffer([app, game25h], now: now) == nil && BCDLogChoice.gameLogToOffer([app, appPrev], now: now) == nil
+          && BCDLogChoice.gameLogToOffer([], now: now) == nil,
+          "round 624: a newest log with no game offers the newest game log of the last day (none when the newest has a game, or no game log is that recent)")
+}
 check(BCDSettingsText.logName("bcd-log.txt") == "BCD's log, this run" && BCDSettingsText.logName("bcd-log.prev.txt") == "BCD's log, the run before",
       "BCD's own logs (bcd-log.txt, bcd-log.prev.txt) are named by what they are")
 let data = try! Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[1]))

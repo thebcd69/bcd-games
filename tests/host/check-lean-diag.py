@@ -228,7 +228,7 @@ check("if (!ios_lean_diag_virtual() || cycle == 1 || (cycle % 30) == 0)   /* mad
       "CoreAnimation shmem replay: every cycle, every 30 with the switch")
 check("if (!zone_bad && (!ios_lean_diag_virtual() || cycle == 1 || (cycle % 30) == 0))" in warm,
       "malloc zone check: every cycle, every 30 with the switch (cost logged then)")
-check("if (cycle == 2 || (cycle % ios_warmer_sweep_cycles()) == 0)" in warm
+check("if (cycle == 2 || (cycle % ios_warmer_sweep_cycles()) == 0 || physmap_at90 == 1)" in warm   # round 624 (D2 S20): + the one-shot at 90 %
       and "(cycle % ios_warmer_sweep_cycles()) == 0))" in warm,
       "[phys-map] and the slot/window inventory follow ios_warmer_sweep_cycles")
 check(warm.count("ios_lean_diag_virtual()") == 5, "no other warmer step depends on the switch (page warming, [footprint], pump sample)")

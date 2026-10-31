@@ -851,10 +851,19 @@ static void load_root_certs(void)
 }
 
 /* On iOS this one unix side serves every pseudo-process of the session.  A
- * 32-bit process's root store import must not consume the list another
- * process is still importing from, so a WoW64 caller enumerates with a
- * per-thread position instead (ios_enum_root_certs_wow).  The lock serialises
- * the one-time load and every walk or removal of the list. */
+ * process's root store import must not consume the list another process is
+ * still importing from, or will import from later, so every caller enumerates
+ * with a per-thread position instead (ios_enum_root_certs_cursor; the WoW64
+ * path since 2026-09-27, the 64-bit path since round 624: the first 64-bit
+ * process of a session took every root, and a later one -- the game after
+ * Steam's Dock host, an installer -- found none, so its TLS failed: OpenAL's
+ * installer 12157, Persona 3 Reload "server not reachable").  Worse, Wine's
+ * rootstore.c sync took the empty list for roots deleted on the host and
+ * removed every imported root from HKLM\Software\Microsoft\SystemCertificates\
+ * Root, so the prefix kept only the built-in roots; the next process that sees
+ * the whole list adds them back.  The same change as the Persona 3 Reload
+ * fork's patch reviewed in round 624.  The lock serialises the one-time load
+ * and every walk of the list. */
 #include <pthread.h>
 #include <stdint.h>
 #include <time.h>
@@ -867,33 +876,14 @@ static void ios_load_roots_locked(void)
     ios_roots_loaded = TRUE;
 }
 
+static NTSTATUS ios_enum_root_certs_cursor( struct enum_root_certs_params *params );
+
 static NTSTATUS enum_root_certs( void *args )
 {
-    struct enum_root_certs_params *params = args;
-    struct list *ptr;
-    struct root_cert *cert;
-    NTSTATUS status = STATUS_SUCCESS;
-
-    pthread_mutex_lock( &ios_root_lock );
-    ios_load_roots_locked();
-
-    if (!(ptr = list_head( &root_cert_list ))) status = STATUS_NO_MORE_ENTRIES;
-    else
-    {
-        cert = LIST_ENTRY( ptr, struct root_cert, entry );
-        *params->needed = cert->size;
-        if (cert->size <= params->size)
-        {
-            memcpy( params->buffer, cert->data, cert->size );
-            list_remove( &cert->entry );
-            free( cert );
-        }
-    }
-    pthread_mutex_unlock( &ios_root_lock );
-    return status;
+    return ios_enum_root_certs_cursor( args );   /* madeira-bcd (round 624): never consumes the shared list */
 }
 
-/* The WoW64 enumeration: each thread keeps its own position; the rootstore
+/* The enumeration: each thread keeps its own position; the rootstore
  * loop runs on one thread and asks again for the same certificate after
  * growing its buffer, so the position advances only when one was copied.  The
  * position is dropped at the end of the list and restarted after 10 s idle. */
@@ -907,7 +897,7 @@ static unsigned long long ios_root_now_ms(void)
     return (unsigned long long)ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
 }
 
-static NTSTATUS ios_enum_root_certs_wow( struct enum_root_certs_params *params )
+static NTSTATUS ios_enum_root_certs_cursor( struct enum_root_certs_params *params )
 {
     uintptr_t self = (uintptr_t)pthread_self();
     unsigned long long now = ios_root_now_ms();
@@ -935,6 +925,13 @@ static NTSTATUS ios_enum_root_certs_wow( struct enum_root_certs_params *params )
         if (n++ == ios_root_cursor[slot].index) break;
     if (ptr == &root_cert_list)
     {
+        static int said;
+        if (said < 32 && ios_root_cursor[slot].index)
+        {
+            said++;   /* madeira-bcd (round 624): how many roots each import got (one line per finished walk, 32 a session) */
+            ERR( "[root-store] madeira-bcd: thread %lx enumerated %u root certificate(s), %u in the shared list\n",
+                 (unsigned long)self, ios_root_cursor[slot].index, n );
+        }
         ios_root_cursor[slot].thread = 0;
         ios_root_cursor[slot].index = 0;
         ios_root_cursor[slot].stamp = 0;
@@ -1061,7 +1058,7 @@ static NTSTATUS wow64_enum_root_certs( void *args )
         ios_wow_host_ptr( params32->needed )
     };
 
-    return ios_enum_root_certs_wow( &params );
+    return ios_enum_root_certs_cursor( &params );
 }
 
 const unixlib_entry_t __wine_unix_call_wow64_funcs[] =

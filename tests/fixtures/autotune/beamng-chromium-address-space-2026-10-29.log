@@ -1,0 +1,303 @@
+[15:10:24.444] [INFO] Checking entitlements...
+[15:10:24.444] [INFO] [build] v0.1.623 (623)
+[15:10:24.444] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B5099f) ram=15389MB available=16362MB cores=10
+[15:10:24.445] [INFO] [device] address-map=[0x1005e8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[15:10:24.463] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:10:31.689] [INFO] [bcd-logs] sent MgsGroundZeroes.exe-2026-10-29_15-09-17.txt: code PFDA0D
+[15:10:34.937] [INFO] [bcd-logs] sent MgsGroundZeroes.exe-2026-10-29_15-08-29.txt: code 9MAJA9
+[15:12:39.240] [INFO] [bcd] library launch BeamNG.drive: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[15:12:39.241] [INFO] Requesting JIT with Built-in StikJIT...
+[15:12:40.668] [INFO] [dock-launch] image-retire=1
+[15:12:40.668] [INFO] [dock-launch] image-map-guard=1
+[15:12:40.676] [INFO] [dock-installers] app=284160 scripts=0 programs=0
+[15:12:40.677] [INFO] [madeira-dock] starting the host for app 284160; Valve's client authenticates and authorizes the launch
+[15:12:40.684] [INFO] Running full Wine sequence...
+[15:12:40.684] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1005e8000,0x8000000000) 512GB available=16315MB low-power=0 thermal=nominal
+[15:12:40.688] [INFO] Allocating 1024MB JIT pool (BRK will suspend process)...
+[15:12:40.689] [INFO] Allocating 1024MB JIT pool via debugger...
+[15:12:40.689] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:12:40.689] [INFO] [jit-debugger] attached=1 at the pool request
+[15:12:40.690] [ERR] ml1036: no hole fits a 1024MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:12:41.368] [INFO] RX pool at 0x148000000
+[15:12:41.384] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.745s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=15688 MB + phys_footprint=695 MB = 16384 MB (hw.memsize says 15389 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=706 MB (peak 706) internal=704 MB compressed=0 MB external=113 MB reusable=54 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x71a7f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.401s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11a050000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11a050000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11a050000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11a058000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11a058000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11a05c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149d88000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.465s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11A050000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x71ac600000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71ac700000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x71ac900000+0x400000 held for 2000 ms (3 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m410932 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7027000000+0xc000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149d34bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[swap] ml1077 backed 0x71b1e80000+0x1010000 (file off 8796093022208 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x71b2e90000+0x1010000 (file off 8796093022224 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=964 MB (peak 964) internal=962 MB compressed=0 MB external=185 MB reusable=54 MB (cycle=2)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 0 of 4096 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 0 MB in use (peak 32), 2 takes, 0 guarded, 0 MB lost to a full free list
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #4 release of 0x71bb3b0000+0xfd0000 held for 2000 ms (1 in flight)
+[free-delay] #5 release of 0x71bc380000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x71bd350000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #7 release of 0x71be320000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #8 release of 0x71bf2f0000+0xfd0000 held for 2000 ms (5 in flight)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=1099 MB compressed=0 MB external=189 MB reusable=54 MB (cycle=3)
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1127 MB (peak 1127) internal=1125 MB compressed=0 MB external=189 MB reusable=54 MB (cycle=4)
+[footprint] rev=ml358 phys=1126 MB (peak 1127) internal=1125 MB compressed=0 MB external=189 MB reusable=54 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\BeamNG.drive.exe" t+ 10.389s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\BeamNG.drive.exe\"" (fd=365, unixdir=366, dup_unixdir=450) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x70e7000000+0x20000000 prot=3/3 shared=0 (and the range continues past this region))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+00ac:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f5300000+0x3bc000 (libwow64fex.dll) → pool 0x14e399000 used=0x675d000/0x27000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f5300000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[bigres] tid=00ac #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x71f5300000) -> 64-bit table (0x1033c0d00)
+[15:12:51.184] [INFO] [dock-report] launch-client-discovery-published=1
+ml957: ? backing 0x797bc24000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797bba8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b930000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b560000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a718000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a6cc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a694000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+00ac:err:process:IsWow64Process2 [x64-machine] IsWow64Process2(process=FFFFFFFF) machine=014c: native ARM64 reported as AMD64 (env.MADEIRA_X64_MACHINE = 1)
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/BeamNG/BeamNG.drive/current/beamng-launcher.log
+[guest-log] #1 tid=00ac   0.66256|E|configureBeamNGProtocol| Unable to open registry classes:No error message has been recorded
+ml957: ? backing 0x797a668000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #33 hwnd=0x10066 class='' text="Default IME" rev=ml853
+[win-name] #34 hwnd=0x10060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #35 hwnd=0x10060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[footprint] rev=ml358 phys=1244 MB (peak 1244) internal=1243 MB compressed=0 MB external=194 MB reusable=54 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #106 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[launch-view] dismissed reason=game-window logs=0
+[swap] ml1077 backed 0x71bb3b0000+0xf10000 (file off 8796093022224 MB): 15 MB in 1 extents, peak 32 MB, 0 refused
+[15:12:52.688] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml358 phys=1205 MB (peak 1244) internal=1203 MB compressed=0 MB external=194 MB reusable=54 MB (cycle=7)
+00ac:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe\" --supportLaunchTokenId=<uuid> -gfx d3d12 -gfxfallback"
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" t+ 14.474s rev=ml526
+[session-log] Steam game BeamNG.drive.x64.exe: logs/BeamNG.drive.x64.exe-2026-10-29_15-12-55.txt
+00ac:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe\" --supportLaunchTokenId=<uuid> -gfx d3d12 -gfxfallback" (fd=515, unixdir=516, dup_unixdir=522) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\"
+[Wine child thread] calling wine_ios_child_main...
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files (x86)/Steam/steamapps/common/BeamNG.drive/Bin64/BeamNG.drive.x64.exe') = 0x0
+ml985: map_image_view size=0x4cd6000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" 0x140000000+0x4cd6000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=1252 peb=0x10cb58000
+[nls-getptr] type=11 id=437 peb=0x10cb58000
+[nls-getptr] type=11 id=20127 peb=0x10cb58000
+I B8 FEX: branch-history-v1 madeira-bcd enabled=false exe=BeamNG.drive.x64.exe
+I B8 FEX: launcher-smc-v1 madeira-bcd enabled=false mode=1 exe=BeamNG.drive.x64.exe
+E B8 [iOS-xins] tracker=0x14f194bc8 BeamNG.drive.x64.exe sec=0x140001000-0x141d7751c
+E B8 [iOS-xins] tracker=0x14f194bc8 BeamNG.drive.x64.exe sec=0x144c41000-0x144c41040
+D B8 Load module BeamNG.drive.x64.exe (beamng.drive.x64.exe-9e0ee207b83256de): 140000000
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x1000 align=0x10000 top-down tries=7 skips=7 | seen=0x7027000000..0x7100000000 views=0 maxgap=0x10000 tailgap=0x10000 stop=no-views-in-range | firstfail=0x70ffff0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x4000 align=0x10000 top-down tries=7 skips=7 | seen=0x7027000000..0x7100000000 views=0 maxgap=0x10000 tailgap=0x10000 stop=no-views-in-range | firstfail=0x70ffff0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x40000 align=0x10000 top-down tries=7 skips=7 | seen=0x7027000000..0x7100000000 views=0 maxgap=0x40000 tailgap=0x40000 stop=no-views-in-range | firstfail=0x70fffc0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[nls-getptr] type=11 id=1252 peb=0x10cb58000
+[nls-getptr] type=11 id=437 peb=0x10cb58000
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14fafc000)
+ml985: map_image_view size=0x1092c000 base=0x6fffe5370000 info_base=0x180000000 map_addr=0x6fffe5370000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+D B8 Load module libcef.dll (libcef.dll-9ddf18e23c0d26f0): 71E03C0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\amd_fidelityfx_loader_dx12.dll" 0x71df400000+0x8000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+ml985: map_image_view size=0x4a3b000 base=0x6fffe0520000 info_base=0x180000000 map_addr=0x6fffe0520000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\libxess.dll" 0x71da9c0000+0x4a3b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\openxr_loader.dll" 0x71da670000+0x1ed000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\steam_api64.dll" 0x71da610000+0x51000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\EOSSDK-Win64-Shipping.dll" 0x71d9220000+0x1354000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[va-scan] FAILED window=0x10000..0xffff0001 size=0x160000 align=0x10000 top-down tries=65513 skips=0 | seen=0x10000..0xffff0001 views=0 maxgap=0x160001 tailgap=0x160001 stop=no-views-in-range | firstfail=0xffe90000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0xffff0001 for 0x160000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0xfffe0001 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+D B8 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71D8B70000
+D B8 Load module d3d11.dll (d3d11.dll-8ad678a9894b5214): 71D86F0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\D3DCOMPILER_47.dll" 0x71d82c0000+0x42e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D B8 Load module D3DCOMPILER_47.dll (d3dcompiler_47.dll-e081d8ea7b71d6ab): 71D82C0000
+D B8 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71D8220000
+D B8 Load module concrt140.dll (concrt140.dll-7f7bd0536697a14b): 71D8190000
+00b8:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b8:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] bcryptprimitives.dll: OK, 1 .text pages executable (copy @0x152d18000)
+D B8 Load module bcryptprimitives.dll (bcryptprimitives.dll-b0b370acd9046023): 71D8110000
+[va-scan] FAILED window=0x10000..0x7900000000 size=0x800000000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0x800000000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[soft-pool] GRANTED soft 0x7800000000 (base returned 0x7800000000, size=0x800000000) — unbacked, commits materialise on demand
+[jumbo#1] +0ms tid=1704cf000 wtid=00b8 peb=0x10cb58000 nrip=0x71f47b7690 grip=0x0 size=0x800000000 (32768 MB) hint=0x239800000000 -> 0x7800000000 st=0x0 | granted=32768 MB ok=1 fail=0
+[va-scan] FAILED window=0x10000..0x7900000000 size=0x800000000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0x800000000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[pool-owner] searching 153 module copies for 2 granted pool bases...
+[alloc-fail] ml814 #2 status=c0000018 hint=0x491800000000 size=0x800000000 type=0x2000 protect=0x1 tid=00b8 | STAGE=fixed-map err=3 at 0x16f000000+0x800000000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=beamng.drive.x64.exe tid=00b8 size=0x800000000 type=0x2000 prot=0x1 hint=0x491800000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[va-scan] FAILED window=0x10000..0x7900000000 size=0x800000000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0x800000000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[alloc-fail] ml814 #3 status=c0000018 hint=0x43d000000000 size=0x800000000 type=0x2000 protect=0x1 tid=00b8 | STAGE=fixed-map err=3 at 0x16f000000+0x800000000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=beamng.drive.x64.exe tid=00b8 size=0x800000000 type=0x2000 prot=0x1 hint=0x43d000000000 zb=0x0 hits=2 rev=ajan5-rockstar
+[va-scan] FAILED window=0x10000..0x7900000000 size=0x800000000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0x800000000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[alloc-fail] ml814 #4 status=c0000018 hint=0x1cb800000000 size=0x800000000 type=0x2000 protect=0x1 tid=00b8 | STAGE=fixed-map err=3 at 0x16f000000+0x800000000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=beamng.drive.x64.exe tid=00b8 size=0x800000000 type=0x2000 prot=0x1 hint=0x1cb800000000 zb=0x0 hits=3 rev=ajan5-rockstar
+[va-scan] FAILED window=0x10000..0x7900000000 size=0xfffff0000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0xfffff0000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0xfffff0000 — top window is full
+[footprint] rev=ml358 phys=1766 MB (peak 1766) internal=1764 MB compressed=0 MB external=272 MB reusable=54 MB (cycle=8)
+[alloc-fail] ml814 #5 status=c0000017 hint=0x0 size=0xfffff0000 type=0x2000 protect=0x1 tid=00b8 | STAGE=fixed-map err=3 at 0x16f000000+0xfffff0000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000017 proc=beamng.drive.x64.exe tid=00b8 size=0xfffff0000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[va-scan] FAILED window=0x10000..0x7900000000 size=0xfffff0000 align=0x10000 bottom-up tries=4207 skips=69 | seen=0x10000..0x7900000000 views=59 maxgap=0x7062320000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x16f000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0x7900000000 for 0xfffff0000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0x78ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0xfffff0000 — top window is full
+[alloc-fail] ml814 #6 status=c0000017 hint=0x0 size=0xfffff0000 type=0x2000 protect=0x1 tid=00b8 | STAGE=fixed-map err=3 at 0x16f000000+0xfffff0000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000017 proc=beamng.drive.x64.exe tid=00b8 size=0xfffff0000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=2 rev=ajan5-rockstar
+[int3-guest] guest_rip=0x71e91db695 x28=0x7c07001140 read=1 rev=ml554
+[int3-guest]   GUEST RAX=0x0000000000000072 RCX=0x00000071bbbaeec4 RDX=0x000000014eee4868 RBX=0x00000071bbbaefe0 rev=ml578
+[int3-guest]   GUEST RSP=0x00000071bbbaeea0 RBP=0x00000071bbbaf400 RSI=0x0000000000000008 RDI=0x00000071f023b080 rev=ml578
+[int3-guest]   GUEST R8=0x0000000000002000 R9=0x0000000000000001 R10=0x00000071bbbaedc0 R11=0x00000000c0000017 rev=ml578
+[int3-guest]   GUEST R12=0x00000071e03c0000 R13=0x00000071bbbaf780 R14=0x00000071e03c0000 R15=0x00000071bc7b5b10 rev=ml578
+[int3-guest]   HOST x0 =0x00000071bbbaeec4 x1 =0x000000014eee4868 x2 =0x0000000000002000 x3 =0x0000000000000001
+[int3-guest]   HOST x8 =0x0000000000000072 x9 =0x00000000bbbaeea0 x10=0x0000007c07001400 x11=0x0000000000000000
+[int3-guest]   HOST x12=0x0000000000000000 x13=0x0000000000000004 x14=0x0000000000000000 x15=0x000000000000020b
+[int3-guest]   HOST x16=0x000000014eced9a4 x17=0x000000010f7cff20 x18=0x00000071ffe90000 x19=0x00000071e03c0000
+[int3-guest]   HOST x20=0x00000071bbbaf780 x21=0x00000071e03c0000 x22=0x00000071bc7b5b10 x23=0x00000071bbbaeea0
+[int3-guest]   HOST x24=0x00000000bbbaeec8 x25=0x0000000000000008 x26=0x00000071f023b080 x27=0x00000071bbbaefe0
+[int3-guest]   HOST x28=0x0000007c07001140 x29=0x00000071bbbaf400 x30=0x000000016cff4274 x31=0x0000000000000000
+[store-undecoded] #1 rev=ml350 insn=0xd4200000 pc=0x16cff452c addr=0x16cff452c rw_addr=0x7024ff452c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=1 rip=0x71e91db695 pc=0x16cff452c addr=0x16cff452c kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x16cff4000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16cff452c addr=0x16cff452c x18=0x71ffe90000 type=6 lr=0x16cff4274 sp=0x10f7d0000 x16=0x14eced9a4 x17=0x10f7cff20
+[guest-code] rev=ml333 pool_rip=0x71e91db695 (PE 0x71e91db695) -- NO pool copy for this address (identity translate)
+[fault-host] 16cff442c: d63f0080 aa0003ea d53bd068 927df108 f9449908 f94bc508 f940191c b9440b88
+[fault-host] 16cff444c: d51b4208 91070388 4cdf2d00 4cdf2d04 4cdf2d08 4cdf2d0c a9420388 a9436f81
+[fault-host] 16cff446c: a9447797 a9456b99 a9460f82 a9471784 a9485393 a9495b95 29426389 d53bd06b
+[fault-host] 16cff448c: 927df16b f944996b f94bc56b 3900057f d61f0140 d4400000 d4400000 d53b420a
+[fault-host] 16cff44ac: b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393
+[fault-host] 16cff44cc: a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000
+[fault-host] 16cff44ec: d53b420a b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784
+[fault-host] 16cff450c: a9085393 a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c
+[fault-host] 16cff452c: d4200000 d53b420a b9040b8a a9020388 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d44 4c9f2d48 4c9f2d4c [d4200000] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe90000 TEB=0x71ffe90000 TEB[0x58]=0x71bc7c06e0 *(gs_cached+0x58)=0x71bc7c06e0
+00b8:err:module:loader_init "libcef.dll" failed to initialize, aborting
+00b8:err:module:loader_init Initializing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" failed, status 80000003
+00b8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000003) syscalls=0 unix_calls=9645
+[unwind] term ml661 begin rip=14ed1216c rsp=71bbbaf348 window=[71bbbaf348..71bc3af348) max=32
+[unwind] term ml661 #00 pc=14ed1216c rsp=71bbbaf348  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-2147483645): closing child fd_socket=521
+[Wine ntdll/server] process_exit_wrapper(-2147483645)
+[Wine child thread] child exited with code -2147483645
+[guest-log] #2 tid=00ac   4.87182|E|gameStartupError| BeamNG <ip> 0x80000003 STATUS_BREAKPOINT
+[guest-log] #3 tid=00ac   4.87184|E|gameStartupError| 0x80000003 - STATUS_BREAKPOINT
+[footprint] rev=ml1060 fast phys=1767 MB compressed=0 MB
+[15:12:56.689] [INFO] [dock-game-end] beamng.drive.x64.exe ended with status 0x80000003; the session goes on for now (game-still-runs)
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x40000 align=0x10000 top-down tries=7 skips=7 | seen=0x7027000000..0x7100000000 views=0 maxgap=0x40000 tailgap=0x40000 stop=no-views-in-range | firstfail=0x70fffc0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[wow-stack-free] #1 the dead thread 00b0's 32-bit stack (guest 0xb550000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0xb550000 is not a live view -> released at the old address (as before) rev=ajan11
+[footprint] rev=ml358 phys=1766 MB (peak 1766) internal=1764 MB compressed=0 MB external=272 MB reusable=54 MB (cycle=9)
+[win-name] #95 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #96 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #97 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #98 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #99 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+[win-name] #100 hwnd=0x20060 class='' text="BeamNG v0.40.3.0 Launcher" rev=ml853
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=9697
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=9697
+00ac:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=443
+[wow-window] slot 0 B=0x7900000000 released (owner peb=0x7900310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1765 MB (peak 1766) internal=1762 MB compressed=0 MB external=272 MB reusable=54 MB (cycle=10)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[file-wfail] ml669 #107 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[15:13:01.373] [INFO] [session] length=20s partial=1 play=0s frames=0 stalls=0/0s peak=1777MB limit=16383MB thermal=nominal lpm=0 api=D3D11/D3D9/32 res=1112x832 cap=60 game=BeamNG.drive

@@ -61,7 +61,7 @@ check('d3d11-src.dll is built with the patch and refused without it',
       '"patch-dxmt-copy-structure-count.py" "[copy-structure-count] skipped #"' in sh
       and '(cd "$OUT/patchroot" && python3 "$R/tools/${BCD_PATCHES[$i]}") || fail' in sh)
 check('the IPA is refused when no 64-bit d3d11.dll carries the patch',
-      'for m in "[copy-structure-count] skipped #" "[rtv-fail] #"; do' in wf and "no 64-bit d3d11.dll carries BCD's Direct3D 11 patches" in wf)
+      any('"[copy-structure-count] skipped #"' in line for line in wf.splitlines() if line.strip().startswith('for m in "[copy-structure-count] skipped #"')) and "no 64-bit d3d11.dll carries BCD's Direct3D 11 patches" in wf)
 rules = (R / 'build/tools/autotune_rules.py').read_text()
 blk = rules[rules.index('"id": "dxmt-copy-structure-count-null"'):][:1800] if '"id": "dxmt-copy-structure-count-null"' in rules else ''
 check('auto-tune answers the crash with d3d11-src.dll (no "fixed in" claim: the 64-bit default DLL is unchanged)',

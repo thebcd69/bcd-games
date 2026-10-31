@@ -1624,6 +1624,30 @@ static int ios_lean_diag;   /* defined with the sampler below */
 #define IOS_SPIN_SHOTS  3         /* looks per run */
 struct ios_spin_state { uint64_t callee; int streak, shots; };
 
+/* madeira-bcd (round 624, agent D3 S8; MIO WNYFPB/24371V): a game thread spins for 10-15 s with no x64->EC calls, so the rate trigger above
+ * never sees it. A second trigger for the same look: exactly one Wine thread pinned (>= 95 % of the interval), no other above 20 %, no frame
+ * presented meanwhile, after the session presented 100 frames or more (start-up loading is not looked at); 4 s for the first look, 20 s for the
+ * second, two a run. The present counter must be known. */
+#define IOS_SPIN_CPU_HOT    0.95      /* share of the interval a Wine thread must use to count as pinned */
+#define IOS_SPIN_CPU_BUSY   0.20      /* any other Wine thread above this ends the streak (the others are parked) */
+#define IOS_SPIN_CPU_FIRST  4000.0    /* ms of streak for the first look */
+#define IOS_SPIN_CPU_AGAIN  20000.0   /* ms for the second */
+#define IOS_SPIN_CPU_MINPRES 100      /* frames the session must have presented: start-up loading is not looked at */
+struct ios_spin_cpu { double ms; uint64_t presents; int shots; };
+
+/* One xprobe sample in: dt_ms of wall time, how many Wine threads were hot and how many busy, the present counter (known = 0: no counter).
+ * 0 (nothing), 1 or 2 (the look) out. */
+static int ios_spin_cpu_step( struct ios_spin_cpu *s, double dt_ms, int hot, int busy, uint64_t presents, int known )
+{
+    if (!known || hot != 1 || busy || presents < IOS_SPIN_CPU_MINPRES) { s->ms = 0; return 0; }
+    if (s->ms == 0) s->presents = presents;
+    else if (presents != s->presents) { s->ms = 0; return 0; }            /* the game presented: it is not stuck */
+    s->ms += dt_ms;
+    if (s->shots == 0 && s->ms >= IOS_SPIN_CPU_FIRST) { s->shots = 1; return 1; }
+    if (s->shots == 1 && s->ms >= IOS_SPIN_CPU_AGAIN) { s->shots = 2; return 2; }
+    return 0;
+}
+
 /* One report in, 0 (nothing), 1 (first look) or 2 (second look) out. */
 static int ios_spin_step( struct ios_spin_state *s, double rate, uint64_t top, double share )
 {
@@ -1698,6 +1722,8 @@ static void ios_spin_where( const struct ios_xp_mod *mods, int n, uint64_t a, ch
     snprintf( out, cap, "no module" );
 }
 
+static const char *ios_spin_cpu_why;   /* madeira-bcd (round 624): the CPU-streak look's own header (ios_spin_capture_cpu) */
+
 static void ios_spin_capture( const char *wall, int look, double rate, double share, int streak, uint64_t top, const char *top_sym )
 {
     extern int ios_jit_pool_image_pc( uintptr_t pc, uintptr_t *pe_addr_out );
@@ -1706,9 +1732,13 @@ static void ios_spin_capture( const char *wall, int look, double rate, double sh
     thread_act_array_t tl; mach_msg_type_number_t tc; unsigned k; int seen = 0;
     static struct ios_xp_mod mods[160];
 
-    wine_log_write( "[spin] ml1140 %s look %d: x64->EC %.0f/s, %.0f%% of the sampled calls for %d s go to %s (0x%llx)%s",
-                    wall, look, rate, share * 100.0, streak, top_sym, (unsigned long long)top,
-                    ios_lean_diag ? "; MADEIRA_LEAN_DIAG: no thread is looked at" : "" );
+    if (ios_spin_cpu_why)
+        wine_log_write( "[spin] ml1140 %s look %d (cpu): %s%s", wall, look, ios_spin_cpu_why,
+                        ios_lean_diag ? "; MADEIRA_LEAN_DIAG: no thread is looked at" : "" );
+    else
+        wine_log_write( "[spin] ml1140 %s look %d: x64->EC %.0f/s, %.0f%% of the sampled calls for %d s go to %s (0x%llx)%s",
+                        wall, look, rate, share * 100.0, streak, top_sym, (unsigned long long)top,
+                        ios_lean_diag ? "; MADEIRA_LEAN_DIAG: no thread is looked at" : "" );
     if (ios_lean_diag) return;
     if (task_threads( mach_task_self(), &tl, &tc ) != KERN_SUCCESS) return;
     for (k = 0; k < tc && seen < 2; k++)
@@ -1834,6 +1864,22 @@ static void ios_spin_capture( const char *wall, int look, double rate, double sh
     vm_deallocate( mach_task_self(), (vm_address_t)tl, tc * sizeof(*tl) );
     if (!seen) wine_log_write( "[spin] ml1140 no Wine thread used 80%% of a core at this moment" );
 }
+
+/* madeira-bcd (round 624, agent D3 S8): the CPU-streak look: the same capture with its own header (the xprobe thread is the only caller, so the
+ * file-scope pointer is safe). */
+static void ios_spin_capture_cpu( const char *wall, int look, uint32_t wtid, double share, double ms )
+{
+    char why[200];
+
+    snprintf( why, sizeof(why), "Wine thread %04x used %.0f%% of a core for %.1f s with no frame presented and no other Wine thread above 20%%",
+              wtid, share * 100.0, ms / 1000.0 );
+    ios_spin_cpu_why = why;
+    ios_spin_capture( wall, look, 0.0, 0.0, (int)(ms / 1000.0), 0, "" );
+    ios_spin_cpu_why = NULL;
+}
+
+/* madeira-bcd (round 624, agent D3 S8): winemetal's count of every Present of the process (as signal_arm64_ios.c reads it). */
+extern uint64_t madeira_get_present_count( void ) __attribute__((weak_import));
 
 static void ios_xp_api_report( const char *wall, double wall_s )
 {
@@ -2933,6 +2979,25 @@ static void ios_xprobe_main( void )
             }
             gettimeofday( &tv, NULL ); localtime_r( &tv.tv_sec, &tmv );
             snprintf( wall, sizeof(wall), "%02d:%02d:%02d.%03d", tmv.tm_hour, tmv.tm_min, tmv.tm_sec, (int)(tv.tv_usec / 1000) );
+            {   /* madeira-bcd (round 624, agent D3 S8; MIO WNYFPB/24371V): one Wine thread pinned for seconds while no frame is presented and
+                 * the others are parked: the [spin] look (ios_spin_cpu_step) */
+                static struct ios_spin_cpu cpu_state;
+                int hot = 0, busy = 0, look;
+                uint32_t hot_wtid = 0;
+                double hot_share = 0;
+
+                for (i = 0; i < nrows; i++)
+                {
+                    double sh = dt_ms > 0 ? (rows[i].p_ms + rows[i].e_ms) / dt_ms : 0;
+
+                    if (!rows[i].wtid) continue;
+                    if (sh >= IOS_SPIN_CPU_HOT) { hot++; hot_wtid = rows[i].wtid; hot_share = sh; }
+                    else if (sh >= IOS_SPIN_CPU_BUSY) busy++;
+                }
+                look = ios_spin_cpu_step( &cpu_state, dt_ms, hot, busy, madeira_get_present_count ? madeira_get_present_count() : 0,
+                                          madeira_get_present_count != NULL );
+                if (look) ios_spin_capture_cpu( wall, look, hot_wtid, hot_share, cpu_state.ms );
+            }
             n = snprintf( line, sizeof(line),
                           "[xp] %s +%.2f dt=%.0f cpu=%.0f (thr %.0f) P=%.0f E=%.0f run=%.0f pgw=%.1f GHz P=%.2f E=%.2f Minst=%.0f IPC=%.2f mJ=%.0f pin=%llu rdKB=%llu fpMB=%llu",
                           wall, XP_MS( now - t_start ) / 1000.0, dt_ms, cpu, sum_thr_ms, pms, ems,
@@ -6283,6 +6348,19 @@ void server_init_process_done(void)
     }
     SERVER_END_REQ;
 
+#ifdef WINE_IOS
+    /* madeira-bcd (round 624, Metal Gear Solid V: Ground Zeroes, 7 logs of builds 574-623): the game's second copy of its own program
+     * got a non-zero status from init_process_done; the assert below aborted the boot thread and the exception dispatcher then recursed
+     * with RIP 0 until the thread's stack ran out (a 530-line cascade that never named the status). Say the status and end this
+     * pseudo-process alone; its parent sees a normal process exit with it. A boot that succeeds never comes here. */
+    if (status)
+    {
+        dprintf( STDERR_FILENO, "[Wine init_done] FAILED status=0x%08x pid=%04x tid=%04x section_state=0x%lx request_fd=%d -- this process "
+                 "cannot start; ending it alone (rev=r624)\n", status, HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess ),
+                 HandleToULong( NtCurrentTeb()->ClientId.UniqueThread ), (unsigned long)ios_section_state(), thread_data->request_fd );
+        abort_process( status );
+    }
+#endif
     assert( !status );
 #ifdef WINE_IOS
     /* On iOS, the parent's PE code (CreateProcessInternalW) should call

@@ -86,6 +86,29 @@ int main( void )
     for (i = 1; i <= 3; i++) ios_spin_step( &s, IOS_SPIN_RATE, 1, IOS_SPIN_SHARE );
     EXPECT( ios_spin_step( &s, IOS_SPIN_RATE, 1, IOS_SPIN_SHARE ) == 1, "exactly the rate and the share count" );
 
+    /* round 624 (agent D3 S8, MIO): the CPU-streak trigger */
+    {
+        struct ios_spin_cpu c;
+        int n, first = 0, second = 0, other = 0;
+
+        memset( &c, 0, sizeof(c) );
+        for (i = 0; i < 100; i++) EXPECT( ios_spin_cpu_step( &c, 320, 1, 0, 5000, 0 ) == 0, "no present counter: never" );
+        for (i = 0; i < 100; i++) EXPECT( ios_spin_cpu_step( &c, 320, 2, 0, 5000, 1 ) == 0 && c.ms == 0, "two hot threads: never" );
+        for (i = 0; i < 100; i++) EXPECT( ios_spin_cpu_step( &c, 320, 1, 1, 5000, 1 ) == 0 && c.ms == 0, "another busy thread: never" );
+        for (i = 0; i < 100; i++) EXPECT( ios_spin_cpu_step( &c, 320, 1, 0, 99, 1 ) == 0 && c.ms == 0, "under 100 frames presented: never" );
+        for (n = 1; n <= 200; n++)
+        {
+            int r = ios_spin_cpu_step( &c, 320, 1, 0, 5000, 1 );
+            if (r == 1 && !first) first = n; else if (r == 2 && !second) second = n; else if (r) other++;
+        }
+        EXPECT( first == 13 && second == 63 && other == 0, "a pinned thread with no frame: the first look at 4.16 s, the second at 20.16 s, no more" );
+        memset( &c, 0, sizeof(c) );
+        for (n = 1; n <= 12; n++) ios_spin_cpu_step( &c, 320, 1, 0, 5000, 1 );
+        EXPECT( ios_spin_cpu_step( &c, 320, 1, 0, 5001, 1 ) == 0 && c.ms == 0, "a frame presented ends the streak" );
+        for (n = 1; n <= 12; n++) EXPECT( ios_spin_cpu_step( &c, 320, 1, 0, 5001, 1 ) == 0, "...and it starts again from 0" );
+        EXPECT( ios_spin_cpu_step( &c, 320, 1, 0, 5001, 1 ) == 1, "...the 13th sample of the new streak is the look" );
+    }
+
     /* return addresses */
     EXPECT( kind( "90 90 90 e8 10 20 30 40" ) && !strcmp( kind( "90 90 90 e8 10 20 30 40" ), "call rel32" ), "E8 rel32 (v-5)" );
     EXPECT( kind( "00 00 00 00 00 00 ff d0" ) != NULL, "FF D0: call rax" );
@@ -131,9 +154,21 @@ with tempfile.TemporaryDirectory() as t:
 # ------------------------------------------------------------------ 2. wiring
 cap = func(src, "static void ios_spin_capture(")
 rep = func(src, "static void ios_xp_api_report(")
-check("the look is taken only where ios_spin_step says so (one call of each, in the xprobe's report)",
-      src.count("ios_spin_step( &spin_state") == 1 and src.count("ios_spin_capture( wall, look,") == 1
-      and rep.index("int look = ios_spin_step") < rep.index("ios_spin_capture( wall, look,"))
+check("the look is taken only where ios_spin_step says so (one call of each, in the xprobe's report; round 624: plus the CPU-streak wrapper's)",
+      src.count("ios_spin_step( &spin_state") == 1 and src.count("ios_spin_capture( wall, look,") == 2
+      and rep.index("int look = ios_spin_step") < rep.index("ios_spin_capture( wall, look,")
+      and "ios_spin_capture( wall, look, 0.0, 0.0, (int)(ms / 1000.0), 0, \"\" );" in func(src, "static void ios_spin_capture_cpu("))
+xp = func(src, "static void *ios_xprobe_main(") if "static void *ios_xprobe_main(" in src else src
+check("round 624 (D3 S8, MIO): the CPU-streak look is taken only where ios_spin_cpu_step says so, with the present counter (a weak import) "
+      "and the Wine threads' shares of the interval",
+      src.count("ios_spin_cpu_step( &cpu_state") == 1 and src.count("ios_spin_capture_cpu( wall, look,") == 1
+      and src.index("look = ios_spin_cpu_step( &cpu_state") < src.index("if (look) ios_spin_capture_cpu( wall, look, hot_wtid, hot_share, cpu_state.ms );")
+      and "extern uint64_t madeira_get_present_count( void ) __attribute__((weak_import));" in src
+      and "madeira_get_present_count ? madeira_get_present_count() : 0,\n                                          madeira_get_present_count != NULL );" in src
+      and "if (sh >= IOS_SPIN_CPU_HOT) { hot++; hot_wtid = rows[i].wtid; hot_share = sh; }" in src
+      and "if (!rows[i].wtid) continue;" in src)
+check("the CPU-streak look has a header of its own and keeps MADEIRA_LEAN_DIAG's meaning",
+      '"[spin] ml1140 %s look %d (cpu): %s%s"' in cap and cap.index("if (ios_spin_cpu_why)") < cap.index("if (ios_lean_diag) return;"))
 check("the report hands the step two numbers it already has (rate, top target and its share): no new counter, no per-call work",
       "ios_spin_step( &spin_state, got_fex && have_fex ? ecc / dt : 0.0, spin_top, spin_share )" in rep
       and "if (!shown) { spin_top = best; spin_share = (double)bestn / (double)newn; }" in rep)
@@ -158,7 +193,7 @@ check("every read of the target's memory goes through vm_read_overwrite (ios_ts_
 check("at most 12 return addresses, each only when a CALL precedes it",
       "shown < 12" in cap and "ios_spin_call_kind( before )" in cap)
 check("the new code never touches a thread, a lock or the log outside the report's thread (no hook in the sampler or the game)",
-      "ios_spin_" not in src[:src.index("static int ios_xp_cmp_u64")] and src.count("ios_spin_capture(") == 2)  # definition + one call
+      "ios_spin_" not in src[:src.index("static int ios_xp_cmp_u64")] and src.count("ios_spin_capture(") == 3)  # definition + the rate look + the CPU-streak look (round 624)
 
 # ------------------------------------------------------------------ 3. compile (optional)
 wine = None

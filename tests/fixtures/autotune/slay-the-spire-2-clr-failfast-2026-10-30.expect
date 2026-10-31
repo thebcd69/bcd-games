@@ -1,0 +1,17 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "godot-d3d12-composition-swapchain",
+  "dotnet-wx-off-failfast"
+ ],
+ "next": [
+  "env.MADEIRA_DXGI_SRC = 1",
+  "env.MADEIRA_DXGI_COMPOSITION = 1",
+  "env.MADEIRA_OPTIN_DLLS = dcomp"
+ ],
+ "note": "Slay the Spire 2 (Steam 2868840, Godot 4.5 + .NET 9.0.7), build 623, iPhone15,2 (Send Log ZXCXT5): after the composition swap chain the runtime commits PAGE_EXECUTE_READ memory for the executable view of its write-xor-execute double mapping and fails fast (c0000602, kernelbase.dll+0x839a0 from coreclr.dll+0x32547a) right after the GC's region range, the termination frame of Quaver's readable write-barrier assertion; the session had no env.DOTNET_EnableWriteXorExecute line. Next the composition lines (rule godot-d3d12-composition-swapchain, priority 8), then env.DOTNET_EnableWriteXorExecute = 0 (rule dotnet-wx-off-failfast). Not tried on a device yet",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

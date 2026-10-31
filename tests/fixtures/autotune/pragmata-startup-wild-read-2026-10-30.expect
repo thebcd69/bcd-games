@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "pragmata-startup-wild-read"
+ ],
+ "next": [],
+ "note": "PRAGMATA (Steam 3357650, RE Engine), build 623, iPhone19,4 (Send Log NGEDJT): with exe-window-mb and env.MADEIRA_X64_IMAGE_NOCOPY = 1 (kept by auto-tune) the 372 MiB program loads at 0x140000000 and its TLS callbacks run; under a second later it reads a wild pointer inside its own obfuscated start-up code (an export resolver hashing ntdll's names), before any engine code or Direct3D call. Known verdict, no line (rule pragmata-startup-wild-read)",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "known"
+}

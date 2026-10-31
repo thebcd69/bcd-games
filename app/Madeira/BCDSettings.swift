@@ -32,6 +32,8 @@ import UIKit
     var developer: any BCDDeveloperBackend
     var vcRuntime: any BCDVCRuntimeBackend
     var gecko: any BCDGeckoBackend
+    /// Round 625 (the owner's item 26): Microsoft's 32-bit MFC, a second group on the Visual C++ page; nil: the page has the 64-bit one only.
+    var vcRuntime32: (any BCDVCRuntimeBackend)? = nil
     /// Sections built elsewhere (Accounts, JIT, BCD Dock, Visual C++ runtime), wired in here:
     /// each draws its whole page beside the list (scrolling and title included). Controls
     /// that use `.bcdSettingsControl` are walked row by row; plain `.bcdFocusable` ones by the
@@ -779,7 +781,7 @@ struct BCDSettingsDetail: View {
     @ViewBuilder private var content: some View {
         switch section {
         case .accounts, .jit, .dock: BCDSettingsPlaceholder(section: section)
-        case .vcruntime: Self.vcRuntime(model.backends.vcRuntime)
+        case .vcruntime: Self.vcRuntime(model.backends.vcRuntime, model.backends.vcRuntime32)
         case .gecko: Self.gecko(model.backends.gecko)
         case .memory: Self.memory(model.backends.memory)
         case .graphics: Self.graphics(model.backends.graphics)
@@ -806,7 +808,17 @@ struct BCDSettingsDetail: View {
     private static func allSettings(_ backend: some BCDAllSettingsBackend) -> AnyView { AnyView(BCDAllSettings(backend: backend)) }
     private static func about(_ backend: some BCDAboutBackend) -> AnyView { AnyView(BCDAboutSettings(backend: backend)) }
     private static func developer(_ backend: some BCDDeveloperBackend) -> AnyView { AnyView(BCDDeveloperSettings(backend: backend)) }
-    private static func vcRuntime(_ backend: some BCDVCRuntimeBackend) -> AnyView { AnyView(BCDVCRuntimeSettings(backend: backend)) }
+    private static func vcRuntime(_ backend: some BCDVCRuntimeBackend, _ mfc32: (any BCDVCRuntimeBackend)?) -> AnyView {
+        guard let mfc32 else { return AnyView(BCDVCRuntimeSettings(backend: backend)) }
+        return vcRuntime(backend, mfc32: mfc32)
+    }
+    /// Round 625 (the owner's item 26): the 64-bit runtime, then the 32-bit MFC under it on the same page.
+    private static func vcRuntime(_ backend: some BCDVCRuntimeBackend, mfc32: some BCDVCRuntimeBackend) -> AnyView {
+        AnyView(VStack(alignment: .leading, spacing: 18) {
+            BCDVCRuntimeSettings(backend: backend)
+            BCDMFC32Settings(backend: mfc32)
+        })
+    }
     private static func gecko(_ backend: some BCDGeckoBackend) -> AnyView { AnyView(BCDGeckoSettings(backend: backend)) }
 }
 

@@ -1,0 +1,188 @@
+[10:19:51.945] [INFO] Checking entitlements...
+[10:19:51.946] [INFO] [build] v0.1.623 (623)
+[10:19:51.949] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11695MB available=8170MB cores=6
+[10:19:51.949] [INFO] [device] address-map=[0x1029d8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[10:19:51.973] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:20:19.686] [INFO] Requesting JIT with Built-in StikJIT...
+[10:20:21.017] [INFO] [bcd] library launch UbisoftConnect.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[10:20:21.056] [INFO] Running full Wine sequence...
+[10:20:21.056] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1029d8000,0x8000000000) 512GB available=8147MB low-power=0 thermal=nominal
+[10:20:21.063] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:20:21.063] [INFO] Allocating 896MB JIT pool via debugger...
+[10:20:21.064] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:20:21.064] [INFO] [jit-debugger] attached=1 at the pool request
+[10:20:21.066] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:20:21.787] [INFO] RX pool at 0x148000000
+[10:20:21.804] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.791s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7544 MB + phys_footprint=647 MB = 8192 MB (hw.memsize says 11695 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x25000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[footprint] rev=ml358 phys=660 MB (peak 660) internal=659 MB compressed=0 MB external=74 MB reusable=15 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[free-delay] #1 release of 0x7025120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7025220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7025420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7025820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7026020000+0xfd0000 held for 2000 ms (5 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x1057b0d00)
+D 24 Load module UbisoftConnect.exe (ubisoftconnect.exe-95ae380368e0333c): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280d9f53b): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5ab9b7d7): 717B9F0000
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717ade0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7027140000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+ml957: ? backing 0x717adb8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[phase] spawn:L"C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe" t+  1.264s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe\" -upc_desktop_mode " (fd=90, unixdir=93, dup_unixdir=97) cwd=L"C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=borrowed
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+ml957: ? backing 0x7203078000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #6 release of 0x70272c0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7101580000+0x100000 held for 2000 ms (7 in flight)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=171
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=171
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[nls-getptr] type=11 id=437 peb=0x7200310000
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (upc.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[file-fail] ml665 #51 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14bfac000)
+[free-delay] #8 release of 0x7028cc0000+0x100000 held for 2000 ms (8 in flight)
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=437 peb=0x7200310000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14c042000)
+ml957: ? backing 0x727b878000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14c061000)
+ml957: ? backing 0x727b654000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x14c07f000)
+ml985: map_image_view size=0xbc62000 base=0x726f880000 info_base=0x10000000 map_addr=0x6f880000 flags=0x4 charact=0x2122 limits=0x7200110000..0x72ffff0000
+D 2C Load module libcef.dll (libcef.dll-868bf8e2316fb3ef): 726F880000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14c097000)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x14c0c7000)
+ml957: ? backing 0x726f060000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x726e580000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x726e498000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module IMM32.dll (imm32.dll-d32574d787cca9a2): 726E480000
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+D 2C Load module Kerberos.dll (kerberos.dll-a465a4dc50344d0c): 726E460000
+D 2C Load module MSV1_0.dll (msv1_0.dll-fe14d41517692ae9): 726E460000
+ml957: ? backing 0x726e44c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module netapi32.dll (netapi32.dll-67f045b4a9a70ff4): 726E430000
+ml957: ? backing 0x726e414000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module netutils.dll (netutils.dll-77547757313a186e): 726E410000
+ml957: ? backing 0x726e464000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module bcryptprimitives.dll (bcryptprimitives.dll-b0bb10acd9b6da6a): 726E460000
+[alloc-fail] ml814 #1 status=c0000018 hint=0x72efef0000 size=0x10000 type=0x2000 protect=0x1 tid=002c | STAGE=none err=3 at 0x7200000000+0x100004000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=upc.exe tid=002c size=0x10000 type=0x2000 prot=0x1 hint=0x72efef0000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #2 status=c0000018 hint=0x72eff00000 size=0x10000 type=0x2000 protect=0x1 tid=002c | STAGE=none err=3 at 0x7200000000+0x100004000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=upc.exe tid=002c size=0x10000 type=0x2000 prot=0x1 hint=0x72eff00000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #3 status=c0000018 hint=0x72eff10000 size=0x10000 type=0x2000 protect=0x1 tid=002c | STAGE=none err=3 at 0x7200000000+0x100004000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=upc.exe tid=002c size=0x10000 type=0x2000 prot=0x1 hint=0x72eff10000 zb=0xffffffff hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x72eff20000 size=0x10000 type=0x2000 protect=0x1 tid=002c | STAGE=none err=3 at 0x7200000000+0x100004000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=upc.exe tid=002c size=0x10000 type=0x2000 prot=0x1 hint=0x72eff20000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+E 2C Unknown ALU Op: 0x11
+E 2C Unknown ALU Op: 0x16
+E 2C Unknown ALU Op: 0x15
+E 2C Unknown ALU Op: 0x16
+E 2C Unknown ALU Op: 0x15
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[stale-heal]   3 slot(s) in the copy of 0x70ff250000 (libwow64fex.dll) -> 0x14b6fb294 for peb=0x7200310000 (owner=0x0 mapper=0x7200310000)
+E 2C Unknown ALU Op: 0x14
+E 2C [iOS-noexec] status=PARTIAL BlockEntry=0x1fe6ecf GuestRIP=0x1fe6e8b repeat=1 rev=ml486
+[xp-names] m793380 "wine-x18-exc"
+E 2C [iOS-noexec] status=PARTIAL BlockEntry=0x1fe6ecf GuestRIP=0x1fe6e7d repeat=1 rev=ml486
+[int3-guest] guest_rip=0x29490cb x28=0x7c09001140 read=1 rev=ml554
+[int3-guest]   ASCII x14 = "`>P.|..."  <== text in a register
+[int3-guest]   ASCII x15 = "`>P.|..."  <== text in a register
+[store-undecoded] #1 rev=ml350 insn=0xd4200000 pc=0x16bff8318 addr=0x16bff8318 rw_addr=0x7023ff8318 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=1 rip=0x0 pc=0x16bff8318 addr=0x16bff8318 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x16bff8000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16bff8318 addr=0x16bff8318 x18=0x7200300000 type=6 lr=0x16bff8260 sp=0x7028b9f350 x16=0x14b701ef0 x17=0x7028b9ee80
+[guest-code] rev=ml333 pool_rip=0x29490cb (PE 0x29490cb) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x387f35c x9=0x387fb54 x10=0xffffffff x11=0x1e4c x0=0x7c09001380 x2=0x7c08398fc0 | teb=0x7200300000 peb=0x7200310000 peb->EcCodeBitMap=0x0
+[fault-host] 16bff8218: d61f0000 d53b4400 927df000 d51b4400 d53b4200 b9040b80 a9021f84 a9031b85
+[fault-host] 16bff8238: a9042788 a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14 58010ee0 aa1c03e1
+[fault-host] 16bff8258: 58010f64 d63f0080 d2c00e53 b9440b84 d51b4204 d53b4404 b27f0484 b943cf87
+[fault-host] 16bff8278: b34618e4 d51b4404 91070384 4cdf2c90 4cdf2c94 a9421f84 a9431b85 a9442788
+[fault-host] 16bff8298: a9452f8a 29426f9a d61f0000 d4400000 d4400000 d53b4400 927df000 d51b4400
+[fault-host] 16bff82b8: d53b4200 b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380
+[fault-host] 16bff82d8: 4c9f2c10 4c9f2c14 d4400000 d53b4400 927df000 d51b4400 d53b4200 b9040b80
+[fault-host] 16bff82f8: a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14
+[fault-host] 16bff8318: d4200000 d53b4400 927df000 d51b4400 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 91070380 4c9f2c10 4c9f2c14 [d4200000] d53b4400 927df000 d51b4400
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x14b91c5f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x14b91c57c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x14b91c574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7200300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[stale-heal]   1 slot(s) in the copy of 0x70ff250000 (libwow64fex.dll) -> 0x14bd3bea4 for peb=0x7200310000 (owner=0x0 mapper=0x7200310000)
+E 2C Unknown ALU Op: 0x16
+E 2C Unknown ALU Op: 0x11
+E 2C Unknown ALU Op: 0x15
+E 2C Unknown ALU Op: 0x14
+E 2C Unknown ALU Op: 0x11
+E 2C Unknown ALU Op: 0x14
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xdeadc0de) syscalls=0 unix_calls=915
+[Wine ntdll/server] process_exit_wrapper(-559038242): closing child fd_socket=96
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(-559038242)
+[Wine child thread] child exited with code -559038242
+[WineProc] stopping wineserver...
+[footprint] rev=ml358 phys=1051 MB (peak 1051) internal=1049 MB compressed=0 MB external=87 MB reusable=15 MB (cycle=2)
+[10:20:24.556] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=1051MB limit=8191MB thermal=nominal lpm=0 api=D3D9/OpenGL/32 res=1408x648 cap=60 game=UbisoftConnect
+[frontend] returned to library
+[footprint] rev=ml358 phys=1060 MB (peak 1060) internal=1058 MB compressed=0 MB external=89 MB reusable=14 MB (cycle=3)
+[10:20:26.387] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1060 MB (peak 1060) internal=1058 MB compressed=0 MB external=89 MB reusable=14 MB (cycle=4)
+[footprint] rev=ml358 phys=1060 MB (peak 1060) internal=1058 MB compressed=0 MB external=111 MB reusable=19 MB (cycle=5)
+[footprint] rev=ml358 phys=1061 MB (peak 1061) internal=1060 MB compressed=0 MB external=113 MB reusable=19 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dce1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1063 MB (peak 1063) internal=1062 MB compressed=0 MB external=128 MB reusable=19 MB (cycle=12)
+[footprint] rev=ml358 phys=1064 MB (peak 1064) internal=1063 MB compressed=0 MB external=128 MB reusable=19 MB (cycle=13)
+[footprint] rev=ml358 phys=1064 MB (peak 1064) internal=1063 MB compressed=0 MB external=128 MB reusable=19 MB (cycle=14)
+[footprint] rev=ml358 phys=1064 MB (peak 1064) internal=1063 MB compressed=0 MB external=128 MB reusable=19 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=16 resident=1211MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1064 MB (peak 1064) internal=1063 MB compressed=0 MB external=129 MB reusable=19 MB (cycle=16)
+[footprint] rev=ml358 phys=1064 MB (peak 1064) internal=1063 MB compressed=0 MB external=129 MB reusable=19 MB (cycle=17)

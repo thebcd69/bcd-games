@@ -1910,6 +1910,65 @@ NTSTATUS WINAPI NtCreateThread( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRI
     return STATUS_NOT_IMPLEMENTED;
 }
 
+/* madeira-bcd (round 624, agent N S9; Diablo II: Resurrected 2T02WX: thread 0xd8, created by 0xb8 with start 0x71f30763f0, faulted
+ * at its first run with x18 = 0 inside the ARM64EC dispatcher, and the log could not say more about it): who created each thread,
+ * with what start routine, parameter and stack, in a ring of the last 256 threads; ios_thread_origin_report prints the record of a
+ * thread once ([thread-origin]) when its fault is reported with x18 = 0 (signal_arm64_ios.c's [x18-decline]). Log only. */
+struct ios_thread_origin
+{
+    unsigned int tid, creator, ms;
+    int printed;
+    void *start, *param, *stack_lo, *stack_hi;
+};
+#define IOS_THREAD_ORIGIN_N 256
+static struct ios_thread_origin ios_thread_origins[IOS_THREAD_ORIGIN_N];
+static unsigned int ios_thread_origin_pos;
+
+static unsigned int ios_thread_origin_ms( void )
+{
+    struct timespec ts;
+    clock_gettime( CLOCK_MONOTONIC, &ts );
+    return (unsigned int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
+
+static void ios_thread_origin_note( unsigned int tid, PRTL_THREAD_START_ROUTINE start, void *param, TEB *teb )
+{
+    struct ios_thread_origin *o =
+        &ios_thread_origins[__atomic_fetch_add( &ios_thread_origin_pos, 1, __ATOMIC_RELAXED ) % IOS_THREAD_ORIGIN_N];
+    TEB *self = NtCurrentTeb();
+
+    __atomic_store_n( &o->tid, 0, __ATOMIC_RELAXED );   /* not valid while it is written */
+    o->creator = self ? (unsigned int)HandleToULong( self->ClientId.UniqueThread ) : 0;
+    o->start = (void *)start;
+    o->param = param;
+    o->stack_lo = teb->DeallocationStack;
+    o->stack_hi = teb->Tib.StackBase;
+    o->ms = ios_thread_origin_ms();
+    o->printed = 0;
+    __atomic_store_n( &o->tid, tid, __ATOMIC_RELEASE );
+}
+
+void ios_thread_origin_report( unsigned int tid )
+{
+    unsigned int end = __atomic_load_n( &ios_thread_origin_pos, __ATOMIC_RELAXED ), i;
+    static unsigned int missing;
+
+    if (!tid) return;
+    for (i = end; i-- > 0 && end - i <= IOS_THREAD_ORIGIN_N; )
+    {
+        struct ios_thread_origin *o = &ios_thread_origins[i % IOS_THREAD_ORIGIN_N];
+        if (__atomic_load_n( &o->tid, __ATOMIC_ACQUIRE ) != tid) continue;
+        if (__atomic_exchange_n( &o->printed, 1, __ATOMIC_RELAXED )) return;
+        dprintf( 2, "[thread-origin] rev=624 tid=%04x created by tid %04x %u ms ago: start=%p param=%p stack %p-%p "
+                    "(its fault was reported with x18 = 0)\n", tid, o->creator, ios_thread_origin_ms() - o->ms, o->start,
+                 o->param, o->stack_lo, o->stack_hi );
+        return;
+    }
+    if (__atomic_add_fetch( &missing, 1, __ATOMIC_RELAXED ) <= 4)
+        dprintf( 2, "[thread-origin] rev=624 tid=%04x: no creation record (not created by NtCreateThreadEx in this process, "
+                    "or before the last %u threads)\n", tid, IOS_THREAD_ORIGIN_N );
+}
+
 /***********************************************************************
  *              NtCreateThreadEx   (NTDLL.@)
  */
@@ -2098,6 +2157,7 @@ NTSTATUS WINAPI NtCreateThreadEx( HANDLE *handle, ACCESS_MASK access, OBJECT_ATT
     thread_data->request_fd  = request_pipe[1];
     thread_data->start = start;
     thread_data->param = param;
+    ios_thread_origin_note( tid, start, param, teb );   /* madeira-bcd (round 624, N S9): log only */
 
     pthread_attr_init( &pthread_attr );
     pthread_attr_setstack( &pthread_attr, thread_data->kernel_stack, kernel_stack_size );
@@ -2428,24 +2488,181 @@ static void ios_sd_object( const char *name )
     else SD_ERR( "[steam-api]   %s: not opened, status %#x\n", name, (unsigned int)status );
 }
 
-static void ios_steam_api_diag( void )
+/* round 624 (agent R, Steam 113: 5T9WRM, AX6XNN): the report did not show what decides a 113. Its "HKLM(32)" reads opened
+ * \Registry\Machine\Software\Valve\Steam with KEY_WOW64_32KEY, which the wineserver drops for a process that is not WoW64
+ * (server/registry.c, create_key/open_key): in the 64-bit Rockstar Launcher that was the 64-bit key, so "SteamPID: no value" in
+ * 75 of 75 64-bit reports said nothing (the Dock writes the 32-bit view, which kernelbase opens as the Wow6432Node child). The
+ * helpers below read that child by its literal path, the keys' last-write times, every named object with "steam" in its name,
+ * the Steam process's image and age, and which client files exist. Reads only, still at most two reports per process. */
+static void ios_sd_wide( const char *s, WCHAR *w, size_t cap, UNICODE_STRING *us )
 {
-    static LONG told;
+    size_t i;
+
+    for (i = 0; s[i] && i + 1 < cap; i++) w[i] = (unsigned char)s[i];
+    w[i] = 0;
+    us->Buffer = w;
+    us->Length = us->MaximumLength = (USHORT)(i * sizeof(WCHAR));
+}
+
+/* A wide string as printable ASCII; with tail set, the last cap - 1 characters (a path's end names the file). */
+static void ios_sd_ascii( const WCHAR *w, ULONG chars, char *out, size_t cap, int tail )
+{
+    ULONG i, n = chars, from = 0;
+
+    if (n > cap - 1) { if (tail) from = n - (ULONG)(cap - 1); n = (ULONG)(cap - 1); }
+    for (i = 0; i < n; i++)
+    {
+        WCHAR c = w[from + i];
+        out[i] = (c >= 32 && c < 127) ? (char)c : '?';
+    }
+    out[n] = 0;
+}
+
+static void ios_sd_key_age( const char *path, const char *label )
+{
+    union { KEY_BASIC_INFORMATION info; char raw[sizeof(KEY_BASIC_INFORMATION) + 256]; } buf;
+    LARGE_INTEGER now;
+    HANDLE key = 0;
+    ULONG len = 0;
+    NTSTATUS status = ios_sd_key( path, KEY_WOW64_64KEY, &key );
+
+    if (status)
+    {
+        SD_ERR( "[steam-api]   %s: key not opened, status %#x\n", label, (unsigned int)status );
+        return;
+    }
+    memset( &buf, 0, sizeof(buf) );
+    status = NtQueryKey( key, KeyBasicInformation, &buf, sizeof(buf), &len );
+    NtClose( key );
+    if (status)
+    {
+        SD_ERR( "[steam-api]   %s: last write not read, status %#x\n", label, (unsigned int)status );
+        return;
+    }
+    NtQuerySystemTime( &now );
+    SD_ERR( "[steam-api]   %s: last written %lld ms ago\n", label,
+            (long long)((now.QuadPart - buf.info.LastWriteTime.QuadPart) / 10000) );
+}
+
+/* The text of a REG_SZ / REG_EXPAND_SZ value (printable ASCII), or "" when there is none. */
+static int ios_sd_read_sz( const char *path, const char *vname, char *out, size_t cap )
+{
+    union { KEY_VALUE_PARTIAL_INFORMATION info; char raw[sizeof(KEY_VALUE_PARTIAL_INFORMATION) + 520]; } buf;
+    WCHAR wide[64];
+    UNICODE_STRING name;
+    HANDLE key = 0;
+    ULONG len = 0;
+
+    out[0] = 0;
+    if (ios_sd_key( path, 0, &key )) return 0;
+    ios_sd_wide( vname, wide, 64, &name );
+    memset( &buf, 0, sizeof(buf) );
+    if (!NtQueryValueKey( key, &name, KeyValuePartialInformation, &buf, sizeof(buf), &len ) &&
+        (buf.info.Type == REG_SZ || buf.info.Type == REG_EXPAND_SZ))
+    {
+        const WCHAR *w = (const WCHAR *)buf.info.Data;
+        ULONG n = buf.info.DataLength / sizeof(WCHAR);
+
+        while (n && !w[n - 1]) n--;
+        ios_sd_ascii( w, n, out, cap, 0 );
+    }
+    NtClose( key );
+    return out[0] != 0;
+}
+
+/* Whether the client file exists under the Steam folder (forward slashes, which SteamPath uses, become backslashes). */
+static void ios_sd_file( const char *dir, const char *file )
+{
+    WCHAR wide[200];
+    char path[200];
+    UNICODE_STRING us;
+    OBJECT_ATTRIBUTES attr;
+    FILE_BASIC_INFORMATION info;
+    NTSTATUS status;
+    size_t i;
+
+    snprintf( path, sizeof(path), "\\??\\%s\\%s", dir, file );
+    for (i = 0; path[i]; i++) if (path[i] == '/') path[i] = '\\';
+    ios_sd_wide( path, wide, 200, &us );
+    InitializeObjectAttributes( &attr, &us, OBJ_CASE_INSENSITIVE, NULL, NULL );
+    status = NtQueryAttributesFile( &attr, &info );
+    if (status) SD_ERR( "[steam-api]   file <SteamPath>\\%s: missing, status %#x\n", file, (unsigned int)status );
+    else SD_ERR( "[steam-api]   file <SteamPath>\\%s: present\n", file );
+}
+
+static int ios_sd_has_steam( const char *s )
+{
+    for (; *s; s++)
+        if ((s[0] | 0x20) == 's' && (s[1] | 0x20) == 't' && (s[2] | 0x20) == 'e' && (s[3] | 0x20) == 'a' && (s[4] | 0x20) == 'm')
+            return 1;
+    return 0;
+}
+
+/* Every object in \BaseNamedObjects whose name contains "steam" (any case), with its type: the report used to try two guessed
+ * names only, so what the real client creates was unknown. One entry per call; at most 8192 entries looked at, 24 printed. */
+static void ios_sd_steam_objects( void )
+{
+    union { DIRECTORY_BASIC_INFORMATION info; char raw[1024]; } buf;
+    WCHAR wide[32];
+    UNICODE_STRING us;
+    OBJECT_ATTRIBUTES attr;
+    HANDLE dir = 0;
+    ULONG context = 0, len = 0, seen = 0, hits = 0;
+    NTSTATUS status;
+
+    ios_sd_wide( "\\BaseNamedObjects", wide, 32, &us );
+    InitializeObjectAttributes( &attr, &us, OBJ_CASE_INSENSITIVE, NULL, NULL );
+    status = NtOpenDirectoryObject( &dir, DIRECTORY_QUERY, &attr );
+    if (status)
+    {
+        SD_ERR( "[steam-api]   \\BaseNamedObjects: not opened, status %#x\n", (unsigned int)status );
+        return;
+    }
+    while (seen < 8192)
+    {
+        char name[80], type[24];
+
+        memset( &buf, 0, sizeof(buf) );
+        if (NtQueryDirectoryObject( dir, &buf.info, sizeof(buf), TRUE, seen == 0, &context, &len )) break;
+        seen++;
+        if (!buf.info.ObjectName.Buffer) continue;
+        ios_sd_ascii( buf.info.ObjectName.Buffer, buf.info.ObjectName.Length / sizeof(WCHAR), name, sizeof(name), 0 );
+        if (!ios_sd_has_steam( name )) continue;
+        if (buf.info.ObjectTypeName.Buffer)
+            ios_sd_ascii( buf.info.ObjectTypeName.Buffer, buf.info.ObjectTypeName.Length / sizeof(WCHAR), type, sizeof(type), 0 );
+        else strcpy( type, "?" );
+        if (hits++ < 24) SD_ERR( "[steam-api]   object \\BaseNamedObjects\\%s (%s)\n", name, type );
+    }
+    NtClose( dir );
+    SD_ERR( "[steam-api]   \\BaseNamedObjects: %u objects, %u with steam in the name%s\n", (unsigned int)seen,
+            (unsigned int)hits, hits > 24 ? " (the first 24 shown)" : "" );
+}
+
+static void ios_sd_report_body( void )
+{
     static const char active[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Valve\\Steam\\ActiveProcess";
     static const char user_steam[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Valve\\Steam";
     static const char machine_steam[] = "\\Registry\\Machine\\Software\\Valve\\Steam";
+    static const char machine_steam32[] = "\\Registry\\Machine\\Software\\Wow6432Node\\Valve\\Steam";
+    char steam_path[120];
     ULONG pid = 0;
 
-    if (InterlockedIncrement( &told ) > 2) return;
-    SD_ERR( "[steam-api] steam_api found no running Steam; process %04x sees:\n",
-               (unsigned int)HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess ) );
     ios_sd_value( active, 0, "pid", "HKCU ActiveProcess pid", 0, &pid );
     ios_sd_value( active, 0, "ActiveUser", "HKCU ActiveProcess ActiveUser", 1, NULL );
     ios_sd_value( active, 0, "SteamClientDll64", "HKCU ActiveProcess SteamClientDll64", 0, NULL );
     ios_sd_value( user_steam, 0, "SteamPath", "HKCU Steam SteamPath", 0, NULL );
-    ios_sd_value( machine_steam, KEY_WOW64_32KEY, "SteamPID", "HKLM(32) Steam SteamPID", 0, NULL );
-    ios_sd_value( machine_steam, KEY_WOW64_32KEY, "InstallPath", "HKLM(32) Steam InstallPath", 0, NULL );
-    ios_sd_value( machine_steam, KEY_WOW64_64KEY, "InstallPath", "HKLM(64) Steam InstallPath", 0, NULL );
+    ios_sd_value( user_steam, 0, "SteamExe", "HKCU Steam SteamExe", 0, NULL );
+    ios_sd_value( user_steam, 0, "SteamPID", "HKCU Steam SteamPID", 0, NULL );
+    ios_sd_value( user_steam, 0, "Language", "HKCU Steam Language", 0, NULL );
+    /* round 624: the 32-bit view by its literal path (the Dock's and kernelbase's), then the 64-bit view, each with its label */
+    ios_sd_value( machine_steam32, KEY_WOW64_64KEY, "SteamPID", "HKLM Wow6432Node Steam SteamPID", 0, NULL );
+    ios_sd_value( machine_steam32, KEY_WOW64_64KEY, "InstallPath", "HKLM Wow6432Node Steam InstallPath", 0, NULL );
+    ios_sd_value( machine_steam, KEY_WOW64_64KEY, "SteamPID", "HKLM 64-bit view Steam SteamPID", 0, NULL );
+    ios_sd_value( machine_steam, KEY_WOW64_64KEY, "InstallPath", "HKLM 64-bit view Steam InstallPath", 0, NULL );
+    ios_sd_key_age( machine_steam32, "HKLM Wow6432Node Valve\\Steam" );
+    ios_sd_key_age( machine_steam, "HKLM 64-bit view Valve\\Steam" );
+    ios_sd_key_age( user_steam, "HKCU Valve\\Steam" );
+    ios_sd_key_age( active, "HKCU Valve\\Steam\\ActiveProcess" );
     if (pid)
     {
         OBJECT_ATTRIBUTES attr;
@@ -2471,14 +2688,70 @@ static void ios_steam_api_diag( void )
             else
                 SD_ERR( "[steam-api]   OpenProcess(%u): opens, exit status %u (259 = still running)\n",
                            (unsigned int)pid, (unsigned int)pbi.ExitStatus );
+            {
+                /* round 624: which program the pid is, and since when */
+                union { UNICODE_STRING us; char raw[sizeof(UNICODE_STRING) + 520]; } img;
+                KERNEL_USER_TIMES times;
+                LARGE_INTEGER now;
+
+                memset( &img, 0, sizeof(img) );
+                if (!NtQueryInformationProcess( process, ProcessImageFileName, &img, sizeof(img), NULL ) && img.us.Buffer)
+                {
+                    char text[96];
+
+                    ios_sd_ascii( img.us.Buffer, img.us.Length / sizeof(WCHAR), text, sizeof(text), 1 );
+                    SD_ERR( "[steam-api]   process %u image: %s\n", (unsigned int)pid, text );
+                }
+                memset( &times, 0, sizeof(times) );
+                if (!NtQueryInformationProcess( process, ProcessTimes, &times, sizeof(times), NULL ) && times.CreateTime.QuadPart)
+                {
+                    NtQuerySystemTime( &now );
+                    SD_ERR( "[steam-api]   process %u started %lld ms ago\n", (unsigned int)pid,
+                            (long long)((now.QuadPart - times.CreateTime.QuadPart) / 10000) );
+                }
+            }
             NtClose( process );
         }
     }
     ios_sd_object( "\\BaseNamedObjects\\STEAM_DIPC_CONSUME" );
     ios_sd_object( "\\BaseNamedObjects\\STEAM_DIPC_PRODUCE" );
+    ios_sd_steam_objects();
+    if (ios_sd_read_sz( user_steam, "SteamPath", steam_path, sizeof(steam_path) ))
+    {
+        ios_sd_file( steam_path, "steamclient64.dll" );
+        ios_sd_file( steam_path, "steamclient.dll" );
+        ios_sd_file( steam_path, "steam.exe" );
+        ios_sd_file( steam_path, "Steam.dll" );
+    }
 }
 
-/* Whether this OutputDebugString exception carries steam_api's "no Steam running" text. */
+static void ios_steam_api_diag( void )
+{
+    static LONG told;
+
+    if (InterlockedIncrement( &told ) > 2) return;
+    SD_ERR( "[steam-api] steam_api found no running Steam; process %04x sees:\n",
+               (unsigned int)HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess ) );
+    ios_sd_report_body();
+}
+
+/* round 624 (agent R, Steam 113): the same report once a session when steam_api DID find the client ("SteamAPI_Init(): Loaded
+ * '...steamclient...' OK"), in a BCD Dock session only (MADEIRA_DOCK_SESSION=1: where the 113 happens), so a 113 log can be laid
+ * next to what a working start of the same launcher saw. No 113 log had anything to compare with. */
+static void ios_steam_api_ok( void )
+{
+    static LONG told;
+    const char *dock = getenv( "MADEIRA_DOCK_SESSION" );
+
+    if (!dock || dock[0] != '1') return;
+    if (InterlockedIncrement( &told ) > 1) return;
+    SD_ERR( "[steam-api] steam_api found Steam (state A, once a session); process %04x sees:\n",
+               (unsigned int)HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess ) );
+    ios_sd_report_body();
+}
+
+/* Whether this OutputDebugString exception carries steam_api's "no Steam running" text (1), or, since round 624, its "Loaded ...
+ * OK" text (2: Steam found, the state-A report); 0 otherwise. */
 static int ios_steam_api_message( const EXCEPTION_RECORD *rec )
 {
     char text[208];
@@ -2495,7 +2768,9 @@ static int ios_steam_api_message( const EXCEPTION_RECORD *rec )
     if (strstr( text, "SteamAPI_IsSteamRunning() did not locate a running instance" )) return 1;
     /* build 591: the older wording of the legacy SteamStub games ("[S_API FAIL] SteamAPI_Init() failed; unable to locate a running
      * instance of Steam, or a local steamclient.dll."; GTA: Vice City D938HM and V85VDT in the Dock). */
-    return !strncmp( text, "[S_API FAIL]", 12 ) && strstr( text, "unable to locate a running instance of Steam" ) != NULL;
+    if (!strncmp( text, "[S_API FAIL]", 12 ) && strstr( text, "unable to locate a running instance of Steam" )) return 1;
+    if (strstr( text, "SteamAPI_Init(): Loaded '" ) && strstr( text, "' OK" )) return 2;
+    return 0;
 }
 
 /* build 580: [steam-api] for 64-bit processes (Rockstar Games Launcher; RGM16D, 0YZKW6 and 20 of the 40 Rockstar sessions of the 577
@@ -2525,16 +2800,21 @@ void ios_steam_api_dbg_hook( const char *str, unsigned int len )
     static const char text[] = "SteamAPI_IsSteamRunning() did not locate a running instance";
     static const char old_fail[] = "[S_API FAIL]";   /* build 591: the older wording, with... */
     static const char old_text[] = "unable to locate a running instance of Steam";   /* ...this text */
+    static const char ok_text[] = "SteamAPI_Init(): Loaded '";   /* round 624: Steam found (with "' OK") */
     const char *colon;
+    size_t rest;
+    int fail;
 
     if (len < 100 || len > 400 || ios_sd_raw) return;
     colon = memchr( str, ':', 9 );     /* "tid:" ahead of the class */
     if (!colon || (size_t)(colon - str) + sizeof(tag) - 1 > len || memcmp( colon, tag, sizeof(tag) - 1 )) return;
-    if (!ios_sd_has( colon, len - (size_t)(colon - str), text, sizeof(text) - 1 ) &&
-        !(ios_sd_has( colon, len - (size_t)(colon - str), old_fail, sizeof(old_fail) - 1 ) &&
-          ios_sd_has( colon, len - (size_t)(colon - str), old_text, sizeof(old_text) - 1 ))) return;
+    rest = len - (size_t)(colon - str);
+    fail = ios_sd_has( colon, rest, text, sizeof(text) - 1 ) ||
+           (ios_sd_has( colon, rest, old_fail, sizeof(old_fail) - 1 ) && ios_sd_has( colon, rest, old_text, sizeof(old_text) - 1 ));
+    if (!fail && !(ios_sd_has( colon, rest, ok_text, sizeof(ok_text) - 1 ) && ios_sd_has( colon, rest, "' OK", 4 ))) return;
     ios_sd_raw = 1;
-    ios_steam_api_diag();
+    if (fail) ios_steam_api_diag();
+    else ios_steam_api_ok();
     ios_sd_raw = 0;
 }
 /* steam-api-diag-test:end */
@@ -2634,6 +2914,33 @@ static void ios_cxx_throw_diag( const EXCEPTION_RECORD *rec )
             ERR_(seh)( "[cxx-type]   ATL::CAtlException hr=%#lx\n", (unsigned long)hr );
         else if (strstr( first, "_com_error@@" ) && ios_cxx_read( obj + ptr, &hr, 4, guest32 ))
             ERR_(seh)( "[cxx-type]   _com_error hr=%#lx\n", (unsigned long)hr );
+        /* madeira-bcd (round 624, agent E2 X1, Amnesia W0BX37: "thrown .?AVlength_error@std@@" and nothing more): a standard library
+         * exception carries its message; MSVC's std::exception is { vtable; __std_exception_data { const char *_What; bool _DoFree; } }.
+         * The text, at most 80 characters, printable ASCII only. Log only. */
+        else if (strstr( first, "@std@@" ))
+        {
+            ULONG_PTR what = 0;
+            char text[81];
+            size_t k;
+
+            memset( text, 0, sizeof(text) );
+            if (ios_cxx_read( obj + ptr, &what, ptr, guest32 ) && what >= 0x10000 &&
+                (ios_cxx_read( what, text, 80, guest32 ) || ios_cxx_read( what, text, 16, guest32 )))
+            {
+                for (k = 0; k < 80 && text[k]; k++) if (text[k] < 0x20 || text[k] > 0x7e) text[k] = '?';
+                text[k] = 0;
+                ERR_(seh)( "[cxx-type]   what=\"%s\"\n", text );
+            }
+        }
+    }
+    /* madeira-bcd (round 624, X1): for the first 4 throws of a 32-bit guest, the thread's 32-bit registers and the return addresses on
+     * its stack (who threw: process_ios.c ios_wow32_stack_dump). Log only. */
+    if (guest32)
+    {
+        extern void ios_wow32_stack_dump( const char *tag );
+        static LONG stacks;
+
+        if (InterlockedIncrement( &stacks ) <= 4) ios_wow32_stack_dump( "throw" );
     }
 }
 
@@ -2642,10 +2949,70 @@ static void ios_cxx_throw_diag( const EXCEPTION_RECORD *rec )
 /*******************************************************************
  *		NtRaiseException (NTDLL.@)
  */
+#ifdef WINE_IOS
+/* madeira-bcd (round 624, agent E2 S2c; Slay the Spire 2 BMVD7C: .NET failed fast at start-up, and the [exc] line read the text it wrote
+ * just before with the wrong parameter layout): the last OutputDebugString texts of each process, printed only when the process ends on
+ * an unhandled exception (NtRaiseException's last lines). Nothing is read while it runs: a raise records the text's address and length,
+ * its process and thread (a few stores); the dump reads them back with fault-safe reads. DBG_PRINTEXCEPTION_WIDE_C carries { wide length,
+ * wide text, ANSI length, ANSI text } (Wine's OutputDebugStringW, kernelbase/debug.c), the ANSI copy is freed when the raise returns, so
+ * the caller's wide text is read; DBG_PRINTEXCEPTION_C carries { length, text }. */
+#define IOS_DBGPRINT_RING 16
+static struct ios_dbgprint { void *peb; ULONG_PTR text; ULONG_PTR len; unsigned int tid; int wide; } ios_dbgprint_ring[IOS_DBGPRINT_RING];
+static LONG ios_dbgprint_next;
+
+static void ios_dbgprint_keep( const EXCEPTION_RECORD *rec )
+{
+    struct ios_dbgprint *e;
+    int wide = rec->ExceptionCode == DBG_PRINTEXCEPTION_WIDE_C;
+
+    if (rec->NumberParameters < 2 || !rec->ExceptionInformation[1]) return;
+    e = &ios_dbgprint_ring[(InterlockedIncrement( &ios_dbgprint_next ) - 1) & (IOS_DBGPRINT_RING - 1)];
+    e->peb = NtCurrentTeb()->Peb;
+    e->tid = HandleToULong( NtCurrentTeb()->ClientId.UniqueThread );
+    e->text = rec->ExceptionInformation[1];
+    e->len = rec->ExceptionInformation[0];
+    e->wide = wide;
+}
+
+static void ios_dbgprint_dump( void )
+{
+    void *peb = NtCurrentTeb()->Peb;
+    LONG last = ios_dbgprint_next, i, shown = 0;
+
+    for (i = last - IOS_DBGPRINT_RING; i < last; i++)
+    {
+        struct ios_dbgprint e;
+        unsigned char raw[480];
+        char text[241];
+        mach_vm_size_t got = 0;
+        unsigned int n, k, len;
+
+        if (i < 0) continue;
+        e = ios_dbgprint_ring[i & (IOS_DBGPRINT_RING - 1)];
+        if (e.peb != peb || !e.text) continue;
+        len = e.len > 240 ? 240 : (unsigned int)e.len;
+        if (!len) continue;
+        n = e.wide ? len * 2 : len;
+        if (mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)e.text, n, (mach_vm_address_t)raw, &got ) != KERN_SUCCESS || !got)
+            continue;
+        for (k = 0; k < len && (e.wide ? 2 * k + 1 : k) < got; k++)
+        {
+            unsigned int c = e.wide ? (unsigned int)raw[2 * k] | ((unsigned int)raw[2 * k + 1] << 8) : raw[k];
+            if (!c) break;
+            text[k] = (c >= 0x20 && c < 0x7f) ? (char)c : (c == '\n' || c == '\r' || c == '\t') ? ' ' : '?';
+        }
+        text[k] = 0;
+        dprintf( 2, "[dbgprint-last] madeira-bcd #%d tid=%04x %s: %s\n", (int)++shown, e.tid, e.wide ? "OutputDebugStringW" : "OutputDebugStringA", text );
+    }
+}
+#endif
+
 NTSTATUS WINAPI NtRaiseException( EXCEPTION_RECORD *rec, CONTEXT *context, BOOL first_chance )
 {
     NTSTATUS status;
 #ifdef WINE_IOS
+    if (rec && (rec->ExceptionCode == DBG_PRINTEXCEPTION_WIDE_C || rec->ExceptionCode == DBG_PRINTEXCEPTION_C))
+        ios_dbgprint_keep( rec );   /* madeira-bcd (round 624, E2 S2c): the text's address only, read at an unhandled end */
     /* ml845: the engine's thread-naming exception is where a bogus "stack base"
      * reaches its per-thread state. Watch the slot across this dispatch. */
     if (rec && rec->ExceptionCode == 0x406D1388)
@@ -2724,8 +3091,14 @@ NTSTATUS WINAPI NtRaiseException( EXCEPTION_RECORD *rec, CONTEXT *context, BOOL 
     }
 #endif
 #ifdef WINE_IOS
-    /* madeira-bcd: [steam-api] (see ios_steam_api_diag): reads only, logs at most twice per process. */
-    if (rec && first_chance && ios_steam_api_message( rec )) ios_steam_api_diag();
+    /* madeira-bcd: [steam-api] (see ios_steam_api_diag): reads only, logs at most twice per process; round 624: once a Dock
+     * session also when steam_api found Steam (ios_steam_api_ok). */
+    if (rec && first_chance)
+    {
+        int steam = ios_steam_api_message( rec );
+        if (steam == 1) ios_steam_api_diag();
+        else if (steam == 2) ios_steam_api_ok();
+    }
 #endif
     status = send_debug_event( rec, context, first_chance, !(is_win64 || is_wow64() || is_old_wow64()) );
 
@@ -2769,6 +3142,16 @@ NTSTATUS WINAPI NtRaiseException( EXCEPTION_RECORD *rec, CONTEXT *context, BOOL 
     else
         ERR_(seh)("Unhandled exception code %x flags %x addr %p\n",
                   rec->ExceptionCode, rec->ExceptionFlags, rec->ExceptionAddress );
+#ifdef WINE_IOS
+    /* madeira-bcd (round 624, agent E2 S2c): the record's parameters (a fail-fast carries the runtime's own) and what the process
+     * wrote with OutputDebugString last (.NET's fatal error text). Log only, on the way out. */
+    dprintf( 2, "[unhandled] madeira-bcd code=%x nparams=%u p0=%lx p1=%lx p2=%lx p3=%lx\n", (unsigned int)rec->ExceptionCode,
+             (unsigned int)rec->NumberParameters, rec->NumberParameters > 0 ? (unsigned long)rec->ExceptionInformation[0] : 0UL,
+             rec->NumberParameters > 1 ? (unsigned long)rec->ExceptionInformation[1] : 0UL,
+             rec->NumberParameters > 2 ? (unsigned long)rec->ExceptionInformation[2] : 0UL,
+             rec->NumberParameters > 3 ? (unsigned long)rec->ExceptionInformation[3] : 0UL );
+    ios_dbgprint_dump();
+#endif
 
     NtTerminateProcess( NtCurrentProcess(), rec->ExceptionCode );
     return STATUS_SUCCESS;

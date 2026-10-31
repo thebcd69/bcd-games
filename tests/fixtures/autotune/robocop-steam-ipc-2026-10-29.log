@@ -1,0 +1,272 @@
+[19:51:36.058] [INFO] Checking entitlements...
+[19:51:36.059] [INFO] [build] v0.1.623 (623)
+[19:51:36.059] [INFO] [device] model=iPad16,3 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=15497MB available=16331MB cores=10
+[19:51:36.060] [INFO] [device] address-map=[0x10035c000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[19:51:36.075] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:51:52.438] [INFO] [bcd] library launch Robocop Rogue City: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:51:52.445] [INFO] [dock-launch] image-retire=1
+[19:51:52.445] [INFO] [dock-launch] image-map-guard=1
+[19:51:52.450] [INFO] [dock-installers] app=1681430 scripts=0 programs=0
+[19:51:52.451] [INFO] [madeira-dock] starting the host for app 1681430; Valve's client authenticates and authorizes the launch
+[19:51:52.461] [INFO] Running full Wine sequence...
+[19:51:52.461] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10035c000,0x8000000000) 512GB available=16333MB low-power=0 thermal=nominal
+[19:51:52.467] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:51:52.467] [INFO] Allocating 896MB JIT pool via debugger...
+[19:51:52.467] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:51:52.468] [INFO] [jit-debugger] attached=1 at the pool request
+[19:51:52.469] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:51:53.171] [INFO] RX pool at 0x148000000
+[19:51:53.202] [INFO] Detaching debugger...
+[19:51:53.222] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.779s rev=ml526
+[hwinput] keyboard focus: program (poll)
+[WineProc] MADEIRA_OPTIN_DLLS: dxva2.dll -> dxva2-optin.dll (Wine's dxva2.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=15693 MB + phys_footprint=690 MB = 16384 MB (hw.memsize says 15497 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=702 MB (peak 702) internal=702 MB compressed=0 MB external=106 MB reusable=17 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.163s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=107, unixdir=108, dup_unixdir=112) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x118000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149e28000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.216s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=136, unixdir=138, dup_unixdir=143) cwd=L"C:\\windows\\"
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 118000000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c660000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702c760000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702c960000+0x400000 held for 2000 ms (3 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m2385204 "wine-x18-exc"
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000104 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1100 MB (peak 1100) internal=1099 MB compressed=0 MB external=176 MB reusable=17 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002C0 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[dns] madeira-bcd begin #2 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd begin #3 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd begin #4 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[free-delay] #4 release of 0x7039810000+0xfd0000 held for 2000 ms (1 in flight)
+[free-delay] #5 release of 0x703a7e0000+0xfd0000 held for 2000 ms (2 in flight)
+[dns] madeira-bcd begin #5 "test.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #6 "api.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml358 phys=1207 MB (peak 1207) internal=1205 MB compressed=0 MB external=180 MB reusable=27 MB (cycle=3)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f51b0000) -> 64-bit table (0x10313cd00)
+[win-name] #31 hwnd=0x10060 class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x20058 class='' text="WineD3D fake window" rev=ml853
+0050:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 000000703BB42900.
+0050:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+[file-wfail] ml669 #59 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #60 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1222 MB (peak 1222) internal=1220 MB compressed=0 MB external=181 MB reusable=27 MB (cycle=4)
+[footprint] rev=ml358 phys=1212 MB (peak 1222) internal=1210 MB compressed=0 MB external=181 MB reusable=27 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\RoboCop.exe" t+ 10.048s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\RoboCop.exe\"" (fd=375, unixdir=376, dup_unixdir=454) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x117060000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x153a94000)
+[file-wfail] ml669 #61 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\Game\\Binaries\\Win64\\RoboCop-Win64-Shipping.exe" t+ 10.284s rev=ml526
+00ac:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\Game\\Binaries\\Win64\\RoboCop-Win64-Shipping.exe\" Game " (fd=474, unixdir=479, dup_unixdir=484) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x8578000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x8578000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8578000 rev=ajan5-motor
+[footprint] rev=ml358 phys=1549 MB (peak 1549) internal=1547 MB compressed=0 MB external=209 MB reusable=27 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #62 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[19:52:03.961] [INFO] [dock-report] launch-game-running=1
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x15ea6c000)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f2490000) -> 64-bit table (0x10313cd00)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x38000 type=0x2000 protect=0x4 tid=00b4 | STAGE=fixed-map err=3 at 0x180000000+0x38000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=robocop-win64-shipping.exe tid=00b4 size=0x38000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #6 release of 0x703b160000+0x100000 held for 2000 ms (1 in flight)
+[steam-api] steam_api found no running Steam; process 00b0 sees:
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steam.exe" t+ 12.780s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+00b4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steam.exe\" steam://run/1681430//Game%20" (fd=499, unixdir=511, dup_unixdir=515) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Robocop Rogue City\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71ef7f0000, then OCCUPIED 0x71ef7f0000+0x10000 prot=1/3 shared=0 (0x10810000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x35) syscalls=0 unix_calls=9690
+[unwind] term ml661 begin rip=71f2ad4ba0 rsp=703af0f188 window=[703af0f188..703b70f188) max=32
+[unwind] term ml661 #00 pc=71f2ad4ba0 rsp=703af0f188  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=0 rbp=703af0ffd0 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=703af0ffd0: 00000000 00000000 2063d95c 01000000 d8ad745c 01000000 00000000 00000000
+[unwind] term ml661 #01 pc=12edc2a08 rsp=703af0f190  RoboCop-Win64-Shipping.exe+0x8542a08
+[unwind] term ml662 #01 nv: rbx=0 rbp=703af0ffd0 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[Wine ntdll/server] process_exit_wrapper(53): closing child fd_socket=483
+[Wine ntdll/server] process_exit_wrapper(53)
+00bc:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00bc:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71ef3c0000+0x3bc000 (libwow64fex.dll) → pool 0x160649000 used=0x18a0d000/0x27000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71ef3c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x35) syscalls=0 unix_calls=9699
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x35) syscalls=0 unix_calls=9714
+00ac:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(53)
+[Wine ntdll/server] process_exit_wrapper(53): closing child fd_socket=451
+[Wine ntdll/server] process_exit_wrapper(53)
+[unixlib] libwow64fex.dll (module 0x71ef3c0000) -> 64-bit table (0x103134d00)
+[nls-getptr] type=11 id=1252 peb=0x7900310000
+[nls-getptr] type=11 id=437 peb=0x7900310000
+ml957: ? backing 0x797b818000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797ac70000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a858000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a824000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a714000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a640000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[win-name] #35 hwnd=0x10068 class='' text="Default IME" rev=ml853
+[exc-disp]   OutputDebugStringA: "[2026-10-29 19:52:05] Verifying installation...
+[exc-disp]   OutputDebugStringA: "[2026-10-29 19:52:05] Downloading Update...
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[exc-disp]   OutputDebugStringA: "[2026-10-29 19:52:05] Checking for available update...
+ml957: ? backing 0x797a3d4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[dns] madeira-bcd begin #17 "client-update.fastly.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[footprint] rev=ml1060 fast phys=1766 MB compressed=0 MB
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x160f24000)
+ml957: ? backing 0x797a38c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[dns] madeira-bcd begin #18 "x1.i.lencr.org" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #19 "yr1.c.lencr.org" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd begin #20 "client-update.akamai.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[stale-heal]   3 slot(s) in the copy of 0x71ef3c0000 (libwow64fex.dll) -> 0x16052b294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[footprint] rev=ml1060 fast phys=1796 MB compressed=0 MB
+[dns] madeira-bcd begin #21 "client-update.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[file-wfail] ml669 #94 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+00bc:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Steam - Fatal Error" / L"Steam needs to be online to update.\t Please confirm your network connection and try again.": main exe base 00400000 size 0x509000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[win-name] #110 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #111 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #112 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #113 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #114 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #115 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #116 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #117 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #118 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #120 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #121 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #125 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[launch-view] dismissed reason=steam-window logs=0
+0050:err:module:load_dll [dll-missing] rev=ml336 #51 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #52 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #53 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #54 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #95 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[wow-stack-free] #1 the dead thread 00c0's 32-bit stack (guest 0x1d10000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x1d10000 is not a live view -> released at the old address (as before) rev=ajan11
+[free-delay] #7 release of 0x70286a0000+0x800000 held for 2000 ms (1 in flight)
+[wow-stack-free] #2 the dead thread 00c8's 32-bit stack (guest 0x2dc0000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x2dc0000 is not a live view -> released at the old address (as before) rev=ajan11
+[free-delay] #8 release of 0x702c670000+0x150000 held for 2000 ms (2 in flight)
+[19:52:11.962] [INFO] [dock-report] launch-game-ended=1
+[19:52:11.962] [INFO] [dock-report] launch-host-result=47
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x2f) syscalls=0 unix_calls=10674
+[unwind] term ml661 begin rip=14a0611d4 rsp=702a71fdb8 window=[702a71fdb8..702af1fdb8) max=32
+[unwind] term ml661 #00 pc=14a0611d4 rsp=702a71fdb8  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x2f) syscalls=0 unix_calls=10681
+[unwind] term ml661 begin rip=14995216c rsp=702a71fbd0 window=[702a71fbd0..702af1fbd0) max=32
+[unwind] term ml661 #00 pc=14995216c rsp=702a71fbd0  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(47)
+[Wine ntdll/server] process_exit_wrapper(47): closing child fd_socket=111
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=142
+[Wine ntdll/server] process_exit_wrapper(47)
+[Wine ntdll/server] process_exit_wrapper(0)
+[19:52:12.461] [INFO] [dock-report] probe-result=47
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170501020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x965b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x170501020
+[win-name] #126 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #127 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #128 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #129 hwnd=0x1007a class='' text="Steam - Fatal Error" rev=ml853
+[win-name] #130 hwnd=0x3005c class='' text="Steam" rev=ml853
+[win-name] #131 hwnd=0x3005c class='' text="Steam" rev=ml853
+[win-name] #132 hwnd=0x3005c class='' text="Steam" rev=ml853
+[win-name] #133 hwnd=0x3005c class='' text="Steam" rev=ml853
+[win-name] #134 hwnd=0x3005c class='' text="Steam" rev=ml853
+[dns] madeira-bcd begin #22 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+D DC Load module secur32.dll (secur32.dll-f6f7ee0cf98e259c): 797BF40000
+D DC Load module Kerberos.dll (kerberos.dll-a465a4dc50344d0c): 797BF20000
+D DC Load module MSV1_0.dll (msv1_0.dll-fe14d41517692ae9): 797BF20000
+ml957: ? backing 0x797bf0c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D DC Load module netapi32.dll (netapi32.dll-67f045b4a9a70ff4): 797BEF0000
+ml957: ? backing 0x797bed4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D DC Load module netutils.dll (netutils.dll-77547757313a186e): 797BED0000
+D DC Load module schannel.dll (schannel.dll-b68bcdedbca49b2e): 797BF20000
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xfffffffe) syscalls=0 unix_calls=10760
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xfffffffe) syscalls=0 unix_calls=10760
+00bc:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-2)
+[Wine ntdll/server] process_exit_wrapper(-2): closing child fd_socket=514
+[wow-window] slot 0 B=0x7900000000 released (owner peb=0x7900310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(-2)
+[Wine child thread] child exited with code -2
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=25 resident=1839MB dbg=DEBUGGED rev=ml525
+[19:52:23.416] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[footprint] rev=ml358 phys=1561 MB (peak 1786) internal=1559 MB compressed=0 MB external=256 MB reusable=26 MB (cycle=19)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1561 MB (peak 1786) internal=1559 MB compressed=0 MB external=256 MB reusable=26 MB (cycle=20)
+[thread-stacks] port=0x965b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170501020
+[footprint] rev=ml358 phys=1560 MB (peak 1786) internal=1560 MB compressed=0 MB external=256 MB reusable=26 MB (cycle=21)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170501020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1562 MB (peak 1786) internal=1560 MB compressed=0 MB external=257 MB reusable=26 MB (cycle=22)
+[footprint] rev=ml358 phys=1562 MB (peak 1786) internal=1560 MB compressed=0 MB external=257 MB reusable=26 MB (cycle=23)
+[footprint] rev=ml358 phys=1561 MB (peak 1786) internal=1560 MB compressed=0 MB external=257 MB reusable=26 MB (cycle=24)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[19:52:41.825] [INFO] [session] length=49s partial=1 play=0s frames=0 stalls=0/0s peak=1797MB limit=16383MB thermal=nominal lpm=0 res=1160x800 cap=60 game=RoboCop: Rogue City

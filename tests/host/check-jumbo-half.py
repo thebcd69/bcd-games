@@ -61,13 +61,29 @@ typedef unsigned int ULONG, NTSTATUS;
 static ULONG_PTR ios_usable_va_floor = 0x7038000000ul;
 static struct { ULONG_PTR lo, hi; } used[64];
 static int nused, calls;
+/* round 624: the holes an unhinted request may be placed in (a 63 GB map's free runs); none: an unhinted request is refused */
+static struct { ULONG_PTR lo, hi; } holes[8];
+static int nholes;
 static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG type, ULONG protect,
                                          ULONG_PTR limit_low, ULONG_PTR limit_high,
                                          ULONG_PTR align, ULONG attributes )
 {
     ULONG_PTR a = (ULONG_PTR)*ret, e = a + *size_ptr;
     calls++;
-    if (!a || limit_low || limit_high || align || attributes) return 0xbad;
+    if (limit_low || limit_high || align || attributes) return 0xbad;
+    if (!a)
+    {
+        if (!nholes) return 0xbad;
+        for (int i = 0; i < nholes; i++)
+            if (holes[i].hi - holes[i].lo >= *size_ptr)
+            {
+                *ret = (void *)holes[i].lo;
+                used[nused].lo = holes[i].lo; used[nused++].hi = holes[i].lo + *size_ptr;
+                holes[i].lo += *size_ptr;
+                return STATUS_SUCCESS;
+            }
+        return 0xc0000017;
+    }
     for (int i = 0; i < nused; i++)
         if (a < used[i].hi && used[i].lo < e) return STATUS_CONFLICTING_ADDRESSES;
     used[nused].lo = a; used[nused++].hi = e;
@@ -129,6 +145,18 @@ int main( void )
     nused = 0;
     occupy( 0x7000000000ul, 0x7400000000ul );
     expect( "16 GB -> 8 GB slot", "1", 16 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 8 * G, 2 );
+    /* round 624, step 2 (The Witcher 3 VCBB6X, a 63 GB map): no slot from the 512 GB layout's floor exists, the map's largest hole is
+     * 23.5 GB at 0x570000000: 32 GB is refused, the half is placed unhinted in that hole */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7c00000000ul );
+    holes[0].lo = 0x570000000ul; holes[0].hi = 0xb30000000ul; nholes = 1;
+    expect( "off: no unhinted half either", NULL, 32 * G, MEM_RESERVE, OLD_PATH, 0, 32 * G, 0 );
+    expect( "32 GB on a 63 GB map -> 16 GB unhinted", "1", 32 * G, MEM_RESERVE, STATUS_SUCCESS, 0x570000000ul, 16 * G, -1 );
+    /* only a 12 GB hole left: the half does not fit either, the old path */
+    holes[0].lo = 0x970000000ul; holes[0].hi = 0xc70000000ul;
+    expect( "no hole for the half: the old path", "1", 32 * G, MEM_RESERVE, OLD_PATH, 0, 32 * G, -1 );
+    expect( "a commit is never served", "1", 32 * G, MEM_RESERVE | MEM_COMMIT, OLD_PATH, 0, 32 * G, 0 );
+    nholes = 0;
     printf( "%s\n", fails ? "HARNESS FAILED" : "harness ok" );
     return fails != 0;
 }
@@ -156,7 +184,13 @@ check("the block runs after the holdback was tried and before the band census",
       fail.index('ios_jumbo_holdback_take( *size_ptr );') < fail.index('getenv( "MADEIRA_JUMBO_HALF" )') <
       fail.index('ios_band_census( "jumbo reserve failed" );'))
 check("it logs [jumbo-half] at most 32 times",
-      block.count("if (half_logs++ < 32)") == 2 and block.count('"[jumbo-half] madeira-bcd') == 2)
+      block.count("if (half_logs++ < 32)") == 3 and block.count('"[jumbo-half] madeira-bcd') == 3)
+step2 = block[block.index("[jumbo-half] step 2"):]
+check("step 2 (round 624) runs after the aligned scan, once: its own request is not halved again (a thread-local guard)",
+      block.index("for (; a + half <= 0x7c00000000ull; a += half)") < block.index("[jumbo-half] step 2")
+      and "static __thread int jumbo_half_nested;" in block and "!jumbo_half_nested &&" in block
+      and step2.index("jumbo_half_nested = 1;") < step2.index("allocate_virtual_memory( &hp2, &hs2, type, protect, 0, 0, 0, 0 );")
+      < step2.index("jumbo_half_nested = 0;"))
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "run: python3 tests/host/check-jumbo-half.py" in wf)
 cat = (R / "app/Madeira/ConfigCatalog.generated.swift").read_text()

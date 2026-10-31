@@ -51,6 +51,11 @@ let sessionNoWait = parse("[steam-host] ml1970 launch-client-error=35\n[steam-ho
 assert(sessionNoWait.contains("another session") && !sessionNoWait.contains("still reports"))
 assert(parse("[steam-host] ml2015 launch-session-wait=35\n[steam-host] ml1970 launch-client-error=22\n[steam-host] ml1830 probe-result=45\n").failure!.contains("configuration"))
 assert(parse("[steam-host] ml1970 launch-client-error=99\n[steam-host] ml1830 probe-result=45\n").failure!.contains("code 45"))
+// Round 624 (agent N S13; QH4XFC, V71SS6, 9Z31S2): client error 46 (the 32-bit window refused) names the install's missing memory limit, and only then
+assert(MadeiraDock.Report.launchRefusal(46, waited: false) == nil)
+assert(MadeiraDock.Report.launchRefusal(46, waited: false, installLacksMemory: true)!.contains("increased memory limit"))
+assert(MadeiraDock.Report.launchRefusal(5, waited: false, installLacksMemory: true)!.contains("license"))
+assert(parse("[steam-host] ml1970 launch-client-error=46\n[steam-host] ml1830 probe-result=45\n").failure!.contains("code 45"))   // the stub install has the limit
 let callbacks = parse((1...20).map { "[steam-host] ml1830 session-callback-id=\(100 + $0)\n" }.joined() + "[steam-host] ml1830 session-callback-id=x\n")
 assert(callbacks.fields["session-callback-ids"] == (1...16).map { String(100 + $0) }.joined(separator: ","))
 assert(callbacks.fields["session-callback-id"] == nil)
@@ -83,7 +88,8 @@ print("PASS: Dock report completion, CRLF, fingerprints, adapter version, callba
 '''
 with tempfile.TemporaryDirectory(prefix='madeira-dock-report-') as directory:
     source = Path(directory) / 'main.swift'; binary = Path(directory) / 'check'
-    source.write_text('import Foundation\nenum MadeiraDock {\n' + parser + '\n}\n' + checks)
+    source.write_text('import Foundation\nenum MemoryRights { static let lacking = false }   // round 624: the install has the limit here\n'
+                      'enum MadeiraDock {\n' + parser + '\n}\n' + checks)
     subprocess.run([SWIFTC, str(source), '-o', str(binary)], check=True)
     subprocess.run([str(binary)], check=True)
 

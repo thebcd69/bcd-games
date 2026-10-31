@@ -1,0 +1,166 @@
+[00:45:17.803] [INFO] Checking entitlements...
+[00:45:17.804] [INFO] [build] v0.1.622 (622)
+[00:45:17.804] [INFO] [device] model=iPhone17,2 idiom=phone os=iOS Version 27.2 (Build 24B115) ram=7622MB available=6124MB cores=6
+[00:45:17.804] [INFO] [device] address-map=[0x100ee8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[00:45:17.826] [INFO] [device] gpu="Apple A18 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:45:25.313] [INFO] Requesting JIT with Built-in StikJIT...
+[00:45:48.542] [INFO] [bcd] library launch GTA5.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[00:45:48.544] [INFO] Session log: logs/GTA5.exe-2026-10-29_00-45-48.txt
+[00:45:48.566] [INFO] Running full Wine sequence...
+[00:45:48.566] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100ee8000,0x8000000000) 512GB available=6103MB low-power=0 thermal=nominal
+[00:45:48.568] [INFO] [game-cfg] env.DXMT_SMALL_RINGS=Launcher.exe;SocialClubHelper.exe env.DXMT_WSI_MODE_TABLE=1 env.DXMT_WSI_MONITOR_IDENTITY=1 env.FEX_VECTORTSOENABLED=0 env.MADEIRA_CHILD_ARGS=PlayGTAV.exe -nobattleye env.MADEIRA_DEVICE_STATS=1 env.MADEIRA_DXGI_SRC=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_EXECREQ_LEAVE=1 env.MADEIRA_FEX_AVX=0 env.MADEIRA_KMT_ADAPTER=1 env.MADEIRA_LOCK_ORPHAN=stamped env.MADEIRA_METAL_HUD_MAIN=1 env.MADEIRA_POOL_HEAD_RESERVE_MB=128 env.MADEIRA_POOL_LOW_IMAGES=1 env.MADEIRA_POOL_RECYCLE_IMAGES=1 env.MADEIRA_SC_PA_POOLS=2 env.MADEIRA_SPAWN_BLOCK=RockstarErrorHandler;.be\vc_redist env.MADEIRA_STEAM_IDENTITY=none env.MADEIRA_TOUCH_MOUSE=1 env.MADEIRA_WOW_MIN_FREE_GB=2 env.MADEIRA_X64_GRAPHICS_ENTRY=1 env.MADEIRA_X64_IMAGE_NOCOPY=1 env.WINEDLLOVERRIDES=video64= low-graphics-tip=1 pool-low=1 pool-page-fit=1 pool-split=1 swap-mb=3072
+[00:45:48.589] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[00:45:48.590] [INFO] Allocating 1152MB JIT pool via debugger...
+[00:45:48.590] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:45:48.590] [INFO] [jit-debugger] attached=1 at the pool request
+[00:45:48.593] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 622MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[00:45:49.401] [INFO] RX pool at 0x148000000
+[00:45:49.827] [INFO] [pool-low] region C 0x12b8bc000+327MB (free runs below the window: 0x1238bc000+455MB; 128MB of the run left free for the low images, pool-low-margin = 128)
+[00:45:50.235] [ERR] [pool-low] region C RX [0x12b8bc000,0x140000000) 327MB, RW [0x7900000000,0x7914744000) at the pool's distance 0x77d4744000 (one RW reservation from 0x7900000000); FEX code buffers come from C first, the pool span is left to the image copies (no-footprint REFUSED)
+[00:45:50.236] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.683s rev=ml526
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[madeira-env] game MADEIRA_STEAM_IDENTITY=none
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7a00000000+0x1ffff0000 rev=ml433
+[00:45:50.523] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=44, sending init_first_thread...
+[00:45:50.523] [Wine init_process] reply_pipe=44, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=4873 MB + phys_footprint=1270 MB = 6144 MB (hw.memsize says 7622 MB)
+ml985: map_image_view size=0x4305000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\GTA5.exe" 0x140000000+0x4305000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x140000000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x140000000+0x1768000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x141768000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x141768000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x14176c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14813e000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148558000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14868c000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148754000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x73fffe0000
+[footprint] rev=ml358 phys=1336 MB (peak 1336) internal=1301 MB compressed=33 MB external=78 MB reusable=3 MB (cycle=1)
+D 24 Load module GTA5.exe (gta5.exe-2d7dfdf50014c8b8): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FFCC0000
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a58000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 73FE140000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 73FE050000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 73FDFA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 73FDF20000
+[copy-verify] psapi.dll: OK, 1 .text pages executable (copy @0x149800000)
+[copy-verify] mf.dll: OK, 16 .text pages executable (copy @0x149894000)
+[copy-verify] mfplat.dll: OK, 14 .text pages executable (copy @0x149978000)
+[copy-verify] propsys.dll: OK, 3 .text pages executable (copy @0x149a4c000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x14a94c000)
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+[phase] spawn:L"C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\PlayGTAV.exe" t+  2.469s rev=ml526
+[child-args] env.MADEIRA_CHILD_ARGS: appended "-nobattleye" to the command line
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\PlayGTAV.exe\" -nobattleye" (fd=132, unixdir=133, dup_unixdir=137) cwd=L"C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data"
+[Wine child thread] calling wine_ios_child_main...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=869
+[unwind] term ml661 begin rip=73fe444ba0 rsp=7100ade6f8 window=[7100ade6f8..71012de6f8) max=32
+[unwind] term ml661 #00 pc=73fe444ba0 rsp=7100ade6f8  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=1 rbp=7100adf300 rsi=73fd000000 rdi=7100adf780 r12=73fd00e234 r13=7100adf780 r14=1 r15=7101500920
+[unwind] term ml662   rbp=7100adf300: 30f3ad00 71000000 1cc000fd 73000000 000000fd 73000000 01000000 00000000
+[unwind] term ml662   rsi=73fd000000: 4d5a9000 03000000 04000000 ffff0000 b8000000 00000000 40000000 00000000
+[unwind] term ml661 #01 pc=73fd00c5c3 rsp=7100ade700  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (playgtav.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[nls-getptr] type=11 id=437 peb=0x1085e4000
+[free-delay] #1 release of 0x7102a90000+0x100000 held for 2000 ms (1 in flight)
+[phase] spawn:L"C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\GTA5.exe" t+  2.537s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"GTA5.exe -nobattleye" (fd=54, unixdir=55, dup_unixdir=70) cwd=L"C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x4305000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x4305000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=none err=3 at 0x7100000000+0x4000 rev=ajan5-motor
+[nls-getptr] type=11 id=1252 peb=0x10cf70000
+[nls-getptr] type=11 id=437 peb=0x10cf70000
+[nls-getptr] type=11 id=20127 peb=0x10cf70000
+[nls-getptr] type=11 id=1252 peb=0x10cf70000
+[nls-getptr] type=11 id=437 peb=0x10cf70000
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\GFSDK_ShadowLib.win64.dll" 0x73f90c0000+0x37f000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\d3dx9_43.dll" 0x73f8e50000+0x263000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\bink2w64.dll" 0x73f88a0000+0x8f000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\launc.dll" 0x73f86d0000+0x19000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] propsys.dll: OK, 3 .text pages executable (copy @0x14dda4000)
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\D3DCOMPILER_43.dll" 0x73f7590000+0x26f000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\GTA V LIGHTER V10 By OptiJuegos\\gta_data\\GFSDK_TXAA_AlphaResolve.win64.dll" 0x73f7570000+0x1c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 34 Load module dnsapi.dll (dnsapi.dll-2edb73fb7e267a8a): 73F6EF0000
+D 34 Load module nsi.dll (nsi.dll-4a9d70fb6c86a57d): 73F6E70000
+D 34 Load module SHLWAPI.dll (shlwapi.dll-ce1cdcc1d59e3a45): 73F6DC0000
+D 34 Load module shcore.dll (shcore.dll-3f5429270fe01a6d): 73F6D40000
+D 34 Load module SHELL32.dll (shell32.dll-a220962968ad1278): 73F63C0000
+D 34 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 73F6310000
+[xp-names] m1558932 "wine-x18-exc"
+[footprint] rev=ml358 phys=1620 MB (peak 1620) internal=1417 MB compressed=201 MB external=170 MB reusable=3 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 3072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[footprint] rev=ml358 phys=1620 MB (peak 1620) internal=1417 MB compressed=201 MB external=170 MB reusable=3 MB (cycle=3)
+[footprint] rev=ml358 phys=1620 MB (peak 1620) internal=1417 MB compressed=201 MB external=170 MB reusable=3 MB (cycle=4)
+[footprint] rev=ml358 phys=1620 MB (peak 1620) internal=1417 MB compressed=201 MB external=170 MB reusable=3 MB (cycle=5)
+[footprint] rev=ml358 phys=1620 MB (peak 1620) internal=1417 MB compressed=201 MB external=170 MB reusable=3 MB (cycle=6)
+[spin] ml1140 00:46:07.376 look 1: x64->EC 88215018/s, 100% of the sampled calls for 4 s go to kernelbase.dll+0x26178 (0x73f9ab6178)
+[spin] ml1140 thread 0034 teb=0x73fffb0000 cpu=100% host pc=0x12d8eb7dc (FEX code or native) lr=0x73f892e024 sp=0x73f9a70000 x23=0x710362f3d8 | guest RIP exact=0x73f88a3a78 (bink2w64.dll+0x3a78) State.rip=0x73f892e024
+[spin] ml1140   RAX=0x14c43e000 RCX=0x73f88a0000 RDX=0x1 RBX=0x73f88a3a78 RSP=0x710362f3d8 RBP=0x710362f400 RSI=0x710362f4e0 RDI=0x14c42c000 R8=0x710362f780 R9=0x710362f780 R10=0x130000 R11=0x10 R12=0x73f88a0000 R13=0x710362f780 R14=0x1 R15=0x7103e70560
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): 89 44 24 20 8b c7 eb 02 33 c0 48 8b 5c 24 40 48 8b 74 24 48 48 8b 7c 24 50 48 83 c4 30 41 5c c3 48 89 5c 24 08 48 89 74 24 10 57 48 83 ec 20 49 8b f8 8b da 48 8b f1 83 fa 01 75 05 e8 0f 18 00 00 4c 8b c7 8b d3 48 8b ce 48 8b 5c 24 30 48 8b 74 24 38 48 83 c4 20 5f e9 ab fe ff ff cc cc cc 48 89 4c 24 08 48 81 ec 88 00 00 00 48 8d 0d 55 1a 07 00 ff 15 17 58 06 00 4c 8b 1d 40 1b 07 00
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x710362f3d8: none in the first 96 qwords
+[spin] ml1140   first stack qwords: 14c3da16c 1 710363ef30 10362f4e0 73f86d0000 710362f528 14c38e4d8 4
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=17 resident=1577MB dbg=DEBUGGED rev=ml525
+[00:46:20.417] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[spin] ml1140 00:46:26.175 look 2: x64->EC 84405653/s, 100% of the sampled calls for 20 s go to kernelbase.dll+0x26178 (0x73f9ab6178)
+[spin] ml1140 thread 0034 teb=0x73fffb0000 cpu=99% host pc=0x12d8ebb58 (FEX code or native) lr=0x73f892e024 sp=0x73f9a70000 x23=0x710362f358 | guest RIP exact=0x73f892e0f8 (bink2w64.dll+0x8e0f8) State.rip=0x73f892e024
+[spin] ml1140   RAX=0x7f11f4a516e9f3fd RCX=0x1416cae828ec8348 RDX=0x14c5ac6e8 RBX=0x124930000 RSP=0x710362f358 RBP=0x710362f400 RSI=0x710362f4e0 RDI=0x14c42c000 R8=0x710362f780 R9=0x710362f780 R10=0x710362f330 R11=0x10 R12=0x73f88a0000 R13=0x710362f780 R14=0x1 R15=0x7103e70560
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): b8 48 89 5c 24 08 48 89 74 48 89 05 90 59 f7 ff 58 e9 8a 59 f7 ff 48 89 d8 48 8d 80 f0 af 5f 01 48 8b 00 48 b9 48 83 ec 28 e8 7c 73 17 48 39 c8 75 b6 48 89 d8 49 89 c6 48 8b 80 6c c5 6b 01 48 8d 8b 00 10 00 00 ba 00 7c 71 01 41 b8 40 00 00 00 4c 8d 0d 70 0e 00 00 48 83 ec 28 ff d0 48 83 c4 28 48 85 c0 74 81 4c 89 f0 e9 81 03 00 00 cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x710362f358: none in the first 96 qwords
+[spin] ml1140   first stack qwords: 216 7103e70560 1 710362f780 73f88a0000 10 130000 710362f780
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 3072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=18 resident=1578MB dbg=DEBUGGED rev=ml525
+[00:46:50.553] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=17 resident=1577MB dbg=DEBUGGED rev=ml525
+[00:47:20.716] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[launch-view] dismissed reason=button logs=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 3072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[freeze] alive t+121s beats=4 gaps=0 iter=476 gen=1 threads=18 resident=1561MB dbg=DEBUGGED rev=ml525
+[00:47:50.865] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[00:48:20.997] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=18 resident=1561MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 3072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[00:48:51.150] [INFO] detach-wait: presents=0 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=18 resident=1561MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=18 resident=1561MB dbg=DEBUGGED rev=ml525
+[00:49:21.270] [INFO] detach-wait: presents=0 running=1 elapsed=210s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 3072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=17 resident=1561MB dbg=DEBUGGED rev=ml525
+[00:49:51.418] [INFO] detach-wait: presents=0 running=1 elapsed=241s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x7100c25040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=133)
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=134)
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=135)
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=19 resident=1561MB dbg=DEBUGGED rev=ml525
+[00:50:21.555] [INFO] detach-wait: presents=0 running=1 elapsed=271s
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=136)
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=137)
+[footprint] rev=ml358 phys=1623 MB (peak 1624) internal=1386 MB compressed=235 MB external=171 MB reusable=4 MB (cycle=138)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[00:50:28.082] [INFO] [session] length=279s partial=1 play=0s frames=0 stalls=0/0s peak=1624MB limit=6143MB thermal=nominal lpm=0 api=D3D10/D3D9/DirectDraw/OpenGL/64 res=1280x720 mfx=1.5 cap=60 game=Grand Theft Auto V Enhanced

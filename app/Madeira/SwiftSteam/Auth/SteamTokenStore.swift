@@ -23,7 +23,9 @@ class SteamTokenStore {
     // MARK: - Public API
 
     /// Save tokens to Keychain
-    func saveTokens(accountName: String, refreshToken: String, accessToken: String, steamID: UInt64) {
+    /// madeira-bcd (round 624, Discord W8): returns the Keychain's status (errSecSuccess when it kept the tokens), so a failed sign-in can say why.
+    @discardableResult
+    func saveTokens(accountName: String, refreshToken: String, accessToken: String, steamID: UInt64) -> OSStatus {
         let tokens = StoredTokens(
             accountName: accountName,
             refreshToken: refreshToken,
@@ -34,7 +36,7 @@ class SteamTokenStore {
 
         guard let data = try? JSONEncoder().encode(tokens) else {
             SteamLog.trace("Failed to encode tokens for storage")
-            return
+            return errSecParam
         }
 
         // Delete existing entry first
@@ -55,6 +57,7 @@ class SteamTokenStore {
         } else {
             SteamLog.trace("Failed to save tokens to Keychain: \(status)")
         }
+        return status
     }
 
     /// Load tokens from Keychain

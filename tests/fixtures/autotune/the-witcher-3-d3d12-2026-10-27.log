@@ -1,0 +1,148 @@
+[20:25:22.826] [INFO] Checking entitlements...
+[20:25:22.827] [INFO] [build] v0.1.614 (614)
+[20:25:22.827] [INFO] [device] model=iPad16,6 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=15416MB available=16360MB cores=10
+[20:25:22.827] [INFO] [device] address-map=[0x104a48000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[20:25:22.850] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:25:44.893] [INFO] Requesting JIT with Built-in StikJIT...
+[20:25:46.259] [INFO] [bcd] library launch The Witcher 3: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:25:46.282] [INFO] Running full Wine sequence...
+[20:25:46.282] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104a48000,0x8000000000) 512GB available=16330MB low-power=0 thermal=nominal
+[20:25:46.289] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:25:46.289] [INFO] Allocating 896MB JIT pool via debugger...
+[20:25:46.289] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:25:46.289] [INFO] [jit-debugger] attached=1 at the pool request
+[20:25:46.291] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:25:46.945] [INFO] RX pool at 0x148000000
+[20:25:46.960] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.719s rev=ml526
+[hwinput] keyboard focus: program (poll)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[20:25:47.247] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=292030
+ml992: os_proc_available_memory=15761 MB + phys_footprint=622 MB = 16384 MB (hw.memsize says 15416 MB)
+ml985: map_image_view size=0x6402000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\witcher3.exe" 0x140000000+0x6402000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x140000000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x140000000+0x298c000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x143ff0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x146298000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x14629c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14813e000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148558000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14868c000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148754000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[footprint] rev=ml358 phys=723 MB (peak 723) internal=722 MB compressed=0 MB external=107 MB reusable=28 MB (cycle=1)
+D 24 Load module witcher3.exe (witcher3.exe-4649b90dfa0a46ee): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a58000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x149f8c000)
+[copy-verify] avrt.dll: OK, 1 .text pages executable (copy @0x14a030000)
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x14a0b4000)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x14a148000)
+[copy-verify] bcrypt.dll: OK, 4 .text pages executable (copy @0x14a280000)
+[file-fail] ml665 #62 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\Program Files (x86)\Steam\steamapps\common\The Witcher 3\bin\x64_dx12\WININET.dll
+E 24 [iOS-xins] tracker=0x148504bc8 WININET.dll sec=0x71fbe70000-0x71fbeab029
+E 24 [iOS-xins] tracker=0x148504bc8 WININET.dll sec=0x71fbeb0000-0x71fbeb0f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FBE60000
+E 24 [iOS-xins] tracker=0x148504bc8 WININET.dll sec=0x71fbe70000-0x71fbeab029
+E 24 [iOS-xins] tracker=0x148504bc8 WININET.dll sec=0x71fbeb0000-0x71fbeb0f90
+E 24 [img-map] ml710 #25 intervals-only WININET.dll base=0x71fbe60000
+ml985: map_image_view size=0x4a3b000 base=0x6ffff7760000 info_base=0x180000000 map_addr=0x6ffff7760000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[copy-verify] winemetal.dll: OK, 2 .text pages executable (copy @0x14b0de000)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\libxell.dll" 0x71f6640000+0x5c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\GFSDK_SSAO_D3D12.win64.dll" 0x71f6510000+0x12e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\libxess_fg.dll" 0x71f33b0000+0x2cf9000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\GFSDK_Aftermath_Lib.x64.dll" 0x71f2e10000+0x594000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Witcher 3\\bin\\x64_dx12\\dxcompiler.dll" 0x71f1ce0000+0x1123000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module POWRPROF.dll (powrprof.dll-147faff017e7494a): 71F1BA0000
+D 24 Load module WINHTTP.dll (winhttp.dll-940743fb9f87d8d4): 71F1AF0000
+D 24 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): 71F1A50000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71F19B0000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F1900000
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71f1960000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71F1960000
+[jumbo#1] +0ms tid=16ba43000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0x400000000 (16384 MB) hint=0x0 -> 0x73ffff0000 st=0x0 | granted=16384 MB ok=1 fail=0
+[mmap-place] ml1027 NO GAP FITS size=0x1000010000 after 73215 regions (ceiling=0x8000000000 walk_stopped_at=0x8000000000 tail=0 MB gaps_seen=0, largest gap 16384 MB, walk 101 ms) -- the map really is full for this size
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0x1000000000 — top window is full
+[pool-owner] searching 47 module copies for 1 granted pool bases...
+[alloc-fail] ml814 #1 status=c0000017 hint=0x0 size=0x1000000000 type=0x2000 protect=0x2 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x1000010000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000017 proc=witcher3.exe tid=0024 size=0x1000000000 type=0x2000 prot=0x2 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0x800000000 — top window is full
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0x800000000 type=0x2000 protect=0x2 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x800010000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000017 proc=witcher3.exe tid=0024 size=0x800000000 type=0x2000 prot=0x2 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x1f400000 (500 MB) type=0x2000 prot=0x2 hint=0x0 peb=0x71ffff0000 total=500 MB
+[steer] #1 size=0x1f400000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c07800000
+[store-noalias] #1 rev=ml348 addr=0x10 insn=0xd9410368 pc=0x16aa4b6b0 NO pool/anon alias | region 0x104a48000+0x26cc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x10 hostpc=0x16aa4b6b0 hinsn=0xd9410368 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x141a9ffb4 pc=0x16aa4b6b0 addr=0x10 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104a48000+0x26cc000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16aa4b6b0 addr=0x10 x18=0x71fffe0000 type=1 lr=0x16affc274 sp=0x71fe3b0000 x16=0x14805d9a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x141a9ffb4 (PE 0x141a9ffb4) -- NO pool copy for this address (identity translate)
+[fault-host] 16aa4b5b0: d9040068 f84086e6 a94a2f8a 8a06116b 8b0b014a a940294b cb06014a b400006a
+[fault-host] 16aa4b5d0: f945b38b f9000f86 d65f0160 6affc20c 00000001 00000000 000001f0 00000000
+[fault-host] 16aa4b5f0: 41aa1f8c 00000001 000000b0 00000000 00000018 00000028 00000000 00000000
+[fault-host] 16aa4b610: 05800180 61089740 61048a41 31415262 0e970c9a 3420098d 30341331 00313140
+[fault-host] 16aa4b630: 00000260 10ffffea f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000afd
+[fault-host] 16aa4b650: f9000ef9 f90012fa a9bf4ef5 f81f8ef6 d10142f7 f9404afd 91002004 5280001b
+[mach_exc] insn_stream PC-12..PC+8: 994000c6 d503201f 710000df [d9410368] d503201f 8b1d00ba 99420113
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x7023885fd0 *(gs_cached+0x58)=0x7023885fd0
+[store-noalias] #2 rev=ml348 addr=0x10 insn=0xd9410368 pc=0x16aa4b6b0 NO pool/anon alias | region 0x104a48000+0x26cc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x10 hostpc=0x16aa4b6b0 hinsn=0xd9410368 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x141a9ffb4 pc=0x16aa4b6b0 addr=0x10 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104a48000+0x26cc000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16aa4b6b0 addr=0x10 x18=0x71fffe0000 type=1 lr=0x16affc274 sp=0x71fe3b0000 x16=0x14805d9a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x141a9ffb4 (PE 0x141a9ffb4) -- NO pool copy for this address (identity translate)
+[fault-host] 16aa4b610: 05800180 61089740 61048a41 31415262 0e970c9a 3420098d 30341331 00313140
+[fault-host] 16aa4b630: 00000260 10ffffea f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000afd
+[fault-host] 16aa4b650: f9000ef9 f90012fa a9bf4ef5 f81f8ef6 d10142f7 f9404afd 91002004 5280001b
+[fault-host] 16aa4b670: 2a0203e5 aa0303f5 aa0103f6 aa0003f9 8b0508a8 d37ced08 8b080084 99448086
+[fault-host] 16aa4b690: d503201f 6b0200df 9a9b009b d37be8a5 8b1d00a6 994000c6 d503201f 710000df
+[fault-host] 16aa4b6b0: d9410368 d503201f 8b1d00ba 99420113 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 994000c6 d503201f 710000df [d9410368] d503201f 8b1d00ba 99420113
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x7023885fd0 *(gs_cached+0x58)=0x7023885fd0
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16aa4b6b0 RX from -32, 64 of 64 bytes: 1f 20 03 d5 df 00 02 6b 9b 00 9b 9a a5 e8 7b d3 a6 00 1d 8b c6 00 40 99 1f 20 03 d5 df 00 00 71 68 03 41 d9 1f 20 03 d5 ba 00 1d 8b 13 01 42 99 1f 20 03 d5 61 00 00 54 1f 20 03 d5 42 03 00 99 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16aa4b6b0 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x1427eeff4 RX from -32, 64 of 64 bytes: fa 48 8b f1 4b 8d 04 9b 48 c1 e0 04 4c 03 d0 45 39 42 48 49 0f 44 da 49 c1 e3 05 41 83 3c 2b 00 48 8b 43 10 49 8d 3c 2b 44 8b 60 20 75 03 44 89 07 48 8b 5b 18 48 85 db 74 3a 66 90 44 8b 43 48 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x1427eeff4 (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 703a020000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on read access to 0000000000000010 at address 00000001427EEFF4 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1736
+[unwind] term ml661 begin rip=1487cc1fc rsp=703a01ced8 window=[703a01ced8..703a81ced8) max=32
+[unwind] term ml661 #00 pc=1487cc1fc rsp=703a01ced8  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[20:25:48.284] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=992MB limit=16383MB thermal=nominal lpm=0 api=D3D12/64 res=1112x832 cap=60 game=The Witcher 3: Wild Hunt — Remastered
+[20:25:48.290] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=1024 MB (peak 1024) internal=1024 MB compressed=0 MB external=145 MB reusable=27 MB (cycle=2)
+[20:25:50.278] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1006 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=30 MB (cycle=3)
+[footprint] rev=ml358 phys=1005 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=29 MB (cycle=4)
+[footprint] rev=ml358 phys=1005 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=29 MB (cycle=5)
+[footprint] rev=ml358 phys=1005 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=29 MB (cycle=6)
+[footprint] rev=ml358 phys=1006 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=29 MB (cycle=7)
+[footprint] rev=ml358 phys=1006 MB (peak 1024) internal=1005 MB compressed=0 MB external=145 MB reusable=29 MB (cycle=8)

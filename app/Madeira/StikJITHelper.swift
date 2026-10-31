@@ -692,6 +692,26 @@ enum StikJITHelper {
             let desc = holes.map { String(format: "0x%lx+%luMB", Int($0.base), Int($0.size >> 20)) }.joined(separator: " ")
             LogStore.shared.log(String(format: "ml1036: free holes >=64MB in [0x%lx,0x7000000000) with the window held: ", goodLow)
                 + (desc.isEmpty ? "NONE" : desc))
+            // madeira-bcd (round 624, agent R; GTA V Legacy 71GQSA and 12 archive logs): when ml1034 could NOT hold the executable window,
+            // the census above still lists the hole that contains it; the pool was sized to that hole, first-fit put it at the hole's base,
+            // it covered 0x140000000 ("BAD POOL placement ... swallows the 0x140000000 executable window") and the re-roll never came back
+            // (8 of 8 launches with the layout-2 hold died silently). `pool-window-cut = 1` (game file or bcd.cfg; off by default, auto-tune's
+            // line after that message) cuts the window out of the holes and, below, plugs the uncut hole first-fit would still pick. Off:
+            // nothing changes; with the window held nothing changes either.
+            let windowCutOn = ["1", "on", "true", "yes"].contains((MadeiraConfig.gameValue("pool-window-cut")
+                ?? MadeiraConfig.get("pool-window-cut") ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
+            let uncutHoles = holes
+            var holesCut = false
+            if windowCutOn && !windowHeld {
+                let cut = StikJITHelper.cutHolesAroundWindow(holes, windowBase: exeWinBase, windowSize: exeWinSize)
+                if cut.count != holes.count || zip(cut, holes).contains(where: { $0.base != $1.base || $0.size != $1.size }) {
+                    holes = cut
+                    holesCut = true
+                    let cutDesc = holes.map { String(format: "0x%lx+%luMB", Int($0.base), Int($0.size >> 20)) }.joined(separator: " ")
+                    LogStore.shared.log("ml1036: pool-window-cut: the executable window was NOT held; holes cut around it: "
+                        + (cutDesc.isEmpty ? "NONE" : cutDesc), level: .error)
+                }
+            }
             let largest = holes.map { $0.size }.max() ?? 0
             // madeira-bcd pool-pair (pool-split only): two runs ABOVE the window, split
             // only by the main thread's stack, can beat the largest single run when that
@@ -792,6 +812,18 @@ enum StikJITHelper {
                                         level: .error)
                 }
             }
+            // madeira-bcd (round 624, pool-window-cut): the debugger does not know about the cut; an uncut hole below the target that
+            // fits the pool would still win first-fit and cover the window, so plug it for the duration of the request.
+            if holesCut && pairA == nil, let target = holes.first(where: { $0.size >= vm_address_t(poolSize) }) {
+                for h in uncutHoles where h.base < target.base && h.size >= vm_address_t(poolSize) {
+                    var a = h.base
+                    if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */) == KERN_SUCCESS && a == h.base {
+                        plugs.append((a, vm_size_t(h.size)))
+                        LogStore.shared.log(String(format: "ml1036: pool-window-cut: plugged uncut hole 0x%lx+%luMB so first-fit lands at 0x%lx",
+                                                   Int(h.base), Int(h.size >> 20), Int(target.base)))
+                    } else if a != h.base { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                }
+            }
             // ml1040: the debugger allocates first-fit. If a LOWER hole also fits
             // the final pool size it would win and strand the pool below the
             // window again, so plug those for the duration of the request.
@@ -829,7 +861,7 @@ enum StikJITHelper {
         var rxPtrOpt: UnsafeMutableRawPointer? = nil
         var requestUnanswered = false
         for attempt in 0..<3 {
-            guard let p = requestRegion(poolSize), p != UnsafeMutableRawPointer(bitPattern: 0) else {
+            guard let p = requestRegion(poolSize, attempt: attempt), p != UnsafeMutableRawPointer(bitPattern: 0) else {
                 LogStore.shared.log(noDebugger ? "BCD could not map \(poolSize >> 20)MB of JIT memory without a debugger (attempt \(attempt))"
                                                : "Debugger failed to allocate RX memory (attempt \(attempt))", level: .error)
                 requestUnanswered = true
@@ -1392,6 +1424,21 @@ enum StikJITHelper {
         return min(available & ~(granule - 1), request)
     }
 
+    /// madeira-bcd (round 624, pool-window-cut): free holes with the executable window cut out; a piece shorter than 64 MB is dropped,
+    /// as the census drops such holes. A hole that does not touch the window is returned unchanged.
+    static func cutHolesAroundWindow(_ holes: [(base: vm_address_t, size: vm_address_t)],
+                                     windowBase: vm_address_t, windowSize: vm_address_t) -> [(base: vm_address_t, size: vm_address_t)] {
+        let wLo = windowBase, wHi = windowBase + windowSize
+        var out: [(base: vm_address_t, size: vm_address_t)] = []
+        for h in holes {
+            let lo = h.base, hi = h.base + h.size
+            if hi <= wLo || lo >= wHi { out.append(h); continue }
+            if wLo > lo && wLo - lo >= 64 << 20 { out.append((base: lo, size: wLo - lo)) }
+            if hi > wHi && hi - wHi >= 64 << 20 { out.append((base: wHi, size: hi - wHi)) }
+        }
+        return out
+    }
+
     /// madeira-bcd split pool: the free runs of at least `minSize` in [lo, hi).
     private static func freeRuns(_ lo: vm_address_t, _ hi: vm_address_t,
                                  minSize: vm_address_t) -> [(base: vm_address_t, size: vm_address_t)] {
@@ -1791,8 +1838,14 @@ enum StikJITHelper {
     /// `_M` (BRK #0xf00d, x16 = 1, answered by madeira-jit.js), or for the debugger-less pool
     /// a memory entry BCD maps RX itself (jit_nodebug_region), so the census and its plugs
     /// steer both the same way. nil when neither gave one.
-    private static func requestRegion(_ size: Int) -> UnsafeMutableRawPointer? {
-        guard noDebugger else { return jit26_prepare_region(nil, size) }
+    private static func requestRegion(_ size: Int, attempt: Int? = nil, site: Int = #line) -> UnsafeMutableRawPointer? {
+        guard noDebugger else {
+            // madeira-bcd (round 624, agent R S2): the process stops inside this BRK until the debugger answers and may be killed there;
+            // the record is on disk first (BCDBrkTrail, BCDSessionRecorderLive.swift). `site` is the caller's line (#line as a default).
+            BCDBrkTrail.begin(site: site, size: size, attempt: attempt)
+            defer { BCDBrkTrail.end() }
+            return jit26_prepare_region(nil, size)
+        }
         var entry: mach_port_t = 0
         guard let p = jit_nodebug_region(size, &entry) else { return nil }
         let base = vm_address_t(bitPattern: p)

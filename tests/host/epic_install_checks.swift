@@ -343,6 +343,11 @@ func rulesPhase() {
           "anti-cheat is found by its files (Easy Anti-Cheat, BattlEye, EQU8)")
     check(BCDEpicRules.antiCheat(in: ["Game/Binaries/Win64/Game.exe", "Game/Content/anticheating-tips.txt", "Game/Content/belt.dll", "Game/Content/beauty/BEAUTY.dll"]) == nil
           && BCDEpicRules.antiCheat(in: []) == nil, "...and an ordinary game is not mistaken for one")
+    // round 624 (agent R S24; 7Z8VKR, TV6H06): Epic's GTA V starts Rockstar's launcher, which needs Windows' service manager
+    check(BCDEpicRules.startsRockstarLauncher("gta5-enhanced") && BCDEpicRules.startsRockstarLauncher("gta5-legacy")
+          && !BCDEpicRules.startsRockstarLauncher(nil) && !BCDEpicRules.startsRockstarLauncher("other")
+          && BCDEpicRules.antiCheatExceptions.allSatisfy { BCDEpicRules.startsRockstarLauncher($0.id) },
+          "the GTA V records (both editions, every anti-cheat exception today) start Windows services; a record without an exception does not")
     check(BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "game\\BIN\\win64\\GAME.EXE") == nil
           && BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "./Game/Bin/Win64/Game.exe") == nil
           && BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "Game\\Other.exe")?.message == "The program Epic names for this game isn't among its files.",

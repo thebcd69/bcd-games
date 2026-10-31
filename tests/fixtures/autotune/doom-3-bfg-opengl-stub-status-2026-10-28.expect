@@ -2,7 +2,8 @@
  "dialogs": [],
  "end": {},
  "matched": [
-  "opengl-only-no-context"
+  "opengl-only-no-context",
+  "x86-wild-fault-diag"
  ],
  "next": [],
  "note": "DOOM 3: BFG Edition (HVZ6P1, build 622, iPhone18,1; XAY19N and J787G9 the same): the 32-bit OpenGL-only game prints nothing about OpenGL; 2 s into the start it reads a string through the value a GL call returned, and the GL-absent stub returns STATUS_NOT_SUPPORTED, so the page fault is at C00000BB (Doom3BFG.exe+0x35CC7E). No window text; the opengl-only-no-context rule now knows this signature and auto-tune stops instead of retrying. Round 623.",

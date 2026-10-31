@@ -1,0 +1,713 @@
+[01:02:29.880] [INFO] Checking entitlements...
+[01:02:29.881] [INFO] [build] v0.1.623 (623)
+[01:02:29.883] [INFO] [device] model=iPhone12,8 idiom=phone os=iOS Version 26.7 (Build 23H24) ram=2957MB available=2084MB cores=6
+[01:02:29.883] [INFO] [device] address-map=[0x1049a0000,0x458000000) 17GB increased-memory=1 extended-va=0
+[01:02:29.890] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 26 on iPhone12,8, no TXM (StikDebug's model rule; device tree agrees)); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[01:02:29.926] [INFO] [device] gpu="Apple A13 GPU" family=apple6 argument-buffers=tier2 mesh=0 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=no-mesh x64=ok
+[01:02:54.275] [INFO] Requesting JIT with Built-in StikJIT...
+[01:02:58.410] [INFO] [bcd] library launch playing.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[01:02:58.450] [INFO] Running full Wine sequence...
+[01:02:58.450] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1049a0000,0x458000000) 17GB available=2075MB low-power=0 thermal=serious
+[01:02:58.457] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:02:58.458] [INFO] Allocating 896MB JIT pool via debugger...
+[01:02:58.458] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:02:58.458] [INFO] [jit-debugger] attached=1 at the pool request
+[01:03:01.030] [INFO] RX pool at 0x300000000
+[01:03:01.095] [INFO] Detaching debugger...
+[phase] wine-start             t+  2.710s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[01:03:01.962] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[01:03:01.962] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=1161 MB + phys_footprint=936 MB = 2098 MB (hw.memsize says 2957 MB)
+ml985: preferred base 0x140000000+0xa8000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa8000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] WindowsPlayer.exe: OK, 4 .text pages executable (copy @0x300004000)
+[footprint] rev=ml358 phys=937 MB (peak 937) internal=392 MB compressed=544 MB external=71 MB reusable=1 MB (cycle=1)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3000ac000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=437 peb=0x457ff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x3001e6000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x300600000)
+[hwinput] keyboard focus: program (responder)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x300734000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x3007fc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x457ff0000
+D 24 Load module playing.exe (playing.exe-c6576560bcd5a999): 121200000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 457CD0000
+[footprint] rev=ml358 phys=955 MB (peak 955) internal=385 MB compressed=568 MB external=77 MB reusable=2 MB (cycle=2)
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=437 peb=0x457ff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-5694e47efd732bf4): 4553F0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 4551D0000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 4550E0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 455030000
+[footprint] rev=ml358 phys=1049 MB (peak 1049) internal=440 MB compressed=608 MB external=82 MB reusable=2 MB (cycle=3)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x303408000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x3034bc000)
+[footprint] rev=ml358 phys=1057 MB (peak 1057) internal=454 MB compressed=601 MB external=88 MB reusable=2 MB (cycle=4)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x303540000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x303624000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x3036a8000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x30402c000)
+[footprint] rev=ml358 phys=1072 MB (peak 1072) internal=485 MB compressed=586 MB external=102 MB reusable=2 MB (cycle=5)
+D 24 Load module ws2_32.dll (ws2_32.dll-590ada9b52e97b01): 4536C0000
+D 24 Load module bcrypt.dll (bcrypt.dll-5a6e36eeb1a98b0b): 453630000
+D 24 Load module HID.DLL (hid.dll-c3a5177fc021edec): 4535A0000
+D 24 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): 453470000
+D 24 Load module dwmapi.dll (dwmapi.dll-760d02687737907f): 4533E0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x453c30000) -> 64-bit table (0x107780d00)
+[xp-names] m490608 "wine-x18-exc"
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 453330000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[bigres] tid=0024 #1 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=511 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x1ffff000 reserved_total=511MB armed=va-pressure -> FAILED, falling back 0x0
+[bigres] tid=0024 #2 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=1023 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #2 size=0x1ffff000 reserved_total=1023MB armed=va-pressure -> FAILED, falling back 0x0
+[bigres] tid=0024 #3 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=1535 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #3 size=0x1ffff000 reserved_total=1535MB armed=va-pressure -> FAILED, falling back 0x0
+[bigres] tid=0024 #4 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=2047 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #4 size=0x1ffff000 reserved_total=2047MB armed=va-pressure -> FAILED, falling back 0x0
+[footprint] rev=ml358 phys=1083 MB (peak 1083) internal=501 MB compressed=580 MB external=107 MB reusable=3 MB (cycle=6)
+[mmap-place] ml1027 NO GAP FITS size=0x20010000 after 115383 regions (ceiling=0x458000000 walk_stopped_at=0x458000000 tail=0 MB gaps_seen=0, largest gap 512 MB, walk 200 ms) -- the map really is full for this size
+[alloc-fail] ml814 #1 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x337129e58 fault_addr=0x0 insn=3d800100 rn=8 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x457fe0000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x4572b0000 (pc=0x337129e58 x18=0x0 registry=0x457fe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x45574b420 pc=0x337129e58 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x337129e58 addr=0x0 x18=0x0 type=1 lr=0x337ffc354 sp=0x4572b0000 x16=0x45574b420 x17=0x45574b420
+[guest-code] rev=ml333 pool_rip=0x300e5c420 (PE 0x45574b420): 48 81 e2 00 00 00 f0 4c 8b d1 4c 8b c2 49 c1 e8
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x337129e58; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RBX=0x4570ad420 = UnityPlayer.dll+0x1cbd420 [RBX]=UnityPlayer.dll+0x1991ae8
+[av-args]   R10=0x45709bdb0 = UnityPlayer.dll+0x1cabdb0 [R10]=UnityPlayer.dll+0x1991a68
+[fault-host] 337129d58: 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d61f0160 37ffc20c
+[fault-host] 337129d78: 00000003 00000000 00000090 00000000 55751e90 00000004 0000000b 00000000
+[fault-host] 337129d98: 00000004 00000028 00000000 00000000 05800180 00002131 00000270 10ffffea
+[fault-host] 337129db8: f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000af9 f81f8efa f10082e9
+[fault-host] 337129dd8: aa1703f8 aa0903f7 aa0003fb aa0303f9 9105e006 d94000c0 d503201f 2a0203fa
+[fault-host] 337129df8: d9400008 d503201f d9420106 d503201f d2930ea7 f2aaae87 f2c00087 f81f8ee7
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 6f00e400 52800000 [3d800100] 3d800500 3d800900 3d800d00
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x122373e80 *(gs_cached+0x58)=0x122373e80
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x4572b0000 (pc=0x337129e58 x18=0x0 registry=0x457fe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x45574b420 pc=0x337129e58 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x337129e58 addr=0x0 x18=0x0 type=1 lr=0x337ffc354 sp=0x4572b0000 x16=0x45574b420 x17=0x45574b420
+[guest-code] rev=ml333 pool_rip=0x300e5c420 (PE 0x45574b420): 48 81 e2 00 00 00 f0 4c 8b d1 4c 8b c2 49 c1 e8
+[fault-host] 337129db8: f900038a b945eb8b 3400004b d4395fc0 f90006fb f9000af9 f81f8efa f10082e9
+[fault-host] 337129dd8: aa1703f8 aa0903f7 aa0003fb aa0303f9 9105e006 d94000c0 d503201f 2a0203fa
+[fault-host] 337129df8: d9400008 d503201f d9420106 d503201f d2930ea7 f2aaae87 f2c00087 f81f8ee7
+[fault-host] 337129e18: a94a2f8a 8a06116b 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86
+[fault-host] 337129e38: d63f0160 10fffbaa f900038a b945eb8b 3400004b d4395fc0 6f00e400 52800000
+[fault-host] 337129e58: 3d800100 3d800500 3d800900 3d800d00 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 6f00e400 52800000 [3d800100] 3d800500 3d800900 3d800d00
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x122373e80 *(gs_cached+0x58)=0x122373e80
+0024:err:seh:segv_handler [x18-decline] #1 pc=0x337129e58 fault_addr=0x0 insn=3d800100 rn=8 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x457fe0000
+0024:err:seh:segv_handler   x8=0x0 x9=0x0 x10=0x337129db0 x16=0x45574b420 x17=0x45574b420 x18=0x0 x19=0x121a9f4c0 x20=0x0
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x45574b420 in image 0x4553f0000: rva 0x35b420, section #0 '.text' rva 0x1000+0x187a793 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x337129e58 RX from -32, 64 of 64 bytes: 60 01 3f d6 aa fb ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 00 e4 00 6f 00 00 80 52 00 01 80 3d 00 05 80 3d 00 09 80 3d 00 0d 80 3d 00 11 80 3d 1f 20 03 d5 00 01 05 d9 00 61 00 91 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x337129e58 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x45574987a RX from -32, 64 of 64 bytes: 57 48 83 ec 20 48 8b d9 49 8b f1 48 8b 89 78 01 00 00 41 8b f8 48 8b 01 ff 50 20 0f 57 c0 33 c9 0f 11 00 0f 11 40 10 0f 11 40 20 0f 11 40 30 0f 11 40 40 48 89 48 50 48 8d 48 18 48 89 49 08 48 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x45574987a (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #5 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=2559 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #5 size=0x1ffff000 reserved_total=2559MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=2 rev=ajan5-rockstar
+[store-noalias] #3 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x337129e58 RX from -32, 64 of 64 bytes: 60 01 3f d6 aa fb ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 00 e4 00 6f 00 00 80 52 00 01 80 3d 00 05 80 3d 00 09 80 3d 00 0d 80 3d 00 11 80 3d 1f 20 03 d5 00 01 05 d9 00 61 00 91 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x337129e58 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x45574987a RX from -32, 64 of 64 bytes: 57 48 83 ec 20 48 8b d9 49 8b f1 48 8b 89 78 01 00 00 41 8b f8 48 8b 01 ff 50 20 0f 57 c0 33 c9 0f 11 00 0f 11 40 10 0f 11 40 20 0f 11 40 30 0f 11 40 40 48 89 48 50 48 8d 48 18 48 89 49 08 48 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x45574987a (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #6 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=3071 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #6 size=0x1ffff000 reserved_total=3071MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #3 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=3 rev=ajan5-rockstar
+[store-noalias] #4 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #7 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=3583 MB
+[steer] #7 size=0x1ffff000 reserved_total=3583MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #4 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=4 rev=ajan5-rockstar
+[store-noalias] #5 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #8 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=4095 MB
+[steer] #8 size=0x1ffff000 reserved_total=4095MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #5 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #6 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #9 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=4607 MB
+[alloc-fail] ml814 #6 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #7 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #10 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=5119 MB
+[alloc-fail] ml814 #7 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[store-noalias] #8 rev=ml348 addr=0x0 insn=0x3d800100 pc=0x337129e58 NO pool/anon alias | region 0x1049a0000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[bigres] tid=0024 #11 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=5631 MB
+[alloc-fail] ml814 #8 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=8 rev=ajan5-rockstar
+[bigres] tid=0024 #12 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=6143 MB
+[alloc-fail] ml814 #9 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #13 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=6655 MB
+[alloc-fail] ml814 #10 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #14 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=7167 MB
+[alloc-fail] ml814 #11 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #15 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=7679 MB
+[alloc-fail] ml814 #12 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #16 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=8191 MB
+[alloc-fail] ml814 #13 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #17 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=8703 MB
+[steer] #17 size=0x1ffff000 reserved_total=8703MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #14 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #18 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=9215 MB
+[steer] #18 size=0x1ffff000 reserved_total=9215MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #15 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #19 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=9727 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #19 size=0x1ffff000 reserved_total=9727MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #16 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=16 rev=ajan5-rockstar
+[bigres] tid=0024 #20 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=10239 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #20 size=0x1ffff000 reserved_total=10239MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #17 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #21 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=10751 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #21 size=0x1ffff000 reserved_total=10751MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #18 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #19 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #22 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=11263 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #22 size=0x1ffff000 reserved_total=11263MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #19 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #20 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #23 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=11775 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #23 size=0x1ffff000 reserved_total=11775MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #20 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #21 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #24 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=12287 MB
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x1ffff000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #24 size=0x1ffff000 reserved_total=12287MB armed=va-pressure -> FAILED, falling back 0x0
+[alloc-fail] ml814 #21 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #22 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #25 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=12799 MB
+[alloc-fail] ml814 #22 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #23 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #26 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=13311 MB
+[alloc-fail] ml814 #23 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[av-detail] ml613 #24 p0=WRITE p1=0x0 hostpc=0x337129e58 hinsn=0x3d800100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[bigres] tid=0024 #27 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=13823 MB
+[alloc-fail] ml814 #24 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #28 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=14335 MB
+[alloc-fail] ml814 #25 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #29 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=14847 MB
+[alloc-fail] ml814 #26 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #30 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=15359 MB
+[alloc-fail] ml814 #27 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #31 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=15871 MB
+[alloc-fail] ml814 #28 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #32 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=16383 MB
+[alloc-fail] ml814 #29 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #33 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=16895 MB
+[alloc-fail] ml814 #30 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #34 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=17407 MB
+[alloc-fail] ml814 #31 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #35 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=17919 MB
+[alloc-fail] ml814 #32 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=32 rev=ajan5-rockstar
+[bigres] tid=0024 #36 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=18431 MB
+[alloc-fail] ml814 #33 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #37 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=18943 MB
+[alloc-fail] ml814 #34 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #38 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=19455 MB
+[alloc-fail] ml814 #35 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #39 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=19967 MB
+[alloc-fail] ml814 #36 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #40 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=20479 MB
+[alloc-fail] ml814 #37 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #41 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=20991 MB
+[alloc-fail] ml814 #38 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #42 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=21503 MB
+[alloc-fail] ml814 #39 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #43 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=22015 MB
+[alloc-fail] ml814 #40 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #44 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=22527 MB
+[alloc-fail] ml814 #41 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #45 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=23039 MB
+[alloc-fail] ml814 #42 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #46 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=23551 MB
+[alloc-fail] ml814 #43 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #47 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=24063 MB
+[alloc-fail] ml814 #44 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #48 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=24575 MB
+[alloc-fail] ml814 #45 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #49 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=25087 MB
+[alloc-fail] ml814 #46 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #50 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=25599 MB
+[alloc-fail] ml814 #47 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #51 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=26111 MB
+[alloc-fail] ml814 #48 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #52 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=26623 MB
+[alloc-fail] ml814 #49 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #53 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=27135 MB
+[alloc-fail] ml814 #50 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #54 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=27647 MB
+[alloc-fail] ml814 #51 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #55 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=28159 MB
+[alloc-fail] ml814 #52 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #56 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=28671 MB
+[alloc-fail] ml814 #53 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #57 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=29183 MB
+[alloc-fail] ml814 #54 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #58 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=29695 MB
+[alloc-fail] ml814 #55 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #59 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=30207 MB
+[alloc-fail] ml814 #56 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #60 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=30719 MB
+[alloc-fail] ml814 #57 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #61 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=31231 MB
+[alloc-fail] ml814 #58 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #62 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=31743 MB
+[alloc-fail] ml814 #59 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #63 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=32255 MB
+[alloc-fail] ml814 #60 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #64 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=32767 MB
+[alloc-fail] ml814 #61 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #65 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=33279 MB
+[alloc-fail] ml814 #62 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #66 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=33791 MB
+[alloc-fail] ml814 #63 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #67 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=34303 MB
+[alloc-fail] ml814 #64 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=64 rev=ajan5-rockstar
+[bigres] tid=0024 #68 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=34815 MB
+[bigres] tid=0024 #69 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=35327 MB
+[bigres] tid=0024 #70 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=35839 MB
+[bigres] tid=0024 #71 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=36351 MB
+[bigres] tid=0024 #72 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=36863 MB
+[bigres] tid=0024 #73 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=37375 MB
+[bigres] tid=0024 #74 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=37887 MB
+[bigres] tid=0024 #75 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=38399 MB
+[bigres] tid=0024 #76 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=38911 MB
+[bigres] tid=0024 #77 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=39423 MB
+[bigres] tid=0024 #78 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=39935 MB
+[bigres] tid=0024 #79 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=40447 MB
+[bigres] tid=0024 #80 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=40959 MB
+[bigres] tid=0024 #81 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=41471 MB
+[bigres] tid=0024 #82 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=41983 MB
+[bigres] tid=0024 #83 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=42495 MB
+[bigres] tid=0024 #84 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=43007 MB
+[bigres] tid=0024 #85 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=43519 MB
+[bigres] tid=0024 #86 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=44031 MB
+[bigres] tid=0024 #87 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=44543 MB
+[bigres] tid=0024 #88 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=45055 MB
+[bigres] tid=0024 #89 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=45567 MB
+[bigres] tid=0024 #90 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=46079 MB
+[bigres] tid=0024 #91 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=46591 MB
+[bigres] tid=0024 #92 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=47103 MB
+[bigres] tid=0024 #93 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=47615 MB
+[bigres] tid=0024 #94 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=48127 MB
+[bigres] tid=0024 #95 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=48639 MB
+[bigres] tid=0024 #96 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=49151 MB
+[bigres] tid=0024 #97 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=49663 MB
+[bigres] tid=0024 #98 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=50175 MB
+[bigres] tid=0024 #99 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=50687 MB
+[bigres] tid=0024 #100 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=51199 MB
+[bigres] tid=0024 #101 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=51711 MB
+[bigres] tid=0024 #102 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=52223 MB
+[bigres] tid=0024 #103 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=52735 MB
+[bigres] tid=0024 #104 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=53247 MB
+[bigres] tid=0024 #105 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=53759 MB
+[bigres] tid=0024 #106 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=54271 MB
+[bigres] tid=0024 #107 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=54783 MB
+[bigres] tid=0024 #108 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=55295 MB
+[bigres] tid=0024 #109 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=55807 MB
+[bigres] tid=0024 #110 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=56319 MB
+[bigres] tid=0024 #111 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=56831 MB
+[bigres] tid=0024 #112 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=57343 MB
+[bigres] tid=0024 #113 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=57855 MB
+[bigres] tid=0024 #114 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=58367 MB
+[bigres] tid=0024 #115 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=58879 MB
+[bigres] tid=0024 #116 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=59391 MB
+[bigres] tid=0024 #117 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=59903 MB
+[bigres] tid=0024 #118 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=60415 MB
+[bigres] tid=0024 #119 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=60927 MB
+[bigres] tid=0024 #120 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=61439 MB
+[bigres] tid=0024 #121 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=61951 MB
+[bigres] tid=0024 #122 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=62463 MB
+[bigres] tid=0024 #123 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=62975 MB
+[bigres] tid=0024 #124 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=63487 MB
+[bigres] tid=0024 #125 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=63999 MB
+[bigres] tid=0024 #126 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=64511 MB
+[bigres] tid=0024 #127 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=65023 MB
+[bigres] tid=0024 #128 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=65535 MB
+[bigres] tid=0024 #129 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=66047 MB
+[bigres] tid=0024 #130 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=66559 MB
+[bigres] tid=0024 #131 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=67071 MB
+[alloc-fail] ml814 #128 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=128 rev=ajan5-rockstar
+[bigres] tid=0024 #132 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=67583 MB
+[bigres] tid=0024 #133 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=68095 MB
+[bigres] tid=0024 #134 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=68607 MB
+[bigres] tid=0024 #135 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=69119 MB
+[bigres] tid=0024 #136 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=69631 MB
+[bigres] tid=0024 #137 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=70143 MB
+[bigres] tid=0024 #138 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=70655 MB
+[bigres] tid=0024 #139 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=71167 MB
+[bigres] tid=0024 #140 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=71679 MB
+[bigres] tid=0024 #141 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=72191 MB
+[bigres] tid=0024 #142 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=72703 MB
+[bigres] tid=0024 #143 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=73215 MB
+[bigres] tid=0024 #144 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=73727 MB
+[bigres] tid=0024 #145 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=74239 MB
+[bigres] tid=0024 #146 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=74751 MB
+[bigres] tid=0024 #147 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=75263 MB
+[bigres] tid=0024 #148 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=75775 MB
+[bigres] tid=0024 #149 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=76287 MB
+[bigres] tid=0024 #150 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=76799 MB
+[bigres] tid=0024 #151 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=77311 MB
+[bigres] tid=0024 #152 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=77823 MB
+[bigres] tid=0024 #153 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=78335 MB
+[bigres] tid=0024 #154 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=78847 MB
+[bigres] tid=0024 #155 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=79359 MB
+[bigres] tid=0024 #156 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=79871 MB
+[bigres] tid=0024 #157 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=80383 MB
+[bigres] tid=0024 #158 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=80895 MB
+[bigres] tid=0024 #159 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=81407 MB
+[bigres] tid=0024 #160 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=81919 MB
+[bigres] tid=0024 #161 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=82431 MB
+[bigres] tid=0024 #162 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=82943 MB
+[bigres] tid=0024 #163 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=83455 MB
+[bigres] tid=0024 #164 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=83967 MB
+[bigres] tid=0024 #165 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=84479 MB
+[bigres] tid=0024 #166 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=84991 MB
+[bigres] tid=0024 #167 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=85503 MB
+[bigres] tid=0024 #168 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=86015 MB
+[bigres] tid=0024 #169 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=86527 MB
+[bigres] tid=0024 #170 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=87039 MB
+[bigres] tid=0024 #171 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=87551 MB
+[bigres] tid=0024 #172 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=88063 MB
+[bigres] tid=0024 #173 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=88575 MB
+[bigres] tid=0024 #174 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=89087 MB
+[bigres] tid=0024 #175 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=89599 MB
+[bigres] tid=0024 #176 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=90111 MB
+[bigres] tid=0024 #177 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=90623 MB
+[bigres] tid=0024 #178 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=91135 MB
+[bigres] tid=0024 #179 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=91647 MB
+[bigres] tid=0024 #180 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=92159 MB
+[bigres] tid=0024 #181 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=92671 MB
+[bigres] tid=0024 #182 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=93183 MB
+[bigres] tid=0024 #183 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=93695 MB
+[bigres] tid=0024 #184 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=94207 MB
+[bigres] tid=0024 #185 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=94719 MB
+[bigres] tid=0024 #186 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=95231 MB
+[bigres] tid=0024 #187 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=95743 MB
+[bigres] tid=0024 #188 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=96255 MB
+[bigres] tid=0024 #189 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=96767 MB
+[bigres] tid=0024 #190 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=97279 MB
+[bigres] tid=0024 #191 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=97791 MB
+[bigres] tid=0024 #192 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=98303 MB
+[bigres] tid=0024 #193 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=98815 MB
+[bigres] tid=0024 #194 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=99327 MB
+[bigres] tid=0024 #195 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=99839 MB
+[alloc-fail] ml814 #192 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #196 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=100351 MB
+[bigres] tid=0024 #197 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=100863 MB
+[bigres] tid=0024 #198 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=101375 MB
+[bigres] tid=0024 #199 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=101887 MB
+[bigres] tid=0024 #200 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=102399 MB
+[bigres] tid=0024 #201 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=102911 MB
+[bigres] tid=0024 #202 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=103423 MB
+[bigres] tid=0024 #203 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=103935 MB
+[bigres] tid=0024 #204 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=104447 MB
+[bigres] tid=0024 #205 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=104959 MB
+[alloc-fail] ml814 #256 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=256 rev=ajan5-rockstar
+[redeliv] 256 identical redeliveries pc=0x337129e58 addr=0x0 — storm forming rev=ml461
+[alloc-fail] ml814 #320 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #384 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #448 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #512 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=512 rev=ajan5-rockstar
+[alloc-fail] ml814 #576 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #640 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #704 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #768 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #832 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[alloc-fail] ml814 #896 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #916 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=468988 MB
+[bigres] tid=0024 #917 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=469500 MB
+[bigres] tid=0024 #918 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=470012 MB
+[bigres] tid=0024 #919 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=470524 MB
+[bigres] tid=0024 #920 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=471036 MB
+[bigres] tid=0024 #921 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=471548 MB
+[bigres] tid=0024 #922 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=472060 MB
+[bigres] tid=0024 #923 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=472572 MB
+[bigres] tid=0024 #924 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=473084 MB
+[bigres] tid=0024 #925 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=473596 MB
+[bigres] tid=0024 #926 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=474108 MB
+[bigres] tid=0024 #927 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=474620 MB
+[bigres] tid=0024 #928 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=475132 MB
+[bigres] tid=0024 #929 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=475644 MB
+[bigres] tid=0024 #930 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=476156 MB
+[bigres] tid=0024 #931 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=476668 MB
+[bigres] tid=0024 #932 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=477180 MB
+[bigres] tid=0024 #933 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=477692 MB
+[bigres] tid=0024 #934 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=478204 MB
+[bigres] tid=0024 #935 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=478716 MB
+[bigres] tid=0024 #936 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=479228 MB
+[bigres] tid=0024 #937 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=479740 MB
+[bigres] tid=0024 #938 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=480252 MB
+[bigres] tid=0024 #939 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=480764 MB
+[bigres] tid=0024 #940 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=481276 MB
+[bigres] tid=0024 #941 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=481788 MB
+[bigres] tid=0024 #942 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=482300 MB
+[bigres] tid=0024 #943 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=482812 MB
+[bigres] tid=0024 #944 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=483324 MB
+[bigres] tid=0024 #945 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=483836 MB
+[bigres] tid=0024 #946 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=484348 MB
+[bigres] tid=0024 #947 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=484860 MB
+[bigres] tid=0024 #948 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=485372 MB
+[bigres] tid=0024 #949 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=485884 MB
+[bigres] tid=0024 #950 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=486396 MB
+[bigres] tid=0024 #951 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=486908 MB
+[bigres] tid=0024 #952 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=487420 MB
+[bigres] tid=0024 #953 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=487932 MB
+[bigres] tid=0024 #954 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=488444 MB
+[bigres] tid=0024 #955 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=488956 MB
+[bigres] tid=0024 #956 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=489468 MB
+[bigres] tid=0024 #957 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=489980 MB
+[bigres] tid=0024 #958 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=490492 MB
+[bigres] tid=0024 #959 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=491004 MB
+[bigres] tid=0024 #960 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=491516 MB
+[bigres] tid=0024 #961 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=492028 MB
+[bigres] tid=0024 #962 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=492540 MB
+[bigres] tid=0024 #963 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=493052 MB
+[alloc-fail] ml814 #960 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #964 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=493564 MB
+[bigres] tid=0024 #965 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=494076 MB
+[bigres] tid=0024 #966 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=494588 MB
+[bigres] tid=0024 #967 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=495100 MB
+[bigres] tid=0024 #968 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=495612 MB
+[bigres] tid=0024 #969 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=496124 MB
+[bigres] tid=0024 #970 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=496636 MB
+[bigres] tid=0024 #971 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=497148 MB
+[bigres] tid=0024 #972 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=497660 MB
+[bigres] tid=0024 #973 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=498172 MB
+[bigres] tid=0024 #974 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=498684 MB
+[bigres] tid=0024 #975 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=499196 MB
+[bigres] tid=0024 #976 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=499708 MB
+[bigres] tid=0024 #977 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=500220 MB
+[bigres] tid=0024 #978 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=500732 MB
+[bigres] tid=0024 #979 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=501244 MB
+[bigres] tid=0024 #980 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=501756 MB
+[bigres] tid=0024 #981 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=502268 MB
+[bigres] tid=0024 #982 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=502780 MB
+[bigres] tid=0024 #983 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=503292 MB
+[bigres] tid=0024 #984 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=503804 MB
+[bigres] tid=0024 #985 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=504316 MB
+[bigres] tid=0024 #986 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=504828 MB
+[bigres] tid=0024 #987 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=505340 MB
+[bigres] tid=0024 #988 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=505852 MB
+[bigres] tid=0024 #989 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=506364 MB
+[bigres] tid=0024 #990 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=506876 MB
+[bigres] tid=0024 #991 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=507388 MB
+[bigres] tid=0024 #992 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=507900 MB
+[bigres] tid=0024 #993 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=508412 MB
+[bigres] tid=0024 #994 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=508924 MB
+[bigres] tid=0024 #995 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=509436 MB
+[bigres] tid=0024 #996 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=509948 MB
+[bigres] tid=0024 #997 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=510460 MB
+[bigres] tid=0024 #998 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=510972 MB
+[bigres] tid=0024 #999 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=511484 MB
+[bigres] tid=0024 #1000 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=511996 MB
+[bigres] tid=0024 #1001 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=512508 MB
+[bigres] tid=0024 #1002 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=513020 MB
+[bigres] tid=0024 #1003 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=513532 MB
+[bigres] tid=0024 #1004 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=514044 MB
+[bigres] tid=0024 #1005 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=514556 MB
+[bigres] tid=0024 #1006 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=515068 MB
+[bigres] tid=0024 #1007 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=515580 MB
+[bigres] tid=0024 #1008 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=516092 MB
+[bigres] tid=0024 #1009 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=516604 MB
+[bigres] tid=0024 #1010 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=517116 MB
+[bigres] tid=0024 #1011 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=517628 MB
+[bigres] tid=0024 #1012 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=518140 MB
+[bigres] tid=0024 #1013 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=518652 MB
+[bigres] tid=0024 #1014 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=519164 MB
+[bigres] tid=0024 #1015 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=519676 MB
+[bigres] tid=0024 #1016 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=520188 MB
+[bigres] tid=0024 #1017 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=520700 MB
+[bigres] tid=0024 #1018 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=521212 MB
+[bigres] tid=0024 #1019 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=521724 MB
+[bigres] tid=0024 #1020 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=522236 MB
+[bigres] tid=0024 #1021 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=522748 MB
+[bigres] tid=0024 #1022 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=523260 MB
+[bigres] tid=0024 #1023 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=523772 MB
+[bigres] tid=0024 #1024 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=524284 MB
+[bigres] tid=0024 #1025 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=524795 MB
+[bigres] tid=0024 #1026 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=525307 MB
+[bigres] tid=0024 #1027 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=525819 MB
+[alloc-fail] ml814 #1024 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[nt-fail] #12 NtAllocateVirtualMemory status=c0000017 proc=playing.exe tid=0024 size=0x1ffff000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1024 rev=ajan5-rockstar
+[bigres] tid=0024 #1028 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=526331 MB
+[bigres] tid=0024 #1029 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=526843 MB
+[bigres] tid=0024 #1030 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=527355 MB
+[bigres] tid=0024 #1031 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=527867 MB
+[bigres] tid=0024 #1032 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=528379 MB
+[bigres] tid=0024 #1033 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=528891 MB
+[bigres] tid=0024 #1034 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=529403 MB
+[bigres] tid=0024 #1035 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=529915 MB
+[bigres] tid=0024 #1036 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=530427 MB
+[bigres] tid=0024 #1037 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=530939 MB
+[bigres] tid=0024 #1038 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=531451 MB
+[bigres] tid=0024 #1039 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=531963 MB
+[bigres] tid=0024 #1040 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=532475 MB
+[bigres] tid=0024 #1041 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=532987 MB
+[bigres] tid=0024 #1042 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=533499 MB
+[bigres] tid=0024 #1043 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=534011 MB
+[bigres] tid=0024 #1044 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=534523 MB
+[bigres] tid=0024 #1045 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=535035 MB
+[bigres] tid=0024 #1046 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=535547 MB
+[bigres] tid=0024 #1047 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=536059 MB
+[bigres] tid=0024 #1048 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=536571 MB
+[bigres] tid=0024 #1049 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=537083 MB
+[bigres] tid=0024 #1050 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=537595 MB
+[bigres] tid=0024 #1051 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=538107 MB
+[bigres] tid=0024 #1052 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=538619 MB
+[bigres] tid=0024 #1053 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=539131 MB
+[bigres] tid=0024 #1054 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=539643 MB
+[bigres] tid=0024 #1055 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=540155 MB
+[bigres] tid=0024 #1056 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=540667 MB
+[bigres] tid=0024 #1057 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=541179 MB
+[bigres] tid=0024 #1058 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=541691 MB
+[bigres] tid=0024 #1059 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=542203 MB
+[bigres] tid=0024 #1060 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=542715 MB
+[bigres] tid=0024 #1061 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=543227 MB
+[bigres] tid=0024 #1062 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=543739 MB
+[bigres] tid=0024 #1063 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=544251 MB
+[bigres] tid=0024 #1064 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=544763 MB
+[bigres] tid=0024 #1065 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=545275 MB
+[bigres] tid=0024 #1066 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=545787 MB
+[bigres] tid=0024 #1067 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=546299 MB
+[bigres] tid=0024 #1068 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=546811 MB
+[bigres] tid=0024 #1069 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=547323 MB
+[bigres] tid=0024 #1070 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=547835 MB
+[bigres] tid=0024 #1071 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=548347 MB
+[bigres] tid=0024 #1072 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=548859 MB
+[bigres] tid=0024 #1073 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=549371 MB
+[bigres] tid=0024 #1074 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=549883 MB
+[bigres] tid=0024 #1075 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=550395 MB
+[bigres] tid=0024 #1076 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=550907 MB
+[bigres] tid=0024 #1077 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=551419 MB
+[bigres] tid=0024 #1078 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=551931 MB
+[bigres] tid=0024 #1079 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=552443 MB
+[bigres] tid=0024 #1080 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=552955 MB
+[bigres] tid=0024 #1081 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=553467 MB
+[bigres] tid=0024 #1082 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=553979 MB
+[bigres] tid=0024 #1083 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=554491 MB
+[bigres] tid=0024 #1084 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=555003 MB
+[bigres] tid=0024 #1085 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=555515 MB
+[bigres] tid=0024 #1086 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=556027 MB
+[bigres] tid=0024 #1087 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=556539 MB
+[bigres] tid=0024 #1088 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=557051 MB
+[bigres] tid=0024 #1089 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=557563 MB
+[bigres] tid=0024 #1090 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=558075 MB
+[bigres] tid=0024 #1091 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=558587 MB
+[alloc-fail] ml814 #1088 status=c0000017 hint=0x0 size=0x1ffff000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x20010000
+[bigres] tid=0024 #1092 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=559099 MB
+[bigres] tid=0024 #1093 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=559611 MB
+[bigres] tid=0024 #1094 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=560123 MB
+[bigres] tid=0024 #1095 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=560635 MB
+[bigres] tid=0024 #1096 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=561147 MB
+[bigres] tid=0024 #1097 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=561659 MB
+[bigres] tid=0024 #1098 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=562171 MB
+[bigres] tid=0024 #1099 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=562683 MB
+[bigres] tid=0024 #1100 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=563195 MB
+[bigres] tid=0024 #1101 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=563707 MB
+[bigres] tid=0024 #1102 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=564219 MB
+[bigres] tid=0024 #1103 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=564731 MB
+[bigres] tid=0024 #1104 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=565243 MB
+[bigres] tid=0024 #1105 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=565755 MB
+[bigres] tid=0024 #1106 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=566267 MB
+[bigres] tid=0024 #1107 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=566779 MB
+[bigres] tid=0024 #1108 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=567291 MB
+[bigres] tid=0024 #1109 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=567803 MB
+[bigres] tid=0024 #1110 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=568315 MB
+[bigres] tid=0024 #1111 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=568827 MB
+[bigres] tid=0024 #1112 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=569339 MB
+[bigres] tid=0024 #1113 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=569851 MB
+[bigres] tid=0024 #1114 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=570363 MB
+[bigres] tid=0024 #1115 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=570875 MB
+[bigres] tid=0024 #1116 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=571387 MB
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #1117 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=571899 MB
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #1118 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=572411 MB
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #1119 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=572923 MB
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[bigres] tid=0024 #1120 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x457ff0000 total=573435 MB
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 121ab0000 (== stack hi) ControlPc=457d32dd8 handler=0000000457CF5388 — this is the unhandled-exception filter frame
+[fault_rip] cnt=3 rip=0x456c35c4c pc=0x337008030 addr=0x1212b3000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1212b0000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x337008030 addr=0x1212b3000 x18=0x457fe0000 type=1 lr=0x3371353a4 sp=0x4572b0000 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302346c4c (PE 0x456c35c4c): 41 83 ce ff 48 8d 05 c9 13 46 00 4a 8b 04 f8 48
+[mach_exc] insn_stream PC-12..PC+8: 540000c2 9274cc84 d14004a5 [190000bf] eb05009f 54ffffa1 f94002e4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x457fe0000 TEB=0x457fe0000 TEB[0x58]=0x122373e80 *(gs_cached+0x58)=0x122373e80
+[fault_rip] cnt=4 rip=0x456c35c4c pc=0x337008030 addr=0x1212b3000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1212b0000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x337008030 addr=0x1212b3000 x18=0x457fe0000 type=1 lr=0x3371353a4 sp=0x4572b0000 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302346c4c (PE 0x456c35c4c): 41 83 ce ff 48 8d 05 c9 13 46 00 4a 8b 04 f8 48
+[mach_exc] insn_stream PC-12..PC+8: 540000c2 9274cc84 d14004a5 [190000bf] eb05009f 54ffffa1 f94002e4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x1212b3000 pc=0x337008030 rw=1 rev=ml420
+[fault_rip] cnt=5 rip=0x456bf0348 pc=0x300107eac addr=0x1212b3e40 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1212b0000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x300107eac addr=0x1212b3e40 x18=0x0 type=1 lr=0x30010c2fc sp=0x1212b3e60 x16=0x337ffc108 x17=0x450100000
+[guest-code] rev=ml333 pool_rip=0x302301348 (PE 0x456bf0348): 41 c6 03 00 4d 3b d3 f2 75 ef 4c 8b 14 24 4c 8b
+[mach_exc] insn_stream PC-12..PC+8: f945ee10 d63f0200 d65f03c0 [a9be53f3] f9000bfe aa0103f4 2a1f03e1
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault_rip] cnt=6 rip=0x456bf0348 pc=0x300107eac addr=0x1212b3e40 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1212b0000+0x4000 rev=ml555
+0024:err:seh:bus_handler BUS #2: pc=0x300107eac addr=0x1212b3e40 x16=0x337ffc108 x17=0x450100000 x18=0x0 lr=0x30010c2fc insn=0xa9be53f3 branch@lr-4=0x97ffeeed
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x1212b3e40 pc=0x300107eac rw=1 rev=ml420
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[01:03:14.951] [INFO] [session] length=16s play=0s frames=0 stalls=0/0s peak=1111MB limit=2097MB thermal=serious lpm=0 api=D3D11/D3D12/OpenGL/Vulkan/64 res=1280x720 cap=60 game=playing
+[frontend] returned to library
+[01:03:16.794] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bb75020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=14 resident=639MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1092 MB (peak 1108) internal=476 MB compressed=615 MB external=111 MB reusable=39 MB (cycle=20)
+[footprint] rev=ml358 phys=1093 MB (peak 1108) internal=467 MB compressed=624 MB external=111 MB reusable=39 MB (cycle=21)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bb75020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1094 MB (peak 1108) internal=237 MB compressed=856 MB external=117 MB reusable=0 MB (cycle=22)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1095 MB (peak 1108) internal=242 MB compressed=851 MB external=112 MB reusable=1 MB (cycle=23)
+[footprint] rev=ml358 phys=1097 MB (peak 1108) internal=245 MB compressed=851 MB external=120 MB reusable=3 MB (cycle=24)
+[footprint] rev=ml358 phys=1101 MB (peak 1108) internal=250 MB compressed=850 MB external=120 MB reusable=3 MB (cycle=25)

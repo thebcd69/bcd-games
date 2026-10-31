@@ -1,0 +1,106 @@
+[05:14:50.419] [INFO] Checking entitlements...
+[05:14:50.419] [INFO] [build] v0.1.622 (622)
+[05:14:50.420] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11695MB available=8171MB cores=6
+[05:14:50.421] [INFO] [device] address-map=[0x1044ac000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[05:14:50.453] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[05:14:53.013] [INFO] Requesting JIT with Built-in StikJIT...
+[05:14:54.429] [INFO] [bcd] library launch TOA.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[05:14:54.457] [INFO] Running full Wine sequence...
+[05:14:54.457] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1044ac000,0x8000000000) 512GB available=8156MB low-power=0 thermal=fair
+[05:14:54.466] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[05:14:54.466] [INFO] Allocating 896MB JIT pool via debugger...
+[05:14:54.466] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[05:14:54.467] [INFO] [jit-debugger] attached=1 at the pool request
+[05:14:54.470] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[05:14:55.173] [INFO] RX pool at 0x148000000
+[05:14:55.190] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.762s rev=ml526
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; system32 + sysx64)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[05:14:55.501] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[05:14:55.501] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7583 MB + phys_footprint=608 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0xb3000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xb4000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x11b7d0000+0xb3000 (PackrLauncher.exe) → pool 0x148004000 used=0xb8000/0x23000000 tramp+0x0
+[copy-verify] PackrLauncher.exe: OK, 26 .text pages executable (copy @0x148004000)
+ml957: PackrLauncher.exe backing 0x11b7d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1480b8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481f2000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14860c000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148740000)
+[footprint] rev=ml358 phys=621 MB (peak 621) internal=620 MB compressed=0 MB external=68 MB reusable=7 MB (cycle=1)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148808000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+D 24 Load module TOA.exe (toa.exe-ebaa7ce0d2643f24): 11B7D0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module SHELL32.dll (shell32.dll-a220962968ad1278): 71FD9F0000
+D 24 Load module shlwapi.dll (shlwapi.dll-ce1cdcc1d59e3a45): 71FD940000
+D 24 Load module shcore.dll (shcore.dll-3f5429270fe01a6d): 71FD8C0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FD810000
+[copy-verify] msvcrt.dll: OK, 29 .text pages executable (copy @0x149700000)
+D 24 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FD680000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x149814000)
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FD460000
+[copy-verify] gdi32.dll: OK, 20 .text pages executable (copy @0x149a3c000)
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FD370000
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x149b34000)
+D 24 Load module win32u.dll (win32u.dll-e45aa71e43175410): 71FD2D0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] imm32.dll: OK, 5 .text pages executable (copy @0x149bd8000)
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FD230000
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x149c7c000)
+D 24 Load module cryptbase.dll (cryptbase.dll-e47fe560728c2647): 71FD1B0000
+Error: failed to load configuration: TOA.json
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=468
+[unwind] term ml661 begin rip=71fe700690 rsp=702380fb68 window=[702380fb68..702400fb68) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=702380fb68  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=1 rbp=702380fbf0 rsi=0 rdi=11b85c008 r12=11b8372a8 r13=11b85e7f0 r14=702380ff10 r15=11b85e910
+[unwind] term ml662   rbp=702380fbf0: 00fd8023 70000000 90187e1b 01000000 00753a24 70000000 00000000 70000000
+[unwind] term ml662   rdi=11b85c008: 00a03a24 70000000 00497d1b 01000000 00000000 00000000 0f000000 00000000
+[unwind] term ml661 #01 pc=11b810499 rsp=702380fb70  PackrLauncher.exe+0x40499
+[unwind] term ml661 #02 pc=11b81044f rsp=702380fba0  PackrLauncher.exe+0x4044f
+[unwind] term ml661 #03 pc=11b7e1890 rsp=702380fc00  PackrLauncher.exe+0x11890
+[unwind] term ml662   rbp=702380ffd0: 00000000 00000000 20637648 01000000 d8ad1148 01000000 00000000 00000000
+[unwind] term ml661 #06 pc=1487719cc rsp=702380ffb0  <no module — STOP>
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=487
+[unwind] term ml661 begin rip=1481362fc rsp=702380f9b8 window=[702380f9b8..702400f9b8) max=32
+[unwind] term ml661 #00 pc=1481362fc rsp=702380f9b8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+1e0: CALL 11b81044f  PackrLauncher.exe+0x4044f
+[term-stack] ml660 sp+240: CALL 11b7e1890  PackrLauncher.exe+0x11890
+[term-stack] ml660 sp+378: call* 11b7d498a  PackrLauncher.exe+0x498a
+[term-stack] ml660 sp+510: CALL 11b7d8267  PackrLauncher.exe+0x8267
+[term-stack] ml660 sp+580: CALL 11b81e795  PackrLauncher.exe+0x4e795
+[term-stack] ml660 sp+5b0: CALL 11b806892  PackrLauncher.exe+0x36892
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[05:14:55.960] [INFO] [session] length=1s play=0s frames=0 stalls=0/0s peak=669MB limit=8191MB thermal=fair lpm=0 res=1408x648 cap=60 game=Tales Of Androgyny Win64
+[frontend] returned to library
+[footprint] rev=ml358 phys=681 MB (peak 681) internal=679 MB compressed=0 MB external=91 MB reusable=6 MB (cycle=2)
+[05:14:57.999] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=679 MB (peak 681) internal=678 MB compressed=0 MB external=91 MB reusable=7 MB (cycle=3)
+[footprint] rev=ml358 phys=679 MB (peak 681) internal=678 MB compressed=0 MB external=91 MB reusable=7 MB (cycle=4)
+[footprint] rev=ml358 phys=680 MB (peak 681) internal=678 MB compressed=0 MB external=91 MB reusable=7 MB (cycle=5)
+[footprint] rev=ml358 phys=685 MB (peak 685) internal=684 MB compressed=0 MB external=112 MB reusable=7 MB (cycle=6)
+[footprint] rev=ml358 phys=686 MB (peak 686) internal=684 MB compressed=0 MB external=113 MB reusable=7 MB (cycle=7)
+[footprint] rev=ml358 phys=687 MB (peak 687) internal=686 MB compressed=0 MB external=119 MB reusable=7 MB (cycle=8)
+[footprint] rev=ml358 phys=687 MB (peak 687) internal=687 MB compressed=0 MB external=119 MB reusable=7 MB (cycle=9)

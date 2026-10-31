@@ -125,7 +125,7 @@ check("without a plan the census block runs as it did (it only replaced `do {`)"
       and "ml1036: free holes >=64MB in [0x%lx,0x7000000000) with the window held: " in pool)
 check("the slice comes free right before the request and the rest goes back right after it",
       pool.index("if let plan = reservePlan { poolSize = PoolReserve.releaseSlice(plan) }")
-      < pool.index("for attempt in 0..<3 {") < pool.index("requestRegion(poolSize)")
+      < pool.index("for attempt in 0..<3 {") < pool.index("requestRegion(poolSize, attempt: attempt)")
       < pool.index("if let plan = reservePlan { PoolReserve.finish(plan, rx: rxPtrOpt, size: poolSize) }"))
 check("the request itself is unchanged (the same two requestRegion calls, placement checks and re-rolls; "
       "six in the file, as check-jit-no-debugger counts them)",

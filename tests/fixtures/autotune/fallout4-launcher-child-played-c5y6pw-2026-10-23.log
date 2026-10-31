@@ -1,0 +1,127 @@
+[21:27:19.500] [INFO] Checking entitlements...
+[21:27:19.500] [INFO] [build] v0.1.580 (580)
+[21:27:19.500] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8173MB cores=6
+[21:27:19.500] [INFO] [device] address-map=[0x1027a8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[21:27:19.511] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:27:24.483] [INFO] Requesting JIT with Built-in StikJIT...
+[21:27:25.892] [INFO] [bcd] library launch Fallout4.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=2.0
+[21:27:25.918] [INFO] Running full Wine sequence...
+[21:27:25.918] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1027a8000,0x8000000000) 512GB available=8158MB low-power=0 thermal=nominal
+[21:27:25.923] [INFO] D3D9 frontend: MADEIRA_D3D9=native via bcd.cfg d3d9
+[21:27:25.924] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[21:27:25.924] [INFO] Allocating 1152MB JIT pool via debugger...
+[21:27:25.924] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:27:25.925] [INFO] [jit-debugger] attached=1 at the pool request
+[21:27:25.927] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 512MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:27:26.567] [INFO] RX pool at 0x11f8e8000
+[21:27:26.581] [INFO] Detaching debugger...
+[hwinput] keyboard focus: program (poll)
+[phase] wine-start             t+  0.696s rev=ml526
+[audio] interruption handling on (env.MADEIRA_AUDIO_RESUME = 1)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7635 MB + phys_footprint=556 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0xa0000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 7 .text pages executable (copy @0x11f8ec000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11f990000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11faa8000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11fb50000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[footprint] rev=ml358 phys=567 MB (peak 567) internal=566 MB compressed=0 MB external=70 MB reusable=7 MB (cycle=1)
+[copy-verify] shell32.dll: OK, 30 .text pages executable (copy @0x11fcd0000)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x1205b4000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  1.012s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\"" (fd=74, unixdir=76, dup_unixdir=80) cwd=L"C:\\Fallout 4\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x121b24000)
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x121bb8000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x121c1c000)
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  1.051s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\" " (fd=90, unixdir=91, dup_unixdir=95) cwd=L"C:\\Fallout 4\\"
+[Wine child thread] calling wine_ios_child_main...
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=172
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=175
+002c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=79
+[Wine ntdll/server] process_exit_wrapper(0)
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  1.070s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\Fallout 4\\Fallout4.exe\"" (fd=86, unixdir=85, dup_unixdir=89) cwd=L"C:\\Fallout 4\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x122994000)
+[phase] spawn:L"C:\\Fallout 4\\Fallout4.exe" t+  1.120s rev=ml526
+003c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Fallout 4\\Fallout4.exe\" " (fd=85, unixdir=111, dup_unixdir=130) cwd=L"C:\\Fallout 4\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x425a000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+003c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=350
+003c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=87
+[Wine ntdll/server] process_exit_wrapper(0)
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 2 child process(es) it started still run (services.exe fallout4.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+D 4C Load module Fallout4.exe (fallout4.exe-6b7953042966853c): 140000000
+D 4C Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FBC20000
+[nls-getptr] type=11 id=1252 peb=0x118b30000
+[nls-getptr] type=11 id=437 peb=0x118b30000
+D 4C Load module steam_api64.dll (steam_api64.dll-385cce10be1dbfe1): 71F9FC0000
+D 4C Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71F9F10000
+D 4C Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71F9E90000
+D 4C Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71F9D80000
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x129bb0000)
+[jumbo#1] +0ms tid=16e14b000 wtid=004c peb=0x118b30000 nrip=0x71fa3a4f00 grip=0x0 size=0x80000000 (2048 MB) hint=0x0 -> 0x7038010000 st=0x0 | granted=2048 MB ok=1 fail=0
+[nls-getptr] type=11 id=10000 peb=0x118b30000
+[nls-getptr] type=11 id=10000 peb=0x118b30000
+[nls-getptr] type=11 id=10000 peb=0x118b30000
+[nls-getptr] type=11 id=10000 peb=0x118b30000
+[xp-names] m1388365 "wine-x18-exc"
+[footprint] rev=ml358 phys=903 MB (peak 903) internal=901 MB compressed=0 MB external=164 MB reusable=7 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=903 MB compressed=0 MB
+[footprint] rev=ml358 phys=903 MB (peak 903) internal=901 MB compressed=0 MB external=164 MB reusable=7 MB (cycle=3)
+[footprint] rev=ml358 phys=904 MB (peak 904) internal=903 MB compressed=0 MB external=164 MB reusable=7 MB (cycle=4)
+[win-name] #5 hwnd=0x1002e class='' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x1002c class='' text="Fallout4" rev=ml853
+[win-name] #7 hwnd=0x1002c class='' text="Fallout4" rev=ml853
+[footprint] rev=ml1060 fast phys=1008 MB compressed=0 MB
+[21:27:34.208] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[footprint] rev=ml1060 fast phys=2245 MB compressed=0 MB
+D 74 Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 71F6C00000
+D 74 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71F6B60000
+[copy-verify] rtworkq.dll: OK, 2 .text pages executable (copy @0x1220c0000)
+D 74 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71F6AE0000
+D 74 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F6A40000
+D 74 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71F69A0000
+[footprint] rev=ml1060 fast phys=2604 MB compressed=0 MB
+D 4C Load module DSOUND.DLL (dsound.dll-541ca4d6eb8180ce): 71F66A0000
+Assertion failed: (view->protect & VPROT_SYSTEM), function create_view, file virtual_ios.c, line 14499.
+00b8:err:seh:NtRaiseException Unhandled exception code 80000101 flags 1 addr 0x25019f1fc
+00b8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000101) syscalls=0 unix_calls=3047
+[Wine ntdll/server] process_exit_wrapper(-2147483391): closing child fd_socket=129
+[Wine ntdll/server] process_exit_wrapper(-2147483391)
+[footprint] rev=ml1060 fast phys=2750 MB compressed=0 MB
+[launch-view] dismissed reason=present logs=1
+[footprint] rev=ml358 phys=2752 MB (peak 2752) internal=2234 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=5)
+[footprint] rev=ml358 phys=2689 MB (peak 2752) internal=2232 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16df10d10 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[21:27:54.456] [OK] Early detach: game presenting and settled
+[21:27:56.457] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=33 resident=2419MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16df10d10 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=31 resident=2423MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16df10d10 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2673 MB (peak 2752) internal=2224 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=39)
+[footprint] rev=ml358 phys=2673 MB (peak 2752) internal=2224 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=40)
+[footprint] rev=ml358 phys=2671 MB (peak 2752) internal=2223 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=41)
+[footprint] rev=ml358 phys=2671 MB (peak 2752) internal=2223 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=42)
+[footprint] rev=ml358 phys=2671 MB (peak 2752) internal=2222 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=43)
+[footprint] rev=ml358 phys=2671 MB (peak 2752) internal=2222 MB compressed=0 MB external=176 MB reusable=23 MB (cycle=44)
+[hwinput] keyboard focus: elsewhere (app inactive)

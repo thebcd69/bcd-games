@@ -333,12 +333,14 @@ void winios_dump_window_tree(void)
         UNICODE_STRING us = { .Buffer = clsW, .MaximumLength = sizeof(clsW) };
         struct window_rects rects = {0};
         DWORD style, ex_style, pid = 0, tid;
-        int j, n;
+        int j, n, cn;
 
         cls[0] = 0;
-        if (NtUserGetClassName( hwnd, FALSE, &us ) > 0)
+        /* madeira-bcd (round 624, agent B S6): NtUserGetClassName returns the character count and leaves us.Length at 0, so no class name
+         * was ever printed (273,976 "[winios-tree] 0x... ''" lines in the archive); the count it returns is the length. */
+        if ((cn = NtUserGetClassName( hwnd, FALSE, &us )) > 0)
         {
-            for (j = 0; j < us.Length / (int)sizeof(WCHAR) && j < 63; j++)
+            for (j = 0; j < cn && j < 63; j++)
                 cls[j] = (clsW[j] >= 32 && clsW[j] < 127) ? (char)clsW[j] : '?';
             cls[j] = 0;
         }
@@ -373,11 +375,12 @@ void winios_dump_window_tree(void)
                     UNICODE_STRING kus = { .Buffer = kclsW, .MaximumLength = sizeof(kclsW) };
                     struct window_rects krects = {0};
                     DWORD kstyle;
+                    int kcn;
 
                     kcls[0] = 0;
-                    if (NtUserGetClassName( kids[k], FALSE, &kus ) > 0)
+                    if ((kcn = NtUserGetClassName( kids[k], FALSE, &kus )) > 0)   /* madeira-bcd (round 624): the count, see above */
                     {
-                        for (j = 0; j < kus.Length / (int)sizeof(WCHAR) && j < 31; j++)
+                        for (j = 0; j < kcn && j < 31; j++)
                             kcls[j] = (kclsW[j] >= 32 && kclsW[j] < 127) ? (char)kclsW[j] : '?';
                         kcls[j] = 0;
                     }
@@ -1304,6 +1307,9 @@ static void winios_drv_refresh_children( HWND hwnd, BOOL geometry )
  * lines of a kind, then every 100th (Winios.m keeps the counts). */
 extern int winios_swapchain_hwnd( void *hwnd ) __attribute__((weak));
 extern int winios_swapchain_take( int slot, int kind, unsigned int *seq ) __attribute__((weak));
+/* Round 625 (the owner's item 29): Winios.m keeps each swapchain window's style and outer size for the app's hint about a game
+ * in a title-bar window larger than the screen (winios_windowed.h). Every change is told, logged or not. */
+extern void winios_swapchain_note_frame( int slot, unsigned int style, int w, int h, int shown ) __attribute__((weak));
 enum { WINIOS_SWAP_STYLE, WINIOS_SWAP_POS_BEGIN, WINIOS_SWAP_POS, WINIOS_SWAP_ACTIVATE };
 
 /* The window's slot + 1 in Winios.m's table, 0 when no swapchain presents into it. */
@@ -1331,8 +1337,11 @@ static void winios_drv_set_window_style( HWND hwnd, INT offset, STYLESTRUCT *sty
 {
     unsigned int seq;
     HWND fg;
+    int slot = winios_swap_win( hwnd );
 
-    if (!winios_swap_win_take( winios_swap_win( hwnd ), WINIOS_SWAP_STYLE, &seq )) return;
+    if (slot && offset == GWL_STYLE && winios_swapchain_note_frame)   /* round 625: the style alone, the size as it was */
+        winios_swapchain_note_frame( slot, (unsigned)style->styleNew, -1, -1, -1 );
+    if (!winios_swap_win_take( slot, WINIOS_SWAP_STYLE, &seq )) return;
     fg = NtUserGetForegroundWindow();
     dprintf( 2, "[swap-win] #%u style hwnd=%p %s %08x -> %08x (set %08x, cleared %08x) shown=%d fg=%p%s tid=%04x\n",
              seq, hwnd, offset == GWL_STYLE ? "GWL_STYLE" : offset == GWL_EXSTYLE ? "GWL_EXSTYLE" : "other",
@@ -1379,6 +1388,9 @@ static void winios_swap_win_pos( int slot, HWND hwnd, HWND insert_after, UINT sw
     HWND fg;
 
     if (winios_swap_pos_hwnd == hwnd) winios_swap_pos_hwnd = 0;
+    if (winios_swapchain_note_frame)   /* round 625: style, outer size, and whether it is the shown window to look at */
+        winios_swapchain_note_frame( slot, (unsigned)get_window_long( hwnd, GWL_STYLE ), (int)(r->window.right - r->window.left),
+                                     (int)(r->window.bottom - r->window.top), is_window_visible( hwnd ) ? 1 : -1 );
     if (!winios_swap_win_take( slot, WINIOS_SWAP_POS, &seq )) return;
     fg = NtUserGetForegroundWindow();
     dprintf( 2, "[swap-win] #%u pos hwnd=%p after=%p flags=%08x window={%d,%d,%d,%d} client={%d,%d,%d,%d} "
@@ -1470,11 +1482,11 @@ static void winios_drv_window_pos_changed( HWND hwnd, HWND insert_after, HWND ow
                 WCHAR clsW[64], txtW[200];
                 char cls[64], txt[200];
                 UNICODE_STRING us = { 0, sizeof(clsW), clsW };
-                int j, tn;
+                int j, tn, cn;
                 cls[0] = 0;
-                if (NtUserGetClassName( hwnd, FALSE, &us ) > 0)
+                if ((cn = NtUserGetClassName( hwnd, FALSE, &us )) > 0)   /* madeira-bcd (round 624, agent B S6): the count, not us.Length (always 0) */
                 {
-                    for (j = 0; j < us.Length / (int)sizeof(WCHAR) && j < 63; j++)
+                    for (j = 0; j < cn && j < 63; j++)
                         cls[j] = (clsW[j] >= 32 && clsW[j] < 127) ? (char)clsW[j] : '?';
                     cls[j] = 0;
                 }
@@ -1484,6 +1496,51 @@ static void winios_drv_window_pos_changed( HWND hwnd, HWND insert_after, HWND ow
                 txt[j] = 0;
                 if (cls[0] || txt[0])
                     dprintf( 2, "[win-name] #%u hwnd=%p class='%s' text=\"%s\" rev=ml853\n", n, hwnd, cls, txt );
+                /* madeira-bcd (round 624, agent B S6; FINAL FANTASY VII's launcher MMJZ8K): an error box keeps its details (a WinForms
+                 * ThreadExceptionDialog's exception and stack, an MFC or crash-reporter box) in a read-only multi-line Edit control, whose text is
+                 * not the window's own: the log never showed the exception. With env MADEIRA_WIN_TEXT = 1 (default off: it asks the control for its
+                 * text with WM_GETTEXT, a call into the program's window procedure) it is logged once per control when it is visible: only a
+                 * read-only multi-line Edit (a details pane, not a field a player types in), only on the thread that owns it (a direct call), at
+                 * most 12 lines per run, 600 characters. */
+                {
+                    static int text_on = -1;
+                    static volatile unsigned text_n;
+                    static HWND text_seen[12];
+
+                    if (text_on < 0)
+                    {
+                        const char *e = getenv( "MADEIRA_WIN_TEXT" );
+                        text_on = e && e[0] == '1' && !e[1];
+                    }
+                    if (text_on && !strcmp( cls, "Edit" ) && text_n < ARRAY_SIZE(text_seen))
+                    {
+                        DWORD wstyle = get_window_long( hwnd, GWL_STYLE );
+                        unsigned k;
+
+                        if ((wstyle & (WS_VISIBLE | 0x804)) == (WS_VISIBLE | 0x804) /* ES_MULTILINE | ES_READONLY */ &&
+                            get_window_thread( hwnd, NULL ) == GetCurrentThreadId())
+                        {
+                            for (k = 0; k < text_n && text_seen[k] != hwnd; k++) ;
+                            if (k == text_n)
+                            {
+                                WCHAR buf[601];
+                                char out[601];
+                                struct send_message_timeout_params p = { .flags = SMTO_ABORTIFHUNG, .timeout = 100 };
+                                LRESULT len;
+
+                                text_seen[text_n++] = hwnd;
+                                buf[0] = 0;
+                                len = NtUserMessageCall( hwnd, WM_GETTEXT, ARRAY_SIZE(buf) - 1, (LPARAM)buf, &p, NtUserSendMessageTimeout, FALSE );
+                                if (len < 0 || len > (LRESULT)ARRAY_SIZE(buf) - 1) len = 0;
+                                for (j = 0; j < len; j++)
+                                    out[j] = buf[j] == '\n' || buf[j] == '\r' ? '|' : (buf[j] >= 32 && buf[j] < 127) ? (char)buf[j] : '?';
+                                out[j] = 0;
+                                dprintf( 2, "[win-text] #%u hwnd=%p parent=%p edit style=%08x len=%d text=\"%s\" rev=r624\n", text_n, hwnd,
+                                         NtUserGetAncestor( hwnd, GA_PARENT ), (unsigned)wstyle, (int)len, out );
+                            }
+                        }
+                    }
+                }
             }
         }
     }

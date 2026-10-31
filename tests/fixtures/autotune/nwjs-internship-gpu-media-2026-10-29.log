@@ -1,0 +1,235 @@
+[14:14:05.890] [INFO] Checking entitlements...
+[14:14:05.891] [INFO] [build] v0.1.622 (622)
+[14:14:05.891] [INFO] [device] model=iPhone16,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7681MB available=6125MB cores=6
+[14:14:05.891] [INFO] [device] address-map=[0x100014000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[14:14:05.907] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[14:14:08.128] [INFO] Requesting JIT with Built-in StikJIT...
+[14:14:09.526] [INFO] [bcd] library launch Game.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:14:09.552] [INFO] Running full Wine sequence...
+[14:14:09.552] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100014000,0x8000000000) 512GB available=6117MB low-power=0 thermal=nominal
+[14:14:09.561] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[14:14:09.561] [INFO] Allocating 896MB JIT pool via debugger...
+[14:14:09.561] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[14:14:09.562] [INFO] [jit-debugger] attached=1 at the pool request
+[14:14:09.565] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 608MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[14:14:10.492] [INFO] RX pool at 0x11991c000
+[14:14:10.513] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.989s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5494 MB + phys_footprint=649 MB = 6144 MB (hw.memsize says 7681 MB)
+ml985: preferred base 0x140000000+0x218000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x218000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Internship[demo]\\Game.exe" 0x148000000+0x218000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x148000000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x148000000+0x15c000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x14815c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x14815c000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x1481a8000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x119920000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x119a5a000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x119e74000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x119fa8000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x11a070000)
+[footprint] rev=ml358 phys=666 MB (peak 666) internal=664 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+D 24 Load module Game.exe (game.exe-046cbe6f2c55ca45): 148000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module nw_elf.dll (nw_elf.dll-c4d94ad010c5a2ef): 71FE280000
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x11a374000)
+D 24 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71FE1F0000
+[free-delay] #1 release of 0x7026890000+0x100000 held for 2000 ms (1 in flight)
+D 24 Load module shcore.dll (shcore.dll-3f5429270fe01a6d): 71FE170000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE0C0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x11b2b8000)
+[copy-verify] jsproxy.dll: OK, 1 .text pages executable (copy @0x11bf68000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[phase] spawn:L"C:\\Internship[demo]\\Game.exe" t+  1.814s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\Internship[demo]\\Game.exe --type=crashpad-handler \"--user-data-dir=C:\\users\\<user>\\AppData\\Local\\rmmz-game\\User Data\" /prefetch:7 --monitor-self --monitor-self-argument=--type=crashpad-handler \"--monitor-self-argument=--user-data-dir=C:\\users\\<user>\\AppData\\Local\\rmmz-g"... (fd=110, unixdir=111, dup_unixdir=115) cwd=L"C:\\Internship[demo]\\"
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[phase] spawn:L"C:\\Internship[demo]\\Game.exe" t+  1.934s rev=ml526
+0030:err:process:spawn_process spawn_process: creating child thread for L"C:\\Internship[demo]\\Game.exe --type=crashpad-handler \"--user-data-dir=C:\\users\\<user>\\AppData\\Local\\rmmz-game\\User Data\" /prefetch:7 --no-periodic-tasks --monitor-self-annotation=ptype=crashpad-handler \"--database=C:\\users\\<user>\\AppData\\Local\\rmmz-game\\User Data\\Crashpa"... (fd=142, unixdir=143, dup_unixdir=147) cwd=L"C:\\Internship[demo]\\"
+[win-name] #3 hwnd=0x1002c class='' text="Default IME" rev=ml853
+[xp-names] m1460019 "wine-x18-exc"
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[win-name] #7 hwnd=0x10036 class='' text="Default IME" rev=ml853
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[win-name] #12 hwnd=0x10042 class='' text="Default IME" rev=ml853
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[copy-verify] netutils.dll: OK, 1 .text pages executable (copy @0x11f3c8000)
+0084:err:module:load_dll [dll-missing] rev=ml336 #3 L"MDMRegistration.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=00000000000002C4 status=00000000 native_pc=0000000119A738C0 is_ec=1 -> returned rip=0000000119A738C0 rsp=00000071F06AFC60 flags=0010000b
+[phase] spawn:L"C:\\Internship[demo]\\Game.exe" t+  2.361s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Internship[demo]\\Game.exe\" --type=gpu-process --field-trial-handle=768,15003534178700846125,3187027896504757702,131072 --no-sandbox --user-data-dir=\"C:\\users\\mobile\\AppData\\Local\\rmmz-game\\User Data\" --nwapp-path=\"C:\\Internship[demo]\" --start-stack-profiler --gpu-prefer"... (fd=416, unixdir=438, dup_unixdir=437) cwd=L"C:\\Internship[demo]\\"
+007c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\wpc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[phase] spawn:L"C:\\Internship[demo]\\Game.exe" t+  2.405s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Internship[demo]\\Game.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --field-trial-handle=768,15003534178700846125,3187027896504757702,131072 --lang=en-US --service-sandbox-type=network --no-sandbox --enable-audio-service-sandbox --user-data-dir=\"C:\\users\\<user>"... (fd=491, unixdir=492, dup_unixdir=496) cwd=L"C:\\Internship[demo]\\"
+[win-name] #25 hwnd=0x10056 class='' text="C:\users\mobile\AppData\Local\rmmz-game\User Data" rev=ml853
+[nls-getptr] type=11 id=437 peb=0x116820000
+[phase] spawn:L"C:\\Internship[demo]\\Game.exe" t+  2.620s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Internship[demo]\\Game.exe\" --type=utility --utility-sub-type=storage.mojom.StorageService --field-trial-handle=768,15003534178700846125,3187027896504757702,131072 --lang=en-US --service-sandbox-type=none --no-sandbox --enable-audio-service-sandbox --user-data-dir=\"C:\\users\\<user>"... (fd=570, unixdir=571, dup_unixdir=575) cwd=L"C:\\Internship[demo]\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x116824000
+[nls-getptr] type=11 id=437 peb=0x116824000
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x12247c000)
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0024:fixme:process:RegisterApplicationRestart (L" --force-color-profile=srgb --disable-devtools --user-data-dir=\"C:\\users\\mobile\\AppData\\Local\\rmmz-game\\User Data\" --no-sandbox --no-zygote --flag-switches-begin --flag-switches-end --enable-audio-service-sandbox --nwapp=\"C:\\Internship[demo]\" --file-url-path-alias=\"/gen=C:\\In"...,7)
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[nls-getptr] type=11 id=20127 peb=0x116824000
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Internship[demo]\\nw.dll" 0x71dbe30000+0x89b7000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=1252 peb=0x116824000
+[nls-getptr] type=11 id=437 peb=0x116824000
+[x64-image] L"\\??\\C:\\Internship[demo]\\nw_elf.dll" 0x71db2b0000+0xea000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Internship[demo]\\ffmpeg.dll" 0x71da100000+0x273000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x12441c000)
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+ml985: map_image_view size=0x89b7000 base=0x6ffff61f0000 info_base=0x180000000 map_addr=0x6ffff61f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Internship[demo]\\nw.dll" 0x71d0800000+0x89b7000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Internship[demo]\\ffmpeg.dll" 0x71d0470000+0x273000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[win-name] #27 hwnd=0x10060 class='' text="BatteryStatusMessageWindow" rev=ml853
+00cc:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00cc:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0028:err:seh:NtGetContextThread [ec-getctx] ml715 #22 handle=00000000000000C0 status=00000000 native_pc=000000023C6A2574 is_ec=0 -> returned rip=000000023C6A2574 rsp=000000014841D4A0 flags=0010000b
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xd940011a pc=0x131d89d90 NO pool/anon alias | region 0x100014000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x131d89d90 hinsn=0xd940011a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=12 base=0x131904000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71f7c147d4 pc=0x131d89d90 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x131d89d90 addr=0x0 x18=0x71fffe0000 type=1 lr=0x71f7c147d4 sp=0x71fe3b0000 x16=0x13f918108 x17=0x148420000
+[guest-code] rev=ml333 pool_rip=0x71f7c147d4 (PE 0x71f7c147d4) -- NO pool copy for this address (identity translate)
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x131d89d90; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R11=0x704275d920 "chrome-extension://njgcanhfjdabfmnlmpmdedalocpaf..."
+[fault-host] 131d89c90: 3400004b d4395fc0 a9bf66fa f81f8efb d10102f7 aa0103f9 aa0003fa d29cd106
+[fault-host] 131d89cb0: f2bfa6c6 f2c00e26 d94000c8 d503201f ca170108 f1000109 f9001ee8 d9400008
+[fault-host] 131d89cd0: d503201f d9468106 d503201f d29ac787 f2bebee7 f2c00e27 f81f8ee7 a94a2f8a
+[fault-host] 131d89cf0: 8a06116b 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d63f0160
+[fault-host] 131d89d10: 10fffb8a f900038a b945eb8b 3400004b d4395fc0 d9400328 d503201f 6b1b0369
+[fault-host] 131d89d30: 5280001b d503201f d900033b d503201f d9030348 d29ac9a6 f2bebee6 f2c00e26
+[mach_exc] insn_stream PC-12..PC+8: 9100a2e2 d503201f d900005a [d940011a] d503201f aa0803e0 52800021
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702603b950 *(gs_cached+0x58)=0x702603b950
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xd940011a pc=0x131d89d90 NO pool/anon alias | region 0x100014000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x131d89d90 hinsn=0xd940011a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=12 base=0x131904000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71f7c147d4 pc=0x131d89d90 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x131d89d90 addr=0x0 x18=0x71fffe0000 type=1 lr=0x71f7c147d4 sp=0x71fe3b0000 x16=0x13f918108 x17=0x148420000
+[guest-code] rev=ml333 pool_rip=0x71f7c147d4 (PE 0x71f7c147d4) -- NO pool copy for this address (identity translate)
+[fault-host] 131d89cf0: 8a06116b 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d63f0160
+[fault-host] 131d89d10: 10fffb8a f900038a b945eb8b 3400004b d4395fc0 d9400328 d503201f 6b1b0369
+[fault-host] 131d89d30: 5280001b d503201f d900033b d503201f d9030348 d29ac9a6 f2bebee6 f2c00e26
+[fault-host] 131d89d50: f81f8ee6 1000004a 97eeb25f 10fff92a f900038a b945eb8b 3400004b d4395fc0
+[fault-host] 131d89d70: d9430340 d503201f 9100c2e3 d503201f d9000060 9100a2e2 d503201f d900005a
+[fault-host] 131d89d90: d940011a d503201f aa0803e0 52800021 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 9100a2e2 d503201f d900005a [d940011a] d503201f aa0803e0 52800021
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702603b950 *(gs_cached+0x58)=0x702603b950
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x131d89d90 RX from -32, 64 of 64 bytes: 40 03 43 d9 1f 20 03 d5 e3 c2 00 91 1f 20 03 d5 60 00 00 d9 e2 a2 00 91 1f 20 03 d5 5a 00 00 d9 1a 01 40 d9 1f 20 03 d5 e0 03 08 aa 21 00 80 52 46 83 40 d9 1f 20 03 d5 e7 cd 9a d2 e7 be be f2 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x131d89d90 (not an anon-JIT page)
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71f5f7d661 RX from -32, 64 of 64 bytes: 48 89 1e 48 89 47 30 e8 f3 1e 12 00 48 8b 4f 30 4c 8d 4c 24 30 49 89 09 4c 8d 44 24 28 49 89 38 48 8b 38 48 89 c1 ba 01 00 00 00 ff 57 08 48 8b 0e 48 89 1e 48 85 c9 74 0a 48 8b 01 ba 01 00 00 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71f5f7d661 (not an anon-JIT page)
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7038820000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x126578000)
+00dc:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+[x64-image] L"\\??\\C:\\Internship[demo]\\ffmpeg.dll" 0x71ce840000+0x273000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+00f0:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00f0:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[hwinput] keyboard focus: program (responder)
+D CC Load module winemetal.dll (winemetal.dll-5dde309614d342ae): 71CF650000
+D F0 Load module shcore.dll (shcore.dll-3f5429270fe01a6d): 71CDF70000
+D CC Load module mf.dll (mf.dll-2bc51e1e469a3496): 71CDF10000
+D CC Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 71CDE40000
+D CC Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71CDDA0000
+D CC Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71CDD20000
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+00cc:err:module:load_dll [dll-missing] rev=ml336 #3 L"msmpeg2vdec.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[200:204:1029/081412.921:ERROR:dxva_video_decode_accelerator_win.cc(1372)] DXVAVDA fatal error: could not LoadLibrary: msmpeg2vdec.dll: Module not found. (0x7E)
+00cc:err:module:load_dll [dll-missing] rev=ml336 #4 L"dxva2.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00cc:err:module:load_dll [dll-missing] rev=ml336 #5 L"msvproc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=2010 MB (peak 2010) internal=2007 MB compressed=0 MB external=228 MB reusable=0 MB (cycle=2)
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+[200:204:1029/081412.941:FATAL:thread_task_runner_handle.cc(29)] Check failed: current. Error: This caller requires a single-threaded context (i.e. the current task needs to run from a SingleThreadTaskRunner). If you're in a test refer to //docs/threading_and_tasks_testing.md.
+[int3-guest] guest_rip=0x71e74b449e x28=0x7c7b801140 read=1 rev=ml554
+[store-undecoded] #1 rev=ml350 insn=0xd4200000 pc=0x13c90c52c addr=0x13c90c52c rw_addr=0x7022ff052c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=3 rip=0x71e74b449e pc=0x13c90c52c addr=0x13c90c52c kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x13c90c000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x13c90c52c addr=0x13c90c52c x18=0x7039990000 type=6 lr=0x13c90c274 sp=0x71eec20000 x16=0x11f85d9a4 x17=0x71eec1ff20
+[guest-code] rev=ml333 pool_rip=0x71e74b449e (PE 0x71e74b449e) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d44 4c9f2d48 4c9f2d4c [d4200000] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x7039990000 TEB=0x7039990000 TEB[0x58]=0x703eacd310 *(gs_cached+0x58)=0x703eacd310
+00cc:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 703ea70000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+00fc:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=000000000000007C status=00000000 native_pc=00000071FFCF7CC8 is_ec=1 -> returned rip=00000071FFCF7CC8 rsp=000000703EA6D6A0 flags=0010000b
+[footprint] rev=ml358 phys=2180 MB (peak 2180) internal=2176 MB compressed=0 MB external=228 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml358 phys=2180 MB (peak 2180) internal=2176 MB compressed=0 MB external=228 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=2180 MB (peak 2180) internal=2177 MB compressed=0 MB external=228 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=2180 MB (peak 2180) internal=2177 MB compressed=0 MB external=228 MB reusable=0 MB (cycle=6)
+00dc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=8415
+[unwind] term ml661 begin rip=71eecc4ba0 rsp=703fc7ecc8 window=[703fc7ecc8..704047ecc8) max=32
+[unwind] term ml661 #00 pc=71eecc4ba0 rsp=703fc7ecc8  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=70487724a0 rbp=0 rsi=0 rdi=aaaaaaaaaaaaaaaa r12=7042dc2501 r13=0 r14=1 r15=aaaaaaaaaaaaaaaa
+[unwind] term ml662   rbx=70487724a0: 00000000 00000000 4e8ef4e2 71000000 675254e3 71000000 9f020000 00000000
+[unwind] term ml661 #01 pc=71de9c2508 rsp=703fc7ecd0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=495
+[Wine ntdll/server] process_exit_wrapper(0)
+00f0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=8431
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=574
+[Wine ntdll/server] process_exit_wrapper(0)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=66 resident=2409MB dbg=DEBUGGED rev=ml525
+[14:14:40.680] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[14:15:10.819] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=64 resident=2410MB dbg=DEBUGGED rev=ml525
+[guest-log] file <container>/Documents/wine/drive_c/Internship[demo]/debug.log
+[guest-log] #1 tid=0024 [1029/081512.682:ERROR:crashpad_client_win.cc(176)] crash server did not respond, self-terminating
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffff7001) syscalls=0 unix_calls=8435
+[unwind] term ml661 #00 pc=71fe454ba0 rsp=703881c998  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=703881e450 rbp=703881cb40 rsi=703881c9c0 rdi=7038820000 r12=703881cde0 r13=0 r14=c0000005 r15=703881e450
+[unwind] term ml662   rbx=703881e450: 050000c0 00000000 00000000 00000000 61d6f7f5 71000000 02000000 00000000
+[unwind] term ml662   rbp=703881cb40: f09f7542 70000000 dc84081a 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=71fe2ae18e rsp=703881c9a0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-36863)
+[WineProc] Wine exited with code -36863 (caught by longjmp)
+[WineProc] stopping wineserver...
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[14:15:13.052] [INFO] [session] length=63s play=0s frames=0 stalls=0/0s peak=2192MB limit=6143MB thermal=nominal lpm=0 res=1424x656 cap=60 game=Internship[demo]
+[14:15:13.060] [INFO] [exit-report] status=0xffff7001
+[frontend] returned to library
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[14:15:14.852] [INFO] Detaching debugger...
+[hwinput] keyboard focus: elsewhere (responder)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+91s beats=3 gaps=0 iter=357 gen=1 threads=36 resident=2429MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=libsystem_platform.dylib`_platform_memcmp+0x110 lr=libswiftCore.dylib`<redacted>+0xb0 sp=0x1701ba180 NATIVE (no FEX state) sp-cand=[ ]
+[freeze] alive t+121s beats=4 gaps=0 iter=476 gen=1 threads=36 resident=2430MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2198 MB (peak 2198) internal=2195 MB compressed=0 MB external=234 MB reusable=1 MB (cycle=67)
+[footprint] rev=ml358 phys=2198 MB (peak 2198) internal=2195 MB compressed=0 MB external=234 MB reusable=1 MB (cycle=68)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170731040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2197 MB (peak 2198) internal=2193 MB compressed=0 MB external=234 MB reusable=1 MB (cycle=69)
+[footprint] rev=ml358 phys=2195 MB (peak 2198) internal=2192 MB compressed=0 MB external=234 MB reusable=2 MB (cycle=70)
+[footprint] rev=ml358 phys=2196 MB (peak 2198) internal=2192 MB compressed=0 MB external=234 MB reusable=2 MB (cycle=71)
+[footprint] rev=ml358 phys=2196 MB (peak 2198) internal=2192 MB compressed=0 MB external=234 MB reusable=2 MB (cycle=72)

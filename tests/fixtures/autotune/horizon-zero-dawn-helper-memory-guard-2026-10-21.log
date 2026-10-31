@@ -1,0 +1,417 @@
+[15:52:32.908] [INFO] Checking entitlements...
+[15:52:32.908] [INFO] [build] v0.1.579 (579)
+[15:52:32.908] [INFO] [device] model=iPhone19,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11508MB available=8171MB cores=6
+[15:52:32.909] [INFO] [device] address-map=[0x102a38000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[15:52:32.925] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-07:00 free-disk=391GB stikdebug-url=0
+[15:52:32.928] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:55:25.802] [INFO] [bcd] library launch Horizon Zero Dawn Remastered: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[15:55:25.803] [INFO] Requesting JIT with Built-in StikJIT...
+[15:55:27.238] [INFO] [dock-launch] image-retire=1
+[15:55:27.238] [INFO] [dock-launch] image-map-guard=1
+[15:55:27.253] [INFO] [dock-installers] app=2561580 scripts=1 programs=0
+[15:55:27.254] [INFO] [madeira-dock] starting the host for app 2561580; Valve's client authenticates and authorizes the launch
+[15:55:27.259] [INFO] Running full Wine sequence...
+[15:55:27.259] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102a38000,0x8000000000) 512GB available=8146MB low-power=0 thermal=nominal
+[15:55:27.261] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[15:55:27.262] [INFO] Allocating 1152MB JIT pool via debugger...
+[15:55:27.262] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:55:27.262] [INFO] [jit-debugger] attached=1 at the pool request
+[15:55:27.263] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:55:27.826] [INFO] RX pool at 0x148000000
+[15:55:27.842] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.614s rev=ml526
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7539 MB + phys_footprint=652 MB = 8192 MB (hw.memsize says 11508 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x71a5f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=664 MB (peak 664) internal=663 MB compressed=0 MB external=103 MB reusable=20 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.240s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11b1e0000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11b1e0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11b1e0000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11b1e8000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11b1e8000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11b1ec000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a02000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.284s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11B1E0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x71aa600000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71aa700000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x71aa900000+0x400000 held for 2000 ms (3 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7025000000+0xc000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+[swap] ml1077 backed 0x71afe80000+0x1010000 (file off 8796093022208 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x71b0e90000+0x1010000 (file off 8796093022224 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+[xp-names] m969359 "wine-x18-exc"
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1031 MB (peak 1031) internal=1029 MB compressed=0 MB external=176 MB reusable=20 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 0 of 4096 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[swap] ml1150 pool: 0 MB in use (peak 32), 2 takes, 0 guarded, 0 MB lost to a full free list
+[footprint] rev=ml358 phys=1035 MB (peak 1035) internal=1034 MB compressed=0 MB external=177 MB reusable=20 MB (cycle=3)
+[file-wfail] ml669 #64 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #65 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #66 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #4 release of 0x71b9bb0000+0xfd0000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #67 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1075 MB (peak 1075) internal=1074 MB compressed=0 MB external=177 MB reusable=20 MB (cycle=4)
+[hwinput] keyboard focus: program (responder)
+[launch-view] dismissed reason=show-desktop logs=0
+[footprint] rev=ml358 phys=1065 MB (peak 1075) internal=1064 MB compressed=0 MB external=177 MB reusable=20 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\HorizonZeroDawnRemastered.exe" t+ 11.146s rev=ml526
+[session-log] Steam game HorizonZeroDawnRemastered.exe: logs/HorizonZeroDawnRemastered.exe-2026-10-21_15-55-38.txt
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\HorizonZeroDawnRemastered.exe\"" (fd=372, unixdir=373, dup_unixdir=436) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered"
+ml985: map_image_view size=0xa4f1000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0xa4f1000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa4f4000 rev=ajan5-motor
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[free-delay] #5 release of 0x71b1920000+0x100000 held for 2000 ms (1 in flight)
+[footprint] rev=ml358 phys=1177 MB (peak 1177) internal=1175 MB compressed=0 MB external=204 MB reusable=20 MB (cycle=6)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x1507fc000)
+[file-wfail] ml669 #68 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #6 release of 0x71b1c20000+0x200000 held for 2000 ms (2 in flight)
+[15:55:38.760] [INFO] [dock-report] launch-client-discovery-published=1
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000068 status=00000000 native_pc=00000071F56A2DAC is_ec=1 -> returned rip=00000071F56A2DAC rsp=00000071BD7A0000 flags=00100003
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=horizonzerodawnremastered.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f5632000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5632000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5633000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5633000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5634000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5634000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5635000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5635000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5636000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5637000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5638000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5639000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f563a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f563b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f563c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f563d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f563e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[exec-alloc] NtAllocateVirtualMemory #16 req_addr=0x71f563f000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f563f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[exec-alloc] NtAllocateVirtualMemory #17 req_addr=0x71f5950000 size=0x1000 type=0x3000 protect=0x40
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\CRS\\crs-handler.exe" t+ 12.654s rev=ml526
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\CRS\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations --kill-timeout=2147483647 --locale=US \"--app-name=Horizon Zero Dawn\2122 Remastered\" \"--database=C:\\users\\mobile\\AppData\\Ro"... (fd=508, unixdir=510, dup_unixdir=514) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\"
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #18 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[15:55:40.022] [INFO] [dock-report] launch-game-running=1
+[copy-verify] winhttp.dll: OK, 8 .text pages executable (copy @0x1534f0000)
+[win-name] #31 hwnd=0x10060 class='' text="Default IME" rev=ml853
+[free-delay] #3 reservation at 0x71c7c00000+0x600000: 1 held release(s) from 0x71c7a40000 (0x7ff000 bytes) freed at once (4 in flight)
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71ed560000-0x71ed59b029
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71ed5a0000-0x71ed5a0f90
+D A8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71ED550000
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71ed560000-0x71ed59b029
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71ed5a0000-0x71ed5a0f90
+E A8 [img-map] ml710 #55 intervals-only WININET.dll base=0x71ed550000
+00a8:err:module:load_dll [dll-missing] rev=ml336 #5 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #6 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Horizon Zero Dawn Remastered/Horizon Zero Dawn Remastered.log
+[guest-log] #1 tid=00a8 22:55:41:008 (00000168) > [Render] Enumerating adapters:
+[guest-log] #2 tid=00a8 22:55:41:008 (00000168) > [Render] 	Adapter 0:
+[guest-log] #3 tid=00a8 22:55:41:008 (00000168) > [Monitor] 		Description             : Apple A20 Pro GPU
+[guest-log] #4 tid=00a8 22:55:41:008 (00000168) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #5 tid=00a8 22:55:41:008 (00000168) > [Monitor] 		Device                  : 2544
+[guest-log] #6 tid=00a8 22:55:41:008 (00000168) > [Monitor] 		Sub system              : 0
+[guest-log] #12 tid=00a8 22:55:41:008 (00000168) > [Render] Loading NVAPI...
+00a8:err:module:load_dll [dll-missing] rev=ml336 #7 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #8 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071B1A71A80, feature level 0xb000, create)
+[guest-log] #23 tid=00a8 22:55:41:020 (00000168) > [NxApp] Querying GPU Driver Info...
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071B1A71A80, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+ml985: map_image_view size=0x46b6000 base=0x6ffff2b30000 info_base=0x180000000 map_addr=0x6ffff2b30000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\amd_fidelityfx_dx12.dll" 0x71e7d90000+0x630000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[guest-log] #31 tid=00a8 22:55:41:242 (00000168) > [Validate Settings] The requested display mode (ResX:1568 ResY:720 Hz:60 3D:0 Exclusive: false, HDR: false) was not available, finding the best alternative...
+[guest-log] #32 tid=00a8 22:55:41:242 (00000168) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #33 tid=00a8 22:55:41:242 (00000168) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #34 tid=00a8 22:55:41:242 (00000168) > [Validate Settings] Changed display mode. (ResX:1408 ResY:648 Hz:60 3D:0 HDR:false)
+[free-delay] #4 reservation at 0x71d9000000+0x200000: 1 held release(s) from 0x71d8ff0000 (0x3ff000 bytes) freed at once (7 in flight)
+[swap] ml1077 backed 0x71d9200000+0x1000000 (file off 8796093022224 MB): 16 MB in 1 extents, peak 32 MB, 0 refused
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\dstorage.dll" 0x71e7c90000+0x36000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #9 L"dstoragecore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\DStorageCore.dll" 0x71e7b10000+0x17b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[swap] ml1077 backed 0x71dd830000+0x1010000 (file off 8796093022208 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+[swap] ml1077 backed 0x71de840000+0x1010000 (file off 8796093022240 MB): 48 MB in 3 extents, peak 48 MB, 0 refused
+[madeira-d3d12] command queue: type 3
+00a8:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00a8 hit=1
+00a8:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00a8 hit=2
+00a8:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E974110 flags=1 nparams=4 tid=00a8 hit=3
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71b19d5000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x8000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71b19e9000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0xc000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71b1a01000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x14000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71b1dd1000 size=0x20000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x24000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71df891000 size=0x40000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x44000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71df921000 size=0x80000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x84000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71dfa31000 size=0x100000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71dfc41000 size=0x200000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x204000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71e0051000 size=0x400000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x4000
+[swap] ml1077 backed 0x71e0060000+0x800000 (file off 8796093022256 MB): 56 MB in 4 extents, peak 56 MB, 0 refused
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71e0861000 size=0x800000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x804000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71e1871000 size=0x1000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x1004000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71e3881000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x2004000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71e7891000 size=0x4000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x8000
+[free-delay] #5 reservation at 0x71e2200000+0x800000: 1 held release(s) from 0x71e2060000 (0x9ff000 bytes) freed at once (11 in flight)
+[alloc-fail] ml814 #30 status=c0000018 hint=0x7407ff1000 size=0x8000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0xa00000
+[bigres] tid=00a8 #1 size=0x10001000 (256 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x1092a4000 total=256 MB
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x10014000) and no V8 cage was asked for; its first page stays a guard
+[swap] ml1077 backed 0x7213dc0000+0x1000000 (file off 8796093022312 MB): 360 MB in 9 extents, peak 456 MB, 0 refused
+[free-delay] #6 reservation at 0x7214e00000+0x200000: 1 held release(s) from 0x7214dd0000 (0x3ff000 bytes) freed at once (12 in flight)
+[free-delay] #7 reservation at 0x7215e00000+0x200000: 1 held release(s) from 0x7215dd0000 (0x3ff000 bytes) freed at once (13 in flight)
+[alloc-fail] ml814 #31 status=c0000018 hint=0x7215006000 size=0x5000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x721503b000 size=0xa000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x7215095000 size=0x14000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71b19d5000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x7215dd6000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x7216217000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x7215199000 size=0x28000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x7216268000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x7216319000 size=0x2000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x721503b000 size=0x2000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x721896d000 size=0x2000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x72162e1000 size=0x50000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x7218a1f000 size=0x2000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x7218b41000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x7215095000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x721b269000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x7218ae1000 size=0xa0000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x721d96d000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x721dba1000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x7215199000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x7220461000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x721daf1000 size=0x140000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x7222b69000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x7223b21000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x72162e1000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x7224151000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x7222fb1000 size=0x280000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x7224451000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x7224fb1000 size=0x20000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x7218ae1000 size=0x20000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x72260b5000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x7216319000 size=0x8000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x72263d5000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x7218b41000 size=0x10000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[jumbo#1] +0ms tid=16dadf000 wtid=00a8 peb=0x1092a4000 nrip=0x129072560 grip=0x14e293050 size=0x440000000 (17408 MB) hint=0x0 -> 0x73ffff0000 st=0x0 | granted=17408 MB ok=1 fail=0
+[x64-image] L"\\??\\c:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\tools\\bin\\x64\\DXCompiler.dll" 0x73feb10000+0x1095000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #10 L"dxil.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 2
+[win-name] #35 hwnd=0x1006e class='' text="Default IME" rev=ml853
+[win-name] #36 hwnd=0x10066 class='' text="Horizon Zero Dawn? Remastered v1.5.89.0" rev=ml853
+[swap-diag] #1 layer 0x1288f65e0: drawable 0x0 format 80 -> 1408x648 format 70, set on the iOS main thread (dispatch_sync) ...
+[swap] ml1077 backed 0x72436e0000+0x8000000 (file off 8796093022504 MB): 582 MB in 16 extents, peak 582 MB, 0 refused
+[bigres] tid=00a8 #2 size=0x17800000 (376 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x1092a4000 total=632 MB
+[swap] ml1077 backed 0x724c0e0000+0x17800000 (file off 0 MB): 958 MB in 17 extents, peak 958 MB, 0 refused
+[bigres] tid=00a8 #3 size=0x17800000 (376 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x1092a4000 total=1008 MB
+[swap] ml1077 backed 0x72638e0000+0x17800000 (file off 376 MB): 1334 MB in 18 extents, peak 1334 MB, 0 refused
+[swap] ml1077 backed 0x727b0e0000+0xe000000 (file off 752 MB): 1558 MB in 19 extents, peak 1558 MB, 0 refused
+[free-delay] #8 reservation at 0x7289c00000+0xa00000: 1 held release(s) from 0x7289af0000 (0xbff000 bytes) freed at once (17 in flight)
+[win-name] #102 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #103 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #104 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #105 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #106 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #107 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #108 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #109 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #111 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #112 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #114 hwnd=0x100a2 class='' text="The PlayStation(R) PC SDK Runtime cannot start. (E-002)" rev=ml853
+[win-name] #118 hwnd=0x10096 class='' text="OK" rev=ml853
+[win-name] #119 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[footprint] rev=ml1060 fast phys=2420 MB compressed=0 MB
+[win-name] #120 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #121 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #122 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+[win-name] #123 hwnd=0x10082 class='' text="HorizonZeroDawnRemastered.exe - System Error" rev=ml853
+ml985: map_image_view size=0xbfb3000 base=0x6fffe50d0000 info_base=0x180000000 map_addr=0x6fffe50d0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[footprint] rev=ml1060 fast phys=2632 MB compressed=0 MB
+[x64-image] L"\\??\\c:\\program files (x86)\\steam\\steamapps\\common\\horizon zero dawn remastered\\localcachedx12\\fullgame.dll" 0x73f24b0000+0xbfb3000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #128 status=c0000018 hint=0x72970b9000 size=0x8000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml1060 fast phys=2859 MB compressed=190 MB
+[bigres] tid=0114 #4 size=0x10001000 (256 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x1092a4000 total=1264 MB
+[swap] ml1077 backed 0x72af070000+0x10000000 (file off 1025 MB): 1808 MB in 19 extents, peak 1808 MB, 0 refused
+[footprint] rev=ml1060 fast phys=2888 MB compressed=297 MB
+[alloc-fail] ml814 #192 status=c0000018 hint=0x7297d51000 size=0x4000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml1060 fast phys=2930 MB compressed=700 MB
+[footprint] rev=ml1060 fast phys=3231 MB compressed=755 MB
+[alloc-fail] ml814 #256 status=c0000018 hint=0x72996b5000 size=0x1000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=16% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dd0b9c0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16d3c6230
+[thread-stacks] port=0x2d03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x204326c0c x18=0x0 sp=0x16d5ee9f0
+[thread-stacks] port=0x280b "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x680f x18=0x0 sp=0x16d4dac40
+[thread-stacks] port=0x11863 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x204326c0c x18=0x0 sp=0x16d564560
+[thread-stacks] port=0xf763 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=13 x8=0x1 x18=0x0 sp=0x16d67eb40
+[thread-stacks] port=0x1883 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x11a7b0501 x18=0x0 sp=0x16d70ab30
+[thread-stacks] port=0xcb53 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=166 x8=0x0 x18=0x0 sp=0x16dd0cd30
+[alloc-fail] ml814 #320 status=c0000018 hint=0x72e9217000 size=0x1000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Horizon Zero Dawn Remastered\\bink2w64.dll" 0x73f1f50000+0x65000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module bink2w64.dll (bink2w64.dll-0e6f653065c55eb9): 73F1F50000
+D A8 Load module xaudio2_8.dll (xaudio2_8.dll-6d69cf073a3abd5f): 73F1EA0000
+D A8 Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 73F1DD0000
+D A8 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 73F1D30000
+D A8 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 73F1CB0000
+D A8 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 73F1C10000
+[ios_audio] ml1230 pacing stream=0x1232a9e00 lead 60 ms: client wrote 2.35 s of audio in 10.00 s (23.5%) over 996 wakes; device short 7644.0 ms in 468 of 468 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1232aa500 lead 60 ms: client wrote 10.08 s of audio in 10.01 s (100.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[15:55:57.985] [INFO] detach-wait: presents=722 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=135 resident=3123MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1232a9e00 lead 60 ms: client wrote 2.34 s of audio in 10.00 s (23.4%) over 993 wakes; device short 7655.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1232aa500 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xcb53 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=33 x8=0x0 x18=0x0 sp=0x16dd0cd30
+[nls-getptr] type=11 id=10000 peb=0x1092a4000
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dd0cd30 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1232a9e00 lead 60 ms: client wrote 2.35 s of audio in 10.00 s (23.5%) over 993 wakes; device short 7665.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1232aa500 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[nls-getptr] type=11 id=10000 peb=0x1092a4000
+[nls-getptr] type=11 id=10001 peb=0x1092a4000
+[nls-getptr] type=11 id=10000 peb=0x1092a4000
+[nls-getptr] type=11 id=10000 peb=0x1092a4000
+[nls-getptr] type=11 id=10008 peb=0x1092a4000
+[swap] ml1077 stats: 1908 MB file-backed now (peak 2027), 22 extents, file used 1497 of 4096 MB, backs 45 releases 23 unbacks 0 refused 0 | coverage classic: disk 274 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[15:56:28.080] [INFO] detach-wait: presents=2502 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=130 resident=3180MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xcb53 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=23 x8=0x0 x18=0x0 sp=0x16dd0cd30
+[guest-log] #59 tid=0244 22:56:28:678 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dd0cd30 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[guest-log] #60 tid=0244 22:56:38:899 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[thread-stacks] port=0xcb53 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=16 x8=0x0 x18=0x0 sp=0x16dd0cd30
+[guest-log] #61 tid=0244 22:56:49:120 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[15:56:58.161] [INFO] detach-wait: presents=4290 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=129 resident=3274MB dbg=DEBUGGED rev=ml525
+[guest-log] #62 tid=0244 22:56:59:346 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[ios_audio] ml1230 pacing stream=0x1232aa700 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dd0cd30 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1232a9e00 lead 60 ms: client wrote 10.08 s of audio in 10.01 s (100.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1232aa500 lead 60 ms: client wrote 10.08 s of audio in 10.01 s (100.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xcb53 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=16 x8=0x0 x18=0x0 sp=0x16dd0cd30
+[thread-stacks] port=0x224a7 "AsyncPsoQueue:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=26 x8=0x16e3180e0 x18=0x0 sp=0x72d29be9d0
+[thread-stacks] port=0x22703 "AsyncPsoQueue:1" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=27 x8=0x16e31c0e0 x18=0x0 sp=0x72d341e9d0
+[thread-stacks] port=0x2757b "FAudio_AudioClientThread" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16dfe40e0 x18=0x0 sp=0x7229a4e9c0
+[thread-stacks] port=0x27303 "audio_client_timer" pc=libsystem_kernel.dylib`mach_wait_until+0x8 run=3 susp=0 cpu=0 x8=0x3a980 x18=0x0 sp=0x722b7af9a0
+[thread-stacks] port=0x2312b "audio_client_timer" pc=libsystem_kernel.dylib`mach_wait_until+0x8 run=3 susp=0 cpu=0 x8=0x3a980 x18=0x0 sp=0x722a71f9a0
+[thread-stacks] port=0x23a53 "audio_client_timer" pc=libsystem_kernel.dylib`mach_wait_until+0x8 run=3 susp=0 cpu=0 x8=0x3a980 x18=0x0 sp=0x722aa2f9a0
+[guest-log] #63 tid=0244 22:57:09:600 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[footprint] rev=ml358 phys=5487 MB (peak 5487) internal=2837 MB compressed=1295 MB external=603 MB reusable=0 MB (cycle=53)
+[footprint] rev=ml358 phys=5493 MB (peak 5493) internal=2843 MB compressed=1295 MB external=603 MB reusable=0 MB (cycle=54)
+[alloc-fail] ml814 #384 status=c0000018 hint=0x7295f2d000 size=0x4000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[alloc-fail] ml814 #448 status=c0000018 hint=0x7229655000 size=0x4000 type=0x3000 protect=0x4 tid=0104 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #512 status=c0000018 hint=0x72287d5000 size=0x1000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[alloc-fail] ml814 #576 status=c0000018 hint=0x72d7508000 size=0x1000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #640 status=c0000018 hint=0x72dd7f9000 size=0x2000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #704 status=c0000018 hint=0x72ec499000 size=0x2000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml358 phys=5851 MB (peak 5851) internal=2980 MB compressed=1365 MB external=392 MB reusable=0 MB (cycle=55)
+[ios_audio] ml1230 pacing stream=0x1232a9e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1232aa500 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1226MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/79 (peak 3) tex-sampled=32MB/111 (peak 96) tex-MSAA=0MB/0 (peak 0) buf-private=119MB/203 (peak 119) buf-shared=1060MB/284 (peak 1099)
+[alloc-fail] ml814 #768 status=c0000018 hint=0x7304fc5000 size=0x1000 type=0x3000 protect=0x4 tid=0110 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #832 status=c0000018 hint=0x7295e05000 size=0x1000 type=0x3000 protect=0x4 tid=0114 | STAGE=none err=3 at 0x7025000000+0x104000
+[ios_audio] ml1230 pacing stream=0x1232aa700 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[alloc-fail] ml814 #896 status=c0000018 hint=0x730e28d000 size=0x4000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[swap] ml1150 pool: memory pressure CRITICAL; pool 534 MB in use
+[footprint] rev=ml358 phys=6565 MB (peak 6565) internal=2504 MB compressed=2175 MB external=405 MB reusable=0 MB (cycle=56)
+[guest-log] #64 tid=0244 22:57:19:830 (00000580) > [PSN Account Linking] [AuthenticationRequest] 5 error 12157
+[alloc-fail] ml814 #960 status=c0000018 hint=0x72fa125000 size=0x1000 type=0x3000 protect=0x4 tid=010c | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #1024 status=c0000018 hint=0x72fea66000 size=0x1000 type=0x3000 protect=0x4 tid=010c | STAGE=none err=3 at 0x7025000000+0x104000
+[nt-fail] #116 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=010c size=0x1000 type=0x3000 prot=0x4 hint=0x730cd67000 zb=0x0 hits=512 rev=ajan5-rockstar
+[alloc-fail] ml814 #1088 status=c0000018 hint=0x72fe077000 size=0x1000 type=0x3000 protect=0x4 tid=010c | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml358 phys=7093 MB (peak 7093) internal=2097 MB compressed=2757 MB external=379 MB reusable=0 MB (cycle=57)
+[alloc-fail] ml814 #1152 status=c0000018 hint=0x72381d6000 size=0x1000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[nt-fail] #117 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=0118 size=0x2000 type=0x3000 prot=0x4 hint=0x730de9f000 zb=0x0 hits=256 rev=ajan5-rockstar
+[nt-fail] #118 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=0118 size=0x18000 type=0x3000 prot=0x4 hint=0x732ad41000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #1216 status=c0000018 hint=0x72f5735000 size=0x1000 type=0x3000 protect=0x4 tid=0110 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #1280 status=c0000018 hint=0x732ecc6000 size=0x1000 type=0x3000 protect=0x4 tid=0110 | STAGE=none err=3 at 0x7025000000+0x104000
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1628MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/111 (peak 3) tex-sampled=33MB/114 (peak 96) tex-MSAA=0MB/0 (peak 0) buf-private=519MB/234 (peak 519) buf-shared=1061MB/290 (peak 1099)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1676MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=3MB/111 (peak 3) tex-sampled=33MB/114 (peak 96) tex-MSAA=0MB/0 (peak 0) buf-private=567MB/237 (peak 567) buf-shared=1061MB/290 (peak 1099)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=11% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dd0cd30 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=7439 MB compressed=3060 MB
+[alloc-fail] ml814 #1344 status=c0000018 hint=0x731b27f000 size=0x2000 type=0x3000 protect=0x4 tid=0100 | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml1060 fast phys=7522 MB compressed=3055 MB
+[alloc-fail] ml814 #1408 status=c0000018 hint=0x72d87b1000 size=0x4000 type=0x3000 protect=0x4 tid=0108 | STAGE=none err=3 at 0x7025000000+0x104000
+[nt-fail] #119 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=0108 size=0x10000 type=0x3000 prot=0x4 hint=0x732f771000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #1472 status=c0000018 hint=0x733d477000 size=0x1000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=3 at 0x7025000000+0x10004000
+[footprint] rev=ml1060 fast phys=7658 MB compressed=3347 MB
+[footprint] rev=ml1060 fast phys=7783 MB compressed=3514 MB
+[alloc-fail] ml814 #1536 status=c0000018 hint=0x732dd48000 size=0x1000 type=0x3000 protect=0x4 tid=0110 | STAGE=none err=3 at 0x7025000000+0x104000
+[alloc-fail] ml814 #1600 status=c0000018 hint=0x734b435000 size=0x1000 type=0x3000 protect=0x4 tid=0108 | STAGE=none err=3 at 0x7025000000+0x104000
+[footprint] rev=ml358 phys=7952 MB (peak 7952) internal=2104 MB compressed=3287 MB external=286 MB reusable=0 MB (cycle=58)
+[nt-fail] #120 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=0114 size=0x300000 type=0x3000 prot=0x4 hint=0x72f5d11000 zb=0x0 hits=1 rev=ajan5-rockstar
+[nt-fail] #121 NtAllocateVirtualMemory status=c0000018 proc=horizonzerodawnremastered.exe tid=010c size=0x3000 type=0x3000 prot=0x4 hint=0x7303f36000 zb=0x0 hits=2 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=8100 MB compressed=3346 MB
+[alloc-fail] ml814 #1664 status=c0000018 hint=0x732bc55000 size=0x1000 type=0x3000 protect=0x4 tid=0118 | STAGE=none err=3 at 0x7025000000+0xfd0000
+[footprint] rev=ml1060 fast phys=8174 MB compressed=3420 MB

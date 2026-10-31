@@ -25,4 +25,9 @@ static inline __attribute__((noreturn)) void wine_ios_exit(int status) {
 }
 
 #define exit(x) wine_ios_exit(x)
+
+/* madeira-bcd (round 624, agent D1 S8): the loader step the app is in, read by the early fault reporter of build/wineserver/early_fault_ios.h;
+ * plain constant strings, last writer wins (defined in build/ntdll-unix/loader_ios.c). */
+extern const char *volatile ios_loader_phase;
+#define IOS_PHASE(s) (ios_loader_phase = (s))
 #endif

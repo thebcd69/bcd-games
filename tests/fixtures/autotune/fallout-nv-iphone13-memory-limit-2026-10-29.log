@@ -1,0 +1,388 @@
+[15:02:43.866] [INFO] Checking entitlements...
+[15:02:43.867] [INFO] [build] v0.1.622 (622)
+[15:02:43.868] [INFO] [device] model=iPhone14,5 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=3661MB available=2331MB cores=6
+[15:02:43.868] [INFO] [device] address-map=[0x1043e8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[15:02:43.890] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:02:48.800] [INFO] Requesting JIT with StikDebug...
+[15:02:48.817] [INFO] Opening StikDebug to enable JIT...
+[15:02:55.402] [INFO] [bcd] library launch Fallout New Vegas: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[15:02:58.722] [INFO] [dock-launch] image-retire=1
+[15:02:58.722] [INFO] [dock-launch] image-map-guard=1
+[15:02:58.788] [INFO] [dock-script-registry] app=22380 scripts=1 values=1 written=0 present=2 skipped=- language=english
+[15:02:58.965] [INFO] [dock-installers] app=22380 program=visualcredist file=vcredist_x86.exe status=done key=HKLM\Software\Valve\Steam\Apps\22380 recorded=1 minimum=1 machine=0x14c
+[15:02:59.023] [INFO] [dock-installers] app=22380 program=directx file=DXSETUP.exe status=done key=HKLM\Software\Valve\Steam\Apps\22380 recorded=1 minimum=1 machine=0x14c
+[15:02:59.024] [INFO] [dock-installers] app=22380 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[15:02:59.025] [INFO] [madeira-dock] starting the host for app 22380; Valve's client authenticates and authorizes the launch
+[15:02:59.039] [INFO] Running full Wine sequence...
+[15:02:59.039] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1043e8000,0x8000000000) 512GB available=2304MB low-power=0 thermal=nominal
+[15:02:59.043] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): only 32-bit programs show Direct3D 9 (FalloutNV.exe imports d3d9.dll) (Fallout New Vegas, remembered)
+[15:02:59.050] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:02:59.050] [INFO] Allocating 896MB JIT pool via debugger...
+[15:02:59.051] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:02:59.051] [INFO] [jit-debugger] attached=1 at the pool request
+[15:02:59.056] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:03:02.097] [INFO] RX pool at 0x11ce98000
+[phase] wine-start             t+  3.173s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1077 backed 0x71ffe00000+0x200000 (whole reservation, ml1257) (file off 0 MB): 2 MB in 1 extents, peak 2 MB, 0 refused
+ml992: os_proc_available_memory=1734 MB + phys_footprint=613 MB = 2348 MB (hw.memsize says 3661 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x11ce9c000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11cf10000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11d028000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11d0d0000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x11d250000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x11d324000)
+[footprint] rev=ml358 phys=617 MB (peak 617) internal=378 MB compressed=238 MB external=77 MB reusable=7 MB (cycle=1)
+[swap] ml1077 backed 0x7023950000+0x100000 (whole reservation, ml1257) (file off 2 MB): 3 MB in 2 extents, peak 3 MB, 0 refused
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[swap] ml1077 backed 0x70240d0000+0x100000 (whole reservation, ml1257) (file off 3 MB): 4 MB in 3 extents, peak 4 MB, 0 refused
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x7024220000+0x480000 (whole reservation, ml1257) (file off 4 MB): 8 MB in 4 extents, peak 8 MB, 0 refused
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  4.117s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x1168a0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[swap] ml1077 backed 0x7027020000+0x100000 (whole reservation, ml1257) (file off 8 MB): 9 MB in 5 extents, peak 9 MB, 0 refused
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  4.248s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[swap] ml1077 backed 0x7027cc0000+0x24c000 (whole reservation, ml1257) (file off 9 MB): 11 MB in 6 extents, peak 11 MB, 0 refused
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 1168A0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[xp-names] m268750 "wine-x18-exc"
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #1 release of 0x70285f0000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x11ed00bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x11ed00bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x11ed00bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x11ed00bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[swap] ml1077 backed 0x702c280000+0x1010000 (whole reservation, ml1257) (file off 33 MB): 50 MB in 13 extents, peak 50 MB, 0 refused
+[swap] ml1077 backed 0x702d290000+0x400000 (whole reservation, ml1257) (file off 50 MB): 54 MB in 14 extents, peak 54 MB, 0 refused
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[swap] ml1077 backed 0x702b270000+0x120000 (whole reservation, ml1257) (file off 17 MB): 23 MB in 13 extents, peak 54 MB, 0 refused
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=865 MB (peak 865) internal=407 MB compressed=457 MB external=155 MB reusable=5 MB (cycle=2)
+[swap] ml1077 stats: 23 MB file-backed now (peak 54), 13 extents, file used 54 of 131072 MB, backs 15 releases 2 unbacks 0 refused 0 | coverage broad: disk 0 MB of 3072 cap, reservations 15, holes 9, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 15 MB (peak 46), 0 MB kept in memory by swap-mb
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F4 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[swap] ml1077 backed 0x70336a0000+0x800000 (whole reservation, ml1257) (file off 19 MB): 30 MB in 13 extents, peak 54 MB, 0 refused
+[free-delay] #2 release of 0x70336a0000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7033ea0000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7034e70000+0xfd0000 held for 2000 ms (3 in flight)
+[footprint] rev=ml358 phys=1045 MB (peak 1045) internal=610 MB compressed=432 MB external=166 MB reusable=5 MB (cycle=3)
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1058 MB (peak 1058) internal=609 MB compressed=446 MB external=167 MB reusable=4 MB (cycle=4)
+[footprint] rev=ml358 phys=1058 MB (peak 1058) internal=609 MB compressed=446 MB external=166 MB reusable=4 MB (cycle=5)
+008c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNVLauncher.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNVLauncher.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNVLauncher.exe" t+ 13.713s rev=ml526
+[session-log] Steam game FalloutNVLauncher.exe: logs/FalloutNVLauncher.exe-2026-10-29_15-03-12.txt
+[wow-window] session armed: a 32-bit process is expected
+008c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNVLauncher.exe\"" (fd=390, unixdir=391, dup_unixdir=437) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f57b0000, then OCCUPIED 0x71f57b0000+0x40000 prot=3/7 shared=0 (0xa850000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files (x86)/Steam/steamapps/common/Fallout New Vegas/FalloutNVLauncher.exe') = 0x0
+00a8:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f5380000+0x3bc000 (libwow64fex.dll) → pool 0x126a19000 used=0x9f45000/0x23000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f5380000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #76 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[unixlib] libwow64fex.dll (module 0x71f5380000) -> 64-bit table (0x1071b0758)
+D A8 Load module FalloutNVLauncher.exe (falloutnvlauncher.exe-5ea6162f412ced78): 7900400000
+ml957: ? backing 0x797b8b8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b4a8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797aaa0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a7e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[15:03:13.039] [INFO] [dock-report] launch-client-discovery-published=1
+[footprint] rev=ml358 phys=1105 MB (peak 1105) internal=683 MB compressed=420 MB external=171 MB reusable=5 MB (cycle=6)
+[pool-section-reach] ? .data: the RW mprotect of this section reaches 0x10034000 bytes past its copy (copy 0x1272bb000, ends 0x127314000) -- NOT clamped: those pool pages lose EXEC for good (set env.MADEIRA_POOL_CLAMP_SECTIONS=1) rev=ajan5-motor
+ml957: ? backing 0x7910000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[pool-poison] HANDED OUT NON-EXEC off=0xa480000 +0x0 va=0x127318000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[free-delay] #5 release of 0x7901a00000+0x200000 held for 2000 ms (1 in flight)
+[pool-poison] HANDED OUT NON-EXEC off=0xa48c000 +0x0 va=0x127324000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa4a8000 +0x0 va=0x127340000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa4c0000 +0x0 va=0x127358000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa4e0000 +0x0 va=0x127378000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa500000 +0x0 va=0x127398000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[file-wfail] ml669 #77 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #6 release of 0x7903e30000+0x120000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x7903f50000+0x100000 held for 2000 ms (3 in flight)
+[15:03:14.039] [INFO] [dock-report] launch-game-running=1
+[alloc-fail] ml814 #2 status=c0000018 hint=0x79ffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=falloutnvlauncher.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0x79ffeeffee zb=0xffffffff hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #3 status=c0000018 hint=0x797bebf000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=falloutnvlauncher.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x797bebf000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[stale-heal]   3 slot(s) in the copy of 0x71f5380000 (libwow64fex.dll) -> 0x1268fb294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[win-name] #31 hwnd=0x10062 class='' text="Default IME" rev=ml853
+[win-name] #35 hwnd=0x10064 class='' text="?y" rev=ml853
+[win-name] #36 hwnd=0x10064 class='' text="?y" rev=ml853
+[free-delay] #8 release of 0x7907d80000+0x800000 held for 2000 ms (4 in flight)
+[launch-view] dismissed reason=game-window logs=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c475040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x1519f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=12 x8=0x0 x18=0x0 sp=0x16c475040
+[wow-stack-free] #1 the dead thread 00ac's 32-bit stack (guest 0x7460000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x7460000 is not a live view -> released at the old address (as before) rev=ajan11
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=1% RUN pc=Madeira`ios_mach_exception_thread+0x642c lr=Madeira`ios_mach_exception_thread+0x46f0 sp=0x16c4751e0 NATIVE (no FEX state) sp-cand=[ ]
+[15:03:32.331] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=41 resident=805MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x1519f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=13 x8=0x0 x18=0x0 sp=0x16c475040
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c475040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 43 MB file-backed now (peak 77), 17 extents, file used 85 of 131072 MB, backs 26 releases 9 unbacks 0 refused 0 | coverage broad: disk 14 MB of 3072 cap, reservations 20, holes 51, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 25 MB (peak 46), 0 MB kept in memory by swap-mb
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=41 resident=814MB dbg=DEBUGGED rev=ml525
+[15:04:02.440] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=40 resident=796MB dbg=DEBUGGED rev=ml525
+[15:04:32.545] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[hwinput] keyboard focus: program (tap on the game view)
+[win-name] #301 hwnd=0x1008c class='' text="Advanced..." rev=ml853
+[win-name] #302 hwnd=0x1008c class='' text="Advanced..." rev=ml853
+00a8:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Video settings have been set for Low Quality." / L"Video settings have been set for Low Quality.": main exe base 00400000 size 0x1fc000
+[swap] ml1077 stats: 43 MB file-backed now (peak 77), 17 extents, file used 85 of 131072 MB, backs 26 releases 9 unbacks 0 refused 0 | coverage broad: disk 14 MB of 3072 cap, reservations 20, holes 51, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 25 MB (peak 46), 0 MB kept in memory by swap-mb
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=40 resident=796MB dbg=DEBUGGED rev=ml525
+[15:05:02.638] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+00a8:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Video settings have been set for Medium Quality." / L"Video settings have been set for Medium Quality.": main exe base 00400000 size 0x1fc000
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNV.exe" t+150.638s rev=ml526
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNV.exe\"" (fd=424, unixdir=425, dup_unixdir=455) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f4f40000, then OCCUPIED 0x71f4f40000+0x10000 prot=1/3 shared=0 (0xb0c0000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=borrowed
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+[pool-poison] HANDED OUT NON-EXEC off=0xc01c000 +0x0 va=0x128eb4000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xc134000 +0x0 va=0x128fcc000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xc24c000 +0x0 va=0x1290e4000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xc364000 +0x0 va=0x1291fc000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xc47c000 +0x0 va=0x129314000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xc594000 +0x0 va=0x12942c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=850 peb=0x7200310000
+00d0:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f4b10000+0x3bc000 (libwow64fex.dll) → pool 0x1374d9000 used=0x1aa05000/0x23000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f4b10000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+[unixlib] libwow64fex.dll (module 0x71f4b10000) -> 64-bit table (0x1071b0758)
+D D0 Load module FalloutNV.exe (falloutnv.exe-7d2dc57032aa0a02): 7200400000
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=850 peb=0x7200310000
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+[unixlib] opengl32 (GL-absent stub table) (module 0x7278230000) -> wow64 table (0x1071b8758)
+[alloc-fail] ml814 #4 status=c0000018 hint=0x7210000000 size=0x71000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x71000 type=0x2000 prot=0x4 hint=0x7210000000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[pool-section-reach] ? .data: the RW mprotect of this section reaches 0x2a74000 bytes past its copy (copy 0x137dc6000, ends 0x137e38000) -- NOT clamped: those pool pages lose EXEC for good (set env.MADEIRA_POOL_CLAMP_SECTIONS=1) rev=ajan5-motor
+[copy-verify] ? BORN NON-EXEC text+0x4000 va=0x137e69000 prot=3 max=3
+[copy-verify] ? BORN NON-EXEC text+0x8000 va=0x137e6d000 prot=3 max=3
+[copy-verify] ? BORN NON-EXEC text+0xc000 va=0x137e71000 prot=3 max=3
+[copy-verify] ?: 4 of 4 .text pages BORN NON-EXEC (copy @0x137e64000)
+[copy-verify] ? BORN NON-EXEC text+0x0 va=0x137e85000 prot=3 max=3
+[copy-verify] ?: 1 of 1 .text pages BORN NON-EXEC (copy @0x137e84000)
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #83 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+E D0 [iOS-xins] tracker=0x137858e50 WININET.dll sec=0x7278071000-0x72780a4f6c
+D D0 Load module WININET.dll (wininet.dll-7ed1ba985c3a8d1d): 7278070000
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=9171
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=9182
+00a8:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=436
+[wow-window] slot 0 B=0x7900000000 released (owner peb=0x7900310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(0)
+[exc-disp]   OutputDebugStringW: "C:\Program Files (x86)\Steam\dumps\assert_falloutnv.exe_20261029150531_1.dmp"
+[15:05:32.716] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=39 resident=1352MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c475040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 backed 0x7218070000+0x5500000 (file off 85 MB): 142 MB in 21 extents, peak 142 MB, 0 refused
+[alloc-fail] ml814 #5 status=c0000018 hint=0x7201000000 size=0x600000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x600000 type=0x2000 prot=0x4 hint=0x7201000000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x7202000000 size=0x600000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x600000 type=0x2000 prot=0x4 hint=0x7202000000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[free-delay] #1 reservation at 0x7203000000+0x600000: 1 held release(s) from 0x7202af0000 (0xbe0000 bytes) freed at once (2 in flight)
+[alloc-fail] ml814 #7 status=c0000018 hint=0x7201000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x7202000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x7203000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x7204000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x7205000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x7206000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x7207000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x7208000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x7209000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x720a000000 size=0x500000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x7201000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x7202000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x7203000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x7204000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x7205000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x7206000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x7207000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x7208000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x7209000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x720a000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x720b000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x7201000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x7202000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x7203000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x7204000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x7205000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x7206000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x7207000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x7208000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x7209000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x720a000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x720b000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x720c000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x7201000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x7202000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x7203000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x7204000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x7205000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x7206000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x7207000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x7208000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x7209000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x720a000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x720b000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x720c000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x720d000000 size=0x800000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x7201000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x7202000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x7203000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x7204000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x7205000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x7206000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x7207000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x7208000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x7209000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x720a000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x720b000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x720c000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #128 status=c0000018 hint=0x720b000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #192 status=c0000018 hint=0x720f000000 size=0x100000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[free-delay] #1 reservation at 0x7205000000+0xd00000 also meets a live view or another program's release: its 1 held release(s) stay held
+[alloc-fail] ml814 #256 status=c0000018 hint=0x7215000000 size=0xd00000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #320 status=c0000018 hint=0x720a000000 size=0x300000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #384 status=c0000018 hint=0x7223000000 size=0x200000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[free-delay] #2 reservation at 0x7205000000+0xf00000 also meets a live view or another program's release: its 1 held release(s) stay held
+[alloc-fail] ml814 #448 status=c0000018 hint=0x7212000000 size=0x100000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #512 status=c0000018 hint=0x7228000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #576 status=c0000018 hint=0x7211000000 size=0x100000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #640 status=c0000018 hint=0x7224000000 size=0x200000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #704 status=c0000018 hint=0x7207000000 size=0x300000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #768 status=c0000018 hint=0x7217000000 size=0x300000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #832 status=c0000018 hint=0x7226000000 size=0x300000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #896 status=c0000018 hint=0x7201000000 size=0x200000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #960 status=c0000018 hint=0x720d000000 size=0x300000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #1024 status=c0000018 hint=0x7218000000 size=0x100000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #70 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x100000 type=0x2000 prot=0x4 hint=0x7204000000 zb=0xffffffff hits=256 rev=ajan5-rockstar
+[alloc-fail] ml814 #1088 status=c0000018 hint=0x7222000000 size=0x100000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #1152 status=c0000018 hint=0x722b000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[alloc-fail] ml814 #1216 status=c0000018 hint=0x7233000000 size=0x400000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #71 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x400000 type=0x2000 prot=0x4 hint=0x7239000000 zb=0xffffffff hits=256 rev=ajan5-rockstar
+[alloc-fail] ml814 #1280 status=c0000018 hint=0x723a000000 size=0x200000 type=0x2000 protect=0x4 tid=00d0 | STAGE=none err=1 at 0x100000000+0x800000
+[nt-fail] #72 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x1 type=0x2000 prot=0x1 hint=0x72ffeeffee zb=0xffffffff hits=1 rev=ajan5-rockstar
+[nt-fail] #73 NtAllocateVirtualMemoryEx status=c0000017 proc=falloutnv.exe tid=00d0 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40 addr[low=0x0 high=0x0 align=0x0]} hits=1 rev=ajan5-rockstar
+[nt-fail] #74 NtAllocateVirtualMemoryEx status=c0000017 proc=falloutnv.exe tid=00d0 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40 addr[low=0x0 high=0x0 align=0x0]} hits=1 rev=ajan5-rockstar
+00d0:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\DbgHelp.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:module:load_dll [dll-missing] rev=ml336 #7 L"C:\\Program Files (x86)\\Steam\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:module:load_dll [dll-missing] rev=ml336 #8 L"C:\\Program Files (x86)\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:module:load_dll [dll-missing] rev=ml336 #9 L"C:\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:module:load_dll [dll-missing] rev=ml336 #10 L"CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d0:err:module:load_dll [dll-missing] rev=ml336 #11 L"nvse_steam_loader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nt-fail] #75 NtAllocateVirtualMemory status=c0000018 proc=falloutnv.exe tid=00d0 size=0x1000 type=0x3000 prot=0x40 hint=0x727bebf000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+ml957: ? backing 0x7278ecc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+info:  [d3d9-caps] ... capped at 256 lines; further distinct queries are not printed
+ml957: ? backing 0x7278bb0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[wow-stack-free] #2 the dead thread 00c4's 32-bit stack (guest 0x9000000) is in window 0x7900000000 (gone), the thread freeing its TEB is in window 0x7200000000: the old address 0x7209000000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-window] TEB block 0x79002e0000 dropped, not pooled: it belongs to a guest window that is no longer live
+[win-name] #897 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[win-name] #898 hwnd=0x3007a class='' text="Fallout: New Vegas" rev=ml853
+[win-name] #899 hwnd=0x3007a class='' text="Fallout: New Vegas" rev=ml853
+[win-name] #901 hwnd=0x70052 class='' text="DIEmWin" rev=ml853
+[stale-heal]   1 slot(s) in the copy of 0x71f4b10000 (libwow64fex.dll) -> 0x1379fbea4 for peb=0x7200310000 (owner=0x0 mapper=0x7200310000)
+D 104 Load module devenum.dll (devenum.dll-2d82771b950ad396): 7278150000
+ml957: ? backing 0x7278ea4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 104 Load module avicap32.dll (avicap32.dll-5a25c37345c8ebdf): 7278EA0000
+ml957: ? backing 0x7278134000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 104 Load module msdmo.dll (msdmo.dll-9d7e478473d5b77a): 7278120000
+ml957: ? backing 0x7278758000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 104 Load module msacm32.drv (msacm32.drv-c413c908d8d724b8): 7278750000
+ml957: ? backing 0x7278104000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 104 Load module midimap.dll (midimap.dll-08e332885fe72b87): 7278100000
+D 13C Load module winegstreamer.dll (winegstreamer.dll-08fe9f4568d5ef6b): 7278090000
+[win-name] #902 hwnd=0x3007a class='' text="Fallout: New Vegas" rev=ml853
+[win-name] #904 hwnd=0x20060 class='' text="Default IME" rev=ml853
+[thread-stacks] port=0x1519f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16c475040
+[swap] ml1077 backed 0x72450f0000+0x810000 (file off 250 MB): 246 MB in 43 extents, peak 250 MB, 0 refused
+[ios_audio] ml1230 pacing stream=0x15d209400 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 1192 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c475040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x15d209400 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1187 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[swap] ml1077 stats: 233 MB file-backed now (peak 259), 41 extents, file used 258 of 131072 MB, backs 70 releases 29 unbacks 0 refused 0 | coverage broad: disk 104 MB of 3072 cap, reservations 20, holes 51, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 215 MB (peak 241), 0 MB kept in memory by swap-mb
+[15:06:02.807] [INFO] detach-wait: presents=1279 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=74 resident=1576MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0x1519f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16c475040
+[ios_audio] ml1230 pacing stream=0x15d209400 lead 60 ms: client wrote 9.95 s of audio in 10.00 s (99.5%) over 1187 wakes; device short 55.3 ms in 3 of 469 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x15d209400 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1187 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c475040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=FalloutNV.exe@0x7200400000
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=FalloutNV.exe@0x7200400000
+[footprint] rev=ml358 phys=1953 MB (peak 1967) internal=1335 MB compressed=486 MB external=217 MB reusable=5 MB (cycle=100)
+[thread-stacks] port=0x1519f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16c475040
+[footprint] rev=ml358 phys=1956 MB (peak 1967) internal=1338 MB compressed=485 MB external=219 MB reusable=5 MB (cycle=101)
+[ios_audio] ml1230 pacing stream=0x15d209400 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 1188 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1956 MB (peak 1967) internal=1338 MB compressed=485 MB external=214 MB reusable=6 MB (cycle=102)
+[footprint] rev=ml358 phys=1956 MB (peak 1967) internal=1338 MB compressed=485 MB external=209 MB reusable=6 MB (cycle=103)
+[file-wfail] ml669 #98 status=0xc0000035 disp=2 access=0x80100000 sharing=0x00000001 options=0x00200021 unix=(none) name=\??\C:\users\mobile\Documents\My Games\FalloutNV\Saves\
+[file-wfail] ml669 #99 status=0xc0000035 disp=2 access=0x80100000 sharing=0x00000001 options=0x00200021 unix=(none) name=\??\C:\users\mobile\Documents\My Games\FalloutNV\Saves\
+[file-wfail] ml669 #100 status=0xc0000035 disp=2 access=0x80100000 sharing=0x00000001 options=0x00200021 unix=(none) name=\??\C:\users\mobile\Documents\My Games\FalloutNV\Saves\
+[file-wfail] ml669 #101 status=0xc0000035 disp=2 access=0x80100000 sharing=0x00000001 options=0x00200021 unix=(none) name=\??\C:\users\mobile\Documents\My Games\FalloutNV\Saves\
+[footprint] rev=ml358 phys=1952 MB (peak 1967) internal=1342 MB compressed=484 MB external=221 MB reusable=6 MB (cycle=104)
+[footprint] rev=ml358 phys=2027 MB (peak 2027) internal=1245 MB compressed=564 MB external=250 MB reusable=1 MB (cycle=105)
+[15:06:32.917] [INFO] detach-wait: presents=2912 running=1 elapsed=210s
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=73 resident=1501MB dbg=DEBUGGED rev=ml525

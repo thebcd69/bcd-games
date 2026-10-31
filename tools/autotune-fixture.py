@@ -11,7 +11,8 @@ the scanner's markers (app/Madeira/AutoTuneCore.swift) and every rule signal
 (build/tools/autotune_rules.py). Lines that repeat are thinned: the first and last
 few are kept, plus enough of every counted signal to pass its threshold. Personal
 data is scrubbed: container paths, Windows user names, e-mail and IP addresses,
-UUIDs.
+UUIDs, an install folder named like a web site (C:\\Games\\... instead) and, on the
+owner's Mac, every entry of the private needles file.
 
 The fixture is then replayed next to the full log. Both must give the same outcome,
 stage, rules and next line, or the cut lost something. NAME.expect is written with
@@ -88,9 +89,37 @@ SCRUB = [
 ]
 
 
+# An install folder named like a web site ("The-Game-Site.com"): a player's download folder says nothing a rule needs and must
+# not reach a public fixture (round 624). Windows paths and container paths only; a URL's host ("//host.io/") and the
+# ".net" folders Windows and Battle.net use are left alone. tests/host/check-autotune.py holds every fixture to the same pattern.
+SITE_FOLDER = re.compile(r"(?i)(?:(?<=\\)|(?<=[^:/]/))([^\\/\s\"'<>|:*?]+\.(?:com|org|to|ru|me|io|cc|xyz|info|site|games|vip|club))([\\/]+)")
+
+
+def _site_folder(m):
+    before = m.string[:m.start()]
+    # "C:\Games\<site folder>\Game" becomes "C:\Games\Game", anything else "<...>\Games\Game".
+    return "" if re.search(r"(?i)(?:^|[\\/])Games[\\/]+$", before) else "Games" + m.group(2)
+
+
+def _private_needles():
+    """The owner's private needles file (personal data, download-site names), never in the repository. Missing: nothing."""
+    p = Path.home() / "madeira-local" / "state" / "alpha-needles.txt"
+    try:
+        lines = p.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    return [re.compile(re.escape(n), re.I) for n in (l.strip() for l in lines) if len(n) >= 6 and not n.startswith("#")]
+
+
+PRIVATE_NEEDLES = _private_needles()
+
+
 def scrub(line):
     for pat, rep in SCRUB:
         line = pat.sub(rep, line)
+    line = SITE_FOLDER.sub(_site_folder, line)
+    for pat in PRIVATE_NEEDLES:
+        line = pat.sub("<redacted>", line)
     return line
 
 

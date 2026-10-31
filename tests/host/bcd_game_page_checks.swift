@@ -275,6 +275,24 @@ func dateChecks() {
         check("neither limit nor extended addressing: the memory note only, GetMoreRam named",
               p.notes.first?.text.contains("lacks the increased memory limit, so") == true && p.notes.first?.text.contains("GetMoreRam") == true
               && !p.notes.contains { $0.text.contains("virtual addressing") }, p)
+        // Round 625 (owner's item 19): a 6 GB iPhone with the increased limit lets apps use 4095 MB; a game of 8 GiB or more gets a note before Play.
+        var fourGB = system
+        fourGB.memoryLimitBytes = 4095 << 20
+        let sekiro = BCDGame(id: "steam.814380", title: "Sekiro", store: .steam, state: .ready, size: 15_000_000_000)
+        p = plan(sekiro, nil, fourGB)
+        check("a 4 GB-limit device and a large game: the note before Play (not a warning)",
+              p.notes.count == 1 && p.notes[0].text.hasPrefix("iOS lets apps use about ") && p.notes[0].text.contains("BCD tries a swap file next")
+              && !p.notes[0].warning, p)
+        let small = BCDGame(id: "steam.105600", title: "Terraria", store: .steam, state: .ready, size: 500_000_000)
+        p = plan(small, nil, fourGB)
+        check("a small game on that device: no note", p.notes.isEmpty, p)
+        p = plan(sekiro, nil, system)
+        check("the large game on a device with more room (6 GB limit): no note", p.notes.isEmpty, p)
+        var fourGBNoLimit = fourGB
+        fourGBNoLimit.increasedMemoryLimit = false
+        p = plan(sekiro, nil, fourGBNoLimit)
+        check("without the increased limit: that install's own note instead, never both",
+              p.notes.count == 1 && p.notes[0].text.contains("lacks the increased memory limit"), p)
         var noVA = system
         noVA.extendedAddressing = false
         p = plan(ready, nil, noVA)

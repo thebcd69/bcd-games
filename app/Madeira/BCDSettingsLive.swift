@@ -22,6 +22,7 @@ extension BCDSettingsBackends {
                             storage: BCDStorageLive(), dotNet: BCDDotNetLive(), logs: BCDLogsLive(), feedback: BCDFeedbackLive(),
                             allSettings: BCDAllSettingsLive(), about: BCDAboutLive(), developer: BCDDeveloperLive(),
                             vcRuntime: BCDVCRuntimeLive(), gecko: BCDGeckoLive(),
+                            vcRuntime32: BCDVCRuntimeLive(runtime: .x86, name: "32-bit MFC"),
                             // Accounts, JIT and BCD Dock (BCDAccountsLive, BCDJITLive, BCDDockLive): each
                             // draws its whole page; B asks its own pages first (BCDSettingsSectionBack).
                             custom: [
@@ -702,10 +703,17 @@ struct BCDTouchEditorHost: View {
 /// VCRuntime.shared (VCRuntimeDownload.swift): the download from Microsoft, its checks and the
 /// copy on the device.
 @MainActor final class BCDVCRuntimeLive: BCDVCRuntimeBackend {
-    private let runtime = VCRuntime.shared
+    private let runtime: VCRuntime
+    /// For the log: "VC++ runtime", or (round 625) "32-bit MFC" for VCRuntime.x86.
+    private let name: String
     private var bag = Set<AnyCancellable>()
 
-    init() {
+    /// `runtime` nil = VCRuntime.shared, read here on the main actor (a default argument of `.shared` would be read
+    /// outside it).
+    init(runtime: VCRuntime? = nil, name: String = "VC++ runtime") {
+        let runtime = runtime ?? .shared
+        self.runtime = runtime
+        self.name = name
         runtime.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
 
@@ -729,14 +737,14 @@ struct BCDTouchEditorHost: View {
     var lastError: String? { runtime.lastError }
 
     func install() {
-        LogStore.shared.log("[bcd-settings] VC++ runtime download")
+        LogStore.shared.log("[bcd-settings] \(name) download")
         runtime.install()
     }
 
     func cancel() { runtime.cancel() }
 
     func remove() {
-        LogStore.shared.log("[bcd-settings] VC++ runtime remove")
+        LogStore.shared.log("[bcd-settings] \(name) remove")
         runtime.remove()
     }
 
@@ -801,7 +809,8 @@ struct BCDLiveSwitch {
         LogUpload.forgetAutomatic()
         let urls = LogUpload.recentLogs()
         files = Dictionary(urls.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
-        recent = urls.map { BCDLogFile(id: $0.path, name: $0.lastPathComponent, date: LogUpload.modified($0), bytes: Int64(LogUpload.size($0))) }
+        recent = urls.map { BCDLogFile(id: $0.path, name: $0.lastPathComponent, date: LogUpload.modified($0), bytes: Int64(LogUpload.size($0)),
+                                       hasGame: LogUpload.hasGame($0)) }
         sent = LogUpload.history.map { BCDSentLog(code: $0.code, name: $0.name, date: $0.date) }
     }
 
@@ -816,6 +825,8 @@ struct BCDLiveSwitch {
             case .success(let code): sendStatus = LogUpload.sentWords(code)
             case .failure(let error): sendStatus = "Not sent: \(error.localizedDescription)"
             }
+            // madeira-bcd (round 624, agent R S13 / Discord W4): the code in an alert with a Copy code button, as after a crash.
+            BCDCrashPrompt.report(result)
             refresh()
         }
     }
@@ -916,9 +927,15 @@ struct BCDLiveSwitch {
         let urls = LogUpload.recentLogs()
         if let first = urls.first {
             // A game's session log is a second name for BCD's log of the same run: the game's name is the better label.
-            let url = urls.first { LogUpload.modified($0) == LogUpload.modified(first) && $0.deletingLastPathComponent().lastPathComponent == "logs" } ?? first
+            var url = urls.first { LogUpload.modified($0) == LogUpload.modified(first) && $0.deletingLastPathComponent().lastPathComponent == "logs" } ?? first
+            // Round 624 (agent N S6): the newest log of a fresh start holds no game: attach the game played last (24 h at most) instead.
+            if !LogUpload.hasGame(url) {
+                let items = urls.map { BCDLogChoice.Item(name: $0.lastPathComponent, modified: LogUpload.modified($0), hasGame: LogUpload.hasGame($0)) }
+                if let i = BCDLogChoice.gameLogToOffer(items, now: Date()) { url = urls[i] }
+            }
             newest = url
-            newestLog = BCDFeedbackLog(name: url.lastPathComponent, date: LogUpload.modified(url), bytes: Int64(LogUpload.size(url)))
+            newestLog = BCDFeedbackLog(name: url.lastPathComponent, date: LogUpload.modified(url), bytes: Int64(LogUpload.size(url)),
+                                       hasGame: LogUpload.hasGame(url))
         } else {
             newest = nil
             newestLog = nil

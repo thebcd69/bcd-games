@@ -75,7 +75,8 @@ enum SteamError: LocalizedError, Equatable {
         case .connectionFailed(let reason):
             return "Couldn't connect to Steam: \(reason)"
         case .connectionTimeout:
-            return "Steam is taking too long to answer. Check that you're online, then try again."
+            return "Steam is taking too long to answer. Check that you're online, then try again. If you are online and it keeps "
+                + "happening, sign in to Steam again."
         case .disconnected:
             return "The connection to Steam was closed."
         case .logonDenied(let code):

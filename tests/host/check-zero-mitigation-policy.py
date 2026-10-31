@@ -195,15 +195,20 @@ recs = json.loads((root / 'recommended/recommendations.json').read_text())
 carrying = [r['id'] for r in recs['rules'] if NAME in json.dumps(r.get('config', []))]
 check('only glyphica-typing-survival carries the line', carrying == ['glyphica-typing-survival'], str(carrying))
 rule = next((r for r in recs['rules'] if r['id'] == 'glyphica-typing-survival'), None)
-check('the rule is new in build 600 and its line carries minBuild 600',
-      rule is not None and rule.get('minBuild') == 600 and {'line': LINE, 'minBuild': 600} in rule['config'], str(rule and rule['config']))
+# Round 624: the public build 600 does not know the key and refused the whole online list because of the line (checked with its own code,
+# ~/madeira-local/check-list-old-builds.py), so the line is from build 601 on (version 2); the rule itself stays new in build 600.
+# Round 624 (agent E2 S3): version 3 adds the fork's kernelbase (kernelbase-optin.dll, build 624), the only kernelbase that reads the key.
+check('the rule is new in build 600, its line carries minBuild 601, the fork\'s kernelbase minBuild 624 (version 3)',
+      rule is not None and rule.get('minBuild') == 600 and {'line': LINE, 'minBuild': 601} in rule['config']
+      and {'line': 'env.MADEIRA_OPTIN_DLLS = kernelbase', 'minBuild': 624} in rule['config'] and rule['version'] == 3,
+      str(rule and rule['config']))
 check('it matches the game by App ID, folder and the program beside ChakraCore.dll (any install source)',
       rule is not None and rule['match'] == {'steamAppIDs': [2400160], 'steamFolders': ['glyphica'],
                                              'programs': [{'name': 'neosphere.exe', 'beside': 'ChakraCore.dll'}]}, str(rule and rule['match']))
 check('its other lines are the standard comments and the standard EC-hook line',
       rule is not None and rule['config'][:3] == ["# BCD's recommended settings for Glyphica: Typing Survival.",
                                                   '# Reset to Recommended, at the bottom of the game\'s settings, brings them back.',
-                                                  'env.MADEIRA_EC_HOOK_TRACE = 0'] and len(rule['config']) == 4)
+                                                  'env.MADEIRA_EC_HOOK_TRACE = 0'] and len(rule['config']) == 5)
 standard = next(r for r in recs['rules'] if r['id'] == 'standard')
 check('the standard list does not have it', NAME not in json.dumps(standard))
 # Round 620: thirteen lists of that round's logs follow Elliot.
@@ -213,10 +218,13 @@ _r620 = ['forza-horizon-4', 'tiny-tinas-wonderlands', 'far-cry-3', 'barotrauma',
          'haste', 'big-walk', 'ball-x-pit', 'just-volleyball-demo', 'farming-simulator-22-epic', 'max-payne-3',
          'f1-2020', 'need-for-speed-the-run',   # round 620's new lists (the last two after the Discord reports)
          'bloons-td-6']                         # round 623 (Bloons TD 6, ajan58)
+_r624 = ['control', 'no-more-room-in-hell', 'red-faction', 'from-the-darkness', 'metal-gear-solid-4-master-collection', 'mycopunk', 'arctic-awakening', 'supermarket-together', 'robocop-rogue-city', 'blasphemous', 'nwjs-game-exe', 'kerbal-space-program', 'mafia-2', 'fallout-3', 'overlord-ii', 'rise-of-the-tomb-raider', 'lucieneslife', 'ubisoft-connect', 'unreal-gold', 'repo', 'osu', 'outlast', 'satisfactory', 'the-witcher-3', 'yakuza-6-the-song-of-life', 'euro-truck-simulator-2', 'gal-gun-2', 'hello-neighbor',
+         'borderlands-goty-enhanced', 'dead-space-2023', 'schedule-i', 'dokimon-quest', 'sonic-adventure-dx', 'requiem-avenging-angel', 'friends-vs-friends', 'fallout-4-other', 'skyrim-special-edition-other', 'wrc-9', 'doki-doki-literature-club',
+         'outlast-2', 'batman-arkham-knight', 'dead-rising', 'reanimal', 'pragmata', 'what-lies-in-the-multiverse', 'muv-luv-photonflowers']   # round 625 (owner's items 10, 12, 13, 14); round 624 (the ten analysis reports of tur624; Borderlands GOTY Enhanced, agent A S7; Dead Space (2023), Discord)
 _ids = [r['id'] for r in recs['rules']]
 check('the rule stands before "standard" (the last rule), after it only the round-602 lists, The Adventures of Elliot and the round-620/623 lists',
       _ids[_ids.index('glyphica-typing-survival'):] == ['glyphica-typing-survival', 'grand-theft-auto-iii', 'postal-2', 'hotline-miami', 'max-payne-2',
-                                                      'pico-park', 'dont-starve-together', 'a-hat-in-time', 'the-adventures-of-elliot'] + _r620 + ['standard'])
+                                                      'pico-park', 'dont-starve-together', 'a-hat-in-time', 'the-adventures-of-elliot'] + _r620 + _r624 + ['standard'])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)
 case = re.search(r'case "MADEIRA_WINTYPES"[^\n]*"%s":(.*?)guard value == "0" \|\| value == "1"' % NAME, pol, re.S)
@@ -230,22 +238,29 @@ rr = [x for x in mod.RULES if x['id'] == RULE]
 check('auto-tune has the rule once', len(rr) == 1)
 if rr:
     x = rr[0]
-    check('it adds the line and nothing else, once (noRetry), only up to stage 2, after a crash',
-          x['lines'] == [LINE] and x.get('noRetry') is True and x.get('maxStage') == 2 and x.get('outcomes') == ['crashed'])
+    check('it adds the line and the fork\'s kernelbase that reads it (round 624), once (noRetry), only up to stage 2, after a crash',
+          x['lines'] == [LINE, 'env.MADEIRA_OPTIN_DLLS = kernelbase'] and x.get('noRetry') is True and x.get('maxStage') == 2
+          and x.get('outcomes') == ['crashed'])
     sigs = json.dumps(x['all'])
     check('it needs the unhandled c0000602 and a ChakraCore frame of the unwinder', 'Unhandled exception code c0000602' in sigs
           and 'ChakraCore.dll+0x' in sigs and '[unwind] term' in sigs)
     check('it does not depend on the fixme line (a quiet log may drop it)', 'GetProcessMitigationPolicy' not in sigs)
-    check('it stops matching once the line is in force', '[madeira-env] game %s=1' % NAME in json.dumps(x['none']))
+    check('it stops matching once the fork\'s kernelbase is in force (the bridge\'s own line; round 624: the key alone never ran)',
+          '[WineProc] MADEIRA_OPTIN_DLLS: kernelbase.dll -> kernelbase-optin.dll' in json.dumps(x['none']))
     check('its evidence names this check and the fixture', any('check-zero-mitigation-policy' in e for e in x['evidence'])
           and any('glyphica-chakracore-failfast' in e for e in x['evidence']))
 others = [x['id'] for x in mod.RULES if NAME in json.dumps(x.get('lines', []))]
 check('no other auto-tune rule adds the line', others == [RULE], str(others))
 fixtures = root / 'tests/fixtures/autotune'
 matching = [p.name for p in sorted(fixtures.glob('*.expect')) if RULE in json.loads(p.read_text()).get('matched', [])]
-check('exactly one fixture matches the rule: the Glyphica log', matching == ['glyphica-chakracore-failfast-2026-10-24.expect'], str(matching))
-exp = json.loads((fixtures / 'glyphica-chakracore-failfast-2026-10-24.expect').read_text())
-check('that fixture is a crash at stage 2 that proposes the line', exp['outcome'] == 'crashed' and exp['stage'] == 2 and exp['next'] == [LINE])
+# round 624 (agent E2 S3): J9JDBG (build 623) failed the same way with the key set; the rule now also gives the fork's kernelbase
+KB = 'env.MADEIRA_OPTIN_DLLS = kernelbase'
+check('exactly the Glyphica fixtures match the rule (build 592, and build 623 with the key set)',
+      matching == ['glyphica-chakracore-failfast-2026-10-24.expect', 'glyphica-chakracore-failfast-key-set-j9jdbg-2026-10-29.expect'], str(matching))
+for _f in matching:
+    exp = json.loads((fixtures / _f).read_text())
+    check('%s is a crash at stage 2 that proposes the line and the fork\'s kernelbase' % _f,
+          exp['outcome'] == 'crashed' and exp['stage'] == 2 and exp['next'] == [LINE, KB])
 
 # ---------------------------------------------------------------- 4. nothing else sets it; the catalog and the CI know it
 users = []
@@ -257,7 +272,9 @@ for sub in ('app', 'build', 'tools', 'madeira-d3d12', 'madeira-dock'):
         if p.is_file() and p.suffix in ('.swift', '.m', '.mm', '.c', '.h', '.cpp', '.py', '.sh', '.json') and NAME in p.read_text(errors='ignore'):
             users.append(str(p.relative_to(root)))
 allowed = {'app/Madeira/GameRecommendationsList.swift', 'app/Madeira/ConfigCatalog.generated.swift', 'app/Madeira/AutoTuneRules.generated.swift',
-           'build/tools/autotune_rules.py', 'build/tools/gen-config-catalog.py'}
+           'build/tools/autotune_rules.py', 'build/tools/gen-config-catalog.py',
+           # round 624 (agent E2 S3): the build of kernelbase-optin.dll and its check name the switch they ship
+           'tools/build-wine-extra-dlls.sh', 'tools/verify-kernelbase-optin.py'}
 check('only the policy, the catalog and auto-tune name it in the app and build sources', set(users) <= allowed, str(sorted(set(users) - allowed)))
 cat = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()
 check('the settings catalog knows the key, off by default', re.search(r'key: "env\.%s".*kind: \.bool, defaultValue: "0"' % NAME, cat) is not None)

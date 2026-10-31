@@ -83,7 +83,15 @@ prelude = r'''
 #include <fcntl.h>
 #include <assert.h>
 #include <sys/mman.h>
+#ifdef __linux__
 #include <linux/falloc.h>
+#else
+#include <mach/mach.h>
+#include <mach/mach_vm.h>
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0   /* region() checks that the hint was honoured */
+#endif
+#endif
 typedef unsigned long ULONG_PTR;
 #define VPROT_READ       0x01
 #define VPROT_WRITE      0x02
@@ -108,6 +116,9 @@ ULONG_PTR ios_fex_arena_base_unix = 0x7c00000000ULL, ios_fex_arena_end_unix = 0x
 void *ios_jit_rw_base_global = (void *)0x7000000000ULL;   /* numerically inside the band on purpose */
 void *ios_jit_rx_base_global = (void *)0x119400000ULL;
 size_t ios_jit_pool_size_global = 0x20000000;
+/* madeira_hud_jit_pool (HUD, 1a183a94) sits inside the core markers and reads the pool's head and tail */
+static size_t jit_pool_offset;
+static volatile size_t ios_jit_tail_reserved;
 /* madeira-bcd pool-low (region C) is off here: no region, every test on it is 0 */
 uintptr_t ios_jit_low_rx_global, ios_jit_low_rw_global;
 size_t ios_jit_low_size_global;
@@ -154,11 +165,13 @@ static void *anon_mmap_fixed( void *a, size_t l, int prot, int flags )
 static int fail_malloc;
 static void *test_malloc( size_t n ) { return fail_malloc ? NULL : malloc( n ); }
 #define malloc( n ) test_malloc( n )
+#ifdef __linux__
 struct fpunchhole { unsigned fp_flags; unsigned reserved; off_t fp_offset; off_t fp_length; };
 #define F_PUNCHHOLE 99
 static int test_fcntl( int fd, int cmd, struct fpunchhole *ph )
 { (void)cmd; return fallocate( fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, ph->fp_offset, ph->fp_length ); }
 #define fcntl( fd, cmd, arg ) test_fcntl( fd, cmd, arg )
+#endif   /* macOS has the real struct fpunchhole and F_PUNCHHOLE */
 '''
 
 harness = r'''
@@ -183,6 +196,22 @@ static void env( const char *cov, const char *mn, const char *rmax )
     ios_swap_config();
 }
 /* protection of the host page at p from /proc/self/maps: "rw", "r-", "--" */
+#ifndef __linux__
+static const char *prot_of( const void *p )   /* the Mach VM map instead of /proc/self/maps */
+{
+    static char out[3];
+    mach_vm_address_t a = (mach_vm_address_t)(uintptr_t)p;
+    mach_vm_size_t s = 0;
+    vm_region_basic_info_data_64_t info;
+    mach_msg_type_number_t c = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t obj;
+    strcpy( out, "??" );
+    if (mach_vm_region( mach_task_self(), &a, &s, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &c, &obj ) == KERN_SUCCESS &&
+        a <= (uintptr_t)p)
+    { out[0] = (info.protection & VM_PROT_READ) ? 'r' : '-'; out[1] = (info.protection & VM_PROT_WRITE) ? 'w' : '-'; }
+    return out;
+}
+#else
 static const char *prot_of( const void *p )
 {
     static char out[3];
@@ -198,6 +227,7 @@ static const char *prot_of( const void *p )
     if (f) fclose( f );
     return out;
 }
+#endif
 
 static void test_config( void )
 {

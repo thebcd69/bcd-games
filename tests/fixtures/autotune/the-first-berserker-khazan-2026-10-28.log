@@ -1,0 +1,112 @@
+[20:05:16.572] [INFO] Checking entitlements...
+[20:05:16.572] [INFO] [build] v0.1.622 (622)
+[20:05:16.573] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=11443MB available=12262MB cores=9
+[20:05:16.573] [INFO] [device] address-map=[0x1049f8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[20:05:16.584] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:06:33.618] [INFO] Requesting JIT with Built-in StikJIT...
+[20:06:47.735] [INFO] [bcd] library launch KZ.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:06:47.748] [INFO] Running full Wine sequence...
+[20:06:47.748] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1049f8000,0x8000000000) 512GB available=12233MB low-power=0 thermal=nominal
+[20:06:47.752] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:06:47.752] [INFO] Allocating 896MB JIT pool via debugger...
+[20:06:47.752] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:06:47.752] [INFO] [jit-debugger] attached=1 at the pool request
+[20:06:47.753] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[20:06:47.754] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 368MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:06:47.754] [ERR] ⚠️ SMALL JIT POOL (368MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[20:06:48.170] [INFO] RX pool at 0x1284a0000
+[20:06:48.182] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.473s rev=ml526
+[hwinput] keyboard focus: program (poll)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[Wine init_process] waiting for request_fd from wineserver...
+[20:06:48.453] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[20:06:48.453] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11857 MB + phys_footprint=430 MB = 12288 MB (hw.memsize says 11443 MB)
+ml985: preferred base 0x140000000+0x50000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x50000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\External\\PC drm free\\The First Berserker Khazan\\KZ.exe" 0x11e500000+0x50000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x11e500000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11e500000+0x10000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11e510000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11e510000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11e51c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1284a4000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1285de000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1289f8000)
+[footprint] rev=ml358 phys=441 MB (peak 441) internal=436 MB compressed=0 MB external=100 MB reusable=19 MB (cycle=1)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x128b2c000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x128bf4000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+D 24 Load module KZ.exe (kz.exe-317f1f5510e60413): 11E500000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x128ef8000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[x64-image] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll" 0x71fcfa0000+0xc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71fcf50000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x12a3cc000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x12a4b0000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x12a534000)
+[phase] spawn:L"C:\\External\\PC drm free\\The First Berserker Khazan\\BBQ\\Binaries\\Win64\\BBQ-Win64-Shipping.exe" t+  1.113s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\External\\PC drm free\\The First Berserker Khazan\\BBQ\\Binaries\\Win64\\BBQ-Win64-Shipping.exe\" BBQ " (fd=88, unixdir=98, dup_unixdir=106) cwd=L"C:\\External\\PC drm free\\The First Berserker Khazan\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x140bf000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\External\\PC drm free\\The First Berserker Khazan\\BBQ\\Binaries\\Win64\\BBQ-Win64-Shipping.exe" 0x140000000+0x140bf000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x12a628000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x12a762000)
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x12ba60000)
+[x64-image] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll" 0x71f9020000+0xc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 71F9020000
+D 2C Load module wininet.dll (wininet.dll-7ef66a985cac5fca): 71F8E10000
+D 2C Load module mpr.dll (mpr.dll-09cefd52a3669014): 71F8D80000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fb0d0000) -> 64-bit table (0x1077c8758)
+D 2C Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F8CD0000
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71f8d30000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71F8D30000
+[x64-image] L"\\??\\C:\\External\\PC drm free\\The First Berserker Khazan\\BBQ\\Binaries\\Win64\\voices38.dll" 0x71f89a0000+0x382000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module voices38.dll (voices38.dll-85bdb7369c2743d2): 71F89A0000
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+[win-name] #10 hwnd=0x10038 class='' text="&Yes" rev=ml853
+[win-name] #11 hwnd=0x10038 class='' text="&Yes" rev=ml853
+[win-name] #14 hwnd=0x1003a class='' text="&No" rev=ml853
+[win-name] #15 hwnd=0x1003a class='' text="&No" rev=ml853
+[win-name] #18 hwnd=0x1003c class='' text="&Abort" rev=ml853
+[win-name] #53 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #54 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #55 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #56 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #57 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #58 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #59 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #60 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #62 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #63 hwnd=0x2002a class='' text="Error" rev=ml853
+[win-name] #65 hwnd=0x1004c class='' text="Disable Mandatory ASLR" rev=ml853
+[win-name] #71 hwnd=0x10040 class='' text="OK" rev=ml853
+[win-name] #72 hwnd=0x2002a class='' text="Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x110b58000
+[xp-names] m458883 "wine-x18-exc"
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=933 MB (peak 933) internal=928 MB compressed=0 MB external=174 MB reusable=19 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=933 MB compressed=0 MB
+[footprint] rev=ml358 phys=933 MB (peak 933) internal=928 MB compressed=0 MB external=174 MB reusable=20 MB (cycle=3)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[20:06:54.556] [INFO] [session] length=6s partial=1 play=0s frames=0 stalls=0/0s peak=934MB limit=12287MB thermal=nominal lpm=0 res=1920x1080 cap=60 game=The First Berserker: Khazan

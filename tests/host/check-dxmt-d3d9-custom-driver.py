@@ -139,7 +139,8 @@ check('the app carries the rule (generated file)', '"fallout-nv-older-nvidia-car
 fx = R / 'tests/fixtures/autotune/fallout-nv-b57aa9-2026-10-23.expect'
 check('its fixture (6RMMDY, build 592) expects the line',
       fx.exists() and json.loads(fx.read_text()).get('next') == ['gpu-card = nvidia-7900gs']
-      and json.loads(fx.read_text()).get('matched') == ['fallout-nv-older-nvidia-card'])
+      # round 624: the lowest-priority diagnostic rule x86-null-fault-diag may match the same 32-bit fault after it; the first match decides.
+      and (json.loads(fx.read_text()).get('matched') or [None])[0] == 'fallout-nv-older-nvidia-card')
 
 if not ok:
     print('FAILED: dxmt-d3d9-custom-driver')

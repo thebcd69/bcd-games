@@ -72,6 +72,12 @@ struct GameProfile {
 }
 
 /// WineMono.swift's model: whether Wine Mono is here (AUTOTUNE_TEST_MONO=1 says it is).
+// Round 624 (agent N S1): the install's memory rights, read by the stuck alert (MemoryRights.swift); an install with the limit here.
+enum MemoryRights {
+    static let lacking = false
+    static let failureNote = "This install lacks the increased memory limit, the usual reason a game stops this early."
+}
+
 @MainActor enum WineMonoModel {
     nonisolated static var available: Bool { ProcessInfo.processInfo.environment["AUTOTUNE_TEST_MONO"] == "1" }
 }

@@ -255,6 +255,14 @@ check("Find on Steam, the cover picture and Controller binds open BCD's own scre
       and "case .section(let group): row.run = { show(.group(group), nil) }" in page)
 check("the game's config is edited on a page of Options (Save and Cancel)", "BCDGameConfigPage(game: game, model: model" in page
       and "model.request(.saveConfig(draft))" in page)
+# round 624 (Discord W3): on a phone the keyboard hid Save and Cancel, and Back dropped what was typed
+check("Back, B and the close button keep the typed config; Cancel and Save are unchanged (round 624)",
+      "if options == .config && page != .config { keepConfigDraft() }" in page
+      and "if options == .config { keepConfigDraft() } else { model.configDraft = nil }" in page
+      and "if let draft = model.configDraft { model.request(.saveConfig(draft)) }" in page)
+check("Save and Cancel sit above the text on a phone held either way (compact width or height)",
+      "private var buttonsOnTop: Bool { vertical == .compact || horizontal == .compact }" in page
+      and "if buttonsOnTop { buttons }" in page and "if !buttonsOnTop { buttons }" in page)
 check("short choices (keys, percentages) are caps in a grid the controller can walk (no lazy grid)",
       "Grid(horizontalSpacing: 6, verticalSpacing: 6)" in page and "LazyVGrid" not in page)
 check("Get the latest recommended settings sits with the recommended settings",

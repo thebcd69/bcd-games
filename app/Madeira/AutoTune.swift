@@ -343,7 +343,7 @@ enum AutoTune {
         let keptNow = after.kept.isEmpty ? "" : "; kept \(after.kept.joined(separator: ", "))"
         LogStore.shared.log("[autotune] \(m.title): \(report.outcome) at stage \(report.stage) after \(Int(report.seconds)) s; "
                             + "matched \(report.matched.joined(separator: ",")); status \(after.status); next \(next)"
-                            + verdict + keptNow)
+                            + verdict + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? ""))   // round 624 (E1 S5b)
         let offer = AutoTuneOffer(title: m.title, windowsPath: m.windowsPath, report: report, state: after,
                                   reason: after.candidateRule.flatMap { id in rules.first { $0.id == id }?.reason })
         DispatchQueue.main.async { AutoTuneOffers.shared.offer = offer }
@@ -392,11 +392,26 @@ struct AutoTuneOffer: Equatable {
         case "ok":
             text += "Nothing was added."
         case "stuck", "gave-up":
+            if MemoryRights.lacking { text += MemoryRights.failureNote + "\n\n" }   // round 624 (agent N S1): the install is the usual reason
+            // madeira-bcd (round 624, Ghost of Tsushima JKJA9Q/VQ9SBA): a game iOS closed for memory with nothing left to try: the game's own
+            // graphics settings are what is left.
+            if report.outcome == "killed" {
+                text += "iOS closed the game at its memory limit. Set the game's own graphics to the lowest preset (and any resolution or "
+                    + "texture setting to Low) and play again.\n\n"
+            }
+            if let note = state.lowDiskNote { text += note + "\n\n" }   // round 624 (agent D3 S5-3): no swap file was tried for lack of storage
             text += "Export the auto-tune report on the game's page, under Auto-tune, to report it."
         case "known":
             text += state.knownAdvice
         default:
             if let c = state.candidate {
+                // madeira-bcd (round 624, agent D3 S5 (d); Sekiro XJ8YM3/ZJYGS9, Cloudpunk F88RB4): a memory kill on a device that lets apps use about
+                // 4 GB, with a swap file next: say why (the peak and the device class), once, before the lines.
+                if report.outcome == "killed", c.contains(where: { $0.hasPrefix("swap-mb") }), let peak = report.peakMB, peak <= 4600,
+                   (report.ramMB ?? Int.max) <= 8000 {
+                    text += "This iPhone lets apps use about 4 GB, and \(title) needed more (its memory reached \(peak) MB). A swap file moves part "
+                        + "of it to storage; an iPad or a newer iPhone has more room.\n\n"
+                }
                 text += c.isEmpty ? "The next start runs the same settings once more: a first failure after an update often clears on its own."
                                  : "The next start tries: " + c.joined(separator: "; ") + "."
                 if let reason { text += " " + reason }

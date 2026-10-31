@@ -18,6 +18,10 @@
 #    exports in its pool copy); this overlay only constructs the map when it still finds it
 #    zero and logs [wow64-ctor] lines with its state, so the next iOS 18 log shows which of
 #    the two happened. A map the static initialiser touched is never touched.
+#  - patch-fex-ios-op82-alias.py (round 624): SecondaryALUOp had no case for 0x82, the 32-bit-only
+#    alias of 0x80 (ADD/OR/AND/SUB/XOR r/m8, imm8): "Unknown ALU Op: 0x10..0x16" and c000001d in
+#    Ubisoft's protection code (Ubisoft Connect, South Park, Assassin's Creed 2). Optional like the
+#    guard: a drifted anchor only skips it. The ARM64EC module needs nothing (0x82 is invalid in 64-bit mode).
 set -eu
 R="$(pwd)"
 MINGW="${MINGW:-$R/toolchains/llvm-mingw-20260421-ucrt-macos-universal/bin}"
@@ -25,6 +29,7 @@ export PATH="$MINGW:$PATH"
 B="${FEX_WOW64_BUILD:-$R/FEX/build-wow64}"
 SHIP="$R/app/Madeira/aarch64-windows/xtajit.dll"
 CPUIDF="FEXCore/Source/Interface/Core/CPUID.cpp"
+OPDISPF="FEXCore/Source/Interface/Core/OpcodeDispatcher.cpp"
 JOBS="$(sysctl -n hw.ncpu 2>/dev/null || nproc)"
 
 git -C FEX diff --name-only | while read -r f; do git -C FEX checkout -- "$f"; done
@@ -32,7 +37,8 @@ python3 "$R/tools/patch-fex-ios-cpuid-index.py" "$R/FEX/$CPUIDF"
 python3 "$R/tools/patch-fex-ios-teb-tsd.py" "$R/FEX/Source/Windows/Common/Priv.h"
 # the safety net must never cost the two required fixes above: a drifted anchor only skips it
 python3 "$R/tools/patch-fex-ios-wow-threads-ctor.py" "$R/FEX" || echo "::warning::the thread-map guard was not applied (FEX anchor changed); xtajit.dll is built without it"
-restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp; }
+python3 "$R/tools/patch-fex-ios-op82-alias.py" "$R/FEX/$OPDISPF" || echo "::warning::the 0x82 alias patch was not applied (FEX anchor changed); xtajit.dll is built without it"
+restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF"; }
 trap restore EXIT
 
 cmake -S "$R/FEX" -B "$B" -G Ninja -DCMAKE_BUILD_TYPE=Release \
@@ -55,4 +61,4 @@ if ! diff "$B.old-exports" "$B.new-exports"; then
     exit 1
 fi
 cp "$B/Bin/libwow64fex.dll" "$SHIP"
-echo "::notice::xtajit.dll (WOW64) built from FEX $(git -C FEX rev-parse --short HEAD) with the CPUID index wrap, the TSD-slot TEB for the WinAPI shims and the thread-map guard, and shipped"
+echo "::notice::xtajit.dll (WOW64) built from FEX $(git -C FEX rev-parse --short HEAD) with the CPUID index wrap, the TSD-slot TEB for the WinAPI shims, the thread-map guard and the 0x82 alias, and shipped"

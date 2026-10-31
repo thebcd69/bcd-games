@@ -68,26 +68,32 @@ EDITS = [
 
 HELPER = r'''#define IOS_GUEST_LOG_SERVICE_LINES 60
 
-/* ''' + marker + r''' (tools/patch-wine-guest-log-service.py): is the calling process RockstarService.exe? */
+/* ''' + marker + r''' (tools/patch-wine-guest-log-service.py): is the calling process RockstarService.exe, or (round 624,
+ * agent R S27; ZTQN18: the installer left no log) Rockstar's launcher installer, Rockstar-Games-Launcher.exe? */
 static int ios_guest_log_is_service( void )
 {
-    static const char want[] = "rockstarservice.exe";
+    static const char *const want[] = { "rockstarservice.exe", "rockstar-games-launcher.exe" };
     const PEB *peb = NtCurrentTeb() ? NtCurrentTeb()->Peb : NULL;
     const RTL_USER_PROCESS_PARAMETERS *pp = peb ? peb->ProcessParameters : NULL;
     const WCHAR *w;
-    size_t len, base = 0, k;
+    size_t len, base = 0, k, n;
 
     if (!pp || !(w = pp->ImagePathName.Buffer)) return 0;
     len = pp->ImagePathName.Length / sizeof(WCHAR);
     for (k = 0; k < len; k++) if (w[k] == '\\' || w[k] == '/') base = k + 1;
-    if (len - base != sizeof(want) - 1) return 0;
-    for (k = 0; k < sizeof(want) - 1; k++)
+    for (n = 0; n < sizeof(want) / sizeof(want[0]); n++)
     {
-        WCHAR c = w[base + k];
-        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
-        if (c != (WCHAR)want[k]) return 0;
+        size_t wl = strlen( want[n] );
+        if (len - base != wl) continue;
+        for (k = 0; k < wl; k++)
+        {
+            WCHAR c = w[base + k];
+            if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+            if (c != (WCHAR)want[n][k]) break;
+        }
+        if (k == wl) return 1;
     }
-    return 1;
+    return 0;
 }
 
 '''

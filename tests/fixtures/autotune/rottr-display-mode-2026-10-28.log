@@ -1,0 +1,279 @@
+[17:30:11.254] [INFO] Checking entitlements...
+[17:30:11.254] [INFO] [build] v0.1.622 (622)
+[17:30:11.255] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11695MB available=6121MB cores=6
+[17:30:11.255] [INFO] [device] address-map=[0x104008000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[17:30:11.271] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:31:15.294] [INFO] [bcd] library launch Rise of the Tomb Raider: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[17:31:15.296] [INFO] Requesting JIT with Built-in StikJIT...
+[17:31:16.861] [INFO] [dock-launch] image-retire=1
+[17:31:16.861] [INFO] [dock-launch] image-map-guard=1
+[17:31:16.866] [INFO] [dock-installers] app=391220 scripts=0 programs=0
+[17:31:16.867] [INFO] [madeira-dock] starting the host for app 391220; Valve's client authenticates and authorizes the launch
+[17:31:16.879] [INFO] Running full Wine sequence...
+[17:31:16.879] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104008000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[17:31:16.885] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:31:16.885] [INFO] Allocating 896MB JIT pool via debugger...
+[17:31:16.885] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:31:16.885] [INFO] [jit-debugger] attached=1 at the pool request
+[17:31:16.887] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[17:31:17.587] [INFO] RX pool at 0x148000000
+[17:31:17.603] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.768s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7578 MB + phys_footprint=613 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=619 MB (peak 619) internal=618 MB compressed=0 MB external=88 MB reusable=8 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.238s rev=ml526
+ml957: ? backing 0x11ef30000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.314s rev=ml526
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11EF30000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7028610000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7028710000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7028910000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7028d10000+0x800000 held for 2000 ms (4 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m1008342 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=977 MB compressed=0 MB external=165 MB reusable=8 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1108 MB (peak 1108) internal=1106 MB compressed=0 MB external=168 MB reusable=8 MB (cycle=3)
+[file-wfail] ml669 #88 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #89 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1113 MB (peak 1113) internal=1112 MB compressed=0 MB external=167 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=1102 MB (peak 1113) internal=1102 MB compressed=0 MB external=168 MB reusable=8 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Rise of the Tomb Raider\\ROTTR.exe" t+ 10.188s rev=ml526
+[nls-getptr] type=11 id=437 peb=0x11c22c000
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x156630000)
+[jumbo#1] +0ms tid=16c483000 wtid=00ac peb=0x11c22c000 nrip=0x71f4d84f00 grip=0x0 size=0xc0000000 (3072 MB) hint=0x0 -> 0x7038010000 st=0x0 | granted=3072 MB ok=1 fail=0
+[file-wfail] ml669 #90 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] madeira_d3d12.dll: OK, 26 .text pages executable (copy @0x15a599000)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Rise of the Tomb Raider\\crashpad_handler.exe" t+ 11.097s rev=ml526
+ml957: ? backing 0x125730000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x10fff4000
+[nls-getptr] type=11 id=437 peb=0x10fff4000
+[nls-getptr] type=11 id=20127 peb=0x10fff4000
+[nls-getptr] type=11 id=1252 peb=0x10fff4000
+[nls-getptr] type=11 id=437 peb=0x10fff4000
+[footprint] rev=ml358 phys=1530 MB (peak 1530) internal=1530 MB compressed=0 MB external=223 MB reusable=8 MB (cycle=6)
+[win-name] #31 hwnd=0x1005c class='' text="Default IME" rev=ml853
+[footprint] rev=ml1060 fast phys=1665 MB compressed=0 MB
+D AC Load module vstdlib_s64.dll (vstdlib_s64.dll-0805e0d24f89e963): 71EC690000
+D AC Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 71EC600000
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=rottr.exe tid=00ac size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c68400000
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #101 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+D AC Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc678e11f2): 71EC450000
+[17:31:28.970] [INFO] [dock-report] launch-game-running=1
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f55f2000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f2000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f55f3000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f3000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f55f4000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f4000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f55f5000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f5000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f55f6000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f55f7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f55f8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f55f9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f55f9000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f55fa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f55fb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f55fc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f55fd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f55fe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f55ff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f595c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f595d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f595d000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f595e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f595f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f597a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f597b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f597c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f597d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f597e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f597f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f5984000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f5985000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f5986000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f5987000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f5988000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f5989000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f598a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f598b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f598b000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f598c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f598d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f598e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f598f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f78c7000 zb=0x0 hits=64 rev=ajan5-rockstar
+[alloc-fail] ml814 #128 status=c0000018 hint=0x71ef397000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #11 NtAllocateVirtualMemory status=c0000018 proc=rottr.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71ef395000 zb=0x0 hits=128 rev=ajan5-rockstar
+[alloc-fail] ml814 #192 status=c0000018 hint=0x71fd57f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+D AC Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71EC390000
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Rise of the Tomb Raider/Rise of the Tomb Raider.log
+[guest-log] #1 tid=00ac 21:31:29:105 (00000172) > [Render] Enumerating adapters:
+[guest-log] #2 tid=00ac 21:31:29:106 (00000172) > [Render] 	Adapter 0:
+[guest-log] #3 tid=00ac 21:31:29:106 (00000172) > [Monitor] 		Description             : Apple A19 Pro GPU
+[guest-log] #4 tid=00ac 21:31:29:106 (00000172) > [Monitor] 		Vendor                  : Unknown (106b)
+D AC Load module nvngx_dlss.dll (nvngx_dlss.dll-1758ead32c83d7ec): 71EB1E0000
+[footprint] rev=ml1060 fast phys=1727 MB compressed=0 MB
+[free-delay] #5 release of 0x7024660000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #6 release of 0x702a530000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x702be60000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #8 release of 0x7106130000+0x110000 held for 2000 ms (4 in flight)
+[guest-log] #18 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] The requested display mode (ResX:1408 ResY:648 Hz:60 3D:0 Exclusive: false, DLSS: false) was not available, finding the best alternative...
+[guest-log] #19 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #20 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #21 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Could not find any display mode...
+[guest-log] #22 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] The requested display mode (ResX:1408 ResY:648 Hz:60 3D:0 Exclusive: false, DLSS: false) was not available, finding the best alternative...
+[guest-log] #23 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #24 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #25 tid=00ac 21:31:29:325 (00000172) > [Validate Settings] Could not find any display mode...
+[guest-log] #27 tid=00ac 21:31:29:379 (00000172) > [NxApp] Querying GPU Driver Info...
+[guest-log] #38 tid=00ac 21:31:29:380 (00000172) > [Settings] 	Display mode: 1408x648@60
+[guest-log] #39 tid=00ac 21:31:29:380 (00000172) > [Settings] 		MultiMonitor: 0
+[guest-log] #40 tid=00ac 21:31:29:380 (00000172) > [Settings] Graphics Options:
+[win-name] #34 hwnd=0x1006e class='' text="Default IME" rev=ml853
+[guest-log] #41 tid=018c 21:31:29:389 (00000396) > [Input] ERROR: Failed to open registry key "SYSTEM\CurrentControlSet\Control\Keyboard Layouts\00000409". (Error: "湉慶楬⁤楷摮睯栠湡汤⹥਀" code: 0x00000578)
+[footprint] rev=ml1060 fast phys=1958 MB compressed=0 MB
+D 18C Load module xinput1_3.dll (xinput1_3.dll-1e6b917460836b36): 71EBC80000
+[guest-log] #42 tid=0174 21:31:29:413 (00000372) > [Resources] Failed to create backbuffer texture (error code = 0X80070057)
+[guest-log] #43 tid=0174 21:31:29:414 (00000372) > [SwapChain] Error occurred during creation.
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=12936
+[unwind] term ml661 begin rip=71f5150f10 rsp=703738fb68 window=[703738fb68..7037b8fb68) max=32
+[unwind] term ml661 #00 pc=71f5150f10 rsp=703738fb68  ucrtbase.dll+0xa0f10
+[unwind] term ml662 #00 nv: rbx=70387b14c0 rbp=703738fc70 rsi=0 rdi=70386abf30 r12=0 r13=0 r14=12a14cf30 r15=0
+[unwind] term ml662   rbx=70387b14c0: 76312e30 20627569 6c642030 2e305f36 34000000 00000000 00000000 00000000
+[unwind] term ml662   rbp=703738fc70: 00004329 01000000 2d6e6f6c 61756e63 68657200 01000000 0b000000 00000000
+[unwind] term ml661 #01 pc=1295d21f8 rsp=703738fb70  ROTTR.exe+0x1a21f8
+00ac:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............e"
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=12985
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=454
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x155322000 NO pool/anon alias | region 0x104008000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #2 rev=ml348 addr=0x100000000 insn=0xf9400170 pc=0x15523e35c NO pool/anon alias | region 0x104008000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[Wine ntdll/server] process_exit_wrapper(0)
+00d4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=13029
+[unwind] term ml662   global @+0x2b -> 1257ecb30 = 0x00000002 (2)
+[unwind] term ml662   global @+0x48 -> 1257b6658 = 0x00000000 (0)
+[unwind] term ml662   global @+0x4f -> 1257b6610 = 0x00000000 (0)
+[unwind] term ml662   global @+0x69 -> 1257b6608 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=15b17d9cc rsp=70fc00ffb0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=545
+[Wine ntdll/server] process_exit_wrapper(0)
+[file-wfail] ml669 #111 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #112 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[17:31:35.883] [INFO] [dock-report] launch-game-ended=1
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[footprint] rev=ml358 phys=1794 MB (peak 1955) internal=1792 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=10)
+[17:31:36.385] [INFO] [dock-report] probe-result=0
+[store-noalias] #3 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x149aa2000 NO pool/anon alias | region 0x104008000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c6b1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x10603 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c6b1040
+[footprint] rev=ml358 phys=1794 MB (peak 1955) internal=1792 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=11)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1795 MB (peak 1955) internal=1793 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=12)
+[frontend] graceful close requested
+[frontend] graceful close requested
+[frontend] graceful close requested
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1794 MB (peak 1955) internal=1793 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=13)
+[frontend] graceful close requested
+[frontend] graceful close requested
+[frontend] graceful close requested
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1794 MB (peak 1955) internal=1793 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=14)
+[footprint] rev=ml358 phys=1794 MB (peak 1955) internal=1793 MB compressed=0 MB external=229 MB reusable=8 MB (cycle=15)
+[17:31:47.038] [INFO] [session] length=30s partial=1 play=0s frames=0 stalls=0/0s peak=2013MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Rise of the Tomb Raider

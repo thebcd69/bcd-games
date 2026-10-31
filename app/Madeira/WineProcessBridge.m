@@ -1085,6 +1085,58 @@ static void madeira_mfc_dock(NSFileManager *fm, NSString *sysx64, NSString *bund
         dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC_DOCK=1: no mfc140.dll / mfc140u.dll in the VC++ runtime folder (not downloaded): nothing linked\n");
 }
 
+/* madeira-bcd (round 625, the owner's item 26): env.MADEIRA_MFC32 = 1 (the game's own line) gives a 32-bit game Microsoft's 32-bit
+ * MFC: mfc140.dll, mfc140u.dll, mfcm140.dll and mfcm140u.dll, as the app downloaded them from Microsoft's vc_redist.x86.exe into
+ * Library/Application Support/VCRuntime/x86 (VCRuntime.x86), are linked into C:\windows\syswow64, which a 32-bit process sees as its
+ * system32. The i386 farm has no MFC and Wine has none, so the links shadow nothing; Wine's own vcruntime140 and msvcp140 stay.
+ * What Lies in the Multiverse's Razer Chroma plug-in (T3CXNQ) and Muv-Luv photonflowers' Ages3ResT.dll (4FD24J) stopped for want of
+ * mfc140u.dll. Off unless the game asks: a game whose optional plug-in fails quietly today is left as it is. env.MADEIRA_MFC = 0 keeps
+ * MFC out here too. A link an earlier session made is removed when this session does not ask for it (the prefix is shared). Logs one
+ * line; nothing at all when the switch is unset and no link of ours is there. */
+static void madeira_mfc32(NSFileManager *fm, NSString *syswow64, NSString *support)
+{
+    NSString *const names[] = { @"mfc140.dll", @"mfc140u.dll", @"mfcm140.dll", @"mfcm140u.dll" };
+    const char *want = getenv("MADEIRA_MFC32");
+    const char *allEnv = getenv("MADEIRA_MFC");
+    const BOOL asked = want && want[0] == '1' && !want[1];
+    const BOOL mfcOff = allEnv && allEnv[0] == '0';
+    NSString *dir = support ? [support stringByAppendingPathComponent:@"VCRuntime/x86"] : nil;
+    const BOOL have = dir && access([dir stringByAppendingPathComponent:@"mfc140u.dll"].fileSystemRepresentation, R_OK) == 0;
+    const BOOL link = asked && !mfcOff && have;
+    NSMutableArray<NSString *> *linked = [NSMutableArray array];
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
+        NSString *dst = [syswow64 stringByAppendingPathComponent:names[i]];
+        NSString *src = [dir stringByAppendingPathComponent:names[i]];
+        NSString *type = [[fm attributesOfItemAtPath:dst error:nil] fileType];   /* the link itself, not its target */
+        if (link && access(src.fileSystemRepresentation, R_OK) == 0) {
+            if (type && ![type isEqualToString:NSFileTypeSymbolicLink]) {
+                dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32=1: %s in syswow64 is a file, not a link: left as it is\n", names[i].UTF8String);
+                continue;
+            }
+            [fm removeItemAtPath:dst error:nil];   /* a stale link of an earlier install */
+            if ([fm createSymbolicLinkAtPath:dst withDestinationPath:src error:nil]) [linked addObject:names[i]];
+            continue;
+        }
+        /* Not asked for, or not there: only a link into the 32-bit MFC folder (what this switch makes) goes. */
+        NSString *target = [type isEqualToString:NSFileTypeSymbolicLink] ? [fm destinationOfSymbolicLinkAtPath:dst error:nil] : nil;
+        if (target && [target containsString:@"/VCRuntime/x86/"]) {
+            [fm removeItemAtPath:dst error:nil];
+            dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32: %s removed from syswow64 (a link of an earlier session; this one does not ask for it)\n",
+                    names[i].UTF8String);
+        }
+    }
+    if (!asked) return;
+    if (mfcOff)
+        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32=1 but MADEIRA_MFC=0: the 32-bit MFC stays out\n");
+    else if (!have)
+        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32=1: the 32-bit MFC is not downloaded (Settings > Visual C++): nothing linked\n");
+    else if (!linked.count)
+        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32=1: nothing could be linked into syswow64\n");
+    else
+        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MFC32=1: %s linked into syswow64 (the downloaded 32-bit MFC)\n",
+                [linked componentsJoinedByString:@" "].UTF8String);
+}
+
 /* C:\windows\winsxs for 32-bit processes: the x86 side-by-side assemblies Wine
  * ships. Re-seeded every session, because the links name the bundle path.
  *
@@ -1288,6 +1340,18 @@ static void madeira_publish_host_probe(void)
         const char *val = sysctlbyname(probes[i].sysctl, &v, &sz, NULL, 0) == 0 ? (v ? "1" : "0") : "?";
         len += snprintf(buf + len, sizeof(buf) - len, "%s%s=%s", i ? "," : "", probes[i].key, val);
         if (len >= sizeof(buf)) return;
+    }
+    /* madeira-bcd (round 624, agent C): env.MADEIRA_FEX_SHA = 0 tells this game's guest that the processor has no SHA extension
+     * (CPUID.7.EBX bit 29). Gal*Gun 2 and Hello Neighbor carry an OpenSSL 1.0.2 whose Win64 SHA-1 routine for that extension returns
+     * with RSP = input pointer + 64 (12 logs: a jump to 0x????????0000003c right after LoadLibrary("NETAPI32.DLL")). FEX takes only an
+     * explicit "SHA=0" from the probe, so the entry the sysctl produced is overwritten in place. Only the exact value 0 acts. */
+    {
+        const char *shaEnv = getenv("MADEIRA_FEX_SHA");
+        if (shaEnv && shaEnv[0] == '0' && shaEnv[1] == '\0') {
+            char *e = strstr(buf, "SHA=");
+            if (e && e[4] != '0') e[4] = '0';
+            dprintf(STDERR_FILENO, "[WineProc] MADEIRA_FEX_SHA=0: the guest is told the processor has no SHA extension\n");
+        }
     }
     setenv("FEX_MADEIRA_HOSTPROBE", buf, 1);
     dprintf(STDERR_FILENO, "[WineProc] FEX host feature probe: %s\n", buf);
@@ -1707,6 +1771,8 @@ static void *wine_process_thread(void *arg) {
             setenv("SteamAppPath", "C:\\Program Files\\Thumper", 1);
             setenv("SteamGameId", "356400", 1);
             setenv("SteamAppId",  "356400", 1);
+            /* round 624 (D2, MJY5PJ): say which branch ran; a game's own env.MADEIRA_STEAM_IDENTITY = none is read after its lines below */
+            dprintf(STDERR_FILENO, "[steam-env] fixed Steam identity published (app 356400); a game's own MADEIRA_STEAM_IDENTITY is read later\n");
         }
         unsetenv("MADEIRA_STEAM_APPID");
         unsetenv("MADEIRA_STEAM_APPPATH");
@@ -1782,6 +1848,20 @@ static void *wine_process_thread(void *arg) {
              * the mapping survives the screen locking. See virtual_ios.c ml1077. */
             {
                 long capMB = (long)madeira_cfg_int("swap-mb", 0);   /* ml1095: bcd.cfg swap-mb = N */
+                long poolMB = (long)madeira_cfg_int("mempool-mb", 0);   /* bcd.cfg mempool-mb = N */
+                /* madeira-bcd (round 625, the owner's decision 38 b; from rtmtree's fork for Persona 3
+                 * Reload): env.MADEIRA_POOL_MORE = 1 in bcd.cfg or the game's config lets helper memory
+                 * take more (MemoryPool.m, virtual_ios.c ml1150). Off: helper memory as in build 624. */
+                int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 0);
+                /* madeira-bcd: helper memory (mempool-mb) no longer needs swap-mb. The pool
+                 * is the tier's first stage, so without a swap file the tier runs with the
+                 * smallest one (64 MB): the pool backs what it can and, once it is used up
+                 * or guarded, the file takes at most 64 MB before commits stay in memory.
+                 * Round 625: with env.MADEIRA_POOL_MORE = 1 only. */
+                if (poolMore && capMB < 64 && poolMB >= 512) {
+                    capMB = 64;
+                    fprintf(stderr, "[swap] app: helper memory %ld MB without swap-mb: the tier runs with a 64 MB file\n", poolMB);
+                }
                 if (capMB >= 64) {
                     NSString *swapPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"madeira-swap.bin"];
                     [[NSFileManager defaultManager] removeItemAtPath:swapPath error:nil];
@@ -1805,9 +1885,11 @@ static void *wine_process_thread(void *arg) {
                         LOG("ml1077 swap tier armed: %{public}s, %ld MB", swapPath.UTF8String, capMB);
                         fprintf(stderr, "[swap] ml1077 app: backing file %s, cap %ld MB\n", swapPath.UTF8String, capMB);
                         /* ml1150: memory pool, the tier's first stage (MemoryPool.m). */
-                        long poolMB = (long)madeira_cfg_int("mempool-mb", 0);   /* bcd.cfg mempool-mb = N */
                         if (poolMB >= 512) {
                             extern long MadeiraMemoryPoolStart(long megabytes);
+                            extern int MadeiraMemoryPoolMore;
+                            MadeiraMemoryPoolMore = poolMore;   /* round 625: its pressure source */
+                            if (poolMore) fprintf(stderr, "[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)\n");
                             long got = MadeiraMemoryPoolStart(poolMB);
                             LOG("ml1150 memory pool: %ld of %ld MB", got, poolMB);
                         }
@@ -1914,6 +1996,18 @@ static void *wine_process_thread(void *arg) {
                     setenv(k.UTF8String, v.UTF8String, 1);
                     LOG("game config env: %{public}s=%{public}s", k.UTF8String, v.UTF8String);
                     fprintf(stderr, "[madeira-env] game %s=%s\n", k.UTF8String, v.UTF8String);
+                }
+                {   /* madeira-bcd (round 624, agent R: the Epic GTA V / RDR2 starts 7Z8VKR, TV6H06): env.MADEIRA_STEAM_IDENTITY = none from the
+                     * game's OWN file. The check near the start of this function runs before these lines are exported, so a key from the game's
+                     * file was never seen there (0 of 2,182 logs printed the line below). Same effect as that check; it still works for a key
+                     * that is set earlier. The environment is read for Wine after this point. */
+                    const char *late_identity = getenv("MADEIRA_STEAM_IDENTITY");
+                    if (late_identity && strcmp(late_identity, "none") == 0 && (getenv("SteamAppId") || getenv("SteamGameId") || getenv("SteamAppPath"))) {
+                        unsetenv("SteamAppPath");
+                        unsetenv("SteamGameId");
+                        unsetenv("SteamAppId");
+                        dprintf(STDERR_FILENO, "[steam-env] MADEIRA_STEAM_IDENTITY=none (from the game's file): no Steam game identity published\n");
+                    }
                 }
                 {   /* madeira-bcd (round 604): the in-game menu's Wine debug channels, for THIS start only (BCDDebugLive.swift, BCDDebugChannels.swift).
                      * The menu writes the text of the WINEDEBUG it wants into a file in the temporary folder; it is exported here, after the game's own
@@ -2933,6 +3027,11 @@ static void *wine_process_thread(void *arg) {
                              NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject,
                              use_arm64ec);
 
+            /* madeira-bcd (round 625, the owner's item 26): env.MADEIRA_MFC32 = 1 links the downloaded 32-bit MFC into syswow64 (linked
+             * from the i386 farm above), see madeira_mfc32; any session, as a 32-bit program runs in both kinds. */
+            madeira_mfc32(fm, [prefix stringByAppendingPathComponent:@"drive_c/windows/syswow64"],
+                          NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject);
+
             /* BCD (issue #13): env.MADEIRA_VCRT_ARM64_KEY = 1 takes the session's VC++ runtime version when it is newer than
              * the marker's fixed one; the marker itself is written by the first Wine process (loader_ios.c). */
             madeira_vcrt_arm64_version(bundlePath,
@@ -3118,7 +3217,9 @@ static void *wine_process_thread(void *arg) {
                 unsigned ticks = 0;
                 while ((n = madeira_live_game_children(names, sizeof names, -1.0)) > 0) {
                     usleep(200 * 1000);
-                    if ((++ticks % 300) == 0)
+                    /* madeira-bcd (round 624, agent R S26; 1EXE6P): at 10 s and 30 s too, not only every 60 s (an installs-only session
+                     * offers its restart 45 s after the batch: the line names what keeps it open before that) */
+                    if (++ticks == 50 || ticks == 150 || (ticks % 300) == 0)
                         dprintf(STDERR_FILENO, "[WineProc] madeira-bcd: still running: %d child process(es) (%s), %u s\n",
                                 n, names, ticks / 5);
                 }
@@ -3228,6 +3329,34 @@ int wine_session_dock_game_ended(int32_t status)
     dprintf(STDERR_FILENO, "[WineProc] madeira-bcd: the Dock game's last process ended with status 0x%x and nothing of it is left; "
             "ending the session here\n", (unsigned)status);
     __atomic_store_n(&g_wine_exit_code, (int)status, __ATOMIC_RELEASE);   /* madeira-bcd: wine_process_exit_code() for a session ended off the boot thread */
+    wine_session_end();
+    return 1;
+}
+
+/* madeira-bcd (round 624, Cuphead PDKQP7 "Close game bug"): the player asked to close, the Dock game's last process ended with a
+ * status that is not a crash (Cuphead quit itself with 0), the host finished and nothing of the game is left. The library ends the
+ * session as wine_session_dock_game_ended does, but the status is NOT made the session's crash status (g_launch_exit stays
+ * empty), so no error box is shown and the session reads as the player's quit. Returns 1 when it ended the session. */
+int wine_session_dock_game_quit(int32_t status)
+{
+    if (!g_wine_running || __atomic_load_n(&g_session_end_claim, __ATOMIC_ACQUIRE)) return 0;
+    dprintf(STDERR_FILENO, "[WineProc] madeira-bcd: the player asked to close and the Dock game's last process ended with status 0x%x; "
+            "nothing of it is left; ending the session here\n", (unsigned)status);
+    __atomic_store_n(&g_wine_exit_code, (int)status, __ATOMIC_RELEASE);
+    wine_session_end();
+    return 1;
+}
+
+/* madeira-bcd (round 625, N-S18; QQ0BEX and about 40 Dock logs): the Dock game's last program closed by itself with a status that
+ * is not a crash (exit code 0) within seconds of its start, before any frame reached the screen (it showed its own error box and
+ * left), the host finished and nothing of it is left. The library ends the session as wine_session_dock_game_quit does (the status
+ * is not the session's crash status) and shows its own words; the player did not ask to close. Returns 1 when it ended the session. */
+int wine_session_dock_game_left(int32_t status)
+{
+    if (!g_wine_running || __atomic_load_n(&g_session_end_claim, __ATOMIC_ACQUIRE)) return 0;
+    dprintf(STDERR_FILENO, "[WineProc] madeira-bcd: the Dock game's last program closed by itself with status 0x%x before it drew a "
+            "picture; nothing of it is left; ending the session here\n", (unsigned)status);
+    __atomic_store_n(&g_wine_exit_code, (int)status, __ATOMIC_RELEASE);
     wine_session_end();
     return 1;
 }

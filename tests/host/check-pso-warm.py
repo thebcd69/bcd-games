@@ -63,14 +63,18 @@ print('PASS: the patch applies once after the GPU fault patch, op 10 lives in _m
 
 # --- the patch's code, run --------------------------------------------------
 helpers = patched[patched.index('/* madeira-bcd: pipeline cache warm-up'):patched.index('static NTSTATUS _madeira_ctl(void *args) {')]
+# Other patches (sc-native, rp-store, ...) put their own blocks between this one and _madeira_ctl: stop at the next patch's block.
+_next = re.search(r'/\* madeira-bcd: [^\n]*tools/patch-(?!winemetal-pso-warm)', helpers[1:])
+if _next:
+    helpers = helpers[:_next.start() + 1]
 case = ctl[ctl.index('  case 10: {'):]
 case = case[:case.index('    break;\n  }\n') + len('    break;\n  }\n')]
 # Objective-C -> C for the host: retains and releases are counted, the pool is a block scope.
 c_code = helpers
-c_code = re.sub(r'\[\(id\)(\w+) retain\]', r'fake_retain((uintptr_t)(\1))', c_code)
-c_code = re.sub(r'\[\(id\)(\w+) release\]', r'fake_release((uintptr_t)(\1))', c_code)
+c_code = re.sub(r'\[\(id\)(\w+(?:\[\w+\])?) retain\]', r'fake_retain((uintptr_t)(\1))', c_code)
+c_code = re.sub(r'\[\(id\)(\w+(?:\[\w+\])?) release\]', r'fake_release((uintptr_t)(\1))', c_code)
 c_code = c_code.replace('@autoreleasepool {', '{')
-assert '[' not in re.sub(r'\w+\[[^\]]*\]', '', c_code.replace('[pso-warm]', '')), 'an Objective-C message was left untranslated'
+assert '[' not in re.sub(r'(?:\w+|\))\[[^\]]*\]', '', c_code.replace('[pso-warm]', '')), 'an Objective-C message was left untranslated'
 
 harness = r'''
 #define _GNU_SOURCE
@@ -86,8 +90,10 @@ typedef int NTSTATUS;
 typedef uint64_t obj_handle_t;
 void *_NSConcreteStackBlock[32], *_NSConcreteGlobalBlock[32];
 struct WMTConstMemoryPointer { const void *ptr; };
-struct WMTRenderPipelineInfo { unsigned char colors[200]; obj_handle_t vertex_function, fragment_function, archive; uint8_t padding[6]; };
-struct WMTComputePipelineInfo { obj_handle_t compute_function; struct WMTConstMemoryPointer lookups; obj_handle_t archive; uint8_t padding; };
+struct WMTRenderPipelineInfo { unsigned char colors[200]; obj_handle_t vertex_function, fragment_function, binary_archive_for_serialization;
+                               struct WMTConstMemoryPointer binary_archives_for_lookup; uint8_t num_binary_archives_for_lookup; uint8_t padding[6]; };
+struct WMTComputePipelineInfo { obj_handle_t compute_function; struct WMTConstMemoryPointer binary_archives_for_lookup;
+                                obj_handle_t binary_archive_for_serialization; uint8_t num_binary_archives_for_lookup; uint8_t padding; };
 struct WMTVertexDescriptorInfo { unsigned char attrs[800]; };
 struct unixcall_mtldevice_newcomputepso { obj_handle_t device; struct WMTConstMemoryPointer info; obj_handle_t ret_error; obj_handle_t ret_pso; };
 struct unixcall_mtldevice_newrenderpso { obj_handle_t device; struct WMTConstMemoryPointer info; obj_handle_t ret_error; obj_handle_t ret_pso; };
@@ -113,27 +119,43 @@ static long long madeira_cfg_int(const char *key, long long dflt) { return !strc
 static int wmtr_enabled(void) { return 0; }
 /* retain counts by handle */
 static int retains[64], releases[64];
+static obj_handle_t archs_r[2] = { 21, 22 }, archs_c[1];   /* the caller's lookup lists: render has two archives, compute none */
 static void fake_retain(uintptr_t h) { assert(h < 64); retains[h]++; }
 static void fake_release(uintptr_t h) { assert(h < 64); releases[h]++; }
 /* DXMT's builders: check the copy, "build" handle 40+kind */
 static const void *orig_info, *orig_vd;
 static int built[3];
+/* The copy keeps the caller's info byte for byte, except lookup.ptr: the copy owns a list of its own (the caller's may be released). */
+static void same_info(const void *copy, const void *orig, size_t size, const void *orig_list, unsigned n) {
+    unsigned char c[1024]; const struct WMTRenderPipelineInfo *r = copy; const obj_handle_t *list;
+    assert(size <= sizeof c);
+    memcpy(c, copy, size);
+    if (size == sizeof(struct WMTRenderPipelineInfo)) {
+        list = r->binary_archives_for_lookup.ptr;
+        ((struct WMTRenderPipelineInfo *)c)->binary_archives_for_lookup.ptr = orig_list;
+    } else {
+        list = ((const struct WMTComputePipelineInfo *)copy)->binary_archives_for_lookup.ptr;
+        ((struct WMTComputePipelineInfo *)c)->binary_archives_for_lookup.ptr = orig_list;
+    }
+    assert(!memcmp(c, orig, size));
+    if (n) { assert(list != orig_list && !memcmp(list, orig_list, n * sizeof(obj_handle_t))); } else assert(list == orig_list);
+}
 static NTSTATUS _MTLDevice_newRenderPipelineState(void *obj) {
     struct unixcall_mtldevice_newrenderpso *p = obj;
     assert(p->device == 7 && p->info.ptr && p->info.ptr != orig_info);
-    assert(!memcmp(p->info.ptr, orig_info, sizeof(struct WMTRenderPipelineInfo)));
+    same_info(p->info.ptr, orig_info, sizeof(struct WMTRenderPipelineInfo), archs_r, 2);
     built[0]++; p->ret_pso = 40; return 0; }
 static NTSTATUS _MTLDevice_newRenderPipelineStateVD(void *obj) {
     struct unixcall_mtldevice_newrenderpso_vd *p = obj;
     assert(p->device == 7 && p->info.ptr != orig_info && p->vd.ptr != orig_vd);
     assert((const unsigned char *)p->vd.ptr == (const unsigned char *)p->info.ptr + sizeof(struct WMTRenderPipelineInfo));
-    assert(!memcmp(p->info.ptr, orig_info, sizeof(struct WMTRenderPipelineInfo)));
+    same_info(p->info.ptr, orig_info, sizeof(struct WMTRenderPipelineInfo), archs_r, 2);
     assert(!memcmp(p->vd.ptr, orig_vd, sizeof(struct WMTVertexDescriptorInfo)));
     built[1]++; p->ret_pso = 41; return 0; }
 static NTSTATUS _MTLDevice_newComputePipelineState(void *obj) {
     struct unixcall_mtldevice_newcomputepso *p = obj;
     assert(p->device == 7 && p->info.ptr != orig_info);
-    assert(!memcmp(p->info.ptr, orig_info, sizeof(struct WMTComputePipelineInfo)));
+    same_info(p->info.ptr, orig_info, sizeof(struct WMTComputePipelineInfo), archs_c, 0);
     built[2]++; p->ret_pso = 0; /* a failed build */ return 0; }
 ''' + c_code + r'''
 static uint32_t op8(unsigned kind, const void *info, const void *vd) {
@@ -151,8 +173,10 @@ int main(int argc, char **argv) {
     int i, q1, q2;
     (void)argc;
     memset(&rp, 0x5a, sizeof rp); rp.vertex_function = 11; rp.fragment_function = 12;
+    rp.binary_archives_for_lookup.ptr = archs_r; rp.num_binary_archives_for_lookup = 2; rp.binary_archive_for_serialization = 23;
     memset(&vd, 0x33, sizeof vd);
     memset(&cp, 0, sizeof cp); cp.compute_function = 13;
+    cp.binary_archives_for_lookup.ptr = archs_c;
     cfg_warm = atoll(argv[1]);
     if (!cfg_warm) {
         orig_info = &rp;
@@ -172,6 +196,7 @@ int main(int argc, char **argv) {
     assert(built[0] == 1 && built[1] == 1 && built[2] == 1);
     assert(retains[11] == 2 && releases[11] == 2 && retains[12] == 2 && releases[12] == 2);
     assert(retains[13] == 1 && releases[13] == 1);
+    assert(retains[21] == 2 && releases[21] == 2 && retains[22] == 2 && releases[22] == 2 && retains[23] == 2 && releases[23] == 2);
     assert(retains[7] == 3 && releases[7] == 3);
     assert(releases[40] == 1 && releases[41] == 1);
     for (i = 0; i < 64; i++) if (i != 40 && i != 41) assert(retains[i] == releases[i]);

@@ -95,6 +95,17 @@ enum SteamInstallFiles {
     /// one seen (case-insensitively). Returns nil for anything that could
     /// escape the install folder.
     nonisolated static func safeRelativePath(_ name: String, folded: inout [String: String]) -> String? {
+        safeRelativePath(name, folded: &folded, existing: { _ in [] })
+    }
+
+    /// madeira-bcd (round 624, Discord forum item 10: Kingdom Come: Deliverance's empty `localization` next to its `Localization`):
+    /// the same fold, seeded from the folders already on disk. `existing` lists an install-relative folder ("" is the install folder
+    /// itself). A run whose manifest spells a folder differently from the one an earlier run (an update, a DLC, a language depot)
+    /// created used to make an empty twin, which a case-sensitive volume keeps and Wine finds first; now a spelling already on disk
+    /// wins: the exact name first, then one that differs only in case, as the DLC removal looks names up. `note` hears each folder
+    /// whose manifest spelling was replaced, and each pair of twins already on disk.
+    nonisolated static func safeRelativePath(_ name: String, folded: inout [String: String], existing: (String) -> [String],
+                                             note: (String) -> Void = { _ in }) -> String? {
         let parts = name.replacingOccurrences(of: "\\", with: "/").split(separator: "/", omittingEmptySubsequences: true).map(String.init)
         guard !parts.isEmpty, parts.count <= 64, name.utf8.count < 1024,
               !parts.contains(where: { $0 == "." || $0 == ".." || $0.contains(":") ||
@@ -103,10 +114,20 @@ enum SteamInstallFiles {
         for (index, part) in parts.enumerated() {
             if index == parts.count - 1 { built.append(part); break }
             let key = (built + [part]).joined(separator: "/").lowercased()
-            if let existing = folded[key] {
-                built = existing.split(separator: "/").map(String.init)
+            if let known = folded[key] {
+                built = known.split(separator: "/").map(String.init)
             } else {
-                built.append(part)
+                let parent = built.joined(separator: "/")
+                let list = existing(parent)
+                let twins = list.filter { $0.caseInsensitiveCompare(part) == .orderedSame }
+                let onDisk = twins.first(where: { $0 == part }) ?? twins.first
+                if twins.count > 1 {
+                    note("case twins on disk in \(parent.isEmpty ? "the install folder" : parent): \(twins.sorted().joined(separator: ", "))")
+                }
+                if let onDisk, onDisk != part {
+                    note("the manifest spells \((built + [part]).joined(separator: "/")), the disk has \(onDisk): kept")
+                }
+                built.append(onDisk ?? part)
                 folded[key] = built.joined(separator: "/")
             }
         }

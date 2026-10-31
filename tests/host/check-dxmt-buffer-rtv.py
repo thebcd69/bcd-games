@@ -104,7 +104,7 @@ else:
 sh = (R / 'tools/build-d3d11-dll.sh').read_text()
 check('d3d11-src.dll is built with the patch and refused without it',
       '"patch-dxmt-buffer-rtv.py" "[rtv-fail] #"' in sh and 'is not in the result (no' in sh)
-check('the IPA is refused when no 64-bit d3d11.dll carries it', 'for m in "[copy-structure-count] skipped #" "[rtv-fail] #"; do' in wf)
+check('the IPA is refused when no 64-bit d3d11.dll carries it', any('"[rtv-fail] #"' in line for line in wf.splitlines() if line.strip().startswith('for m in "[copy-structure-count] skipped #"')))
 
 bridge = (R / 'app/Madeira/WineProcessBridge.m').read_text()
 end = bridge[bridge.index('static void wine_session_end(void)\n{'):]   # the definition, not the declaration near the top
@@ -127,8 +127,9 @@ check('auto-tune answers the box with both lines, and not again once the empty v
       and '"none": [s("S_OK with no view (env.MADEIRA_BUFFER_RTV_EMPTY)")]' in blk, blk[:400])
 fx = R / 'tests/fixtures/autotune/need-for-speed-the-run-buffer-rtv-2026-10-28.expect'
 exp = json.loads(fx.read_text()) if fx.exists() else {}
+# round 624: the lowest-priority diagnostic rule x86-null-fault-diag may match the same 32-bit fault after it; the first match decides.
 check('the Discord log (build 614) is a fixture that gets both lines',
-      exp.get('matched') == ['d3d11-buffer-render-target-view']
+      (exp.get('matched') or [None])[0] == 'd3d11-buffer-render-target-view'
       and exp.get('next') == ['env.MADEIRA_BUFFER_RTV_EMPTY = 1', 'env.MADEIRA_D3D11_SRC = 1'], exp)
 
 lists = json.loads((R / 'recommended/recommendations.json').read_text())

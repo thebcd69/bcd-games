@@ -110,8 +110,12 @@ done
 # 64-bit game gets them with env.MADEIRA_D3D11_SRC = 1:
 #   tools/patch-dxmt-copy-structure-count.py  F1 2020 (CopyStructureCount without a buffer)
 #   tools/patch-dxmt-buffer-rtv.py            Frostbite 2 games (render target views on a buffer, [rtv-fail])
+#   tools/patch-dxmt-srv-getdesc-mips.py      Dark Souls III (an SRV's GetDesc reports the real mip count, [srv-getdesc]; round 624)
+#   tools/patch-dxmt-d11-query-stuck.py       WRC 9 ([query-stuck], DXMT_QUERY_TS_WATCHDOG; round 624: build 624's first IPA lacked it here)
 BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skipped #"
-             "patch-dxmt-buffer-rtv.py" "[rtv-fail] #")
+             "patch-dxmt-buffer-rtv.py" "[rtv-fail] #"
+             "patch-dxmt-srv-getdesc-mips.py" "[srv-getdesc] madeira-bcd #"
+             "patch-dxmt-d11-query-stuck.py" "[query-stuck] madeira-bcd query=")
 SHIP_HAS_BCD=1
 for ((i = 1; i < ${#BCD_PATCHES[@]}; i += 2)); do
     LC_ALL=C grep -aqF "${BCD_PATCHES[$i]}" "$SHIP/d3d11.dll" || SHIP_HAS_BCD=0

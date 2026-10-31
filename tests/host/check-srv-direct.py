@@ -169,6 +169,9 @@ static int ios_srv_qos_follow_seen, ios_srv_qos_gen_seen;
 static void (*req_handlers[REQ_NB_REQUESTS])( const void *req, void *reply );
 @GLOBALS@
 static int ios_srv_loop_locked;
+/* round 624 (agent E1 S9): the [reg-miss] trace (request_ios.c, env.MADEIRA_REG_TRACE, off by default) is never on in this model */
+static int ios_reg_trace_want( enum request req, unsigned int error ) { (void)req; (void)error; return 0; }
+static void ios_reg_trace( enum request req, const union generic_reply *reply ) { (void)req; (void)reply; }
 @ENTER@
 @LEAVE@
 @EXIT@

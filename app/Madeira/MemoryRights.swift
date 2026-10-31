@@ -25,6 +25,11 @@ enum MemoryRights {
         + "small games can still run. Add it with GetMoreRam (with SideStore or LiveContainer), or sign BCD with "
         + "a paid developer account. BCD's README explains how."
 
+    /// Where a game has just stopped on an install without the limit (the Dock's stopped screen, auto-tune's alert): round 624 (agent N S1;
+    /// Q9NC0W/YNBVQ8 wrote "does not start on iPhone 15 Pro" and "Wine starts but not the game"); the install, not the game, is the usual reason.
+    static let failureNote = "This install lacks the increased memory limit, the usual reason a game stops this early. "
+        + "Add it with GetMoreRam (with SideStore or LiveContainer), or sign BCD with a paid developer account."
+
     /// The defaults key holding the build the box was last shown for.
     static let shownBuildKey = "bcd.memoryNotice.shownBuild"
 
@@ -39,12 +44,36 @@ enum MemoryRights {
     static let shared = MemoryRightsNotice()
 
     @Published var message: String?
+    /// The box's title: "Memory limit", or the one of the box below.
+    @Published var title = "Memory limit"
     private var started = false
+    private var poolStop: String?
+
+    /// madeira-bcd (round 624, agent N S16; 0ZHPYJ and 34 more archive logs): the last run never came back from the JIT memory request
+    /// (BCDSessionRecorderLive.recoverUnfinished reads the start-up phase file). Said once, in this box, before and never together with the
+    /// memory-limit words (those wait for the next run).
+    static let poolStopTitle = "The last start stopped early"
+    static let poolStopWords = "Last time BCD stopped while JIT was being set up for the game: its JIT memory request did not come back. "
+        + "Check in Settings › JIT that JIT turns on, that LocalDevVPN is connected and that the pairing file is set, then press Play again."
+    func lastStartStoppedInPoolRequest() {
+        if started {
+            if message == nil { title = Self.poolStopTitle; message = Self.poolStopWords }
+        } else {
+            poolStop = Self.poolStopWords
+        }
+    }
 
     /// When the library first appears, once per run.
     func start() {
         guard !started else { return }
         started = true
+        if let words = poolStop {
+            poolStop = nil
+            title = Self.poolStopTitle
+            message = words
+            return
+        }
+        title = "Memory limit"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         guard MemoryRights.due(lacking: MemoryRights.lacking,
                                   shownBuild: UserDefaults.standard.string(forKey: MemoryRights.shownBuildKey),

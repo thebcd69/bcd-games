@@ -54,6 +54,7 @@ expect = {
     'MC_DRAW': 'draw', 'MC_DRAW_INDEXED': 'draw', 'MC_DRAW_INDIRECT': 'indirect',
     'MC_DRAW_INDEXED_INDIRECT': 'indirect', 'MC_DISPATCH_INDIRECT': 'indirect', 'MC_DISPATCH': 'dispatch',
     'MC_COPY_BB': 'copy', 'MC_COPY_B2T': 'copy', 'MC_COPY_T2B': 'copy', 'MC_COPY_T2T': 'copy', 'MC_RESOLVE': 'copy',
+    'MC_WBI': 'copy',   # WriteBufferImmediate is written by a 4-byte blit copy
     'MC_CLEAR_RT': 'clear', 'MC_CLEAR_DS': 'clear', 'MC_FILL_BB': 'clear', 'MC_FILL_TEX': 'clear',
     'MC_BARRIER': 'barrier', 'MC_RTS': 'targets', 'MC_QUERY_BEGIN': 'query', 'MC_QUERY_END': 'query',
     'MC_QUERY_RESOLVE': 'query',

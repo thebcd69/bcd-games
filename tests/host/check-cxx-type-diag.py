@@ -57,6 +57,8 @@ static void dbg(const char *fmt, ...) { va_list ap; va_start(ap, fmt); vprintf(f
 static unsigned char *img; static size_t img_size; static ULONG_PTR wow_base;
 static ULONG_PTR ios_wow_base(void) { return wow_base; }
 static void *ios_wow_host_ptr(ULONG a) { return a ? (void *)(wow_base + a) : NULL; }
+/* round 624 (X1): the 32-bit stack dump lives in process_ios.c; here it only says it was asked */
+void ios_wow32_stack_dump(const char *tag) { printf("[stub] wow32 stack dump %s\n", tag); }
 static NTSTATUS NtReadVirtualMemory(HANDLE p, const void *addr, void *buf, SIZE_T n, SIZE_T *got)
 {
     (void)p;
@@ -95,6 +97,12 @@ int main(void)
     build64(0x2000, 0x2100, 0x2200, 0x2240, 0x2300, 0x2400, ".?AV\x01\x02odd@@", "");
     rec.ExceptionInformation[2] = (ULONG_PTR)img + 0x2000;
     printf("--- odd\n"); ios_cxx_throw_diag(&rec);
+
+    /* round 624 (X1): a standard library exception's message: { vtable; const char *_What; bool _DoFree } at the thrown object */
+    build64(0x9000, 0x9100, 0x9200, 0x9240, 0x9300, 0x9400, ".?AVlength_error@std@@", ".?AVlogic_error@std@@");
+    { ULONG_PTR w = (ULONG_PTR)img + 0x9900; memcpy(img + 0x9800 + 8, &w, 8); strcpy((char *)img + 0x9900, "string too long\x01!"); }
+    rec.ExceptionInformation[1] = (ULONG_PTR)img + 0x9800; rec.ExceptionInformation[2] = (ULONG_PTR)img + 0x9000;
+    printf("--- what\n"); ios_cxx_throw_diag(&rec);
 
     /* 32-bit in a WoW window: absolute guest pointers (offsets from the window base), name at +8 */
     wow_base = (ULONG_PTR)img;
@@ -143,6 +151,10 @@ with tempfile.TemporaryDirectory() as tmp:
               'thrown .?AVruntime_error@std@@; also catchable as: .?AVexception@std@@ (2 catchable type(s)' in x64 and '64-bit throw at 0x14023a6cc4' in x64
               and 'p0=0x19930520 p1=0x7000001234' in x64 and 'exception parameters (4)' in x64, x64)
         check('the same ThrowInfo thrown again prints nothing', parts.get('again') == [])
+        wh = '\n'.join(parts.get('what', []))
+        check('round 624 (X1): a std:: exception prints its message (printable ASCII only), and a 64-bit throw asks for no 32-bit stack',
+              'thrown .?AVlength_error@std@@' in wh and '[cxx-type]   what="string too long?!"' in wh and '[stub]' not in wh
+              and 'what=' not in x64, wh)
         un = '\n'.join(parts.get('unreadable', []))
         check('an unreadable ThrowInfo says so and still prints the parameters', '? (ThrowInfo or its type list not readable)' in un and 'exception parameters (4)' in un, un)
         odd = '\n'.join(parts.get('odd', []))
@@ -150,9 +162,11 @@ with tempfile.TemporaryDirectory() as tmp:
         w32 = '\n'.join(parts.get('32-bit', []))
         check('32-bit in a WoW window: guest pointers resolved, name at +8, three parameters',
               '32-bit throw at 0x4405a9: thrown .?AVCMyError@@; also catchable as: nothing (1 catchable type(s)' in w32 and 'exception parameters (3)' in w32, w32)
+        check('round 624 (X1): a 32-bit throw asks for the 32-bit stack dump once, after its two lines; the capped run asks for no more',
+              parts.get('32-bit', [''] * 3)[2:3] == ['[stub] wow32 stack dump throw'] and out.count('[stub] wow32 stack dump') == 1, w32)
         cap = '\n'.join(parts.get('32-bit', [])[2:])
-        check('at most twelve throws are reported (two lines each), 8 of 20 distinct ThrowInfos are left out',
-              out.count('[cxx-type] build591') == 1 + 1 + 1 + 1 + (12 - 4), str(out.count('[cxx-type] build591')))
+        check('at most twelve throws are reported (two lines each), 13 of 20 distinct ThrowInfos are left out',
+              out.count('[cxx-type] build591') == 1 + 1 + 1 + 1 + 1 + (12 - 5), str(out.count('[cxx-type] build591')))
 
 # madeira-bcd (lead, 2026-10-23): the HRESULT of an ATL or COM exception (the EA installer's C7-2F79), read from the thrown object, log only
 _src = (Path(__file__).resolve().parents[2] / 'build/ntdll-unix/thread_ios.c').read_text()

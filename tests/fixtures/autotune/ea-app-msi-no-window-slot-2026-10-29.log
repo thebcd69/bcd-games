@@ -1,0 +1,358 @@
+[22:48:15.681] [INFO] Checking entitlements...
+[22:48:15.682] [INFO] [build] v0.1.623 (623)
+[22:48:15.682] [INFO] [device] model=iPad16,10 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11845MB available=12267MB cores=8
+[22:48:15.682] [INFO] [device] address-map=[0x10457c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[22:48:15.691] [INFO] [device] settings: low-power=0 thermal=nominal screen=2048x2732@2.0x max-fps=60 utc-offset=+08:00 free-disk=26GB stikdebug-url=1
+[22:48:15.694] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:48:20.054] [INFO] [bcd] library launch EAappInstaller.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=0 metalfx=off
+[22:48:20.055] [INFO] Session log: logs/EAappInstaller.exe-2026-10-29_22-48-20.txt
+[22:48:20.067] [INFO] Running full Wine sequence...
+[22:48:20.067] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10457c000,0x8000000000) 512GB available=12252MB low-power=0 thermal=nominal
+[22:48:20.109] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:48:20.109] [INFO] Allocating 896MB JIT pool via debugger...
+[22:48:20.109] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:48:20.110] [INFO] [jit-debugger] attached=1 at the pool request
+[22:48:20.111] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:48:21.964] [INFO] RX pool at 0x148000000
+[22:48:23.019] [INFO] Detaching debugger...
+[22:48:23.024] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.943s rev=ml526
+[madeira-env] game LC_ALL=en_US.UTF-8
+[madeira-env] game MADEIRA_APC_BUSY_QUEUE=1
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; sysx64 only)
+[WineProc] MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll (Direct3D 8 on Direct3D 9, DXMT's; syswow64)
+[WineProc] MADEIRA_OPTIN_DLLS: msi.dll -> msi-optin.dll (Wine's msi.dll for this game)
+[WineProc] MADEIRA_OPTIN_DLLS: dxva2.dll -> dxva2-optin.dll (Wine's dxva2.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11371 MB + phys_footprint=916 MB = 12288 MB (hw.memsize says 11845 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[ec-hook] #1 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e310a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #2 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e311038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[ec-hook] #3 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e3113a4+0x4: rva 0x113a4, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 16 aa 83 05 00 94 e4 03 00 aa | pool before sync: 21 7b 01 14 e0 03 16 aa 83 05 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #4 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e311a40+0x4: rva 0x11a40, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | pool before sync: 7f 79 01 14 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | jump -> 0 (-) bytes there: -
+[ec-hook] #5 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e310a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #6 scope=difference view=difference tid=0024 image 0x10e300000 (pool copy 0x148004000) 0x10e311038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7038160000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=927 MB (peak 927) internal=925 MB compressed=0 MB external=107 MB reusable=7 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="shell - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #10 hwnd=0x1003a class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\cmd.exe" t+  3.409s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"cmd /c C:\\bcd-games\\<uuid>.bat" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"C:\\bcd-launchers\\"
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x149a84000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  3.456s rev=ml526
+[launch-view] dismissed reason=surface logs=0
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x30 --headless" (fd=120, unixdir=121, dup_unixdir=127) cwd=L"C:\\bcd-launchers\\"
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14afac000)
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  3.504s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\"" (fd=134, unixdir=135, dup_unixdir=139) cwd=L"C:\\bcd-launchers\\"
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  3.553s rev=ml526
+004c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\" " (fd=146, unixdir=147, dup_unixdir=151) cwd=L"C:\\bcd-launchers\\"
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=377
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=380
+004c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=138
+[Wine ntdll/server] process_exit_wrapper(0)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\start.exe" cmdline=L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\bcd-launchers\\EAappInstaller.exe\""
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  3.572s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\bcd-launchers\\EAappInstaller.exe\"" (fd=97, unixdir=138, dup_unixdir=152) cwd=L"C:\\bcd-launchers\\"
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x14d82c000)
+0054:err:service:scmdatabase_autostart_services autostart: starting L"PnkBstrB"
+[phase] spawn:L"C:\\windows\\syswow64\\PnkBstrB.exe" t+  3.624s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0054:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\syswow64\\PnkBstrB.exe" (fd=145, unixdir=170, dup_unixdir=177) cwd=L"C:\\bcd-launchers\\"
+005c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\bcd-launchers\\EAappInstaller.exe" cmdline=L"\"C:\\bcd-launchers\\EAappInstaller.exe\" "
+[phase] spawn:L"C:\\bcd-launchers\\EAappInstaller.exe" t+  3.632s rev=ml526
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f9d30000, then OCCUPIED 0x71f9d30000+0x10000 prot=1/3 shared=0 (0x62d0000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+0068:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0068:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f9900000+0x3bc000 (libwow64fex.dll) → pool 0x150085000 used=0x8449000/0x37144000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f9900000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[guest-log] madeira-bcd text-log mirror: every line, 800 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] #1 tid=0068 [rpm-sink] alive rev=ml492
+[bigres] tid=0068 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x71f9900000) -> 64-bit table (0x112bc0d00)
+D 68 Load module PnkBstrB.exe (pnkbstrb.exe-adaf3c7162037bfb): 7900400000
+D 68 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 79FFF40000
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f94c0000, then OCCUPIED 0x71f94c0000+0x10000 prot=1/3 shared=0 (0x6b40000 of the range is not free))
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+005c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=706
+005c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=147
+[Wine ntdll/server] process_exit_wrapper(0)
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+0070:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0070:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[Wine ntdll/server] process_exit_wrapper(0)
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f9090000+0x3bc000 (libwow64fex.dll) → pool 0x150a39000 used=0x8dfd000/0x37144000 tramp+0x4000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x150f20000)
+D 68 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 797BED0000
+D 68 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 797BC40000
+[bigres] tid=0070 #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=512 MB
+D 68 Load module WSOCK32.dll (wsock32.dll-baa0216ae0bd2a13): 797BC20000
+D 68 Load module ws2_32.dll (ws2_32.dll-5902ca9b51f79685): 797BBE0000
+ml957: ? backing 0x797ba48000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b960000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797acf0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797abb4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x727ba48000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a9f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0054:err:service:scmdatabase_autostart_services autostart: starting L"PnkBstrA"
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/windows/system32/LogFiles/PunkBuster/PnkBstrB.log
+[guest-log] #2 tid=0088 [10.29.2026 21:48:23] PnkBstrB v2.057 (COD2) Service Started Successfully. This service is a component of the PunkBuster Anti-Cheat system. Visit http://www.evenbalance.com for more information.
+[xp-names] m1461880 "wine-x18-exc"
+[wow-window] reserved B=0x7300000000..0x7400000000 (slot 2) guard=owned
+[wow-window] slot 2 B=0x7300000000 bound to peb=0x7300310000
+0090:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0090:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[guest-log] #3 tid=0090 [rpm-sink] alive rev=ml492
+[bigres] tid=0090 #3 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7300310000 total=768 MB
+[phase] spawn:L"C:\\windows\\temp\\{<uuid>}\\.cr\\EAappInstaller.exe" t+  3.965s rev=ml526
+0070:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\Temp\\{<uuid>}\\.cr\\EAappInstaller.exe\" -burn.clean.room=\"C:\\bcd-launchers\\EAappInstaller.exe\" -burn.filehandle.attached=100 -burn.filehandle.self=104 " (fd=285, unixdir=288, dup_unixdir=296) cwd=L"C:\\bcd-launchers\\"
+[wow-window] reserved B=0x7800000000..0x7900000000 (slot 3) guard=borrowed
+[wow-window] slot 3 B=0x7800000000 bound to peb=0x7800310000
+009c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-refused] ml1285 #3 addr=0x1 size=0 type=0x8000 status=0xc000000d view=0x0+0 protect=0 valloc=-1 tid=0090
+[bigres] tid=009c #4 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7800310000 total=1024 MB
+[phase] spawn:L"C:\\windows\\system32\\rpcss.exe" t+  4.061s rev=ml526
+[guest-log] #4 tid=00a8 [10.29.2026 21:48:24] PnkBstrA v1029 Service Started Successfully. This service is a component of the PunkBuster Anti-Cheat system. Visit http://www.evenbalance.com for more information.
+0078:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\rpcss.exe" (fd=329, unixdir=335, dup_unixdir=341) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x152b18000)
+[wow-stack-free] #1 the dead thread 0094's 32-bit stack (guest 0x1840000) is in window 0x7200000000 (live), the thread freeing its TEB is in window 0x7800000000: the old address 0x7801840000 IS a live view -> released in its own window rev=ajan11
+[free-delay] #1 release of 0x7201840000+0x800000 held for 2000 ms (1 in flight)
+[guest-log] #5 tid=009c [0098:009C][2026-10-29T14:48:24]i001: Burn v3.11.2.4516, Windows v10.0 (Build 19045: Service Pack 0), path: C:\windows\temp\{<uuid>}\.cr\EAappInstaller.exe
+[guest-log] #6 tid=009c [0098:009C][2026-10-29T14:48:24]i000: Initializing string variable 'DefaultInstallFolder' to value '[ProgramFiles64Folder]Electronic Arts\EA Desktop'
+[win-name] #27 hwnd=0x10058 class='' text="Default IME" rev=ml853
+[win-name] #47 hwnd=0x1006e class='' text="Default IME" rev=ml853
+[win-name] #53 hwnd=0x10072 class='' text="LABEL_APPINSTALLLOC" rev=ml853
+[ec-hook] #8 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[ec-hook] #9 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[ec-hook] #10 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[ec-hook] #11 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[ec-hook] #12 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[ec-hook] #13 scope=other-jump view=pool tid=00e8 image 0x7879a30000 (pool copy 0x153088000) 0x7879a3b7a3+0x42: rva 0xb7a3, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE) | PE bytes: 00 b4 c4 12 00 c8 c4 12 00 da c4 12 00 ea c4 12 | pool before sync: e9 eb 00 00 00 8b 45 ec 8d 4d f0 89 4c 24 08 89 | jump -> 0x153093893 (POOL copy 0x153088000 (owner=0x0 mapper=0x7800310000) of 0x7879a30000, rva 0xb893, section #0 '.text' rva 0x1000+0xf91c chars 0x60000020 (R-X CODE)) bytes there: 83 c4 40 5e 5f 5b 5d c2 0c 00 46 89 d9 8b 1f 8d 
+[free-delay] #2 release of 0x7801840000+0x800000 held for 2000 ms (2 in flight)
+ml985: map_image_view size=0x44a1000 base=0x7875240000 info_base=0x10000000 map_addr=0x75240000 flags=0x4 charact=0x2102 limits=0x7800110000..0x78ffff0000
+[free-delay] #3 release of 0x780eec0000+0x1000000 held for 2000 ms (3 in flight)
+[free-delay] #1 reservation at 0x780eec0000+0x40000: 1 held release(s) from 0x780eec0000 (0x1000000 bytes) freed at once (2 in flight)
+[footprint] rev=ml358 phys=1667 MB (peak 1667) internal=1665 MB compressed=0 MB external=221 MB reusable=7 MB (cycle=2)
+[footprint] rev=ml358 phys=1843 MB (peak 1843) internal=1840 MB compressed=0 MB external=221 MB reusable=8 MB (cycle=3)
+[wow-stack-free] #2 the dead thread 00dc's 32-bit stack (guest 0x2a00000) is in window 0x7800000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x2a00000 is not a live view -> released at the old address (as before) rev=ajan11
+[footprint] rev=ml358 phys=1844 MB (peak 1844) internal=1841 MB compressed=0 MB external=221 MB reusable=8 MB (cycle=4)
+[phase] spawn:L"C:\\windows\\temp\\{<uuid>}\\.be\\EAappInstaller.exe" t+ 11.350s rev=ml526
+009c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\Temp\\{<uuid>}\\.be\\EAappInstaller.exe\" -q -burn.elevated BurnPipe.{<uuid>} {<uuid>} 152" (fd=195, unixdir=201, dup_unixdir=206) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7700000000..0x7800000000 (slot 4) guard=borrowed
+[wow-window] slot 4 B=0x7700000000 bound to peb=0x7700310000
+0184:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0184:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[bigres] tid=0184 #5 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7700310000 total=1280 MB
+[footprint] rev=ml358 phys=1898 MB (peak 1898) internal=1895 MB compressed=0 MB external=225 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=1936 MB (peak 1936) internal=1933 MB compressed=0 MB external=226 MB reusable=8 MB (cycle=6)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x14d45d000)
+[store-noalias] #1 rev=ml348 addr=0x7800000000 insn=0x78bfc315 pc=0x1732f8aa0 NO pool/anon alias | region 0x7800000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x7800000000 hostpc=0x1732f8aa0 hinsn=0x78bfc315 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=8 base=0x173134000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x1732f8aa0 addr=0x7800000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7800000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1732f8aa0 addr=0x7800000000 x18=0x78002d0000 type=1 lr=0x1742b5688 sp=0x704fd7f350 x16=0x7cf1065d80 x17=0x7bc9839c
+[guest-code] rev=ml333 pool_rip=0x7bc9839c (PE 0x7bc9839c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x203fd8c x9=0x203fd8c x10=0x0 x11=0x0 x0=0x1732f8a60 x2=0x15212a4f9 | teb=0x78002d0000 peb=0x7800310000 peb->EcCodeBitMap=0x0
+[wow-null32] rev=ajan7-arkham #1 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x1732f8aa0; EAX=0xfffffffe ECX=0x0 EDX=0x203ff90 EBX=0x15ce4e8 ESI=0x0 EDI=0x0 EBP=0x203fd8c ESP=0x203fd8c (75 modules in the PEB32 list)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:203fdf0 +04:7bc983d1(kernelbase.dll+0x583d1) +08:0 +0c:203ff90 +10:7bca87f0(kernelbase.dll+0x687f0) +14:203fd90 +18:1 +1c:203fdf0 +20:15ce4e8 +24:0 +28:0 +2c:203fd8c +30:7bc9839c(kernelbase.dll+0x5839c) +34:203fd01 +38:1 +3c:85b8d48
+[wow-null32]   TEB32=0x2d2000 PEB32=0x311000 TlsBitmapBits=0x00000003ffffffff TlsExpansionSlots=0x0; 2 cell(s) hold a value: [19]=0x19a5a400 [22]=0x19acf100
+[wow-null32]   32 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 20 21 23 24 25 26 27 28 29 30 31 32 33
+[fault-host] 1732f89a0: 7a731eaa 00000000 fffffdd0 ffffffff 14000002 d61f0000 58000100 d63f0000
+[fault-host] 1732f89c0: 00000000 00000000 7a731eaa 00000000 fffffe4c ffffffff 7c134108 00000001
+[fault-host] 1732f89e0: 0000048c 00000000 7a723cfa 00000000 000002c2 00000000 00000036 00000028
+[fault-host] 1732f8a00: 00000000 00000000 03800180 50345034 34105623 12015610 03801286 46503323
+[fault-host] 1732f8a20: 00812602 07892345 73234533 00810202 c0122345 00000010 000001a0 02008102
+[fault-host] 1732f8a40: 38c00081 59000000 55000000 56103410 12862501 8e230380 00039708 d503201f
+[mach_exc] insn_stream PC-12..PC+8: 110008f5 0b0402b5 8b354278 [78bfc315] d503201f 53103ea0 6b14401f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x78002d0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x7800000000 insn=0x78bfc315 pc=0x1732f8aa0 NO pool/anon alias | region 0x7800000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x7800000000 hostpc=0x1732f8aa0 hinsn=0x78bfc315 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=8 base=0x173134000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x1732f8aa0 addr=0x7800000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7800000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1732f8aa0 addr=0x7800000000 x18=0x78002d0000 type=1 lr=0x1742b5688 sp=0x704fd7f350 x16=0x7cf1065d80 x17=0x7bc9839c
+[guest-code] rev=ml333 pool_rip=0x7bc9839c (PE 0x7bc9839c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x203fd8c x9=0x203fd8c x10=0x0 x11=0x0 x0=0x1732f8a60 x2=0x15212a4f9 | teb=0x78002d0000 peb=0x7800310000 peb->EcCodeBitMap=0x0
+[fault-host] 1732f8a00: 00000000 00000000 03800180 50345034 34105623 12015610 03801286 46503323
+[fault-host] 1732f8a20: 00812602 07892345 73234533 00810202 c0122345 00000010 000001a0 02008102
+[fault-host] 1732f8a40: 38c00081 59000000 55000000 56103410 12862501 8e230380 00039708 d503201f
+[fault-host] 1732f8a60: 000000a8 10ffffe0 f9000380 f90f639f 51001108 b8284a69 aa0803e9 12800024
+[fault-host] 1732f8a80: 11002134 8b344278 b8bfc307 d503201f 52800014 110008f5 0b0402b5 8b354278
+[fault-host] 1732f8aa0: 78bfc315 d503201f 53103ea0 6b14401f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 110008f5 0b0402b5 8b354278 [78bfc315] d503201f 53103ea0 6b14401f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x78002d0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0194:err:seh:bus_handler BUS->AV: unreadable target addr=0x7800000000 pc=0x1732f8aa0 rw=0 rev=ml420
+[store-noalias] #3 rev=ml348 addr=0x7800000000 insn=0x78bfc315 pc=0x1732f8aa0 NO pool/anon alias | region 0x7800000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x7800000000 hostpc=0x1732f8aa0 hinsn=0x78bfc315 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=8 base=0x173134000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[wow-stack-free] #3 the dead thread 0188's 32-bit stack (guest 0x1840000) is in window 0x7700000000 (live), the thread freeing its TEB is in window 0x7800000000: the old address 0x7801840000 IS a live view -> released in its own window rev=ajan11
+[free-delay] #4 release of 0x7701840000+0x800000 held for 2000 ms (1 in flight)
+[guest-log] #138 tid=009c [0098:009C][2026-10-29T14:48:38]i000: EAXBA* INFO  (startService:33) Starting service 'MSIserver'...
+[phase] spawn:L"C:\\windows\\system32\\msiexec.exe" t+ 18.562s rev=ml526
+019c:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\msiexec.exe /V" (fd=794, unixdir=795, dup_unixdir=799) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7600000000..0x7700000000 (slot 5) guard=borrowed
+[wow-window] slot 5 B=0x7600000000 bound to peb=0x7600310000
+01a4:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+01a4:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+ml957: libwow64fex.dll backing 0x71f6890000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[bigres] tid=01a4 #6 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7600310000 total=1536 MB
+[unixlib] libwow64fex.dll (module 0x71f6890000) -> 64-bit table (0x112bc0d00)
+[phase] spawn:L"C:\\windows\\syswow64\\msiexec.exe" t+ 19.983s rev=ml526
+0184:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\syswow64\\msiexec.exe -Embedding 384" (fd=858, unixdir=859, dup_unixdir=863) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7500000000..0x7600000000 (slot 6) guard=borrowed
+[wow-window] slot 6 B=0x7500000000 bound to peb=0x7500310000
+ml957: ? backing 0x7500414000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+01c4:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+01c4:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f6020000+0x3bc000 (libwow64fex.dll) → pool 0x14dba9000 used=0x5f6d000/0x37144000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f6020000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[bigres] tid=01c4 #7 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7500310000 total=1792 MB
+[unixlib] libwow64fex.dll (module 0x71f6020000) -> 64-bit table (0x112bc0d00)
+ml957: ? backing 0x757ba48000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x757acf0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x757a9f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x757a44c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 1C4 Load module crypt32.dll (crypt32.dll-6b71bb9bfc79c7f6): 757ABD0000
+ml957: ? backing 0x757abb4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 1C4 Load module bcrypt.dll (bcrypt.dll-5a6646eeb106d9b2): 757ABA0000
+D 1CC Load module msif69c.tmp (msif69c.tmp-1aa52f70c9fb75fe): 7574AF0000
+[free-delay] #5 release of 0x70387d0000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x704f480000+0x100000 held for 2000 ms (3 in flight)
+[wow-stack-free] #4 the dead thread 0194's 32-bit stack (guest 0x1840000) is in window 0x7800000000 (live), the thread freeing its TEB is in window 0x7500000000: the old address 0x7501840000 is not a live view -> released at the old address (as before) rev=ajan11
+[free-delay] #7 release of 0x7056710000+0x100000 held for 2000 ms (4 in flight)
+[wow-stack-free] #5 the dead thread 01cc's 32-bit stack (guest 0x17d0000) is in window 0x7500000000 (live), the thread freeing its TEB is in window 0x7700000000: the old address 0x77017d0000 is not a live view -> released at the old address (as before) rev=ajan11
+D 1DC Load module msif69c.tmp (msif69c.tmp-1aa52f70c9fb75fe): 7574AF0000
+[free-delay] #8 release of 0x7055e10000+0x100000 held for 2000 ms (5 in flight)
+[wow-stack-free] #6 the dead thread 01c8's 32-bit stack (guest 0x38c0000) is in window 0x7700000000 (live), the thread freeing its TEB is in window 0x7500000000: the old address 0x75038c0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-stack-free] #7 the dead thread 01dc's 32-bit stack (guest 0x1fd0000) is in window 0x7500000000 (live), the thread freeing its TEB is in window 0x7700000000: the old address 0x7701fd0000 is not a live view -> released at the old address (as before) rev=ajan11
+D 1E4 Load module msif9a5.tmp (msif9a5.tmp-e4416472ad35a42c): 7574AF0000
+01e4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\rundll32.exe" cmdline=L"rundll32.exe \"C:\\users\\<user>\\AppData\\Local\\Temp\\msif9a5.tmp\",zzzzInvokeManagedCustomActionOutOfProc SfxCA_295565750 1 juno-custom-actions!JunoCustomActions.JunoCustomActions.InitializeSession"
+[phase] spawn:L"C:\\windows\\system32\\rundll32.exe" t+ 20.771s rev=ml526
+01e4:err:process:spawn_process spawn_process: creating child thread for L"rundll32.exe \"C:\\users\\<user>\\AppData\\Local\\Temp\\msif9a5.tmp\",zzzzInvokeManagedCustomActionOutOfProc SfxCA_295565750 1 juno-custom-actions!JunoCustomActions.JunoCustomActions.InitializeSession" (fd=913, unixdir=914, dup_unixdir=918) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7900000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7800000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7700000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7600000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7500000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7400000000 REJECTED: the 4GB range is not free (OCCUPIED 0x73ffff0000+0x14000 prot=0/7 shared=0 (and the range continues past this region))
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+no-teb:err:module:wine_ios_child_main [Wine child] boot FAILED at stage 'guest-window-reserve' for wine: guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+[wow-stack-free] #8 the dead thread 01d8's 32-bit stack (guest 0x50c0000) is in window 0x7700000000 (live), the thread freeing its TEB is in window 0x7500000000: the old address 0x75050c0000 is not a live view -> released at the old address (as before) rev=ajan11
+0184:err:msi:ITERATE_Actions Execution halted, action L"JunoInitializeSession" returned 1603
+[wow-window] slot 6 B=0x7500000000 released (owner peb=0x7500310000 exited); torn down when the next 32-bit process starts
+[win-name] #396 hwnd=0x1008a class='' text="Send error report" rev=ml853
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17f59d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=24 x8=0x0 x18=0x0 sp=0x16b881ce0
+[thread-stacks] port=0x1703 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=34 x8=0x124db6981 x18=0x0 sp=0x16b90ab30
+[thread-stacks] port=0x3c03 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16ba22fc0
+[thread-stacks] port=0x5003 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1ffd84b5c x18=0x0 sp=0x16bbc1f00
+[thread-stacks] port=0x4f03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1ffd84b5c x18=0x0 sp=0x16bc52ac0
+[thread-stacks] port=0xb003 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1ffd84b5c x18=0x0 sp=0x16bd68c60
+[thread-stacks] port=0xf923 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x17f59d020
+[22:48:53.115] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=90 resident=2339MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xf923 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x17f59d020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17f59d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x7800310000 modules=9 first=EAappInstaller.exe@0x7800400000
+[footprint] rev=ml358 phys=2086 MB (peak 2109) internal=2082 MB compressed=0 MB external=236 MB reusable=7 MB (cycle=30)
+[22:49:23.204] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=89 resident=2326MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xf923 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x17f59d020
+[win-name] #428 hwnd=0x1008a class='' text="Send error report" rev=ml853
+[thread-stacks] port=0x1fdab "wine_rpcrt4_io" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bfa80e0 x18=0x0 sp=0x7051b7e9d0
+[thread-stacks] port=0x15e17 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bfb00e0 x18=0x0 sp=0x7052d7e820
+[thread-stacks] port=0x15fb3 "wine_sechost_service" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bfb40e0 x18=0x0 sp=0x705377e9d0
+[thread-stacks] port=0x1fa53 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bfb80e0 x18=0x0 sp=0x705407e9d0
+[thread-stacks] port=0x1f807 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16bfbc0e0 x18=0x0 sp=0x705497e9c0
+[thread-stacks] port=0x3583 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=4 x8=0x124db6981 x18=0x0 sp=0x16ba22b30
+[footprint] rev=ml358 phys=2083 MB (peak 2109) internal=2079 MB compressed=0 MB external=236 MB reusable=7 MB (cycle=31)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17f59d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=EAappInstaller.exe@0x7200400000
+[thread-sample] ml876 modmap peb=0x7800310000 modules=9 first=EAappInstaller.exe@0x7800400000
+[footprint] rev=ml358 phys=2084 MB (peak 2109) internal=2079 MB compressed=0 MB external=236 MB reusable=7 MB (cycle=32)
+[win-name] #448 hwnd=0x1008a class='' text="Send error report" rev=ml853
+[footprint] rev=ml358 phys=2084 MB (peak 2109) internal=2080 MB compressed=0 MB external=236 MB reusable=7 MB (cycle=33)
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[win-name] #468 hwnd=0x1008a class='' text="Send error report" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[nls-getptr] type=11 id=10000 peb=0x7800310000
+[footprint] rev=ml358 phys=2084 MB (peak 2109) internal=2080 MB compressed=0 MB external=236 MB reusable=7 MB (cycle=34)
+[win-name] #496 hwnd=0x1006a class='' text="EA?app installer" rev=ml853
+[win-name] #497 hwnd=0x1006a class='' text="EA?app installer" rev=ml853
+[win-name] #498 hwnd=0x1006a class='' text="EA?app installer" rev=ml853
+[win-name] #499 hwnd=0x1006a class='' text="EA?app installer" rev=ml853
+[win-name] #505 hwnd=0x20074 class='' text="URL Moniker Notification Window" rev=ml853
+[win-name] #518 hwnd=0x200c2 class='' text="URL Moniker Notification Window" rev=ml853
+[guest-log] #204 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: BundleExecutableName = EAappInstaller.exe
+[guest-log] #236 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleOriginalSource = C:\bcd-launchers\EAappInstaller.exe
+[guest-log] #240 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleSourceProcessFolder = C:\bcd-launchers\
+[guest-log] #241 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleSourceProcessPath = C:\bcd-launchers\EAappInstaller.exe
+[guest-log] #242 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleTag =
+[guest-log] #243 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleUILevel = 4
+[guest-log] #244 tid=009c [0098:009C][2026-10-29T14:49:31]i410: Variable: WixBundleVersion = 13.813.1.6327
+0184:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=5527
+0184:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=5528
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=205
+[wow-window] slot 4 B=0x7700000000 released (owner peb=0x7700310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[guest-log] #245 tid=009c [0098:009C][2026-10-29T14:49:31]i007: Exit code: 0x1, restarting: No
+009c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=5531
+009c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=5533
+009c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=295
+[wow-window] slot 3 B=0x7800000000 released (owner peb=0x7800310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[wow-window] TEB block 0x77002e0000 dropped, not pooled: it belongs to a guest window that is no longer live
+D 70 Load module uxtheme.dll (uxtheme.dll-4e148963445b2ada): 727A210000
+0070:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=5554
+0070:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=5554
+0070:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=181
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[footprint] rev=ml358 phys=2051 MB (peak 2109) internal=2047 MB compressed=0 MB external=245 MB reusable=7 MB (cycle=35)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[22:49:33.731] [INFO] [session] length=73s partial=1 play=0s frames=0 stalls=0/0s peak=2144MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=EA app setup

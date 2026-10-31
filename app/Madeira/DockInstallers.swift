@@ -723,6 +723,18 @@ enum DockInstallers {
     /// What the starting screen says once the installs ended, until the session has closed (the
     /// wineserver writes the registry to disk as it stops; Madeira asks for the restart then).
     nonisolated static let closingWords = "This session is closing now. Wait until BCD asks you to restart it."
+    /// The seconds after the batch at which a session that is still open is offered the restart (MadeiraDockModel): one number for the offer
+    /// and the countdown below.
+    nonisolated static let restartOfferDelay = 45
+    /// madeira-bcd (round 624, agent R S25; 1EXE6P: both installs succeeded, the screen said only that the session was closing, and the player
+    /// left 35 s later thinking it had crashed): between the end of the installs and the restart offer the starting screen counts down.
+    static func closingCountdown(now: Date = Date()) -> String {
+        guard let done = finishedAt else { return closingWords }
+        let left = restartOfferDelay - Int(now.timeIntervalSince(done))
+        guard left > 0 else { return closingWords }
+        return "The installs are finished. BCD is saving the setup and asks you to restart in about \(left) second\(left == 1 ? "" : "s"). "
+            + "Do not close BCD yet."
+    }
     /// madeira-bcd: the game's lines a session of one-time installs runs without. Social Club's
     /// layout 2 (env.MADEIRA_SC_PA_POOLS) and RDR2's hold (env.MADEIRA_RDR2_VA_HOLD) take the
     /// 4 GB slots 32-bit programs run in, so the Visual C++ setups' second 32-bit process could
@@ -783,6 +795,11 @@ enum DockInstallers {
     /// After this long on one program, poll logs a notice and the status names the
     /// minutes. Nothing is stopped: an installer may legitimately take long.
     static let stallSeconds = 600
+    /// madeira-bcd (round 624, agent A S4, Fall Guys 7NKYWT: the player closed BCD after 172 s, before the 600 s notice): in an installs-only
+    /// session a program still running after this long gets one log line and the way out in the status. Text and log only.
+    static let slowSeconds = 120
+    /// The Dock app id of the batch prepare set up (the 120 s line names it; poll has no game).
+    private static var sessionAppID = 0
 
     nonisolated static func flag(_ name: String) -> Bool { SteamSignIn.flag(name, default: true) }
     nonisolated static var enabled: Bool { flag("MADEIRA_DOCK_INSTALLERS") }   // 0: Dock starts run no install-script programs
@@ -1043,8 +1060,9 @@ enum DockInstallers {
                         hasWineMono: Bool = WineMonoModel.available,
                         fusionSource: URL? = Bundle.main.resourceURL?.appendingPathComponent("i386-windows/fusion.dll")) {
         script = nil; serverSync = false; note = nil; finishedAt = nil; logged = []; runningSince = nil; installsOnly = false
-        allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false
+        allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false; sessionAppID = 0
         let app = game.id
+        sessionAppID = app
         let batchFile = drive.appendingPathComponent(scriptName)
         try? FileManager.default.removeItem(at: batchFile)
         let offeredAgain = absorbResults(reason: "next-start", drive: drive, prefix: prefix)
@@ -1346,6 +1364,16 @@ enum DockInstallers {
             let seconds = max(0, Int(now.timeIntervalSince(runningSince?.at ?? now)))
             let program = results.started[running] ?? ""
             var text = "One-time install \(running) of \(max(results.total, running)): \(program) is running…"
+            // madeira-bcd (round 624, 7NKYWT): an installs-only session whose program has run two minutes without an exit status says so once
+            // in the log, and the status gives the time and (when the next start skips the installs) the way out, before the 600 s notice.
+            if installsOnly, seconds >= slowSeconds, seconds < stallSeconds, results.exits[running] == nil, logged.insert("slow\(running)").inserted {
+                LogStore.shared.log("[dock-installers] app=\(sessionAppID) install still running after \(seconds) s: program=\(program) " +
+                                    "(no exit status yet; the session is for the installs only)")
+            }
+            if installsOnly, seconds >= slowSeconds, seconds < stallSeconds {
+                text += " (\(seconds / 60) min \(seconds % 60) s)"
+                if skipsNextStart { text += "\nIf it does not finish, close BCD (swipe it away in the app switcher) and open it again: the next start skips the installs and starts the game." }
+            }
             if seconds >= stallSeconds {
                 var hint = "If its window has stopped changing, the installer may be done but still open. Closing the session now leaves it unrecorded; Record as done under One-time installs can record it afterwards."
                 // madeira-bcd: the way out of an installer that never finishes. This start turned the choice to Skip,

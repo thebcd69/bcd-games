@@ -61,9 +61,20 @@ for cls in ("MTLD3D9VertexBuffer", "MTLD3D9IndexBuffer"):
           f"{cls}: the stale draw is left only when the wait is refused (DXMT_D9_RENAME_WAIT=0 or a dead device)")
     check(b.count("m_device->drainForDynamicRename()") == 1, f"{cls}: one wait per refresh")
 
+# madeira-bcd (round 624): in CI this runs after tools/patch-dxmt-d9-ib-range.py, which adds the index buffer's range refresh
+# (env DXMT_D9_IB_RANGE=1): a third failed-rename path with the same wait, retry, in-place store and stale-draw fallback.
+ranged = "MTLD3D9IndexBuffer::refreshRange(uint32_t lo, uint32_t hi) {" in buf
+if ranged:
+    r = body(buf, "MTLD3D9IndexBuffer::refreshRange(uint32_t lo, uint32_t hi) {")
+    first = r.index("renameDynamicBuffer(")
+    order = [first, r.find("m_device->drainForDynamicRename()"), r.find("renameDynamicBuffer(", first + 1),
+             r.find("m_device->noteRenameInPlace()"), r.find("the draw reads stale contents"), r.find("updateContents(")]
+    check(all(x >= 0 for x in order) and order == sorted(order) and r.count("m_device->drainForDynamicRename()") == 1,
+          "MTLD3D9IndexBuffer::refreshRange (DXMT_D9_IB_RANGE): the same wait, retry and in-place store before its range store")
 callers = re.findall(r"drainForDynamicRename\(\)", buf + dev)
-check(len(re.findall(r"m_device->drainForDynamicRename\(\)", buf)) == 2 and len(callers) == 3,
-      "the wait is called only from the two failed-rename paths (and defined once)")
+n_paths = 3 if ranged else 2
+check(len(re.findall(r"m_device->drainForDynamicRename\(\)", buf)) == n_paths and len(callers) == n_paths + 1,
+      "the wait is called only from the failed-rename paths (the two whole refreshes, the range refresh when patched) and defined once")
 
 d = body(dev, "MTLD3D9Device::drainForDynamicRename() {")
 check('env::getEnvVar("DXMT_D9_RENAME_WAIT") != "0"' in d and "if (!enabled)\n    return false;" in d,

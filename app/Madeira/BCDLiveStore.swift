@@ -552,6 +552,7 @@ import os
                 return
             }
             LogStore.shared.log("[bcd-ui] play \(entry.desktop == true ? "desktop" : "local")")
+            if entry.desktop == true { BCDDesktopHint.arm(games: store.games.count) }   // round 624 (agent D2 S2): the empty desktop's note
             begin(entry, launch)
         case .steam(let appID)?:
             // The entry the classic Steam card opens Game details with, and that page's own check

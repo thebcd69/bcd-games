@@ -43,6 +43,7 @@ from pathlib import Path
 import difflib
 import importlib.util
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -349,18 +350,29 @@ with tempfile.TemporaryDirectory(prefix='madeira-fibertrace-pe-') as directory:
 build = (root / 'tools/build-wine-extra-dlls.sh').read_text()
 fbt = build[build.index('if [ -n "$FBT" ]; then'):]
 fbt = fbt[:fbt.index('\nfi\n') + 4]
+# The shipped kernelbase.dll is only read, never written: each line that names it is a build condition that tests it
+# ([ -f ... ]) or a check that compares exports with it (its last argument). Round 624 added kernelbase-optin.dll's two (ZMP).
+kb_uses = [l.strip() for l in build.splitlines() if '"$SHIP/kernelbase.dll"' in l]
+kb_read_only = (len(kb_uses) >= 2 and
+                '--verify "$SHIP/kernelbase-fibertrace.dll.tmp" "$SHIP/kernelbase.dll"; then' in '\n'.join(kb_uses) and
+                all((l.startswith('if [ "${MADEIRA_') and l.endswith('[ -f "$SHIP/kernelbase.dll" ]; then') and
+                     l.count('"$SHIP/kernelbase.dll"') == 1) or
+                    (l.startswith('python3 "$R/tools/') and l.endswith(' "$SHIP/kernelbase.dll"; then') and
+                     l.count('"$SHIP/kernelbase.dll"') == 1 and '>' not in l)
+                    for l in kb_uses))
 check('the build patches, builds kernelbase, strips like build-modules.sh, verifies, then ships',
       'patch-wine-kernelbase-fibertrace.py" "$R/wine"' in fbt and
       'make -C "$B" -j"$JOBS" dlls/kernelbase/arm64ec-windows/kernelbase.dll' in fbt and
       'arm64ec-w64-mingw32-strip" --strip-debug' in fbt and
       '--verify "$SHIP/kernelbase-fibertrace.dll.tmp" "$SHIP/kernelbase.dll"' in fbt and
       'mv "$SHIP/kernelbase-fibertrace.dll.tmp" "$SHIP/kernelbase-fibertrace.dll"' in fbt and
-      build.count('"$SHIP/kernelbase.dll"') == 2)   # the FBT condition and --verify: never written
+      kb_read_only)
 check('the build restores the five files and drops the patched objects',
       all(f in fbt for f in ft.FILES) and 'git -C "$R/wine" checkout -- $kbsrc' in fbt and
       fbt.count('rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o') == 2)
+guard = re.search(r'\[ -n "\$todo((?:\$[A-Z]+)+)" \] \|\| \{ echo "nothing to build"; exit 0; \}', build)   # the variables in any order (round 624 added ZMP and DCO)
 check('MADEIRA_FIBER_TRACE_BUILD=0 skips it', '"${MADEIRA_FIBER_TRACE_BUILD:-1}" != 0' in build and
-      '[ -n "$todo$XI$WGI$UCX$NTS$XSE$FBT$WER$WTY$OPT$SDL" ]' in build)
+      bool(guard) and '$FBT' in re.findall(r'\$[A-Z]+', guard.group(1)))
 bridge = (root / 'app/Madeira/WineProcessBridge.m').read_text()
 blk = bridge[bridge.index('const char *fiberTrace = getenv("MADEIRA_FIBER_TRACE");'):]
 blk = blk[:blk.index('\n            }\n')]

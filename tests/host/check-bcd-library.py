@@ -121,6 +121,13 @@ check("Library: signed out of Steam, a card offers the sign-in",
       "if steamShown, let steam, steam.available, steam.name == nil {" in library
       and 'Text("Sign in to Steam")' in library
       and '.bcdFocusable("library.signin", cornerRadius: 18) { store.actions?.signIn(.steam) }' in library)
+# Round 624 (agent N S10, 2FJV7P "How do i start my game with steam"; N S11, H0TBAZ with 1 GB free): how a Steam game starts, and low storage
+home = (APP / "BCDHomeView.swift").read_text() if "APP" in globals() else (app / "BCDHomeView.swift").read_text()
+check("Library and Home: a signed-in Steam account with games, none installed, is told to tap Install and then Play; Home warns under 3 GB free",
+      'Text("None of your Steam games is installed yet. Tap one, then Install; BCD downloads it from Steam and Play starts it with Valve\'s own Steam client.")' in library
+      and '"Open a Steam game and tap Install: BCD downloads it itself. When it is done, tap Play."' in home
+      and "private var steamNothingInstalled: Bool {" in home
+      and 'if free < Int64(3) << 30 {' in home and '"Very little space is left. iOS closes apps in the background when it needs room, and games need space to start. "' in home)
 check("Library: a Steam account with no Windows games says so",
       "steam.name != nil, store.count(.steam) == 0" in library and "There are no Windows games on this Steam account" in library)
 check("Library: with no game added by hand, how games get into drive_c",

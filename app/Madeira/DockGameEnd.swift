@@ -24,7 +24,11 @@ import Foundation
 //     c0000409 / c000001d / c0000374, a breakpoint, or a negative exit code), and that is `grace` seconds ago
 //     (a launcher's relaunch came within 0.4 s in the logs of 331 Dock sessions; the next start after any crash of
 //     a program was 27 s later or never: Rockstar's service retries).
-// A game that ended with exit code 0, or any other status, is left as it is today.
+// A game that ended with exit code 0, or any other status, is left as it is today, with one exception (round 625, N-S18):
+// a program that closed by itself with exit code 0 within `shortExitSeconds` of its start, before any frame reached the
+// screen (Brotato, Until Then, Darksiders II, Shadow of Mordor ... showed their own error box and left: QQ0BEX and about
+// 40 Dock logs), ends the session under all the other conditions above. `rendered` says whether frames were drawn;
+// env.MADEIRA_DOCK_SHORT_EXIT_END = 0 turns the exception off (the library then passes rendered = true).
 // A launch the host reported as failed, with no game process, is the second rule below (round 580).
 
 /// One process of the session, as the engine's process table reports it.
@@ -69,6 +73,8 @@ struct DockHostState: Equatable {
 enum DockGameEndRules {
     /// Seconds the game's last program must have been gone.
     static let defaultGrace = 10.0
+    /// Round 625 (N-S18): a program that left with exit code 0 within this many seconds of its start, before any frame was drawn.
+    static let shortExitSeconds = 30.0
     static let graceRange = 3.0...300.0
 
     /// `env.MADEIRA_DOCK_GAME_END_GRACE` as text: a number of seconds inside the range, else the default.
@@ -103,8 +109,12 @@ enum DockGameEndRules {
 
     /// `places`: where programs live on drive C (SteamLaunchScene.Places.standard). `host` is asked only when
     /// everything the table can say is already in favour of ending, so the report file is read for the rare case.
+    /// `anyStatus` (round 624, Cuphead PDKQP7 "Close game bug"): the player has asked to close, so a game that ended with ANY
+    /// status is over (Cuphead quit itself with 0 and the session sat on the empty desktop: 212 of 433 archive Dock sessions whose
+    /// host reported the game over); every other condition below stays.
+    /// `rendered` (round 625): frames of the game reached the screen in this session; false lets a short clean exit end it too.
     static func verdict(_ table: DockProcessTable, places: SteamLaunchScene.Places, grace: Double,
-                        host: () -> DockHostState) -> Verdict {
+                        anyStatus: Bool = false, rendered: Bool = true, host: () -> DockHostState) -> Verdict {
         var running = 0
         var last: DockProcess?
         let shared = valveShared(places)
@@ -120,7 +130,10 @@ enum DockGameEndRules {
                 break
             }
         }
-        guard let last, isCrash(last.status) else { return .none }
+        guard let last else { return .none }
+        // Round 625 (N-S18): it closed by itself with 0, soon, having drawn nothing (its own error box, then exit).
+        let shortCleanExit = !rendered && last.status == 0 && last.lived < shortExitSeconds
+        guard anyStatus || isCrash(last.status) || shortCleanExit else { return .none }
         func wait(_ why: String) -> Verdict { .wait(status: last.status, file: last.fileName, why: why) }
         if !table.complete { return wait("table-incomplete") }
         if table.untracked > 0 { return wait("untracked-process") }

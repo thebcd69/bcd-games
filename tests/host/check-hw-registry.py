@@ -229,7 +229,7 @@ int main( void )
               and "(CTX->HostFeatures.SupportsCRC << 20) |         // SSE4.2" in cpp
               and "(SupportsAVX() << 27) |                         // OSXSAVE" in cpp
               and "(SupportsAVX() << 28) |                         // AVX" in cpp
-              and "(SupportsAVX() << 5) |                   // AVX2 support" in cpp
+              and "(SupportsAVX2() << 5) |                  // AVX2 support (BCD: MADEIRA_FEX_AVX=2 hides it)" in cpp
               and "if (CTX->HostFeatures.SupportsAVX) {\n    XCR0 |= XCR0_AVX;" in cpp)
         check("FEX: level/revision formulas and AMD64 for the ARM64EC module",
               "CpuInfo.ProcessorLevel = ((FamilyIdentifier >> 8) & 0xf) + ((FamilyIdentifier >> 20) & 0xff);" in cf

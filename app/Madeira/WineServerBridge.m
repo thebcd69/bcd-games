@@ -47,6 +47,14 @@ extern void wineserver_log_set_file(const char *path);
 // Set NLS directory for wineserver (defined in unicode_ios.c)
 extern void wineserver_set_nls_dir(const char *path);
 
+static volatile int g_wineserver_running;
+// madeira-bcd (round 624, agent D2 S1): the message of the fatal error that ended the server thread, for the app's launch error.
+static char g_wineserver_fatal[256];
+
+const char *wineserver_fatal_message(void) {
+    return g_wineserver_fatal;
+}
+
 // Override wineserver's fatal_error to use logging and pthread_exit instead of exit(1)
 void fatal_error( const char *err, ... ) {
     va_list args;
@@ -55,6 +63,11 @@ void fatal_error( const char *err, ... ) {
     vsnprintf(buf, sizeof(buf), err, args);
     va_end(args);
     wine_log_msg_impl("[Wine] FATAL: %s", buf);
+    // madeira-bcd (round 624, agent D2 S1; RM4C0R, AQZ3E2, 3DX90K): the thread ends here, so the server is no longer running. Until now
+    // wineserver_is_running() kept answering 1 and the app waited on a dead server with a black screen; now the launch says why.
+    snprintf(g_wineserver_fatal, sizeof(g_wineserver_fatal), "%s", buf);
+    { size_t n = strlen(g_wineserver_fatal); while (n && (g_wineserver_fatal[n - 1] == '\n' || g_wineserver_fatal[n - 1] == '\r')) g_wineserver_fatal[--n] = 0; }
+    g_wineserver_running = 0;
     // Don't call exit(1) — that kills the whole app.
     // Instead, terminate just this thread.
     pthread_exit(NULL);
@@ -68,7 +81,6 @@ extern int debug_level;
 volatile int g_wineserver_should_stop = 0;
 
 static pthread_t g_wineserver_thread;
-static volatile int g_wineserver_running = 0;
 static char *g_prefix_path = NULL;
 
 static void *wineserver_thread_func(void *arg) {
@@ -155,6 +167,7 @@ int wineserver_start(const char *prefix_path) {
         extern int wineserver_ready;
         __atomic_store_n(&wineserver_ready, 0, __ATOMIC_RELEASE);
     }
+    g_wineserver_fatal[0] = 0;   /* madeira-bcd (round 624): a new start forgets the last start's fatal message */
     g_wineserver_running = 1;
 
     /* 2026-07-04 perf: the wineserver thread used to be created at LOWERED

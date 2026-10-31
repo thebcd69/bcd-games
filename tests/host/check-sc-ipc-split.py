@@ -389,6 +389,12 @@ __asm__(
 "pmovmskb %xmm4,%eax; cmp $65535,%eax; jne probe_fail; pmovmskb %xmm5,%eax; cmp $65535,%eax; jne probe_fail;"
 "mov %rdi,%rax; jmp probe_return; probe_fail: xor %eax,%eax;"
 "probe_return: add $40,%rsp; pop %rdi; pop %rbx; ret\n");
+#ifdef __APPLE__   /* Mach-O: the C-visible names carry a leading underscore */
+__asm__(".globl _store_ctor, _store_role, _call_loop, _initial_connect, _lookup_direct, _receive_channel, _probe_get\n"
+        ".set _store_ctor, store_ctor\n.set _store_role, store_role\n.set _call_loop, call_loop\n"
+        ".set _initial_connect, initial_connect\n.set _lookup_direct, lookup_direct\n"
+        ".set _receive_channel, receive_channel\n.set _probe_get, probe_get\n");
+#endif
 int main(int argc, char **argv)
 {
     image = mmap(NULL, IOS_SCH_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -401,6 +407,9 @@ int main(int argc, char **argv)
     WCHAR path[] = {'S','o','c','i','a','l','C','l','u','b','H','e','l','p','e','r','.','e','x','e'};
     UNICODE_STRING name = {path, sizeof(path)};
     sch_fill(image);
+    unsigned char getter_before[8], keep_before[4];   /* the fixture holds a filler where the helper's code is: compare against it, not against helper bytes */
+    memcpy(getter_before, image + 0x4b290, sizeof(getter_before));
+    memcpy(keep_before, image + IOS_SCH_RENDER_CHANNEL_KEEP, sizeof(keep_before));
     uint64_t base = IOS_SCH_IMAGE_BASE;
     *(uint64_t *)(image + IOS_SCH_VT_BROWSER + IOS_SCH_SLOT_BROWSER * 8) = base + IOS_SCH_GET_HANDLER;
     *(uint64_t *)(image + IOS_SCH_VT_BROWSER + IOS_SCH_SLOT_RENDERER * 8) = base + IOS_SCH_GET_NULL;
@@ -409,11 +418,11 @@ int main(int argc, char **argv)
     *(uint64_t *)(image + IOS_SCH_VT_RPH) = base + IOS_SCH_WEBKIT;
     ios_sc_render_handler_patch(image, IOS_SCH_SIZE, &nt, sec, &name);
     if (argc > 1 && !strcmp(argv[1], "disabled")) {
-        assert(!memcmp(image + 0x4b290, "\x48\x8b\x05\xf9\x28\x18\x00\xc3", 8));
+        assert(!memcmp(image + 0x4b290, getter_before, sizeof(getter_before)));
         for (size_t i = 0; i < sizeof(ios_sch_ipc_split); i++) assert(!image[IOS_SCH_IPC_SPLIT+i]);
         assert((unsigned char)image[IOS_SCH_IPC_CONNECT] == 0xe9);
         assert((unsigned char)image[IOS_SCH_RENDER_DRAIN_SITE] == 0xe8);
-        assert(!memcmp(image + IOS_SCH_RENDER_CHANNEL_KEEP, "\x44\x0f\xb6\xc3", 4));
+        assert(!memcmp(image + IOS_SCH_RENDER_CHANNEL_KEEP, keep_before, sizeof(keep_before)));
         for (size_t i = 0; i < sizeof(ios_sch_renderer_channels); i++)
             assert(!image[IOS_SCH_RENDER_CHANNEL_THUNK+i]);
         assert(!munmap(image, IOS_SCH_SIZE));
@@ -439,6 +448,13 @@ int main(int argc, char **argv)
     memcpy(image + 0x4da73, direct_return, sizeof(direct_return));
     const unsigned char reply_return[] = {0x48,0x83,0xc4,0x28,0x5e,0x5b,0xc3};
     memcpy(image + IOS_SCH_RENDER_CHANNEL_REPLY + 0x19, reply_return, sizeof(reply_return));
+    /* Stand-in for the helper's code that follows the patched Channel Response instruction (the fixture holds only a filler there
+     * since 293cd397): TEST RSI,RSI; JZ reply_cleanup; MOV RDX,[RSI]; CALL Connect, ending exactly at reply_cleanup. */
+    const unsigned char reply_tail[] = {0x48,0x85,0xf6,0x74,0x08,0x48,0x8b,0x16,0xe8,0,0,0,0};
+    memcpy(image + IOS_SCH_RENDER_CHANNEL_KEEP + 7, reply_tail, sizeof(reply_tail));
+    assert(IOS_SCH_RENDER_CHANNEL_KEEP + 7 + sizeof(reply_tail) == IOS_SCH_RENDER_CHANNEL_REPLY + 0x19);
+    int32_t connect_disp = IOS_SCH_IPC_CONNECT - (IOS_SCH_RENDER_CHANNEL_KEEP + 7 + (int)sizeof(reply_tail));
+    memcpy(image + IOS_SCH_RENDER_CHANNEL_KEEP + 7 + sizeof(reply_tail) - 4, &connect_disp, sizeof(connect_disp));
     destructor_fixture();
     *(uintptr_t *)(image + 0x181af8) = (uintptr_t)currently_on;
     assert(!mprotect(image + 0x1000, 0x180000, PROT_READ | PROT_EXEC));

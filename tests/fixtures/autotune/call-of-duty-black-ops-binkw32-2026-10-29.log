@@ -1,0 +1,103 @@
+[19:11:40.109] [INFO] Checking entitlements...
+[19:11:40.110] [INFO] [build] v0.1.623 (623)
+[19:11:40.110] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=11722MB available=8171MB cores=6
+[19:11:40.110] [INFO] [device] address-map=[0x1045e0000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:11:40.123] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:11:43.623] [INFO] Requesting JIT with Built-in StikJIT...
+[19:11:46.621] [INFO] [bcd] library launch game.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:11:46.645] [INFO] Running full Wine sequence...
+[19:11:46.646] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1045e0000,0x8000000000) 512GB available=8153MB low-power=0 thermal=nominal
+[19:11:46.652] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:11:46.652] [INFO] Allocating 896MB JIT pool via debugger...
+[19:11:46.652] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:11:46.652] [INFO] [jit-debugger] attached=1 at the pool request
+[19:11:46.654] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:11:47.322] [INFO] RX pool at 0x148000000
+[19:11:47.337] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.725s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[19:11:47.624] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[19:11:47.624] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7582 MB + phys_footprint=609 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: map_image_view size=0x4fd4000 base=0x7100400000 info_base=0x400000 map_addr=0 flags=0 charact=0x123 limits=0x7100110000..0x71ffff0000
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7023120000+0x100000 held for 2000 ms (1 in flight)
+[footprint] rev=ml358 phys=631 MB (peak 631) internal=629 MB compressed=0 MB external=71 MB reusable=5 MB (cycle=1)
+[free-delay] #2 release of 0x7023220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7023420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7023820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7024020000+0xfd0000 held for 2000 ms (5 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x1073b8d00)
+D 24 Load module game.exe (game.exe-0000000000000000): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+ml957: ? backing 0x7110000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module steam_api.dll (steam_api.dll-b4436ce9a4c3e971): 7110000000
+D 24 Load module bgt5.dll (bgt5.dll-27f1d0df8f18e665): 717BB10000
+ml957: ? backing 0x717b788000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x1489df000)
+ml957: ? backing 0x717b378000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x1489ff000)
+ml957: ? backing 0x717b210000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"binkw32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library binkw32.dll (which is needed by L"C:\\Games\\Black Ops\\sub\\game.exe") not found
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148a15000)
+ml957: ? backing 0x717a2d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module shcore.dll (shcore.dll-3f5d19270cfefa1b): 717A2C0000
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148a2f000)
+ml957: ? backing 0x717a2ac000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module XINPUT1_3.dll (xinput1_3.dll-1e62717460831c33): 717A2A0000
+D 24 Load module hid.dll (hid.dll-c3acd77fc0c38a5e): 717A280000
+D 24 Load module setupapi.dll (setupapi.dll-eb8e8a5cf98f5e47): 717A200000
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148a43000)
+ml957: ? backing 0x717a1e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e9ee325c5ec8e93): 717A1D0000
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148a61000)
+ml957: ? backing 0x717a1b4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module PSAPI.DLL (psapi.dll-d7ed89fa3ac84834): 717A1B0000
+0024:err:module:loader_init Importing dlls for L"C:\\Games\\Black Ops\\sub\\game.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=219
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:11:48.146] [INFO] [session] length=1s play=0s frames=0 stalls=0/0s peak=678MB limit=8191MB thermal=nominal lpm=0 api=D3D9/DirectDraw/32 res=1408x648 cap=60 game=Call of Duty - Black Ops
+[19:11:48.155] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[footprint] rev=ml358 phys=690 MB (peak 690) internal=688 MB compressed=0 MB external=74 MB reusable=4 MB (cycle=2)
+[19:11:50.139] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=687 MB (peak 690) internal=686 MB compressed=0 MB external=75 MB reusable=6 MB (cycle=3)
+[footprint] rev=ml358 phys=687 MB (peak 690) internal=686 MB compressed=0 MB external=75 MB reusable=6 MB (cycle=4)
+[footprint] rev=ml358 phys=687 MB (peak 690) internal=686 MB compressed=0 MB external=75 MB reusable=6 MB (cycle=5)
+[footprint] rev=ml358 phys=687 MB (peak 690) internal=686 MB compressed=0 MB external=75 MB reusable=6 MB (cycle=6)
+[footprint] rev=ml358 phys=687 MB (peak 690) internal=686 MB compressed=0 MB external=75 MB reusable=6 MB (cycle=7)

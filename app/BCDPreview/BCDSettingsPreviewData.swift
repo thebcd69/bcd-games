@@ -14,7 +14,7 @@ extension BCDSettingsBackends {
         BCDSettingsBackends(memory: BCDPreviewMemory(), graphics: BCDPreviewGraphics(), controls: BCDPreviewControls(),
                             storage: BCDPreviewStorage(), dotNet: BCDPreviewDotNet(), logs: BCDPreviewLogs(), feedback: BCDPreviewFeedback(),
                             allSettings: BCDPreviewAllSettings(), about: BCDPreviewAbout(), developer: BCDPreviewDeveloper(),
-                            vcRuntime: BCDPreviewVCRuntime(), gecko: BCDPreviewGecko())
+                            vcRuntime: BCDPreviewVCRuntime(), gecko: BCDPreviewGecko(), vcRuntime32: BCDPreviewVCRuntime())
     }
 }
 

@@ -292,6 +292,437 @@ jobs:
       - name: Check BCD's game starts and downloads
         run: python3 tests/host/check-bcd-launch.py --require-swift
 
+      # Host checks that sat in tests/host without a workflow step until round 624. Every one passed in the committed tree with its
+      # submodules at their pins and in the built tree, so their place here does not matter; none needs an environment variable
+      # (wine/, FEX/, dxmt/, madeira-dock/ are at the repository root). Group 1 needs only the checkout (swiftc or cc where the check
+      # compiles); group 2 are the checks whose test was brought up to date with the code in round 624.
+
+      # ===== Group 1: 72 checks (check-jit-network opens loopback listeners only); none writes outside its temp folder; 0.1-14 s each under load =====
+
+      # tools/update-altsource.py builds the AltStore source from a release (download and codesign are mocked)
+      - name: Check altsource
+        run: python3 tests/host/check-altsource.py
+
+      # the iOS audio driver folds 5.1/7.1 layouts into the stereo bus (MADEIRA_AUDIO_DOWNMIX=0 restores the old mapping)
+      - name: Check audio downmix
+        run: python3 tests/host/check-audio-downmix.py
+
+      # the 32-bit audio driver table keeps the 64-bit table's 37 slots and the render-scratch allocator keeps a guest ceiling.
+      - name: Check audio wow64
+        run: python3 tests/host/check-audio-wow64.py
+
+      # bcd.cfg is found by native readers that run before the guest starts (early docs dir, HOME order)
+      - name: Check cfg early docs
+        run: python3 tests/host/check-cfg-early-docs.py
+
+      # a library game's own cfg lines ($MADEIRA_CFG_GAME) win over bcd.cfg.
+      - name: Check cfg game
+        run: python3 tests/host/check-cfg-game.py
+
+      # a pseudo-process child gets a desktop window like the session.
+      - name: Check child desktop
+        run: python3 tests/host/check-child-desktop.py
+
+      # a pseudo-process child's emulator gets the child's own ntdll copy (JIT alias push)
+      - name: Check child ntdll alias
+        run: python3 tests/host/check-child-ntdll-alias.py
+
+      # Chromium's out-of-memory exit names the failed request's size at NtTerminateProcess ([chromium-oom])
+      - name: Check chromium oom exit
+        run: python3 tests/host/check-chromium-oom-exit.py
+
+      # unchanged ClipCursor requests notify no one (wineserver queue_ios.c)
+      - name: Check clip dedupe
+        run: python3 tests/host/check-clip-dedupe.py
+
+      # a console's conhost.exe starts without a window (--headless)
+      - name: Check console headless
+        run: python3 tests/host/check-console-headless.py
+
+      # touch-control layouts and built-in presets (Foundation-only Swift blocks compiled on the host)
+      - name: Check control presets
+        run: python3 tests/host/check-control-presets.py
+
+      # SwapDeviceContextState patch and the opt-in source build of DXMT's 64-bit d3d11.dll.
+      - name: Check d3d11 src
+        run: python3 tests/host/check-d3d11-src.py
+
+      # opt-in tiled resources of the D3D12 runtime (d3d12-tiled-resources = 1)
+      - name: Check d3d12 tiled
+        run: python3 tests/host/check-d3d12-tiled.py
+
+      # round 624: the D3D12 methods that refuse a call say which ([madeira-d3d12] FAILED, log only), the unix ntdll's
+      # log-only lines of the round stay where they belong, and the Wine server survives a refused master-socket bind
+      - name: Check round 624 log lines
+        run: |
+          python3 tests/host/check-d3d12-fail-log.py
+          python3 tests/host/check-round624-log-lines.py
+          python3 tests/host/check-wineserver-bind-fallback.py
+          python3 tests/host/check-gdi-table-child.py
+          python3 tests/host/check-wow-unity-plain.py
+          python3 tests/host/check-present-lum.py
+          python3 tests/host/check-no-input-hint.py
+          python3 tests/host/check-windowed-hint.py
+          python3 tests/host/check-open-url.py
+          python3 tests/host/check-win-text.py
+          python3 tests/host/check-cluster-logs.py
+          python3 tests/host/check-fex-fault-diag.py
+          python3 tests/host/check-early-fault.py
+          python3 tests/host/check-log-upload-guard.py
+          python3 tests/host/check-jit-brk-trail.py
+          python3 tests/host/check-ill-insn-diag.py
+          python3 tests/host/check-installs-countdown.py
+          python3 tests/host/check-kernelbase-optin.py
+          python3 tests/host/check-fex-alias-capacity.py
+          python3 tests/host/check-godot-composition.py
+          python3 tests/host/check-clr-death-diag.py
+          python3 tests/host/check-crypt32-root-enum.py
+          python3 tests/host/check-gpu-stall.py
+          python3 tests/host/check-gpu-time-wow64.py
+          python3 tests/host/check-noexec-who.py
+          python3 tests/host/check-desktop-shell.py
+          python3 tests/host/check-d9-texfmt.py
+          python3 tests/host/check-d9-query-stuck.py
+          python3 tests/host/check-d11-query-stuck.py
+          python3 tests/host/check-soft-pool-decommit.py
+          python3 tests/host/check-mem-burst.py
+
+      # DXMT D3D9 upload ring stays bounded while a title loads without Present (ml1490)
+      - name: Check d9 upload commit
+        run: python3 tests/host/check-d9-upload-commit.py
+
+      # tools/patch-wine-dns-trace.py names every getaddrinfo and bounds it on request.
+      - name: Check dns trace
+        run: python3 tests/host/check-dns-trace.py
+
+      # Madeira Dock's transfer path through Wine's own prefix resolver.
+      - name: Check dock path
+        run: python3 tests/host/check-dock-path.py
+
+      # Madeira Dock's report parser (whitelisted numeric fields only)
+      - name: Check dock report
+        run: python3 tests/host/check-dock-report.py
+
+      # IDXGIFactory7 for DXMT's factory and the opt-in dxgi.dll source build.
+      - name: Check dxgi factory7
+        run: python3 tests/host/check-dxgi-factory7.py
+
+      # every DXMT/airconv/winemetal patch script applies in the workflow's order and is idempotent.
+      - name: Check dxmt patch chain
+        run: python3 tests/host/check-dxmt-patch-chain.py
+
+      # conhost.exe is refused in an ARM64EC session.
+      - name: Check ec conhost
+        run: python3 tests/host/check-ec-conhost.py
+
+      # NtProtectVirtualMemory's [exec-req] path leaves the syscall callback.
+      - name: Check execreq leave
+        run: python3 tests/host/check-execreq-leave.py
+
+      # FEX arena failure census: clipping, protection accounting, alignment, bounded output.
+      - name: Check fex arena census
+        run: python3 tests/host/check-fex-arena-census.py
+
+      # tools/patch-fex-ios-callret-8mb.py against the pinned FEX tree.
+      - name: Check fex callret 8mb
+        run: python3 tests/host/check-fex-callret-8mb.py
+
+      # D3D9 sampler anisotropy cap (getOrCreateSampler, ml1250)
+      - name: Check filtering cap
+        run: python3 tests/host/check-filtering-cap.py
+
+      # a version query cannot use up the fixed-base window (GTA V launcher, RDR2)
+      - name: Check fixed base guard
+        run: python3 tests/host/check-fixed-base-guard.py
+
+      # delayed release of 1-16 MB guest allocations (MADEIRA_FREE_DELAY_MS)
+      - name: Check free delay
+        run: python3 tests/host/check-free-delay.py
+
+      # library front end: launch profiles, controller navigation, session exit report.
+      - name: Check frontend
+        run: python3 tests/host/check-frontend.py
+
+      # snapshot transport and win32u gamepad query.
+      - name: Check gamepad
+        run: python3 tests/host/check-gamepad.py
+
+      # a scalar guest store crossing the end of an anonymous alias is stored page by page (build 623)
+      - name: Check gpr store straddle
+        run: python3 tests/host/check-gpr-store-straddle.py
+
+      # opt-in HID controller: descriptors and reports read back through Wine's own hid.dll code.
+      - name: Check hidpad
+        run: python3 tests/host/check-hidpad.py
+
+      # a module loaded again at the base of its unloaded pool copy gets fresh .data/.bss.
+      - name: Check image reload
+        run: python3 tests/host/check-image-reload.py
+
+      # unloaded-image translation retirement (MADEIRA_JIT_IMAGE_RETIRE)
+      - name: Check image retire
+        run: python3 tests/host/check-image-retire.py
+
+      # the JIT-pool dump is opt-in (ios_jit_dump_enabled)
+      - name: Check jit dump optin
+        run: python3 tests/host/check-jit-dump-optin.py
+
+      # every child gets the JIT pool's WINE_IOS_JIT_* variables (ios_env_with)
+      - name: Check jit env
+        run: python3 tests/host/check-jit-env.py
+
+      # StikDebug and the iOS 26 built-in JIT helper: static integration checks.
+      - name: Check jit method
+        run: python3 tests/host/check-jit-method.py
+
+      # LocalDevVPN loopback check and the JIT shortcut (JITNetwork.swift LoopbackProbe)
+      # Opens listeners on 127.0.0.1 (ephemeral ports) only; nothing leaves the machine.
+      - name: Check jit network
+        run: python3 tests/host/check-jit-network.py
+
+      # opt-in D3DKMT adapter, the [vkmt] trace and DXGI's UMD version patch.
+      - name: Check kmt adapter
+        run: python3 tests/host/check-kmt-adapter.py
+
+      # in-process NSI network tables (nsi_network_ios.c)
+      - name: Check nsi network
+        run: python3 tests/host/check-nsi-network.py
+
+      # NVAPI trace and display-name fallback patches.
+      - name: Check nvapi trace
+        run: python3 tests/host/check-nvapi-trace.py
+
+      # controller output (DualSense output reports, XInput rumble) on its way to the physical pad.
+      - name: Check pad output
+        run: python3 tests/host/check-pad-output.py
+
+      # a placement walk that found no gap is remembered (ios_ml1027_place)
+      - name: Check place proof
+        run: python3 tests/host/check-place-proof.py
+
+      # the CPU power governor holds the average at its target (MADEIRA_POWER_GOV_MW)
+      - name: Check power gov
+        run: python3 tests/host/check-power-gov.py
+
+      # Social Club layout 2 keeps room for RDR2's 8960 MB reserve (MADEIRA_RDR2_VA_HOLD)
+      - name: Check rdr2 va hold
+        run: python3 tests/host/check-rdr2-va-hold.py
+
+      # the wineserver overwrites a link to a read-only file (fd_ios.c)
+      - name: Check readonly link
+        run: python3 tests/host/check-readonly-link.py
+
+      # front end Settings: display rate, swap tier and sync engine (MadeiraConfig.set)
+      - name: Check runtime settings
+        run: python3 tests/host/check-runtime-settings.py
+
+      # Social Club's Chromium: one CEF process, its libcef.dll copy and its glued pools.
+      - name: Check sc cef gate
+        run: python3 tests/host/check-sc-cef-gate.py
+
+      # Social Club layout 2: the helper's commits into its large grants, in 256 MB steps.
+      - name: Check sc grant growth
+        run: python3 tests/host/check-sc-grant-growth.py
+
+      # Social Club helper restarts and layout 2 (virtual_ios.c)
+      - name: Check sc layout
+        run: python3 tests/host/check-sc-layout.py
+
+      # [sc-rph]: the browser CefApp hands out the renderer app's handler.
+      - name: Check sc render handler
+        run: python3 tests/host/check-sc-render-handler.py
+
+      # D3D9 scene batching (ml1250)
+      - name: Check scene batching
+        run: python3 tests/host/check-scene-batching.py
+
+      # a thread killed inside an uninterrupted section leaves it first (server_ios.c)
+      - name: Check section abort
+        run: python3 tests/host/check-section-abort.py
+
+      # packed shader cache madeira_sc_pack.c (opt-in d3d12-shader-pack = 1)
+      - name: Check shader pack
+        run: python3 tests/host/check-shader-pack.py
+
+      # guest-window band and small-map rule (ios_wow_band, ios_wow_map_allows_window)
+      - name: Check small va band
+        run: python3 tests/host/check-small-va-band.py
+
+      # thread stack spill and the small-stack executables (MADEIRA_THREAD_STACK_SPILL, MADEIRA_SMALL_STACK_EXES)
+      - name: Check stack spill
+        run: python3 tests/host/check-stack-spill.py
+
+      # the stale-pointer heal translates each copy for the process that uses it.
+      - name: Check stale heal owner
+        run: python3 tests/host/check-stale-heal-owner.py
+
+      # Steam games in the library: installed/partial state from Steam's own manifests, Dock discovery.
+      - name: Check steam games
+        run: python3 tests/host/check-steam-games.py
+
+      # Steam sign-in (SwiftSteam): licence headers, Keychain item stays local, no credential in logs; Swift checks.
+      - name: Check steam signin native
+        run: python3 tests/host/check-steam-signin-native.py
+
+      # swapchain mode-switch diagnostics ([swap-diag], [swap-win], [main-stall]) only log.
+      - name: Check swap diag
+        run: python3 tests/host/check-swap-diag.py
+
+      # a thread that cannot be created says why (Chromium OOM exit with size 0)
+      - name: Check thread create failure
+        run: python3 tests/host/check-thread-create-failure.py
+
+      # touch ownership/arbitration logic (TouchGamepadState)
+      - name: Check touch gamepad
+        run: python3 tests/host/check-touch-gamepad.py
+
+      # unix-library binder by caller bitness (load_builtin_unixlib)
+      - name: Check unixlib binder
+        run: python3 tests/host/check-unixlib-binder.py
+
+      # env.MADEIRA_VCRT_ARM64_KEY, the volatile ARM64 Visual C++ redistributable marker (server_ios.c)
+      - name: Check vcrt arm64 key
+        run: python3 tests/host/check-vcrt-arm64-key.py
+
+      # the virtual monitor's Win32 names (sysparams_ios.c)
+      - name: Check vmon identity
+        run: python3 tests/host/check-vmon-identity.py
+
+      # the monitor's fault-safe reads against real protected/unmapped pages (Wine patch applied twice to a temp copy)
+      - name: Check waiter read
+        run: python3 tests/host/check-waiter-read.py
+
+      # win32u allocation ceiling per pseudo-process (win32u_zero_bits)
+      - name: Check win32u zero bits
+        run: python3 tests/host/check-win32u-zero-bits.py
+
+      # window coordinates with Wine's real rectangle and DPI functions (build 391)
+      - name: Check window coordinates
+        run: python3 tests/host/check-window-coordinates.py
+
+      # the compositor callback and Wine's is_window_visible (build 391 regression)
+      - name: Check window visibility
+        run: python3 tests/host/check-window-visibility.py
+
+      # Wine Mono's first-use download: pins match build/wine-mono/pin.sh, installer unpacks synthetic .tar.xz archives.
+      - name: Check wine mono
+        run: python3 tests/host/check-wine-mono.py
+
+      # WoW64 thread contexts on the server side (I386_CONTEXT offsets, apply only for i386)
+      - name: Check wow context
+        run: python3 tests/host/check-wow-context.py
+
+      # FEX WOW64 module keeps the CPU area current and honours RESET_STATE.
+      - name: Check wow cpu area
+        run: python3 tests/host/check-wow-cpu-area.py
+
+      # WOW64 syscall parking in the code-buffer sweeper.
+      - name: Check wow sweep
+        run: python3 tests/host/check-wow-sweep.py
+
+      # ADD/SUB off x18 take the destination-register trampoline.
+      - name: Check x18 arith
+        run: python3 tests/host/check-x18-arith.py
+
+      # ===== Group 2: 20 checks whose test was brought up to date with the code in round 624 =====
+
+      # tools/patch-wine-cpu-error-diag.py applies once to the committed user32/wow64 files ([msgbox-origin], [pf-xmmi64] log only).
+      - name: Check cpu error diag
+        run: python3 tests/host/check-cpu-error-diag.py
+
+      # tools/patch-wine-rpc-np-diag.py: [rpc-np] logs a failed RPC named-pipe read, nothing else changes.
+      - name: Check rpc np diag
+        run: python3 tests/host/check-rpc-np-diag.py
+
+      # Madeira Dock's app-side contract (pool policy, discovery, launch validation, transfer envelope, environment) compiled from production Swift.
+      - name: Check dock contract
+        run: python3 tests/host/check-dock-contract.py
+
+      # Dock one-time installs: install-script plan, ledger, DirectX provided by BCD after a failure, batch text (production Swift under ASan).
+      - name: Check dock installers
+        run: python3 tests/host/check-dock-installers.py
+
+      # Ghost of Tsushima diagnostics switches in madeira_d3d12.c (skip-ps, dxil-dump, fence-strict, upload-guard, ...) stay off by default and sit behind g_sd_state.
+      - name: Check got diagnostics
+        run: python3 tests/host/check-got-diagnostics.py
+
+      # HKLM\HARDWARE\DESCRIPTION registry mirror of FEX's CPUID answers and wineboot's BIOS/processor values (fuzzed under ASan/UBSan).
+      - name: Check hw registry
+        run: python3 tests/host/check-hw-registry.py
+
+      # first-run setup: rules, pages, once-per-run decision, never over a session, Run setup again.
+      - name: Check onboarding
+        run: python3 tests/host/check-onboarding.py
+
+      # pso-warm: pipeline cache warm-up in winemetal (op 10), copies and retains balanced, d3d12 side sends both lazy kinds.
+      - name: Check pso warm
+        run: python3 tests/host/check-pso-warm.py
+
+      # replay-split: every D3D12 command kind has a named [perf] bucket, timers only behind the flag.
+      - name: Check replay split
+        run: python3 tests/host/check-replay-split.py
+
+      # media packaging gate (tools/check-wine-media-dlls.py): WMVCORE/winegstreamer exports, imports, forwarders, delay imports.
+      - name: Check wine media dlls
+        run: python3 tests/host/check-wine-media-dlls.py
+
+      # x64 classification, IAT slots and fault-safe guest-instruction diagnostics (ASan/UBSan, three negative controls).
+      - name: Check guest instruction
+        run: python3 tests/host/check-guest-instruction.py
+
+      # D3D9 device lock and FEX split CAS: no split-lock rollback, strict split locks on for WOW64, 4x20000 XADD exact.
+      - name: Check d3d9 splitlock
+        run: python3 tests/host/check-d3d9-splitlock.py
+
+      # MADEIRA_BAND_CENSUS: the 64 GB band census (layouts, 8960 MB fit, capped at 64 lines).
+      - name: Check band census
+        run: python3 tests/host/check-band-census.py
+
+      # [bg-qos]: background helper processes leave the performance cores while a game presents.
+      - name: Check bg qos
+        run: python3 tests/host/check-bg-qos.py
+
+      # always-on monitors stay off the game's cores (warmer sweep cadence, one [xp-names] line per native thread).
+      - name: Check monitor cadence
+        run: python3 tests/host/check-monitor-cadence.py
+
+      # an unaligned ordered/exclusive/LSE access in the app's own code is emulated in place (GTA V launcher stlr).
+      - name: Check native unaligned
+        run: python3 tests/host/check-native-unaligned.py
+
+      # wineserver request doorbell: no request lost through the bells alone (1.6 M requests, 8 clients; has a 5 s watchdog).
+      # The only one here with a wall-clock watchdog (5 s per request); passed 3/3 including 6 copies at once on 12 vCPUs.
+      - name: Check srv doorbell
+        run: python3 tests/host/check-srv-doorbell.py
+
+      # swap tier core: coverage modes, merged free extents, host-page copy-back, reserve-time backing, census.
+      - name: Check swap coverage
+        run: python3 tests/host/check-swap-coverage.py
+
+      # aux-IAT heal: timeGetTime's QPC/QPF stubs healed to the process's ntdll copy through the RW view only.
+      - name: Check aux iat heal
+        run: python3 tests/host/check-aux-iat-heal.py
+
+      # owned Steam library and downloads: protocol, manifests, decrypt/decompress, resumable install against three local HTTP servers (loopback only, ~25 s CPU).
+      # Starts three HTTP servers on 127.0.0.1 itself (never contacts Steam); needs swiftc, cc and the openssl command; 47-84 s wall under load (about 25 s of CPU).
+      - name: Check steam library
+        run: python3 tests/host/check-steam-library.py
+
+      # ===== Group 3: needs a host FFmpeg (built once, then cached) =====
+
+      # Builds a host FFmpeg 7.1.1 from the tracked tarball on first use (1 m 46 s cold here, 7 s warm) into ~/.cache/madeira-host-ffmpeg/ (set
+      # MADEIRA_HOST_FFMPEG to a prebuilt prefix to move it); then the production wg_parser under ASan/UBSan. Needs the diff of check-wg-parser.py.
+      - name: Check wg-parser on libavformat (MP3/WAV/MP4)
+        run: python3 tests/host/check-wg-parser.py
+
+
+      # ===== Not in the workflow =====
+      # check-fastsync.py          non-deterministic (a stochastic "control must stall" assertion fails under CPU load)
+      # check-jit-pairing.py       runs cargo test: writes build/rppairing-ios/target into the repo, needs loopback sockets and crates.io
+      # check-sc-ipc-rebind.py, check-sc-ipc-split.py, check-sc-render-loop.py, check-sc-runstate.py, check-sc-ui-close.py
+      #                            assemble x86-64 with GNU as/ld/objcopy/nm and run x86-64 code: need an x86-64 host + GNU binutils (the arm64 runner cannot run them)
+      # check-launcher-smc.py, check-fex-branch-history.py   need the Python unicorn module (not installed, no network); also need their diffs
+
       # BCD's interface is the app's interface (BCDLiveStore.swift, BCDLiveFrontEnd.swift;
       # docs/BCD-UI-ARCHITECTURE.md): the BCD choice and its one-time move, Play through the
       # classic library's function, the in-game flag, setup over it, the preview build.
@@ -328,6 +759,12 @@ jobs:
       # auto-tune's rule and its two fixtures.
       - name: Check a child process's own keyed event (Control, RunOnce)
         run: python3 tests/host/check-keyed-event-per-process.py
+
+      # Gal*Gun 2 and Hello Neighbor (logs CWFP3N, B2B7BR, TAW359): OpenSSL 1.0.2's SHA-extension SHA-1 routine returns with a wrong stack
+      # pointer after NETAPI32.DLL loads. env.MADEIRA_FEX_SHA = 0 tells such a game's guest the processor has no SHA extension: the app's
+      # rewrite of FEX's host probe compiled and run over every value, FEX's reading of it, the list rows, auto-tune's rule and its fixtures.
+      - name: Check the per-game SHA extension switch (Gal*Gun 2, Hello Neighbor)
+        run: python3 tests/host/check-fex-sha-off.py
 
       # env.MADEIRA_ZERO_MITIGATION_POLICY (Glyphica: Typing Survival, ChakraCore's fail-fast over an unwritten CFG policy): the Wine fork's
       # kernelbase GetProcessMitigationPolicy compiled on the host and run over every value of the switch (off: untouched; 1: zeroed, 1 to 16
@@ -667,6 +1104,12 @@ jobs:
             echo "::error::configure TAIL :: $TAIL"
           fi
 
+      # The WMA decoder transform (build/ntdll-unix/winegstreamer_unixlib_ios.c) compiled against the configured Wine build tree: it needs
+      # wine/build-macos/include/config.h and the widl headers of the step "Generate cross-tree headers ..." above (else SKIP-FAIL),
+      # and builds its own host FFmpeg on first use (8 s once cached).
+      - name: Check the WMA decoder transform
+        run: python3 tests/host/check-wma-decoder.py
+
       - name: Clone freetype 2.13.3
         run: git clone --depth 1 --branch VER-2-13-3 https://github.com/freetype/freetype.git research/freetype
 
@@ -778,11 +1221,27 @@ jobs:
           python3 tests/host/check-guest-log-renpy.py
           python3 tools/patch-wine-guest-log-renpy.py wine/dlls/ntdll/unix/file.c
 
+      # madeira-bcd (round 624, Blasphemous JPZBGJ): the managed stack trace under an exception line ("  at Foo.Bar () ...", Unity's
+      # "(Filename: ...)") reaches the session log too: 12 frames after each exception line, 36 a process, inside the line budget.
+      # The base mirror is already in the wine mirror's source, so this is a patch of its own. Logging only.
+      - name: Patch wine text-log mirror to keep the stack trace under an exception line
+        run: |
+          python3 tests/host/check-guest-log-trace.py
+          python3 tools/patch-wine-guest-log-trace.py wine/dlls/ntdll/unix/file.c
+
       # [file-trace]: every guest open / attribute query with its status when
       # MADEIRA_FILE_TRACE=1 (GTA V Enhanced's "incomplete installation"
       # screen names no file; [file-fail] stops after 64 DLL-search misses).
       - name: Patch wine with the guest file trace
         run: python3 tools/patch-wine-file-trace.py wine/dlls/ntdll/unix/file.c
+
+      # [file-census] (round 624, agent D2 S19: Counter-Strike: Source's CreateFileA storm, QJKJZJ / RQ8CSF): Wine's file lookups
+      # per ten-second window (whole-path shortcut, component lookups, misses, directory scans, time spent, the slowest path), a
+      # line only for a window with 200 component lookups or more, 60 lines a session; log only; env MADEIRA_FILE_CENSUS = 0 off.
+      - name: Patch wine with the file-lookup census
+        run: |
+          python3 tests/host/check-wine-file-census.py
+          python3 tools/patch-wine-file-census.py wine/dlls/ntdll/unix/file.c
 
       # A file opened as \??\GLOBALROOT\??\C:\... (or \DosDevices\GLOBALROOT\??\C:\...) failed with "path not found"; the DOS path
       # behind the wrapper now reaches the drive resolver. Only names that failed before change (iOS only).
@@ -1059,6 +1518,13 @@ jobs:
         run: |
           python3 tests/host/check-wineserver-async-cancel.py
           python3 tools/patch-wineserver-async-cancel.py wine
+
+      # madeira-bcd (round 624, agent C S10; MGS Ground Zeroes): the wineserver names each new process and a refused
+      # init_process_done ([srv-proc], 64 lines each); the refusal itself is unchanged.
+      - name: Patch the wineserver's process log
+        run: |
+          python3 tests/host/check-wineserver-proc-log.py
+          python3 tools/patch-wineserver-proc-log.py wine
 
       # madeira-bcd: a WM_PAINT that never ends no longer starves WM_TIMER
       # (build/wineserver/queue_ios.c; the Rockstar Games Launcher installer
@@ -1659,7 +2125,14 @@ jobs:
           python3 tools/patch-dock-game-scm.py madeira-dock/src/launch.c || echo "::warning::Dock game-session service manager patch not applied"
           # env.MADEIRA_DOCK_KEEP_ALIVE = <exe>;<exe>: hold the session while a self-updating launcher restarts
           python3 tools/patch-dock-keep-alive.py madeira-dock/src/launch.c || echo "::warning::Dock keep-alive patch not applied"
+          # round 624 (Steam 113): the published values read back while the game starts; env.MADEIRA_DOCK_PUMP_MS / _REASSERT experiments
+          python3 tools/patch-dock-steam-readback.py madeira-dock/src/launch.c || echo "::warning::Dock Steam readback patch not applied"
           bash build/madeira-dock/build.sh
+
+      # madeira-bcd (round 624, Steam 113: 39 of 187 Rockstar Dock sessions): the Dock patches in order on a copy, the readback
+      # helpers on the host, the whole host compiled with its flags, the app's report fields, the catalog.
+      - name: Check the Dock Steam readback
+        run: python3 tests/host/check-dock-steam-readback.py
 
       # 30 and 40 FPS caps (pacing modes 3 and 4) for the Session panel.
       - name: Patch DXMT present pacing with 30/40 FPS modes
@@ -1722,6 +2195,12 @@ jobs:
       - name: Patch DXMT render target views on a buffer
         run: python3 tools/patch-dxmt-buffer-rtv.py
 
+      # Dark Souls III (round 624, 10 logs of builds 565-622): an SRV made with MipLevels = -1 reported 0xFFFFFFFF from GetDesc and the
+      # game sized an array with it. env.MADEIRA_SRV_GETDESC_RESOLVE = 1 resolves the count in the view's description (off by default;
+      # [srv-getdesc]). The 64-bit game gets it through d3d11-src.dll (tools/build-d3d11-dll.sh).
+      - name: Patch DXMT SRV GetDesc mip count
+        run: python3 tools/patch-dxmt-srv-getdesc-mips.py
+
       # Build 623 (upstream willfaust/dxmt d811847f2): the GS/TS draw-argument marshal loops never advanced, so a batch of two
       # or more geometry/tessellation draws spun until the GPU timed out; a zero-size draw dispatches nothing. Reaches the
       # 32-bit d3d10/d3d11 and the native library (the 64-bit d3d11.dll is upstream's binary).
@@ -1762,6 +2241,40 @@ jobs:
 
       - name: Patch DXMT D3D9 fullscreen extent
         run: python3 tools/patch-dxmt-fullscreen-extent.py
+
+      # Call of Duty: World at War (K8K2D3, 32 FPS in heavy scenes): every draw after a lock of its ~1 MB dynamic index buffer copied
+      # the whole buffer to the GPU, ~920 times a frame. env DXMT_D9_IB_RANGE=1 (default off) copies only the index bytes a draw reads,
+      # renaming first when an earlier draw of the generation read them; the census gets a "buffer refresh per frame" line either
+      # way. The check runs the state machine against a model of the GPU generations. Before the i386 farm key, which hashes it.
+      - name: Check DXMT D3D9 index-buffer range refresh
+        run: python3 tests/host/check-dxmt-d9-ib-range.py
+
+      - name: Patch DXMT D3D9 index-buffer range refresh
+        run: python3 tools/patch-dxmt-d9-ib-range.py
+
+      # Far Cry 2 (Z7CADQ, round 624 agent D2 S16): with MADEIRA_FRAME_STATS (off by default) GetData times its park on the GPU
+      # fence and [d3d9-query] gets a third line, parked ms a frame and issue-to-complete percentiles. Without it nothing changes.
+      # After the index-range patch (same census file); before the i386 farm key, which hashes it.
+      - name: Patch DXMT D3D9 query park time
+        run: python3 tools/patch-dxmt-d3d9-query-park.py
+
+      # LEGO Batman, Silent Hunter 3, Requiem (round 624, Discord forum item 11: wrong, pink or black textures): [d3d9-tex-fmt] names
+      # each distinct texture format, pool and usage a game creates and the Metal format it became (40 lines; part of the D3D9 census,
+      # MADEIRA_D3D9_CENSUS=0 turns it off). Log only. Before the i386 farm key, which hashes it.
+      - name: Patch DXMT D3D9 texture format log
+        run: python3 tools/patch-dxmt-d9-texfmt-log.py
+
+      # Counter-Strike: Source 64-bit (round 624, agent D2 S18, W69RYK: a GetData poll loop for good): [d3d9-query-stuck] names a query
+      # still pending after 1,048,576 polls (building, the GPU behind, or a lost occlusion result), 16 lines; DXMT_D9_QUERY_LOST_MS
+      # (off unless a game's file sets it) answers a lost occlusion query as visible. Before the i386 farm key, which hashes it.
+      - name: Patch DXMT D3D9 stuck query report
+        run: python3 tools/patch-dxmt-d9-query-stuck.py
+
+      # WRC 9 (round 624, agent D2 S11, JDJ8KE/WV1P7T: GetData on a TIMESTAMP_DISJOINT query for good): [query-stuck] says what an event-class
+      # query pending 1.5 s waits for (its event, the signalled one, the queue, unsubmitted work); DXMT_QUERY_TS_WATCHDOG (off unless a
+      # game's file sets it) answers a timestamp query pending 2 s as complete. The i386 d3d11.dll and d3d11-src.dll. Before the farm key.
+      - name: Patch DXMT D3D11 stuck query report
+        run: python3 tools/patch-dxmt-d11-query-stuck.py
 
       # env.MADEIRA_DXMT_FAULT_INFO = 1 (off by default): command buffers with
       # encoder execution status, labelled encoders and a [fault-enc] line after
@@ -1928,6 +2441,17 @@ jobs:
       - name: Patch winemetal GPU trace and render-pass experiment
         run: python3 tools/patch-winemetal-gpu-trace.py
 
+      # Just Cause 3's world stall (round 624, agent D2 S15), both OFF by default: MADEIRA_GPU_TRACE=slow=<ms>,S,N starts the
+      # trace above after 3 presents in a row more than <ms> apart; MADEIRA_GPU_STALL_MS=<ms> names a command buffer unfinished
+      # that long after its commit ([gpu-stall]). Native only.
+      - name: Patch winemetal GPU stall watch and slow-frame trace
+        run: python3 tools/patch-winemetal-gpu-stall.py
+
+      # A 32-bit DXMT game's [gpu-perf] line (round 624, agent D2 S16, Far Cry 2): MadeiraCtl op 3 for a 32-bit caller while
+      # MADEIRA_FRAME_STATS is on, its guest pointer converted. Without the switch nothing changes. Native only.
+      - name: Patch winemetal GPU time for 32-bit callers
+        run: python3 tools/patch-winemetal-ctl-gpu-time-wow64.py
+
       # A render pass filled all eight colour attachments of its descriptor
       # (~240 Objective-C messages and 8 allocations a pass); only the slots
       # with a texture are filled now, the same pass for Metal. bcd.cfg /
@@ -1998,6 +2522,25 @@ jobs:
           python3 tests/host/check-x64-machine.py
           python3 tools/patch-wine-x64-machine.py wine
 
+      # madeira-bcd (round 624, agent A S13: osu! SV6C4C, Deadpool, Diablo II): [veh] add, which of a 32-bit program's own modules
+      # registers an exception handler (ntdll's RtlAddVectoredExceptionHandler / RtlAddVectoredContinueHandler, kernelbase's
+      # SetUnhandledExceptionFilter; 16 lines a process at most; log only). i386 farm only, put back right after it like the x64
+      # machine answer: the 64-bit ntdll/kernelbase are committed binaries and the arm64ec extra-DLL builds compare an unpatched
+      # ntdll/kernelbase byte for byte with them.
+      - name: Patch wine with the exception-handler registration log (i386 farm only)
+        run: |
+          python3 tests/host/check-veh-add-log.py
+          python3 tools/patch-wine-veh-add-log.py wine
+
+      # madeira-bcd (round 624, agent E2 S13: Guacamelee Gold 0P65SX, Hitman: Contracts KBBQJK, Guacamelee STCE DDFJM7/DNWRXA):
+      # '"msvcrt.dll" failed to initialize' names no step; this says whether HeapCreate or the "C" locale failed (the TLS step already
+      # does). Log only, on branches that end the process today. i386 farm only, put back right after it: dlls/msvcrt/main.c is
+      # shared by the arm64ec msvcr* builds of tools/build-wine-extra-dlls.sh.
+      - name: Patch wine with the msvcrt init diagnostics (i386 farm only)
+        run: |
+          python3 tests/host/check-msvcrt-initdiag.py
+          python3 tools/patch-wine-msvcrt-initdiag.py wine
+
       # WoW64's 32-bit Windows farm (app/Madeira/i386-windows), which upstream
       # builds from the pinned wine and DXMT (build/wine-i386) and does not
       # commit. Cached per wine/DXMT revision and per the tools/patch-wine-*.py
@@ -2037,7 +2580,7 @@ jobs:
 
       - name: Put back the files patched for the i386 farm only (x64 machine answer)
         if: always()
-        run: git -C wine checkout -- dlls/ntdll/env.c dlls/kernelbase/process.c
+        run: git -C wine checkout -- dlls/ntdll/env.c dlls/kernelbase/process.c dlls/ntdll/exception.c dlls/kernelbase/debug.c dlls/msvcrt/main.c
 
       # madeira-bcd: DXMT's Direct3D 9 frontend compiled for arm64ec (tools/build-d3d9-x64-dll.sh), shipped as
       # arm64ec-windows/d3d9-dxmt.dll NEXT TO Wine's d3d9.dll, which stays the default: a 64-bit game gets it as its d3d9.dll only
@@ -2289,6 +2832,7 @@ jobs:
           python3 tests/host/check-anon-cas-flush.py
           python3 tests/host/check-stp-split-readback.py
           python3 tests/host/check-cxx-type-diag.py
+          python3 tests/host/check-term-stack-32.py
           python3 tests/host/check-smc-loop-diag.py
 
       # madeira-bcd: env.MADEIRA_JUMBO_HALF (off by default) gives a failed 8 GB probe
@@ -2383,6 +2927,13 @@ jobs:
       - name: Check Dock game end
         run: ASAN_OPTIONS=symbolize=0 python3 tests/host/check-dock-game-end.py
 
+      # madeira-bcd (round 624, agent D2 S3 and S7; Geometry Dash from the Windows desktop VDFZHN, Steam with Rockstar's launcher RX4AK5):
+      # the Windows desktop says why a program ended at once. The engine marks a process that made a real OpenGL call (the stub table,
+      # virtual_ios.c) and keeps the mark with its end (process_ios.c, madeira_child_ends_since); the library logs [desktop-exit] and
+      # puts one notice on the session line for an OpenGL program, and once when the JIT pool refuses an image. Text and log only.
+      - name: Check the Windows desktop's exit watch
+        run: ASAN_OPTIONS=symbolize=0 python3 tests/host/check-desktop-exit.py
+
       # madeira-bcd (round 579, Tomb Raider: Underworld ZWAA2K): a 32-bit main program that cannot get its 4 GB window ended the boot
       # thread with pthread_exit (fatal_error), so the session never ended and the app showed "running" for three minutes. The failure
       # now reports its status and leaves by exit(): the shim long-jumps back to wine_process_thread on the boot thread.
@@ -2449,6 +3000,10 @@ jobs:
       # answers them with no view (Need for Speed: The Run; the DXMT patch, d3d11-src.dll for 64-bit games).
       - name: Check DXMT render target views on a buffer
         run: python3 tests/host/check-dxmt-buffer-rtv.py
+
+      # madeira-bcd (round 624): Dark Souls III's SRV mip count from GetDesc (the DXMT patch, opt-in; d3d11-src.dll for the 64-bit game).
+      - name: Check DXMT SRV GetDesc mip count
+        run: python3 tests/host/check-dxmt-srv-getdesc.py
 
       # madeira-bcd (round 620, thebcd69/bcd-games#17): Add a game names why a file is not a Windows program (words only).
       - name: Check the not-a-Windows-program words
@@ -2607,6 +3162,12 @@ jobs:
       - name: Check the WOW64 thread-map guard
         run: python3 tests/host/check-fex-wow-threads-ctor.py
 
+      # madeira-bcd (round 624): the 32-bit FEX module translates 0x82, 0x80's 32-bit-only alias (Ubisoft Connect, South Park,
+      # Assassin's Creed 2: "Unknown ALU Op: 0x10..0x16", c000001d, exit 0xdeadc0de); the patch on a copy of the pinned file, the
+      # decode tables, the build wiring, the device test's compile, the trap's code bytes in [int3-guest], the auto-tune rule.
+      - name: Check the FEX 0x82 alias
+        run: python3 tests/host/check-fex-op82-alias.py
+
       # madeira-bcd: the WoW64 CPU module runs from its JIT-pool copy only where the kernel would let its PE
       # view execute next to it (iOS 18; the cause of the iOS 18 32-bit start failure, builds 573/574).
       - name: Check WoW64 CPU module pool-only execution
@@ -2729,6 +3290,12 @@ jobs:
       - name: Check the swap-mb cap
         run: python3 tests/host/check-swap-cap.py
 
+      # madeira-bcd (round 624; from rtmtree's fork bcd-games-persona): helper memory (mempool-mb, the ml1150 pool) spans its
+      # regions, is asked before broad's disk cap, zeroes a decommit in place, merges freed space, counts free and file-backed
+      # pages in its guard and ignores BCD's own limit warning; env.MADEIRA_POOL_MIN_KB and env.MADEIRA_POOL_FEX are opt-in.
+      - name: Check helper memory
+        run: python3 tests/host/check-helper-memory.py
+
       # madeira-bcd (build 623; upstream Madeira 726686e): a 32-bit program's branch to a low address faults in the guest
       # instead of ending the program (36 logs).
       - name: Check wow-low-rip
@@ -2739,6 +3306,33 @@ jobs:
 
       - name: Check DXMT d3d9.customDriver and the GeForce 7900 GS card
         run: python3 tests/host/check-dxmt-d3d9-custom-driver.py
+
+      # madeira-bcd (build 624, round 624: R.E.P.O. and other Unity games on Mono): an executable request outside the Wine view of its
+      # nearest MZ page is not that image's tail (MADEIRA_MZ_VIEW_CHECK, build/ntdll-unix/ios_mz_view.h).
+      - name: Check the MZ view check
+        run: python3 tests/host/check-mz-view.py
+
+      # madeira-bcd (build 624, round 624: Battle.net Y0HFHB, Garry's Mod): a 32-bit guest window is found by its reserving thread's
+      # Darwin id, never by a pthread_t a dead thread left behind; the silent "already have one" branch logs how it found the window.
+      - name: Check the 32-bit window owner
+        run: python3 tests/host/check-wow-slot-owner.py
+
+      # madeira-bcd (build 624, round 624: Garry's Mod, 8 of 8 logs): the committed aarch64 wow64.dll is byte-patched so a NULL SID from
+      # NtQueryInformationToken (TokenAppContainerSid) is answered, not read (tools/patch-wow64-token-null-sid.py).
+      - name: Check the patched wow64.dll
+        run: python3 tests/host/check-wow64-token-null-sid.py
+
+      # madeira-bcd (build 624, round 624): env.MADEIRA_STEAM_IDENTITY = none from a game's own file is checked after the game's env lines.
+      - name: Check the Steam identity order
+        run: python3 tests/host/check-steam-identity-order.py
+
+      # madeira-bcd (build 624, round 624: LiveContainer, GTA V BTHD1F): the app's own __TEXT comes from the image that holds the code.
+      - name: Check the app text range by dladdr
+        run: python3 tests/host/check-app-text-dladdr.py
+
+      # madeira-bcd (build 624, round 624: GTA V Legacy 71GQSA): pool-window-cut keeps the JIT pool clear of a window that was not held.
+      - name: Check the pool window cut
+        run: python3 tests/host/check-pool-window-cut.py
 
       # madeira-bcd: the ARM64EC JIT no longer maintains the call-ret shadow stack nothing reads on iOS
       # (MADEIRA_FEX_CALLRET_ELIDE=0 keeps it).
@@ -2819,6 +3413,18 @@ jobs:
         continue-on-error: true
         run: bash tools/build-bcd-helper.sh
 
+      # BCD's winebrowser.exe (bcd-openurl/, round 625, the owner's item 23): what a Windows program runs to open a web page; the app
+      # asks the player. x86-64 into arm64ec-windows, aarch64 into aarch64-windows, i686 into the i386 farm in place of Wine's own (after
+      # the farm). A build that fails keeps the tracked programs; the check after it says whether each farm has BCD's.
+      - name: Build BCD's winebrowser.exe (three farms)
+        continue-on-error: true
+        shell: bash
+        run: |
+          bash tools/build-bcd-openurl.sh
+          for f in app/Madeira/arm64ec-windows/winebrowser.exe app/Madeira/aarch64-windows/winebrowser.exe app/Madeira/i386-windows/winebrowser.exe; do
+            if [ -f "$f" ] && LC_ALL=C grep -aq "\[open-url\] madeira-bcd" "$f"; then echo "::notice::$f is BCD's"; else echo "::warning::$f is not BCD's winebrowser.exe"; fi
+          done
+
       # 7-Zip 26.05 from the pinned release (third-party/7zip), without its RAR code: 7zFM.exe (the File Manager) and 7z.exe, x86-64
       # Windows programs next to Wine's programs in arm64ec-windows. About ten minutes; a build that fails keeps the tracked programs.
       - name: Build 7-Zip (7zFM.exe and 7z.exe, without the RAR code)
@@ -2864,6 +3470,11 @@ jobs:
       # handling of unrelated extra DLLs above. Do not ship another missing farm.
       - name: Verify Wine media reader DLLs
         run: python3 tools/check-wine-media-dlls.py app/Madeira/arm64ec-windows
+
+      # Round 624 (agent E2 S3): the step that builds the opt-in DLLs may fail without failing the build; a DLL a game list or an
+      # auto-tune rule names in env.MADEIRA_OPTIN_DLLS (Glyphica's kernelbase-optin.dll, build 624) must not go missing silently.
+      - name: Verify the opt-in DLLs the lists and rules name
+        run: python3 tools/check-optin-dlls-shipped.py app/Madeira/arm64ec-windows
 
       - name: Save wine arm64ec build
         if: steps.wineeccache.outputs.cache-hit != 'true' && hashFiles('wine/build-arm64ec/dlls/msvcr80/arm64ec-windows/msvcr80.dll') != ''
@@ -2937,7 +3548,9 @@ jobs:
           # patches reach a 64-bit game only through d3d11-src.dll, and recommended lists ask for it
           # (F1 2020), so an IPA in which no 64-bit d3d11.dll carries them is refused.
           NEED=""
-          for m in "[copy-structure-count] skipped #" "[rtv-fail] #"; do
+          # Round 624: Dark Souls III's [srv-getdesc] and WRC 9's [query-stuck] too (build 624's first IPA shipped a
+          # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it).
+          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query="; do
             LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11.dll && continue
             [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ] && LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11-src.dll && continue
             NEED="$NEED \"$m\""
@@ -3161,6 +3774,16 @@ jobs:
       # /tmp/vcr.exe, and a session links the bundle's copy first (WineProcessBridge.m).
       - name: Check the in-app VC++ runtime download
         run: python3 tests/host/check-vcruntime-download.py --require-swift
+
+      # BCD (round 625, the owner's item 26): the same download for Microsoft's 32-bit package, whose four MFC DLLs a 32-bit game gets
+      # with env.MADEIRA_MFC32 = 1. The package is fetched here only for the check (into /tmp, never shipped: every device downloads its
+      # own copy from Microsoft); without it the check runs on its synthetic package alone.
+      - name: Check the 32-bit MFC download and its session links
+        shell: bash
+        run: |
+          curl -fsSL --retry 3 --retry-delay 2 --proto '=https' --proto-redir '=https' --max-filesize 134217728 -o /tmp/vcr-x86.exe \
+            https://aka.ms/vs/17/release/vc_redist.x86.exe || { rm -f /tmp/vcr-x86.exe; echo "::warning::vc_redist.x86.exe not downloaded: the MFC check uses its synthetic package"; }
+          python3 tests/host/check-mfc32.py --require-swift
 
       # madeira-bcd (upstream port 2026-10-25): PrefixExtractor.c refuses '..' components, absolute paths and a bad tar size field;
       # PrefixExtractor.c built on the host with zlib and sanitizers, given synthetic archives and the bundled prefix template.

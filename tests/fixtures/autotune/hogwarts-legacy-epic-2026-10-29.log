@@ -1,0 +1,106 @@
+[20:35:48.930] [INFO] Checking entitlements...
+[20:35:48.931] [INFO] [build] v0.1.623 (623)
+[20:35:48.931] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 26.5 (Build 23F77) ram=11441MB available=12266MB cores=9
+[20:35:48.931] [INFO] [device] address-map=[0x104850000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[20:35:48.939] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@1.72x max-fps=120 utc-offset=+09:00 free-disk=123GB stikdebug-url=1
+[20:35:48.943] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:36:25.601] [INFO] Requesting JIT with StikDebug...
+[20:36:25.616] [INFO] Opening StikDebug to enable JIT...
+[20:36:33.495] [INFO] [epic-launch] start app=fa..93 signed-in=1 ovt=1 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[20:36:33.499] [INFO] [bcd] library launch HogwartsLegacy.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:36:33.500] [INFO] Session log: logs/HogwartsLegacy.exe-2026-10-29_20-36-33.txt
+[20:36:33.515] [INFO] Running full Wine sequence...
+[20:36:33.515] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104850000,0xfc0000000) 63GB available=12247MB low-power=0 thermal=nominal
+[20:36:33.519] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:36:33.519] [INFO] Allocating 896MB JIT pool via debugger...
+[20:36:33.519] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:36:33.519] [INFO] [jit-debugger] attached=1 at the pool request
+[20:36:33.520] [OK] [exe-window] executable window widened to [0x140000000,+448MB) for this game (exe-window-mb)
+[20:36:35.333] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  1.892s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[20:36:35.666] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11335 MB + phys_footprint=952 MB = 12288 MB (hw.memsize says 11441 MB)
+ml985: preferred base 0x140000000+0x4b000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x4c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x300004000)
+ml957: ? backing 0x11d7a0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x300050000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x30018a000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x3005a4000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x3006d8000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x3007a0000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[footprint] rev=ml358 phys=967 MB (peak 967) internal=963 MB compressed=0 MB external=94 MB reusable=14 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+D 24 Load module HogwartsLegacy.exe (hogwartslegacy.exe-1335beae1459bbaa): 11D7A0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): FBEF50000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): FBEE60000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): FBEDB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBED30000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x301e14000)
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x301e98000)
+[copy-verify] CONCRT140.dll: OK, 12 .text pages executable (copy @0x301ea4000)
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): FBDD50000
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x301ef4000)
+D 24 Load module XINPUT1_3.DLL (xinput1_3.dll-1e6b91746083ed2b): FBDCC0000
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x301f88000)
+D 24 Load module hid.dll (hid.dll-c3a5177fc021edec): FBDC30000
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x30201c000)
+D 24 Load module setupapi.dll (setupapi.dll-eb860a5cf96d3e18): FBDB50000
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): FBDAD0000
+D 24 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): FBD9E0000
+[phase] spawn:L"C:\\Program Files\\Epic Games\\HogwartsLegacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe" t+  2.395s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\HogwartsLegacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe\" Phoenix -SaveToUserDir -UserDir=HogwartsLegacy -epicapp=fa4240e57a3c46b39f169041b7811293 -epicenv=Prod -EpicPortal -epiclocale=en" (fd=80, unixdir=90, dup_unixdir=98) cwd=L"C:\\Program Files\\Epic Games\\HogwartsLegacy\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x1c3ad000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x10000..0x1000000000
+ml985: preferred base 0x140000000+0x1c3ad000 REFUSED status=0xc0000018 image_flags=0 charact=0x23 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x1c3b0000 rev=ajan5-motor
+wine: failed to create main module for L"C:\\Program Files\\Epic Games\\HogwartsLegacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe", status c0000018
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000018) syscalls=0 unix_calls=639
+[Wine ntdll/server] process_exit_wrapper(-1073741800): closing child fd_socket=97
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000018) syscalls=0 unix_calls=643
+[unwind] term ml661 begin rip=fbf500690 rsp=12849fed8 window=[12849fed8..128c9fed8) max=32
+[unwind] term ml661 #00 pc=fbf500690 rsp=12849fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=c0000018 rbp=12849ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=12849ff60: d0ff4928 01000000 ac1c7a1d 01000000 180000c0 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=11d7a90a5 rsp=12849fee0  (exe)+0x90a5
+[unwind] term ml662 #01 nv: rbx=c0000018 rbp=12849ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   global @+0x69 -> 11d7b5338 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=3007099cc rsp=12849ffb0  <no module — STOP>
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000018) syscalls=0 unix_calls=658
+[unwind] term ml661 begin rip=3000ce16c rsp=12849fc48 window=[12849fc48..128c9fc48) max=32
+[unwind] term ml661 #00 pc=3000ce16c rsp=12849fc48  <no module — STOP>
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741800)
+[Wine ntdll/server] process_exit_wrapper(-1073741800)
+[WineProc] Wine exited with code -1073741800 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (hogwartslegacy.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741800)
+[Wine child thread] child exited with code -1073741800
+[WineProc] stopping wineserver...
+[20:36:36.515] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=1924MB limit=12287MB thermal=nominal lpm=0 res=2560x1440 game=Hogwarts Legacy
+[20:36:36.526] [INFO] [exit-report] status=0xc0000018
+[frontend] returned to library
+[20:36:36.612] [INFO] [bcd-host] no report
+[footprint] rev=ml358 phys=2039 MB (peak 2039) internal=2035 MB compressed=0 MB external=119 MB reusable=13 MB (cycle=2)
+[20:36:38.424] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=2178 MB (peak 2178) internal=2175 MB compressed=0 MB external=119 MB reusable=13 MB (cycle=3)
+[footprint] rev=ml358 phys=1934 MB (peak 2178) internal=1931 MB compressed=0 MB external=119 MB reusable=14 MB (cycle=4)
+[footprint] rev=ml358 phys=1938 MB (peak 2178) internal=1935 MB compressed=0 MB external=129 MB reusable=14 MB (cycle=5)

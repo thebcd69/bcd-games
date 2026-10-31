@@ -12,6 +12,8 @@ int wineserver_start(const char *prefix_path);
 
 // Check if wineserver is running
 int wineserver_is_running(void);
+// madeira-bcd (round 624): the message of the fatal error that ended the server thread ("" when none did).
+const char *wineserver_fatal_message(void);
 /* 1 once the server has finished starting up (registry loaded), just before
  * its main loop: the point from which Wine may start. */
 int wineserver_is_ready(void);

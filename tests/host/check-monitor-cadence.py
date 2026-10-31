@@ -56,7 +56,11 @@ int main( int argc, char **argv )
         if (c == 1 || (ios_warmer_sweep_cycles() == 5 ? (c % 15) == 0 : (c % ios_warmer_sweep_cycles()) == 0))
             inventories++;
     }
+#ifdef __APPLE__
+    pthread_setname_np( "probe-me" );   /* macOS: names the calling thread, one argument */
+#else
     pthread_setname_np( pthread_self(), "probe-me" );
+#endif
     ios_xp_name_native( pthread_self(), 981493 );
     ios_xp_name_native( pthread_self(), 981493 );
     ios_xp_name_native( pthread_self(), 981492 );
@@ -86,7 +90,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
 # --- textual wiring -----------------------------------------------------------
 assert warmer.count('if (IOS_POOL_IN_HOLE(o)) continue;') == 4, 'pages are still warmed every cycle'
-assert 'if (cycle == 2 || (cycle % ios_warmer_sweep_cycles()) == 0)' in warmer
+# round 624 (agent D2 S20): plus a one-shot walk when the footprint first reaches 90 % of the limit
+assert 'if (cycle == 2 || (cycle % ios_warmer_sweep_cycles()) == 0 || physmap_at90 == 1)' in warmer
 assert 'if (cycle == 1 || (ios_warmer_sweep_cycles() == 5 ? (cycle % 15) == 0' in warmer
 assert 'if ((cycle % 5) == 0 && rx)' in warmer, 'the .text sweep keeps its cadence'
 assert '(walk %ld ms; next in %u ' in warmer

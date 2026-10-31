@@ -1,0 +1,147 @@
+[19:09:30.618] [INFO] Checking entitlements...
+[19:09:30.618] [INFO] [build] v0.1.622 (622)
+[19:09:30.619] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11695MB available=3356MB cores=6
+[19:09:30.619] [INFO] [device] address-map=[0x10284c000,0x7180000000) 454GB increased-memory=0 extended-va=0
+[19:09:30.639] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:09:44.367] [INFO] Requesting JIT with StikDebug...
+[19:09:44.409] [INFO] Opening StikDebug to enable JIT...
+[19:09:48.777] [INFO] [epic-launch] host start held (env.BCD_EPIC_HOST_START = 1)
+[19:09:48.778] [INFO] [epic-launch] start app=f4..1c signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[19:09:48.781] [INFO] [bcd] library launch FarmingSimulator2022.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:09:48.799] [INFO] Running full Wine sequence...
+[19:09:48.799] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10284c000,0x7180000000) 454GB available=3343MB low-power=0 thermal=nominal
+[19:09:48.810] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:09:48.810] [INFO] Allocating 896MB JIT pool via debugger...
+[19:09:48.811] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:09:48.812] [INFO] [jit-debugger] attached=1 at the pool request
+[19:09:48.814] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:09:50.656] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  1.931s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=2739 MB + phys_footprint=636 MB = 3376 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x23000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x24000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148005000)
+ml957: ? backing 0x11b300000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=636 MB (peak 636) internal=635 MB compressed=0 MB external=81 MB reusable=7 MB (cycle=1)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14802c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717fff0000
+[nls-getptr] type=11 id=437 peb=0x717fff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x148166000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148580000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1486b4000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14877c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x717fff0000
+D 24 Load module bcdhost.exe (bcdhost.exe-e1189fd6ff7a7f8d): 11B300000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 717FCD0000
+[nls-getptr] type=11 id=1252 peb=0x717fff0000
+[nls-getptr] type=11 id=437 peb=0x717fff0000
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\FarmingSimulator22\\FarmingSimulator2022.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\FarmingSimulator22\\FarmingSimulator2022.exe\" -AUTH_LOGIN=unused -AUTH_PASSWORD=* -AUTH_TYPE=exchangecode -epicapp=f452ea20ae1b43698209998b56c2cc1c -epicenv=Prod -EpicPortal -epicusername=* -epicuserid=* -epiclocale=pt -epicsandboxid=308cbcb523ad4937a8c50"...
+[phase] spawn:L"C:\\Program Files\\Epic Games\\FarmingSimulator22\\FarmingSimulator2022.exe" t+  3.327s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\FarmingSimulator22\\FarmingSimulator2022.exe\" -AUTH_LOGIN=unused -AUTH_PASSWORD=<code> -AUTH_TYPE=exchangecode -epicapp=f452ea20ae1b43698209998b56c2cc1c -epicenv=Prod -EpicPortal -epicusername=<name> -epicuserid=<id>"... (fd=73, unixdir=74, dup_unixdir=78) cwd=L"C:\\Program Files\\Epic Games\\FarmingSimulator22"
+[Wine child thread] calling wine_ios_child_main...
+ml985: preferred base 0x140000000+0x5d000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x60000 rev=ajan5-motor
+ml957: ? backing 0x11b330000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x109da0000
+D 2C Load module FarmingSimulator2022.exe (farmingsimulator2022.exe-17ae4fe39c89181a): 11B330000
+D 2C Load module  (-2d1580055211ffc7): 717FCD0000
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+D 2C Load module USER32.dll (user32.dll-7d4349728057d260): 717D7F0000
+D 2C Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 717D700000
+[footprint] rev=ml358 phys=727 MB (peak 727) internal=726 MB compressed=0 MB external=96 MB reusable=7 MB (cycle=2)
+[free-delay] #1 release of 0x7177310000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7177410000+0x200000 held for 2000 ms (2 in flight)
+[nls-getptr] type=11 id=10000 peb=0x109da0000
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[phase] spawn:L"C:\\Program Files\\Epic Games\\FarmingSimulator22\\x64\\FarmingSimulator2022Game.exe" t+  4.902s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"x64/FarmingSimulator2022Game.exe\"  -AUTH_LOGIN=unused -AUTH_PASSWORD=<code> -AUTH_TYPE=exchangecode -epicapp=f452ea20ae1b43698209998b56c2cc1c -epicenv=Prod -EpicPortal -epicusername=<name> -epicuserid=<id> -epiclocale=pt -epicsa"... (fd=89, unixdir=98, dup_unixdir=102) cwd=L"C:\\Program Files\\Epic Games\\FarmingSimulator22\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] FarmingSimulator2022Game.exe: OK, 780 .text pages executable (copy @0x149c71000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14c3c4000)
+[nls-getptr] type=11 id=1252 peb=0x10a004000
+[nls-getptr] type=11 id=437 peb=0x10a004000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14c4fe000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14c918000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14ca4c000)
+[nls-getptr] type=11 id=20127 peb=0x10a004000
+[19:09:54.216] [INFO] [session] length=5s partial=1 play=0s frames=0 stalls=0/0s peak=824MB limit=3375MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Farming Simulator 22
+[nls-getptr] type=11 id=1252 peb=0x10a004000
+[nls-getptr] type=11 id=437 peb=0x10a004000
+[19:13:09.808] [INFO] detach-wait: presents=0 running=1 elapsed=199s
+[freeze] alive t+199s beats=1 gaps=1 iter=18 gen=1 threads=24 resident=963MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=853 MB (peak 853) internal=851 MB compressed=0 MB external=105 MB reusable=8 MB (cycle=3)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dde1040 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=889
+[unwind] term ml661 begin rip=717dda0690 rsp=7176aafed8 window=[7176aafed8..71772afed8) max=32
+[unwind] term ml661 #00 pc=717dda0690 rsp=7176aafed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=7176aaff60 rsi=0 rdi=7177612060 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=7176aaff60: d0ffaa76 71000000 57dc331b 01000000 00000000 00000000 00000000 71000000
+[unwind] term ml662   rdi=7177612060: 70e9ab76 71000000 a0e9ab76 71000000 60236177 71000000 d0236177 71000000
+[unwind] term ml661 #01 pc=11b3428d5 rsp=7176aafee0  (exe)+0x128d5
+[unwind] term ml662   global @+0x6e -> 11b355340 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=14919d9cc rsp=7176aaffb0  <no module — STOP>
+[unwind] term ml661 end
+[free-delay] #3 release of 0x702b410000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x702a410000+0x1000000 held for 2000 ms (2 in flight)
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=908
+[unwind] term ml661 begin rip=148b622fc rsp=7176aafd28 window=[7176aafd28..71772afd28) max=32
+[unwind] term ml661 #00 pc=148b622fc rsp=7176aafd28  <no module — STOP>
+[unwind] term ml661 end
+002c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=77
+[Wine ntdll/server] process_exit_wrapper(0)
+[hwinput] keyboard focus: program (app active)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14d9c4000)
+[footprint] rev=ml358 phys=889 MB (peak 889) internal=888 MB compressed=0 MB external=128 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml1060 fast phys=892 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=909 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=951 MB compressed=0 MB
+[footprint] rev=ml358 phys=952 MB (peak 952) internal=951 MB compressed=0 MB external=138 MB reusable=8 MB (cycle=5)
+D 34 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): 7171D60000
+D 34 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 717B6C0000
+D 34 Load module IMM32.dll (imm32.dll-d32ec4d784d2a68d): 7171CC0000
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+D 34 Load module OPENGL32.dll (opengl32.dll-9fddefc254677b75): 7171B60000
+D 34 Load module XINPUT1_4.dll (xinput1_4.dll-a6149d3778dec34c): 7171AD0000
+D 34 Load module stream_engine.dll (stream_engine.dll-118de1d99b59fe73): 7171940000
+0034:err:win:ios_child_desktop_fixup [child-desktop] pid=0030 peb=0x10a004000 tid=0034: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x14d2241d8 fault_addr=0x57e insn=39403909 rn=8 xRn=0x570 (rn_val==fault_addr? 0) x18=0 teb=0x717ffc0000
+[store-noalias] #1 rev=ml348 addr=0x57e insn=0x39403909 pc=0x14d2241d8 NO pool/anon alias | region 0x10284c000+0x26dc000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x57e hostpc=0x14d2241d8 hinsn=0x39403909 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x14d2241d8 addr=0x57e kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x10284c000+0x26dc000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x14d2241d8 addr=0x57e x18=0x0 type=1 lr=0x14d209864 sp=0x717ae5e3f0 x16=0x7fffffffffffff x17=0x5348
+[fault-host] 14d2240d8: d65f03c0 d10403ff f9006bfe aa0403e5 90000349 aa0003e8 a9be88a1 910023e1
+[fault-host] 14d2240f8: f90008a3 528000c0 52801902 f9006fe5 aa0803e3 aa1f03e4 f942b529 d63f0120
+[fault-host] 14d224118: 910023e0 39033fff 94009e15 f9406bfe 910403ff d65f03c0 0002c681 d10083ff
+[fault-host] 14d224138: f9000bfe 14031844 92403c09 5280030a f9407d08 9baa2128 39403909 34000109
+[fault-host] 14d224158: f2703c1f 54000080 79401909 6b40413f 54000061 f9000901 1400000f b40001c0
+[fault-host] 14d224178: 900003a8 39462108 36100168 b0000242 911c2042 b0000243 911bc063 aa0003e8
+[fault-host] 14d224198: 52800040 910003e4 52800105 f90003e8 940000d8 f9400bfe 910083ff d65f03c0
+[fault-host] 14d2241b8: 0002a765 d10083ff f9000bfe 14031827 92403c09 5280030a f9407d08 9baa2128
+[fault-host] 14d2241d8: 39403909 340001a9 f2703c1f 54000080 00000000 00000000 00000000 00000000
+[footprint] rev=ml358 phys=956 MB (peak 956) internal=954 MB compressed=0 MB external=141 MB reusable=8 MB (cycle=6)
+[19:13:16.000] [INFO] [session] length=207s partial=1 play=0s frames=0 stalls=0/0s peak=956MB limit=3375MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Farming Simulator 22
+[19:19:53.297] [INFO] detach-wait: presents=0 running=1 elapsed=602s
+[freeze] alive t+603s beats=2 gaps=2 iter=47 gen=1 threads=21 resident=330MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=Madeira`ios_mach_exception_thread+0xcfc4 lr=Madeira`ios_mach_exception_thread+0xcf98 sp=0x16dde11e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=831 MB (peak 956) internal=313 MB compressed=515 MB external=133 MB reusable=0 MB (cycle=7)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=940 MB (peak 956) internal=422 MB compressed=515 MB external=133 MB reusable=0 MB (cycle=8)
+[19:19:56.176] [INFO] [session] length=607s partial=1 play=0s frames=0 stalls=0/0s peak=957MB limit=3375MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Farming Simulator 22
+[19:21:21.814] [INFO] detach-wait: presents=0 running=1 elapsed=691s
+[freeze] alive t+691s beats=3 gaps=3 iter=60 gen=1 threads=23 resident=552MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=940 MB (peak 956) internal=420 MB compressed=517 MB external=131 MB reusable=0 MB (cycle=9)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=940 MB (peak 956) internal=420 MB compressed=517 MB external=131 MB reusable=0 MB (cycle=10)
+[19:21:23.955] [INFO] [session] length=695s partial=1 play=0s frames=0 stalls=0/0s peak=957MB limit=3375MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Farming Simulator 22

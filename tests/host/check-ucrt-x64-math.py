@@ -235,7 +235,12 @@ print('PASS: --verify accepts x64 bodies in an X64 range and refuses fast-forwar
 # ---- the build step ----------------------------------------------------------
 sh = (root / 'tools/build-wine-extra-dlls.sh').read_text()
 assert 'if [ "${MADEIRA_UCRT_X64_MATH_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/ucrtbase/Makefile.in" ]; then' in sh
-assert '[ -n "$todo$XI$WGI$UCX$NTS$XSE$FBT$WER$WTY$OPT$SDL" ] || { echo "nothing to build"; exit 0; }' in sh   # NTS: ntdll-sync.dll, XSE: ntdll-xsec.dll, FBT: kernelbase-fibertrace.dll, WER: wer-optin.dll, WTY: wintypes-optin.dll, SDL: setupapi-optin.dll
+import re
+# NTS: ntdll-sync.dll, XSE: ntdll-xsec.dll, FBT: kernelbase-fibertrace.dll, WER: wer-optin.dll, WTY: wintypes-optin.dll, SDL: setupapi-optin.dll
+# (round 624 added ZMP, kernelbase-optin.dll, and DCO, dcomp-optin.dll; the order of the variables does not matter)
+guard = re.search(r'\[ -n "\$todo((?:\$[A-Z]+)+)" \] \|\| \{ echo "nothing to build"; exit 0; \}', sh)
+assert guard and {'$XI', '$WGI', '$UCX', '$NTS', '$XSE', '$FBT', '$WER', '$WTY', '$OPT', '$SDL'} <= set(re.findall(r'\$[A-Z]+', guard.group(1))), \
+    'the "nothing to build" guard must count every extra DLL'
 assert '[ -n "$targets" ] && make -C "$B" -k -j"$JOBS" $targets' in sh, 'no make of "all" when only ucrtbase is wanted'
 step = sh[sh.index('if [ -n "$UCX" ]; then'):]
 step = step[:step.index('\nfi\n') + 4]

@@ -24,12 +24,15 @@ if src.is_file():
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "wine/dlls/rpcrt4"
         d.mkdir(parents=True)
-        shutil.copy(src, d / "rpc_transport.c")
+        # Start from the file as committed (a build tree's wine already carries the patch); without git use the working file.
+        r = subprocess.run(["git", "-C", str(root / "wine"), "show", "HEAD:dlls/rpcrt4/rpc_transport.c"], capture_output=True, text=True)
+        text = r.stdout if r.returncode == 0 and r.stdout else src.read_text()
+        (d / "rpc_transport.c").write_text(text)
         p = root / "tools/patch-wine-rpc-np-diag.py"
         r1 = subprocess.run([sys.executable, str(p), str(Path(t) / "wine")], capture_output=True, text=True)
         r2 = subprocess.run([sys.executable, str(p), str(Path(t) / "wine")], capture_output=True, text=True)
         check("applies once", r1.returncode == 0 and "applied" in r1.stdout and "already" in r2.stdout)
-        before, after = src.read_text(), (d / "rpc_transport.c").read_text()
+        before, after = text, (d / "rpc_transport.c").read_text()
         added = after.replace(before.split("    release_np_event(connection, event);\n    return status")[0], "", 1)
         check("only the failure path logs, at most 16 times, and the return is unchanged",
               "if (status && status != STATUS_BUFFER_OVERFLOW)" in after and "<= 16" in after and

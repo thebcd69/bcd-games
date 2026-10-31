@@ -88,6 +88,27 @@ static struct ios_jit_mapping ios_jit_mappings[8];
 static int ios_jit_mapping_count;
 static void *ios_jit_rx_base_global, *ios_jit_rw_base_global;
 static size_t ios_jit_pool_size_global;
+#ifdef __APPLE__
+#include <mach/mach.h>
+#include <mach/mach_vm.h>
+#include <fcntl.h>
+/* the production reader itself: fault-safe mach_vm_read_overwrite */
+static int ios_safe_read64( uint64_t addr, uint64_t *out )
+{
+    mach_vm_size_t got = 0;
+    if (addr < 0x1000 || (addr & 7)) return -1;
+    return mach_vm_read_overwrite( mach_task_self(), addr, 8, (mach_vm_address_t)(uintptr_t)out, &got ) == KERN_SUCCESS && got == 8 ? 0 : -1;
+}
+static int memfd_create( const char *name, unsigned flags )   /* an anonymous temp file (in TMPDIR, already unlinked) stands in for the memfd */
+{
+    FILE *f = tmpfile();
+    (void)name; (void)flags;
+    return f ? dup( fileno( f ) ) : -1;
+}
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0   /* macOS has no such flag: the address is a hint and main() compares what it got */
+#endif
+#else
 #include <sys/uio.h>
 /* fault-safe like the production mach_vm_read_overwrite reader */
 static int ios_safe_read64( uint64_t addr, uint64_t *out )
@@ -96,6 +117,7 @@ static int ios_safe_read64( uint64_t addr, uint64_t *out )
     if (addr < 0x1000 || (addr & 7)) return -1;
     return process_vm_readv( getpid(), &l, 1, &r, 1, 0 ) == 8 ? 0 : -1;
 }
+#endif
 ''' + translate + heal + r'''
 #define POOL_SIZE 0x400000ul
 static unsigned char *rx_view, *rw_view;

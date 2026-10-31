@@ -25,6 +25,12 @@ What this checks (the Mac has no NFS and no device log runs here):
      program prints; an int3 prints its own headline; the cap, the repeat of one fault, a 64-bit guest, an address outside the window, no TEB and
      no registers print nothing; the unset switch reads no memory.
   4. The catalog entry, the lists and the CI step exist; the real signal_arm64_ios.c still compiles for iOS (when a wine tree is there).
+Round 624 (agents E1 S17 and D2 S8; Unreal Gold EQ6DMS/X3HYP5, Need for Speed: Underground 2 B1MR64): a second access-violation call in
+bus_handler's "BUS->AV: unreadable target" branch (the Mach thread's call reaches only the first 12 events; Unreal Gold's wall came at about
+17,400); a write to a readable page takes no report; the report adds the views around the fault and the pointers (virtual_ios.c, the lock
+only tried; a busy lock is said), the WoW64 allocations and frees before the fault (a ring of 64 kept only with the switch; compiled and
+driven here: Unreal Gold's shape, the wrap, a 64-bit process) and the places of the program's image that hold the fault address; the entry is
+never inlined, so bus_handler's own frame on the signal stack stays as it was.
 """
 from pathlib import Path
 import json
@@ -61,8 +67,8 @@ check('the header is included exactly once, after the earlier 32-bit diagnostics
       signal_src.count(inc) == 1 and signal_src.index('#include "ios_int3_x86_diag.h"') < signal_src.index(inc)
       and signal_src.index('#include "ios_ill_guest_diag.h"') < signal_src.index(inc)
       < signal_src.index('static void *ios_mach_exception_thread( void *arg )'))
-check('one call site for the int3 and one for the access violation, each behind `if (ios_x86_fault_enabled()`',
-      signal_src.count('ios_x86_fault_int3(') == 1 and signal_src.count('ios_x86_fault_av(') == 1 and signal_src.count('if (ios_x86_fault_enabled()') == 2)
+check('one call site for the int3 and two for the access violation (round 624: the signal path\'s too), each behind `if (ios_x86_fault_enabled()`',
+      signal_src.count('ios_x86_fault_int3(') == 1 and signal_src.count('ios_x86_fault_av(') == 2 and signal_src.count('if (ios_x86_fault_enabled()') == 3)
 i3 = signal_src.index('ios_x86_fault_int3(')
 g3 = signal_src.rindex('if (ios_x86_fault_enabled()', 0, i3)
 battle = signal_src.index('ios_int3_x86_diag( &bs, i3x_teb, gregs, grip );')
@@ -71,6 +77,44 @@ check('the int3 call is inside the [int3-guest] block, after the Battle.net call
       and signal_src[g3:i3].count('{') == 1 and signal_src[g3:i3].count('}') == 0)
 av = signal_src.index('ios_x86_fault_av(')
 ga = signal_src.rindex('if (ios_x86_fault_enabled()', 0, av)
+# round 624 (agent E1 S17): the second access-violation call, in the signal path's "BUS->AV: unreadable target" branch
+av2 = signal_src.index('ios_x86_fault_av(', av + 1)
+ga2 = signal_src.rindex('if (ios_x86_fault_enabled()', 0, av2)
+bus = signal_src[signal_src.index('static void bus_handler( int signal, siginfo_t *siginfo, void *sigcontext )'):]
+check('round 624 (E1 S17 a1): the second call is in bus_handler\'s "BUS->AV: unreadable target" branch, after [wow-null32] and before the AV is '
+      'delivered, for JIT code with FEX\'s state at x28, the guest rip read fault-safely from [x28 + 0x18]',
+      signal_src.index('"BUS->AV: unreadable target addr=%p pc=%p rw=%d rev=ml420\\n"') < signal_src.index('ios_wow_null_diag_bus( &((ucontext_t *)sigcontext)->uc_mcontext->__ss, (uintptr_t)NtCurrentTeb(), (uintptr_t)siginfo->si_addr );')
+      < ga2 < av2 < signal_src.index('goto bus_fatal;', av2) and 'ios_x86_fault_av(' in bus
+      and 'ios_av_args_pc_is_jit( __darwin_arm_thread_state64_get_pc( *xf_ss ) ) && xf_ss->__x[28] > 0x100000' in signal_src[ga2:av2]
+      and 'ios_av_args_read( xf_ss->__x[28] + 0x18, &xf_rip, 8 )' in signal_src[ga2:av2]
+      and 'vrec.ExceptionInformation[0] == 1 ? 1 : vrec.ExceptionInformation[0] == 0 ? 0 : -1' in signal_src[av2:av2 + 300])
+check('round 624: the report\'s entry is never inlined (bus_handler\'s own frame stays as it was on the 50 KB signal stack)',
+      'static __attribute__((noinline)) void ios_x86_fault_av(' in code)
+check('round 624 (E1 S17 a1): an access to a readable page is not counted as a report, and the test comes before the cap',
+      code.index('if (ios_av_args_read( base + (uint64_t)fault_addr, &probe, 1 )) return;')
+      < code.index('if ((num = __sync_add_and_fetch( &reports, 1 )) > IOS_X86F_MAX_REPORTS) return;')
+      and code.index('if (!thread_teb) return;') < code.index('if (ios_av_args_read( base + (uint64_t)fault_addr, &probe, 1 )) return;'))
+check('round 624 (E1 S17 a2, D2 S8 d2/d3): the views, the allocation ring and the image scan only for an access violation, after the objects',
+      code.index('ios_x86f_object( base, "EBP", ebp, mods, nmods );') < code.index('if (fault_addr >= 0)\n    {\n        extern void ios_x86f_alloc_ring_dump( uint32_t fault );')
+      < code.index('ios_x86f_scan_image( base, mods, nmods, (uint32_t)fault_addr );') < code.index('"[x86-fault]   end of report #%d\\n"')
+      and 'uint32_t page[0x800 / 4]' in code and 'mods[0].size > 0x4000000u' in code)
+vsrc = (root / 'build/ntdll-unix/virtual_ios.c').read_text()
+dfr = vsrc[vsrc.index('void ios_dump_fault_region( void *addr )\n{'):vsrc.index('static void ios_fault_region_lines( void *addr )\n{')]
+check('round 624: ios_dump_fault_region is as before (storm gate, the lock, the lines, unlock); the report\'s variant has no gate and only tries the lock',
+      dfr.index('if (!ios_storm_gate( &fr_storm )) return;') < dfr.index('mutex_lock( &virtual_mutex );') < dfr.index('ios_fault_region_lines( addr );')
+      < dfr.index('mutex_unlock( &virtual_mutex );')
+      and 'int ios_dump_fault_region_report( void *addr )\n{\n    if (pthread_mutex_trylock( &virtual_mutex )) return 0;\n    ios_fault_region_lines( addr );\n    pthread_mutex_unlock( &virtual_mutex );\n    return 1;\n}' in dfr)
+note = vsrc[vsrc.index('static void ios_vm_note_alloc( void *base, SIZE_T size, ULONG type, ULONG protect,'):]
+note = note[:note.index('\n}\n')]
+wow = note[note.index('    if (!log_all && !covers && is_wow64())\n    {'):note.index('    if (b < 0x100000000ull && !viol && !zbits) return;')]
+check('round 624 (E1 S17 a3): a WoW64 allocation without the switch returns as before; with it, the ring and a line (the first 400, then every 256th)',
+      wow.index('if (!ios_x86_fault_switch()) return;') < wow.index('ios_x86f_ring_note( b, size, type, protect, 0 );')
+      and 'if (k <= 400 || !(k % 256))' in wow and wow.rstrip().endswith('return;\n    }') and wow.count('return;') == 2)
+free_note = vsrc[vsrc.index('static void ios_vm_note_free( void *base, SIZE_T size, ULONG type )'):]
+free_note = free_note[:free_note.index('\n}\n')]
+check('round 624 (D2 S8 d2): a WoW64 free goes into the ring only with the switch on', 'if (is_wow64() && ios_x86_fault_switch()) ios_x86f_ring_note( b, size, type, 0, 1 );' in free_note)
+check('round 624: the switch reaches virtual_ios.c through one getter of signal_arm64_ios.c (the environment is read in one place)',
+      'int ios_x86_fault_switch( void ) { return ios_x86_fault_enabled(); }' in signal_src and 'MADEIRA_X86_FAULT_DUMP' not in vsrc)
 check('the access-violation call is inside the [rsp-trunc] block, for EXC_BAD_ACCESS in JIT code only',
       signal_src.rindex('"[rsp-trunc] x28=%p guest_rip=%p', 0, ga) > 0 and ga < av
       and 'req->exception == EXC_BAD_ACCESS && ios_av_args_pc_is_jit( __darwin_arm_thread_state64_get_pc( state ) )' in signal_src[ga:av]
@@ -92,6 +136,10 @@ check('capped at 3 reports per session; the repeat of the fault just reported is
 check('the switch is MADEIRA_X86_FAULT_DUMP, read once, and only the exact value 1 turns it on',
       code.count('getenv(') == 1 and 'getenv( "MADEIRA_X86_FAULT_DUMP" )' in code and 'enabled = e && e[0] == \'1\' && !e[1];' in code
       and 'static int enabled = -1;' in code)
+check('round 624 (A-S12): the access-violation call asks for the exact EIP from FEX\'s block table; the int3 path and the 6-argument wrapper do not',
+      'ios_x86_fault_report_ex( st, thread_teb, g, block_rip, guest_addr, write, 1 );' in code and 'ios_native_rip_from_hostpc' in code
+      and 'ios_x86_fault_report_ex( st, thread_teb, gregs, eip64, fault_addr, write, 0 );' in code
+      and code.index('if ((num = __sync_add_and_fetch( &reports, 1 )) > IOS_X86F_MAX_REPORTS) return;') < code.index('if (resolve && fault_addr >= 0)'))
 check('the access-violation call hands over the x32 register mapping (EAX x4, ECX x7, EDX x5, EBX x6, ESP x8, EBP x9, ESI x10, EDI x11)',
       'g[0] = st->__x[4]; g[1] = st->__x[7]; g[2] = st->__x[5]; g[3] = st->__x[6];' in code
       and 'g[4] = st->__x[8]; g[5] = st->__x[9]; g[6] = st->__x[10]; g[7] = st->__x[11];' in code)
@@ -101,8 +149,10 @@ stripped = signal_src
 stripped = re.sub(r'/\* ajan21-loglar \(build 598\): \[x86-fault\].*?#include "ios_x86_fault_diag\.h"\n', '', stripped, flags=re.S)
 stripped = re.sub(r'\n\n *\/\* ajan21-loglar \(build 598\): the same evidence for a game\'s own int3.*?ios_x86_fault_int3\( &bs, xf_teb, gregs, grip \);\n *\}\n', '\n', stripped, flags=re.S)
 stripped = re.sub(r'\n\n *\/\* ajan21-loglar \(build 598\): the opt-in report for a 32-bit guest\'s access violation.*?ios_x86_fault_av\( &state, xf_teb, cs\[0\], \(uint64_t\)fault_addr, -1 \);\n *\}\n', '\n', stripped, flags=re.S)
-leftovers = re.findall(r'[^\n]*(?:x86_fault|X86_FAULT|x86-fault|xf_teb)[^\n]*', stripped)
-check('taking out the include and the two guarded blocks leaves no reference to the report in signal_arm64_ios.c', not leftovers, str(leftovers[:4]))
+stripped = re.sub(r'/\* round 624 \(agents E1 S17, D2 S8\): virtual_ios\.c keeps.*?\nint ios_x86_fault_switch\( void \) \{ return ios_x86_fault_enabled\(\); \}\n', '', stripped, flags=re.S)
+stripped = re.sub(r'\n *\/\* madeira-bcd \(round 624, agent E1 S17; Unreal Gold EQ6DMS, X3HYP5\): the opt-in \[x86-fault\] report on this path too\..*?vrec\.ExceptionInformation\[0\] == 0 \? 0 : -1 \);\n *\}\n', '\n', stripped, flags=re.S)
+leftovers = re.findall(r'[^\n]*(?:x86_fault|X86_FAULT|x86-fault|xf_teb|xf_ss|xf_rip)[^\n]*', stripped)
+check('taking out the include, the getter and the three guarded blocks leaves no reference to the report in signal_arm64_ios.c', not leftovers, str(leftovers[:4]))
 
 
 def tracked(rootdir):
@@ -120,7 +170,18 @@ allowed = {
     'tests/host/check-game-recommendations.py',
     # the int3 report's check names this switch to tell the two apart (2026-10-24)
     'tests/host/check-int3-x86-diag.py',
+    # round 624: auto-tune's lowest-priority rule x86-null-fault-diag offers the switch after a 32-bit NULL-page fault
+    'build/tools/autotune_rules.py', 'app/Madeira/AutoTuneRules.generated.swift',
+    # round 624 (agent A S4, 7NKYWT): the EA app's sessions carry it for their installer's custom-action hosts; its launcher check pins the line
+    'app/Madeira/BCDLaunchers.swift', 'tests/host/check-bcd-launchers.py',
 }
+# The EA app's entry is the one launcher line: exactly one source line in BCDLaunchers.swift, inside the eaApp entry, not in Battle.net's.
+launch_src = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
+ea_entry = launch_src[launch_src.index('static let eaApp'):]
+bn_entry = launch_src[launch_src.index('static let battlenet'):launch_src.index('static let eaApp')]
+check('the EA app entry (only) carries env.MADEIRA_X86_FAULT_DUMP = 1 in its sessionConfig (round 624, 7NKYWT)',
+      launch_src.count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1 and '"env.MADEIRA_X86_FAULT_DUMP = 1"' in ea_entry
+      and 'MADEIRA_X86_FAULT_DUMP' not in bn_entry)
 users = []
 for f in tracked(root):
     rel = str(f.relative_to(root))
@@ -142,9 +203,17 @@ for r in recs['rules']:
         if 'MADEIRA_X86_FAULT_DUMP' in text:
             carriers.append((r['id'], text, ln.get('minBuild') if isinstance(ln, dict) else None))
 # ajan22 (same round) added Chuchel and Botanicula (32-bit Adobe AIR page faults) with the same line.
-check('the bundled lists that carry the switch are exactly Most Wanted, Underground 2, Chuchel and Botanicula, once each, as env.MADEIRA_X86_FAULT_DUMP = 1 with minBuild 598',
+# Round 624: four diagnostic lists more (Mafia II 052WJE and Unreal Gold EQ6DMS from build 624, Overlord II QJY0A4 and Ubisoft Connect P4KC3V
+# from build 598), each to make the next log name its fault.
+# Round 624 (agent E1 S7, TS8ME1): Doki Doki Literature Club's diagnostic list (Ren'Py's exit(-1)) from build 598.
+check('the bundled lists that carry the switch are exactly Most Wanted, Underground 2, Chuchel, Botanicula and (round 624) Mafia II, osu!, Overlord II, '
+      'Ubisoft Connect, Unreal Gold and Doki Doki Literature Club, once each, as env.MADEIRA_X86_FAULT_DUMP = 1 with minBuild 598 (Mafia II and Unreal Gold 624)',
       sorted(carriers) == [('botanicula', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('chuchel', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
-                           ('nfs-most-wanted', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('nfs-underground-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)], str(carriers))
+                           ('doki-doki-literature-club', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+                           ('mafia-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624),
+                           ('nfs-most-wanted', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('nfs-underground-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+                           ('osu', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('overlord-ii', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('ubisoft-connect', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+                           ('unreal-gold', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)], str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs
 cc = os.environ.get('CC', 'cc')
@@ -177,6 +246,23 @@ static kern_return_t counting_read( vm_map_t t, mach_vm_address_t a, mach_vm_siz
     g_reads++;
     return mach_vm_read_overwrite( t, a, n, buf, got );
 }
+/* round 624 (A-S12): FEX's block table, faked: the exact EIP for the block at [x28] (0 = not resolved) */
+static uint64_t fake_exact;
+uint64_t ios_native_rip_from_hostpc( uint64_t bb, uint64_t pc, const char **why )
+{
+    (void)pc; if (why) *why = fake_exact ? "ok" : "hostPC outside block";
+    return bb ? fake_exact : 0;
+}
+static uint64_t fake_cpustate[8];
+/* round 624: virtual_ios.c's views (the memory lock only tried) and allocation ring, faked */
+static int fake_lock_busy;
+int ios_dump_fault_region_report( void *addr )
+{
+    if (fake_lock_busy) return 0;
+    fprintf( stderr, "[fault-rgn] (fake) addr=%p\n", addr );
+    return 1;
+}
+void ios_x86f_alloc_ring_dump( uint32_t fault ) { fprintf( stderr, "[x86-fault]   WoW64 allocations and frees before the fault (fake) 0x%08x\n", fault ); }
 #define mach_vm_read_overwrite counting_read
 '''
 
@@ -263,6 +349,7 @@ static struct world make(void)
         ldr_entry(LDR_G + 0x100, LDR_G + 0x200, EXE, EXE_SIZE, "speed.exe", LDR_G + 0x1000);
         ldr_entry(LDR_G + 0x200, LDR_G + 0x0c, 0xfff40000, 0xaa000, "ntdll.dll", LDR_G + 0x1100);
         pe_header(EXE, EXE_SIZE, 0x4382e1d3);
+        w32(WIN + EXE + 0x200, 0xb514ab6a);             /* round 624 (D2 S8 d3): the program holds the fault address there */
         /* the code of the block: a recognisable ramp, the faulting `mov eax,[ecx]` (8b 01) 5 bytes into the block at 0x81ab7a */
         for (uint32_t a = BLOCK - 0x100; a < BLOCK + 0xa0; a++) *(uint8_t *)(WIN + a) = (uint8_t)(a - (BLOCK - 0x100));
         { const uint8_t ins[8] = { 0x33, 0xf6, 0x85, 0xd2, 0x0f, 0x8b, 0x01, 0x90 }; memcpy((void *)(WIN + BLOCK), ins, sizeof(ins)); }
@@ -282,6 +369,9 @@ static struct world make(void)
         w32(WIN + 0xa6a0110, 0x0069c4e0);
     }
     ios_jit_rx_base_global = NULL; ios_jit_pool_size_global = 0;
+    /* round 624: FEX's CPU state at x28, its first word the faulting block's host address; a call (E8 rel32) ending at 0x433210 */
+    fake_cpustate[0] = 0x16a937260; w.st.__x[28] = (uint64_t)(uintptr_t)fake_cpustate;
+    *(uint8_t *)(WIN + 0x43320b) = 0xe8;
     w.teb64 = WIN + TEB64_G;
     w.st.__x[19] = WIN;
     w.st.__x[18] = w.teb64;
@@ -333,7 +423,16 @@ int main(int argc, char **argv)
         printf("benign-done reads=%lu\n", g_reads);
         return 0;
     }
+    if (!strcmp(s, "exact")) { fake_exact = BLOCK + 5; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
+    if (!strcmp(s, "stk")) { fake_exact = 0; w.st.__x[9] = 0; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
     if (!strcmp(s, "noteb")) { w32(WIN + TEB32_G + 0x18, 0x999000); guarded_av(&w, BLOCK, WIN + 0xb514ab6a); w32(WIN + TEB32_G + 0x18, TEB32_G); return 0; }
+    if (!strcmp(s, "readable")) {
+        /* round 624 (E1 S17 a1): a write to a readable page (speed.exe's header) is no report and takes none of the three */
+        guarded_av(&w, BLOCK, WIN + EXE + 0x10); guarded_av(&w, BLOCK + 1, WIN + EXE + 0x20);
+        guarded_av(&w, BLOCK, WIN + 0xb514ab6a);
+        return 0;
+    }
+    if (!strcmp(s, "busy")) { fake_lock_busy = 1; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
     if (!strcmp(s, "nostack")) { w.st.__x[8] = 0x6000000; w.st.__x[9] = 0x6000010; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
     return 0;
 }
@@ -412,10 +511,46 @@ else:
                   any('[EDI=0xa6a00c0]+0x00: 69c4e0(speed.exe+0x29c4e0) aaaaaaaa aaaaaaaa aaaaaaaa' in l for l in ls)
                   and len([l for l in ls if '[EDI=0xa6a00c0]+0x' in l]) == 3 and any('[EAX=0xa6a0110]+0x00: 69c4e0(speed.exe+0x29c4e0)' in l for l in ls)
                   and any('[EBP=0x127fdf4]+0x00:' in l for l in ls) and not any('[ECX=' in l for l in ls) and not any('[EBX=' in l or '[ESI=' in l for l in ls), r.stderr)
-            check('the report ends with a marker and every line of this report carries one of the two prefixes',
-                  ls and ls[-1].endswith('end of report #1') and all(l.startswith('[x86-fault]') or l.startswith('[int3-x86]') for l in allv if l and not l.startswith('reads=')), r.stderr)
+            check('the report ends with a marker and every line of this report carries one of the two prefixes (round 624: and the views\' [fault-rgn])',
+                  ls and ls[-1].endswith('end of report #1')
+                  and all(l.startswith(('[x86-fault]', '[int3-x86]', '[fault-rgn]')) for l in allv if l and not l.startswith('reads=')), r.stderr)
+            check('round 624 (E1 S17 a2): the views around the fault, EBP and EDI (one place a page: ECX is the fault\'s page; ESI, EBX, EDX are 0)',
+                  [l for l in ls if l.startswith('[x86-fault]   views around ')] == ['[x86-fault]   views around fault=0xb514ab6a:',
+                                                                                 '[x86-fault]   views around EBP=0x0127fdf4:',
+                                                                                 '[x86-fault]   views around EDI=0x0a6a00c0:']
+                  and len([l for l in allv if l.startswith('[fault-rgn] (fake) addr=0x50b514ab6a')]) == 1, r.stderr)
+            check('round 624 (D2 S8 d2): the allocations before the fault, after the views', any(l.startswith('[x86-fault]   WoW64 allocations and frees before the fault (fake) 0xb514ab6a') for l in ls), r.stderr)
+            check('round 624 (D2 S8 d3): the image holds the fault address at speed.exe+0x200, the one place',
+                  any(l.startswith('[x86-fault]   the image speed.exe holds the fault address 0xb514ab6a as a dword at 1 place(s): speed.exe+0x200 (') for l in ls), r.stderr)
             check('the number of lines is bounded (a report is under 100 lines)', 25 < len(allv) < 100, str(len(allv)))
+            check('round 624 (A-S12): an unresolved exact EIP keeps the old headline and adds one note that the block is FEX\'s State.rip',
+                  len([l for l in ls if l.startswith("[x86-fault]   note: the block above is FEX's State.rip (0x0081ab75)")]) == 1
+                  and any('note:' in l and '(hostPC outside block)' in l for l in ls), r.stderr)
             check('it did read guest memory (the switch is on)', int(re.search(r'reads=(\d+)', r.stdout).group(1)) > 20, r.stdout)
+
+            r = run('exact', MADEIRA_X86_FAULT_DUMP='1')
+            ls = lines(r)
+            allv = r.stderr.splitlines()
+            check('round 624 (A-S12): the exact EIP from FEX\'s block table names the faulting instruction, State.rip is said to be the last block entry',
+                  ls and ls[0].startswith('[x86-fault] #1 a 32-bit guest faulted at guest 0xb514ab6a at EIP 0x0081ab7a (speed.exe+0x41ab7a) '
+                                          '[exact: the block table of FEX for host pc 0x')
+                  and 'State.rip=0x0081ab75 is only the last block entry], window 0x5000000000, 2 modules in the PEB32 list;' in ls[0]
+                  and not any('note:' in l for l in ls), r.stderr)
+            check('...the code window is the instruction\'s ("eip"), its bytes at +0 are the faulting mov eax,[ecx], and the PE identity is the program\'s',
+                  any(l.startswith('[x86-fault]   code eip: 256 bytes before and 160 after guest 0x0081ab7a (speed.exe+0x41ab7a)') for l in allv)
+                  and any(l.startswith('[x86-fault]   code eip +0: 8b 01 90 08 09 0a') for l in allv)
+                  and any(l.startswith('[int3-x86]   image speed.exe base=0x400000') for l in allv), r.stderr)
+            check('...and the repeat of the same fault is still no second report (the dedupe keys on State.rip)',
+                  len([l for l in ls if ' a 32-bit guest faulted ' in l]) == 1, r.stderr)
+            r = run('stk', MADEIRA_X86_FAULT_DUMP='1')
+            ls = lines(r)
+            allv = r.stderr.splitlines()
+            check('round 624 (A-S12): with no EBP chain the code before the call-preceded return addresses on the stack is printed ("stk#N"), '
+                  'a data word into the program is not',
+                  not any('frame #' in l for l in ls)
+                  and any(l.startswith('[x86-fault]   code stk#0: 64 bytes before and 8 after guest 0x00433210 (speed.exe+0x33210)') for l in allv)
+                  and not any('code stk#' in l and '0x00817770' in l for l in allv)
+                  and len([l for l in allv if '   code stk#' in l and 'bytes before' in l]) <= 8, r.stderr)
 
             r = run('int3', MADEIRA_X86_FAULT_DUMP='1')
             ls = lines(r)
@@ -425,6 +560,15 @@ else:
                   and 'EAX=0x0 ECX=0x0 EDX=0x82804c EBX=0x6 ESI=0xaa EDI=0xa6a00c0 EBP=0x127fdf4 ESP=0x127fddc' in ls[0]
                   and not any('fault address minus' in l for l in ls)
                   and any(l.startswith('[x86-fault]   code int3 +0: cc ') for l in allv), r.stderr)
+            check('round 624: an int3 has no views, no allocations and no image scan (they are for an access)',
+                  not any('views around' in l or 'WoW64 allocations' in l or 'holds the fault address' in l for l in ls) and not any(l.startswith('[fault-rgn]') for l in allv), r.stderr)
+            r = run('readable', MADEIRA_X86_FAULT_DUMP='1')
+            heads = [l for l in lines(r) if ' a 32-bit guest faulted ' in l]
+            check('round 624 (E1 S17 a1): two writes to a readable page take no report; the wild pointer after them is report #1',
+                  len(heads) == 1 and heads[0].startswith('[x86-fault] #1 a 32-bit guest faulted at guest 0xb514ab6a'), r.stderr)
+            r = run('busy', MADEIRA_X86_FAULT_DUMP='1')
+            check('round 624 (E1 S17 a2): a busy memory lock is said, the report goes on', len([l for l in lines(r) if 'the memory lock was busy: not read' in l]) == 3
+                  and any(l.endswith('end of report #1') for l in lines(r)), r.stderr)
 
             r = run('repeat', MADEIRA_X86_FAULT_DUMP='1')
             heads = [l for l in lines(r) if ' a 32-bit guest faulted ' in l]
@@ -442,6 +586,61 @@ else:
             ls = lines(r)
             check('an unreadable stack says so, and the code and the objects still print', any('guest stack at ESP=0x6000000 is not readable' in l for l in ls)
                   and any('code block +0:' in l for l in r.stderr.splitlines()) and not any('frame #0' in l for l in ls), r.stderr)
+
+# ---------------------------------------------------------------- 3b. virtual_ios.c's allocation ring (round 624, agents E1 S17 and D2 S8)
+ring_src = vsrc[vsrc.index('#define IOS_X86F_RING 64'):vsrc.index("/* Guest band only: FEX's own arenas and the JIT pool would bury the signal. */")]
+RING_MAIN = r"""
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+typedef unsigned long long UINT64; typedef size_t SIZE_T; typedef unsigned int ULONG; typedef uintptr_t ULONG_PTR;
+typedef struct { struct { void *UniqueProcess, *UniqueThread; } ClientId; } TEB;
+static TEB teb = { { 0, (void *)0x9c } };
+static TEB *NtCurrentTeb( void ) { return &teb; }
+static ULONG_PTR win = 0x5000000000ULL;
+ULONG_PTR ios_wow_base( void ) { return win; }
+static unsigned int now_ms = 1000;
+static unsigned int ios_vh_ms( void ) { return now_ms; }
+@RING@
+int main( void )
+{
+    ios_x86f_alloc_ring_dump( 0x1234 );                                         /* nothing yet */
+    /* Unreal Gold EQ6DMS: the 64 KB texture view, a 756 KB view released before the storm; the fault one row past the end */
+    ios_x86f_ring_note( win + 0x07a30000, 0x10000, 0x3000, 0x04, 0 );
+    now_ms += 5; ios_x86f_ring_note( win + 0x07a40000, 0xbd000, 0x8000, 0, 1 );
+    now_ms += 5; ios_x86f_ring_note( 0x7000000000ULL, 0x1000, 0x1000, 0x04, 0 );  /* outside the window: not kept */
+    now_ms += 10;
+    ios_x86f_alloc_ring_dump( 0x07a40010 );
+    /* the ring keeps the last 64 */
+    for (unsigned i = 0; i < 70; i++) ios_x86f_ring_note( win + 0x10000000 + i * 0x10000, 0x1000, 0x1000, 0x04, 0 );
+    ios_x86f_alloc_ring_dump( 0x07a3fff0 );
+    win = 0; ios_x86f_ring_note( 0x5000001000ULL, 0x1000, 0x1000, 0x04, 0 );     /* no window (a 64-bit process): not kept */
+    ios_x86f_alloc_ring_dump( 0 );
+    return 0;
+}
+"""
+if sys.platform == 'darwin' and shutil.which(cc):
+    with tempfile.TemporaryDirectory(prefix='x86ring-') as d:
+        d = Path(d)
+        (d / 'r.c').write_text(RING_MAIN.replace('@RING@', ring_src))
+        c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Werror', '-Wno-unused-function', '-fsanitize=address,undefined', str(d / 'r.c'), '-o', str(d / 'r')],
+                           capture_output=True, text=True)
+        check('round 624: the allocation ring of virtual_ios.c compiles on the host (ASan, UBSan, -Werror)', c.returncode == 0, c.stderr[-3000:])
+        if c.returncode == 0:
+            r = subprocess.run([str(d / 'r')], capture_output=True, text=True, env=dict(os.environ, ASAN_OPTIONS='symbolize=0'))
+            out = [l for l in r.stderr.splitlines() if l.startswith('[x86-fault]')]
+            check('an empty ring says so', out[0].endswith('(0 in all, the last 0, guest addresses): none recorded'), '\n'.join(out[:3]))
+            check('Unreal Gold\'s shape: the fault is 16 bytes past the texture view\'s end and inside the view released after it; an address outside the window is not kept',
+                  out[1].endswith('(2 in all, the last 2, guest addresses):')
+                  and out[2] == '[x86-fault]     #0 alloc 0x07a30000+0x10000 type=0x3000 prot=0x4 tid=009c 20 ms ago  <== the fault is past its end'
+                  and out[3] == '[x86-fault]     #1 free  0x07a40000+0xbd000 type=0x8000 prot=0x0 tid=009c 15 ms ago  <== the fault is inside', '\n'.join(out[:5]))
+            last = [l for l in out if l.startswith('[x86-fault]   WoW64')][2]
+            rows = out[out.index(last) + 1:out.index(last) + 65]
+            check('the ring keeps the last 64 of 72, oldest first, and marks a fault just past an entry\'s end',
+                  last.endswith('(72 in all, the last 64, guest addresses):') and rows[0].startswith('[x86-fault]     #8 alloc 0x10060000+0x1000')
+                  and rows[-1].startswith('[x86-fault]     #71 alloc 0x10450000+0x1000') and len(rows) == 64, '\n'.join(rows[:2] + rows[-2:]))
+            check('a process without a 4 GB window (64-bit) adds nothing', out[-1].endswith('#71 alloc 0x10450000+0x1000 type=0x1000 prot=0x4 tid=009c 0 ms ago')
+                  and '(72 in all' in [l for l in out if l.startswith('[x86-fault]   WoW64')][-1], '\n'.join(out[-3:]))
 
 # ---------------------------------------------------------------- 4. catalog, CI, iOS compile
 gen_cat = (root / 'build/tools/gen-config-catalog.py').read_text()

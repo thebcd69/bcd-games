@@ -313,8 +313,11 @@ check('if (any_committed) ios_swap_recommit( base, size, fresh_bytes );' in avm,
 commit = body_of(virt, 'static void ios_swap_commit( void *base, size_t size, unsigned int vprot, struct file_view *view )\n{')
 check('ios_swap_present( base, size, vprot );' in commit, 'a commit inside a mapped reservation goes through ios_swap_present')
 smap = body_of(virt, 'static int ios_swap_map( void *base, size_t size, int unix_prot, int committed )\n{')
-check('if (ios_swap_broad && ios_swap_disk_used() >= ios_swap_cap) { ios_swap_disk_refused++; ios_swap_refused++; return IOS_SW_REFUSED; }' in smap,
-      'a reservation is not mapped once the disk has reached swap-mb (the ml1257 rule)')
+# Round 625 (the owner's decision 38 b): the rule is asked before helper memory as in build 624, or after it with
+# env.MADEIRA_POOL_MORE = 1 (check-helper-memory.py); a reservation for the file meets it either way.
+check('if (!ios_pool_more && ios_swap_broad && ios_swap_disk_used() >= ios_swap_cap) { ios_swap_disk_refused++; ios_swap_refused++; return IOS_SW_REFUSED; }' in smap
+      and 'if (ios_pool_more && ios_swap_broad && ios_swap_disk_used() >= ios_swap_cap) { ios_swap_disk_refused++; ios_swap_refused++; return IOS_SW_REFUSED; }' in smap,
+      'a reservation is not mapped once the disk has reached swap-mb (the ml1257 rule; before helper memory, or after it with MADEIRA_POOL_MORE)')
 present = body_of(virt, 'static void ios_swap_present( void *base, size_t size, unsigned int vprot )\n{')
 check('full = ios_swap_broad && plain && ios_swap_disk_full();' in present and 'if (full && !ios_swap_ext[i].img && ncut < 16)' in present,
       'a fresh commit into a reservation in the file stays in memory once the disk has reached swap-mb')

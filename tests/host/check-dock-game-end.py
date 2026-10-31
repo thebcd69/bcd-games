@@ -83,6 +83,20 @@ func verdict(_ processes: [DockProcess], untracked: Int = 0, complete: Bool = tr
         hostAsked += 1; return host
     }
 }
+// round 624: the same with the player's Close (anyStatus: a game that ended with any status is over)
+func verdictAsked(_ processes: [DockProcess], untracked: Int = 0, complete: Bool = true, grace: Double = R.graceRange.lowerBound,
+                  host: DockHostState = hostDone) -> R.Verdict {
+    hostAsked = 0
+    return R.verdict(DockProcessTable(processes: processes, untracked: untracked, complete: complete), places: places, grace: grace,
+                     anyStatus: true) { hostAsked += 1; return host }
+}
+// round 625 (N-S18): the same before any frame reached the screen (rendered: false)
+func verdictNoPicture(_ processes: [DockProcess], untracked: Int = 0, complete: Bool = true, grace: Double = 10,
+                      host: DockHostState = hostDone) -> R.Verdict {
+    hostAsked = 0
+    return R.verdict(DockProcessTable(processes: processes, untracked: untracked, complete: complete), places: places, grace: grace,
+                     rendered: false) { hostAsked += 1; return host }
+}
 // Wine's own programs and the Dock host, as the table lists them in a Dock session.
 let dockhost = ended("C:\\windows\\system32\\dockhost.exe", 0, ago: 7)
 let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
@@ -164,6 +178,49 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(verdict([dockhost, ended(dying, 1, ago: 60)]) == .none && verdict([dockhost, ended(dying, 3, ago: 60)]) == .none, "plain codes 1 and 3: nothing")
         require(verdict([dockhost, ended(dying, 0xC0000005, ago: 300), ended(game, 0, ago: 50)]) == .none,
                 "an early crash of one program, the game's own last end is 0: nothing (the LAST program decides)")
+
+        // ---- round 625 (N-S18; QQ0BEX and about 40 Dock logs): it closed by itself with 0 within 30 s, before any frame
+        let brotato = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Brotato\\Brotato.exe"
+        require(R.shortExitSeconds == 30, "the short exit is 30 s")
+        require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 5)]) == .end(status: 0, file: "brotato.exe", lived: 5),
+                "0 after 5 s, no frame, the host finished, nothing runs: end")
+        require(verdict([dockhost, ended(brotato, 0, ago: 60, lived: 5)]) == .none, "the same after frames were drawn: nothing (today's rule)")
+        require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 40)]) == .none
+                && verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 30)]) == .none, "it lived 30 s or more: nothing")
+        require(verdictNoPicture([dockhost, ended(brotato, 1, ago: 60, lived: 5)]) == .none, "a plain code 1 is not a short clean exit: nothing")
+        require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 4, lived: 5)]) == .wait(status: 0, file: "brotato.exe", why: "grace"),
+                "within the grace: wait")
+        require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 5)], host: DockHostState(gameRan: true, gameOver: false, finished: false))
+                == .wait(status: 0, file: "brotato.exe", why: "host-still-counts-the-game"), "Valve's client still counts the game (a relaunch): wait")
+        require(verdictNoPicture([dockhost, ended(game, 0, ago: 60, lived: 5), runs(brotato)]) == .wait(status: 0, file: "game.exe", why: "game-still-runs"),
+                "a launcher that started the game (a program of it runs): wait")
+        require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 5)], untracked: 1) == .wait(status: 0, file: "brotato.exe", why: "untracked-process"),
+                "an untracked program: wait")
+        require(verdictNoPicture([dockhost, ended(dying, 0xC0000005, ago: 60, lived: 5)]) == .end(status: 0xC0000005, file: "dyinglightgame.exe", lived: 5),
+                "a crash before any frame ends as before")
+        require(verdictNoPicture([dockhost]) == .none, "no program of the game: nothing")
+
+        // ---- round 624 (Cuphead PDKQP7 "Close game bug"): after the player's Close, a game that ended with any status is over
+        let cuphead = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cuphead\\Cuphead.exe"
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 4, lived: 330)]) == .end(status: 0, file: "cuphead.exe", lived: 330),
+                "Close, the game quit with 0, the host finished, nothing runs: end")
+        require(verdictAsked([dockhost, ended(cuphead, 1, ago: 4)]) == .end(status: 1, file: "cuphead.exe", lived: 30), "a plain code after Close: end")
+        require(verdict([dockhost, ended(cuphead, 0, ago: 60)]) == .none, "without the Close the clean quit keeps today's behaviour")
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 1)]) == .wait(status: 0, file: "cuphead.exe", why: "grace"),
+                "within the 3 s grace (a launcher that hands over to the game): wait")
+        require(verdictAsked([dockhost, ended(game, 0, ago: 60), runs(cuphead)]) == .wait(status: 0, file: "game.exe", why: "game-still-runs"),
+                "Close while a program of the game runs: wait (the Alt+F4 closes it as before)")
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: true, gameOver: true, finished: false))
+                == .wait(status: 0, file: "cuphead.exe", why: "host-not-finished"), "the host has not finished: wait")
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: false, gameOver: false, finished: false))
+                == .wait(status: 0, file: "cuphead.exe", why: "host-never-saw-the-game-run"), "Close before the game ever ran: wait")
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], untracked: 1) == .wait(status: 0, file: "cuphead.exe", why: "untracked-process"),
+                "an untracked program: wait")
+        require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], complete: false) == .wait(status: 0, file: "cuphead.exe", why: "table-incomplete"),
+                "a cut table: wait")
+        require(verdictAsked([dockhost]) == .none && verdictAsked([]) == .none, "Close with no program of the game: nothing")
+        require(verdictAsked([dockhost, ended(dying, 0xC0000005, ago: 10)]) == .end(status: 0xC0000005, file: "dyinglightgame.exe", lived: 30),
+                "a crash after Close still ends the session")
         require(verdict([dockhost, ended(game, 0, ago: 300), ended(dying, 0xC0000005, ago: 50)])
                 == .end(status: 0xC0000005, file: "dyinglightgame.exe", lived: 30), "the last program crashed: end")
 
@@ -689,8 +746,44 @@ require('if let words = endedByDockFailure {' in block(library, 'private func ex
 report = block(library, 'private func exitReport() -> String?')
 require('wine_crash_exit_status(&status)' in report and 'The game quit with Windows error' in report,
         'the exit report is the 578 one: it reads wine_crash_exit_status, which the Dock end fills')
-for name in ('madeira_child_report', 'wine_session_dock_game_ended'):
+for name in ('madeira_child_report', 'wine_session_dock_game_ended', 'wine_session_dock_game_quit'):
     require(name in header, '%s is declared for Swift (WineProcessBridge.h)' % name)
+# round 624 (Cuphead PDKQP7): the player's Close
+require('let asked = quitRequested' in watch and 'anyStatus: asked' in watch
+        and 'let grace = asked ? DockGameEndRules.graceRange.lowerBound' in watch,
+        'after the player\'s Close the watch ends a game that ended with any status, after the shortest grace')
+require('if DockGameEndRules.isCrash(status) {' in watch
+        and watch.index('if DockGameEndRules.isCrash(status) {') < watch.index('wine_session_dock_game_ended(Int32(bitPattern: status))')
+        < watch.index('DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock_game_quit(Int32(bitPattern: status)) }'),
+        'a crash status ends the session as before; any other status (after Close) through the quit call, off the main queue')
+require('(the player had asked to close)' in watch, 'the [dock-game-end] line says the player had asked')
+# round 625 (N-S18): a short clean exit before any frame
+require('let rendered = !MadeiraConfig.flag("MADEIRA_DOCK_SHORT_EXIT_END") || madeira_get_present_count() >= launchPresent + 3' in watch
+        and 'anyStatus: asked, rendered: rendered)' in watch,
+        'the watch passes whether frames reached the screen (the starting screen\'s own test); the key off passes rendered = true')
+short_branch = watch[watch.index('if !asked && !DockGameEndRules.isCrash(status) {'):]
+short_branch = short_branch[:short_branch.index('                return\n')]
+require('endedByDockShortExit = ' in short_branch and 'before it showed a picture. If it showed a message, that is the reason.' in short_branch
+        and 'wine_session_dock_game_left(Int32(bitPattern: status))' in short_branch and 'wine_session_dock_game_ended' not in short_branch
+        and 'no picture was drawn' in short_branch,
+        'a short clean exit ends the session with the reason in words, through the left call (not a crash status), and logs it')
+require(watch.index('if !asked && !DockGameEndRules.isCrash(status) {') < watch.index('if DockGameEndRules.isCrash(status) {'),
+        'the short-exit branch comes before the crash and quit calls')
+require('if let words = endedByDockShortExit {' in report and report.index('guard !quitRequested') < report.index('endedByDockShortExit'),
+        'the exit report shows the short-exit words (not after the user quit)')
+require('endedByDockFailure = nil; endedByDockShortExit = nil' in block(library, 'func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil)'),
+        'a new session forgets the short-exit words')
+left_fn = block(bridge, 'int wine_session_dock_game_left(int32_t status)')
+require('if (!g_wine_running || __atomic_load_n(&g_session_end_claim, __ATOMIC_ACQUIRE)) return 0;' in left_fn
+        and 'g_launch_exit' not in left_fn and 'wine_session_end();' in left_fn and 'g_wine_exit_code' in left_fn
+        and 'asked to close' not in left_fn,
+        'the left call acts only on a running session and does the end work without making the status a crash status or claiming a Close')
+require('int wine_session_dock_game_left(int32_t status);' in header, 'wine_session_dock_game_left is declared for Swift')
+quit_fn = block(bridge, 'int wine_session_dock_game_quit(int32_t status)')
+require('if (!g_wine_running || __atomic_load_n(&g_session_end_claim, __ATOMIC_ACQUIRE)) return 0;' in quit_fn
+        and 'g_launch_exit' not in quit_fn and 'wine_session_end();' in quit_fn and 'g_wine_exit_code' in quit_fn,
+        'the quit call acts only on a running session and does the end work without making the status a crash status')
+require(not re.findall(r'"[^"\n]*\.exe"', quit_fn), 'no program names in the quit call')
 
 wrapper = block(server, 'void process_exit_wrapper( int status )')
 slot_branch = wrapper[:wrapper.index('    else\n    {')]
@@ -712,7 +805,8 @@ require('if (!g_wine_running || __atomic_load_n(&g_session_end_claim, __ATOMIC_A
         'the bridge function acts only on a running session, records the status first, then runs the end work')
 
 # keys
-for key, default, kind in (('env.MADEIRA_DOCK_GAME_END', '1', 'bool'), ('env.MADEIRA_DOCK_GAME_END_GRACE', '10', 'int')):
+for key, default, kind in (('env.MADEIRA_DOCK_GAME_END', '1', 'bool'), ('env.MADEIRA_DOCK_GAME_END_GRACE', '10', 'int'),
+                           ('env.MADEIRA_DOCK_SHORT_EXIT_END', '1', 'bool')):
     m = re.search(r'"%s": \{[^}]*?"kind": "%s", "default": "%s"' % (re.escape(key), kind, default), catalog, re.S)
     require(m is not None, '%s is in the settings catalog generator (%s, default %s); ConfigCatalog.generated.swift is regenerated in the full tree' % (key, kind, default))
 # auto-tune rules
@@ -720,6 +814,12 @@ for rid in ('dock-game-died-session-open',):
     chunk = rules_py[rules_py.index('"id": "%s"' % rid):]
     chunk = chunk[:chunk.index('\n    },\n')]
     require('"lines": []' in chunk and '"fixedIn": 579' in chunk and '"none"' in chunk, 'rule %s: a code fix (no lines, fixedIn 579) with a guard for the new path' % rid)
+for rid in ('dock-game-quit-session-open',):
+    chunk = rules_py[rules_py.index('"id": "%s"' % rid):]
+    chunk = chunk[:chunk.index('\n    },\n')]
+    require('"lines": []' in chunk and '"fixedIn": 624' in chunk and '"session": "dock"' in chunk and '"minStage": 4' in chunk
+            and 's("[dock-game-end]")' in chunk and 's("[frontend] graceful close requested")' in chunk,
+            'rule %s: a code fix for Dock sessions that played (no lines, fixedIn 624, minStage 4) with a guard for the new path' % rid)
 for rid in ('dock-launch-failed-session-open',):
     chunk = rules_py[rules_py.index('"id": "%s"' % rid):]
     chunk = chunk[:chunk.index('\n    },\n')]

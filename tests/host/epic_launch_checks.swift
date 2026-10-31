@@ -107,6 +107,10 @@ func requestPhase() {
     check(BCDEpicHostReport.parse("") == nil && BCDEpicHostReport.parse("error=1\n") == nil && BCDEpicHostReport.parse(String(repeating: "stage=1\n", count: 400)) == nil, "an empty report, one with no stage and an oversized one are nothing")
     check(BCDEpicHostReport.parse("stage=5\nerror=24\nlast-error=5\n")?.failedBeforeStart == true && BCDEpicHostReport.parse("stage=7\nerror=0\n")?.failedBeforeStart == false
           && BCDEpicHostReport.parse("stage=6\nerror=0\n")?.failedBeforeStart == false, "failedBeforeStart: an error below stage 6 only")
+    // round 624 (Discord forum item 7): the words of that case are about BCD Host, not about signing in to Epic
+    check(BCDEpicHostFiles.notStartedWords.hasPrefix("BCD Host stopped before the game started; your Epic sign-in is fine.")
+          && !BCDEpicHostFiles.notStartedWords.contains("signed in to Epic") && BCDEpicHostFiles.notStartedWords.contains("Settings › Logs"),
+          "a host that stopped before the game: BCD Host's words, the sign-in is fine, send the log")
 }
 
 // MARK: Files

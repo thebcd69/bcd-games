@@ -1,0 +1,180 @@
+[01:51:12.738] [INFO] Checking entitlements...
+[01:51:12.739] [INFO] [build] v0.1.574 (574)
+[01:51:12.741] [INFO] [device] model=iPhone14,5 idiom=phone os=iOS Version 27.0 (Build 24A5380h) ram=3661MB available=2333MB cores=6
+[01:51:12.742] [INFO] [device] address-map=[0x100530000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[01:51:12.774] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:51:31.810] [INFO] [bcd] library launch HelloNeighbor.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[01:51:31.835] [INFO] Running full Wine sequence...
+[01:51:31.835] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100530000,0x8000000000) 512GB available=2321MB low-power=1 thermal=nominal
+[01:51:31.845] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:51:31.845] [INFO] Allocating 896MB JIT pool via debugger...
+[01:51:31.846] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:51:31.847] [INFO] [jit-debugger] attached=1 at the pool request
+[01:51:31.852] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[01:51:36.092] [INFO] RX pool at 0x148000000
+[01:51:36.169] [INFO] Detaching debugger...
+[01:51:36.191] [INFO] Starting wineserver...
+[phase] wine-start             t+  4.434s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[01:51:37.130] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[01:51:37.131] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=1683 MB + phys_footprint=664 MB = 2348 MB (hw.memsize says 3661 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148005000)
+ml957: ? backing 0x104a60000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14807c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481b6000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485d0000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148704000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487cc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[footprint] rev=ml358 phys=676 MB (peak 676) internal=266 MB compressed=409 MB external=92 MB reusable=2 MB (cycle=1)
+D 24 Load module HelloNeighbor.exe (helloneighbor.exe-7c18ca35e1a2fb4b): 104A60000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x149ed8000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x149f6c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14a000000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a0e4000)
+[phase] spawn:L"C:\\Hello Neighbor\\HelloNeighbor\\Binaries\\Win64\\HelloNeighbor-Win64-Shipping.exe" t+  6.086s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Hello Neighbor\\HelloNeighbor/Binaries/Win64/HelloNeighbor-Win64-Shipping.exe\" HelloNeighbor " (fd=97, unixdir=106, dup_unixdir=114)
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x100a7c000
+[nls-getptr] type=11 id=437 peb=0x100a7c000
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x14ea0c000)
+[xp-names] m659758 "wine-x18-exc"
+[footprint] rev=ml358 phys=936 MB (peak 936) internal=476 MB compressed=459 MB external=166 MB reusable=2 MB (cycle=2)
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x1516b4000)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9730000) -> 64-bit table (0x1096040a0)
+[footprint] rev=ml1060 fast phys=960 MB compressed=450 MB
+[footprint] rev=ml1060 fast phys=1111 MB compressed=460 MB
+[footprint] rev=ml1060 fast phys=1200 MB compressed=474 MB
+[footprint] rev=ml358 phys=1206 MB (peak 1206) internal=731 MB compressed=473 MB external=151 MB reusable=1 MB (cycle=3)
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=756 MB compressed=476 MB external=151 MB reusable=1 MB (cycle=4)
+[nls-getptr] type=11 id=10000 peb=0x100a7c000
+[nls-getptr] type=11 id=10000 peb=0x100a7c000
+[nls-getptr] type=11 id=10000 peb=0x100a7c000
+[nls-getptr] type=11 id=10000 peb=0x100a7c000
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1281 MB compressed=476 MB
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #4 hwnd=0x3002a class='' text="SplashScreenGuard" rev=ml853
+[win-name] #5 hwnd=0x3002a class='' text="SplashScreenGuard" rev=ml853
+[footprint] rev=ml1060 fast phys=1328 MB compressed=459 MB
+[free-delay] #1 release of 0x703c940000+0x5f0000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x703cf30000+0x5f0000 held for 2000 ms (2 in flight)
+[win-name] #10 hwnd=0x10052 class='' text="Default IME" rev=ml853
+[win-name] #11 hwnd=0x2004e class='' text="SplashScreen" rev=ml853
+[win-name] #12 hwnd=0x2004e class='' text="SplashScreen" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1356 MB compressed=467 MB
+[free-delay] #3 release of 0x703f470000+0x110000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x703f360000+0x110000 held for 2000 ms (4 in flight)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=1145 MB (peak 1234) internal=739 MB compressed=334 MB external=159 MB reusable=4 MB (cycle=5)
+[free-delay] #5 release of 0x703fd80000+0x800000 held for 2000 ms (1 in flight)
+[footprint] rev=ml358 phys=1309 MB (peak 1309) internal=910 MB compressed=334 MB external=163 MB reusable=4 MB (cycle=6)
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #6 release of 0x703c150000+0x7e9000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x703f580000+0x800000 held for 2000 ms (3 in flight)
+[win-name] #181 hwnd=0x20040 class='' text="Default IME" rev=ml853
+[win-name] #186 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+[win-name] #190 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+[win-name] #191 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+[free-delay] #8 release of 0x703d540000+0x620000 held for 2000 ms (4 in flight)
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[01:51:48.124] [INFO] Game is presenting (#1, splash) — early detach in 20s
+D 2C Load module libvorbis_64.dll (libvorbis_64.dll-28e815dd89bf571d): 71F68D0000
+D 2C Load module libvorbisfile_64.dll (libvorbisfile_64.dll-92c510c3dda9c57a): 71F68C0000
+D 2C Load module XAudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): 71F6800000
+D 2C Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F6760000
+[footprint] rev=ml1060 fast phys=1604 MB compressed=343 MB
+err:   [bc-stream] ml744 decoded total=897 BC1=508 BC2=0 BC3=158 BC4u=0 BC5u=231 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=1623 MB compressed=344 MB
+[footprint] rev=ml1060 fast phys=1720 MB compressed=357 MB
+[footprint] rev=ml1060 fast phys=1753 MB compressed=367 MB
+[launch-view] dismissed reason=present logs=1
+err:   [bc-stream] ml744 decoded total=955 BC1=545 BC2=0 BC3=158 BC4u=0 BC5u=252 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=2094 MB compressed=501 MB
+err:   [bc-stream] ml744 decoded total=1191 BC1=680 BC2=0 BC3=203 BC4u=0 BC5u=308 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=2116 MB compressed=507 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170215a50 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[win-name] #192 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+[win-name] #193 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+[win-name] #194 hwnd=0x20042 class='' text="Hello Neighbor  " rev=ml853
+D 8C Load module NETAPI32.DLL (netapi32.dll-67f8b5b4a9085bf8): 71F6590000
+D 8C Load module netutils.dll (netutils.dll-775c075731954c7b): 71F6510000
+I 8C [iOS] CompileBlock: REFUSING low/invalid RIP=0x3c
+[av-detail] ml613 #1 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x3c pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x0 addr=0x0 x18=0x71ffe50000 type=1 lr=0x16dff8354 sp=0x71f88d0000 x16=0x71f88cf6f0 x17=0x14d80e884
+[guest-code] rev=ml333 pool_rip=0x3c (PE 0x3c) -- NO pool copy for this address (identity translate)
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x702959dce0 *(gs_cached+0x58)=0x702959dce0
+[av-detail] ml613 #2 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x3c pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x0 addr=0x0 x18=0x71ffe50000 type=1 lr=0x16dff8354 sp=0x71f88d0000 x16=0x71f88cf6f0 x17=0x14d80e884
+[guest-code] rev=ml333 pool_rip=0x3c (PE 0x3c) -- NO pool copy for this address (identity translate)
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x702959dce0 *(gs_cached+0x58)=0x702959dce0
+008c:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x0
+008c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=14800
+[unwind] term ml661 begin rip=3c rsp=705115b4e4 window=[705115b4e4..705195b4e4) max=32
+[unwind] term ml661 #00 pc=3c rsp=705115b4e4  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=113
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000005) syscalls=0 unix_calls=14805
+[unwind] term ml661 begin rip=71fe700690 rsp=702780fed8 window=[702780fed8..702800fed8) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=702780fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=c0000005 rbp=702780ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   global @+0x76 -> 104a712c8 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=1487359cc rsp=702780ffb0  <no module — STOP>
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=14819
+[unwind] term ml661 begin rip=1480fa16c rsp=702780fc48 window=[702780fc48..702800fc48) max=32
+[unwind] term ml661 #00 pc=1480fa16c rsp=702780fc48  <no module — STOP>
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741819)
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (helloneighbor-win64-shipping.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14d8de000 NO pool/anon alias | region 0x100530000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[lock-reap] SRW 0x703b048e20 dead_teb=0xdead released exclusive (word 00010007 -> 00000006) rev=ml446
+[store-noalias] #2 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x150e43000 NO pool/anon alias | region 0x100530000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[01:52:06.354] [INFO] detach-wait: presents=213 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=25 resident=1221MB dbg=DEBUGGED rev=ml525
+[01:52:08.379] [OK] Early detach: game presenting and settled
+[01:52:10.385] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170215a50 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=26 resident=870MB dbg=DEBUGGED rev=ml525
+[store-noalias] #3 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14d8de000 NO pool/anon alias | region 0x100530000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170215a50 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=24 resident=878MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170215a50 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[frontend] graceful close requested
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170215a50 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[frontend] graceful close requested
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=25 resident=871MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2008 MB (peak 2094) internal=723 MB compressed=963 MB external=140 MB reusable=7 MB (cycle=62)
+[footprint] rev=ml358 phys=2008 MB (peak 2094) internal=720 MB compressed=966 MB external=140 MB reusable=7 MB (cycle=63)
+[footprint] rev=ml358 phys=2008 MB (peak 2094) internal=718 MB compressed=968 MB external=140 MB reusable=7 MB (cycle=64)
+[footprint] rev=ml358 phys=2009 MB (peak 2094) internal=719 MB compressed=968 MB external=140 MB reusable=7 MB (cycle=65)
+[footprint] rev=ml358 phys=2009 MB (peak 2094) internal=719 MB compressed=968 MB external=140 MB reusable=7 MB (cycle=66)
+[footprint] rev=ml358 phys=2009 MB (peak 2094) internal=718 MB compressed=968 MB external=140 MB reusable=7 MB (cycle=67)
+[hwinput] keyboard focus: elsewhere (app inactive)

@@ -29,6 +29,9 @@ enum BCDSessionRecorder {
             BCDScreenshotLive.install()
             BCDPerfTraceSend.install()   // round 604: the comment box tells that a performance trace goes with a log
             BCDDebugRunLive.shared.appStarted()   // round 604: a guided debug run that was open when BCD closed (before the crash question below)
+            if let last = BCDBrkTrail.takeUnfinished() {   // round 624 (agent R S2): before the session's own lines
+                LogStore.shared.log("[jit-brk-prev] the previous run ended inside a debugger region request: \(last)")
+            }
             BCDSessionRecorderLive.shared.recoverUnfinished()
         }
     }
@@ -36,6 +39,84 @@ enum BCDSessionRecorder {
     private static func onMain(_ work: @escaping @MainActor () -> Void) {
         if Thread.isMainThread { MainActor.assumeIsolated(work) } else { DispatchQueue.main.async { MainActor.assumeIsolated(work) } }
     }
+}
+
+/// Round 624 (agent B S3; Blasphemous P3M757 and 31 more logs that end inside the JIT-pool request): the last start-up phase of the run, in a
+/// one-line file beside the session marker, written by the engine thread BEFORE the step it names (the pool request suspends the whole process
+/// while the debugger works, so nothing can be logged from inside it, and the marker's main-actor writes would come too late). A clean end
+/// removes it (removeMarker); the next start reads it with the marker and says where the last start stopped.
+enum BCDStartPhase {
+    static var url: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("bcd-session-phase.txt")
+    }
+    /// Called from any thread, synchronously: one small atomic write per phase (five per start).
+    static func note(_ name: String) {
+        guard let url, let data = "\(name)\t\(Date().timeIntervalSince1970)\n".data(using: .utf8) else { return }
+        try? data.write(to: url, options: .atomic)
+    }
+    /// Reads and removes the file: (phase, seconds since 1970) or nil.
+    static func take() -> (name: String, at: Double)? {
+        guard let url else { return nil }
+        defer { try? FileManager.default.removeItem(at: url) }
+        guard let text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        let parts = text.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "\t")
+        guard parts.count == 2, let at = Double(parts[1]) else { return nil }
+        return (String(parts[0]), at)
+    }
+    static func clear() { if let url { try? FileManager.default.removeItem(at: url) } }
+}
+
+/// Round 624 (agent R S2; GTA V Enhanced 6D6ZZS and the archive's "window held" logs that end inside a pool step): one record per debugger
+/// region request (BRK), written and fsynced BEFORE the request (the whole process is stopped inside it until the debugger answers and may be
+/// killed there, so nothing logged from inside survives), and a "returned" line after it. A next start that finds a record without
+/// "returned" logs which request the last run ended in, with the device's state when it began. Application Support, beside the marker.
+enum BCDBrkTrail {
+    /// A stored value so that the host check can point it at a temporary file.
+    static var url: URL? = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("jit-brk-last.txt")
+    private static let lock = NSLock()
+    private static var began = 0.0   // systemUptime of the open request
+
+    /// `site`: the caller's line in StikJITHelper.swift; `attempt`: the pool loop's try (nil elsewhere).
+    static func begin(site: Int, size: Int, attempt: Int?) {
+        guard let url else { return }
+        lock.lock(); defer { lock.unlock() }
+        let info = ProcessInfo.processInfo
+        began = info.systemUptime
+        let line = "begin site=L\(site) size=\(size >> 20)MB attempt=\(attempt.map(String.init) ?? "-") uptime=\(String(format: "%.1f", began)) "
+            + "wall=\(Int(Date().timeIntervalSince1970)) thermal=\(info.thermalState.rawValue) lpm=\(info.isLowPowerModeEnabled ? 1 : 0) "
+            + "avail=\(os_proc_available_memory() >> 20)MB\n"
+        write(line, to: url, fresh: true)   // the file holds the last request only
+    }
+
+    static func end() {
+        guard let url else { return }
+        lock.lock(); defer { lock.unlock() }
+        write("returned ms=\(Int((ProcessInfo.processInfo.systemUptime - began) * 1000))\n", to: url, fresh: false)
+    }
+
+    private static func write(_ text: String, to url: URL, fresh: Bool) {
+        if fresh || !FileManager.default.fileExists(atPath: url.path) { FileManager.default.createFile(atPath: url.path, contents: nil) }
+        guard let handle = try? FileHandle(forWritingTo: url) else { return }
+        defer { try? handle.close() }
+        _ = try? handle.seekToEnd()
+        try? handle.write(contentsOf: Data(text.utf8))
+        try? handle.synchronize()   // fsync: the record must survive a kill inside the request
+    }
+
+    /// At the next start: the last record when it has no "returned" line, else nil; the file goes either way.
+    static func takeUnfinished() -> String? {
+        guard let url else { return nil }
+        defer { try? FileManager.default.removeItem(at: url) }
+        guard let text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        guard let last = text.split(separator: "\n").last.map(String.init), last.hasPrefix("begin ") else { return nil }
+        return last
+    }
+}
+
+/// The engine thread's call: the phase on disk first, then the existing "[phase]" line.
+func winiosPhase(_ name: String) {
+    BCDStartPhase.note(name)
+    winios_phase(name)
 }
 
 @MainActor final class BCDSessionRecorderLive {
@@ -183,11 +264,20 @@ enum BCDSessionRecorder {
     func removeMarker() {
         marker = nil
         if let url = Self.markerURL { try? FileManager.default.removeItem(at: url) }
+        BCDStartPhase.clear()
     }
 
     // MARK: The next start
 
     func recoverUnfinished() {
+        let phase = BCDStartPhase.take()   // read and removed here; the [session] line below names it when a marker is found
+        // madeira-bcd (round 624, agent N S16; 0ZHPYJ): "pool-alloc-begin" is written before the JIT memory request and "pool-ready" as soon
+        // as it returns, failed or not; a run whose last phase is the first never came back from it (the process is stopped while the
+        // debugger serves it). Said once, with or without a marker (the question may be turned off).
+        if let phase, phase.name == "pool-alloc-begin", Date().timeIntervalSince1970 - phase.at < 86400 {
+            LogStore.shared.log("[jit-pool] the last run ended inside the JIT memory request (\(max(0, Int(Date().timeIntervalSince1970 - phase.at)) / 60) min ago); told once")
+            MemoryRightsNotice.shared.lastStartStoppedInPoolRequest()
+        }
         guard let url = Self.markerURL, let data = try? Data(contentsOf: url) else { return }
         // One question per session, whatever the answer: the marker goes now.
         try? FileManager.default.removeItem(at: url)
@@ -195,12 +285,28 @@ enum BCDSessionRecorder {
         let log = Self.findLog(inode: found.logInode)
         let offer = BCDCrashRules.offer(marker: found, endedAt: log.map { LogUpload.modified($0).timeIntervalSince1970 },
                                         now: Date().timeIntervalSince1970, enabled: Self.asks)
-        LogStore.shared.log("[session] the last session of \(found.title) did not end cleanly (\(found.background ? "in the background" : "in front")); "
-                            + (offer == nil ? "not asking (\(Self.asks ? "too old" : "turned off"))" : log == nil ? "its log is gone, not asking" : "asking whether to send its log"))
+        let stop = phase.map { ", last start-up phase \($0.name) \(max(0, Int($0.at - found.startedAt))) s after the start" } ?? ""
+        LogStore.shared.log("[session] the last session of \(found.title) did not end cleanly (\(found.background ? "in the background" : "in front")\(stop)); "
+                            + (offer == nil ? "not asking (\(BCDCrashRules.notAsking(marker: found, now: Date().timeIntervalSince1970, enabled: Self.asks)))" : log == nil ? "its log is gone, not asking" : "asking whether to send its log"))
+        // madeira-bcd (round 624, agent R S5, RT83GE/6D6ZZS): the failed run's last lines in this log too (scrubbed; log only).
+        if let log { Self.logTail(of: log) }
         guard let offer, let log else { return }
         // Round 604: a guided debug run that was open when BCD closed asks its own question about the same log (BCDHelpLive.swift): not twice.
         if BCDDebugRunLive.shared.coversUnfinished { return }
         BCDCrashPrompt.shared.schedule(offer, log: log)
+    }
+
+    /// madeira-bcd (round 624, agent R S5): the last 60 lines of the failed run's log, each through the upload scrubber, as "[prev-tail]" lines
+    /// (BCDPrevTail keeps whole lines of the last 64 KB). Once, at the start after an unclean end.
+    static func logTail(of url: URL) {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return }
+        defer { try? handle.close() }
+        let size = (try? handle.seekToEnd()) ?? 0
+        let from = size > UInt64(BCDPrevTail.maxBytes) ? size - UInt64(BCDPrevTail.maxBytes) : 0
+        guard (try? handle.seek(toOffset: from)) != nil, let data = try? handle.readToEnd(), !data.isEmpty else { return }
+        let lines = BCDPrevTail.lines(data, offset: from)
+        LogStore.shared.log("[prev-tail] the last \(lines.count) line(s) of the previous run's log (\(url.lastPathComponent)), scrubbed:")
+        for line in lines { LogStore.shared.log("[prev-tail] " + LogUploadCore.scrub(line)) }
     }
 
     /// The session's log after a restart: a logs/ link named after the game (preferred, the intake files it by that name), or the rotated

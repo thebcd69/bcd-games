@@ -244,6 +244,15 @@ enum LogUpload {
         return Array((runs + own).sorted { modified($0) > modified($1) }.prefix(listed))
     }
 
+    /// Round 624 (agent N S6): whether the log holds a game's session (every session log has a "[bcd] library launch" or "[dock-launch]" line near
+    /// its top; a log of BCD's own start-up has neither). The first 64 KB are read.
+    static func hasGame(_ url: URL) -> Bool {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? handle.close() }
+        let head = String(decoding: (try? handle.read(upToCount: 65536)) ?? Data(), as: UTF8.self)
+        return head.contains("[bcd] library launch") || head.contains("[dock-launch]")
+    }
+
     static func modified(_ url: URL) -> Date {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
     }

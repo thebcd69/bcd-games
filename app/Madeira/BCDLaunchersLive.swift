@@ -143,6 +143,7 @@ import Foundation
         }
         entry.arguments = BCDLauncherArguments.merged(entry.arguments, table: start.arguments)
         entry.config = BCDLauncherConfig.merged(entry.config, lines: start.sessionConfig, id: spec.id)
+        entry.demandStartServices = start.demandStartServices.isEmpty ? nil : start.demandStartServices   // round 625: BCD's, at every start
         return entry
     }
 

@@ -48,6 +48,7 @@ harness = r'''
 #include <pthread.h>
 typedef int kern_return_t;
 typedef unsigned int mach_msg_type_number_t;
+#define mach_port_t fake_mach_port_t   /* macOS's own <pthread.h> already has a mach_port_t (unsigned int) */
 typedef int mach_port_t;
 typedef uint64_t mach_vm_address_t, mach_vm_size_t;
 typedef int *vm_region_info_t;

@@ -49,6 +49,11 @@
 //    VCRuntime.didChangeNotification     posted on the main thread after each change above
 //
 //  Log tag: [vcruntime].
+//
+//  Round 625 (the owner's item 26): VCRuntime.x86 is the same for Microsoft's 32-bit package, for its four MFC DLLs only
+//  (mfc140.dll, mfc140u.dll, mfcm140.dll, mfcm140u.dll) in Library/Application Support/VCRuntime/x86; a 32-bit game gets
+//  them in its syswow64 when its config says env.MADEIRA_MFC32 = 1 (WineProcessBridge.m madeira_mfc32). VCRuntimePackage
+//  says which package; every function takes the x64 one unless told otherwise, so the 64-bit path is as before.
 
 import Foundation
 import CryptoKit
@@ -117,6 +122,36 @@ enum VCRuntimeSource {
     static func expectedSHA256(in url: URL) -> String? {
         url.pathComponents.first { $0.count == 64 && $0.allSatisfy(\.isHexDigit) }?.lowercased()
     }
+}
+
+/// Which of Microsoft's two packages (round 625, the owner's item 26: the 32-bit one, for MFC only).
+struct VCRuntimePackage: Equatable, Sendable {
+    /// For the log and the messages.
+    let name: String
+    /// Microsoft's permanent link.
+    let url: URL
+    /// Its folder in Library/Application Support/VCRuntime, and the download's file name there while it is unpacked.
+    let folderName: String
+    let downloadName: String
+    /// What is taken out of it, and the file that marks a folder holding them.
+    let dllNames: [String]
+    let marker: String
+    /// The suffix the package's cabinets give these DLLs ("vcruntime140.dll_amd64", "mfc140u.dll_x86").
+    let entrySuffix: String
+    /// IMAGE_FILE_HEADER.Machine, and whether the optional header is PE32+.
+    let machine: Int
+    let pe32Plus: Bool
+
+    static let x64 = VCRuntimePackage(name: "x64", url: VCRuntimeSource.url, folderName: "x86_64",
+                                      downloadName: "vc_redist.x64.exe.download", dllNames: VCRuntimeInstaller.dllNames,
+                                      marker: VCRuntimeInstaller.marker, entrySuffix: "_amd64", machine: 0x8664, pe32Plus: true)
+    /// Round 625: the 32-bit package, for its four MFC DLLs (a 32-bit game keeps Wine's own C++ runtime). Checked 2026-10-31 on
+    /// Microsoft's 14.44.35211 package (13,953,392 bytes, SHA-256 0c09f261...5c55ed64): its cabinet a11 holds mfc140.dll_x86,
+    /// mfc140u.dll_x86, mfcm140.dll_x86 and mfcm140u.dll_x86, each i386, PE32, a DLL, signed (and ten language DLLs, not taken).
+    static let x86 = VCRuntimePackage(name: "x86", url: URL(string: "https://aka.ms/vs/17/release/vc_redist.x86.exe")!, folderName: "x86",
+                                      downloadName: "vc_redist.x86.exe.download",
+                                      dllNames: ["mfc140.dll", "mfc140u.dll", "mfcm140.dll", "mfcm140u.dll"], marker: "mfc140u.dll",
+                                      entrySuffix: "_x86", machine: 0x14C, pe32Plus: false)
 }
 
 /// The parts of a PE image the checks need, read with every offset checked.
@@ -253,25 +288,34 @@ enum VCRuntimeInstaller {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("VCRuntime", isDirectory: true)
     }
-    static func folder(in root: URL) -> URL { root.appendingPathComponent("x86_64", isDirectory: true) }
-    private static func staging(in root: URL) -> URL { root.appendingPathComponent("x86_64.partial", isDirectory: true) }
-    private static func retired(in root: URL) -> URL { root.appendingPathComponent("x86_64.old", isDirectory: true) }
-    private static func removed(in root: URL) -> URL { root.appendingPathComponent("x86_64.removed", isDirectory: true) }
-    static func downloadFile(in root: URL) -> URL { root.appendingPathComponent("vc_redist.x64.exe.download") }
+    static func folder(in root: URL, package: VCRuntimePackage = .x64) -> URL {
+        root.appendingPathComponent(package.folderName, isDirectory: true)
+    }
+    private static func staging(in root: URL, package: VCRuntimePackage) -> URL {
+        root.appendingPathComponent(package.folderName + ".partial", isDirectory: true)
+    }
+    private static func retired(in root: URL, package: VCRuntimePackage) -> URL {
+        root.appendingPathComponent(package.folderName + ".old", isDirectory: true)
+    }
+    private static func removed(in root: URL, package: VCRuntimePackage) -> URL {
+        root.appendingPathComponent(package.folderName + ".removed", isDirectory: true)
+    }
+    static func downloadFile(in root: URL, package: VCRuntimePackage = .x64) -> URL { root.appendingPathComponent(package.downloadName) }
 
     /// The file version of the marker DLL in `folder`, or nil when the folder does not hold it.
-    static func installedVersion(in folder: URL) -> String? {
-        let marker = folder.appendingPathComponent(Self.marker)
+    static func installedVersion(in folder: URL, package: VCRuntimePackage = .x64) -> String? {
+        let marker = folder.appendingPathComponent(package.marker)
         guard FileManager.default.isReadableFile(atPath: marker.path) else { return nil }
         guard let data = try? Data(contentsOf: marker, options: .alwaysMapped) else { return "" }
         return PEImage(data)?.fileVersion ?? ""
     }
 
-    /// An x64 DLL as Microsoft ships it: PE32+, AMD64, a DLL, its signature attached.
-    static func check(_ data: Data, name: String) throws {
+    /// An x64 DLL as Microsoft ships it: PE32+, AMD64, a DLL, its signature attached (the 32-bit package's: PE32, i386).
+    static func check(_ data: Data, name: String, package: VCRuntimePackage = .x64) throws {
         guard let image = PEImage(data) else { throw VCRuntimeError.extraction("\(name) in the installer is not a Windows DLL.") }
-        guard image.machine == 0x8664, image.isPE32Plus, image.isDLL else {
-            throw VCRuntimeError.extraction("\(name) in the installer is not an x64 DLL.")
+        guard image.machine == package.machine, image.isPE32Plus == package.pe32Plus, image.isDLL else {
+            throw VCRuntimeError.extraction(package.pe32Plus ? "\(name) in the installer is not an x64 DLL."
+                                                             : "\(name) in the installer is not a 32-bit (x86) DLL.")
         }
         guard image.hasCertificate else {
             throw VCRuntimeError.extraction("\(name) in the installer has lost Microsoft's signature.")
@@ -285,7 +329,7 @@ enum VCRuntimeInstaller {
     /// `_arm64` ones, and the ARM64 cabinet's x64 managed MFC, are never taken). Each DLL
     /// passes `check` before it is written. `progress` gets 0...1. Throws unless all
     /// fourteen were found.
-    static func extract(installer: URL, into folder: URL, progress: (Double) -> Void = { _ in }) throws {
+    static func extract(installer: URL, into folder: URL, package: VCRuntimePackage = .x64, progress: (Double) -> Void = { _ in }) throws {
         let exe = try Data(contentsOf: installer, options: .alwaysMapped)
         guard exe.count > 64, exe.starts(with: [0x4D, 0x5A]) else {
             throw VCRuntimeError.extraction("The download is not Microsoft's Visual C++ installer.")
@@ -295,7 +339,7 @@ enum VCRuntimeInstaller {
         try exe.withUnsafeBytes { (raw: UnsafeRawBufferPointer) in
             guard let base = raw.baseAddress else { return }
             var from = 0
-            while found.count < dllNames.count, from < raw.count {
+            while found.count < package.dllNames.count, from < raw.count {
                 let at = Int(bcd_cab_find(base, raw.count, from))
                 if at < 0 { break }
                 var handle: OpaquePointer?
@@ -305,13 +349,13 @@ enum VCRuntimeInstaller {
                 }
                 defer { bcd_cab_close(outer) }
                 let span = Int(bcd_cab_size(outer))
-                try peel(outer, into: folder, found: &found) { part in
+                try peel(outer, into: folder, package: package, found: &found) { part in
                     progress(min(1, (Double(at) + part * Double(span)) / Double(raw.count)))
                 }
                 from = at + span
             }
         }
-        let missing = dllNames.filter { !found.contains($0) }
+        let missing = package.dllNames.filter { !found.contains($0) }
         guard missing.isEmpty else {
             throw VCRuntimeError.extraction("Microsoft's installer did not hold \(missing.joined(separator: ", ")).")
         }
@@ -320,14 +364,14 @@ enum VCRuntimeInstaller {
 
     /// The files of an outer cabinet, in order (one decompression pass); the ones that are
     /// cabinets give up the DLLs still missing.
-    private static func peel(_ outer: OpaquePointer, into folder: URL, found: inout Set<String>,
+    private static func peel(_ outer: OpaquePointer, into folder: URL, package: VCRuntimePackage, found: inout Set<String>,
                              progress: (Double) -> Void) throws {
         let count = bcd_cab_count(outer)
         let total = (0..<count).reduce(0.0) { $0 + Double(bcd_cab_file_size(outer, $1)) }
         guard total <= Double(maxUnpacked) else { return }             // not one of the installer's
         var done = 0.0
         for index in 0..<count {
-            if found.count == dllNames.count { return }
+            if found.count == package.dllNames.count { return }
             let size = Int(bcd_cab_file_size(outer, index))
             defer {
                 done += Double(size)
@@ -344,19 +388,19 @@ enum VCRuntimeInstaller {
                 var handle: OpaquePointer?
                 guard bcd_cab_open(raw.baseAddress, raw.count, &handle) == BCD_CAB_OK, let inner = handle else { return }
                 defer { bcd_cab_close(inner) }
-                try take(from: inner, into: folder, found: &found)
+                try take(from: inner, into: folder, package: package, found: &found)
             }
         }
     }
 
-    /// The wanted `<name>.dll_amd64` entries of an inner cabinet; the first copy of each wins.
-    private static func take(from inner: OpaquePointer, into folder: URL, found: inout Set<String>) throws {
+    /// The wanted `<name>.dll_amd64` (32-bit package: `_x86`) entries of an inner cabinet; the first copy of each wins.
+    private static func take(from inner: OpaquePointer, into folder: URL, package: VCRuntimePackage, found: inout Set<String>) throws {
         for index in 0..<bcd_cab_count(inner) {
             guard let stored = bcd_cab_name(inner, index) else { continue }
             let name = String(cString: stored).lowercased()
-            guard name.hasSuffix(".dll_amd64") else { continue }
-            let dll = String(name.dropLast("_amd64".count))
-            guard dllNames.contains(dll), !found.contains(dll) else { continue }
+            guard name.hasSuffix(".dll" + package.entrySuffix) else { continue }
+            let dll = String(name.dropLast(package.entrySuffix.count))
+            guard package.dllNames.contains(dll), !found.contains(dll) else { continue }
             let size = Int(bcd_cab_file_size(inner, index))
             guard size > 0, size <= maxPayload else {
                 throw VCRuntimeError.extraction("\(dll) in the installer has an impossible size.")
@@ -366,7 +410,7 @@ enum VCRuntimeInstaller {
             guard rc == BCD_CAB_OK else {
                 throw VCRuntimeError.extraction("\(dll) could not be unpacked (\(String(cString: bcd_cab_error(rc)))).")
             }
-            try check(bytes, name: dll)
+            try check(bytes, name: dll, package: package)
             try bytes.write(to: folder.appendingPathComponent(dll), options: .withoutOverwriting)
             found.insert(dll)
         }
@@ -378,20 +422,20 @@ enum VCRuntimeInstaller {
     /// asked just before that step: an installed copy is not replaced under a running game.
     /// Returns vcruntime140.dll's file version ("" if unreadable). On any error the installed
     /// copy is as it was.
-    static func install(installer: URL, downloadedFrom url: URL?, root: URL,
+    static func install(installer: URL, downloadedFrom url: URL?, root: URL, package: VCRuntimePackage = .x64,
                         sessionRunning: () -> Bool = { false },
                         progress: (Double) -> Void = { _ in }) throws -> String {
         let fm = FileManager.default
-        let staging = Self.staging(in: root), folder = Self.folder(in: root)
+        let staging = Self.staging(in: root, package: package), folder = Self.folder(in: root, package: package)
         if let url, let expected = VCRuntimeSource.expectedSHA256(in: url) {
             guard try WineMonoInstaller.sha256(of: installer) == expected else { throw VCRuntimeError.checksumMismatch }
         }
         try? fm.removeItem(at: staging)
         defer { try? fm.removeItem(at: staging) }
-        try extract(installer: installer, into: staging, progress: progress)
-        let version = installedVersion(in: staging) ?? ""
+        try extract(installer: installer, into: staging, package: package, progress: progress)
+        let version = installedVersion(in: staging, package: package) ?? ""
         if fm.fileExists(atPath: folder.path), sessionRunning() { throw VCRuntimeError.sessionRunning }
-        try replace(folder, with: staging, retired: Self.retired(in: root))
+        try replace(folder, with: staging, retired: Self.retired(in: root, package: package))
         return version
     }
 
@@ -421,9 +465,9 @@ enum VCRuntimeInstaller {
 
     /// Deletes the installed copy: first renamed away in one step, so a session starting
     /// meanwhile finds the whole copy or none.
-    static func remove(root: URL) throws {
+    static func remove(root: URL, package: VCRuntimePackage = .x64) throws {
         let fm = FileManager.default
-        let folder = Self.folder(in: root), removed = Self.removed(in: root)
+        let folder = Self.folder(in: root, package: package), removed = Self.removed(in: root, package: package)
         guard fm.fileExists(atPath: folder.path) else { return }
         try? fm.removeItem(at: removed)
         try fm.moveItem(at: folder, to: removed)
@@ -432,13 +476,14 @@ enum VCRuntimeInstaller {
 
     /// What an install or removal the app was killed in left behind. Killed between the
     /// two steps of a swap without RENAME_SWAP, the old copy is put back.
-    static func removeLeftovers(root: URL) {
+    static func removeLeftovers(root: URL, package: VCRuntimePackage = .x64) {
         let fm = FileManager.default
-        let folder = Self.folder(in: root), retired = Self.retired(in: root)
-        if !fm.fileExists(atPath: folder.path), fm.fileExists(atPath: retired.appendingPathComponent(marker).path) {
+        let folder = Self.folder(in: root, package: package), retired = Self.retired(in: root, package: package)
+        if !fm.fileExists(atPath: folder.path), fm.fileExists(atPath: retired.appendingPathComponent(package.marker).path) {
             try? fm.moveItem(at: retired, to: folder)
         }
-        for url in [Self.staging(in: root), retired, Self.removed(in: root), Self.downloadFile(in: root)] {
+        for url in [Self.staging(in: root, package: package), retired, Self.removed(in: root, package: package),
+                    Self.downloadFile(in: root, package: package)] {
             try? fm.removeItem(at: url)
         }
     }
@@ -557,6 +602,9 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
 @MainActor final class VCRuntime: ObservableObject {
     static let shared = VCRuntime(root: VCRuntimeInstaller.defaultRoot,
                                   bundledFolder: Bundle.main.bundleURL.appendingPathComponent("x86_64-vcruntime", isDirectory: true))
+    /// Round 625 (the owner's item 26): Microsoft's 32-bit MFC, downloaded the same way. No build carries it (no bundle folder).
+    static let x86 = VCRuntime(root: VCRuntimeInstaller.defaultRoot,
+                               bundledFolder: Bundle.main.bundleURL.appendingPathComponent("i386-mfc", isDirectory: true), package: .x86)
 
     enum Status: Equatable {
         case notInstalled
@@ -601,10 +649,12 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
     let root: URL
     /// The bundle's x86_64-vcruntime, or a test's folder.
     let bundledFolder: URL
-    var folder: URL { VCRuntimeInstaller.folder(in: root) }
+    /// Which of Microsoft's packages (round 625: x64, or x86 for MFC).
+    let package: VCRuntimePackage
+    var folder: URL { VCRuntimeInstaller.folder(in: root, package: package) }
     /// The download's first URL and session settings. tests/host/check-vcruntime-download.py
     /// serves Microsoft's answers from a URLProtocol through them; the app keeps these.
-    var downloadURL = VCRuntimeSource.url
+    var downloadURL: URL
     var downloadConfiguration = VCRuntimeDownloader.configuration()
 
     private var installedState: Status = .notInstalled              // the disk's state, while busy too
@@ -615,18 +665,20 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     #endif
 
-    init(root: URL, bundledFolder: URL) {
+    init(root: URL, bundledFolder: URL, package: VCRuntimePackage = .x64) {
         self.root = root
         self.bundledFolder = bundledFolder
-        VCRuntimeInstaller.removeLeftovers(root: root)
+        self.package = package
+        downloadURL = package.url
+        VCRuntimeInstaller.removeLeftovers(root: root, package: package)
         refresh()
     }
 
     func refresh() {
-        let version = VCRuntimeInstaller.installedVersion(in: folder)
+        let version = VCRuntimeInstaller.installedVersion(in: folder, package: package)
         installedState = version.map { .installed(version: $0) } ?? .notInstalled
         if !isBusy { status = installedState }
-        let bundled = FileManager.default.isReadableFile(atPath: bundledFolder.appendingPathComponent(VCRuntimeInstaller.marker).path)
+        let bundled = FileManager.default.isReadableFile(atPath: bundledFolder.appendingPathComponent(package.marker).path)
         source = bundled ? .bundled : version != nil ? .downloaded : .none
         changed()
     }
@@ -668,7 +720,7 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
             return false
         }
         do {
-            try VCRuntimeInstaller.remove(root: root)
+            try VCRuntimeInstaller.remove(root: root, package: package)
             lastError = nil
             log("removed")
         } catch {
@@ -697,7 +749,7 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
             values.isExcludedFromBackup = true
             var url = root
             try url.setResourceValues(values)
-            VCRuntimeInstaller.removeLeftovers(root: root)
+            VCRuntimeInstaller.removeLeftovers(root: root, package: package)
             let free = try root.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
                 .volumeAvailableCapacityForImportantUsage
             if let free, free < Self.spaceNeeded { throw VCRuntimeError.notEnoughSpace }
@@ -713,7 +765,7 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
         progressHandler = progress
         completionHandler = completion
         beginBackgroundTask()
-        return VCRuntimeInstaller.downloadFile(in: root)
+        return VCRuntimeInstaller.downloadFile(in: root, package: package)
     }
 
     /// Reports arrive through separate tasks: an older one that comes late is dropped.
@@ -739,12 +791,12 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
     private func unpack(_ installer: URL, downloadedFrom url: URL?, deleteAfterwards: Bool) {
         status = .installing(0)
         changed()
-        let root = self.root
+        let root = self.root, package = self.package
         Task.detached(priority: .userInitiated) {
             var last = -1
             let outcome: Result<String, Error>
             do {
-                let version = try VCRuntimeInstaller.install(installer: installer, downloadedFrom: url, root: root,
+                let version = try VCRuntimeInstaller.install(installer: installer, downloadedFrom: url, root: root, package: package,
                                                              sessionRunning: { wine_process_is_running() != 0 }) { fraction in
                     let percent = Int(fraction * 100)
                     guard percent != last else { return }
@@ -776,7 +828,7 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
         switch outcome {
         case .success(let version):
             lastError = nil
-            log("installed \(version.isEmpty ? "(version unreadable)" : version) in Application Support/VCRuntime/x86_64")
+            log("installed \(version.isEmpty ? "(version unreadable)" : version) in Application Support/VCRuntime/\(package.folderName)")
         case .failure(let error):
             if (error as? VCRuntimeError) == .cancelled {
                 lastError = nil
@@ -796,7 +848,7 @@ final class VCRuntimeDownloader: NSObject, URLSessionDownloadDelegate, @unchecke
     }
 
     private func log(_ line: String) {
-        LogStore.shared.log("[vcruntime] " + line)
+        LogStore.shared.log((package == .x64 ? "[vcruntime] " : "[vcruntime-\(package.name)] ") + line)
     }
 
     // MARK: Background time

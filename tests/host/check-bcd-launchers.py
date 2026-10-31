@@ -138,9 +138,16 @@ check('let arguments = BCDLauncherArguments.merged(entry.arguments, table: spec.
       "... and the launcher's own arguments when it has any, as Open does (2026-10-24)")
 bn = files["BCDLaunchers.swift"]
 bn = bn[bn.index("static let battlenet = BCDLauncherSpec("):bn.index("static let eaApp")]
-check('launcherArguments: "--in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials '
-      '--renderer-process-limit=2")' in bn,
+check('launcherArguments: Self.battlenetChromiumSwitches,' in bn   # round 625: demandStartServices follows
+      and 'static let battlenetChromiumSwitches = "--in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials '
+          '--renderer-process-limit=2"' in files["BCDLaunchers.swift"],
       "Battle.net (only) starts with Chromium's switches that keep its 32-bit processes within the device's windows (owner's run, 598)")
+# Round 625 (the owner's item 27, agent N S5; Y0HFHB): the installer starts Battle.net.exe itself, so its session hands the same four
+# words to it through env.MADEIRA_CHILD_ARGS, from the same constant, and splits the pool; the installed launcher's start is unchanged.
+check('installerOnlyConfig: ["env.MADEIRA_CHILD_ARGS = Battle.net.exe " + Self.battlenetChromiumSwitches, "pool-split = 1"],' in bn
+      and files["BCDLaunchers.swift"].count('installerOnlyConfig: ["') == 1
+      and 'var installerOnlyConfig: [String] = []' in files["BCDLaunchers.swift"],
+      "Battle.net's installer (only) gives its browser the four switches and splits the JIT pool (round 625)")
 check(files["BCDLaunchers.swift"].count("--in-process-gpu") == 1 and "NetworkServiceInProcess\"" not in files["BCDLaunchers.swift"],
       "... no other launcher gets them, and the switch that did nothing is left out")
 check('sessionConfig: Self.commonSessionConfig + ["env.LC_ALL = en_US.UTF-8", "env.MADEIRA_APC_BUSY_QUEUE = 1",\n'
@@ -149,21 +156,23 @@ check('sessionConfig: Self.commonSessionConfig + ["env.LC_ALL = en_US.UTF-8", "e
       '                                                   "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1",\n'
       '                                                   "env.MADEIRA_SPAWN_BLOCK = vc_redist-",\n'
       '                                                   "env.MADEIRA_EA_CEF_FLAGS = --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows",\n'
-      '                                                   "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1"]' in files["BCDLaunchers.swift"]
+      '                                                   "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1", "env.MADEIRA_X86_FAULT_DUMP = 1"]' in files["BCDLaunchers.swift"]
       and files["BCDLaunchers.swift"].count('"env.LC_ALL = en_US.UTF-8"') == 1
-      and files["BCDLaunchers.swift"].count('"env.MADEIRA_APC_BUSY_QUEUE = 1"') == 1,
-      "the EA app (only) also gets an English locale (its installer died on a non-English locale, C7-2F79, build 593) and keeps a finished "
-      "answer for a busy thread (its MSI's first custom action lost one: JunoInitializeSession 1603)")
+      and files["BCDLaunchers.swift"].count('"env.MADEIRA_APC_BUSY_QUEUE = 1"') == 1
+      and files["BCDLaunchers.swift"].count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1,
+      "the EA app (only) also gets an English locale (its installer died on a non-English locale, C7-2F79, build 593), keeps a finished "
+      "answer for a busy thread (its MSI's first custom action lost one: JunoInitializeSession 1603) and (round 624, 7NKYWT) the 32-bit "
+      "fault report for its installer's custom-action hosts")
 # ajan32/ea-cef (2026-10-24): the EA app's Chromium lines belong to the installed launcher's session only, never to its installer's.
 launchers = files["BCDLaunchers.swift"]
-check('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true)' in launchers
+check('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true,' in launchers
       and launchers.count('launcherOnlyConfig: ["') == 1 and launchers.count('"env.MADEIRA_EA_CEF = 1"') == 1
       and launchers.count('"env.MADEIRA_SC_PA_POOLS = 2"') == 1,
       "only the EA app's table entry has launcherOnlyConfig: layout 2 and env.MADEIRA_EA_CEF = 1 (the EA app's Chromium, 2026-10-24)")
 check("var programSessionConfig: [String] { sessionConfig + launcherOnlyConfig }" in launchers
-      and "sessionConfig: spec.programSessionConfig)" in launchers
-      and "BCDLauncherStart(windowsPath: spec.installerWindowsPath, arguments: spec.installerArguments, sessionConfig: spec.sessionConfig)" in launchers,
-      "the program's start takes sessionConfig + launcherOnlyConfig, the installer's start sessionConfig alone")
+      and "sessionConfig: spec.programSessionConfig," in launchers   # round 625: the demand-start list follows
+      and "BCDLauncherStart(windowsPath: spec.installerWindowsPath, arguments: spec.installerArguments, sessionConfig: spec.sessionConfig + spec.installerOnlyConfig," in launchers,
+      "the program's start takes sessionConfig + launcherOnlyConfig, the installer's start sessionConfig + installerOnlyConfig (round 625)")
 content = read(APP / "ContentView.swift")
 check("library.begin(entry, remember: !BCDLaunchersLive.isSetup(entry))" in content,
       "an installer's run is not remembered in the library (ContentView.startLibraryEntry)")
@@ -420,7 +429,13 @@ func touch(_ url: URL, _ data: Data = Data("x".utf8)) {
               && BCDLauncherArguments.merged("  " + table + " --x  ", table: table) == table + " --x",
               "what the player typed after the table's switches is kept (a trial added at the end)")
         check(BCDLauncherArguments.merged("-windowed", table: "") == "-windowed", "a launcher with no switches leaves the player's arguments alone")
-        check(programStart.sessionConfig == bn.sessionConfig && installerStart.sessionConfig == bn.sessionConfig, "both starts carry the table's session lines")
+        check(programStart.sessionConfig == bn.sessionConfig && installerStart.sessionConfig == bn.sessionConfig + bn.installerOnlyConfig,
+              "both starts carry the table's session lines, the installer's also its own (round 625)")
+        check(bn.installerOnlyConfig == ["env.MADEIRA_CHILD_ARGS = Battle.net.exe --in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials --renderer-process-limit=2", "pool-split = 1"]
+              && "env.MADEIRA_CHILD_ARGS = Battle.net.exe " + programStart.arguments == bn.installerOnlyConfig[0]
+              && !programStart.sessionConfig.contains(where: { $0.hasPrefix("env.MADEIRA_CHILD_ARGS") || $0.hasPrefix("pool-split") })
+              && ea.installerOnlyConfig.isEmpty && BCDLauncherStart.installer(ea).sessionConfig == ea.sessionConfig,
+              "Battle.net's installer hands its browser the launcher's own four switches and splits the pool; its Open and the EA app are unchanged")
         let eaInstaller = BCDLauncherStart.installer(ea)
         let eaProgram = BCDLauncherStart.program(ea, relative: "Program Files/Electronic Arts/EA Desktop/EA Desktop/EADesktop.exe")
         check(bn.launcherOnlyConfig.isEmpty && bn.programSessionConfig == bn.sessionConfig, "Battle.net has no launcher-only lines: its program's lines are the table's")
@@ -649,6 +664,27 @@ with tempfile.TemporaryDirectory(prefix="bcd-launchers-") as tmp:
             check(m.group(1) == pins["version"], f"Gecko's version {m.group(1)} equals addons.c's GECKO_VERSION")
             check(m.group(2) == pins["x86"], "Gecko's x86 SHA-256 equals addons.c's GECKO_SHA")
             check(m.group(3) == pins["x86_64"], "Gecko's x86_64 SHA-256 equals addons.c's GECKO_SHA")
+
+# Round 625 (owner's item 25, agent A S5; EA app setup H95G25): Wine's PunkBuster stubs start on demand in the EA app's and
+# Battle.net's sessions (installer and program); the start carries the list, the entry takes it at every start; no other spec has one.
+_live = files.get("BCDLaunchersLive.swift") or (APP / "BCDLaunchersLive.swift").read_text()
+check(launchers_src.count('demandStartServices: ["PnkBstrA", "PnkBstrB"])') == 2
+      and 'var demandStartServices: [String] = []' in launchers_src
+      and launchers_src.count('demandStartServices: spec.demandStartServices)') == 2
+      and 'entry.demandStartServices = start.demandStartServices.isEmpty ? nil : start.demandStartServices' in _live,
+      "round 625: the EA app and Battle.net set PunkBuster's stubs to start on demand in both of their sessions; nothing else does")
+
+# Round 625 (owner's item 27, agent N S5; Battle.net's installer Y0HFHB, build 614): the code fix's auto-tune rule (fixedIn 625) names
+# the installer's own browser start without the switches and the exhausted pool, and steps aside once [child-args] appended them.
+_rules = (R / "build/tools/autotune_rules.py").read_text()
+_bn = _rules[_rules.index('"id": "battlenet-installer-browser-switches"'):]
+_bn = _bn[:_bn.index("\n    },")]
+_exp = __import__("json").loads((R / "tests/fixtures/autotune/battlenet-installer-pool-exhausted-2026-10-29.expect").read_text())
+check('"fixedIn": 625' in _bn and '"lines": []' in _bn
+      and 's("--runonstartup=true", "Battle.net.exe"), s("library launch Battle.net-Setup.exe:"), s("[jit-pool] EXHAUSTED")' in _bn
+      and 's("[child-args] env.MADEIRA_CHILD_ARGS: appended")' in _bn
+      and _exp["matched"][0] == "battlenet-installer-browser-switches" and _exp["status"] == "known",
+      "round 625: auto-tune names Battle.net's installer browser without the switches as fixed in 625 (fixture Y0HFHB)")
 
 print("PASS: BCD launchers" if not failures else f"FAIL: {failures} check(s) failed")
 sys.exit(1 if failures else 0)

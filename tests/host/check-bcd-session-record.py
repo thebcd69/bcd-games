@@ -95,6 +95,13 @@ check(live.count("bcd_frame_stats_read(&frames)") == 1 and live.count("Timer(") 
 began = block(live, "func began(_ entry: LibraryEntry) {")
 check("bcd_frame_stats_begin()" in began and "writeMarker(for: entry)" in began and began.count("addObserver(") == 4,
       "a session starts the statistics, writes the marker and watches the heat, Low Power Mode and the app's coming and going")
+recover = block(live, "func recoverUnfinished() {")
+tail_fn = block(live, "static func logTail(of url: URL) {")
+check("if let log { Self.logTail(of: log) }" in recover and recover.index("did not end cleanly") < recover.index("Self.logTail(of: log)")
+      < recover.index("guard let offer, let log else { return }")
+      and "BCDPrevTail.lines(data, offset: from)" in tail_fn and 'LogStore.shared.log("[prev-tail] " + LogUploadCore.scrub(line))' in tail_fn
+      and "BCDPrevTail.maxBytes" in tail_fn and "write(" not in tail_fn,
+      "round 624 (R S5): after an unclean end the failed run's last lines go into the new log, each scrubbed, whether or not BCD asks to send it")
 ended = block(live, "func ended() {")
 check("LogStore.shared.log(summary(partial: false).line())" in ended and "removeObservers()" in ended and "removeMarker()" in ended,
       "a session ends with the summary line, the observers gone and the marker removed")
@@ -107,11 +114,56 @@ check('ProcessInfo.thermalStateDidChangeNotification' in live and "noteHeat()" i
 check("applicationSupportDirectory" in live and "documentDirectory" not in live.split("static var markerURL")[1].split("}")[0],
       "the marker lives in Application Support, not in the Documents folder the player sees")
 check(rec.count("bcd-session-open.json") == 1, "one marker file")
+# Round 624 (agent B S3, Blasphemous P3M757 and 31 logs that end inside the JIT-pool request): the start-up phase is on disk before its step
+content = (APP / "ContentView.swift").read_text()
+phase_type = block(rec, "enum BCDStartPhase {")
+recover_p = block(live, "func recoverUnfinished() {")
+check(rec.count("bcd-session-phase.txt") == 1 and "func winiosPhase(_ name: String)" in rec
+      and "BCDStartPhase.note(name)\n    winios_phase(name)" in rec and "try? data.write(to: url, options: .atomic)" in phase_type,
+      "round 624 (B S3): one phase file beside the marker, written synchronously from the calling thread before the [phase] line")
+check(content.count('winiosPhase("') == 5 and 'winios_phase("' not in content
+      and content.index('winiosPhase("pool-alloc-begin")') < content.index('StikJITHelper.allocatePool('),
+      "...by all five start-up phases of ContentView.swift, the pool request's before the request")
+check(recover_p.index("BCDStartPhase.take()") < recover_p.index("guard let url = Self.markerURL")
+      and "BCDStartPhase.clear()" in block(live, "func removeMarker() {")
+      and 'let stop = phase.map { ", last start-up phase' in recover_p and "\\(stop)); " in recover_p,
+      "...read and removed at the next start (named in the [session] line only when there is one), removed at a clean end")
 recover = block(live, "func recoverUnfinished() {")
 check(recover.index("try? FileManager.default.removeItem(at: url)") < recover.index("JSONDecoder().decode(BCDSessionMarker.self"),
       "the marker is removed BEFORE it is read: one question per session, whatever happens next")
 check("BCDCrashRules.offer(marker: found" in recover and "enabled: Self.asks" in recover and "BCDCrashPrompt.shared.schedule(offer, log: log)" in recover,
       "the rules decide (turned off, too old); a log that is gone is not asked about")
+check("BCDCrashRules.notAsking(marker: found, now: Date().timeIntervalSince1970, enabled: Self.asks)" in recover,
+      "round 624 (N S14): the [session] line names the rules' reason for not asking (turned off, too old, a start left within 20 s)")
+starting = block((APP / "BCDSessionLive.swift").read_text(), "private func startingInfo() -> BCDStartingInfo {")
+check('if dock.failure == nil && info.seconds < BCDCrashRules.shortStart {' in starting and 'BCDStartNote(id: "stay-in-front", text: "Stay in BCD until the game\'s picture shows.' in starting,
+      "round 624 (N S14): the starting screen says to stay in BCD for the first 90 s of a start that has not stopped")
+_sl = (APP / "BCDSessionLive.swift").read_text()
+_ls = (APP / "BCDLiveStore.swift").read_text()
+check('if BCDDesktopHint.armed, model.activeEntry?.desktop == true {' in starting and 'BCDStartNote(id: "desktop-empty", text: BCDDesktopHint.text)' in starting
+      and 'guard games <= 1, !defaults.bool(forKey: flag) else { return }' in _sl and 'static let flag = "bcd.desktop-hint-shown"' in _sl
+      and 'if entry.desktop == true { BCDDesktopHint.arm(games: store.games.count) }' in _ls
+      and _ls.index('BCDDesktopHint.arm(games: store.games.count)') < _ls.index('begin(entry, launch)', _ls.index('BCDDesktopHint.arm(')),
+      "round 624 (D2 S2): the Windows desktop's first start on an install with no other game shows one note on the starting screen, once")
+
+
+def _swift_words(src, marker):
+    """The text of a Swift string constant written as "..." + "..." pieces, from `marker` on."""
+    rest = src[src.index(marker) + len(marker):]
+    out, first = [], True
+    for line in rest.splitlines():
+        s = line.strip()
+        if not first and not s.startswith("+"):
+            break
+        out += re.findall(r'"((?:[^"\\]|\\.)*)"', s)
+        first = False
+    return "".join(out)
+
+
+_pv = (R / "app/BCDPreview/BCDPreviewSession.swift").read_text()
+check(_swift_words(_sl, "static let text = ") == _swift_words(_pv, "static let desktopHint = ")
+      and "Start, Run, Browse" in _swift_words(_pv, "static let desktopHint = "),
+      "the preview app's copy of the desktop note (starting-desktop) says exactly what BCDDesktopHint.text says")
 check("static func findLog(inode: UInt64) -> URL?" in live and "bcd-log.prev.txt" in live and "systemFileNumber" in live,
       "the session's log is found again by its inode: the game's own name under logs/, else the rotated bcd-log.prev.txt")
 facade = block(rec, "enum BCDSessionRecorder {")

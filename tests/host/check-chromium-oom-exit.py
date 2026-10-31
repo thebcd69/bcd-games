@@ -108,7 +108,14 @@ int main(void)
     printf("%s", out);
     if (!strstr(out, "3 parameter(s): request 0x200000 bytes (2 MB), 3072 MB, 12288 MB")
         || !strstr(out, "raised at 0x154440110")) { printf("FAIL: the record in the stack's top was not reported\n"); return 1; }
-    if (strstr(out, "0x111") || strstr(out, "0x222") || strstr(out, "0x333")) { printf("FAIL: a lookalike was reported\n"); return 1; }
+    {   /* round 624: count the reported records instead of looking for "0x111" anywhere: the stack's own address can hold
+         * it (aligned_alloc gave 0x1112c2000 once, and the check failed on a correct line) */
+        int records = 0;
+        const char *s = out;
+        while ((s = strstr(s, "record at 0x"))) { records++; s++; }
+        if (records != 1 || strstr(out, "request 0x111 ") || strstr(out, "request 0x222 ") || strstr(out, "request 0x333 "))
+        { printf("FAIL: a lookalike was reported\n"); return 1; }
+    }
 
     /* 2: a record across a chunk edge: the first chunk ends at lo + 64 KB */
     memset(stack, 0, words * 8);

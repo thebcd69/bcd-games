@@ -7,7 +7,8 @@ import UIKit
 
 /// The in-game layer on sample values, for the preview app's photographs (tools/ui-preview.py):
 ///   -BCDTab ingame-menu[-display|-controls|-tools|-binds|-quit|-cloud|-desk]
-///   -BCDTab starting[-dock|-installs|-failed|-log|-home]
+///   -BCDTab starting[-dock|-installs|-failed|-log|-home|-desktop]   (-desktop: the Windows desktop's first start on an empty library)
+///   -BCDTab message-opengl|message-pool   (the session line over the running Windows desktop: Library.swift DesktopExitRules)
 ///   -BCDTab overlay[-1|-2|-3|-4|-custom|-legacy|-edit|-warn|-desk|-keyboard]   (the performance HUD's layouts; -legacy is an old overlay carried over)
 ///   -BCDTab ingame-menu-hud[-custom]   (the Display tab with the HUD's rows, or the Custom HUD's page)
 /// A picture of a game stands in for the running game. Only the preview app compiles this file.
@@ -16,17 +17,38 @@ struct BCDPreviewSessionScreens: ViewModifier {
     let focus: BCDFocus
 
     static func handles(_ tab: String) -> Bool {
-        tab.hasPrefix("ingame-menu") || tab.hasPrefix("starting") || tab.hasPrefix("overlay")
+        tab.hasPrefix("ingame-menu") || tab.hasPrefix("starting") || tab.hasPrefix("overlay") || tab.hasPrefix("message-")
     }
 
     func body(content: Content) -> some View {
         let tab = UserDefaults.standard.string(forKey: "BCDTab") ?? "home"
         if Self.handles(tab) {
-            // The shell stays (hidden) so the preview app's start-up runs as for every screen.
-            content.hidden().overlay { BCDPreviewSessionStage(spec: tab, store: store, focus: focus).ignoresSafeArea() }
+            // The shell stays (hidden) so the preview app's start-up runs as for every screen. The stage goes in a window of its own
+            // that never becomes key, as the app's touch-controls window does (ContentView.swift, TouchControlsHost): the layer reads
+            // the key window's safe area (BCDSessionInsets), and read from inside that same window, iOS 26 lays the window out again in
+            // the middle of the update ("AttributeGraph: cycle detected"), which left the stage as its first frame drew it (round 624:
+            // upright on an iOS 26 simulator, no session line, no starting screen and no HUD).
+            content.hidden().onAppear { BCDPreviewStageWindow.show(BCDPreviewSessionStage(spec: tab, store: store, focus: focus)) }
         } else {
             content
         }
+    }
+}
+
+/// The stage's window (BCDPreviewSessionScreens): above the shell like the app's touch-controls window (+101), never key.
+@MainActor private enum BCDPreviewStageWindow {
+    private static var window: UIWindow?
+
+    static func show<Stage: View>(_ stage: Stage) {
+        guard window == nil, let scene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first else { return }
+        let w = UIWindow(windowScene: scene)
+        w.windowLevel = .normal + 101
+        w.backgroundColor = .black
+        let host = UIHostingController(rootView: stage.ignoresSafeArea())
+        host.view.backgroundColor = .black
+        w.rootViewController = host
+        w.isHidden = false   // deliberately never made key
+        window = w
     }
 }
 
@@ -39,7 +61,10 @@ private struct BCDPreviewSessionStage: View {
     @StateObject private var keyboard = BCDKeyboardBarModel()
 
     private var game: BCDGame {
-        store.games.first { $0.id == "367520" } ?? BCDGame(id: "sample", title: "Sample Game", store: .local, state: .ready)
+        if spec == "starting-desktop" || spec.hasPrefix("message-") {
+            return BCDGame(id: "desktop", title: "Windows desktop", store: .local, state: .ready)
+        }
+        return store.games.first { $0.id == "367520" } ?? BCDGame(id: "sample", title: "Sample Game", store: .local, state: .ready)
     }
 
     var body: some View {
@@ -113,10 +138,19 @@ private struct BCDPreviewSessionStage: View {
             case "starting-home":
                 info.canSkip = true
                 info.tip = "The game menu: the ≡ button beside the game."
+            case "starting-desktop":
+                info.step = .loading
+                info.notes = [BCDStartNote(id: "desktop-empty", text: BCDPreviewSessionSamples.desktopHint)]
             default:
                 info.step = .loading
             }
             hud.starting = BCDStartingFeed(info)
+            return
+        }
+        if spec.hasPrefix("message-") {
+            // The session line over the running Windows desktop (LibraryModel.sessionMessage, set by watchDesktopExits).
+            hud.message = spec == "message-pool" ? BCDPreviewSessionSamples.desktopPoolWords : BCDPreviewSessionSamples.desktopOpenGLWords
+            actions.hud = hud
             return
         }
         hud.performance = BCDPreviewSessionSamples.hudFeed(spec)
@@ -214,6 +248,14 @@ enum BCDPreviewSessionSamples {
         feed.dimmed = false
         return feed
     }
+
+    /// Copies of the production words (check-desktop-exit.py and check-bcd-session-record.py keep them the same): BCDDesktopHint.text
+    /// (BCDSessionLive.swift) and DesktopExitRules (Library.swift), both in engine-bound files the preview does not build.
+    static let desktopHint = "The Windows desktop starts empty. To play a game, add it to the library or sign in to Steam. To run a program yourself: "
+        + "Start, Run, Browse, then pick its .exe (your files are on the drive named C:)."
+    static let desktopOpenGLWords = "GeometryDash.exe needs OpenGL, which BCD does not have yet, so it closes. This is not a setting."
+    static let desktopPoolWords = "The Windows desktop is out of room for programs: what runs on it now is too big for this device. "
+        + "Close a program, or start the game from BCD's library."
 
     static let deskReading = BCDPerformanceReading(readings: [
         BCDReading(id: "fps", text: "59.8 FPS", tone: .good), BCDReading(id: "mem", text: "2310/6144 MB", tone: .good),

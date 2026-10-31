@@ -366,7 +366,7 @@ with tempfile.TemporaryDirectory() as tmp:
     if r.returncode:
         print(r.stdout[-6000:], r.stderr[-6000:])
         sys.exit("FAIL: harness did not compile")
-    env = dict(os.environ, ASAN_OPTIONS="detect_leaks=1")
+    env = dict(os.environ, ASAN_OPTIONS="symbolize=0:detect_leaks=" + ("0" if sys.platform == "darwin" else "1"))   # macOS ASan has no leak detector
     env.pop("MADEIRA_WMA_SEARCH", None)
     ok = True
     for label, extra_env, args in [("parameter search on (default)", {}, []),

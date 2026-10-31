@@ -75,6 +75,9 @@ struct AutoTuneRule: Codable {
     /// (the 12 GB tier's swap-mb = 6144 over GTA V Enhanced's list line swap-mb = 3072): the list's file entries are otherwise as good as the
     /// user's own and keep a rule out. Never a user's key, and never a lower or equal value.
     var listUpgrade: Bool?
+    /// Round 625 (owner's item 21, agent E1 S13-c; Hogwarts Legacy GBQRKH): with `listUpgrade`, a crashed or exited-early verdict may
+    /// raise the list's number too, not only a memory kill; the larger-number test still applies, and never a user's key.
+    var listUpgradeFailure: Bool?
     /// One sentence the app shows with the attempt.
     var reason: String
     /// Fixture names and notes the rule was taken from.
@@ -88,6 +91,14 @@ struct AutoTuneRule: Codable {
     /// the best match, auto-tune stops at once (status "known") instead of spending a retry; its `reason` says what it is, and the advice does
     /// not promise a build.
     var noFix: Bool?
+    /// madeira-bcd (round 624, RETRO-2 RQ1): a noFix rule that is also evaluated for a session scored "ran" or "quit": the session looked
+    /// played (the clock raised its stage, or the player quit), yet the rule's signals say why it was none (Forza Horizon 4 waiting 314 s
+    /// with no frame, Diablo II: Resurrected inside its loader's protection, Porsche's Direct3D 7 box). Only a noFix rule may carry it, and
+    /// it only changes the verdict's text ("known"): nothing is tried.
+    var evaluateWhenRan: Bool?
+    /// madeira-bcd (round 624, Fallout 4 voices, WRSNC8): an evaluateWhenRan rule that speaks ONLY for a session that played: its signals are
+    /// the game's own side effect (a missing audio decoder), never the reason a failed session failed, so a crash keeps its own verdict.
+    var ranOnly: Bool?
 }
 
 enum AutoTuneRules {
@@ -125,6 +136,9 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var build: Int?
     var ramMB: Int?
     var availableMB: Int?
+    /// madeira-bcd (round 624, agent D3 S5-3; Sekiro XJ8YM3, Cloudpunk F88RB4): the free storage the device reported at start, whole GB
+    /// ("[device] settings: ... free-disk=2GB"); nil when it said "unknown" or the log has no such line.
+    var freeDiskGB: Int?
     var dock = false
     var d3d12 = false
     /// 0 nothing, 1 Wine started, 2 the game's modules loaded, 3 first frame,
@@ -133,6 +147,10 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var aliveSeconds = 0
     var lastFootprintMB: Int?
     var peakFootprintMB: Int?
+    /// madeira-bcd (round 624, Metro 2033 Redux Y1H618/CTJQ9D): the last slow "[footprint] rev=ml358" value, and whether the newest
+    /// footprint line was the fast sampler's (a jump the slow line did not see yet).
+    var lastSlowFootprintMB: Int?
+    var lastFootprintFast = false
     /// The memory limit the log itself names: "ml992: os_proc_available_memory=A MB + phys_footprint=B MB = L MB".
     /// A kill is told from the footprint's last line against it when the app's own marker had none (Clair Obscur
     /// A5HRFG died at 6105 of 6144 MB and was not seen as killed: the fallback below guessed 6366).
@@ -142,6 +160,15 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var exitStatus: UInt32?
     var unhandled = 0
     var runtimeErrorDialog = false
+    /// madeira-bcd (round 624, Portal 2 HZE5E9, RoboCop TK6WRV): "[steam-api] steam_api found no running Steam", the game's own Steam
+    /// library said no Steam client was running (the Steam IPC family, 82 archive logs).
+    var steamNotFound = false
+    /// madeira-bcd (round 624, agent R S29: GTA V Legacy AX6XNN, GTA IV 5T9WRM): the Rockstar Games Launcher's own error line, mirrored
+    /// by [guest-log] ("[error] * Code:      113 (LAUNCHER_ERR_STEAM_FAILED)"; 58 archive logs, all 113). AX6XNN showed it, never drew a
+    /// game frame and was scored "ran, ok" because the Launcher's window presented for two minutes.
+    var launcherErrors = 0
+    /// A Launcher error line came before the player's close (the close of a Launcher that had already failed is no play).
+    var launcherErrorBeforeQuit = false
     var freezeGaps = 0
     var mainStalls = 0
     /// The highest "detach-wait: presents=N" (every 30 s while the app waits on the game;
@@ -191,6 +218,16 @@ struct AutoTuneLogFacts: Codable, Equatable {
     /// game had presented for 75 s and the app scored a crash). Faults and error exits counted before this line stay crash evidence; after it
     /// nothing is counted (unhandled, errorExits, exitStatus) and the app's own crash status is not taken for the game's.
     var cleanMainExit = false
+    /// madeira-bcd (round 624): the launcher's Wine process ended with code 0 while a child process it started still ran ("[WineProc]
+    /// madeira-bcd: the main process exited but N child process(es) it started still run ... a launcher started the game"). What a child
+    /// does after that line is the game's own run, not the teardown of the launcher: Control (FGTGM8) died in its child control_dx11.exe,
+    /// 11 s into the start, with the launcher already at code 0, and the session was scored "exited-early" with no rule matched.
+    var childrenPending = false
+    /// The crash evidence counted after that line (the three counters above, kept apart): it is the session's own only when the game
+    /// never presented (stage below 4, AutoTuneEngine.outcome).
+    var childUnhandled = 0
+    var childExitStatus: UInt32?
+    var childErrorExits = 0
     /// The last "[hwinput] keyboard focus:" line said the keyboard went elsewhere because the app went inactive or the pointer left the
     /// game view: the user was away when the log ended. Final Fantasy Tactics 7QVF78 (19 s, "app inactive") and THPS 3+4 NZECAK
     /// (24 s, "pointer left the game view") were scored as the game ending early.
@@ -212,6 +249,28 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var sessionPlaySeconds: Int?
     /// The newest summary was the partial one written when the app went to the background (the session did not end after it).
     var sessionPartial = false
+    /// madeira-bcd (round 624): "[fexlock] STUCK write-wait" lines: a thread waits for a FEX lock that is never released (R.E.P.O. AJ7RNE: the
+    /// thread waits for a lock it holds itself). Counted, so a session that never presented and logged such a deadlock is a hang, not a run.
+    var fexlockStuck = 0
+    /// madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): the last "detach-wait: presents=N" value and how many times in a row the same value
+    /// came again (the line comes every 30 s), so that a frame counter which stopped can be told from one that never ran.
+    var presentsLast = -1
+    var presentsFlat = 0
+    /// A thread waited for a FEX lock it owned ("[fexlock] STUCK") and the frame counter had not moved for three readings (90 s): the game is frozen.
+    var lockFreeze: Bool { fexlockStuck > 0 && presentsCounted == true && presentsLast > 0 && presentsFlat >= 3 }
+    /// The same, as it stood when the player asked to quit (a frozen game the player closed is not one that was quit after playing).
+    var lockFreezeAtQuit = false
+    /// madeira-bcd (round 624, RETRO-1 R4, WRC 9 JDJ8KE/WV1P7T): "[spin] ml1140 ... look 1: x64->EC" reports (a guest thread in a tight loop).
+    /// With the Dock's frame counter standing still for two readings (60 s) after frames, the game is frozen, like lockFreeze.
+    var spinReports = 0
+    var spinFreeze: Bool { spinReports > 0 && presentsCounted == true && presentsLast > 0 && presentsFlat >= 2 }
+    var spinFreezeAtQuit = false
+    /// madeira-bcd (round 624, RETRO-2 RQ3, Ghost of Tsushima JKJA9Q): the last error exit of a program of the session came after a frame had
+    /// been seen (the game itself failing), not before the first frame (a helper such as crs-video.exe ending with an error while the game loads).
+    var lastErrorExitAfterFrame = false
+    /// madeira-bcd (round 624, Farming Simulator 22 on Discord): "[mach_exc] UNHANDLED #1 ... x18=0x0": a host fault in a thread with no TEB
+    /// that nothing handled (the game's process stopped there while the app kept waiting).
+    var machFaultNoTeb = 0
 
     var crashEvidence: Int { unhandled + errorExits + (runtimeErrorDialog ? 1 : 0) + (exitStatus == nil ? 0 : 1) }
 }
@@ -334,6 +393,7 @@ final class AutoTuneLogScanner {
     private static let mRam = Array(" ram=".utf8)
     private static let mLaunch = Array("[device] launch:".utf8)
     private static let mAvailable = Array("available=".utf8)
+    private static let mFreeDisk = Array(" free-disk=".utf8)
     private static let mDock = Array("[dock-launch]".utf8)
     /// A D3D12 game opens a command queue; a D3D11 game may only probe D3D12CreateDevice (GTA V Legacy).
     private static let mD3D12 = Array("[madeira-d3d12] command queue: type".utf8)
@@ -365,16 +425,31 @@ final class AutoTuneLogScanner {
     private static let mUnhandled = Array("Unhandled exception".utf8)
     private static let mRootFrame = Array("ACCEPTING terminal root frame".utf8)
     private static let mRuntimeError = Array("Runtime error!".utf8)
+    /// madeira-bcd (round 624, Gal*Gun 2 B2B7BR): an Unreal Engine 4 program's own crash window ("The UE4-<project> Game has crashed and
+    /// will close"), shown when the program crashed; the session had no exit status and was scored "ran".
+    private static let mUE4Crash = Array("has crashed and will close".utf8)
+    private static let mSteamNotFound = Array("steam_api found no running Steam".utf8)
+    private static let mLauncherError = Array("(LAUNCHER_ERR_".utf8)
     private static let mFreeze = Array("cause=unexplained-FREEZE".utf8)
     private static let mMainStall = Array("[main-stall] #".utf8)
+    private static let mFexlockStuck = Array("[fexlock] STUCK write-wait".utf8)
+    /// madeira-bcd (round 624, RETRO-1 R4): the [spin] report's look at a guest thread in a tight loop.
+    private static let mSpinLook = Array(" look 1: x64->EC ".utf8)
+    /// madeira-bcd (round 624, Farming Simulator 22): an unhandled host fault in a thread with no TEB (both on one line).
+    private static let mMachUnhandled1 = Array("[mach_exc] UNHANDLED #1 pc=".utf8)   // "#1 pc=": not #12400 (Watch Dogs 2's SMC traps)
+    private static let mX18Zero = Array(" x18=0x0 ".utf8)
     private static let mDetachWait = Array("detach-wait: presents=".utf8)
     private static let mLaunchView = Array("[launch-view] dismissed reason=".utf8)
     private static let mCoverByPresent = Array("dismissed reason=present".utf8)
     private static let mDeviceError = Array("Device error at frame".utf8)
+    /// madeira-bcd (round 624, Rise of the Tomb Raider): the game's own message (mirrored by [guest-log]) that its swapchain could not be
+    /// created. It ends itself with exit 0 and never presents, and without this the session was scored "ran" or "quit" (8 Dock logs).
+    private static let mSwapChainFail = Array("[SwapChain] Error occurred during creation.".utf8)
     private static let mTerminate = Array("NtTerminateProcess(".utf8)
     private static let mErrorCode = Array("exit_code=0xc".utf8)
     /// The whole Wine process finished with code 0 (the trailing " (" keeps code 0 from matching 01, 0x.. and the like).
     private static let mWineExit0 = Array("[WineProc] Wine exited with code 0 (".utf8)
+    private static let mMainExitedChildren = Array("[WineProc] madeira-bcd: the main process exited but".utf8)
     private static let mFocus = Array("[hwinput] keyboard focus: ".utf8)
     private static let mFocusElsewhereInactive = Array("elsewhere (app inactive)".utf8)
     private static let mFocusElsewherePointer = Array("elsewhere (pointer left the game view)".utf8)
@@ -421,6 +496,7 @@ final class AutoTuneLogScanner {
         if facts.availableMB == nil, S.find(l, S.mLaunch) != nil, let v = S.number(l, after: S.mAvailable) {
             facts.availableMB = Int(v)
         }
+        if facts.freeDiskGB == nil, S.find(l, S.mFreeDisk) != nil, let v = S.number(l, after: S.mFreeDisk) { facts.freeDiskGB = Int(v) }
         if !facts.dock, S.find(l, S.mDock) != nil { facts.dock = true }
         if !facts.d3d12, S.find(l, S.mD3D12) != nil { facts.d3d12 = true }
         if facts.stage < 1, S.find(l, S.mWineStart) != nil { facts.stage = 1 }
@@ -443,13 +519,21 @@ final class AutoTuneLogScanner {
         }
         if let v = S.number(l, after: S.mFootprint) {
             facts.lastFootprintMB = Int(v)
+            facts.lastSlowFootprintMB = Int(v)
+            facts.lastFootprintFast = false
             if let p = S.number(l, after: S.mPeak) { facts.peakFootprintMB = max(facts.peakFootprintMB ?? 0, Int(p)) }
         } else if let v = S.number(l, after: S.mFootprintFast) {
             facts.lastFootprintMB = Int(v)
+            facts.lastFootprintFast = true
             facts.peakFootprintMB = max(facts.peakFootprintMB ?? 0, Int(v))
         }
         if S.find(l, S.mQuit) != nil {
-            if !facts.quitRequested { facts.crashEvidenceAtQuit = facts.crashEvidence }
+            if !facts.quitRequested {
+                facts.crashEvidenceAtQuit = facts.crashEvidence
+                facts.launcherErrorBeforeQuit = facts.launcherErrors > 0
+                facts.lockFreezeAtQuit = facts.lockFreeze
+                facts.spinFreezeAtQuit = facts.spinFreeze
+            }
             facts.quitRequested = true
         }
         if S.find(l, S.mReturned) != nil { facts.returnedToLibrary = true }
@@ -457,24 +541,39 @@ final class AutoTuneLogScanner {
         if S.find(l, S.mFocus) != nil {
             facts.focusLeft = S.find(l, S.mFocusElsewhereInactive) != nil || S.find(l, S.mFocusElsewherePointer) != nil
         }
-        if !facts.cleanMainExit, let v = S.number(l, after: S.mExitReport, hex: true) { facts.exitStatus = UInt32(truncatingIfNeeded: v) }
-        if !facts.cleanMainExit, S.find(l, S.mUnhandled) != nil || S.find(l, S.mRootFrame) != nil { facts.unhandled += 1 }
-        if S.find(l, S.mRuntimeError) != nil { facts.runtimeErrorDialog = true }
+        if facts.cleanMainExit, !facts.childrenPending, S.find(l, S.mMainExitedChildren) != nil { facts.childrenPending = true }
+        if let v = S.number(l, after: S.mExitReport, hex: true) {
+            if !facts.cleanMainExit { facts.exitStatus = UInt32(truncatingIfNeeded: v) }
+            else if facts.childrenPending { facts.childExitStatus = UInt32(truncatingIfNeeded: v) }
+        }
+        if S.find(l, S.mUnhandled) != nil || S.find(l, S.mRootFrame) != nil {
+            if !facts.cleanMainExit { facts.unhandled += 1 } else if facts.childrenPending { facts.childUnhandled += 1 }
+        }
+        if S.find(l, S.mRuntimeError) != nil || S.find(l, S.mUE4Crash) != nil { facts.runtimeErrorDialog = true }
+        if S.find(l, S.mSteamNotFound) != nil { facts.steamNotFound = true }
+        if S.find(l, S.mLauncherError) != nil { facts.launcherErrors += 1 }
         if S.find(l, S.mFreeze) != nil { facts.freezeGaps += 1 }
         if S.find(l, S.mMainStall) != nil { facts.mainStalls += 1 }
+        if S.find(l, S.mFexlockStuck) != nil { facts.fexlockStuck += 1 }
+        if S.find(l, S.mSpinLook) != nil { facts.spinReports += 1 }
+        if S.find(l, S.mMachUnhandled1) != nil, S.find(l, S.mX18Zero) != nil { facts.machFaultNoTeb += 1 }
+        if !facts.cleanMainExit, S.find(l, S.mSwapChainFail) != nil { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
         if let v = S.number(l, after: S.mDetachWait) {
             facts.presentsCounted = true
             facts.presentsLogged = max(facts.presentsLogged, Int(v))
+            if Int(v) == facts.presentsLast { facts.presentsFlat += 1 } else { facts.presentsLast = Int(v); facts.presentsFlat = 0 }
             if v >= 1 { facts.stage = max(facts.stage, 3); facts.frameSeen = true }
             if v >= 600 { facts.stage = max(facts.stage, 4) }   // about 20 s of frames
         }
         if facts.stage < 3, S.find(l, S.mLaunchView) != nil { facts.stage = 3 }
         if S.find(l, S.mLaunchView) != nil, S.find(l, S.mCoverByPresent) != nil { facts.frameSeen = true }
         if S.find(l, S.mDeviceError) != nil { facts.gpuErrors += 1 }
-        if !facts.cleanMainExit,
-           (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
+        if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
             || S.find(l, S.mChildNegative) != nil || S.find(l, S.mInitFailed) != nil
-            || S.find(l, S.mObjCException) != nil || S.find(l, S.mRedelivKill) != nil { facts.errorExits += 1 }
+            || S.find(l, S.mObjCException) != nil || S.find(l, S.mRedelivKill) != nil {
+            if !facts.cleanMainExit { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
+            else if facts.childrenPending { facts.childErrorExits += 1 }
+        }
         if !facts.monoMissing, S.find(l, S.mMscoreeErr) != nil, S.find(l, S.mMonoMissing) != nil { facts.monoMissing = true }
         if !facts.installsOnly, S.find(l, S.mInstallsOnly) != nil { facts.installsOnly = true }
         if !facts.installsEnded, S.find(l, S.mInstallsEnded) != nil { facts.installsEnded = true }
@@ -537,6 +636,9 @@ struct AutoTuneReport: Codable, Equatable {
     /// The last footprint line as a percentage of the memory limit (AutoTuneRule.memoryMinPct); nil when the log has no footprint line or
     /// neither the marker nor the log names the limit. Optional, so that a saved state without it still loads.
     var memoryPct: Int?
+    /// madeira-bcd (round 624): the free storage in whole GB at the session's start (AutoTuneLogFacts.freeDiskGB); a swap attempt is sized to
+    /// it. Optional, so that a saved state without it still loads.
+    var freeDiskGB: Int?
 
     var failed: Bool { ["crashed", "killed", "hung", "exited-early"].contains(outcome) }
     var played: Bool { outcome == "ran" || outcome == "quit" }
@@ -552,19 +654,54 @@ enum AutoTuneEngine {
         // failed (Saints Row: The Third's DirectX setup, T3P8HK, scored "crashed" and given exe-window-mb = 512 for the game).
         // Nothing to learn about the game's settings.
         if f.installsOver { return "inconclusive" }
-        let crashedInLog = f.unhandled > 0 || f.runtimeErrorDialog || f.exitStatus != nil || f.errorExits > 0
-            || (!f.dialogs.isEmpty && f.stage < 4)
+        // madeira-bcd (round 624, E1): in a Dock session an error box after the game's steam_api found no running Steam is a failure at any
+        // stage (Portal 2 HZE5E9: "Engine Error: Steam is not running", a black window presenting behind it, scored "ran"). Dock only: the
+        // Rockstar launcher's own probe of an Epic start prints the same line and an "Error" box and is left as it was (VX8ZZ0, YZZFYA, PA6PEB).
+        // madeira-bcd (round 624, agent R S29, AX6XNN): the Rockstar Launcher said it failed (LAUNCHER_ERR_..., 113 in all 58 archive
+        // logs) and no game frame came: below stage 4, or the Dock's frame counter stayed at 0 (its window presenting is no game).
+        let launcherFailed = f.launcherErrors > 0 && (f.stage < 4 || (f.presentsCounted == true && f.presentsLogged == 0))
+        // madeira-bcd (round 624, RETRO-2 RQ3, Ghost of Tsushima JKJA9Q): a program of the session that ended with an error before the first frame
+        // (crs-video.exe, c0000135), in a session that went on to draw and reached stage 4, is a helper, not the game's crash. An error exit after
+        // a frame (the game itself failing) still counts, and so do an unhandled exception, a runtime-error box and an exit report.
+        let helperExitOnly = f.errorExits > 0 && f.frameSeen && f.stage >= 4 && !f.lastErrorExitAfterFrame
+        let errorExitsEff = helperExitOnly ? 0 : f.errorExits
+        let crashedInLog = f.unhandled > 0 || f.runtimeErrorDialog || f.exitStatus != nil || errorExitsEff > 0
+            || (!f.dialogs.isEmpty && f.stage < 4) || (f.dock && f.steamNotFound && !f.dialogs.isEmpty) || launcherFailed
+        // madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): the game drew 3474 frames, then the Dock's counter stayed at that number for
+        // 5 minutes while a thread waited for a FEX lock it owned; the player closed the frozen game, and "quit after playing" (and "ran") hid
+        // the freeze from every rule. As it stood at the quit, when the player asked to quit.
+        // madeira-bcd (round 624, RETRO-1 R4, WRC 9 JDJ8KE/WV1P7T): a [spin] report with the frame counter standing still for 60 s is the same
+        // freeze; the player pressed Close 75-80 s into the frozen picture and "quit" hid it.
+        let frozeLocked = f.quitRequested ? (f.lockFreezeAtQuit || f.spinFreezeAtQuit) : (f.lockFreeze || f.spinFreeze)
         if end.killed {
-            if end.userSaid == "i-closed" { return "inconclusive" }
+            // madeira-bcd (round 624, Cult of the Lamb VHRFNE): "I closed it" after a minute of nothing on screen, with a thread waiting
+            // for a BCD lock it owns itself ("[fexlock] STUCK write-wait") and no frame ever drawn, is not a player leaving a game that
+            // works: keep the evidence (the Dock's frame counter is there, it stayed at 0, nothing crashed or was quit).
+            let frozenWithoutFrames = f.fexlockStuck > 0 && f.presentsCounted == true && f.presentsLogged == 0 && !crashedInLog && !f.quitRequested
+            if end.userSaid == "i-closed" { return frozenWithoutFrames || (frozeLocked && !crashedInLog) ? "hung" : "inconclusive" }
             // madeira-bcd (round 591): the user asked a game that was playing to close ("graceful close requested" after the Dock counted frames
             // for 20 s or more), and the app was killed before it came back to the library: the game played, and the end is the app's, not a hang
             // (Cult of the Lamb T0K6FH at stage 5 with 8,296 frames was scored "hung" and its next start was spent on a retry; MGS Peace Walker
             // NMYVVM likewise). Not when the user said the app froze, when the app saw a freeze or a GPU error, or when the game had crashed before the
             // quit.
             let quitAfterPlay = f.quitRequested && !f.returnedToLibrary && f.stage >= 4 && f.presentsCounted == true && f.presentsLogged >= 1
-                && f.freezeGaps == 0 && f.gpuErrors == 0 && (f.crashEvidenceAtQuit ?? 0) == 0
+                && f.freezeGaps == 0 && f.gpuErrors == 0 && (f.crashEvidenceAtQuit ?? 0) == 0 && !frozeLocked
             if end.userSaid != "froze" && quitAfterPlay { return "quit" }
-            if end.userSaid == "froze" || f.freezeGaps > 0 || f.gpuErrors > 0
+            // madeira-bcd (round 624, Cloudpunk F88RB4): the player answered "it froze", but the app saw no freeze, no GPU error, no crash and no
+            // quit, and the last footprint line is at the memory limit (4094 of 4095 MB 16 s after the start): iOS closed the game for memory while
+            // it looked frozen to the player. Scored "hung", the swap rules never ran. A real freeze the app saw keeps "hung" below.
+            if end.userSaid == "froze", f.freezeGaps == 0, f.gpuErrors == 0, !crashedInLog, !(f.quitRequested && !f.returnedToLibrary),
+               let last = f.lastFootprintMB, let limit = end.limitMB ?? f.limitMB, last >= limit - max(150, limit / 50) { return "killed" }
+            // madeira-bcd (round 624, Metro 2033 Redux Y1H618 and CTJQ9D on 4096 MB phones): the footprint jumped by 1.5 GB in 0.35 s before the
+            // first frame and the app was gone, at 82-88 % of the limit (the last fast line; the slow one is 2 s behind). The player's "it
+            // froze" scored it "hung" with no rule. Only below stage 4, with no freeze, GPU error, crash or quit, the newest footprint line the
+            // fast sampler's at 80 % of the limit or more and 1.4 times the last slow line (a burst, not a plateau): 5 of 2,270 archive logs,
+            // of which only these two change (the other three were already "killed").
+            if f.stage <= 3, f.freezeGaps == 0, f.gpuErrors == 0, !f.quitRequested, !crashedInLog,
+               let last = f.lastFootprintMB, let slow = f.lastSlowFootprintMB, f.lastFootprintFast,
+               let limit = end.limitMB ?? f.limitMB, limit >= 2048,
+               last * 100 >= limit * 80, last * 10 >= slow * 14 { return "killed" }
+            if end.userSaid == "froze" || f.freezeGaps > 0 || f.gpuErrors > 0 || frozeLocked
                 || (f.quitRequested && !f.returnedToLibrary) { return "hung" }
             // madeira-bcd 578 (lead, from ajan6-mm): a session killed at the memory limit whose only crash evidence is
             // a helper program's error exit (Miles Morales' crs-video.exe, c0000135) is a memory kill, not a crash:
@@ -588,16 +725,42 @@ enum AutoTuneEngine {
                     if last >= limit - max(200, limit * 3 / 100) { return "killed" }
                 }
             }
+            // madeira-bcd (round 624, Fallout 4 0PT2YV and WRSNC8): the game played (frames for 20 s or more, 58 FPS), the player left BCD
+            // (focus elsewhere) and iOS closed the app in the background ("partial=1" summary), far below the memory limit, with nothing crashed
+            // or frozen. The player's "it closed by itself" is true, but the game is fine: scored "killed", auto-tune spent starts on it.
+            // Round 624 (RETRO-2 RQ2, Batman: Arkham Knight E2NZQ3): without the focus line too; "partial=1" is written only when the app went to
+            // the background, and the memory test below still keeps a kill at the limit a kill.
+            let playedThenLeft = f.sessionPartial && f.frameSeen && f.stage >= 4 && (f.sessionPlaySeconds ?? 0) >= 20
+                && f.freezeGaps == 0 && f.gpuErrors == 0 && !crashedInLog
+            if playedThenLeft, let last = f.lastFootprintMB, let limit = end.limitMB ?? f.limitMB, last < limit * 9 / 10 { return "ran" }
             if end.userSaid == "closed-by-itself" { return "killed" }
             return "inconclusive"
         }
         // The app's crash status of a run whose Wine process ended with code 0 is a leftover thread's (cleanMainExit).
         let crashStatus = f.cleanMainExit ? nil : end.crashStatus
         if !end.sawProcess && crashStatus == nil { return "inconclusive" }
+        // madeira-bcd (round 624, R.E.P.O. AJ7RNE): a thread waited for a FEX lock forever ("[fexlock] STUCK write-wait") and the Dock's frame
+        // counter stayed at 0 for 6.5 minutes, yet the stage the clock raises (5 after five minutes) scored the session "ran, ok" and auto-tune
+        // tried nothing. Only with the Dock's counter (a game that draws without it keeps the old rule, round 580) and no crash evidence.
+        if f.fexlockStuck > 0 && f.presentsCounted == true && f.presentsLogged == 0 && crashStatus == nil && !crashedInLog { return "hung" }
+        // madeira-bcd (round 624, Farming Simulator 22 on Discord): a host fault in a thread with no TEB that nothing handled, and the Dock's frame
+        // counter at 0 for a session that stayed alive two minutes or more (695 s): the game's process stopped there; the clock's stage 5 scored it
+        // "ran". A session that ended soon after such a fault (MGS Ground Zeroes PFDA0D, 73 s; The Swapper 6AJPF0) keeps "exited-early".
+        if f.machFaultNoTeb > 0 && f.presentsCounted == true && f.presentsLogged == 0 && f.aliveSeconds >= 120 && crashStatus == nil
+            && !crashedInLog && !f.quitRequested {
+            return "hung"
+        }
+        // madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): frames, then a counter that stood still for 90 s or more with a FEX lock held.
+        if frozeLocked && crashStatus == nil && !crashedInLog { return "hung" }
         // The user quit a game that was on screen: whatever it logged on the way out, it played,
         // unless it had crashed before the user asked (the quit line's moment, when it is logged).
-        if end.quitRequested && f.stage >= 3 && (f.crashEvidenceAtQuit ?? 0) == 0 { return "quit" }
+        if end.quitRequested && f.stage >= 3 && (f.crashEvidenceAtQuit ?? 0) == 0 && !(launcherFailed && f.launcherErrorBeforeQuit) { return "quit" }
         if crashStatus != nil || crashedInLog { return "crashed" }
+        // madeira-bcd (round 624): a launcher's child that failed before the game ever presented (Control's control_dx11.exe, FGTGM8: the
+        // launcher ended with code 0 and the child died in the game's audio start, 11 s in). Only here, after the killed and quit verdicts,
+        // so that a memory kill or a quit is read as before; and only below stage 4, so that a child that played and then printed an
+        // error exit is still "ran".
+        if f.childrenPending && f.stage < 4 && (f.childUnhandled > 0 || f.childExitStatus != nil || f.childErrorExits > 0) { return "crashed" }
         if end.quitRequested { return "exited-early" }
         // Alive for two minutes is not playing when no frame was ever presented (No Man's Sky 4KAT5E sat 151 s at
         // stage 2 with presents=0): only a session that presented counts as having run.
@@ -607,6 +770,10 @@ enum AutoTuneEngine {
         // madeira-bcd (round 580, lead): a wider "no frames" rule was tried and left out: a game that draws without the
         // Dock's frame counter (OpenGL, GDI) would read as not run, and auto-tune would add lines to a game that plays.
         let noFrameProof = (f.presentsCounted ?? false) && f.presentsLogged == 0 && f.stage < 3
+        // madeira-bcd (round 624, WRC 9 JDJ8KE/WV1P7T): alive for two minutes is not playing when the session's own summary says it played
+        // 10 s or less after a few frames (32 frames, then the loading screen stayed for 100 s): "hung", not "ran". Of the 82 archive logs
+        // alive 100 s or more with 15 s or less of play, only these two change.
+        if f.stage <= 3, f.aliveSeconds >= 120, let play = f.sessionPlaySeconds, play <= 10, f.presentsLogged > 0 { return "hung" }
         return f.stage >= 4 || (f.aliveSeconds >= 120 && !noFrameProof) ? "ran" : "exited-early"
     }
 
@@ -627,7 +794,7 @@ enum AutoTuneEngine {
                                presents: presents, peakMB: f.peakFootprintMB, dock: f.dock,
                                d3d12: f.d3d12, ramMB: f.ramMB, matched: [], evidence: scanner.evidence,
                                dialogs: f.dialogs, build: f.build, jitImageFailMB: f.jitImageFailMB, fixedExeMB: f.fixedExeMB,
-                               memoryPct: memoryPct)
+                               memoryPct: memoryPct, freeDiskGB: f.freeDiskGB)
         var report = r
         if f.monoMissing && report.failed { report.monoMissing = true }
         report.matched = rules.filter { matches($0, report: r, counts: scanner.counts, signals: signals) }
@@ -662,8 +829,11 @@ enum AutoTuneEngine {
             guard let i = signals.firstIndex(of: AutoTuneSignal(has: s.has)) else { return false }
             return counts[i] >= (s.count ?? 1)
         }
-        guard report.failed else { return false }
-        if let o = rule.outcomes, !o.contains(report.outcome) { return false }
+        // madeira-bcd (round 624, RETRO-2 RQ1): a noFix rule marked evaluateWhenRan also speaks for a session scored ran/quit.
+        let ranRule = rule.evaluateWhenRan == true && rule.noFix == true && report.played
+        guard report.failed || ranRule else { return false }
+        if rule.ranOnly == true && !ranRule { return false }
+        if !ranRule, let o = rule.outcomes, !o.contains(report.outcome) { return false }
         if let s = rule.session, s != (report.dock ? "dock" : "library") { return false }
         if let a = rule.api, a != (report.d3d12 ? "d3d12" : "d3d11") { return false }
         if let lo = rule.ramMinMB, (report.ramMB ?? 0) < lo { return false }
@@ -745,6 +915,18 @@ struct AutoTuneState: Codable, Equatable {
     /// to download Wine Mono, while this device has none. Optional: a state saved before it existed
     /// still loads, and a game without the problem keeps the same file as before.
     var monoMissing: Bool?
+    /// madeira-bcd (round 624, agent D3 S5-3): a swap attempt was left out because the device had this many whole GB free, too little
+    /// (AutoTuneEngine.swapRoomMB). Set only with the status "stuck". Optional: a state saved before it existed still loads.
+    var lowDiskGB: Int?
+    /// madeira-bcd (round 624, agent E1 S5b): with the status "stuck", each matched rule that was passed over and why ("rule (tried)"),
+    /// for the log. Optional: a state saved before it existed still loads.
+    var skippedNote: String?
+
+    /// Why no swap file was tried, for "stuck" (nil unless an attempt was left out for lack of room).
+    var lowDiskNote: String? {
+        lowDiskGB.map { "A swap file would help this game, but it needs about 3 GB of free storage and this device has \($0) GB free. "
+            + "Free some space and play again." }
+    }
 
     /// What the search tried, for "no known fix" (the rule ids, and the unchanged retry).
     var triedSummary: String {
@@ -783,9 +965,27 @@ extension AutoTuneEngine {
     /// rounded down, as the scanner reads it) plus 17 and then up to a multiple of 16 (575 MiB gives 592, 379 gives 400), so the
     /// image and 16 MiB or more fit (exe-window-fixed-base-large). Without a main program in the report the line is left as it is.
     static func resolve(_ lines: [String], report: AutoTuneReport) -> [String] {
-        guard let exe = report.fixedExeMB else { return lines }
-        let window = (exe + 17 + 15) / 16 * 16
-        return lines.map { $0.replacingOccurrences(of: "{exeWindowMB}", with: String(window)) }
+        var out = lines
+        if let exe = report.fixedExeMB {
+            let window = (exe + 17 + 15) / 16 * 16
+            out = out.map { $0.replacingOccurrences(of: "{exeWindowMB}", with: String(window)) }
+        }
+        // madeira-bcd (round 624, agent D3 S5-3): a swap file is sized to the room the device has, never more than it can hold (swapRoomMB).
+        if let free = report.freeDiskGB {
+            out = out.map { line in
+                guard AutoTuneRules.key(line) == "swap-mb", let want = Int(AutoTuneRules.value(line)) else { return line }
+                return "swap-mb = \(min(want, swapRoomMB(freeGB: free)))"
+            }
+        }
+        return out
+    }
+
+    /// madeira-bcd (round 624, Sekiro XJ8YM3 and Cloudpunk F88RB4, both with 2 GB free and a 3072 MB swap file in the attempt): the most a swap
+    /// file may take of `freeGB` whole GB of free storage: all but 1.5 GB (saves, shader caches, iOS itself); 0 when less than 1 GB would be left
+    /// for the file, since a swap file that small moves too little to change a memory kill.
+    static func swapRoomMB(freeGB: Int) -> Int {
+        let room = freeGB * 1024 - 1536
+        return room < 1024 ? 0 : room
     }
 
     /// One session ended: decide on the line it tried and pick the next one.
@@ -794,6 +994,7 @@ extension AutoTuneEngine {
                         userKeys: Set<String>, fingerprint: String, log: String?, now: Date = Date(),
                         listValues: [String: String] = [:]) -> AutoTuneState {
         var s = state
+        s.skippedNote = nil   // madeira-bcd (round 624, E1 S5b): this session's own, set below only for a "stuck" verdict
         if s.fingerprint != fingerprint {
             // The user changed the game's settings: what follows is compared with a new baseline.
             s.fingerprint = fingerprint
@@ -824,6 +1025,20 @@ extension AutoTuneEngine {
         }
         s.attempts.append(attempt)
 
+        // madeira-bcd (round 624, RETRO-2 RQ1): a session that looked played, with nothing kept, whose log carries the signals of a noFix rule
+        // marked evaluateWhenRan: say what it was ("known") instead of "it played without changes". Nothing is tried.
+        if report.played, s.kept.isEmpty,
+           let rule = report.matched.lazy.compactMap({ id in rules.first { $0.id == id } }).first(where: { $0.evaluateWhenRan == true && $0.noFix == true }) {
+            s.status = "known"
+            s.known = rule.id
+            s.knownReason = rule.reason
+            s.knownFixedIn = nil
+            s.knownNoFix = true
+            s.knownBuild = report.build
+            s.candidate = nil
+            s.candidateRule = nil
+            return s
+        }
         if report.played {
             s.status = s.kept.isEmpty ? "ok" : "found"
             return s
@@ -863,35 +1078,60 @@ extension AutoTuneEngine {
         // belongs to x64-image-nocopy, x64-image-smc-nocopy and x64-image-rwx-protector-nocopy; the plain-RWX line to two more): when that
         // earlier try was reverted the same start would only be spent again.
         let triedLines = s.tried.compactMap { id in rules.first { $0.id == id }?.lines }
+        var noRoom: Int?
+        // madeira-bcd (round 624, agent E1 S5b; Supermarket Together 45T9YP, Hogwarts Legacy GBQRKH): why each matched rule was passed
+        // over, for the [autotune] line of a "stuck" verdict (text only: the choice below is the same).
+        var skipped: [String] = []
         let next = report.matched.compactMap { id in rules.first { $0.id == id } }.first { rule in
-            if rule.fixedIn != nil || rule.noFix == true { return false }
+            func skip(_ why: String) -> Bool { skipped.append("\(rule.id) (\(why))"); return false }
+            if rule.fixedIn != nil || rule.noFix == true { return skip("no line fixes it") }
+            // madeira-bcd (round 624, agent D3 S5-3): a swap attempt the device has no room for is no attempt (swapRoomMB); one that would not
+            // raise the swap file auto-tune already kept is none either.
+            if let free = report.freeDiskGB,
+               let swap = rule.lines.first(where: { AutoTuneRules.key($0) == "swap-mb" }).flatMap({ Int(AutoTuneRules.value($0)) }) {
+                let room = swapRoomMB(freeGB: free)
+                let have = s.kept.first(where: { AutoTuneRules.key($0) == "swap-mb" }).flatMap { Int(AutoTuneRules.value($0)) } ?? 0
+                if room == 0 || (rule.upgrade == true && min(swap, room) <= have) {
+                    noRoom = free
+                    return skip(room == 0 ? "no storage for a swap file" : "no larger swap file fits")
+                }
+            }
             let keys = rule.lines.map(AutoTuneRules.key)
-            if s.tried.contains(rule.id) || triedLines.contains(rule.lines) || keys.contains(where: userKeys.contains) { return false }
+            if s.tried.contains(rule.id) { return skip("tried") }
+            if triedLines.contains(rule.lines) { return skip("its lines were tried") }
+            if keys.contains(where: userKeys.contains) { return skip("a key you set") }
             // madeira-bcd (round 591): the recommended list's own lines in the game's file are as good as the user's, except for a rule that is
             // marked as an upgrade of them, after a memory kill, and only with a larger number (GTA V Enhanced's list swap-mb = 3072 kept the
             // 12 GB tier's swap-mb = 6144 out, A24ES3). A line equal to the list's is already in force; a rule with nothing new is no attempt.
             if !listValues.isEmpty {
-                if rule.listUpgrade == true && report.outcome == "killed" {
+                if rule.listUpgrade == true && (report.outcome == "killed"
+                    || (rule.listUpgradeFailure == true && (report.outcome == "crashed" || report.outcome == "exited-early"))) {
                     var changes = false
-                    for line in rule.lines {
+                    for line in resolve(rule.lines, report: report) {   // round 625: "{exeWindowMB}" as the attempt would write it
                         guard let had = listValues[AutoTuneRules.key(line)] else { changes = true; continue }
                         let value = AutoTuneRules.value(line)
                         if value == had { continue }
-                        guard let new = Int(value), let old = Int(had), new > old else { return false }
+                        guard let new = Int(value), let old = Int(had), new > old else { return skip("the recommended list's value is larger") }
                         changes = true
                     }
-                    if !changes { return false }
+                    if !changes { return skip("the recommended list has its lines") }
                 } else if keys.contains(where: { listValues[$0] != nil }) {
-                    return false   // any other rule or verdict: the list's keys are the user's, as before
+                    return skip("a key of the recommended list")   // any other rule or verdict: the list's keys are the user's, as before
                 }
             }
             // An upgrade raises what auto-tune kept; anything else adds only new keys.
-            return rule.upgrade == true ? keys.contains(where: keptKeys.contains) : !keys.contains(where: keptKeys.contains)
+            if rule.upgrade == true {
+                return keys.contains(where: keptKeys.contains) ? true : skip("nothing kept to raise")
+            }
+            return !keys.contains(where: keptKeys.contains) ? true : skip("a key auto-tune kept")
         }
         guard let rule = next else {
             s.status = "stuck"
+            s.lowDiskGB = noRoom
+            s.skippedNote = skipped.isEmpty ? nil : skipped.joined(separator: ", ")
             return s
         }
+        s.lowDiskGB = nil
         s.tried.append(rule.id)
         s.candidate = resolve(rule.lines, report: report)
         s.candidateRule = rule.id

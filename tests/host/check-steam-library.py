@@ -528,6 +528,7 @@ enum SteamLog {
     static func trace(_ m: @autoclosure () -> String) {}
     static func event(_ m: String) { loggedEvents.append(m) }
 }
+enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): MadeiraDock's result-46 words read it; the install has the limit here
 enum SteamSignIn {
     static func flag(_ name: String, default fallback: Bool) -> Bool { getenv(name).map { String(cString: $0) != "0" } ?? fallback }
 }
@@ -880,7 +881,7 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         var wrong = key; wrong[0] ^= 1
         do { let o = try ContentDecryptor.processChunk(encryptedData: encrypted, depotKey: wrong, expectedCRC: ContentDecryptor.adler32(plainVector), expectedSize: plainVector.count); require(o != plainVector, "\(kind): a wrong key does not decode") }
         catch { require(error is SteamError, "\(kind): a wrong key is rejected") }
-        var cut = encrypted; cut.removeLast(40)
+        var cut = encrypted; cut.removeLast(200)   // well inside the compressed data (the last ~70 bytes of a zip chunk are only its central directory, which the decoder does not need)
         do { let o = try ContentDecryptor.processChunk(encryptedData: cut, depotKey: key, expectedCRC: 0, expectedSize: plainVector.count); require(o != plainVector, "\(kind): a truncated chunk does not decode") }
         catch { require(error is SteamError, "\(kind): a truncated chunk is rejected") }
     }
@@ -907,6 +908,24 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     var folded: [String: String] = [:]
     require(SteamInstallFiles.safeRelativePath("Docs\\Readme.txt", folded: &folded) == "Docs/Readme.txt", "backslashes become separators")
     require(SteamInstallFiles.safeRelativePath("docs/notes.txt", folded: &folded) == "Docs/notes.txt", "a directory keeps the first spelling seen (Windows semantics)")
+    // Round 624 (Discord forum item 10, Kingdom Come: Deliverance): a spelling already on disk wins over the manifest's.
+    var seeded: [String: String] = [:]
+    var notes: [String] = []
+    let disk: [String: [String]] = ["": ["Data", "Localization"], "Localization": ["English_xml.pak"], "Data": ["Levels", "levels"]]
+    let onDisk: (String) -> [String] = { disk[$0] ?? [] }
+    require(SteamInstallFiles.safeRelativePath("localization/French_xml.pak", folded: &seeded, existing: onDisk, note: { notes.append($0) })
+            == "Localization/French_xml.pak", "a folder the disk spells Localization takes that spelling (no empty twin)")
+    require(SteamInstallFiles.safeRelativePath("LOCALIZATION/German_xml.pak", folded: &seeded, existing: onDisk, note: { notes.append($0) })
+            == "Localization/German_xml.pak", "...and keeps it for the rest of the run")
+    require(SteamInstallFiles.safeRelativePath("Data/Levels/x.pak", folded: &seeded, existing: onDisk, note: { notes.append($0) })
+            == "Data/Levels/x.pak", "twins already on disk: the exact spelling is used")
+    require(SteamInstallFiles.safeRelativePath("Shaders/a.pak", folded: &seeded, existing: onDisk, note: { notes.append($0) })
+            == "Shaders/a.pak", "a folder the disk does not have keeps the manifest's spelling")
+    require(notes == ["the manifest spells localization, the disk has Localization: kept", "case twins on disk in Data: Levels, levels"],
+            "the replaced spelling and the twins on disk are noted once each (\(notes))")
+    var plain: [String: String] = [:]
+    require(SteamInstallFiles.safeRelativePath("localization/x.pak", folded: &plain) == "localization/x.pak",
+            "without a disk listing the old fold is unchanged")
     for bad in ["../x", "a/../../x", "..\\x", "/abs", "a//b/../c", "C:\\x", "a/b:c", "", "a\u{01}b", String(repeating: "a/", count: 70) + "b"] {
         var f: [String: String] = [:]
         let result = SteamInstallFiles.safeRelativePath(bad, folded: &f)
@@ -1037,7 +1056,8 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         do { try MadeiraDock.validate(game, drive: drive, bundled: true) ; require(false, "validate needs the client files") }
         catch { require(error.localizedDescription.contains("client"), "Dock's launch check passes the record and stops at the missing client files only") }
         require(SteamInstallFiles.buildID(appID: 9000, steamApps: steamApps) == build, "the record's build id")
-        require(found.first(where: { $0.id == 9100 })?.installed == true, "the owning app has its own record for the shared depot, as Valve's client requires")
+        // The owner of the shared depot has its own record on disk (checked from Python below); Madeira Dock's list hides an app that only lends depots (cb293856, MadeiraDock.games).
+        require(found.first(where: { $0.id == 9100 }) == nil, "the owning app only lends its depot: Madeira Dock's list hides it, its record stays on disk")
         let events = loggedEvents.joined(separator: "\n")
         require(!events.contains("Fixture") && !events.contains("7656119") && !events.contains("tok"), "no name, account or token in the log")
         require(events.contains("[steam-depot] license app=9000 skipped=9004"), "a depot the account neither has a key for nor a license for is left out")
@@ -1099,15 +1119,17 @@ work = Path(tempfile.mkdtemp(prefix='madeira-steam-library-'))
 servers = []
 try:
     shim = work / 'shim'
-    for name, header, csource in [('CommonCrypto', CRYPTO_H, CRYPTO_C), ('Compression', COMPRESSION_H, COMPRESSION_C)]:
-        directory = shim / name
-        directory.mkdir(parents=True)
-        stem = 'cc_shim' if name == 'CommonCrypto' else 'compression_shim'
-        (directory / f'{stem}.h').write_text(header)
-        (directory / f'{stem}.c').write_text(csource)
-        (directory / 'module.modulemap').write_text(f'module {name} [system] {{ header "{stem}.h" export * }}\n')
-    (shim / 'zlib').mkdir()
-    (shim / 'zlib/module.modulemap').write_text('module zlib [system] { header "/usr/include/zlib.h" link "z" export * }\n')
+    on_mac = sys.platform == 'darwin'   # the SDK has the real CommonCrypto, Compression and zlib modules: the Linux stand-ins would collide with them
+    if not on_mac:
+        for name, header, csource in [('CommonCrypto', CRYPTO_H, CRYPTO_C), ('Compression', COMPRESSION_H, COMPRESSION_C)]:
+            directory = shim / name
+            directory.mkdir(parents=True)
+            stem = 'cc_shim' if name == 'CommonCrypto' else 'compression_shim'
+            (directory / f'{stem}.h').write_text(header)
+            (directory / f'{stem}.c').write_text(csource)
+            (directory / 'module.modulemap').write_text(f'module {name} [system] {{ header "{stem}.h" export * }}\n')
+        (shim / 'zlib').mkdir()
+        (shim / 'zlib/module.modulemap').write_text('module zlib [system] { header "/usr/include/zlib.h" link "z" export * }\n')
     (work / 'decoders.h').write_text(DECODERS_H.format(app=app))
 
     objects = []
@@ -1117,8 +1139,9 @@ try:
         require(result.returncode == 0, f'{Path(source).name} compiles on the host')
         if result.returncode: sys.stdout.write(result.stderr[-3000:])
         objects.append(str(obj))
-    compile_c(shim / 'CommonCrypto/cc_shim.c', ['-I', str(shim / 'CommonCrypto')])
-    compile_c(shim / 'Compression/compression_shim.c', ['-I', str(shim / 'Compression')])
+    if not on_mac:
+        compile_c(shim / 'CommonCrypto/cc_shim.c', ['-I', str(shim / 'CommonCrypto')])
+        compile_c(shim / 'Compression/compression_shim.c', ['-I', str(shim / 'Compression')])
     for name in ['zstd_edu.c', 'lzma_shim.c', 'chunk_zip.c']:
         compile_c(steam / name)
 
@@ -1139,12 +1162,13 @@ try:
                   steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift',
                   app / 'BCDSteamDLC/BCDSteamDLC.swift', app / 'BCDSteamDLC/BCDSteamDLCDownload.swift']   # the downloader's DLC steps (Foundation only)
     exe = work / 'check'
-    build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-g', '-o', str(exe),
-                            '-I', str(shim / 'CommonCrypto'), '-I', str(shim / 'Compression'), '-I', str(shim / 'zlib'),
-                            '-import-objc-header', str(work / 'decoders.h'),
+    build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-g', '-o', str(exe)] +
+                           ([] if on_mac else ['-I', str(shim / 'CommonCrypto'), '-I', str(shim / 'Compression'), '-I', str(shim / 'zlib')]) +
+                           ['-import-objc-header', str(work / 'decoders.h'),
                             str(work / 'stubs.swift'), str(work / 'checks.swift'), str(work / 'dock.swift'), str(work / 'owned.swift'),
                             str(work / 'dates.swift'), str(work / 'downloader.swift')] + [str(x) for x in production] + objects +
-                           ['-Xlinker', '-lcrypto', '-Xlinker', '-llzma', '-Xlinker', '-lz'], capture_output=True, text=True)
+                           (['-Xlinker', '-llzma', '-Xlinker', '-lz'] if on_mac else ['-Xlinker', '-lcrypto', '-Xlinker', '-llzma', '-Xlinker', '-lz']),
+                           capture_output=True, text=True)
     require(build.returncode == 0, 'the production Steam library, download and decoder code compile on the host')
     if build.returncode:
         sys.stdout.write(build.stderr[-6000:])

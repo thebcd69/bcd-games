@@ -35,6 +35,9 @@ Behaviour (swiftc on the host; --require-swift makes its absence a failure):
   - BCDFrameRate: steady readings at 60, 19 (no rounding to steps of 5) and nothing; lines packed
     to the width;
   - LibraryController: the Home hold sends "home" once per half-second hold, only when opted in.
+  - BCDSessionLinePlace (round 624): the session line ends 8 pt short of the menu button on an upright phone (a long line ran
+    under it), goes below a button dragged near the middle, and keeps its old place on a phone held sideways, on an iPad and
+    with no button.
 Preview build (tools/ui-preview.py --build-only; --require-preview makes a missing Xcode a
 failure): the views build without the engine.
 
@@ -221,10 +224,16 @@ check("case .toggleLog: model.toggleLaunchLogs()" in starting and "case .showDes
       "the starting screen: live log, Show desktop, Show the game, Close session")
 info = block(session, "private func startingInfo() -> BCDStartingInfo {")
 check("MadeiraDock.pollReport().fields" in info and "DockInstallers.poll(drive: MadeiraDock.drive)" in info
-      and "DockInstallers.installsOnly ? DockInstallers.closingWords : nil" in info and "DockInstallers.note" in info
+      and "DockInstallers.installsOnly ? DockInstallers.closingCountdown() : nil" in info and "DockInstallers.note" in info
       and "dock.failure" in info and "info.canClose = true" in info and "info.canShowDesktop = dock.holding" in info
       and "info.canShowGame = model.launchSlow && !dock.holding" in info and "model.launchSlow" in info,
       "the starting screen reads the Dock's report, installs, failure and the slow start as the classic one did")
+# round 624 (agent D2 S1 / Discord W1: BioShock 2 sat 62 minutes at "Loading" on a dead Wine server): ten minutes without a frame
+check('if model.launchVerySlow {' in info and 'BCDStartNote(id: "very-slow", text: "Nothing has been drawn for 10 minutes.' in info
+      and info.index("if model.launchVerySlow {") < info.index("} else if model.launchSlow {")
+      and "launchVerySlow = true" in library and "Date().timeIntervalSince(launchStarted) > 600" in library
+      and "launchSlow = false; launchVerySlow = false;" in library,
+      "the starting screen says to close BCD and start again after 10 minutes without a frame (round 624)")
 check("model.menuButtonRect = frame" in session and "model.performanceRect = frame" in session,
       "the menu button and the overlay take their touches (ControlsWindow)")
 check('static let homeHold = MadeiraConfig.flag("MADEIRA_MENU_HOME_HOLD", fallback: false)' in library
@@ -248,6 +257,11 @@ check("w.windowLevel = .normal + 102" in host and "if framesSeen >= 2 { BCDStart
 
 # ---- 5. nothing alive while closed --------------------------------------------------------------
 layer = block(src["BCDSession.swift"], "struct BCDSessionLayer: View {")
+check("let place = BCDSessionLinePlace.of(viewport: geo.size, top: insets.top + 12," in layer
+      and "button: menuButton.viewport == geo.size ? menuButton.frame : .zero)" in layer
+      and ".frame(maxWidth: place.width)" in layer and ".padding(.top, place.top)" in layer
+      and "report: { menuButton = ($0, geo.size); actions.menuButtonFrame($0) }" in layer,
+      "the session line keeps clear of the menu button, whose frame the layer keeps with the screen size it had (round 624)")
 check("if let menu = hud.menu {" in layer and "if let starting = hud.starting {" in layer
       and "if hud.starting == nil, let performance = hud.performance {" in layer, "the menu, the starting screen and the performance HUD exist only while shown")
 check("hud.menu = nil" in block(session, "private func closeMenuModel(save: Bool) {")
@@ -287,6 +301,7 @@ else:
     harness += block(starting_src, "enum BCDDockStart {") + "\n"
     harness += block(overlay_src, "struct BCDReading: Identifiable, Equatable {") + "\n"
     harness += block(overlay_src, "enum BCDFrameRate {") + "\n"
+    harness += "#if canImport(CoreGraphics)\nimport CoreGraphics\n#endif\n" + block(src["BCDSession.swift"], "enum BCDSessionLinePlace {") + "\n"
     harness += rules + "\n"
     lc = block(library, "final class LibraryController: ObservableObject, @unchecked Sendable {")
     # Round 604: the controller's chord (hold Start / hold Home) types LibraryController.sample reads.
@@ -427,6 +442,27 @@ guide.configure(enabled: true, ownsInput: false)
 guide.sample(buttons: 0x0400, lx: 0, ly: 0); Thread.sleep(forTimeInterval: 0.6); guide.sample(buttons: 0x0400, lx: 0, ly: 0); pump()
 expect(got == ["home"], "hold Home (chosen in the menu): half a second held sends home once")
 BCDChordSetting.mode = .backStart
+
+// The session line and the menu button (the button's frame as BCDDraggable reports it: 44 pt, 8 pt from the screen's edge).
+func line(_ w: CGFloat, _ h: CGFloat, top: CGFloat, button: CGRect) -> (CGFloat, CGFloat) {
+    let p = BCDSessionLinePlace.of(viewport: CGSize(width: w, height: h), top: top, button: button)
+    return (p.width, p.top)
+}
+expect(line(375, 667, top: 32, button: CGRect(x: 323, y: 28, width: 44, height: 44)) == (255, 32),
+       "an upright iPhone SE: the line ends 8 pt short of the menu button in the corner")
+expect(line(375, 667, top: 32, button: CGRect(x: 8, y: 28, width: 44, height: 44)) == (255, 32),
+       "the button moved to the other corner: the same, mirrored")
+expect(line(375, 667, top: 32, button: CGRect(x: 165, y: 28, width: 44, height: 44)) == (335, 80),
+       "the button dragged to the middle: the line goes 8 pt below it")
+expect(line(375, 667, top: 32, button: CGRect(x: 323, y: 300, width: 44, height: 44)) == (335, 32),
+       "the button dragged down the side: the old place")
+expect(line(375, 667, top: 32, button: .zero) == (335, 32), "no button (the starting screen, a menu): the old place")
+expect(line(667, 375, top: 12, button: CGRect(x: 615, y: 8, width: 44, height: 44)) == (520, 12),
+       "an iPhone SE held sideways: the old place")
+expect(line(874, 402, top: 12, button: CGRect(x: 822, y: 44, width: 44, height: 44)) == (520, 12),
+       "an iPhone 17 Pro held sideways: the old place")
+expect(line(744, 1133, top: 36, button: CGRect(x: 692, y: 32, width: 44, height: 44)) == (520, 36),
+       "an upright iPad mini: the old place")
 exit(failed == 0 ? 0 : 1)
 '''
     with tempfile.TemporaryDirectory() as tmp:

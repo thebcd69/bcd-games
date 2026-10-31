@@ -7,6 +7,7 @@ classification; data and ARM64 targets must still translate to their copies.
 from pathlib import Path
 import os
 import subprocess
+import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[2]
@@ -252,12 +253,18 @@ int main(int argc, char **argv)
         ios_dump_guest_instruction(NULL, STATUS_PRIVILEGED_INSTRUCTION, b + 0x1100, owner);
         assert(strstr(output, "snapshot=INCOMPLETE"));
         empty_success = 0;
+        /* round 624 (from rtmtree's P3R fork): no text window (a main image run from its PE VA): the 48 bytes around rip
+         * as memory holds them now, one CURRENT line, nothing else */
+        reset_output();
+        assert(!ios_dump_guest_instruction(NULL, STATUS_PRIVILEGED_INSTRUCTION, b + 0x2010, owner));
+        assert(strstr(output, "no registered x64 text window") && strstr(output, "[guest-insn] CURRENT address=") && reads == 48);
+        assert(!strstr(output, "COPY") && !strstr(output, "snapshot="));
         reset_output();
         for (unsigned i = 0; i < 64; i++)
             ios_dump_guest_instruction(NULL, STATUS_PRIVILEGED_INSTRUCTION, b + 0x1100, owner);
-        assert(reads == 12 * 96); /* first four reports consumed above; 16 total */
+        assert(reads == 11 * 96); /* first five reports consumed above; 16 total */
         assert(!ios_dump_guest_instruction(NULL, STATUS_PRIVILEGED_INSTRUCTION, b + 0x1100, owner));
-        assert(reads == 12 * 96); /* extended path also disabled by the exhausted report budget */
+        assert(reads == 11 * 96); /* extended path also disabled by the exhausted report budget */
         reset_output(); unsigned char unused[48] = {0};
         assert(!ios_guest_instruction_read("invalid", UINT64_MAX - 2, 48, unused));
         assert(!ios_guest_instruction_read("invalid", b, 49, unused));
@@ -574,7 +581,9 @@ with tempfile.TemporaryDirectory(prefix='guest-instruction-') as directory:
     cc = os.environ.get('CC', 'cc')
     flags = ['-std=gnu11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
              '-fsanitize=address,undefined', '-fno-sanitize-recover=all']
-    env = dict(os.environ, ASAN_OPTIONS='detect_leaks=1', UBSAN_OPTIONS='halt_on_error=1')
+    # macOS ASan has no leak detector (it aborts at start-up), and its symbolizer opens a password dialog on the Mac: off.
+    env = dict(os.environ, ASAN_OPTIONS='symbolize=0:detect_leaks=' + ('0' if sys.platform == 'darwin' else '1'),
+               UBSAN_OPTIONS='halt_on_error=1:symbolize=0')
     unit = folder / 'check.c'
     unit.write_text(code)
     binary = folder / 'check'

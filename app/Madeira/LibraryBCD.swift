@@ -81,7 +81,10 @@ enum BCDLaunch {
         let program = path.split(separator: "\\").last.map(String.init) ?? path
         LogStore.shared.log("[bcd] library launch \(program): avx=\(LibraryPrefs.avx(path) ? 1 : 0) "
                             + "wine-vcrt=\(LibraryPrefs.wineVCRT(path) ? 1 : 0) nvidia=\(LibraryPrefs.nvidia(path) ? 1 : 0) "
-                            + "game-config=\(profile.hasSettings ? 1 : 0) metalfx=\(profile.metalFXFactor.map { String($0) } ?? "off")")
+                            + "game-config=\(profile.hasSettings ? 1 : 0) metalfx=\(profile.metalFXFactor.map { String($0) } ?? "off")"
+                            // madeira-bcd (round 624, agent D2 S1 / Discord W1): whether BCD runs inside LiveContainer (the three wineserver
+                            // bind failures were all LiveContainer installs); appended last, so readers of the fields before it are unchanged.
+                            + " lc=\(getenv("LC_HOME_PATH") != nil ? 1 : 0)")
         if sessionLog { LogStore.shared.startSessionLog(program: program) }
     }
 

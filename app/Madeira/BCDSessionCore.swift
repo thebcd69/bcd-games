@@ -129,10 +129,20 @@ struct BCDCrashOffer: Equatable {
     var title: String
     var minutes: Int
     var background: Bool
+    /// madeira-bcd (round 624, agent N S14): how long the session lasted, in seconds (nil: not known).
+    var seconds: Int? = nil
 
     var heading: String { "The last session closed unexpectedly" }
 
     var message: String {
+        // madeira-bcd (round 624, agent N S14; FWXFQ1): a start that went to the background within 90 s was left while it started; iOS
+        // pauses such a game and may close it. The memory story below is the wrong one for it.
+        if background, let seconds, seconds < BCDCrashRules.shortStart {
+            return "BCD went to the background \(seconds) seconds after you pressed Play, while \(title) was still starting. iOS pauses a game that "
+                + "is started and left, and may close it. Stay in BCD until the game's picture shows. If something took you away (a sign-in, "
+                + "StikDebug for JIT), come back and press Play again.\n\nYou can still send the log. Before it leaves the device BCD takes out "
+                + "folder paths, user names, e-mail and IP addresses."
+        }
         let played = minutes < 1 ? "" : " after about \(minutes) minute\(minutes == 1 ? "" : "s")"
         let what = background
             ? "BCD was closed while it was in the background and \(title) was running\(played). iOS does this when the device runs short of memory; closing BCD from the app switcher looks the same."
@@ -144,6 +154,10 @@ struct BCDCrashOffer: Equatable {
 enum BCDCrashRules {
     /// A marker older than this is not asked about: the player has moved on.
     static let maxAge: Double = 7 * 86400
+    /// madeira-bcd (round 624, agent N S14): a session that went to the background less than `shortStart` seconds after Play was a start that
+    /// was left (its own words); under `leftTooSoon` seconds nothing is asked: its log holds the first seconds of a start and nothing else.
+    static let shortStart = 90
+    static let leftTooSoon = 20
 
     /// The question for a marker found at start, or nil: no marker, the player turned the question off, the marker is too old or from
     /// the future. `endedAt`: when the session's log was last written (seconds since 1970; nil: unknown), the best sign of when it ended.
@@ -152,8 +166,17 @@ enum BCDCrashRules {
         guard marker.startedAt > 0, marker.startedAt <= now + 60, now - marker.startedAt <= maxAge else { return nil }
         let end = background(marker, endedAt: endedAt)
         let minutes = Int(max(0, end - marker.startedAt) / 60)
+        let seconds = Int(max(0, end - marker.startedAt))
+        if marker.background && seconds < leftTooSoon { return nil }
         let title = marker.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        return BCDCrashOffer(title: title.isEmpty ? "a game" : title, minutes: minutes, background: marker.background)
+        return BCDCrashOffer(title: title.isEmpty ? "a game" : title, minutes: minutes, background: marker.background, seconds: seconds)
+    }
+
+    /// The [session] line's reason when offer(...) gives nil for a marker that was found.
+    static func notAsking(marker: BCDSessionMarker, now: Double, enabled: Bool) -> String {
+        guard enabled else { return "turned off" }
+        guard marker.startedAt > 0, marker.startedAt <= now + 60, now - marker.startedAt <= maxAge else { return "too old" }
+        return marker.background ? "it went to the background within \(leftTooSoon) s of the start" : "too old"
     }
 
     /// The moment the session is taken to have ended: the log's last write, but never before the session began nor before the app
@@ -227,4 +250,24 @@ enum BCDScreenshotRules {
 
     /// The words under the choice to send it: the picture cannot be cleaned like the log is.
     static let sentAsItIs = "A small copy of the picture (about 100 KB) is sent as it is: BCD cannot take anything out of it. Leave it out if the game shows your name or an account."
+}
+
+/// madeira-bcd (round 624, agent R S5: GTA V RT83GE and 6D6ZZS): after a session that did not end cleanly, the new log gets the last lines of
+/// the failed run's log as "[prev-tail]" lines, because a Send Log of the new run does not hold them. The app reads the last 64 KB of that log;
+/// this keeps whole lines only (a first line cut by the read is dropped), the last 60, each at most 400 characters. The live side scrubs every
+/// line with the upload scrubber before it is logged.
+enum BCDPrevTail {
+    static let maxBytes = 65536
+    static let maxLines = 60
+    static let maxLineLength = 400
+
+    /// `data` is the file from `offset` to its end. Split on the bytes (Swift's "\r\n" is one Character, which no "\n" split would cut).
+    static func lines(_ data: Data, offset: UInt64) -> [String] {
+        var parts = data.split(separator: UInt8(ascii: "\n"), omittingEmptySubsequences: true)
+        if offset > 0, !parts.isEmpty, data.first != UInt8(ascii: "\n") { parts.removeFirst() }
+        return parts.suffix(maxLines).compactMap { bytes in
+            let text = bytes.last == UInt8(ascii: "\r") ? bytes.dropLast() : bytes
+            return text.isEmpty ? nil : String(String(decoding: text, as: UTF8.self).prefix(maxLineLength))
+        }
+    }
 }

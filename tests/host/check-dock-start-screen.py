@@ -40,6 +40,8 @@ def require(condition, label):
 
 
 screen = (app / 'DockStartScreen.swift').read_text(encoding='utf-8')
+# Round 624 (agent N S1): the install's note is added at the call site; the pure function keeps its three parameters (it is compiled alone here).
+assert 'static func failure(result: Int?, words: String?, launching: Bool) -> String?' in screen
 library = (app / 'Library.swift').read_text(encoding='utf-8')
 content = (app / 'ContentView.swift').read_text(encoding='utf-8')
 winios = (app / 'Winios/Winios.m').read_text(encoding='utf-8')
