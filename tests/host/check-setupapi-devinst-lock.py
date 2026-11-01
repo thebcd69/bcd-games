@@ -572,8 +572,9 @@ check('Dying Light (Steam 239140) has a list with the line from build 577 on (57
       dying[0]['config'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.LC_ALL = en_US.UTF-8',
                                  {'line': 'env.MADEIRA_OPTIN_DLLS = setupapi', 'minBuild': 577, 'maxBuild': 593},
                                  {'line': 'env.MADEIRA_OPTIN_DLLS = setupapi,ddraw', 'minBuild': 594}])
+# Round 626: Dead Island Definitive Edition (Techland's engine, the same Dying Light lines) names it too.
 check('no other list names setupapi',
-      all('setupapi' not in json.dumps(r) for r in recs['rules'] if r['id'] != 'dying-light'))
+      all('setupapi' not in json.dumps(r) for r in recs['rules'] if r['id'] not in ('dying-light', 'dead-island-definitive')))
 rules = (root / 'build/tools/autotune_rules.py').read_text()
 i = rules.index('"id": "setupapi-devinst-race"')
 rule = rules[i:rules.index('\n    },', i)]

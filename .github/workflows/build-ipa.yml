@@ -148,6 +148,13 @@ jobs:
       - name: Check the screen orientation lock
         run: python3 tests/host/check-bcd-orientation.py
 
+      # Experimental support for the foldable iPhone, iPhone Duo (BCDFoldable.swift): runs only on that model (iPhone19,4) with an
+      # experimental switch on (off by default). The gate is run over 56 other model identifiers, the hooks are listed (one line each),
+      # the default Resolution for its inner display and the scene-size tracker are run on the host, and the engine side is shown to
+      # follow only (no orientation or geometry request, nothing paused or restarted). Nothing else in the app changes.
+      - name: Check the foldable iPhone support
+        run: python3 tests/host/check-bcd-foldable.py
+
       # A Done button on the keyboard where config lines and long text are typed (BCDKeyboardDone): every editor has one.
       - name: Check the keyboard's Done button
         run: python3 tests/host/check-bcd-keyboard-done.py
@@ -374,6 +381,17 @@ jobs:
           python3 tests/host/check-installs-countdown.py
           python3 tests/host/check-kernelbase-optin.py
           python3 tests/host/check-fex-alias-capacity.py
+          python3 tests/host/check-fex-ec-teardown-ctx.py
+          python3 tests/host/check-fex-cpuid-classic.py
+          python3 tests/host/check-display-rate.py
+          python3 tests/host/check-display-hz.py
+          python3 tests/host/check-x64-nocopy-dataimp.py
+          python3 tests/host/check-pe-module-name-safe.py
+          python3 tests/host/check-diag-module-name.py
+          python3 tests/host/check-ctx-null.py
+          python3 tests/host/check-hint-storm.py
+          python3 tests/host/check-fd-pollout-guard.py
+          python3 tests/host/check-dock-install-skip.py
           python3 tests/host/check-godot-composition.py
           python3 tests/host/check-clr-death-diag.py
           python3 tests/host/check-crypt32-root-enum.py
@@ -641,6 +659,15 @@ jobs:
       # Dock one-time installs: install-script plan, ledger, DirectX provided by BCD after a failure, batch text (production Swift under ASan).
       - name: Check dock installers
         run: python3 tests/host/check-dock-installers.py
+      # Round 626 (A1 S12): a Dock start that runs the EA app's installer links msiexec into system32 for that session.
+      - name: Check the EA app installer's Dock session
+        run: python3 tests/host/check-dock-ea-installer.py
+      # Round 626 (P S8): the Mach exception thread's diagnostics read through mach_vm_read_overwrite, never a plain load.
+      - name: Check the Mach exception thread's checked reads
+        run: python3 tests/host/check-mach-exc-safe-reads.py
+      # Round 626 (U2 S10, Sable PVTSYM): every CoreHaptics call of the controller rumble is guarded; a stopped engine is rebuilt.
+      - name: Check the rumble's CoreHaptics guard
+        run: python3 tests/host/check-pad-output-haptics-guard.py
 
       # Ghost of Tsushima diagnostics switches in madeira_d3d12.c (skip-ps, dxil-dump, fence-strict, upload-guard, ...) stay off by default and sit behind g_sd_state.
       - name: Check got diagnostics
@@ -1504,6 +1531,11 @@ jobs:
       - name: Check ASF and WMV
         run: python3 tests/host/check-wmv-asf.py
 
+      # Round 626 (agent V; Unity cutscenes: Silksong DF0537, Hollow Knight H3SBFV, Power Drill Massacre 641PEM): BCD's raw video converter
+      # wg_transform (NV12/YV12/I420 to RGB/YUV of the same size), behind env.MADEIRA_WG_VPROC = 1; key off is the old refusal.
+      - name: Check the raw video converter
+        run: python3 tests/host/check-vproc.py
+
       # Windows thread priorities must not demote USER_INTERACTIVE guest
       # threads onto the efficiency cores (Crysis's main thread ran there).
       - name: Patch wineserver thread priorities (keep pthread QoS)
@@ -1602,6 +1634,11 @@ jobs:
       # 16-byte blob instead of E_NOTIMPL (Resident Evil Requiem's demo ends in its fatal-error dialog right after the call).
       - name: Check the opt-in D3D12 pipeline cached blob
         run: python3 tests/host/check-d3d12-pso-cached-blob.py
+
+      # madeira-bcd (round 626): d3d12-heap-va-align = 1 (opt-in): a D3D12 heap with a placement alignment of 64 KB or more starts on a
+      # 64 KB GPU address (Clair Obscur: Expedition 33's transient allocator got a NULL buffer from a heap Metal placed 32 KB off).
+      - name: Check the opt-in D3D12 heap address alignment
+        run: python3 tests/host/check-d3d12-heap-va-align.py
 
       # madeira-bcd (round 2026-10-24): wow64win passes a class atom (CreateWindowEx's class, UNICODE_STRING.Buffer, CREATESTRUCT.lpszClass)
       # through as an atom instead of adding the guest window base to it (Bioshock Remastered and LEGO Batman 2 died in their first window).
@@ -2275,6 +2312,16 @@ jobs:
       # game's file sets it) answers a timestamp query pending 2 s as complete. The i386 d3d11.dll and d3d11-src.dll. Before the farm key.
       - name: Patch DXMT D3D11 stuck query report
         run: python3 tools/patch-dxmt-d11-query-stuck.py
+
+      # Batman: Arkham City (round 626, agent T S2, 9AGR39/AE9TXK): a tessellation mesh pipeline that did not compile ("Total mesh size
+      # (33792) exceeds the maximum mesh size allowed (32768)") left no pipeline bound and its draws made the driver fault; they are now
+      # dropped until a pipeline of that kind compiles ([mesh-skip] ml870; geometry the same). The i386 d3d11.dll and d3d11-src.dll.
+      # Before the farm key, which hashes it.
+      - name: Check DXMT mesh pipeline failures
+        run: python3 tests/host/check-dxmt-tess-pso-failed.py
+
+      - name: Patch DXMT mesh pipeline failures
+        run: python3 tools/patch-dxmt-tess-pso-failed.py
 
       # env.MADEIRA_DXMT_FAULT_INFO = 1 (off by default): command buffers with
       # encoder execution status, labelled encoders and a [fault-enc] line after
@@ -3312,6 +3359,11 @@ jobs:
       - name: Check the MZ view check
         run: python3 tests/host/check-mz-view.py
 
+      # madeira-bcd (round 626, Splatterhouse YWX9P5): a fixed section view beyond the address limit is refused (Wine answered a
+      # success-class status with no view behind it), and big refused fixed views name the kernel's regions ([map-block]).
+      - name: Check that a fixed view beyond the address limit is refused
+        run: python3 tests/host/check-map-beyond-limit.py
+
       # madeira-bcd (build 624, round 624: Battle.net Y0HFHB, Garry's Mod): a 32-bit guest window is found by its reserving thread's
       # Darwin id, never by a pthread_t a dead thread left behind; the silent "already have one" branch logs how it found the window.
       - name: Check the 32-bit window owner
@@ -3550,7 +3602,7 @@ jobs:
           NEED=""
           # Round 624: Dark Souls III's [srv-getdesc] and WRC 9's [query-stuck] too (build 624's first IPA shipped a
           # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it).
-          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query="; do
+          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 "; do
             LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11.dll && continue
             [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ] && LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11-src.dll && continue
             NEED="$NEED \"$m\""

@@ -1,0 +1,679 @@
+[10:53:14.732] [INFO] Checking entitlements...
+[10:53:14.732] [INFO] [build] v0.1.623 (623)
+[10:53:14.733] [INFO] [device] model=iPad16,3 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7455MB available=8164MB cores=9
+[10:53:14.733] [INFO] [device] address-map=[0x100bd0000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[10:53:14.742] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@2.0x max-fps=120 utc-offset=-03:00 free-disk=9GB stikdebug-url=1
+[10:53:14.745] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:53:18.842] [INFO] [bcd] library launch Spelunky 2: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[10:53:18.842] [INFO] Requesting JIT with Built-in StikJIT...
+[10:53:20.216] [INFO] [dock-launch] image-retire=1
+[10:53:20.216] [INFO] [dock-launch] image-map-guard=1
+[10:53:20.221] [INFO] [dock-installers] app=418530 scripts=0 programs=0
+[10:53:20.222] [INFO] [madeira-dock] starting the host for app 418530; Valve's client authenticates and authorizes the launch
+[10:53:20.232] [INFO] Running full Wine sequence...
+[10:53:20.233] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100bd0000,0x8000000000) 512GB available=8151MB low-power=0 thermal=nominal
+[10:53:20.234] [INFO] [game-cfg] env.DXMT_WSI_MODE_TABLE=1 env.DXMT_WSI_MONITOR_IDENTITY=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X64_IMAGE_NOCOPY=1
+[10:53:20.237] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[10:53:20.238] [INFO] Allocating 1152MB JIT pool via debugger...
+[10:53:20.238] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:53:20.238] [INFO] [jit-debugger] attached=1 at the pool request
+[10:53:20.239] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:53:20.997] [INFO] RX pool at 0x148000000
+[10:53:21.016] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.822s rev=ml526
+[game-cfg] <container>/Library/Application Support/GameConfigs/d36bdeef3d2053ee.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[10:53:21.282] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=7512 MB + phys_footprint=679 MB = 8192 MB (hw.memsize says 7455 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x119a40000+0x70000 (?) → pool 0x148004000 used=0x78000/0x27000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71ffa10000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x27000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0x71ff980000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x27000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=691 MB (peak 691) internal=691 MB compressed=0 MB external=81 MB reusable=13 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.215s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=97, unixdir=98, dup_unixdir=102) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11af90000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11af90000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11af90000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11af98000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11af98000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11af9c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x14996c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a02000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.267s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=126, unixdir=128, dup_unixdir=133) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11AF90000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=850 peb=0x108024000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c5e0000+0x100000 held for 2000 ms (1 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m4187433 "wine-x18-exc"
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000200 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1037 MB (peak 1037) internal=1036 MB compressed=0 MB external=154 MB reusable=13 MB (cycle=2)
+[free-delay] #2 release of 0x7039010000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7039810000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x703a7e0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x703b7b0000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x703c780000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x703d750000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x703e720000+0xfd0000 held for 2000 ms (8 in flight)
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[footprint] rev=ml358 phys=1091 MB (peak 1091) internal=1090 MB compressed=0 MB external=154 MB reusable=12 MB (cycle=3)
+[file-wfail] ml669 #54 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #55 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #56 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[file-wfail] ml669 #57 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1106 MB (peak 1106) internal=1105 MB compressed=0 MB external=154 MB reusable=12 MB (cycle=4)
+[10:53:29.322] [INFO] [dock-report] launch-client-discovery-published=1
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spelunky 2\\Spel2.exe" t+  9.100s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spelunky 2\\Spel2.exe\" random" (fd=367, unixdir=368, dup_unixdir=437) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spelunky 2"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x22e73000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x22e73000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x22e74000 rev=ajan5-motor
+[footprint] rev=ml358 phys=1435 MB (peak 1435) internal=1433 MB compressed=0 MB external=155 MB reusable=12 MB (cycle=5)
+[nls-getptr] type=11 id=1252 peb=0x10812c000
+[nls-getptr] type=11 id=850 peb=0x10812c000
+[nls-getptr] type=11 id=20127 peb=0x10812c000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10812c000
+[nls-getptr] type=11 id=850 peb=0x10812c000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x1506fc000)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spelunky 2\\D3DCOMPILER_47.dll" 0x71f2200000+0x42e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71f1de0000-0x71f1e1b029
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71f1e20000-0x71f1e20f90
+D A8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F1DD0000
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71f1de0000-0x71f1e1b029
+E A8 [iOS-xins] tracker=0x14e70cbc8 WININET.dll sec=0x71f1e20000-0x71f1e20f90
+E A8 [img-map] ml710 #37 intervals-only WININET.dll base=0x71f1dd0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spelunky 2\\discord_game_sdk.dll" 0x71f1830000+0x3b4000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[file-wfail] ml669 #60 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71efe10000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71efaa0000+0x80000 (nsi.dll) → pool 0x151a24000 used=0x9aa8000/0x27000000 tramp+0x4000
+[jit-pool] image 0x71efa20000+0x80000 (imagehlp.dll) → pool 0x151aa8000 used=0x9b2c000/0x27000000 tramp+0x4000
+[jit-pool] image 0x71ef990000+0x90000 (psapi.dll) → pool 0x151b2c000 used=0x9bc0000/0x27000000 tramp+0x4000
+[jit-pool] image 0x71ef900000+0x90000 (version.dll) → pool 0x151bc0000 used=0x9c54000/0x27000000 tramp+0x4000
+D A8 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71EF900000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71ef760000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module tier0_s64.dll (tier0_s64.dll-46fed3100444d04b): 71EF760000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71ef690000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module vstdlib_s64.dll (vstdlib_s64.dll-0805e0d24f89e963): 71EF690000
+[jit-pool] image 0x71ef600000+0x90000 (mswsock.dll) → pool 0x151c54000 used=0x9ce8000/0x27000000 tramp+0x4000
+D A8 Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 71EF600000
+[jit-pool] image 0x71ef570000+0x90000 (secur32.dll) → pool 0x151ce8000 used=0x9d7c000/0x27000000 tramp+0x4000
+D A8 Load module Secur32.dll (secur32.dll-f6ff7e0cf92170a6): 71EF570000
+00a8:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=spel2.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c45400000
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\gameoverlayrenderer64.dll" 0x71ef3c0000+0x1ac000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc678e11f2): 71EF3C0000
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f5632000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5632000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5633000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5633000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5634000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5634000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5635000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f5635000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5636000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5637000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5638000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5639000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f563a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f563b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f563c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f563d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #15 req_addr=0x71f563e000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f563e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #16 req_addr=0x71f563f000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f563f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #17 req_addr=0x71f595c000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f595c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #18 req_addr=0x71f595d000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f595d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #19 req_addr=0x71f595e000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f595e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #20 req_addr=0x71f595f000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f595f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f5979000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f597a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f597b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f597c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f597d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f597e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f597f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f5984000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f5985000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f5986000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f5987000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f5988000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f5989000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f598a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f598b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f598c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f598d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f598e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f598f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f6497000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f6498000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f6499000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f649a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f649b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f649c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f649d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f649e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f649f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f6b37000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f6b38000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f6b39000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f6b3a000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f6b3b000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f6b3c000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f6b3d000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f6b3e000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f6b3f000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f71d7000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f71d8000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f71d9000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f71da000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f71db000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f71dc000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f71dd000 size=0x1000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[guest-log] file <container>/Documents/wine/drive_c/Program Files (x86)/Steam/steamapps/common/Spelunky 2/spelunky.log
+[guest-log] #1 tid=00a8 10:53:31: Adapter 0: Apple M4 GPU (1024Mb)
+[guest-log] #2 tid=00a8 10:53:31: Selected adapter 0
+[10:53:31.232] [INFO] [dock-report] launch-game-running=1
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[guest-log] #3 tid=00a8 10:53:31: Output 0 (\\.\DISPLAY1) attached to desktop as primary: 1160x800
+[guest-log] #4 tid=00a8 10:53:31: Found 1 attached adapter outputs.
+[guest-log] #5 tid=00a8 10:53:31: Selected output 0 (\\.\DISPLAY1): 1160x800
+[guest-log] #6 tid=00a8 10:53:31: Current display settings: 1160x800x32 @60
+[guest-log] #7 tid=00a8 10:53:31: Desktop display mode: 1160x800(60.00 Hz)
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x1005a class='' text="Spelunky 2" rev=ml853
+[win-name] #33 hwnd=0x1005a class='' text="Spelunky 2" rev=ml853
+[guest-log] #8 tid=00a8 10:53:31: Display initialized
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[guest-log] #9 tid=00a8 10:53:31: Using adapter: Apple M4 GPU (1024Mb)
+[footprint] rev=ml358 phys=1922 MB (peak 1922) internal=1920 MB compressed=0 MB external=217 MB reusable=12 MB (cycle=6)
+[launch-view] dismissed reason=game-window logs=0
+[footprint] rev=ml1060 fast phys=1939 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1956 MB compressed=0 MB
+[free-delay] #1024 release of 0x703c100000+0x100000 held for 2000 ms (95 in flight)
+[steer] #2 size=0x2010000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c52400000
+[alloc-fail] ml814 #128 status=c0000018 hint=0x7017f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #192 status=c0000018 hint=0x7957f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #256 status=c0000018 hint=0x7ad7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #320 status=c0000018 hint=0x7477f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #384 status=c0000018 hint=0x7857f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #448 status=c0000018 hint=0x7d97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #512 status=c0000018 hint=0x7fb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #576 status=c0000018 hint=0x7e57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #640 status=c0000018 hint=0x7037f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #704 status=c0000018 hint=0x7cb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #768 status=c0000018 hint=0x70d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #832 status=c0000018 hint=0x7c57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #896 status=c0000018 hint=0x74f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #960 status=c0000018 hint=0x73d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1024 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1088 status=c0000018 hint=0x7f77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1152 status=c0000018 hint=0x75d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1216 status=c0000018 hint=0x7737f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1280 status=c0000018 hint=0x7fd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1344 status=c0000018 hint=0x7497f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1408 status=c0000018 hint=0x7637f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1472 status=c0000018 hint=0x7f57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1536 status=c0000018 hint=0x7dd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1600 status=c0000018 hint=0x7257f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1664 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1728 status=c0000018 hint=0x7097f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1792 status=c0000018 hint=0x7d77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1856 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1920 status=c0000018 hint=0x7bd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1984 status=c0000018 hint=0x7cf7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2048 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2112 status=c0000018 hint=0x72d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2176 status=c0000018 hint=0x7857f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2240 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2304 status=c0000018 hint=0x7397f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2368 status=c0000018 hint=0x7717f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2432 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2496 status=c0000018 hint=0x76d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2560 status=c0000018 hint=0x7797f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2624 status=c0000018 hint=0x7cd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2688 status=c0000018 hint=0x71f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2752 status=c0000018 hint=0x78b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2816 status=c0000018 hint=0x7d37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2880 status=c0000018 hint=0x7837f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2944 status=c0000018 hint=0x7d17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3008 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3072 status=c0000018 hint=0x72d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3136 status=c0000018 hint=0x7fb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3200 status=c0000018 hint=0x7af7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3264 status=c0000018 hint=0x7157f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3328 status=c0000018 hint=0x7b37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3392 status=c0000018 hint=0x79f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3456 status=c0000018 hint=0x74f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3520 status=c0000018 hint=0x7597f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3584 status=c0000018 hint=0x7237f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3648 status=c0000018 hint=0x7597f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3712 status=c0000018 hint=0x7657f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3776 status=c0000018 hint=0x7cd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3840 status=c0000018 hint=0x7937f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3904 status=c0000018 hint=0x76b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3968 status=c0000018 hint=0x7057f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4032 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4096 status=c0000018 hint=0x7317f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4160 status=c0000018 hint=0x7797f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4224 status=c0000018 hint=0x7f77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4288 status=c0000018 hint=0x77f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4352 status=c0000018 hint=0x7d97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4416 status=c0000018 hint=0x7757f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4480 status=c0000018 hint=0x7297f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4544 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4608 status=c0000018 hint=0x7a57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4672 status=c0000018 hint=0x77b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4736 status=c0000018 hint=0x7897f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4800 status=c0000018 hint=0x71b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4864 status=c0000018 hint=0x7b97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4928 status=c0000018 hint=0x7997f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4992 status=c0000018 hint=0x7ed7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5056 status=c0000018 hint=0x7057f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5120 status=c0000018 hint=0x7417f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5184 status=c0000018 hint=0x7897f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5248 status=c0000018 hint=0x7897f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5312 status=c0000018 hint=0x7777f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5376 status=c0000018 hint=0x7f57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5440 status=c0000018 hint=0x7bd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5504 status=c0000018 hint=0x7057f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5568 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5632 status=c0000018 hint=0x74d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5696 status=c0000018 hint=0x78b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5760 status=c0000018 hint=0x7fd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5824 status=c0000018 hint=0x7bf7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5888 status=c0000018 hint=0x7b97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #5952 status=c0000018 hint=0x7317f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6016 status=c0000018 hint=0x7c37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6080 status=c0000018 hint=0x7097f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6144 status=c0000018 hint=0x7a17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6208 status=c0000018 hint=0x7717f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6272 status=c0000018 hint=0x79b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6336 status=c0000018 hint=0x7137f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6400 status=c0000018 hint=0x7c37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6464 status=c0000018 hint=0x7257f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6528 status=c0000018 hint=0x7597f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6592 status=c0000018 hint=0x7ef7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6656 status=c0000018 hint=0x73f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6720 status=c0000018 hint=0x7957f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6784 status=c0000018 hint=0x7c37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6848 status=c0000018 hint=0x7c57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6912 status=c0000018 hint=0x7297f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #6976 status=c0000018 hint=0x7757f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7040 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7104 status=c0000018 hint=0x7ef7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7168 status=c0000018 hint=0x7d17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7232 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7296 status=c0000018 hint=0x7d17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7360 status=c0000018 hint=0x70f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7424 status=c0000018 hint=0x71b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7488 status=c0000018 hint=0x7417f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7552 status=c0000018 hint=0x7937f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7616 status=c0000018 hint=0x7a97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7680 status=c0000018 hint=0x7af7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7744 status=c0000018 hint=0x76d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7808 status=c0000018 hint=0x7137f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7872 status=c0000018 hint=0x7137f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #7936 status=c0000018 hint=0x7bd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8000 status=c0000018 hint=0x7e37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8064 status=c0000018 hint=0x7ff7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8128 status=c0000018 hint=0x7d97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8192 status=c0000018 hint=0x7817f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8256 status=c0000018 hint=0x7fb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8320 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8384 status=c0000018 hint=0x7517f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8448 status=c0000018 hint=0x7037f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8512 status=c0000018 hint=0x7097f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8576 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8640 status=c0000018 hint=0x7a77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8704 status=c0000018 hint=0x7d37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8768 status=c0000018 hint=0x7737f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8832 status=c0000018 hint=0x7f17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8896 status=c0000018 hint=0x7f17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #8960 status=c0000018 hint=0x7977f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #9024 status=c0000018 hint=0x7837f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #9088 status=c0000018 hint=0x7417f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53184 status=c0000018 hint=0x7017f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53248 status=c0000018 hint=0x7997f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53312 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53376 status=c0000018 hint=0x7797f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53440 status=c0000018 hint=0x7977f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53504 status=c0000018 hint=0x75b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53568 status=c0000018 hint=0x7c77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53632 status=c0000018 hint=0x78f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53696 status=c0000018 hint=0x70d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53760 status=c0000018 hint=0x7897f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53824 status=c0000018 hint=0x7bd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53888 status=c0000018 hint=0x75b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53952 status=c0000018 hint=0x7ef7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54016 status=c0000018 hint=0x7517f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54080 status=c0000018 hint=0x7137f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54144 status=c0000018 hint=0x7697f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54208 status=c0000018 hint=0x7757f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54272 status=c0000018 hint=0x7d37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54336 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54400 status=c0000018 hint=0x76b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54464 status=c0000018 hint=0x73d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54528 status=c0000018 hint=0x7537f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54592 status=c0000018 hint=0x7617f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54656 status=c0000018 hint=0x7f57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54720 status=c0000018 hint=0x79f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54784 status=c0000018 hint=0x7757f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54848 status=c0000018 hint=0x7777f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54912 status=c0000018 hint=0x7a77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54976 status=c0000018 hint=0x78f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55040 status=c0000018 hint=0x7dd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55104 status=c0000018 hint=0x70b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55168 status=c0000018 hint=0x7a77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55232 status=c0000018 hint=0x7537f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55296 status=c0000018 hint=0x7f37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55360 status=c0000018 hint=0x7c77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55424 status=c0000018 hint=0x7df7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55488 status=c0000018 hint=0x71d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55552 status=c0000018 hint=0x7a97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55616 status=c0000018 hint=0x7c17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55680 status=c0000018 hint=0x79f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55744 status=c0000018 hint=0x75b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55808 status=c0000018 hint=0x7477f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55872 status=c0000018 hint=0x7d17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55936 status=c0000018 hint=0x7837f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56000 status=c0000018 hint=0x73f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56064 status=c0000018 hint=0x79d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56128 status=c0000018 hint=0x70f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56192 status=c0000018 hint=0x7a17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56256 status=c0000018 hint=0x7157f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56320 status=c0000018 hint=0x7097f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56384 status=c0000018 hint=0x7e37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56448 status=c0000018 hint=0x7b17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56512 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56576 status=c0000018 hint=0x70d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56640 status=c0000018 hint=0x7d57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56704 status=c0000018 hint=0x7ef7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56768 status=c0000018 hint=0x70b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56832 status=c0000018 hint=0x7377f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56896 status=c0000018 hint=0x7997f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56960 status=c0000018 hint=0x7977f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57024 status=c0000018 hint=0x7177f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57088 status=c0000018 hint=0x7cb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57152 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57216 status=c0000018 hint=0x74d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57280 status=c0000018 hint=0x74d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57344 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57408 status=c0000018 hint=0x72b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57472 status=c0000018 hint=0x7797f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57536 status=c0000018 hint=0x7457f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57600 status=c0000018 hint=0x7697f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57664 status=c0000018 hint=0x7437f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57728 status=c0000018 hint=0x7237f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57792 status=c0000018 hint=0x7117f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57856 status=c0000018 hint=0x7537f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57920 status=c0000018 hint=0x7cd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57984 status=c0000018 hint=0x7157f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58048 status=c0000018 hint=0x7597f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58112 status=c0000018 hint=0x73d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58176 status=c0000018 hint=0x79f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58240 status=c0000018 hint=0x7777f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58304 status=c0000018 hint=0x7a37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58368 status=c0000018 hint=0x73d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58432 status=c0000018 hint=0x7417f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58496 status=c0000018 hint=0x7bb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58560 status=c0000018 hint=0x7397f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58624 status=c0000018 hint=0x74b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58688 status=c0000018 hint=0x7bd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58752 status=c0000018 hint=0x79f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58816 status=c0000018 hint=0x7bf7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58880 status=c0000018 hint=0x73f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58944 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59008 status=c0000018 hint=0x7357f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59072 status=c0000018 hint=0x7117f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59136 status=c0000018 hint=0x74b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59200 status=c0000018 hint=0x7ab7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59264 status=c0000018 hint=0x7777f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59328 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59392 status=c0000018 hint=0x7997f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59456 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59520 status=c0000018 hint=0x7277f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59584 status=c0000018 hint=0x76f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59648 status=c0000018 hint=0x7477f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59712 status=c0000018 hint=0x7cf7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59776 status=c0000018 hint=0x7837f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59840 status=c0000018 hint=0x70d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59904 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59968 status=c0000018 hint=0x7917f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60032 status=c0000018 hint=0x7c77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60096 status=c0000018 hint=0x7f97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60160 status=c0000018 hint=0x7417f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60224 status=c0000018 hint=0x78b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60288 status=c0000018 hint=0x73f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60352 status=c0000018 hint=0x7df7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60416 status=c0000018 hint=0x7eb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60480 status=c0000018 hint=0x7ed7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60544 status=c0000018 hint=0x7d37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60608 status=c0000018 hint=0x77f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60672 status=c0000018 hint=0x7d17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60736 status=c0000018 hint=0x7377f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60800 status=c0000018 hint=0x7a57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60864 status=c0000018 hint=0x7dd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60928 status=c0000018 hint=0x79d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60992 status=c0000018 hint=0x7057f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61056 status=c0000018 hint=0x7cf7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61120 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61184 status=c0000018 hint=0x72f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61248 status=c0000018 hint=0x7717f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61312 status=c0000018 hint=0x7a17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61376 status=c0000018 hint=0x70d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61440 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61504 status=c0000018 hint=0x71f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61568 status=c0000018 hint=0x7597f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61632 status=c0000018 hint=0x7db7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61696 status=c0000018 hint=0x7297f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61760 status=c0000018 hint=0x76f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61824 status=c0000018 hint=0x76d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61888 status=c0000018 hint=0x77d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61952 status=c0000018 hint=0x7d57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62016 status=c0000018 hint=0x78b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62080 status=c0000018 hint=0x7297f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62144 status=c0000018 hint=0x7b17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62208 status=c0000018 hint=0x7ad7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62272 status=c0000018 hint=0x74f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62336 status=c0000018 hint=0x78b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62400 status=c0000018 hint=0x7b37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62464 status=c0000018 hint=0x70f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62528 status=c0000018 hint=0x7e37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62592 status=c0000018 hint=0x7b77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62656 status=c0000018 hint=0x7677f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62720 status=c0000018 hint=0x7c97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62784 status=c0000018 hint=0x7b77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62848 status=c0000018 hint=0x7917f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62912 status=c0000018 hint=0x73b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62976 status=c0000018 hint=0x7957f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63040 status=c0000018 hint=0x7f57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63104 status=c0000018 hint=0x72f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63168 status=c0000018 hint=0x7637f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63232 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63296 status=c0000018 hint=0x7c57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63360 status=c0000018 hint=0x7f97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63424 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63488 status=c0000018 hint=0x7a37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63552 status=c0000018 hint=0x77f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63616 status=c0000018 hint=0x7437f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63680 status=c0000018 hint=0x7e77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63744 status=c0000018 hint=0x7d37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63808 status=c0000018 hint=0x7357f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63872 status=c0000018 hint=0x7557f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63936 status=c0000018 hint=0x7af7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64000 status=c0000018 hint=0x76b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64064 status=c0000018 hint=0x7637f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64128 status=c0000018 hint=0x75f7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64192 status=c0000018 hint=0x7fd7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64256 status=c0000018 hint=0x72d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64320 status=c0000018 hint=0x7317f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64384 status=c0000018 hint=0x7697f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64448 status=c0000018 hint=0x7bb7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64512 status=c0000018 hint=0x7077f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64576 status=c0000018 hint=0x7217f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64640 status=c0000018 hint=0x7277f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64704 status=c0000018 hint=0x7d97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64768 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64832 status=c0000018 hint=0x74d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64896 status=c0000018 hint=0x7a37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64960 status=c0000018 hint=0x7af7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65024 status=c0000018 hint=0x7357f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65088 status=c0000018 hint=0x7317f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65152 status=c0000018 hint=0x7b37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65216 status=c0000018 hint=0x79b7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65280 status=c0000018 hint=0x7db7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65344 status=c0000018 hint=0x7c37f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65408 status=c0000018 hint=0x7897f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65472 status=c0000018 hint=0x7f57f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #65536 status=c0000018 hint=0x7a97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #131072 status=c0000018 hint=0x71d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #262144 status=c0000018 hint=0x7917f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #524288 status=c0000018 hint=0x7e77f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #1048576 status=c0000018 hint=0x7717f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #2097152 status=c0000018 hint=0x7a97f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #4194304 status=c0000018 hint=0x72d7f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #34 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x7dd7f800000 zb=0x0 hits=4194304 rev=ajan5-rockstar
+[alloc-fail] ml814 #8388608 status=c0000018 hint=0x7517f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #35 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x79d7f800000 zb=0x0 hits=8388608 rev=ajan5-rockstar
+[alloc-fail] ml814 #16777216 status=c0000018 hint=0x7e17f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #36 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x72f7f800000 zb=0x0 hits=16777216 rev=ajan5-rockstar
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc01020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=2 x8=0x0 x18=0x0 sp=0x16f22e230
+[thread-stacks] port=0x2403 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=54 x8=0x1fd504b24 x18=0x0 sp=0x16f3ccc60
+[thread-stacks] port=0x5303 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x11bc80581 x18=0x0 sp=0x16f5feb30
+[thread-stacks] port=0x8303 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16f68ab40
+[thread-stacks] port=0x8403 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fd504b24 x18=0x0 sp=0x16f716ac0
+[thread-stacks] port=0xaf03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x1fd504b24 x18=0x0 sp=0x16f7a0560
+[thread-stacks] port=0xbf2b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fc01020
+[alloc-fail] ml814 #33554432 status=c0000018 hint=0x7337f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #37 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x7d37f800000 zb=0x0 hits=33554432 rev=ajan5-rockstar
+[hwinput] keyboard focus: program (responder)
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[sock-big] send ERROR fd=391 errno=65 rev=ml464
+[10:53:51.179] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=50 resident=2133MB dbg=DEBUGGED rev=ml525
+[alloc-fail] ml814 #67108864 status=c0000018 hint=0x7697f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #38 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x77d7f800000 zb=0x0 hits=67108864 rev=ajan5-rockstar
+[thread-stacks] port=0xbf2b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fc01020
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16fc017d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0xb43f00004443 pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16fc017d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0xb43f00004493 pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[wait-chain]   WAIT     "wine-x18-exc" cpu=0 run=3 api=mach_msg x0=0x16fc017d0 obj/x1=0x400000002 val=?0000000000000000 x2=0x80001112 x3=0xb43f000217f7 pc=libsystem_kernel.dylib`mach_msg2_trap+0x8
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc01020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[alloc-fail] ml814 #134217728 status=c0000018 hint=0x7877f800000 size=0x2000000 type=0x3000 protect=0x4 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #39 NtAllocateVirtualMemory status=c0000018 proc=spel2.exe tid=00a8 size=0x2000000 type=0x3000 prot=0x4 hint=0x7237f800000 zb=0x0 hits=134217728 rev=ajan5-rockstar
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=46 resident=2146MB dbg=DEBUGGED rev=ml525
+[10:54:21.274] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-stacks] port=0xbf2b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fc01020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc01020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1913 MB (peak 1969) internal=1831 MB compressed=79 MB external=220 MB reusable=4 MB (cycle=39)
+[footprint] rev=ml358 phys=1913 MB (peak 1969) internal=1831 MB compressed=79 MB external=220 MB reusable=4 MB (cycle=40)
+[thread-stacks] port=0xbf2b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fc01020
+[thread-stacks] port=0x11033 "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x1f40 x18=0x0 sp=0x125d7fb00
+[thread-stacks] port=0x958f "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0xea60 x18=0x0 sp=0x125f7fb00
+[thread-stacks] port=0x14457 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x12637eb40
+[thread-stacks] port=0x1aec3 "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16f5240e0 x18=0x0 sp=0x11b26e9d0
+[thread-stacks] port=0x1d27b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=1 x8=0x1 x18=0x0 sp=0x16f63ab40
+[thread-stacks] port=0x1b1e3 "" pc=?`?+0x0 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x0
+[footprint] rev=ml358 phys=1913 MB (peak 1969) internal=1831 MB compressed=79 MB external=220 MB reusable=4 MB (cycle=41)
+[footprint] rev=ml358 phys=1914 MB (peak 1969) internal=1832 MB compressed=79 MB external=220 MB reusable=4 MB (cycle=42)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc01020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1914 MB (peak 1969) internal=1832 MB compressed=79 MB external=220 MB reusable=4 MB (cycle=43)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1913 MB (peak 1969) internal=1813 MB compressed=98 MB external=242 MB reusable=5 MB (cycle=44)
+[10:54:48.696] [INFO] [session] length=88s partial=1 play=0s frames=0 stalls=0/0s peak=1975MB limit=8191MB thermal=nominal lpm=0 api=D3D11/64 res=1160x800 cap=60 game=Spelunky 2

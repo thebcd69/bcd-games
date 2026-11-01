@@ -220,7 +220,12 @@ _r620 = ['forza-horizon-4', 'tiny-tinas-wonderlands', 'far-cry-3', 'barotrauma',
          'bloons-td-6']                         # round 623 (Bloons TD 6, ajan58)
 _r624 = ['control', 'no-more-room-in-hell', 'red-faction', 'from-the-darkness', 'metal-gear-solid-4-master-collection', 'mycopunk', 'arctic-awakening', 'supermarket-together', 'robocop-rogue-city', 'blasphemous', 'nwjs-game-exe', 'kerbal-space-program', 'mafia-2', 'fallout-3', 'overlord-ii', 'rise-of-the-tomb-raider', 'lucieneslife', 'ubisoft-connect', 'unreal-gold', 'repo', 'osu', 'outlast', 'satisfactory', 'the-witcher-3', 'yakuza-6-the-song-of-life', 'euro-truck-simulator-2', 'gal-gun-2', 'hello-neighbor',
          'borderlands-goty-enhanced', 'dead-space-2023', 'schedule-i', 'dokimon-quest', 'sonic-adventure-dx', 'requiem-avenging-angel', 'friends-vs-friends', 'fallout-4-other', 'skyrim-special-edition-other', 'wrc-9', 'doki-doki-literature-club',
-         'outlast-2', 'batman-arkham-knight', 'dead-rising', 'reanimal', 'pragmata', 'what-lies-in-the-multiverse', 'muv-luv-photonflowers']   # round 625 (owner's items 10, 12, 13, 14); round 624 (the ten analysis reports of tur624; Borderlands GOTY Enhanced, agent A S7; Dead Space (2023), Discord)
+         'outlast-2', 'batman-arkham-knight', 'dead-rising', 'reanimal', 'pragmata', 'what-lies-in-the-multiverse', 'muv-luv-photonflowers',
+         'nioh-2', 'ghpc', 'murder-miners', 'crosscode', 'dead-island-definitive', 'football-manager-27',
+         'call-of-duty-modern-warfare-2-2009', 'cyberpunk-2077', 'deadlock',
+         'power-drill-massacre', 'hellblade-senuas-sacrifice', 'valheim', 'overcooked-2',
+         'oxygen-not-included', 'caravan-sandwitch', 'dragon-age-origins', 'reskate', 'haak',
+         'bioshock-remastered-epic', 'hollow-knight-silksong', 'hollow-knight', 'burnout-paradise', 'poppy-playtime', 'dark-souls-ptde', 'saints-row-the-third', 'sleeping-dogs-definitive-edition', 'call-of-duty-black-ops']   # round 626 (agents T, U1, U2, A2, G1, P, V)   # round 625 (owner's items 10, 12, 13, 14); round 624 (the ten analysis reports of tur624; Borderlands GOTY Enhanced, agent A S7; Dead Space (2023), Discord)
 _ids = [r['id'] for r in recs['rules']]
 check('the rule stands before "standard" (the last rule), after it only the round-602 lists, The Adventures of Elliot and the round-620/623 lists',
       _ids[_ids.index('glyphica-typing-survival'):] == ['glyphica-typing-survival', 'grand-theft-auto-iii', 'postal-2', 'hotline-miami', 'max-payne-2',

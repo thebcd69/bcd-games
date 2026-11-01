@@ -85,7 +85,7 @@ check('no helper writes memory, protects pages, stops threads or exits',
 # the only reads of guest or host memory are the Mach ones (no raw dereference of a computed address)
 raw_deref = re.findall(r'\*\s*\(\s*(?:const\s+)?(?:volatile\s+)?(?:u?int\d+_t|void|char|unsigned\w*|uintptr_t)\s*\*\s*\)', block)
 check('no raw dereference of a guest or host address (reads are mach_vm_read_overwrite only)',
-      not raw_deref and block.count('mach_vm_read_overwrite(') == 2, str(raw_deref))
+      not raw_deref and block.count('mach_vm_read_overwrite(') == 3, str(raw_deref))   # + ios_exc_read64 (round 626, agent P S8, d14635bc)
 check('only the failure signatures are reported',
       'fault_addr == 0xd4400000UL' in block and 'prev == 0x52800001' in block and 'insn == 0xf9400021' in block
       and 'if (rip < 0x0000800000000000ULL) return;' in block and block.count('ios_ajan2_pc_is_jit( pc )') == 4

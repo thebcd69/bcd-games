@@ -1960,6 +1960,7 @@ static void ios_soft_report( const char *why )
 static void ios_bigres_note( void *base, size_t size );   /* defined below */
 
 static int ios_safe_read64( uint64_t addr, uint64_t *out );
+static int ios_safe_read( uintptr_t addr, void *out, size_t len );   /* madeira-bcd (round 626): defined below; ios_pe_module_name_safe */
 static void ios_jumbo_census( void *hint, size_t size, void *result, unsigned st )
 {
     unsigned seq = ++ios_jumbo_seq;
@@ -4754,6 +4755,37 @@ unsigned ios_fex_branch_history_offset( void )
  * Callbacks are published only after both lookups complete, and the resolved
  * flag is set LAST, so a concurrent reader either sees the old state or a fully
  * populated one — never a half-installed pair. */
+/* safe-module-name-test:begin (tests/host/check-pe-module-name-safe.py compiles this region) */
+/* madeira-bcd (round 626, agent G2 S13; Tomb Raider Game of the Year GR49ZZ, build 623): ios_pe_module_name's reads, every one through
+ * the kernel (ios_safe_read), into the caller's buffer. The resolver below named every ios_jit_mappings[] entry with plain loads, and an
+ * entry whose image was unmapped (the game's refused netapi32/Kerberos loads, "[image-reload] unmapped image") took a BUS fault at its
+ * base that no guest handler could take. Same answers as ios_pe_module_name for a readable image; "?" where it would have faulted. */
+static const char *ios_pe_module_name_safe( const void *image_base, size_t image_size, char *out, size_t out_size )
+{
+    uintptr_t b = (uintptr_t)image_base;
+    unsigned char mz[2], pe[0x90];
+    uint32_t lfanew = 0, exp_rva = 0, name_rva = 0;
+    size_t cap;
+
+    if (!b || image_size < 0x100 || out_size < 2) return "?";
+    if (!ios_safe_read( b, mz, 2 ) || mz[0] != 'M' || mz[1] != 'Z') return "?";
+    if (!ios_safe_read( b + 0x3c, &lfanew, 4 ) || (size_t)lfanew + 0x90 > image_size) return "?";
+    if (!ios_safe_read( b + lfanew, pe, sizeof(pe) ) || pe[0] != 'P' || pe[1] != 'E') return "?";
+    if ((pe[0x18] | (pe[0x19] << 8)) != 0x20b) return "?";                      /* PE32+ only, as before */
+    memcpy( &exp_rva, pe + 0x88, 4 );                                            /* DataDir[0] Export VA */
+    if (!exp_rva || (size_t)exp_rva + 0x10 > image_size) return "?";
+    if (!ios_safe_read( b + exp_rva + 0x0c, &name_rva, 4 )) return "?";        /* IMAGE_EXPORT_DIRECTORY.Name */
+    if (!name_rva || (size_t)name_rva + 1 > image_size) return "?";
+    cap = image_size - name_rva;
+    if (cap > 64) cap = 64;
+    if (cap > out_size - 1) cap = out_size - 1;
+    if (cap > 0x4000 - ((b + name_rva) & 0x3fff)) cap = 0x4000 - ((b + name_rva) & 0x3fff);   /* never across a page */
+    if (!ios_safe_read( b + name_rva, out, cap )) return "?";
+    out[cap] = 0;
+    return memchr( out, 0, cap ) ? out : "?";                                   /* a NUL inside the image, as before */
+}
+/* safe-module-name-test:end */
+
 void ios_resolve_fex_exports( void )
 {
     int i;
@@ -4766,9 +4798,12 @@ void ios_resolve_fex_exports( void )
     for (i = 0; i < ios_jit_mapping_count; i++)
     {
         void *rip_cb, *rel_cb;
-        const char *nm = ios_pe_module_name( ios_jit_mappings[i].pe_base,
-                                             ios_jit_mappings[i].size );
-        if (!nm) continue;
+        char nb[72];
+        const char *nm;
+        /* madeira-bcd (round 626, GR49ZZ): an entry whose image was unmapped keeps its pe_base on purpose
+         * (ios_jit_note_image_unmapped); it cannot be this process's emulator. The others are named fault-safely. */
+        if (!ios_jit_mappings[i].pe_base || !ios_jit_mappings[i].size || ios_jit_mappings[i].unmapped) continue;
+        nm = ios_pe_module_name_safe( ios_jit_mappings[i].pe_base, ios_jit_mappings[i].size, nb, sizeof(nb) );
         if (!strstr( nm, "xtajit64" ) && !strstr( nm, "arm64ecfex" )) continue;
 
         rip_cb = ios_pe_find_export( ios_jit_mappings[i].pe_base, "BTCpu64IosRipFromHostPC" );
@@ -6523,6 +6558,57 @@ static int ios_img_off_is_exec( const void *img, size_t img_size, size_t off )
     return 0;   /* outside every section: headers/padding, not code */
 }
 
+/* madeira-bcd round 626 (agent A2 S7; Poppy Playtime's launcher 6DS3FK, build 623; WC6QN0, build 611): a pure x64 image run without a
+ * pool copy (VPROT_X64DATA, MADEIRA_X64_IMAGE_NOCOPY or the NOCOPY fallback) is in no ios_jit_mappings[] entry, so the binder below
+ * returned at once and its IAT slots for DATA exports of ARM64EC DLLs (msvcp140's std::cout) kept the PE address, where the DLL's live
+ * data is not. With env.MADEIRA_X64_NOCOPY_DATAIMP = 1 (default off: no table, nothing changes) such images are noted here at mapping
+ * (under the virtual mutex) and forgotten at delete_view; the binder finds them lock-free. Full table: the image is not bound (as before). */
+#define IOS_X64_NOCOPY_MAX 128
+static struct { uintptr_t base; size_t size; } ios_x64_nocopy_tab[IOS_X64_NOCOPY_MAX];
+
+static int ios_x64_nocopy_dataimp_enabled(void)
+{
+    static int cached = -1;
+    if (cached < 0)
+    {
+        const char *s = getenv( "MADEIRA_X64_NOCOPY_DATAIMP" );
+        cached = (s && s[0] == '1' && !s[1]) ? 1 : 0;
+    }
+    return cached;
+}
+
+static void ios_x64_nocopy_note( uintptr_t base, size_t size )
+{
+    int i;
+    for (i = 0; i < IOS_X64_NOCOPY_MAX; i++)
+        if (!__atomic_load_n( &ios_x64_nocopy_tab[i].base, __ATOMIC_ACQUIRE ))
+        {
+            ios_x64_nocopy_tab[i].size = size;
+            __atomic_store_n( &ios_x64_nocopy_tab[i].base, base, __ATOMIC_RELEASE );
+            return;
+        }
+}
+
+static void ios_x64_nocopy_forget( uintptr_t base )
+{
+    int i;
+    for (i = 0; i < IOS_X64_NOCOPY_MAX; i++)
+        if (__atomic_load_n( &ios_x64_nocopy_tab[i].base, __ATOMIC_ACQUIRE ) == base)
+            __atomic_store_n( &ios_x64_nocopy_tab[i].base, (uintptr_t)0, __ATOMIC_RELEASE );
+}
+
+static int ios_x64_nocopy_find( uintptr_t rs, uintptr_t re, uintptr_t *pe, size_t *size )
+{
+    int i;
+    for (i = 0; i < IOS_X64_NOCOPY_MAX; i++)
+    {
+        uintptr_t b = __atomic_load_n( &ios_x64_nocopy_tab[i].base, __ATOMIC_ACQUIRE );
+        size_t s = ios_x64_nocopy_tab[i].size;
+        if (b && rs >= b && re <= b + s) { *pe = b; *size = s; return 1; }
+    }
+    return 0;
+}
+
 /* ml1244: bind an x64 importer's DATA imports to the copy that is actually live.
  *
  * An ARM64EC/ARM64 module executes from its pool copy and reaches its own
@@ -6547,6 +6633,8 @@ static void ios_x64_iat_bind_live_data( char *base, size_t size )
 {
     static int said, calls;
     uintptr_t rs = (uintptr_t)base, re = rs + size, pe, lo, hi, page = 0;
+    size_t pe_size = 0;
+    int nocopy = 0;
     IMAGE_NT_HEADERS64 nt;
     IMAGE_DATA_DIRECTORY dir;
     unsigned int lfanew = 0;
@@ -6560,14 +6648,21 @@ static void ios_x64_iat_bind_live_data( char *base, size_t size )
         if (b && rs >= b && re <= b + ios_jit_mappings[i].size) { imp = i; break; }
     }
     /* ml1245: a pure x64 importer only; an EC module reads its pool-side IAT */
-    if (imp < 0 || ios_jit_mapping_machine( imp ) != 0x8664 || ios_jit_mapping_is_hybrid( imp )) return;
+    if (imp >= 0)
+    {
+        if (ios_jit_mapping_machine( imp ) != 0x8664 || ios_jit_mapping_is_hybrid( imp )) return;
+        pe = (uintptr_t)ios_jit_mappings[imp].pe_base;
+        pe_size = ios_jit_mappings[imp].size;
+    }
+    /* round 626 (A2 S7): an importer without a pool copy (AMD64 and not hybrid by construction: only such images are noted) */
+    else if (ios_x64_nocopy_dataimp_enabled() && ios_x64_nocopy_find( rs, re, &pe, &pe_size )) nocopy = 1;
+    else return;
 
     /* The importer's headers are read fault-safe too, like its IAT pages below:
      * this runs on every protection change inside an x64 image, and a packer or
      * DRM stub may have made its own header page PAGE_NOACCESS. */
-    pe = (uintptr_t)ios_jit_mappings[imp].pe_base;
     if (!ios_safe_read( pe + offsetof( IMAGE_DOS_HEADER, e_lfanew ), &lfanew, sizeof(lfanew) )
-        || (size_t)lfanew + sizeof(nt) > ios_jit_mappings[imp].size
+        || (size_t)lfanew + sizeof(nt) > pe_size
         || !ios_safe_read( pe + lfanew, &nt, sizeof(nt) )) return;
     if (nt.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
         nt.OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_IAT) return;
@@ -6633,8 +6728,8 @@ static void ios_x64_iat_bind_live_data( char *base, size_t size )
     /* One line per x64 IAT window for the first few calls, then only windows
      * that bound something: a silent log must mean "never reached", not "maybe". */
     if (++calls <= 6 || (bound && calls <= 400))
-        dprintf( 2, "[x64-data-imp] ml1245 importer pe=%p IAT window %p+%#lx: %d slot(s), %d data import(s) bound%s\n",
-                 (void *)pe, (void *)lo, (unsigned long)(hi - lo), scanned, bound,
+        dprintf( 2, "[x64-data-imp] ml1245 importer pe=%p%s IAT window %p+%#lx: %d slot(s), %d data import(s) bound%s\n",
+                 (void *)pe, nocopy ? " (nocopy)" : "", (void *)lo, (unsigned long)(hi - lo), scanned, bound,
                  unreadable ? " (ml1169: unreadable IAT page(s) skipped)" : "" );
 }
 
@@ -14971,6 +15066,7 @@ static void delete_view( struct file_view *view ) /* [in] View */
     if ((view->protect & SEC_IMAGE) && ios_jit_image_retire_enabled())
         ios_jit_retire_image( view->base, view->size );
     if (view->protect & SEC_IMAGE) ios_jit_note_image_unmapped( view->base, view->size );
+    if ((view->protect & VPROT_X64DATA) && ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_forget( (uintptr_t)view->base );   /* round 626 (A2 S7) */
     ios_swap_release_range( view->base, view->size, 0 );   /* ml1077 */
     if (!(view->protect & VPROT_SYSTEM) && ios_alias_release_enabled())
         ios_alias_release_view( view->base, view->size );   /* madeira-bcd: MADEIRA_ALIAS_RELEASE */
@@ -21659,13 +21755,38 @@ static NTSTATUS map_view( struct file_view **view_ret, void *base, size_t size,
 
     if (base)
     {
+#ifdef WINE_IOS
+        /* madeira-bcd (round 626, agent G2 S10; Splatterhouse YWX9P5, build 623): STATUS_WORKING_SET_LIMIT_RANGE is 0x40000002, a
+         * success-class status. NtMapViewOfSection[Ex] handed it back with no view behind it, the arm64ec wrapper counted it as success
+         * and kernelbase's MapViewOfFileEx ("< 0" is failure) returned the requested address as a mapped view: a memory manager that tries
+         * 1<<n took 1<<47 and wrote into nothing. Refused like the other limit checks below (the program gets ERROR_INVALID_ADDRESS).
+         * map_view is reached with a base only from virtual_map_section; allocate_virtual_memory refuses such a base before. */
+        if (is_beyond_limit( base, size, address_space_limit )) return STATUS_CONFLICTING_ADDRESSES;
+#else
         if (is_beyond_limit( base, size, address_space_limit )) return STATUS_WORKING_SET_LIMIT_RANGE;
+#endif
         if (limit_low && base < (void *)limit_low) return STATUS_CONFLICTING_ADDRESSES;
         if (limit_high && is_beyond_limit( base, size, (void *)limit_high )) return STATUS_CONFLICTING_ADDRESSES;
         if (is_beyond_limit( base, size, host_addr_space_limit )) return STATUS_CONFLICTING_ADDRESSES;
         /* madeira-bcd: [arena-guard] -- see ios_arena_guard_refuses (off unless env.MADEIRA_ARENA_GUARD = 1) */
         if (ios_arena_guard_refuses( base, size, limit_low, limit_high )) return STATUS_CONFLICTING_ADDRESSES;
-        if ((status = map_fixed_area( base, size, unix_prot ))) return status;
+        if ((status = map_fixed_area( base, size, unix_prot )))
+        {
+#ifdef WINE_IOS
+            /* madeira-bcd (round 626, agent G2 S10): the first 16 refusals of a fixed view of 256 MB or more name the kernel's regions in
+             * the range (log only), so the next log says which occupant blocked a program that maps its memory at a fixed address. */
+            static LONG block_told;
+            if (size >= 0x10000000 && InterlockedIncrement( &block_told ) <= 16)
+            {
+                char regions[480];
+                ios_va_regions( base, size, regions, sizeof(regions) );
+                dprintf( 2, "[map-block] #%d fixed view %p +0x%lx refused (status 0x%x, STAGE=%s err=%d): kernel regions in the range: %s rev=g2-626\n",
+                         (int)block_told, base, (unsigned long)size, (unsigned int)status,
+                         ios_af.stage <= 6 ? ios_af_stage_name[ios_af.stage] : "?", ios_af.err, regions );
+            }
+#endif
+            return status;
+        }
         if (is_beyond_limit( base, size, working_set_limit )) working_set_limit = address_space_limit;
         ptr = base;
     }
@@ -25860,6 +25981,7 @@ static NTSTATUS map_image_into_view( struct file_view *view, const UNICODE_STRIN
         if (ios_x64_image_nocopy_enabled())
         {
             view->protect |= VPROT_X64DATA;
+            if (ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_note( (uintptr_t)ptr, total_size );   /* round 626 (A2 S7) */
             if (x64_images++ < 64)
                 dprintf( 2, "[x64-image] %s %p+0x%lx mapped without a pool copy (pure x64: the emulator runs "
                             "it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)\n",
@@ -25868,6 +25990,7 @@ static NTSTATUS map_image_into_view( struct file_view *view, const UNICODE_STRIN
         else if (ios_x64_image_copy_can_never_fit( total_size ))   /* round 625 (S14-b): see ios_x64_image_copy_can_never_fit */
         {
             view->protect |= VPROT_X64DATA;
+            if (ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_note( (uintptr_t)ptr, total_size );   /* round 626 (A2 S7) */
             if (x64_images++ < 64)
                 dprintf( 2, "[x64-image] %s %p+0x%lx: the JIT pool of %lu MB cannot hold the %lu MB copy: running it from "
                             "the loaded image (NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off)\n",
@@ -33529,12 +33652,73 @@ static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirt
 #endif
 }
 
+/* hint-storm-test:begin (tests/host/check-hint-storm.py compiles this region) */
+/* madeira-bcd (round 626, agent U2 S5; Spelunky 2 ZR4NTC, 9BHTK8 build 623 and 8 archive logs 574-623, all iPad16,3): from fmod.dll on, one
+ * thread asks again and again for a 32 MB reservation hinted at a random address in the top TiB of an 8 TiB space; BCD's address map
+ * ends at 0x8000000000, so every request is refused (c0000018, up to 225 million times) and the game's main thread never leaves the
+ * loop. env.MADEIRA_HINT_STORM_N = N (0, the default: off; 256..65536): after N consecutive refusals on one thread of reservations of
+ * the same size hinted above the map's end (a request that can never succeed here), such a request is served without its hint. A
+ * success of the thread's own resets the count; a served request does not (the storm goes on being served). */
+struct ios_hint_storm { unsigned long long size; unsigned int n; };
+
+static unsigned int ios_hint_storm_parse( const char *s )
+{
+    unsigned long v;
+    char *end;
+    if (!s || !*s) return 0;
+    v = strtoul( s, &end, 10 );
+    return (*end || v < 256 || v > 65536) ? 0 : (unsigned int)v;
+}
+
+/* refused: the request was one that can never succeed here (hinted above the map's end, a reservation, refused); 1: serve it */
+static int ios_hint_storm_note( struct ios_hint_storm *hs, int refused, int success, unsigned long long size, unsigned int limit )
+{
+    if (success) { hs->n = 0; hs->size = 0; return 0; }
+    if (!refused) return 0;
+    if (hs->size != size) { hs->size = size; hs->n = 0; }
+    if (hs->n < 0xffffffffu) hs->n++;
+    return hs->n >= limit;
+}
+/* hint-storm-test:end */
+
+static unsigned int ios_hint_storm_limit( void )
+{
+    static int v = -1;
+    if (v < 0) v = (int)ios_hint_storm_parse( getenv( "MADEIRA_HINT_STORM_N" ) );
+    return (unsigned int)v;
+}
+static __thread struct ios_hint_storm ios_hint_storm_tls;
+
 NTSTATUS WINAPI NtAllocateVirtualMemory( HANDLE process, PVOID *ret, ULONG_PTR zero_bits,
                                          SIZE_T *size_ptr, ULONG type, ULONG protect )
 {
     const void *hint = ret ? *ret : NULL;
     const ULONGLONG want = size_ptr ? *size_ptr : 0;
     NTSTATUS status = ios_nt_impl_NtAllocateVirtualMemory( process, ret, zero_bits, size_ptr, type, protect );
+    unsigned int hs_limit = ios_hint_storm_limit();   /* madeira-bcd round 626 (U2 S5): 0 unless env.MADEIRA_HINT_STORM_N */
+
+    if (hs_limit && process == NtCurrentProcess() && ret && size_ptr)
+    {
+        int refused = status == STATUS_CONFLICTING_ADDRESSES && hint && (type & MEM_RESERVE) &&
+                      (ULONG_PTR)hint >= (ULONG_PTR)host_addr_space_limit;
+        if (ios_hint_storm_note( &ios_hint_storm_tls, refused, !NT_ERROR( status ), want, hs_limit ))
+        {
+            PVOID again = NULL;
+            SIZE_T again_size = (SIZE_T)want;
+            NTSTATUS st2 = ios_nt_impl_NtAllocateVirtualMemory( process, &again, 0, &again_size, type, protect );
+            static unsigned int served;
+            if (!NT_ERROR( st2 ))
+            {
+                *ret = again;
+                *size_ptr = again_size;
+                status = st2;
+                if (++served <= 4 || !(served & 1023))
+                    dprintf( 2, "[hint-storm] ml2202 #%u: a %#llx-byte reservation hinted at %p (above the address map's end, refused %u "
+                             "times on this thread) served at %p (env.MADEIRA_HINT_STORM_N=%u)\n", served, (unsigned long long)want,
+                             hint, ios_hint_storm_tls.n, again, hs_limit );
+            }
+        }
+    }
 
     if (NT_ERROR( status ))
         ios_ntfail_alloc( "NtAllocateVirtualMemory", status, process, hint, want, type, protect, zero_bits, NULL, 0 );

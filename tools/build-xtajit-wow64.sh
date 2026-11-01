@@ -6,6 +6,8 @@
 # build/fex-wow64/build.sh's (FEX_IOS_HOST_BUILD turns on the 32-bit guest
 # window). Run from the repo root; on a failed build the committed module stays.
 #
+#  - patch-fex-ios-cpuid-classic.py: opt-in (MADEIRA_FEX_CPUID_CLASSIC=1): CPUID leaf 1
+#    reports DE and PSE in EDX as real processors do (Burnout Paradise's CPU check).
 #  - patch-fex-ios-cpuid-index.py: CPUID 0x80000002-4 indexed the per-CPU table
 #    with the raw host CPU number; 32-bit Crysis died in strlen(0xfff68000)
 #    inside Function_8000_0002h before its first frame (log 2026-09-30 11:57).
@@ -38,6 +40,8 @@ python3 "$R/tools/patch-fex-ios-teb-tsd.py" "$R/FEX/Source/Windows/Common/Priv.h
 # the safety net must never cost the two required fixes above: a drifted anchor only skips it
 python3 "$R/tools/patch-fex-ios-wow-threads-ctor.py" "$R/FEX" || echo "::warning::the thread-map guard was not applied (FEX anchor changed); xtajit.dll is built without it"
 python3 "$R/tools/patch-fex-ios-op82-alias.py" "$R/FEX/$OPDISPF" || echo "::warning::the 0x82 alias patch was not applied (FEX anchor changed); xtajit.dll is built without it"
+# opt-in (round 626, Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE; EDX unchanged without it
+python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/$CPUIDF" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
 restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF"; }
 trap restore EXIT
 

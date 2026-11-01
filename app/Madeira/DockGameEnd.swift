@@ -122,6 +122,9 @@ enum DockGameEndRules {
             switch SteamLaunchScene.owner(p.path, places: places) {
             case .other:
                 if let shared, SteamLaunchScene.path(p.path).hasPrefix(shared) { break }
+                // Round 626 (agent P S11; BV5WT9 and 13 archive Rockstar sessions): after the player's Close, Rockstar's resident
+                // launcher, its service and Social Club are not the game; counting them kept the session open for good.
+                if anyStatus, isResidentLauncher(p.path) { break }
                 if p.running { running += 1 }
                 else if last.map({ p.endedAgo < $0.endedAgo }) ?? true { last = p }
             case .unknown:
@@ -144,6 +147,13 @@ enum DockGameEndRules {
         if !state.gameOver { return wait("host-still-counts-the-game") }
         if !state.finished { return wait("host-not-finished") }
         return .end(status: last.status, file: last.fileName, lived: last.lived)
+    }
+
+    /// Round 626 (agent P S11): Rockstar's Games Launcher, its service and Social Club live under C:\Program Files\Rockstar Games\
+    /// (or the x86 folder) and stay resident after the game closes. Consulted only after the player's Close (`anyStatus`).
+    static func isResidentLauncher(_ image: String) -> Bool {
+        let p = SteamLaunchScene.path(image)
+        return p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\")
     }
 
     // MARK: A launch that failed (round 580)

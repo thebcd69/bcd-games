@@ -69,6 +69,26 @@ static void on_main(dispatch_block_t block)
 - (void)teardown;
 @end
 
+/* madeira-bcd (round 626, Sable PVTSYM, build 623): a call on the player or engine of a haptic engine iOS has already stopped (idle, an
+ * audio-session change, the pad asleep) raises NSException 'com.apple.CoreHaptics' ("checkEngineRunning: self.running") instead of
+ * returning an error, and uncaught it ended the app ("Terminating app due to uncaught exception"): the engine's stoppedHandler only
+ * queues engineLost: on the main queue, so a push queued before it reached the dead player first. Every CoreHaptics call of
+ * MadeiraRumble goes through this; NO means it raised, and the caller drops that handle's engine so the next rumble builds a fresh one.
+ * A healthy pad makes the same calls as before. */
+static BOOL MadeiraHapticTry(void (NS_NOESCAPE ^call)(void))
+{
+    @try {
+        call();
+        return YES;
+    } @catch (NSException *e) {
+        static int said;
+        if (said++ < 8)
+            fprintf(stderr, "[hidpad-out] ml2108 haptic call raised %s (%s); engine dropped, restarting on demand\n",
+                    e.name.UTF8String ? e.name.UTF8String : "?", e.reason.UTF8String ? e.reason.UTF8String : "?");
+        return NO;
+    }
+}
+
 @implementation MadeiraRumble {
     __weak GCController *_controller;
     int _slot;
@@ -162,6 +182,18 @@ static void on_main(dispatch_block_t block)
     if (g_active) [self push];
 }
 
+/* madeira-bcd (round 626): a CoreHaptics call on handle i raised (MadeiraHapticTry); forget its engine and player as engineLost:
+ * does, without the restart (the caller goes on) and without counting a strike. */
+- (void)dropEngine:(int)i
+{
+    CHHapticEngine *engine = _engine[i];
+    _engine[i] = nil;   // before stopping: its stoppedHandler then finds nothing to restart
+    _player[i] = nil;
+    _playing[i] = NO;
+    _sent[i] = -1;
+    if (engine) MadeiraHapticTry(^{ [engine stopWithCompletionHandler:nil]; });
+}
+
 - (id<CHHapticPatternPlayer>)playerFor:(int)i
 {
     if (_player[i]) return _player[i];
@@ -188,8 +220,9 @@ static void on_main(dispatch_block_t block)
             [weakSelf engineLost:i engine:weakEngine reason:-1];
         });
     };
-    NSError *error = nil;
-    if (![engine startAndReturnError:&error]) {
+    __block NSError *error = nil;
+    __block BOOL engineStarted = NO;
+    if (!MadeiraHapticTry(^{ NSError *e = nil; engineStarted = [engine startAndReturnError:&e]; error = e; }) || !engineStarted) {
         [self fail:"engine start" error:error];
         return nil;
     }
@@ -205,7 +238,9 @@ static void on_main(dispatch_block_t block)
                                                          parameters:parameters
                                                        relativeTime:0
                                                            duration:30.0];
-    CHHapticPattern *pattern = [[CHHapticPattern alloc] initWithEvents:@[event] parameters:@[] error:&error];
+    NSError *patternError = nil;
+    CHHapticPattern *pattern = [[CHHapticPattern alloc] initWithEvents:@[event] parameters:@[] error:&patternError];
+    error = patternError;
     // A PLAIN player only, on this fresh engine. Game controllers refuse the
     // advanced one with "Couldn't communicate with a helper application"
     // (Apple developer forums thread 773615: the engine's connection to
@@ -215,9 +250,10 @@ static void on_main(dispatch_block_t block)
     // player then failed with the same error on both handles and the pad never
     // rumbled. The plain player takes the same intensity control; push
     // restarts it before the 30 s event ends.
-    id<CHHapticPatternPlayer> player = pattern ? [engine createPlayerWithPattern:pattern error:&error] : nil;
+    __block id<CHHapticPatternPlayer> player = nil;
+    if (pattern) MadeiraHapticTry(^{ NSError *e = nil; player = [engine createPlayerWithPattern:pattern error:&e]; error = e; });
     if (!player) {
-        [engine stopWithCompletionHandler:nil];
+        MadeiraHapticTry(^{ [engine stopWithCompletionHandler:nil]; });
         [self fail:"pattern player" error:error];
         return nil;
     }
@@ -232,13 +268,14 @@ static void on_main(dispatch_block_t block)
     return player;
 }
 
-- (void)sendLevel:(float)level to:(id<CHHapticPatternPlayer>)player
+/* NO: the call raised (MadeiraHapticTry); the caller drops the handle's engine. */
+- (BOOL)sendLevel:(float)level to:(id<CHHapticPatternPlayer>)player
 {
     CHHapticDynamicParameter *intensity =
         [[CHHapticDynamicParameter alloc] initWithParameterID:CHHapticDynamicParameterIDHapticIntensityControl
                                                         value:level
                                                  relativeTime:0];
-    [player sendParameters:@[intensity] atTime:CHHapticTimeImmediate error:nil];
+    return MadeiraHapticTry(^{ [player sendParameters:@[intensity] atTime:CHHapticTimeImmediate error:nil]; });
 }
 
 - (void)push
@@ -246,7 +283,8 @@ static void on_main(dispatch_block_t block)
     for (int i = 0; i < 2; i++) {
         float level = g_active ? _want[i] : 0;
         if (level < 0.5f / 255.0f) {
-            if (_playing[i]) [_player[i] stopAtTime:CHHapticTimeImmediate error:nil];
+            id<CHHapticPatternPlayer> playing = _playing[i] ? _player[i] : nil;
+            if (playing && !MadeiraHapticTry(^{ [playing stopAtTime:CHHapticTimeImmediate error:nil]; })) [self dropEngine:i];
             _playing[i] = NO;
             _sent[i] = 0;
             continue;
@@ -255,27 +293,40 @@ static void on_main(dispatch_block_t block)
         if (!player) continue;
         // A plain player does not loop: start it again well before its 30 s event ends.
         if (_playing[i] && CFAbsoluteTimeGetCurrent() - _startedAt[i] > 25.0) {
-            [player stopAtTime:CHHapticTimeImmediate error:nil];
+            if (!MadeiraHapticTry(^{ [player stopAtTime:CHHapticTimeImmediate error:nil]; })) {
+                [self dropEngine:i];
+                continue;
+            }
             _playing[i] = NO;
         }
         if (!_playing[i]) {
-            NSError *error = nil;
-            [self sendLevel:level to:player];
-            if (![player startAtTime:CHHapticTimeImmediate error:&error]) {
+            __block NSError *error = nil;
+            __block BOOL started = NO;
+            if (![self sendLevel:level to:player]) {
+                [self dropEngine:i];
+                continue;
+            }
+            if (!MadeiraHapticTry(^{ NSError *e = nil; started = [player startAtTime:CHHapticTimeImmediate error:&e]; error = e; }) || !started) {
                 // Drop this handle's engine: the next try (after the back-off)
                 // builds a fresh one instead of starting a dead player again.
                 CHHapticEngine *engine = _engine[i];
                 _engine[i] = nil;   // before stopping: its stoppedHandler then finds nothing to restart
                 _player[i] = nil;
-                [engine stopWithCompletionHandler:nil];
+                MadeiraHapticTry(^{ [engine stopWithCompletionHandler:nil]; });
                 [self fail:"player start" error:error];
                 continue;
             }
             _playing[i] = YES;
             _startedAt[i] = CFAbsoluteTimeGetCurrent();
-            [self sendLevel:level to:player];
+            if (![self sendLevel:level to:player]) {
+                [self dropEngine:i];
+                continue;
+            }
         } else if (level != _sent[i]) {
-            [self sendLevel:level to:player];
+            if (![self sendLevel:level to:player]) {
+                [self dropEngine:i];
+                continue;
+            }
         }
         _sent[i] = level;
     }
@@ -297,7 +348,8 @@ static void on_main(dispatch_block_t block)
 - (void)stop
 {
     for (int i = 0; i < 2; i++) {
-        if (_playing[i]) [_player[i] stopAtTime:CHHapticTimeImmediate error:nil];
+        id<CHHapticPatternPlayer> playing = _playing[i] ? _player[i] : nil;
+        if (playing && !MadeiraHapticTry(^{ [playing stopAtTime:CHHapticTimeImmediate error:nil]; })) [self dropEngine:i];
         _playing[i] = NO;
         _sent[i] = -1;
     }
@@ -310,7 +362,7 @@ static void on_main(dispatch_block_t block)
         CHHapticEngine *engine = _engine[i];
         _engine[i] = nil;           // before stopping: its stoppedHandler then finds nothing to restart
         _player[i] = nil;
-        [engine stopWithCompletionHandler:nil];
+        if (engine) MadeiraHapticTry(^{ [engine stopWithCompletionHandler:nil]; });
     }
 }
 @end

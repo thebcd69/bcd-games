@@ -467,6 +467,14 @@ struct RecommendationsPolicy {
         "DXMT_D9_IB_RANGE",   // build 624: an indexed Direct3D 9 draw refreshes only the index bytes it reads, on by default; 0 turns it off (tools/patch-dxmt-d9-ib-range.py)
         "MADEIRA_REG_TRACE",   // build 624: the wineserver logs each failed registry request ([reg-miss], 400 at most; Far Cry 3's updater)
         "MADEIRA_WOW_UNITY_PLAIN",   // build 624: a 32-bit Unity game's own Mono makes its window's RWX memory plain (From the Darkness)
+        "MADEIRA_GDI_SHARED_SECTION",   // read since build 580; lists from 626 (BioShock Remastered from Epic, VV1JGH: a 32-bit game under BCD Host); 0 or 1 (checked below)
+        "MADEIRA_WG_VPROC",   // build 626 (Unity cutscenes, agent V): BCD's raw video converter wg_transform; 0 or 1 (checked below)
+        "MADEIRA_FEX_CPUID_CLASSIC",   // build 626 (Burnout Paradise, agent G1 S7): CPUID leaf 1 reports DE and PSE; 0 or 1 (checked below)
+        "MADEIRA_REPORT_HZ",   // build 626 (Silksong, agent H S2): Windows programs are told the rate the session holds; 0 or 1 (checked below)
+        "MADEIRA_X64_NOCOPY_DATAIMP",   // build 626 (Poppy Playtime, agent A2 S7): a no-copy x64 program's data imports bound live; 0 or 1 (checked below)
+        "MADEIRA_HINT_STORM_N",   // build 626 (Spelunky 2, agent U2 S5): serve impossible hinted reservations after N refusals; 0 or 256..65536 (below)
+        "MADEIRA_SRV_POLLOUT_GUARD",   // build 626 (the Rockstar launcher, agent R S1): no connect completion without a peer; 0 or 1 (checked below)
+        "MADEIRA_DOCK_INSTALL_SKIP",   // build 626 (six games' DirectX setup, agent A1 S7): one-time installs BCD provides; names (checked below)
     ]
 
     var configKeys: Set<String>
@@ -499,12 +507,50 @@ struct RecommendationsPolicy {
                 // kernelbase (round 624, Glyphica: Typing Survival): the Wine fork's own kernelbase, built from the tree as kernelbase-optin.dll
                 // (the shipped kernelbase.dll is a prebuilt file without the fork's changes).
                 // dcomp (round 624, Slay the Spire 2): a DirectComposition device that draws nothing (dcomp-optin.dll).
+                // msvproc (round 626, Unity cutscenes): Wine's Video Processor MFT for a 64-bit game (msvproc-optin.dll, from build 626).
                 let names = value.lowercased().split(whereSeparator: { ",; ".contains($0) })
                 guard !names.isEmpty, names.allSatisfy({ ["dxva2", "evr", "xpsprint", "sfc", "sfc_os", "tbs", "twinapi.appcore", "setupapi"].contains($0)
                         || ["mfasfsrcsnk", "wmvdecod", "wmadmod"].contains($0) || ["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0)
                         || ["msi", "mspatcha", "odbccp32", "sxs", "rstrtmgr"].contains($0) || ["glu32", "tdh", "gamingtcui", "qwave"].contains($0)
-                        || $0 == "kernelbase" || $0 == "dcomp" }) else {
-                    throw RecommendationsError.policy("\(path): MADEIRA_OPTIN_DLLS may only name dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore or setupapi, or mfasfsrcsnk, wmvdecod, wmadmod, or oledlg, fwpuclnt, sensapi, ddraw, or msi, mspatcha, odbccp32, sxs, rstrtmgr, or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp")
+                        || $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" }) else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_OPTIN_DLLS may only name dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore or setupapi, or mfasfsrcsnk, wmvdecod, wmadmod, or oledlg, fwpuclnt, sensapi, ddraw, or msi, mspatcha, odbccp32, sxs, rstrtmgr, or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc")
+                }
+            case "MADEIRA_WG_VPROC":
+                // build 626 (Unity cutscenes): BCD's raw video converter (winegstreamer_vproc_ios.c); off unless a game's list says 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_WG_VPROC is 0 or 1")
+                }
+            case "MADEIRA_HINT_STORM_N":
+                // build 626: virtual_ios.c's NtAllocateVirtualMemory (0 = off; the parser takes 256..65536, anything else is off).
+                guard value == "0" || (Int(value).map { (256...65536).contains($0) && String($0) == value } ?? false) else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_HINT_STORM_N is 0 or a whole number from 256 to 65536")
+                }
+            case "MADEIRA_DOCK_INSTALL_SKIP":
+                // build 626: install-script entry names as the [dock-installers] lines print them, separated by commas or semicolons.
+                let names = value.lowercased().split(whereSeparator: { ",; ".contains($0) })
+                guard !names.isEmpty, names.count <= 8,
+                      names.allSatisfy({ $0.count <= 64 && $0.allSatisfy { $0.isLetter || $0.isNumber || "._-".contains($0) } }) else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_DOCK_INSTALL_SKIP names up to eight install programs (letters, digits, . _ -)")
+                }
+            case "MADEIRA_SRV_POLLOUT_GUARD":
+                // build 626: the wineserver's poll loop withholds POLLOUT for a TCP socket without a peer (fd_ios.c); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_SRV_POLLOUT_GUARD is 0 or 1")
+                }
+            case "MADEIRA_X64_NOCOPY_DATAIMP":
+                // build 626: virtual_ios.c binds a no-copy x64 importer's data imports of ARM64EC DLLs; off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_X64_NOCOPY_DATAIMP is 0 or 1")
+                }
+            case "MADEIRA_REPORT_HZ":
+                // build 626: the virtual monitor reports the session's rate (sysparams_ios.c ios_report_hz); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_REPORT_HZ is 0 or 1")
+                }
+            case "MADEIRA_FEX_CPUID_CLASSIC":
+                // build 626 (Burnout Paradise): the emulator reports CPUID.1:EDX DE and PSE (tools/patch-fex-ios-cpuid-classic.py); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_FEX_CPUID_CLASSIC is 0 or 1")
                 }
             case "MADEIRA_DXGI_COMPOSITION":
                 guard value == "0" || value == "1" else {
@@ -647,6 +693,11 @@ struct RecommendationsPolicy {
                 // build 624 (32-bit Unity games, From the Darkness PA7PQB): off unless a game's list says 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_WOW_UNITY_PLAIN is 0 or 1")
+                }
+            case "MADEIRA_GDI_SHARED_SECTION":
+                // build 626 lists (read since 580): 1 gives a 32-bit program started from a 64-bit one the shared GDI table, 0 keeps it private.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_GDI_SHARED_SECTION is 0 or 1")
                 }
             case "MADEIRA_WIN_TEXT":
                 // build 624 (agent B S6): asks a visible read-only multi-line Edit control for its text once (a diagnostic); 0 or 1.

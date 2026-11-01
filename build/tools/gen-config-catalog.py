@@ -56,6 +56,15 @@ OVERLAY = {
                         "data live; does not recycle executable ranges or change GPU capabilities. Restart the "
                         "session after changing it.",
                 "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
+    # round 626 (agent H S2; Hollow Knight: Silksong DF0537)
+    "env.MADEIRA_REPORT_HZ": {"category": "Windows, display & input", "title": "Tell Windows programs the real refresh rate",
+                "kind": "bool", "default": "0",
+                "note": "Default off: Windows programs are told a 60 Hz monitor, whatever the frame limit. 1: the monitor reports the "
+                        "rate the session holds the display at (120 Hz on a ProMotion device with the limit on MAX, Unlimited or 40 "
+                        "FPS; 60 with the 60 and 30 FPS limits), and the mode list offers every size at 60 Hz and at that rate. For "
+                        "games that pace themselves by the monitor's rate (Unity games read it). Fixed when the game starts; a "
+                        "\"[vmode] MADEIRA_REPORT_HZ=1\" line says it is on. Not tried on a device yet.",
+                "sources": ["build/win32u-unix/sysparams_ios.c", "app/Madeira/ProMotionIntent.swift"]},
     "env.MADEIRA_GDI_SHARED_SECTION": {"category": "Windows, display & input",
                 "title": "GDI table 32-bit programs can reach", "kind": "text", "default": "",
                 "note": "Empty: the GDI handle table is a section every 32-bit program can map in its own memory "
@@ -516,6 +525,14 @@ OVERLAY = {
                         "without the file tier between; upload buffers stay where upload-swap puts them. Read once per "
                         "game start."},
     # madeira-bcd: A/B switches for the Sony ports' corrupted meshes (Horizon Zero Dawn, Ghost of Tsushima).
+    "d3d12-heap-va-align": {"category": "Direct3D 12", "title": "Heaps start on a 64 KB GPU address",
+                "kind": "int", "default": "0", "choices": [("", "Off"), ("1", "64 KB"), ("2", "The heap's own alignment (at most 4 MB)")],
+                "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"],
+                "note": "Default off. 1: a DEFAULT heap the game made with a placement alignment of 64 KB or more starts on a 64 KB "
+                        "boundary of the GPU address space, as Direct3D 12 promises (Metal places about every other heap 32 KB off; "
+                        "Unreal Engine 5's transient allocator then cannot fit a 128 MB buffer in a 128 MB heap and the game stops: "
+                        "Clair Obscur: Expedition 33). The Metal heap is 64 KB larger. 2: the heap's own alignment, at most 4 MB. "
+                        "Read once a session; ml2201 lines name the start and the padding."},
     "d3d12-wave-ops": {"category": "Direct3D 12", "title": "Report wave operations",
                 "kind": "bool", "default": "1",
                 "note": "On by default. 0: OPTIONS1 reports WaveOps FALSE, so a game with a fallback picks shaders "
@@ -773,6 +790,43 @@ OVERLAY = {
                         "a watch thread wakes every 500 ms while it is set.",
                 "sources": ["tools/patch-winemetal-gpu-stall.py"]},
     # round 624 (agent A S7): read by FEX's ProcessInit only in the build (tools/patch-fex-ios-alias-capacity.py), not in a scanned source
+    # round 626 (agent A1 S7): read by DockInstallers.swift from the game's own file (DockInstallScripts.installSkipNames)
+    "env.MADEIRA_DOCK_INSTALL_SKIP": {"category": "Steam & Dock", "title": "One-time installs BCD provides (names)",
+                "kind": "text", "default": "",
+                "note": "Empty by default. Names of a Steam game's one-time install programs, as the log's [dock-installers] "
+                        "lines print them (program=directx), separated by commas: BCD records them as done instead of running them. "
+                        "For DirectX's runtime setup, which fails at the first start of some games while BCD ships what it "
+                        "installs (Dark Souls: Prepare to Die Edition, Batman: Arkham City GOTY, Saints Row: The Third, Sleeping "
+                        "Dogs: Definitive Edition, Call of Duty: Black Ops, Fallout: New Vegas), and for Batman's AMD Dual-Core "
+                        "Optimizer (amd), which never closes. Set in the game's own settings only.",
+                "sources": ["app/Madeira/DockInstallers.swift"]},
+    # round 626 (agent R S1; the Rockstar launcher M443E0, PN6QF2)
+    "env.MADEIRA_SRV_POLLOUT_GUARD": {"category": "Steam & Dock", "title": "No connect completion without a peer",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: BCD's Windows server never reports a TCP connection as connected while the socket has no "
+                        "peer, and forgets what kind of file a reused slot held. A new socket on the slot of a closed pipe was told "
+                        "at once that its connection was ready; the program sent, the system answered \"not connected\", and "
+                        "Rockstar's launcher said its update service was unavailable. Read when the server starts; "
+                        "\"[srv-pollout-guard]\" lines say when it held an event back.",
+                "sources": ["build/wineserver/fd_ios.c"]},
+    # round 626 (agent U2 S5; Spelunky 2 ZR4NTC, 9BHTK8)
+    "env.MADEIRA_HINT_STORM_N": {"category": "Memory & JIT pool", "title": "Serve impossible hinted reservations elsewhere (after N)",
+                "kind": "int", "default": "0",
+                "note": "Default 0 (off). 256 to 65536: after that many refusals in a row, on one thread, of reservations of the same "
+                        "size that a program asks for at an address beyond the end of BCD's address map (a request that can never "
+                        "succeed here), BCD gives the next one a block elsewhere. Spelunky 2's audio library asked for 32 MB blocks "
+                        "at such addresses millions of times and the game never drew. 4096 for Spelunky 2. Read once when the game's "
+                        "process starts; \"[hint-storm]\" lines say what was served.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    # round 626 (agent A2 S7; Poppy Playtime 6DS3FK)
+    "env.MADEIRA_X64_NOCOPY_DATAIMP": {"category": "Memory & JIT pool", "title": "Data imports of programs run without a copy",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: a 64-bit program that runs without a copy in the JIT pool (env.MADEIRA_X64_IMAGE_NOCOPY or the "
+                        "automatic fallback) reads the data a Windows library exports (such as std::cout) from the copy the library "
+                        "really writes, as a program with a copy already does. Poppy Playtime's launcher read std::cout's empty "
+                        "copy and stopped. Read once when the game's process starts; \"[x64-data-imp] ml1245 importer ... (nocopy)\" "
+                        "lines say what was bound.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_FEX_ALIAS_MAX": {"category": "Memory & JIT pool", "title": "Emulator's table of image copies (entries)", "kind": "int",
                 "default": "256",
                 "note": "Default 256. The emulator keeps one entry for each library copy in the JIT pool and refuses copies past this many; a "
@@ -794,6 +848,16 @@ OVERLAY = {
                         "with 2 GB left (the EA app's session does this; GTA IV's launcher chain on a 63 GB map needed it). Read at "
                         "every window.",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    "env.WINE_D3D_CONFIG": {"category": "Wine libraries", "title": "Wine's Direct3D settings (wined3d)", "kind": "text",
+                "default": "",
+                "note": "Wine's own WINE_D3D_CONFIG for its wined3d layer (DirectDraw and the Direct3D Wine draws itself), e.g. renderer=no3d: "
+                        "an adapter without 3D, for a game that only asks DirectDraw what the display can do (Red Dead Redemption 2's rows, "
+                        "Modern Warfare 2 (2009)). Unset: Wine's default, which needs OpenGL."},
+    "env.MADEIRA_DOCK_EA_MSISERVICE": {"category": "Steam & Dock", "title": "EA app installer: Windows Installer service", "kind": "bool",
+                "default": "1",
+                "note": "Default on (build 626). A BCD Dock start whose one-time installs run the EA app's installer links msiexec.exe into "
+                        "system32 for that session, so the installer's Windows Installer service can start. 0: it is left out (the installer "
+                        "then stops at its service check with error 1923)."},
     "env.MADEIRA_WOW_UNITY_PLAIN": {"category": "Memory & JIT pool", "title": "A Unity game's own Mono counts as Mono (32-bit)", "kind": "bool",
                 "default": "0",
                 "note": "Default off. 1: a 32-bit Unity game's own Mono runtime (mono-2.0-bdwgc.dll, or mono.dll in older Unity) makes its "
@@ -1245,6 +1309,15 @@ OVERLAY = {
                         "the error, as before; every failed view is logged as [rtv-fail]. A 64-bit game needs "
                         "env.MADEIRA_D3D11_SRC = 1 as well. Set it in the game's own file; read once per game start."},
     # madeira-bcd (round 624): the SHA extension hidden from one game (WineProcessBridge.m madeira_publish_host_probe; FEX reads the probe).
+    # round 626 (agent G1 S7): read by FEX through tools/patch-fex-ios-cpuid-classic.py (a build-time patch the scan does not see)
+    "env.MADEIRA_FEX_CPUID_CLASSIC": {"category": "x86 emulation (FEX)", "title": "Report the classic processor bits (DE, PSE)",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: CPUID leaf 1 reports debugging extensions (DE) and page size extension (PSE) in EDX, "
+                        "as every real x86 processor since the Pentium does; the emulator reports both as missing. Burnout "
+                        "Paradise's CPU check tests DE and stops with its own \"CPU Error\" box without it. Programs cannot use "
+                        "the features behind the two bits, so only a program that tests them sees a difference. Read once when "
+                        "the game's process starts; a \"[fex-cpuid]\" line says it is on.",
+                "sources": ["tools/patch-fex-ios-cpuid-classic.py"]},
     "env.MADEIRA_FEX_SHA": {"category": "x86 emulation (FEX)", "title": "Report a processor without the SHA extension",
                 "kind": "bool", "default": "1", "sources": ["app/Madeira/WineProcessBridge.m"],
                 "note": "Default on: the program is told what the device has (the SHA extension, which every supported iPhone and iPad "
@@ -1502,6 +1575,14 @@ OVERLAY = {
                         "\"Device error at frame N\" a [fault-enc] line names the faulted, affected and unknown encoders. "
                         "For D3D9/10/11 games that hang or fault the GPU (GTA V Legacy at Story Mode, build 546). A "
                         "diagnostic with some GPU cost; off (default): unchanged. Set it in the game's own file."},
+    "env.MADEIRA_WG_VPROC": {"category": "Media", "title": "BCD's video converter (Unity cutscenes)",
+                "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/winegstreamer_vproc_ios.c", "build/ntdll-unix/winegstreamer_unixlib_ios.c"],
+                "note": "Default off. 1: Wine's Video Processor (msvproc) converts a decoded video picture (NV12, YV12, I420) "
+                        "into the format the game asks for (RGB32, ARGB32, ABGR32, YUV) on BCD's unix side. Unity's video player needs it: "
+                        "without it every cutscene stays black (WindowsVideoMedia error 0xc00d5212; Power Drill Massacre, Silksong). "
+                        "A 64-bit game also needs env.MADEIRA_WG_64BIT = 1 and env.MADEIRA_OPTIN_DLLS = msvproc. No scaling: a size change "
+                        "is refused. Read once a session. Logged as [vproc] lines."},
     "env.MADEIRA_WG_64BIT": {"category": "Media", "title": "BCD's media decoders for a 64-bit game",
                 "kind": "bool", "default": "0",
                 "sources": ["build/ntdll-unix/virtual_ios.c", "build/ntdll-unix/winegstreamer_unixlib_ios.c",

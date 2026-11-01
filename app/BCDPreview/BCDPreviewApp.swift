@@ -24,6 +24,9 @@ import UIKit
 ///   -BCDTab game[-<game id>[-<what>]]          a game's page (BCDGamePageSample.swift)
 ///   -BCDTab add[-games|-pick]                  Add a game (BCDAddGameSample.swift)
 ///   -BCDTab epic-ask[-offline|-owned|-signin]  the question BCD asks when an Epic game's signed-in start can't be made (BCDPreviewEpicAsk.swift)
+///   -BCDStage 890x626[:regular,regular]       the interface in a window of that many points on the screen's centre, with those size
+///                                             classes (BCDPreviewStage.swift; tools/ui-preview.py --stage crops the photograph to it)
+///   -BCDSceneWidth 600                        tells the foldable support's size-class follower the window is 600 pt wide (BCDFoldableUI.swift)
 ///   -BCDOrientationLock landscape|landscape-camera-left|landscape-camera-right   the screen orientation lock of a game's session
 ///                                             (BCDOrientation.swift), turned on 2 s after the screen is up; -BCDOrientationRelease <seconds>
 ///                                             turns it off that long after that. It names the same lock and app delegate as the app's.
@@ -72,6 +75,7 @@ struct BCDPreviewApp: App {
                     BCDPreviewMeasure.start(store: store, focus: focus)   // -BCDSampleGames, -BCDMeasure (tools/ui-memory.py)
                     pressButtons(UserDefaults.standard.string(forKey: "BCDButtons"))
                     lockOrientation()
+                    followSceneWidth()
                     // tools/ui-preview.py waits for this line before it photographs the screen.
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         print("BCDPreview: ready")
@@ -79,6 +83,7 @@ struct BCDPreviewApp: App {
                     }
                 }
                 .modifier(BCDPreviewSessionScreens(store: store, focus: focus))   // -BCDTab ingame-menu|starting|overlay (BCDPreviewSession.swift)
+                .modifier(BCDPreviewStage())   // -BCDStage WxH[:regular|compact,regular|compact] (BCDPreviewStage.swift): a window of that size, centred; outermost, so the in-game screens are inside it
         }
     }
 
@@ -145,6 +150,17 @@ struct BCDPreviewApp: App {
         let release = defaults.double(forKey: "BCDOrientationRelease")
         if release > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2 + release) { BCDOrientationLock.shared.apply(.free) }
+        }
+    }
+
+    /// -BCDSceneWidth <points>: the foldable support's size-class follower (BCDFoldableUI.swift) told that the window is that wide, to see
+    /// a regular iPad window read as compact (a narrow window of the foldable's inner display, which no simulator has).
+    private func followSceneWidth() {
+        let width = UserDefaults.standard.double(forKey: "BCDSceneWidth")
+        guard width > 0 else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            BCDFoldableSceneClass.follow(scene: scene, width: width)
         }
     }
 

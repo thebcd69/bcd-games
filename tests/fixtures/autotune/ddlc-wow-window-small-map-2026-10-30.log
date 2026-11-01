@@ -1,0 +1,208 @@
+[23:01:58.347] [INFO] Checking entitlements...
+[23:01:58.348] [INFO] [build] v0.1.623 (623)
+[23:01:58.349] [INFO] [device] model=iPad13,1 idiom=pad os=iPadOS Version 26.6 (Build 23G71) ram=3868MB available=2849MB cores=6
+[23:01:58.349] [INFO] [device] address-map=[0x102c18000,0x458000000) 17GB increased-memory=1 extended-va=0
+[23:01:58.355] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 26 on iPad13,1, no TXM (StikDebug's model rule; device tree agrees)); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[23:01:58.368] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+03:00 free-disk=78GB stikdebug-url=0
+[23:01:58.374] [INFO] [device] gpu="Apple A14 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:02:15.817] [INFO] Requesting JIT with Built-in StikJIT...
+[23:02:42.294] [INFO] [bcd] library launch Doki Doki Literature Club: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[23:02:42.314] [INFO] [dock-launch] image-retire=1
+[23:02:42.314] [INFO] [dock-launch] image-map-guard=1
+[23:02:42.324] [INFO] [dock-installers] app=698780 scripts=0 programs=0
+[23:02:42.325] [INFO] [madeira-dock] starting the host for app 698780; Valve's client authenticates and authorizes the launch
+[23:02:42.343] [INFO] Running full Wine sequence...
+[23:02:42.343] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102c18000,0x458000000) 17GB available=2821MB low-power=0 thermal=nominal
+[23:02:42.350] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[23:02:42.351] [INFO] Allocating 1152MB JIT pool via debugger...
+[23:02:42.351] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:02:42.351] [INFO] [jit-debugger] attached=1 at the pool request
+[23:02:45.109] [INFO] RX pool at 0x300000000
+[23:02:45.188] [INFO] Detaching debugger...
+[phase] wine-start             t+  2.915s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+ml992: os_proc_available_memory=1658 MB + phys_footprint=1208 MB = 2867 MB (hw.memsize says 3868 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[footprint] rev=ml358 phys=1209 MB (peak 1209) internal=657 MB compressed=550 MB external=92 MB reusable=6 MB (cycle=1)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=437 peb=0x457ff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[footprint] rev=ml358 phys=1220 MB (peak 1220) internal=678 MB compressed=540 MB external=100 MB reusable=6 MB (cycle=2)
+[nls-getptr] type=11 id=20127 peb=0x457ff0000
+[gdi-shared] session table 0x122b60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+[nls-getptr] type=11 id=1252 peb=0x457ff0000
+[nls-getptr] type=11 id=10000 peb=0x457ff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  7.583s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=103, unixdir=104, dup_unixdir=108) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x301837000)
+ml957: ? backing 0x450400000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=1241 MB (peak 1241) internal=699 MB compressed=541 MB external=116 MB reusable=6 MB (cycle=3)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3018d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301a0c000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x301aa0000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  9.153s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=132, unixdir=134, dup_unixdir=139) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=20127 peb=0x10a600000
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=1252 peb=0x10aba8000
+[nls-getptr] type=11 id=437 peb=0x10aba8000
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1265 MB (peak 1265) internal=725 MB compressed=538 MB external=127 MB reusable=6 MB (cycle=4)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+[nls-getptr] type=11 id=20127 peb=0x10aba8000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 450400000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 456610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10a600000
+[nls-getptr] type=11 id=437 peb=0x10a600000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 455090000
+[footprint] rev=ml358 phys=1298 MB (peak 1298) internal=763 MB compressed=533 MB external=132 MB reusable=6 MB (cycle=5)
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 455010000
+[file-wfail] ml669 #17 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 454F00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 454E40000
+[file-wfail] ml669 #18 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #19 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #20 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #21 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #22 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1313 MB (peak 1313) internal=736 MB compressed=575 MB external=138 MB reusable=6 MB (cycle=6)
+[xp-names] m1041089 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0x7fff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[va-scan] FAILED window=0x7400000000..0x800000000 size=0x2000000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x800000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> FAILED, falling back 0x0
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x301f7cbc8 WININET.dll sec=0x451080000-0x4510bb029
+E 4C [iOS-xins] tracker=0x301f7cbc8 WININET.dll sec=0x4510c0000-0x4510c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 451070000
+E 4C [iOS-xins] tracker=0x301f7cbc8 WININET.dll sec=0x451080000-0x4510bb029
+E 4C [iOS-xins] tracker=0x301f7cbc8 WININET.dll sec=0x4510c0000-0x4510c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x451070000
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000118 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dbb9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #37 L"libavfilter-11.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #38 L"libavformat-62.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #39 L"libavutil-60.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #40 L"libswresample-6.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #41 L"libswscale-9.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #42 L"video64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=8 x8=0x0 x18=0x0 sp=0x16d1e61d0
+[thread-stacks] port=0x3803 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d411ca0
+[thread-stacks] port=0x4503 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16d52ab40
+[thread-stacks] port=0x4b03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1edfe4a80 x18=0x0 sp=0x16d6ceab0
+[thread-stacks] port=0xb30f "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x1edfe4a80 x18=0x0 sp=0x16d758550
+[thread-stacks] port=0xa13b "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0xc713 x18=0x0 sp=0x16d642c40
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16dbb9020
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002BC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+D 50 Load module dsound.dll (dsound.dll-541ca4d6eb8180ce): 44DFA0000
+D 50 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 44DF00000
+D 50 Load module winhttp.dll (winhttp.dll-940743fb9f87d8d4): 44DDD0000
+D 50 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): 44DD30000
+D 88 Load module dhcpcsvc.dll (dhcpcsvc.dll-ddd225dc767891f4): 44DC70000
+D 88 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 44DA50000
+[23:03:15.309] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=45 resident=1006MB dbg=DEBUGGED rev=ml525
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Doki Doki Literature Club\\DDLC.exe" t+ 37.092s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+009c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Doki Doki Literature Club\\DDLC.exe\"" (fd=367, unixdir=368, dup_unixdir=479) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Doki Doki Literature Club"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] small address map: it ends at 0x458000000, below the normal guest-window band -- candidates come from [0x7048000000,0x73ffff0000), at most 2 window(s) at once
+[wow-window] refused: map too small (ends at 0x458000000, MADEIRA_WOW_MIN_MAP_GB=48)
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+no-teb:err:module:wine_ios_child_main [Wine child] boot FAILED at stage 'guest-window-reserve' for wine: guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+[23:03:19.851] [INFO] [dock-report] launch-client-discovery-published=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x2d) syscalls=0 unix_calls=8114
+[unwind] term ml661 begin rip=3020611d4 rsp=12577fdb8 window=[12577fdb8..125f7fdb8) max=32
+[unwind] term ml661 #00 pc=3020611d4 rsp=12577fdb8  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x2d) syscalls=0 unix_calls=8121
+[unwind] term ml661 begin rip=30195216c rsp=12577fbd0 window=[12577fbd0..125f7fbd0) max=32
+[unwind] term ml661 #00 pc=30195216c rsp=12577fbd0  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(45)
+[Wine ntdll/server] process_exit_wrapper(45): closing child fd_socket=107
+0044:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=8122
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=138
+[Wine ntdll/server] process_exit_wrapper(45)
+[Wine ntdll/server] process_exit_wrapper(0)
+[23:03:24.843] [INFO] [dock-report] probe-result=45
+[23:03:24.846] [INFO] [dock-game-end] the host reported the launch failed (code 45) and no game process runs; the session ends in 20 s unless one starts
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dbb9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x301bb6000 NO pool/anon alias | region 0x102c18000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dbb9020
+[23:03:45.343] [INFO] [dock-game-end] the host reported the launch failed (code 45) and no game process ran: ending the session
+[WineProc] stopping wineserver...
+[23:03:45.441] [INFO] detach-wait: presents=0 running=0 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=20 resident=775MB dbg=DEBUGGED rev=ml525
+[23:03:45.851] [INFO] [session] length=63s play=0s frames=0 stalls=0/0s peak=1743MB limit=2866MB thermal=nominal lpm=0 res=1152x800 cap=60 game=Doki Doki Literature Club
+[frontend] returned to library
+[23:03:47.447] [INFO] Detaching debugger...
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dbb9020
+[freeze] alive t+90s beats=3 gaps=0 iter=356 gen=1 threads=19 resident=793MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+120s beats=4 gaps=0 iter=474 gen=1 threads=19 resident=793MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+150s beats=5 gaps=0 iter=592 gen=1 threads=20 resident=794MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+180s beats=6 gaps=0 iter=710 gen=1 threads=20 resident=795MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+210s beats=7 gaps=0 iter=828 gen=1 threads=20 resident=796MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+241s beats=8 gaps=0 iter=946 gen=1 threads=20 resident=797MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+271s beats=9 gaps=0 iter=1064 gen=1 threads=20 resident=798MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dbb9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+301s beats=10 gaps=0 iter=1182 gen=1 threads=20 resident=799MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dbb9020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dbb9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dbb9020
+[freeze] alive t+331s beats=11 gaps=0 iter=1300 gen=1 threads=20 resident=800MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1546 MB (peak 1742) internal=608 MB compressed=935 MB external=174 MB reusable=18 MB (cycle=166)
+[footprint] rev=ml358 phys=1546 MB (peak 1742) internal=608 MB compressed=935 MB external=174 MB reusable=18 MB (cycle=167)
+[footprint] rev=ml358 phys=1546 MB (peak 1742) internal=608 MB compressed=935 MB external=174 MB reusable=18 MB (cycle=168)
+[footprint] rev=ml358 phys=1546 MB (peak 1742) internal=583 MB compressed=960 MB external=174 MB reusable=18 MB (cycle=169)
+[footprint] rev=ml358 phys=1548 MB (peak 1742) internal=585 MB compressed=960 MB external=180 MB reusable=19 MB (cycle=170)
+[thread-stacks] port=0xca13 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dbb9020
+[thread-stacks] port=0x10893 "wine_explorer_display_settings_restorer" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d1ec0e0 x18=0x0 sp=0x4502fe610
+[thread-stacks] port=0x14cfb "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d1f00e0 x18=0x0 sp=0x4503fe9c0
+[thread-stacks] port=0x10383 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d1f40e0 x18=0x0 sp=0x45079e9c0
+[thread-stacks] port=0x13a2b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=6 x8=0x10af9fe01 x18=0x0 sp=0x16d2cab30
+[thread-stacks] port=0xe2c7 "" pc=libswiftCore.dylib`<redacted>+0x74 run=1 susp=0 cpu=885 x8=0x16d49c94f x18=0x0 sp=0x16d49c850
+[thread-stacks] port=0x1cd0b "" pc=libswiftCore.dylib`<redacted>+0x98 run=1 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16d52a4f0
+[footprint] rev=ml358 phys=1553 MB (peak 1742) internal=552 MB compressed=998 MB external=180 MB reusable=19 MB (cycle=171)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dbb9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]

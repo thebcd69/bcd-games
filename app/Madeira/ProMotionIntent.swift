@@ -28,6 +28,10 @@ final class ProMotionIntent {
     static let shared = ProMotionIntent()
     private var link: CADisplayLink?
     private var activeMax: Float = 0
+    /// madeira-bcd (round 626, agent H S1): what the link's callbacks say about the rate iOS grants (log only).
+    private var meter = DisplayRateMeter()
+    /// The intent apply(mode:) published last (has30Cap's first read republishes it instead of 0).
+    private static var lastIntent = 0
 
     /// Honest report of what the panel can do, for the native `[frame]` line.
     static var panelMaxFPS: Int { UIScreen.main.maximumFramesPerSecond }
@@ -39,7 +43,9 @@ final class ProMotionIntent {
     /// hook. Both arrive with willfaust/dxmt#1; without it mode 3 would run
     /// uncapped, so the 30 choice is offered only when this is true.
     static var has30Cap: Bool = {
-        madeira_set_display_max_fps(Int32(panelMaxFPS), 0)
+        // madeira-bcd (round 626, agent H S1): the last intent, not 0: a first read after apply(mode:) armed the link (the HUD's limit
+        // list, the in-game menu) cleared DXMT's recorded intent, so the [frame] line said "intent 0" while the link ran.
+        madeira_set_display_max_fps(Int32(panelMaxFPS), Int32(lastIntent))
         return madeira_dxmt_has_display_pacing() != 0
     }()
 
@@ -73,9 +79,11 @@ final class ProMotionIntent {
             l.add(to: .main, forMode: .common)
             link = l
             activeMax = want
-            fputs("[promote] display link armed preferred=\(Int(want))Hz panel_max=\(ProMotionIntent.panelMaxFPS)Hz\n", stderr)
+            meter.reset()
+            // madeira-bcd (round 626): LogStore, not stderr: a session's first stderr lines are not in the log yet.
+            LogStore.shared.log("[promote] display link armed preferred=\(Int(want))Hz panel_max=\(ProMotionIntent.panelMaxFPS)Hz")
         } else {
-            if link != nil { fputs("[promote] display link released\n", stderr) }
+            if link != nil { LogStore.shared.log("[promote] display link released") }
             link?.invalidate()
             link = nil
             activeMax = 0
@@ -89,14 +97,33 @@ final class ProMotionIntent {
         return panelMaxFPS                                                // MAX, RAW, 40 cap
     }
 
+    /// madeira-bcd (round 626, agent H S2): the rate a session holds the panel at for a pacing mode: 60 for the 60 and 30 caps, the
+    /// panel's maximum for MAX, uncapped and the 40 cap. Published as BCD_SESSION_HZ before Wine starts (applyEnvironment).
+    static func sessionHz(for mode: Int32) -> Int { (mode == 1 || mode == 3) ? 60 : max(60, panelMaxFPS) }
+
+    /// What win32u reports to Windows programs: 60, or with env.MADEIRA_REPORT_HZ = 1 the session's rate (build/win32u-unix/sysparams_ios.c).
+    static func reportedHz(for mode: Int32) -> Int {
+        guard let on = getenv("MADEIRA_REPORT_HZ"), String(cString: on) == "1" else { return 60 }
+        let hz = sessionHz(for: mode)
+        return hz > 60 && hz <= 240 ? hz : 60
+    }
+
     /// Arms or releases the link for `mode` and publishes the rates to DXMT.
     static func apply(mode: Int32) {
         let hz = maxHz(for: mode)
+        lastIntent = hz
+        LogStore.shared.log("[promote] apply mode=\(mode) intent=\(hz)Hz panel_max=\(panelMaxFPS)Hz hold-in-60-cap=\(holdMaximum ? 1 : 0)")
         shared.setActive(hz > 0, maxHz: hz)
         madeira_set_display_max_fps(Int32(panelMaxFPS), Int32(hz))
     }
 
-    @objc private func tick(_ sender: CADisplayLink) {}
+    @objc private func tick(_ sender: CADisplayLink) {
+        // madeira-bcd (round 626, agent H S1): a few double operations a callback; a line now and then (12 a session at most).
+        if let line = meter.note(timestamp: sender.timestamp, targetTimestamp: sender.targetTimestamp,
+                                 preferred: Int(activeMax), panelMax: ProMotionIntent.panelMaxFPS) {
+            LogStore.shared.log(line)
+        }
+    }
 }
 
 /// ml1137: process-wide fence-mode display state for the overlay pill.
@@ -180,3 +207,48 @@ final class ThermalPacing {
         LogStore.shared.log("[thermal-cap] \(state == .critical ? "critical" : "serious"): mode \(current) -> \(target == 4 ? "40" : "30") FPS cap")
     }
 }
+
+// display-rate-meter:begin (tests/host/check-display-rate.py compiles this region alone: Foundation only)
+/// madeira-bcd (round 626, agent H S1; Hollow Knight: Silksong DF0537): what the display link's callbacks say about the rate iOS really
+/// grants. ProMotionIntent.tick feeds it; the lines go to the log. Two numbers, because they answer different questions:
+///   granted = the link's own frame duration (targetTimestamp - timestamp) averaged over the window: the rate iOS decided on for this
+///             app; a busy main thread does not change it;
+///   arrived = callbacks per second of wall time: what the main run loop received. Lower than granted = the main thread was late.
+struct DisplayRateMeter {
+    /// The first measurement after `settle` seconds, then one only when the granted rate moved by `change` (or every `quiet` seconds at
+    /// most), `maxLines` a session. A pause of `gap` seconds (the app in the background) starts the window again.
+    static let settle = 2.0, quiet = 20.0, change = 0.08, gap = 1.0, maxLines = 12
+
+    private(set) var lines = 0
+    private var ticks = 0
+    private var first = 0.0, last = 0.0, durationSum = 0.0, durations = 0
+    private var loggedHz = 0.0, loggedAt = 0.0
+
+    mutating func reset() { self = DisplayRateMeter() }
+
+    /// One callback of the link: its `timestamp` and `targetTimestamp` (seconds). Returns the line to log, or nil.
+    mutating func note(timestamp: Double, targetTimestamp: Double, preferred: Int, panelMax: Int) -> String? {
+        if ticks > 0 && timestamp - last > Self.gap { ticks = 0; durationSum = 0; durations = 0 }   // background or a long stall
+        if ticks == 0 { first = timestamp; last = timestamp; ticks = 1; return nil }
+        ticks += 1
+        last = timestamp
+        let d = targetTimestamp - timestamp
+        if d > 0.0005 && d < 0.2 { durationSum += d; durations += 1 }
+        let span = last - first
+        guard span >= Self.settle, ticks > 2, durations > 0 else { return nil }
+        let arrived = Double(ticks - 1) / span
+        let granted = Double(durations) / durationSum
+        let callbacks = ticks - 1
+        first = last; ticks = 1; durationSum = 0; durations = 0            // the next window starts here
+        guard lines < Self.maxLines else { return nil }
+        let moved = loggedHz > 0 && abs(granted - loggedHz) / loggedHz >= Self.change
+        guard loggedHz == 0 || moved || last - loggedAt >= Self.quiet else { return nil }
+        lines += 1; loggedHz = granted; loggedAt = last
+        var note = ""
+        if granted < Double(preferred) * 0.8 { note = " -- BELOW the request" }
+        else if arrived < granted * 0.9 { note = " -- callbacks arrived late (main thread busy)" }
+        return String(format: "[promote] display link: granted %.1f Hz (%.2f ms per frame), %d callbacks in %.1f s = %.1f Hz arrived; asked preferred=%dHz, panel_max=%dHz",
+                      granted, 1000 / granted, callbacks, span, arrived, preferred, panelMax) + note
+    }
+}
+// display-rate-meter:end

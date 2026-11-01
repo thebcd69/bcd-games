@@ -165,6 +165,11 @@ fi
 #    its own EC code bitmap test (the loop top tests L1 misses): 11
 #    instructions less on every return from ARM64EC code.
 #    MADEIRA_FEX_EC_RET_DIRECT=0 keeps the test.
+#  - patch-fex-ios-cpuid-classic.py: opt-in (MADEIRA_FEX_CPUID_CLASSIC=1): CPUID leaf 1
+#    reports DE and PSE in EDX as real processors do. Every pin.
+#  - patch-fex-ios-ec-teardown-ctx.py: an exception that arrives after the emulator's
+#    context was torn down (a process ending) goes on to Wine instead of faulting on
+#    the null context. No switch: that path faulted inside FEX before. Every pin.
 #  - patch-fex-ios-mono-bp-unlocked-miss.py: opt-in (MADEIRA_MONO_BP_UNLOCKED_MISS=1):
 #    MonoBackpatcherWrite stores an alias-table miss without CodeInvalidationMutex,
 #    so the access violation that store raises no longer leaves the mutex write-owned
@@ -207,6 +212,11 @@ else
 fi
 # Opt-in, whichever pin: MADEIRA_MONO_BP_UNLOCKED_MISS=1 (round 623).
 python3 "$R/tools/patch-fex-ios-mono-bp-unlocked-miss.py" "$R/FEX/FEXCore/Source/Interface/Core/Core.cpp"
+# Whichever pin (round 626, agent C S4; Clair Obscur's crash reporter HWMBZ2, DQQR62, CDPEFN, 1FJAWW): an exception that arrives after the
+# emulator's context was torn down goes on to Wine instead of faulting on the null context ("[fex-fault] pc=...+0x1123c4" in 624-625).
+python3 "$R/tools/patch-fex-ios-ec-teardown-ctx.py" "$R/FEX" || echo "::warning::the torn-down context guard was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Opt-in, whichever pin (round 626, agent G1 S7; Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE.
+python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/FEXCore/Source/Interface/Core/CPUID.cpp" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit64.dll is built without it"
 # Opt-in, whichever pin (round 624, agent A S7; Borderlands GOTY Enhanced V0FQAS): the alias table has room for 1024 image copies,
 # the limit in force stays 256 unless env.MADEIRA_FEX_ALIAS_MAX names more; the miss line says how full the table is.
 python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"

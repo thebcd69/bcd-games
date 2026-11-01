@@ -138,6 +138,10 @@ func require(_ condition: @autoclosure () -> Bool, _ label: String) {
                 "BCD's own steam_api diagnostic line is found")
         require(said([start, "[S_API] SteamAPI_Init(): SteamAPI_IsSteamRunning() did not locate a running instance of Steam.."]),
                 "Valve's steam_api text is found")
+        // Round 626 (Slay the Spire 2 9W1M7B): SteamAPI_InitEx's result as the game printed it, mirrored by [guest-log].
+        require(said([start, "[guest-log] #11 tid=006c [ERROR] Steamworks initialization failed! Result: k_ESteamAPIInitResult_NoSteamClient, "
+                      + "message: Cannot create IPC pipe to Steam client process.  Steam is probably not running."]),
+                "Steamworks' InitEx result (NoSteamClient) is found")
         require(!said(["SteamAPI_Init() failed.", "x"]), "a failure line with no direct start before it (a Dock session's child) is not")
         require(!said([start, "wine: all is well", "[xp] 1 2 3"]), "a direct start whose log says nothing about Steam: no")
         require(!said(["SteamAPI_Init() failed.", start, "ready"]), "an earlier session's failure line does not count after a later direct start")

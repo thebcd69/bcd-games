@@ -1,0 +1,214 @@
+[00:56:21.023] [INFO] Checking entitlements...
+[00:56:21.024] [INFO] [build] v0.1.623 (623)
+[00:56:21.024] [INFO] [device] model=iPhone17,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=7622MB available=6123MB cores=6
+[00:56:21.024] [INFO] [device] address-map=[0x104088000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[00:56:21.035] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-04:00 free-disk=0GB stikdebug-url=1
+[00:56:21.039] [INFO] [device] gpu="Apple A18 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:56:26.066] [INFO] Requesting JIT with Built-in StikJIT...
+[00:57:28.022] [INFO] [bcd] library launch splatterhouse.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[00:57:28.043] [INFO] Running full Wine sequence...
+[00:57:28.043] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104088000,0x8000000000) 512GB available=6099MB low-power=0 thermal=nominal
+[00:57:28.050] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[00:57:28.050] [INFO] Allocating 896MB JIT pool via debugger...
+[00:57:28.050] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:57:28.050] [INFO] [jit-debugger] attached=1 at the pool request
+[00:57:28.051] [ERR] ml1034: could NOT reserve the executable window (kr=3) BEFORE RX - something else already holds 0x140000000; a non-relocatable image will be displaced and its absolute pointers will be stale
+[00:57:28.053] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[00:57:28.927] [INFO] RX pool at 0x148000000
+[00:57:28.946] [INFO] Detaching debugger...
+[00:57:29.775] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=604MB limit=6143MB thermal=nominal lpm=0 api=D3D12/D3D9/64 res=1408x648 cap=60 game=splatterhouse
+[phase] wine-start             t+  1.867s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5529 MB + phys_footprint=614 MB = 6144 MB (hw.memsize says 7622 MB)
+ml985: map_image_view size=0x4df9000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x140000000+0x4df9000 (?) → pool 0x148005000 used=0x4e05000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 4325 .text pages executable (copy @0x148005000)
+ml957: ? backing 0x140000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=771 MB (peak 771) internal=770 MB compressed=0 MB external=122 MB reusable=12 MB (cycle=1)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14ce04000 used=0x4f3c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14ce04000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x412000 (libarm64ecfex.dll) → pool 0x14cf3e000 used=0x535a000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14cf3e000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14d358000 used=0x548c000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14d358000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14d48c000 used=0x5554000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14d48c000)
+[hwinput] keyboard focus: program (app active)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14d554000 used=0x5854000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14d554000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module splatterhouse.exe (splatterhouse.exe-51c65c5895188b35): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module rexruntimerd.dll (rexruntimerd.dll-054ec0526eec0f9e): 71FD650000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FD5B0000
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): 71FD470000
+D 24 Load module winemetal.dll (winemetal.dll-5dde309614d342ae): 71FD440000
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x14f07c000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x14f130000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x14f224000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14f2b8000)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x14fc3c000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=1 first=000000014435B530
+[copy-verify] uxtheme.dll: OK, 5 .text pages executable (copy @0x150b4c000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.631s rev=ml526
+[jit-pool] image 0x71fa8a0000+0x65e000 (rexgpu-xenosrd.dll) → pool 0x150d28000 used=0x9388000/0x23000000 tramp+0x0
+D 24 Load module rexgpu-xenosrd.dll (rexgpu-xenosrd.dll-312d4851c720009c): 71FA8A0000
+[jit-pool] image 0x71fa440000+0x451000 (madeira_d3d12.dll) → pool 0x151389000 used=0x97e5000/0x23000000 tramp+0x4000
+D 24 Load module D3D12.dll (d3d12.dll-d660d8a141d7903e): 71FA440000
+[jit-pool] image 0x71fa390000+0xb0000 (d3dcompiler_47.dll) → pool 0x1517e4000 used=0x9898000/0x23000000 tramp+0x4000
+D 24 Load module D3DCompiler_47.dll (d3dcompiler_47.dll-e0c838ea40199618): 71FA390000
+[jit-pool] image 0x71fa020000+0x370000 (wined3d.dll) → pool 0x151898000 used=0x9c0c000/0x23000000 tramp+0x4000
+D 24 Load module wined3d.dll (wined3d.dll-e53ebe6d434bb891): 71FA020000
+[jit-pool] image 0x71f9ec0000+0x160000 (opengl32.dll) → pool 0x151c0c000 used=0x9d70000/0x23000000 tramp+0x4000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71F9EC0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9ec0000) -> 64-bit table (0x106e68d00)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"dxilconv.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"dxcompiler.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, probe)."
+[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, probe)
+[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, probe)
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=00000070238454A0, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[free-delay] #1 release of 0x7026530000+0x200000 held for 2000 ms (1 in flight)
+[win-name] #5 hwnd=0x10036 class='' text="Default IME" rev=ml853
+[jit-pool] image 0x71f9e10000+0xb0000 (uxtheme.dll) → pool 0x151d70000 used=0x9e24000/0x23000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F9E10000
+[win-name] #10 hwnd=0x2002e class='' text="splatterhouse [rexglue-v0.10.0-dev.g08e0615-RelWithDebInfo]" rev=ml853
+[win-name] #11 hwnd=0x2002e class='' text="splatterhouse [rexglue-v0.10.0-dev.g08e0615-RelWithDebInfo]" rev=ml853
+[steer] #1 size=0x2740000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c10810000
+[swap-diag] #1 layer 0x14639ae40: drawable 800x600 format 80 -> 1408x648 format 80, set on the iOS main thread (dispatch_sync) ...
+[swap-diag] #1 layer 0x14639ae40: drawable 800x600 format 80 -> 1408x648 format 80, set on the iOS main thread (dispatch_sync) ...
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=1 at 0x100000000+0x100000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[nt-fail] #1 NtMapViewOfSection status=c0000018 proc=splatterhouse.exe tid=0024 size=0x40000000 type=0x0 prot=0x4 hint=0x100000000 zb=0x0 h=0x114 off=0x0 hits=1 rev=ajan5-rockstar
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x200000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[nt-fail] #2 NtMapViewOfSection status=c0000018 proc=splatterhouse.exe tid=0024 size=0x40000000 type=0x0 prot=0x4 hint=0x200000000 zb=0x0 h=0x114 off=0x0 hits=2 rev=ajan5-rockstar
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x400000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[nt-fail] #3 NtMapViewOfSection status=c0000018 proc=splatterhouse.exe tid=0024 size=0x40000000 type=0x0 prot=0x4 hint=0x400000000 zb=0x0 h=0x114 off=0x0 hits=3 rev=ajan5-rockstar
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x800000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[nt-fail] #4 NtMapViewOfSection status=c0000018 proc=splatterhouse.exe tid=0024 size=0x40000000 type=0x0 prot=0x4 hint=0x800000000 zb=0x0 h=0x114 off=0x0 hits=4 rev=ajan5-rockstar
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x1000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x2000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=fixed-map err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[nt-fail] #5 NtMapViewOfSection status=c0000018 proc=splatterhouse.exe tid=0024 size=0x40000000 type=0x0 prot=0x4 hint=0x8000000000 zb=0x0 h=0x114 off=0x0 hits=8 rev=ajan5-rockstar
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0xc0000018 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x40000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x3f000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x1000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x10000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x10000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x20000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x20000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x20000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[map-sec] virtual_map_section handle=0x114 prot=0x4 size=0x20000000 -> 0x40000002 | STAGE=none err=3 at 0x4000000000+0x40000000 (map_view's own record: placement-scan = no place found; vprot-table/view-struct = create_view; fixed-map = MAP_FIXED) rev=ajan5-motor
+[alloc-fail] ml814 #1 status=c000000d hint=0x800000000000 size=0x10000 type=0x1000 protect=0x1 tid=0024 | STAGE=none err=3 at 0x4000000000+0x40000000
+[nt-fail] #6 NtAllocateVirtualMemory status=c000000d proc=splatterhouse.exe tid=0024 size=0x10000 type=0x1000 prot=0x1 hint=0x800000000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[guest-log] file <container>/Documents/wine/drive_c/Splatterhouse/splatterhouse.log
+[guest-log] #1 tid=0024 [2026-10-31 00:57:30.869] [error] [sys] [t36] BaseHeap::AllocFixed failed to alloc range from host
+[alloc-fail] ml814 #2 status=c000000d hint=0x800100000000 size=0x1000000 type=0x1000 protect=0x4 tid=0024 | STAGE=none err=3 at 0x4000000000+0x40000000
+[nt-fail] #7 NtAllocateVirtualMemory status=c000000d proc=splatterhouse.exe tid=0024 size=0x1000000 type=0x1000 prot=0x4 hint=0x800100000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[guest-log] #2 tid=0024 [2026-10-31 00:57:30.871] [error] [sys] [t36] BaseHeap::AllocFixed failed to alloc range from host
+[guest-log] #3 tid=0024 [2026-10-31 00:57:30.871] [error] [sys] [t36] PhysicalHeap::Alloc unable to alloc physical memory in parent heap
+[alloc-fail] ml814 #3 status=c000000d hint=0x800100000000 size=0x20000000 type=0x1000 protect=0x4 tid=0024 | STAGE=none err=3 at 0x4000000000+0x40000000
+[nt-fail] #8 NtAllocateVirtualMemory status=c000000d proc=splatterhouse.exe tid=0024 size=0x20000000 type=0x1000 prot=0x4 hint=0x800100000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c000000d hint=0x800080000000 size=0x40000 type=0x1000 protect=0x4 tid=0024 | STAGE=none err=3 at 0x4000000000+0x40000000
+[nt-fail] #9 NtAllocateVirtualMemory status=c000000d proc=splatterhouse.exe tid=0024 size=0x40000 type=0x1000 prot=0x4 hint=0x800080000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[guest-log] #4 tid=0024 [2026-10-31 00:57:30.872] [error] [sys] [t36] BaseHeap::Alloc failed to alloc range from host
+[store-noalias] #1 rev=ml348 addr=0x80008000001c insn=0x990000e6 pc=0x16a3c101c NO alias and NO region (unmapped) — genuine bad pointer
+[av-detail] ml613 #1 p0=WRITE p1=0x80008000001c hostpc=0x16a3c101c hinsn=0x990000e6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fd906044 pc=0x16a3c101c addr=0x80008000001c kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16a3c101c addr=0x80008000001c x18=0x71fffe0000 type=1 lr=0x71fd906044 sp=0x71fe3b0000 x16=0x16affc108 x17=0x1235a0000
+[guest-code] rev=ml333 pool_rip=0x14db11044 (PE 0x71fd906044): 80 7d b0 01 75 09 48 8b 4d a8 e8 2d 9c 49 00 89
+[fault-host] 16a3c0f1c: 194000c6 53081cca 6b02615f 913ffc06 8b0100c6 2a0603e0 1a881048 91097326
+[fault-host] 16a3c0f3c: 994000c1 d503201f 91098326 994000c2 d503201f 0b010042 2b080042 9a9f27e6
+[fault-host] 16a3c0f5c: 71000449 ba1f84c2 aa0203f8 aa0903e2 91090326 d94000c8 d503201f 9100e3a4
+[fault-host] 16a3c0f7c: f90022e4 b90022e0 3900e2ff 52800066 b90032e6 52800046 b9002ae6 aa1a03e0
+[fault-host] 16a3c0f9c: d9420106 d503201f d29c7707 f2bfb1e7 f2c00e27 f81f8ee7 a94a2f8a 8a06116b
+[fault-host] 16a3c0fbc: 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d63f0160 10ff30ca
+[mach_exc] insn_stream PC-12..PC+8: 72a707e6 8b080007 d503201f [990000e6] 52800026 b3401cc8 1400004f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x70240849d0 *(gs_cached+0x58)=0x70240849d0
+[store-noalias] #2 rev=ml348 addr=0x80008000001c insn=0x990000e6 pc=0x16a3c101c NO alias and NO region (unmapped) — genuine bad pointer
+[av-detail] ml613 #2 p0=WRITE p1=0x80008000001c hostpc=0x16a3c101c hinsn=0x990000e6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fd906044 pc=0x16a3c101c addr=0x80008000001c kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16a3c101c addr=0x80008000001c x18=0x71fffe0000 type=1 lr=0x71fd906044 sp=0x71fe3b0000 x16=0x16affc108 x17=0x1235a0000
+[guest-code] rev=ml333 pool_rip=0x14db11044 (PE 0x71fd906044): 80 7d b0 01 75 09 48 8b 4d a8 e8 2d 9c 49 00 89
+[fault-host] 16a3c0f7c: f90022e4 b90022e0 3900e2ff 52800066 b90032e6 52800046 b9002ae6 aa1a03e0
+[fault-host] 16a3c0f9c: d9420106 d503201f d29c7707 f2bfb1e7 f2c00e27 f81f8ee7 a94a2f8a 8a06116b
+[fault-host] 16a3c0fbc: 8b0b014a a940294b cb06014a b400006a f945b38b f9000f86 d63f0160 10ff30ca
+[fault-host] 16a3c0fdc: f900038a b945eb8b 3400004b d4395fc0 9109b326 994000c8 d503201f d9428326
+[fault-host] 16a3c0ffc: d503201f 8b060108 52800380 72b00000 528dc546 72a707e6 8b080007 d503201f
+[fault-host] 16a3c101c: 990000e6 52800026 b3401cc8 1400004f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 72a707e6 8b080007 d503201f [990000e6] 52800026 b3401cc8 1400004f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x70240849d0 *(gs_cached+0x58)=0x70240849d0
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x71fd906044 in image 0x71fd650000: rva 0x2b6044, section #0 '.text' rva 0x1000+0x750e86 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16a3c101c RX from -32, 64 of 64 bytes: 1f 20 03 d5 08 01 06 8b 80 03 80 52 00 00 b0 72 46 c5 8d 52 e6 07 a7 72 07 00 08 8b 1f 20 03 d5 e6 00 00 99 26 00 80 52 c8 1c 40 b3 4f 00 00 14 e8 03 15 aa 09 21 00 b1 1f 40 00 d5 f8 03 08 aa 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16a3c101c (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 16A3C101C AV WRITE of 80008000001C
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71fd8fe3c7 RX from -32, 64 of 64 bytes: 00 00 00 c7 44 24 28 02 00 00 00 48 89 f9 ff 50 20 8b 86 6c 02 00 00 48 03 46 28 b9 1c 00 00 80 c7 04 01 2a 6e 3f 38 b0 01 e9 8d 00 00 00 4c 89 f0 48 83 c0 08 48 89 45 50 49 8b 46 18 48 89 45 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71fd8fe3c7 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 71FD8FE3C7 AV WRITE of 80008000001C
+[guest-log] #5 tid=0024 [2026-10-31 00:57:30.874] [error] [sys] [t36] Unhandled guest access violation: write of guest 0x8000001C (host 0x000080008000001C) on thread 0x24
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7023810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on write access to 000080008000001C at address 00000071FD8FE3C7 (thread 0024), starting debugger...
+[xp-names] m4595014 "wine-x18-exc"
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1041
+[unwind] term ml661 begin rip=14d5cc1fc rsp=702380d918 window=[702380d918..702400d918) max=32
+[unwind] term ml661 #00 pc=14d5cc1fc rsp=702380d918  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[00:57:31.041] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=1022MB limit=6143MB thermal=nominal lpm=0 api=D3D12/D3D9/64 res=1408x648 cap=60 game=splatterhouse
+[00:57:31.043] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=2)
+[00:57:32.926] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=3)
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=4)
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=5)
+[footprint] rev=ml358 phys=1030 MB (peak 1030) internal=1029 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=16 resident=1206MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: elsewhere (responder)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=16 resident=1211MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1031 MB (peak 1031) internal=1029 MB compressed=0 MB external=166 MB reusable=15 MB (cycle=34)
+[footprint] rev=ml358 phys=1031 MB (peak 1031) internal=1029 MB compressed=0 MB external=166 MB reusable=15 MB (cycle=35)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+118s beats=3 gaps=1 iter=279 gen=1 threads=21 resident=356MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=875 MB (peak 1031) internal=335 MB compressed=538 MB external=161 MB reusable=0 MB (cycle=36)
+[footprint] rev=ml358 phys=1006 MB (peak 1031) internal=466 MB compressed=538 MB external=161 MB reusable=0 MB (cycle=37)
+[footprint] rev=ml358 phys=1006 MB (peak 1031) internal=466 MB compressed=538 MB external=161 MB reusable=0 MB (cycle=38)
+[footprint] rev=ml358 phys=1006 MB (peak 1031) internal=466 MB compressed=538 MB external=161 MB reusable=0 MB (cycle=39)

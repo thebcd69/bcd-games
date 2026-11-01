@@ -252,6 +252,9 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                                          isOn: backend.holdMaximumRate) { backend.setHoldMaximumRate($0) }
                 }
             }
+            if BCDFoldableDevice.isThisDevice {   // madeira-bcd foldable (experimental, BCDFoldable.swift): the foldable iPhone's Settings only; every other device's Graphics page is unchanged
+                BCDSettingsGroup(title: "Foldable iPhone") { BCDFoldableSettingsRow() }
+            }
             if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
             BCDSettingsGroup {
                 BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "more"), title: "More graphics options",

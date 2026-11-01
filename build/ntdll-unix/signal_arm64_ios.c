@@ -1577,6 +1577,44 @@ static int ios_fault_read_insn( uint64_t fault_pc, uint32_t *out )
     return 1;
 }
 
+/* ctx-null-test:begin (tests/host/check-ctx-null.py compiles this region) */
+/* madeira-bcd (round 626, agent A1 S2; Tony Hawk's Pro Skater 1+2 HSDNPN, NK0SRY build 623, NZECAK build 578): GetThreadContext(handle,
+ * NULL) and SetThreadContext(handle, NULL). Windows answers STATUS_ACCESS_VIOLATION (the call returns FALSE, ERROR_NOACCESS); the shipped
+ * ARM64EC ntdll.dll's NtGetContextThread / NtSetContextThread wrappers read the CONTEXT themselves and fault ("[av-detail] ... p1=0x30
+ * ... hinsn=0xb9403288"), which ends the process. The file is a tracked binary, so the answer is given here: only for a read of a
+ * NULL-class address at exactly those two loads, recognised by their own words, the prologue before them and the common return after
+ * them (the frame is intact there: sp has not moved since the prologue), the wrapper returns STATUS_ACCESS_VIOLATION from its
+ * epilogue. Any other pc, address or ntdll build: 0, the old path. `rd` reads one instruction word (ios_fault_read_insn). */
+static uint64_t ios_ctx_null_resume( uint64_t pc, uint64_t fault_addr, uint64_t ctx_reg_get, uint64_t ctx_reg_set,
+                                     int (*rd)( uint64_t, uint32_t * ), int *which )
+{
+    static const uint32_t get_pro[10] = { 0xa9bc53f3, 0xa9015bf5, 0xa9026bf9, 0xa9037bfb, 0xd10f43ff,
+                                          0xaa0103f4, 0xaa0003f3, 0x910103e0, 0x2a1f03e1, 0x52807202 };   /* then bl memset */
+    static const uint32_t get_epi[6] = { 0x910f43ff, 0xa9437bfb, 0xa9426bf9, 0xa9415bf5, 0xa8c453f3, 0xd65f03c0 };
+    static const uint32_t set_pro[3] = { 0xf81f0ffb, 0xf90007fe, 0xd10e43ff };
+    static const uint32_t set_epi[4] = { 0x910e43ff, 0xf94007fe, 0xf84107fb, 0xd65f03c0 };
+    uint32_t w = 0;
+    unsigned k;
+
+    if (fault_addr >= 0x10000 || pc < 0x10000 || !rd( pc, &w )) return 0;
+    if (w == 0xb9403288 && ctx_reg_get + 0x30 == fault_addr)            /* ldr w8, [x20, #0x30]: CONTEXT.ContextFlags */
+    {
+        for (k = 0; k < 10; k++) if (!rd( pc - 0x2c + 4 * k, &w ) || w != get_pro[k]) return 0;
+        for (k = 0; k < 6; k++) if (!rd( pc + 0x2d8 + 4 * k, &w ) || w != get_epi[k]) return 0;
+        *which = 0;
+        return pc + 0x2d8;
+    }
+    if (w == 0xb940442a && ctx_reg_set + 0x44 == fault_addr)            /* ldr w10, [x1, #0x44] */
+    {
+        for (k = 0; k < 3; k++) if (!rd( pc - 0xc + 4 * k, &w ) || w != set_pro[k]) return 0;
+        for (k = 0; k < 4; k++) if (!rd( pc + 0x534 + 4 * k, &w ) || w != set_epi[k]) return 0;
+        *which = 1;
+        return pc + 0x534;
+    }
+    return 0;
+}
+/* ctx-null-test:end */
+
 /* madeira-bcd: the instructions an exclusive pair holds between its LDXR/LDAXR and its
  * STXR/STLXR, as operations on the loaded value (ml1284's emulation below).
  *
@@ -2570,6 +2608,16 @@ static int ios_kuser_keep_regs( void )
         on = (e && e[0] == '1');
     }
     return on;
+}
+
+/* madeira-bcd (round 626, agent P S8; E9C6ME and 14 archive logs): a checked 8-byte read for the Mach exception thread's
+ * diagnostics. A plain load of a wild register value faulted inside that thread, which serves every Mach exception of the app,
+ * so nothing answered the next fault and the app hung. mach_vm_read_overwrite never faults. */
+static int ios_exc_read64( uint64_t addr, uint64_t *out )
+{
+    mach_vm_size_t got = 0;
+    return mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)addr, 8, (mach_vm_address_t)(uintptr_t)out, &got ) == KERN_SUCCESS
+           && got == 8;
 }
 
 static void *ios_mach_exception_thread( void *arg )
@@ -3836,6 +3884,28 @@ static void *ios_mach_exception_thread( void *arg )
                                 (unsigned long long)fault_addr);
                         }
                     }
+                }
+            }
+
+            /* 3.5 (madeira-bcd, round 626, agent A1 S2): GetThreadContext / SetThreadContext with a NULL CONTEXT answer
+             * STATUS_ACCESS_VIOLATION from the ARM64EC ntdll wrapper's own epilogue, as Windows does (ios_ctx_null_resume). */
+            if (!handled && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)
+            {
+                uint64_t ctx_pc = (uint64_t)__darwin_arm_thread_state64_get_pc( state );
+                int which = -1;
+                uint64_t resume = ios_ctx_null_resume( ctx_pc, (uint64_t)fault_addr, state.__x[20], state.__x[1],
+                                                       ios_fault_read_insn, &which );
+                if (resume)
+                {
+                    static volatile int ctx_null_said;
+                    state.__x[0] = 0xC0000005;   /* STATUS_ACCESS_VIOLATION: the wrapper's return value */
+                    __darwin_arm_thread_state64_set_pc_fptr( state, (void *)(uintptr_t)resume );
+                    handled = 1;
+                    if (__sync_fetch_and_add( &ctx_null_said, 1 ) < 4)
+                        dprintf( STDERR_FILENO, "[ctx-null] r626 Nt%sContextThread(handle, %p): STATUS_ACCESS_VIOLATION, as Windows answers "
+                                 "(pc %p resumes at the wrapper's return %p)\n", which ? "Set" : "Get",
+                                 (void *)(uintptr_t)((uint64_t)fault_addr - (which ? 0x44 : 0x30)), (void *)(uintptr_t)ctx_pc,
+                                 (void *)(uintptr_t)resume );
                 }
             }
 
@@ -6973,9 +7043,10 @@ skip_reclaim_band: ;
                     /* Read instruction at LR-4 to identify the BL/BLR */
                     if (cnt <= 3 && (uintptr_t)state.__lr >= 0x100000000ULL)
                     {
-                        uint32_t *lr_p = (uint32_t*)(uintptr_t)(state.__lr - 4);
-                        dprintf(STDERR_FILENO, "[mach_exc] caller_insn @lr-4=0x%p: 0x%08x\n",
-                            (void*)lr_p, *lr_p);
+                        uint64_t insn = 0;   /* round 626 (P S8): a checked read, never a fault in this thread */
+                        if (ios_exc_read64( (uint64_t)state.__lr - 4, &insn ))
+                            dprintf(STDERR_FILENO, "[mach_exc] caller_insn @lr-4=0x%llx: 0x%08x\n",
+                                (unsigned long long)((uint64_t)state.__lr - 4), (uint32_t)insn);
                     }
                     /* Which pool COPY is pc in, and who owns it? Names the
                      * session-vs-child copy — the PE attribution below can't
@@ -6998,9 +7069,10 @@ skip_reclaim_band: ;
                         if (cnt <= 2 && copy_pe && (uintptr_t)copy_pe >= 0x100000000ULL)
                         {
                             uint64_t x16v = (uint64_t)state.__x[16];
-                            uint64_t pool_v = (x16v >= 0x100000000ULL)
-                                ? *(volatile uint64_t *)(uintptr_t)(x16v + 0x4e0) : 0xdead1;
-                            uint64_t pe_v = *(volatile uint64_t *)((uintptr_t)copy_pe + 0xc04e0);
+                            /* round 626 (P S8): checked reads; a wild x16 (E9C6ME: 0xffffffffffff) faulted here and hung the app */
+                            uint64_t pool_v = 0xdead1, pe_v = 0xdead2;
+                            if (x16v >= 0x100000000ULL && !ios_exc_read64( x16v + 0x4e0, &pool_v )) pool_v = 0xdead3;
+                            if (!ios_exc_read64( (uint64_t)(uintptr_t)copy_pe + 0xc04e0, &pe_v )) pe_v = 0xdead4;
                             dprintf(STDERR_FILENO,
                                 "[nls-probe] upcase ptr: pool[x16+0x4e0]=0x%llx  PE[pe+0xc04e0]=0x%llx  (x16=0x%llx pe=%p rva_pc=0x%llx)\n",
                                 (unsigned long long)pool_v, (unsigned long long)pe_v,
@@ -7114,9 +7186,9 @@ skip_reclaim_band: ;
                                             uint64_t x0v = (uint64_t)state.__x[0];
                                             uint64_t l1base = 0xdead, l1mask = 0xdead;
                                             int host = (x0v >= 0x100000000ULL && x0v < 0x800000000000ULL);
-                                            if (host) {
-                                                l1base = *(volatile uint64_t *)(uintptr_t)(x0v + 0x30);
-                                                l1mask = *(volatile uint64_t *)(uintptr_t)(x0v + 0x38);
+                                            if (host) {   /* round 626 (agent P S8): checked reads, never a fault in the Mach thread */
+                                                if (!ios_exc_read64( x0v + 0x30, &l1base )) l1base = 0xdead3;
+                                                if (!ios_exc_read64( x0v + 0x38, &l1mask )) l1mask = 0xdead3;
                                             }
                                             dprintf(STDERR_FILENO,
                                                 "[findblock-probe] rva=0x%llx x0(LookupCache)=0x%llx host=%d x1(Thread)=0x%llx x2(rip)=0x%llx L1base[0x30]=0x%llx L1mask[0x38]=0x%llx\n",
@@ -7151,8 +7223,8 @@ skip_reclaim_band: ;
                                             {
                                                 uint64_t bk[6] = {0,0,0,0,0,0};
                                                 if (x11v >= 0x100000000ULL && x11v < 0x800000000000ULL)
-                                                    for (int bi = 0; bi < 6; bi++)
-                                                        bk[bi] = *(volatile uint64_t *)(uintptr_t)(x11v + (uint64_t)bi * 8);
+                                                    for (int bi = 0; bi < 6; bi++)   /* round 626 (P S8): checked */
+                                                        if (!ios_exc_read64( x11v + (uint64_t)bi * 8, &bk[bi] )) bk[bi] = 0xdead3;
                                                 dprintf(STDERR_FILENO,
                                                     "[bucketscan-probe] buckets@x11: %016llx %016llx %016llx %016llx %016llx %016llx | x0=%llx x9=%llx x10=%llx x19=%llx x20=%llx x21=%llx x22=%llx\n",
                                                     (unsigned long long)bk[0], (unsigned long long)bk[1],
@@ -7173,14 +7245,15 @@ skip_reclaim_band: ;
                                                     for (int ci = 0; ci < 4 && !found; ci++) {
                                                         uint64_t th = cands[ci];
                                                         if (th < 0x100000000ULL || th >= 0x800000000000ULL) continue;
-                                                        uint64_t mb = *(volatile uint64_t *)(uintptr_t)(th + 0x18);
-                                                        if (mb != x11v) continue;
+                                                        uint64_t mb = 0, vb = 0xdead3, ve = 0xdead3, f20 = 0xdead3, f28 = 0xdead3, w38 = 0;
+                                                        uint8_t  sh;
+                                                        if (!ios_exc_read64( th + 0x18, &mb ) || mb != x11v) continue;   /* round 626 (P S8): checked */
                                                         found = 1;
-                                                        uint64_t vb  = *(volatile uint64_t *)(uintptr_t)(th + 0x0);
-                                                        uint64_t ve  = *(volatile uint64_t *)(uintptr_t)(th + 0x8);
-                                                        uint64_t f20 = *(volatile uint64_t *)(uintptr_t)(th + 0x20);
-                                                        uint64_t f28 = *(volatile uint64_t *)(uintptr_t)(th + 0x28);
-                                                        uint8_t  sh  = *(volatile uint8_t  *)(uintptr_t)(th + 0x3e);
+                                                        if (!ios_exc_read64( th + 0x0, &vb )) vb = 0xdead3;
+                                                        if (!ios_exc_read64( th + 0x8, &ve )) ve = 0xdead3;
+                                                        if (!ios_exc_read64( th + 0x20, &f20 )) f20 = 0xdead3;
+                                                        if (!ios_exc_read64( th + 0x28, &f28 )) f28 = 0xdead3;
+                                                        sh = ios_exc_read64( th + 0x38, &w38 ) ? (uint8_t)(w38 >> 48) : 0xff;   /* the byte at +0x3e */
                                                         dprintf(STDERR_FILENO,
                                                             "[bucketscan-probe] THIS=0x%llx(reg%d) values.begin=0x%llx end=0x%llx [0x20]=0x%llx [0x28]=0x%llx m_shifts=0x%x\n",
                                                             (unsigned long long)th, ci, (unsigned long long)vb,
@@ -7212,9 +7285,10 @@ skip_reclaim_band: ;
                             {
                                 uint64_t lr_rva = va - mod;
                                 uint64_t pool_base = (uint64_t)state.__lr - lr_rva;
-                                uint32_t *cp = (uint32_t *)(uintptr_t)state.__lr;
-                                uint32_t adrp_i = cp[-7];   /* lr-0x1c */
-                                uint32_t ldr_i  = cp[-3];   /* lr-0xc  */
+                                uint64_t w_adrp = 0, w_ldr = 0;   /* round 626 (P S8): the caller's code read checked, as everything below */
+                                int code_ok = ios_exc_read64( (uint64_t)state.__lr - 0x1c, &w_adrp ) && ios_exc_read64( (uint64_t)state.__lr - 0xc, &w_ldr );
+                                uint32_t adrp_i = code_ok ? (uint32_t)w_adrp : 0;   /* lr-0x1c */
+                                uint32_t ldr_i  = code_ok ? (uint32_t)w_ldr : 0;    /* lr-0xc  */
                                 int is_adrp = ((adrp_i >> 24) & 0x9f) == 0x90;
                                 int is_ldr  = ((ldr_i  >> 22) & 0x3ff) == 0x3e5; /* LDR imm,64 unsigned */
                                 if (is_adrp && is_ldr)
@@ -7228,8 +7302,9 @@ skip_reclaim_band: ;
                                     uint64_t off  = (uint64_t)((ldr_i >> 10) & 0xfff) << 3;
                                     uint64_t g_pool = page + off;
                                     uint64_t g_rva  = g_pool - pool_base;
-                                    uint64_t gv_pool = *(volatile uint64_t *)(uintptr_t)g_pool;
-                                    uint64_t gv_pe   = *(volatile uint64_t *)(uintptr_t)(mod + g_rva);
+                                    uint64_t gv_pool = 0xdead3, gv_pe = 0xdead3;   /* round 626 (P S8): checked */
+                                    if (!ios_exc_read64( g_pool, &gv_pool )) gv_pool = 0xdead3;
+                                    if (!ios_exc_read64( mod + g_rva, &gv_pe )) gv_pe = 0xdead3;
                                     dprintf(STDERR_FILENO,
                                         "[nullfp-probe] tgt-global rva=0x%llx pool[0x%llx]=0x%llx PE[0x%llx]=0x%llx mod=%s lr_rva=0x%llx\n",
                                         (unsigned long long)g_rva,
@@ -9200,6 +9275,42 @@ static int ios_storm_end_child_only( thread_t thread, uintptr_t thread_teb, uint
     return 1;
 }
 
+/* madeira-bcd (round 626, agent G2 S6): the [stack-ovf] report's module names, every read through the kernel, as [term-stack]'s
+ * ios_diag_module_name in process_ios.c (a module record can outlive the readable mapping of its image). Same labels where readable. */
+static int ios_ovf_read( uint64_t addr, void *buf, unsigned int len )
+{
+    mach_vm_size_t got = 0;
+    if (!addr || addr < 0x10000ULL || addr >= 0x800000000000ULL) return 0;
+    return mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)addr, len, (mach_vm_address_t)buf, &got ) == KERN_SUCCESS
+           && got == len;
+}
+
+static const char *ios_ovf_module_name( uint64_t mbase, unsigned long long msz, char *out, unsigned int cap )
+{
+    unsigned char mz[2];
+    unsigned int e_lf = 0, exp_rva = 0, name_rva = 0, n;
+
+    if (cap < 2) return "?";
+    if (!ios_ovf_read( mbase, mz, 2 )) return "(unmapped record)";
+    if (mz[0] != 'M' || mz[1] != 'Z') return "?";
+    if (ios_ovf_read( mbase + 0x3c, &e_lf, 4 ) && e_lf < 0x1000 &&
+        ios_ovf_read( mbase + e_lf + 0x88, &exp_rva, 4 ) && exp_rva && exp_rva < msz &&
+        ios_ovf_read( mbase + exp_rva + 0x0c, &name_rva, 4 ) && name_rva && name_rva < msz)
+    {
+        n = cap - 1;
+        if (n > msz - name_rva) n = (unsigned int)(msz - name_rva);
+        if (!ios_ovf_read( mbase + name_rva, out, n ))
+        {
+            unsigned int room = 0x4000 - (unsigned int)((mbase + name_rva) & 0x3fff);
+            if (n > room) n = room;
+            if (!ios_ovf_read( mbase + name_rva, out, n )) return "(exe)";
+        }
+        out[n] = 0;
+        return out;
+    }
+    return "(exe)";
+}
+
 static int ios_mach_deliver_guest_exception_inner( thread_t thread, arm_thread_state64_t *state,
                                                    arm_neon_state64_t *neon, int have_neon,
                                                    int exception, uintptr_t fault_addr,
@@ -10025,25 +10136,15 @@ dispatch:
                         uint64_t v = ovf_buf[wi];
                         unsigned long long msz = 0;
                         unsigned long long mbase = ios_jit_module_base_for_va( v, &msz );
-                        const unsigned char *mb;
-                        const char *mname = "?";
-                        unsigned int e_lf, exp_rva, name_rva;
+                        char nb[40];
+                        const char *mname;
                         int k;
                         if (!mbase) continue;
                         total_code++;
                         for (k = 0; k < nuq; k++) if (uq[k] == v) { uqn[k]++; break; }
                         if (k == nuq && nuq < 24) { uq[nuq] = v; uqn[nuq] = 1; nuq++; }
                         if (whits >= 8) continue;
-                        mb = (const unsigned char *)(uintptr_t)mbase;
-                        if (mb[0] == 'M' && mb[1] == 'Z' &&
-                            (e_lf = *(const unsigned int *)(mb + 0x3c)) < 0x1000 &&
-                            (exp_rva = *(const unsigned int *)(mb + e_lf + 0x88)) &&
-                            exp_rva < msz &&
-                            (name_rva = *(const unsigned int *)(mb + exp_rva + 0x0c)) &&
-                            name_rva < msz)
-                            mname = (const char *)(mb + name_rva);
-                        else if (mb[0] == 'M' && mb[1] == 'Z')
-                            mname = "(exe)";
+                        mname = ios_ovf_module_name( mbase, msz, nb, sizeof(nb) );   /* round 626 (agent G2 S6): fault-safe */
                         dprintf( 2, "[stack-ovf]   w%d +%03x: %llx  %.32s+0x%llx\n",
                                  w, wi * 8, (unsigned long long)v, mname,
                                  (unsigned long long)(v - mbase) );

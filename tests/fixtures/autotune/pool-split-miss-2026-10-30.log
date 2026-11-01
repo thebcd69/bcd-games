@@ -1,0 +1,168 @@
+[21:32:57.020] [INFO] Checking entitlements...
+[21:32:57.020] [INFO] [build] v0.1.623 (623)
+[21:32:57.022] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8169MB cores=6
+[21:32:57.023] [INFO] [device] address-map=[0x100db0000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[21:32:57.039] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=+07:00 free-disk=81GB stikdebug-url=0
+[21:32:57.041] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:32:58.174] [INFO] [bcd] library launch Grand Theft Auto IV: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[21:32:58.175] [INFO] Requesting JIT with Built-in StikJIT...
+[21:33:07.494] [INFO] [dock-launch] image-retire=1
+[21:33:07.495] [INFO] [dock-launch] image-map-guard=1
+[21:33:07.605] [INFO] [dock-installers] app=12210 program=240240 file=Social-Club-Setup.exe status=done key=HKLM\Software\Rockstar Games\Steam\SDK recorded=1 minimum=1 machine=0x8664
+[21:33:07.634] [INFO] [dock-installers] app=12210 program=101093031 file=Rockstar-Games-Launcher.exe status=done key=HKLM\Software\Rockstar Games\Steam\Launcher recorded=1 minimum=1 machine=0x8664
+[21:33:07.634] [INFO] [dock-installers] app=12210 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[21:33:07.635] [INFO] [madeira-dock] starting the host for app 12210; Valve's client authenticates and authorizes the launch
+[21:33:07.642] [INFO] Running full Wine sequence...
+[21:33:07.642] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100db0000,0x8000000000) 512GB available=8139MB low-power=0 thermal=nominal
+[21:33:07.643] [INFO] [game-cfg] env.MADEIRA_DOCK_GAME_SCM=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=0 env.MADEIRA_SC_PA_POOLS=2 env.MADEIRA_SPAWN_BLOCK=RockstarErrorHandler env.MADEIRA_X64_IMAGE_NOCOPY=1 pool-split=1
+[21:33:07.646] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[21:33:07.646] [INFO] Allocating 896MB JIT pool via debugger...
+[21:33:07.646] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:33:07.646] [INFO] [jit-debugger] attached=1 at the pool request
+[21:33:07.648] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 608MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:33:08.371] [INFO] RX pool at 0x148000000
+[21:33:08.702] [ERR] [pool-split] the second region landed at 0x126000000, not in the run at 0x16f910000 — released (kr=0); the pool stays one region
+[21:33:08.719] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.106s rev=ml526
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   pool-split = 1
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7a00000000+0x1ffff0000 rev=ml433
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[21:33:08.964] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=7520 MB + phys_footprint=671 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x11ac00000+0x70000 (?) → pool 0x148004000 used=0x78000/0x26000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[jit-pool] image 0x73ffce0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x26000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[jit-pool] image 0x73ffc40000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x26000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[jit-pool] image 0x73ffad0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x26000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[footprint] rev=ml358 phys=676 MB (peak 676) internal=674 MB compressed=0 MB external=93 MB reusable=30 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=850 peb=0x73fffe0000
+[jit-pool] image 0x73ffa00000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x26000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0x73ff970000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x26000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x73fffe0000
+[gdi-shared] session table 0x7100f40000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.493s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=97, unixdir=98, dup_unixdir=102) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11fb20000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11fb20000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11fb20000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11fb28000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11fb28000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11fb2c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x149834000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x14996c000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149a00000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149b16000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.554s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=124, unixdir=128, dup_unixdir=133) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=20127 peb=0x10847c000
+[nls-getptr] type=11 id=1252 peb=0x108384000
+[nls-getptr] type=11 id=850 peb=0x108384000
+[nls-getptr] type=11 id=20127 peb=0x108384000
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11FB20000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FE600000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10847c000
+[nls-getptr] type=11 id=850 peb=0x10847c000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 73FC180000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 73FC100000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 73FBFF0000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 73FBF30000
+[free-delay] #1 release of 0x71055b0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71056b0000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x71058b0000+0x400000 held for 2000 ms (3 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x73f87f0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7d05400000
+[xp-names] m64123 "wine-x18-exc"
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\crashhandler64.dll" 0x73f8370000+0x1af000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149edcbc8 WININET.dll sec=0x73f8170000-0x73f81ab029
+E 4C [iOS-xins] tracker=0x149edcbc8 WININET.dll sec=0x73f81b0000-0x73f81b0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73F8160000
+E 4C [iOS-xins] tracker=0x149edcbc8 WININET.dll sec=0x73f8170000-0x73f81ab029
+E 4C [iOS-xins] tracker=0x149edcbc8 WININET.dll sec=0x73f81b0000-0x73f81b0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x73f8160000
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=903 MB (peak 903) internal=902 MB compressed=0 MB external=167 MB reusable=30 MB (cycle=2)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x73f7220000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x73f6af0000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x73f6450000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x73f5db0000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #37 L"libavfilter-11.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #38 L"libavformat-62.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #39 L"libavutil-60.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #40 L"libswresample-6.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #41 L"libswscale-9.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #42 L"video64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[jit-pool] image 0x73f5cf0000+0xc0000 (dsound.dll) → pool 0x14dde4000 used=0x5ea8000/0x26000000 tramp+0x4000
+D 50 Load module dsound.dll (dsound.dll-541ca4d6eb8180ce): 73F5CF0000
+[jit-pool] image 0x73f5c50000+0xa0000 (mmdevapi.dll) → pool 0x14dea8000 used=0x5f4c000/0x26000000 tramp+0x4000
+D 50 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 73F5C50000
+[jit-pool] image 0x73f5b20000+0xb0000 (winhttp.dll) → pool 0x14df4c000 used=0x6000000/0x26000000 tramp+0x4000
+D 50 Load module winhttp.dll (winhttp.dll-940743fb9f87d8d4): 73F5B20000
+[jit-pool] image 0x73f5a80000+0xa0000 (jsproxy.dll) → pool 0x14e000000 used=0x60a4000/0x26000000 tramp+0x4000
+D 50 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): 73F5A80000
+[jit-pool] image 0x73f5980000+0x80000 (dhcpcsvc.dll) → pool 0x14e0a4000 used=0x6128000/0x26000000 tramp+0x4000
+D 88 Load module dhcpcsvc.dll (dhcpcsvc.dll-ddd225dc767891f4): 73F5980000
+[jit-pool] image 0x73f5820000+0xe0000 (cryptnet.dll) → pool 0x14e128000 used=0x620c000/0x26000000 tramp+0x4000
+D 88 Load module cryptnet.dll (cryptnet.dll-c70a2270b30e54e3): 73F5820000
+[file-wfail] ml669 #63 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1047 MB (peak 1047) internal=1046 MB compressed=0 MB external=175 MB reusable=32 MB (cycle=3)
+[file-wfail] ml669 #70 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #78 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[21:33:14.279] [INFO] [session] length=6s partial=1 play=0s frames=0 stalls=0/0s peak=1072MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Grand Theft Auto IV: The Complete Edition

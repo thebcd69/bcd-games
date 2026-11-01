@@ -2956,6 +2956,38 @@ static int ios_unw_read( uint64_t addr, void *buf, unsigned int len )
 }
 
 static int ios_unw_rd32( uint64_t a, unsigned int *v ) { return ios_unw_read( a, v, 4 ); }
+
+/* diag-module-name-test:begin (tests/host/check-diag-module-name.py compiles this function) */
+/* madeira-bcd (round 626, agent G2 S6; NieR:Automata 8FWJCP, build 623): a module's export name for a diagnostic line, every read through
+ * the kernel. The module record (ios_jit_module_base_for_va) can outlive the readable mapping of its image: [term-stack] read an unmapped
+ * uxtheme.dll record with plain loads inside NtTerminateProcess and turned the program's clean exit into c0000005. The same labels as
+ * before where the image is readable ("?" not a PE, "(exe)" no export name); "(unmapped record)" where the old reads would have faulted. */
+static const char *ios_diag_module_name( uint64_t mbase, unsigned long long msz, char *out, unsigned int cap )
+{
+    unsigned char mz[2];
+    unsigned int e_lf = 0, exp_rva = 0, name_rva = 0, n;
+
+    if (cap < 2) return "?";
+    if (!ios_unw_read( mbase, mz, 2 )) return "(unmapped record)";
+    if (mz[0] != 'M' || mz[1] != 'Z') return "?";
+    if (ios_unw_rd32( mbase + 0x3c, &e_lf ) && e_lf < 0x1000 &&
+        ios_unw_rd32( mbase + e_lf + 0x88, &exp_rva ) && exp_rva && exp_rva < msz &&
+        ios_unw_rd32( mbase + exp_rva + 0x0c, &name_rva ) && name_rva && name_rva < msz)
+    {
+        n = cap - 1;
+        if (n > msz - name_rva) n = (unsigned int)(msz - name_rva);
+        if (!ios_unw_read( mbase + name_rva, out, n ))
+        {
+            unsigned int room = 0x4000 - (unsigned int)((mbase + name_rva) & 0x3fff);   /* the name's own page only */
+            if (n > room) n = room;
+            if (!ios_unw_read( mbase + name_rva, out, n )) return "(exe)";
+        }
+        out[n] = 0;
+        return out;
+    }
+    return "(exe)";
+}
+/* diag-module-name-test:end */
 static int ios_unw_rd64( uint64_t a, uint64_t *v )     { return ios_unw_read( a, v, 8 ); }
 
 /* Locate the RUNTIME_FUNCTION covering `rva` in module `base`. Returns 1 and
@@ -4147,18 +4179,8 @@ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
                                 if (kind[0] == ' ' && hits >= 8) continue;   /* keep the log honest but bounded */
                                 /* name via export directory of the map view */
                                 {
-                                    const unsigned char *mb = (const unsigned char *)(uintptr_t)mbase;
-                                    const char *mname = "?";
-                                    unsigned int e_lf, exp_rva, name_rva;
-                                    if (mb[0] == 'M' && mb[1] == 'Z' &&
-                                        (e_lf = *(const unsigned int *)(mb + 0x3c)) < 0x1000 &&
-                                        (exp_rva = *(const unsigned int *)(mb + e_lf + 0x88)) &&
-                                        exp_rva < msz &&
-                                        (name_rva = *(const unsigned int *)(mb + exp_rva + 0x0c)) &&
-                                        name_rva < msz)
-                                        mname = (const char *)(mb + name_rva);
-                                    else if (mb[0] == 'M' && mb[1] == 'Z')
-                                        mname = "(exe)";
+                                    char nb[40];
+                                    const char *mname = ios_diag_module_name( mbase, msz, nb, sizeof(nb) );   /* round 626: fault-safe */
                                     dprintf(2, "[term-stack] ml660 sp+%03x: %s %llx  %.32s+0x%llx\n",
                                             wi * 8, kind, (unsigned long long)v, mname,
                                             (unsigned long long)(v - mbase));

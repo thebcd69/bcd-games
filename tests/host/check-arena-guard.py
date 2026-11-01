@@ -54,7 +54,8 @@ check("the switch is read once and only '1' turns the guard on",
       src.count('getenv( "MADEIRA_ARENA_GUARD" )') == 1 and "v = (e && e[0] == '1');" in guard)
 check("map_view asks the guard right before map_fixed_area",
       "if (ios_arena_guard_refuses( base, size, limit_low, limit_high )) return STATUS_CONFLICTING_ADDRESSES;\n"
-      "        if ((status = map_fixed_area( base, size, unix_prot ))) return status;" in src and src.count("ios_arena_guard_refuses(") == 2)
+      "        if ((status = map_fixed_area( base, size, unix_prot )))\n" in src and src.count("ios_arena_guard_refuses(") == 2)
+# (round 626, agent G2 S10: the refusal of a big fixed view names the kernel's regions ([map-block]) before it returns the status)
 valve = src[src.index("ULONG_PTR steer_lo = ios_steer_floor();"):src.index("if (!sst && ios_steer_n < IOS_STEER_MAX)")]
 check("the steering valve skips its top slot through the bound its retry also uses",
       "if (!ios_steer_top_slot_usable()) steer_lo = (ULONG_PTR)host_addr_space_limit;" in valve and src.count("ios_steer_top_slot_usable()") == 1

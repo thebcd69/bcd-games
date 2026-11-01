@@ -4365,9 +4365,38 @@ static BOOL ios_mode_at_index( UINT index, int *w, int *h )
     return FALSE;
 }
 
+/* hz-test:begin (tests/host/check-display-hz.py compiles this region) */
+/* madeira-bcd (round 626, agent H S2; Hollow Knight: Silksong DF0537): env.MADEIRA_REPORT_HZ = 1 (default off): the refresh rate the
+ * virtual monitor reports follows the rate the session holds the panel at (the app publishes it in BCD_SESSION_HZ before Wine starts:
+ * the panel's maximum for MAX, uncapped and the 40 cap, 60 for the 60 and 30 caps); the mode list then offers every size at 60 Hz and
+ * at that rate, 60 Hz first. Unset, 0, or no published rate above 60: 60 Hz everywhere, as before. Read once. */
+static int ios_report_hz(void)
+{
+    static int hz = -1;
+    if (hz < 0)
+    {
+        const char *on = getenv( "MADEIRA_REPORT_HZ" ), *held = getenv( "BCD_SESSION_HZ" );
+        int v = held ? atoi( held ) : 0;
+        hz = (on && !strcmp( on, "1" ) && v > 60 && v <= 240) ? v : 60;
+        if (hz != 60)
+            dprintf( 2, "[vmode] MADEIRA_REPORT_HZ=1: the virtual monitor reports %d Hz (and 60 Hz) to Windows programs\n", hz );
+    }
+    return hz;
+}
+
+/* Which size and which rate the n-th listed mode is. At 60 Hz: the unchanged list (index = size). Above: every size twice, 60 Hz first,
+ * so a program that walks the list to the end sees both and one that stops early sees the 60 Hz modes first. */
+static void ios_listed_mode( DWORD index, int hz, DWORD *size_index, DWORD *freq )
+{
+    if (hz <= 60) { *size_index = index; *freq = 60; return; }
+    *size_index = index / 2;
+    *freq = (index & 1) ? (DWORD)hz : 60;
+}
+/* hz-test:end */
+
 static BOOL ios_virtual_enum_display_settings( DWORD index, DEVMODEW *devmode, DWORD flags )
 {
-    int sw, sh;
+    int sw, sh, hz = ios_report_hz();
 
     ios_screen_size( &sw, &sh );
 
@@ -4375,7 +4404,7 @@ static BOOL ios_virtual_enum_display_settings( DWORD index, DEVMODEW *devmode, D
                         DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFLAGS | DM_DISPLAYFREQUENCY;
     devmode->dmDisplayOrientation = DMDO_DEFAULT;
     devmode->dmBitsPerPel = 32;
-    devmode->dmDisplayFrequency = 60;
+    devmode->dmDisplayFrequency = hz;   /* madeira-bcd: 60 unless env.MADEIRA_REPORT_HZ = 1 (ios_report_hz) */
     devmode->dmDisplayFlags = 0;
     devmode->dmPosition.x = 0;
     devmode->dmPosition.y = 0;
@@ -4387,8 +4416,8 @@ static BOOL ios_virtual_enum_display_settings( DWORD index, DEVMODEW *devmode, D
         {
             static int logged;
             if (logged++ < 4)
-                dprintf(2, "[vmode] synthesized %s = %dx%d\n",
-                        index == ENUM_CURRENT_SETTINGS ? "CURRENT" : "REGISTRY", sw, sh);
+                dprintf(2, "[vmode] synthesized %s = %dx%d @%uHz\n",   /* madeira-bcd (round 626, agent H S1): the rate Windows programs are told */
+                        index == ENUM_CURRENT_SETTINGS ? "CURRENT" : "REGISTRY", sw, sh, (unsigned int)devmode->dmDisplayFrequency);
         }
         return TRUE;
     }
@@ -4396,14 +4425,17 @@ static BOOL ios_virtual_enum_display_settings( DWORD index, DEVMODEW *devmode, D
 
     {
         int mw, mh;
+        DWORD size_index, freq;
 
-        if (!ios_mode_at_index( index, &mw, &mh ))
+        ios_listed_mode( index, hz, &size_index, &freq );   /* madeira-bcd: index = size, 60 Hz, unless env.MADEIRA_REPORT_HZ = 1 */
+        if (!ios_mode_at_index( size_index, &mw, &mh ))
         {
             RtlSetLastWin32Error( ERROR_NO_MORE_FILES );
             return FALSE;
         }
         devmode->dmPelsWidth = mw;
         devmode->dmPelsHeight = mh;
+        devmode->dmDisplayFrequency = freq;
     }
     return TRUE;
 }

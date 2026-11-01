@@ -1,0 +1,188 @@
+[11:00:27.115] [INFO] Checking entitlements...
+[11:00:27.115] [INFO] [build] v0.1.623 (623)
+[11:00:27.116] [INFO] [device] model=iPad15,3 idiom=pad os=iPadOS Version 26.6 (Build 23G71) ram=7642MB available=8171MB cores=8
+[11:00:27.116] [INFO] [device] address-map=[0x1024ec000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[11:00:27.126] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+05:30 free-disk=6GB stikdebug-url=1
+[11:00:27.129] [INFO] [device] gpu="Apple M3 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:00:50.905] [INFO] Requesting JIT with StikDebug...
+[11:00:50.927] [INFO] Opening StikDebug to enable JIT...
+[11:00:55.635] [INFO] [epic-launch] start app=bc..55 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=1 desktop=0 arguments=epic
+[11:00:55.643] [INFO] [bcd] library launch BioshockHD.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[11:00:55.655] [INFO] Running full Wine sequence...
+[11:00:55.655] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1024ec000,0xfc0000000) 63GB available=8146MB low-power=0 thermal=nominal
+[11:00:55.659] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:00:55.659] [INFO] Allocating 896MB JIT pool via debugger...
+[11:00:55.659] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:00:55.660] [INFO] [jit-debugger] attached=1 at the pool request
+[11:00:57.921] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  2.369s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[11:00:58.280] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7239 MB + phys_footprint=952 MB = 8192 MB (hw.memsize says 7642 MB)
+ml985: preferred base 0x140000000+0xa0000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x11c840000+0xa0000 (?) → pool 0x300004000 used=0xa8000/0x38000000 tramp+0x4000
+[copy-verify] ?: OK, 7 .text pages executable (copy @0x300004000)
+[jit-pool] image 0xfbfcf0000+0x110000 (ntdll.dll) → pool 0x3000a8000 used=0x1c0000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x3000a8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[jit-pool] image 0xfbfc50000+0xa0000 (KERNEL32.dll) → pool 0x3001c0000 used=0x268000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x3001c0000)
+[jit-pool] image 0xfbfae0000+0x170000 (kernelbase.dll) → pool 0x300268000 used=0x3e8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300268000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf200000+0x8e0000 (shell32.dll) → pool 0x3003e8000 used=0xccc000/0x38000000 tramp+0x4000
+[copy-verify] shell32.dll: OK, 30 .text pages executable (copy @0x3003e8000)
+[jit-pool] image 0xfbf170000+0x90000 (shlwapi.dll) → pool 0x300ccc000 used=0xd60000/0x38000000 tramp+0x4000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x300ccc000)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x125800000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=973 MB (peak 973) internal=971 MB compressed=0 MB external=102 MB reusable=17 MB (cycle=1)
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  2.770s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\"" (fd=76, unixdir=78, dup_unixdir=82) cwd=L"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x302144000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x3021d8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30223c000)
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x3022d0000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x302334000)
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  2.818s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\" " (fd=92, unixdir=93, dup_unixdir=97) cwd=L"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\"
+[Wine child thread] calling wine_ios_child_main...
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=172
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=175
+002c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=81
+[Wine ntdll/server] process_exit_wrapper(0)
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  2.837s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\BioshockHD.exe\" -epicapp=bc2c95c6ff564a16b26644f1d3ac3c55 -epicenv=Prod -EpicPortal -epiclocale=en" (fd=87, unixdir=83, dup_unixdir=91) cwd=L"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] msvcrt.dll: OK, 30 .text pages executable (copy @0x30302c000)
+[phase] spawn:L"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\BioshockHD.exe" t+  2.897s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+003c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\BioshockHD.exe\" -epicapp=bc2c95c6ff564a16b26644f1d3ac3c55 -epicenv=Prod -EpicPortal -epiclocale=en" (fd=79, unixdir=112, dup_unixdir=132) cwd=L"C:\\Program Files\\Epic Games\\BioshockRemastered\\Build\\FinalEpic\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+004c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x410900000 transfer=0x41124c895 window=0x400000000 guest_base=0x10900000
+003c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=358
+003c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=89
+[Wine ntdll/server] process_exit_wrapper(0)
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 2 child process(es) it started still run (services.exe bioshockhd.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[file-fail] ml665 #31 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+004c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+004c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffbd0000+0x3bc000 (libwow64fex.dll) → pool 0x3048a1000 used=0x4c65000/0x38000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x3ffbd0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=bioshockhd.exe tid=004c size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=004c #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x400310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x3ffbd0000) -> 64-bit table (0x1052c4d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 4C Load module BioshockHD.exe (bioshockhd.exe-dcbf19a9f2726e74): 410900000
+D 4C Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 4C Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 47BED0000
+D 4C Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 47BC40000
+D 4C Load module EOSSDK-Win32-Shipping.dll (eossdk-win32-shipping.dll-d373abd04bfd6b1f): 47AA40000
+D 4C Load module ADVAPI32.dll (advapi32.dll-e40424e11a1bfe07): 47A9F0000
+ml957: ? backing 0x47a9d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47a494000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x410000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47a0d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x479720000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x4796b0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x478a60000+0x6000 (?) → pool 0x305189000 used=0x5195000/0x38000000 tramp+0x0
+ml957: ? backing 0x478a64000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x478a30000+0x1b000 (?) → pool 0x305197000 used=0x51b7000/0x38000000 tramp+0x0
+ml957: ? backing 0x478a48000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x478910000+0x1b000 (?) → pool 0x3051b7000 used=0x51d7000/0x38000000 tramp+0x0
+ml957: ? backing 0x478928000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x4788a0000+0xe000 (?) → pool 0x3051d7000 used=0x51eb000/0x38000000 tramp+0x0
+ml957: ? backing 0x4788ac000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x4782a0000+0x1f000 (?) → pool 0x3051e8000 used=0x5208000/0x38000000 tramp+0x0
+ml957: ? backing 0x4782bc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 4C Load module netapi32.dll (netapi32.dll-67f045b4a9a70ff4): 4782A0000
+[jit-pool] image 0x478280000+0x7000 (?) → pool 0x305208000 used=0x5210000/0x38000000 tramp+0x0
+ml957: ? backing 0x478284000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 4C Load module netutils.dll (netutils.dll-77547757313a186e): 478280000
+D 4C Load module concrt140.dll (concrt140.dll-7f70d053658941c8): 4782C0000
+004c:err:win:ios_child_desktop_fixup [child-desktop] pid=0048 peb=0x400310000 tid=004c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+D 4C Load module uxtheme.dll (uxtheme.dll-4e148963445b2ada): 478280000
+[unixlib] opengl32 (GL-absent stub table) (module 0x4782f0000) -> wow64 table (0x1052ccd00)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[stale-heal]   3 slot(s) in the copy of 0x3ffbd0000 (libwow64fex.dll) -> 0x304783294 for peb=0x400310000 (owner=0x0 mapper=0x400310000)
+[footprint] rev=ml358 phys=1383 MB (peak 1383) internal=1381 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=2)
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[win-name] #3 hwnd=0x10030 class='' text="Default IME" rev=ml853
+D 4C Load module rsaenh.dll (rsaenh.dll-6cdd9371ff8bf11e): 478260000
+D 4C Load module rsaenh.dll (rsaenh.dll-6cdd9371ff8bf11e): 478260000
+004c:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Epic Store error" / L"Please launch the game from Epic Store.": main exe base 10900000 size 0x1676000
+[win-name] #24 hwnd=0x10044 class='' text="&Yes" rev=ml853
+[win-name] #25 hwnd=0x10044 class='' text="&Yes" rev=ml853
+[win-name] #28 hwnd=0x10046 class='' text="&No" rev=ml853
+[win-name] #29 hwnd=0x10046 class='' text="&No" rev=ml853
+[win-name] #32 hwnd=0x10048 class='' text="&Abort" rev=ml853
+[xp-names] m554601 "wine-x18-exc"
+[win-name] #67 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #68 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #69 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #70 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #71 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #72 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #73 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #74 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #75 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #77 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #78 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #81 hwnd=0x1004c class='' text="OK" rev=ml853
+[win-name] #82 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[win-name] #83 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #84 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #85 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+[win-name] #86 hwnd=0x1003c class='' text="Epic Store error" rev=ml853
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=972
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=979
+004c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=127
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=1417 MB (peak 1417) internal=1413 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=3)
+[footprint] rev=ml358 phys=1417 MB (peak 1417) internal=1413 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=4)
+[footprint] rev=ml358 phys=1417 MB (peak 1417) internal=1413 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=5)
+[footprint] rev=ml358 phys=1416 MB (peak 1417) internal=1412 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e2e5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[11:01:28.137] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=21 resident=1584MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e2e5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=21 resident=1594MB dbg=DEBUGGED rev=ml525
+[11:01:58.290] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e2e5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1421 MB (peak 1425) internal=1419 MB compressed=0 MB external=155 MB reusable=20 MB (cycle=36)
+[footprint] rev=ml358 phys=1416 MB (peak 1425) internal=1414 MB compressed=0 MB external=155 MB reusable=20 MB (cycle=37)
+[footprint] rev=ml358 phys=1415 MB (peak 1425) internal=1414 MB compressed=0 MB external=155 MB reusable=20 MB (cycle=38)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1415 MB (peak 1425) internal=1413 MB compressed=0 MB external=155 MB reusable=21 MB (cycle=39)
+[footprint] rev=ml358 phys=1414 MB (peak 1425) internal=1413 MB compressed=0 MB external=155 MB reusable=21 MB (cycle=40)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1414 MB (peak 1425) internal=1413 MB compressed=0 MB external=155 MB reusable=21 MB (cycle=41)
+[11:02:18.988] [INFO] [session] length=83s partial=1 play=0s frames=0 stalls=0/0s peak=1431MB limit=8191MB thermal=nominal lpm=0 api=D3D11/D3D12/D3D9/32 res=1728x1200 cap=60 game=BioShock Remastered

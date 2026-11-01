@@ -1937,6 +1937,7 @@ static void *wine_process_thread(void *arg) {
                     "MADEIRA_FRAMEGEN",          /* ml1184: the game's "Frame generation" */
                     "DXMT_ENABLE_NVEXT", "DXMT_WSI_MONITOR_IDENTITY", "DXMT_WSI_MODE_TABLE",   /* the game's "Report an NVIDIA GPU" */
                     "BCD_SERVICES_DIR", "BCD_SERVICES_TARGET",   /* round 620: the services batch's non-ASCII folder and program */
+                    "BCD_SESSION_HZ",            /* round 626: the rate the session holds the display at (env.MADEIRA_REPORT_HZ) */
                 };
                 enum { per_launch_count = sizeof(per_launch) / sizeof(per_launch[0]) };
                 BOOL game_set[per_launch_count];
@@ -2698,14 +2699,29 @@ static void *wine_process_thread(void *arg) {
                     NSString *src = [ecDir stringByAppendingPathComponent:file];
                     NSString *dll = [name stringByAppendingString:@".dll"];
                     if ([wanted containsObject:name]) {
-                        for (NSString *dir in optDirs) {
+                        /* madeira-bcd (round 626, Slay the Spire 2 through BCD Dock, Send Log 1FJAWW): in a session whose first
+                         * program is ARM64 (explorer.exe: BCD Dock, a Wine desktop) system32 holds the ARM64 set, and the
+                         * cross-link pass above adds the ARM64EC files the ARM64 set lacks (dcomp.dll). A 64-bit (x64) program
+                         * finds such a DLL in system32 and loads it: sysx64, where the link above goes, is only its fallback
+                         * when system32 has the wrong architecture or nothing (find_dll_file's mixed-arch fallback). The game
+                         * ran Wine's own dcomp.dll ("fixme:dcomp:DCompositionCreateDevice") and Godot stopped at
+                         * swap_chain_resize: a black window. Such a name (an ARM64EC <name>.dll ships, an ARM64 one does not)
+                         * gets the link in system32 too, as in an ARM64EC session; only dcomp today. A name the ARM64 set ships
+                         * (setupapi, for one) keeps its ARM64 file there, and one with no shipped <name>.dll at all is found
+                         * through the fallback as before. The cleanup below removes the link again in a session that does not
+                         * list it, and the next session's cross-link pass puts Wine's file back. */
+                        BOOL shadowed = !use_arm64ec
+                            && [fm fileExistsAtPath:[ecDir stringByAppendingPathComponent:dll]]
+                            && ![fm fileExistsAtPath:[[bundlePath stringByAppendingPathComponent:@"aarch64-windows"] stringByAppendingPathComponent:dll]];
+                        for (NSString *dir in (shadowed ? [optDirs arrayByAddingObject:sys32Dir] : optDirs)) {
                             NSString *dst = [dir stringByAppendingPathComponent:dll];
                             [fm removeItemAtPath:dst error:nil];
                             [fm createSymbolicLinkAtPath:dst withDestinationPath:src error:nil];
                         }
                         [wanted removeObject:name];
-                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_OPTIN_DLLS: %s -> %s (Wine's %s for this game)\n",
-                                dll.UTF8String, file.UTF8String, dll.UTF8String);
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_OPTIN_DLLS: %s -> %s (Wine's %s for this game%s)\n",
+                                dll.UTF8String, file.UTF8String, dll.UTF8String,
+                                shadowed ? "; also in system32, where Wine's own file would come first" : "");
                     } else {
                         for (NSString *dir in @[ [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"], sys32Dir ]) {
                             NSString *dst = [dir stringByAppendingPathComponent:dll];
@@ -3266,6 +3282,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_FEX_AVX"); unsetenv("MADEIRA_FRAMEGEN");   /* ml1184 */
     unsetenv("DXMT_ENABLE_NVEXT"); unsetenv("DXMT_WSI_MONITOR_IDENTITY"); unsetenv("DXMT_WSI_MODE_TABLE");
     unsetenv("BCD_SERVICES_DIR"); unsetenv("BCD_SERVICES_TARGET");   /* round 620 */
+    unsetenv("BCD_SESSION_HZ");   /* round 626 (agent H S2): the next launch publishes its own */
     /* madeira-bcd: Horizon Zero Dawn's per-game switches must not reach a later game
      * of this app run (GTA V Enhanced runs without them). */
     unsetenv("MADEIRA_UCRT_X64_MATH"); unsetenv("MADEIRA_SRV_FGETPATH");

@@ -1,0 +1,355 @@
+[09:47:22.206] [INFO] Checking entitlements...
+[09:47:22.207] [INFO] [build] v0.1.623 (623)
+[09:47:22.208] [INFO] [device] model=iPhone17,4 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6122MB cores=6
+[09:47:22.208] [INFO] [device] address-map=[0x1025ac000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[09:47:22.218] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=60 utc-offset=-04:00 free-disk=18GB stikdebug-url=0
+[09:47:22.221] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[09:47:49.533] [INFO] Requesting JIT with Built-in StikJIT...
+[09:47:50.909] [INFO] [bcd] library launch CrossCode.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[09:47:50.943] [INFO] Running full Wine sequence...
+[09:47:50.943] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1025ac000,0x8000000000) 512GB available=6105MB low-power=0 thermal=nominal
+[09:47:50.953] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[09:47:50.953] [INFO] Allocating 896MB JIT pool via debugger...
+[09:47:50.953] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[09:47:50.954] [INFO] [jit-debugger] attached=1 at the pool request
+[09:47:50.956] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[09:47:51.738] [INFO] RX pool at 0x148000000
+[09:47:51.761] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.845s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5498 MB + phys_footprint=645 MB = 6144 MB (hw.memsize says 7655 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x25000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x105384d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module CrossCode.exe (crosscode.exe-c61fa691456ca445): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+[footprint] rev=ml358 phys=660 MB (peak 660) internal=660 MB compressed=0 MB external=92 MB reusable=20 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module nw_elf.dll (nw_elf.dll-c4dfead010c5a2ef): 717BBB0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280d9f53b): 717B9F0000
+ml957: ? backing 0x717b8f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717ad50000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717aa68000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717aa34000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7025370000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+ml957: ? backing 0x717a9f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #1 release of 0x7101730000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7101830000+0x100000 held for 2000 ms (2 in flight)
+ml985: map_image_view size=0x59d3000 base=0x7174ff0000 info_base=0x10000000 map_addr=0x74ff0000 flags=0x4 charact=0x2122 limits=0x7100110000..0x71ffff0000
+ml957: ? backing 0x7174ecc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148aec000)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148af4000)
+[phase] spawn:L"C:\\GOG Games\\CrossCode\\CrossCode.exe" t+  1.421s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=crashpad-handler \"--user-data-dir=C:\\users\\<user>\\AppData\\Local\\CrossCode\\User Data\" /prefetch:7 --monitor-self-annotation=ptype=crashpad-handler \"--database=C:\\users\\<user>\\AppData\\Local\\CrossCode\\User Data\\Crashpad\" \"-"... (fd=100, unixdir=103, dup_unixdir=137) cwd=L"C:\\GOG Games\\CrossCode\\"
+[hwinput] keyboard focus: program (poll)
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+002c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x72004f39e0 window=0x7200000000 guest_base=0x400000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148b08000)
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x148c20000)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[bigres] tid=002c #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=512 MB
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[free-delay] #3 release of 0x7201740000+0x100000 held for 2000 ms (3 in flight)
+0030:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x7200310000 tid=0030: no desktop window (status 0xc0000008, thread desktop 0x14); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[win-name] #3 hwnd=0x1002c class='' text="Default IME" rev=ml853
+0068:err:module:load_dll [dll-missing] rev=ml336 #1 L"MDMRegistration.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #10 hwnd=0x1003c class='' text="Default IME" rev=ml853
+[xp-names] m4560256 "wine-x18-exc"
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x14957e000)
+[win-name] #23 hwnd=0x10050 class='' text="C:\users\mobile\AppData\Local\CrossCode\User Data" rev=ml853
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+00d8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\GOG Games\\CrossCode\\CrossCode.exe" cmdline=L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=renderer --no-sandbox --file-url-path-alias=\"/gen=C:\\GOG Games\\CrossCode\\gen\" --no-zygote --field-trial-handle=1288,2959661363646802175,10026346006877383532,131072 --service-pipe-token=17765892518277979853 --lang=en-US --user-data-di"...
+[phase] spawn:L"C:\\GOG Games\\CrossCode\\CrossCode.exe" t+  2.409s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=renderer --no-sandbox --file-url-path-alias=\"/gen=C:\\GOG Games\\CrossCode\\gen\" --no-zygote --field-trial-handle=1288,2959661363646802175,10026346006877383532,131072 --service-pipe-token=17765892518277979853 --lang=en-US --user-data-di"... (fd=639, unixdir=640, dup_unixdir=644) cwd=L"C:\\GOG Games\\CrossCode\\"
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] reserved B=0x7300000000..0x7400000000 (slot 2) guard=owned
+[wow-window] slot 2 B=0x7300000000 bound to peb=0x7300310000
+00e0:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7300400000 transfer=0x73004f39e0 window=0x7300000000 guest_base=0x400000
+00e0:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00e0:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[bigres] tid=00e0 #3 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7300310000 total=768 MB
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[free-refused] ml1285 #3 addr=0x1 size=0 type=0x8000 status=0xc000000d view=0x0+0 protect=0 valloc=-1 tid=00e0
+[free-delay] #4 release of 0x7301890000+0x100000 held for 2000 ms (4 in flight)
+ml985: map_image_view size=0x59d3000 base=0x7374ff0000 info_base=0x10000000 map_addr=0x74ff0000 flags=0x4 charact=0x2122 limits=0x7300110000..0x73ffff0000
+[footprint] rev=ml358 phys=1592 MB (peak 1592) internal=1588 MB compressed=0 MB external=109 MB reusable=20 MB (cycle=2)
+[alloc-fail] ml814 #1 status=c0000018 hint=0x735de80000 size=0x140000 type=0x3000 protect=0x1 tid=00e0 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=00e0 size=0x140000 type=0x3000 prot=0x1 hint=0x735de80000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[free-delay] #5 release of 0x730d5d0000+0x140000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x730d710000+0x150000 held for 2000 ms (6 in flight)
+[free-delay] #1 reservation at 0x730d720000+0x140000: 1 held release(s) from 0x730d710000 (0x150000 bytes) freed at once (5 in flight)
+[stp-emul] ml629 #1 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c6f4 rw=0x70021606f4 base 0x7356a5c6f4 -> 0x7356a5c714 (writeback)
+[stp-emul] ml629 #2 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c714 rw=0x7002160714 base 0x7356a5c714 -> 0x7356a5c734 (writeback)
+[stp-emul] ml629 #3 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c734 rw=0x7002160734 base 0x7356a5c734 -> 0x7356a5c754 (writeback)
+[stp-emul] ml629 #4 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c754 rw=0x7002160754 base 0x7356a5c754 -> 0x7356a5c774 (writeback)
+[stp-emul] ml629 #5 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c774 rw=0x7002160774 base 0x7356a5c774 -> 0x7356a5c794 (writeback)
+[stp-emul] ml629 #6 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c794 rw=0x7002160794 base 0x7356a5c794 -> 0x7356a5c7b4 (writeback)
+[stp-emul] ml629 #7 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c7d4 rw=0x70021607d4 base 0x7356a5c7d4 -> 0x7356a5c7f4 (writeback)
+[stp-emul] ml629 #8 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7356a5c7f4 rw=0x70021607f4 base 0x7356a5c7f4 -> 0x7356a5c814 (writeback)
+[exec-alloc] NtAllocateVirtualMemory #19 req_addr=0x7356a06000 size=0x57000 type=0x1000 protect=0x20
+[exec-alloc] NtAllocateVirtualMemory #20 req_addr=0x7333506000 size=0x79000 type=0x1000 protect=0x20
+E E0 Unknown ALU Op: 0x14
+[win-name] #29 hwnd=0x1005a class='' text="CrossCode" rev=ml853
+[win-name] #30 hwnd=0x1005a class='' text="CrossCode" rev=ml853
+[win-name] #31 hwnd=0x1005a class='' text="CrossCode" rev=ml853
+[free-delay] #7 release of 0x730d960000+0x400000 held for 2000 ms (3 in flight)
+[launch-view] dismissed reason=surface logs=0
+[free-delay] #8 release of 0x730dd60000+0x800000 held for 2000 ms (4 in flight)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=11 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[09:47:55.843] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[anon-cas] build580 insn=88e4ff0b pc=15dc3f6d4 addr=732a184010 rw=7002230010 width=4
+[footprint] rev=ml358 phys=1858 MB (peak 1858) internal=1791 MB compressed=0 MB external=112 MB reusable=20 MB (cycle=3)
+[anon-cas] build580 insn=88e4ff06 pc=15dfe7280 addr=732a184010 rw=7002230010 width=4
+[free-delay] #2 reservation at 0x734a300000+0x80000: 1 held release(s) from 0x734a200000 (0x490000 bytes) freed at once (19 in flight)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x735e500000 size=0x80000 type=0x2000 protect=0x1 tid=00e0 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=00e0 size=0x80000 type=0x2000 prot=0x1 hint=0x735e500000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #3 status=c0000018 hint=0x735de80000 size=0x80000 type=0x2000 protect=0x1 tid=00e0 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=00e0 size=0x80000 type=0x2000 prot=0x1 hint=0x735de80000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x7337c80000 size=0x80000 type=0x2000 protect=0x1 tid=00e0 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=00e0 size=0x80000 type=0x2000 prot=0x1 hint=0x7337c80000 zb=0xffffffff hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x7338380000 size=0x80000 type=0x2000 protect=0x1 tid=00e0 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=00e0 size=0x80000 type=0x2000 prot=0x1 hint=0x7338380000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+[anon-cas] build580 insn=88e4ff0b pc=15dc3f6d4 addr=732a184010 rw=7002230010 width=4
+[phase] spawn:L"C:\\GOG Games\\CrossCode\\CrossCode.exe" t+  5.956s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=utility --field-trial-handle=1288,2959661363646802175,10026346006877383532,131072 --lang=en-US --service-sandbox-type=audio --no-sandbox --user-data-dir=\"C:\\users\\mobile\\AppData\\Local\\CrossCode\\User Data\" --nwapp-path=\"C:\\GOG Ga"... (fd=1069, unixdir=1070, dup_unixdir=1074) cwd=L"C:\\GOG Games\\CrossCode\\"
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 3) guard=owned
+[wow-window] slot 3 B=0x7900000000 bound to peb=0x7900310000
+0154:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7900400000 transfer=0x79004f39e0 window=0x7900000000 guest_base=0x400000
+0154:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0154:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[bigres] tid=0154 #4 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=1024 MB
+[exec-alloc] NtAllocateVirtualMemoryEx #9 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #10 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x14ad11000)
+ml985: map_image_view size=0x59d3000 base=0x7974ff0000 info_base=0x10000000 map_addr=0x74ff0000 flags=0x4 charact=0x2122 limits=0x7900110000..0x79ffff0000
+[wow-stack-free] #1 the dead thread 0094's 32-bit stack (guest 0xc9a0000) is in window 0x7100000000 (live), the thread freeing its TEB is in window 0x7900000000: the old address 0x790c9a0000 is not a live view -> released at the old address (as before) rev=ajan11
+0068:err:file:ios_video_track_open [video-io] ml733 OPEN slot=3 handle=0x724 ...e\assets\media\sound\background\desert\sandstorm-ambient.ogg
+[footprint] rev=ml358 phys=2227 MB (peak 2227) internal=2097 MB compressed=109 MB external=194 MB reusable=13 MB (cycle=4)
+[alloc-fail] ml814 #6 status=c0000018 hint=0x735d100000 size=0x80000 type=0x2000 protect=0x1 tid=01a8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #7 status=c0000018 hint=0x735f780000 size=0x140000 type=0x3000 protect=0x1 tid=01a8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=crosscode.exe tid=01a8 size=0x140000 type=0x3000 prot=0x1 hint=0x735f780000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[anon-cas] build580 insn=88e4ff06 pc=15dfe7280 addr=732a184010 rw=7002230010 width=4
+[store-noalias] #1 rev=ml348 addr=0x730fc08559 insn=0xb87f6b0a pc=0x15f2c16e4 NO pool/anon alias | region 0x730fc00000+0x400000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x730fc08559 hostpc=0x15f2c16e4 hinsn=0xb87f6b0a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=7 base=0x159ff4000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x15f2c16e4 addr=0x730fc08559 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x730fc00000+0x400000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x15f2c16e4 addr=0x730fc08559 x18=0x0 type=1 lr=0x15f2c1830 sp=0x704911f350 x16=0x149659e94 x17=0x704911f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8e0ec (PE 0xfff8e0ec) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xc44f72c x9=0xc44f734 x10=0xfc08559 x11=0xc44f764 x0=0x15f2c1550 x2=0x1f80 | teb=0x7300200000 peb=0x7300310000 peb->EcCodeBitMap=0x0
+[fault-full] x4=ffffffffc0000024 x5=fff8e440 x6=1 x7=fc08559
+[fault-host] 15f2c15e4: 11003134 8b344278 b8bfc307 d503201f 121f00f4 7100029f 9a9f17f4 b3401e86
+[fault-host] 15f2c1604: 121e00f4 7100029f 54000061 321f00a5 14000008 121f00e7 2a0700a5 710000ba
+[fault-host] 15f2c1624: 54fffbc1 52800005 52800034 b3401e86 11002134 8b344278 b8bfc30a d503201f
+[fault-host] 15f2c1644: 8b2a4278 b8bfc307 d503201f 120004e4 71000c9f 54000160 7100049a aa0403fb
+[fault-host] 15f2c1664: 54000261 8b2a4278 2a0703e1 88e1ff05 2a0103e4 6b0400ff 54fffe41 14000013
+[fault-host] 15f2c1684: 2b0663ff aa0603fa d500401f 54000161 8b2a4278 2a0703e1 88e1ff05 2a0103e4
+[mach_exc] insn_stream PC-12..PC+8: d500401f 54fff600 8b274278 [b87f6b0a] d5033dbf 52800014 51002108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7300200000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x730fc08559 insn=0xb87f6b0a pc=0x15f2c16e4 NO pool/anon alias | region 0x730fc00000+0x400000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x730fc08559 hostpc=0x15f2c16e4 hinsn=0xb87f6b0a rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=7 base=0x159ff4000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x15f2c16e4 addr=0x730fc08559 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x730fc00000+0x400000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x15f2c16e4 addr=0x730fc08559 x18=0x0 type=1 lr=0x15f2c1830 sp=0x704911f350 x16=0x149659e94 x17=0x704911f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8e0ec (PE 0xfff8e0ec) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xc44f72c x9=0xc44f734 x10=0xfc08559 x11=0xc44f764 x0=0x15f2c1550 x2=0x1f80 | teb=0x7300200000 peb=0x7300310000 peb->EcCodeBitMap=0x0
+[fault-full] x4=ffffffffc0000024 x5=fff8e440 x6=1 x7=fc08559
+[fault-host] 15f2c1644: 8b2a4278 b8bfc307 d503201f 120004e4 71000c9f 54000160 7100049a aa0403fb
+[fault-host] 15f2c1664: 54000261 8b2a4278 2a0703e1 88e1ff05 2a0103e4 6b0400ff 54fffe41 14000013
+[fault-host] 15f2c1684: 2b0663ff aa0603fa d500401f 54000161 8b2a4278 2a0703e1 88e1ff05 2a0103e4
+[fault-host] 15f2c16a4: 6b0400ff 54fffce1 14000023 32020be4 f90f639f 17ffffb9 528001a4 72b80004
+[fault-host] 15f2c16c4: f90f639f 17ffffb5 52800004 721e74fa aa1a03e7 d500401f 54fff600 8b274278
+[fault-host] 15f2c16e4: b87f6b0a d5033dbf 52800014 51002108 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d500401f 54fff600 8b274278 [b87f6b0a] d5033dbf 52800014 51002108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0xa8: 0x14988457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x149884574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7300200000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0124:err:seh:bus_handler BUS #1: pc=0x15f2c16e4 addr=0x730fc08559 x16=0x149659e94 x17=0x704911f2b0 x18=0x0 lr=0x15f2c1830 insn=0xb87f6b0a branch@lr-4=0xd63f0020
+0124:err:seh:bus_handler BUS->AV: unreadable target addr=0x730fc08559 pc=0x15f2c16e4 rw=0 rev=ml420
+[store-noalias] #3 rev=ml348 addr=0x730c450000 insn=0x38401426 pc=0x1abb2015c NO pool/anon alias | region 0x730c450000+0x8000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x704891fa90 (pc=0x1abb2015c x18=0x0 registry=0x7300200000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=READ p1=0x730c450000 hostpc=0x1abb2015c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x1abb2015c addr=0x730c450000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x730c450000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x1abb2015c addr=0x730c450000 x18=0x0 type=1 lr=0x103b301ec sp=0x704891fa90 x16=0x1abb1ffa0 x17=0x2084bb2e0
+[guest-code] rev=ml333 pool_rip=0x3d0000 (PE 0x3d0000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x16dc2c0e0 x9=0xcbed x10=0x23817d7c00a36dc9 x11=0x23817d0d4b8197ed x0=0x730c44e49c x2=0x4 | teb=0x7300200000 peb=0x7300310000 peb->EcCodeBitMap=0x0
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[x86_seg] State.gs_cached=0x0 TEB=0x7300200000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #4 rev=ml348 addr=0x730c450000 insn=0x38401426 pc=0x1abb2015c NO pool/anon alias | region 0x730c450000+0x8000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x704891fa90 (pc=0x1abb2015c x18=0x0 registry=0x7300200000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #4 p0=READ p1=0x730c450000 hostpc=0x1abb2015c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x1abb2015c addr=0x730c450000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x730c450000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x1abb2015c addr=0x730c450000 x18=0x0 type=1 lr=0x103b301ec sp=0x704891fa90 x16=0x1abb1ffa0 x17=0x2084bb2e0
+[guest-code] rev=ml333 pool_rip=0x3d0000 (PE 0x3d0000) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+0124:err:seh:bus_handler BUS #2: pc=0x1abb2015c addr=0x730c450000 x16=0x1abb1ffa0 x17=0x2084bb2e0 x18=0x0 lr=0x103b301ec insn=0x38401426 branch@lr-4=0x9430c0eb
+[syscall-fault] a protection fault (SIGBUS) at 0x730c450000 inside a system call with a __TRY: the call fails (pc=0x1abb2015c lr=0x103b301ec) instead of the process ending rev=ajan11
+[guest-log] file <container>/Documents/wine/drive_c/GOG Games/CrossCode/debug.log
+[guest-log] #1 tid=003c [1030/134759.136:ERROR:process_info.cc(611)] range at 0x311000, size 0x230 fully unreadable
+[guest-log] #2 tid=003c [1030/134759.140:ERROR:process_info.cc(611)] range at 0xfffc929c, size 0x24 fully unreadable
+[guest-log] #3 tid=003c [1030/134759.140:ERROR:process_info.cc(611)] range at 0x3e36a8, size 0x48 fully unreadable
+[guest-log] #4 tid=003c [1030/134759.140:ERROR:process_info.cc(611)] range at 0x3e3768, size 0x48 fully unreadable
+[guest-log] #5 tid=003c [1030/134759.140:ERROR:process_info.cc(611)] range at 0x3e3796, size 0x1a fully unreadable
+[guest-log] #6 tid=003c [1030/134759.140:ERROR:process_info.cc(611)] range at 0x3e37f8, size 0x48 fully unreadable
+[guest-log] #59 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e6868, size 0x16 fully unreadable
+[guest-log] #60 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e7aa8, size 0x48 fully unreadable
+[guest-log] #61 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e6890, size 0x3c fully unreadable
+[guest-log] #62 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e68b8, size 0x14 fully unreadable
+[guest-log] #63 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e7b68, size 0x48 fully unreadable
+[guest-log] #64 tid=003c [1030/134759.145:ERROR:process_info.cc(611)] range at 0x3e68e0, size 0x3a fully unreadable
+[store-noalias] #5 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x16bff8354 NO pool/anon alias | region 0x1025ac000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x0 hostpc=0x16bff8354 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x16bff8000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x0 pc=0x16bff8354 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x16bff8354 addr=0x0 x18=0x72002c0000 type=1 lr=0x16bff81d8 sp=0x702841f350 x16=0x1ce x17=0x0
+[guest-code] rev=ml333 pool_rip=0x501979 (PE 0x501979) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4400 927df000 d51b4400
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x16bff8354 NO pool/anon alias | region 0x1025ac000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x0 hostpc=0x16bff8354 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x16bff8000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x0 pc=0x16bff8354 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+003c:err:seh:dispatch_exception [fast-fail] ml604 code=7 addr=0000000000501979 — terminating this pseudo-process (fast-fail bypasses VEH/SEH on Windows; unwinding it stranded fls_section in ml603)
+003c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000409) syscalls=0 unix_calls=11119
+[Wine ntdll/server] process_exit_wrapper(-1073740791): closing child fd_socket=136
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(-1073740791)
+[footprint] rev=ml358 phys=2318 MB (peak 2318) internal=2142 MB compressed=117 MB external=126 MB reusable=13 MB (cycle=5)
+[footprint] rev=ml358 phys=2303 MB (peak 2318) internal=2144 MB compressed=117 MB external=126 MB reusable=13 MB (cycle=6)
+[wow-stack-free] #2 the dead thread 0180's 32-bit stack (guest 0x88a0000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x7100000000: the old address 0x71088a0000 is not a live view -> released at the old address (as before) rev=ajan11
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 5.65 s of audio in 10.00 s (56.5%) over 917 wakes; device short 4255.3 ms in 394 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e10d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[09:48:16.061] [OK] Early detach: game presenting and settled
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 4.92 s of audio in 10.00 s (49.2%) over 1018 wakes; device short 5085.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..960 frames; worst late wake 0.0 ms; clamped 0 samples
+[09:48:18.063] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=101 resident=2271MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 1.29 s of audio in 10.01 s (12.9%) over 998 wakes; device short 8715.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..960 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e10d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 0.19 s of audio in 10.01 s (1.9%) over 995 wakes; device short 9815.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.1 ms; clamped 0 samples
+00d8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\GOG Games\\CrossCode\\CrossCode.exe" cmdline=L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=utility --field-trial-handle=1288,2959661363646802175,10026346006877383532,131072 --lang=en-US --no-sandbox --no-sandbox --user-data-dir=\"C:\\users\\mobile\\AppData\\Local\\CrossCode\\User Data\" --nwapp-path=\"C:\\GOG Games\\CrossCode\""...
+[phase] spawn:L"C:\\GOG Games\\CrossCode\\CrossCode.exe" t+ 47.316s rev=ml526
+00d8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\GOG Games\\CrossCode\\CrossCode.exe\" --type=utility --field-trial-handle=1288,2959661363646802175,10026346006877383532,131072 --lang=en-US --no-sandbox --no-sandbox --user-data-dir=\"C:\\users\\mobile\\AppData\\Local\\CrossCode\\User Data\" --nwapp-path=\"C:\\GOG Games\\CrossCode\""... (fd=141, unixdir=142, dup_unixdir=147) cwd=L"C:\\GOG Games\\CrossCode\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=borrowed
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+01b4:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x72004f39e0 window=0x7200000000 guest_base=0x400000
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=437 peb=0x7200310000
+01b4:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+01b4:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70fd900000+0x3bc000 (libwow64fex.dll) → pool 0x14af11000 used=0x32d5000/0x25000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x70fd900000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+[bigres] tid=01b4 #5 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=1280 MB
+[unixlib] libwow64fex.dll (module 0x70fd900000) -> 64-bit table (0x105384d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #11 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #12 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=437 peb=0x7200310000
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+ml985: map_image_view size=0x59d3000 base=0x7274ff0000 info_base=0x10000000 map_addr=0x74ff0000 flags=0x4 charact=0x2122 limits=0x7200110000..0x72ffff0000
+ml957: ? backing 0x7210000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7274324000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x72741e4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x727417c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7274154000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 1B4 Load module wevtapi.dll (wevtapi.dll-5441b3955c4d872c): 7274130000
+ml957: ? backing 0x7274110000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 1B4 Load module ESENT.dll (esent.dll-ba082a2abf53e724): 7274100000
+D 1B4 Load module Kerberos.dll (kerberos.dll-a465a4dc50344d0c): 7272B20000
+D 1B4 Load module MSV1_0.dll (msv1_0.dll-fe14d41517692ae9): 7272B20000
+D 1B4 Load module dbghelp.dll (dbghelp.dll-04363877bc98d3e3): 72735E0000
+D 1B4 Load module uxtheme.dll (uxtheme.dll-4e148963445b2ada): 7273670000
+[wow-stack-free] #3 the dead thread 00e4's 32-bit stack (guest 0x16710000) is in window 0x7100000000 (live), the thread freeing its TEB is in window 0x7200000000: the old address 0x7216710000 is not a live view -> released at the old address (as before) rev=ajan11
+01b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=12130
+01b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=12132
+01b4:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=145
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(0)
+[footprint] rev=ml1060 fast phys=2462 MB compressed=166 MB
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 0.20 s of audio in 10.00 s (2.0%) over 995 wakes; device short 9805.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.1 ms; clamped 0 samples
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=99 resident=2411MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2457 MB (peak 2464) internal=2264 MB compressed=166 MB external=133 MB reusable=13 MB (cycle=31)
+[footprint] rev=ml358 phys=2456 MB (peak 2464) internal=2263 MB compressed=166 MB external=133 MB reusable=13 MB (cycle=32)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e10d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=2456 MB (peak 2464) internal=2263 MB compressed=166 MB external=133 MB reusable=13 MB (cycle=33)
+[ios_audio] ml1230 pacing stream=0x123a2dd00 lead 60 ms: client wrote 0.19 s of audio in 10.01 s (1.9%) over 990 wakes; device short 9815.3 ms in 469 of 469 passes (largest pass 1024 frames); ring 0..480 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml358 phys=2456 MB (peak 2464) internal=2263 MB compressed=166 MB external=133 MB reusable=13 MB (cycle=34)
+0124:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffff7001) syscalls=0 unix_calls=12284
+[Wine ntdll/server] process_exit_wrapper(-36863): closing child fd_socket=643
+[wow-window] slot 2 B=0x7300000000 released (owner peb=0x7300310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(-36863)
+[wow-stack-free] #4 the dead thread 01cc's 32-bit stack (guest 0x6830000) is in window 0x7200000000 (gone), the thread freeing its TEB is in window 0x7900000000: the old address 0x7906830000 IS a live view -> not released (its window is gone) rev=ajan11
+[wow-window] TEB block 0x72002a0000 dropped, not pooled: it belongs to a guest window that is no longer live
+[store-undecoded] #1 rev=ml350 insn=0xb8e50305 pc=0x166348da8 addr=0x7101751004 rw_addr=0x70021ed004 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #7 p0=WRITE p1=0x7101751004 hostpc=0x166348da8 hinsn=0xb8e50305 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=7 rip=0x0 pc=0x166348da8 addr=0x7101751004 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7101750000+0x4000 rev=ml555
+[store-undecoded] #2 rev=ml350 insn=0xb8e50305 pc=0x166348da8 addr=0x7101751004 rw_addr=0x70021ed004 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #8 p0=WRITE p1=0x7101751004 hostpc=0x166348da8 hinsn=0xb8e50305 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=8 rip=0x0 pc=0x166348da8 addr=0x7101751004 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7101750000+0x4000 rev=ml555
+[win-name] #63 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[win-name] #64 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[win-name] #65 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[win-name] #66 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[win-name] #67 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[win-name] #68 hwnd=0x1005a class='' text="CrossCode Min v1.4.2-2" rev=ml853
+[wow-stack-free] #5 the dead thread 0188's 32-bit stack (guest 0x90b0000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x7100000000: the old address 0x71090b0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-stack-free] #6 the dead thread 00a8's 32-bit stack (guest 0xf1e0000) is in window 0x7100000000 (live), the thread freeing its TEB is in window 0x7900000000: the old address 0x790f1e0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-stack-free] #7 the dead thread 01a0's 32-bit stack (guest 0x98b0000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x7100000000: the old address 0x71098b0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-stack-free] #8 the dead thread 00a4's 32-bit stack (guest 0xe9e0000) is in window 0x7100000000 (live), the thread freeing its TEB is in window 0x7900000000: the old address 0x790e9e0000 is not a live view -> released at the old address (as before) rev=ajan11
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[09:48:59.441] [INFO] [session] length=68s play=4s frames=2 avg=1.3 worst=2164ms stalls=1/2s peak=2473MB limit=6143MB thermal=nominal lpm=0 res=1424x656 cap=60 game=CrossCode
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=2401 MB (peak 2464) internal=2220 MB compressed=161 MB external=130 MB reusable=14 MB (cycle=35)
+[footprint] rev=ml358 phys=2401 MB (peak 2464) internal=2220 MB compressed=161 MB external=130 MB reusable=14 MB (cycle=36)

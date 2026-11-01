@@ -1,0 +1,168 @@
+[07:58:37.500] [INFO] Checking entitlements...
+[07:58:37.501] [INFO] [build] v0.1.623 (623)
+[07:58:37.501] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6125MB cores=6
+[07:58:37.501] [INFO] [device] address-map=[0x1028f8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[07:58:37.512] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=120 utc-offset=+07:00 free-disk=12GB stikdebug-url=1
+[07:58:37.516] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[07:58:53.573] [INFO] Requesting JIT with Built-in StikJIT...
+[07:59:44.637] [INFO] [bcd] library launch NieRAutomata.exe: avx=1 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[07:59:44.657] [INFO] Running full Wine sequence...
+[07:59:44.657] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1028f8000,0x8000000000) 512GB available=6103MB low-power=0 thermal=nominal
+[07:59:44.664] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[07:59:44.665] [INFO] Allocating 896MB JIT pool via debugger...
+[07:59:44.665] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[07:59:44.665] [INFO] [jit-debugger] attached=1 at the pool request
+[07:59:44.668] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[07:59:45.544] [INFO] RX pool at 0x148000000
+[07:59:45.564] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.940s rev=ml526
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[07:59:45.885] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[07:59:45.885] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5503 MB + phys_footprint=640 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: preferred base 0x140000000+0x18f7000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x18f8000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x123000000+0x18f7000 (PRJ_028_gdk.exe) → pool 0x148004000 used=0x18fc000/0x25000000 tramp+0x0
+[copy-verify] PRJ_028_gdk.exe: OK, 775 .text pages executable (copy @0x148004000)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1498fc000 used=0x1a34000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498fc000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[footprint] rev=ml358 phys=692 MB (peak 692) internal=691 MB compressed=0 MB external=72 MB reusable=15 MB (cycle=1)
+[jit-pool] image 0x71fe8b0000+0x412000 (libarm64ecfex.dll) → pool 0x149a36000 used=0x1e52000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a36000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x149e50000 used=0x1f84000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x149e50000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x149f84000 used=0x204c000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x149f84000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14a04c000 used=0x234c000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14a04c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module NieRAutomata.exe (nierautomata.exe-c8ce40eab763b9bc): 123000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14ba54000)
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x14bb78000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x14bc9c000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x14bd50000)
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x14be44000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x14bec8000)
+D 24 Load module setupapi.dll (setupapi.dll-eb860a5cf96d3e18): 71FC380000
+[jit-pool] image 0x71fc300000+0x80000 (cfgmgr32.dll) → pool 0x14c3a0000 used=0x4424000/0x25000000 tramp+0x4000
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71FC300000
+[jit-pool] image 0x71fc270000+0x90000 (xinput1_4.dll) → pool 0x14c424000 used=0x44b8000/0x25000000 tramp+0x4000
+D 24 Load module XINPUT1_4.dll (xinput1_4.dll-a6149d3778de4551): 71FC270000
+[jit-pool] image 0x71fc140000+0x130000 (oleaut32.dll) → pool 0x14c4b8000 used=0x45ec000/0x25000000 tramp+0x4000
+D 24 Load module OLEAUT32.dll (oleaut32.dll-ed3f8116102cb254): 71FC140000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[jit-pool] image 0x71fc0a0000+0xa0000 (imm32.dll) → pool 0x14c5ec000 used=0x4690000/0x25000000 tramp+0x4000
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FC0A0000
+[jit-pool] image 0x71fbff0000+0xb0000 (uxtheme.dll) → pool 0x14c690000 used=0x4744000/0x25000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71FBFF0000
+[image-reload] unmapped image 0x71fbff0000+0xb0000: 1 pool copy marked
+[alloc-fail] ml814 #1 status=c0000018 hint=0x180000000 size=0x3a000 type=0x2000 protect=0x4 tid=0024 | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=nierautomata.exe tid=0024 size=0x3a000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[jit-pool] image 0x7026600000+0x3a000 (gamehelper.dll) → pool 0x14c746000 used=0x4786000/0x25000000 tramp+0x0
+[free-delay] #1 release of 0x7026500000+0x100000 held for 2000 ms (1 in flight)
+[steam-api] steam_api found no running Steam; process 0020 sees:
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x35) syscalls=0 unix_calls=709
+[unwind] term ml661 begin rip=71fe454ba0 rsp=702580f318 window=[702580f318..702600f318) max=32
+[unwind] term ml661 #00 pc=71fe454ba0 rsp=702580f318  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=0 rbp=702580ffd0 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=702580ffd0: 00000000 00000000 20a3fa49 01000000 d8ed9549 01000000 00000000 00000000
+[unwind] term ml661 #01 pc=1248c0647 rsp=702580f320  PRJ_028_gdk.exe+0x18c0647
+[unwind] term ml662 #01 nv: rbx=0 rbp=702580ffd0 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=702580ffd0: 00000000 00000000 20a3fa49 01000000 d8ed9549 01000000 00000000 00000000
+[unwind] term ml661 #03 pc=1 rsp=702580f330  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 1248c0647  PRJ_028_gdk.exe+0x18c0647
+[term-stack] ml660 sp+008:   ? 7026600000  gamehelper.dll+0x0
+[store-noalias] #1 rev=ml348 addr=0x71fbff0000 insn=0x39400008 pc=0x103deeae4 NO pool/anon alias | region 0x71fc0a0000+0x10000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x11c11f6c0 (pc=0x103deeae4 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x71fbff0000 hostpc=0x103deeae4 hinsn=0x39400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fe454ba0 pc=0x103deeae4 addr=0x71fbff0000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71fc0a0000+0x10000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x103deeae4 addr=0x71fbff0000 x18=0x0 type=1 lr=0x103dee98c sp=0x11c11f6c0 x16=0x0 x17=0x129a1
+[fault-host] 103dee9e4: 54000708 11000508 b901fbe8 7100093f 54000683 2a0903e8 eb08039a 54000603
+[fault-host] 103deea04: f900e7ed f940abe8 f9403108 f900efe8 71010f7f f0006ca8 91227508 f0006caa
+[fault-host] 103deea24: 9122694a 9a880148 a901a7e8 a90073f8 f9000bfa 52800040 f0006ca1 91214c21
+[fault-host] 103deea44: 9432f509 f0006ca0 91228800 aa1a03e1 f940efe2 9400015e 71010f7f 54000301
+[fault-host] 103deea64: aa1303fb f940e7e8 37f80e48 2a0803e8 ab1c011f aa1503f3 540001e2 8b1c011a
+[fault-host] 103deea84: f940a7e8 eb08035f 1a9f17e8 a90023fa 52800040 f0006ca1 9122b021 9432f4f2
+[mach_exc] insn_stream PC-12..PC+8: 7100811f 7a470aa4 540004ec [39400008] 7101351f 540002c1 39400408
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtTerminateProcess+0x1fb0 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtTerminateProcess+0x1e58
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702584fb90 *(gs_cached+0x58)=0x702584fb90
+[store-noalias] #2 rev=ml348 addr=0x71fbff0000 insn=0x39400008 pc=0x103deeae4 NO pool/anon alias | region 0x71fc0a0000+0x10000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x11c11f6c0 (pc=0x103deeae4 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x71fbff0000 hostpc=0x103deeae4 hinsn=0x39400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fe454ba0 pc=0x103deeae4 addr=0x71fbff0000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71fc0a0000+0x10000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x103deeae4 addr=0x71fbff0000 x18=0x0 type=1 lr=0x103dee98c sp=0x11c11f6c0 x16=0x0 x17=0x129a1
+[fault-host] 103deea44: 9432f509 f0006ca0 91228800 aa1a03e1 f940efe2 9400015e 71010f7f 54000301
+[fault-host] 103deea64: aa1303fb f940e7e8 37f80e48 2a0803e8 ab1c011f aa1503f3 540001e2 8b1c011a
+[fault-host] 103deea84: f940a7e8 eb08035f 1a9f17e8 a90023fa 52800040 f0006ca1 9122b021 9432f4f2
+[fault-host] 103deeaa4: f0006ca0 9123e400 aa1a03e1 f940efe2 94000147 b941ebfa 14000004 b941ebfa
+[fault-host] 103deeac4: aa1303fb aa1503f3 aa1603f5 aa1703e0 39400328 7100811f 7a470aa4 540004ec
+[fault-host] 103deeae4: 39400008 7101351f 540002c1 39400408 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 7100811f 7a470aa4 540004ec [39400008] 7101351f 540002c1 39400408
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtTerminateProcess+0x1fb0 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtTerminateProcess+0x1e58
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702584fb90 *(gs_cached+0x58)=0x702584fb90
+0024:err:seh:segv_handler   x8=0x20 x9=0x0 x10=0x10538d7f0 x16=0x0 x17=0x129a1 x18=0x0 x19=0x200 x20=0xa
+I 24 [iOS] CompileBlock: REFUSING low/invalid RIP=0x0
+[av-detail] ml613 #3 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x0 addr=0x0 x18=0x71fffe0000 type=1 lr=0x16cffc354 sp=0x71fe3b0000 x16=0x71fe3af6f0 x17=0x149966884
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702584fb90 *(gs_cached+0x58)=0x702584fb90
+[av-detail] ml613 #4 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x0 addr=0x0 x18=0x71fffe0000 type=1 lr=0x16cffc354 sp=0x71fe3b0000 x16=0x71fe3af6f0 x17=0x149966884
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 24 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+0024:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=717
+[unwind] term ml661 begin rip=0 rsp=702580ffa8 window=[702580ffa8..702600ffa8) max=32
+[unwind] term ml661 #00 pc=0 rsp=702580ffa8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+010:   ? 123000000  PRJ_028_gdk.exe+0x0
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[xp-names] m7935600 "wine-x18-exc"
+[07:59:46.659] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=792MB limit=6143MB thermal=nominal lpm=0 api=D3D11/64 res=1424x656 mfx=1.5 game=NieRAutomata
+[07:59:46.668] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=787 MB (peak 787) internal=786 MB compressed=0 MB external=107 MB reusable=14 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=787 MB compressed=0 MB
+[07:59:48.624] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=787 MB (peak 787) internal=786 MB compressed=0 MB external=107 MB reusable=14 MB (cycle=3)
+[footprint] rev=ml358 phys=785 MB (peak 787) internal=783 MB compressed=0 MB external=107 MB reusable=16 MB (cycle=4)
+[footprint] rev=ml358 phys=785 MB (peak 787) internal=784 MB compressed=0 MB external=107 MB reusable=16 MB (cycle=5)
+[footprint] rev=ml358 phys=785 MB (peak 787) internal=784 MB compressed=0 MB external=108 MB reusable=16 MB (cycle=6)
+[footprint] rev=ml358 phys=785 MB (peak 787) internal=784 MB compressed=0 MB external=108 MB reusable=16 MB (cycle=8)
+[footprint] rev=ml358 phys=785 MB (peak 787) internal=784 MB compressed=0 MB external=108 MB reusable=16 MB (cycle=9)
+[footprint] rev=ml358 phys=790 MB (peak 790) internal=788 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=10)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dca9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=790 MB (peak 790) internal=789 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=11)
+[footprint] rev=ml358 phys=790 MB (peak 790) internal=789 MB compressed=0 MB external=131 MB reusable=16 MB (cycle=12)
+[footprint] rev=ml358 phys=791 MB (peak 791) internal=790 MB compressed=0 MB external=133 MB reusable=16 MB (cycle=13)

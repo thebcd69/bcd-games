@@ -1,0 +1,284 @@
+[20:28:34.792] [INFO] Checking entitlements...
+[20:28:34.794] [INFO] [build] v0.1.623 (623)
+[20:28:34.795] [INFO] [device] model=iPhone18,4 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11734MB available=6636MB cores=6
+[20:28:34.795] [INFO] [device] address-map=[0x100140000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[20:28:34.824] [INFO] [device] settings: low-power=1 thermal=nominal screen=1260x2736@3.0x max-fps=120 utc-offset=-07:00 free-disk=301GB stikdebug-url=0
+[20:28:34.838] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:07:12.123] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[21:07:12.124] [INFO] Requesting JIT with Built-in StikJIT...
+[21:07:24.133] [INFO] [dock-launch] image-retire=1
+[21:07:24.133] [INFO] [dock-launch] image-map-guard=1
+[21:07:24.144] [INFO] [dock-installers] app=1817070 scripts=0 programs=0
+[21:07:24.145] [INFO] [madeira-dock] starting the host for app 1817070; Valve's client authenticates and authorizes the launch
+[21:07:24.157] [INFO] Running full Wine sequence...
+[21:07:24.157] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100140000,0x8000000000) 512GB available=8150MB low-power=0 thermal=serious
+[21:07:24.166] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[21:07:24.166] [INFO] Allocating 896MB JIT pool via debugger...
+[21:07:24.166] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:07:24.166] [INFO] [jit-debugger] attached=1 at the pool request
+[21:07:24.168] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:07:24.998] [INFO] RX pool at 0x148000000
+[21:07:25.016] [INFO] Detaching debugger...
+[21:07:25.847] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=679MB limit=6655MB thermal=serious lpm=0 res=1408x648 cap=30 game=Marvel’s Spider-Man Remastered
+[phase] wine-start             t+  1.805s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7513 MB + phys_footprint=678 MB = 8192 MB (hw.memsize says 11734 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[hwinput] keyboard focus: program (app active)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=690 MB (peak 690) internal=686 MB compressed=2 MB external=96 MB reusable=60 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.460s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=100, unixdir=101, dup_unixdir=105) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x123310000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x123310000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x123310000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x123318000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x123318000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x12331c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.610s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=129, unixdir=131, dup_unixdir=136) cwd=L"C:\\windows\\"
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 123310000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c620000+0x100000 held for 2000 ms (1 in flight)
+[xp-names] m23542109 "wine-x18-exc"
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dc8bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+[free-delay] #2 release of 0x70332c0000+0x400000 held for 2000 ms (2 in flight)
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+[footprint] rev=ml358 phys=922 MB (peak 922) internal=918 MB compressed=2 MB external=163 MB reusable=60 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=000000000000020C status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002CC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1053 MB (peak 1053) internal=1049 MB compressed=2 MB external=171 MB reusable=60 MB (cycle=3)
+[file-wfail] ml669 #65 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #69 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #70 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1092 MB (peak 1092) internal=1088 MB compressed=2 MB external=171 MB reusable=60 MB (cycle=4)
+[footprint] rev=ml358 phys=1092 MB (peak 1092) internal=1088 MB compressed=2 MB external=170 MB reusable=60 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\Spider-Man.exe" t+ 12.245s rev=ml526
+[session-log] Steam game Spider-Man.exe: logs/Spider-Man.exe-2026-10-29_21-07-36.txt
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\Spider-Man.exe\"" (fd=370, unixdir=371, dup_unixdir=460) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered"
+ml985: map_image_view size=0x85fd000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85fd000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8600000 rev=ajan5-motor
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[free-delay] #3 release of 0x7033520000+0x100000 held for 2000 ms (1 in flight)
+[21:07:36.657] [INFO] [dock-report] launch-client-discovery-published=1
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x150698000)
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1291 MB (peak 1291) internal=1287 MB compressed=2 MB external=208 MB reusable=60 MB (cycle=6)
+[jumbo#1] +0ms tid=16fe5f000 wtid=00a8 peb=0x117090000 nrip=0x71f4dc4f00 grip=0x0 size=0x7fc00000 (2044 MB) hint=0x0 -> 0x703dc60000 st=0x0 | granted=2044 MB ok=1 fail=0
+[bigres] tid=00a8 #1 size=0x153ff000 (339 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x117090000 total=339 MB
+[bigres] tid=00a8 #2 size=0x33c00000 (828 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x117090000 total=1167 MB
+[jumbo#2] +2ms tid=16fe5f000 wtid=00a8 peb=0x117090000 nrip=0x12f00f7ba grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7112080000 st=0x0 | granted=3068 MB ok=2 fail=0
+[bigres] tid=00a8 #3 size=0x2a800000 (680 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x117090000 total=1847 MB
+[free-delay] #4 release of 0x71860d0000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x71870a0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #6 release of 0x7188070000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #7 release of 0x7189040000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #8 release of 0x718a010000+0xfd0000 held for 2000 ms (6 in flight)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-handler.exe" t+ 13.179s rev=ml526
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\Spider-Man.exe\" --capture-image -"... (fd=653, unixdir=654, dup_unixdir=658) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\"
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x152ac4000)
+ml985: map_image_view size=0x85fd000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85fd000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8600000 rev=ajan5-motor
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+ml985: map_image_view size=0x85fd000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85fd000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8600000 rev=ajan5-motor
+ml985: map_image_view size=0x85fd000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85fd000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8600000 rev=ajan5-motor
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe" t+ 13.616s rev=ml526
+00e0:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe\" --pid=164 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Insomniac Games\\Marvel's Spider-Man Remastered\\crs\\temp\\<uuid>\\crash-report\" --save"... (fd=703, unixdir=704, dup_unixdir=708) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=437 peb=0x1170cc000
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000178 status=00000000 native_pc=00000071F56A2DAC is_ec=1 -> returned rip=00000071F56A2DAC rsp=0000007194110000 flags=00100003
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=0000000000000178 status=00000000 native_pc=00000071F34A1130 is_ec=0 -> returned rip=00000071F34A1130 rsp=0000007194110000 flags=00100003
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=0000000000000178 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Marvel's Spider-Man Remastered/Marvel's Spider-Man Remastered.log
+[guest-log] #1 tid=00a8 04:07:37:833 (00000168) > [Steam] Failed to initialize Steam. Make sure your Steam client is running before launching the game.
+[nls-getptr] type=11 id=20127 peb=0x1170cc000
+[file-wfail] ml669 #93 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #8 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x1170cc000
+[nls-getptr] type=11 id=437 peb=0x1170cc000
+[21:07:38.014] [INFO] [dock-report] launch-game-running=1
+[copy-verify] concrt140.dll: OK, 5 .text pages executable (copy @0x1561d4000)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #2 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+E E8 [iOS-xins] tracker=0x151768bc8 WININET.dll sec=0x71ec250000-0x71ec28b029
+E E8 [iOS-xins] tracker=0x151768bc8 WININET.dll sec=0x71ec290000-0x71ec290f90
+D E8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71EC240000
+E E8 [iOS-xins] tracker=0x151768bc8 WININET.dll sec=0x71ec250000-0x71ec28b029
+E E8 [iOS-xins] tracker=0x151768bc8 WININET.dll sec=0x71ec290000-0x71ec290f90
+E E8 [img-map] ml710 #39 intervals-only WININET.dll base=0x71ec240000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.common.dll" 0x71ec0b0000+0xb4000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00e8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".............................................................."
+00e8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".................................................................................."
+00e8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[220:232:20261030,040738.316:ERROR sie_analytics.cc:381] Failed to post telemetry event: status(0) WinHttpSendRequest: error 0x13d while retrieving error 0x2f7d..."
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.dlss.dll" 0x71eefa0000+0x3b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.dlss_g.dll" 0x71ec600000+0x6c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+D F8 Load module MFReadWrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71EA430000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.pcl.dll" 0x71ec210000+0x29000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module sl.pcl.dll (sl.pcl.dll-f37451156b3f6853): 71EC210000
+00f8:err:module:load_dll [dll-missing] rev=ml336 #1 L"EVR.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00f8:err:module:import_dll Library EVR.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe") not found
+D F8 Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71EA310000
+D F8 Load module msacm32.dll (msacm32.dll-6badd8b32a7d355b): 71EA280000
+00f8:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe" failed, status c0000135
+00f8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=12508
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=707
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.reflex.dll" 0x71ea250000+0x2b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module sl.reflex.dll (sl.reflex.dll-a9bd59c77110e4ee): 71EA250000
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[guest-log] #2 tid=00a8 04:07:38:537 (00000168) > [Render] Enumerating adapters:
+[guest-log] #3 tid=00a8 04:07:38:537 (00000168) > [Render] 	Adapter 0:
+[guest-log] #4 tid=00a8 04:07:38:537 (00000168) > [Monitor] 		Description             : Apple A19 Pro GPU
+[guest-log] #5 tid=00a8 04:07:38:537 (00000168) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #6 tid=00a8 04:07:38:537 (00000168) > [Monitor] 		Device                  : 2544
+[guest-log] #13 tid=00a8 04:07:38:538 (00000168) > [Render] Loading NVAPI...
+00a8:err:module:load_dll [dll-missing] rev=ml336 #5 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #6 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[guest-log] #19 tid=00a8 04:07:38:557 (00000168) > [Render] Querying NVAPI for Surround modes
+[guest-log] #20 tid=00a8 04:07:38:558 (00000168) > [Render] NvAPI_Mosaic_GetDisplayViewportsByResolution() - no surround modes detected
+[guest-log] #21 tid=00a8 04:07:38:558 (00000168) > [Render] 	Monitor '1 (Apple A19 Pro GPU(1))' (0000000000010001):
+[guest-log] #22 tid=00a8 04:07:38:558 (00000168) > [Render] ***** Additional Monitor Output Info *****
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703C2A9EC0, feature level 0xb000, create)
+[guest-log] #23 tid=00a8 04:07:38:572 (00000168) > [NxReflex] DLSSG support result:Result::eErrorOSDisabledHWS
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\D3DCompiler_47.dll" 0x71e9e40000+0x404000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A8 Load module D3DCompiler_47.dll (d3dcompiler_47.dll-e08378ea7884436e): 71E9E40000
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703C2A9EC0, feature level 0xb000, create)
+[guest-log] #24 tid=00a8 04:07:38:616 (00000168) > [Render] GPU node count: 1
+[madeira-d3d12] command queue: type 0
+[nls-getptr] type=11 id=10000 peb=0x117090000
+[win-name] #35 hwnd=0x1006c class='' text="Default IME" rev=ml853
+[win-name] #42 hwnd=0x10070 class='' text="&Yes" rev=ml853
+[win-name] #92 hwnd=0x10064 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[win-name] #94 hwnd=0x10064 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[win-name] #95 hwnd=0x10064 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[win-name] #97 hwnd=0x10084 class='' text="Marvel's Spider-Man Remastered cannot be started while Steam is not running." rev=ml853
+[win-name] #103 hwnd=0x10078 class='' text="OK" rev=ml853
+[win-name] #104 hwnd=0x10064 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x117090000
+[21:07:38.658] [INFO] [dock-game-end] crs-video.exe ended with status 0xc0000135; the session goes on for now (game-still-runs)
+[footprint] rev=ml1060 fast phys=1949 MB compressed=2 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170605020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=11 x8=0x0 x18=0x0 sp=0x16fcbe230
+[thread-stacks] port=0x27e7 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f402eba4 x18=0x0 sp=0x16fd41f00
+[thread-stacks] port=0xc227 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x17011ab40
+[thread-stacks] port=0xc173 "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0xfa1b x18=0x0 sp=0x16feeac40
+[thread-stacks] port=0x7df3 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f402eba4 x18=0x0 sp=0x170232ac0
+[thread-stacks] port=0x9813 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=144 x8=0x1f402eba4 x18=0x0 sp=0x1702bcc60
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[21:07:56.080] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=64 resident=2306MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170605020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[21:08:26.193] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=64 resident=2279MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=63 resident=2269MB dbg=DEBUGGED rev=ml525
+[21:08:56.322] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170605020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[21:09:26.408] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=63 resident=2269MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170605020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170605020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[21:09:56.507] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=63 resident=2271MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=76)
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=77)
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=78)
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=79)
+[thread-stacks] port=0xab4b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170605020
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=80)
+[thread-stacks] port=0x1fe43 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1700040e0 x18=0x0 sp=0x170bed920
+[thread-stacks] port=0x1fdff "CJobMgr::m_WorkThreadPool:2" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1707c80e0 x18=0x0 sp=0x170dee9d0
+[thread-stacks] port=0x1f14b "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1708640e0 x18=0x0 sp=0x17139e9d0
+[thread-stacks] port=0xd39b "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1702c40e0 x18=0x0 sp=0x1703ce9d0
+[thread-stacks] port=0x91fb "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=1 x8=0x107bac5c1 x18=0x0 sp=0x17011ab30
+[thread-stacks] port=0xd52b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x171002b40
+[footprint] rev=ml358 phys=1950 MB (peak 1957) internal=1945 MB compressed=2 MB external=304 MB reusable=21 MB (cycle=81)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[21:10:10.120] [INFO] [session] length=165s partial=1 play=0s frames=0 stalls=0/0s peak=1965MB limit=8191MB thermal=serious lpm=0 res=1408x648 cap=30 game=Marvel’s Spider-Man Remastered

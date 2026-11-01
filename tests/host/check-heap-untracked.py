@@ -42,7 +42,7 @@ d3d12 = (R / "madeira-d3d12/src/pe/madeira_d3d12.c").read_text()
 check("madeira-d3d12's two placement-heap sites, both private",
       d3d12.count("MTLDevice_newPlacementHeap(") == 2 and
       d3d12.count("MTLDevice_newPlacementHeap(d->mtl_device, hs, WMTResourceStorageModePrivate)") == 1 and
-      d3d12.count("MTLDevice_newPlacementHeap(hd->mtl_device, desc->SizeInBytes, WMTResourceStorageModePrivate)") == 1)
+      d3d12.count("MTLDevice_newPlacementHeap(hd->mtl_device, want, WMTResourceStorageModePrivate)") == 1)   # round 626: want = SizeInBytes + d3d12-heap-va-align's boundary (0 when off)
 
 if not wm.is_file():
     print(f"SKIP: no winemetal sources at {wm}")

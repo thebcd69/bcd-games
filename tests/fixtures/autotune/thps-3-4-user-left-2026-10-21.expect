@@ -1,10 +1,12 @@
 {
  "dialogs": [],
  "end": {},
- "matched": [],
+ "matched": [
+  "get-context-thread-null-context"
+ ],
  "next": [],
- "note": "Tony Hawk's Pro Skater 3 + 4 (a library entry), build 578, iPad17,3 (Send Log NZECAK): 24 s of play, 3254 MB, then '[hwinput] keyboard focus: elsewhere (pointer left the game view)' and the log ends; no crash evidence (the access violation at address 0x30 was handled), no rule matched. 'Inconclusive' rather than 'exited-early' for the same reason as final-fantasy-tactics-user-left.",
- "outcome": "inconclusive",
+ "note": "Tony Hawk's Pro Skater 1 + 2 (THPS12.exe, Steam 2395210; the file name says 3 + 4, a misreading of round 578), build 578, iPad17,3 (Send Log NZECAK): the same crash as HSDNPN and NK0SRY (round 626, agent A1 S2): the game called GetThreadContext(handle, NULL), BCD's ARM64EC ntdll wrapper read address 0x30 and the process ended with exit code 3. Earlier read as the player leaving after 24 s ('inconclusive'); from build 626 the NULL context gets Windows' answer.",
+ "outcome": "exited-early",
  "stage": 3,
- "status": "baseline"
+ "status": "known"
 }

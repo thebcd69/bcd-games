@@ -74,7 +74,8 @@ for path in sorted(app.rglob('*')):
         continue
     text = path.read_text(encoding='utf-8', errors='replace')
     count = text.count('"MADEIRA_GDI_SHARED_SECTION"')
-    expected = 3 if path.name == 'ContentView.swift' else 0
+    # round 626 (agent G1 S6): a list may set it (BioShock Remastered from Epic): the policy names it and checks its value
+    expected = 3 if path.name == 'ContentView.swift' else 2 if path.name == 'GameRecommendationsList.swift' else 0
     if count != expected:
         require(False, f'{path.name}: MADEIRA_GDI_SHARED_SECTION appears {count} time(s), expected {expected}')
 require(content.count('"MADEIRA_GDI_SHARED_SECTION"') == 3,

@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "ue-transient-heap-misaligned-va"
+ ],
+ "next": [
+  "d3d12-heap-va-align = 1"
+ ],
+ "note": "Clair Obscur: Expedition 33 (Steam 1903340), build 625, iPad17,1 (Send Log HWMBZ2; MKX1Z2 is the same): the second 128 MB transient heap gets its spanning buffer and no placement, and the render thread reads address 8, UE's transient allocator having handed the render graph a NULL buffer (Metal started the heap 32 KB off a 64 KB boundary). Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 5,
+ "status": "trying"
+}

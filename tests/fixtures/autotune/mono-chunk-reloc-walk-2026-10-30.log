@@ -1,0 +1,255 @@
+[10:32:28.389] [INFO] Checking entitlements...
+[10:32:28.390] [INFO] [build] v0.1.623 (623)
+[10:32:28.390] [INFO] [device] model=iPad15,3 idiom=pad os=iPadOS Version 26.6 (Build 23G71) ram=7642MB available=8171MB cores=8
+[10:32:28.390] [INFO] [device] address-map=[0x100edc000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[10:32:28.401] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+05:30 free-disk=23GB stikdebug-url=1
+[10:32:28.404] [INFO] [device] gpu="Apple M3 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:33:24.341] [INFO] Requesting JIT with StikDebug...
+[10:33:24.378] [INFO] Opening StikDebug to enable JIT...
+[10:35:59.916] [INFO] Requesting JIT with StikDebug...
+[10:35:59.942] [INFO] Opening StikDebug to enable JIT...
+[10:36:07.743] [INFO] [bcd] library launch Risk of Rain 2: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[10:36:07.758] [INFO] [dock-launch] image-retire=1
+[10:36:07.758] [INFO] [dock-launch] image-map-guard=1
+[10:36:07.762] [INFO] [dock-installers] app=632360 scripts=0 programs=0
+[10:36:07.763] [INFO] [madeira-dock] starting the host for app 632360; Valve's client authenticates and authorizes the launch
+[10:36:07.777] [INFO] Running full Wine sequence...
+[10:36:07.777] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100edc000,0xfc0000000) 63GB available=8141MB low-power=0 thermal=nominal
+[10:36:11.042] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:36:11.042] [INFO] [jit-debugger] attached=1 at the pool request
+[10:36:13.293] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  2.343s rev=ml526
+[WineProc] MADEIRA_WINTYPES=1: wintypes.dll -> wintypes-optin.dll (Wine's wintypes.dll for this game; sysx64 only)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[10:36:13.663] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=7105 MB + phys_footprint=1086 MB = 8192 MB (hw.memsize says 7642 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x11d3c0000+0x70000 (?) → pool 0x300004000 used=0x78000/0x38000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[jit-pool] image 0xfbfcf0000+0x110000 (ntdll.dll) → pool 0x300078000 used=0x190000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[jit-pool] image 0xfbfc50000+0xa0000 (KERNEL32.dll) → pool 0x300190000 used=0x238000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[jit-pool] image 0xfbfae0000+0x170000 (kernelbase.dll) → pool 0x300238000 used=0x3b8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbfa10000+0xd0000 (rpcrt4.dll) → pool 0x3003b8000 used=0x48c000/0x38000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[jit-pool] image 0xfbf980000+0x90000 (advapi32.dll) → pool 0x30048c000 used=0x520000/0x38000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[footprint] rev=ml358 phys=1093 MB (peak 1093) internal=1093 MB compressed=0 MB external=115 MB reusable=52 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x12ee40000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.893s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x120310000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3018d4000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x301a0e000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301e28000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.977s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 120310000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=437 peb=0x1085e4000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m543174 "wine-x18-exc"
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FB8F70000
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0xfb8f70000
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1363 MB (peak 1363) internal=1362 MB compressed=0 MB external=186 MB reusable=52 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[footprint] rev=ml358 phys=1536 MB (peak 1536) internal=1535 MB compressed=0 MB external=194 MB reusable=52 MB (cycle=3)
+[file-wfail] ml669 #63 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #70 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1563 MB (peak 1563) internal=1563 MB compressed=0 MB external=194 MB reusable=52 MB (cycle=4)
+[footprint] rev=ml358 phys=1564 MB (peak 1564) internal=1563 MB compressed=0 MB external=194 MB reusable=52 MB (cycle=5)
+[footprint] rev=ml358 phys=1564 MB (peak 1564) internal=1563 MB compressed=0 MB external=194 MB reusable=52 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2\\Risk of Rain 2.exe" t+ 12.997s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2\\Risk of Rain 2.exe\"" (fd=386, unixdir=387, dup_unixdir=392) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x11b6c8000
+[nls-getptr] type=11 id=437 peb=0x11b6c8000
+[nls-getptr] type=11 id=20127 peb=0x11b6c8000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x11b6c8000
+[nls-getptr] type=11 id=437 peb=0x11b6c8000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x30caec000)
+[10:36:24.277] [INFO] [dock-report] launch-client-discovery-published=1
+[unixlib] opengl32 (GL-absent stub table) (module 0xfb24b0000) -> 64-bit table (0x103cbcd00)
+[bigres] tid=00a8 #1 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=511 MB
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[bigres] tid=00ac #2 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=1023 MB
+[bigres] tid=00a8 #3 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=1535 MB
+[bigres] tid=00a8 #4 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=2047 MB
+[bigres] tid=00a8 #5 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=2559 MB
+[bigres] tid=00a8 #6 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=3071 MB
+[bigres] tid=00a8 #7 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=3583 MB
+[bigres] tid=00a8 #8 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=4095 MB
+[bigres] tid=00a8 #9 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=4607 MB
+[bigres] tid=00a8 #10 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=5119 MB
+[bigres] tid=00a8 #11 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=5631 MB
+[bigres] tid=00a8 #12 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=6143 MB
+E A8 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0xfb1200000 xend=0xfb17836f0 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+D A8 Load module mono-2.0-bdwgc.dll (mono-2.0-bdwgc.dll-0fb768a11ae1430e): FB1200000
+E A8 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0xfb1200000 xend=0xfb17836f0 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[swp-emul] ml626 #1 insn=0xf8fa80da size=8 Rs=x26 Rt=x26 addr=0x128c60c08 rw=0x346da4c08 in=0x128c60de0 old=0x128c60c5b
+[bigres] tid=00a8 #13 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=6655 MB
+[win-name] #33 hwnd=0x10066 class='' text="Default IME" rev=ml853
+[bigres] tid=00a8 #14 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=7167 MB
+D A8 Load module winemetal.dll (winemetal.dll-5dde309614d342ae): FB03E0000
+[jit-pool] image 0xfb01e0000+0xc0000 (wbemprox.dll) → pool 0x30f564000 used=0xf628000/0x38000000 tramp+0x4000
+D A8 Load module wbemprox.dll (wbemprox.dll-32727b2744fb579d): FB01E0000
+[jit-pool] image 0xfb00b0000+0x130000 (winspool.drv) → pool 0x30f628000 used=0xf75c000/0x38000000 tramp+0x4000
+D A8 Load module winspool.drv (winspool.drv-1d86ae048b0921a6): FB00B0000
+[jit-pool] image 0xfb0010000+0xa0000 (compstui.dll) → pool 0x30f75c000 used=0xf800000/0x38000000 tramp+0x4000
+D A8 Load module compstui.dll (compstui.dll-6caceb67ab4f8333): FB0010000
+[jit-pool] image 0xfafe90000+0x180000 (comctl32.dll) → pool 0x30f800000 used=0xf984000/0x38000000 tramp+0x4000
+D A8 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): FAFE90000
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Hopoo Games, LLC/Risk of Rain 2/Player.log
+[guest-log] #1 tid=00a8     Renderer: Apple M3 GPU (ID=0x2544)
+[guest-log] #2 tid=00a8     Vendor:   NVIDIA
+[guest-log] #3 tid=00a8     Driver:   32.0.15.8157
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+00a8:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2\\Risk of Rain 2_Data\\Managed/mono/aot-cache/amd64/UnityEngine.PerformanceReportingModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2\\Risk of Rain 2_Data\\Managed\\UnityEngine.PhysicsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[stp-emul] ml629 #1 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c625b0 rw=0x346da65b0 base 0x128c625b0 -> 0x128c625d0 (writeback)
+[stp-emul] ml629 #2 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c625d0 rw=0x346da65d0 base 0x128c625d0 -> 0x128c625f0 (writeback)
+[stp-emul] ml629 #3 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c625f0 rw=0x346da65f0 base 0x128c625f0 -> 0x128c62610 (writeback)
+[stp-emul] ml629 #4 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c62610 rw=0x346da6610 base 0x128c62610 -> 0x128c62630 (writeback)
+[stp-emul] ml629 #5 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c62630 rw=0x346da6630 base 0x128c62630 -> 0x128c62650 (writeback)
+[stp-emul] ml629 #6 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c62650 rw=0x346da6650 base 0x128c62650 -> 0x128c62670 (writeback)
+[stp-emul] ml629 #7 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c62670 rw=0x346da6670 base 0x128c62670 -> 0x128c62690 (writeback)
+[stp-emul] ml629 #8 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x128c62690 rw=0x346da6690 base 0x128c62690 -> 0x128c626b0 (writeback)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x128c70000 size=0x10000 type=0x3000 protect=0x40 tid=00a8 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=risk of rain 2.exe tid=00a8 size=0x10000 type=0x3000 prot=0x40 hint=0x128c70000 zb=0x0 hits=1 rev=ajan5-rockstar
+[10:36:25.778] [INFO] [dock-report] launch-game-running=1
+00a8:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000214 status=00000000 native_pc=000000024B67EED8 is_ec=0 -> returned rip=000000024B67EED8 rsp=0000000D428FE9D0 flags=00100003
+[exec-alloc] NtAllocateVirtualMemory #8 req_addr=0x129fe0000 size=0x20000 type=0x3000 protect=0x40
+[footprint] rev=ml1060 fast phys=2230 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2250 MB compressed=0 MB
+[exec-alloc] NtAllocateVirtualMemory #9 req_addr=0x12a000000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #3 status=c0000018 hint=0x12a000000 size=0x10000 type=0x3000 protect=0x40 tid=00a8 | STAGE=fixed-map err=3 at 0x12a000000+0x10000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=risk of rain 2.exe tid=00a8 size=0x10000 type=0x3000 prot=0x40 hint=0x12a000000 zb=0x0 hits=2 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #10 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[jit-pool] image 0xfafc80000+0x90000 (xinput1_3.dll) → pool 0x30f9d4000 used=0xfa68000/0x38000000 tramp+0x4000
+D A8 Load module xinput1_3.dll (xinput1_3.dll-1e6b91746083ed2b): FAFC80000
+[vdcfg] QueryDisplayConfig flags=0x4 -> 0, 0 paths 0 modes
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[win-name] #35 hwnd=0x2005e class='' text="Risk of Rain 2" rev=ml853
+[vdcfg] QueryDisplayConfig flags=0x4 -> 0, 0 paths 0 modes
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[bigres] tid=0160 #15 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=7679 MB
+[footprint] rev=ml1060 fast phys=2485 MB compressed=0 MB
+[bigres] tid=0160 #16 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x11b6c8000 total=8191 MB
+[exec-alloc] NtAllocateVirtualMemory #11 req_addr=0x12eff0000 size=0x10000 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #12 req_addr=0x12f000000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #4 status=c0000018 hint=0x12f000000 size=0x10000 type=0x3000 protect=0x40 tid=00a8 | STAGE=fixed-map err=3 at 0x12f000000+0x10000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=risk of rain 2.exe tid=00a8 size=0x10000 type=0x3000 prot=0x40 hint=0x12f000000 zb=0x0 hits=3 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #13 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[jit-pool] image 0x12f400000+0x3d6000 (?) → pool 0x30fa79000 used=0xfe55000/0x38000000 tramp+0x0
+[footprint] rev=ml1060 fast phys=2896 MB compressed=0 MB
+[launch-view] dismissed reason=game-window logs=1
+[store-noalias] #1 rev=ml348 addr=0x380000000 insn=0x78402768 pc=0x1024670ec NO pool/anon alias | region 0x380000000+0x10000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0xd418ff2a0 (pc=0x1024670ec x18=0x0 registry=0xfbfe50000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x380000000 hostpc=0x1024670ec hinsn=0x78402768 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[vm-fault-wait] #1 a read fault at 0x380000000 of tid=00a8 teb=0xfbfe50000 waits for virtual_mutex
+[footprint] rev=ml1060 fast phys=3357 MB compressed=0 MB
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__psynch_mutexwait+0x8 lr=libsystem_pthread.dylib`<redacted>+0x54 sp=0x16f8f50b0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=42 x8=0x0 x18=0x0 sp=0x16ef221d0
+[thread-stacks] port=0xf03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x205b18e58 x18=0x0 sp=0x16efa5ef0
+[thread-stacks] port=0x3203 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=7 x8=0x0 x18=0x0 sp=0x16f14dca0
+[thread-stacks] port=0x9163 "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x8d07 x18=0x0 sp=0x16f7dec40
+[thread-stacks] port=0x1ee23 "com.apple.NSURLConnectionLoader" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f035c60
+[thread-stacks] port=0x846f "wine-x18-exc" pc=libsystem_kernel.dylib`__psynch_mutexwait+0x8 run=3 susp=0 cpu=0 x8=0x103a657c7 x18=0x0 sp=0x16f8f50b0
+[thread-stacks]   bt[1] Madeira`ios_virtual_handle_fault_for_thread+0xd0
+[10:36:43.447] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=87 resident=3481MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=20)
+[thread-stacks] port=0x846f "wine-x18-exc" pc=libsystem_kernel.dylib`__psynch_mutexwait+0x8 run=3 susp=0 cpu=0 x8=0x103a657c7 x18=0x0 sp=0x16f8f50b0
+[thread-stacks]   bt[1] Madeira`ios_virtual_handle_fault_for_thread+0xd0
+[thread-stacks] port=0x22143 "BatchDeleteObjects" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fc000e0 x18=0x0 sp=0xd458fe9d0
+[thread-stacks] port=0x28a5b "Loading.AsyncRead" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fc040e0 x18=0x0 sp=0xd45afe9d0
+[thread-stacks] port=0x2280f "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0xd460feae0
+[thread-stacks] port=0x27e57 "UnityGfxDeviceWorker" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fca80e0 x18=0x0 sp=0xd466fe9d0
+[thread-stacks] port=0x23827 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0xd46cfeae0
+[thread-stacks] port=0x2724b "Loading.PreloadManager" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16f39c0e0 x18=0x0 sp=0xd410fe9d0
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=21)
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=22)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__psynch_mutexwait+0x8 lr=libsystem_pthread.dylib`<redacted>+0x54 sp=0x16f8f50b0 NATIVE (no FEX state) sp-cand=[ ]
+[10:36:57.876] [INFO] [session] length=50s partial=1 play=0s frames=0 stalls=0/0s peak=3358MB limit=8191MB thermal=nominal lpm=0 api=D3D9/OpenGL/64 res=1152x800 cap=60 game=Risk of Rain 2
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=23)
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=24)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=3266 MB (peak 3354) internal=3188 MB compressed=0 MB external=240 MB reusable=52 MB (cycle=25)
+[10:37:02.314] [INFO] [session] length=54s partial=1 play=0s frames=0 stalls=0/0s peak=3358MB limit=8191MB thermal=nominal lpm=0 api=D3D9/OpenGL/64 res=1152x800 cap=60 game=Risk of Rain 2

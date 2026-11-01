@@ -329,6 +329,7 @@ final class MetalBackedView: UIView {
             applyDisplayMode(reason: "layout")
             let full = convert(bounds, to: w)
             winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
+            if BCDFoldable.active { BCDFoldableLive.layoutPass(self, in: w) }   // madeira-bcd foldable (experimental, BCDFoldableLive.swift): only on the foldable iPhone with its switch on; re-frames the control window when the scene's size changes without a rotation
         }
     }
 
@@ -1037,6 +1038,7 @@ struct ContentView: View {
                                     startDock: { startDock($0, compactPool: $1) })
                 }
             }
+            .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): adds nothing off the foldable iPhone with its switch on; there, a window under 700 pt reads as compact so the iPad layout is not drawn in it
             .navigationTitle("BCD")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.regularMaterial, for: .navigationBar)
@@ -1520,6 +1522,7 @@ struct ContentView: View {
         ws_log_quiet = 1
 
         let epicSession = profile.map { BCDEpic.shared.owns(entryID: $0.id) } ?? false   // madeira-bcd (2026-10-22): read here, on the main thread (BCDEpic is main-actor); used for the msiexec line below
+        let eaInstallerSession = DockInstallers.runsEAAppInstaller && DockInstallers.flag("MADEIRA_DOCK_EA_MSISERVICE")   // round 626 (A1 S12)
         let windowsDesktopEntry = profile?.desktop == true   // madeira-bcd (2026-10-23): the library's "Windows desktop" entry (no game), for the msiexec line below
         DispatchQueue.global(qos: .userInitiated).async {
             // A library entry's launch profile (executable, arguments, x87
@@ -1661,6 +1664,12 @@ struct ContentView: View {
             } else if windowsDesktopEntry {
                 setenv("MADEIRA_MSIEXEC_SYSTEM32", "1", 1)
                 logStore.log("[msiexec64] Windows desktop: msiexec in system32 for this session")
+            } else if eaInstallerSession {
+                // madeira-bcd (round 626, agent A1 S12; XMTZMJ, 563J50, W2A0QS): a Dock start whose one-time installs run the EA app's
+                // installer: its bootstrapper starts the Windows Installer service first and aborts with 1923 when MSIServer cannot run
+                // system32\msiexec.exe. env.MADEIRA_DOCK_EA_MSISERVICE = 0 leaves it out.
+                setenv("MADEIRA_MSIEXEC_SYSTEM32", "1", 1)
+                logStore.log("[msiexec64] Dock install of the EA app: msiexec in system32 for this session")
             } else {
                 unsetenv("MADEIRA_MSIEXEC_SYSTEM32")
             }

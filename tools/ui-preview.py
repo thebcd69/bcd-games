@@ -17,6 +17,8 @@ sheet puts them side by side.
     tools/ui-preview.py --focus library.game.wc3 --press x,down   then a controller's presses (x opens the game's menu)
     tools/ui-preview.py --screens settings.memory    a screen's part: Settings opened on Memory
     tools/ui-preview.py --screens game-620,game-wc3-options   a game's page (-BCDTab game-<id>-<what>)
+    tools/ui-preview.py --stage 890x626:regular,regular --devices "iPad Pro 13-inch (M4)" --orient landscape
+                                                     a window of 890x626 pt with those size classes, cropped (the foldable iPhone's inner display)
     tools/ui-preview.py --list                       the simulators this Mac has
 
 Out: /tmp/bcd-ui-preview/ (or --out). Simulators are booted one at a time and shut down
@@ -99,6 +101,11 @@ ENGINE_BOUND |= {"BCDPerfTraceLive.swift", "BCDReadinessLive.swift", "BCDHelpLiv
 # The game folder's graphics defaults (BCDGraphicsScan.swift is pure Foundation and builds here; BCDGraphicsDefaults.swift names LibraryEntry,
 # MadeiraConfig and LogStore, so it stays out).
 ENGINE_BOUND |= {"BCDGraphicsDefaults.swift"}
+
+# The experimental foldable-iPhone support (BCDFoldable.swift: the gate and the pure follower, and BCDFoldableSettings.swift: the
+# Settings row, which never shows off the foldable model, build here; BCDFoldableLive.swift names the game view, the control window
+# and LogStore, so it stays out).
+ENGINE_BOUND |= {"BCDFoldableLive.swift"}
 SCREENS += ["ingame-menu", "starting", "overlay"]
 
 
@@ -301,7 +308,7 @@ def build(out, *, use_cache=True):
         return target
 
 
-def shoot(app, device, udid, screens, orients, focus_all, empty, out, press=None):
+def shoot(app, device, udid, screens, orients, focus_all, empty, out, press=None, stage=None, scene_width=None):
     shots = []
     subprocess.run(["xcrun", "simctl", "boot", udid], capture_output=True)
     run(["xcrun", "simctl", "bootstatus", udid, "-b"])
@@ -327,6 +334,10 @@ def shoot(app, device, udid, screens, orients, focus_all, empty, out, press=None
                 args += ["-BCDEmpty", "YES"]
             if press:
                 args += ["-BCDButtons", press]
+            if stage:
+                args += ["-BCDStage", stage]
+            if scene_width:
+                args += ["-BCDSceneWidth", str(scene_width)]
             subprocess.run(["xcrun", "simctl", "terminate", udid, BUNDLE_ID], capture_output=True)
             log = out / f".launch-{udid}.txt"
             log.unlink(missing_ok=True)
@@ -347,7 +358,7 @@ def shoot(app, device, udid, screens, orients, focus_all, empty, out, press=None
             time.sleep(3 + (1.6 + 0.4 * len(press.split(",")) if press else 0))
             first = False
             name = (f"{device.replace(' ', '_').replace('(', '').replace(')', '')}--{screen}{'--ring-' + ring if ring else ''}"
-                    f"{'--' + press.replace(',', '-') if press else ''}--{orient}.png")
+                    f"{'--' + press.replace(',', '-') if press else ''}{'--stage-' + stage.replace(':', '-').replace(',', '-') if stage else ''}{'--scene-width-' + str(scene_width).replace(':', '-') if scene_width else ''}--{orient}.png")
             run(["xcrun", "simctl", "io", udid, "screenshot", str(out / name)])
             subprocess.run(["xcrun", "simctl", "terminate", udid, BUNDLE_ID], capture_output=True)
             try:
@@ -357,6 +368,10 @@ def shoot(app, device, udid, screens, orients, focus_all, empty, out, press=None
             if orient == "landscape":
                 # simctl saves the panel as mounted (portrait); turn it the way the app stands.
                 run(["sips", "-r", "270", str(out / name)])
+            if stage:
+                # The window stands in the middle of the screen: keep only it (an iPad is 2x).
+                w, h = (float(v) for v in stage.partition(":")[0].lower().split("x"))
+                run(["sips", "--cropToHeightWidth", str(int(h * 2)), str(int(w * 2)), str(out / name)])
             shots.append(out / name)
             print(f"  {name}")
     subprocess.run(["xcrun", "simctl", "terminate", udid, BUNDLE_ID], capture_output=True)
@@ -379,6 +394,9 @@ def main():
     ap.add_argument("--orient", default="landscape,portrait")
     ap.add_argument("--focus")
     ap.add_argument("--press", help="a controller's presses after the screen is up: up,down,left,right,a,b,x,y,lb,rb,menu")
+    ap.add_argument("--stage", help="WxH[:regular|compact,regular|compact]: the interface in a window of that many points, centred on an iPad "
+                                   "(the foldable iPhone's inner display is 890x626:regular,regular; --devices \"iPad Pro 13-inch (M4)\")")
+    ap.add_argument("--scene-width", help="points: tell the foldable support's size-class follower the window is that wide (the iPad then reads as compact)")
     ap.add_argument("--empty", action="store_true")
     ap.add_argument("--out", type=Path, default=Path("/tmp/bcd-ui-preview"))
     ap.add_argument("--build-only", action="store_true")
@@ -408,7 +426,7 @@ def main():
         udid, version, _ = sims[device]
         print(f"{device} (iOS {version})")
         shoot(app, device, udid, [s.strip() for s in a.screens.split(",")], [o.strip() for o in a.orient.split(",")],
-              a.focus, a.empty, a.out, a.press)
+              a.focus, a.empty, a.out, a.press, a.stage, a.scene_width)
     print(f"ui-preview: screenshots in {a.out}")
 
 

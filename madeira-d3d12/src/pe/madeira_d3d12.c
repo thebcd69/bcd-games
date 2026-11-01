@@ -14521,11 +14521,33 @@ static void mad_refuse_log(const D3D12_RESOURCE_DESC *desc, D3D12_HEAP_TYPE heap
  * now real Metal placement heaps. CUSTOM heaps (a DXBC title's hundreds of
  * small CPU-page texture heaps, ~1.7 GB of mostly empty space) stay
  * description-only. bcd.cfg heap-backing = 0 restores the old behaviour. */
+/* madeira-bcd d3d12-heap-va-align (round 626, Clair Obscur: Expedition 33 HWMBZ2/MKX1Z2; agent C): default 0 = as before. 1: a DEFAULT
+ * placement heap the application made with a placement alignment of 64 KB or more (UE's transient heaps ask 4 MiB) starts on a 64 KB
+ * boundary of the GPU address space, as Direct3D 12 promises; 2: on the heap's own alignment, at most 4 MiB. Metal hands out heaps 32 KB
+ * off a 64 KB boundary on about every other allocation; UE aligns its sub-allocations to the address, so a 128 MiB request no longer fits
+ * a 128 MiB heap, its allocator returns NULL and the RenderThread reads address 8. */
+static int mad_heap_va_align_mode(void) {
+    static int v = -1;
+    if (v < 0) { v = (int)mad_cfg_int_pe("d3d12-heap-va-align", 0); if (v < 0 || v > 2) v = 0; }
+    return v;
+}
+/* heap-va-pad-test:begin (tests/host/check-d3d12-heap-va-align.py compiles this region) */
+static UINT64 mad_va_pad(UINT64 base, UINT64 align) { return (align - (base & (align - 1))) & (align - 1); }   /* align: a power of two */
+/* The boundary a heap starts on for a d3d12-heap-va-align mode and the heap's placement alignment; 0: as before (no padding). */
+static UINT64 mad_heap_va_align_for(int mode, UINT64 alignment) {
+    if (mode != 1 && mode != 2) return 0;
+    if (alignment < 65536u) return 0;                        /* 0 (the default 64 KB) and smaller: the application asked nothing */
+    if (mode == 2 && !(alignment & (alignment - 1))) return alignment < (4ull << 20) ? alignment : (4ull << 20);
+    return 65536u;
+}
+/* heap-va-pad-test:end */
+
 struct mad_memheap {
     ID3D12HeapVtbl *vtbl; LONG refs; const IID *iid; const char *name;
     struct mad_device *device;
     D3D12_HEAP_DESC desc;
     obj_handle_t mtl;   /* ml1145: the Metal placement heap, or 0 */
+    UINT64 mpad, msize;   /* madeira-bcd d3d12-heap-va-align: where the application's offset 0 sits in the Metal heap, and its size */
     SRWLOCK pl_lock; struct mad_resource **pl; unsigned npl, pl_cap; unsigned serial;   /* madeira-bcd: what is placed in it */
 };
 static LONG g_res_serial, g_heap_serial;
@@ -14661,8 +14683,9 @@ static HRESULT mad_create_resource_at(struct mad_device *d, D3D12_HEAP_TYPE heap
         if (ph && ph->mtl) {   /* ml1145: inside the application's heap, at its offset */
             UINT64 psz = 0, pal = 0;
             MTLDevice_heapTextureSizeAndAlign(d->mtl_device, &ti, &psz, &pal);
-            if (psz && pal && !(poff % pal) && poff + psz <= ph->desc.SizeInBytes)
-                r->texture = MTLHeap_newTextureAtOffset(ph->mtl, &ti, poff);
+            UINT64 moff = poff + ph->mpad;   /* madeira-bcd d3d12-heap-va-align: 0 unless the key padded the heap */
+            if (psz && pal && !(moff % pal) && moff + psz <= ph->msize)
+                r->texture = MTLHeap_newTextureAtOffset(ph->mtl, &ti, moff);
             if (r->texture) { r->placed_heap = ph; r->placed_off = poff; r->placed_size = psz; mad_pl_add(ph, r); ID3D12Heap_AddRef((ID3D12Heap *)ph); InterlockedIncrement(&g_placed_in_heap); }
             else mad_placed_fallback(ph, desc, poff, psz, pal);
         }
@@ -14744,8 +14767,9 @@ static HRESULT mad_create_resource_at(struct mad_device *d, D3D12_HEAP_TYPE heap
         if (ph && ph->mtl && heap_type == D3D12_HEAP_TYPE_DEFAULT) {   /* ml1145: inside the application's heap */
             UINT64 psz = 0, pal = 0;
             MTLDevice_heapBufferSizeAndAlign(d->mtl_device, info.length, info.options, &psz, &pal);
-            if (psz && pal && !(poff % pal) && poff + psz <= ph->desc.SizeInBytes)
-                r->buffer = MTLHeap_newBufferAtOffset(ph->mtl, &info, poff);
+            UINT64 moff = poff + ph->mpad;   /* madeira-bcd d3d12-heap-va-align: 0 unless the key padded the heap */
+            if (psz && pal && !(moff % pal) && moff + psz <= ph->msize)
+                r->buffer = MTLHeap_newBufferAtOffset(ph->mtl, &info, moff);
             if (r->buffer) { r->placed_heap = ph; r->placed_off = poff; r->placed_size = psz; mad_pl_add(ph, r); ID3D12Heap_AddRef((ID3D12Heap *)ph); InterlockedIncrement(&g_placed_in_heap); }
             else { mad_placed_fallback(ph, desc, poff, psz, pal); info.memory.ptr = NULL; info.gpu_address = 0; }
         }
@@ -14880,7 +14904,7 @@ static ULONG STDMETHODCALLTYPE memheap_Release(ID3D12Heap *This) {
                       (unsigned long long)h->desc.SizeInBytes >> 10);   /* ml895 */
         if (h->mtl) {   /* ml1145: every placed resource held a reference, so none is left; ml1148: but the GPU may still hold them */
             struct mad_device *hd = h->device; int queued = 0;
-            InterlockedExchangeAdd64(&g_mheap_bytes, -(LONG64)h->desc.SizeInBytes);   /* madeira-bcd metal-gap: queued frees are counted apart */
+            InterlockedExchangeAdd64(&g_mheap_bytes, -(LONG64)h->msize);   /* madeira-bcd metal-gap: queued frees are counted apart (msize: the Metal heap's size) */
             EnterCriticalSection(&hd->heap_lock);
             if (mad_grow((void **)&hd->mhret, &hd->mhret_cap, hd->nmhret + 1, sizeof *hd->mhret)) {
                 hd->mhret[hd->nmhret].heap = h->mtl; hd->mhret[hd->nmhret].serial = (UINT64)hd->gpu_serial; hd->mhret[hd->nmhret].mem = NULL; hd->nmhret++; queued = 1;
@@ -14931,8 +14955,24 @@ static HRESULT STDMETHODCALLTYPE device_CreateHeap(ID3D12Device *This, const D3D
         struct mad_device *hd = (struct mad_device *)This;
         if (backing < 0) { backing = (int)mad_cfg_int_pe("heap-backing", 1); d3d12_log("[madeira-d3d12] ml1145 heap-backing = %d (DEFAULT heaps %s)\n", backing, backing ? "are Metal placement heaps; placed resources alias" : "are descriptions only"); }
         if (backing && desc->Properties.Type == D3D12_HEAP_TYPE_DEFAULT && desc->SizeInBytes) {
-            h->mtl = MTLDevice_newPlacementHeap(hd->mtl_device, desc->SizeInBytes, WMTResourceStorageModePrivate);
-            if (h->mtl) { mad_resident(hd, h->mtl); InterlockedExchangeAdd64(&g_mheap_bytes, (LONG64)desc->SizeInBytes); }   /* madeira-bcd metal-gap */
+            /* madeira-bcd d3d12-heap-va-align (off: va_align 0, want == SizeInBytes, mpad stays 0) */
+            UINT64 va_align = mad_heap_va_align_for(mad_heap_va_align_mode(), desc->Alignment), want = desc->SizeInBytes + va_align;
+            h->msize = want;
+            h->mtl = MTLDevice_newPlacementHeap(hd->mtl_device, want, WMTResourceStorageModePrivate);
+            if (h->mtl && va_align) {   /* where the heap really starts: a 16 KB buffer at offset 0 of the still empty heap */
+                struct WMTBufferInfo pi; obj_handle_t pb; static unsigned said_va;
+                memset(&pi, 0, sizeof pi); pi.length = 16384; pi.options = WMTResourceStorageModePrivate;
+                if ((pb = MTLHeap_newBufferAtOffset(h->mtl, &pi, 0))) {
+                    if (pi.gpu_address) h->mpad = mad_va_pad(pi.gpu_address, va_align);
+                    NSObject_release(pb);
+                    if (said_va++ < 64)
+                        d3d12_log("[madeira-d3d12] ml2201 heap %p (%llu KB, align %llu): start GPU address %#llx, phase %#llx of %llu -> padded by %#llx\n",
+                                  (void *)h, (unsigned long long)(desc->SizeInBytes >> 10), (unsigned long long)desc->Alignment,
+                                  (unsigned long long)pi.gpu_address, (unsigned long long)(pi.gpu_address & (va_align - 1)),
+                                  (unsigned long long)va_align, (unsigned long long)h->mpad);
+                }
+            }
+            if (h->mtl) { mad_resident(hd, h->mtl); InterlockedExchangeAdd64(&g_mheap_bytes, (LONG64)want); }   /* madeira-bcd metal-gap */
             if (said_b++ < 32) d3d12_log("[madeira-d3d12] ml1145 heap %llu KB flags %#x %s\n", (unsigned long long)(desc->SizeInBytes >> 10),
                                          (unsigned)desc->Flags, h->mtl ? "backed by a Metal placement heap" : "COULD NOT be backed; its resources stand alone");
         }
@@ -14957,6 +14997,14 @@ static HRESULT STDMETHODCALLTYPE device_CreatePlacedResource(ID3D12Device *This,
     (void)state; (void)clear;
     if (!h || !desc || !out) { if (said++ < 8) d3d12_log("[madeira-d3d12] CreatePlacedResource: null heap/desc/out\n"); return E_INVALIDARG; }
     hr = mad_create_resource_at((struct mad_device *)This, h->desc.Properties.Type, desc, riid, out, h, offset);   /* ml1145 */
+    if (SUCCEEDED(hr) && *out && !offset && h->desc.Alignment == 4194304 && (h->desc.Flags & 0x1000)) {
+        /* madeira-bcd d3d12-heap-va-align (round 626): where a transient heap starts in GPU-address space; Direct3D 12 promises a
+         * 64 KB boundary (phase 0). Log only, the first 24 times. */
+        static LONG vsaid; const struct mad_resource *vr = (const struct mad_resource *)*out;
+        if (vr->buffer && vr->gpu_address && InterlockedIncrement(&vsaid) <= 24)
+            d3d12_log("[madeira-d3d12] ml2201 transient heap %p start GPU address %#llx, 64 KB phase %#x (Direct3D 12: 0)%s\n", (void *)h,
+                      (unsigned long long)vr->gpu_address, (unsigned)(vr->gpu_address & 0xffff), h->mpad ? " (padded)" : "");
+    }
     if (SUCCEEDED(hr) && *out) {   /* madeira-bcd: every placement, so a capture's alias report can be followed back */
         static LONG psaid; const struct mad_resource *pr = (const struct mad_resource *)*out; char t[80];
         if (InterlockedIncrement(&psaid) <= 6000) {

@@ -159,7 +159,14 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var returnedToLibrary = false
     var exitStatus: UInt32?
     var unhandled = 0
+    /// madeira-bcd (round 626, agent T S2, Batman: Arkham City AE9TXK): Metal's "failed assertion `" was logged; the abort that follows it
+    /// ("[task-exc] BREAKPOINT") then counts as an unhandled crash (the app died; the session was scored ran or inconclusive).
+    var metalAssertion = false
     var runtimeErrorDialog = false
+    /// madeira-bcd (round 626, agent P S3, Football Manager 27 ANXA7R): a DLL a game loads from its "\Plugins\" folder (Unity's native
+    /// plugins) imports a library that was not found ("err:module:import_dll Library tbs.dll (which is needed by ...\\Plugins\\...) not
+    /// found"). A program that then ends itself with exit code 1 failed to start (Unity: "Failed to init plugin"), not a quit.
+    var pluginImportMissing = false
     /// madeira-bcd (round 624, Portal 2 HZE5E9, RoboCop TK6WRV): "[steam-api] steam_api found no running Steam", the game's own Steam
     /// library said no Steam client was running (the Steam IPC family, 82 archive logs).
     var steamNotFound = false
@@ -424,6 +431,10 @@ final class AutoTuneLogScanner {
     private static let mExitReport = Array("[exit-report] status=0x".utf8)
     private static let mUnhandled = Array("Unhandled exception".utf8)
     private static let mRootFrame = Array("ACCEPTING terminal root frame".utf8)
+    /// madeira-bcd (round 626): Metal's own assertion (an API misuse it does not survive, e.g. "Command encoder released without
+    /// endEncoding" after BCD ended a faulted encode thread) and the abort trap the app took after it.
+    private static let mMetalAssertion = Array("failed assertion `".utf8)
+    private static let mTaskExcBreakpoint = Array("[task-exc] BREAKPOINT #".utf8)
     private static let mRuntimeError = Array("Runtime error!".utf8)
     /// madeira-bcd (round 624, Gal*Gun 2 B2B7BR): an Unreal Engine 4 program's own crash window ("The UE4-<project> Game has crashed and
     /// will close"), shown when the program crashed; the session had no exit status and was scored "ran".
@@ -445,6 +456,16 @@ final class AutoTuneLogScanner {
     /// madeira-bcd (round 624, Rise of the Tomb Raider): the game's own message (mirrored by [guest-log]) that its swapchain could not be
     /// created. It ends itself with exit 0 and never presents, and without this the session was scored "ran" or "quit" (8 Dock logs).
     private static let mSwapChainFail = Array("[SwapChain] Error occurred during creation.".utf8)
+    /// madeira-bcd (round 626, agent G1 S13): WineServerBridge.m's fatal_error: the Wine server thread ended, so the session cannot play
+    /// ("[Wine] FATAL: bind: Operation not permitted" in a LiveContainer install, ZJC49F, WHVV4H; ".wineserver must not be accessible by
+    /// other users"). 4 of the 11 archive logs with it were scored ran from the cover button or the clock; it counts as an error exit now.
+    private static let mWineFatal = Array("[Wine] FATAL: ".utf8)
+    /// madeira-bcd (round 626, agent P S3): a native plugin's import that was not found (the log doubles each backslash), and the
+    /// program's own exit with code 1 after it (pluginImportMissing).
+    private static let mImportDllLibrary = Array("err:module:import_dll Library ".utf8)
+    private static let mPluginsDir = Array("\\\\Plugins\\\\".utf8)
+    private static let mNotFoundEnd = Array(") not found".utf8)
+    private static let mExitOne = Array("NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1)".utf8)
     private static let mTerminate = Array("NtTerminateProcess(".utf8)
     private static let mErrorCode = Array("exit_code=0xc".utf8)
     /// The whole Wine process finished with code 0 (the trailing " (" keeps code 0 from matching 01, 0x.. and the like).
@@ -479,7 +500,10 @@ final class AutoTuneLogScanner {
     /// Window titles that read like an error and are not one. GameMaker's runner creates a hidden form named "Error Messages"
     /// at start, long before the game's own window (Hotline Miami, logs 339R82 and 1VPXSG, lines 1913 and 1919 of 12,400);
     /// counted as the game's error box it made a game that ended itself with exit 0 a "crash".
-    private static let notDialogs: Set<String> = ["Error Messages"]
+    /// madeira-bcd (round 626, agent G1 S12): BioWare's configuration utility (DAOriginsConfig.exe; Mass Effect's shares the page) has a
+    /// group box titled "Error Log"; counted as the game's error box it made the first-run settings screen a crash (Dragon Age: Origins
+    /// 6E2BH0). In 2,589 archive logs that title is in this one only.
+    private static let notDialogs: Set<String> = ["Error Messages", "Error Log"]
     private static let errorWords = ["error", "Error", "ERROR", "could not", "Could not", "Could Not", "failed", "Failed",
                                      "not supported", "unable", "Unable", "cannot", "Cannot", "Fatal", "fatal"].map { Array($0.utf8) }
 
@@ -549,6 +573,8 @@ final class AutoTuneLogScanner {
         if S.find(l, S.mUnhandled) != nil || S.find(l, S.mRootFrame) != nil {
             if !facts.cleanMainExit { facts.unhandled += 1 } else if facts.childrenPending { facts.childUnhandled += 1 }
         }
+        if !facts.metalAssertion, S.find(l, S.mMetalAssertion) != nil { facts.metalAssertion = true }
+        else if facts.metalAssertion, facts.unhandled == 0, S.find(l, S.mTaskExcBreakpoint) != nil { facts.unhandled = 1 }
         if S.find(l, S.mRuntimeError) != nil || S.find(l, S.mUE4Crash) != nil { facts.runtimeErrorDialog = true }
         if S.find(l, S.mSteamNotFound) != nil { facts.steamNotFound = true }
         if S.find(l, S.mLauncherError) != nil { facts.launcherErrors += 1 }
@@ -558,6 +584,13 @@ final class AutoTuneLogScanner {
         if S.find(l, S.mSpinLook) != nil { facts.spinReports += 1 }
         if S.find(l, S.mMachUnhandled1) != nil, S.find(l, S.mX18Zero) != nil { facts.machFaultNoTeb += 1 }
         if !facts.cleanMainExit, S.find(l, S.mSwapChainFail) != nil { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
+        if !facts.cleanMainExit, S.find(l, S.mWineFatal) != nil { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
+        if !facts.pluginImportMissing, S.find(l, S.mImportDllLibrary) != nil, S.find(l, S.mPluginsDir) != nil, S.find(l, S.mNotFoundEnd) != nil {
+            facts.pluginImportMissing = true
+        }
+        if facts.pluginImportMissing, !facts.cleanMainExit, S.find(l, S.mExitOne) != nil {
+            facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen
+        }
         if let v = S.number(l, after: S.mDetachWait) {
             facts.presentsCounted = true
             facts.presentsLogged = max(facts.presentsLogged, Int(v))
@@ -720,6 +753,12 @@ enum AutoTuneEngine {
                 // The app's marker first, else the limit the log names (ml992), else the guess below.
                 let known = end.limitMB ?? f.limitMB
                 if let limit = known, last >= limit - max(150, limit / 50) { return "killed" }
+                // madeira-bcd (round 626, agent G2 S12; The Forest EEZ6Y7 on a 3 GB iPhone with a 2098 MB budget): the newest line was the
+                // slow sampler's, 1935 MB, after the compressor had taken the fast line's 2009 MB back down, 13 MB under the test above, and
+                // the process was gone seconds later. The run's peak is the same evidence when the newest line is within a tenth of it and
+                // the game never got to play (stage 3 or less, no freeze, no GPU error, no quit; a game that played keeps the test above).
+                if let limit = known, let peak = f.peakFootprintMB, f.stage <= 3, f.freezeGaps == 0, f.gpuErrors == 0, !f.quitRequested,
+                   peak >= limit - max(150, limit / 50), last * 10 >= peak * 9 { return "killed" }
                 if known == nil, let avail = f.availableMB {
                     let limit = avail + 256
                     if last >= limit - max(200, limit * 3 / 100) { return "killed" }

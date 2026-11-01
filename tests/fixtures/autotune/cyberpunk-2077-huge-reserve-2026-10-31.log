@@ -1,0 +1,270 @@
+[13:04:28.267] [INFO] Checking entitlements...
+[13:04:28.267] [INFO] [build] v0.1.623 (623)
+[13:04:28.268] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 26.5 (Build 23F77) ram=11441MB available=12266MB cores=9
+[13:04:28.268] [INFO] [device] address-map=[0x102c14000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[13:04:28.279] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@1.72x max-fps=120 utc-offset=+09:00 free-disk=123GB stikdebug-url=1
+[13:04:28.285] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[13:04:30.792] [INFO] [bcd] library launch Cyberpunk 2077: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[13:04:30.792] [INFO] Requesting JIT with StikDebug...
+[13:04:30.809] [INFO] Opening StikDebug to enable JIT...
+[13:04:36.751] [INFO] [dock-launch] image-retire=1
+[13:04:36.752] [INFO] [dock-launch] image-map-guard=1
+[13:04:36.758] [INFO] [dock-installers] app=1091500 scripts=0 programs=0
+[13:04:36.759] [INFO] [madeira-dock] starting the host for app 1091500; Valve's client authenticates and authorizes the launch
+[13:04:36.771] [INFO] Running full Wine sequence...
+[13:04:36.771] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102c14000,0xfc0000000) 63GB available=12252MB low-power=0 thermal=nominal
+[13:04:36.784] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[13:04:36.784] [INFO] Allocating 896MB JIT pool via debugger...
+[13:04:36.784] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[13:04:36.784] [INFO] [jit-debugger] attached=1 at the pool request
+[13:04:38.641] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  1.931s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+ml992: os_proc_available_memory=11338 MB + phys_footprint=949 MB = 12288 MB (hw.memsize says 11441 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[footprint] rev=ml358 phys=958 MB (peak 958) internal=955 MB compressed=0 MB external=93 MB reusable=9 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x125590000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.400s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=102, unixdir=103, dup_unixdir=107) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+ml957: ? backing 0x126f40000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301e28000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.471s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=131, unixdir=133, dup_unixdir=138) cwd=L"C:\\windows\\"
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 126F40000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m4418229 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FB8F70000
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301dd4bc8 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=1220 MB (peak 1220) internal=1218 MB compressed=0 MB external=163 MB reusable=8 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1315 MB compressed=0 MB external=167 MB reusable=8 MB (cycle=3)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[file-wfail] ml669 #58 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #59 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1426 MB (peak 1426) internal=1423 MB compressed=0 MB external=170 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=1437 MB (peak 1437) internal=1435 MB compressed=0 MB external=170 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=1426 MB (peak 1437) internal=1425 MB compressed=0 MB external=171 MB reusable=8 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe" t+ 13.439s rev=ml526
+0088:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe\"" (fd=370, unixdir=371, dup_unixdir=442) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0xd31000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[13:04:50.271] [INFO] [dock-report] launch-client-discovery-published=1
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=437 peb=0x11ba20000
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x30ae64000)
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/Programs/CD Projekt Red/REDlauncher/logs/REDprelauncher.log
+[guest-log] #1 tid=00a8 2026-10-31 13:04:50.630 [Warning][ (0)] [TID 168][red-prelauncher]: OsVersionInfo: DisplayVersion registry key not found.
+[guest-log] #2 tid=00a8 2026-10-31 13:04:50.661 [Error][ (0)] [TID 168][red-prelauncher]: Waiting for Launcher Installer start failed. Process failed to start: File not found. (0).
+[guest-log] #3 tid=00a8 2026-10-31 13:04:50.661 [Error][ (0)] [TID 168][red-prelauncher]: Failed to install REDlauncher! Falling back to launching the game.
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe" t+ 13.883s rev=ml526
+[session-log] Steam game Cyberpunk2077.exe: logs/Cyberpunk2077.exe-2026-10-31_13-04-50.txt
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe\" " (fd=472, unixdir=473, dup_unixdir=477) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x581b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x1000000000
+[guest-log] #4 tid=00a8 2026-10-31 13:04:50.713 [Error][ (0)] [TID 168][red-prelauncher]: Application exited with code -1.
+[nls-getptr] type=11 id=1252 peb=0x11ba28000
+[nls-getptr] type=11 id=437 peb=0x11ba28000
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xffffffff) syscalls=0 unix_calls=8424
+[unwind] term ml661 begin rip=30a12d1d4 rsp=148fffe28 window=[148fffe28..1497ffe28) max=32
+[unwind] term ml661 #00 pc=30a12d1d4 rsp=148fffe28  <no module — STOP>
+[unwind] term ml661 end
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffffffff) syscalls=0 unix_calls=8492
+[unwind] term ml661 begin rip=309bc616c rsp=148fffc80 window=[148fffc80..1497ffc80) max=32
+[unwind] term ml661 #00 pc=309bc616c rsp=148fffc80  <no module — STOP>
+[unwind] term ml661 end
+00a8:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1)
+[Wine ntdll/server] process_exit_wrapper(-1): closing child fd_socket=435
+[Wine ntdll/server] process_exit_wrapper(-1)
+[Wine child thread] child exited with code -1
+[nls-getptr] type=11 id=20127 peb=0x11ba28000
+[13:04:50.772] [INFO] [dock-game-end] redprelauncher.exe ended with status 0xffffffff; the session goes on for now (game-still-runs)
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x11ba28000
+[nls-getptr] type=11 id=437 peb=0x11ba28000
+[copy-verify] msvcrt.dll: OK, 29 .text pages executable (copy @0x313a2c000)
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+E B0 [iOS-xins] tracker=0x313080bc8 WININET.dll sec=0xfacca0000-0xfaccdb029
+E B0 [iOS-xins] tracker=0x313080bc8 WININET.dll sec=0xfacce0000-0xfacce0f90
+D B0 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FACC90000
+E B0 [iOS-xins] tracker=0x313080bc8 WININET.dll sec=0xfacca0000-0xfaccdb029
+E B0 [iOS-xins] tracker=0x313080bc8 WININET.dll sec=0xfacce0000-0xfacce0f90
+E B0 [img-map] ml710 #35 intervals-only WININET.dll base=0xfacc90000
+ml985: map_image_view size=0x4a36000 base=0x6ffff0230000 info_base=0x180000000 map_addr=0x6ffff0230000 flags=0x4 charact=0x2022 limits=0x10000..0x1000000000
+[copy-verify] PhysX3Common_x64.dll: OK, 109 .text pages executable (copy @0x31dec5000)
+D B0 Load module oo2ext_7_win64.dll (oo2ext_7_win64.dll-80f908ddf5b36b6f): FA7200000
+D B0 Load module amd_ags_x64.dll (amd_ags_x64.dll-cbfabe2bc2e2862f): FA71D0000
+D B0 Load module OLEAUT32.dll (oleaut32.dll-ed3f8116102cb254): FA70A0000
+D B0 Load module winhttp.dll (winhttp.dll-940743fb9f87d8d4): FA6FF0000
+D B0 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): FA6F50000
+D B0 Load module concrt140.dll (concrt140.dll-7f7bd0536697a14b): FA6EC0000
+00b0:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=2 first=0000000141963654
+[jumbo#1] +0ms tid=16ddbf000 wtid=00b0 peb=0x11ba28000 nrip=0xfb2404f00 grip=0x0 size=0x400000000 (16384 MB) hint=0x0 -> 0x370000000 st=0x0 | granted=16384 MB ok=1 fail=0
+[mmap-place] ml1027 NO GAP FITS size=0x1000010000 after 118437 regions (ceiling=0xfc0000000 walk_stopped_at=0xfc0000000 tail=0 MB gaps_seen=0, largest gap 15360 MB, walk 124 ms) -- the map really is full for this size
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0x1000000000 — top window is full
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[pool-owner] searching 162 module copies for 1 granted pool bases...
+[13:04:51.772] [INFO] [dock-report] launch-game-running=1
+[jumbo#2] +294ms tid=16ddbf000 wtid=00b0 peb=0x11ba28000 nrip=0x14068c42c grip=0x0 size=0x1000000000 (65536 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=16384 MB ok=1 fail=1
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0x1000000000 type=0x2000 protect=0x2 tid=00b0 | STAGE=anon-mmap err=12 at 0x0+0x1000010000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000017 proc=cyberpunk2077.exe tid=00b0 size=0x1000000000 type=0x2000 prot=0x2 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[mmap-place] ml1027 NO GAP FITS size=0x800010000 after 118443 regions (ceiling=0xfc0000000 walk_stopped_at=0xfc0000000 tail=0 MB gaps_seen=0, largest gap 15360 MB, walk 126 ms) -- the map really is full for this size
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0x800000000 — top window is full
+[jumbo#3] +162ms tid=16ddbf000 wtid=00b0 peb=0x11ba28000 nrip=0x14068b783 grip=0x0 size=0x800000000 (32768 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=16384 MB ok=1 fail=2
+[alloc-fail] ml814 #3 status=c0000017 hint=0x0 size=0x800000000 type=0x2000 protect=0x2 tid=00b0 | STAGE=anon-mmap err=12 at 0x0+0x800010000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000017 proc=cyberpunk2077.exe tid=00b0 size=0x800000000 type=0x2000 prot=0x2 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[bigres] tid=00b0 #1 size=0x1f400000 (500 MB) type=0x2000 prot=0x2 hint=0x0 peb=0x11ba28000 total=500 MB
+[jumbo#4] +0ms tid=16ddbf000 wtid=00b0 peb=0x11ba28000 nrip=0x140764567 grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x770000000 st=0x0 | granted=17408 MB ok=2 fail=2
+[jumbo#5] +0ms tid=16ddbf000 wtid=00b0 peb=0x11ba28000 nrip=0x140981f30 grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7b0000000 st=0x0 | granted=18432 MB ok=3 fail=2
+[store-noalias] #1 rev=ml348 addr=0x28 insn=0x194000c6 pc=0x3357ecad4 NO pool/anon alias | region 0x102c14000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x28 hostpc=0x3357ecad4 hinsn=0x194000c6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x334ff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x142610d2c pc=0x3357ecad4 addr=0x28 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x102c14000+0x26ec000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x3357ecad4 addr=0x28 x18=0xfbfe40000 type=1 lr=0x336ff8274 sp=0xfb2380000 x16=0x312bd99a4 x17=0xfb237ff20
+[guest-code] rev=ml333 pool_rip=0x30f971d2c (PE 0x142610d2c): 48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 57
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x28 at host pc=0x3357ecad4; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RCX=RDX=0x143bf65f0 = cpLauncher.exe+0x3bf65f0
+[fault-host] 3357ec9d4: d28d8b86 f2a832e6 f2c00026 f81f8ee6 1000004a 94000074 10fffb2a f900038a
+[fault-host] 3357ec9f4: b945eb8b 3400004b d4395fc0 2a1b03e4 f9401afb 2a0403e8 f9401ef9 b10082e9
+[fault-host] 3357eca14: aa1703f8 aa0903f7 a8c11afa d500401f a94a2f8a 8a06116b 8b0b014a a940294b
+[fault-host] 3357eca34: cb06014a b400006a f945b38b f9000f86 d65f0160 f1000009 54fffa80 f10000a9
+[fault-host] 3357eca54: 54fffa40 f100007f 540000c1 19000004 b945eb8b 3400004b d4395fc0 17ffffe5
+[fault-host] 3357eca74: f1000369 540000c1 19000004 b945eb8b 3400004b d4395fc0 17ffffc4 cb00037b
+[mach_exc] insn_stream PC-12..PC+8: 54ffff01 14000013 8b010366 [194000c6] b3401cc8 aa1a03f9 19000028
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbfe40000 TEB=0xfbfe40000 TEB[0x58]=0x1466c3ab0 *(gs_cached+0x58)=0x1466c3ab0
+[store-noalias] #2 rev=ml348 addr=0x28 insn=0x194000c6 pc=0x3357ecad4 NO pool/anon alias | region 0x102c14000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x28 hostpc=0x3357ecad4 hinsn=0x194000c6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x334ff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x142610d2c pc=0x3357ecad4 addr=0x28 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x102c14000+0x26ec000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x3357ecad4 addr=0x28 x18=0xfbfe40000 type=1 lr=0x336ff8274 sp=0xfb2380000 x16=0x312bd99a4 x17=0xfb237ff20
+[guest-code] rev=ml333 pool_rip=0x30f971d2c (PE 0x142610d2c): 48 8b c4 48 89 58 08 48 89 68 10 48 89 70 18 57
+[fault-host] 3357eca34: cb06014a b400006a f945b38b f9000f86 d65f0160 f1000009 54fffa80 f10000a9
+[fault-host] 3357eca54: 54fffa40 f100007f 540000c1 19000004 b945eb8b 3400004b d4395fc0 17ffffe5
+[fault-host] 3357eca74: f1000369 540000c1 19000004 b945eb8b 3400004b d4395fc0 17ffffc4 cb00037b
+[fault-host] 3357eca94: aa0003e1 aa0503e2 aa0303fa b100047f 54000161 8b010366 194000c6 b3401cc8
+[fault-host] 3357ecab4: 19000028 91000421 72001d1f 54fffa20 f1000442 54ffff01 14000013 8b010366
+[fault-host] 3357ecad4: 194000c6 b3401cc8 aa1a03f9 19000028 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 54ffff01 14000013 8b010366 [194000c6] b3401cc8 aa1a03f9 19000028
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbfe40000 TEB=0xfbfe40000 TEB[0x58]=0x1466c3ab0 *(gs_cached+0x58)=0x1466c3ab0
+00b0:err:seh:segv_handler   [guest-rip-sec] rip=0x142610d2c in image 0x140000000: rva 0x2610d2c, section #0 '.text' rva 0x1000+0x2ff1ce6 chars 0x60000020 (R-X CODE), vprot=0x25
+00b0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x3357ecad4 RX from -32, 64 of 64 bytes: 28 00 00 19 21 04 00 91 1f 1d 00 72 20 fa ff 54 42 04 00 f1 01 ff ff 54 13 00 00 14 66 03 01 8b c6 00 40 19 c8 1c 40 b3 f9 03 1a aa 28 00 00 19 21 04 00 91 1f 1d 00 72 c0 f8 ff 54 42 04 00 f1 
+00b0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x3357ecad4 (not an anon-JIT page)
+D B0 Exception: Code: C0000005 Address: 3357ECAD4 AV READ of 28
+00b0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x141976cb6 RX from -32, 64 of 64 bytes: 4d 8b c3 49 8b f9 49 83 f9 ff 75 14 8a 04 13 88 02 48 ff c2 84 c0 74 b1 49 83 e8 01 75 ee eb 2e 8a 04 13 48 8b f7 88 02 48 ff c2 84 c0 74 9a 49 83 e8 01 74 06 48 83 ef 01 75 e5 4d 85 c0 48 8d 
+00b0:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x141976cb6 (not an anon-JIT page)
+D B0 Exception: Code: C0000005 Address: 141976CB6 AV READ of 28
+00b0:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 146020000 (== stack hi) ControlPc=fb2ce2dd8 handler=0000000FB2CA5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on read access to 0000000000000028 at address 0000000141976CB6 (thread 00b0), starting debugger...
+00b0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=10547
+[unwind] term ml661 begin rip=3133481fc rsp=14601e298 window=[14601e298..14681e298) max=32
+[unwind] term ml661 #00 pc=3133481fc rsp=14601e298  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=476
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[Wine child thread] child exited with code -1073741819
+[13:04:52.273] [INFO] [dock-game-end] cyberpunk2077.exe ended with status 0xc0000005; the session goes on for now (grace)
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=106
+0044:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=137
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[13:04:58.274] [INFO] [dock-report] launch-game-ended=1
+[13:04:58.275] [INFO] [dock-report] probe-result=0
+[13:04:58.899] [INFO] [madeira-dock] host finished (result 0)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16db31020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=28 x8=0x0 x18=0x0 sp=0x16d1ea1c0
+[thread-stacks] port=0x1603 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=5 x8=0x2042f12f0 x18=0x0 sp=0x16d270550
+[thread-stacks] port=0x3203 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d415ca0
+[thread-stacks] port=0x4603 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2042f12f0 x18=0x0 sp=0x16d5baab0
+[thread-stacks] port=0xb203 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=33 x8=0x2042f12f0 x18=0x0 sp=0x16d7e8c50
+[thread-stacks] port=0xfa03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2042f12f0 x18=0x0 sp=0x16d871ef0
+[thread-stacks] port=0x8c27 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16db31020
+[thread-stacks] port=0x952f "wine-stale-heal" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2042f12f0 x18=0x0 sp=0x16dbbef20
+[thread-stacks] port=0x984b "wine_explorer_display_settings_restorer" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16dbc80e0 x18=0x0 sp=0x1265fe610
+[thread-stacks] port=0x992b "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16dbcc0e0 x18=0x0 sp=0x126efe9c0
+[thread-stacks] port=0x10293 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16dc5c0e0 x18=0x0 sp=0x12781e9c0
+[thread-stacks] port=0xfb73 "" pc=?`?+0x0 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x0
+[13:05:02.277] [INFO] [dock-game-end] cyberpunk2077.exe ended with status 0xc0000005 after 1 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[13:05:02.778] [INFO] [session] length=26s play=0s frames=0 stalls=0/0s peak=2176MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=Cyberpunk 2077
+[13:05:02.789] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[13:05:04.487] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=2013 MB (peak 2166) internal=2009 MB compressed=0 MB external=245 MB reusable=8 MB (cycle=14)
+[footprint] rev=ml358 phys=2013 MB (peak 2166) internal=2009 MB compressed=0 MB external=245 MB reusable=8 MB (cycle=15)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=20 resident=2262MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2013 MB (peak 2166) internal=2009 MB compressed=0 MB external=245 MB reusable=8 MB (cycle=16)
+[footprint] rev=ml358 phys=2013 MB (peak 2166) internal=2009 MB compressed=0 MB external=245 MB reusable=8 MB (cycle=17)
+[footprint] rev=ml358 phys=2013 MB (peak 2166) internal=2009 MB compressed=0 MB external=245 MB reusable=8 MB (cycle=18)
+[footprint] rev=ml358 phys=2017 MB (peak 2166) internal=2013 MB compressed=0 MB external=254 MB reusable=8 MB (cycle=19)

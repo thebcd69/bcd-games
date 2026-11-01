@@ -2045,6 +2045,10 @@ static NTSTATUS transform_set_output_type( wg_transform_t handle, const struct w
  * through the 64-bit table only (see the entries below and that file's header). */
 #include "winegstreamer_wmv_ios.c"
 
+/* madeira-bcd (round 626): raw video to raw video, behind env.MADEIRA_WG_VPROC = 1 (Unity cutscenes through Wine's Video
+ * Processor MFT). Both tables; see that file's header. */
+#include "winegstreamer_vproc_ios.c"
+
 /***********************************************************************
  *           the unix call entries
  */
@@ -2072,6 +2076,7 @@ static NTSTATUS wma_transform_create( void *args )
 {
     struct wg_transform_create_params *params = args;
 
+    if (vproc_wanted( params )) return vproc_transform_create( params );
     if (IsEqualGUID( &params->input_type.major, &madeira_MFMediaType_Video ))
         return wmv_transform_create( params );
     return transform_create( params );
@@ -2081,6 +2086,7 @@ static NTSTATUS wma_transform_destroy( void *args )
 {
     wg_transform_t handle = *(wg_transform_t *)args;
 
+    if (vproc_is_handle( handle )) return vproc_destroy( handle );
     if (wmv_is_handle( handle )) return wmv_destroy( handle );
     return transform_destroy( handle );
 }
@@ -2089,6 +2095,7 @@ static NTSTATUS wma_transform_get_output_type( void *args )
 {
     struct wg_transform_get_output_type_params *params = args;
 
+    if (vproc_is_handle( params->transform )) return vproc_get_output_type( params->transform, &params->media_type );
     if (wmv_is_handle( params->transform )) return wmv_get_output_type( params->transform, &params->media_type );
     return transform_get_output_type( params->transform, &params->media_type );
 }
@@ -2097,6 +2104,7 @@ static NTSTATUS wma_transform_set_output_type( void *args )
 {
     struct wg_transform_set_output_type_params *params = args;
 
+    if (vproc_is_handle( params->transform )) return vproc_set_output_type( params->transform, &params->media_type );
     if (wmv_is_handle( params->transform )) return wmv_set_output_type( params->transform, &params->media_type );
     return transform_set_output_type( params->transform, &params->media_type );
 }
@@ -2107,6 +2115,8 @@ static NTSTATUS wma_transform_push_data( void *args )
     struct wg_sample *sample = params->sample;
 
     if (!sample) return STATUS_INVALID_PARAMETER;
+    if (vproc_is_handle( params->transform ))
+        return vproc_push_data( params->transform, sample, (const void *)(UINT_PTR)sample->data, &params->result );
     if (wmv_is_handle( params->transform ))
         return wmv_push_data( params->transform, sample, (const void *)(UINT_PTR)sample->data, &params->result );
     return transform_push_data( params->transform, sample,
@@ -2119,6 +2129,8 @@ static NTSTATUS wma_transform_read_data( void *args )
     struct wg_sample *sample = params->sample;
 
     if (!sample) return STATUS_INVALID_PARAMETER;
+    if (vproc_is_handle( params->transform ))
+        return vproc_read_data( params->transform, sample, (void *)(UINT_PTR)sample->data, &params->result );
     if (wmv_is_handle( params->transform ))
         return wmv_read_data( params->transform, sample, (void *)(UINT_PTR)sample->data, &params->result );
     return transform_read_data( params->transform, sample,
@@ -2130,6 +2142,7 @@ static NTSTATUS wma_transform_get_status( void *args )
     struct wg_transform_get_status_params *params = args;
     struct wma_transform *transform;
 
+    if (vproc_is_handle( params->transform )) return vproc_get_status( params->transform, &params->accepts_input );
     if (wmv_is_handle( params->transform )) return wmv_get_status( params->transform, &params->accepts_input );
     transform = get_transform( params->transform );
     if (!transform) return STATUS_INVALID_HANDLE;
@@ -2144,6 +2157,7 @@ static NTSTATUS wma_transform_drain( void *args )
     struct wma_transform *transform;
     NTSTATUS status;
 
+    if (vproc_is_handle( *(wg_transform_t *)args )) return vproc_drain( *(wg_transform_t *)args );
     if (wmv_is_handle( *(wg_transform_t *)args )) return wmv_drain( *(wg_transform_t *)args );
     transform = get_transform( *(wg_transform_t *)args );
     if (!transform) return STATUS_INVALID_HANDLE;
@@ -2175,6 +2189,7 @@ static NTSTATUS wma_transform_flush( void *args )
 {
     struct wma_transform *transform;
 
+    if (vproc_is_handle( *(wg_transform_t *)args )) return vproc_flush( *(wg_transform_t *)args );
     if (wmv_is_handle( *(wg_transform_t *)args )) return wmv_flush( *(wg_transform_t *)args );
     transform = get_transform( *(wg_transform_t *)args );
     if (!transform) return STATUS_INVALID_HANDLE;
@@ -2897,7 +2912,7 @@ static NTSTATUS wow64_wma_transform_create( void *args )
     media_type_from32( &params.output_type, &params32->output_type );
     params.attrs = params32->attrs;
 
-    status = transform_create( &params );
+    status = vproc_wanted( &params ) ? vproc_transform_create( &params ) : transform_create( &params );   /* madeira-bcd round 626 */
     params32->transform = params.transform;
     return status;
 }
@@ -2911,6 +2926,8 @@ static NTSTATUS wow64_wma_transform_push_data( void *args )
 
     if (!params32) return STATUS_INVALID_PARAMETER;
     if (!(sample = ios_wow_host_ptr( params32->sample ))) return STATUS_INVALID_PARAMETER;
+    if (vproc_is_handle( params32->transform ))
+        return vproc_push_data( params32->transform, sample, ios_wow_host_ptr( (ULONG)sample->data ), &params32->result );
     return transform_push_data( params32->transform, sample,
                                 ios_wow_host_ptr( (ULONG)sample->data ), &params32->result );
 }
@@ -2922,6 +2939,8 @@ static NTSTATUS wow64_wma_transform_read_data( void *args )
 
     if (!params32) return STATUS_INVALID_PARAMETER;
     if (!(sample = ios_wow_host_ptr( params32->sample ))) return STATUS_INVALID_PARAMETER;
+    if (vproc_is_handle( params32->transform ))
+        return vproc_read_data( params32->transform, sample, ios_wow_host_ptr( (ULONG)sample->data ), &params32->result );
     return transform_read_data( params32->transform, sample,
                                 ios_wow_host_ptr( (ULONG)sample->data ), &params32->result );
 }
@@ -2934,7 +2953,8 @@ static NTSTATUS wow64_wma_transform_get_output_type( void *args )
 
     if (!params32) return STATUS_INVALID_PARAMETER;
     media_type_from32( &type, &params32->media_type );
-    status = transform_get_output_type( params32->transform, &type );
+    status = vproc_is_handle( params32->transform ) ? vproc_get_output_type( params32->transform, &type )
+                                                    : transform_get_output_type( params32->transform, &type );
     /* OUT: the major type and the size the PE side must allocate.  The format
      * pointer itself is the caller's and is never written back. */
     params32->media_type.major = type.major;
@@ -2949,6 +2969,7 @@ static NTSTATUS wow64_wma_transform_set_output_type( void *args )
 
     if (!params32) return STATUS_INVALID_PARAMETER;
     media_type_from32( &type, &params32->media_type );
+    if (vproc_is_handle( params32->transform )) return vproc_set_output_type( params32->transform, &type );
     return transform_set_output_type( params32->transform, &type );
 }
 

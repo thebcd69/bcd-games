@@ -1,0 +1,129 @@
+[12:42:43.123] [INFO] Checking entitlements...
+[12:42:43.124] [INFO] [build] v0.1.623 (623)
+[12:42:43.124] [INFO] [device] model=iPhone17,5 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=7720MB available=6123MB cores=6
+[12:42:43.125] [INFO] [device] address-map=[0x100a74000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[12:42:43.137] [INFO] [device] settings: low-power=0 thermal=nominal screen=1170x2532@3.0x max-fps=60 utc-offset=+11:00 free-disk=57GB stikdebug-url=1
+[12:42:43.145] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[12:42:44.187] [INFO] [bcd] library launch GeoGuessr.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[12:42:44.208] [INFO] Running full Wine sequence...
+[12:42:44.208] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100a74000,0x8000000000) 512GB available=6110MB low-power=0 thermal=nominal
+[12:42:44.214] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[12:42:44.215] [INFO] Allocating 896MB JIT pool via debugger...
+[12:42:44.215] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[12:42:44.216] [INFO] [jit-debugger] attached=1 at the pool request
+[12:42:44.218] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 528MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[12:42:46.084] [INFO] RX pool at 0x11e55c000
+[12:42:46.128] [INFO] Detaching debugger...
+[12:42:46.136] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.964s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[12:42:46.509] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5568 MB + phys_footprint=575 MB = 6144 MB (hw.memsize says 7720 MB)
+ml985: map_image_view size=0xd898000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0xd898000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xd898000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[footprint] rev=ml358 phys=1009 MB (peak 1009) internal=1007 MB compressed=0 MB external=102 MB reusable=0 MB (cycle=1)
+[copy-verify] electron.exe: OK, 11121 .text pages executable (copy @0x11e560000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x12bdf8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x12bf32000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x12c34c000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x12c480000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x12c548000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module GeoGuessr.exe (geoguessr.exe-d9f581eafbe0aa2c): 148000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+D 24 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71FE2E0000
+D 24 Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71FE1C0000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FDFA0000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FDEB0000
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x12d3f8000)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x12d48c000)
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FD6D0000
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x12d530000)
+D 24 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): 71FD5A0000
+[copy-verify] bcrypt.dll: OK, 4 .text pages executable (copy @0x12d668000)
+D 24 Load module bcrypt.dll (bcrypt.dll-5a6e36eeb1a98b0b): 71FD510000
+[copy-verify] dwrite.dll: OK, 19 .text pages executable (copy @0x12d6fc000)
+D 24 Load module DWrite.dll (dwrite.dll-fbd06511c99dad9e): 71FD430000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] imm32.dll: OK, 5 .text pages executable (copy @0x12d7e0000)
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FD390000
+D 24 Load module bcryptprimitives.dll (bcryptprimitives.dll-b0b370acd9046023): 71FD310000
+[jumbo#1] +0ms tid=16fbbb000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0x800000000 (32768 MB) hint=0x2b3800000000 -> 0x7400000000 st=0x0 | granted=32768 MB ok=1 fail=0
+[jumbo#2] +0ms tid=16fbbb000 wtid=0024 peb=0x71ffff0000 nrip=0x14a3b258a grip=0x0 size=0x800000000 (32768 MB) hint=0x4f800000000 -> 0x7400000000 st=0x0 | granted=65536 MB ok=2 fail=0
+[jumbo#3] +0ms tid=16fbbb000 wtid=0024 peb=0x71ffff0000 nrip=0x14a3b258a grip=0x0 size=0x800000000 (32768 MB) hint=0x422800000000 -> 0x7400000000 st=0x0 | granted=98304 MB ok=3 fail=0
+[mmap-place] ml1027 NO GAP FITS size=0x1000000000 after 68418 regions (ceiling=0x8000000000 walk_stopped_at=0x8000000000 tail=0 MB gaps_seen=0, largest gap 32768 MB, walk 90 ms) -- the map really is full for this size
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0xfffff0000 — top window is full
+[pool-owner] searching 26 module copies for 3 granted pool bases...
+[jumbo#4] +175ms tid=16fbbb000 wtid=0024 peb=0x71ffff0000 nrip=0x14a3b258a grip=0x0 size=0xfffff0000 (65535 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=98304 MB ok=3 fail=1
+[alloc-fail] ml814 #1 status=c0000017 hint=0x0 size=0xfffff0000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x1000000000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000017 proc=geoguessr.exe tid=0024 size=0xfffff0000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=1 rev=ajan5-rockstar
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0xfffff0000 — top window is full
+[jumbo#5] +26ms tid=16fbbb000 wtid=0024 peb=0x71ffff0000 nrip=0x14fb1f817 grip=0x0 size=0xfffff0000 (65535 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=98304 MB ok=3 fail=2
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0xfffff0000 type=0x2000 protect=0x1 tid=0024 | STAGE=anon-mmap err=12 at 0x0+0x1000000000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000017 proc=geoguessr.exe tid=0024 size=0xfffff0000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 hits=2 rev=ajan5-rockstar
+[int3-guest] guest_rip=0x14fb1f615 x28=0x7c00801140 read=1 rev=ml554
+[int3-guest]   GUEST RAX=0x0000000000000072 RCX=0x000000702180fa64 RDX=0x000000012c048868 RBX=0x000000702180fb80 rev=ml578
+[int3-guest]   GUEST RSP=0x000000702180fa40 RBP=0x000000702180ffd0 RSI=0x0000000000000008 RDI=0x0000000154ecc100 rev=ml578
+[int3-guest]   GUEST R8=0x0000000000002000 R9=0x0000000000000001 R10=0x000000702180f960 R11=0x00000000c0000017 rev=ml578
+[int3-guest]   GUEST R12=0x0000000000000000 R13=0x0000000000000000 R14=0x0000000000000000 R15=0x0000000000000000 rev=ml578
+[int3-guest]   HOST x0 =0x000000702180fa64 x1 =0x000000012c048868 x2 =0x0000000000002000 x3 =0x0000000000000001
+[int3-guest]   HOST x8 =0x0000000000000072 x9 =0x000000002180fa40 x10=0x0000007c00801400 x11=0x0000000000000000
+[int3-guest]   HOST x12=0x0000000000000000 x13=0x0000000000000007 x14=0x0000000000000000 x15=0x000000000000020b
+[int3-guest]   HOST x16=0x000000012be519a4 x17=0x00000071fe3aff20 x18=0x00000071fffe0000 x19=0x0000000000000000
+[int3-guest]   HOST x20=0x0000000000000000 x21=0x0000000000000000 x22=0x0000000000000000 x23=0x000000702180fa40
+[int3-guest]   HOST x24=0x000000002180fa68 x25=0x0000000000000008 x26=0x0000000154ecc100 x27=0x000000702180fb80
+[int3-guest]   HOST x28=0x0000007c00801140 x29=0x000000702180ffd0 x30=0x000000013f558274 x31=0x0000000000000000
+[store-undecoded] #1 rev=ml350 insn=0xd4200000 pc=0x13f55852c addr=0x13f55852c rw_addr=0x7020ffc52c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=1 rip=0x14fb1f615 pc=0x13f55852c addr=0x13f55852c kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x13f558000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x13f55852c addr=0x13f55852c x18=0x71fffe0000 type=6 lr=0x13f558274 sp=0x71fe3b0000 x16=0x12be519a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x12607f615 (PE 0x14fb1f615): cc 0f 0b cc cc cc cc cc cc cc cc 48 83 ec 28 48
+[fault-host] 13f55842c: d63f0080 aa0003ea d53bd068 927df108 f9448d08 f94bc508 f940191c b9440b88
+[fault-host] 13f55844c: d51b4208 91070388 4cdf2d00 4cdf2d04 4cdf2d08 4cdf2d0c a9420388 a9436f81
+[fault-host] 13f55846c: a9447797 a9456b99 a9460f82 a9471784 a9485393 a9495b95 29426389 d53bd06b
+[fault-host] 13f55848c: 927df16b f9448d6b f94bc56b 3900057f d61f0140 d4400000 d4400000 d53b420a
+[fault-host] 13f5584ac: b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393
+[fault-host] 13f5584cc: a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000
+[fault-host] 13f5584ec: d53b420a b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784
+[fault-host] 13f55850c: a9085393 a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c
+[fault-host] 13f55852c: d4200000 d53b420a b9040b8a a9020388 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d44 4c9f2d48 4c9f2d4c [d4200000] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702184fe90 *(gs_cached+0x58)=0x702184fe90
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7021810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled exception 0x80000003 in thread 24 at address 000000014FB1F614 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000003) syscalls=0 unix_calls=507
+[unwind] term ml661 begin rip=12be76284 rsp=702180e298 window=[702180e298..702200e298) max=32
+[unwind] term ml661 #00 pc=12be76284 rsp=702180e298  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-2147483645)
+[WineProc] Wine exited with code -2147483645 (caught by longjmp)
+[WineProc] stopping wineserver...
+[12:42:47.710] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=1075MB limit=6143MB thermal=nominal lpm=0 api=D3D11/D3D12/64 res=1416x656 cap=60 game=Steam
+[frontend] returned to library
+[footprint] rev=ml358 phys=1085 MB (peak 1085) internal=1084 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=2)
+[12:42:49.456] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1086 MB (peak 1086) internal=1084 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml358 phys=1086 MB (peak 1086) internal=1085 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=1086 MB (peak 1086) internal=1085 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=5)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1086 MB (peak 1086) internal=1085 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=6)
+[footprint] rev=ml358 phys=1093 MB (peak 1093) internal=1091 MB compressed=0 MB external=135 MB reusable=0 MB (cycle=7)
+[footprint] rev=ml358 phys=1094 MB (peak 1094) internal=1093 MB compressed=0 MB external=138 MB reusable=0 MB (cycle=8)

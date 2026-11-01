@@ -182,7 +182,11 @@ fi
 # Discord Social SDK) imports qwave.dll, Windows' quality-of-service API; the 64-bit set lacks it, the plugin cannot load, and the IL2CPP
 # game ends with "UnhandledExceptionHandler caught: Unable to load DLL 'discord_partner_sdk'" 16 s into the start. A Mono Unity game
 # (Mycopunk, BP35FG/NEQQN0) logs the same import failure and goes on, so it is opt-in. Wine's qwave imports nothing beyond the kernel.
-OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave"
+# msvproc (2026-10-31, round 626, agent V; Unity cutscenes: Silksong DF0537, Hollow Knight H3SBFV): the source reader creates Wine's Video
+# Processor MFT (CLSID_VideoProcessorMFT, registered in the prefix as C:\windows\system32\msvproc.dll) to turn the media source's NV12
+# into the RGB picture Unity asks for; only the 32-bit set has msvproc.dll. With env.MADEIRA_WG_VPROC = 1 BCD's winegstreamer does the
+# conversion (winegstreamer_vproc_ios.c). Its imports (combase, mfplat, uuid libraries) all ship.
+OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc"
 OPT=""
 if [ "${MADEIRA_OPTIN_BUILD:-1}" != 0 ]; then
     for d in $OPTIN_WANT; do

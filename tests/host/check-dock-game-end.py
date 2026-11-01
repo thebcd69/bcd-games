@@ -210,6 +210,21 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
                 "within the 3 s grace (a launcher that hands over to the game): wait")
         require(verdictAsked([dockhost, ended(game, 0, ago: 60), runs(cuphead)]) == .wait(status: 0, file: "game.exe", why: "game-still-runs"),
                 "Close while a program of the game runs: wait (the Alt+F4 closes it as before)")
+        // ---- round 626 (agent P S11; BV5WT9 and 13 archive sessions): after Close, Rockstar's resident launcher is not the game
+        let rdr2 = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Red Dead Redemption 2\\RDR2.exe"
+        let rLauncher = "C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe"
+        let rService = "C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe"
+        require(verdictAsked([dockhost, ended(rdr2, 0, ago: 6, lived: 900), runs(rLauncher), runs(rService), runs(rService)])
+                    == .end(status: 0, file: "rdr2.exe", lived: 900),
+                "Close, RDR2 ended 0, the host finished, only Rockstar's launcher and service run: end with the game's status")
+        require(verdictAsked([dockhost, ended(rService, 0xC0000135, ago: 300), ended(rdr2, 0, ago: 6, lived: 900), runs(rLauncher)])
+                    == .end(status: 0, file: "rdr2.exe", lived: 900),
+                "an earlier RockstarService.exe that ended with c0000135 is not shown as the game's crash")
+        require(verdict([dockhost, ended(rdr2, 0, ago: 60), runs(rLauncher)]) == .none,
+                "without the Close the launcher still counts (today's behaviour)")
+        require(R.isResidentLauncher("C:\\Program Files (x86)\\Rockstar Games\\Social Club\\SocialClubHelper.exe")
+                && !R.isResidentLauncher(rdr2) && !R.isResidentLauncher(cuphead),
+                "the resident launcher is Rockstar's folder only")
         require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: true, gameOver: true, finished: false))
                 == .wait(status: 0, file: "cuphead.exe", why: "host-not-finished"), "the host has not finished: wait")
         require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: false, gameOver: false, finished: false))

@@ -1,0 +1,151 @@
+[00:23:06.045] [INFO] Checking entitlements...
+[00:23:06.046] [INFO] [build] v0.1.623 (623)
+[00:23:06.046] [INFO] [device] model=iPad16,10 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11845MB available=12266MB cores=8
+[00:23:06.046] [INFO] [device] address-map=[0x104d5c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[00:23:06.063] [INFO] [device] settings: low-power=0 thermal=fair screen=2048x2732@2.0x max-fps=60 utc-offset=+08:00 free-disk=54GB stikdebug-url=1
+[00:23:06.066] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:23:12.921] [INFO] [steam-start] app=21690 mode=game
+[00:23:13.994] [INFO] [steam-start] app=21690 launch-entries=1 programs=2 source=steam
+[00:23:15.096] [INFO] [steam-start] app=21690 direct source=steam args=0 folder=program
+[00:23:15.101] [INFO] [bcd] library launch Resident Evil 5: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[00:23:15.121] [INFO] Running full Wine sequence...
+[00:23:15.121] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104d5c000,0x8000000000) 512GB available=12245MB low-power=0 thermal=fair
+[00:23:15.530] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[00:23:15.531] [INFO] Allocating 896MB JIT pool via debugger...
+[00:23:15.531] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:23:15.531] [INFO] [jit-debugger] attached=1 at the pool request
+[00:23:15.532] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[00:23:17.311] [INFO] RX pool at 0x148000000
+[00:23:17.338] [INFO] Detaching debugger...
+[00:23:17.343] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.851s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[Wine init_process] waiting for request_fd from wineserver...
+[00:23:17.653] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[00:23:17.653] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=21690
+ml992: os_proc_available_memory=11667 MB + phys_footprint=620 MB = 12288 MB (hw.memsize says 11845 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x22000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[footprint] rev=ml358 phys=632 MB (peak 632) internal=632 MB compressed=0 MB external=105 MB reusable=18 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7022120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7022220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7022420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7022820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7023020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7023ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7024fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7025f90000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x113bf8d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Launcher.exe (launcher.exe-0fb481bbc57f131a): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module MSVCR80.dll (msvcr80.dll-7a47e1b2fb8b29b3): 717BB90000
+D 24 Load module msvcrt.dll (msvcrt.dll-23622f236d91ec13): 717BAE0000
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Resident Evil 5\\re5dx9.exe" t+  2.278s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"re5dx9.exe\"" (fd=76, unixdir=80, dup_unixdir=85) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Resident Evil 5\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=borrowed
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+[file-fail] ml665 #26 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[bigres] tid=002c #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=512 MB
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+ml957: ? backing 0x727b828000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x727aa80000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x14acd7000)
+ml957: ? backing 0x727a9b0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14acef000)
+ml957: ? backing 0x727a898000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x14ad0f000)
+ml957: ? backing 0x727a86c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x14ad23000)
+ml957: ? backing 0x727a7a8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 6 .text pages executable (copy @0x14ad40000)
+[gdi-shared] session table 0x702cac0000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[nls-getptr] type=11 id=10000 peb=0x7200310000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14ad7b000)
+ml957: ? backing 0x727a4e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[stale-heal]   3 slot(s) in the copy of 0x70ff250000 (libwow64fex.dll) -> 0x14a357294 for peb=0x7200310000 (owner=0x0 mapper=0x7200310000)
+ml957: ? backing 0x7210000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+002c:err:seh:ios_steam_api_diag [steam-api] steam_api found no running Steam; process 0028 sees:
+ml957: ? backing 0x7278fb4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7278f64000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module MSWSOCK.dll (mswsock.dll-e1bbefc99a17481f): 7278DE0000
+D 2C Load module Secur32.dll (secur32.dll-f6f7ee0cf98e259c): 7278DB0000
+D 2C Load module Kerberos.dll (kerberos.dll-a465a4dc50344d0c): 7278D90000
+D 2C Load module MSV1_0.dll (msv1_0.dll-fe14d41517692ae9): 7278D90000
+ml957: ? backing 0x7278d7c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module netapi32.dll (netapi32.dll-67f045b4a9a70ff4): 7278D60000
+ml957: ? backing 0x7278d44000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 2C Load module netutils.dll (netutils.dll-77547757313a186e): 7278D40000
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x35) syscalls=0 unix_calls=488
+[Wine ntdll/server] process_exit_wrapper(53): closing child fd_socket=84
+[wow-window] slot 1 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(53)
+[footprint] rev=ml358 phys=801 MB (peak 801) internal=800 MB compressed=0 MB external=113 MB reusable=18 MB (cycle=2)
+[guest-stk] lr 0x148240b3c = libwow64fex.dll+0xafb3c
+[guest-stk] sp+0xe8 0x1482945f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x148 0x14829457c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x268 0x148294574 = libwow64fex.dll+0x103574
+[footprint] rev=ml358 phys=801 MB (peak 801) internal=800 MB compressed=0 MB external=113 MB reusable=18 MB (cycle=3)
+[footprint] rev=ml358 phys=801 MB (peak 801) internal=800 MB compressed=0 MB external=113 MB reusable=18 MB (cycle=4)
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=799 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=5)
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=799 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b95d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=798 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=13)
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=798 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=14)
+[footprint] rev=ml358 phys=800 MB (peak 801) internal=799 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=15)
+[launch-view] dismissed reason=button logs=0
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=16 resident=932MB dbg=DEBUGGED rev=ml525
+[00:23:47.575] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[footprint] rev=ml358 phys=800 MB (peak 801) internal=799 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=16)
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=797 MB compressed=0 MB external=113 MB reusable=20 MB (cycle=17)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=799 MB (peak 801) internal=798 MB compressed=0 MB external=122 MB reusable=20 MB (cycle=18)
+[00:23:52.469] [INFO] [session] length=37s partial=1 play=0s frames=0 stalls=0/0s peak=815MB limit=12287MB thermal=fair lpm=0 api=D3D9/32 res=1112x832 cap=60 game=Resident Evil 5

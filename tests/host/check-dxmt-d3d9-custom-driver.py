@@ -126,8 +126,8 @@ check('the sync looks the file up through BCDGPUCards.prefsFile and writes only 
 # --- New Vegas's list and the auto-tune rule --------------------------------------------------------------------------------------
 recs = json.loads(read('recommended/recommendations.json'))
 fnv = [r for r in recs['rules'] if r['id'] == 'fallout-new-vegas']
-check('New Vegas\'s list gives the card from build 623 (v3)',
-      len(fnv) == 1 and {'line': 'gpu-card = nvidia-7900gs', 'minBuild': 623} in fnv[0]['config'] and fnv[0]['version'] == 3)
+check('New Vegas\'s list gives the card from build 623 (v3; v4, round 626: the DirectX setup skip)',
+      len(fnv) == 1 and {'line': 'gpu-card = nvidia-7900gs', 'minBuild': 623} in fnv[0]['config'] and fnv[0]['version'] == 4)
 rules = read('build/tools/autotune_rules.py')
 a = rules.find('"id": "fallout-nv-older-nvidia-card"')
 rule = rules[a:rules.find('\n    },', a)]

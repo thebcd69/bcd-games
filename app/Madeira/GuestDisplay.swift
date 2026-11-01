@@ -182,6 +182,7 @@ enum ResolutionChoices {
     /// library entries (whose default comes from it) are also made off it.
     static var screen: Screen = {
         #if canImport(UIKit)
+        if let inner = BCDFoldable.innerScreen { return Screen(points: inner.points, pixels: inner.pixels) }   // madeira-bcd foldable (experimental): the foldable iPhone with its switch on takes the inner display's shape (UIScreen.main is ambiguous there); nil, and nothing changes, everywhere else
         let b = UIScreen.main.bounds, n = UIScreen.main.nativeBounds
         return Screen(points: CGSize(width: max(b.width, b.height), height: min(b.width, b.height)),
                       pixels: CGSize(width: max(n.width, n.height), height: min(n.width, n.height)))

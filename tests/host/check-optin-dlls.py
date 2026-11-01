@@ -65,6 +65,32 @@ check('a listed one is linked as <name>.dll in sysx64, and system32 too in an AR
       and 'createSymbolicLinkAtPath:dst withDestinationPath:src' in blk)
 check('one not listed loses only a link of ours', '[to.lastPathComponent isEqualToString:file]' in blk and
       blk.count('removeItemAtPath:dst') == 2)
+# Round 626 (Slay the Spire 2 through BCD Dock, 1FJAWW): in an ARM64 (explorer.exe) session system32 holds the ARM64 set plus the
+# ARM64EC files it lacks (the cross-link pass), and an x64 program loads system32's dcomp.dll before it ever looks in sysx64 (the
+# loader's mixed-arch fallback runs only on a wrong-architecture or missing file): the game ran Wine's dcomp.dll, not dcomp-optin.dll.
+check('round 626: in an ARM64 session a listed name that an ARM64EC <name>.dll ships for and the ARM64 set does not is linked in '
+      'system32 too, and the line says so',
+      'BOOL shadowed = !use_arm64ec\n                            && [fm fileExistsAtPath:[ecDir stringByAppendingPathComponent:dll]]\n'
+      '                            && ![fm fileExistsAtPath:[[bundlePath stringByAppendingPathComponent:@"aarch64-windows"] stringByAppendingPathComponent:dll]];' in blk
+      and '(shadowed ? [optDirs arrayByAddingObject:sys32Dir] : optDirs)' in blk
+      and 'shadowed ? "; also in system32, where Wine\'s own file would come first" : ""' in blk)
+loader = Path(os.environ.get('WINE_SRC') or (root / 'wine')) / 'dlls/ntdll/loader.c'
+if loader.exists():
+    lt = loader.read_text(errors='replace')
+    fb = lt[lt.index('iOS-Madeira mixed-arch pseudo-processes'):]
+    fb = fb[:fb.index('#endif')]
+    check('the loader looks in sysx64 only when system32 has the wrong architecture or nothing (why the system32 link is needed)',
+          'if (status == STATUS_INVALID_IMAGE_FORMAT || status == STATUS_DLL_NOT_FOUND)' in fb and 'sysx64' in fb)
+else:
+    print('skip the loader check (no Wine tree here; WINE_SRC names one)')
+ec_set = root / 'app/Madeira/arm64ec-windows'
+aa_set = root / 'app/Madeira/aarch64-windows'
+if any(ec_set.glob('*-optin.dll')) and any(aa_set.glob('*.dll')):
+    shadowed = sorted(f.name[:-10] for f in ec_set.glob('*-optin.dll')
+                      if (ec_set / (f.name[:-10] + '.dll')).exists() and not (aa_set / (f.name[:-10] + '.dll')).exists())
+    check('of the shipped opt-in DLLs only dcomp is shadowed that way (%s)' % shadowed, shadowed == ['dcomp'])
+else:
+    print('skip the shipped-set check (no built DLL sets in this tree)')
 check('it says what it linked, and what it could not', 'MADEIRA_OPTIN_DLLS: %s -> %s' in blk and
       'which this build does not ship as %s-optin.dll' in blk)
 check('the switch ends with the session', 'unsetenv("MADEIRA_OPTIN_DLLS");' in bridge)

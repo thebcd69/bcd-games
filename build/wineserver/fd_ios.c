@@ -1251,6 +1251,10 @@ static inline void main_loop_epoll(void) { }
 
 
 /* add a user in the poll array and return its index, or -1 on failure */
+/* madeira-bcd (round 626, agent R S1): env.MADEIRA_SRV_POLLOUT_GUARD = 1 (default off). See ios_tcp_unconnected. */
+static int ios_pollout_guard;
+static void ios_fd_class_forget( int user );
+
 static int add_poll_user( struct fd *fd )
 {
     int ret;
@@ -1286,6 +1290,7 @@ static int add_poll_user( struct fd *fd )
     pollfd[ret].events = 0;
     pollfd[ret].revents = 0;
     poll_users[ret] = fd;
+    if (ios_pollout_guard) ios_fd_class_forget( ret );   /* madeira-bcd (round 626): a recycled slot is a new object */
     active_users++;
     {
         static unsigned long logged;   /* madeira-bcd: ios_srv_log_sample */
@@ -1303,6 +1308,7 @@ static void remove_poll_user( struct fd *fd, int user )
 
     remove_epoll_user( fd, user );
     pollfd[user].fd = -1;
+    if (ios_pollout_guard) ios_fd_class_forget( user );   /* madeira-bcd (round 626) */
     pollfd[user].events = 0;
     pollfd[user].revents = 0;
     poll_users[user] = (struct fd *)freelist;
@@ -1438,20 +1444,30 @@ static void ios_doorbell_service(void)
  * loops in winhttp. So INET fds get a real zero-timeout poll() each
  * iteration; pipes and the AF_UNIX pair keep the legacy synthesis.
  * Family is cached per (user,fd) — getsockname once per socket. */
+/* madeira-bcd (round 626): the class cache at file scope, so a recycled poll slot can forget it (ios_fd_class_forget, only with
+ * env.MADEIRA_SRV_POLLOUT_GUARD = 1); cache_peer: 0 unknown, 1 seen connected, 2 not a TCP stream (ios_tcp_unconnected). */
+static int *cache_fd;
+static signed char *cache_val;
+static unsigned char *cache_peer;
+static int cache_size;
+
 static signed char ios_fd_is_inet( int user, int fd )
 {
-    static int *cache_fd;
-    static signed char *cache_val;
-    static int cache_size;
-
     if (user >= cache_size)
     {
         int newsize = (user + 64) & ~63;
         int *nfd = realloc( cache_fd, newsize * sizeof(*nfd) );
-        signed char *nval = realloc( cache_val, newsize );
-        if (!nfd || !nval) return 0;
+        signed char *nval;
+        unsigned char *npeer;
+        if (!nfd) return 0;
+        cache_fd = nfd;
+        if (!(nval = realloc( cache_val, newsize ))) return 0;
+        cache_val = nval;
+        if (!(npeer = realloc( cache_peer, newsize ))) return 0;
+        cache_peer = npeer;
         memset( nfd + cache_size, 0xff, (newsize - cache_size) * sizeof(*nfd) );
-        cache_fd = nfd; cache_val = nval; cache_size = newsize;
+        memset( npeer + cache_size, 0, newsize - cache_size );
+        cache_size = newsize;
     }
     /* ml579: CACHE RESTORED. The ml576 A/B ran 30.8M classifications across two
      * runs and found the cache would have been wrong TWICE, with ZERO of the
@@ -1469,12 +1485,53 @@ static signed char ios_fd_is_inet( int user, int fd )
         struct sockaddr_storage ss;
         socklen_t slen = sizeof(ss);
         cache_fd[user] = fd;
+        cache_peer[user] = 0;
         if (getsockname( fd, (struct sockaddr *)&ss, &slen ) == -1)
             cache_val[user] = 0;
         else
             cache_val[user] = (ss.ss_family == AF_INET || ss.ss_family == AF_INET6);
     }
     return cache_val[user];
+}
+
+/* pollout-guard-test:begin (tests/host/check-fd-pollout-guard.py compiles this region with the cache above) */
+static void ios_fd_class_forget( int user )
+{
+    if (user >= 0 && user < cache_size) { cache_fd[user] = -1; cache_peer[user] = 0; }
+}
+
+/* madeira-bcd (round 626, agent R S1; the Rockstar launcher M443E0, PN6QF2, a class of 172 archive logs): a TCP stream socket with no
+ * peer yet cannot have completed its connect. The poll loop synthesizes POLLOUT for every fd it classes as not INET, and the class
+ * cache kept the class of a recycled (user, fd) pair, so a new INET socket on an old pipe's slot and fd number got a connect completion
+ * at once; the program sent and the kernel answered ENOTCONN ("[sock-big] send ERROR ... errno=57"). With the guard on, such a POLLOUT
+ * is withheld (and the class forgotten, so the next pass polls the socket for real); POLLERR/POLLHUP are never touched. 1: withhold. */
+static int ios_tcp_unconnected( int user, int fd )
+{
+    struct sockaddr_storage ss;
+    socklen_t sl = sizeof(ss), tl;
+    int type = 0;
+    int cached = user >= 0 && user < cache_size && cache_fd[user] == fd;
+
+    if (cached && cache_peer[user]) return 0;                    /* seen connected, or not a TCP stream, for this (user, fd) */
+    tl = sizeof(type);
+    if (getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &tl ) || type != SOCK_STREAM ||
+        getsockname( fd, (struct sockaddr *)&ss, &sl ) || (ss.ss_family != AF_INET && ss.ss_family != AF_INET6))
+    {
+        if (cached) cache_peer[user] = 2;
+        return 0;
+    }
+    sl = sizeof(ss);
+    if (!getpeername( fd, (struct sockaddr *)&ss, &sl )) { if (cached) cache_peer[user] = 1; return 0; }
+    return errno == ENOTCONN;
+}
+/* pollout-guard-test:end */
+
+static void ios_pollout_guard_said( int user, int fd, int synthesized )
+{
+    static int said;
+    if (said++ < 8)
+        ws_log( "[srv-pollout-guard] ml626 user=%d fd=%d: POLLOUT withheld, the TCP socket has no peer (synthesized=%d)",
+                user, fd, synthesized );
 }
 
 void main_loop(void)
@@ -1549,7 +1606,10 @@ void main_loop(void)
         ws_log("[wineserver-fd] iOS poll loop: master_fd=%d nb_users=%d active=%d", pollfd[0].fd, nb_users, active_users);
         {
             kern_return_t skr;
+            char pgb[16]; const char *pg = ios_srv_switch( "MADEIRA_SRV_POLLOUT_GUARD", pgb, sizeof(pgb) );  /* round 626 (R S1): 1 = on; off by default */
             char wcb[16]; const char *wc = ios_srv_switch( "MADEIRA_SRV_WAKE_COALESCE", wcb, sizeof(wcb) );  /* 0: one wake signal per request, as before */
+            ios_pollout_guard = pg && pg[0] == '1' && !pg[1];
+            if (ios_pollout_guard) ws_log( "[wineserver-fd] ml626 POLLOUT guard on: no connect completion for a TCP socket without a peer (env.MADEIRA_SRV_POLLOUT_GUARD)" );
             ios_srv_wake_coalesce = !(wc && wc[0] == '0' && !wc[1]);
             ws_log("[wineserver-fd] coalesced request wake: %s (MADEIRA_SRV_WAKE_COALESCE=0 disables)",
                    ios_srv_wake_coalesce ? "on" : "off");
@@ -1850,6 +1910,13 @@ void main_loop(void)
                             int u = rp_user[k];
                             if (!rp[k].revents) continue;
                             if (pollfd[u].fd != rp[k].fd) continue;
+                            if (ios_pollout_guard && (rp[k].revents & POLLOUT) && !(rp[k].revents & (POLLERR | POLLHUP)) &&
+                                ios_tcp_unconnected( u, rp[k].fd ))   /* madeira-bcd (round 626, R S1) */
+                            {
+                                rp[k].revents &= ~POLLOUT;
+                                ios_pollout_guard_said( u, rp[k].fd, 0 );
+                                if (!rp[k].revents) continue;
+                            }
                             ios_events_fired++; ios_c_inet++;
                             fd_poll_event( poll_users[u], rp[k].revents );
                         }
@@ -1863,6 +1930,13 @@ void main_loop(void)
                         int u = rp_user[k];
                         if (!rp[k].revents) continue;
                         if (pollfd[u].fd != rp[k].fd) continue;  /* user removed mid-dispatch */
+                        if (ios_pollout_guard && (rp[k].revents & POLLOUT) && !(rp[k].revents & (POLLERR | POLLHUP)) &&
+                            ios_tcp_unconnected( u, rp[k].fd ))   /* madeira-bcd (round 626, R S1) */
+                        {
+                            rp[k].revents &= ~POLLOUT;
+                            ios_pollout_guard_said( u, rp[k].fd, 0 );
+                            if (!rp[k].revents) continue;
+                        }
                         ios_events_fired++; ios_c_inet++;
                         fd_poll_event( poll_users[u], rp[k].revents );
                     }
@@ -1918,8 +1992,16 @@ void main_loop(void)
 
                     if (pollfd[i].events & POLLOUT)
                     {
-                        revents |= POLLOUT;
-                        ios_c_synout++;
+                        if (ios_pollout_guard && ios_tcp_unconnected( i, pollfd[i].fd ))   /* madeira-bcd (round 626, R S1) */
+                        {
+                            ios_fd_class_forget( i );   /* the next pass classes it again and polls it for real */
+                            ios_pollout_guard_said( i, pollfd[i].fd, 1 );
+                        }
+                        else
+                        {
+                            revents |= POLLOUT;
+                            ios_c_synout++;
+                        }
                     }
 
                     if (revents)

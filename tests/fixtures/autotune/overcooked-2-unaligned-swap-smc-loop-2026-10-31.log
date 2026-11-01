@@ -1,0 +1,836 @@
+[11:57:31.731] [INFO] Checking entitlements...
+[11:57:31.731] [INFO] [build] v0.1.623 (623)
+[11:57:31.732] [INFO] [device] model=iPad16,10 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11845MB available=12266MB cores=8
+[11:57:31.732] [INFO] [device] address-map=[0x1025c8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[11:57:31.752] [INFO] [device] settings: low-power=0 thermal=fair screen=2048x2732@2.0x max-fps=60 utc-offset=+08:00 free-disk=57GB stikdebug-url=1
+[11:57:31.756] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:57:34.627] [INFO] [bcd] library launch Overcooked! 2: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[11:57:34.636] [INFO] [dock-launch] image-retire=1
+[11:57:34.637] [INFO] [dock-launch] image-map-guard=1
+[11:57:34.964] [INFO] [dock-installers] app=728880 program=dxsetup file=DXSETUP.exe status=done key=HKLM\Software\Valve\Steam\Apps\CommonRedist\DirectX\Jun2010 recorded=1 minimum=1 machine=0x14c
+[11:57:35.047] [INFO] [dock-installers] app=728880 program=x86 sp1 file=vcredist_x86.exe status=done key=HKLM\Software\Valve\Steam\Apps\CommonRedist\vcredist\2005 recorded=1 minimum=1 machine=0x14c
+[11:57:35.130] [INFO] [dock-installers] app=728880 program=x64 sp1 file=vcredist_x64.exe status=done key=HKLM\Software\Valve\Steam\Apps\CommonRedist\vcredist\2005 recorded=1 minimum=1 machine=0x14c
+[11:57:35.130] [INFO] [dock-installers] app=728880 scripts=4 programs=3 pending=0 done=3 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[11:57:35.132] [INFO] [madeira-dock] starting the host for app 728880; Valve's client authenticates and authorizes the launch
+[11:57:35.150] [INFO] Running full Wine sequence...
+[11:57:35.150] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1025c8000,0x8000000000) 512GB available=12235MB low-power=0 thermal=fair
+[11:57:36.007] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:57:36.007] [INFO] Allocating 896MB JIT pool via debugger...
+[11:57:36.007] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:57:36.008] [INFO] [jit-debugger] attached=1 at the pool request
+[11:57:36.010] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:57:38.303] [INFO] RX pool at 0x148000000
+[11:57:38.335] [INFO] Detaching debugger...
+[11:57:38.340] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.388s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[11:57:38.784] [Wine init_process] reply_pipe=41, sending init_first_thread...
+ml992: os_proc_available_memory=11606 MB + phys_footprint=681 MB = 12288 MB (hw.memsize says 11845 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[free-delay] #1 release of 0x7025e00000+0x100000 held for 2000 ms (1 in flight)
+[gdi-shared] session table 0x7026050000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=693 MB (peak 693) internal=692 MB compressed=0 MB external=106 MB reusable=10 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #5 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  3.040s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x10e4f0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  3.120s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 10E4F0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m84923 "wine-x18-exc"
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001FC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+0050:err:module:import_dll Loading library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+[footprint] rev=ml358 phys=994 MB (peak 994) internal=993 MB compressed=0 MB external=176 MB reusable=10 MB (cycle=2)
+0050:err:module:import_dll Loading library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:module:import_dll Loading library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") failed (error c000007b).
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[free-delay] #2 release of 0x7038010000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7038810000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7039fe0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #5 release of 0x703afb0000+0xfd0000 held for 2000 ms (4 in flight)
+[footprint] rev=ml358 phys=1149 MB (peak 1149) internal=1147 MB compressed=0 MB external=180 MB reusable=10 MB (cycle=3)
+[file-wfail] ml669 #54 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #55 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #56 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #57 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1178 MB (peak 1178) internal=1176 MB compressed=0 MB external=180 MB reusable=10 MB (cycle=4)
+[free-delay] #6 release of 0x7030eb0000+0x110000 held for 2000 ms (1 in flight)
+[free-delay] #7 release of 0x7030fc0000+0x110000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x70310d0000+0x110000 held for 2000 ms (3 in flight)
+[footprint] rev=ml358 phys=1350 MB (peak 1350) internal=1349 MB compressed=0 MB external=180 MB reusable=10 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2.exe" t+ 11.970s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2.exe\"" (fd=551, unixdir=552, dup_unixdir=556) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f54b0000, then OCCUPIED 0x71f54b0000+0x40000 prot=3/7 shared=0 (0xab50000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+00d8:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7900400000 transfer=0x79004a1310 window=0x7900000000 guest_base=0x400000
+[nls-getptr] type=11 id=1252 peb=0x7900310000
+[nls-getptr] type=11 id=437 peb=0x7900310000
+00d8:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f5080000+0x3bc000 (libwow64fex.dll) → pool 0x151c51000 used=0xa015000/0x25000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f5080000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #110 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[bigres] tid=00d8 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x71f5080000) -> 64-bit table (0x1113f8d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x7900310000
+[nls-getptr] type=11 id=437 peb=0x7900310000
+ml957: ? backing 0x797a778000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a3d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a328000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x79797f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x79796c8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[11:57:48.149] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[unixlib] opengl32 (GL-absent stub table) (module 0x79798e0000) -> wow64 table (0x111400d00)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x152571000)
+ml957: ? backing 0x7977e4c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7977e14000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=1519 MB (peak 1519) internal=1517 MB compressed=0 MB external=185 MB reusable=10 MB (cycle=6)
+[file-wfail] ml669 #111 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[11:57:49.149] [INFO] [dock-report] launch-game-running=1
+E D8 [mono-cfg] ml623 module=mono.dll base=0x7910000000 xend=0x791013269d | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x100000 type=0x3000 protect=0x40
+[stp-emul] ml629 #1 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x79051a0000 rw=0x700a5c0000 base 0x79051a0000 -> 0x79051a0020 (writeback)
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x40001 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x40001 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x40001 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #6 req_addr=0x0 size=0x40001 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #7 req_addr=0x0 size=0x100000 type=0x3000 protect=0x40
+[stp-emul] ml629 #2 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7905770030 rw=0x700a6c0030 base 0x7905770030 -> 0x7905770050 (writeback)
+[stp-emul] ml629 #3 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7905770078 rw=0x700a6c0078 base 0x7905770078 -> 0x7905770098 (writeback)
+[stp-emul] ml629 #4 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7905770098 rw=0x700a6c0098 base 0x7905770098 -> 0x79057700b8 (writeback)
+[stp-emul] ml629 #5 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x79057700b8 rw=0x700a6c00b8 base 0x79057700b8 -> 0x79057700d8 (writeback)
+[stp-emul] ml629 #6 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x79057700d8 rw=0x700a6c00d8 base 0x79057700d8 -> 0x79057700f8 (writeback)
+[stp-emul] ml629 #7 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7905770118 rw=0x700a6c0118 base 0x7905770118 -> 0x7905770138 (writeback)
+[swp-emul] ml626 #1 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770040 rw=0x700a6c0040 in=0xd4 old=0x10
+[swp-emul] ml626 #2 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770128 rw=0x700a6c0128 in=0x1c old=0x10
+[stp-emul] ml629 #8 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7905770160 rw=0x700a6c0160 base 0x7905770160 -> 0x7905770180 (writeback)
+[swp-emul] ml626 #3 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770170 rw=0x700a6c0170 in=0xffffffa4 old=0xfffffee0
+[swp-emul] ml626 #4 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770128 rw=0x700a6c0128 in=0x1c old=0x1c
+[swp-emul] ml626 #5 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770198 rw=0x700a6c0198 in=0xffffff7c old=0xfffffeb8
+[swp-emul] ml626 #6 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x7905770128 rw=0x700a6c0128 in=0x1c old=0x1c
+[swp-emul] ml626 #7 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x79057701b8 rw=0x700a6c01b8 in=0x1c old=0x10
+[swp-emul] ml626 #8 insn=0xb8e48304 size=4 Rs=x4 Rt=x4 addr=0x79057701e8 rw=0x700a6c01e8 in=0xffffff2c old=0xfffffe68
+[win-name] #33 hwnd=0x10066 class='' text="Default IME" rev=ml853
+ml957: ? backing 0x7977a1c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D D8 Load module wbemprox.dll (wbemprox.dll-327d7b2744d72f2e): 79778A0000
+D D8 Load module winspool.drv (winspool.drv-1d97ce048bbb982f): 7977860000
+ml957: ? backing 0x7977840000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D D8 Load module compstui.dll (compstui.dll-6ca7db67abfd3bb9): 7977830000
+D D8 Load module comctl32.dll (comctl32.dll-8c5c2d137b4d13fc): 79776F0000
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Team17/Overcooked2/output_log.txt
+[guest-log] #1 tid=00d8     Renderer: Apple M4 GPU (ID=0x0)
+[stale-heal]   3 slot(s) in the copy of 0x71f5080000 (libwow64fex.dll) -> 0x151b33294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=18 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+ml957: ? backing 0x79776d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D D8 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbfcb18f): 79776B0000
+ml957: ? backing 0x7977694000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 184 Load module avrt.dll (avrt.dll-cbfea88ff176fa3f): 7977690000
+00d8:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.UnityWebRequestModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.UnityWebRequestAudioModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:module:load_dll [dll-missing] rev=ml336 #45 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.UnityWebRequestTextureModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:module:load_dll [dll-missing] rev=ml336 #46 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.UnityWebRequestWWWModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.VideoModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00d8:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Overcooked! 2\\Overcooked2_Data\\Managed\\UnityEngine.WindModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swp-emul] ml626 #1 REFUSING unaligned atomic: insn=0xb8e48304 size=4 addr=0x790577020f rw=0x700a6c020f
+[store-undecoded] #1 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x790577020f rw_addr=0x700a6c020f — alias OK, ADD THIS ENCODING to the case-4 emulator
+[unaligned-atomic] mach-path pc=0x16b69a874 insn=0xb8e48304 addr=0x790577020f handed to FEX as 80000002 (was c0000005 before 2026-09-19) emu=0 to-fex=1
+[excl-store] ml1284 #1 insn=0x880bff4a size=4 ea=0x7905770210 load-reg=11 delta=0 emulated
+[excl-store] ml1284 #2 insn=0x880afec8 size=4 ea=0x790577020c load-reg=10 delta=0 emulated
+[swp-emul] ml626 #2 REFUSING unaligned atomic: insn=0xb8e48304 size=4 addr=0x79057702c7 rw=0x700a6c02c7
+[store-undecoded] #2 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #1 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16b69a874 addr=0x79057702c7 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7905770000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16b69a874 addr=0x79057702c7 x18=0x7900300000 type=1 lr=0x16b85d128 sp=0x12baef350 x16=0x7c2452c080 x17=0x1002891d
+[guest-code] rev=ml333 pool_rip=0x1002891d (PE 0x1002891d) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xccf6e0 x9=0xccf708 x10=0x4d x11=0x57702c7 x0=0x16b69a850 x2=0x151e2e4f9 | teb=0x7900300000 peb=0x7900310000 peb->EcCodeBitMap=0x0
+[fault-host] 16b69a774: 00000000 1011070a 00000000 fffffdd0 ffffffff 14000002 d61f0000 58000100
+[fault-host] 16b69a794: d63f0000 00000000 00000000 1010d2ab 00000000 fffffe0c ffffffff 6bff8108
+[fault-host] 16b69a7b4: 00000001 0000079c 00000000 1010d8a7 00000000 00000100 00000000 0000004f
+[fault-host] 16b69a7d4: 00000028 00000000 00000000 03800180 01008102 01078954 45431072 34660380
+[fault-host] 16b69a7f4: 10131c02 12864310 10078c69 088b068a 00810234 801c0152 12860103 1c010380
+[fault-host] 16b69a814: 86010380 86101312 02038012 81020081 00810200 03804543 45264543 74550380
+[mach_exc] insn_stream PC-12..PC+8: 91001118 b8784a65 8b254278 [b8e48304] aa0803f4 b8744a75 11001294
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x151d545f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x151d5457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x151d54574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7900300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[swp-emul] ml626 #3 REFUSING unaligned atomic: insn=0xb8e48304 size=4 addr=0x79057702c7 rw=0x700a6c02c7
+[store-undecoded] #3 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #2 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16b69a874 addr=0x79057702c7 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7905770000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16b69a874 addr=0x79057702c7 x18=0x7900300000 type=1 lr=0x16b85d128 sp=0x12baef350 x16=0x7c2452c080 x17=0x1002891d
+[guest-code] rev=ml333 pool_rip=0x1002891d (PE 0x1002891d) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xccf6e0 x9=0xccf708 x10=0x4d x11=0x57702c7 x0=0x16b69a850 x2=0x151e2e4f9 | teb=0x7900300000 peb=0x7900310000 peb->EcCodeBitMap=0x0
+[fault-host] 16b69a7d4: 00000028 00000000 00000000 03800180 01008102 01078954 45431072 34660380
+[fault-host] 16b69a7f4: 10131c02 12864310 10078c69 088b068a 00810234 801c0152 12860103 1c010380
+[fault-host] 16b69a814: 86010380 86101312 02038012 81020081 00810200 03804543 45264543 74550380
+[fault-host] 16b69a834: 80454310 12860103 10550380 68128612 02520110 00000081 d503201f 00000068
+[fault-host] 16b69a854: 10ffffe0 f9000380 f90f639f 91002118 b8784a64 91001118 b8784a65 8b254278
+[fault-host] 16b69a874: b8e48304 aa0803f4 b8744a75 11001294 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 91001118 b8784a65 8b254278 [b8e48304] aa0803f4 b8744a75 11001294
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x151d545f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x151d5457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x151d54574 = libwow64fex.dll+0x103574 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x7900300000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+ml998: [wr-strip-declined] 0x79057702c7 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x7905770000+0x100000 protect=0x27 {  } page_off=0
+ml998: [wr-strip-declined]   neighbours prev=00 this=0x25 next=0x27
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[swp-emul] ml626 #4 REFUSING unaligned atomic: insn=0xb8e48304 size=4 addr=0x79057702c7 rw=0x700a6c02c7
+[store-undecoded] #4 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #3 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[store-undecoded] #5 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #4 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[store-undecoded] #6 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #5 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[store-undecoded] #7 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #6 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[store-undecoded] #8 rev=ml350 insn=0xb8e48304 pc=0x16b69a874 addr=0x79057702c7 rw_addr=0x700a6c02c7 — alias OK, ADD THIS ENCODING to the case-4 emulator
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=50% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16d835ce0
+[thread-stacks] port=0x1a03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2030a0b5c x18=0x0 sp=0x16d8b9f00
+[thread-stacks] port=0x4d03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=37 x8=0x2030a0b5c x18=0x0 sp=0x16daecc60
+[thread-stacks] port=0x4403 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x2030a0b5c x18=0x0 sp=0x16dc04560
+[thread-stacks] port=0x4503 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16dc92fc0
+[thread-stacks] port=0xaf03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2030a0b5c x18=0x0 sp=0x16de36ac0
+[thread-stacks] port=0xc157 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=498 x8=0x0 x18=0x0 sp=0x16e0f1020
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=50% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1100 NATIVE (unresolved: block Size implausible) sp-cand=[ ]
+[wow-stack-free] #1 the dead thread 0180's 32-bit stack (guest 0x1d170000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x1d170000 is not a live view -> released at the old address (as before) rev=ajan11
+[11:58:08.423] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=88 resident=2040MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[11:58:09.573] [INFO] [session] length=34s partial=1 play=0s frames=0 stalls=0/0s peak=1850MB limit=12287MB thermal=fair lpm=0 res=1112x832 cap=60 game=Overcooked! 2
+[thread-stacks] port=0xc157 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=1 susp=0 cpu=508 x8=0x254096000 x18=0x0 sp=0x16e0efcb0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=49% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=49% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0efcb0 NATIVE (no FEX state) sp-cand=[ ]
+[11:58:38.438] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=88 resident=2043MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc157 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=495 x8=0x0 x18=0x0 sp=0x16e0f1020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=49% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "wine-x18-exc" teb=0x0 cpu=49% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1100 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=49% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e0f1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0xc157 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=498 x8=0x0 x18=0x0 sp=0x16e0f1020
+[thread-stacks] port=0x17127 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=1 x8=0x16dd580e0 x18=0x0 sp=0x12a4ee840
+[thread-stacks] port=0x1e603 "AURemoteIO::IOThread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x177c26cf0
+[thread-stacks] port=0x1731b "audio_client_timer" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x2030a0b5c x18=0x0 sp=0x177d2f940
+[thread-stacks] port=0x1e323 "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x270f x18=0x0 sp=0x17862fb00
+[thread-stacks] port=0x17ac7 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x10a4c7b01 x18=0x0 sp=0x16e40ab30
+[thread-stacks] port=0xb557 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16db7ab40
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=42)
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=43)
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=44)
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=45)
+[11:59:08.481] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=358 gen=1 threads=88 resident=2031MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=46)
+[footprint] rev=ml358 phys=1827 MB (peak 1849) internal=1823 MB compressed=0 MB external=197 MB reusable=10 MB (cycle=47)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[av-detail] ml613 #2510848 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #2514944 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #2519040 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #2523136 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #2527232 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #2531328 p0=WRITE p1=0x79057702c7 hostpc=0x16b69a874 hinsn=0xb8e48304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=3 base=0x16aff8000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+[11:59:12.983] [INFO] [session] length=97s partial=1 play=0s frames=0 stalls=0/0s peak=1852MB limit=12287MB thermal=fair lpm=0 res=1112x832 cap=60 game=Overcooked! 2
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7
+D D8 Handled self-modifying code: pc: 16B69A874 fault: 79057702C7

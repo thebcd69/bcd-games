@@ -431,6 +431,34 @@ enum DockInstallScripts {
         return file == "dxsetup.exe" || file == "dxwebsetup.exe"
     }
 
+    /// madeira-bcd (round 626, agent A1 S7): the one-time installs the game's own settings mark as provided: the names of
+    /// `env.MADEIRA_DOCK_INSTALL_SKIP` (the last such line wins), as the [dock-installers] lines print them (program=directx),
+    /// separated by commas, semicolons or spaces, lower-cased. DirectX's runtime setup fails at the first start of six games while BCD
+    /// ships what it installs (Dark Souls: Prepare to Die Edition DMWDNW, Batman: Arkham City GOTY V31CH8, ...); their lists name it.
+    nonisolated static func installSkipNames(text: String) -> Set<String> {
+        var value = ""
+        for raw in text.components(separatedBy: .newlines) {
+            let line = raw.trimmingCharacters(in: .whitespaces)
+            guard !line.hasPrefix("#"), let equals = line.firstIndex(of: "=") else { continue }
+            if line[..<equals].trimmingCharacters(in: .whitespaces) == "env.MADEIRA_DOCK_INSTALL_SKIP" {
+                value = line[line.index(after: equals)...].trimmingCharacters(in: .whitespaces)
+            }
+        }
+        return Set(value.lowercased().split(whereSeparator: { ",; ".contains($0) }).map(String.init))
+    }
+
+    /// The same, read from this launch's game file (MADEIRA_CFG_GAME, as DockScriptRegistry.enabled reads it); empty without one.
+    nonisolated static func installSkipNames(gameConfigPath: String? = ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"]) -> Set<String> {
+        guard let path = gameConfigPath, !path.isEmpty, let text = try? String(contentsOfFile: path, encoding: .utf8) else { return [] }
+        return installSkipNames(text: text)
+    }
+
+    /// madeira-bcd (round 626, agent A1 S12; XMTZMJ, 563J50): the EA app's installer, which a Steam game from EA runs as a one-time install.
+    /// Its bootstrapper starts the Windows Installer service before its MSI; Wine's MSIServer runs system32\msiexec.exe (ContentView).
+    static func isEAAppInstaller(_ executable: String) -> Bool {
+        (executable.split(separator: "\\").last.map(String.init) ?? executable).lowercased() == "eaappinstaller.exe"
+    }
+
     /// madeira-bcd: who provides what a plan's provided program would have installed: "BCD" for DirectX's runtime libraries,
     /// "Wine Mono" for a .NET Framework.
     static func provider(_ process: SteamInstallProcess) -> String { isDirectXSetup(process.executable) ? "BCD" : "Wine Mono" }
@@ -782,6 +810,8 @@ enum DockInstallers {
     /// madeira-bcd: a DirectX setup of this start's batch exited with a failing status (poll): the restart alert says BCD
     /// provides the DirectX runtime libraries itself.
     private(set) static var failedDirectX = false
+    /// madeira-bcd (round 626, agent A1 S12): this start's install batch runs the EA app's installer (ContentView links msiexec for it).
+    private(set) static var runsEAAppInstaller = false
     /// This start runs installers and turns madsync off for its session.
     private(set) static var serverSync = false
     /// This start's plan in words (the Dock sheet's status), nil when there is nothing to say.
@@ -1060,7 +1090,7 @@ enum DockInstallers {
                         hasWineMono: Bool = WineMonoModel.available,
                         fusionSource: URL? = Bundle.main.resourceURL?.appendingPathComponent("i386-windows/fusion.dll")) {
         script = nil; serverSync = false; note = nil; finishedAt = nil; logged = []; runningSince = nil; installsOnly = false
-        allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false; sessionAppID = 0
+        allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false; sessionAppID = 0; runsEAAppInstaller = false
         let app = game.id
         sessionAppID = app
         let batchFile = drive.appendingPathComponent(scriptName)
@@ -1105,6 +1135,7 @@ enum DockInstallers {
         // with 6, -9 and 0xC0000018 (infinst.exe of Saints Row: The Third, T3P8HK) and exited 0 in Just Cause 2 (JYFG4D).
         let directXProvided = flag("MADEIRA_DOCK_DIRECTX_PROVIDED")   // 0: a failed DirectX setup stays pending, as before
         let failedBefore = Set(ledger.failedRuns(app))
+        let skip = DockInstallScripts.installSkipNames()   // madeira-bcd (round 626, A1 S7): the game's own list of provided installs; empty by default
         let items = DockInstallScripts.plan(found,
                                             done: { DockInstallScripts.marked($0, in: registry[$0.hive] ?? "") },
                                             exists: { resolve($0, drive: drive) != nil },
@@ -1115,6 +1146,7 @@ enum DockInstallers {
                                             provided: {
                                                 (dotNetMono && hasWineMono && DockInstallScripts.isDotNetFramework($0.executable))
                                                     || (directXProvided && DockInstallScripts.isDirectXSetup($0.executable) && failedBefore.contains($0.run.name))
+                                                    || skip.contains(DockInstallScripts.label($0.run).lowercased())
                                             })
         let providedRuns = DockInstallScripts.providedRuns(items)
         var providedWritten = 0
@@ -1160,6 +1192,7 @@ enum DockInstallers {
                 script = "C:\\" + scriptName
                 serverSync = sessionOff
                 installsOnly = flag("MADEIRA_DOCK_INSTALL_SEPARATE")   // 0: the host follows the installers in the same session
+                runsEAAppInstaller = pending.contains { DockInstallScripts.isEAAppInstaller($0.executable) }
             } catch {
                 LogStore.shared.log("[dock-installers] app=\(app) batch not written: \(error.localizedDescription)", level: .error)
                 // madeira-bcd: nothing will run, so the choice this start turned to Skip goes back: the programs are not
@@ -1196,7 +1229,10 @@ enum DockInstallers {
             if item.status == .provided {
                 let recorded = providedRuns.held.contains(run) ? "no, another program of this entry still has to run"
                     : providedWritten > 0 ? "yes, \(providedWritten) values" : "no values written (the prefix's registry is not seeded yet)"
-                if DockInstallScripts.provider(item.process) == "BCD" {
+                if skip.contains(DockInstallScripts.label(run).lowercased()) {
+                    LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the game's settings list it in " +
+                                        "env.MADEIRA_DOCK_INSTALL_SKIP (BCD provides what it installs); file=\(file); record: \(recorded)")
+                } else if DockInstallScripts.provider(item.process) == "BCD" {
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by BCD; " +
                                         "file=\(file) is DirectX's runtime setup, it failed in this game before, and BCD ships what it installs " +
                                         "(D3DX9/10/11, D3DCompiler, XAudio2, X3DAudio, XAPOFX, XInput) as Wine's builtin DLLs; record: \(recorded)")

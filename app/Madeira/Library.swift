@@ -614,6 +614,9 @@ struct LibraryEntry: Codable, Identifiable {
             else { unsetenv("MADEIRA_FASTSYNC_SEM") }
         }
         madeira_set_vsync_locked(effectiveFPSMode)
+        // madeira-bcd (round 626, agent H S2): the rate this session holds the panel at; win32u reports it to Windows programs only with
+        // env.MADEIRA_REPORT_HZ = 1 (sysparams_ios.c ios_report_hz); nothing else reads it. Fixed for the session.
+        setenv("BCD_SESSION_HZ", String(ProMotionIntent.sessionHz(for: effectiveFPSMode)), 1)
         // This game's own lines; a launch without any unsets the previous game's.
         do {
             let pairs = try MadeiraConfig.applyGame(gameConfigText)
@@ -1248,6 +1251,9 @@ final class LibraryModel: ObservableObject {
         applyControllerMode()
         MetalHostView.shared.isHidden = false
         ProMotionIntent.apply(mode: entry.effectiveFPSMode)
+        // madeira-bcd (round 626, agent H S1): the display rate this session holds and the one Windows programs are told (log only)
+        LogStore.shared.log("[display-rate] session start: limit=mode \(entry.effectiveFPSMode) panel_max=\(ProMotionIntent.panelMaxFPS) Hz "
+                            + "held=\(ProMotionIntent.maxHz(for: entry.effectiveFPSMode)) Hz reported-to-Windows=\(ProMotionIntent.reportedHz(for: entry.effectiveFPSMode)) Hz")
         BCDOrientationLive.sessionBegan(entry)   // madeira-bcd: Settings › Graphics › Screen orientation, or the game's own choice; "follow the device" (the default) does nothing
         ThermalPacing.shared.begin()
         BCDHUDState.shared.sessionBegan(entry)   // madeira-bcd: the performance HUD this session takes (BCDHUDLive.swift): the game's own, an old overlay switch carried over, or the choice for every game (Off unless chosen)
@@ -1926,8 +1932,11 @@ enum SteamStartHint {
     static let text = "The game could not find Steam and closed. It needs Steam: open its page, set Start with to "
         + "BCD Dock (Steam's client), then play it again."
     /// What a log line says when the game, Valve's steam_api or BCD's own diagnostic found no Steam client.
+    /// madeira-bcd (round 626, Slay the Spire 2 9W1M7B): SteamAPI_InitEx's result as a game prints it ("Steamworks initialization failed!
+    /// Result: k_ESteamAPIInitResult_NoSteamClient, message: Cannot create IPC pipe to Steam client process."), through [guest-log].
     static let needles = ["SteamAPI_Init() failed", "did not locate a running instance of Steam",
-                          "steam_api found no running Steam", "Steam must be running to play this game"]
+                          "steam_api found no running Steam", "Steam must be running to play this game",
+                          "k_ESteamAPIInitResult_NoSteamClient"]
     /// The line the library writes when a Steam game starts without Dock (ContentView.launchLibraryEntry).
     static let startMarker = "[steam-start] app="
     static let startMode = " direct source="

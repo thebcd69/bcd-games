@@ -1,0 +1,1008 @@
+[23:57:15.467] [INFO] Checking entitlements...
+[23:57:15.467] [INFO] [build] v0.1.623 (623)
+[23:57:15.467] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11695MB available=6122MB cores=6
+[23:57:15.468] [INFO] [device] address-map=[0x104548000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[23:57:15.485] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-04:00 free-disk=66GB stikdebug-url=1
+[23:57:15.487] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:57:17.964] [INFO] [steam-start] app=12210 direct source=choice args=0 folder=program
+[23:57:17.964] [INFO] Requesting JIT with StikDebug...
+[23:57:17.986] [INFO] Opening StikDebug to enable JIT...
+[23:57:25.246] [INFO] [bcd] library launch Grand Theft Auto IV: avx=0 wine-vcrt=1 nvidia=1 game-config=1 metalfx=off
+[23:57:25.266] [INFO] Running full Wine sequence...
+[23:57:25.266] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104548000,0x8000000000) 512GB available=6113MB low-power=0 thermal=nominal
+[23:57:25.274] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:57:25.274] [INFO] Allocating 896MB JIT pool via debugger...
+[23:57:25.275] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:57:25.275] [INFO] [jit-debugger] attached=1 at the pool request
+[23:57:25.279] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:57:27.073] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  2.899s rev=ml526
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7a00000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard owned)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=owned
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[iOS env] INCLUDED: SteamAppId=12210
+ml992: os_proc_available_memory=5230 MB + phys_footprint=913 MB = 6144 MB (hw.memsize says 11695 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x17fac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x37060000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x17fac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[footprint] rev=ml358 phys=943 MB (peak 943) internal=942 MB compressed=0 MB external=95 MB reusable=5 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x17fac0000) -> 64-bit table (0x1133f8d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module GTAIV.exe (gtaiv.exe-43183eba905d71e5): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280d9f53b): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5ab9b7d7): 717B9F0000
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b764000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7118038000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b488000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b2a4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b210000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x125400000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+ml957: ? backing 0x717a3f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+E 24 [iOS-xins] tracker=0x148510e50 MTLX.dll sec=0x717a1f1000-0x717a1fde00
+E 24 [iOS-xins] tracker=0x148510e50 MTLX.dll sec=0x717a21e000-0x717a282e00
+D 24 Load module MTLX.dll (mtlx.dll-c58f7231bee9ab16): 717A1F0000
+[store-noalias] #1 rev=ml348 addr=0x717a1fc000 insn=0x089fff07 pc=0x17e22367c NO pool/anon alias | region 0x717a1fc000+0x1c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x717a1fc000 hostpc=0x17e22367c hinsn=0x089fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x17e22367c addr=0x717a1fc000 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a1fc000+0x1c000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x17e22367c addr=0x717a1fc000 x18=0x0 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[guest-code] rev=ml333 pool_rip=0x7a1fca65 (PE 0x7a1fca65) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x27ef668 x9=0x27ef6b0 x10=0x27ef76c x11=0x1 x0=0x17e223620 x2=0x13 | teb=0x717ffc0000 peb=0x717ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 17e22357c: d500401f 1400000c 00000000 14000002 d61f0000 58000240 d63f0000 00000000
+[fault-host] 17e22359c: 00000000 7a1f26aa 00000000 ffffffc4 ffffffff 14000002 d61f0000 58000100
+[fault-host] 17e2235bc: d63f0000 00000000 00000000 7a1f263a 00000000 ffffffd0 ffffffff 7f05c108
+[fault-host] 17e2235dc: 00000001 0000010c 00000000 7a1fa984 00000000 00002b17 00000000 00000008
+[fault-host] 17e2235fc: 00000028 00000000 00000000 03800180 c0502523 00000004 00002afd 00002356
+[fault-host] 17e22361c: d503201f 000000d8 10ffffe0 f9000380 f90f639f 51004134 8b344278 b8bfc307
+[mach_exc] insn_stream PC-12..PC+8: 38bfc314 b3401e87 8b244278 [089fff07] 51004134 8b344278 b8bfc305
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x1482945f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x717a1fc000 insn=0x089fff07 pc=0x17e22367c NO pool/anon alias | region 0x717a1fc000+0x1c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x717a1fc000 hostpc=0x17e22367c hinsn=0x089fff07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x17e22367c addr=0x717a1fc000 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a1fc000+0x1c000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x17e22367c addr=0x717a1fc000 x18=0x0 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[guest-code] rev=ml333 pool_rip=0x7a1fca65 (PE 0x7a1fca65) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x27ef668 x9=0x27ef6b0 x10=0x27ef76c x11=0x1 x0=0x17e223620 x2=0x13 | teb=0x717ffc0000 peb=0x717ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 17e2235dc: 00000001 0000010c 00000000 7a1fa984 00000000 00002b17 00000000 00000008
+[fault-host] 17e2235fc: 00000028 00000000 00000000 03800180 c0502523 00000004 00002afd 00002356
+[fault-host] 17e22361c: d503201f 000000d8 10ffffe0 f9000380 f90f639f 51004134 8b344278 b8bfc307
+[fault-host] 17e22363c: d503201f 8b274278 38bfc314 b3401e85 51000534 8b344278 089fff05 51004134
+[fault-host] 17e22365c: 8b344278 b8bfc304 d503201f 51000534 8b344278 38bfc314 b3401e87 8b244278
+[fault-host] 17e22367c: 089fff07 51004134 8b344278 b8bfc305 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 38bfc314 b3401e87 8b244278 [089fff07] 51004134 8b344278 b8bfc305
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler BUS #1: pc=0x17e22367c addr=0x717a1fc000 x16=0x148069e94 x17=0x1253ff2b0 x18=0x0 lr=0x17f05c14c insn=0x089fff07 branch@lr-4=0xd63f0040
+ml998: [wr-strip-declined] 0x717a1fc000 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x717a1f0000+0x93000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0xc000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x21
+D 24 Handled self-modifying code: pc: 17E22367C fault: 717A1FC000
+[store-noalias] #3 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x717a258ad9 hostpc=0x17e2265cc hinsn=0xb83f6b07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x17e2265cc addr=0x717a258ad9 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a258000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x17e2265cc addr=0x717a258ad9 x18=0x0 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1
+[guest-code] rev=ml333 pool_rip=0x7a22370f (PE 0x7a22370f) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x27ef670 x9=0x27ef6b0 x10=0x27ef76c x11=0x1 x0=0x17e226580 x2=0x40 | teb=0x717ffc0000 peb=0x717ffd0000 peb->EcCodeBitMap=0x0
+[mach_exc] insn_stream PC-12..PC+8: aa1a03e7 8b344278 d5033bbf [b83f6b07] 529166b4 72af44d4 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #4 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x717a258ad9 hostpc=0x17e2265cc hinsn=0xb83f6b07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x17e2265cc addr=0x717a258ad9 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a258000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x17e2265cc addr=0x717a258ad9 x18=0x0 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1
+[guest-code] rev=ml333 pool_rip=0x7a22370f (PE 0x7a22370f) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: aa1a03e7 8b344278 d5033bbf [b83f6b07] 529166b4 72af44d4 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+0024:err:seh:bus_handler BUS #2: pc=0x17e2265cc addr=0x717a258ad9 x16=0x14806ac60 x17=0x1 x18=0x0 lr=0x17f05c1d8 insn=0xb83f6b07 branch@lr-4=0xd63f0080
+ml998: [wr-strip-declined] 0x717a258ad9 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x717a1f0000+0x93000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x68000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+[store-noalias] #5 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x717a258ad9 hostpc=0x17e2265cc hinsn=0xb83f6b07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+[store-noalias] #6 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x717a258ad9 hostpc=0x17e2265cc hinsn=0xb83f6b07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+[store-noalias] #7 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+[store-noalias] #8 rev=ml348 addr=0x717a258ad9 insn=0xb83f6b07 pc=0x17e2265cc NO pool/anon alias | region 0x717a258000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page that never got dual-mapped)
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+D 24 Handled self-modifying code: pc: 17E2265CC fault: 717A258AD9
+[av-detail] ml613 #4096 p0=WRITE p1=0x717a258ad9 hostpc=0x17e2265cc hinsn=0xb83f6b07 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x0 pc=0x17e30b3d0 addr=0x717a2619cf kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a260000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x17e30b3d0 addr=0x717a2619cf x18=0x0 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x0
+[guest-code] rev=ml333 pool_rip=0x7a27ecd8 (PE 0x7a27ecd8) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 72af44d4 8b344278 d5033bbf [b83f6b05] d500401f 14000002 00000000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault_rip] cnt=6 rip=0x0 pc=0x17e30b3d0 addr=0x717a2619cf kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x717a260000+0x4000 rev=ml555
+ml998: [wr-strip-declined] 0x717a25800b vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x717a1f0000+0x93000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x68000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+ml998: [wr-strip-declined] 0x717a258017 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x717a1f0000+0x93000 protect=0x180002d { SEC_IMAGE WRITECOPY  } page_off=0x68000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+[mach_exc] UNHANDLED #100 pc=0x17e2260f0 addr=0x717a25896e x18=0x717ffc0000 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[guest-code] rev=ml333 pool_rip=0x7a25a7b5 (PE 0x7a25a7b5) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 38bfc314 b3401e85 8b244278 [089fff05] 529bb2b4 72af44f4 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #200 pc=0x17e2260f0 addr=0x717a25902f x18=0x717ffc0000 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1253feb70
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[guest-code] rev=ml333 pool_rip=0x7a259297 (PE 0x7a259297) -- NO pool copy for this address (identity translate)
+[xp-names] m826628 "wine-x18-exc"
+[mach_exc] UNHANDLED #1000 pc=0x17e2260f0 addr=0x717a259c82 x18=0x717ffc0000 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1253feb70
+[mach_exc] UNHANDLED #1100 pc=0x17e2260f0 addr=0x717a259e12 x18=0x717ffc0000 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1253feb70
+[mach_exc] UNHANDLED #1200 pc=0x17e2260f0 addr=0x717a259f9a x18=0x717ffc0000 type=1 lr=0x17f05c1d8 sp=0x1253ff350 x16=0x14806ac60 x17=0x1253feb70
+[mach_exc] UNHANDLED #1300 pc=0x17e2260f0 addr=0x717a25a026 x18=0x717ffc0000 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[mach_exc] UNHANDLED #2000 pc=0x17e2260f0 addr=0x717a25a1a4 x18=0x717ffc0000 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[av-detail] ml613 #8192 p0=WRITE p1=0x717a25a624 hostpc=0x17e2260f0 hinsn=0x089fff05 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #12288 p0=WRITE p1=0x717a25af23 hostpc=0x17e2260f0 hinsn=0x089fff05 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #16384 p0=WRITE p1=0x717a27d5a9 hostpc=0x17e2260f0 hinsn=0x089fff05 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #20480 p0=WRITE p1=0x717a27dedd hostpc=0x17e2260f0 hinsn=0x089fff05 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x17e05c000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled inline self-modifying code: pc: 17E542314 rip: 7A2200A5 fault: 717A2205A2
+D 24 Handled inline self-modifying code: pc: 17E5424F4 rip: 7A2200A5 fault: 717A220658
+D 24 Handled inline self-modifying code: pc: 17E5426D4 rip: 7A2200A5 fault: 717A22065C
+D 24 Handled inline self-modifying code: pc: 17E5428B4 rip: 7A2200A5 fault: 717A220660
+D 24 Handled inline self-modifying code: pc: 17E542A94 rip: 7A2200A5 fault: 717A220664
+D 24 Handled inline self-modifying code: pc: 17E542C74 rip: 7A2200A5 fault: 717A220668
+D 24 Handled inline self-modifying code: pc: 17E542F24 rip: 7A2200A5 fault: 717A220670
+D 24 Handled inline self-modifying code: pc: 17E543104 rip: 7A2200A5 fault: 717A220674
+D 24 Handled inline self-modifying code: pc: 17E5432E4 rip: 7A2200A5 fault: 717A220B04
+D 24 Handled inline self-modifying code: pc: 17E5434C4 rip: 7A2200A5 fault: 717A220B08
+D 24 Handled inline self-modifying code: pc: 17E5436A4 rip: 7A2200A5 fault: 717A220B0C
+D 24 Handled inline self-modifying code: pc: 17E543884 rip: 7A2200A5 fault: 717A220B10
+D 24 Handled inline self-modifying code: pc: 17E543A64 rip: 7A2200A5 fault: 717A220B14
+D 24 Handled inline self-modifying code: pc: 17E543C44 rip: 7A2200A5 fault: 717A220B18
+D 24 Handled inline self-modifying code: pc: 17E543E24 rip: 7A2200A5 fault: 717A220B1C
+D 24 Handled inline self-modifying code: pc: 17E544004 rip: 7A2200A5 fault: 717A220B20
+[mach_exc] UNHANDLED #18500 pc=0x17e5441e4 addr=0x717a25800b x18=0x0 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+  4.531s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -launchTitleInFolder \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\"" (fd=112, unixdir=118, dup_unixdir=123) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\"
+ml985: preferred base 0x140000000+0x2014000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x2014000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" 0x125580000+0x2014000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x125580000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x125580000+0x474000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x1259f4000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x1259f4000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x125b74000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Handled inline self-modifying code: pc: 17E5A5044 rip: 7A23EACF fault: 717A23E14A
+D 24 Handled inline self-modifying code: pc: 17E5A5224 rip: 7A23EACF fault: 717A23E14E
+D 24 Handled inline self-modifying code: pc: 17E5A5404 rip: 7A23EACF fault: 717A23E152
+D 24 Handled inline self-modifying code: pc: 17E5A55E4 rip: 7A23EACF fault: 717A23E156
+D 24 Handled inline self-modifying code: pc: 17E5A57C4 rip: 7A23EACF fault: 717A23E15A
+D 24 Handled inline self-modifying code: pc: 17E5A59A4 rip: 7A23EACF fault: 717A23E3FD
+D 24 Handled inline self-modifying code: pc: 17E5A5B84 rip: 7A23EACF fault: 717A23E401
+D 24 Handled inline self-modifying code: pc: 17E5A5D64 rip: 7A23EACF fault: 717A23E405
+D 24 Handled inline self-modifying code: pc: 17E5A5F44 rip: 7A23EACF fault: 717A23E415
+D 24 Handled inline self-modifying code: pc: 17E5A6124 rip: 7A23EACF fault: 717A23E419
+D 24 Handled inline self-modifying code: pc: 17E5A6304 rip: 7A23EACF fault: 717A23E439
+D 24 Handled inline self-modifying code: pc: 17E5A64E4 rip: 7A23EACF fault: 717A23E7BC
+D 24 Handled inline self-modifying code: pc: 17E5A66C4 rip: 7A23EACF fault: 717A23E7C0
+D 24 Handled inline self-modifying code: pc: 17E5A68A4 rip: 7A23EACF fault: 717A23E7C4
+D 24 Handled inline self-modifying code: pc: 17E5A6A84 rip: 7A23EACF fault: 717A23E7C8
+D 24 Handled inline self-modifying code: pc: 17E5A6C64 rip: 7A23EACF fault: 717A23E7CC
+D 24 Handled inline self-modifying code: pc: 17E5A6E44 rip: 7A23EACF fault: 717A23E7D0
+D 24 Handled inline self-modifying code: pc: 17E5A70F4 rip: 7A23EACF fault: 717A23E7E0
+D 24 Handled inline self-modifying code: pc: 17E5A72D4 rip: 7A23EACF fault: 717A23EEF6
+D 24 Handled inline self-modifying code: pc: 17E5A74B4 rip: 7A23EACF fault: 717A23EEFA
+D 24 Handled inline self-modifying code: pc: 17E5A7694 rip: 7A23EACF fault: 717A23EEFE
+D 24 Handled inline self-modifying code: pc: 17E5A7874 rip: 7A23EACF fault: 717A23EF02
+D 24 Handled inline self-modifying code: pc: 17E5A7A54 rip: 7A23EACF fault: 717A23EF06
+D 24 Handled inline self-modifying code: pc: 17E5A7C34 rip: 7A23EACF fault: 717A23EF12
+D 24 Handled inline self-modifying code: pc: 17E5A7E14 rip: 7A23EACF fault: 717A23EF16
+[mach_exc] UNHANDLED #19200 pc=0x17e5a2580 addr=0x717a242908 x18=0x0 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[mach_exc] insn_stream PC-12..PC+8: 38bfc314 b3401e85 8b244278 [089fff05] 52834954 72af4494 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] UNHANDLED #19300 pc=0x17e5a80a4 addr=0x717a25ad00 x18=0x0 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[mach_exc] insn_stream PC-12..PC+8: d503201f 8b244278 d5033bbf [b83f6b05] 528f9034 72af44f4 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 24 Handled self-modifying code: pc: 17E5AC3DC fault: 717A27C1D8
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27C1DC
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1DD
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1E1
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1E5
+D 24 Handled self-modifying code: pc: 17E5AC3DC fault: 717A27C1E9
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1ED
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1F1
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1F5
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1F9
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C1FD
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27C201
+D 24 Handled self-modifying code: pc: 17E5AC3DC fault: 717A27C202
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27C206
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C209
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C20D
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C211
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C215
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C219
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C21D
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27C221
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27C225
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27D16E
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D16F
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D173
+[mach_exc] UNHANDLED #19400 pc=0x17e5a80a4 addr=0x717a27d177 x18=0x717ffc0000 type=1 lr=0x17f05c14c sp=0x1253ff350 x16=0x148069e94 x17=0x1253ff2b0
+[mach_exc] insn_stream PC-12..PC+8: d503201f 8b244278 d5033bbf [b83f6b05] 528f9034 72af44f4 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D177
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D17B
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D17F
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27D183
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27D188
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27D18E
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27D18F
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27D193
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E5BF
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5C0
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5C4
+D 24 Handled self-modifying code: pc: 17E5AC3DC fault: 717A27E5C8
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5CC
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5D0
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5D4
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5D8
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E5DC
+D 24 Handled self-modifying code: pc: 17E5AC3DC fault: 717A27E5DF
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E5E3
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5E4
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5E8
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5EC
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5F0
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5F4
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5F8
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E5FC
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E600
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E604
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E65C
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E65F
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E663
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E667
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E66B
+D 24 Handled self-modifying code: pc: 17E5A80A4 fault: 717A27E66F
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27E673
+D 24 Handled self-modifying code: pc: 17E5A2580 fault: 717A27F21E
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=14232
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (launcher.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[footprint] rev=ml358 phys=1061 MB (peak 1061) internal=1060 MB compressed=0 MB external=103 MB reusable=5 MB (cycle=2)
+[guest-stk] sp+0xc8 0x148294574 = libwow64fex.dll+0x103574
+[guest-stk] sp+0xe0 0x148291558 = libwow64fex.dll+0x100558
+[guest-stk] sp+0x150 0x14829165c = libwow64fex.dll+0x10065c
+[guest-stk] sp+0x398 0x1482945f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x3f8 0x14829457c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x518 0x148294574 = libwow64fex.dll+0x103574
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x14973c000)
+[copy-verify] gdi32.dll: OK, 20 .text pages executable (copy @0x149964000)
+[footprint] rev=ml358 phys=1092 MB (peak 1092) internal=1091 MB compressed=0 MB external=126 MB reusable=5 MB (cycle=3)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x14ad24000)
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x17d2140d4 RX from -32, 64 of 64 bytes: c0 5f 39 d4 e8 43 87 d2 88 cf a4 f2 28 00 c0 f2 06 3b 8f d2 06 ad a4 f2 26 00 c0 f2 1f 20 03 d5 c8 00 00 d9 46 2e 97 d2 c6 af a4 f2 26 00 c0 f2 1f 20 03 d5 df 00 00 99 8b 73 47 f9 6c 09 40 92 
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x17d2140d4 (not an anon-JIT page)
+D 2C Handled self-modifying code: pc: 17D2140D4 fault: 1256879D8
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/users/mobile/Documents/Rockstar Games/Launcher/launcher.log
+[guest-log] #1 tid=0030 [2026-10-31 03:57:33.010] [ ERROR ] [Main ] [shell] Could not do OpenProcess on parent process.
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x17d247e1c RX from -32, 64 of 64 bytes: 66 b1 a4 f2 26 00 c0 f2 c8 00 40 99 1f 20 03 d5 a6 27 92 d2 a6 ac a4 f2 26 00 c0 f2 bf 3b 03 d5 c8 00 00 b8 66 13 95 d2 06 b0 a4 f2 26 00 c0 f2 c8 00 40 d9 1f 20 03 d5 06 29 84 52 a6 03 06 8b 
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x17d247e1c (not an anon-JIT page)
+D 2C Handled self-modifying code: pc: 17D247E1C fault: 12565913D
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x17d25082c RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 a8 83 41 d9 1f 20 03 d5 a1 03 41 d9 1f 20 03 d5 08 01 40 19 28 00 00 19 a6 03 42 99 1f 20 03 d5 c6 04 00 51 1f 20 03 d5 a6 03 02 99 a6 03 41 d9 1f 20 03 d5 
+002c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x17d25082c (not an anon-JIT page)
+D 2C Handled self-modifying code: pc: 17D25082C fault: 1257FE69C
+D 2C Handled self-modifying code: pc: 17D25082C fault: 1266132D0
+D 2C Handled self-modifying code: pc: 17D270C4C fault: 12561A919
+D 2C Handled self-modifying code: pc: 17D2704A4 fault: 12577D2F3
+D 2C Handled self-modifying code: pc: 17D2704A4 fault: 1257987B5
+D 2C Handled self-modifying code: pc: 17D2704A4 fault: 1257F2FE4
+D 2C Handled self-modifying code: pc: 17D270C4C fault: 1257FE69C
+D 2C Handled self-modifying code: pc: 17D270C4C fault: 1259E5F97
+D 2C Handled self-modifying code: pc: 17D270C4C fault: 126FF756B
+D 2C Handled self-modifying code: pc: 17D271678 fault: 1258BA472
+[guest-log] #2 tid=0030 [2026-10-31 03:57:33.612] [ ERROR ] [Main ] [shell] Could not do OpenProcess on parent process.
+D 2C Handled self-modifying code: pc: 17D34DEE8 fault: 125623C2B
+D 2C Handled self-modifying code: pc: 17D3513BC fault: 1274729F8
+[mach_exc] UNHANDLED #19500 pc=0x17d3549f4 addr=0x12564ceff x18=0x0 type=1 lr=0x17e058274 sp=0x17f660000 x16=0x148b899a4 x17=0x17f65ff20
+[mach_exc] insn_stream PC-12..PC+8: 99400108 d503201f d5033bbf [b8000028] 994203a8 d503201f 51001108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 2C Handled self-modifying code: pc: 17D3549F4 fault: 12564CEFF
+D 2C Handled self-modifying code: pc: 17D354F9C fault: 126F7863D
+D 2C Handled self-modifying code: pc: 17D355BC8 fault: 1259E7C27
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] #3 tid=0030 [2026-10-31 03:57:33.641] [ ERROR ] [Main ] [svc] Unable to open SC manager! (1722)
+[guest-log] #4 tid=0030 [2026-10-31 03:57:33.641] [ ERROR ] [Main ] [svc] Unable to get service running state, reinstalling!
+002c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" install"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+  8.371s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" install" (fd=106, unixdir=109, dup_unixdir=114) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Handled self-modifying code: pc: 17C08A96C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08C150 fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08C150 fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08C150 fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+D 38 Handled self-modifying code: pc: 17C08B64C fault: 12DA24F03
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] svc #9 tid=0038 [2026-10-31 03:57:34.658] [    52] [   38] Failed to open handle to SCM!
+[guest-log] svc #13 tid=0038 [2026-10-31 03:57:34.659] [    52] [   38] Failed to open handle to SCM!
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=17660
+[unwind] term ml661 begin rip=13c510690 rsp=12e5afed8 window=[12e5afed8..12edafed8) max=32
+[unwind] term ml661 #00 pc=13c510690 rsp=12e5afed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=1 rbp=12e5aff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=12e5aff60: d0ff5a2e 01000000 b49da52d 01000000 01000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=12da75b29 rsp=12e5afee0  <no module — STOP>
+[unwind] term ml661 end
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=17678
+0038:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=113
+[Wine ntdll/server] process_exit_wrapper(1)
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] #5 tid=0030 [2026-10-31 03:57:34.798] [ ERROR ] [Main ] [svc] Unable to open SC manager! (1722)
+[footprint] rev=ml358 phys=1188 MB (peak 1188) internal=1187 MB compressed=0 MB external=157 MB reusable=5 MB (cycle=4)
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+  9.530s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=109, unixdir=110, dup_unixdir=118) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 125635059
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 12564D22C
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 125664510
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 1257AC814
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 1257F7AA5
+D 2C Handled self-modifying code: pc: 17D388E5C fault: 1263CB6E3
+D 2C Handled self-modifying code: pc: 17D390664 fault: 1255A0523
+D 2C Handled self-modifying code: pc: 17D390664 fault: 1255B3CB3
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1255BCD65
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1256039DE
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1256092D6
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1256350C3
+D 2C Handled self-modifying code: pc: 17D390664 fault: 1256440E8
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 125658582
+D 2C Handled self-modifying code: pc: 17D390664 fault: 125678285
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 125682ADB
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 125684A38
+D 2C Handled self-modifying code: pc: 17D390664 fault: 12569BB1B
+D 2C Handled self-modifying code: pc: 17D390664 fault: 12569CB12
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1256C100D
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1256E0C9E
+D 2C Handled self-modifying code: pc: 17D390664 fault: 125748A35
+D 2C Handled self-modifying code: pc: 17D390C0C fault: 1257F46E1
+[mach_exc] UNHANDLED #19600 pc=0x17d396f88 addr=0x1257caab9 x18=0x0 type=1 lr=0x17e058274 sp=0x17f660000 x16=0x148b899a4 x17=0x17f65ff20
+[mach_exc] insn_stream PC-12..PC+8: f2a4af86 f2c00026 d5033bbf [b80000c8] d2932506 f2a4ada6 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault_rip] cnt=19665 rip=0x1256c2d04 pc=0x17d39635c addr=0x126eb9cd8 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x126eb8000+0x4000 [first] rev=ml555
+[fault_rip] cnt=19667 rip=0x12578b9bd pc=0x17d390664 addr=0x1255b3cb3 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x1255b0000+0x4000 [first] rev=ml555
+[steam-api] steam_api found no running Steam; process 0028 sees:
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14eac4000)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x137360000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=002c | STAGE=fixed-map err=3 at 0x70fff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=launcher.exe tid=002c size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7d18020000
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x104c50000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[steam-api] steam_api found no running Steam; process 0028 sees:
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x1386d0000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x1374e0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x137360000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=002c | STAGE=fixed-map err=3 at 0x70fff70000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=launcher.exe tid=002c size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=2 rev=ajan5-rockstar
+[fault_rip] cnt=19681 rip=0x13014e177 pc=0x17b08a96c addr=0x130164f03 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x130164000+0x4000 [first] rev=ml555
+D 48 Handled self-modifying code: pc: 17B08A96C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08C150 fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08C150 fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08C150 fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+D 48 Handled self-modifying code: pc: 17B08B64C fault: 130164F03
+[steer] #2 size=0x2000000 reserved_total=256MB armed=va-pressure -> above ceiling 0x7d1d620000
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #12 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] svc #27 tid=0048 [2026-10-31 03:57:36.062] [    68] [   48] Failed to open handle to SCM!
+[guest-log] svc #31 tid=0048 [2026-10-31 03:57:36.063] [    68] [   48] Failed to open handle to SCM!
+[guest-log] svc #34 tid=0048 [2026-10-31 03:57:36.063] [    68] [   48] Installing service...
+[guest-log] svc #35 tid=0048 [2026-10-31 03:57:36.064] [    68] [   48] Failed to open handle to SCM!
+0048:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=20847
+0048:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=20866
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=115
+[Wine ntdll/server] process_exit_wrapper(1)
+[va-scan] FAILED window=0x10000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=66678 skips=107 | seen=0x10000..0x7100000000 views=227 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x10000 errno=12(Cannot allocate memory)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x10000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=66678 skips=107 | seen=0x10000..0x7100000000 views=230 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x10000 errno=12(Cannot allocate memory)   --> relaxing ceiling, retrying unclamped
+[fault_rip] cnt=19691 rip=0x1256c09fb pc=0x17dcb34b8 addr=0x1258a878e kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x1258a8000+0x4000 [first] rev=ml555
+[va-scan] FAILED window=0x10000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=66678 skips=107 | seen=0x10000..0x7100000000 views=233 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x10000 errno=12(Cannot allocate memory)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x10000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=66678 skips=107 | seen=0x10000..0x7100000000 views=236 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x10000 errno=12(Cannot allocate memory)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x10000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=66678 skips=107 | seen=0x10000..0x7100000000 views=239 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x10000 errno=12(Cannot allocate memory)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=1271 skips=162 | seen=0x100000000..0x7100000000 views=241 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[footprint] rev=ml358 phys=1415 MB (peak 1415) internal=1413 MB compressed=0 MB external=188 MB reusable=5 MB (cycle=5)
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[wow-window] #11 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7200004000..0x8000000000
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[wow-window] #12 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7200004000..0x8000000000
+[wow-window] #13 band below the 32-bit windows full: 0x800000 bytes placed above them in 0x7200004000..0x8000000000
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[wow-window] #14 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7200004000..0x8000000000
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[wow-window] #15 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7200004000..0x8000000000
+[wow-window] #16 band below the 32-bit windows full: 0x800000 bytes placed above them in 0x7200004000..0x8000000000
+[va-scan] window room 0x100000000..0x7100000000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x7000000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[guest-log] #6 tid=0030 [2026-10-31 03:57:37.020] [WARNING] [Main ] [svc] Error starting service! (attempt 1 / 3, exit code 1)
+[guest-log] #7 tid=0030 [2026-10-31 03:57:37.020] [ ERROR ] [Main ] [svc] Unable to open SC manager! (1722)
+[unixlib] opengl32 (GL-absent stub table) (module 0x73ff190000) -> 64-bit table (0x113400d00)
+[free-delay] #1 release of 0x720b6d0000+0x400000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x720bad0000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x720c2d0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x720f1e0000+0x6a0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x720e910000+0x8d0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7211880000+0x140000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x72119c0000+0x110000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7211cc0000+0x1f0000 held for 2000 ms (8 in flight)
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[win-name] #4 hwnd=0x10034 class='' text="RGSCSystemTray" rev=ml853
+[win-name] #7 hwnd=0x10038 class='' text="Default IME" rev=ml853
+[win-name] #8 hwnd=0x10036 class='' text="UiWindow" rev=ml853
+[copy-verify] uxtheme.dll: OK, 5 .text pages executable (copy @0x14cbec000)
+[guest-log] #13 tid=0030 [2026-10-31 03:57:38.458] [ ERROR ] [Main ] [error] * Code:      113 (LAUNCHER_ERR_STEAM_FAILED)
+[guest-log] #16 tid=0030 [2026-10-31 03:57:38.458] [ ERROR ] [Main ] [error] ************************************************************************
+[guest-log] #17 tid=0030 [2026-10-31 03:57:38.459] [ ERROR ] [Main ] [launcher] Displaying error message: Steam failed to initialize. Please verify that the Steam Client is running and try again.
+[win-name] #10 hwnd=0x1003a class='' text="UiWindow" rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=1631 MB (peak 1631) internal=1630 MB compressed=0 MB external=209 MB reusable=5 MB (cycle=6)
+[footprint] rev=ml1060 fast phys=1631 MB compressed=0 MB
+[rb-tex] madeira-bcd new readback #1: fmt 80 940x318 level 0 (texture 940x318, 1 mips)
+[win-name] #11 hwnd=0x1003a class='' text="Error" rev=ml853
+[footprint] rev=ml1060 fast phys=1754 MB compressed=0 MB
+[win-name] #15 hwnd=0x1003a class='' text="Error" rev=ml853
+[win-name] #16 hwnd=0x1003a class='' text="Error" rev=ml853
+[win-name] #17 hwnd=0x1003a class='' text="Error" rev=ml853
+[win-name] #18 hwnd=0x1003a class='' text="Error" rev=ml853
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 14.763s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=346, unixdir=347, dup_unixdir=351) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x720b890000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[launch-view] dismissed reason=surface logs=0
+[exec-alloc] NtAllocateVirtualMemoryEx #9 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #10 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=850 peb=0x10bfbc000
+[footprint] rev=ml1060 fast phys=1772 MB compressed=0 MB
+[fault_rip] cnt=19693 rip=0x720b89e177 pc=0x17c08a96c addr=0x720b8b4f03 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x720b8b4000+0x4000 [first] rev=ml555
+D BC Handled self-modifying code: pc: 17C08A96C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08C150 fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08C150 fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08C150 fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+D BC Handled self-modifying code: pc: 17C08B64C fault: 720B8B4F03
+[mach_exc] UNHANDLED #19700 pc=0x17c096488 addr=0x720b8b5d7a x18=0x0 type=1 lr=0x17d054274 sp=0x79ffe80000 x16=0x14c7899a4 x17=0x79ffe7ff20
+[mach_exc] insn_stream PC-12..PC+8: f2c00e41 8b000826 d5033bbf [b80000c8] 994683a6 d503201f 510004c6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[file-wfail] ml669 #17 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] svc #49 tid=00bc [2026-10-31 03:57:41.167] [   184] [   BC] Checking if service is installed...
+[guest-log] svc #50 tid=00bc [2026-10-31 03:57:41.168] [   184] [   BC] Failed to open handle to SCM!
+[guest-log] svc #53 tid=00bc [2026-10-31 03:57:41.168] [   184] [   BC] Checking if service is installed...
+[guest-log] svc #54 tid=00bc [2026-10-31 03:57:41.169] [   184] [   BC] Failed to open handle to SCM!
+[guest-log] svc #57 tid=00bc [2026-10-31 03:57:41.169] [   184] [   BC] Installing service...
+[guest-log] svc #58 tid=00bc [2026-10-31 03:57:41.169] [   184] [   BC] Failed to open handle to SCM!
+[guest-log] svc #59 tid=00bc [2026-10-31 03:57:41.169] [   184] [   BC] Last error: 1722 (0x6ba): RPC server unavailable.
+[guest-log] svc #60 tid=00bc [2026-10-31 03:57:41.169] [   184] [   BC]
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=23858
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=23876
+00bc:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=350
+[Wine ntdll/server] process_exit_wrapper(1)
+[guest-log] #18 tid=0030 [2026-10-31 03:57:41.229] [WARNING] [Main ] [svc] Error starting service! (attempt 2 / 3, exit code 1)
+[file-wfail] ml669 #18 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] #19 tid=0030 [2026-10-31 03:57:41.229] [ ERROR ] [Main ] [svc] Unable to open SC manager! (1722)
+[hwinput] keyboard focus: elsewhere (tap elsewhere)
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 21.981s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start" (fd=347, unixdir=348, dup_unixdir=355) cwd=L"C:\\Program Files\\Rockstar Games\\Launcher\\"
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" 0x720f4c0000+0x1b0000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[nls-getptr] type=11 id=1252 peb=0x10937c000
+[nls-getptr] type=11 id=850 peb=0x10937c000
+[nls-getptr] type=11 id=20127 peb=0x10937c000
+[hwinput] keyboard focus: program (tap on the game view)
+[exec-alloc] NtAllocateVirtualMemoryEx #11 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D CC Load module RockstarService.exe (rockstarservice.exe-5a3bee5a2cd84360): 720F4C0000
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #12 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10937c000
+[nls-getptr] type=11 id=850 peb=0x10937c000
+[footprint] rev=ml1060 fast phys=1789 MB compressed=0 MB
+[copy-verify] bcrypt.dll: OK, 4 .text pages executable (copy @0x14f814000)
+D CC Load module ole32.dll (ole32.dll-424c26e02d7b7d0d): 73FA840000
+D CC Load module combase.dll (combase.dll-87add9b7d0a5b955): 73FA790000
+D CC Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): 73FA6A0000
+D CC Load module coml2.dll (coml2.dll-735614df14a136bf): 73FA610000
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0xa0000 align=0x10000 top-down tries=1230 skips=116 | seen=0x100000000..0x7100000000 views=268 maxgap=0x6ffb7f0000 tailgap=0x6ffb7f0000 stop=walked-all-views | firstfail=0x70fff60000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D CC Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 73FA570000
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=1271 skips=156 | seen=0x100000000..0x7100000000 views=269 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=1271 skips=156 | seen=0x100000000..0x7100000000 views=269 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=1271 skips=156 | seen=0x100000000..0x7100000000 views=269 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=1271 skips=156 | seen=0x100000000..0x7100000000 views=269 maxgap=0x6f80110000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0x100000000..0x7100000000 size=0x90000 align=0x10000 top-down tries=1225 skips=118 | seen=0x100000000..0x7100000000 views=270 maxgap=0x6ffb7e0000 tailgap=0x6ffb7e0000 stop=walked-all-views | firstfail=0x70fff70000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+D CC Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 73FA4E0000
+[fault_rip] cnt=19703 rip=0x720f4ce177 pc=0x17c08a96c addr=0x720f4e4f03 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x720f4e4000+0x4000 [first] rev=ml555
+D CC Handled self-modifying code: pc: 17C08A96C fault: 720F4E4F03
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x17c08b64c RX from -32, 64 of 64 bytes: 09 01 01 2b e8 03 09 aa 1f 20 03 d5 a8 43 07 99 66 e0 89 d2 c6 e9 a1 f2 46 0e c0 f2 bf 3b 03 d5 df 00 00 b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 a6 ec a1 f2 46 0e c0 f2 e6 8e 1f f8 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x17c08b64c (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x17c08b64c RX from -32, 64 of 64 bytes: 09 01 01 2b e8 03 09 aa 1f 20 03 d5 a8 43 07 99 66 e0 89 d2 c6 e9 a1 f2 46 0e c0 f2 bf 3b 03 d5 df 00 00 b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 a6 ec a1 f2 46 0e c0 f2 e6 8e 1f f8 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x17c08b64c (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x17c08b64c RX from -32, 64 of 64 bytes: 09 01 01 2b e8 03 09 aa 1f 20 03 d5 a8 43 07 99 66 e0 89 d2 c6 e9 a1 f2 46 0e c0 f2 bf 3b 03 d5 df 00 00 b8 a8 63 00 91 a1 33 00 91 e0 03 08 aa 46 fb 92 d2 a6 ec a1 f2 46 0e c0 f2 e6 8e 1f f8 
+00cc:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x17c08b64c (not an anon-JIT page)
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08C150 fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08C150 fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08C150 fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+D CC Handled self-modifying code: pc: 17C08B64C fault: 720F4E4F03
+[av-detail] ml613 #24576 p0=WRITE p1=0x720f4e4f03 hostpc=0x17c08b64c hinsn=0xb80000df rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x17c054000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[file-wfail] ml669 #19 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #20 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #21 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+00cc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=26775
+[unwind] term ml662   rbp=72177fff60: d0ff7f17 72000000 b49d510f 72000000 01000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=720f535b29 rsp=72177ffee0  <no module — STOP>
+[unwind] term ml661 end
+00cc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=26793
+[unwind] term ml661 begin rip=14dbc62fc rsp=72177ffd28 window=[72177ffd28..7217fffd28) max=32
+[unwind] term ml661 #00 pc=14dbc62fc rsp=72177ffd28  <no module — STOP>
+[unwind] term ml661 end
+00cc:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=352
+[Wine ntdll/server] process_exit_wrapper(1)
+[guest-log] #20 tid=0030 [2026-10-31 03:57:48.331] [ ERROR ] [Main ] [svc] Error starting service! (exit code 1)
+[file-wfail] ml669 #22 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] #21 tid=0030 [2026-10-31 03:57:48.332] [ ERROR ] [Main ] [svc] Unable to open SC manager! (1722)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17f4b9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10be7c000 modules=24 first=RockstarService.exe@0x12da00000
+[thread-sample] ml876 modmap peb=0x10be84000 modules=24 first=RockstarService.exe@0x130140000
+[thread-sample] ml876 modmap peb=0x10937c000 modules=24 first=RockstarService.exe@0x720f4c0000
+[win-name] #19 hwnd=0x1003a class='' text="Error" rev=ml853
+[footprint] rev=ml1060 fast phys=1832 MB compressed=0 MB
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[23:57:58.255] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=45 resident=2024MB dbg=DEBUGGED rev=ml525
+[23:57:59.486] [INFO] [session] length=34s partial=1 play=0s frames=0 stalls=0/0s peak=1844MB limit=6143MB thermal=nominal lpm=0 api=D3D9/DirectDraw/64 res=1408x648 mfx=1.5 cap=60 game=Grand Theft Auto IV: The Complete Edition
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1799 MB (peak 1832) internal=1745 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=19)
+[footprint] rev=ml358 phys=1828 MB (peak 1832) internal=1749 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=20)
+[footprint] rev=ml358 phys=1808 MB (peak 1832) internal=1752 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=21)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17f4b9020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10be7c000 modules=24 first=RockstarService.exe@0x12da00000
+[thread-sample] ml876 modmap peb=0x10be84000 modules=24 first=RockstarService.exe@0x130140000
+[footprint] rev=ml358 phys=1835 MB (peak 1835) internal=1756 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=22)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1839 MB (peak 1839) internal=1759 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=23)
+[footprint] rev=ml358 phys=1817 MB (peak 1839) internal=1763 MB compressed=0 MB external=277 MB reusable=11 MB (cycle=24)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[23:58:16.288] [INFO] [session] length=51s partial=1 play=0s frames=0 stalls=0/0s peak=1844MB limit=6143MB thermal=nominal lpm=0 api=D3D9/DirectDraw/64 res=1408x648 mfx=1.5 cap=60 game=Grand Theft Auto IV: The Complete Edition

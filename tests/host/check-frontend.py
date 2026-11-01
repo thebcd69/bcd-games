@@ -105,7 +105,8 @@ func madeira_set_vsync_locked(_ mode: Int32) { vsync = mode }
 enum ProMotionIntent {
     static var has30Cap = true
     static var has40Cap = true
-''' + block(fps, '    static func supportedMode(_ mode: Int) -> Int32 {') + r'''
+    static var panelMaxFPS = 120   // round 626 (agent H S2): sessionHz below reads it
+''' + block(fps, '    static func supportedMode(_ mode: Int) -> Int32 {') + "\n" + block(fps, '    static func sessionHz(for mode: Int32) -> Int {') + r'''
 }
 struct TouchControl: Codable, Equatable { var nx = 0.5 }
 enum ControlAction: Codable, Equatable, Hashable { case none }   // LibraryEntry.controllerBinds

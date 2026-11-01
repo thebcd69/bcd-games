@@ -1,0 +1,206 @@
+[19:07:50.954] [INFO] Checking entitlements...
+[19:07:50.955] [INFO] [build] v0.1.623 (623)
+[19:07:50.955] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=5663MB available=4072MB cores=6
+[19:07:50.956] [INFO] [device] address-map=[0x104d54000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:07:50.981] [INFO] [device] settings: low-power=0 thermal=serious screen=1179x2556@3.0x max-fps=120 utc-offset=+05:30 free-disk=42GB stikdebug-url=1
+[19:07:50.985] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:07:55.405] [INFO] [epic-launch] start app=24..ca signed-in=1 ovt=0 deployment=1 host=1 tree=1 services=0 desktop=0 arguments=epic
+[19:07:55.414] [INFO] [bcd] library launch PlaytimeLauncher.exe: avx=1 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off
+[19:07:55.431] [INFO] Running full Wine sequence...
+[19:07:55.431] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104d54000,0x8000000000) 512GB available=4061MB low-power=0 thermal=serious
+[19:07:55.443] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:07:55.443] [INFO] Allocating 896MB JIT pool via debugger...
+[19:07:55.443] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:07:55.444] [INFO] [jit-debugger] attached=1 at the pool request
+[19:07:55.446] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:07:57.801] [INFO] RX pool at 0x148000000
+[19:07:57.849] [INFO] Detaching debugger...
+[19:07:57.856] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.452s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3503 MB + phys_footprint=592 MB = 4096 MB (hw.memsize says 5663 MB)
+ml985: preferred base 0x140000000+0x87000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x88000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+ml957: ? backing 0x10cb60000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14808c000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481c6000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485e0000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148714000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487dc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[footprint] rev=ml358 phys=607 MB (peak 607) internal=606 MB compressed=0 MB external=137 MB reusable=3 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module PlaytimeLauncher.exe (playtimelauncher.exe-787bff5875bda6ce): 10CB60000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x149fa8000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a08c000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x14a110000)
+[phase] spawn:L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\PlaytimeLauncher\\Binaries\\Win64\\PlaytimeLauncher-Win64-Shipping.exe" t+  3.136s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\PlaytimeLauncher\\Binaries\\Win64\\PlaytimeLauncher-Win64-Shipping.exe\" PlaytimeLauncher -epicapp=246eeb03ef15431f8ea95c6c7ae1e2ca -epicenv=Prod -EpicPortal -epiclocale=en -epicdeploymentid=3a25c77cdb034ec1b49855819f489ab0" (fd=81, unixdir=89, dup_unixdir=97) cwd=L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\"
+ml985: map_image_view size=0x6b7d000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x151f20000)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fb660000) -> 64-bit table (0x115d90d00)
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x10ca90000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x14); registered the desktop/message classes for this process; retry 0 -> top_window=0x10024 msg_window=0x10026
+002c:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=2 first=00000001448A65B4
+[xp-names] m966309 "wine-x18-exc"
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[footprint] rev=ml358 phys=1280 MB (peak 1280) internal=1277 MB compressed=0 MB external=204 MB reusable=3 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 131072 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage broad: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[footprint] rev=ml1060 fast phys=1280 MB compressed=0 MB
+[copy-verify] mf.dll: OK, 16 .text pages executable (copy @0x154d64000)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #1 release of 0x702fd60000+0x200000 held for 2000 ms (1 in flight)
+[swap] ml1077 backed 0x702ff60000+0x400000 (whole reservation, ml1257) (file off 0 MB): 4 MB in 1 extents, peak 4 MB, 0 refused
+[free-delay] #2 release of 0x702ff60000+0x400000 held for 2000 ms (2 in flight)
+[swap] ml1077 backed 0x7030360000+0x800000 (whole reservation, ml1257) (file off 4 MB): 12 MB in 2 extents, peak 12 MB, 0 refused
+[free-delay] #3 release of 0x7030360000+0x800000 held for 2000 ms (3 in flight)
+[swap] ml1077 backed 0x7030b60000+0xfd0000 (whole reservation, ml1257) (file off 12 MB): 27 MB in 3 extents, peak 27 MB, 0 refused
+[free-delay] #4 release of 0x7030b60000+0xfd0000 held for 2000 ms (4 in flight)
+[swap] ml1077 backed 0x7031b30000+0xfd0000 (whole reservation, ml1257) (file off 27 MB): 43 MB in 4 extents, peak 43 MB, 0 refused
+[free-delay] #5 release of 0x7031b30000+0xfd0000 held for 2000 ms (5 in flight)
+[swap] ml1077 backed 0x7032b00000+0xfd0000 (whole reservation, ml1257) (file off 43 MB): 59 MB in 5 extents, peak 59 MB, 0 refused
+[free-delay] #6 release of 0x7032b00000+0xfd0000 held for 2000 ms (6 in flight)
+[swap] ml1077 backed 0x7033ad0000+0xfd0000 (whole reservation, ml1257) (file off 59 MB): 75 MB in 6 extents, peak 75 MB, 0 refused
+[free-delay] #7 release of 0x7033ad0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7034aa0000+0xfd0000 held for 2000 ms (8 in flight)
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=0000007036B41F50, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007036B41F50, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007036B41F50, feature level 0xb000, create)
+[swap] ml1077 backed 0x703dcd0000+0x800000 (whole reservation, ml1257) (file off 154 MB): 162 MB in 11 extents, peak 162 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0x10ca90000
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+[footprint] rev=ml1060 fast phys=1417 MB compressed=0 MB
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[swap] ml1077 backed 0x7040bf0000+0x400000 (whole reservation, ml1257) (file off 162 MB): 166 MB in 12 extents, peak 166 MB, 0 refused
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007036B420B0, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007036B420B0, feature level 0xc000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[swap] ml1077 backed 0x7041bc0000+0x2000000 (whole reservation, ml1257) (file off 166 MB): 198 MB in 13 extents, peak 198 MB, 0 refused
+[swap] ml1077 backed 0x7043bc0000+0x600000 (whole reservation, ml1257) (file off 198 MB): 204 MB in 14 extents, peak 204 MB, 0 refused
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=41MB: tex-RT=1MB/1 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/2 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/2 (peak 32) buf-shared=8MB/3 (peak 8)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=41MB: tex-RT=1MB/1 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/2 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/2 (peak 32) buf-shared=8MB/3 (peak 8)
+[footprint] rev=ml1060 fast phys=1609 MB compressed=0 MB
+[swap] ml1077 backed 0x7048d60000+0x400000 (whole reservation, ml1257) (file off 204 MB): 208 MB in 15 extents, peak 208 MB, 0 refused
+[swap] ml1077 backed 0x70491c0000+0x800000 (whole reservation, ml1257) (file off 208 MB): 216 MB in 16 extents, peak 216 MB, 0 refused
+[win-name] #7 hwnd=0x1004c class='' text="Default IME" rev=ml853
+[win-name] #8 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+[win-name] #9 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+[win-name] #10 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+[win-name] #14 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+[swap-diag] #1 layer 0x10ec08740: drawable 800x600 format 80 -> 2560x1440 format 90, set on the iOS main thread (dispatch_sync) ...
+[swap-diag] #1 layer 0x10ec08740: drawable 2560x1440 format 90 -> 2560x1440 format 90, set on the iOS main thread (dispatch_sync) ...
+[swap-diag] #1 layer 0x10ec08740: drawable 2560x1440 format 90 -> 2560x1440 format 90, set on the iOS main thread (dispatch_sync) ...
+[win-name] #15 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+[19:08:01.693] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[footprint] rev=ml1060 fast phys=1773 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1790 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=1813 MB compressed=0 MB
+[footprint] rev=ml358 phys=1816 MB (peak 1816) internal=1608 MB compressed=0 MB external=232 MB reusable=2 MB (cycle=3)
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=2130 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2464 MB compressed=0 MB
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[rb-tex] madeira-bcd new readback #1: fmt 115 4x4 level 0 (texture 64x64, 1 mips)
+[rb-tex] madeira-bcd new readback #3: fmt 125 1x1 level 0 (texture 1x1, 1 mips)
+[rb-tex] madeira-bcd new readback #4: fmt 90 4x4 level 0 (texture 32x32, 1 mips)
+[footprint] rev=ml358 phys=3212 MB (peak 3212) internal=907 MB compressed=807 MB external=283 MB reusable=2 MB (cycle=4)
+[footprint] rev=ml1060 fast phys=3287 MB compressed=806 MB
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml358 phys=3342 MB (peak 3342) internal=991 MB compressed=794 MB external=280 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml1060 fast phys=3342 MB compressed=793 MB
+[footprint] rev=ml358 phys=3344 MB (peak 3344) internal=1000 MB compressed=788 MB external=280 MB reusable=0 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x10f972600 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 430 passes (largest pass 1115 frames); ring 2093..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: program (program cursor)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b61d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[19:08:21.707] [OK] Early detach: game presenting and settled
+[19:08:23.711] [INFO] Detaching debugger...
+[ios_audio] ml1230 pacing stream=0x10f972600 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2091..4797 frames; worst late wake 0.1 ms; clamped 0 samples
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=66 resident=1320MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x10f972600 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 216 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2093..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b61d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x10f972600 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2091..4797 frames; worst late wake 0.0 ms; clamped 0 samples
+[phase] spawn:L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\Chapter1\\Poppy_Playtime.exe" t+ 57.294s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:/Program Files/Epic Games/PoppyPlaytimeChapterOne/PlaytimeLauncher/../Chapter1/Poppy_Playtime.exe\"  -epicenv=Prod -EpicPortal -epiclocale=en -epicdeploymentid=3a25c77cdb034ec1b49855819f489ab0 -epicapp=246eeb03ef15431f8ea95c6c7ae1e2ca" (fd=149, unixdir=342, dup_unixdir=350) cwd=L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\PlaytimeLauncher\\Binaries\\Win64\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x10ce40000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x104ddc000
+[nls-getptr] type=11 id=437 peb=0x104ddc000
+[nls-getptr] type=11 id=20127 peb=0x104ddc000
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x104ddc000
+[nls-getptr] type=11 id=437 peb=0x104ddc000
+[footprint] rev=ml1060 fast phys=3367 MB compressed=718 MB
+[win-name] #18 hwnd=0x20048 class='' text="PlaytimeLauncher  " rev=ml853
+D 100 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): 71F5730000
+D 100 Load module XINPUT1_3.DLL (xinput1_3.dll-1e6b91746083ed2b): 71F56A0000
+D 100 Load module hid.dll (hid.dll-c3a5177fc021edec): 71F5610000
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x157ce8000)
+D 100 Load module setupapi.dll (setupapi.dll-eb860a5cf96d3e18): 71F5530000
+D 100 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71F54B0000
+D 100 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): 71F53C0000
+[phase] spawn:L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\Chapter1\\Poppy_Playtime\\Binaries\\Win64\\Poppy_Playtime-Win64-Shipping.exe" t+ 57.534s rev=ml526
+0100:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\Chapter1\\Poppy_Playtime\\Binaries\\Win64\\Poppy_Playtime-Win64-Shipping.exe\" Poppy_Playtime -epicenv=Prod -EpicPortal -epiclocale=en -epicdeploymentid=3a25c77cdb034ec1b49855819f489ab0 -epicapp=246eeb03ef15431f8ea95c6c7ae1e2ca" (fd=362, unixdir=421, dup_unixdir=425) cwd=L"C:\\Program Files\\Epic Games\\PoppyPlaytimeChapterOne\\PlaytimeLauncher\\Binaries\\Win64\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x6e3d000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x6e3d000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=none err=0 at 0x0+0x0 rev=ajan5-motor
+[footprint] rev=ml1060 fast phys=3407 MB compressed=616 MB
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=17341
+[unwind] term ml661 begin rip=1513691d4 rsp=70243afe28 window=[70243afe28..7024bafe28) max=32
+[unwind] term ml661 #00 pc=1513691d4 rsp=70243afe28  <no module — STOP>
+[unwind] term ml661 end
+[store-noalias] #1 rev=ml348 addr=0xf0 insn=0xf940794b pc=0x150fec910 NO pool/anon alias | region 0x104d54000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0xf0 hostpc=0x150fec910 hinsn=0xf940794b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x150e0216c pc=0x150fec910 addr=0xf0 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104d54000+0x8000 [first] rev=ml555
+[rip-leak] guest RIP 0x150e0216c IS POOL addr = PE 0x71ffd4e16c (module base 0x71ffcd0000 rva 0x7e16c)
+[mach_exc] UNHANDLED #1 pc=0x150fec910 addr=0xf0 x18=0x71fffd0000 type=1 lr=0x150ddf9a0 sp=0x70243afa90 x16=0xffffffffffff x17=0x543f
+[guest-code] rev=ml333 pool_rip=0x150e0216c (PE 0x150e0216c) -- NO pool copy for this address (identity translate)
+[fault-host] 150fec810: 91006280 aa1303e1 aa1903e2 97fb9e65 f9002a9f aa1603e0 94021c93 aa1303e0
+[fault-host] 150fec830: aa1503e1 f9405bfe a94a6bf9 a9495bf5 a94853f3 910303ff d65f03c0 97ff9b0b
+[fault-host] 150fec850: d4200020 14000001 aa0003f3 910003e0 97fffdbf aa1303e0 94024ba2 d4200020
+[fault-host] 150fec870: 97ff9b02 d4200020 aa0003f3 aa1a03e0 97fb6c64 aa1303e0 94024b9a d4200020
+[fault-host] 150fec890: 97ff9afa d4200020 000c8f85 d10243ff a90653f3 a9075bf5 a9087bf9 f9402808
+[fault-host] 150fec8b0: d53bd069 927df129 eb09011f 54000101 f00014c8 9105c108 c85f7d09 91000529
+[fault-host] 150fec8d0: c80a7d09 35ffffaa 1400004d aa0003f3 f100003f f9402c00 92402c28 da9f1049
+[fault-host] 150fec8f0: 9000070c 8b090108 f940000a f940158c 913ffd08 2a0303f5 9274cc34 9274cd08
+[fault-host] 150fec910: f940794b f940018c eb08013f b000064a 00000000 00000000 00000000 00000000
+[swap] ml1077 stats: 96 MB file-backed now (peak 224), 10 extents, file used 224 of 131072 MB, backs 23 releases 13 unbacks 0 refused 0 | coverage broad: disk 49 MB of 4096 cap, reservations 23, holes 45, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 88 MB (peak 154), 0 MB kept in memory by swap-mb
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=23 resident=1735MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=Madeira`ios_mach_exception_thread+0xd43c lr=Madeira`ios_mach_exception_thread+0xd410 sp=0x16b61d1c0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=22 resident=1740MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=Madeira`ios_mach_exception_thread+0xd43c lr=Madeira`ios_mach_exception_thread+0xd410 sp=0x16b61d1c0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=3197 MB (peak 3357) internal=1399 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=51)
+[footprint] rev=ml358 phys=3196 MB (peak 3357) internal=1399 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=52)
+[footprint] rev=ml358 phys=3196 MB (peak 3357) internal=1399 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=53)
+[footprint] rev=ml358 phys=3196 MB (peak 3357) internal=1399 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=54)
+[footprint] rev=ml358 phys=3196 MB (peak 3357) internal=1399 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=55)
+[footprint] rev=ml358 phys=3197 MB (peak 3357) internal=1400 MB compressed=294 MB external=294 MB reusable=0 MB (cycle=56)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[19:09:51.078] [INFO] [session] length=115s partial=1 play=51s frames=869 avg=18.0 low1=14.9 worst=2969ms stalls=1/3s peak=3518MB limit=4095MB thermal=serious lpm=0 res=1280x720 mfx=2 cap=60 game=Poppy Playtime

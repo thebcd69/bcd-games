@@ -46,8 +46,11 @@ for name, text in [('MadeiraDock.swift', dock), ('MadeiraDockModel.swift', view)
     # madeira-bcd (d0f94231): DockInstallers.isDirectXSetup tells Microsoft's own DirectX End-User Runtime setup by its two file
     # names (dxsetup.exe, dxwebsetup.exe); it is a Microsoft redistributable, not a game's program, and only a setup that already
     # failed once in the game is acted on (tests/host/check-dock-installers.py).
+    # madeira-bcd (round 626, agent A1 S12, 1a47d821): DockInstallers.isEAAppInstaller tells the EA app's installer (EAappInstaller.exe), which
+    # a Steam game from EA runs as a one-time install, by its file name; it is EA's client installer, not a game's program, and only its
+    # install session gets msiexec in system32 (tests/host/check-dock-ea-installer.py).
     require(names <= {'dockhost.exe', 'explorer.exe', 'steam.exe', '.exe', 'msiexec.exe', 'steamservice.exe',
-                      'dxsetup.exe', 'dxwebsetup.exe'},
+                      'dxsetup.exe', 'dxwebsetup.exe', 'eaappinstaller.exe'},
             f'{name}: no program-name list ({sorted(names)})')
     for line in text.splitlines():
         if re.search(r'SteamLog\.(event|trace)|LogStore|print\(|NSLog', line):

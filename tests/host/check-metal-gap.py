@@ -72,8 +72,9 @@ check("ring chunks counted when a new one is made, after the pool and the failur
 heap = block("static HRESULT STDMETHODCALLTYPE device_CreateHeap(ID3D12Device *This, const D3D12_HEAP_DESC *desc,")
 mrel = block("static ULONG STDMETHODCALLTYPE memheap_Release(ID3D12Heap *This) {")
 check("placement heaps count while the application holds them",
-      "if (h->mtl) { mad_resident(hd, h->mtl); InterlockedExchangeAdd64(&g_mheap_bytes, (LONG64)desc->SizeInBytes); }" in heap
-      and "InterlockedExchangeAdd64(&g_mheap_bytes, -(LONG64)h->desc.SizeInBytes);" in mrel
+      "if (h->mtl) { mad_resident(hd, h->mtl); InterlockedExchangeAdd64(&g_mheap_bytes, (LONG64)want); }" in heap
+      and "InterlockedExchangeAdd64(&g_mheap_bytes, -(LONG64)h->msize);" in mrel   # round 626: the Metal heap's size (d3d12-heap-va-align)
+      and "h->msize = want;" in heap
       and mrel.index("if (h->mtl) {") < mrel.index("g_mheap_bytes"))
 
 clock = src[src.index("/* ml1150: the memory census on a clock"):]

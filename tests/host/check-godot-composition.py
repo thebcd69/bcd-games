@@ -191,7 +191,7 @@ check('dxgi-src.dll\'s build applies it after the other factory overlays, tolera
       and 'LC_ALL=C grep -aq "MADEIRA_DXGI_COMPOSITION" "$OUT/dxgi.dll"' in bd)
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('a list may set the switch (0 or 1) and name dcomp', '"MADEIRA_DXGI_COMPOSITION",' in pol and 'case "MADEIRA_DXGI_COMPOSITION":' in pol
-      and '|| $0 == "kernelbase" || $0 == "dcomp" }) else {' in pol)
+      and '|| $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" }) else {' in pol)   # msvproc: round 626 (agent V)
 cat = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()
 check('the catalog documents the switch (off by default)', re.search(r'key: "env\.MADEIRA_DXGI_COMPOSITION"[^\n]*kind: \.bool, defaultValue: "0"', cat) is not None)
 recs = json.loads((root / 'recommended/recommendations.json').read_text())

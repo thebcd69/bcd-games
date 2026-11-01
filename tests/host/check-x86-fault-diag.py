@@ -209,6 +209,7 @@ for r in recs['rules']:
 check('the bundled lists that carry the switch are exactly Most Wanted, Underground 2, Chuchel, Botanicula and (round 624) Mafia II, osu!, Overlord II, '
       'Ubisoft Connect, Unreal Gold and Doki Doki Literature Club, once each, as env.MADEIRA_X86_FAULT_DUMP = 1 with minBuild 598 (Mafia II and Unreal Gold 624)',
       sorted(carriers) == [('botanicula', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('chuchel', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+                           ('crosscode', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),   # round 626 (agent U1 S3, DBS8WF)
                            ('doki-doki-literature-club', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
                            ('mafia-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624),
                            ('nfs-most-wanted', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('nfs-underground-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),

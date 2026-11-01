@@ -1,0 +1,214 @@
+[20:57:27.196] [INFO] Checking entitlements...
+[20:57:27.198] [INFO] [build] v0.1.623 (623)
+[20:57:27.198] [INFO] [device] model=iPhone17,4 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6122MB cores=6
+[20:57:27.198] [INFO] [device] address-map=[0x102148000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[20:57:27.211] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=60 utc-offset=-04:00 free-disk=19GB stikdebug-url=0
+[20:57:27.219] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:57:34.540] [INFO] Requesting JIT with Built-in StikJIT...
+[20:57:36.081] [INFO] [epic-launch] start app=9b..26 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[20:57:36.085] [INFO] [bcd] library launch Sable.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:57:36.098] [INFO] Running full Wine sequence...
+[20:57:36.098] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102148000,0x8000000000) 512GB available=6101MB low-power=0 thermal=nominal
+[20:57:36.103] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:57:36.103] [INFO] Allocating 896MB JIT pool via debugger...
+[20:57:36.103] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:57:36.103] [INFO] [jit-debugger] attached=1 at the pool request
+[20:57:36.105] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:57:36.875] [INFO] RX pool at 0x148000000
+[20:57:36.894] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.832s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[20:57:37.268] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[20:57:37.268] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5494 MB + phys_footprint=649 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: preferred base 0x140000000+0xa5000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa8000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x11ab40000+0xa5000 (WindowsPlayer.exe) → pool 0x148007000 used=0xb3000/0x25000000 tramp+0x0
+[copy-verify] WindowsPlayer.exe: OK, 3 .text pages executable (copy @0x148007000)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1480b0000 used=0x1e8000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1480b0000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x412000 (libarm64ecfex.dll) → pool 0x1481ea000 used=0x606000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481ea000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x148604000 used=0x738000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148604000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148738000 used=0x800000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148738000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x148800000 used=0xb00000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148800000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[footprint] rev=ml358 phys=664 MB (peak 664) internal=651 MB compressed=0 MB external=70 MB reusable=8 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Sable.exe (sable.exe-591997692baa986a): 11AB40000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-56cd747ef7237d6a): 71FC780000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FC560000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FC470000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FC3C0000
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14b22c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14b2b0000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14b394000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14b418000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14bd9c000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fafc0000) -> 64-bit table (0x104f28d00)
+[bigres] tid=0024 #1 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=511 MB
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[bigres] tid=0024 #2 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=1023 MB
+[bigres] tid=0024 #3 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=1535 MB
+[bigres] tid=0024 #4 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=2047 MB
+[bigres] tid=0024 #5 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=2559 MB
+[bigres] tid=0024 #6 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=3071 MB
+[bigres] tid=0024 #7 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=3583 MB
+[bigres] tid=0024 #8 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=4095 MB
+[bigres] tid=0024 #9 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=4607 MB
+[bigres] tid=0024 #10 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=5119 MB
+[bigres] tid=0024 #11 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=5631 MB
+[copy-verify] dnsapi.dll: OK, 3 .text pages executable (copy @0x14ff28000)
+[free-delay] #1 release of 0x7027600000+0x310000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7028b10000+0x110000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7028c20000+0x210000 held for 2000 ms (3 in flight)
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001DC status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012228E9D0 flags=00100003
+[bigres] tid=002c #12 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=6143 MB
+[xp-names] m4226189 "wine-x18-exc"
+[win-name] #5 hwnd=0x10036 class='' text="Default IME" rev=ml853
+[bigres] tid=0024 #13 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=6655 MB
+[bigres] tid=0024 #14 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=7167 MB
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Shedworks/Sable/Player.log
+[guest-log] #1 tid=0024     Renderer: Apple A18 GPU (ID=0x0)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[bigres] tid=0024 #15 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=7679 MB
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x20010000) and no V8 cage was asked for; its first page stays a guard
+[win-name] #7 hwnd=0x2002e class='' text="Sable" rev=ml853
+[win-name] #8 hwnd=0x2002e class='' text="Sable" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[bigres] tid=00b8 #16 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=8191 MB
+[bigres] tid=00b8 #17 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=8703 MB
+[steer] #1 size=0x1ffff000 reserved_total=8703MB armed=8GB-total -> above ceiling 0x7c47800000
+[win-name] #16 hwnd=0x10048 class='' text="Default IME" rev=ml853
+[win-name] #17 hwnd=0x10044 class='' text="InControl Message Window" rev=ml853
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000001DC status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012228E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=000000000000039C status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=00000072245DE9D0 flags=00100003
+[jit-pool] image 0x73fe380000+0x130000 (msvcp140.dll) → pool 0x152434000 used=0xa568000/0x25000000 tramp+0x4000
+D 24 Load module MSVCP140.dll (msvcp140.dll-fd8e26e91ed9d4a2): 73FE380000
+[jit-pool] image 0x73fe300000+0x80000 (vcruntime140.dll) → pool 0x152568000 used=0xa5ec000/0x25000000 tramp+0x4000
+D 24 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): 73FE300000
+[jit-pool] image 0x73fe2f0000+0xc000 (VCRUNTIME140_1.dll) → pool 0x1525ec000 used=0xa5f8000/0x25000000 tramp+0x0
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 73FE2F0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x73fe2a0000+0x4e000 (CONCRT140.dll) → pool 0x1525f8000 used=0xa648000/0x25000000 tramp+0x0
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 73FE2A0000
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............."
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[guest-log] #2 tid=0024 [EOS][LogEOSOverlay][Warning] Failed to initialize overlay module: PATH_NOT_CONFIGURED
+[guest-log] #3 tid=0024 [EOS][LogEOSAuth][Warning] FAccountPortalBrowserManager::Init: Failed to register overlay: EOS_NotConfigured
+[jit-pool] image 0x73fdee0000+0x33b000 (fmodstudio.dll) → pool 0x15264b000 used=0xa98b000/0x25000000 tramp+0x0
+D 24 Load module fmodstudio.dll (fmodstudio.dll-12c8ec9425abe557): 73FDEE0000
+[jit-pool] image 0x73fde40000+0xa0000 (mmdevapi.dll) → pool 0x152988000 used=0xaa2c000/0x25000000 tramp+0x4000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 73FDE40000
+[free-delay] #4 release of 0x7223730000+0x100000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7223630000+0x100000 held for 2000 ms (5 in flight)
+[footprint] rev=ml358 phys=1467 MB (peak 1467) internal=1398 MB compressed=0 MB external=126 MB reusable=8 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=1468 MB compressed=0 MB
+[footprint] rev=ml358 phys=1464 MB (peak 1467) internal=1395 MB compressed=0 MB external=126 MB reusable=8 MB (cycle=3)
+[free-delay] #6 release of 0x7250250000+0x290000 held for 2000 ms (1 in flight)
+[free-delay] #7 release of 0x72504e0000+0x130000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x7251040000+0x2c0000 held for 2000 ms (3 in flight)
+[footprint] rev=ml358 phys=1516 MB (peak 1516) internal=1448 MB compressed=0 MB external=126 MB reusable=8 MB (cycle=4)
+[bigres] tid=00b8 #18 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=9215 MB
+[steer] #2 size=0x1ffff000 reserved_total=9215MB armed=8GB-total -> above ceiling 0x7c91800000
+[20:57:43.513] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[footprint] rev=ml1060 fast phys=1763 MB compressed=0 MB
+[launch-view] dismissed reason=present logs=0
+err:   [bc-census] ml653 periodic: 64 BC resources, 355 subresources
+err:   [bc-census] ml653   BC1_UNORM_SRGB n=27 16928KB max=2048x2048 mips=12 arr=6 cube=1 | use def=27 imm=0 dyn=0 stg=0 | data y=27 n=0 | cpu r=0 w=0 | bind srv=27 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM_SRGB n=37 29008KB max=2048x2048 mips=12 arr=1 cube=0 | use def=37 imm=0 dyn=0 stg=0 | data y=37 n=0 | cpu r=0 w=0 | bind srv=37 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x25
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x35
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=0 CopyResource=0 CopySubresourceRegion=0 Map=0
+[footprint] rev=ml1060 fast phys=1910 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2060 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2115 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2189 MB compressed=0 MB
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000148818110 flags=1 nparams=4 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000148818110 flags=1 nparams=4 tid=0024 hit=2
+[footprint] rev=ml358 phys=2451 MB (peak 2451) internal=1832 MB compressed=0 MB external=130 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=2590 MB (peak 2590) internal=1831 MB compressed=0 MB external=130 MB reusable=5 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x11c391100 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e4e5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x11c391100 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000148818110 flags=1 nparams=4 tid=0024 hit=3
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000148818110 flags=1 nparams=4 tid=0024 hit=4
+[guest-log] #4 tid=0024 Failed to find a valid fullscreen resolution for exclusiveFullscreen 1424x656 failed, trying without exclusive fullscreen mode
+[win-name] #18 hwnd=0x2002e class='' text="Sable" rev=ml853
+[20:58:03.520] [OK] Early detach: game presenting and settled
+[footprint] rev=ml358 phys=2759 MB (peak 2780) internal=1736 MB compressed=104 MB external=129 MB reusable=4 MB (cycle=14)
+[20:58:05.525] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=2763 MB (peak 2780) internal=1740 MB compressed=104 MB external=129 MB reusable=4 MB (cycle=15)
+[guest-log] #5 tid=0024 Exception: [EOS] User is not connected to Epic Online Services.
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=71 resident=1807MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=3149 MB (peak 3149) internal=1703 MB compressed=354 MB external=129 MB reusable=4 MB (cycle=16)
+[bigres] tid=009c #19 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=9727 MB
+[steer] #3 size=0x1ffff000 reserved_total=9727MB armed=8GB-total -> above ceiling 0x7cb8400000
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=00000000000004F4 status=00000000 native_pc=00000002576A0AE8 is_ec=0 -> returned rip=00000002576A0AE8 rsp=000000725113FA00 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=0000000000000508 status=00000000 native_pc=00000002576A0AE8 is_ec=0 -> returned rip=00000002576A0AE8 rsp=000000725A92FA00 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=00000000000005A0 status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=0000007251E7E840 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=00000000000005A4 status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000725207E840 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=00000000000005A8 status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=00000072633FE840 flags=00100003
+[ios_audio] ml1230 pacing stream=0x11c391100 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=4161 MB (peak 4161) internal=1866 MB compressed=707 MB external=130 MB reusable=4 MB (cycle=17)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=41 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=41 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=41 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=41 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=45 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=4757 MB (peak 4757) internal=1985 MB compressed=839 MB external=130 MB reusable=0 MB (cycle=18)
+[footprint] rev=ml1060 fast phys=5212 MB compressed=883 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=70 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=5263 MB compressed=887 MB
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x1
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x412
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x1120
+err:   [bc-census] ml653   SRV view fmt 98 (BC7_UNORM) x2
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=0 CopyResource=0 CopySubresourceRegion=0 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 1826861KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=71 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=5328 MB compressed=890 MB
+[guest-log] #6 tid=0024 GPUI prefab 'WindCatcher (10)' doesn't have a prototype!
+[guest-log] #7 tid=0024 GPUI prefab 'WindCatcher (12)' doesn't have a prototype!
+[guest-log] #8 tid=0024 GPUI prefab 'WindCatcher (9)' doesn't have a prototype!
+[guest-log] #9 tid=0024 GPUI prefab 'WindCatcher (11)' doesn't have a prototype!
+[guest-log] #10 tid=0024 GPUI prefab 'WindCatcher (10)' doesn't have a prototype!
+[footprint] rev=ml358 phys=5405 MB (peak 5405) internal=2225 MB compressed=899 MB external=106 MB reusable=0 MB (cycle=19)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=84 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=5501 MB compressed=970 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=84 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[guest-log] #11 tid=0024 GPUI prefab 'DuneSmallFoliagePlant02' doesn't have a prototype!
+[footprint] rev=ml1060 fast phys=5583 MB compressed=998 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=84 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=84 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #35 handle=00000000000001DC status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012228E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #36 handle=00000000000005C4 status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=0000000122C9E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #37 handle=00000000000005B4 status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=0000000122E9E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #38 handle=000000000000050C status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012309E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #39 handle=000000000000051C status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012329E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #40 handle=000000000000048C status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=000000012349E9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=000000000000039C status=00000000 native_pc=00000002576A5EE8 is_ec=0 -> returned rip=00000002576A5EE8 rsp=00000072245DE9D0 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=00000000000004F0 status=00000000 native_pc=00000002576A8388 is_ec=0 -> returned rip=00000002576A8388 rsp=000000725044FB00 flags=00100003
+[footprint] rev=ml1060 fast phys=5676 MB compressed=1176 MB
+*** Terminating app due to uncaught exception 'com.apple.CoreHaptics', reason: '-[CHHapticEngine(CHHapticEngineInternal) checkEngineRunning:]: self.running'

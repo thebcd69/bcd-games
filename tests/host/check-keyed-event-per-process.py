@@ -229,7 +229,7 @@ check('only the header and the loader name the switch in the C sources and the a
       == {'build/ntdll-unix/ios_keyed_event.h', 'build/ntdll-unix/loader_ios.c'}, str(sorted(readers)))
 recs = json.loads((root / 'recommended/recommendations.json').read_text())
 setters = sorted(r['id'] for r in recs['rules'] if 'MADEIRA_KEYED_EVENT_PER_PROCESS' in json.dumps(r.get('config', [])) + json.dumps(r.get('smallRAMConfig', [])))
-check('in the list only the rule of Control sets it (a game that never ran past this crash)', setters in ([], ['control']), str(setters))
+check('in the list only the rules of Control and (round 626) CrossCode set it (games that never ran past this crash)', setters in ([], ['control'], ['control', 'crosscode']), str(setters))
 spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

@@ -1,0 +1,181 @@
+[18:01:44.911] [INFO] Checking entitlements...
+[18:01:44.911] [INFO] [build] v0.1.623 (623)
+[18:01:44.912] [INFO] [device] model=iPad16,10 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11845MB available=12265MB cores=8
+[18:01:44.912] [INFO] [device] address-map=[0x1040fc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[18:01:44.930] [INFO] [device] settings: low-power=0 thermal=nominal screen=2048x2732@2.0x max-fps=60 utc-offset=+08:00 free-disk=65GB stikdebug-url=1
+[18:01:44.933] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[18:01:47.334] [INFO] [bcd] library launch game.bat: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[18:01:47.349] [INFO] Running full Wine sequence...
+[18:01:47.349] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1040fc000,0x8000000000) 512GB available=12248MB low-power=0 thermal=nominal
+[18:01:47.354] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[18:01:47.354] [INFO] Allocating 896MB JIT pool via debugger...
+[18:01:47.354] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[18:01:47.354] [INFO] [jit-debugger] attached=1 at the pool request
+[18:01:47.356] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[18:01:49.232] [INFO] RX pool at 0x148000000
+[18:01:49.259] [INFO] Detaching debugger...
+[18:01:49.277] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.953s rev=ml526
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[18:01:49.547] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11678 MB + phys_footprint=609 MB = 12288 MB (hw.memsize says 11845 MB)
+ml985: preferred base 0x140000000+0xa0000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[jit-pool] image 0x10bae0000+0xa0000 (?) → pool 0x148004000 used=0xa8000/0x23000000 tramp+0x4000
+[copy-verify] ?: OK, 7 .text pages executable (copy @0x148004000)
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x1480a8000 used=0x1c0000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x1480a8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x1481c0000 used=0x268000/0x23000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x1481c0000)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148268000 used=0x3e8000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148268000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71ff200000+0x8e0000 (shell32.dll) → pool 0x1483e8000 used=0xccc000/0x23000000 tramp+0x4000
+[copy-verify] shell32.dll: OK, 30 .text pages executable (copy @0x1483e8000)
+[jit-pool] image 0x71ff170000+0x90000 (shlwapi.dll) → pool 0x148ccc000 used=0xd60000/0x23000000 tramp+0x4000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x148ccc000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7023f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=630 MB (peak 630) internal=629 MB compressed=0 MB external=115 MB reusable=6 MB (cycle=1)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  2.348s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" /wait \"C:\\ExternalGames\\Grand-Theft-Auto-San-Andreas-<redacted>\\Grand Theft Auto San Andreas\\gta_sa.exe\"" (fd=49, unixdir=78, dup_unixdir=82) cwd=L"C:\\ExternalGames\\Grand-Theft-Auto-San-Andreas-<redacted>\\Grand Theft Auto San Andreas\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x14a144000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14a1d8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14a23c000)
+[copy-verify] sechost.dll: OK, 4 .text pages executable (copy @0x14a2d0000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x14a334000)
+[phase] spawn:L"C:\\ExternalGames\\Grand-Theft-Auto-San-Andreas-<redacted>\\Grand Theft Auto San Andreas\\gta_sa.exe" t+  2.396s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\ExternalGames\\Grand-Theft-Auto-San-Andreas-<redacted>\\Grand Theft Auto San Andreas\\gta_sa.exe\" " (fd=92, unixdir=93, dup_unixdir=97) cwd=L"C:\\ExternalGames\\Grand-Theft-Auto-San-Andreas-<redacted>\\Grand Theft Auto San Andreas\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71fd7b0000, then OCCUPIED 0x71fd7b0000+0x10000 prot=1/3 shared=0 (0x2850000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+ml957: ? backing 0x7901554000+0x24000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0034:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7900400000 transfer=0x7900824570 window=0x7900000000 guest_base=0x400000
+[file-fail] ml665 #29 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0034:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0034:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71fd380000+0x3bc000 (libwow64fex.dll) → pool 0x14bc29000 used=0x3fed000/0x23000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71fd380000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[bigres] tid=0034 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x71fd380000) -> 64-bit table (0x112ff8d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 34 Load module gta_sa.exe (gta_sa.exe-438265c5ff174580): 7900400000
+D 34 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 79FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 34 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 797BED0000
+D 34 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 797BC40000
+[nls-getptr] type=11 id=437 peb=0x7900310000
+D 34 Load module WINMM.dll (winmm.dll-1143775136415a3f): 797BB70000
+D 34 Load module user32.dll (user32.dll-7d7be97280d9f53b): 797B9B0000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14c452000)
+ml957: ? backing 0x797b8b8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797b4a8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[free-delay] #1 release of 0x7902800000+0x100000 held for 2000 ms (1 in flight)
+ml957: ? backing 0x797b438000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #2 release of 0x7902a50000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7902d70000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7903290000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7903ab0000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7904aa0000+0xfd0000 held for 2000 ms (6 in flight)
+[unixlib] opengl32 (GL-absent stub table) (module 0x797afd0000) -> wow64 table (0x113000d00)
+0034:err:win:ios_child_desktop_fixup [child-desktop] pid=0030 peb=0x7900310000 tid=0034: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10024 msg_window=0x10026
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[nls-getptr] type=11 id=10000 peb=0x7900310000
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x2002a class='' text="WineD3D fake window" rev=ml853
+0034:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 06273F08.
+[free-delay] #7 release of 0x7907d30000+0x390000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x79080c0000+0x390000 held for 2000 ms (8 in flight)
+D 34 Load module D3D8.DLL (d3d8.dll-1582b8d8b97da60d): 797AF90000
+ml957: ? backing 0x797af74000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[image-reload] unmapped image 0x797af70000+0x7000: 1 pool copy marked
+[win-name] #7 hwnd=0x20034 class='' text="Default IME" rev=ml853
+[win-name] #8 hwnd=0x3002a class='' text="WineD3D fake window" rev=ml853
+0034:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 06273F08.
+ml957: ? backing 0x797af60000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #13 hwnd=0x1003a class='' text="Default IME" rev=ml853
+[win-name] #14 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[jit-pool] image 0x797ac30000+0x1b000 (?) → pool 0x14c4e7000 used=0x4507000/0x23000000 tramp+0x0
+ml957: ? backing 0x797ac48000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x797a880000+0xe000 (?) → pool 0x14c505000 used=0x4519000/0x23000000 tramp+0x0
+ml957: ? backing 0x797a88c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #15 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[win-name] #16 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[win-name] #20 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[win-name] #21 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[stale-heal]   3 slot(s) in the copy of 0x71fd380000 (libwow64fex.dll) -> 0x14bb0b294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[xp-names] m1862521 "wine-x18-exc"
+[win-name] #22 hwnd=0x40030 class='' text="GTA: San Andreas" rev=ml853
+[18:01:50.314] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml358 phys=944 MB (peak 944) internal=869 MB compressed=0 MB external=145 MB reusable=6 MB (cycle=2)
+[guest-stk] sp+0x28 0x14bd2ea7c = libwow64fex.dll+0x105a7c
+[guest-stk] sp+0x138 0x14bd63f2c = libwow64fex.dll+0x13af2c
+[guest-stk] sp+0x160 0x14be064f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x170 0x14bc3fa0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x378 0x14bd2c5f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x3d8 0x14bd2c57c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x4f8 0x14bd2c574 = libwow64fex.dll+0x103574
+[footprint] rev=ml358 phys=920 MB (peak 944) internal=848 MB compressed=0 MB external=145 MB reusable=8 MB (cycle=3)
+[footprint] rev=ml358 phys=961 MB (peak 961) internal=853 MB compressed=0 MB external=145 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=923 MB (peak 961) internal=850 MB compressed=0 MB external=145 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=924 MB (peak 961) internal=852 MB compressed=0 MB external=145 MB reusable=8 MB (cycle=6)
+D 34 Load module quartz.dll (quartz.dll-0b037268ac641cc8): 797A7F0000
+D 34 Load module devenum.dll (devenum.dll-2d82771b9509673b): 797A790000
+[jit-pool] image 0x797a770000+0x7000 (?) → pool 0x14c518000 used=0x4520000/0x23000000 tramp+0x0
+ml957: ? backing 0x797a774000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 34 Load module avicap32.dll (avicap32.dll-5a25c37345cb5843): 797A770000
+[jit-pool] image 0x797a740000+0x16000 (?) → pool 0x14c522000 used=0x453e000/0x23000000 tramp+0x0
+ml957: ? backing 0x797a754000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 34 Load module msdmo.dll (msdmo.dll-9d7e478473d603ee): 797A740000
+[jit-pool] image 0x797a720000+0xa000 (?) → pool 0x14c53d000 used=0x454d000/0x23000000 tramp+0x0
+ml957: ? backing 0x797a728000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 34 Load module msacm32.drv (msacm32.drv-c413c908d8d4902d): 797A720000
+[jit-pool] image 0x797a700000+0x7000 (?) → pool 0x14c54c000 used=0x4554000/0x23000000 tramp+0x0
+ml957: ? backing 0x797a704000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 34 Load module midimap.dll (midimap.dll-08e332885fe49f14): 797A700000
+D 60 Load module winegstreamer.dll (winegstreamer.dll-08fe9f4568d65b1c): 797A690000
+[unixlib] winegstreamer (wma + wg_parser, libav*) (module 0x797a690000) -> wow64 table (0x11295f018)
+[wg-parser] ml1990 connect refused (no container, compressed_out=1): no enabled demuxer recognised the stream
+[wg-parser] ml1990 connect refused (no container, compressed_out=1): no enabled demuxer recognised the stream (repeat #2)
+[wg-parser] ml1990 connect refused (no container, compressed_out=0): no enabled demuxer recognised the stream
+[win-name] #24 hwnd=0x10042 class='' text="DIEmWin" rev=ml853
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c15d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[18:02:10.530] [OK] Early detach: game presenting and settled
+[18:02:12.533] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=33 resident=1065MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c15d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=28 resident=1060MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=922 MB (peak 961) internal=903 MB compressed=0 MB external=147 MB reusable=9 MB (cycle=35)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c15d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=921 MB (peak 961) internal=903 MB compressed=0 MB external=147 MB reusable=9 MB (cycle=36)
+[footprint] rev=ml358 phys=921 MB (peak 961) internal=903 MB compressed=0 MB external=147 MB reusable=9 MB (cycle=37)
+[footprint] rev=ml358 phys=922 MB (peak 961) internal=904 MB compressed=0 MB external=147 MB reusable=8 MB (cycle=38)
+[frontend] graceful close requested
+[wg-parser] ml1990 connect refused (no container, compressed_out=1): no enabled demuxer recognised the stream (repeat #4)
+[wg-parser] ml1990 connect refused (no container, compressed_out=0): no enabled demuxer recognised the stream (repeat #2)
+[footprint] rev=ml358 phys=924 MB (peak 961) internal=905 MB compressed=0 MB external=148 MB reusable=9 MB (cycle=39)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=924 MB (peak 961) internal=905 MB compressed=0 MB external=157 MB reusable=9 MB (cycle=40)
+[18:03:09.281] [INFO] [session] length=81s partial=1 play=10s frames=601 avg=60.6 low1=59.0 worst=33ms stalls=0/0s peak=980MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=Grand Theft Auto: San Andreas – The Definitive Edition
