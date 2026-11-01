@@ -94,6 +94,12 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
 - **.NET games** through Wine Mono, downloaded in the app.
 - **Feedback from the app:** Settings › Feedback to tell us what is broken or what to improve,
   and Send Log after a crash.
+- **iPhone Duo (experimental):** on the foldable iPhone, turn on Settings › Graphics › Foldable
+  iPhone support (experimental). A game you add then starts at a resolution shaped like the inner
+  display, the touch controls follow the screen when you fold or unfold the phone, and BCD uses its
+  phone layout in a window narrower than 700 points. Installed directly, iOS shows BCD in a small
+  window on the inner display; inside LiveContainer it fills the screen. The switch is off by
+  default and changes nothing on other iPhones and iPads.
 
 ## Games
 
@@ -114,27 +120,80 @@ Also running: Warcraft II: Battle.net Edition. Work in progress: Ratchet & Clank
 
 ### Seen running in testers' logs and reports
 
-These games reached gameplay and were played for several minutes without a crash in the logs
-testers sent with Send Log, or were reported running on the BCD Discord with the device and
-frame rate. None of them was played from start to finish, and results depend on the device,
-the iOS version and the settings.
+These games reached gameplay and were played for several minutes in the logs testers sent with
+Send Log, or were reported running on the BCD Discord (the device and frame rate are given where
+the report had them). None of them was played from start to finish, and results depend on the
+device, the iOS version and the settings.
 
+- Aliens versus Predator Classic 2000 (M5 iPad Pro: keyboard and mouse)
+- Ancestors: The Humankind Odyssey
+- Batman: Arkham Asylum (iPhone 13 Pro Max: default settings, 50-60 FPS)
+- Batman: Arkham City (M4 iPad Pro: high settings, 1600x1200, 40-60 FPS)
+- Batman: Arkham Knight (M5 iPad Pro: maximum settings, native resolution, 30 FPS)
+- Batman: Arkham Origins (M4 iPad Pro: high settings, 1600x1200, 40-60 FPS)
+- Call of Duty 4: Modern Warfare (M5 iPad Pro)
+- Call of Duty: Black Ops (iPhone 17 Pro)
+- Call of Duty: Black Ops II, Zombies mode (iPhone 15)
+- Call of Duty: Modern Warfare 3 (iPhone 17 Pro: medium settings, 40-50 FPS)
+- Call of Duty: World at War (iPad Air M4)
 - Celeste
 - Cleared Hot
+- Counter-Strike: Source (iPhone 14 Pro)
 - Dark Souls II: Scholar of the First Sin
+- Dead Rising
 - Dead Space (2008)
 - DELTARUNE
+- Dokimon (iPhone 15 Pro Max)
 - Doom 3
+- Dragon's Dogma: Dark Arisen (iPhone 17 Pro: 720p with 2x upscaling, mostly 60 FPS)
+- Dying Light (iPhone 17 Pro Max)
+- The Elder Scrolls V: Skyrim Special Edition (iPhone 15 Pro Max: 14-25 FPS)
+- F1 2020 (M5 iPad Pro: native resolution)
+- Fallout 4
 - Fallout: New Vegas
+- Far Cry 2 (iPhone 15 Pro Max: 720p low/medium, 30-60 FPS)
 - Far Cry 3
 - Final Fantasy VII Remake Intergrade (M5 iPad Pro: low settings, 900p, 30 FPS)
+- Fistful of Frags (iPhone 14 Pro: low FPS)
+- Half-Life 2 (iPhone 14: 60 FPS)
+- Hollow Knight: Silksong (M5 iPad Pro)
+- Kingdom Come: Deliverance (M5 iPad Pro: low settings, about 50 FPS)
 - Kingdom Hearts III (M5 iPad Pro: highest settings, mostly 60 FPS)
+- Left 4 Dead 2 (iPad Air M2: medium settings, online play works)
 - Marie's Room
+- Marvel's Spider-Man Remastered (iPad Air M3: 23-30 FPS, flickering)
+- Megabonk
 - METAL GEAR SOLID: Peace Walker - Master Collection Version
 - Metro 2033 Redux (iPhone 17 Pro: 60 FPS with tessellation off)
+- Metro Exodus (M4 iPad Pro: 1280x720, 30-80 FPS)
+- Metro: Last Light Redux (iPhone 17 Pro)
+- MiSide
 - Moonlighter
+- Need for Speed: The Run (iPhone 17 Pro Max)
+- NieR:Automata (M5 iPad Pro: lowest settings, 1728x1192, 40-60 FPS)
+- No, I'm not a Human (iPad Air M2)
+- Outlast (iPhone 17 Pro: about 45 FPS)
+- Overcooked! 2 (iPad Air M4)
+- Pacific Drive (iPhone 17 Pro: 15-20 FPS)
+- PEAK (iPad Air M3: low settings, about 30 FPS)
+- Pizza Tower
+- PlateUp! (M1 iPad: 40 FPS)
+- POSTAL 2 (iPhone 15)
+- Requiem: Avenging Angel (iPad M5)
+- Rise of the Tomb Raider (iPhone 17 Pro Max)
+- Satisfactory (M1 iPad)
+- Schedule I (M5 iPad Pro)
+- Shadow of the Tomb Raider (M4 iPad Pro)
+- Silent Hunter III (M5 iPad Pro)
+- Slay the Spire 2
+- Sleeping Dogs: Definitive Edition (iPhone 15 Pro Max: 15-30 FPS)
+- Sonic Mania
+- System Shock 2 (M5 iPad Pro: keyboard and mouse)
 - Timberborn
 - Tomb Raider (2013)
+- ULTRAKILL (iPad Air M4)
+- Undertale
+- The Witcher 3: Wild Hunt (iPad Air M3, version 1.32: low settings, 40-60 FPS)
 
 How well a game runs varies a lot; many games do not start yet.
 
