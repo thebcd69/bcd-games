@@ -1,7 +1,7 @@
 {
   "format": 1,
-  "version": 26,
-  "generated": "2026-10-31",
+  "version": 27,
+  "generated": "2026-11-01",
   "rules": [
     {
       "id": "rdr2-steam",
@@ -4238,7 +4238,7 @@
     {
       "id": "slay-the-spire-2",
       "title": "Slay the Spire 2",
-      "version": 4,
+      "version": 5,
       "match": {
         "steamAppIDs": [2868840],
         "steamFolders": ["slay the spire 2"],
@@ -4256,7 +4256,8 @@
         {"line": "env.MADEIRA_DXGI_COMPOSITION = 1", "minBuild": 624},
         {"line": "env.MADEIRA_OPTIN_DLLS = dcomp", "minBuild": 624},
         {"line": "env.DOTNET_EnableWriteXorExecute = 0", "minBuild": 576},
-        {"line": "env.MADEIRA_ANON_LDADDAL32 = 1", "minBuild": 608}
+        {"line": "env.MADEIRA_ANON_LDADDAL32 = 1", "minBuild": 608},
+        {"line": "env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1", "minBuild": 624}
       ],
       "notes": [
         "Slay the Spire 2 (Steam 2868840, Godot 4 + .NET), round 620, iPad17,3, builds 611/614 (Send Logs 2K0RGS, 6YPKSD, HV84ES, ZNRMDX): the",
@@ -4277,7 +4278,15 @@
         "where it patches its write barrier in the runtime's write-xor-execute code memory. All seven logs of this game that ran with",
         "env.DOTNET_EnableWriteXorExecute = 0 got past this point; the two that did not stopped there. env.MADEIRA_ANON_LDADDAL32 = 1",
         "(build 608) is the line auto-tune added to the logs that went further: the three earlier logs without it stopped next at an",
-        "undecoded 32-bit LDADDAL on the runtime's code memory, none of the four with it did. Not tried on a device with this row yet."
+        "undecoded 32-bit LDADDAL on the runtime's code memory, none of the four with it did. Not tried on a device with this row yet.",
+        "Version 5 (2026-11-01; 58D8SD build 626 and 1R1NCG build 625, iPad16,10; the same crash in GZFVM3 build 579 and AWASB9 build 611):",
+        "with build 626 the game reaches its menu, then a Godot worker thread dies in RtlRunOnceComplete (ARM64EC ntdll.dll+0x68008, a read of",
+        "8 bytes of x86 code) and Sentry's crash reporter ends the game with 0xffff7001. The release before the fault returned c0000024: the",
+        "game is a later pseudo-process (started by the Dock's host) whose NULL keyed-event handle names another process's object, so a waiter",
+        "of the InitOnce never slept and left its stack frame. env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1 (read since build 598, a list line from",
+        "624) gives the game its own keyed event, as Control's row does. 17 logs of this game ran with it (builds 600-623, auto-tune added it",
+        "after this crash) and none had this crash; each stopped earlier, 13 of them at the .NET GC reserve version 1 answers or the fail-fast",
+        "version 4 answers (the same start-up stops as logs without it: NMDFT1, AWASB9, ZXCXT5). Not tried on a device with build 626 yet."
       ]
     },
     {
