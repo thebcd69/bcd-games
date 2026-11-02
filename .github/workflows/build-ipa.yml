@@ -2892,6 +2892,9 @@ jobs:
       - name: Check alias release
         run: python3 tests/host/check-alias-release.py
 
+      - name: Check file reads into guest JIT aliases
+        run: python3 tests/host/check-alias-read.py
+
       # madeira-bcd: env.MADEIRA_VA_PRESSURE_GAP_OK (off by default): a slow scan through the hole
       # iOS refuses below the app image does not latch address-space pressure (Rift Apart, 556).
       - name: Check va-pressure gap

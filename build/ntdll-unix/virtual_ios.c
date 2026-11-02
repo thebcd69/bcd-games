@@ -29670,6 +29670,43 @@ unsigned int virtual_locked_server_call( void *req_ptr )
 }
 
 
+/* Kernel copyout cannot take our Mach store faults on a physically RX guest
+ * page. Stage reads that overlap an alias before consuming any of the file:
+ * retrying EFAULT also misses successful short reads at an alias boundary. */
+static ssize_t ios_alias_read( int fd, void *addr, size_t size, const off_t *offset )
+{
+    sigset_t sigset;
+    BOOL has_write_watch = FALSE;
+    ssize_t ret = -1;
+    int err = EFAULT;
+    char *buffer;
+
+    server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+    if (!check_write_access( addr, size, &has_write_watch ))
+    {
+        if ((buffer = malloc( size )))
+        {
+            size_t done = 0;
+            ret = offset ? pread( fd, buffer, size, *offset ) : read( fd, buffer, size );
+            err = errno;
+            while (ret > 0 && done < (size_t)ret)
+            {
+                uintptr_t at = (uintptr_t)addr + done;
+                uintptr_t alias = ios_jit_anon_alias_lookup( at );
+                size_t len = min( (size_t)ret - done, host_page_size - (at & host_page_mask) );
+                memcpy( (void *)(alias ? alias : at), buffer + done, len );
+                done += len;
+            }
+            free( buffer );
+        }
+        else err = ENOMEM;
+        if (has_write_watch) update_write_watches( addr, size, max( 0, ret ));
+    }
+    server_leave_uninterrupted_section( &virtual_mutex, &sigset );
+    errno = err;
+    return ret;
+}
+
 /***********************************************************************
  *           virtual_locked_read
  */
@@ -29679,7 +29716,11 @@ ssize_t virtual_locked_read( int fd, void *addr, size_t size )
     BOOL has_write_watch = FALSE;
     int err = EFAULT;
 
-    ssize_t ret = read( fd, addr, size );
+    ssize_t ret;
+
+    if (size && ios_jit_anon_alias_overlaps( addr, size, NULL, NULL ))
+        return ios_alias_read( fd, addr, size, NULL );
+    ret = read( fd, addr, size );
     if (ret != -1 || use_kernel_writewatch || errno != EFAULT) return ret;
 
     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
@@ -29704,7 +29745,11 @@ ssize_t virtual_locked_pread( int fd, void *addr, size_t size, off_t offset )
     BOOL has_write_watch = FALSE;
     int err = EFAULT;
 
-    ssize_t ret = pread( fd, addr, size, offset );
+    ssize_t ret;
+
+    if (size && ios_jit_anon_alias_overlaps( addr, size, NULL, NULL ))
+        return ios_alias_read( fd, addr, size, &offset );
+    ret = pread( fd, addr, size, offset );
     if (ret != -1 || use_kernel_writewatch || errno != EFAULT) return ret;
 
     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
