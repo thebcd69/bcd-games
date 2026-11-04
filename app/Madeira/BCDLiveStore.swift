@@ -114,10 +114,17 @@ import os
                 self.store.windowsClosing = library.desktopClosing
                 self.store.windowsError = library.desktopCloseError
                 self.store.windowsNeedsRestart = current == nil && LibraryModel.sessionsThisRun > 0
+                // Returning from a background desktop does not remount the
+                // front end. Release Steam's session hold on the state change,
+                // rather than waiting for another app foreground transition.
+                if BCDDuoFeatures.active { account.reconcileSession() }
                 self.session(running: current != nil && !home)
             }.store(in: &watchers)
         store.showWindows = { library.showWindowsDesktop() }
-        store.stopWindows = { library.requestQuit() }
+        store.stopWindows = {
+            guard library.current != nil, library.activeEntry?.desktop == true else { return }
+            library.requestQuit()
+        }
         store.restartWindows = { library.restartNotice = LibraryModel.restartMessage }
         store.closeForRestart = {
             BCDSessionRecorder.closingOnPurpose()
@@ -650,6 +657,7 @@ import os
     /// sign-in) waits for the page to close, so the Steam message shows over BCD's interface.
     private func download(_ appID: Int) {
         let account = SteamOwnedLibrary.shared
+        if BCDDuoFeatures.active { account.reconcileSession() }
         if SteamOwnedLibrary.enabled && account.signedIn {
             account.install(appID)
         } else {
