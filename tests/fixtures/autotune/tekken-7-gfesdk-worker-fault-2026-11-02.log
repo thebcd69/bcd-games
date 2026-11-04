@@ -1,0 +1,327 @@
+[21:17:07.508] [INFO] Checking entitlements...
+[21:17:07.509] [INFO] [build] v0.1.626 (626)
+[21:17:07.509] [INFO] [device] model=iPhone17,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=7622MB available=6102MB cores=6
+[21:17:07.509] [INFO] [device] address-map=[0x102198000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[21:17:07.520] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-03:00 free-disk=57GB stikdebug-url=0
+[21:17:07.523] [INFO] [device] gpu="Apple A18 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:17:16.627] [INFO] Requesting JIT with Built-in StikJIT...
+[21:17:36.277] [INFO] [bcd] library launch TEKKEN 7.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[21:17:36.299] [INFO] Running full Wine sequence...
+[21:17:36.299] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102198000,0x8000000000) 512GB available=6105MB low-power=0 thermal=nominal
+[21:17:36.300] [INFO] [game-cfg] env.FEX_HALFBARRIERTSOENABLED=1 env.FEX_MEMCPYSETTSOENABLED=0 env.FEX_MULTIBLOCK=1 env.FEX_TSOENABLED=1 env.FEX_VECTORTSOENABLED=0 env.MADEIRA_CAGE_RELEASE=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_WER=1
+[21:17:36.304] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[21:17:36.308] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[21:17:36.308] [INFO] Allocating 1152MB JIT pool via debugger...
+[21:17:36.308] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:17:36.308] [INFO] [jit-debugger] attached=1 at the pool request
+[21:17:36.311] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:17:37.081] [INFO] RX pool at 0x148000000
+[21:17:37.102] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.833s rev=ml526
+[21:17:37.141] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=25 proc=0020 tid=0000
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 12 x 512 MB registered, extension exited
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[WineProc] MADEIRA_WER=1: wer.dll -> wer-optin.dll (Wine's wer.dll for this game; system32 + sysx64)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x71a5000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[21:17:37.671] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5495 MB + phys_footprint=648 MB = 6144 MB (hw.memsize says 7622 MB)
+ml985: preferred base 0x140000000+0x49000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x4c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x119da0000+0x49000 (?) → pool 0x148006000 used=0x56000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148006000)
+ml957: ? backing 0x119da0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148054000 used=0x18c000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148054000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x14818e000 used=0x5ae000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14818e000)
+[window] 0x7048000000..0x7400000000 regions=99 occupied=13856 MB of 15232 MB free=1423 MB maxhole=1423 MB@0x71a5974000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x1485ac000 used=0x6e0000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485ac000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x1486e0000 used=0x7a8000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1486e0000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1487a8000 used=0xaa8000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487a8000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module TEKKEN 7.exe (tekken 7.exe-b575d8a931315776): 119DA0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x1250a8000..0x7985000000 regions=75977 occupied=468310 MB of 493055 MB free=47353 MB maxhole=22608 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=689 MB (peak 689) internal=688 MB compressed=0 MB external=77 MB reusable=10 MB (cycle=1)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x149eb4000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x149f48000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x149fdc000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a0c0000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Games\\TekkenGame\\Binaries\\Win64\\TekkenGame-Win64-Shipping.exe" cmdline=L"\"C:\\Games\\TekkenGame\\Binaries\\Win64\\TekkenGame-Win64-Shipping.exe\"  "
+[phase] spawn:L"C:\\Games\\TekkenGame\\Binaries\\Win64\\TekkenGame-Win64-Shipping.exe" t+  1.539s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Games\\TekkenGame\\Binaries\\Win64\\TekkenGame-Win64-Shipping.exe\"  " (fd=81, unixdir=90, dup_unixdir=98) cwd=L"C:\\Games\\"
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x1097a4000
+[nls-getptr] type=11 id=437 peb=0x1097a4000
+E 2C [iOS-xins] tracker=0x14e528c08 WININET.dll sec=0x71fc0d0000-0x71fc10b029
+E 2C [iOS-xins] tracker=0x14e528c08 WININET.dll sec=0x71fc110000-0x71fc110f90
+D 2C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FC0C0000
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x14f294000)
+E 2C [iOS-xins] tracker=0x14e528c08 WININET.dll sec=0x71fc0d0000-0x71fc10b029
+E 2C [iOS-xins] tracker=0x14e528c08 WININET.dll sec=0x71fc110000-0x71fc110f90
+E 2C [img-map] ml710 #12 intervals-only WININET.dll base=0x71fc0c0000
+[copy-verify] powrprof.dll: OK, 2 .text pages executable (copy @0x151fac000)
+002c:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x1097a4000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[image-reload] unmapped image 0x71f8d30000+0xb0000: 1 pool copy marked
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f99b0000) -> 64-bit table (0x105028828)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"aqProf.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"VtuneApi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"VtuneApi32e.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp-names] m37150 "wine-x18-exc"
+[xp] 21:17:38.351 +0.64 dt=321 cpu=327 (thr 326) P=326 E=1 run=333 pgw=-1.0 GHz P=4.01 E=1.34 Minst=6506 IPC=4.97 mJ=1287 pin=43 rdKB=932 fpMB=957
+[swap] ml1077 backed 0x71a8640000+0x8e0000 (file off 8796093022208 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[xp] 21:17:38.601 +0.89 dt=250 cpu=261 (thr 262) P=261 E=1 run=265 pgw=-1.0 GHz P=4.01 E=1.30 Minst=5058 IPC=4.83 mJ=1089 pin=0 rdKB=0 fpMB=974
+[swap] ml1077 backed 0x71aa0e0000+0xc10000 (file off 8796093022216 MB): 20 MB in 2 extents, peak 20 MB, 0 refused
+[xp] 21:17:38.926 +1.22 dt=325 cpu=328 (thr 328) P=328 E=1 run=333 pgw=-1.0 GHz P=4.00 E=1.26 Minst=6888 IPC=5.25 mJ=1416 pin=0 rdKB=0 fpMB=994
+[xp] 21:17:39.250 +1.54 dt=324 cpu=328 (thr 328) P=327 E=1 run=333 pgw=-1.0 GHz P=4.00 E=1.33 Minst=6863 IPC=5.24 mJ=1419 pin=0 rdKB=0 fpMB=1018
+[xp] 21:17:39.567 +1.86 dt=317 cpu=253 (thr 243) P=252 E=1 run=257 pgw=-1.0 GHz P=3.95 E=1.30 Minst=4849 IPC=4.86 mJ=1045 pin=0 rdKB=84 fpMB=1102
+[footprint] rev=ml358 phys=1167 MB (peak 1167) internal=1181 MB compressed=0 MB external=147 MB reusable=10 MB (cycle=2)
+[xp] 21:17:39.821 +2.11 dt=253 cpu=261 (thr 252) P=256 E=5 run=266 pgw=-1.0 GHz P=3.79 E=1.46 Minst=4644 IPC=4.76 mJ=950 pin=0 rdKB=372 fpMB=1167
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 stats: 20 MB file-backed now (peak 20), 2 extents, file used 0 of 4096 MB, backs 2 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 20 MB in use (peak 20), 2 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 1555 MB available
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1179 MB compressed=0 MB internal=1193 MB
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[swap] ml1077 backed 0x71b5720000+0x3000000 (file off 8796093022228 MB): 68 MB in 3 extents, peak 68 MB, 0 refused
+[swap] ml1077 backed 0x71b8fa0000+0x2000000 (file off 8796093022276 MB): 100 MB in 4 extents, peak 100 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0x1097a4000
+[nls-getptr] type=11 id=10000 peb=0x1097a4000
+[nls-getptr] type=11 id=10000 peb=0x1097a4000
+[nls-getptr] type=11 id=10000 peb=0x1097a4000
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #8 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #9 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #10 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #11 L"APEX_ClothingGPU_x64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1255 MB compressed=0 MB internal=1317 MB
+[win-name] #3 hwnd=0x3002a class='Static' text="" rev=ml853
+[win-name] #4 hwnd=0x3002a class='Static' text="SplashScreenGuard" rev=ml853
+[win-name] #5 hwnd=0x3002a class='Static' text="SplashScreenGuard" rev=ml853
+[win-name] #6 hwnd=0x1003a class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #12 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[free-delay] #1 release of 0x71bc2d0000+0x2b0000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71bc580000+0x2b0000 held for 2000 ms (2 in flight)
+[blit] #1 rop=cc0020  SRC phys=0,0 1280x720 vis={0,0,1279,719}  DST phys=0,0 1280x720 vis={0,0,1279,719} rev=ml506
+[free-delay] #3 release of 0x71be730000+0x110000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x71be620000+0x110000 held for 2000 ms (4 in flight)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[footprint] rev=ml1060 fast phys=1392 MB compressed=0 MB internal=1309 MB
+[footprint] rev=ml1060 fast phys=1410 MB compressed=0 MB internal=1328 MB
+[footprint] rev=ml1060 fast phys=1435 MB compressed=0 MB internal=1352 MB
+[footprint] rev=ml1060 fast phys=1456 MB compressed=0 MB internal=1374 MB
+[footprint] rev=ml358 phys=1574 MB (peak 1574) internal=1522 MB compressed=0 MB external=159 MB reusable=10 MB (cycle=3)
+[free-delay] #5 release of 0x71bbf40000+0x384000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x71bc830000+0x3c0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x71cef50000+0x420000 held for 2000 ms (7 in flight)
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+[swap] ml1150 pool: guard closed (907 MB available, margin 1024 MB, system pressure 0); 100 MB in use
+[swap] ml1077 backed 0x71d0f30000+0x1000000 (file off 0 MB): 116 MB in 5 extents, peak 116 MB, 0 refused
+[mem-burst] rev=624 +284 MB in 508 ms phys=1719 internal=1627 compressed=0 other=92 | guest commits since the last sample: n=759, 366 MB, biggest 16 MB tid=002c | swap backed=16 MB | pool head=187 MB tail=160 MB
+[swap] ml1077 backed 0x71d2740000+0x1000000 (file off 16 MB): 132 MB in 6 extents, peak 132 MB, 0 refused
+[21:17:42.195] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[jit-pool] image 0x71f60d0000+0x1a7000 (libvorbis_64.dll) → pool 0x153e76000 used=0xc022000/0x25000000 tramp+0x0
+D 2C Load module libvorbis_64.dll (libvorbis_64.dll-28e815dd89bf571d): 71F60D0000
+[jit-pool] image 0x71f60c0000+0xe000 (libvorbisfile_64.dll) → pool 0x154022000 used=0xc036000/0x25000000 tramp+0x0
+D 2C Load module libvorbisfile_64.dll (libvorbisfile_64.dll-92c510c3dda9c57a): 71F60C0000
+[jit-pool] image 0x71f6000000+0xc0000 (xaudio2_7.dll) → pool 0x154034000 used=0xc0f8000/0x25000000 tramp+0x4000
+D 2C Load module XAudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): 71F6000000
+[win-name] #288 hwnd=0x4002a class='UnrealWindow' text="TEKKEN 7 " rev=ml853
+[free-delay] #8 release of 0x71be840000+0x800000 held for 2000 ms (8 in flight)
+[win-name] #289 hwnd=0x1005c class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #290 hwnd=0x1005c class='__wine_xinput_devnotify' text="" rev=ml853
+0140:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0140 status=00000001 caller=000000014E6DA32C
+[jit-pool] image 0x71f5e90000+0xa7000 (AnselSDK64.dll) → pool 0x1540fb000 used=0xc1a7000/0x25000000 tramp+0x0
+D 2C Load module AnselSDK64.dll (anselsdk64.dll-00240f1cbfbcfcbc): 71F5E90000
+[rb-tex] madeira-bcd new readback #1: fmt 115 9x1 level 0 (texture 9x1, 1 mips)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=53 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[launch-view] dismissed reason=present logs=0
+[win-name] #291 hwnd=0x4002a class='UnrealWindow' text="TEKKEN 7 " rev=ml853
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=67 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=82 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=96 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=2352 MB (peak 2352) internal=1975 MB compressed=0 MB external=256 MB reusable=11 MB (cycle=4)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=111 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+0060:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "............"
+005c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "............"
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x3210000) and no V8 cage was asked for; its first page stays a guard
+[footprint] rev=ml358 phys=2500 MB (peak 2500) internal=2137 MB compressed=0 MB external=310 MB reusable=11 MB (cycle=5)
+err:   [bc-census] ml653 periodic: 64 BC resources, 392 subresources
+err:   [bc-census] ml653   BC1_TYPELESS n=17 5054KB max=1024x1024 mips=11 arr=6 cube=1 | use def=17 imm=0 dyn=0 stg=0 | data y=0 n=17 | cpu r=0 w=0 | bind srv=17 rt=0 uav=0
+err:   [bc-census] ml653   BC3_TYPELESS n=40 1615KB max=1920x512 mips=10 arr=1 cube=0 | use def=40 imm=0 dyn=0 stg=0 | data y=0 n=40 | cpu r=0 w=0 | bind srv=40 rt=0 uav=0
+err:   [bc-census] ml653   BC5_UNORM n=1 85KB max=256x256 mips=9 arr=1 cube=0 | use def=1 imm=0 dyn=0 stg=0 | data y=0 n=1 | cpu r=0 w=0 | bind srv=1 rt=0 uav=0
+err:   [bc-census] ml653   BC7_TYPELESS n=6 8KB max=32x32 mips=6 arr=1 cube=0 | use def=6 imm=0 dyn=0 stg=0 | data y=0 n=6 | cpu r=0 w=0 | bind srv=6 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x2
+[footprint] rev=ml358 phys=2633 MB (peak 2633) internal=2273 MB compressed=0 MB external=321 MB reusable=11 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x1247d7200 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1247d7300 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[file-census] r624 15s: case-sensitive=1 full-path-tries=3053 full-path-hits=1897 component-lookups=6314 shortcut-hits=4064 misses=2184 scans=2250 entries-scanned=59981 us-in-lookup=487327 (3% of the window) slowest=0.399 ms ...devices/c:/Games/TekkenGame/Content
+err:   [bc-census] ml653 periodic: 256 BC resources, 594 subresources
+[win-name] #292 hwnd=0x10060 class='DIEmWin' text="" rev=ml853
+[win-name] #293 hwnd=0x10060 class='DIEmWin' text="DIEmWin" rev=ml853
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[sock-big] send ERROR fd=249 errno=65 rev=ml464
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e495020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1247d7200 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[21:18:02.222] [OK] Early detach: game presenting and settled
+[ios_audio] ml1230 pacing stream=0x1247d7300 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 backed 0x7226f10000+0x39c0000 (file off 48 MB): 332 MB in 11 extents, peak 363 MB, 0 refused
+[21:18:04.224] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=82 resident=2562MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 backed 0x72254a0000+0x22d0000 (file off 48 MB): 279 MB in 10 extents, peak 363 MB, 0 refused
+[swap] ml1077 backed 0x7227770000+0x2350000 (file off 274 MB): 314 MB in 11 extents, peak 363 MB, 0 refused
+[swap] ml1077 backed 0x722a460000+0x4cd0000 (file off 309 MB): 356 MB in 11 extents, peak 363 MB, 0 refused
+[swap] ml1077 backed 0x7233df0000+0x9950000 (file off 501 MB): 551 MB in 13 extents, peak 551 MB, 0 refused
+[ios_audio] ml1230 pacing stream=0x1247d7200 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1247d7300 lead 60 ms: client wrote 10.00 s of audio in 10.01 s (99.9%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 backed 0x7231790000+0x9950000 (file off 501 MB): 551 MB in 13 extents, peak 551 MB, 0 refused
+[jit-pool] image 0x73ffee0000+0x90000 (schannel.dll) → pool 0x1541a4000 used=0xc238000/0x25000000 tramp+0x4000
+D 64 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 73FFEE0000
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/NVIDIA Corporation/GfeSDK/TekkenGame-Win64-Shipping_40.log
+[guest-log] #1 tid=002c 2026-11-01T21:18:16.126[E]: MessagebusWrapper.cpp:34 	#0 Error creating message bus interface
+002c:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E794110 flags=1 nparams=4 tid=002c hit=1
+[guest-log] #2 tid=002c 2026-11-01T21:18:16.131[E]: Core.cpp:122 	#0 Unexpected exception during NVGSDK_Create
+[guest-log] #3 tid=002c 2026-11-01T21:18:16.131[E]: CoreCInterface.cpp:90 	#0 Error: failed initializing SDK -1020
+[jit-pool] image 0x73ffd50000+0x90000 (netprofm.dll) → pool 0x154238000 used=0xc2cc000/0x25000000 tramp+0x4000
+D 2C Load module netprofm.dll (netprofm.dll-b562c150cf34dc18): 73FFD50000
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x440
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x3
+err:   [bc-census] ml653   SRV view fmt 83 (BC5_UNORM) x1
+err:   [bc-census] ml653   SRV view fmt 98 (BC7_UNORM) x13
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=1084 CopyResource=0 CopySubresourceRegion=0 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 39350KB
+[footprint] rev=ml1060 fast phys=2968 MB compressed=320 MB internal=2247 MB
+[footprint] rev=ml1060 fast phys=2989 MB compressed=320 MB internal=2268 MB
+[footprint] rev=ml1060 fast phys=3054 MB compressed=320 MB internal=2288 MB
+[footprint] rev=ml1060 fast phys=3082 MB compressed=328 MB internal=2278 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2094 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=3103 MB compressed=351 MB internal=2267 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2106 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2119 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2131 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2143 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=2150 tex<-stg=0 stg<-tex=1 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+0168:err:sync:RtlEnterCriticalSection [cs-raise] ml671 Wait status=c0000008 crit=00000071D917EDF0 sem=0000000100000001 owner=0001 lock=3 recursion=1 caller=000000014E0A5FB8
+0168:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7234940000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled exception 0xc0000008 in thread 168 at address 000000014E04D034 (thread 0168), starting debugger...
+0168:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000008) syscalls=0 unix_calls=37314
+[unwind] term ml661 begin rip=14e7f41fc rsp=723493e598 window=[723493e598..723513e598) max=32
+[unwind] term ml661 #00 pc=14e7f41fc rsp=723493e598  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? 71ffcf5388  ntdll.dll+0x25388
+[term-stack] ml660 sp+0f0: call* 71f851472f  GfeSDK.dll+0x1f472f
+[term-stack] ml660 sp+0f8: CALL 71f851497a  GfeSDK.dll+0x1f497a
+[term-stack] ml660 sp+100:   ? 71fc6519cc  kernel32.dll+0x319cc
+[term-stack] ml660 sp+108:   ? 71fc646320  kernel32.dll+0x26320
+[term-stack] ml660 sp+110:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+118: CALL 71f8493f49  GfeSDK.dll+0x173f49
+[term-stack] ml660 sp+120: CALL 71f83715ff  GfeSDK.dll+0x515ff
+[term-stack] ml660 sp+128: call* 71f84894d1  GfeSDK.dll+0x1694d1
+[term-stack] ml660 sp+280: call* 71f834fc88  GfeSDK.dll+0x2fc88
+[term-stack] ml660 sp+a10: call* 71f834fc88  GfeSDK.dll+0x2fc88
+[term-stack] ml660 sp+f50: call* 71f834fc88  GfeSDK.dll+0x2fc88
+[Wine ntdll/server] process_exit_wrapper(-1073741816): closing child fd_socket=97
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000008) syscalls=0 unix_calls=37318
+[unwind] term ml661 begin rip=71fe700690 rsp=71a581fed8 window=[71a581fed8..71a601fed8) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=71a581fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=c0000008 rbp=71a581ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=71a581ffd0: 00000000 00000000 20637048 01000000 d86d0b48 01000000 00000000 00000000
+[unwind] term ml661 stop: ret pc 0 repeats or is null
+[unwind] term ml661 end
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000008) syscalls=0 unix_calls=37331
+[unwind] term ml661 begin rip=1480d216c rsp=71a581fc48 window=[71a581fc48..71a601fc48) max=32
+[unwind] term ml661 #00 pc=1480d216c rsp=71a581fc48  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+0e8:   ? 119dae7a8  (exe)+0xe7a8
+[term-stack] ml660 sp+0f0:   ? 71fe450200  kernelbase.dll+0x80200
+[term-stack] ml660 sp+118:   ? 119da2fd4  (exe)+0x2fd4
+[term-stack] ml660 sp+290: call* 119da4031  (exe)+0x4031
+[term-stack] ml660 sp+2c0: CALL 119da3fe7  (exe)+0x3fe7
+[term-stack] ml660 sp+320: CALL 119da1945  (exe)+0x1945
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741816)
+[Wine ntdll/server] process_exit_wrapper(-1073741816)
+[WineProc] Wine exited with code -1073741816 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (tekkengame-win64-shipping.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[Wine ntdll/server] process_exit_wrapper(-1073741816)
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[footprint] rev=ml1060 fast phys=3126 MB compressed=374 MB internal=2289 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e495020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[WineProc] stopping wineserver...
+[21:18:20.303] [INFO] [session] length=44s play=36s frames=2063 avg=57.3 low1=49.6 low01=12.3 worst=1047ms stalls=0/0s peak=3128MB limit=6143MB thermal=nominal lpm=0 res=1280x720 cap=60 game=TEKKEN 7
+[21:18:20.314] [INFO] [exit-report] status=0xc0000008
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[store-noalias] #2 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #3 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #4 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #5 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3021 MB (peak 3126) internal=2215 MB compressed=439 MB external=492 MB reusable=4 MB (cycle=26)
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3018 MB (peak 3126) internal=2216 MB compressed=439 MB external=492 MB reusable=4 MB (cycle=27)
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3018 MB (peak 3126) internal=2216 MB compressed=439 MB external=492 MB reusable=4 MB (cycle=28)
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3018 MB (peak 3126) internal=2216 MB compressed=439 MB external=492 MB reusable=4 MB (cycle=29)
+[window] 0x7048000000..0x7400000000 regions=5376 occupied=15069 MB of 15232 MB free=210 MB maxhole=73 MB@0x71e4270000 rev=ml787 (periodic)
+[window] 0x1250a8000..0x7985000000 regions=81638 occupied=469999 MB of 493055 MB free=45618 MB maxhole=22562 MB@0x7402d60000 rev=ml787 (layerkit-span)
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3018 MB (peak 3126) internal=2216 MB compressed=439 MB external=492 MB reusable=4 MB (cycle=30)
+[swap] ml1077 stats: 420 MB file-backed now (peak 551), 14 extents, file used 654 of 4096 MB, backs 31 releases 17 unbacks 0 refused 0 | coverage classic: disk 144 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 332 MB (peak 462), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 88 MB in use (peak 100), 4 takes, 27 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 172 MB available
+[store-noalias] #6 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e162000 NO pool/anon alias | region 0x102198000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=37 resident=2728MB dbg=DEBUGGED rev=ml525
+[xp] 21:18:37.994 +60.28 dt=300 cpu=32 (thr 34) P=19 E=12 run=37 pgw=-1.0 GHz P=2.83 E=1.75 Minst=174 IPC=2.27 mJ=34 pin=1 rdKB=16 fpMB=3020
+[xp] 21:18:38.269 +60.56 dt=276 cpu=37 (thr 37) P=6 E=31 run=44 pgw=-1.0 GHz P=1.96 E=1.18 Minst=76 IPC=1.56 mJ=7 pin=5 rdKB=64 fpMB=3020
+[xp] 21:18:38.530 +60.82 dt=261 cpu=85 (thr 85) P=50 E=34 run=103 pgw=-1.0 GHz P=2.03 E=1.33 Minst=271 IPC=1.84 mJ=36 pin=20 rdKB=404 fpMB=3021
+[census-hold] idx=36 port=0x1296b teb=0x71c79d0000 tid=00b8 HOLDS fexlock @0x7c03cf0108 run_state=3 susp=1 pc=0x14e162000 lr=0x14e279cdc sp=0x71f6c0f0f0 bt: 14e0a6554 14e081958 14e359574 14e21f590 14e35b338 14e1745e4 0 0
+[footprint] rev=ml358 phys=3021 MB (peak 3126) internal=2219 MB compressed=439 MB external=503 MB reusable=7 MB (cycle=31)
+[xp] 21:18:38.820 +61.11 dt=290 cpu=53 (thr 53) P=3 E=51 run=76 pgw=-1.0 GHz P=1.38 E=1.55 Minst=116 IPC=1.42 mJ=6 pin=0 rdKB=0 fpMB=3021
+[xp] 21:18:39.124 +61.41 dt=304 cpu=320 (thr 320) P=25 E=295 run=329 pgw=-1.0 GHz P=1.51 E=2.37 Minst=2592 IPC=3.52 mJ=121 pin=1 rdKB=80 fpMB=3023
+E=295 run=329 pgw=-1.0 GHz P=1.51 E=2.37 Minst=2592 IPC=3.52 mJ=121 pin=1 rdKB=80 fpMB=3023
+[xp] 21:18:39.749 +62.04 dt=326 cpu=336 (thr 335) P=8 E=328 run=341 pgw=-1.0 GHz P=1.80 E=2.32 Minst=2712 IPC=3.49 mJ=127 pin=0 rdKB=0 fpMB=3038

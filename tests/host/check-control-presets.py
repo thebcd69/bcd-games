@@ -319,7 +319,9 @@ window = function(content, 'final class ControlsWindow: UIWindow {')
 assert window.index('if m.editing || m.sessionPanel {') < window.index('!hit.isDescendant(of: root)') \
     < window.index('guard m.hitsInteractive('), 'menu and dialog presentations take their touches in play mode'
 reserve = function(gamepad, '@MainActor func reserveSessionSlot(touchControls: Bool) {')
-assert reserve.index('guard Self.enabled, Self.optIn("MADEIRA_PAD_EARLY_SLOT")') < reserve.index('touchState.reserved = true')
+assert reserve.index('guard Self.enabled, gameSet || Self.optIn("MADEIRA_PAD_EARLY_SLOT")') < reserve.index('touchState.reserved = true')
+# Round 630 (agent T1 S1, Dokimon Quest): the game's own file can set it (a list row), exactly "1"; a set switch that reserves nothing says so.
+assert 'let gameSet = MadeiraConfig.gameValue("env.MADEIRA_PAD_EARLY_SLOT") == "1"' in reserve and 'slot=0 not reserved' in reserve
 run = function(content, 'private func runWineFullSequence(profile: LibraryEntry? = nil) {')
 assert run.index('GamepadInput.shared.reserveSessionSlot(') < run.index('DispatchQueue.global'), 'reserved before Wine starts'
 

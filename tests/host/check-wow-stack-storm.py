@@ -100,7 +100,10 @@ check('it reads the faulting thread\'s PEB through vm_read_overwrite and asks io
 check('only a fault in the JIT pool counts as guest code', 'in_guest = (rxb && pc >= rxb && pc < rxb + ios_jit_pool_size_global) || ios_jit_low_contains( (uintptr_t)pc );' in sef)
 check('the storming thread is ended with thread_terminate (suspend when that fails), as the [zombie] rule does',
       'thread_terminate( thread )' in sef and 'thread_suspend( thread )' in sef)
-check('a process that could not be handed to the worker keeps the old ending', 'if (!ios_end_child_process_async( peb, (int)STATUS_ACCESS_VIOLATION )) return 0;' in sef)
+# Round 630 (agent T1 S30): a process already inside ExitProcess ends with the status it chose (ios_exiting_status), others with c0000005.
+check('a process that could not be handed to the worker keeps the old ending; one already exiting ends with its own status',
+      'if (!ios_end_child_process_async( peb, exiting ? (int)chosen : (int)STATUS_ACCESS_VIOLATION )) return 0;' in sef
+      and 'int exiting = ios_exiting_status( peb, &chosen );' in sef)
 check('32 endings in a session is the limit, then the old ending', 'ended >= 32' in sef)
 check('after a handled storm the counter slot and the latch are cleared and the delivery returns',
       'redeliv[rslot].thread = 0;' in signal[signal.index(call):term_at] and 'ios_redeliv_terminating = 0;' in signal[signal.index(call):term_at]

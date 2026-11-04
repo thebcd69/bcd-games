@@ -1255,9 +1255,16 @@ struct ContentView: View {
             return .init(appID: appID, kind: .syncing, title: "Steam Cloud sync is still running",
                          message: "Steam Cloud is still checking or downloading \(name)'s saves. If you start now, you may end up playing older saves.")
         case .unchecked(let why):
+            // Round 630 (agent A1 S18; Resident Evil HD RHV40S): offline (no network path), on an install where BCD has no record of an online Steam start,
+            // the start that follows is refused (code 50); the player read only "you're offline" first. A hint, not a refusal: that record
+            // is not proof (N14Q6D signed in offline without it), so the host still decides.
+            let firstOnline = DockOffline.networkDown && DockOffline.accountSaved == nil
+                ? " If no Steam game was started online on this device yet, Steam may also refuse to start this one offline: start it once online."
+                : ""
             return .init(appID: appID, kind: .unchecked, title: "Couldn't check Steam Cloud",
                          message: "BCD can't tell whether the saves of \(name) on this device are the newest."
-                            + (why.map { " (\($0))" } ?? "") + " If another device has newer saves and you start now, you'll have to choose between them later.")
+                            + (why.map { " (\($0))" } ?? "") + " If another device has newer saves and you start now, you'll have to choose between them later."
+                            + firstOnline)
         case .conflict(let count):
             return .init(appID: appID, kind: .conflict, title: "Steam Cloud has different saves",
                          message: "This device and Steam Cloud disagree on \(count) of \(name)'s saves. Pick the ones to keep on the game's page, or play with the saves on this device.")
@@ -1523,6 +1530,7 @@ struct ContentView: View {
 
         let epicSession = profile.map { BCDEpic.shared.owns(entryID: $0.id) } ?? false   // madeira-bcd (2026-10-22): read here, on the main thread (BCDEpic is main-actor); used for the msiexec line below
         let eaInstallerSession = DockInstallers.runsEAAppInstaller && DockInstallers.flag("MADEIRA_DOCK_EA_MSISERVICE")   // round 626 (A1 S12)
+        let eaInstallLines = DockInstallers.eaInstallSession ? BCDLauncherSpec.eaInstallerSessionLines : []   // round 630 (A1 S12): read here, on the main thread
         let windowsDesktopEntry = profile?.desktop == true   // madeira-bcd (2026-10-23): the library's "Windows desktop" entry (no game), for the msiexec line below
         DispatchQueue.global(qos: .userInitiated).async {
             // A library entry's launch profile (executable, arguments, x87
@@ -1537,10 +1545,15 @@ struct ContentView: View {
                 logStore.log("[launch-route] library profile applied")
                 // madeira-bcd: a Dock session of one-time installs runs without the game's
                 // address-space holds, which leave its 32-bit setups no room.
-                let dropped = DockInstallers.applyInstallSessionConfig()
-                if !dropped.isEmpty {
+                let installSession = DockInstallers.applyInstallSessionConfig(extra: eaInstallLines)
+                if !installSession.dropped.isEmpty {
                     logStore.log("[dock-installers] this session of one-time installs leaves out the game's " +
-                                 dropped.sorted().joined(separator: ", ") + " (MADEIRA_DOCK_INSTALL_LAYOUT=0 keeps them)")
+                                 installSession.dropped.sorted().joined(separator: ", ") + " (MADEIRA_DOCK_INSTALL_LAYOUT=0 keeps them)")
+                }
+                // round 630 (agent A1 S12): the EA app's installer runs with the lines of BCD's own EA app flow
+                if !installSession.added.isEmpty {
+                    logStore.log("[dock-installers] this session of one-time installs runs the EA app's installer with its lines from the EA app's " +
+                                 "entry: " + installSession.added.joined(separator: "; ") + " (MADEIRA_DOCK_EA_SESSION=0: none)")
                 }
             } else {
                 // No library entry (a BCD Dock start started from Settings): no entry lines
@@ -2379,7 +2392,8 @@ struct ContentView: View {
             // madeira-bcd: they run in a session of their own (DockInstallers.installsOnly), and
             // a Reset takes out what they installed; the other games share those installs.
             DockInstallers.prepare(game, drive: MadeiraDock.drive, prefix: MadeiraDock.prefix,
-                                   others: MadeiraDock.games(drive: MadeiraDock.drive))
+                                   others: MadeiraDock.games(drive: MadeiraDock.drive),
+                                   hasGecko: BCDGeckoFiles.ready(BCDGeckoFiles.defaultRoot))   // round 630 (A1 S20): the EA app's installer waits for it
             // madeira-bcd (round 578): a start that has Valve's client prepare per-user executables (CEG)
             // finds Valve's own client service installed, as on Windows; the Dock host's own installer
             // step failed in 3 of 5 logged sessions (DockCEGService). No session runs yet.
@@ -2646,6 +2660,42 @@ struct TouchControl: Codable, Identifiable, Equatable {
     /// editor. Optional and written only when set, so a layout saved before it existed, and any layout
     /// with nothing locked, is the same file as always.
     var locked: Bool?
+    /// madeira-bcd (2026-11-03): the player's own shape and words for this control (BCD's editor, Look).
+    /// Optional and written only when set, so a layout saved before it existed, and any layout without
+    /// them, is the same file as always.
+    var face: Face?
+}
+
+extension TouchControl {
+    /// A control's own look: `shape` "circle", "square" or "rectangle", a rectangle's `aspect` (its
+    /// width over its height) and `text`, the words drawn in place of its label. The rules are BCD's
+    /// (BCDTouchCustomShape, BCDTouchText in BCDTouchCore.swift); this only keeps them. Read leniently:
+    /// a value of the wrong kind is left out, and a shape name this build does not know is kept but
+    /// draws the standard shape, so a layout never fails to load over its look.
+    struct Face: Codable, Equatable {
+        var shape: String?
+        var aspect: Double?
+        var text: String?
+
+        init(shape: String? = nil, aspect: Double? = nil, text: String? = nil) {
+            self.shape = shape
+            self.aspect = aspect
+            self.text = text
+        }
+
+        /// Nothing of its own: the control is written without a look.
+        var isEmpty: Bool { shape == nil && aspect == nil && text == nil }
+
+        private enum CodingKeys: String, CodingKey { case shape, aspect, text }
+
+        init(from decoder: Decoder) throws {
+            guard let c = try? decoder.container(keyedBy: CodingKeys.self) else { return }
+            shape = try? c.decodeIfPresent(String.self, forKey: .shape)
+            aspect = (try? c.decodeIfPresent(Double.self, forKey: .aspect)).flatMap { $0.isFinite ? $0 : nil }
+            // At most 64 Unicode scalars, as a shared layout file allows a text (BCDControlShare).
+            text = (try? c.decodeIfPresent(String.self, forKey: .text)).map { String(String.UnicodeScalarView($0.unicodeScalars.prefix(64))) }
+        }
+    }
 }
 
 final class TouchControlsModel: ObservableObject {
@@ -2686,7 +2736,11 @@ final class TouchControlsModel: ObservableObject {
     }
     /// The drawn frame: the diameter for round controls, the pad button's own
     /// shape otherwise (ControlAction.controlSize).
-    static func size(_ c: TouchControl) -> CGSize { c.action.controlSize(diameter: diameter(c)) }
+    static func size(_ c: TouchControl) -> CGSize {
+        // madeira-bcd (2026-11-03): a shape of the player's own (BCD's editor, Look) is drawn its own size.
+        if c.face != nil, let own = c.bcdOwnShape { return BCDTouchGeometry.size(own, diameter: Double(diameter(c))) }
+        return c.action.controlSize(diameter: diameter(c))
+    }
 
     private var loading = false
     private static var url: URL {
@@ -2754,6 +2808,12 @@ final class TouchControlsModel: ObservableObject {
             let r = Self.diameter(c) / 2
             let cx = CGFloat(c.nx) * bounds.width
             let cy = CGFloat(c.ny) * bounds.height
+            // madeira-bcd (2026-11-03): a control the player gave a shape of its own takes touches in that shape
+            // (BCDTouchGeometry.windowTakes); every other control as always.
+            if c.face != nil, let own = c.bcdOwnShape {
+                if BCDTouchGeometry.windowTakes(CGPoint(x: p.x - cx, y: p.y - cy), own: own, diameter: Double(r * 2)) { return true }
+                continue
+            }
             if hypot(p.x - cx, p.y - cy) <= r { return true }
         }
         return false

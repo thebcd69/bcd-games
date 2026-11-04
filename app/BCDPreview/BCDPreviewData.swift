@@ -32,7 +32,7 @@ extension BCDStore {
             store.games = [
                 BCDGame(id: "wc3", title: "Warcraft III: Reign of Chaos", store: .local, state: .ready, size: 1_200_000_000,
                         lastPlayed: now - 0.2 * h, minutesPlayed: 220, autoTuned: true, thirtyTwoBit: true, added: 4),
-                BCDGame(id: "432940", title: "Breakneck", store: .steam, state: .downloading(progress: 0.34), size: 2_400_000_000,
+                BCDGame(id: "107100", title: "Bastion", store: .steam, state: .downloading(progress: 0.34), size: 2_400_000_000,
                         lastPlayed: now - 30 * h),
                 BCDGame(id: "367520", title: "Hollow Knight", store: .steam, state: .ready, size: 9_100_000_000,
                         place: .externalDrive, lastPlayed: now - 3 * h, minutesPlayed: 1840, added: 7),
@@ -60,11 +60,11 @@ extension BCDStore {
                 BCDGame(id: "gog.witcher", title: "The Witcher: Enhanced Edition", store: .gog, state: .ready, size: 15_000_000_000,
                         lastPlayed: now - 400 * h, minutesPlayed: 45, added: 2),
             ]
-            let steamApp = ["432940": 432940, "367520": 367520, "620": 620, "epic.deathsdoor": 894020, "epic.gtav": 271590, "gog.moonscars": 1374970,
+            let steamApp = ["107100": 107100, "367520": 367520, "620": 620, "epic.deathsdoor": 894020, "epic.gtav": 271590, "gog.moonscars": 1374970,
                             "271590": 271590, "1715130": 1715130, "2420110": 2420110, "1895880": 1895880, "gog.witcher": 20900]
             store.games = store.games.map { game in steamApp[game.id].map { withArt(game, steam: $0) } ?? game }
             store.downloads = [
-                BCDDownload(id: "432940", title: "Breakneck", store: .steam, doneBytes: 816_000_000, totalBytes: 2_400_000_000,
+                BCDDownload(id: "107100", title: "Bastion", store: .steam, doneBytes: 816_000_000, totalBytes: 2_400_000_000,
                             bytesPerSecond: 23_600_000),
                 BCDDownload(id: "epic.salt", title: "Salt Harbor", store: .epic, doneBytes: 1_680_000_000, totalBytes: 4_000_000_000,
                             bytesPerSecond: 31_000_000),

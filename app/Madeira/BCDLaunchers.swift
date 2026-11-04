@@ -111,6 +111,10 @@ struct BCDLauncherSpec: Identifiable, Hashable {
     /// A launcher that needs more adds its lines to its own entry below.
     static let commonSessionConfig = ["env.MADEIRA_GDI_SHARED_SECTION = 1", "env.MADEIRA_MSIEXEC_SYSTEM32 = 1"]
 
+    /// madeira-bcd (round 630, agent A1 S12): the lines the EA app's installer runs with in this flow (BCDLauncherStart.installer), for a
+    /// BCD Dock session of one-time installs that runs the same installer from a Steam game's install script (DockInstallers.eaInstallSession).
+    static var eaInstallerSessionLines: [String] { eaApp.sessionConfig + eaApp.installerOnlyConfig }
+
     /// The launchers BCD offers, in the order the Library lists them.
     static let all: [BCDLauncherSpec] = [battlenet, eaApp]
 
@@ -161,7 +165,11 @@ struct BCDLauncherSpec: Identifiable, Hashable {
         // a 32-bit guest's int3 (3 times at most, "[int3-x86]"), the stack, the code, the module list and libcef.dll's CodeView record, so that
         // the next int3 of this program can be named the same way (log only: reads the guest's memory, writes nothing, stops nothing).
         // Only this entry sets them; a 64-bit process (the Rockstar Games Launcher's 64-bit CEF) is never touched by either, set or not.
-        sessionConfig: Self.commonSessionConfig + ["env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1", "env.MADEIRA_INT3_X86_DUMP = 1"],
+        // Round 630 (agent A2 S5; 6KW9QM, build 626): after the Microsoft sign-in hand-off the 32-bit browser process read NULL+7 inside
+        // libcef.dll twice; env.MADEIRA_X86_FAULT_DUMP = 1 (log only, three reports at most, build/ntdll-unix/ios_x86_fault_diag.h) names
+        // the instruction and the registers in the first run, as the EA app's entry has since round 624.
+        sessionConfig: Self.commonSessionConfig + ["env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1", "env.MADEIRA_INT3_X86_DUMP = 1",
+                                                   "env.MADEIRA_X86_FAULT_DUMP = 1"],
         // lead (2026-10-24, build 598, the owner's iPhone18,2): every 32-bit process needs a 4 GB window of its own, and this device has 7
         // free. Battle.net, its GPU process, its storage and network services, its renderers and the Agent took all 7: four renderers
         // and a GPU process (the DX12/Vulkan info one, at 126 s) could not start ("BOOT FAILED at stage 'guest-window-reserve'", log
@@ -239,6 +247,12 @@ struct BCDLauncherSpec: Identifiable, Hashable {
         // (BackupRefPtr off, V8 --jitless, no proxy server, as for Social Club and Steam) and refuses its --type= children
         // (build/ntdll-unix/process_ios.c). env.MADEIRA_EA_CEF_CMDLINE = 0 leaves the command line alone, env.MADEIRA_EA_CEF_FLAGS adds
         // switches. Only this entry sets them; every other program takes the paths it took before.
+        // Round 630 (agent A2 S9; BPAGVS iPhone18,1 and H22TJN iPad15,3, build 626, EA app 13.813.1.6327; both logs also show it in the
+        // previous run): the installed launcher crashed at its first helper on every start (EALocalHostSvc.exe or EADesktop.exe -ls=Launcher,
+        // ARM64EC ntdll.dll+0x26b10, the new heap's free list read back as 0 right after this thread stored it). The heap had been given the
+        // address of another process's anonymous-JIT page whose alias records outlived its release, so the store went to the stale pool
+        // alias. env.MADEIRA_ALIAS_RELEASE = 1 drops a released view's alias records with it (build/ntdll-unix/virtual_ios.c, the key of the
+        // Rift Apart and Spider-Man 2 rows; tests/host/check-alias-release.py). Launcher-only: the installer's session is unchanged.
         // Round 624 (agent A S4, 7NKYWT and H95G25): the installer's managed custom-action hosts (SfxCA) stop on NULL+4; the 32-bit fault
         // report (env.MADEIRA_X86_FAULT_DUMP = 1, log only, three reports at most; build/ntdll-unix/ios_x86_fault_diag.h) names the code
         // and registers in the first run, not only after auto-tune's retry.
@@ -249,7 +263,7 @@ struct BCDLauncherSpec: Identifiable, Hashable {
                                                    "env.MADEIRA_SPAWN_BLOCK = vc_redist-",
                                                    "env.MADEIRA_EA_CEF_FLAGS = --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows",
                                                    "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1", "env.MADEIRA_X86_FAULT_DUMP = 1"],
-        launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true,
+        launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1", "env.MADEIRA_ALIAS_RELEASE = 1"], needsGecko: true, needsArticle: true,
         demandStartServices: ["PnkBstrA", "PnkBstrB"])
 }
 

@@ -383,6 +383,14 @@ jobs:
           python3 tests/host/check-fex-alias-capacity.py
           python3 tests/host/check-fex-ec-teardown-ctx.py
           python3 tests/host/check-fex-cpuid-classic.py
+          python3 tests/host/check-fex-thread-init-nomem.py
+          python3 tests/host/check-fex-exit-runaway.py
+          python3 tests/host/check-fex-inval-null-thread.py
+          python3 tests/host/check-fex-processorid.py
+          python3 tests/host/check-fex-moffs-rip.py
+          python3 tests/host/check-thread-sample-syscall.py
+          python3 tests/host/check-usd-osversion.py
+          python3 tests/host/check-thread-fault-isolate.py
           python3 tests/host/check-display-rate.py
           python3 tests/host/check-display-hz.py
           python3 tests/host/check-x64-nocopy-dataimp.py
@@ -786,6 +794,11 @@ jobs:
       # auto-tune's rule and its two fixtures.
       - name: Check a child process's own keyed event (Control, RunOnce)
         run: python3 tests/host/check-keyed-event-per-process.py
+
+      # Messiah's "Launch Messiah.bat" (logs since build 614): the 64-bit cmd.exe found no reg.exe. Sessions link the i386 command-line
+      # tools into the 64-bit system32 where the name is absent (env.MADEIRA_SYSTEM32_X86_TOOLS = 0 turns it off).
+      - name: Check Windows' command-line tools in the 64-bit system32 (Messiah)
+        run: python3 tests/host/check-system32-x86-tools.py
 
       # Gal*Gun 2 and Hello Neighbor (logs CWFP3N, B2B7BR, TAW359): OpenSSL 1.0.2's SHA-extension SHA-1 routine returns with a wrong stack
       # pointer after NETAPI32.DLL loads. env.MADEIRA_FEX_SHA = 0 tells such a game's guest the processor has no SHA extension: the app's
@@ -1256,6 +1269,14 @@ jobs:
           python3 tests/host/check-guest-log-trace.py
           python3 tools/patch-wine-guest-log-trace.py wine/dlls/ntdll/unix/file.c
 
+      # madeira-bcd (round 630, agent R): a launcher's own log names the player's accounts (Rockstar's launcher.log: "Steam user:",
+      # "Saved profile for", "Signed in online to profile:", "Gamer:"); the mirror keeps such a line up to that word and drops the
+      # name, so an uploaded log never holds it. Logging only.
+      - name: Patch wine text-log mirror to drop account names
+        run: |
+          python3 tests/host/check-guest-log-redact.py
+          python3 tools/patch-wine-guest-log-redact.py wine/dlls/ntdll/unix/file.c
+
       # [file-trace]: every guest open / attribute query with its status when
       # MADEIRA_FILE_TRACE=1 (GTA V Enhanced's "incomplete installation"
       # screen names no file; [file-fail] stops after 64 DLL-search misses).
@@ -1287,6 +1308,14 @@ jobs:
       # fstat instead of fstat + two xattr reads (env.MADEIRA_FILE_INFO_FULL=1 undoes it).
       - name: Patch wine with size queries from one fstat
         run: python3 tools/patch-wine-file-info-fstat.py wine/dlls/ntdll/unix/file.c
+
+      # madeira-bcd (round 630, agent O1 S14): Ren'Py 6.99 games (Doki Doki Literature Club, Coming Out on Top) stopped at start-up:
+      # Python's platform.mac_ver() found the iOS host's SystemVersion.plist through Wine's "/path is a Unix path" rule and called
+      # os.uname(), which Python for Windows lacks. Exactly that one file is reported as not found to Windows programs.
+      - name: Patch wine to hide the host's version file from Windows programs
+        run: |
+          python3 tests/host/check-hide-host-version-plist.py
+          python3 tools/patch-wine-hide-host-version-plist.py wine/dlls/ntdll/unix/file.c
 
       - name: Check opt-in graphics DLL lifetime
         run: python3 tests/host/check-graphics-pin.py
@@ -1409,6 +1438,22 @@ jobs:
       - name: Patch wine d3dx9 volume textures from resources
         run: python3 tools/patch-wine-d3dx9-volume-resource.py wine
 
+      # madeira-bcd (round 630, Skyrim 93EMSH): opt-in (env.MADEIRA_XAUDIO2_CALLBACK_ORDER = 1): xaudio2's RegisterForCallbacks
+      # publishes the callback array before its count, so FAudio's audio thread never reads a NULL array. Unset: unchanged.
+      # The i386 farm builds it; the arm64ec copies stay the shipped ones.
+      - name: Patch wine xaudio2 engine callbacks (opt-in)
+        run: |
+          python3 tests/host/check-xaudio2-callbacks.py
+          python3 tools/patch-wine-xaudio2-callbacks.py wine
+
+      # madeira-bcd (round 630, S.T.A.L.K.E.R. RVFPNE): Wine's HLSL compiler (vkd3d-shader) reads `point` as a name unless white
+      # space and a type or a modifier follow it (the geometry-shader keyword); a Direct3D 9 shader naming a value `point` was a
+      # syntax error. Sources that compile today tokenise the same. The i386 farm builds it (flex regenerates the lexer).
+      - name: Patch wine vkd3d-shader to read point as a name
+        run: |
+          python3 tests/host/check-vkd3d-point-ident.py
+          python3 tools/patch-wine-vkd3d-point-ident.py wine
+
       # madeira-bcd: [rpc-np] names the status of a failed RPC named-pipe read (Steam's CEG service
       # install and RockstarService failed their svcctl bind with 1726, build 574). Logging only.
       - name: Patch wine rpcrt4 named-pipe diagnostics
@@ -1440,6 +1485,13 @@ jobs:
         run: |
           python3 tests/host/check-lock-orphan.py
           python3 tools/patch-wine-lock-orphan.py wine/dlls/ntdll/unix/sync.c
+
+      # madeira-bcd (round 630, A2 S2): the monitor and the reaper read lock words through the fault-safe reader; msync() accepts the
+      # PROT_NONE page of a dead 32-bit program's released window, and the plain read ended the app (the Steam client 9PB1B5).
+      - name: Patch wine with the fault-safe orphan-lock reads
+        run: |
+          python3 tests/host/check-orphan-safe-read.py
+          python3 tools/patch-wine-orphan-safe-read.py wine/dlls/ntdll/unix/sync.c
 
       # madeira-bcd: bcd.cfg yield-mode (opt-in): the yield primitive behind
       # SwitchToThread / Sleep(0) (switch or a bounded depress instead of
@@ -2164,6 +2216,18 @@ jobs:
           python3 tools/patch-dock-keep-alive.py madeira-dock/src/launch.c || echo "::warning::Dock keep-alive patch not applied"
           # round 624 (Steam 113): the published values read back while the game starts; env.MADEIRA_DOCK_PUMP_MS / _REASSERT experiments
           python3 tools/patch-dock-steam-readback.py madeira-dock/src/launch.c || echo "::warning::Dock Steam readback patch not applied"
+          # round 630 (444TS8): a late sign-in gets 45 s for the licence list (at most 180 s); env.MADEIRA_DOCK_LICENCE_WAIT = 0: 90 s as before
+          python3 tests/host/check-dock-licence-wait.py
+          python3 tools/patch-dock-licence-wait.py madeira-dock/src/session.c || echo "::warning::Dock licence-wait patch not applied"
+          # round 630 (FRKBN1): env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1 (off by default): an accepted prepare request with zero jobs goes on to Valve's launch
+          python3 tests/host/check-dock-ceg-zero-jobs.py
+          python3 tools/patch-dock-ceg-zero-jobs.py madeira-dock/src/launch.c || echo "::warning::Dock CEG zero-jobs patch not applied"
+          # round 630 (N14Q6D): the two silent install-folder failures (host result 41) report which check failed; log only
+          python3 tests/host/check-dock-install-dir-events.py
+          python3 tools/patch-dock-install-dir-events.py madeira-dock/src/launch.c || echo "::warning::Dock install-folder events patch not applied"
+          # round 630 (BN3SXW): the Steam client entries step (42) says which part failed; a failed open is tried once more after 1 s
+          python3 tests/host/check-dock-registry-events.py
+          python3 tools/patch-dock-registry-events.py madeira-dock/src/launch.c || echo "::warning::Dock registry events patch not applied"
           bash build/madeira-dock/build.sh
 
       # madeira-bcd (round 624, Steam 113: 39 of 187 Rockstar Dock sessions): the Dock patches in order on a copy, the readback
@@ -2312,6 +2376,16 @@ jobs:
       # game's file sets it) answers a timestamp query pending 2 s as complete. The i386 d3d11.dll and d3d11-src.dll. Before the farm key.
       - name: Patch DXMT D3D11 stuck query report
         run: python3 tools/patch-dxmt-d11-query-stuck.py
+
+      # Alan Wake (A6232G, round 630 agent O1 S3): 67 pipelines a run failed ("Fragment input(s) user(NORMAL0) ... not written by vertex
+      # shader") because the SM3 vertex-output walk dropped NORMAL/TANGENT/BINORMAL/BLENDWEIGHT/BLENDINDICES/DEPTH; it emits them now,
+      # under the names the pixel side already reads and stubs. After the D3D9/D3D11 query chain (each of its steps directly follows
+      # the one before, by their checks); before the i386 farm key, which hashes it.
+      - name: Check DXMT D3D9 SM3 vertex interface
+        run: python3 tests/host/check-dxmt-d9-sm3-vs-interface.py
+
+      - name: Patch DXMT D3D9 SM3 vertex interface
+        run: python3 tools/patch-dxmt-d9-sm3-vs-interface.py
 
       # Batman: Arkham City (round 626, agent T S2, 9AGR39/AE9TXK): a tessellation mesh pipeline that did not compile ("Total mesh size
       # (33792) exceeds the maximum mesh size allowed (32768)") left no pipeline bound and its draws made the driver fault; they are now
@@ -3700,6 +3774,36 @@ jobs:
       # madeira-bcd (2026-10-23): env.MADEIRA_FEX_AVX = 2, AVX reported without AVX2 (FEX CPUID; Bink 2 video in Spider-Man 2).
       - name: Check AVX without AVX2
         run: python3 tests/host/check-fex-avx-no-avx2.py
+
+      # madeira-bcd (2026-11-02): log-only FEX cache measurement ([CB_COST] compile/flush cost, [cb-sample] blocks), owner's go.
+      - name: Check FEX cache measurement counters
+        run: python3 tests/host/check-fex-cb-cost.py
+
+      # madeira-bcd (round 630): LSE read-modify-write atomics (LD<OP>, CAS) on aliased pages, the last case of the Mach store emulator.
+      - name: Check LSE atomics on aliased pages
+        run: python3 tests/host/check-jit-alias-atomics.py
+      - name: Check the thread registry reuses ended threads' slots
+        run: python3 tests/host/check-thread-registry-reclaim.py
+      - name: Check the Message window class per program (MADEIRA_MESSAGE_CLASS)
+        run: python3 tests/host/check-message-class.py
+      - name: Check MADEIRA_CHILD_ARGS never reaches a crash handler
+        run: python3 tests/host/check-child-args-crashpad.py
+      - name: Check a later desktop window never takes the input desktop
+        run: python3 tests/host/check-input-desktop.py
+      - name: Check an exiting process ends with the status it chose
+        run: python3 tests/host/check-exiting-status.py
+
+      # madeira-bcd (round 630, G1 S3): the guest code around a call through NULL ([guest-code-at-fault], log only).
+      - name: Check the guest code dump at a call through NULL
+        run: python3 tests/host/check-guest-code-at-fault.py
+      - name: Check a fault a system call's __TRY answers is never a livelock
+        run: python3 tests/host/check-syscall-fault-loop.py
+      - name: Check the IL2CPP collector-race repair's third pass
+        run: python3 tests/host/check-il2cpp-gc-vtable.py
+      - name: Check an error status reaches the app whole
+        run: python3 tests/host/check-exit-status-whole.py
+      - name: Check the stuck-wait registry gives every thread its own slot
+        run: python3 tests/host/check-wait-registry-slot.py
 
       - name: Fetch the VC++ runtime DLLs from Microsoft
         shell: bash

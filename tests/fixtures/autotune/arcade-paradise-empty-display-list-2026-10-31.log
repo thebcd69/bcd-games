@@ -1,0 +1,253 @@
+[08:06:12.149] [INFO] Checking entitlements...
+[08:06:12.150] [INFO] [build] v0.1.625 (625)
+[08:06:12.150] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8170MB cores=6
+[08:06:12.150] [INFO] [device] address-map=[0x104460000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[08:06:12.161] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=-04:00 free-disk=54GB stikdebug-url=0
+[08:06:12.164] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[08:06:14.459] [INFO] Requesting JIT with Built-in StikJIT...
+[08:06:15.832] [INFO] [bcd] library launch ArcadeParadise.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[08:06:15.864] [INFO] Running full Wine sequence...
+[08:06:15.865] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104460000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[08:06:15.867] [INFO] [game-cfg] env.MADEIRA_CAGE_RELEASE=1 env.MADEIRA_EC_HOOK_TRACE=0
+[08:06:15.874] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[08:06:15.874] [INFO] Allocating 896MB JIT pool via debugger...
+[08:06:15.874] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[08:06:15.874] [INFO] [jit-debugger] attached=1 at the pool request
+[08:06:15.877] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[08:06:16.579] [INFO] RX pool at 0x148000000
+[08:06:16.595] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.761s rev=ml526
+[08:06:16.634] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[08:06:16.862] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[08:06:16.862] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7581 MB + phys_footprint=610 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0xa3000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa4000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11b570000+0xa3000 (WindowsPlayer.exe) → pool 0x148004000 used=0xa8000/0x23000000 tramp+0x0
+[copy-verify] WindowsPlayer.exe: OK, 3 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1480a8000 used=0x1e0000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1480a8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x1481e2000 used=0x602000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481e2000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x148600000 used=0x734000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148600000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148734000 used=0x7fc000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148734000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1487fc000 used=0xafc000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487fc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[window] 0x16c378000..0x7813000000 regions=35991 occupied=461404 MB of 485996 MB free=41280 MB maxhole=16688 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=625 MB (peak 625) internal=624 MB compressed=0 MB external=73 MB reusable=7 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module ArcadeParadise.exe (arcadeparadise.exe-c2cac348a618222e): 11B570000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-56ee747ef4155719): 71FC990000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FC770000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FC680000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FC5D0000
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14b018000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14b09c000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14b180000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14b204000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14bb88000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fb1d0000) -> 64-bit table (0x1072cb828)
+[bigres] tid=0024 #1 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=511 MB
+[steer] #1 size=0x1ffff000 reserved_total=511MB armed=va-pressure -> above ceiling 0x7c04400000
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\GOG Games\\Arcade Paradise\\UnityCrashHandler64.exe" cmdline=L"\"C:\\GOG Games\\Arcade Paradise\\UnityCrashHandler64.exe\" --attach 32 481645367296"
+[image-reload] unmapped image 0x71fa960000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[bigres] tid=0024 #2 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=1023 MB
+[steer] #2 size=0x1ffff000 reserved_total=1023MB armed=va-pressure -> above ceiling 0x7c25400000
+[bigres] tid=0024 #3 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=1535 MB
+[steer] #3 size=0x1ffff000 reserved_total=1535MB armed=va-pressure -> above ceiling 0x7c45400000
+[bigres] tid=0024 #4 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=2047 MB
+[steer] #4 size=0x1ffff000 reserved_total=2047MB armed=va-pressure -> above ceiling 0x7c65400000
+[bigres] tid=0024 #5 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=2559 MB
+[steer] #5 size=0x1ffff000 reserved_total=2559MB armed=va-pressure -> above ceiling 0x7c85400000
+[bigres] tid=0024 #6 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=3071 MB
+[steer] #6 size=0x1ffff000 reserved_total=3071MB armed=va-pressure -> above ceiling 0x7ca5400000
+[bigres] tid=0024 #7 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=3583 MB
+[steer] #7 size=0x1ffff000 reserved_total=3583MB armed=va-pressure -> above ceiling 0x7cc5400000
+[bigres] tid=0024 #8 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=4095 MB
+[steer] #8 size=0x1ffff000 reserved_total=4095MB armed=va-pressure -> above ceiling 0x7ce5400000
+[bigres] tid=0024 #9 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=4607 MB
+[steer] #9 size=0x1ffff000 reserved_total=4607MB armed=va-pressure -> above ceiling 0x7d05400000
+[bigres] tid=0024 #10 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=5119 MB
+[steer] #10 size=0x1ffff000 reserved_total=5119MB armed=va-pressure -> above ceiling 0x7d25400000
+[bigres] tid=0024 #11 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=5631 MB
+[steer] #11 size=0x1ffff000 reserved_total=5631MB armed=va-pressure -> above ceiling 0x7d45400000
+[bigres] tid=0024 #12 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=6143 MB
+[steer] #12 size=0x1ffff000 reserved_total=6143MB armed=va-pressure -> above ceiling 0x7d65800000
+[copy-verify] nsi.dll: OK, 2 .text pages executable (copy @0x14f0fc000)
+[free-delay] #1 release of 0x7024710000+0x110000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70259c0000+0x170000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7025b30000+0x220000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7027060000+0x110000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7027170000+0x190000 held for 2000 ms (5 in flight)
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000168 status=00000000 native_pc=000000024EC95EE8 is_ec=0 -> returned rip=000000024EC95EE8 rsp=000000011D25E9D0 flags=00100003
+[bigres] tid=002c #13 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=6655 MB
+[steer] #13 size=0x1ffff000 reserved_total=6655MB armed=va-pressure -> above ceiling 0x7d8d000000
+ml957: ? backing 0x71f7810000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\GOG Games\\Arcade Paradise\\ArcadeParadise_Data\\Plugins\\x86_64\\EOSGenerated.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[bigres] tid=0024 #14 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=7167 MB
+[steer] #14 size=0x1ffff000 reserved_total=7167MB armed=va-pressure -> above ceiling 0x7dd4800000
+[jit-pool] image 0x71f6950000+0xa0000 (compstui.dll) → pool 0x14fe80000 used=0x7f24000/0x23000000 tramp+0x4000
+D 24 Load module compstui.dll (compstui.dll-6caceb67ab4f8333): 71F6950000
+[jit-pool] image 0x71f67d0000+0x180000 (comctl32.dll) → pool 0x14ff24000 used=0x80a8000/0x23000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71F67D0000
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Nosebleed Interactive/Arcade Paradise/Player.log
+[guest-log] #1 tid=0024     Renderer: Apple A19 Pro GPU (ID=0x0)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[jit-pool] image 0x71f66f0000+0xa0000 (mmdevapi.dll) → pool 0x1500a8000 used=0x814c000/0x23000000 tramp+0x4000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71F66F0000
+[jit-pool] image 0x71f65f0000+0x80000 (avrt.dll) → pool 0x15014c000 used=0x81d0000/0x23000000 tramp+0x4000
+D A8 Load module avrt.dll (avrt.dll-cbf6d88ff1151c3b): 71F65F0000
+[image-reload] unmapped image 0x71f65f0000+0x80000: 1 pool copy marked
+[xp-names] m50313 "wine-x18-exc"
+[xp] 08:06:17.562 +0.65 dt=325 cpu=517 (thr 272) P=391 E=126 run=613 pgw=-1.0 GHz P=4.16 E=2.58 Minst=5423 IPC=2.78 mJ=1673 pin=66 rdKB=176 fpMB=1344
+[bigres] tid=009c #15 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=7679 MB
+[steer] #15 size=0x1ffff000 reserved_total=7679MB armed=va-pressure -> above ceiling 0x7e06000000
+[bigres] tid=009c #16 size=0x1ffff000 (511 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x71ffff0000 total=8191 MB
+[steer] #16 size=0x1ffff000 reserved_total=8191MB armed=va-pressure -> above ceiling 0x7e26000000
+[win-name] #7 hwnd=0x2002e class='UnityWndClass' text="Arcade Paradise" rev=ml853
+[jit-pool] image 0x71f63e0000+0x90000 (xinput1_3.dll) → pool 0x1501d0000 used=0x8264000/0x23000000 tramp+0x4000
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e6b91746084d992): 71F63E0000
+00cc:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00cc status=00000001 caller=000000014875A32C
+[store-noalias] #1 rev=ml348 addr=0x8 insn=0xd94080c2 pc=0x16a80d4d0 NO pool/anon alias | region 0x104460000+0x2768000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x8 hostpc=0x16a80d4d0 hinsn=0xd94080c2 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fd75619f pc=0x16a80d4d0 addr=0x8 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104460000+0x2768000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16a80d4d0 addr=0x8 x18=0x71fffe0000 type=1 lr=0x16affc274 sp=0x71fe3b0000 x16=0x1481019a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x1498c719f (PE 0x71fd75619f): f7 45 58 00 00 40 00 75 07 44 89 64 24 74 eb 11
+[fault-host] 16a80d3d0: d503201f d294f406 f2bfbbe6 f2c00e26 bd4000c9 d2935786 f2bfbbe6 f2c00e26
+[fault-host] 16a80d3f0: bd4000c7 9958c3b6 d503201f 995803b3 d503201f 52801506 9b067c01 93407ea0
+[fault-host] 16a80d410: d503201f d91983a0 8b080026 994680c8 d503201f 9108c3a6 d503201f 990000c8
+[fault-host] 16a80d430: 5280003b 910903a6 994000c2 d503201f 52800005 2a0503f5 d503201f 991803a5
+[fault-host] 16a80d450: 2a1b03f9 d503201f 991843bb 9108a3a6 194000c6 53081cca 6b05615f 54000c20
+[fault-host] 16a80d470: d95f83a8 d503201f 8b000801 2a0203e4 910843a6 d503201f 990000c5 910853a6
+[mach_exc] insn_stream PC-12..PC+8: 1a88d0c8 7100005f 8b010c06 [d94080c2] d503201f 8b010c06 994000d6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702384fab0 *(gs_cached+0x58)=0x702384fab0
+[store-noalias] #2 rev=ml348 addr=0x8 insn=0xd94080c2 pc=0x16a80d4d0 NO pool/anon alias | region 0x104460000+0x2768000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x8 hostpc=0x16a80d4d0 hinsn=0xd94080c2 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fd75619f pc=0x16a80d4d0 addr=0x8 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104460000+0x2768000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16a80d4d0 addr=0x8 x18=0x71fffe0000 type=1 lr=0x16affc274 sp=0x71fe3b0000 x16=0x1481019a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x1498c719f (PE 0x71fd75619f): f7 45 58 00 00 40 00 75 07 44 89 64 24 74 eb 11
+[fault-host] 16a80d430: 5280003b 910903a6 994000c2 d503201f 52800005 2a0503f5 d503201f 991803a5
+[fault-host] 16a80d450: 2a1b03f9 d503201f 991843bb 9108a3a6 194000c6 53081cca 6b05615f 54000c20
+[fault-host] 16a80d470: d95f83a8 d503201f 8b000801 2a0203e4 910843a6 d503201f 990000c5 910853a6
+[fault-host] 16a80d490: d503201f 990000db 2a0503e3 910843a6 d94000db d503201f 4eab1d63 d9400100
+[fault-host] 16a80d4b0: d503201f 9945c348 d503201f 7100011f b94076e6 1a88d0c8 7100005f 8b010c06
+[fault-host] 16a80d4d0: d94080c2 d503201f 8b010c06 994000d6 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 1a88d0c8 7100005f 8b010c06 [d94080c2] d503201f 8b010c06 994000d6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702384fab0 *(gs_cached+0x58)=0x702384fab0
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x71fd75619f in image 0x71fc990000: rva 0xdc619f, section #0 '.text' rva 0x1000+0x144f1d0 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x16a80c710 rip=0x71fd756358 x86=4c 8b 44 d1 08 44 8b 3c d1 44 0f 44 d0 48 8b 44
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16a80d4d0 RX from -32, 64 of 64 bytes: 1f 20 03 d5 48 c3 45 99 1f 20 03 d5 1f 01 00 71 e6 76 40 b9 c8 d0 88 1a 5f 00 00 71 06 0c 01 8b c2 80 40 d9 1f 20 03 d5 06 0c 01 8b d6 00 40 99 1f 20 03 d5 04 01 84 1a 06 0c 01 8b c8 80 41 d9 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16a80d4d0 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 16A80D4D0 AV READ of 8
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71fd756358 RX from -32, 64 of 64 bytes: 00 00 45 8b cb 48 8b 9d 10 02 00 00 41 0f 28 db 48 8b 08 8b 47 5c 85 c0 0f 4e 44 24 74 45 85 c0 4c 8b 44 d1 08 44 8b 3c d1 44 0f 44 d0 48 8b 44 d1 18 44 8b 64 d1 04 49 8d 14 c0 4c 3b c2 74 57 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71fd756358 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 71FD756358 AV READ of 8
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7023810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+[jit-pool] image 0x71f62f0000+0xf0000 (dbghelp.dll) → pool 0x150264000 used=0x8358000/0x23000000 tramp+0x4000
+D 24 Load module dbghelp.dll (dbghelp.dll-043eb877bc0ae473): 71F62F0000
+[guest-log] #2 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'No more files.' (Address: 00000071FD756358)
+[guest-log] #3 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FCEDD53C)
+[guest-log] #4 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD03C25B)
+[guest-log] #5 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD13B3C7)
+[guest-log] #6 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FCEDE880)
+[guest-log] #7 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FCEE27AB)
+[xp] 08:06:17.838 +0.92 dt=276 cpu=302 (thr 293) P=296 E=6 run=310 pgw=-1.0 GHz P=4.05 E=2.46 Minst=6451 IPC=5.32 mJ=1499 pin=4 rdKB=0 fpMB=1418
+[guest-log] #8 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'No more files.' (Address: 000000011B5711F2)
+[free-delay] #6 release of 0x703e8d0000+0x170000 held for 2000 ms (6 in flight)
+[image-reload] unmapped image 0x71f62f0000+0xf0000: 1 pool copy marked
+wine: Unhandled page fault on read access to 0000000000000008 at address 00000071FD756358 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=2855
+[unwind] term ml661 begin rip=1488741fc rsp=70237fdba8 window=[70237fdba8..7023ffdba8) max=32
+[unwind] term ml661 #00 pc=1488741fc rsp=70237fdba8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+0f8:   ? 71fd756358  UnityPlayer.dll+0xdc6358
+[term-stack] ml660 sp+5d8:   ? 71fd756358  UnityPlayer.dll+0xdc6358
+[term-stack] ml660 sp+890:   ? 71fd756358  UnityPlayer.dll+0xdc6358
+[term-stack] ml660 sp+928: CALL 71fd7562a3  UnityPlayer.dll+0xdc62a3
+[term-stack] ml660 sp+988: CALL 71fcf2640c  UnityPlayer.dll+0x59640c
+[term-stack] ml660 sp+998:   ? 71fe1888a0  UnityPlayer.dll+0x17f88a0
+[term-stack] ml660 sp+c38: CALL 71fcedd53c  UnityPlayer.dll+0x54d53c
+[term-stack] ml660 sp+cb8: CALL 71fcf26686  UnityPlayer.dll+0x596686
+[term-stack] ml660 sp+d08: call* 71fcf21df0  UnityPlayer.dll+0x591df0
+[term-stack] ml660 sp+d48: call* 71fd03c25b  UnityPlayer.dll+0x6ac25b
+[term-stack] ml660 sp+d88: CALL 71fd13b3c7  UnityPlayer.dll+0x7ab3c7
+[term-stack] ml660 sp+ef8: CALL 71fcede880  UnityPlayer.dll+0x54e880
+[srv-kill] kill_thread tid=00b4 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00b8 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00bc pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00c0 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00c4 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00c8 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[xp] 08:06:18.159 +1.24 dt=321 cpu=82 (thr 2) P=80 E=2 run=84 pgw=-1.0 GHz P=3.86 E=2.17 Minst=1836 IPC=5.87 mJ=389 pin=0 rdKB=0 fpMB=1408
+[08:06:18.363] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=1418MB limit=8191MB thermal=nominal lpm=0 api=D3D9/OpenGL/64 res=1408x648 cap=60 game=Arcade Paradise
+[08:06:18.369] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[xp] 08:06:18.413 +1.50 dt=254 cpu=120 (thr 119) P=18 E=101 run=117 pgw=-1.0 GHz P=1.79 E=2.11 Minst=870 IPC=3.52 mJ=32 pin=0 rdKB=0 fpMB=1409
+[xp] 08:06:18.670 +1.76 dt=257 cpu=473 (thr 423) P=173 E=299 run=539 pgw=-1.0 GHz P=3.89 E=2.56 Minst=6393 IPC=4.44 mJ=858 pin=1 rdKB=0 fpMB=1426
+[footprint] rev=ml358 phys=1412 MB (peak 1412) internal=1379 MB compressed=0 MB external=126 MB reusable=6 MB (cycle=2)
+[xp] 08:06:18.957 +2.04 dt=287 cpu=294 (thr 297) P=12 E=283 run=303 pgw=-1.0 GHz P=3.87 E=2.59 Minst=3451 IPC=4.45 mJ=154 pin=0 rdKB=0 fpMB=1412
+[footprint] rev=ml1060 fast phys=1412 MB compressed=0 MB internal=1379 MB
+[08:06:20.160] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1412 MB (peak 1412) internal=1380 MB compressed=0 MB external=127 MB reusable=6 MB (cycle=3)
+[footprint] rev=ml358 phys=1409 MB (peak 1412) internal=1377 MB compressed=0 MB external=127 MB reusable=9 MB (cycle=4)
+[footprint] rev=ml358 phys=1401 MB (peak 1412) internal=1370 MB compressed=0 MB external=127 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=1412 MB (peak 1412) internal=1380 MB compressed=0 MB external=128 MB reusable=10 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bce1030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=28 resident=1528MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bce1030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1414 MB (peak 1414) internal=1383 MB compressed=0 MB external=139 MB reusable=11 MB (cycle=24)
+[footprint] rev=ml358 phys=1414 MB (peak 1414) internal=1383 MB compressed=0 MB external=139 MB reusable=11 MB (cycle=25)
+[footprint] rev=ml358 phys=1414 MB (peak 1414) internal=1383 MB compressed=0 MB external=140 MB reusable=11 MB (cycle=26)
+[footprint] rev=ml358 phys=1414 MB (peak 1414) internal=1383 MB compressed=0 MB external=140 MB reusable=11 MB (cycle=27)
+[footprint] rev=ml358 phys=1416 MB (peak 1416) internal=1385 MB compressed=0 MB external=145 MB reusable=11 MB (cycle=28)
+[xp] 08:07:13.371 +56.46 dt=327 cpu=20 (thr 20) P=0 E=20 run=21 pgw=-1.0 GHz P=0.00 E=1.06 Minst=44 IPC=2.10 mJ=2 pin=0 rdKB=0 fpMB=1416
+[xp] 08:07:13.693 +56.78 dt=321 cpu=26 (thr 25) P=0 E=26 run=27 pgw=-1.0 GHz P=0.00 E=1.05 Minst=66 IPC=2.47 mJ=2 pin=0 rdKB=0 fpMB=1416
+[footprint] rev=ml358 phys=1416 MB (peak 1416) internal=1385 MB compressed=0 MB external=145 MB reusable=11 MB (cycle=29)
+[xp] 08:07:14.014 +57.10 dt=321 cpu=39 (thr 38) P=0 E=39 run=48 pgw=-1.0 GHz P=0.00 E=1.04 Minst=70 IPC=1.72 mJ=3 pin=0 rdKB=0 fpMB=1416
+[xp] 08:07:14.345 +57.43 dt=332 cpu=58 (thr 59) P=25 E=33 run=93 pgw=-1.0 GHz P=1.64 E=1.42 Minst=156 IPC=1.77 mJ=15 pin=2 rdKB=192 fpMB=1416
+Hz P=0.00 E=1.05 Minst=66 IPC=2.47 mJ=2 pin=0 rdKB=0 fpMB=1416
+[08:07:14.020] [xp] 08:07:14.014 +57.10 dt=321 cpu=39 (thr 38) P=0 E=39 run=48 pgw=-1.0 GHz P=0.00 E=1.04 Minst=70 IPC=1.72 mJ=3 pin=0 rdKB=0 fpMB=1416
+[08:07:14.346] [xp] 08:07:14.345 +57.43 dt=332 cpu=58 (thr 59) P=25 E=33 run=93 pgw=-1.0 GHz P=1.64 E=1.42 Minst=156 IPC=1.77 mJ=15 pin=2 rdKB=192 fpMB=1416

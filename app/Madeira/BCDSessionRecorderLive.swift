@@ -76,13 +76,15 @@ enum BCDBrkTrail {
     private static let lock = NSLock()
     private static var began = 0.0   // systemUptime of the open request
 
-    /// `site`: the caller's line in StikJITHelper.swift; `attempt`: the pool loop's try (nil elsewhere).
-    static func begin(site: Int, size: Int, attempt: Int?) {
+    /// `site`: the caller's line in StikJITHelper.swift; `attempt`: the pool loop's try (nil elsewhere); `region`: which of the pool's
+    /// regions the request is for (round 630, agent A1 S19: A the pool, A-single its split's replacement, B the second region and B-mid
+    /// its middle try, C the low region), so the next start's line names it without the source at hand.
+    static func begin(site: Int, size: Int, attempt: Int?, region: String = "?") {
         guard let url else { return }
         lock.lock(); defer { lock.unlock() }
         let info = ProcessInfo.processInfo
         began = info.systemUptime
-        let line = "begin site=L\(site) size=\(size >> 20)MB attempt=\(attempt.map(String.init) ?? "-") uptime=\(String(format: "%.1f", began)) "
+        let line = "begin site=L\(site) region=\(region) size=\(size >> 20)MB attempt=\(attempt.map(String.init) ?? "-") uptime=\(String(format: "%.1f", began)) "
             + "wall=\(Int(Date().timeIntervalSince1970)) thermal=\(info.thermalState.rawValue) lpm=\(info.isLowPowerModeEnabled ? 1 : 0) "
             + "avail=\(os_proc_available_memory() >> 20)MB\n"
         write(line, to: url, fresh: true)   // the file holds the last request only
@@ -282,6 +284,8 @@ func winiosPhase(_ name: String) {
         // One question per session, whatever the answer: the marker goes now.
         try? FileManager.default.removeItem(at: url)
         guard let found = try? JSONDecoder().decode(BCDSessionMarker.self, from: data) else { return }
+        // Round 630 (agent A1 S15): a Dock install batch that this session cut short is offered once more (DockInstallers.absorbResults).
+        if found.background { DockInstallers.previousSessionBackgroundAfter = found.changedAt - found.startedAt }
         let log = Self.findLog(inode: found.logInode)
         let offer = BCDCrashRules.offer(marker: found, endedAt: log.map { LogUpload.modified($0).timeIntervalSince1970 },
                                         now: Date().timeIntervalSince1970, enabled: Self.asks)

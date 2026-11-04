@@ -129,17 +129,21 @@ assert 'Very Low' in apply_src and 'AMD FSR' in apply_src and 'Balanced or ' in 
 assert list(presets) == ['rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other', 'gta5l-steam', 'gta5l-other', 'ghost-of-tsushima', 'god-of-war',
                          'horizon-zero-dawn', 'horizon-forbidden-west', 'ratchet-clank-rift-apart', 'crysis-remastered',
                          'crysis-2-remastered', 'crysis-3-remastered', 'msfs-2024', 'counter-strike-2', 'warcraft-2-bne',
-                         'breakneck', 'spelunky-2', 'albion-online', 'megabonk', 'no-im-not-a-human', 'over-the-hill', 'fort-solis', 'dragon-ball-sparking-zero', 'final-fantasy-vii-steam', 'animal-well', 'hogwarts-legacy', 'metal-gear-solid-v', 'stellar-blade-demo', 'star-wars-galactic-racer', 'minecraft-dungeons-2', 'denshattack', 'final-fantasy-resonance-demo', 'no-rest-for-the-wicked', 'quaver', 'dying-light', 'beamng-drive', 'monster-hunter-stories-3-trial', 'pwaat', 'lego-party', '1000xresist', 'american-truck-simulator', 'marvels-spider-man-miles-morales', 'diablo-ii-resurrected', 'clair-obscur-expedition-33', 'gta4-steam', 'gtasa-de-steam', 'unrailed-2-back-on-track', 'resident-evil-2', 'resident-evil-7', 'blazblue-entropy-effect', 'dark-souls-iii', 'marvels-spider-man-remastered', 'marvels-spider-man-2', 'raidou-remastered', 'yakuza-like-a-dragon', 'batman-arkham-city-goty', 'metal-gear-solid-peace-walker', 'lonely-mountains-snow-riders', 'trails-in-the-sky-1st-chapter', 'subnautica-2', 'rdr1-steam', 'resident-evil-requiem', 'resident-evil-requiem-demo', 'resident-evil-6', 'resident-evil-revelations-2',
+                         'breakneck', 'spelunky-2', 'albion-online', 'megabonk', 'no-im-not-a-human', 'over-the-hill', 'fort-solis', 'dragon-ball-sparking-zero', 'final-fantasy-vii-steam', 'messiah',   # round 630
+                         'animal-well', 'hogwarts-legacy', 'metal-gear-solid-v', 'stellar-blade-demo', 'star-wars-galactic-racer', 'minecraft-dungeons-2', 'denshattack', 'final-fantasy-resonance-demo', 'no-rest-for-the-wicked', 'quaver', 'dying-light', 'beamng-drive', 'monster-hunter-stories-3-trial', 'pwaat', 'lego-party', '1000xresist', 'american-truck-simulator', 'marvels-spider-man-miles-morales', 'diablo-ii-resurrected', 'clair-obscur-expedition-33', 'gta4-steam', 'gtasa-de-steam', 'unrailed-2-back-on-track', 'resident-evil-2', 'resident-evil-7', 'blazblue-entropy-effect', 'dark-souls-iii', 'marvels-spider-man-remastered', 'marvels-spider-man-2', 'raidou-remastered', 'yakuza-like-a-dragon', 'batman-arkham-asylum-goty', 'batman-arkham-city-goty', 'metal-gear-solid-peace-walker', 'lonely-mountains-snow-riders', 'trails-in-the-sky-1st-chapter', 'subnautica-2', 'rdr1-steam', 'resident-evil-requiem', 'resident-evil-requiem-demo', 'resident-evil-6', 'resident-evil-revelations-2',
                          'bioshock-infinite-epic', 'danganronpa-trigger-happy-havoc', 'life-is-strange-remastered', 'life-is-strange-2', 'project-zomboid', 'spiderheck', 'rounds', 'plateup', 'final-fantasy-tactics-ivalice-chronicles', 'age-of-empires-ii-hd', 'fallout-new-vegas', 'digimon-story-cyber-sleuth', 'final-fantasy-xv-demo', 'borderlands-3', 'zenless-zone-zero', 'jetboard-joust', 'sword-and-fairy-3', 'dead-as-disco', 'tung', 'darksiders-ii-deathinitive', 'nfs-most-wanted', 'nfs-underground-2', 'sekiro-shadows-die-twice', 'mudrunner', 'indivisible', 'terraria', 'risk-of-rain-2', 'jackal', 'stardew-valley', 'counter-strike-source', 'chuchel', 'botanicula', 'fallout-4', 'skyrim-special-edition', 'lego-batman-the-videogame', 'silent-hunter-3', 'just-cause-3', 'glyphica-typing-survival', 'grand-theft-auto-iii', 'postal-2', 'hotline-miami', 'max-payne-2', 'pico-park', 'dont-starve-together', 'a-hat-in-time', 'the-adventures-of-elliot', 'forza-horizon-4', 'tiny-tinas-wonderlands', 'far-cry-3', 'barotrauma', 'slay-the-spire-2', 'resident-evil-3', 'marvel-cosmic-invasion', 'haste', 'big-walk', 'ball-x-pit', 'just-volleyball-demo', 'farming-simulator-22-epic', 'max-payne-3', 'f1-2020', 'need-for-speed-the-run', 'bloons-td-6',
                          'control', 'no-more-room-in-hell', 'red-faction', 'from-the-darkness', 'metal-gear-solid-4-master-collection', 'mycopunk', 'arctic-awakening', 'supermarket-together', 'robocop-rogue-city', 'blasphemous', 'nwjs-game-exe', 'kerbal-space-program', 'mafia-2', 'fallout-3', 'overlord-ii', 'rise-of-the-tomb-raider', 'lucieneslife', 'ubisoft-connect', 'unreal-gold', 'repo', 'osu', 'outlast', 'satisfactory', 'the-witcher-3', 'yakuza-6-the-song-of-life', 'euro-truck-simulator-2', 'gal-gun-2', 'hello-neighbor', 'borderlands-goty-enhanced', 'dead-space-2023', 'schedule-i', 'dokimon-quest', 'sonic-adventure-dx', 'requiem-avenging-angel', 'friends-vs-friends', 'fallout-4-other', 'skyrim-special-edition-other', 'wrc-9', 'doki-doki-literature-club',   # round 624
                          'outlast-2', 'batman-arkham-knight', 'dead-rising', 'reanimal', 'pragmata', 'what-lies-in-the-multiverse', 'muv-luv-photonflowers',   # round 625
-                         'nioh-2', 'ghpc', 'murder-miners', 'crosscode', 'dead-island-definitive', 'football-manager-27', 'call-of-duty-modern-warfare-2-2009', 'cyberpunk-2077', 'deadlock',
+                         'nioh-2', 'ghpc', 'murder-miners', 'crosscode', 'dead-island-definitive', 'football-manager-27', 'dead-or-alive-6', 'fifa-22', 'darksiders-warmastered-edition', 'grandchase', 'rotfront', 'bioshock', 'aliens-colonial-marines', 'hitman-blood-money', 'hitman-contracts', 'guacamelee-gold', 'nfs-porsche-unleashed', 'resident-evil-5', 'stalker-xray-engine', 'tales-of-zestiria', 'the-witcher-enhanced-edition', 'cult-of-the-lamb', 'baldurs-gate-3', 'vampire-bloodlines', 'goldsrc-hl-exe', 'arcade-paradise', 'toem', 'bendy-and-the-ink-machine', 'shroom-and-gloom', 'peak', 'tekken-7', 'call-of-duty-modern-warfare-2-2009', 'cyberpunk-2077', 'deadlock',
                          'power-drill-massacre', 'hellblade-senuas-sacrifice', 'valheim', 'overcooked-2',
                          'oxygen-not-included', 'caravan-sandwitch', 'dragon-age-origins', 'reskate', 'haak',
                          'bioshock-remastered-epic', 'hollow-knight-silksong', 'hollow-knight',   # round 626
                          'burnout-paradise',   # round 626 G1 S7 (7MSNGW)
                          'poppy-playtime',   # round 626 A2 S7 (6DS3FK)
                          'dark-souls-ptde', 'saints-row-the-third', 'sleeping-dogs-definitive-edition', 'call-of-duty-black-ops',   # round 626 A1 S7
+                         'the-wolf-among-us-remastered', 'sable', 'the-darkside-detective-2',   # round 630 T2 S14, S10
+                         'payday-2',   # round 630 G2 S6
+                         'halo-the-master-chief-collection', 'football-manager-26',   # round 630 Discord (agent D S2, S7)
                          'standard'], list(presets)
 
 catalog_keys = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog))
@@ -240,8 +244,23 @@ env.MADEIRA_X64_IMAGE_NOCOPY = 1
 env.WINEDLLOVERRIDES = video64=
 env.MADEIRA_DEVICE_STATS = 1
 env.MADEIRA_METAL_HUD_MAIN = 1'''.split('\n')
-assert presets['rdr2-steam']['lines'][2:] == rdr2, 'the RDR2 list differs from the owner\'s'
-assert presets['rdr2-steam']['version'] == 12, presets['rdr2-steam']['version']   # 11 (2026-10-21): env.MADEIRA_FEX_AVX = 0; 12: 30 FPS + tip (build 622)
+# Round 630 (a player on the owner's Discord, 2026-11-04; RDR2 S29BE1, JRBQ8D, Q2G5WK, 8JSG87, GTA V Legacy KTD37Z): the Rockstar Games
+# Launcher 1.0.110.3139 (2026-11-03) imports tbs.dll; without it the launcher ends with c0000135 and the game cannot start. Every list
+# that starts the Rockstar Games Launcher gets BCD's opt-in tbs (shipped since build 579) before its tip: rule
+# rockstar-launcher-tbs-import gives the same line to a copy without a row.
+tbs630 = 'env.MADEIRA_OPTIN_DLLS = tbs'
+_tbs630_rows = ('rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other', 'gta5l-steam', 'gta5l-other', 'gta4-steam', 'gtasa-de-steam',
+                'rdr1-steam', 'max-payne-3')
+for _id in _tbs630_rows:
+    _row = next(r for r in recs['rules'] if r['id'] == _id)
+    assert [c for c in _row['config'] if isinstance(c, dict) and c.get('line') == tbs630] == [{'line': tbs630, 'minBuild': 579}], _id
+    _last = _row['config'][-1]
+    assert _last == {'line': tbs630, 'minBuild': 579} or (_last == {'line': 'low-graphics-tip = 1', 'minBuild': 622}
+                                                         and _row['config'][-2] == {'line': tbs630, 'minBuild': 579}), _id
+assert sorted(r['id'] for r in recs['rules'] if any(isinstance(c, dict) and c.get('line') == tbs630 for c in r['config'])) == sorted(
+    _tbs630_rows + ('dead-as-disco', 'football-manager-26', 'football-manager-27'))
+assert presets['rdr2-steam']['lines'][2:] == rdr2 + [tbs630], 'the RDR2 list differs from the owner\'s (plus the launcher\'s tbs, round 630)'
+assert presets['rdr2-steam']['version'] == 13, presets['rdr2-steam']['version']   # 11 (2026-10-21): env.MADEIRA_FEX_AVX = 0; 12: 30 FPS + tip (build 622); 13: tbs (round 630)
 assert presets['rdr2-steam']['switches'] == ('avx: false, nvidia: false, wineVCRT: false, fastSync: true, '
                                              'semaphoreFastPath: false, fpsMode: 3, resolution: GameRecommendation.screen720, display: "fit"'), presets['rdr2-steam']['switches']
 assert 'static let screen720 = "screen@720"' in lists_src and 'resolution == Self.screen720 ? "this screen\'s shape at 720 lines" : resolution' in lists_src
@@ -259,15 +278,15 @@ assert avx_pin in rdr2 and avx_pin in presets['gta5e-steam']['lines'] and avx_pi
 # (every start of it stopped at the same launcher before; gta5l-other has had it since its own list). RDR2 outside Steam keeps AVX
 # as it was: a copy of it played with its list (W9AC45).
 assert avx_pin not in rdr2_other['lines'] and avx_pin in presets['gta5e-other']['lines']
-_rdr2_other_base = [line for line in rdr2 if line not in dock_only and line != avx_pin]
+_rdr2_other_base = [line for line in rdr2 if line not in dock_only and line != avx_pin]   # rdr2: the owner's lines, without tbs630
 _wdo_idx = _rdr2_other_base.index('env.WINEDLLOVERRIDES = video64=')
 assert rdr2_other['lines'][2:] == (
     _rdr2_other_base[:_wdo_idx + 1]
     + ['env.WINEDLLOVERRIDES = video64=;socialclub=n,b;version=n,b', 'env.MADEIRA_DLL_LOCAL = socialclub.dll=version.dll']
     + _rdr2_other_base[_wdo_idx + 1:]
-    + ['env.MADEIRA_EC_HOOK_TRACE = 0']
+    + ['env.MADEIRA_EC_HOOK_TRACE = 0', tbs630]
 ), rdr2_other['lines']
-assert rdr2_other['version'] == 3 and rdr2_other['switches'] == presets['rdr2-steam']['switches'], rdr2_other
+assert rdr2_other['version'] == 4 and rdr2_other['switches'] == presets['rdr2-steam']['switches'], rdr2_other
 assert 'env.MADEIRA_EC_HOOK_TRACE = 0' in presets['gta5e-other']['lines']
 # Every other game (owner's decision, 2026-10-12): the ec-hook reporter off, nothing else, no switches.
 standard = presets['standard']
@@ -285,20 +304,23 @@ for ident in ('gta5e-steam', 'gta5e-other', 'rdr2-steam', 'rdr2-other', 'horizon
 # Version 3 of the Steam list (build 514): the VC++ setup's elevated engine is not started, as for RDR2.
 # steam 4 (2026-10-21): env.MADEIRA_FEX_AVX = 0
 # other 4 (round 624): the Rockstar-chain lines of the Steam copy and env.MADEIRA_STEAM_IDENTITY = none (minBuild 624).
-assert presets['gta5e-steam']['version'] == 6 and presets['gta5e-other']['version'] == 5, \
+# other 6 (round 630, agent R S11): env.BCD_EPIC_HOST_START = 1 (minBuild 598) before the tip: an Epic start keeps BCD Host first.
+# steam 7, other 7 (round 630): the launcher's tbs (tbs630) before the tip.
+assert presets['gta5e-steam']['version'] == 7 and presets['gta5e-other']['version'] == 7 \
+    and 'env.BCD_EPIC_HOST_START = 1' in presets['gta5e-other']['lines'] and 'env.BCD_EPIC_HOST_START = 1' not in presets['gta5e-steam']['lines'], \
     (presets['gta5e-steam']['version'], presets['gta5e-other']['version'])
 for ident in ('rdr2-steam', 'rdr2-other', 'gta5e-steam'):
     assert 'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler;.be\\vc_redist' in presets[ident]['lines'], ident
 # GTA V Legacy (Steam) v1: the owner's 2026-10-15 lines; DirectX 11, so no D3D12 lines and no DualSense mode.
 legacy = presets['gta5l-steam']
 # v2 (owner, build 547): no vram-mb and no swap-mb in the list; a device under 12 GB gets the 3 GB RAM swap.
-assert legacy['version'] == 4 and legacy['title'] == 'GTA V Legacy (Steam)', legacy   # 3: env.MADEIRA_FEX_AVX = 0; 4: 30 FPS + tip
+assert legacy['version'] == 5 and legacy['title'] == 'GTA V Legacy (Steam)', legacy   # 3: env.MADEIRA_FEX_AVX = 0; 4: 30 FPS + tip; 5: tbs (round 630)
 assert not any(line.startswith(('vram-mb', 'swap-mb')) for line in legacy['lines']), legacy['lines']
 assert legacy['small'] == ['swap-mb = 3072'], legacy['small']
 assert 'static var smallRAMDevice: Bool { deviceRAMBytes < 10 << 30 }' in lists_src
 # Round 624 (agent E1): Euro Truck Simulator 2 gets the BC texture clamp on a device under 10 GB only (2MJ7AZ, K299DR: killed at the
 # limit of an 8 GB phone while loading 1.36 GB of BC textures).
-assert [ident for ident, p in presets.items() if p['small']] == ['gta5e-steam', 'gta5e-other', 'gta5l-steam', 'gta5l-other', 'metal-gear-solid-4-master-collection', 'euro-truck-simulator-2', 'outlast-2', 'ghpc', 'oxygen-not-included']   # ghpc, gta5e: round 626 swap tier; ONI: round 626 clamp
+assert [ident for ident, p in presets.items() if p['small']] == ['gta5e-steam', 'gta5e-other', 'gta5l-steam', 'gta5l-other', 'metal-gear-solid-4-master-collection', 'euro-truck-simulator-2', 'outlast-2', 'ghpc', 'shroom-and-gloom', 'oxygen-not-included']   # ghpc, gta5e: round 626 swap tier; ONI: round 626 clamp; Shroom and Gloom: round 630 clamp (U S12)
 assert presets['oxygen-not-included']['small'] == ['env.MADEIRA_MIP_CLAMP_AUTO = 1'] and presets['oxygen-not-included']['small_builds'] == [(625, 1000000000)]
 # Round 626 (agent P S7; AK97GE, CKTRQX, 4HHFA0): GTA V Enhanced on an 8 GB phone gets broad swap coverage with an 8192 MB cap after its list.
 for _id in ('gta5e-steam', 'gta5e-other'):
@@ -327,8 +349,10 @@ assert presets['outlast-2']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0'] an
 # Round 625 (the owner's item 26; T3CXNQ, 4FD24J): the two 32-bit games that stopped for want of mfc140u.dll take Microsoft's 32-bit MFC
 # (downloaded in Settings) from build 625; nothing else in their lists, and no other row sets the switch.
 for _id in ('what-lies-in-the-multiverse', 'muv-luv-photonflowers'):
-    assert presets[_id]['version'] == 1 and presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_MFC32 = 1'] \
-        and presets[_id]['line_builds'][-1] == (625, 1000000000), presets[_id]
+    _mv = _id == 'muv-luv-photonflowers'   # round 630 (O2 S4): version 2 adds a WINEDEBUG trace after the MFC line
+    assert presets[_id]['version'] == (2 if _mv else 1) and presets[_id]['lines'][2:4] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_MFC32 = 1'] \
+        and presets[_id]['line_builds'][3] == (625, 1000000000), presets[_id]
+    assert presets[_id]['lines'][4:] == (['env.WINEDEBUG = err+all,err-virtual,+loaddll,+file,+reg'] if _mv else []), presets[_id]
 assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_MFC32' in json.dumps(r['config'])) == ['muv-luv-photonflowers', 'what-lies-in-the-multiverse']
 # Round 625 (agent L4 S3-a, NGEDJT): PRAGMATA's 372 MiB program has its relocations stripped; the window for it at 0x140000000 and no pool
 # copy are the two lines auto-tune kept, from the first start. Its stop in its own start-up code is a known verdict (pragmata-startup-wild-read).
@@ -338,9 +362,12 @@ assert presets['pragmata']['version'] == 1 and presets['pragmata']['lines'][2:] 
 # no Steam identity from build 598 (error 113 in every Epic start of build 592); the same RAM swap and switches.
 _legacy_other = presets['gta5l-other']
 _dock = ('env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_DOCK_KEEP_ALIVE = Launcher.exe;GTA5.exe')
-assert _legacy_other['version'] == 2 and _legacy_other['title'] == 'GTA V Legacy (not Steam)', _legacy_other
-assert _legacy_other['lines'][2:] == [l for l in legacy['lines'][2:] if l not in _dock] + ['env.MADEIRA_STEAM_IDENTITY = none'], _legacy_other['lines']
-assert _legacy_other['line_builds'][-1] == (598, 1000000000) and set(_legacy_other['line_builds'][:-1]) == {(0, 1000000000)}
+# v3 (round 630, agent R S11): + env.BCD_EPIC_HOST_START = 1 (minBuild 598), the Epic start through BCD Host.
+# v4 (round 630): + the launcher's tbs (minBuild 579) after them, as in the Steam list.
+assert _legacy_other['version'] == 4 and _legacy_other['title'] == 'GTA V Legacy (not Steam)', _legacy_other
+assert legacy['lines'][-1] == tbs630 and legacy['line_builds'][-1] == (579, 1000000000), legacy['lines'][-3:]
+assert _legacy_other['lines'][2:] == [l for l in legacy['lines'][2:] if l not in _dock and l != tbs630] + ['env.MADEIRA_STEAM_IDENTITY = none', 'env.BCD_EPIC_HOST_START = 1', tbs630], _legacy_other['lines']
+assert _legacy_other['line_builds'][-3:] == [(598, 1000000000), (598, 1000000000), (579, 1000000000)] and set(_legacy_other['line_builds'][:-3]) == {(0, 1000000000)}
 assert _legacy_other['small'] == legacy['small'] and _legacy_other['switches'] == legacy['switches']
 assert 'env.MADEIRA_DOCK_KEEP_ALIVE = Launcher.exe;GTA5.exe' in legacy['lines']
 assert 'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler;.be\\vc_redist' in legacy['lines']
@@ -449,10 +476,11 @@ assert not any(line.startswith(('skin-check', 'skin-dump', 'fence-strict', 'vis-
 # Version 3 (build 515, the owner's working list): the ec-hook reporter off, a 4 GB swap file, and
 # thread stacks that may take the kernel's pick (a thread the game could not create froze it, 15:39).
 got = presets['ghost-of-tsushima']
+# Version 5 (owner, 2026-11-01): the swap file in broad mode (swap-mode = 2, swap-min-mb = 8) and 1 GB (was 4 GB); the rest unchanged.
 assert got['lines'][2:] == ['dxil-tess = 0', 'sampler-reduction = 3', 'ind-count = 6000', 'typed-view-align = 16',
-                            'typed-view-shadow = 1', 'view-census = 1', 'env.MADEIRA_PAD_MODE = hid', 'swap-mb = 4096',
-                            'env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_THREAD_STACK_SPILL = 1'], got['lines']
-assert got['version'] == 4, got['version']   # 4: 30 FPS + tip (build 622)
+                            'typed-view-shadow = 1', 'view-census = 1', 'swap-mode = 2', 'swap-min-mb = 8', 'swap-mb = 1024',
+                            'env.MADEIRA_PAD_MODE = hid', 'env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_THREAD_STACK_SPILL = 1'], got['lines']
+assert got['version'] == 5, got['version']   # 4: 30 FPS + tip (build 622); 5: broad swap, 1 GB
 assert got['switches'] == ('avx: true, nvidia: true, wineVCRT: false, fastSync: true, semaphoreFastPath: false, fpsMode: 3, '
                            'resolution: "1280x720", display: "fit"'), got['switches']
 assert not any(line.startswith('typed-view-rgb32') for p in presets.values() if p not in (hfw, rca)
@@ -499,8 +527,10 @@ assert not any(line.startswith(('env.MADEIRA_JUMBO_HALF', 'env.MADEIRA_CAGE_RELE
                # (with its small-map step of build 624) gives it the half. Its only line of the six.
                and not (p is presets['the-witcher-3'] and line == 'env.MADEIRA_JUMBO_HALF = 1')
                # round 626 (agent G1 S11): Cyberpunk 2077, the same 32/64 GB reserve experiment
-               and not (p is presets['cyberpunk-2077'] and line == 'env.MADEIRA_JUMBO_HALF = 1')), \
-    'jumbo-half, cage-release, alias-release, LC_ALL, fence-early and va-pressure-gap are Rift Apart\'s and Spider-Man 2\'s only (LC_ALL: Dying Light\'s and Dead Island DE\'s too; jumbo-half: The Witcher 3\'s and Cyberpunk 2077\'s too)'
+               and not (p is presets['cyberpunk-2077'] and line == 'env.MADEIRA_JUMBO_HALF = 1')
+               # round 630 (agent T1 S31, Q335M7): PEAK started from its own folder; auto-tune found and kept cage-release, "Runs good"
+               and not (p is presets['peak'] and line == 'env.MADEIRA_CAGE_RELEASE = 1')), \
+    'jumbo-half, cage-release, alias-release, LC_ALL, fence-early and va-pressure-gap are Rift Apart\'s and Spider-Man 2\'s only (LC_ALL: Dying Light\'s and Dead Island DE\'s too; jumbo-half: The Witcher 3\'s and Cyberpunk 2077\'s too; cage-release: PEAK\'s too)'
 # 2026-10-23 (owner: the list carries the latest Spider-Man settings, not running yet)
 # v3 (owner, 2026-10-28): pso-warm = 2 (the 621 stutter in a new area was pipelines built at their first draw; the owner found it
 # smooth with it), 30 FPS and the tip.
@@ -543,8 +573,11 @@ assert c['version'] == 3 and c['switches'] == 'avx: true, nvidia: false, wineVCR
 assert presets['outlast']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_APP_DLL_SHADOW = msvcr100.dll;msvcp100.dll',
                                            'env.MADEIRA_D3D9_X64 = dxmt'], presets['outlast']['lines']
 assert not any(line.startswith('env.MADEIRA_APP_DLL_SHADOW') for p in presets.values() if p is not c and p is not presets['outlast']
+               and p is not presets['hitman-contracts'] and p is not presets['guacamelee-gold']
                for line in p['lines']), \
-    'the app-local DLL shadow is Crysis 3 Remastered\'s and (round 624) Outlast\'s only'
+    'the app-local DLL shadow is Crysis 3 Remastered\'s, (round 624) Outlast\'s and (round 630, 32-bit msvcrt) Hitman: Contracts\' and Guacamelee\'s only'
+for _id in ('hitman-contracts', 'guacamelee-gold'):   # round 630 O2 S1: the i386 branch of the key exists from build 630
+    assert presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_APP_DLL_SHADOW = msvcrt.dll'] and presets[_id]['line_builds'][-1] == (630, 1000000000), _id
 # Microsoft Flight Simulator 2024, version 1 (for build 538): being brought up. Build 534 stopped in the loader
 # (srvcli.dll missing, 2026-10-14 20:27); the owner's test settings: the standard line, AVX and NVIDIA on, Fit.
 # Version 2: on 538 (21:20) the JIT pool ran out at CoherentGTCore.dll, so pure-x64 images get no pool copy.
@@ -600,10 +633,13 @@ assert presets['from-the-darkness']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE 
 assert presets['power-drill-massacre']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WOW_RWX_PLAIN = 1', 'env.MADEIRA_WG_VPROC = 1'], presets['power-drill-massacre']['lines']   # v2: round 626 V
 # Round 626 (agent U2 S3, FFTMY3): Overcooked! 2, Mono's unaligned atomic swap on its RWX chunk, the same line.
 assert presets['overcooked-2']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WOW_RWX_PLAIN = 1'], presets['overcooked-2']['lines']
+# Round 630 (agent T2 S10, CKCAAD): The Darkside Detective: A Fumble in the Dark, a 32-bit Unity game with 17 M emulated stores, the same line.
+assert presets['the-darkside-detective-2']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WOW_RWX_PLAIN = 1'], presets['the-darkside-detective-2']['lines']
 assert not any(line.startswith('env.MADEIRA_WOW_RWX_PLAIN') for p in presets.values()
-               if p not in (wc2, bn, presets['pwaat'], presets['from-the-darkness'], presets['power-drill-massacre'], presets['overcooked-2'])
+               if p not in (wc2, bn, presets['pwaat'], presets['from-the-darkness'], presets['power-drill-massacre'], presets['overcooked-2'],
+                            presets['the-darkside-detective-2'])
                for line in p['lines']), \
-    'plain RWX memory is Warcraft II\'s, Breakneck\'s, PWAAT\'s, From the Darkness\'s, Power Drill Massacre\'s and Overcooked! 2\'s only'
+    'plain RWX memory is Warcraft II\'s, Breakneck\'s, PWAAT\'s, From the Darkness\'s, Power Drill Massacre\'s, Overcooked! 2\'s and The Darkside Detective 2\'s only'
 print('PASS: RDR2 (Steam) is the owner\'s 463 list plus the 466, 467, 470, 472, 475, 476, 480 and 514 test lines and the AVX pin (v11), line for line with its switches (720 lines of this screen), and outside Steam the same without the Dock lines, with the ec-hook reporter off (v1); GTA V Enhanced keeps its tested lines plus the stamped orphan-lock mode (v2) and, from Steam, the VC++ engine block (v3) and the AVX pin (v4), GoW its tested lines; Horizon Zero Dawn has build 491\'s proven list plus build 494\'s frame-rate switches (v16), GoT the owner\'s build 515 list (v3); Horizon Forbidden West its eleventh try\'s list with the aligned copies on and discarded targets loaded (v4: float3 views get a copy too; v5: MipLevels 0 textures get their full chain); Rift Apart HFW\'s general lines with AVX and NVIDIA on (v1); GTA V Legacy from Steam the owner\'s DirectX 11 lines (v1), without vram-mb and swap-mb and with the 3 GB RAM swap only under 12 GB of RAM (v2) and the AVX pin (v3); Crysis Remastered the standard line with every switch off (v1); Crysis 3 Remastered with its own vcruntime140.dll refused (v2); MSFS 2024 the standard line with AVX and NVIDIA on (v1), pure-x64 images without a pool copy (v2), feature level 12_1 (v3), shader model 6.7 (v4), the fiber trace (v5), then without it (v6); Counter-Strike 2 the standard line with every switch off (v1), then the split pool (v2); Spelunky 2 and Albion Online the split pool (v1); Warcraft II BNE plain RWX memory (v1); Breakneck the same (v1); every other game the standard list (v1)')
 
 # Megabonk v2 (round 620, thebcd69/bcd-games#18 and #25, tested by the reporter on build 614): the Windows.Gaming.Input pad and the real
@@ -612,15 +648,24 @@ assert presets['megabonk']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'en
                                              'env.MADEIRA_REAL_SUSPEND = 1'] and presets['megabonk']['version'] == 2, presets['megabonk']
 assert presets['megabonk']['line_builds'][-1] == (620, 1000000000), presets['megabonk']['line_builds']
 assert presets['no-im-not-a-human']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1'] and presets['no-im-not-a-human']['version'] == 1, presets['no-im-not-a-human']
-assert presets['over-the-hill']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1'] and presets['over-the-hill']['version'] == 1, presets['over-the-hill']
+# Round 630 (agent T2 S14): v2 adds DXMT's auto mip clamp (build 625) for the scene loads that end at the memory limit.
+assert presets['over-the-hill']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1', 'env.MADEIRA_MIP_CLAMP_AUTO = 1'] \
+    and presets['over-the-hill']['version'] == 2 and presets['over-the-hill']['line_builds'][-1] == (625, 1000000000), presets['over-the-hill']
 assert presets['fort-solis']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = dxva2'] and presets['fort-solis']['version'] == 1, presets['fort-solis']
 assert presets['dragon-ball-sparking-zero']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = dxva2'] and presets['dragon-ball-sparking-zero']['version'] == 1, presets['dragon-ball-sparking-zero']
 # Round 624 (agent B S6, MMJZ8K): FINAL FANTASY VII's .NET launcher shows its own exception box; the diagnostic logs the box's details pane.
 # Round 624 (Discord: "NoDriver calling waveOutOpen"): v2 adds BCD's default WINEDEBUG with warn+winmm (err-virtual kept), build 624 on.
+# Round 630 (agents D S3 and O3 S1, 03ZW5E): v3 adds the Message window class in every program, build 630 on.
 assert presets['final-fantasy-vii-steam']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WIN_TEXT = 1',
-                                                           'env.WINEDEBUG = err+all,err-virtual,fixme-d3dcompiler,warn+winmm'] \
-    and presets['final-fantasy-vii-steam']['version'] == 2 \
-    and presets['final-fantasy-vii-steam']['line_builds'][-2:] == [(624, 1000000000), (624, 1000000000)], presets['final-fantasy-vii-steam']
+                                                           'env.WINEDEBUG = err+all,err-virtual,fixme-d3dcompiler,warn+winmm',
+                                                           'env.MADEIRA_MESSAGE_CLASS = 1'] \
+    and presets['final-fantasy-vii-steam']['version'] == 3 \
+    and presets['final-fantasy-vii-steam']['line_builds'][-3:] == [(624, 1000000000), (624, 1000000000), (630, 1000000000)], presets['final-fantasy-vii-steam']
+# Round 630 (agent O3, the owner's J0R6MM): Messiah gets the Message window class (630) and winmm/MCI warnings for its cutscenes (624).
+assert presets['messiah']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_MESSAGE_CLASS = 1',
+                                           'env.WINEDEBUG = err+all,err-virtual,fixme-d3dcompiler,warn+winmm,warn+mci,fixme+mci'] \
+    and presets['messiah']['version'] == 1 \
+    and presets['messiah']['line_builds'][-2:] == [(630, 1000000000), (624, 1000000000)], presets['messiah']
 assert presets['animal-well']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = xpsprint', 'present-lum = 1'] and presets['animal-well']['version'] == 2, presets['animal-well']
 # v2 (round 624, agent E1, GBQRKH): the Epic build's program is 451.9 MiB, 3.7 MiB more than v1's 448 MB window; 512 MB holds both programs.
 assert presets['hogwarts-legacy']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'exe-window-mb = 512'] and presets['hogwarts-legacy']['version'] == 2, presets['hogwarts-legacy']
@@ -656,11 +701,14 @@ _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_DXGI_SRC =
 # Round 625 (agent L4 S1-a: ZXCXT5, BMVD7C): v4 switches the .NET runtime's write-xor-execute code memory off (the fail-fast at its write
 # barrier, c0000602) and gives the 32-bit LDADDAL emulation auto-tune added to every log that went further (build 608).
 _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.DOTNET_EnableWriteXorExecute = 0', 'env.MADEIRA_ANON_LDADDAL32 = 1']
-_r620_v = {'slay-the-spire-2': 4, 'far-cry-3': 2, 'marvel-cosmic-invasion': 2}
+# 2026-11-01 (58D8SD build 626, 1R1NCG build 625): v5 gives the game its own keyed event (RtlRunOnceComplete, Control's line) from build 624,
+# the build whose list policy takes the key.
+_r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1']
+_r620_v = {'slay-the-spire-2': 5, 'far-cry-3': 2, 'marvel-cosmic-invasion': 2}
 for _id, _lines in _r620.items():
     assert presets[_id]['version'] == _r620_v.get(_id, 1) and presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0'] + _lines, (_id, presets[_id])
-assert presets['slay-the-spire-2']['line_builds'][-6:] == [(576, 1000000000), (624, 1000000000), (624, 1000000000), (624, 1000000000),
-                                                          (576, 1000000000), (608, 1000000000)], presets['slay-the-spire-2']['line_builds']
+assert presets['slay-the-spire-2']['line_builds'][-7:] == [(576, 1000000000), (624, 1000000000), (624, 1000000000), (624, 1000000000),
+                                                          (576, 1000000000), (608, 1000000000), (624, 1000000000)], presets['slay-the-spire-2']['line_builds']
 assert presets['far-cry-3']['line_builds'][-1] == (624, 1000000000), presets['far-cry-3']['line_builds']
 for _id, _line in (('forza-horizon-4', 'env.MADEIRA_OPTIN_DLLS = dxva2,gamingtcui'), ('big-walk', 'env.MADEIRA_REAL_SUSPEND = 1'),
                    ('ball-x-pit', 'env.MADEIRA_REAL_SUSPEND = 1')):
@@ -691,7 +739,7 @@ _scm = {'line': 'env.MADEIRA_DOCK_GAME_SCM = 1', 'minBuild': 576}
 # Round 620: Max Payne 3 starts the same Launcher (FXY57T, YXFHTE): the San Andreas DE lines, plus pool-split for the pool that shrank
 # to 560 MB before RockstarService.exe's code buffers were refused.
 assert presets['max-payne-3']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_FEX_AVX = 0',
-    'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'pool-split = 1'] and presets['max-payne-3']['version'] == 1
+    'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'pool-split = 1', tbs630] and presets['max-payne-3']['version'] == 2
 for _id in ('gta4-steam', 'gtasa-de-steam'):
     _rule = next(r for r in recs['rules'] if r['id'] == _id)
     # (no KEEP_ALIVE: GTA V's line, with no evidence in these logs; the lead left it out)
@@ -705,11 +753,14 @@ for _id in ('gta4-steam', 'gtasa-de-steam'):
               'env.MADEIRA_POOL_RECYCLE_IMAGES = 1', 'env.MADEIRA_WOW_MIN_FREE_GB = 2'] if _id == 'gta4-steam' else []
     # (GTA IV's version 4, round 626, agent R S2: the Launcher's whole log mirrored from build 626, for 9GYNAV's code 234)
     _diag626 = ['env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 800', 'env.MADEIRA_SRV_POLLOUT_GUARD = 1'] if _id == 'gta4-steam' else []   # + R S1 guard (v5)
+    _slot630 = ['env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1'] if _id == 'gta4-steam' else []   # v6: round 630 agent R S4
     assert presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_FEX_AVX = 0'] + _sc2 + [
-                                         'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1'] + _pool4 + _diag626, presets[_id]
-    assert presets[_id]['version'] == (5 if _id == 'gta4-steam' else 1) and presets[_id]['switches'] == '' and not presets[_id]['small'], presets[_id]
+                                         'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1'] + _pool4 + _diag626 + _slot630 + [tbs630], presets[_id]
+    assert presets[_id]['version'] == (7 if _id == 'gta4-steam' else 2) and presets[_id]['switches'] == '' and not presets[_id]['small'], presets[_id]
     # every line after the standard one goes to builds from 576 on; none of GTA V's engine, DXGI, adapter or pool lines (GTA IV: the layout only)
-    assert all(isinstance(l, dict) and l.get('minBuild') == (626 if l.get('line', '').startswith(('env.MADEIRA_GUEST_LOG', 'env.MADEIRA_SRV_POLLOUT_GUARD')) else 576)
+    assert all(isinstance(l, dict) and l.get('minBuild') == (630 if l.get('line', '').startswith('env.MADEIRA_WOW_PLACEHOLDER_SLOTS') else
+                                                            626 if l.get('line', '').startswith(('env.MADEIRA_GUEST_LOG', 'env.MADEIRA_SRV_POLLOUT_GUARD')) else
+                                                            579 if l.get('line') == tbs630 else 576)
                for l in _rule['config'][3:]), _id
     assert not any(k in ' '.join(l for l in presets[_id]['lines'] if l not in _pool4) for k in ('pool-split', 'DXGI', 'D3D11_SRC', 'KMT_ADAPTER',
                                                                   'DXMT_', 'LOCK_ORPHAN', 'EXECREQ_LEAVE', 'CHILD_ARGS', 'vc_redist')), _id
@@ -743,12 +794,18 @@ assert presets['yakuza-like-a-dragon']['lines'][2:] == [_std, 'exe-window-mb = 4
 # Round 624 (Discord forum item 5): Dead Space (2023), a 419 MiB fixed-base program; its siblings' two lines, by App ID and folder only.
 assert presets['dead-space-2023']['lines'][2:] == [_std, 'exe-window-mb = 448', _nocopy] and presets['dead-space-2023']['version'] == 1, presets['dead-space-2023']
 # Round 624 (Discord): controller experiments for two Unity games and a diagnostic line for a slow 32-bit Direct3D 8 game.
-for _id in ('schedule-i', 'dokimon-quest'):
-    assert presets[_id]['lines'][2:] == [_std, 'env.MADEIRA_WGI_HOST_PADS = 1'] and presets[_id]['version'] == 1 \
-        and presets[_id]['line_builds'][-1] == (624, 1000000000), presets[_id]
+# Round 630 (agent T1 S1; N9PJHQ, DQKXK3): Dokimon Quest v2 connects player 1 from the session start (the game's file is read from build 630).
+for _id in ('dokimon-quest',):
+    assert presets[_id]['lines'][2:] == [_std, 'env.MADEIRA_WGI_HOST_PADS = 1', 'env.MADEIRA_PAD_EARLY_SLOT = 1'] and presets[_id]['version'] == 2 \
+        and presets[_id]['line_builds'][-2:] == [(624, 1000000000), (630, 1000000000)], presets[_id]
+# Round 630 (agent T2 S14, 8G315S): Schedule I v2 adds DXMT's auto mip clamp (build 625).
+assert presets['schedule-i']['lines'][2:] == [_std, 'env.MADEIRA_WGI_HOST_PADS = 1', 'env.MADEIRA_MIP_CLAMP_AUTO = 1'] \
+    and presets['schedule-i']['version'] == 2 and presets['schedule-i']['line_builds'][-2:] == [(624, 1000000000), (625, 1000000000)], presets['schedule-i']
 assert presets['sonic-adventure-dx']['lines'][2:] == [_std, 'env.MADEIRA_FRAME_STATS = 1'] and presets['sonic-adventure-dx']['version'] == 1, presets['sonic-adventure-dx']
-assert presets['requiem-avenging-angel']['lines'][2:] == presets['lego-batman-the-videogame']['lines'][2:6] \
-    and presets['requiem-avenging-angel']['version'] == 1, presets['requiem-avenging-angel']   # LEGO Batman's diagnostic set
+assert presets['requiem-avenging-angel']['lines'][2:] == [_std, 'env.MADEIRA_FRAME_STATS = 1', 'env.MADEIRA_GPU_TRACE = 8,2,1',
+                                                     'env.MADEIRA_GPU_TRACE = 20,2,1', 'env.DXMT_DUMP_D9_SHADER = 1'] \
+    and presets['requiem-avenging-angel']['version'] == 2 \
+    and presets['requiem-avenging-angel']['line_builds'][-3:-1] == [(598, 629), (630, 1000000000)], presets['requiem-avenging-angel']   # LEGO Batman's diagnostic set; round 630 (O1 S2): the GPU frame at +20 s
 assert presets['friends-vs-friends']['lines'][2:] == [_std, 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 800'] \
     and presets['friends-vs-friends']['version'] == 1, presets['friends-vs-friends']   # agent E1 S4 (YKCQXE): the game's own log
 assert presets['batman-arkham-city-goty']['lines'][2:] == [_std, 'env.FEX_X87REDUCEDPRECISION = 0', 'env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1', 'dxmt = d3d11.noMeshShaders=1', 'env.MADEIRA_DOCK_INSTALL_SKIP = directx,amd'] and presets['batman-arkham-city-goty']['version'] == 5, presets['batman-arkham-city-goty']   # v2 (2026-10-23): BmLauncher.exe beside BatmanAC.exe
@@ -756,13 +813,15 @@ _bat = next(r for r in recs['rules'] if r['id'] == 'batman-arkham-city-goty')
 assert {'line': 'env.FEX_X87REDUCEDPRECISION = 0', 'minBuild': 580} in _bat['config'] and {'line': 'env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1', 'minBuild': 580} in _bat['config'], _bat['config']
 # v4 (round 626, agent T S2): up to build 625 the tessellation/geometry draws are dropped (a failed mesh PSO crashed the driver); 626 drops only failed ones
 assert {'line': 'dxmt = d3d11.noMeshShaders=1', 'minBuild': 580, 'maxBuild': 625} in _bat['config'], _bat['config']
-for _id in ('metal-gear-solid-peace-walker', 'lonely-mountains-snow-riders'):   # Lonely Mountains v2 (round 624): any copy
-    assert presets[_id]['lines'][2:] == [_std, 'env.MADEIRA_WINTYPES = 1'] and presets[_id]['version'] == (2 if _id == 'lonely-mountains-snow-riders' else 1), presets[_id]
+for _id in ('metal-gear-solid-peace-walker', 'lonely-mountains-snow-riders'):   # Lonely Mountains v2 (round 624): any copy; v3 (round 630, U S8): the real suspend
+    _lm = _id == 'lonely-mountains-snow-riders'
+    assert presets[_id]['lines'][2:] == [_std, 'env.MADEIRA_WINTYPES = 1'] + (['env.MADEIRA_REAL_SUSPEND = 1'] if _lm else []) \
+        and presets[_id]['version'] == (3 if _lm else 1), presets[_id]
 assert presets['trails-in-the-sky-1st-chapter']['lines'][2:] == [_std, 'env.MADEIRA_VDCFG_PATH = 1'] and presets['trails-in-the-sky-1st-chapter']['version'] == 2, presets['trails-in-the-sky-1st-chapter']   # v2 (round 623): a program-folder start matches too
 assert {'line': 'env.MADEIRA_VDCFG_PATH = 1', 'minBuild': 580} in next(r for r in recs['rules'] if r['id'] == 'trails-in-the-sky-1st-chapter')['config']
 assert presets['subnautica-2']['lines'][2:] == [_std, _nocopy] and presets['subnautica-2']['version'] == 2, presets['subnautica-2']
-assert presets['rdr1-steam']['lines'][2:] == [_std, 'env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', _nocopy] and presets['rdr1-steam']['version'] == 1, presets['rdr1-steam']
-assert all(isinstance(l, dict) and l.get('minBuild') == 576 for l in next(r for r in recs['rules'] if r['id'] == 'rdr1-steam')['config'][3:])
+assert presets['rdr1-steam']['lines'][2:] == [_std, 'env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', _nocopy, tbs630] and presets['rdr1-steam']['version'] == 2, presets['rdr1-steam']
+assert all(isinstance(l, dict) and l.get('minBuild') == (579 if l.get('line') == tbs630 else 576) for l in next(r for r in recs['rules'] if r['id'] == 'rdr1-steam')['config'][3:])
 assert not any('FEX_AVX' in l for l in presets['rdr1-steam']['lines']), 'RDR1 leaves out gta4-steam\'s AVX pin (no c000001d in its log)'
 # Build 591 list (2026-10-23, the tur591 log wave; docs/DURUM.md section 2): lists for games that fail today, each line from a log. Every line
 # whose switch is read only from build 591 on (the first five names below, and _JAVA_OPTIONS) carries minBuild 591; the older switches keep the
@@ -778,7 +837,9 @@ for _id in ('life-is-strange-remastered', 'life-is-strange-2'):
     assert {'line': _nocopy, 'minBuild': 576} in _cfg(_id), _id
 # a fixed-base window is the image plus 16-20 MiB and fits the free run above 0x140000000 (751 MiB in the RE Requiem logs, 721 in Life is Strange 2's)
 assert 575.07 < 592 < 720 and 379.2 < 400 < 720
-assert presets['project-zomboid']['lines'][2:] == [_std, 'env._JAVA_OPTIONS = -XX:-UseZGC'] and presets['project-zomboid']['version'] == 2, presets['project-zomboid']
+# Round 630 (agent T2 S3): v3 copies the JVM's own logs into BCD's log (a diagnostic for the CriticalSection spin).
+assert presets['project-zomboid']['lines'][2:] == [_std, 'env._JAVA_OPTIONS = -XX:-UseZGC', 'env.MADEIRA_GUEST_LOG = all',
+                                                    'env.MADEIRA_GUEST_LOG_LIMIT = 800'] and presets['project-zomboid']['version'] == 3, presets['project-zomboid']
 assert {'line': 'env._JAVA_OPTIONS = -XX:-UseZGC', 'minBuild': 591} in _cfg('project-zomboid')
 _new591 = {
     'spiderheck': 'env.MADEIRA_FAULT_GUARD_RATE = 1', 'rounds': 'env.MADEIRA_FAULT_GUARD_RATE = 1', 'plateup': 'env.MADEIRA_FAULT_GUARD_RATE = 1',
@@ -788,8 +849,10 @@ _new591 = {
     'jetboard-joust': 'env.MADEIRA_ANON_CAS_FLUSH = 1', 'sword-and-fairy-3': 'env.MADEIRA_NLS_EXTRA = 1',
 }
 for _id, _line in _new591.items():
-    assert presets[_id]['lines'][2:] == [_std, _line] + (['env.MADEIRA_D3D9_LAST = 1', 'gpu-card = nvidia-7900gs', 'env.MADEIRA_DOCK_INSTALL_SKIP = directx'] if _id == 'fallout-new-vegas' else []) \
-        and presets[_id]['version'] == (4 if _id == 'fallout-new-vegas' else 1 if _id in ('age-of-empires-ii-hd', 'sword-and-fairy-3') else 2) \
+    # Round 630 (agent T2 S14, 8BQ1Z4): the FINAL FANTASY XV demo v3 adds DXMT's auto mip clamp (build 625).
+    assert presets[_id]['lines'][2:] == [_std, _line] + (['env.MADEIRA_D3D9_LAST = 1', 'gpu-card = nvidia-7900gs', 'env.MADEIRA_DOCK_INSTALL_SKIP = directx'] if _id == 'fallout-new-vegas'
+                                                          else ['env.MADEIRA_MIP_CLAMP_AUTO = 1'] if _id == 'final-fantasy-xv-demo' else []) \
+        and presets[_id]['version'] == (4 if _id == 'fallout-new-vegas' else 3 if _id == 'final-fantasy-xv-demo' else 1 if _id in ('age-of-empires-ii-hd', 'sword-and-fairy-3') else 2) \
         and presets[_id]['switches'] == '', (_id, presets[_id])   # Fallout: New Vegas: + build 598's diagnostic (v2, list v8) and build 623's card (v3), below;
         # round 624: the seven Steam-only program matches of this batch match any copy (v2)
     assert {'line': _line, 'minBuild': 591} in _cfg(_id), _id
@@ -809,13 +872,13 @@ assert {'line': 'env.MADEIRA_D3D9_X64 = dxmt', 'minBuild': 595} in _cfg('darksid
 assert _ds2[2:] == ['env.MADEIRA_D3D9_LAST = 1', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 30000'], _ds2
 for _l in ('env.MADEIRA_D3D9_LAST = 1', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 30000'):
     assert {'line': _l, 'minBuild': 597} in _cfg('darksiders-ii-deathinitive'), _l
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_LAST' in json.dumps(r['config'])) == ['darksiders-ii-deathinitive', 'fallout-3', 'fallout-new-vegas']   # + Fallout: New Vegas (ajan20, build 598, a diagnostic)
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_LAST' in json.dumps(r['config'])) == ['darksiders-ii-deathinitive', 'fallout-3', 'fallout-new-vegas', 'goldsrc-hl-exe']   # + Fallout: New Vegas (ajan20, build 598, a diagnostic); round 630: the Half-Life engine (O3 S14)
 # Terraria (2026-10-24, build 598): a diagnostic only, the file trace, for its "Failed to load asset" box (four logs); no fix, no other game.
 assert presets['terraria']['lines'][2:] == [_std, 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 60000'] and presets['terraria']['version'] == 1 \
     and presets['terraria']['switches'] == '', presets['terraria']
 for _l in ('env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 60000'):
     assert {'line': _l, 'minBuild': 598} in _cfg('terraria'), _l
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE' in json.dumps(r['config'])) == ['bioshock-infinite-epic', 'blasphemous', 'caravan-sandwitch', 'danganronpa-trigger-happy-havoc', 'darksiders-ii-deathinitive', 'doki-doki-literature-club', 'haak', 'nfs-most-wanted', 'nfs-underground-2', 'overlord-ii', 'terraria']   # + BioShock Infinite (Epic) and Danganronpa (ajan20, build 598, diagnostics); round 624: Doki Doki, the two Need for Speed lists; round 626: Caravan SandWitch, HAAK
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE' in json.dumps(r['config'])) == ['aliens-colonial-marines', 'bendy-and-the-ink-machine', 'bioshock', 'bioshock-infinite-epic', 'blasphemous', 'call-of-duty-modern-warfare-2-2009', 'caravan-sandwitch', 'danganronpa-trigger-happy-havoc', 'darksiders-ii-deathinitive', 'darksiders-warmastered-edition', 'doki-doki-literature-club', 'haak', 'hitman-blood-money', 'nfs-most-wanted', 'nfs-underground-2', 'overlord-ii', 'resident-evil-requiem-demo', 'terraria']   # round 630: BioShock (O1 S11), MW2 (G1 S5), Darksiders WE (G1 S9) and RE Requiem demo (G2 S15) diagnostics; + BioShock Infinite (Epic) and Danganronpa (ajan20, build 598, diagnostics); round 624: Doki Doki, the two Need for Speed lists; round 626: Caravan SandWitch, HAAK
 # ajan23/loglar (2026-10-24, build 598): two more 64-bit Direct3D 9 games that crash on the failed Direct3DCreate9 (MudRunner, Indivisible), and
 # Sekiro, whose unhandled C++ exception follows two lookups of code page 932. Each list's own line only, opt-in, from build 598.
 for _id, _line in (('mudrunner', 'env.MADEIRA_D3D9_X64 = dxmt'), ('indivisible', 'env.MADEIRA_D3D9_X64 = dxmt'), ('sekiro-shadows-die-twice', 'env.MADEIRA_NLS_EXTRA = 1')):
@@ -833,7 +896,7 @@ for _id, _line in (('risk-of-rain-2', 'env.MADEIRA_WINTYPES = 1'), ('stardew-val
     assert presets[_id]['lines'][2:] == [_std, _line] + _more and presets[_id]['version'] == (2 if _more else 1) and presets[_id]['switches'] == '', (_id, presets[_id])
     assert {'line': _line, 'minBuild': 598} in _cfg(_id), _id
 assert {'line': 'env.MADEIRA_MZ_VIEW_CHECK = 1', 'minBuild': 624} in _cfg('risk-of-rain-2')
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_ANON_CAS_FLUSH' in json.dumps(r['config'])) == ['jetboard-joust', 'stardew-valley'], 'only the CoreCLR games carry the CAS flush'
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_ANON_CAS_FLUSH' in json.dumps(r['config'])) == ['baldurs-gate-3', 'jetboard-joust', 'stardew-valley'], 'only the CoreCLR programs carry the CAS flush (round 630: BG3\'s .NET launcher)'
 assert '"MADEIRA_D3D9_X64"' in (app / 'GameRecommendationsList.swift').read_text() and 'guard value == "dxmt" || value == "wined3d"' in (app / 'GameRecommendationsList.swift').read_text()
 # Build 598 (ajan21-loglar, 2026-10-24): the report of a 32-bit program's access violation or int3 (ios_x86_fault_diag.h) for the two Need for Speed
 # games that stop at a fixed place of their own program (speed.exe at 0x81AB7A, SPEED2.EXE at 0x4405A9). Log only, a diagnostic and no fix;
@@ -847,7 +910,7 @@ for _id in ('nfs-most-wanted', 'nfs-underground-2'):
 for _id in ('chuchel', 'botanicula'):
     assert presets[_id]['lines'][2:] == [_std, 'env.MADEIRA_X86_FAULT_DUMP = 1'] and presets[_id]['version'] == 1 and presets[_id]['switches'] == '', (_id, presets[_id])
     assert {'line': 'env.MADEIRA_X86_FAULT_DUMP = 1', 'minBuild': 598} in _cfg(_id), _id
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_X86_FAULT_DUMP' in json.dumps(r['config'])) == ['botanicula', 'chuchel', 'crosscode', 'doki-doki-literature-club', 'mafia-2', 'nfs-most-wanted', 'nfs-underground-2', 'osu', 'overlord-ii', 'ubisoft-connect', 'unreal-gold']   # round 624: six diagnostic lists
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_X86_FAULT_DUMP' in json.dumps(r['config'])) == ['aliens-colonial-marines', 'bioshock', 'botanicula', 'chuchel', 'crosscode', 'doki-doki-literature-club', 'fallout-3', 'hitman-blood-money', 'hotline-miami', 'mafia-2', 'nfs-most-wanted', 'nfs-underground-2', 'osu', 'overlord-ii', 'resident-evil-5', 'stalker-xray-engine', 'tales-of-zestiria', 'ubisoft-connect', 'unreal-gold', 'vampire-bloodlines']   # round 624: six diagnostic lists; round 630: Vampire: Bloodlines (O3 S10)
 assert presets['wrc-9']['lines'][2:] == [_std, 'env.MADEIRA_D3D11_SRC = 1', 'env.DXMT_QUERY_TS_WATCHDOG = 1'] and presets['wrc-9']['version'] == 1 \
     and presets['wrc-9']['line_builds'][-2:] == [(624, 1000000000), (624, 1000000000)], presets['wrc-9']   # agent D2 S11 (JDJ8KE): the timestamp watchdog
 for _id, _mb in (('fallout-4-other', 614), ('skyrim-special-edition-other', 598)):   # round 624: the voice line for a copy outside Steam (no launcher swap)
@@ -875,12 +938,18 @@ assert {'line': 'env.MADEIRA_OPTIN_DLLS = wmadmod', 'minBuild': 598} in _cfg('sk
 # v2 (round 624): from build 601 on; the public build 600 does not know the key and refused the whole online list for it.
 assert {'line': 'env.MADEIRA_ZERO_MITIGATION_POLICY = 1', 'minBuild': 601} in _cfg('glyphica-typing-survival')
 assert next(r for r in recs['rules'] if r['id'] == 'glyphica-typing-survival')['minBuild'] == 600
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_ZERO_MITIGATION_POLICY' in json.dumps(r['config'])) == ['glyphica-typing-survival']
+# Round 630 (agent U S2): Football Manager 27 v2 has the line too (an experiment, minBuild 630; the key brings the opt-in kernelbase from 630).
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_ZERO_MITIGATION_POLICY' in json.dumps(r['config'])) == ['football-manager-27', 'glyphica-typing-survival']
+assert {'line': 'env.MADEIRA_ZERO_MITIGATION_POLICY = 1', 'minBuild': 630} in _cfg('football-manager-27')
 # Round 602 (ajan41/tur602): the Direct3D 8 games. Each list is the standard line and the d3d8to9 line, which only builds from 602 apply; nothing else names the key.
 _d8 = ['grand-theft-auto-iii', 'postal-2', 'hotline-miami', 'max-payne-2', 'red-faction']   # Red Faction: round 624 (agent D2, 8R8V3Z)
 assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D8' in json.dumps(r['config'])) == sorted(_d8), 'only the five Direct3D 8 games carry env.MADEIRA_D3D8'
 for _id in _d8:
     _r = next(r for r in recs['rules'] if r['id'] == _id)
+    if _id == 'hotline-miami':   # round 630 (A2 S15): version 2 adds the 32-bit fault report after the d3d8to9 line
+        assert _r['config'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', {'line': 'env.MADEIRA_D3D8 = d3d9', 'minBuild': 602},
+                                    {'line': 'env.MADEIRA_X86_FAULT_DUMP = 1', 'minBuild': 624}] and _r['version'] == 2 and 'minBuild' not in _r, _id
+        continue
     assert _r['config'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', {'line': 'env.MADEIRA_D3D8 = d3d9', 'minBuild': 602}] and _r['version'] == 1 and 'minBuild' not in _r, _id
 assert not [r['id'] for r in recs['rules'] if 'MADEIRA_DDRAW' in json.dumps(r['config'])], 'no list sets cnc-ddraw yet (no log shows a 2D DirectDraw game that fails)'
 # Upstream port 2026-10-25 (ajan45, build 602): The Adventures of Elliot (Steam 3483510, a 473 MiB fixed-base program; BCD log 8Q0SJ8, build 592, c0000018 for want of
@@ -898,14 +967,14 @@ assert '"MADEIRA_SPAWN_SWAP"' in (app / 'GameRecommendationsList.swift').read_te
 # ZZZ: dxva2 is an old opt-in name (Fort Solis, Dragon Ball Sparking Zero carry it at 575)
 assert presets['zenless-zone-zero']['lines'][2:] == [_std, 'env.MADEIRA_OPTIN_DLLS = dxva2'] and {'line': 'env.MADEIRA_OPTIN_DLLS = dxva2', 'minBuild': 575} in _cfg('zenless-zone-zero')
 # the two rules that already existed: GTA IV gains Social Club's layout 2 (version 2), Horizon Zero Dawn the Dock MFC link (version 17)
-assert presets['gta4-steam']['version'] == 5 and 'env.MADEIRA_SC_PA_POOLS = 2' in presets['gta4-steam']['lines'] and presets['gta4-steam']['lines'][-1] == 'env.MADEIRA_SRV_POLLOUT_GUARD = 1'   # 5: round 626 R S1 POLLOUT guard; 4: round 626 log lines; 3: round 624 pool lines and {'line': 'env.MADEIRA_SC_PA_POOLS = 2', 'minBuild': 576} in _cfg('gta4-steam')
+assert presets['gta4-steam']['version'] == 7 and 'env.MADEIRA_SC_PA_POOLS = 2' in presets['gta4-steam']['lines'] and presets['gta4-steam']['lines'][-3:] == ['env.MADEIRA_SRV_POLLOUT_GUARD = 1', 'env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1', tbs630]   # 7: round 630 the launcher's tbs   # 6: round 630 R S4 one 32-bit window at the start   # 5: round 626 R S1 POLLOUT guard; 4: round 626 log lines; 3: round 624 pool lines and {'line': 'env.MADEIRA_SC_PA_POOLS = 2', 'minBuild': 576} in _cfg('gta4-steam')
 for _id in ('gtasa-de-steam', 'rdr1-steam'):
     assert not any('SC_PA_POOLS' in l for l in presets[_id]['lines']), _id + ': unproven, left alone'
 assert presets['horizon-zero-dawn']['version'] == 18 and presets['horizon-zero-dawn']['lines'][-1] == 'env.MADEIRA_MFC_DOCK = 1'
 assert {'line': 'env.MADEIRA_MFC_DOCK = 1', 'minBuild': 591} in _cfg('horizon-zero-dawn') and presets['horizon-zero-dawn']['lines'][2:-1] == [l for l in presets['horizon-zero-dawn']['lines'][2:] if 'MFC_DOCK' not in l]
 # no other game of the list carries a build 591 switch: only these rules name them (Far Cry 3: the install-script registry, round 620)
 _names591 = ('MADEIRA_FAULT_GUARD_RATE', 'MADEIRA_USER_VA_GB', 'MADEIRA_MFC_DOCK', 'MADEIRA_DOCK_SCRIPT_REGISTRY', 'MADEIRA_ANON_CAS_FLUSH', 'MADEIRA_NLS_EXTRA', '_JAVA_OPTIONS')
-assert sorted(r['id'] for r in recs['rules'] if any(n in json.dumps(r['config']) for n in _names591)) == sorted([i for i in _new591 if 'OPTIN_DLLS' not in _new591[i]] + ['project-zomboid', 'horizon-zero-dawn', 'sekiro-shadows-die-twice', 'stardew-valley', 'far-cry-3', 'fallout-3'])   # Sekiro: build 598's NLS_EXTRA; Fallout 3: round 624 (New Vegas's script-registry line)
+assert sorted(r['id'] for r in recs['rules'] if any(n in json.dumps(r['config']) for n in _names591)) == sorted([i for i in _new591 if 'OPTIN_DLLS' not in _new591[i]] + ['project-zomboid', 'horizon-zero-dawn', 'sekiro-shadows-die-twice', 'stardew-valley', 'far-cry-3', 'fallout-3', 'the-witcher-enhanced-edition', 'baldurs-gate-3'])   # Sekiro: build 598's NLS_EXTRA; Fallout 3: round 624 (New Vegas's script-registry line); The Witcher EE: round 630 (O3 S6)
 # the names a list line may use only from build 591 are in the policy, with a value check
 _policy_src = (app / 'GameRecommendationsList.swift').read_text()
 for _name in _names591:
@@ -999,6 +1068,7 @@ MATCH = {
     'fort-solis': {'steamAppIDs': [1931730], 'steamFolders': ['fort solis'], 'programs': [{'name': 'fortsolis.exe'}]},
     'dragon-ball-sparking-zero': {'steamAppIDs': [1790600], 'steamFolders': ['dragon ball sparking! zero'], 'programs': [{'name': 'sparkingzero-win64-shipping.exe'}]},
     'final-fantasy-vii-steam': {'steamAppIDs': [39140], 'steamFolders': ['final fantasy vii steam edition'], 'programs': [{'name': 'ffvii_launcher.exe'}]},
+    'messiah': {'steamAppIDs': [577980], 'steamFolders': ['messiah'], 'programs': [{'name': 'messiahglide3x.exe'}]},   # round 630
     'animal-well': {'steamAppIDs': [813230], 'steamFolders': ['animal well'], 'programs': [{'name': 'animal well.exe'}]},
     'hogwarts-legacy': {'steamAppIDs': [990080], 'steamFolders': ['hogwarts legacy'], 'programs': [{'name': 'hogwartslegacy.exe'}]},
     'metal-gear-solid-v': {'steamAppIDs': [287700], 'steamFolders': ['mgs_tpp'], 'programs': [{'name': 'mgsvtpp.exe'}]},
@@ -1032,6 +1102,7 @@ MATCH = {
     'marvels-spider-man-2': {'steamAppIDs': [2651280], 'steamFolders': ["marvel's spider-man 2"], 'programs': [{'name': 'spider-man2.exe'}]},
     'raidou-remastered': {'steamAppIDs': [2288350], 'steamFolders': ['raidou tmotsa'], 'programs': [{'name': 'raidou tmotsa.exe'}]},
     'yakuza-like-a-dragon': {'steamAppIDs': [1235140], 'steamFolders': ['yakuza like a dragon'], 'programs': [{'name': 'yakuzalikeadragon.exe'}]},
+    'batman-arkham-asylum-goty': {'steamAppIDs': [35140], 'steamFolders': ['batman arkham asylum goty']},   # round 630 A2 S14 (60GN7A)
     'batman-arkham-city-goty': {'steamAppIDs': [200260], 'steamFolders': ['batman arkham city goty'], 'programs': [{'name': 'batmanac.exe'}, {'name': 'bmlauncher.exe', 'beside': 'BatmanAC.exe'}]},
     'metal-gear-solid-peace-walker': {'steamAppIDs': [2492660], 'steamFolders': ['mgs_pw']},
     'lonely-mountains-snow-riders': {'steamAppIDs': [2545360], 'steamFolders': ['lmsr'], 'programs': [{'name': 'lmsr_windows64_steam.exe'}]},
@@ -1120,7 +1191,7 @@ MATCH = {
     'blasphemous': {'steamAppIDs': [774361], 'steamFolders': ['blasphemous'], 'programs': [{'name': 'blasphemous.exe'}]},
     'nwjs-game-exe': {'programs': [{'name': 'game.exe', 'beside': 'nw_elf.dll'}, {'name': 'game.exe', 'beside': 'nw.dll'}]},
     'kerbal-space-program': {'steamAppIDs': [220200], 'programs': [{'name': 'ksp_x64.exe'}, {'name': 'ksp.exe'}]},
-    'mafia-2': {'programs': [{'name': 'mafia2.exe'}]},
+    'mafia-2': {'steamAppIDs': [50130], 'steamFolders': ['mafia ii'], 'programs': [{'name': 'mafia2.exe'}]},   # v2 round 630 A2 S14 (BKXNYD: the Steam copy)
     'fallout-3': {'steamAppIDs': [22300, 22370], 'steamFolders': ['fallout 3 goty', 'fallout 3'], 'programs': [{'name': 'fallout3.exe'}, {'name': 'falloutlauncher.exe'}, {'name': 'fallout3launcher.exe'}]},
     'overlord-ii': {'programs': [{'name': 'overlord2.exe'}]},
     'rise-of-the-tomb-raider': {'steamAppIDs': [391220], 'steamFolders': ['rise of the tomb raider'], 'programs': [{'name': 'rottr.exe'}]},
@@ -1161,6 +1232,31 @@ MATCH = {
     'crosscode': {'steamFolders': ['crosscode'], 'programs': [{'name': 'crosscode.exe', 'beside': 'nw.dll'}]},   # round 626 U1 S3 (DBS8WF)
     'dead-island-definitive': {'steamAppIDs': [383150, 383180], 'steamFolders': ['dide', 'dirde'], 'programs': [{'name': 'deadislandgame.exe', 'beside': 'engine_x64_rwdi.dll'}, {'name': 'deadislandriptidegame.exe', 'beside': 'engine_x64_rwdi.dll'}]},   # round 626 G1 S14
     'football-manager-27': {'steamAppIDs': [4530370], 'steamFolders': ['football manager 27'], 'programs': [{'name': 'fm.exe', 'steam': True}]},   # round 626 P S3 (ANXA7R)
+    'dead-or-alive-6': {'programs': [{'name': 'doa6.exe'}, {'name': 'doa6lr.exe'}]},   # round 630 G1 S8 (KEG3T2)
+    'fifa-22': {'steamAppIDs': [1506830]},   # round 630 G1 S14 (RD2XDZ)
+    'darksiders-warmastered-edition': {'steamAppIDs': [462780], 'steamFolders': ['darksiders warmastered edition'], 'programs': [{'name': 'darksiders1.exe'}]},   # round 630 G1 S9 (01XE9K)
+    'grandchase': {'steamAppIDs': [985810], 'steamFolders': ['grandchase'], 'programs': [{'name': 'grandchase.exe'}]},   # round 630 G2 S7 (QB5XMM)
+    'rotfront': {'steamAppIDs': [4502770], 'programs': [{'name': 'rotfront-win64-shipping.exe'}]},   # round 630 G2 S20 (FFJ9EQ)
+    'bioshock': {'steamAppIDs': [7670], 'programs': [{'name': 'bioshock.exe'}]},   # round 630 O1 S11 (57C6EQ)
+    'aliens-colonial-marines': {'programs': [{'name': 'acm.exe'}]},   # round 630 O1 S5 (PTF674)
+    'hitman-blood-money': {'steamAppIDs': [6860], 'steamFolders': ['hitman blood money'], 'programs': [{'name': 'hitmanbloodmoney.exe'}]},   # round 630 O1 S19 (ZVQSNK)
+    'hitman-contracts': {'steamAppIDs': [247430], 'steamFolders': ['hitman contracts'], 'programs': [{'name': 'hitmancontracts.exe'}]},   # round 630 O2 S1 (8JPXPD)
+    'guacamelee-gold': {'steamAppIDs': [214770], 'steamFolders': ['guacamelee'], 'programs': [{'name': 'guac.exe'}]},   # round 630 O2 S1 (KKBJNY)
+    'nfs-porsche-unleashed': {'programs': [{'name': 'porsche.exe'}]},   # round 630 O2 S8 (6QXWP8)
+    'resident-evil-5': {'steamAppIDs': [21690], 'steamFolders': ['resident evil 5'], 'programs': [{'name': 're5dx9.exe'}]},   # round 630 O2 S9 (63ZC32)
+    'stalker-xray-engine': {'steamAppIDs': [4500, 20510, 41700], 'steamFolders': ['stalker clear sky'], 'programs': [{'name': 'xrengine.exe'}]},   # round 630 O2 S10 (B2ZXF4)
+    'tales-of-zestiria': {'steamAppIDs': [351970], 'steamFolders': ['tales of zestiria'], 'programs': [{'name': 'tales of zestiria.exe'}]},   # round 630 O2 S11 (TS51A7)
+    'the-witcher-enhanced-edition': {'steamAppIDs': [20900], 'steamFolders': ['the witcher enhanced edition'], 'programs': [{'name': 'witcher.exe'}]},   # round 630 O3 S6 (STQXBJ)
+    'cult-of-the-lamb': {'steamAppIDs': [1313140], 'steamFolders': ['cult of the lamb'], 'programs': [{'name': 'cult of the lamb.exe'}]},   # round 630 U S7 (4DR32H)
+    'baldurs-gate-3': {'steamAppIDs': [1086940], 'steamFolders': ['baldurs gate 3'], 'programs': [{'name': 'larilauncher.exe'}, {'name': 'bg3.exe'}, {'name': 'bg3_dx11.exe'}]},   # round 630 T1 S9 (YZ6WCQ)
+    'vampire-bloodlines': {'programs': [{'name': 'vampire.exe', 'beside': 'launcher.dll'}]},   # round 630 O3 S10
+    'goldsrc-hl-exe': {'programs': [{'name': 'hl.exe', 'beside': 'sw.dll'}]},   # round 630 O3 S14
+    'arcade-paradise': {'programs': [{'name': 'arcadeparadise.exe'}]},   # round 630 U S4
+    'toem': {'programs': [{'name': 'toem.exe'}]},   # round 630 U S4
+    'bendy-and-the-ink-machine': {'steamAppIDs': [622650], 'programs': [{'name': 'bendy and the ink machine.exe'}]},   # round 630 U S5
+    'shroom-and-gloom': {'programs': [{'name': 'shroom and gloom.exe'}]},   # round 630 U S12
+    'peak': {'steamFolders': ['peak'], 'programs': [{'name': 'peak.exe', 'beside': 'UnityPlayer.dll'}]},   # round 630 T1 S31 (Q335M7)
+    'tekken-7': {'steamAppIDs': [389730], 'steamFolders': ['tekken 7'], 'programs': [{'name': 'tekken 7.exe'}, {'name': 'tekkengame-win64-shipping.exe'}]},   # round 630 G3 S4 (37CPHE)
     'call-of-duty-modern-warfare-2-2009': {'steamAppIDs': [10180], 'programs': [{'name': 'iw4sp.exe'}]},   # round 626 G1 S9
     'cyberpunk-2077': {'steamAppIDs': [1091500], 'steamFolders': ['cyberpunk 2077'], 'programs': [{'name': 'cyberpunk2077.exe'}]},   # round 626 G1 S11
     'deadlock': {'steamAppIDs': [1422450], 'steamFolders': ['deadlock'], 'programs': [{'name': 'deadlock.exe', 'beside': 'engine2.dll'}]},   # round 626 G1 S15
@@ -1183,6 +1279,14 @@ MATCH = {
     'saints-row-the-third': {'steamAppIDs': [55230], 'steamFolders': ['saints row the third']},   # round 626 A1 S7 (T3P8HK)
     'sleeping-dogs-definitive-edition': {'steamAppIDs': [307690], 'steamFolders': ['sleepingdogsdefinitiveedition']},   # round 626 A1 S7 (SXH6T6)
     'call-of-duty-black-ops': {'steamAppIDs': [42700], 'steamFolders': ['call of duty black ops']},   # round 626 A1 S7 (QJYC1M)
+    'the-wolf-among-us-remastered': {'steamAppIDs': [3884860], 'steamFolders': ['the wolf among us remastered'],
+                                     'programs': [{'name': 'thewolfamongusremastered.exe'}]},   # round 630 T2 S14 (T42FW2)
+    'sable': {'programs': [{'name': 'sable.exe'}]},   # round 630 T2 S14 (TGE3CV)
+    'the-darkside-detective-2': {'programs': [{'name': 'thedarksidedetective2.exe'}]},   # round 630 T2 S10 (CKCAAD)
+    'payday-2': {'steamAppIDs': [218620], 'steamFolders': ['payday 2'], 'programs': [{'name': 'payday2.exe'}]},   # round 630 G2 S6 (5GYAQA)
+    'halo-the-master-chief-collection': {'steamAppIDs': [976730], 'steamFolders': ['halo the master chief collection'],
+                                         'programs': [{'name': 'mcc-win64-shipping.exe'}]},   # round 630 Discord (1NT0Q7)
+    'football-manager-26': {'steamAppIDs': [3551340], 'steamFolders': ['football manager 26']},   # round 630 Discord (KT8N4X)
 }
 for ident, p in presets.items():
     assert p['match'] == MATCH.get(ident), (ident, p['match'])
@@ -1407,10 +1511,10 @@ check(!R.gta5LegacySteam.fileText.contains("swap-mb") && !R.gta5LegacySteam.file
 R.deviceRAMBytes = 16 << 30
 check(R.all.map { $0.fileText } == onTwelve, "a 16 GB iPad: the same lists as a 12 GB phone")
 R.deviceRAMBytes = 7_500 << 20
-check(R.gta5LegacySteam.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nswap-mb = 3072\n"),
-      "an 8 GB phone: the 3 GB RAM swap after GTA V Legacy's list")
-check(R.gta5LegacyOther.fileText.hasSuffix("env.MADEIRA_STEAM_IDENTITY = none\nswap-mb = 3072\n"),
-      "an 8 GB phone: the same 3 GB RAM swap after the non-Steam Legacy list")
+check(R.gta5LegacySteam.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nenv.MADEIRA_OPTIN_DLLS = tbs\nswap-mb = 3072\n"),
+      "an 8 GB phone: the 3 GB RAM swap after GTA V Legacy's list (v5: + the launcher's tbs, round 630)")
+check(R.gta5LegacyOther.fileText.hasSuffix("env.MADEIRA_STEAM_IDENTITY = none\nenv.BCD_EPIC_HOST_START = 1\nenv.MADEIRA_OPTIN_DLLS = tbs\nswap-mb = 3072\n"),
+      "an 8 GB phone: the same 3 GB RAM swap after the non-Steam Legacy list (v3: + the Epic host start, v4: + the launcher's tbs, round 630)")
 // round 624: Euro Truck Simulator 2 gets the BC texture clamp on a device under 10 GB (its smallRAMConfig)
 check(R.all.first { $0.id == "euro-truck-simulator-2" }?.fileText.hasSuffix("dxmt = d3d11.mipClampBC=1\n") == true,
       "an 8 GB phone: the BC texture clamp after Euro Truck Simulator 2's list")
@@ -1421,10 +1525,10 @@ check(R.all.first { $0.id == "metal-gear-solid-4-master-collection" }?.fileText.
 check(R.all.first { $0.id == "ghpc" }?.fileText.hasSuffix("env.MADEIRA_EC_HOOK_TRACE = 0\nswap-mb = 3072\nswap-mode = 2\nswap-min-mb = 1\n") == true,   // build 602: no tip line yet
       "an 8 GB phone: GHPC's swap tier after its list")
 // round 626 (agent P S7): GTA V Enhanced's broad swap tier on a small device, after its list (the later swap-mb wins)
-check(R.gta5EnhancedSteam.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nswap-mb = 8192\nswap-mode = 2\n")
+check(R.gta5EnhancedSteam.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nenv.MADEIRA_OPTIN_DLLS = tbs\nswap-mb = 8192\nswap-mode = 2\n")
       && R.gta5EnhancedSteam.fileText.contains("swap-mb = 3072\n"), "an 8 GB phone: GTA V Enhanced's broad swap tier after its Steam list")
-check(R.gta5EnhancedOther.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nswap-mb = 8192\nswap-mode = 2\n"),
-      "an 8 GB phone: the same after the non-Steam Enhanced list")
+check(R.gta5EnhancedOther.fileText.hasSuffix("env.MADEIRA_METAL_HUD_MAIN = 1\nenv.BCD_EPIC_HOST_START = 1\nenv.MADEIRA_OPTIN_DLLS = tbs\nswap-mb = 8192\nswap-mode = 2\n"),
+      "an 8 GB phone: the same after the non-Steam Enhanced list (v6: + the Epic host start, v7: + the launcher's tbs, round 630)")
 check(zip(R.all, onTwelve).allSatisfy { $0.0.id == "gta5l-steam" || $0.0.id == "gta5l-other" || $0.0.id == "euro-truck-simulator-2"
                                         || $0.0.id == "gta5e-steam" || $0.0.id == "gta5e-other"
                                         || $0.0.id == "metal-gear-solid-4-master-collection" || $0.0.id == "ghpc" || $0.0.fileText == $0.1 },
@@ -1584,8 +1688,8 @@ check(id(steam + #"\Counter-Strike Global Offensive"#, 730) != "counter-strike-s
 check(id(steam + #"\Spintires"#, 263280) == "none" && id(steam + #"\Indivisible Soundtrack"#, 1094140) == "none"
       && id(steam + #"\tModLoader"#, 1281930) == "none" && id(steam + #"\Terraria Dedicated Server"#) == "none",
       "Spintires, Indivisible's soundtrack, tModLoader and the Terraria server folder do not take MudRunner's, Indivisible's or Terraria's list")
-check(id(steam + #"\Darksiders Warmastered Edition"#, 462780) == "none" && id(steam + #"\Darksiders Genesis"#, 710920) == "none",
-      "the other Darksiders games do not take Darksiders II's list (their Direct3D is another story)")
+check(id(steam + #"\Darksiders Warmastered Edition"#, 462780) == "darksiders-warmastered-edition" && id(steam + #"\Darksiders Genesis"#, 710920) == "none",
+      "the other Darksiders games do not take Darksiders II's list (their Direct3D is another story); Warmastered has its own (round 630, G1 S9)")
 // 2026-10-24: Need for Speed Most Wanted (speed.exe) and Underground 2 (SPEED2.EXE), build 598's report of a 32-bit program's crash. Non-Steam
 // programs: recognised by the program's name, wherever it is installed and in any case; nothing else takes them.
 for (program, rule) in [("speed.exe", "nfs-most-wanted"), ("Speed.exe", "nfs-most-wanted"), ("SPEED2.EXE", "nfs-underground-2")] {
@@ -1871,7 +1975,9 @@ print("PASS: a newer list reaches untouched configs (file only), never a changed
 #    ARM64" choice, which makes both call address 0 a few seconds after the first frame (rule d3d9-native-null-call).
 _d3d12blob = {'line': 'd3d12-pso-cached-blob = 1', 'minBuild': 598}
 assert _d3d12blob in _cfg('resident-evil-requiem') and _d3d12blob in _cfg('resident-evil-requiem-demo')
-assert presets['resident-evil-requiem-demo']['lines'][2:] == [_std, _nocopy, 'd3d12-pso-cached-blob = 1'] and presets['resident-evil-requiem-demo']['version'] == 2 \
+assert presets['resident-evil-requiem-demo']['lines'][2:] == [_std, _nocopy, 'd3d12-pso-cached-blob = 1', 'env.MADEIRA_GUEST_LOG = all',   # v3: round 630 G2 S15
+                                                         'env.MADEIRA_GUEST_LOG_LIMIT = 1500', 'env.MADEIRA_FILE_TRACE = 1',
+                                                         'env.MADEIRA_FILE_TRACE_LIMIT = 30000'] and presets['resident-evil-requiem-demo']['version'] == 3 \
     and presets['resident-evil-requiem-demo']['switches'] == '', presets['resident-evil-requiem-demo']
 assert {'line': _nocopy, 'minBuild': 576} in _cfg('resident-evil-requiem-demo')
 assert sorted(r['id'] for r in recs['rules'] if 'd3d12-pso-cached-blob' in json.dumps(r['config'])) == ['resident-evil-requiem', 'resident-evil-requiem-demo'], \
@@ -1898,7 +2004,7 @@ assert {'line': 'gpu-card = nvidia-7900gs', 'minBuild': 623} in _cfg('fallout-ne
 assert sorted(r['id'] for r in recs['rules'] if 'nvidia-7900gs' in json.dumps(r['config'])) == ['fallout-3', 'fallout-new-vegas'], 'only New Vegas and Fallout 3 carry the older NVIDIA card'
 assert {'line': 'env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1', 'minBuild': 591} in _cfg('fallout-new-vegas')
 assert {'line': 'env.MADEIRA_D3D9_LAST = 1', 'minBuild': 598} in _cfg('fallout-new-vegas')
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_LAST' in json.dumps(r['config'])) == ['darksiders-ii-deathinitive', 'fallout-3', 'fallout-new-vegas']
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_LAST' in json.dumps(r['config'])) == ['darksiders-ii-deathinitive', 'fallout-3', 'fallout-new-vegas', 'goldsrc-hl-exe']
 
 #  - BioShock Infinite: Complete Edition from the Epic Games Store (program ShippingPC-XGame.exe with EOSSDK-Win32-Shipping.dll beside it; the Steam copy has
 #    no such file): eight logs of one tester end 1.5-3 s after the start with ExitProcess(1) and no reason. Four diagnostic lines from build 598 (the game's own
@@ -1908,8 +2014,8 @@ assert presets['bioshock-infinite-epic']['lines'][2:] == [_std, 'env.BCD_EPIC_HO
     and presets['bioshock-infinite-epic']['version'] == 1 and presets['bioshock-infinite-epic']['switches'] == '', presets['bioshock-infinite-epic']
 for _l in ('env.BCD_EPIC_HOST_START = 1', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 1500', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 30000'):
     assert {'line': _l, 'minBuild': 598} in _cfg('bioshock-infinite-epic'), _l
-assert sorted(r['id'] for r in recs['rules'] if 'BCD_EPIC_HOST_START' in json.dumps(r['config'])) == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic'], \
-    'only the BioShock Infinite, BioShock Remastered (round 626, VV1JGH) and Farming Simulator 22 (Epic) lists hold the host start (FS22: round 620, 5C4SAB)'
+assert sorted(r['id'] for r in recs['rules'] if 'BCD_EPIC_HOST_START' in json.dumps(r['config'])) == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'gta5e-other', 'gta5l-other'], \
+    'only the BioShock Infinite, BioShock Remastered (round 626, VV1JGH), Farming Simulator 22 (Epic) and GTA V outside Steam (round 630, agent R S11) lists hold the host start (FS22: round 620, 5C4SAB)'
 # Round 626 (agent G1 S6): BioShock Remastered from Epic is a 32-bit game under the 64-bit BCD Host: the shared GDI table from the first start;
 # lists may set MADEIRA_GDI_SHARED_SECTION from build 626 only (0 or 1).
 assert {'line': 'env.MADEIRA_GDI_SHARED_SECTION = 1', 'minBuild': 626} in _cfg('bioshock-remastered-epic')
@@ -1925,9 +2031,9 @@ assert {'line': 'env.MADEIRA_WG_VPROC = 1', 'minBuild': 626} in _cfg('power-dril
 assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_WG_VPROC' in json.dumps(r['config'])) == ['hollow-knight', 'hollow-knight-silksong', 'power-drill-massacre']
 assert '"MADEIRA_WG_VPROC",   // build 626' in (app / 'GameRecommendationsList.swift').read_text() and '$0 == "msvproc"' in (app / 'GameRecommendationsList.swift').read_text()
 # Round 624: the diagnostic lists of Blasphemous, the NW.js games and osu! mirror the game's own log too (each to name its stop).
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_GUEST_LOG' in json.dumps(r['config'])) == ['bioshock-infinite-epic', 'blasphemous', 'caravan-sandwitch', 'crosscode', 'danganronpa-trigger-happy-havoc', 'dead-island-definitive', 'doki-doki-literature-club', 'friends-vs-friends', 'gta4-steam', 'haak', 'nwjs-game-exe', 'osu'], \
-    'only the BioShock Infinite (Epic), Danganronpa, (round 624) Blasphemous, NW.js, osu!, Friends vs Friends and (round 626) GTA IV, Caravan SandWitch and HAAK lists mirror the whole log'
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE =' in json.dumps(r['config'])) == ['bioshock-infinite-epic', 'blasphemous', 'caravan-sandwitch', 'danganronpa-trigger-happy-havoc', 'darksiders-ii-deathinitive', 'doki-doki-literature-club', 'haak', 'nfs-most-wanted', 'nfs-underground-2', 'overlord-ii', 'terraria']   # + round 624's diagnostic lists; round 626: Caravan SandWitch, HAAK
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_GUEST_LOG' in json.dumps(r['config'])) == ['aliens-colonial-marines', 'arcade-paradise', 'bioshock-infinite-epic', 'blasphemous', 'call-of-duty-modern-warfare-2-2009', 'caravan-sandwitch', 'crosscode', 'danganronpa-trigger-happy-havoc', 'darksiders-warmastered-edition', 'dead-island-definitive', 'doki-doki-literature-club', 'friends-vs-friends', 'goldsrc-hl-exe', 'gta4-steam', 'haak', 'nwjs-game-exe', 'osu', 'project-zomboid', 'resident-evil-requiem-demo', 'rotfront', 'stalker-xray-engine', 'toem', 'vampire-bloodlines'], \
+    'only the BioShock Infinite (Epic), Danganronpa, (round 624) Blasphemous, NW.js, osu!, Friends vs Friends, (round 626) GTA IV, Caravan SandWitch and HAAK and (round 630) Project Zomboid, MW2, Darksiders WE, the RE Requiem demo, Rotfront, Aliens: Colonial Marines, S.T.A.L.K.E.R., Vampire: Bloodlines, Half-Life engine, Arcade Paradise and TOEM lists mirror the whole log'
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE =' in json.dumps(r['config'])) == ['aliens-colonial-marines', 'bendy-and-the-ink-machine', 'bioshock', 'bioshock-infinite-epic', 'blasphemous', 'call-of-duty-modern-warfare-2-2009', 'caravan-sandwitch', 'danganronpa-trigger-happy-havoc', 'darksiders-ii-deathinitive', 'darksiders-warmastered-edition', 'doki-doki-literature-club', 'haak', 'hitman-blood-money', 'nfs-most-wanted', 'nfs-underground-2', 'overlord-ii', 'resident-evil-requiem-demo', 'terraria']   # + round 624's diagnostic lists; round 626: Caravan SandWitch, HAAK; round 630: MW2, Darksiders WE, RE Requiem demo
 assert '"MADEIRA_GUEST_LOG"' in (app / 'GameRecommendationsList.swift').read_text() and 'guard value == "all"' in (app / 'GameRecommendationsList.swift').read_text()
 
 #  - Danganronpa: Trigger Happy Havoc (DR1_us.exe): two logs end 1 s after the start, the program having asked for a window of 16711308 x 16711308 pixels, Direct3D 9

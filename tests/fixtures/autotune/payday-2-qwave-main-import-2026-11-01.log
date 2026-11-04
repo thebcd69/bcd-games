@@ -1,0 +1,137 @@
+[22:52:05.478] [INFO] Checking entitlements...
+[22:52:05.479] [INFO] [build] v0.1.626 (626)
+[22:52:05.479] [INFO] [device] model=iPad16,10 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11845MB available=12265MB cores=8
+[22:52:05.479] [INFO] [device] address-map=[0x100100000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[22:52:05.487] [INFO] [device] settings: low-power=0 thermal=nominal screen=2048x2732@2.0x max-fps=60 utc-offset=+08:00 free-disk=9GB stikdebug-url=1
+[22:52:05.490] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:52:07.693] [INFO] [steam-start] app=218620 direct source=choice args=0 folder=program
+[22:52:07.699] [INFO] [bcd] library launch PAYDAY 2: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[22:52:07.714] [INFO] Running full Wine sequence...
+[22:52:07.714] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100100000,0x8000000000) 512GB available=12237MB low-power=0 thermal=nominal
+[22:52:07.715] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[22:52:07.719] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:52:07.719] [INFO] Allocating 896MB JIT pool via debugger...
+[22:52:07.719] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:52:07.719] [INFO] [jit-debugger] attached=1 at the pool request
+[22:52:07.721] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:52:09.977] [INFO] RX pool at 0x148000000
+[22:52:10.009] [INFO] Detaching debugger...
+[22:52:10.024] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.343s rev=ml526
+[22:52:10.062] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/063500999f11ab63.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[22:52:10.328] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[22:52:10.328] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[22:52:10.328] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=218620
+ml992: os_proc_available_memory=11608 MB + phys_footprint=679 MB = 12288 MB (hw.memsize says 11845 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11845 MB), so it is a sentinel, not a limit
+[exe-window] 0x140000000+0xfc4000 is under the 64MB floor but its relocations are stripped: it can only run at this base, so it gets the window (MADEIRA_EXE_WINDOW_SMALL_FIXED=0 refuses it as before)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x140000000+0xfc3000 (PAYDAY2.exe) → pool 0x148005000 used=0xfcd000/0x27000000 tramp+0x0
+[copy-verify] PAYDAY2.exe: OK, 781 .text pages executable (copy @0x148005000)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148fcc000 used=0x1104000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148fcc000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x149106000 used=0x1526000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149106000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x149524000 used=0x1658000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x149524000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x149658000 used=0x1720000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x149658000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x149720000 used=0x1a20000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x149720000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module PAYDAY2.exe (payday2.exe-e68d1897197dde41): 140000000
+[window] 0x122000000..0x7817000000 regions=80075 occupied=462119 MB of 487248 MB free=41880 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=724 MB (peak 724) internal=724 MB compressed=0 MB external=117 MB reusable=3 MB (cycle=1)
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x14aed4000)
+[copy-verify] steam_api64.dll: OK, 11 .text pages executable (copy @0x14af68000)
+[copy-verify] bink2w64.dll: OK, 16 .text pages executable (copy @0x14afb9000)
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14b038000)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14b15c000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14c380000)
+[valloc] ml959 # base=0x7c01800000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01800000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7c01810000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01810000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7c01820000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01820000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7c01830000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01830000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7c01840000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01840000 zero_bits=0x0 limit=0x0
+[jit-pool] image 0x71f97f0000+0x80000 (vcruntime140.dll) → pool 0x14e5c4000 used=0x6648000/0x27000000 tramp+0x4000
+D 24 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): 71F97F0000
+[jit-pool] image 0x71f9760000+0x90000 (version.dll) → pool 0x14e648000 used=0x66dc000/0x27000000 tramp+0x4000
+D 24 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71F9760000
+[jit-pool] image 0x71f9750000+0xc000 (VCRUNTIME140_1.dll) → pool 0x14e6dc000 used=0x66e8000/0x27000000 tramp+0x0
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 71F9750000
+[jit-pool] image 0x71f8b50000+0xbf1000 (discord_partner_sdk.dll) → pool 0x14e6eb000 used=0x72e3000/0x27000000 tramp+0x0
+D 24 Load module discord_partner_sdk.dll (discord_partner_sdk.dll-c535f6092a9fa0cb): 71F8B50000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"qwave.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library qwave.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\PAYDAY 2\\discord_partner_sdk.dll") not found
+[jit-pool] image 0x71f8ad0000+0x80000 (avrt.dll) → pool 0x14f2e0000 used=0x7364000/0x27000000 tramp+0x4000
+D 24 Load module avrt.dll (avrt.dll-cbf6d88ff1151c3b): 71F8AD0000
+[jit-pool] image 0x71f8a30000+0xa0000 (propsys.dll) → pool 0x14f364000 used=0x7408000/0x27000000 tramp+0x4000
+D 24 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71F8A30000
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"discord_partner_sdk.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library discord_partner_sdk.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\PAYDAY 2\\PAYDAY2.exe") not found
+0024:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\PAYDAY 2\\PAYDAY2.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=766
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[22:52:10.714] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=892MB limit=12287MB thermal=nominal lpm=0 api=D3D11/64 res=1112x832 cap=60 game=PAYDAY 2
+[22:52:10.717] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[xp] 22:52:10.951 +0.58 dt=289 cpu=468 (thr 443) P=197 E=271 run=493 pgw=-1.0 GHz P=3.73 E=2.81 Minst=6020 IPC=4.02 mJ=980 pin=0 rdKB=0 fpMB=905
+[xp] 22:52:11.205 +0.83 dt=254 cpu=252 (thr 252) P=4 E=248 run=263 pgw=-1.0 GHz P=3.88 E=2.81 Minst=2693 IPC=3.78 mJ=161 pin=0 rdKB=0 fpMB=904
+[xp] 22:52:11.464 +1.09 dt=259 cpu=258 (thr 258) P=4 E=254 run=270 pgw=-1.0 GHz P=3.67 E=2.82 Minst=2649 IPC=3.61 mJ=162 pin=0 rdKB=0 fpMB=905
+[xp] 22:52:11.748 +1.37 dt=285 cpu=61 (thr 61) P=3 E=59 run=63 pgw=-1.0 GHz P=3.72 E=2.66 Minst=556 IPC=3.34 mJ=38 pin=0 rdKB=0 fpMB=905
+[xp] 22:52:12.026 +1.65 dt=277 cpu=15 (thr 15) P=0 E=15 run=15 pgw=-1.0 GHz P=0.00 E=1.66 Minst=37 IPC=1.49 mJ=2 pin=0 rdKB=0 fpMB=905
+[xp] 22:52:12.349 +1.97 dt=323 cpu=16 (thr 16) P=0 E=16 run=17 pgw=-1.0 GHz P=0.00 E=1.64 Minst=37 IPC=1.40 mJ=2 pin=0 rdKB=0 fpMB=899
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=160 MB reusable=8 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=902 MB compressed=0 MB internal=901 MB
+[22:52:12.832] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=160 MB reusable=8 MB (cycle=3)
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=160 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=160 MB reusable=8 MB (cycle=5)
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=160 MB reusable=8 MB (cycle=6)
+[footprint] rev=ml358 phys=908 MB (peak 908) internal=907 MB compressed=0 MB external=163 MB reusable=8 MB (cycle=10)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701e5020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=912 MB (peak 912) internal=911 MB compressed=0 MB external=163 MB reusable=8 MB (cycle=11)
+[footprint] rev=ml358 phys=907 MB (peak 912) internal=906 MB compressed=0 MB external=163 MB reusable=8 MB (cycle=12)
+[footprint] rev=ml358 phys=907 MB (peak 912) internal=906 MB compressed=0 MB external=163 MB reusable=8 MB (cycle=13)
+[footprint] rev=ml358 phys=913 MB (peak 913) internal=912 MB compressed=0 MB external=174 MB reusable=8 MB (cycle=14)
+[footprint] rev=ml358 phys=914 MB (peak 914) internal=913 MB compressed=0 MB external=176 MB reusable=8 MB (cycle=15)
+[xp] 22:52:39.100 +28.73 dt=294 cpu=69 (thr 69) P=13 E=55 run=73 pgw=-1.0 GHz P=1.52 E=1.96 Minst=191 IPC=1.48 mJ=17 pin=4 rdKB=48 fpMB=914
+[xp] 22:52:39.366 +28.99 dt=266 cpu=69 (thr 69) P=19 E=51 run=74 pgw=-1.0 GHz P=1.68 E=1.88 Minst=192 IPC=1.52 mJ=20 pin=0 rdKB=0 fpMB=914
+[xp] 22:52:39.644 +29.27 dt=278 cpu=34 (thr 33) P=22 E=12 run=35 pgw=-1.0 GHz P=1.74 E=1.59 Minst=125 IPC=2.21 mJ=17 pin=0 rdKB=0 fpMB=914
+[xp] 22:52:39.965 +29.59 dt=321 cpu=62 (thr 62) P=11 E=51 run=66 pgw=-1.0 GHz P=1.52 E=1.83 Minst=162 IPC=1.48 mJ=14 pin=0 rdKB=0 fpMB=914
+[freeze] alive t+30s beats=1 gaps=0 iter=118 gen=1 threads=19 resident=1098MB dbg=DEBUGGED rev=ml525
+[xp] 22:52:40.291 +29.92 dt=327 cpu=81 (thr 79) P=29 E=53 run=88 pgw=-1.0 GHz P=2.08 E=1.80 Minst=246 IPC=1.60 mJ=35 pin=0 rdKB=0 fpMB=914
+[xp] 22:52:40.614 +30.24 dt=323 cpu=32 (thr 32) P=3 E=29 run=34 pgw=-1.0 GHz P=1.39 E=1.88 Minst=72 IPC=1.22 mJ=6 pin=0 rdKB=0 fpMB=914

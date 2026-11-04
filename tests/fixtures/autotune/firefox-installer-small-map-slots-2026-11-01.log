@@ -1,0 +1,412 @@
+[23:03:16.305] [INFO] Checking entitlements...
+[23:03:16.306] [INFO] [build] v0.1.626 (626)
+[23:03:16.306] [INFO] [device] model=iPhone13,4 idiom=phone os=iOS Version 18.6.2 (Build 22G100) ram=5693MB available=4081MB cores=6
+[23:03:16.307] [INFO] [device] address-map=[0x1040f8000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[23:03:16.308] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 18: TXM restricts JIT memory only from iOS 26); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[23:03:16.320] [INFO] [device] settings: low-power=0 thermal=nominal screen=1284x2778@3.0x max-fps=60 utc-offset=+05:30 free-disk=35GB stikdebug-url=1
+[23:03:16.326] [INFO] [device] gpu="Apple A14 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:08:12.760] [INFO] [bcd-ui] play desktop
+[23:08:12.799] [INFO] Running full Wine sequence...
+[23:08:12.799] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1040f8000,0xfc0000000) 63GB available=3909MB low-power=0 thermal=nominal
+[23:08:12.809] [INFO] Allocating 512MB JIT pool (BRK will suspend process)...
+[23:08:12.809] [INFO] Allocating 512MB JIT pool via debugger...
+[23:08:12.809] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:08:12.809] [INFO] [jit-debugger] attached=1 at the pool request
+[23:08:13.867] [INFO] RX pool at 0x148000000
+[23:08:13.923] [INFO] Detaching debugger...
+[23:08:13.951] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.202s rev=ml526
+[23:08:14.011] [wineserver] send_client_fd: fd=36 handle=0x3a2 msg_fd_unix=33 proc=0020 tid=0000
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; sysx64 only)
+[WineProc] MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll (Direct3D 8 on Direct3D 9, DXMT's; syswow64)
+[WineProc] MADEIRA_OPTIN_DLLS: wmadmod.dll -> wmadmod-optin.dll (Wine's wmadmod.dll for this game)
+[WineProc] MADEIRA_OPTIN_DLLS: mfasfsrcsnk.dll -> mfasfsrcsnk-optin.dll (Wine's mfasfsrcsnk.dll for this game)
+[shell-dir] user folders for madeira, mobile: 11 created (Start Menu included)
+[valloc] ml959 # base=0x104f70000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[23:08:14.343] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3362 MB + phys_footprint=733 MB = 4096 MB (hw.memsize says 5693 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x10ab80000+0x70000 (?) → pool 0x148004000 used=0x78000/0x20000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0xb00000000,0xd00000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcf0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x20000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[ec-hook] #1 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab90a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #2 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab91038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[ec-hook] #3 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab913a4+0x4: rva 0x113a4, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 16 aa 83 05 00 94 e4 03 00 aa | pool before sync: 21 7b 01 14 e0 03 16 aa 83 05 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #4 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab91a40+0x4: rva 0x11a40, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | pool before sync: 7f 79 01 14 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | jump -> 0 (-) bytes there: -
+[ec-hook] #5 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab90a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #6 scope=difference view=difference tid=0024 image 0x10ab80000 (pool copy 0x148004000) 0x10ab91038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[jit-pool] image 0xfbfc50000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x20000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[jit-pool] image 0xfbfae0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x20000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[window] 0x12e800000..0xb00000000 regions=65604 occupied=7305 MB of 40216 MB free=65166 MB maxhole=32256 MB@0x320000000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=737 MB (peak 737) internal=736 MB compressed=0 MB external=92 MB reusable=25 MB (cycle=1)
+[jit-pool] image 0xfbfa10000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x20000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0xfbf980000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x20000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x11f160000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1416x656, winstation visible, input desktop set
+[image-reload] unmapped image 0xfbf260000+0x90000: 1 pool copy marked
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #3 hwnd=0x10020 class='#32769' text="shell - Wine Desktop" rev=ml853
+[win-name] #4 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+[win-name] #5 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-name] #6 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  1.878s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\services.exe" (fd=97, unixdir=98, dup_unixdir=102) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x149898000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x1499b0000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x149a44000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[launch-view] dismissed reason=surface logs=0
+[xp] 23:08:14.931 +0.53 dt=258 cpu=92 (thr 54) P=90 E=2 run=99 pgw=-1.0 GHz P=2.90 E=1.65 Minst=956 IPC=3.62 mJ=213 pin=219 rdKB=3760 fpMB=779
+[phase] spawn:L"C:\\windows\\system32\\rpcss.exe" t+  2.191s rev=ml526
+004c:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\rpcss.exe" (fd=149, unixdir=150, dup_unixdir=154) cwd=L"C:\\windows\\"
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x14a578000)
+[xp-names] m6421533 "wine-x18-exc"
+[xp] 23:08:15.185 +0.78 dt=254 cpu=111 (thr 51) P=106 E=5 run=116 pgw=-1.0 GHz P=2.15 E=1.76 Minst=799 IPC=3.38 mJ=146 pin=25 rdKB=400 fpMB=759
+[xp] 23:08:15.481 +1.08 dt=296 cpu=11 (thr 11) P=1 E=10 run=15 pgw=-1.0 GHz P=0.93 E=1.79 Minst=19 IPC=1.00 mJ=1 pin=0 rdKB=0 fpMB=759
+[xp] 23:08:15.784 +1.38 dt=303 cpu=32 (thr 32) P=0 E=32 run=39 pgw=-1.0 GHz P=0.00 E=1.80 Minst=52 IPC=0.89 mJ=3 pin=0 rdKB=0 fpMB=759
+[xp] 23:08:16.049 +1.65 dt=265 cpu=13 (thr 13) P=0 E=13 run=19 pgw=-1.0 GHz P=0.00 E=1.76 Minst=26 IPC=1.16 mJ=1 pin=0 rdKB=0 fpMB=759
+[xp] 23:08:16.333 +1.93 dt=284 cpu=10 (thr 10) P=0 E=10 run=16 pgw=-1.0 GHz P=0.00 E=1.82 Minst=16 IPC=0.89 mJ=1 pin=0 rdKB=0 fpMB=759
+[footprint] rev=ml358 phys=759 MB (peak 759) internal=759 MB compressed=0 MB external=128 MB reusable=25 MB (cycle=2)
+[footprint] rev=ml358 phys=760 MB (peak 760) internal=759 MB compressed=0 MB external=128 MB reusable=25 MB (cycle=3)
+[hwinput] keyboard focus: program (program cursor)
+[footprint] rev=ml358 phys=759 MB (peak 760) internal=759 MB compressed=0 MB external=128 MB reusable=25 MB (cycle=4)
+[footprint] rev=ml358 phys=759 MB (peak 760) internal=759 MB compressed=0 MB external=128 MB reusable=25 MB (cycle=5)
+[footprint] rev=ml358 phys=759 MB (peak 760) internal=759 MB compressed=0 MB external=128 MB reusable=25 MB (cycle=6)
+[srv-input] btn msg=0x201 at (42,642) hit win=00040030 thread=0x10824b000
+[srv-input] btn msg=0x201 at (42,642) hit win=00040030 thread=0x10824b000
+[srv-input] btn msg=0x201 at (42,642) hit win=00040030 thread=0x10824b000
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c535020 NATIVE (no FEX state) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=2 x8=0x0 x18=0x0 sp=0x16bd05c60
+[thread-stacks] port=0x3007 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c0d5ca0
+[thread-stacks] port=0x4b03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=7 x8=0x1f3423b50 x18=0x0 sp=0x16c160d50
+[thread-stacks] port=0xde1b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1050ebd01 x18=0x0 sp=0x16bf32b30
+[thread-stacks] port=0x580f "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f3423b50 x18=0x0 sp=0x16bea1c90
+[thread-stacks] port=0x1010f "" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0xf27 x18=0x0 sp=0x16bfbecc0
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c535020
+[srv-input] btn msg=0x201 at (75,570) hit win=00010058 thread=0x10824b000
+[phase] spawn:L"C:\\windows\\system32\\explorer.exe" t+ 29.390s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\explorer.exe\"" (fd=142, unixdir=143, dup_unixdir=148) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[image-reload] unmapped image 0xfbcb30000+0x90000: 1 pool copy marked
+007c:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+007c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[23:08:44.154] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=38 resident=977MB dbg=DEBUGGED rev=ml525
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (214,132) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[srv-input] btn msg=0x201 at (164,137) hit win=00020056 thread=0x10a452100
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16c535020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c535020 NATIVE (no FEX state) sp-cand=[ ]
+[phase] spawn:L"C:\\Games\\Firefox Installer.exe" t+ 43.518s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+007c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Games\\Firefox Installer.exe\"" (fd=143, unixdir=220, dup_unixdir=226) cwd=L"C:\\Games\\"
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+00a4:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x400400000 transfer=0x400434fa0 window=0x400000000 guest_base=0x400000
+00a4:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a4:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffbd0000+0x3bc000 (libwow64fex.dll) → pool 0x14c7e9000 used=0x4bad000/0x20000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x3ffbd0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-split] libwow64fex.dll 0x3ffbd0000+0x1dc000 prot=r-x: EXEC was granted in place although the pool copy 0x14c7e9000 exists -- taken back, the pool copy runs it [wow-cpu-pool]
+[guest-log] madeira-bcd text-log mirror: every line, 800 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] #1 tid=00a4 [rpm-sink] alive rev=ml492
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=firefox installer.exe tid=00a4 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=00a4 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x400310000 total=256 MB
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ffbd0000) -> 64-bit table (0x10ef9c828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D A4 Load module Firefox Installer.exe (firefox installer.exe-fafb642e6be836d2): 400400000
+D A4 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D A4 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 47BED0000
+D A4 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 47BC40000
+D A4 Load module MSVCRT.dll (msvcrt.dll-23623f236d95fd2b): 47BB90000
+[reserved-area] #1 MAP_FIXED over our own reservation refused: 0x401540000+0x10000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401540000+0x10000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #1 detail: 0x10000 bytes bottom-up; 9 candidate(s) refused [0x401540000 0x401550000 0x401560000 0x401570000 0x401580000 0x401590000 0x4015a0000 0x4015b0000 0x4015c0000]; kernel regions across the first refused range (p/m = protection/maximum): 0x401540000+0x10000 0/0; last candidate tried after a refusal, before it was mapped: 0x4015d0000: 0x4015d0000+0x6a30000 0/7 (it took the mapping)
+[reserved-area] #2 MAP_FIXED over our own reservation refused: 0x401540000+0x8000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401540000+0x8000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #2 detail: 0x8000 bytes bottom-up; 9 candidate(s) refused [0x401540000 0x401550000 0x401560000 0x401570000 0x401580000 0x401590000 0x4015a0000 0x4015b0000 0x4015c0000]; kernel regions across the first refused range (p/m = protection/maximum): 0x401540000+0x8000 0/0; last candidate tried after a refusal, before it was mapped: 0x4015e0000: 0x4015e0000+0x6a20000 0/7 (it took the mapping)
+[reserved-area] #3 MAP_FIXED over our own reservation refused: 0x401540000+0x14000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401540000+0x8000 prot=0/0 shared=0 | the retry placed it (8 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #3 detail: 0x14000 bytes bottom-up; 8 candidate(s) refused [0x401540000 0x401550000 0x401560000 0x401570000 0x401580000 0x401590000 0x4015a0000 0x4015b0000]; kernel regions across the first refused range (p/m = protection/maximum): 0x401540000+0x8000 0/0; 0x401548000+0x8000 0/0; 0x401550000+0x4000 0/0; last candidate tried after a refusal, before it was mapped: 0x4015f0000: 0x4015f0000+0x6a10000 0/7 (it took the mapping)
+D A4 Load module USER32.dll (user32.dll-7d7be97280dde402): 47B9D0000
+ml957: ? backing 0x47b8d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14d033000)
+ml957: ? backing 0x47b768000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[phase] spawn:L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zS0A037D7C\\setup-stub.exe" t+ 45.034s rev=ml526
+00a4:err:process:spawn_process spawn_process: creating child thread for L".\\setup-stub.exe" (fd=263, unixdir=270, dup_unixdir=274) cwd=L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zS0A037D7C\\"
+[wow-window] B=0x400000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x500000000: window body after failed reservations (OCCUPIED 0x500000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x500000000 REJECTED: 4GB+guard unavailable and the page at 0x600000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x600000000 are free, next region 0xb00000000 (+0x4ffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x600000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x600000000..0x700000000 (slot 1) guard=owned
+[wow-window] slot 1 B=0x600000000 bound to peb=0x600310000
+00bc:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x600400000 transfer=0x6004034c5 window=0x600000000 guest_base=0x400000
+00bc:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00bc:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x3ff360000+0x3bc000 (libwow64fex.dll) → pool 0x14d1dd000 used=0x55a1000/0x20000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x3ff360000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-split] libwow64fex.dll 0x3ff360000+0x1dc000 prot=r-x: EXEC was granted in place although the pool copy 0x14d1dd000 exists -- taken back, the pool copy runs it [wow-cpu-pool]
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c000000d proc=setup-stub.exe tid=00bc size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=00bc #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x600310000 total=512 MB
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ff360000) -> 64-bit table (0x10ef9c828)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+ml957: ? backing 0x67b8d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x67a980000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[stale-heal]   3 slot(s) in the copy of 0x3ffbd0000 (libwow64fex.dll) -> 0x14c6cb294 for peb=0x400310000 (owner=0x0 mapper=0x400310000)
+[stale-heal]   3 slot(s) in the copy of 0x3ff360000 (libwow64fex.dll) -> 0x14d0bf294 for peb=0x600310000 (owner=0x0 mapper=0x600310000)
+ml957: ? backing 0x67b768000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x67a8b8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+00bc:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\CLBCATQ.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00bc:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\windows\\system32\\NTMARTA.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+ml957: ? backing 0x67a614000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[image-reload] unmapped image 0x67a700000+0x1f000: 1 pool copy marked
+[image-reload] unmapped image 0x67a610000+0x7000: 1 pool copy marked
+[image-reload] unmapped image 0x67a690000+0x12000: 1 pool copy marked
+ml957: ? backing 0x60191c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[ec-hook] #4 scope=other-jump view=pool tid=00bc image 0x601910000 (pool copy 0x14dadb000) 0x60191423c+0x6: rva 0x423c, section #0 '.text' rva 0x1000+0x6142 chars 0x60000020 (R-X CODE) | PE bytes: ff 25 ac 80 91 01 83 f8 fc 75 0f a1 10 bf 91 01 | pool before sync: ff 25 ac 80 00 10 83 f8 fc 75 0f a1 10 bf 00 10 | jump -> 0 (-) bytes there: -
+[ec-hook] #5 scope=other-jump view=pool tid=00bc image 0x601910000 (pool copy 0x14dadb000) 0x60191713c+0x6: rva 0x713c, section #0 '.text' rva 0x1000+0x6142 chars 0x60000020 (R-X CODE) | PE bytes: ff 25 c8 80 91 01 | pool before sync: ff 25 c8 80 00 10 | jump -> 0 (-) bytes there: -
+[image-reload] unmapped image 0x601910000+0xf000: 1 pool copy marked
+[phase] spawn:L"C:\\windows\\system32\\control.exe" t+ 46.972s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\control.exe appwiz.cpl install_gecko" (fd=360, unixdir=362, dup_unixdir=366) cwd=L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zS0A037D7C\\"
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+ml957: ? backing 0x67a174000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[wow-stack-free] #1 the dead thread 00a8's 32-bit stack (guest 0x1610000) is in window 0x400000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x1610000 is not a live view -> released at the old address (as before) rev=ajan11
+[free-refused] ml1285 #3 addr=0x1610000 size=0 type=0x8000 status=0xc00000a0 view=0x0+0 protect=0 valloc=-1 tid=00c4
+[window] 0x12e800000..0xb00000000 regions=66376 occupied=15884 MB of 40216 MB free=40715 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[23:09:14.211] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=40 resident=1145MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=12 x8=0x0 x18=0x0 sp=0x16c535020
+ml957: ? backing 0x67a0e4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D BC Load module CertCheck.dll (certcheck.dll-1e0449061edb099b): 67A0E0000
+D BC Load module WINTRUST.dll (wintrust.dll-f4cd6b53ba313cdb): 67A0A0000
+D D8 Load module imagehlp.dll (imagehlp.dll-8b1026ce1eafe3a1): 67A080000
+ml957: ? backing 0x67a06c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D D8 Load module cryptnet.dll (cryptnet.dll-c704d270b39f2495): 67A060000
+[phase] spawn:L"C:\\users\\<user>\\AppData\\Local\\Temp\\nsb8667.tmp\\download.exe" t+ 80.354s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\users\\<user>\\AppData\\Local\\Temp\\nsb8667.tmp\\download.exe\" /LaunchedFromStub /INI=C:\\users\\<user>\\AppData\\Local\\Temp\\nsb8667.tmp\\config.ini" (fd=351, unixdir=353, dup_unixdir=359) cwd=L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zS0A037D7C\\"
+ml957: ? backing 0x123ba0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[ec-hook] #6 scope=other-jump view=PE tid=00e0 image 0x123ba0000 (pool copy 0x14db24000) 0x123bc27a8+0x5: rva 0x227a8, section #0 '.text' rva 0x1000+0x2c5f0 chars 0x60000020 (R-X CODE) | PE bytes: e9 03 12 aa 0a 80 40 f9 28 09 40 f9 5f 01 08 eb | pool before sync: 1f d6 00 14 0a 80 40 f9 28 09 40 f9 5f 01 08 eb | jump -> 0x12e6639b0 (no pool copy) bytes there: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+[ec-hook] #7 scope=other-jump view=PE tid=00e0 image 0x123ba0000 (pool copy 0x14db24000) 0x123bc27a8+0x5: rva 0x227a8, section #0 '.text' rva 0x1000+0x2c5f0 chars 0x60000020 (R-X CODE) | PE bytes: e9 03 12 aa 0a 80 40 f9 28 09 40 f9 5f 01 08 eb | pool before sync: 1f d6 00 14 0a 80 40 f9 28 09 40 f9 5f 01 08 eb | jump -> 0x12e6639b0 (no pool copy) bytes there: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+[nls-getptr] type=11 id=1252 peb=0x104f6c000
+[nls-getptr] type=11 id=437 peb=0x104f6c000
+[nls-getptr] type=11 id=20127 peb=0x104f6c000
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x2010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x2010000 reserved_total=512MB armed=va-pressure -> FAILED, falling back 0x0
+[wow-stack-free] #2 the dead thread 00d8's 32-bit stack (guest 0x3ab0000) is in window 0x600000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x3ab0000 is not a live view -> released at the old address (as before) rev=ajan11
+[phase] spawn:L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zSCD04FE0D\\setup.exe" t+ 86.521s rev=ml526
+00e0:err:process:spawn_process spawn_process: creating child thread for L".\\setup.exe /LaunchedFromStub /INI=C:\\users\\<user>\\AppData\\Local\\Temp\\nsb8667.tmp\\config.ini" (fd=353, unixdir=393, dup_unixdir=397) cwd=L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zSCD04FE0D\\"
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+[copy-verify] uxtheme.dll: OK, 5 .text pages executable (copy @0x14e9e0000)
+[image-reload] unmapped image 0x3fe1a0000+0x90000: 1 pool copy marked
+[win-name] #933 hwnd=0x10110 class='Static' text="Internal error." rev=ml853
+[23:09:44.286] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=40 resident=1174MB dbg=DEBUGGED rev=ml525
+[23:10:14.379] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=40 resident=1175MB dbg=DEBUGGED rev=ml525
+[window] 0x12e800000..0xb00000000 regions=66516 occupied=15873 MB of 40216 MB free=40726 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[23:10:44.500] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=38 resident=710MB dbg=DEBUGGED rev=ml525
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x123bc58e8 fault_addr=0x60 insn=f9403109 rn=8 xRn=0x0 (rn_val==fault_addr? 0) x18=0 teb=0xfbfe90000
+[store-noalias] #1 rev=ml348 addr=0x60 insn=0xf9403109 pc=0x123bc58e8 NO pool/anon alias | region 0x1040f8000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x60 hostpc=0x123bc58e8 hinsn=0xf9403109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x123bc58e8 addr=0x60 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1040f8000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x123bc58e8 addr=0x60 x18=0x0 type=1 lr=0x123bc39ec sp=0x13ca2ff00 x16=0x14dbbab30 x17=0x40ac2be6aa52
+[ec-fault-regs] x8=0x0 x9=0xffffffff x10=0x0 x11=0x11d400380 x0=0x1 x2=0x11d40a998 | teb=0xfbfe90000 peb=0x104f6c000 peb->EcCodeBitMap=0x0
+[fault-host] 123bc57e8: 9a8c83ec 91000529 f800854b eb0c013f 54ffffa1 52800020 d65f03c0 00000000
+[fault-host] 123bc5808: a9be53f3 f9000bf5 a9bf7bfd 910003fd 53001c08 350001e8 b00000e8 91034113
+[fault-host] 123bc5828: b0000049 91024135 91028274 f8408660 b40000c0 b100041f 54000060 c8dffea8
+[fault-host] 123bc5848: d63f0100 f81f827f eb14027f 54ffff01 52800020 a8c17bfd f9400bf5 a8c253f3
+[fault-host] 123bc5868: d65f03c0 00000000 f81f0ff3 a9be7bfd 910003fd b00000f3 b9428260 d5033bbf
+[fault-host] 123bc5888: 35000220 aa1203e8 b90013ff f9403109 f940112a b940094b 37f800eb 910043e0
+[mach_exc] insn_stream PC-12..PC+8: 910003fd aa1203e8 b90013ff [f9403109] f940112a b940094b 37f800eb
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0xfbfe90000 TEB[0x58]=0x11d4018d0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x60 insn=0xf9403109 pc=0x123bc58e8 NO pool/anon alias | region 0x1040f8000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x60 hostpc=0x123bc58e8 hinsn=0xf9403109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x123bc58e8 addr=0x60 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1040f8000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x123bc58e8 addr=0x60 x18=0x0 type=1 lr=0x123bc39ec sp=0x13ca2ff00 x16=0x14dbbab30 x17=0x40ac2be6aa52
+[ec-fault-regs] x8=0x0 x9=0xffffffff x10=0x0 x11=0x11d400380 x0=0x1 x2=0x11d40a998 | teb=0xfbfe90000 peb=0x104f6c000 peb->EcCodeBitMap=0x0
+[fault-host] 123bc5848: d63f0100 f81f827f eb14027f 54ffff01 52800020 a8c17bfd f9400bf5 a8c253f3
+[fault-host] 123bc5868: d65f03c0 00000000 f81f0ff3 a9be7bfd 910003fd b00000f3 b9428260 d5033bbf
+[fault-host] 123bc5888: 35000220 aa1203e8 b90013ff f9403109 f940112a b940094b 37f800eb 910043e0
+[fault-host] 123bc58a8: 97fffe74 b94013e8 52800040 7100051f 54000040 52800020 910a0268 889ffd00
+[fault-host] 123bc58c8: d5033bbf a8c27bfd f84107f3 d65f03c0 a9be7bfd 910003fd aa1203e8 b90013ff
+[fault-host] 123bc58e8: f9403109 f940112a b940094b 37f800eb 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 910003fd aa1203e8 b90013ff [f9403109] f940112a b940094b 37f800eb
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0xfbfe90000 TEB[0x58]=0x11d4018d0 *(gs_cached+0x58)=0x0
+00e0:err:seh:segv_handler [x18-decline] #1 pc=0x123bc58e8 fault_addr=0x60 insn=f9403109 rn=8 xRn=0x0 (rn_val==fault_addr? 0) x18=0 teb=0xfbfe90000
+wine: Unhandled page fault on read access to 0000000000000060 at address 0000000123BC58E8 (thread 00e0), starting debugger...
+00e0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1794
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=357
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[Wine child thread] child exited with code -1073741819
+[23:11:14.579] [INFO] detach-wait: presents=0 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=37 resident=717MB dbg=DEBUGGED rev=ml525
+[window] 0x12e800000..0xb00000000 regions=66549 occupied=15874 MB of 40216 MB free=40725 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[win-name] #1280 hwnd=0x200c2 class='#32770' text="Firefox Installer" rev=ml853
+[23:12:14.839] [INFO] detach-wait: presents=0 running=1 elapsed=240s
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=37 resident=721MB dbg=DEBUGGED rev=ml525
+[window] 0x12e800000..0xb00000000 regions=66594 occupied=15874 MB of 40216 MB free=40725 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[win-name] #1408 hwnd=0x200c2 class='#32770' text="Firefox Installer" rev=ml853
+[win-name] #1536 hwnd=0x200c2 class='#32770' text="Firefox Installer" rev=ml853
+[win-name] #1664 hwnd=0x200c2 class='#32770' text="Firefox Installer" rev=ml853
+[23:12:44.966] [INFO] detach-wait: presents=0 running=1 elapsed=270s
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=37 resident=722MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[23:13:01.972] [INFO] [session] length=289s partial=1 play=0s frames=0 stalls=0/0s peak=1007MB limit=4095MB thermal=nominal lpm=0 res=1416x656 cap=60 game=Desktop
+[23:19:51.910] [INFO] detach-wait: presents=0 running=1 elapsed=697s
+[freeze] alive t+698s beats=10 gaps=1 iter=1139 gen=1 threads=41 resident=579MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (app active)
+[window] 0x12e800000..0xb00000000 regions=66622 occupied=15794 MB of 40216 MB free=40805 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=300 full-path-hits=200 component-lookups=301 shortcut-hits=100 misses=201 scans=201 entries-scanned=1407 us-in-lookup=156923 (1% of the window) slowest=1.947 ms ...97D9-C183AB5C6F6C/Documents/wine/dosdevices/c:/Program Files
+[file-census] r624 10s: case-sensitive=1 full-path-tries=300 full-path-hits=200 component-lookups=300 shortcut-hits=100 misses=200 scans=200 entries-scanned=1400 us-in-lookup=168076 (1% of the window) slowest=1.965 ms ...97D9-C183AB5C6F6C/Documents/wine/dosdevices/c:/Program Files
+[freeze] alive t+728s beats=11 gaps=1 iter=1258 gen=1 threads=36 resident=582MB dbg=DEBUGGED rev=ml525
+[23:20:22.069] [INFO] detach-wait: presents=0 running=1 elapsed=728s
+[file-census] r624 10s: case-sensitive=1 full-path-tries=300 full-path-hits=200 component-lookups=301 shortcut-hits=100 misses=201 scans=201 entries-scanned=1407 us-in-lookup=154959 (1% of the window) slowest=1.948 ms ...97D9-C183AB5C6F6C/Documents/wine/dosdevices/c:/Program Files
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c535020 NATIVE (no FEX state) sp-cand=[ ]
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c535020
+00bc:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Firefox Installer" / L"It looks like Firefox couldn\2019t be installed. Choose OK to start over.": main exe base 00400000 size 0x77000
+[reserved-area] #58 MAP_FIXED over our own reservation refused: 0x601570000+0x4000 errno=12 (Cannot allocate memory) | OCCUPIED 0x601570000+0x4000 prot=0/0 shared=0 | the retry placed it (11 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #58 detail: 0x4000 bytes bottom-up; 11 candidate(s) refused [0x601570000 0x601580000 0x601590000 0x6015a0000 0x6015b0000 0x6015c0000 0x6015d0000 0x6015e0000 0x6015f0000 0x601900000 0x601910000]; kernel regions across the first refused range (p/m = protection/maximum): 0x601570000+0x4000 0/0; last candidate tried after a refusal, before it was mapped: 0x601940000: 0x601940000+0x8000 0/7 (it took the mapping)
+[reserved-area] #59 MAP_FIXED over our own reservation refused: 0x601570000+0x30000 errno=12 (Cannot allocate memory) | OCCUPIED 0x601570000+0x4000 prot=0/0 shared=0 | the retry placed it (7 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #59 detail: 0x30000 bytes bottom-up; 7 candidate(s) refused [0x601570000 0x601580000 0x601590000 0x6015a0000 0x6015b0000 0x6015c0000 0x6015d0000]; kernel regions across the first refused range (p/m = protection/maximum): 0x601570000+0x4000 0/0; 0x601574000+0x4000 0/0; 0x601578000+0x8000 0/0; 0x601580000+0x4000 0/0; 0x601584000+0x4000 0/0; 0x601588000+0x8000 0/0; more; last candidate tried after a refusal, before it was mapped: 0x601ae0000: 0x601ae0000+0x800000 0/7 (it took the mapping)
+[phase] spawn:L"C:\\windows\\system32\\winebrowser.exe" t+751.881s rev=ml526
+00bc:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\winebrowser.exe\" \"https://www.mozilla.org/en-US/firefox/installer-help/?channel=release&installer_lang=en-US&installer_arch=3\"" (fd=343, unixdir=350, dup_unixdir=357) cwd=L"C:\\users\\<user>\\AppData\\Local\\Temp\\7zS0A037D7C\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+D BC Load module nsJSON.dll (nsjson.dll-f471968d1edef89b): 67A040000
+[reserved-area] #60 MAP_FIXED over our own reservation refused: 0x601570000+0x8000 errno=12 (Cannot allocate memory) | OCCUPIED 0x601570000+0x4000 prot=0/0 shared=0 | the retry placed it (11 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #60 detail: 0x8000 bytes bottom-up; 11 candidate(s) refused [0x601570000 0x601580000 0x601590000 0x6015a0000 0x6015b0000 0x6015c0000 0x6015d0000 0x6015e0000 0x6015f0000 0x601900000 0x601910000]; kernel regions across the first refused range (p/m = protection/maximum): 0x601570000+0x4000 0/0; 0x601574000+0x4000 0/0; last candidate tried after a refusal, before it was mapped: 0x601960000: 0x601960000+0x180000 0/7 (it took the mapping)
+D BC Load module AppAssocReg.dll (appassocreg.dll-b307bba0545b9247): 601960000
+[win-name] #1792 hwnd=0x200c2 class='#32770' text="Firefox Installer" rev=ml853
+[image-reload] unmapped image 0x67a0e0000+0x6000: 1 pool copy marked
+[image-reload] unmapped image 0x67a780000+0x7000: 1 pool copy marked
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=1897
+00bc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=1897
+00bc:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=273
+[wow-stack-free] #3 the dead thread 00d4's 32-bit stack (guest 0x22e0000) is in window 0x600000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x22e0000 is not a live view -> released at the old address (as before) rev=ajan11
+[wow-window] slot 1 B=0x600000000 released (owner peb=0x600310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(0)
+00a4:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=225
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(0)
+[freeze] alive t+758s beats=12 gaps=1 iter=1377 gen=1 threads=35 resident=590MB dbg=DEBUGGED rev=ml525
+[23:20:52.219] [INFO] detach-wait: presents=0 running=1 elapsed=758s
+[phase] spawn:L"C:\\Games\\ChromeStandaloneSetup64.exe" t+761.113s rev=ml526
+007c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Games\\ChromeStandaloneSetup64.exe\"" (fd=219, unixdir=220, dup_unixdir=230) cwd=L"C:\\Games\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+[wow-reap] B=0x400000000 of exited peb=0x400310000: 0 leftover thread(s) ended, 5 kept
+[wow-reap] teb=0x6002d0000 of exited peb=0x600310000 in a system call (pc=0x1d973532c): parked, suspended for good (kr=53)
+[wow-reap] B=0x600000000 of exited peb=0x600310000: 1 leftover thread(s) ended, 0 kept
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+[wow-reap] second reservation after ending leftover threads: still no window
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+no-teb:err:module:wine_ios_child_main [Wine child] boot FAILED at stage 'guest-window-reserve' for wine: guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16c535020
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c535020 NATIVE (no FEX state) sp-cand=[ ]
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\windows\\system32\\bthprops.cpl" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #1920 hwnd=0x300c0 class='Button' text="&No" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\wineboot.exe" t+773.030s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\wineboot.exe --end-session --shutdown" (fd=217, unixdir=220, dup_unixdir=230) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+[ec-hook] #8 scope=other-jump view=pool tid=0110 image 0x10b180000 (pool copy 0x14ea74000) 0x10b191cd4+0x5: rva 0x11cd4, section #0 '.text' rva 0x10000+0x73bc chars 0x60000020 (R-X CODE) | PE bytes: 48 32 40 f9 53 4f 47 f9 e1 03 2b 91 5f 63 07 f9 | pool before sync: e9 b8 01 14 53 4f 47 f9 e1 03 2b 91 5f 63 07 f9 | jump -> 0x1a1bc5e91 (no pool copy) bytes there: a5 2a d0 42 60 20 91 52 1c 22 94 ed 6e e3 94 f5 
+[ec-hook] #9 scope=other-jump view=pool tid=0110 image 0x10b180000 (pool copy 0x14ea74000) 0x10b191cd4+0x5: rva 0x11cd4, section #0 '.text' rva 0x10000+0x73bc chars 0x60000020 (R-X CODE) | PE bytes: 48 32 40 f9 53 4f 47 f9 e1 03 2b 91 5f 63 07 f9 | pool before sync: e9 b8 01 14 53 4f 47 f9 e1 03 2b 91 5f 63 07 f9 | jump -> 0x1a1bc5e91 (no pool copy) bytes there: a5 2a d0 42 60 20 91 52 1c 22 94 ed 6e e3 94 f5 
+[nls-getptr] type=11 id=1252 peb=0x104494000
+[nls-getptr] type=11 id=437 peb=0x104494000
+[jit-pool] image 0x3fdca0000+0x80000 (ws2_32.dll) → pool 0x14f148000 used=0x71cc000/0x20000000 tramp+0x4000
+[nls-getptr] type=11 id=20127 peb=0x104494000
+[jit-pool] image 0x3fdab0000+0x1f0000 (user32.dll) → pool 0x14f1cc000 used=0x73c4000/0x20000000 tramp+0x8000
+[jit-pool] image 0x3fd9e0000+0xd0000 (gdi32.dll) → pool 0x14f3c4000 used=0x749c000/0x20000000 tramp+0x8000
+[jit-pool] image 0x3fd950000+0x90000 (win32u.dll) → pool 0x14f49c000 used=0x7530000/0x20000000 tramp+0x4000
+[jit-pool] image 0x3fd8e0000+0x70000 (imm32.dll) → pool 0x14f530000 used=0x75a4000/0x20000000 tramp+0x4000
+[jit-pool] image 0x3fd850000+0x90000 (uxtheme.dll) → pool 0x14f5a4000 used=0x7638000/0x20000000 tramp+0x4000
+[image-reload] unmapped image 0x3fd850000+0x90000: 1 pool copy marked
+0110:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=225
+[Wine ntdll/server] process_exit_wrapper(0)
+[window] 0x12e800000..0xb00000000 regions=66099 occupied=7632 MB of 40216 MB free=48967 MB maxhole=16383 MB@0x700004000 rev=ml787 (layerkit-span)
+[thread-stacks] port=0xb257 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x16c535020
+[thread-stacks] port=0xc143 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c79c0e0 x18=0x0 sp=0x11d7fe9c0
+[thread-stacks] port=0xe837 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c7a00e0 x18=0x0 sp=0x11d8fe9c0
+[thread-stacks] port=0x4987 "wine_rpcrt4_io" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c7a40e0 x18=0x0 sp=0x123afe9d0
+[thread-stacks] port=0x10e53 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1050ebd01 x18=0x0 sp=0x16c956b30
+[thread-stacks] port=0x1175f "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x105309681 x18=0x0 sp=0x16bf32a90
+[thread-stacks] port=0x1401b "wine_wininet_collect_connections" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=1 cpu=0 x8=0xf423e x18=0x0 sp=0x10b0ffb00
+[footprint] rev=ml358 phys=800 MB (peak 1006) internal=397 MB compressed=401 MB external=184 MB reusable=23 MB (cycle=184)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c535020 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=800 MB (peak 1006) internal=397 MB compressed=401 MB external=184 MB reusable=23 MB (cycle=185)
+[footprint] rev=ml358 phys=801 MB (peak 1006) internal=400 MB compressed=400 MB external=184 MB reusable=22 MB (cycle=186)
+[footprint] rev=ml358 phys=801 MB (peak 1006) internal=399 MB compressed=400 MB external=184 MB reusable=22 MB (cycle=187)
+[winios-tree] 0x10046 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10044 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x2003e 'WineDdeEventClass' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x40030 'Shell_TrayWnd' "" style=94000000 ex=08000000 vis=1 tid=0024 win={0,636,1416,656} client={0,636,1416,656}
+[winios-tree] 0x20050 'Wine IME' "" style=84000000 ex=00000080 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[winios-tree] 0x1003a 'IME' "Default IME" style=8c000000 ex=00000000 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[freeze] alive t+788s beats=13 gaps=1 iter=1496 gen=1 threads=31 resident=606MB dbg=DEBUGGED rev=ml525
+[23:21:22.342] [INFO] detach-wait: presents=0 running=1 elapsed=788s
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=800 MB (peak 1006) internal=398 MB compressed=399 MB external=184 MB reusable=23 MB (cycle=188)
+[xp] 23:21:24.402 +789.99 dt=273 cpu=6 (thr 6) P=0 E=6 run=9 pgw=-1.0 GHz P=0.00 E=1.82 Minst=13 IPC=1.18 mJ=1 pin=0 rdKB=0 fpMB=800
+[xp] 23:21:24.708 +790.30 dt=307 cpu=5 (thr 5) P=0 E=5 run=9 pgw=-1.0 GHz P=0.00 E=1.82 Minst=11 IPC=1.12 mJ=1 pin=0 rdKB=0 fpMB=799
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 23:21:24.983 +790.58 dt=274 cpu=24 (thr 23) P=0 E=24 run=31 pgw=-1.0 GHz P=0.00 E=1.74 Minst=29 IPC=0.69 mJ=2 pin=0 rdKB=0 fpMB=799
+[xp] 23:21:25.281 +790.87 dt=298 cpu=11 (thr 11) P=1 E=11 run=33 pgw=-1.0 GHz P=1.58 E=1.82 Minst=18 IPC=0.86 mJ=1 pin=0 rdKB=0 fpMB=799
+[xp] 23:21:25.539 +791.13 dt=258 cpu=7 (thr 7) P=0 E=7 run=14 pgw=-1.0 GHz P=0.00 E=1.82 Minst=9 IPC=0.77 mJ=1 pin=0 rdKB=0 fpMB=799
+[footprint] rev=ml358 phys=799 MB (peak 1006) internal=398 MB compressed=399 MB external=184 MB reusable=23 MB (cycle=189)
+[23:21:25.833] [INFO] [session] length=793s partial=1 play=0s frames=0 stalls=0/0s peak=1007MB limit=4095MB thermal=nominal lpm=0 res=1416x656 cap=60 game=Desktop
+[xp] 23:21:25.848 +791.44 dt=310 cpu=44 (thr 41) P=0 E=44 run=80 pgw=-1.0 GHz P=0.00 E=1.82 Minst=79 IPC=0.98 mJ=4 pin=0 rdKB=4 fpMB=799
+GHz P=0.00 E=1.82 Minst=79 IPC=0.98 mJ=4 pin=0 rdKB=4 fpMB=799

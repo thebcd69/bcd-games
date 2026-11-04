@@ -288,6 +288,26 @@ func dateChecks() {
         check("a small game on that device: no note", p.notes.isEmpty, p)
         p = plan(sekiro, nil, system)
         check("the large game on a device with more room (6 GB limit): no note", p.notes.isEmpty, p)
+        // Round 630 (agent U S9; SCP: Secret Laboratory 1CKN4G): a 2.3 GB-limit device (iPhone 11/12/13 class) and an entry started from
+        // its own folder, whose size is unknown: the note too, with the graphics hint.
+        var tiny = system
+        tiny.memoryLimitBytes = 2348 << 20
+        let folderGame = BCDGame(id: "home.5c1", title: "SCP: Secret Laboratory", store: .local, state: .ready)
+        p = plan(folderGame, nil, tiny)
+        check("a 2.3 GB-limit device and an entry of unknown size: the note before Play, with the graphics hint (not a warning)",
+              p.notes.count == 1 && p.notes[0].text.hasPrefix("iOS lets apps use about ") && p.notes[0].text.contains("which is little for most PC games")
+              && p.notes[0].text.contains("BCD tries a swap file next") && p.notes[0].text.contains("lowest graphics settings") && !p.notes[0].warning, p)
+        p = plan(sekiro, nil, tiny)
+        check("a large game on the 2.3 GB device: the same note, once", p.notes.count == 1 && p.notes[0].text.contains("which is little for most PC games"), p)
+        p = plan(small, nil, tiny)
+        check("a small game of known size on the 2.3 GB device: no note", p.notes.isEmpty, p)
+        p = plan(folderGame, nil, fourGB)
+        check("the entry of unknown size on a 4 GB-limit device: no note (as before)", p.notes.isEmpty, p)
+        var tinyNoLimit = tiny
+        tinyNoLimit.increasedMemoryLimit = false
+        p = plan(folderGame, nil, tinyNoLimit)
+        check("without the increased limit on the 2.3 GB device: that install's own note instead, never both",
+              p.notes.count == 1 && p.notes[0].text.contains("lacks the increased memory limit"), p)
         var fourGBNoLimit = fourGB
         fourGBNoLimit.increasedMemoryLimit = false
         p = plan(sekiro, nil, fourGBNoLimit)

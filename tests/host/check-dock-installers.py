@@ -688,6 +688,89 @@ func pe(_ url: URL, machine: UInt16) throws {
                 "an entry recorded as provided is no longer unfinished")
         require(!(DockInstallers.note ?? "").contains("Not finished last time: dotnet"), "the note does not call a provided setup unfinished")
 
+        // ---- madeira-bcd (round 630, agent A1 S20/S12/S13): the EA app's installer waits for Wine Gecko; its install session gets the lines
+        // of BCD's own EA app flow; a skip or an unfinished run of it says the game cannot start without the EA app. A prefix and a drive of
+        // their own, so the choices and records of the scenarios above stay as they are.
+        let eaPrefix = base.appendingPathComponent("ea-scenario/wine"), eaDrive = eaPrefix.appendingPathComponent("drive_c")
+        let eaCommon = eaDrive.appendingPathComponent("Program Files (x86)/Steam/steamapps/common")
+        try write(eaPrefix.appendingPathComponent("system.reg"), "WINE REGISTRY Version 2\n\n")
+        try write(eaPrefix.appendingPathComponent("user.reg"), "WINE REGISTRY Version 2\n\n")
+        func eaGame(_ id: Int, _ name: String) throws -> DockGame {
+            let g = DockGame(id: id, name: name, installDir: name, library: "Program Files (x86)/Steam/steamapps", installed: true, customExecutables: false)
+            try write(eaCommon.appendingPathComponent(name + "/installscript.vdf"),
+                      "\"installscript\" { \"run process\" {" +
+                      " \"EA app\" { \"process 1\" \"%INSTALLDIR%\\\\__Installer\\\\Origin\\\\redist\\\\internal\\\\EAappInstaller.exe\" }" +
+                      " \"runtime\" { \"process 1\" \"%INSTALLDIR%\\\\Setup\\\\vc.exe\" }" +
+                      " } }")
+            try pe(eaCommon.appendingPathComponent(name + "/__Installer/Origin/redist/internal/EAappInstaller.exe"), machine: 0x14c)
+            try pe(eaCommon.appendingPathComponent(name + "/Setup/vc.exe"), machine: 0x14c)
+            return g
+        }
+        func eaBatch() -> String { (try? String(contentsOf: eaDrive.appendingPathComponent("bcd-dock-installers.cmd"), encoding: .utf8)) ?? "" }
+        let noGecko = try eaGame(7020, "NoGecko")
+        DockInstallers.prepare(noGecko, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: false, fusionSource: nil)
+        require(!eaBatch().contains("EAappInstaller.exe") && eaBatch().contains("vc.exe") && !DockInstallers.eaInstallSession,
+                "no Wine Gecko: the EA app's installer is held back, the other program runs, and the session gets no EA lines")
+        require(logged("app=7020 program=ea app file=EAappInstaller.exe status=unsupported reason=needs-Wine's-HTML-engine;-download-it-in-Settings-›-HTML-engine-for-installers") &&
+                logged("app=7020 program=ea app held: file=EAappInstaller.exe is the EA app's installer, which shows a web page, and this device has no Wine Gecko") &&
+                (DockInstallers.note ?? "").contains("Not supported by this build: ea app (needs Wine's HTML engine; download it in Settings › HTML engine for installers)"),
+                "no Wine Gecko: the log and the note say where to get it (\(DockInstallers.note ?? "-"))")
+        let withGecko = try eaGame(7021, "WithGecko")
+        DockInstallers.prepare(withGecko, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: true, fusionSource: nil)
+        require(eaBatch().contains("EAappInstaller.exe") && DockInstallers.runsEAAppInstaller && DockInstallers.eaInstallSession,
+                "with Wine Gecko the EA app's installer runs, and its session takes the EA app's lines")
+        setenv("MADEIRA_DOCK_EA_SESSION", "0", 1)
+        require(!DockInstallers.eaInstallSession, "MADEIRA_DOCK_EA_SESSION=0: no EA lines")
+        unsetenv("MADEIRA_DOCK_EA_SESSION")
+        setenv("MADEIRA_DOCK_EA_GECKO", "0", 1)
+        let oldWay = try eaGame(7022, "OldWay")
+        DockInstallers.prepare(oldWay, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: false, fusionSource: nil)
+        require(eaBatch().contains("EAappInstaller.exe") && !logged("app=7022 program=ea app held"), "MADEIRA_DOCK_EA_GECKO=0: the installer runs as before")
+        unsetenv("MADEIRA_DOCK_EA_GECKO")
+        // A start whose choice is Skip: the note says the game cannot start without the EA app.
+        let skipEA = try eaGame(7023, "SkipEA")
+        DockInstallers.setRunsNext(7023, false, prefix: eaPrefix)
+        DockInstallers.prepare(skipEA, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: true, fusionSource: nil)
+        require((DockInstallers.note ?? "").hasPrefix("The one-time installs were skipped this time.") &&
+                (DockInstallers.note ?? "").contains("This game cannot start without the EA app, whose installer is one of them."),
+                "a skip that leaves out the EA app's installer says the game cannot start without it (\(DockInstallers.note ?? "-"))")
+        // An unfinished EA installer (an earlier batch saw no exit) that does not run at this start: the note says so.
+        let unfinishedEA = try eaGame(7024, "UnfinishedEA")
+        var eaLedger = DockInstallLedger.load(prefix: eaPrefix); eaLedger.setUnfinished(7024, ["ea app"]); try eaLedger.save(prefix: eaPrefix)
+        DockInstallers.setRunsNext(7024, false, prefix: eaPrefix)
+        DockInstallers.prepare(unfinishedEA, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: true, fusionSource: nil)
+        require((DockInstallers.note ?? "").contains("Not finished last time: ea app") &&
+                (DockInstallers.note ?? "").contains("This game cannot start without the EA app: pick Run at next start so its installer runs again."),
+                "an unfinished EA app installer: the note says the game cannot start without it (\(DockInstallers.note ?? "-"))")
+        // A skip without the EA app's installer says nothing of it.
+        let plainGame = DockGame(id: 7025, name: "PlainSkip", installDir: "PlainSkip", library: "Program Files (x86)/Steam/steamapps", installed: true, customExecutables: false)
+        try write(eaCommon.appendingPathComponent("PlainSkip/installscript.vdf"), "\"installscript\" { \"run process\" { \"runtime\" { \"process 1\" \"%INSTALLDIR%\\\\Setup\\\\vc.exe\" } } }")
+        try pe(eaCommon.appendingPathComponent("PlainSkip/Setup/vc.exe"), machine: 0x14c)
+        DockInstallers.setRunsNext(7025, false, prefix: eaPrefix)
+        DockInstallers.prepare(plainGame, drive: eaDrive, prefix: eaPrefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, hasGecko: true, fusionSource: nil)
+        require((DockInstallers.note ?? "").hasPrefix("The one-time installs were skipped this time.") && !(DockInstallers.note ?? "").contains("EA app"),
+                "a skip of other installers names no EA app (\(DockInstallers.note ?? "-"))")
+        // The install session's config: the EA lines are added to the copy, each only when the game's file has no line with its key.
+        let cfgDir = base.appendingPathComponent("ea-cfg", isDirectory: true)
+        try FileManager.default.createDirectory(at: cfgDir, withIntermediateDirectories: true)
+        let gameCfg = cfgDir.appendingPathComponent("game.cfg")
+        try write(gameCfg, "# the game's own lines\nenv.LC_ALL = de_DE.UTF-8\nenv.MADEIRA_SC_PA_POOLS = 2\nswap-mb = 4096\n")
+        setenv("MADEIRA_CFG_GAME", gameCfg.path, 1); setenv("MADEIRA_DOCK_INSTALLS_SESSION", "1", 1)
+        let eaLines = ["env.LC_ALL = en_US.UTF-8", "env.MADEIRA_APC_BUSY_QUEUE = 1", "pool-split = 1"]
+        let applied = DockInstallers.applyInstallSessionConfig(extra: eaLines, directory: cfgDir)
+        let copyText = (try? String(contentsOf: cfgDir.appendingPathComponent("bcd-game-installs.cfg"), encoding: .utf8)) ?? ""
+        require(applied.dropped == ["env.MADEIRA_SC_PA_POOLS"] && applied.added == ["env.MADEIRA_APC_BUSY_QUEUE = 1", "pool-split = 1"] &&
+                copyText.contains("env.LC_ALL = de_DE.UTF-8") && !copyText.contains("en_US") && copyText.contains("env.MADEIRA_APC_BUSY_QUEUE = 1") &&
+                copyText.contains("pool-split = 1") && copyText.contains("swap-mb = 4096") && !copyText.contains("MADEIRA_SC_PA_POOLS") &&
+                ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"] == cfgDir.appendingPathComponent("bcd-game-installs.cfg").path,
+                "the install session's copy keeps the game's own lines, drops the holds and adds the EA lines it lacks (\(applied))")
+        try write(gameCfg, "swap-mb = 4096\n")
+        setenv("MADEIRA_CFG_GAME", gameCfg.path, 1)
+        let plainCopy = DockInstallers.applyInstallSessionConfig(directory: cfgDir)
+        require(plainCopy.dropped.isEmpty && plainCopy.added.isEmpty && ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"] == gameCfg.path,
+                "no hold and no EA lines: the game's file is used as it is")
+        unsetenv("MADEIRA_DOCK_INSTALLS_SESSION"); unsetenv("MADEIRA_CFG_GAME")
+
         // ---- madeira-bcd (round 579, ajan7-installers): DirectX's setup that failed once, and the choice after a session that never started
         require(["C:\\x\\DXSETUP.exe", "C:\\x\\DXSetup.exe", "C:\\x\\dxsetup.exe", "C:\\x\\DXWebSetup.exe", "dxsetup.exe"].allSatisfy { DockInstallScripts.isDirectXSetup($0) } &&
                 !["C:\\x\\dxsetup.msi", "C:\\x\\mydxsetup.exe", "C:\\DirectX\\setup.exe", "C:\\x\\dxsetup.exe.bak", "C:\\x\\vcredist_x86.exe",
@@ -829,6 +912,30 @@ func pe(_ url: URL, machine: UInt16) throws {
         out = since(mark)
         require(out.contains("statuses=240240=unfinished,101093031=not-started") && out.contains("app=7024 choice=skip pending=2 why=unfinished") && !out.contains("choice=run again") &&
                 DockInstallers.script == nil, "an installer that never closed: skipped as before, the way out of the stall hint")
+        // Round 630 (agent A1 S15; FRKBN1): the same batch, cut short by a session that went to the background 14 s after its start and
+        // ended there: counted as not run, offered once more, the note says why; 45 s in the background: skipped as before.
+        let cut14 = try dxGame(7091, "Cut14", rockEntries)
+        start(cut14)
+        try putResult("begin 2 \r\nservices started\r\nstart 1 240240 \r\n")
+        DockInstallers.previousSessionBackgroundAfter = 14
+        mark = now()
+        start(cut14)
+        out = since(mark)
+        require(out.contains("statuses=240240=unfinished,101093031=not-started") && out.contains("app=7091 the last session went to the background 14 s after its start")
+                && out.contains("app=7091 choice=run again") && DockInstallers.script != nil
+                && (DockInstallers.note ?? "").hasPrefix("The one-time installs were cut short last time (BCD went to the background), so they run again now. ")
+                && !(DockInstallers.note ?? "").contains("Not finished last time"),
+                "a batch cut short in the background within 30 s: offered once more with its own words (\(DockInstallers.note ?? "-"))")
+        let cut45 = try dxGame(7092, "Cut45", rockEntries)
+        start(cut45)
+        try putResult("begin 2 \r\nservices started\r\nstart 1 240240 \r\n")
+        DockInstallers.previousSessionBackgroundAfter = 45
+        mark = now()
+        start(cut45)
+        out = since(mark)
+        require(out.contains("app=7092 choice=skip pending=2 why=unfinished") && !out.contains("choice=run again") && !out.contains("app=7092 the last session went")
+                && DockInstallers.script == nil, "a batch whose session went to the background later (45 s): skipped as before")
+        DockInstallers.previousSessionBackgroundAfter = nil
         // A choice the user makes after the interrupted session wins.
         let rock5 = try dxGame(7025, "Rock5", rockEntries)
         start(rock5)

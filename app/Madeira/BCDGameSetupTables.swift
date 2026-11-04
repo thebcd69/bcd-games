@@ -146,10 +146,10 @@ enum BCDFEXPresets {
 
     static let all: [BCDFEXPreset] = [
         BCDFEXPreset(id: "stability", title: "Stability",
-                     note: "Memory is ordered as an Intel processor orders it, vector and block-copy accesses included; unaligned accesses are not cut down to half barriers; code is translated in small blocks. The slowest choice, for a game that fails on some runs and not on others.",
+                     note: "Memory is ordered as an Intel processor orders it, vector and block-copy accesses included; unaligned accesses are not cut down to half barriers; code is translated in small blocks. The slowest choice, for a game that fails on some runs and not on others. Every 16 bytes a game copies or clears costs a memory barrier here, so a game that moves megabytes a frame can fall to a few frames per second.",
                      lines: [tso: "1", vector: "1", memcpy: "1", halfBarrier: "0", multiblock: "0"]),
         BCDFEXPreset(id: "compatibility", title: "Compatibility",
-                     note: "Vector and block-copy accesses are ordered too, with the usual way of translating blocks. For a game that needs the strict order and runs fast enough.",
+                     note: "Vector and block-copy accesses are ordered too, with the usual way of translating blocks. For a game that needs the strict order and runs fast enough. Block copies are ordered too, which is slower for a game that copies a lot.",
                      lines: [tso: "1", vector: "1", memcpy: "1", halfBarrier: "1", multiblock: "1"]),
         BCDFEXPreset(id: "performance", title: "Performance",
                      note: "Loads and stores are ordered, but vector and block-copy accesses are not: fewer barriers, a faster processor side. Six of BCD's tested lists switch vector ordering off. A game that breaks only sometimes may need Stability instead.",

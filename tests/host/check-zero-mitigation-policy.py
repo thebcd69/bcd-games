@@ -193,7 +193,8 @@ else:
 # ---------------------------------------------------------------- 2. the list
 recs = json.loads((root / 'recommended/recommendations.json').read_text())
 carrying = [r['id'] for r in recs['rules'] if NAME in json.dumps(r.get('config', []))]
-check('only glyphica-typing-survival carries the line', carrying == ['glyphica-typing-survival'], str(carrying))
+# Round 630 (agent U S2): Football Manager 27 v2 carries it too (an experiment, from build 630).
+check('only glyphica-typing-survival and (round 630) football-manager-27 carry the line', carrying == ['glyphica-typing-survival', 'football-manager-27'], str(carrying))
 rule = next((r for r in recs['rules'] if r['id'] == 'glyphica-typing-survival'), None)
 # Round 624: the public build 600 does not know the key and refused the whole online list because of the line (checked with its own code,
 # ~/madeira-local/check-list-old-builds.py), so the line is from build 601 on (version 2); the rule itself stays new in build 600.
@@ -222,6 +223,11 @@ _r624 = ['control', 'no-more-room-in-hell', 'red-faction', 'from-the-darkness', 
          'borderlands-goty-enhanced', 'dead-space-2023', 'schedule-i', 'dokimon-quest', 'sonic-adventure-dx', 'requiem-avenging-angel', 'friends-vs-friends', 'fallout-4-other', 'skyrim-special-edition-other', 'wrc-9', 'doki-doki-literature-club',
          'outlast-2', 'batman-arkham-knight', 'dead-rising', 'reanimal', 'pragmata', 'what-lies-in-the-multiverse', 'muv-luv-photonflowers',
          'nioh-2', 'ghpc', 'murder-miners', 'crosscode', 'dead-island-definitive', 'football-manager-27',
+         # round 630: the log review's new lists, before Modern Warfare 2's
+         'dead-or-alive-6', 'fifa-22', 'darksiders-warmastered-edition', 'grandchase', 'rotfront', 'bioshock', 'aliens-colonial-marines',
+         'hitman-blood-money', 'hitman-contracts', 'guacamelee-gold', 'nfs-porsche-unleashed', 'resident-evil-5', 'stalker-xray-engine',
+         'tales-of-zestiria', 'the-witcher-enhanced-edition', 'cult-of-the-lamb', 'baldurs-gate-3', 'vampire-bloodlines', 'goldsrc-hl-exe',
+         'arcade-paradise', 'toem', 'bendy-and-the-ink-machine', 'shroom-and-gloom', 'peak', 'tekken-7',
          'call-of-duty-modern-warfare-2-2009', 'cyberpunk-2077', 'deadlock',
          'power-drill-massacre', 'hellblade-senuas-sacrifice', 'valheim', 'overcooked-2',
          'oxygen-not-included', 'caravan-sandwitch', 'dragon-age-origins', 'reskate', 'haak',
@@ -229,7 +235,9 @@ _r624 = ['control', 'no-more-room-in-hell', 'red-faction', 'from-the-darkness', 
 _ids = [r['id'] for r in recs['rules']]
 check('the rule stands before "standard" (the last rule), after it only the round-602 lists, The Adventures of Elliot and the round-620/623 lists',
       _ids[_ids.index('glyphica-typing-survival'):] == ['glyphica-typing-survival', 'grand-theft-auto-iii', 'postal-2', 'hotline-miami', 'max-payne-2',
-                                                      'pico-park', 'dont-starve-together', 'a-hat-in-time', 'the-adventures-of-elliot'] + _r620 + _r624 + ['standard'])
+                                                      'pico-park', 'dont-starve-together', 'a-hat-in-time', 'the-adventures-of-elliot'] + _r620 + _r624
+      + ['the-wolf-among-us-remastered', 'sable', 'the-darkside-detective-2', 'payday-2', 'halo-the-master-chief-collection',   # round 630 (T2, G2, D)
+         'football-manager-26'] + ['standard'])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)
 case = re.search(r'case "MADEIRA_WINTYPES"[^\n]*"%s":(.*?)guard value == "0" \|\| value == "1"' % NAME, pol, re.S)
@@ -255,7 +263,8 @@ if rr:
     check('its evidence names this check and the fixture', any('check-zero-mitigation-policy' in e for e in x['evidence'])
           and any('glyphica-chakracore-failfast' in e for e in x['evidence']))
 others = [x['id'] for x in mod.RULES if NAME in json.dumps(x.get('lines', []))]
-check('no other auto-tune rule adds the line', others == [RULE], str(others))
+# Round 630 (agent U S2): Football Manager 27's experiment rule adds it too (its own signals: the plugin and the refused block).
+check('no other auto-tune rule adds the line but Football Manager 27\'s', sorted(others) == sorted([RULE, 'football-manager-27-mitigation-policy-wild-call']), str(others))
 fixtures = root / 'tests/fixtures/autotune'
 matching = [p.name for p in sorted(fixtures.glob('*.expect')) if RULE in json.loads(p.read_text()).get('matched', [])]
 # round 624 (agent E2 S3): J9JDBG (build 623) failed the same way with the key set; the rule now also gives the fork's kernelbase
@@ -279,7 +288,9 @@ for sub in ('app', 'build', 'tools', 'madeira-d3d12', 'madeira-dock'):
 allowed = {'app/Madeira/GameRecommendationsList.swift', 'app/Madeira/ConfigCatalog.generated.swift', 'app/Madeira/AutoTuneRules.generated.swift',
            'build/tools/autotune_rules.py', 'build/tools/gen-config-catalog.py',
            # round 624 (agent E2 S3): the build of kernelbase-optin.dll and its check name the switch they ship
-           'tools/build-wine-extra-dlls.sh', 'tools/verify-kernelbase-optin.py'}
+           'tools/build-wine-extra-dlls.sh', 'tools/verify-kernelbase-optin.py',
+           # round 630 (agent U S2): the bridge adds the opt-in kernelbase when the key is 1
+           'app/Madeira/WineProcessBridge.m'}
 check('only the policy, the catalog and auto-tune name it in the app and build sources', set(users) <= allowed, str(sorted(set(users) - allowed)))
 cat = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()
 check('the settings catalog knows the key, off by default', re.search(r'key: "env\.%s".*kind: \.bool, defaultValue: "0"' % NAME, cat) is not None)

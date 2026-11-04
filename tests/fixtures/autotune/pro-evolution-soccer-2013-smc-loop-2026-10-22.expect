@@ -2,12 +2,13 @@
  "dialogs": [],
  "end": {},
  "matched": [
-  "wow-rwx-plain-smc"
+  "wow-rwx-plain-smc",
+  "lse-atomic-store-undecoded"
  ],
  "next": [
   "env.MADEIRA_WOW_RWX_PLAIN = 1"
  ],
- "note": "Pro Evolution Soccer 2013 (local, 32-bit) build 580, iPhone15,2: the same self-modifying-code fault is handled 2,000 times and the redelivery guard ends the process; the log has no [store-noalias] line, so wow-rwx-plain-smc did not match until it also took 256 handled-SMC lines",
+ "note": "Pro Evolution Soccer 2013 (local, 32-bit) build 580, iPhone15,2: the same self-modifying-code fault is handled 2,000 times and the redelivery guard ends the process; the log has no [store-noalias] line, so wow-rwx-plain-smc did not match until it also took 256 handled-SMC lines Round 630: lse-atomic-store-undecoded also matches here, last (the lowest-priority rules; the verdict is unchanged).",
  "outcome": "crashed",
  "stage": 2,
  "status": "trying"

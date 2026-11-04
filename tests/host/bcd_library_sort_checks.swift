@@ -29,7 +29,7 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
             game("c", "Hollow Knight", size: 9_100_000_000, played: 60, added: 1),
             game("d", "Portal 2", .notInstalled, size: 12_800_000_000),
             game("e", "Astro", size: 50_000_000, played: 100),
-            game("f", "Breakneck", .downloading(progress: 0.2), size: 2_400_000_000, added: 12),
+            game("f", "Bastion", .downloading(progress: 0.2), size: 2_400_000_000, added: 12),
         ]
         func ids(_ sort: BCDLibrarySort, _ games: [BCDGame]? = nil) -> String { sort.sorted(games ?? list).map(\.id).joined() }
 

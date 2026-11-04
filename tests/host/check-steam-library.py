@@ -180,8 +180,14 @@ require(watch.index('MadeiraDock.cleanup()') < watch.index('SteamOwnedLibrary.sh
         "the connection may come back only when the Dock host's report or session is over")
 owned_model = sources['SteamOwnedLibrary.swift']
 prepare = block(owned_model, 'func prepareDock() async')
-require(prepare.index('sessionChanged(active: true)') < prepare.index('await running?.value') < prepare.index('await gate.holdForDock()'),
+require(prepare.index('sessionChanged(active: true)')
+        < prepare.index('if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await running.value }) {')
+        < prepare.index('if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await gate.holdForDock() }) {'),
         'prepareDock pauses downloads, waits for the running one, then waits for the connection to close')
+# Round 630 (agent A1 S17; PYVTE8): each wait is bounded (30 s; the healthy hand-offs took 1.6 s at most) and says how it ended.
+require('static let dockStepLimit: Double = 30' in owned_model and prepare.count('SteamLog.event(') == 4
+        and 'did not end in' in prepare and 'connection closed for BCD Dock' in prepare,
+        'prepareDock bounds both waits and logs each ending')
 changed = block(owned_model, 'func sessionChanged(active running: Bool)')
 require('guard gate.reopen(sessionRunning: false) else { return }' in changed and 'gate.close()' in changed
         and 'session.resume()' not in changed and 'session.suspend()' not in changed,
@@ -787,6 +793,16 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     require(events == ["logoff-sent", "socket-closed", "sign-in-transfer-written"],
             "a Dock start during a session's close waits for that close: \(events)")
     gate.releaseDock(); gate.reopen(sessionRunning: false)
+    // Round 630 (agent A1 S17): a bounded wait answers true for work that ends in time, false for work that does not, and lets it go on.
+    @MainActor final class Flag { var on = false }
+    let finished = Flag()
+    let quick = await SteamConnectionGate.endsWithin(seconds: 2) { try? await Task.sleep(nanoseconds: 20_000_000) }
+    let slowStart = Date()
+    let slow = await SteamConnectionGate.endsWithin(seconds: 0.2) { try? await Task.sleep(nanoseconds: 600_000_000); finished.on = true }
+    let slowTook = Date().timeIntervalSince(slowStart)
+    require(quick && !slow && slowTook < 0.5 && !finished.on, "a bounded wait: quick work true, slow work false after the limit (\(slowTook) s)")
+    try? await Task.sleep(nanoseconds: 700_000_000)
+    require(finished.on, "the slow work went on by itself after the bounded wait gave up")
 
     // ---- app info: depot selection
     let full = appVDF(#"""

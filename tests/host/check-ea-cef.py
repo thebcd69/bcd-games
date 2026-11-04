@@ -153,7 +153,8 @@ swift_users = sorted(p.name for p in (root / 'app/Madeira').glob('*.swift')
 check(swift_users == ['BCDLaunchers.swift'], 'in the app only the launcher table names env.MADEIRA_EA_CEF', swift_users)
 bn = launchers[launchers.index('static let battlenet = BCDLauncherSpec('):launchers.index('/// Electronic Arts\' EA app.')]
 check('MADEIRA_EA_CEF' not in bn and 'MADEIRA_SC_PA_POOLS' not in bn, 'Battle.net\'s entry has neither line')
-check(launchers.count('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"]') == 1,
+# Round 630 (agent A2 S9; BPAGVS, H22TJN): the installed launcher also drops a released view's alias records (MADEIRA_ALIAS_RELEASE).
+check(launchers.count('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1", "env.MADEIRA_ALIAS_RELEASE = 1"]') == 1,
       'the EA app\'s entry sets layout 2 and the switch, in the lines only its installed launcher gets')
 gen = (root / 'build/tools/gen-config-catalog.py').read_text()
 check(all('"env.%s"' % k in gen for k in ('MADEIRA_EA_CEF', 'MADEIRA_EA_CEF_FLAGS', 'MADEIRA_EA_CEF_CMDLINE')),

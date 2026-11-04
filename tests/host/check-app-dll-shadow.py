@@ -142,16 +142,22 @@ int main(void) {
         else:
             print(b.stderr[-2000:])
 
-gate = ('    if (pi->machine != IMAGE_FILE_MACHINE_AMD64 || pi->is_hybrid || pi->wine_builtin) return FALSE;\n'
-        '    if (!ios_is_arm64ec_cur()) return FALSE;\n')
-check("the gate stays: plain x64 images in an x64 (ARM64EC) process", gate in fn)
-check("unset, the early return keeps its old condition (MADEIRA_APP_UCRT=1 turns the ucrt refusal off)",
+gate = ('    if (pi->is_hybrid || pi->wine_builtin) return FALSE;\n'
+        '    if (!wow32 && pi->machine != IMAGE_FILE_MACHINE_AMD64) return FALSE;\n'
+        '    if (!wow32 && !ios_is_arm64ec_cur()) return FALSE;\n')
+check("the gate: plain x64 images in an x64 (ARM64EC) process, and (round 630, O2 S1) plain i386 images",
+      gate in fn and "const BOOL wow32 = (pi->machine == IMAGE_FILE_MACHINE_I386);" in fn)
+check("unset, the early return keeps its old condition (MADEIRA_APP_UCRT=1 turns the ucrt refusal off); an i386 image without the "
+      "key returns before any work (round 630)",
       'shadow = getenv( "MADEIRA_APP_DLL_SHADOW" );' in fn and
-      "    if (shadow && !*shadow) shadow = NULL;\n    if (opt && !shadow) return FALSE;\n" in fn and
-      fn.count("return FALSE;") == 5)
-check("the ucrtbase refusal is unchanged apart from its MADEIRA_APP_UCRT guard",
-      "    if (!opt && name && len == sizeof(ucrt) - 1)\n" in fn and
+      "    if (shadow && !*shadow) shadow = NULL;\n    if (wow32 && !shadow) return FALSE;\n    if (opt && !shadow) return FALSE;\n" in fn and
+      fn.index("if (wow32 && !shadow) return FALSE;") < fn.index("get_mapping_info( handle") and
+      fn.count("return FALSE;") == 7)
+check("the ucrtbase refusal is unchanged apart from its MADEIRA_APP_UCRT guard and stays x64-only",
+      "    if (!wow32 && !opt && name && len == sizeof(ucrt) - 1)\n" in fn and
       '"[ucrt-shadow] %s: plain x64 ucrtbase.dll outside the system farm' in fn)
+check("the line says which kind of DLL it refused", '"[app-dll-shadow] %s: plain %s DLL %s, named by "' in fn
+      and 'debugstr_us(&nt_name), wow32 ? "i386" : "x64",' in fn)
 blk = fn[fn.index("if (!ret && shadow"):]
 check("the new refusal needs the list, a listed name and a path outside \\windows\\ (or directly in system32), and logs [app-dll-shadow]",
       blk.index("ios_app_dll_listed( shadow, name, len )") < blk.index("!ios_path_in_windows(") <

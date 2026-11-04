@@ -3,10 +3,11 @@
  "end": {},
  "matched": [
   "anon-alias-cas",
-  "dock-game-died-session-open"
+  "dock-game-died-session-open",
+  "lse-atomic-store-undecoded"
  ],
  "next": [],
- "note": "Jetboard Joust (MonoGame on a self-contained CoreCLR, Steam through BCD Dock), build 578, iPad16,3 (Send Logs 5QQ3XX, 5WG4FG, N4F8JR): the CLR patches its own code in an RWX page with a 64-bit compare-and-swap (CASAL, insn 0xc8e8ff60) that the store emulator does not decode ([store-undecoded] #1, 'ADD THIS ENCODING'), 200+ unhandled faults follow and the process ends with c000001d. fex-avx-on matched on that exit code and was tried (N4F8JR 'tried fex-avx-on: reverted'; 5QQ3XX already ran with FEX_AVX=1 and died the same): the rule now has a none signal for [store-undecoded]. The fix is in code (signal_arm64_ios.c, the CAS in the anon-alias branch), not a line. Round 580 merge (lead): with both the fex-avx-on guard (ajan9/lists) and the anon-alias CAS rule (ajan9/motor), the log matches anon-alias-cas and dock-game-died-session-open; fex-avx-on no longer fires.",
+ "note": "Jetboard Joust (MonoGame on a self-contained CoreCLR, Steam through BCD Dock), build 578, iPad16,3 (Send Logs 5QQ3XX, 5WG4FG, N4F8JR): the CLR patches its own code in an RWX page with a 64-bit compare-and-swap (CASAL, insn 0xc8e8ff60) that the store emulator does not decode ([store-undecoded] #1, 'ADD THIS ENCODING'), 200+ unhandled faults follow and the process ends with c000001d. fex-avx-on matched on that exit code and was tried (N4F8JR 'tried fex-avx-on: reverted'; 5QQ3XX already ran with FEX_AVX=1 and died the same): the rule now has a none signal for [store-undecoded]. The fix is in code (signal_arm64_ios.c, the CAS in the anon-alias branch), not a line. Round 580 merge (lead): with both the fex-avx-on guard (ajan9/lists) and the anon-alias CAS rule (ajan9/motor), the log matches anon-alias-cas and dock-game-died-session-open; fex-avx-on no longer fires. Round 630: lse-atomic-store-undecoded also matches here, last (the lowest-priority rules; the verdict is unchanged).",
  "outcome": "crashed",
  "stage": 3,
  "status": "known"

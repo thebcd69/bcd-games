@@ -55,7 +55,8 @@ extension BCDTouchAction {
 extension BCDTouchItem {
     init(stored c: TouchControl) {
         self.init(id: c.id, x: c.nx, y: c.ny, scale: c.scale, action: BCDTouchAction(stored: c.action), padLink: c.padBinding,
-                  locked: c.locked == true)
+                  locked: c.locked == true, customShape: BCDTouchCustomShape(name: c.face?.shape, aspect: c.face?.aspect),
+                  customText: BCDTouchText.clean(c.face?.text))
     }
 
     var stored: TouchControl {
@@ -67,7 +68,26 @@ extension BCDTouchItem {
         c.action = action.stored
         c.padBinding = padLink
         c.locked = locked ? true : nil   // never written as false: a layout with nothing locked is the file it always was
+        c.face = TouchControl.Face.from(shape: customShape, text: customText)
         return c
+    }
+}
+
+extension TouchControl.Face {
+    /// The stored look for the player's shape and words; nil when there is neither, so a control without a look of its
+    /// own is written as it always was.
+    static func from(shape: BCDTouchCustomShape?, text: String?) -> TouchControl.Face? {
+        let face = TouchControl.Face(shape: shape?.name, aspect: shape?.aspect, text: BCDTouchText.clean(text))
+        return face.isEmpty ? nil : face
+    }
+}
+
+extension TouchControl {
+    /// The player's own shape as drawn, where it counts (never on a stick): the overlay window's hit test and the HUD's
+    /// room for the controls ask it (TouchControlsModel), without the rest of the view value.
+    var bcdOwnShape: BCDTouchShape? {
+        guard let face, let shape = BCDTouchCustomShape(name: face.shape, aspect: face.aspect) else { return nil }
+        return BCDTouchAction(stored: action).isStick ? nil : shape.drawn
     }
 }
 
@@ -177,6 +197,23 @@ extension BCDTouchItem {
     func setAction(_ id: UUID, _ action: BCDTouchAction) { update(id) { $0.action = action.stored } }
     func setScale(_ id: UUID, _ scale: Double) { update(id) { if $0.locked != true { $0.scale = BCDTouchGeometry.clampScale(scale) } } }
     func setLocked(_ id: UUID, _ locked: Bool) { update(id) { $0.locked = locked ? true : nil } }
+
+    /// A shape changes the control's size, so a locked control keeps its own; its words stay as they are.
+    func setCustomShape(_ id: UUID, _ shape: BCDTouchCustomShape?) {
+        update(id) { c in
+            guard c.locked != true else { return }
+            let face = TouchControl.Face(shape: shape?.name, aspect: shape?.aspect, text: c.face?.text)
+            c.face = face.isEmpty ? nil : face
+        }
+    }
+
+    /// The words, cleaned (BCDTouchText); empty words take them off. Its shape, even one this build does not know, stays.
+    func setCustomText(_ id: UUID, _ text: String?) {
+        update(id) { c in
+            let face = TouchControl.Face(shape: c.face?.shape, aspect: c.face?.aspect, text: BCDTouchText.clean(text))
+            c.face = face.isEmpty ? nil : face
+        }
+    }
 
     /// In front of (last) or behind (first) the other controls: the list is the layer order.
     func bringToFront(_ id: UUID) { reorder(id, toFront: true) }

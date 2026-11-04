@@ -262,6 +262,19 @@ with tempfile.TemporaryDirectory() as t:
     assert "start armed=1" in out and "placeholders=1" in out, out + err   # 0x72 is the holdback
     print("PASS: MADEIRA_WOW_PLACEHOLDERS=1 restores ahead-of-time placeholders, bounded on a small map")
 
+    # Round 630 (agent R S4, GTA IV through BCD Dock): MADEIRA_WOW_PLACEHOLDER_SLOTS reserves exactly that many windows (at most 2),
+    # for a 64-bit launcher chain that starts one 32-bit game; without the key a 64-bit session reserves nothing, as before.
+    out, err = run(exe, "64bit", TABLET, env={"MADEIRA_WOW_PLACEHOLDER_SLOTS": "1"})
+    assert "start armed=1" in out and "placeholders=1" in out, out + err
+    assert "MADEIRA_WOW_PLACEHOLDER_SLOTS=1: 1 window(s) reserved at the session start rev=r630" in err, err
+    out, err = run(exe, "64bit", TABLET, env={"MADEIRA_WOW_PLACEHOLDER_SLOTS": "7"})
+    assert "start armed=1" in out and "placeholders=2" in out, out + err   # clamped to 2
+    out, err = run(exe, "64bit", BIG, env={"MADEIRA_WOW_PLACEHOLDER_SLOTS": "1"})
+    assert "start armed=1" in out and "placeholders=1" in out, out + err
+    out, err = run(exe, "64bit", BIG)
+    assert "start armed=0" in out and "placeholders=0" in out and "rev=r630" not in err, out + err
+    print("PASS: MADEIRA_WOW_PLACEHOLDER_SLOTS reserves exactly 1 or 2 windows at the start; unset, a 64-bit session reserves none")
+
     out, err = run(exe, "bias", BIG)      # no holdback: 0x71 is taken by the first process, 0x72 is the candidate
     assert "bias end=7200000000" in out, out + err
     print("PASS: once armed, top-down furniture is kept below the free candidate slot")

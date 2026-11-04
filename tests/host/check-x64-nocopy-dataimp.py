@@ -171,13 +171,15 @@ check("the catalog documents it, off by default",
 recs = json.loads((root / "recommended/recommendations.json").read_text())
 carriers = sorted(r["id"] for r in recs["rules"] if "MADEIRA_X64_NOCOPY_DATAIMP" in json.dumps(r["config"]))
 pp = next((r for r in recs["rules"] if r["id"] == "poppy-playtime"), None)
-check("only Poppy Playtime's row sets it, from build 626", carriers == ["poppy-playtime"] and pp is not None
+# Round 630 (agent G1 S4): the REDlauncher of The Witcher 3 and Cyberpunk 2077 (7Q6RTY) stops the same way; their rows carry it too.
+check("only Poppy Playtime's, (round 630) Cyberpunk 2077's and The Witcher 3's rows set it, Poppy Playtime's from build 626",
+      carriers == ["cyberpunk-2077", "poppy-playtime", "the-witcher-3"] and pp is not None
       and {"line": "env.MADEIRA_X64_NOCOPY_DATAIMP = 1", "minBuild": 626} in pp["config"], carriers)
 rules = (root / "build/tools/autotune_rules.py").read_text()
 r = rules[rules.index('"id": "x64-nocopy-unbound-data-import"'):] if '"id": "x64-nocopy-unbound-data-import"' in rules else ""
 r = r[:r.index("\n    },")] if r else ""
 check("auto-tune adds the line after the launcher's read of std::cout's PE copy",
-      '"lines": ["env.MADEIRA_X64_NOCOPY_DATAIMP = 1"]' in r and "mapped without a pool copy" in r and "msvcp140.dll+0xe4" in r, r[:400])
+      '"lines": ["env.MADEIRA_X64_NOCOPY_DATAIMP = 1"]' in r and "mapped without a pool copy" in r and "msvcp140.dll+0xe" in r, r[:400])   # round 630: any stream object
 exp = root / "tests/fixtures/autotune/poppy-playtime-nocopy-cout-2026-10-31.expect"
 check("the fixture is there and expects the line", exp.is_file() and json.loads(exp.read_text()).get("next") == ["env.MADEIRA_X64_NOCOPY_DATAIMP = 1"])
 wf = (root / ".github/workflows/build-ipa.yml").read_text()

@@ -14,6 +14,9 @@ import UIKit
 ///   touch-picker    the bar's layout picker
 ///   touch-menu      the section an in-game menu shows (BCDTouchMenuSection)
 ///   touch-off       no controls (for a footprint comparison)
+///   touch-custom    controls with shapes and words of their own (circle, square, rectangles, long and short words)
+///   touch-look      the editor on a control's Look tab (a rectangle with words)
+///   touch-text      the card a control's words are typed in
 /// BCDTouchPreviewModel also stands in for the engine in other previews (an in-game menu).
 @MainActor final class BCDTouchPreviewModel: ObservableObject, BCDTouchInput, BCDTouchEditorActions, BCDTouchMenuActions {
     @Published var items: [BCDTouchItem] = []
@@ -31,9 +34,9 @@ import UIKit
     }
 
     /// The sample laid out for `screen` (the preview app starts upright and then turns, so this
-    /// runs again for the size it ends up with).
-    func configure(keys: Bool, screen: CGSize, held names: [String: CGSize] = [:], select: String? = nil) {
-        items = keys ? Self.keyboardLayout() : Self.controllerLayout(screen)
+    /// runs again for the size it ends up with). `custom`: the controls with looks of their own.
+    func configure(keys: Bool, screen: CGSize, held names: [String: CGSize] = [:], select: String? = nil, custom: Bool = false) {
+        items = custom ? Self.customLayout() : keys ? Self.keyboardLayout() : Self.controllerLayout(screen)
         baseline = items
         held = [:]
         for item in items { if let name = item.action.padName, let v = names[name] { held[item.id] = v } }
@@ -92,6 +95,8 @@ import UIKit
     func bringToFront(_ id: UUID) { items = BCDTouchLayering.moved(items, id, toFront: true) }
     func sendToBack(_ id: UUID) { items = BCDTouchLayering.moved(items, id, toFront: false) }
     func setPadLink(_ id: UUID, _ name: String?) { update(id) { $0.padLink = name } }
+    func setCustomShape(_ id: UUID, _ shape: BCDTouchCustomShape?) { update(id) { if !$0.locked { $0.customShape = shape } } }
+    func setCustomText(_ id: UUID, _ text: String?) { update(id) { $0.customText = BCDTouchText.clean(text) } }
     func setOpacity(_ value: Double) { opacity = value }
     func setLayoutScale(_ value: Double) { layoutScale = value }
     func saveAsNewLayout() {
@@ -144,6 +149,28 @@ import UIKit
         add("L3", 0.62 * k, side + 76 * k + stick / 2 + 20 * k + click / 2, clickY)
         add("R3", 0.62 * k, w - side - 76 * k - stick / 2 - 20 * k - click / 2, clickY)
         return out
+    }
+
+    /// Controls with looks of their own (BCD's editor, Look): every shape, short and long words, words on a standard
+    /// control, a stick that keeps its ring, and a word too long for its control (cut short).
+    static func customLayout() -> [BCDTouchItem] {
+        func item(_ a: BCDTouchAction, _ x: Double, _ y: Double, _ s: Double = 1, shape: BCDTouchCustomShape? = nil,
+                  text: String? = nil) -> BCDTouchItem {
+            BCDTouchItem(id: UUID(), x: x, y: y, scale: s, action: a, customShape: shape, customText: text)
+        }
+        return [
+            item(.keyStick(.wasd), 0.14, 0.72, 1.5, shape: .square, text: "MOVE"),
+            item(.key(0x49), 0.82, 0.3, 1.0, shape: .rectangle(aspect: 2), text: "INV"),
+            item(.key(0x4D), 0.62, 0.3, 1.0, shape: .square, text: "MAP"),
+            item(.key(0x46), 0.72, 0.55, 1.1, shape: .circle, text: "USE"),
+            item(.key(0x74), 0.9, 0.55, 0.9, shape: .rectangle(aspect: 0.5), text: "SAVE"),
+            item(.mouseLeft, 0.88, 0.8, 1.2, text: "FIRE"),
+            item(.key(0x20), 0.68, 0.8, 1.0, shape: .rectangle(aspect: 3), text: "QUICK SAVE"),
+            item(.pad("LB"), 0.35, 0.15, 0.9, text: "GRENADE"),
+            item(.pad("A"), 0.45, 0.5, 0.8, shape: .square),
+            item(.key(0x51), 0.3, 0.45, 0.5, text: "INVENTORY"),
+            item(.key(0x1B), 0.07, 0.12, 0.7, shape: .rectangle(aspect: 1.6), text: "🎒"),
+        ]
     }
 
     /// Keys and the mouse, as a shooter on a keyboard wants them.
@@ -201,13 +228,16 @@ private struct BCDTouchPreviewCase: View {
         _model = StateObject(wrappedValue: BCDTouchPreviewModel())
     }
 
+    private var custom: Bool { spec == "touch-custom" || spec == "touch-look" || spec == "touch-text" }
+
     private func configure() {
         model.configure(keys: spec == "touch-keys" || spec == "touch-picker", screen: screen,
                         held: spec == "touch" ? ["A": .zero, "LS": CGSize(width: 0.72, height: -0.69)] : [:],
-                        select: spec == "touch-editor" ? "Y" : nil)
+                        select: spec == "touch-editor" ? "Y" : nil, custom: custom)
+        if spec == "touch-look" || spec == "touch-text" { model.selected = model.items.first { $0.customText == "INV" }?.id }
     }
 
-    private var editing: Bool { spec == "touch-editor" || spec == "touch-layouts" }
+    private var editing: Bool { spec == "touch-editor" || spec == "touch-layouts" || spec == "touch-look" || spec == "touch-text" }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -221,6 +251,11 @@ private struct BCDTouchPreviewCase: View {
             case "touch-editor", "touch-layouts":
                 BCDTouchEditor(state: model.editorState, screen: screen, insets: insets, actions: model,
                                showLayouts: spec == "touch-layouts")
+            case "touch-look", "touch-text":
+                // Made again once the sample's control is selected, so it opens on the Look tab or the words' card.
+                BCDTouchEditor(state: model.editorState, screen: screen, insets: insets, actions: model,
+                               tab: .look, typing: spec == "touch-text")
+                    .id(model.selected)
             case "touch-keys":
                 bar
             case "touch-picker":

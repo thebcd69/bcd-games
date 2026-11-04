@@ -77,6 +77,12 @@ check('static let poolStopTitle = "The last start stopped early"' in notice
       and "if message == nil { title = Self.poolStopTitle; message = Self.poolStopWords }" in stopped,
       "round 624 (N S16): a run that never came back from the JIT memory request is told once, in this box with its own title, before "
       "and never together with the memory-limit words; told at once if the library is already up and the box is free")
+# Round 630 (agent A1 S6; YKKBBN): a copy signed without get-task-allow is told at the first library screen, after a pool stop and
+# before the memory-limit words; a debuggable copy (or unknown flags, which count as debuggable) sees nothing new.
+check("if !SigningStatus.current.debuggable {" in start and "message = SigningStatus.notDebuggableMessage" in start
+      and start.index("if let words = poolStop {") < start.index("if !SigningStatus.current.debuggable {") < start.index('title = "Memory limit"')
+      and 'static let notDebuggableTitle = "JIT can\'t turn on"' in notice,
+      "round 630 (A1 S6): a copy that cannot use JIT is told when the library first appears, not only at Play")
 check('if let phase, phase.name == "pool-alloc-begin", Date().timeIntervalSince1970 - phase.at < 86400 {' in recover
       and recover.index('phase.name == "pool-alloc-begin"') < recover.index("guard let url = Self.markerURL")
       and "MemoryRightsNotice.shared.lastStartStoppedInPoolRequest()" in recover and "[jit-pool] the last run ended inside the JIT memory request" in recover,

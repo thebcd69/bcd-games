@@ -23,13 +23,23 @@ Source checks (every host):
     ControlPresetsModel (bcd-control-presets.json), a library game's through its profile;
   - drawn over a running game: no animation, blur, material or shadow in the touch views, and
     no "Madeira" or "Xbox" in what a person reads;
-  - the in-game menu's section exists as ui-session uses it, and CI runs this check.
+  - the in-game menu's section exists as ui-session uses it, and CI runs this check;
+  - a look of the player's own (2026-11-03: a shape and words, BCD's editor, Look): the stored
+    control gains one optional key, read leniently and written only when set; the overlay
+    window's hit test, the HUD's room for the controls and a key control's surface use the shape
+    only for a control that has one (every other control keeps the code it had); the face draws
+    the words through BCDTouchTextFit; the words' field gives the key window back; a locked
+    control keeps its shape.
 Behaviour (swiftc on the host; --require-swift makes its absence a failure):
   - tests/host/bcd_touch_checks.swift, compiled with the stored layout types, the layout store,
-    the classic control's own input functions, BCDTouchCore.swift and BCDTouchLive.swift's
-    conversion: every control sends the same events step by step as the classic one, is the same
-    size and takes the same touches; layouts and bcd-control-presets.json convert both ways
-    byte for byte; the editor's panel stays off the selected control.
+    the classic control's own input functions, BCDTouchCore.swift, BCDTouchLive.swift's
+    conversion and the shared layout file's rules (BCDControlShareCore.swift): every control
+    sends the same events step by step as the classic one, is the same size and takes the same
+    touches; layouts and bcd-control-presets.json convert both ways byte for byte; the editor's
+    panel stays off the selected control; looks round-trip in every format (the controls file,
+    the layouts file, a shared file), unreadable ones load as none, a control without one is
+    sized and touched as before, one with a shape takes touches exactly where it is drawn, and
+    words are drawn as large as fit, per shape, never below the minimum.
 Build (xcrun; --require-swift makes its absence a failure):
   - the preview build compiles (tools/ui-preview.py --build-only).
 
@@ -183,8 +193,10 @@ for what, needle in (("a cancelled touch", "override func touchesCancelled"), ("
     check(needle in key_view or needle in src["BCDTouchControls.swift"], f"a key control lets go on {what}")
 
 # ---- locking and layer order (upstream port 2026-10-25) --------------------------------------
-check("    var locked: Bool?\n}" in block(content, "struct TouchControl: Codable, Identifiable, Equatable {"),
-      "the stored control gains one optional key (so a layout written before it, or with nothing locked, is the same file)")
+stored = block(content, "struct TouchControl: Codable, Identifiable, Equatable {")
+check("    var locked: Bool?\n    /// madeira-bcd (2026-11-03)" in stored and stored.rstrip().endswith("    var face: Face?\n}"),
+      "the stored control ends with two optional keys, locked and then face (so a layout written before them, "
+      "or with nothing locked and no look, is the same file)")
 check("guard m.editing, let i = m.index(of: m.selected), m.controls[i].locked != true else { return }" in content,
       "the pinch does not resize a locked control")
 check("update(id) { if $0.locked != true { $0.nx = x; $0.ny = y } }" in live
@@ -211,6 +223,46 @@ check("HStack(spacing: 10)" in bar and ".frame(width: 44, height: 44)" in bar an
 check("(TouchControlsOverlay.showsLayoutMenu(self) ? 4 : 3) + 1" in model_hit
       and "showsLayouts: TouchControlsOverlay.showsLayoutMenu(model)" in live,
       "the overlay window's hit band counts the same buttons")
+
+# ---- a look of the player's own: a shape and words (2026-11-03, Discord #ideas) -------------
+face_type = block(content, "    struct Face: Codable, Equatable {")
+check("guard let c = try? decoder.container(keyedBy: CodingKeys.self) else { return }" in face_type
+      and face_type.count("try? c.decodeIfPresent(") == 3 and "func encode(to" not in face_type,
+      "the stored look is read leniently (a value of the wrong kind is left out) and written by the synthesized encoder, "
+      "which leaves out every key that is not set")
+check("SwiftUI" not in face_type and "UIKit" not in face_type,
+      "... and stays Foundation-only, inside the slice the host checks compile")
+model_size = block(content, "    static func size(_ c: TouchControl) -> CGSize {")
+check("if c.face != nil, let own = c.bcdOwnShape { return BCDTouchGeometry.size(own, diameter: Double(diameter(c))) }" in model_size
+      and "return c.action.controlSize(diameter: diameter(c))" in model_size,
+      "the HUD's room for a control: its own shape's size only when it has one, else the size it always had")
+check("if c.face != nil, let own = c.bcdOwnShape {" in model_hit
+      and "BCDTouchGeometry.windowTakes(CGPoint(x: p.x - cx, y: p.y - cy), own: own, diameter: Double(r * 2))" in model_hit
+      and "if hypot(p.x - cx, p.y - cy) <= r { return true }" in model_hit
+      and model_hit.index("if c.face != nil") < model_hit.index("if hypot(p.x - cx, p.y - cy) <= r"),
+      "the overlay window takes a touch in a control's own shape only when it has one; every other control keeps its circle")
+check("if let own { return BCDTouchGeometry.inside(CGPoint(x: dx, y: dy), own, diameter: diameter) }" in inside,
+      "a key control with a shape of its own takes touches in that shape on its own surface too")
+check("BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input)" in control
+      and "custom: item.customShape, words: item.words)" in control
+      and "private var size: CGSize { BCDTouchGeometry.size(item.shape, diameter: Double(diameter)) }" in control,
+      "a control is drawn, sized and touched in its own shape (BCDTouchItem.shape, ownShape), with its own words")
+face_view = block(src["BCDTouchControls.swift"], "struct BCDTouchFace: View {")
+check("BCDTouchTextFit.fit(words, in: shape, frame: size, measure: BCDTouchTextMeasure.unit)" in face_view
+      and "if let words, !action.isStick {" in face_view
+      and "private var shape: BCDTouchShape { action.shape(custom: custom) }" in face_view,
+      "the face draws the player's words as large as they fit, never on a stick")
+field = block(src["BCDTouchEditor.swift"], "final class BCDTouchTextFieldView: UITextField {")
+check("window.makeKey()" in field and "previous.makeKey()" in field
+      and "giveKeyBack()" in block(field, "override func resignFirstResponder() -> Bool {")
+      and "if window == nil { giveKeyBack() }" in field,
+      "the words' field makes its window key only while it is edited, and gives the key window back when editing ends or it goes")
+check("case .look: look" in inspector and "actions.setCustomShape(item.id, choice)" in inspector and "editText()" in inspector
+      and "actions.setCustomText(item.id, nil)" in inspector,
+      "the selected control's panel has the Look tab: Standard, Circle, Square, Rectangle, and its words")
+check("guard c.locked != true else { return }" in block(live, "func setCustomShape(_ id: UUID, _ shape: BCDTouchCustomShape?) {"),
+      "a locked control keeps its shape (a shape sizes the control)")
+check("func setCustomShape(" in sample and "func setCustomText(" in sample, "the preview model takes a look too")
 
 # ---- storage -------------------------------------------------------------------------------
 writes = {n: w for n in VIEWS + [LIVE] for w in ("write(to:", "FileManager", "JSONEncoder", "UserDefaults", ".json")
@@ -312,12 +364,16 @@ final class ClassicButton {
 ''' + classic_fns + "\n}\n"
     core = src["BCDTouchCore.swift"]
     conversion = live.split("// MARK: - Stored controls <-> BCD's values", 1)[1].split("// MARK: - Input and edits", 1)[0]
+    # The shared layout file's rules: a look travels in a shared file (bcd_touch_checks.swift exports and reads one back).
+    share_core = (APP / "BCDControlShareCore.swift").read_text()
+    check(share_core.count("import Foundation\n") == 1, "the shared layout file's rules import Foundation alone")
     checks = (R / "tests/host/bcd_touch_checks.swift").read_text()
     with tempfile.TemporaryDirectory(prefix="bcd-touch-") as tmp:
         main = Path(tmp) / "main.swift"
         header = "import Foundation\n#if canImport(CoreGraphics)\nimport CoreGraphics\n#endif\n"
         main.write_text(header + actions + pure_touch + pure_presets + classic
-                        + core.replace("import Foundation\nimport CoreGraphics\n", "") + conversion + checks)
+                        + core.replace("import Foundation\nimport CoreGraphics\n", "") + conversion
+                        + share_core.replace("import Foundation\n", "") + checks)
         exe = Path(tmp) / "check"
         r = subprocess.run([SWIFTC, "-O", str(main), "-o", str(exe)], capture_output=True, text=True)
         check(r.returncode == 0, "the behaviour checks compile on the host", (r.stderr or r.stdout)[-3000:])

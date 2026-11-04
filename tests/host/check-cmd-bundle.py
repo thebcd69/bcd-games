@@ -142,7 +142,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
 # ---- Part C: the library's spelling, the workflow, the auto-tune rule
 lib = (root / "app/Madeira/Library.swift").read_text()
-spelling = 'return ("C:\\\\windows\\\\system32\\\\cmd.exe", withExtra("/c \\(quoted(path))"))'
+# Round 630 (agent G1 S6): the target goes through cmdTarget (CALL before a path with ( ) & ... , quoted as before otherwise)
+spelling = 'return ("C:\\\\windows\\\\system32\\\\cmd.exe", withExtra("/c \\(cmdTarget(path))"))'
 check("the library starts a .bat/.cmd as C:\\windows\\system32\\cmd.exe (the spelling the predicate matches)",
       spelling in lib and '"C:\\\\windows\\\\system32\\\\cmd.exe"' in pred)
 check("a batch file inside the Wine desktop goes through explorer.exe, which already has the aarch64 core",

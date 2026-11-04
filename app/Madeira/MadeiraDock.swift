@@ -265,7 +265,9 @@ enum MadeiraDock {
             if result == 49 {
                 switch fields["ceg-result"].flatMap(Int.init) {
                 case -1: return "Preparing this game's executable took Steam too long. Check your connection, then try again."
-                case 0: return "Steam never began preparing this game's executable. Have Steam verify the game's files, then try again."
+                // Round 630 (agent A1 S14, FRKBN1): Valve's client accepted the request and said it started no job (ceg-request=0); the
+                // old words ("never began") read as a timeout. Auto-tune's dock-ceg-no-job tries env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1 next.
+                case 0: return "Steam started no job to prepare this game's executable, so BCD did not start the game. Use Check and repair files in the game's options, then try again; if it keeps happening, export the log."
                 case 10: return "Steam is still busy with this game, updating or running it. Wait a moment, then try again."
                 case -4: return "Steam couldn't prepare this game's executable because the Windows service manager it needs didn't start."
                 case -5: return "Steam couldn't prepare this game's executable: its Windows service isn't installed in BCD's Windows setup."
@@ -273,6 +275,17 @@ enum MadeiraDock {
                 // registered (Call of Duty: Black Ops, Saints Row, Just Cause 2); the auto-tune rule dock-ceg-result-55 names it the same way.
                 case 55: return "Steam's copy protection couldn't start the game: Steam couldn't get this game's executable ready for your account (code 55). This is a known stop: Steam's request to build it failed, and no BCD setting is known to change it."
                 default: return "Steam's copy protection couldn't start the game: Steam couldn't get this game's executable ready for your account (code \(fields["ceg-result"] ?? "?"))."
+                }
+            }
+            // Round 630 (agent A1 S16; GP Bikes N14Q6D): 41 is the host's answer when the install folder Valve's client names for the game
+            // cannot be read or is not BCD's record (madeira-dock src/launch.c). After a sign-in that never reached Steam's servers the
+            // offline start BCD tried instead ended there; a game's first start has to be online.
+            if result == 41 {
+                if fields["session-offline-fallback"] == "1" {
+                    return "Steam couldn't reach its servers, and the offline start BCD tried instead couldn't find this game's folder (code 41). Check your connection (a VPN or a content filter can block Steam), then try again: a game's first start has to be online."
+                }
+                if fields["launch-install-directory-mismatch"] == "1" {
+                    return "Steam names a different folder for this game than BCD's record (code 41). Use Check and repair files in the game's options, then try again."
                 }
             }
             // The host sets the Steam client's discovery entries in the Windows registry (HKCU Software\Valve\Steam\ActiveProcess and
@@ -343,6 +356,8 @@ enum MadeiraDock {
         "session-requested-app-listed", "session-auth-test-result",
         "session-online-subscription-count", "session-online-app-zero-query", "session-online-callback-id",
         "session-timeout-subscription-count", "session-timeout-app-listed", "session-timeout-still-online",
+        // round 630 (444TS8; tools/patch-dock-licence-wait.py): the licence wait moved after a late sign-in, ms from the logon start
+        "session-licence-wait-ms",
         "session-online-blip", "session-online-blips", "session-online-lost", "session-entitlement-source",
         "session-offline-abi", "session-offline-requested", "session-offline-can", "session-offline-logon-result",
         "session-offline-logon-retry", "session-offline-logon-state", "session-offline-callback-id",
@@ -353,6 +368,8 @@ enum MadeiraDock {
         "launch-config-wait", "launch-config-gave-up", "launch-session-wait", "launch-session-gave-up",
         "ceg-request", "ceg-request-result", "ceg-request-busy", "ceg-server-result", "ceg-job-result",
         "ceg-finished-jobs", "ceg-result", "ceg-disabled", "ceg-unsupported-client",
+        // round 630 (FRKBN1; tools/patch-dock-ceg-zero-jobs.py): an accepted request with zero jobs went on to the launch (the key's experiment)
+        "ceg-zero-jobs-launch",
         "ceg-scm", "ceg-scm-started", "ceg-scm-error", "ceg-service-registered", "ceg-service-install", "ceg-service-stop", "ceg-scm-stopped",
         "game-scm", "game-scm-timeout", "launch-keep-alive",
         // round 624 (Steam 113; tools/patch-dock-steam-readback.py): the published values read back while the game starts (bits:
@@ -363,6 +380,10 @@ enum MadeiraDock {
         // registry values back. A Rockstar launcher that says "Steam failed to initialize" while the host
         // reported a launch without error (20 of 40 sessions, 2026-10-19/20) needs these to be told apart.
         "launch-install-directory-verified", "launch-install-directory-mismatch",
+        // round 630 (N14Q6D; tools/patch-dock-install-dir-events.py): which of the two silent install-folder checks ended a start with 41
+        "launch-install-directory-expected-length", "launch-install-directory-got",
+        // round 630 (BN3SXW; tools/patch-dock-registry-events.py): which part of the Steam client entries step ended a start with 42
+        "launch-registry-step", "launch-registry-error", "launch-registry-retry",
         "launch-client-discovery-published", "launch-request-submitted", "launch-game-running",
         "launch-game-ended", "launch-discovery-restored", "launch-host-result",
         "shutdown-begin", "shutdown-complete", "probe-result"]

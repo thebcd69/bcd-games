@@ -4,10 +4,11 @@
  "matched": [
   "wow64-native-iosb-completion-store",
   "x64-image-nocopy",
-  "pool-split-exhausted"
+  "pool-split-exhausted",
+  "lse-atomic-store-undecoded"
  ],
  "next": [],
- "note": "Battle.net (build 594, the owner's iPhone18,2, launcher card, log 19:22:01): the updated Agent (Agent.9824) and AgentHelper.exe, both 32-bit console programs, faulted 8 and 10 times in Madeira`invoke_system_apc (a WRITE at 0x10004 / 0x10000: the Information and Status of an IO_STATUS_BLOCK32) while NtWriteFile waited for conhost. The status block was the uninitialised 64-bit one of FEX's own WriteFile (rpmalloc's first band-selector lines, 142 and 69 bytes, written from native code inside the 32-bit process), which ntdll took for a guest one. Both programs survived (the Agent listened, Battle.net connected). wow64-native-iosb-completion-store: known, fixed in 596 (a store that cannot land is skipped, '[iosb-dead]'). Matched beside it, and not this crash: launcher-without-windows-services (a pipe\\svcctl open that failed at t+1.3 s, before services.exe was up), x64-image-nocopy, pool-split-exhausted. The Battle.net window's spinner is its renderer helpers dying on a Chromium int3 (guest 0x6DE800E1, libcef.dll+0x16D00E1), a separate cause.",
+ "note": "Battle.net (build 594, the owner's iPhone18,2, launcher card, log 19:22:01): the updated Agent (Agent.9824) and AgentHelper.exe, both 32-bit console programs, faulted 8 and 10 times in Madeira`invoke_system_apc (a WRITE at 0x10004 / 0x10000: the Information and Status of an IO_STATUS_BLOCK32) while NtWriteFile waited for conhost. The status block was the uninitialised 64-bit one of FEX's own WriteFile (rpmalloc's first band-selector lines, 142 and 69 bytes, written from native code inside the 32-bit process), which ntdll took for a guest one. Both programs survived (the Agent listened, Battle.net connected). wow64-native-iosb-completion-store: known, fixed in 596 (a store that cannot land is skipped, '[iosb-dead]'). Matched beside it, and not this crash: launcher-without-windows-services (a pipe\\svcctl open that failed at t+1.3 s, before services.exe was up), x64-image-nocopy, pool-split-exhausted. The Battle.net window's spinner is its renderer helpers dying on a Chromium int3 (guest 0x6DE800E1, libcef.dll+0x16D00E1), a separate cause. Round 630: lse-atomic-store-undecoded also matches here, last (the lowest-priority rules; the verdict is unchanged).",
  "outcome": "crashed",
  "stage": 3,
  "status": "known"

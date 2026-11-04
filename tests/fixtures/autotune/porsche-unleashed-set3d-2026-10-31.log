@@ -1,0 +1,215 @@
+[11:06:32.777] [INFO] Checking entitlements...
+[11:06:32.778] [INFO] [build] v0.1.625 (625)
+[11:06:32.779] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=11695MB available=6122MB cores=6
+[11:06:32.779] [INFO] [device] address-map=[0x102a1c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[11:06:32.790] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.52x max-fps=120 utc-offset=-04:00 free-disk=34GB stikdebug-url=1
+[11:06:32.794] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:06:35.535] [INFO] [bcd] library launch Porsche.exe: avx=1 wine-vcrt=1 nvidia=1 game-config=1 metalfx=off lc=1
+[11:06:35.561] [INFO] Running full Wine sequence...
+[11:06:35.561] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102a1c000,0x8000000000) 512GB available=6110MB low-power=0 thermal=nominal
+[11:06:35.562] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[11:06:35.572] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:06:35.572] [INFO] Allocating 896MB JIT pool via debugger...
+[11:06:35.573] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:06:35.573] [INFO] [jit-debugger] attached=1 at the pool request
+[11:06:35.577] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:06:40.635] [INFO] RX pool at 0x148000000
+[11:06:40.658] [INFO] [session] length=5s partial=1 play=0s frames=0 stalls=0/0s peak=624MB limit=6143MB thermal=nominal lpm=0 api=DirectDraw/32 res=1424x656 cap=60 game=Porsche
+[11:06:40.670] [INFO] Detaching debugger...
+[11:06:40.785] [INFO] Starting wineserver...
+[phase] wine-start             t+  5.263s rev=ml526
+[11:06:40.835] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/1ba177b4ce67d1ca.cfg (read)
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[11:06:41.210] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[11:06:41.210] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5505 MB + phys_footprint=638 MB = 6144 MB (hw.memsize says 11695 MB)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x25000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x25000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[window] 0x7048000000..0x7400000000 regions=137 occupied=12293 MB of 15232 MB free=2938 MB maxhole=2938 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148554000 used=0x678000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x148678000 used=0x720000/0x25000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148720000 used=0x8a0000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7025120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7025220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7025420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7025820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7026020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7026ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7027fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7028f90000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x111943828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Porsche.exe (porsche.exe-cb0c37c6d791f698): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cf1c34): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x122000000..0x7805000000 regions=76058 occupied=466364 MB of 486960 MB free=37059 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=681 MB (peak 681) internal=680 MB compressed=0 MB external=115 MB reusable=0 MB (cycle=1)
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d2e732): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aaafa1c): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+D 24 Load module mrbupd.dll (mrbupd.dll-8ee5b653c77d0221): 7110000000
+D 24 Load module USER32.dll (user32.dll-7d7be97280ded113): 717BA80000
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717b6b0000+0x12000 (?) → pool 0x1489db000 used=0x9f3000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x1489db000)
+ml957: ? backing 0x717b6c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717ace0000+0x13000 (?) → pool 0x1489f1000 used=0xa09000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x1489f1000)
+ml957: ? backing 0x717acf0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717a8c0000+0x1b000 (?) → pool 0x148a0b000 used=0xa2b000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x148a0b000)
+ml957: ? backing 0x717a8d8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717a370000+0x1a000 (?) → pool 0x148a2b000 used=0xa4b000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148a2b000)
+ml957: ? backing 0x717a388000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x702d020000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[jit-pool] image 0x717a2d0000+0x1b000 (?) → pool 0x148a4b000 used=0xa6b000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148a4b000)
+ml957: ? backing 0x717a2e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module imm32.dll (imm32.dll-d32574d787cb85b9): 717A2D0000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445c0921): 717A290000
+[unixlib] opengl32 (GL-absent stub table) (module 0x717a470000) -> wow64 table (0x11194b828)
+D 24 Load module rasapi32.dll (rasapi32.dll-6de272790cd3473c): 717A2B0000
+D 24 Load module dinput8.dll (dinput8.dll-fa6b381494d15059): 717A280000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[jit-pool] image 0x717a240000+0x23000 (?) → pool 0x148a6a000 used=0xa92000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x148a6a000)
+ml957: ? backing 0x717a260000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbfb9d98): 717A240000
+D 24 Load module oleaut32.dll (oleaut32.dll-ed26e11610ca6f05): 717A180000
+[win-name] #3 hwnd=0x3002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x3002a class='OleMainThreadWndClass' text="" rev=ml853
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[win-name] #5 hwnd=0x4002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #6 hwnd=0x4002a class='OleMainThreadWndClass' text="" rev=ml853
+[xp] 11:06:41.815 +0.55 dt=294 cpu=261 (thr 115) P=249 E=12 run=274 pgw=-1.0 GHz P=3.29 E=2.25 Minst=3682 IPC=4.36 mJ=691 pin=62 rdKB=528 fpMB=775
+[xp] 11:06:42.107 +0.85 dt=292 cpu=306 (thr 306) P=303 E=3 run=310 pgw=-1.0 GHz P=3.64 E=1.21 Minst=2727 IPC=2.47 mJ=991 pin=0 rdKB=0 fpMB=775
+[xp] 11:06:42.428 +1.17 dt=321 cpu=345 (thr 345) P=336 E=9 run=358 pgw=-1.0 GHz P=3.69 E=1.79 Minst=3078 IPC=2.45 mJ=1136 pin=0 rdKB=0 fpMB=775
+[xp] 11:06:42.692 +1.43 dt=264 cpu=275 (thr 275) P=272 E=3 run=279 pgw=-1.0 GHz P=3.68 E=1.09 Minst=2486 IPC=2.47 mJ=922 pin=0 rdKB=0 fpMB=775
+[xp] 11:06:42.986 +1.73 dt=294 cpu=305 (thr 304) P=301 E=4 run=303 pgw=-1.0 GHz P=3.61 E=1.20 Minst=2698 IPC=2.48 mJ=958 pin=0 rdKB=0 fpMB=775
+[xp] 11:06:43.295 +2.03 dt=309 cpu=316 (thr 316) P=312 E=4 run=326 pgw=-1.0 GHz P=3.76 E=1.09 Minst=2901 IPC=2.47 mJ=1142 pin=0 rdKB=0 fpMB=775
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=776 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=2)
+[guest-stk] sp+0x130 0x14829165c = libwow64fex.dll+0x10065c
+[guest-stk] sp+0x138 0x1481a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x160 0x14836e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x378 0x1482945f8 = libwow64fex.dll+0x1035f8
+[guest-stk] sp+0x3d8 0x14829457c = libwow64fex.dll+0x10357c
+[guest-stk] sp+0x4f8 0x148294574 = libwow64fex.dll+0x103574
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L".\\drivers\\registryz.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L".\\drivers\\registryzz.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Error: terminate execution?" / L"You have DirectX 0. Please install DirectX 7.\nCould not load \".\\drivers\\registryz\" [FILE=\\real\\patch3\\pc\\set3d.c, LINE=273]\n": main exe base 00400000 size 0x2e3000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #61 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #67 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #68 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #69 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #70 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #71 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #72 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #73 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #75 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #76 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #78 hwnd=0x1004c class='Static' text="You have DirectX 0. Please install DirectX 7.?Could not load ".\drivers\registryz" [FILE=\real\patch3\pc\set3d.c, LINE=273]?" rev=ml853
+[win-name] #81 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[xp-names] m2646172 "wine-x18-exc"
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=777 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=777 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=777 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=777 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x121dac200 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 1187 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: elsewhere (app inactive)
+[11:06:56.323] [INFO] [session] length=20s partial=1 play=0s frames=0 stalls=0/0s peak=780MB limit=6143MB thermal=nominal lpm=0 api=DirectDraw/32 res=1424x656 cap=60 game=Porsche
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de41030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x121dac200 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 1186 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[11:07:10.926] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=24 resident=899MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x121dac200 lead 60 ms: client wrote 9.93 s of audio in 10.00 s (99.3%) over 1176 wakes; device short 55.3 ms in 3 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121dac200 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 1184 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de41030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x121dac200 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1179 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=779 MB (peak 779) internal=778 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=28)
+[win-name] #82 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #83 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #84 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #85 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[win-name] #86 hwnd=0x6002a class='#32770' text="Error: terminate execution?" rev=ml853
+[va-exit] rev=ml312 0x7c00be0000+0x1b000 type=0x3000 tid=0024 steer=NONE#0 freed=0 steer_n=0
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=427
+[srv-kill] kill_thread tid=0028 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=002c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0030 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=004c pid=0020 violent=1 rev=ml586
+[vfree] ml842 # base=0x7c014c1000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=428
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[11:07:36.563] [INFO] [session] length=61s play=0s frames=0 stalls=0/0s peak=788MB limit=6143MB thermal=nominal lpm=0 api=DirectDraw/32 res=1424x656 cap=60 game=Porsche
+[frontend] returned to library
+[footprint] rev=ml358 phys=721 MB (peak 779) internal=719 MB compressed=0 MB external=122 MB reusable=0 MB (cycle=29)
+[11:07:38.503] [INFO] Detaching debugger...
+[hwinput] keyboard focus: elsewhere (responder)
+[window] 0x7048000000..0x7400000000 regions=416 occupied=12297 MB of 15232 MB free=2934 MB maxhole=2934 MB@0x7048000000 rev=ml787 (periodic)
+[window] 0x122000000..0x7805000000 regions=76305 occupied=466370 MB of 486960 MB free=37053 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=722 MB (peak 779) internal=721 MB compressed=0 MB external=125 MB reusable=0 MB (cycle=30)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=18 resident=858MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=727 MB (peak 779) internal=725 MB compressed=0 MB external=132 MB reusable=0 MB (cycle=31)
+[footprint] rev=ml358 phys=724 MB (peak 779) internal=722 MB compressed=0 MB external=134 MB reusable=4 MB (cycle=32)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de41030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=725 MB (peak 779) internal=723 MB compressed=0 MB external=135 MB reusable=4 MB (cycle=33)
+[xp] 11:07:45.829 +64.57 dt=327 cpu=78 (thr 78) P=21 E=57 run=83 pgw=-1.0 GHz P=1.61 E=1.49 Minst=276 IPC=2.33 mJ=19 pin=0 rdKB=0 fpMB=725
+[xp] 11:07:46.143 +64.88 dt=314 cpu=46 (thr 46) P=0 E=46 run=50 pgw=-1.0 GHz P=0.00 E=1.26 Minst=89 IPC=1.56 mJ=4 pin=0 rdKB=0 fpMB=725
+[xp] 11:07:46.435 +65.17 dt=292 cpu=75 (thr 74) P=23 E=51 run=103 pgw=-1.0 GHz P=1.79 E=1.38 Minst=170 IPC=1.52 mJ=18 pin=0 rdKB=0 fpMB=725
+[xp] 11:07:46.745 +65.48 dt=310 cpu=18 (thr 16) P=0 E=17 run=20 pgw=-1.0 GHz P=1.49 E=1.70 Minst=40 IPC=1.33 mJ=2 pin=0 rdKB=0 fpMB=725
+[11:07:46.746] [xp] 11:07:46.745 +65.48 dt=310 cpu=18 (thr 16) P=0 E=17 run=20 pgw=-1.0 GHz P=1.49 E=1.70 Minst=40 IPC=1.33 mJ=2 pin=0 rdKB=0 fpMB=725
+[11:07:47.011] [xp] 11:07:47.011 +65.75 dt=266 cpu=227 (thr 228) P=19 E=208 run=242 pgw=-1.0 GHz P=2.01 E=2.37 Minst=1941 IPC=3.66 mJ=99 pin=2 rdKB=80 fpMB=731

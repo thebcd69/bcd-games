@@ -76,6 +76,19 @@ func problem(_ data: Data) -> BCDControlShare.Problem? {
         check("a control with too many fields", problem(file([control(extra: Dictionary(uniqueKeysWithValues: (0..<30).map { ("k\($0)", 1) }))])) == .badControl(0, "too many fields"))
         check("every refusal says it in words", [BCDControlShare.Problem.tooBig, .notJSON, .notALayoutFile, .newerVersion(3), .noControls, .tooMany(200), .badControl(2, "x")].allSatisfy { !$0.words.isEmpty })
 
+        // ---- a control's own look (2026-11-03: its shape and words, TouchControl.face) -----------------------------------------
+        var lookTravels = false
+        if case .success(let p) = BCDControlShare.parse(file([control(extra: ["face": ["shape": "rectangle", "aspect": 2, "text": "INV"]])])),
+           let list = (try? JSONSerialization.jsonObject(with: p.controlsJSON)) as? [[String: Any]], let face = list.first?["face"] as? [String: Any] {
+            lookTravels = face["shape"] as? String == "rectangle" && (face["aspect"] as? Double) == 2 && face["text"] as? String == "INV" && face.count == 3
+        }
+        check("a control's own look travels as it is", lookTravels)
+        check("a look this build cannot read is passed on, not refused (the app's decoder leaves it out and the control loads)",
+              problem(file([control(extra: ["face": ["shape": "hexagon", "aspect": "x", "text": 5]])])) == nil && problem(file([control(extra: ["face": 7])])) == nil)
+        check("words longer than a shared file allows a text are refused, as any long text is",
+              problem(file([control(extra: ["face": ["text": String(repeating: "W", count: 65)]])])) == .badControl(0, "a text is too long")
+              && problem(file([control(extra: ["face": ["text": String(repeating: "W", count: 64)]])])) == nil)
+
         // ---- names ------------------------------------------------------------------------------------------
         check("a name is one line without control or format characters, at most 40 characters, never empty",
               BCDControlShare.cleanName("a\u{0}b\u{202E}c\nd") == "abc d" && BCDControlShare.cleanName(String(repeating: "x", count: 100)).count == 40

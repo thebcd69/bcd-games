@@ -2,12 +2,16 @@
  "dialogs": [],
  "end": {},
  "matched": [
+  "nfs-blackbox-wild-pointer",
   "nfs-most-wanted-known-stop",
   "x86-wild-fault-diag"
  ],
- "next": [],
- "note": "Need for Speed: Most Wanted (5C54B7, build 592): Speed.exe stops in the track loader (read of B514AB6A at 0081AB7A); known",
+ "next": [
+  "env.MADEIRA_WOW_RWX_PLAIN = 1",
+  "env.FEX_X87REDUCEDPRECISION = 0"
+ ],
+ "note": "Need for Speed: Most Wanted (5C54B7, build 592): Speed.exe stops in the track loader (read of B514AB6A at 0081AB7A); known Round 630 (agent O2 S5): nfs-blackbox-wild-pointer now comes first: one attempt (exact x87 math, plain RWX memory) before the known verdict, kept only if the game gets further.",
  "outcome": "crashed",
  "stage": 3,
- "status": "known"
+ "status": "trying"
 }

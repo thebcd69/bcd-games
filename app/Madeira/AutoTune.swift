@@ -188,6 +188,8 @@ enum AutoTune {
         /// Set once the session ended normally, before the analysis; a marker with it
         /// survived only a kill during the analysis.
         var end: AutoTuneSessionEnd?
+        /// Round 630 (agent U S15b): the lines auto-tune's layer gave this session (exportLayer's), optional: an older marker still decodes.
+        var layer: [String]?
     }
 
     /// The session H2 armed in this app run.
@@ -206,7 +208,8 @@ enum AutoTune {
                        build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "",
                        logInode: inode, limitMB: memoryLimitMB(),
                        fingerprint: fingerprint(entry), userKeys: Array(userKeys(entry)).sorted(),
-                       listValues: listValues(entry), end: nil)
+                       listValues: listValues(entry), end: nil,
+                       layer: state(entry.windowsPath).layerLines.filter { !userKeys(entry).contains(AutoTuneRules.key($0)) })
         if let d = try? JSONEncoder().encode(m) { try? d.write(to: url, options: .atomic) }
         armed = m
     }
@@ -346,7 +349,17 @@ enum AutoTune {
                             + verdict + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? ""))   // round 624 (E1 S5b)
         let offer = AutoTuneOffer(title: m.title, windowsPath: m.windowsPath, report: report, state: after,
                                   reason: after.candidateRule.flatMap { id in rules.first { $0.id == id }?.reason })
-        DispatchQueue.main.async { AutoTuneOffers.shared.offer = offer }
+        DispatchQueue.main.async {
+            // Round 630 (agent U S15b; G3SF3A): a recovered session's analysis ends while the next session of the same game runs. When that
+            // session already carries every line the result asks the next start to try, "The next start tries ..." is wrong: no result now;
+            // the running session's own comes when it ends. (armed is read on the main thread, where the session hooks set it.)
+            if let running = armed, running.windowsPath == m.windowsPath, let lines = after.candidate, !lines.isEmpty,
+               Set(lines).isSubset(of: Set(running.layer ?? [])) {
+                LogStore.shared.log("[autotune] \(m.title): result not shown, the running session already carries \(lines.joined(separator: "; "))")
+                return
+            }
+            AutoTuneOffers.shared.offer = offer
+        }
     }
 }
 

@@ -104,7 +104,8 @@ check('Glyphica\'s list gives the DLL from build 624 with the key', {'line': 'en
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the download policy of build 624 lets a list name kernelbase (else a 624 device would refuse the whole online list); older builds '
       'never check the line (minBuild 624, checkPolicy checks only the lines a build gets)',
-      '|| $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" }) else {' in pol and 'or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc")' in pol
+      '|| $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" || $0 == "xinputuap" || $0 == "httpapi" || $0 == "dbgcore" }) else {' in pol
+      and 'or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc, xinputuap, httpapi, dbgcore")' in pol
       and 'for (j, line) in lines.enumerated() where everyLine || line.applies(build: build) {' in pol)
 rules = (root / 'build/tools/autotune_rules.py').read_text()
 r = rules[rules.index('"id": "chakracore-cfg-policy-failfast"'):]
@@ -120,14 +121,23 @@ with tempfile.TemporaryDirectory() as t:
     _s = _iu.spec_from_file_location('cods', tool2); _m = _iu.module_from_spec(_s); _s.loader.exec_module(_m)
     names = _m.wanted(root / 'recommended/recommendations.json', root / 'build/tools/autotune_rules.py')
     for n in names:
-        (t / (n + '-optin.dll')).write_bytes(b'MZ')
+        (t / _m.shipped_as(n)).write_bytes(b'MZ')
     r_all = subprocess.run([sys.executable, str(tool2), str(t)], capture_output=True, text=True)
     (t / 'kernelbase-optin.dll').unlink()
     r_kb = subprocess.run([sys.executable, str(tool2), str(t)], capture_output=True, text=True)
+    (t / 'kernelbase-optin.dll').write_bytes(b'MZ')
+    (t / 'dbghelp.dll').unlink()
+    r_dbg = subprocess.run([sys.executable, str(tool2), str(t)], capture_output=True, text=True)
 check('the shipped-DLL check names kernelbase among what the lists and rules want, passes when every DLL is there, and fails naming '
       'kernelbase-optin.dll and its wanters when it is not', 'kernelbase' in names and r_all.returncode == 0
       and r_kb.returncode == 1 and 'kernelbase-optin.dll is not in' in r_kb.stdout and 'glyphica-typing-survival' in r_kb.stdout,
       (r_all.stdout + r_kb.stdout)[-600:])
+# round 630 (agent G2 S18; build 630's first run stopped here): dbgcore has no -optin.dll, the bridge links dbgcore.dll to the
+# shipped dbghelp.dll, so the check wants dbghelp.dll for it, and a folder of every *-optin.dll without dbghelp.dll fails.
+check('dbgcore is provided by the shipped dbghelp.dll (the bridge\'s link), not by a dbgcore-optin.dll',
+      _m.shipped_as('dbgcore') == 'dbghelp.dll' and _m.shipped_as('kernelbase') == 'kernelbase-optin.dll' and 'dbgcore' in names
+      and r_dbg.returncode == 1 and 'dbghelp.dll is not in' in r_dbg.stdout and 'name dbgcore in' in r_dbg.stdout
+      and 'kernelbase-optin.dll is not in' not in r_dbg.stdout, (r_dbg.stdout)[-600:])
 check('CI runs it after the extra DLLs are built (not continue-on-error)',
       wf.index('- name: Build extra Wine DLLs for arm64ec') < wf.index('- name: Verify the opt-in DLLs the lists and rules name')
       and 'run: python3 tools/check-optin-dlls-shipped.py app/Madeira/arm64ec-windows' in wf

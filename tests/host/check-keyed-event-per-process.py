@@ -229,7 +229,9 @@ check('only the header and the loader name the switch in the C sources and the a
       == {'build/ntdll-unix/ios_keyed_event.h', 'build/ntdll-unix/loader_ios.c'}, str(sorted(readers)))
 recs = json.loads((root / 'recommended/recommendations.json').read_text())
 setters = sorted(r['id'] for r in recs['rules'] if 'MADEIRA_KEYED_EVENT_PER_PROCESS' in json.dumps(r.get('config', [])) + json.dumps(r.get('smallRAMConfig', [])))
-check('in the list only the rules of Control and (round 626) CrossCode set it (games that never ran past this crash)', setters in ([], ['control'], ['control', 'crosscode']), str(setters))
+# 2026-11-01 (58D8SD, build 626): Slay the Spire 2 v5 too; from build 626 it reaches its menu and then dies in this crash (1R1NCG, 58D8SD).
+check('in the list only the rules of Control, (round 626) CrossCode and (2026-11-01) Slay the Spire 2 set it (games whose logs stop at this crash)',
+      setters in ([], ['control'], ['control', 'crosscode'], ['control', 'crosscode', 'slay-the-spire-2']), str(setters))
 spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
@@ -244,9 +246,12 @@ if rule:
           'message or the c0000024 the release returned (round 624), and is off once the line is in force',
           '"[mach_exc] pc PE: ntdll.dll+0x680"' in flat and 'Unhandled page fault on read access to' in anyof and '[fault-full] x0=c0000024 x1=' in anyof
           and 'MADEIRA_KEYED_EVENT_PER_PROCESS=1' in json.dumps(rule['none']))
+    # 2026-11-01 (58D8SD): a game whose crash reporter ends it (no page-fault text) after the session's two [fault-full] dumps went to
+    # earlier faults: the c0000024 is only in the SEGV handler's dump ("segv_handler   x0=0xc0000024 x1=...").
+    check('the rule also takes the c0000024 of the SEGV handler\'s dump (2026-11-01)', '"x0=0xc0000024 x1="' in anyof)
 for name in ('control-runonce-keyed-event-2026-10-23', 'slay-the-spire-2-runonce-keyed-event-2026-10-22',
              'control-launcher-child-runonce-2026-10-29', 'spider-man-remastered-runonce-keyed-event-2026-10-28',
-             'mechabellum-runonce-failpath-2026-10-29'):
+             'mechabellum-runonce-failpath-2026-10-29', 'slay-the-spire-2-runonce-crashpad-2026-11-01'):
     exp = root / 'tests/fixtures/autotune' / (name + '.expect')
     data = json.loads(exp.read_text()) if exp.is_file() else {}
     check('fixture %s proposes the line' % name,

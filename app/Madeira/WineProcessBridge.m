@@ -371,7 +371,8 @@ volatile int g_madeira_srv_log_all = 0;      /* env.MADEIRA_SRV_LOG_ALL = 1 */
 void wine_session_note_launch_exit(int status);
 static uint64_t g_launch_exit = 0;
 void wine_launched_process_did_exit(int status) {
-    if ((uint32_t)status >= 0xC0000000u)
+    /* madeira-bcd (round 630, agent G3 S19): Wine's stub status 0x80000100 ("unimplemented function ... aborting") is an error end too */
+    if ((uint32_t)status >= 0xC0000000u || (uint32_t)status == 0x80000100u)
         __atomic_store_n(&g_launch_exit, (UINT64_C(1) << 32) | (uint32_t)status, __ATOMIC_RELEASE);
     wine_session_note_launch_exit(status);
 }
@@ -1850,14 +1851,19 @@ static void *wine_process_thread(void *arg) {
                 long capMB = (long)madeira_cfg_int("swap-mb", 0);   /* ml1095: bcd.cfg swap-mb = N */
                 long poolMB = (long)madeira_cfg_int("mempool-mb", 0);   /* bcd.cfg mempool-mb = N */
                 /* madeira-bcd (round 625, the owner's decision 38 b; from rtmtree's fork for Persona 3
-                 * Reload): env.MADEIRA_POOL_MORE = 1 in bcd.cfg or the game's config lets helper memory
-                 * take more (MemoryPool.m, virtual_ios.c ml1150). Off: helper memory as in build 624. */
-                int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 0);
+                 * Reload): env.MADEIRA_POOL_MORE lets helper memory take more (MemoryPool.m, virtual_ios.c
+                 * ml1150). Round 630 (the owner's go, 2026-11-03: "Evet, ekleyelim bunu da"): on unless
+                 * bcd.cfg or the game's config sets it otherwise; env.MADEIRA_POOL_MORE = 0 gives helper
+                 * memory as in build 624. The tier reads the key from the environment (ios_pool_config), so
+                 * the value is exported here; a line of the user's own is exported again below, with the
+                 * same words read as on ("1", "on", "true", "yes"). */
+                int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 1);
+                setenv("MADEIRA_POOL_MORE", poolMore ? "1" : "0", 1);
                 /* madeira-bcd: helper memory (mempool-mb) no longer needs swap-mb. The pool
                  * is the tier's first stage, so without a swap file the tier runs with the
                  * smallest one (64 MB): the pool backs what it can and, once it is used up
                  * or guarded, the file takes at most 64 MB before commits stay in memory.
-                 * Round 625: with env.MADEIRA_POOL_MORE = 1 only. */
+                 * Round 625: with env.MADEIRA_POOL_MORE on only (the default from round 630). */
                 if (poolMore && capMB < 64 && poolMB >= 512) {
                     capMB = 64;
                     fprintf(stderr, "[swap] app: helper memory %ld MB without swap-mb: the tier runs with a 64 MB file\n", poolMB);
@@ -1890,6 +1896,11 @@ static void *wine_process_thread(void *arg) {
                             extern int MadeiraMemoryPoolMore;
                             MadeiraMemoryPoolMore = poolMore;   /* round 625: its pressure source */
                             if (poolMore) fprintf(stderr, "[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)\n");
+                            /* round 630 (agent T2 S1; RDR2 N1P94T): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (bcd.cfg or the game's
+                             * config; off unless set): the pool's regions keep no window in BCD's address space. */
+                            extern int MadeiraMemoryPoolLazy;
+                            MadeiraMemoryPoolLazy = madeira_cfg_bool("env.MADEIRA_POOL_LAZY_WINDOWS", 0);
+                            if (MadeiraMemoryPoolLazy) fprintf(stderr, "[swap] ml1150 app: helper memory keeps no windows (env.MADEIRA_POOL_LAZY_WINDOWS)\n");
                             long got = MadeiraMemoryPoolStart(poolMB);
                             LOG("ml1150 memory pool: %ld of %ld MB", got, poolMB);
                         }
@@ -2372,6 +2383,52 @@ static void *wine_process_thread(void *arg) {
                 }
             }
 
+            /* madeira-bcd (2026-11-01): MADEIRA_SYSTEM32_X86_TOOLS (on unless 0) links Windows' command-line tools, which the
+             * bundle has only as i386, into the 64-bit system32 when that name is not there: a 64-bit program, or a batch file
+             * the 64-bit cmd.exe runs, then finds "reg", "find", "xcopy"... and Wine starts the tool as WoW64, as msiexec above.
+             * Messiah (Steam 577980, logs ANV0TK, 2D4QK1, MZYTWC, 83H0WC, 9ACRYW since build 614) starts through "Launch
+             * Messiah.bat", which Valve's 64-bit client runs with the 64-bit cmd.exe; its first command is
+             * `reg Query ... | find /i "x86"`, no reg.exe resolves, and Wine's cmd ends a batch whose pipe cannot start its
+             * left program with ExitProcess(255) (programs/cmd/wcmdmain.c, handle_pipe_command): nothing starts, blue screen.
+             * Only names absent from system32 are linked, so no program that resolves today changes; a real file or another
+             * link of that name is left alone; with the variable at 0 the links BCD made are removed. msiexec, regsvr32,
+             * rundll32 and the service tools are not in the list. */
+            {
+                static const char *const x86Tools[] = {
+                    "attrib.exe", "cacls.exe", "cscript.exe", "expand.exe", "fc.exe", "find.exe", "findstr.exe", "hostname.exe",
+                    "icacls.exe", "ipconfig.exe", "ping.exe", "reg.exe", "robocopy.exe", "sdbinst.exe", "setx.exe", "sort.exe",
+                    "subst.exe", "systeminfo.exe", "taskkill.exe", "tasklist.exe", "timeout.exe", "where.exe", "whoami.exe",
+                    "wmic.exe", "wscript.exe", "xcopy.exe",
+                };
+                const char *toolsWant = getenv("MADEIRA_SYSTEM32_X86_TOOLS");
+                const BOOL toolsOn = !(toolsWant && strcmp(toolsWant, "0") == 0);
+                NSString *x86Dir = [bundlePath stringByAppendingPathComponent:@"i386-windows"];
+                int toolsLinked = 0, toolsKept = 0, toolsRemoved = 0;
+                for (size_t t = 0; t < sizeof(x86Tools) / sizeof(x86Tools[0]); t++) {
+                    NSString *name = [NSString stringWithUTF8String:x86Tools[t]];
+                    NSString *dst = [sys32Dir stringByAppendingPathComponent:name];
+                    NSString *src = [x86Dir stringByAppendingPathComponent:name];
+                    struct stat st;
+                    const BOOL there = lstat(dst.fileSystemRepresentation, &st) == 0;
+                    NSString *cur = (there && S_ISLNK(st.st_mode)) ? [fm destinationOfSymbolicLinkAtPath:dst error:nil] : nil;
+                    const BOOL ours = cur != nil && [cur hasSuffix:[@"/i386-windows/" stringByAppendingString:name]];
+                    if (toolsOn && has_i386_set && [fm fileExistsAtPath:src]) {
+                        if (!there || ours) {
+                            [fm removeItemAtPath:dst error:nil];
+                            if ([fm createSymbolicLinkAtPath:dst withDestinationPath:src error:nil]) toolsLinked++;
+                        } else {
+                            toolsKept++;
+                        }
+                    } else if (ours) {
+                        [fm removeItemAtPath:dst error:nil];
+                        toolsRemoved++;
+                    }
+                }
+                dprintf(STDERR_FILENO, "[x86-tools] system32: %d of %zu i386 command-line tools linked for 64-bit programs, %d names "
+                        "already there left alone, %d of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=%s)\n",
+                        toolsLinked, sizeof(x86Tools) / sizeof(x86Tools[0]), toolsKept, toolsRemoved, toolsOn ? "on" : "0");
+            }
+
             /* madeira-bcd: the AVX opt-in lives in a separately built FEX module
              * (tools/build-xtajit64.sh ships it as xtajit64-avx.dll). Only a
              * game whose settings ask for AVX gets it; everything else keeps
@@ -2687,6 +2744,16 @@ static void *wine_process_thread(void *arg) {
                 }
                 if ([wanted containsObject:@"evr"]) [wanted addObject:@"dxva2"];
                 if ([wanted containsObject:@"sfc"]) [wanted addObject:@"sfc_os"];
+                /* madeira-bcd (round 630, agent U S2; Football Manager 27 88YTP3): env.MADEIRA_ZERO_MITIGATION_POLICY = 1 is read only by the
+                 * opt-in kernelbase (wine dlls/kernelbase/process.c), so the key brings it along: one line in a game's file (or one tried
+                 * by the app) is enough. Unset or any other value: the list is as written. */
+                {
+                    const char *zmp = getenv("MADEIRA_ZERO_MITIGATION_POLICY");
+                    if (zmp && !strcmp(zmp, "1") && ![wanted containsObject:@"kernelbase"]) {
+                        [wanted addObject:@"kernelbase"];
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_ZERO_MITIGATION_POLICY=1: the opt-in kernelbase is added to MADEIRA_OPTIN_DLLS\n");
+                    }
+                }
                 if (([wanted containsObject:@"wmadmod"] || [wanted containsObject:@"wmvdecod"] || [wanted containsObject:@"mfasfsrcsnk"]) && !getenv("MADEIRA_WG_64BIT")) setenv("MADEIRA_WG_64BIT", "1", 0);
                 NSString *ecDir = [bundlePath stringByAppendingPathComponent:@"arm64ec-windows"];
                 NSArray *optDirs = use_arm64ec
@@ -2728,6 +2795,30 @@ static void *wine_process_thread(void *arg) {
                             NSString *to = [fm destinationOfSymbolicLinkAtPath:dst error:nil];
                             if (to && [to.lastPathComponent isEqualToString:file]) [fm removeItemAtPath:dst error:nil];
                         }
+                    }
+                }
+                /* madeira-bcd (round 630, agent G2 S18; Rotfront FFJ9EQ and 32 more archive logs): an Unreal game's own
+                 * Engine\Binaries\ThirdParty\DbgHelp\dbghelp.dll forwards MiniDumpWriteDump to dbgcore.dll (Windows 10's layout),
+                 * which BCD does not ship: "find_forwarded_export module not found for forward 'dbgcore.MiniDumpWriteDump'", and in
+                 * the game's crash handler the delay-load exception c06d007f and an R6025 box. Wine's dbghelp.dll exports the
+                 * function (BCD's own answer is a header-only dump), so a game that lists dbgcore gets dbgcore.dll as a link to the
+                 * shipped dbghelp.dll; a session that does not list it has a link of ours taken away. */
+                {
+                    NSString *dbghelp = [ecDir stringByAppendingPathComponent:@"dbghelp.dll"];
+                    BOOL wantDbgcore = [wanted containsObject:@"dbgcore"];
+                    for (NSString *dir in @[ [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"], sys32Dir ]) {
+                        NSString *dst = [dir stringByAppendingPathComponent:@"dbgcore.dll"];
+                        NSString *to = [fm destinationOfSymbolicLinkAtPath:dst error:nil];
+                        if (wantDbgcore && [optDirs containsObject:dir] && [fm fileExistsAtPath:dbghelp]) {
+                            [fm removeItemAtPath:dst error:nil];
+                            [fm createSymbolicLinkAtPath:dst withDestinationPath:dbghelp error:nil];
+                        }
+                        else if (to && [to isEqualToString:dbghelp]) [fm removeItemAtPath:dst error:nil];
+                    }
+                    if (wantDbgcore && [fm fileExistsAtPath:dbghelp]) {
+                        [wanted removeObject:@"dbgcore"];
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_OPTIN_DLLS: dbgcore.dll -> dbghelp.dll (the shipped dbghelp answers the "
+                                               "forwards of a game's own dbghelp)\n");
                     }
                 }
                 for (NSString *name in wanted)

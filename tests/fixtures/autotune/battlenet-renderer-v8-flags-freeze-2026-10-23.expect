@@ -3,12 +3,13 @@
  "end": {},
  "matched": [
   "chromium-v8-flags-freeze-writecopy",
-  "cage-release-band-exhausted"
+  "cage-release-band-exhausted",
+  "lse-atomic-store-undecoded"
  ],
  "next": [
   "env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1"
  ],
- "note": "Battle.net (build 596, the owner's iPhone18,2, launcher card, log 22:12:09): the login window spun for ever; Battle.net's own log said the render process was terminated and reloaded every 5 s. The renderers (Battle.net.exe --type=renderer, 32-bit Chromium 108.0.5359.125, Blizzard's libcef.dll) ended on an int3 at libcef.dll+0x16D00E1 (guest_rip 0x6de800e2, exit 0x80000003) 0.1 to 0.3 s after GpuMemoryThread started: V8's flag freeze (v8::base::OS::SetDataReadOnly) asked VirtualProtect for the old protection of v8_flags and CHECKed PAGE_READWRITE; BCD reported the recorded PAGE_WRITECOPY of the image's data page. chromium-v8-flags-freeze-writecopy proposes env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1 (value only; [wc-old] in the log); build 597's launcher card sets it for Battle.net itself. Matched beside it, and not the cause: cage-release-band-exhausted (the crash loop used up the JIT pool about 56 s later; no 32-bit process could start after that).",
+ "note": "Battle.net (build 596, the owner's iPhone18,2, launcher card, log 22:12:09): the login window spun for ever; Battle.net's own log said the render process was terminated and reloaded every 5 s. The renderers (Battle.net.exe --type=renderer, 32-bit Chromium 108.0.5359.125, Blizzard's libcef.dll) ended on an int3 at libcef.dll+0x16D00E1 (guest_rip 0x6de800e2, exit 0x80000003) 0.1 to 0.3 s after GpuMemoryThread started: V8's flag freeze (v8::base::OS::SetDataReadOnly) asked VirtualProtect for the old protection of v8_flags and CHECKed PAGE_READWRITE; BCD reported the recorded PAGE_WRITECOPY of the image's data page. chromium-v8-flags-freeze-writecopy proposes env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1 (value only; [wc-old] in the log); build 597's launcher card sets it for Battle.net itself. Matched beside it, and not the cause: cage-release-band-exhausted (the crash loop used up the JIT pool about 56 s later; no 32-bit process could start after that). Round 630: lse-atomic-store-undecoded also matches here, last (the lowest-priority rules; the verdict is unchanged).",
  "outcome": "crashed",
  "stage": 3,
  "status": "trying"

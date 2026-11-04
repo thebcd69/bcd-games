@@ -109,7 +109,9 @@ ea = launchers[launchers.index('static let eaApp = BCDLauncherSpec('):]
 common = re.search(r'static let commonSessionConfig = \[(.*?)\]', launchers).group(1)
 line = '"env.MADEIRA_INT3_X86_DUMP = 1"'
 check('Battle.net\'s launcher entry sets env.MADEIRA_INT3_X86_DUMP = 1, once', launchers.count(line) == 1 and line in bn
-      and 'sessionConfig: Self.commonSessionConfig + ["env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1", ' + line + '],' in bn)
+      # round 630 (agent A2 S5): the 32-bit fault report follows on the next line of the same list
+      and 'sessionConfig: Self.commonSessionConfig + ["env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1", ' + line + ',\n' in bn
+      and '"env.MADEIRA_X86_FAULT_DUMP = 1"],' in bn)
 check('the EA app\'s entry and the common session lines do not', 'MADEIRA_INT3_X86_DUMP' not in ea.split('\n}\n')[0] and 'MADEIRA_INT3_X86_DUMP' not in common)
 
 
@@ -129,6 +131,8 @@ allowed = {
     'tests/host/check-wc-old-prot.py', 'build/ntdll-unix/ios_wc_old_prot.h', 'build/ntdll-unix/virtual_ios.c',
     # the 32-bit fault report of the 2026-10-24 log round (env.MADEIRA_X86_FAULT_DUMP) names this switch to tell the two apart
     'build/ntdll-unix/ios_x86_fault_diag.h', 'tests/host/check-x86-fault-diag.py',
+    # round 630 (agent A2 S5): the launcher check pins Battle.net's session lines, this switch among them
+    'tests/host/check-bcd-launchers.py',
 }
 users = []
 for f in tracked(root):

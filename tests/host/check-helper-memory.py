@@ -31,8 +31,13 @@ it with madeira_cfg_bool, the tier from the exported env). Without it helper mem
 uses it today, and a second run of the same core proves that: a reservation larger than a region goes to the file, each range lies
 in one region (a bump pointer per region), the warning level closes the guard, the guard counts free pages only, the disk cap
 refuses before the pool is asked, a decommit inside a pool reservation is left to the caller (released), freed ranges are not
-merged, mempool-mb without swap-mb arms nothing, the margin is the one madeira_pool_add read. The Settings rows are unchanged
-(helper memory still needs the swap file there). MADEIRA_POOL_MIN_KB and MADEIRA_POOL_FEX are opt-in keys of their own.
+merged, mempool-mb without swap-mb arms nothing, the margin is the one madeira_pool_add read. MADEIRA_POOL_MIN_KB and
+MADEIRA_POOL_FEX are opt-in keys of their own.
+
+Round 630 (the owner's go, 2026-11-03: "Evet, ekleyelim bunu da"): the key is on unless a config sets it. The app reads it with
+default 1 and exports MADEIRA_POOL_MORE=1/0 for the tier before the config's env lines (a user's own line is exported after it
+and wins); env.MADEIRA_POOL_MORE = 0 gives build 624's helper memory, which the second run still proves. Settings lets helper
+memory be chosen without the swap file and says what it adds; the catalog's default is 1.
 Device runs are still required: this proves the bookkeeping and the mappings, not iOS's footprint ledger.
 """
 from pathlib import Path
@@ -315,6 +320,55 @@ static int main_off( void )
     return bad != 0;
 }
 
+/* Round 630 (agent T2 S1; RDR2 N1P94T): env.MADEIRA_POOL_LAZY_WINDOWS: the regions keep no window; a zeroing maps its range for that
+ * moment only, through the same memory entry, so every mapping of the range reads zero afterwards. */
+static char *entry_map( mach_port_t entry, uint64_t off, size_t len )
+{
+    mach_vm_address_t a = 0;
+    if (mach_vm_map( mach_task_self(), &a, len, 0, VM_FLAGS_ANYWHERE, entry, off, FALSE, VM_PROT_READ | VM_PROT_WRITE,
+                     VM_PROT_READ | VM_PROT_WRITE, VM_INHERIT_NONE ) != KERN_SUCCESS) return NULL;
+    return (char *)(uintptr_t)a;
+}
+static int main_lazy( void )
+{
+    mach_port_t entries[NREG];
+    char *w;
+    int i;
+    madeira_pool_set_lazy_windows( 1 );
+    for (i = 0; i < NREG; i++)
+    {
+        memory_object_size_t size = REGION;
+        vm_prot_t flags = VM_PROT_READ | VM_PROT_WRITE | MAP_MEM_NAMED_CREATE;
+        entries[i] = MACH_PORT_NULL;
+        if (mach_make_memory_entry_64( mach_task_self(), &size, 0, flags, &entries[i], MACH_PORT_NULL ) != KERN_SUCCESS)
+        { printf( "FAIL: mach_make_memory_entry_64\n" ); return 2; }
+        CHECK( madeira_pool_add( entries[i], REGION ) == 0, "lazy: a region is registered" );
+        CHECK( ios_pool_reg[i].window == NULL, "lazy: ... and keeps no window" );
+    }
+    /* (MACH_PORT_NULL would map anonymous memory: a name that is no port is what an entry that does not map looks like) */
+    CHECK( madeira_pool_add( (mach_port_t)0x7ffffff3, REGION ) == -1 && ios_pool_nreg == NREG, "lazy: an entry that does not map is refused" );
+    /* data in the last 8 MB of region 1 and the first 8 MB of region 2, written through mappings of their own */
+    w = entry_map( entries[1], REGION - 8 * MB, 8 * MB ); memset( w, 0x5a, 8 * MB ); mach_vm_deallocate( mach_task_self(), (mach_vm_address_t)(uintptr_t)w, 8 * MB );
+    w = entry_map( entries[2], 0, 8 * MB ); memset( w, 0x5b, 8 * MB ); mach_vm_deallocate( mach_task_self(), (mach_vm_address_t)(uintptr_t)w, 8 * MB );
+    CHECK( ios_pool_zero( 2 * REGION - 4 * MB, 8 * MB ) == 0, "lazy: a range across two regions is zeroed" );
+    w = entry_map( entries[1], REGION - 8 * MB, 8 * MB );
+    CHECK( all( w, 4 * MB, 0x5a ) && all( w + 4 * MB, 4 * MB, 0 ), "lazy: ... in region 1 only the zeroed half reads zero" );
+    mach_vm_deallocate( mach_task_self(), (mach_vm_address_t)(uintptr_t)w, 8 * MB );
+    w = entry_map( entries[2], 0, 8 * MB );
+    CHECK( all( w, 4 * MB, 0 ) && all( w + 4 * MB, 4 * MB, 0x5b ), "lazy: ... and in region 2 too" );
+    mach_vm_deallocate( mach_task_self(), (mach_vm_address_t)(uintptr_t)w, 8 * MB );
+    /* a whole region, more than one 64 MB chunk would be in production: zeroed in pieces here too (REGION is 32 MB) */
+    w = entry_map( entries[3], 0, REGION ); memset( w, 0x5c, REGION );
+    CHECK( ios_pool_zero( 3 * REGION, REGION ) == 0 && all( w, REGION, 0 ), "lazy: a whole region is zeroed; a mapping made before sees it" );
+    mach_vm_deallocate( mach_task_self(), (mach_vm_address_t)(uintptr_t)w, REGION );
+    /* an entry that is gone: the temporary map fails, and the zeroing says so */
+    mach_port_deallocate( mach_task_self(), entries[0] );
+    ios_pool_reg[0].entry = (mach_port_t)0x7ffffff3;
+    CHECK( ios_pool_zero( 0, 4 * MB ) == -1, "lazy: a range whose entry cannot be mapped is not zeroed (-1, as a failed madvise)" );
+    printf( "%d failures\n", bad );
+    return bad != 0;
+}
+
 int main( int argc, char **argv )
 {
     char path[] = "/tmp/madeira-helpermem-XXXXXX";
@@ -324,6 +378,7 @@ int main( int argc, char **argv )
     unsigned long long refused;
     int i, fd;
     if (argc > 1 && !strcmp( argv[1], "off" )) return main_off();
+    if (argc > 1 && !strcmp( argv[1], "lazy" )) return main_lazy();
     fd = mkstemp( path );
     if (fd < 0) return 2;
     close( fd );
@@ -561,6 +616,19 @@ int main( int argc, char **argv )
 }
 '''
 
+# Round 630 (agent T2 S1): env.MADEIRA_POOL_LAZY_WINDOWS: read by the bridge (off unless set), passed before the first region, in the
+# catalog and the list policy.
+_bridge = (root / 'app/Madeira/WineProcessBridge.m').read_text()
+_mp = (root / 'app/Madeira/MemoryPool.m').read_text()
+check('MadeiraMemoryPoolLazy = madeira_cfg_bool("env.MADEIRA_POOL_LAZY_WINDOWS", 0);' in _bridge
+      and _bridge.index('MadeiraMemoryPoolLazy = madeira_cfg_bool(') < _bridge.index('long got = MadeiraMemoryPoolStart(poolMB);')
+      and _mp.index('madeira_pool_set_lazy_windows(MadeiraMemoryPoolLazy);') < _mp.index('if (madeira_pool_add(entry, region) != 0)'),
+      'lazy windows: the bridge reads env.MADEIRA_POOL_LAZY_WINDOWS (off unless set) and MemoryPool.m passes it before the first region')
+_cat = (root / 'build/tools/gen-config-catalog.py').read_text()
+_pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
+check(re.search(r'"env\.MADEIRA_POOL_LAZY_WINDOWS": \{[^}]*"default": "0"', _cat, re.S) is not None
+      and 'MADEIRA_POOL_LAZY_WINDOWS is 0 or 1' in _pol, 'lazy windows: the catalog (default off) and the list policy know the key')
+
 if sys.platform != 'darwin':
     print('note: the runtime part needs Darwin (mach memory entries, F_PUNCHHOLE); source checks only')
 else:
@@ -572,6 +640,13 @@ else:
                            capture_output=True, text=True)
         check(b.returncode == 0, 'the swap-tier core compiles with the harness' + ('' if b.returncode == 0 else ':\n' + b.stderr[-4000:]))
         if b.returncode == 0:
+            # round 630 (agent T2 S1): env.MADEIRA_POOL_LAZY_WINDOWS, in a process of its own (the tier's state is global)
+            lz = subprocess.run([str(exe), 'lazy'], capture_output=True, text=True)
+            lfails = [l for l in lz.stdout.splitlines() if l.startswith('FAIL')]
+            check(lz.returncode == 0 and not lfails and lz.stdout.count('ok: ') >= 13,
+                  'lazy windows: %d checks' % lz.stdout.count('ok: ') + ('' if not lfails else ':\n' + '\n'.join(lfails)))
+            check('no windows kept (MADEIRA_POOL_LAZY_WINDOWS): a range is mapped only while it is zeroed' in lz.stderr,
+                  'lazy windows: the first region says so in its line')
             r = subprocess.run([str(exe)], capture_output=True, text=True)
             fails = [l for l in r.stdout.splitlines() if l.startswith('FAIL')]
             check(r.returncode == 0 and not fails, 'runtime: %d checks' % r.stdout.count('ok: ') + ('' if not fails else ':\n' + '\n'.join(fails)))
@@ -662,21 +737,31 @@ check('!split && system_level == 2 ? 1 : system_level' in src, 'without the spli
 bridge = (root / 'app/Madeira/WineProcessBridge.m').read_text()
 check(re.search(r'if \(poolMore && capMB < 64 && poolMB >= 512\) \{\s*capMB = 64;', bridge) is not None,
       'mempool-mb arms the tier without swap-mb, with MADEIRA_POOL_MORE only')
-check('int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 0);' in bridge
+check('int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 1);' in bridge
       and 'MadeiraMemoryPoolMore = poolMore;' in bridge
       and bridge.index('MadeiraMemoryPoolMore = poolMore;') < bridge.index('long got = MadeiraMemoryPoolStart(poolMB);'),
-      'the app reads the key from bcd.cfg or the game\'s config and sets the pressure source\'s switch before the pool starts')
+      'the app reads the key from bcd.cfg or the game\'s config (on when unset, round 630) and sets the pressure source\'s switch before the pool starts')
+exp = 'setenv("MADEIRA_POOL_MORE", poolMore ? "1" : "0", 1);'
+check(bridge.count(exp) == 1
+      and bridge.index('int poolMore = madeira_cfg_bool("env.MADEIRA_POOL_MORE", 1);') < bridge.index(exp) < bridge.index('if (capMB >= 64) {')
+      and bridge.index(exp) < bridge.index('/* ml1062: environment exports'),
+      'round 630: the app exports the key\'s value for the tier (ios_pool_config reads the environment) before the tier is armed, '
+      'and before the config\'s own env lines, so a line of the user\'s is exported after it and wins')
 check(bridge.index('long poolMB = (long)madeira_cfg_int("mempool-mb", 0);') < bridge.index('if (capMB >= 64) {'),
       'mempool-mb is read before the tier is armed')
 sections = (root / 'app/Madeira/BCDSettingsSections.swift').read_text()
 row = sections[sections.index('row(.memoryPool, "Helper memory"'):]
 row = row[:row.index(')\n')]
-check('Experimental; needs the swap file.' in row and 'enabled: backend.value(.swap) != ""' in row
-      and 'Helper memory adds' not in sections,
-      'Settings: the rows are build 624\'s (round 625: the key is opt-in; without it helper memory still needs the swap file)')
+cover = sections[sections.index('row(.swapCoverage, "What can move"'):]
+cover = cover[:cover.index(')\n')]
+check('Works without the swap file.' in row and 'Experimental.' in row and 'enabled:' not in row
+      and 'enabled: backend.value(.swap) != "" || backend.value(.memoryPool) != ""' in cover
+      and 'BCDSettingsInfoRow(title: "Helper memory adds"' in sections,
+      'Settings (round 630, the key on by default): helper memory can be chosen without the swap file, what can move applies '
+      'to either, and "This device" shows what helper memory adds')
 cat = (root / 'build/tools/gen-config-catalog.py').read_text()
-check(re.search(r'"env\.MADEIRA_POOL_MORE": \{[^}]*?"kind": "bool", "default": "0"', cat, re.S) is not None,
-      'the settings catalog knows the key (bool, default 0)')
+check(re.search(r'"env\.MADEIRA_POOL_MORE": \{[^}]*?"kind": "bool", "default": "1"', cat, re.S) is not None,
+      'the settings catalog knows the key (bool, default 1 from round 630)')
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('python3 tests/host/check-helper-memory.py' in wf, 'CI runs this check')
 

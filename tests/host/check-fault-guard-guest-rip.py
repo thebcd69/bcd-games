@@ -207,6 +207,8 @@ static int ios_fault_loop_guest_progress_on(void) { return 0; }
 static int ios_fault_loop_guest_progress(struct ios_fault_progress *last, uintptr_t thread, unsigned exception, uintptr_t frame, uintptr_t x28,
                                          uint64_t guest_rip, uint64_t *previous)
 { (void)last; (void)thread; (void)exception; (void)frame; (void)x28; (void)guest_rip; *previous = 0; return 0; }
+/* round 630 (agent O2 S2): a fault inside a system call's __TRY is no livelock; off here (check-syscall-fault-loop.py runs it) */
+static int ios_mach_syscall_try_active(uintptr_t teb, uint64_t sp) { (void)teb; (void)sp; return 0; }
 static int mach_task_self(void) { return 0; }
 static int mach_vm_region(int task, mach_vm_address_t *q, mach_vm_size_t *rs,
                          int f, vm_region_info_t r, mach_msg_type_number_t *rc, mach_port_t *ro)

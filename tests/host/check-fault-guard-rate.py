@@ -101,6 +101,13 @@ struct fake_ctx { uintptr_t pc; uint64_t x0; };
 struct fake_si { void *si_addr; };
 #define PC_sig(c) ((c)->pc)
 #define REGn_sig(n, c) ((c)->x0)
+/* round 630 (agent O2 S2): a fault inside a system call's __TRY restarts the run; outside one here (check-syscall-fault-loop.py runs it) */
+struct fake_thread_data { void *jmp_buf; };
+static struct fake_thread_data fake_thread_data;
+static void *NtCurrentTeb(void) { return &fake_thread_data; }
+static struct fake_thread_data *ntdll_get_thread_data(void) { return &fake_thread_data; }
+static int is_inside_syscall(uint64_t sp) { (void)sp; return 0; }
+#define SP_sig(c) ((uint64_t)0)
 #define ERR(...) do { if (getenv("QUIET_LOG") == NULL) fprintf(stderr, __VA_ARGS__); } while (0)
 static uintptr_t ios_teb_for_signals;
 static void ios_fixup_x18_for_return(struct fake_ctx *c) { (void)c; }

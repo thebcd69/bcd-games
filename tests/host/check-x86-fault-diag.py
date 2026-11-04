@@ -67,8 +67,24 @@ check('the header is included exactly once, after the earlier 32-bit diagnostics
       signal_src.count(inc) == 1 and signal_src.index('#include "ios_int3_x86_diag.h"') < signal_src.index(inc)
       and signal_src.index('#include "ios_ill_guest_diag.h"') < signal_src.index(inc)
       < signal_src.index('static void *ios_mach_exception_thread( void *arg )'))
-check('one call site for the int3 and two for the access violation (round 624: the signal path\'s too), each behind `if (ios_x86_fault_enabled()`',
-      signal_src.count('ios_x86_fault_int3(') == 1 and signal_src.count('ios_x86_fault_av(') == 2 and signal_src.count('if (ios_x86_fault_enabled()') == 3)
+check('one call site for the int3, two for the access violation (round 624: the signal path\'s too) and (round 630) two for a branch where no code '
+      'is, each behind `if (ios_x86_fault_enabled()`',
+      signal_src.count('ios_x86_fault_int3(') == 1 and signal_src.count('ios_x86_fault_av(') == 2
+      and signal_src.count('ios_x86_fault_branch_nowhere(') == 2 and signal_src.count('if (ios_x86_fault_enabled()') == 5)
+# round 630 (agents O3 S10/S15, A1 S22): the Mach thread's call after the JIT-only access-violation call, for a low fault address outside JIT
+# code, from FEX's frame; and the [wow-low-rip] branch's, before the pc is moved to the dispatcher's call
+bn1 = signal_src.index('ios_x86_fault_branch_nowhere(')
+bn2 = signal_src.index('ios_x86_fault_branch_nowhere(', bn1 + 1)
+check('round 630: the Mach thread\'s branch-to-nowhere call is the else of the JIT access-violation call, for EXC_BAD_ACCESS below 64 KB, '
+      'with FEX\'s frame and State.rip',
+      signal_src.index('ios_x86_fault_av( &state, xf_teb, cs[0], (uint64_t)fault_addr, -1 );') < bn1
+      and 'else if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)' in signal_src[bn1 - 700:bn1]
+      and signal_src[bn1:bn1 + 90].startswith('ios_x86_fault_branch_nowhere( &state, xf_teb, st28, cs[0], "null-call" );'))
+low = signal_src[signal_src.index('"[wow-low-rip] guest branch to %p: pc set to the dispatcher\'s call %p so the "'):]
+check('round 630: the [wow-low-rip] branch reports the caller before the pc moves, from FEX\'s frame at x28, behind the switch',
+      low.index('ios_x86_fault_branch_nowhere(') < low.index('PC_sig(context) = lp_lr - 4;')
+      and 'if (ios_x86_fault_enabled())\n                ios_x86_fault_branch_nowhere( &context->uc_mcontext->__ss, (uintptr_t)NtCurrentTeb(),\n'
+          '                                              context->uc_mcontext->__ss.__x[28], lp_pc, "wow-low-rip" );' in low)
 i3 = signal_src.index('ios_x86_fault_int3(')
 g3 = signal_src.rindex('if (ios_x86_fault_enabled()', 0, i3)
 battle = signal_src.index('ios_int3_x86_diag( &bs, i3x_teb, gregs, grip );')
@@ -108,11 +124,21 @@ note = vsrc[vsrc.index('static void ios_vm_note_alloc( void *base, SIZE_T size, 
 note = note[:note.index('\n}\n')]
 wow = note[note.index('    if (!log_all && !covers && is_wow64())\n    {'):note.index('    if (b < 0x100000000ull && !viol && !zbits) return;')]
 check('round 624 (E1 S17 a3): a WoW64 allocation without the switch returns as before; with it, the ring and a line (the first 400, then every 256th)',
-      wow.index('if (!ios_x86_fault_switch()) return;') < wow.index('ios_x86f_ring_note( b, size, type, protect, 0 );')
+      wow.index('if (!ios_x86_fault_switch()) return;') < wow.index('ios_x86f_ring_note( b, size, type, protect, 0, hint );')
       and 'if (k <= 400 || !(k % 256))' in wow and wow.rstrip().endswith('return;\n    }') and wow.count('return;') == 2)
 free_note = vsrc[vsrc.index('static void ios_vm_note_free( void *base, SIZE_T size, ULONG type )'):]
 free_note = free_note[:free_note.index('\n}\n')]
-check('round 624 (D2 S8 d2): a WoW64 free goes into the ring only with the switch on', 'if (is_wow64() && ios_x86_fault_switch()) ios_x86f_ring_note( b, size, type, 0, 1 );' in free_note)
+check('round 624 (D2 S8 d2): a WoW64 free goes into the ring only with the switch on', 'if (is_wow64() && ios_x86_fault_switch()) ios_x86f_ring_note( b, size, type, 0, 1, 0 );' in free_note)
+# round 630 (agent O3 S15): WoW64 section views and unmaps into the ring, the first 100 views as [map-view] lines, only with the switch
+nv = vsrc[vsrc.index('static void ios_x86f_note_view('):]
+nv = nv[:nv.index('\n}\n')]
+check('round 630 (O3 S15): a section view of the WoW64 process itself goes into the ring and (100 at most) a [map-view] line, only with the switch; '
+      'both map calls and the unmap feed it',
+      'if (process != NtCurrentProcess() || !is_wow64() || !ios_x86_fault_switch()) return;' in nv
+      and 'if (got) ios_x86f_ring_note( got, size_ptr ? *size_ptr : 0, MEM_MAPPED, protect, 0, req );' in nv
+      and 'if ((k = __atomic_add_fetch( &views, 1, __ATOMIC_RELAXED )) > 100) return;' in nv and '"[map-view] r630 #%lu %s section=%p' in nv
+      and vsrc.count('ios_x86f_note_view( "NtMapViewOfSection') == 2
+      and 'if (!NT_ERROR( status ) && process == NtCurrentProcess() && is_wow64() && ios_x86_fault_switch())\n        ios_x86f_ring_note( (UINT64)(ULONG_PTR)addr, 0, MEM_MAPPED, 0, 1, 0 );' in vsrc)
 check('round 624: the switch reaches virtual_ios.c through one getter of signal_arm64_ios.c (the environment is read in one place)',
       'int ios_x86_fault_switch( void ) { return ios_x86_fault_enabled(); }' in signal_src and 'MADEIRA_X86_FAULT_DUMP' not in vsrc)
 check('the access-violation call is inside the [rsp-trunc] block, for EXC_BAD_ACCESS in JIT code only',
@@ -128,7 +154,7 @@ raw_deref = re.findall(r'\*\s*\(\s*(?:const\s+)?(?:volatile\s+)?(?:u?int\d+_t|vo
 check('no raw dereference of a guest address', not raw_deref, str(raw_deref))
 check('only for a 32-bit guest (rip below 4 GB, a 4 GB aligned window base in x19) and with a TEB (x18 when it lies in the window, else the lookup)',
       'if (!gregs || eip64 < 0x10000 || eip64 > 0xffffffffULL) return;' in code and 'if (!thread_teb) return;' in code
-      and code.count('(base & 0xffffffffULL) == 0 && base >= 0x100000000ULL') == 2
+      and code.count('(base & 0xffffffffULL) == 0 && base >= 0x100000000ULL') == 3
       and 'st->__x[18] >= base && st->__x[18] - base < 0x100000000ULL) thread_teb = (uintptr_t)st->__x[18];' in code)
 check('capped at 3 reports per session; the repeat of the fault just reported is not a report',
       'IOS_X86F_MAX_REPORTS  3' in header and '> IOS_X86F_MAX_REPORTS) return;' in code and 'static volatile int reports;' in code
@@ -151,8 +177,12 @@ stripped = re.sub(r'\n\n *\/\* ajan21-loglar \(build 598\): the same evidence fo
 stripped = re.sub(r'\n\n *\/\* ajan21-loglar \(build 598\): the opt-in report for a 32-bit guest\'s access violation.*?ios_x86_fault_av\( &state, xf_teb, cs\[0\], \(uint64_t\)fault_addr, -1 \);\n *\}\n', '\n', stripped, flags=re.S)
 stripped = re.sub(r'/\* round 624 \(agents E1 S17, D2 S8\): virtual_ios\.c keeps.*?\nint ios_x86_fault_switch\( void \) \{ return ios_x86_fault_enabled\(\); \}\n', '', stripped, flags=re.S)
 stripped = re.sub(r'\n *\/\* madeira-bcd \(round 624, agent E1 S17; Unreal Gold EQ6DMS, X3HYP5\): the opt-in \[x86-fault\] report on this path too\..*?vrec\.ExceptionInformation\[0\] == 0 \? 0 : -1 \);\n *\}\n', '\n', stripped, flags=re.S)
+# round 630: the branch-to-nowhere calls (agents O3 S10/S15 and A1 S22) and the call chain at a software raise (O3 S17)
+stripped = re.sub(r'\n *\/\* round 630 \(agents O3 S10/S15; Vampire ZGERG3, Jet Set Radio 2EZCT8\).*?"null-call" \);\n *\}\n', '\n', stripped, flags=re.S)
+stripped = re.sub(r'\n *\/\* round 630 \(agent A1 S22; Need for Speed: Most Wanted SGQDPG\).*?lp_pc, "wow-low-rip" \);\n', '\n', stripped, flags=re.S)
+stripped = re.sub(r'\n *\/\* round 630 \(agent O3 S17; Prototype 2 E0FWD8.*?ios_wow32_stack_dump\( "raise" \);\n *\}\n', '\n', stripped, flags=re.S)
 leftovers = re.findall(r'[^\n]*(?:x86_fault|X86_FAULT|x86-fault|xf_teb|xf_ss|xf_rip)[^\n]*', stripped)
-check('taking out the include, the getter and the three guarded blocks leaves no reference to the report in signal_arm64_ios.c', not leftovers, str(leftovers[:4]))
+check('taking out the include, the getter and the guarded blocks (three, and round 630\'s three) leaves no reference to the report in signal_arm64_ios.c', not leftovers, str(leftovers[:4]))
 
 
 def tracked(rootdir):
@@ -174,14 +204,17 @@ allowed = {
     'build/tools/autotune_rules.py', 'app/Madeira/AutoTuneRules.generated.swift',
     # round 624 (agent A S4, 7NKYWT): the EA app's sessions carry it for their installer's custom-action hosts; its launcher check pins the line
     'app/Madeira/BCDLaunchers.swift', 'tests/host/check-bcd-launchers.py',
+    # round 630: checks that pin whole list rows or launcher lines, this switch among them: Hotline Miami's row (agent A2 S15) and
+    # Battle.net's session lines (agent A2 S5)
+    'tests/host/check-d3d8-to-d3d9.py', 'tests/host/check-wc-old-prot.py',
 }
-# The EA app's entry is the one launcher line: exactly one source line in BCDLaunchers.swift, inside the eaApp entry, not in Battle.net's.
+# The launcher lines: the EA app's entry (round 624, 7NKYWT) and Battle.net's (round 630, agent A2 S5, 6KW9QM), one source line each.
 launch_src = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
 ea_entry = launch_src[launch_src.index('static let eaApp'):]
 bn_entry = launch_src[launch_src.index('static let battlenet'):launch_src.index('static let eaApp')]
-check('the EA app entry (only) carries env.MADEIRA_X86_FAULT_DUMP = 1 in its sessionConfig (round 624, 7NKYWT)',
-      launch_src.count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1 and '"env.MADEIRA_X86_FAULT_DUMP = 1"' in ea_entry
-      and 'MADEIRA_X86_FAULT_DUMP' not in bn_entry)
+check('the EA app and Battle.net entries carry env.MADEIRA_X86_FAULT_DUMP = 1 in their sessionConfig, once each (round 624 7NKYWT, round 630 6KW9QM)',
+      launch_src.count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 2 and ea_entry.count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1
+      and bn_entry.count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1)
 users = []
 for f in tracked(root):
     rel = str(f.relative_to(root))
@@ -208,13 +241,20 @@ for r in recs['rules']:
 # Round 624 (agent E1 S7, TS8ME1): Doki Doki Literature Club's diagnostic list (Ren'Py's exit(-1)) from build 598.
 check('the bundled lists that carry the switch are exactly Most Wanted, Underground 2, Chuchel, Botanicula and (round 624) Mafia II, osu!, Overlord II, '
       'Ubisoft Connect, Unreal Gold and Doki Doki Literature Club, once each, as env.MADEIRA_X86_FAULT_DUMP = 1 with minBuild 598 (Mafia II and Unreal Gold 624)',
-      sorted(carriers) == [('botanicula', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('chuchel', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+      sorted(carriers) == sorted([('botanicula', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('chuchel', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
                            ('crosscode', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),   # round 626 (agent U1 S3, DBS8WF)
                            ('doki-doki-literature-club', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
                            ('mafia-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624),
                            ('nfs-most-wanted', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('nfs-underground-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
                            ('osu', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('overlord-ii', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('ubisoft-connect', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
-                           ('unreal-gold', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)], str(carriers))
+                           ('unreal-gold', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624),
+                           # round 630: the diagnostic rows of the log review (agents O1, O2, O3, A2, G1)
+                           ('aliens-colonial-marines', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('bioshock', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630),
+                           ('fallout-3', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('hitman-blood-money', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
+                           ('hotline-miami', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624), ('resident-evil-5', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630),
+                           ('stalker-xray-engine', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('tales-of-zestiria', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630),
+                           ('vampire-bloodlines', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]),
+      str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs
 cc = os.environ.get('CC', 'cc')
@@ -435,6 +475,22 @@ int main(int argc, char **argv)
     }
     if (!strcmp(s, "busy")) { fake_lock_busy = 1; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
     if (!strcmp(s, "nostack")) { w.st.__x[8] = 0x6000000; w.st.__x[9] = 0x6000010; guarded_av(&w, BLOCK, WIN + 0xb514ab6a); return 0; }
+    if (!strcmp(s, "nowhere")) {
+        /* round 630 (agents O3 S10/S15, A1 S22): FEX's frame, State.rip at +0x18 and the registers at +0x20 (RAX RCX RDX RBX RSP RBP RSI
+         * RDI); ESP points at the return address 0x433210 (a direct call before it, in speed.exe) */
+        static uint64_t frame[16];
+        uint64_t fr = (uint64_t)(uintptr_t)frame;
+        frame[4] = 0x11; frame[5] = 0x22; frame[6] = 0x33; frame[7] = 0x44;
+        frame[8] = 0x127fdf8; frame[9] = 0x127fe3c; frame[10] = 0x55; frame[11] = 0x66;
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0, "null-call");              /* a NULL call */
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, BLOCK, "null-call");          /* code is there: nothing */
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, 0, 0, "null-call");               /* no frame: nothing */
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0x262c1234, "null-call");     /* nothing mapped there */
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0x100, "wow-low-rip");
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0x200, "wow-low-rip");        /* a fourth: over the cap */
+        printf("nowhere-done reads=%lu\n", g_reads);
+        return 0;
+    }
     return 0;
 }
 '''
@@ -553,6 +609,26 @@ else:
                   and not any('code stk#' in l and '0x00817770' in l for l in allv)
                   and len([l for l in allv if '   code stk#' in l and 'bytes before' in l]) <= 8, r.stderr)
 
+            r = run('nowhere', MADEIRA_X86_FAULT_DUMP='1')
+            allv = r.stderr.splitlines()
+            heads = [l for l in allv if ' a 32-bit guest branched to ' in l]
+            rets = [l for l in allv if l.startswith('[x86-fault] #') and 'the return address at ESP of a 32-bit call' in l]
+            check('round 630: a branch where no code is: three headers at most (a NULL call, a target nothing maps, a low address), none for a '
+                  'target with code or without a frame; each names the dword at ESP and is followed by a report around that return address',
+                  len(heads) == 3 and heads[0] == '[x86-fault] null-call: a 32-bit guest branched to 0x00000000, where no code is; the dword at '
+                  'ESP=0x0127fdf8 is 0x00433210 (the return address when a call went there); the report below is around it'
+                  and '0x262c1234' in heads[1] and heads[2].startswith('[x86-fault] wow-low-rip: a 32-bit guest branched to 0x00000100')
+                  and len(rets) == 3 and rets[0].startswith('[x86-fault] #1 the return address at ESP of a 32-bit call that went where no code is: '
+                  'guest 0x00433210 (speed.exe+0x33210)') and 'ESP=0x127fdf8' in rets[0] and 'EAX=0x11 ECX=0x22' in rets[0], r.stderr[-1500:])
+            check('round 630: the report around the return address has the code window labelled ret (the E8 before it), the stack and no access '
+                  'lines; a target nothing maps also gets the allocation ring for that address',
+                  any(l.startswith('[x86-fault]   code ret ') for l in allv) and not any('fault address minus' in l for l in allv)
+                  and any(l == '[x86-fault]   WoW64 allocations and frees before the fault (fake) 0x262c1234' for l in allv)
+                  and sum(1 for l in allv if 'WoW64 allocations and frees before the fault (fake)' in l) == 1
+                  and 'nowhere-done' in r.stdout, r.stderr[-1500:])
+            r = run('nowhere')
+            check('round 630: without the switch the branch-to-nowhere path prints and reads nothing',
+                  r.stderr == '' and r.stdout.strip() == 'nowhere-done reads=0', r.stderr + r.stdout)
             r = run('int3', MADEIRA_X86_FAULT_DUMP='1')
             ls = lines(r)
             allv = r.stderr.splitlines()
@@ -607,15 +683,20 @@ int main( void )
 {
     ios_x86f_alloc_ring_dump( 0x1234 );                                         /* nothing yet */
     /* Unreal Gold EQ6DMS: the 64 KB texture view, a 756 KB view released before the storm; the fault one row past the end */
-    ios_x86f_ring_note( win + 0x07a30000, 0x10000, 0x3000, 0x04, 0 );
-    now_ms += 5; ios_x86f_ring_note( win + 0x07a40000, 0xbd000, 0x8000, 0, 1 );
-    now_ms += 5; ios_x86f_ring_note( 0x7000000000ULL, 0x1000, 0x1000, 0x04, 0 );  /* outside the window: not kept */
+    ios_x86f_ring_note( win + 0x07a30000, 0x10000, 0x3000, 0x04, 0, 0 );
+    now_ms += 5; ios_x86f_ring_note( win + 0x07a40000, 0xbd000, 0x8000, 0, 1, 0 );
+    now_ms += 5; ios_x86f_ring_note( 0x7000000000ULL, 0x1000, 0x1000, 0x04, 0, 0 );  /* outside the window: not kept */
     now_ms += 10;
     ios_x86f_alloc_ring_dump( 0x07a40010 );
     /* the ring keeps the last 64 */
-    for (unsigned i = 0; i < 70; i++) ios_x86f_ring_note( win + 0x10000000 + i * 0x10000, 0x1000, 0x1000, 0x04, 0 );
+    for (unsigned i = 0; i < 70; i++) ios_x86f_ring_note( win + 0x10000000 + i * 0x10000, 0x1000, 0x1000, 0x04, 0, win + 0x10000000 + i * 0x10000 );
     ios_x86f_alloc_ring_dump( 0x07a3fff0 );
-    win = 0; ios_x86f_ring_note( 0x5000001000ULL, 0x1000, 0x1000, 0x04, 0 );     /* no window (a 64-bit process): not kept */
+    /* round 630 (O3 S15, Jet Set Radio): a request for 0x262c0000 placed at 0x062c0000, in host and in guest form, and a section view */
+    ios_x86f_ring_note( win + 0x062c0000, 0x180000, 0x3000, 0x40, 0, win + 0x262c0000 );
+    ios_x86f_ring_note( win + 0x062c0000, 0x180000, 0x3000, 0x40, 0, 0x262c0000 );
+    ios_x86f_ring_note( win + 0x06500000, 0x10000, 0x40000, 0x20, 0, 0 );
+    ios_x86f_alloc_ring_dump( 0x062c1000 );
+    win = 0; ios_x86f_ring_note( 0x5000001000ULL, 0x1000, 0x1000, 0x04, 0, 0 );     /* no window (a 64-bit process): not kept */
     ios_x86f_alloc_ring_dump( 0 );
     return 0;
 }
@@ -640,8 +721,14 @@ if sys.platform == 'darwin' and shutil.which(cc):
             check('the ring keeps the last 64 of 72, oldest first, and marks a fault just past an entry\'s end',
                   last.endswith('(72 in all, the last 64, guest addresses):') and rows[0].startswith('[x86-fault]     #8 alloc 0x10060000+0x1000')
                   and rows[-1].startswith('[x86-fault]     #71 alloc 0x10450000+0x1000') and len(rows) == 64, '\n'.join(rows[:2] + rows[-2:]))
-            check('a process without a 4 GB window (64-bit) adds nothing', out[-1].endswith('#71 alloc 0x10450000+0x1000 type=0x1000 prot=0x4 tid=009c 0 ms ago')
-                  and '(72 in all' in [l for l in out if l.startswith('[x86-fault]   WoW64')][-1], '\n'.join(out[-3:]))
+            req_rows = out[out.index([l for l in out if l.startswith('[x86-fault]   WoW64')][3]) + 1:]
+            check('round 630 (O3 S15): a request placed elsewhere shows req= (host or guest form), a request placed where asked and none show nothing',
+                  any(l.startswith('[x86-fault]     #72 alloc 0x062c0000+0x180000 type=0x3000 prot=0x40 tid=009c 0 ms ago req=0x262c0000  <== the fault is inside') for l in req_rows)
+                  and any(l.startswith('[x86-fault]     #73 alloc 0x062c0000+0x180000 type=0x3000 prot=0x40 tid=009c 0 ms ago req=0x262c0000') for l in req_rows)
+                  and any(l == '[x86-fault]     #74 alloc 0x06500000+0x10000 type=0x40000 prot=0x20 tid=009c 0 ms ago' for l in req_rows)
+                  and not any('req=' in l for l in out if ' 0x1' in l and '#7' not in l), '\n'.join(req_rows[-4:]))
+            check('a process without a 4 GB window (64-bit) adds nothing', out[-1].endswith('#74 alloc 0x06500000+0x10000 type=0x40000 prot=0x20 tid=009c 0 ms ago')
+                  and '(75 in all' in [l for l in out if l.startswith('[x86-fault]   WoW64')][-1], '\n'.join(out[-3:]))
 
 # ---------------------------------------------------------------- 4. catalog, CI, iOS compile
 gen_cat = (root / 'build/tools/gen-config-catalog.py').read_text()

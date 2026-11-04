@@ -77,7 +77,7 @@ check('appendingPathComponent("arm64ec-windows/vulkan-1.dll")' in prep, "only wi
 check('installSessionDroppedKeys: Set<String> = ["env.MADEIRA_SC_PA_POOLS", "env.MADEIRA_RDR2_VA_HOLD"]' in installers,
       'a session of one-time installs leaves out only the two address-space holds that take the 32-bit slots')
 check('setenv("MADEIRA_DOCK_INSTALLS_SESSION", "1", 1)' in content and 'unsetenv("MADEIRA_DOCK_INSTALLS_SESSION")' in content and
-      content.index('profile.applyEnvironment()') < content.index('DockInstallers.applyInstallSessionConfig()'),
+      content.index('profile.applyEnvironment()') < content.index('DockInstallers.applyInstallSessionConfig(extra: eaInstallLines)'),
       'only an installs-only Dock start marks its session; the copy without them replaces the game file after the profile wrote it')
 check('setenv("MADEIRA_CFG_GAME", copy.path, 1)' in installers and 'bcd-game-installs.cfg' in installers,
       'the session reads the copy (MADEIRA_CFG_GAME); the game\'s own file stays as it is')

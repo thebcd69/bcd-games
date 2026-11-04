@@ -1,0 +1,145 @@
+[19:53:48.111] [INFO] Checking entitlements...
+[19:53:48.112] [INFO] [build] v0.1.626 (626)
+[19:53:48.113] [INFO] [device] model=iPad16,5 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7374MB available=8172MB cores=9
+[19:53:48.113] [INFO] [device] address-map=[0x100b64000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:53:48.124] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=-05:00 free-disk=27GB stikdebug-url=0
+[19:53:48.128] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:56:57.604] [INFO] Requesting JIT with Built-in StikJIT...
+[19:56:59.331] [INFO] [bcd] library launch witcher3.exe: avx=1 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[19:56:59.358] [INFO] Running full Wine sequence...
+[19:56:59.358] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100b64000,0x8000000000) 512GB available=8140MB low-power=0 thermal=nominal
+[19:56:59.360] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_JUMBO_HALF=1
+[19:56:59.363] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[19:56:59.366] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:56:59.366] [INFO] Allocating 896MB JIT pool via debugger...
+[19:56:59.367] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:56:59.367] [INFO] [jit-debugger] attached=1 at the pool request
+[19:56:59.369] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:57:00.096] [INFO] RX pool at 0x148000000
+[19:57:00.114] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.802s rev=ml526
+[19:57:00.170] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 4 x 512 MB registered, extension exited
+[game-cfg] <container>/Library/Application Support/GameConfigs/f9c703fdb74cfc58.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x70a7000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[19:57:00.806] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[19:57:00.806] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[19:57:00.806] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7507 MB + phys_footprint=684 MB = 8192 MB (hw.memsize says 7374 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7374 MB), so it is a sentinel, not a limit
+ml985: map_image_view size=0x5c57000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=70 occupied=9729 MB of 15232 MB free=5518 MB maxhole=5517 MB@0x70a7004000 rev=ml787 (periodic)
+[jit-pool] image 0x140000000+0x5c57000 (witcher3.exe) → pool 0x148005000 used=0x5c61000/0x27000000 tramp+0x0
+[copy-verify] witcher3.exe: OK, 2044 .text pages executable (copy @0x148005000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14dc60000 used=0x5d98000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14dc60000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x123800000..0x7887000000 regions=80038 occupied=464251 MB of 489016 MB free=43309 MB maxhole=18544 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=870 MB (peak 870) internal=863 MB compressed=3 MB external=76 MB reusable=9 MB (cycle=1)
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x14dd9a000 used=0x61ba000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14dd9a000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14e1b8000 used=0x62ec000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14e1b8000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14e2ec000 used=0x63b4000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14e2ec000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14e3b4000 used=0x66b4000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14e3b4000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module witcher3.exe (witcher3.exe-45cce90df680a7ff): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[va-exit] rev=ml312 0x7c00c00000+0x802000 type=0x2000 tid=0024 steer=NONE#0 freed=0 steer_n=0
+[valloc] ml959 # base=0x7c00c01000 size=0x800000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c00c01000 zero_bits=0x0 limit=0x0
+E 24 [cpu-area] ThreadInit-done tid=0x24 teb=0x71fffe0000 tsd275=0x71fffe0000 x18teb=0x71fffe0000 area=0x121800000 StateFrame(ED0)=0x7c00801140 ThreadState(ED1)=0x7c00801000 EnterEC=0x16effc108
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"libcurl.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library libcurl.dll (which is needed by L"C:\\The Witcher 3\\bin\\x64\\witcher3.exe") not found
+[valloc] ml959 # base=0x70a9890000 size=0x100000 type=0x2000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x70a9890000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x70a9890000 zero_bits=0x0 limit=0x0
+[copy-verify] NvCameraSDK64.dll: OK, 1 .text pages executable (copy @0x14f763000)
+[copy-verify] msvcp120.dll: OK, 31 .text pages executable (copy @0x14f770000)
+[copy-verify] msvcr120.dll: OK, 34 .text pages executable (copy @0x14f894000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"REDGalaxy64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library REDGalaxy64.dll (which is needed by L"C:\\The Witcher 3\\bin\\x64\\witcher3.exe") not found
+[copy-verify] powrprof.dll: OK, 2 .text pages executable (copy @0x14f9c8000)
+[copy-verify] wininet.dll: OK, 15 .text pages executable (copy @0x14fa4c000)
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0x71fce10000-0x71fce4b029
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0x71fce50000-0x71fce50f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FCE00000
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0x71fce10000-0x71fce4b029
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0x71fce50000-0x71fce50f90
+E 24 [img-map] ml710 #21 intervals-only WININET.dll base=0x71fce00000
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"GFSDK_SSAO_D3D11.win64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library GFSDK_SSAO_D3D11.win64.dll (which is needed by L"C:\\The Witcher 3\\bin\\x64\\witcher3.exe") not found
+[valloc] ml959 # base=0x7c006f0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c006f0000 zero_bits=0x0 limit=0x0
+[jit-pool] image 0x71fbb40000+0xb0000 (dinput8.dll) → pool 0x150ea0000 used=0x8f54000/0x27000000 tramp+0x4000
+D 24 Load module DINPUT8.dll (dinput8.dll-fa63f814948e9838): 71FBB40000
+[jit-pool] image 0x71fb9c0000+0x180000 (comctl32.dll) → pool 0x150f54000 used=0x90d8000/0x27000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71FB9C0000
+[jit-pool] image 0x71fb930000+0x90000 (hid.dll) → pool 0x1510d8000 used=0x916c000/0x27000000 tramp+0x4000
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x1510d8000)
+D 24 Load module hid.dll (hid.dll-c3a5177fc021edec): 71FB930000
+[jit-pool] image 0x71fb850000+0xe0000 (setupapi.dll) → pool 0x15116c000 used=0x9250000/0x27000000 tramp+0x4000
+D 24 Load module setupapi.dll (setupapi.dll-eb860a5cf96d3e18): 71FB850000
+[jit-pool] image 0x71fb7d0000+0x80000 (cfgmgr32.dll) → pool 0x151250000 used=0x92d4000/0x27000000 tramp+0x4000
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71FB7D0000
+[jit-pool] image 0x71fb310000+0x4b2000 (D3DCOMPILER_47.dll) → pool 0x1512d6000 used=0x978e000/0x27000000 tramp+0x0
+D 24 Load module D3DCOMPILER_47.dll (d3dcompiler_47.dll-e08818ea3e58fda9): 71FB310000
+0024:err:module:loader_init Importing dlls for L"C:\\The Witcher 3\\bin\\x64\\witcher3.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=578
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:57:01.358] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=975MB limit=8191MB thermal=nominal lpm=0 api=D3D11/64 res=1112x832 cap=60 game=The Witcher 3
+[19:57:01.361] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[xp] 19:57:01.513 +0.56 dt=308 cpu=353 (thr 315) P=173 E=180 run=373 pgw=-1.0 GHz P=3.83 E=2.83 Minst=4545 IPC=3.88 mJ=895 pin=368 rdKB=11212 fpMB=984
+[xp] 19:57:01.836 +0.89 dt=324 cpu=329 (thr 330) P=5 E=325 run=334 pgw=-1.0 GHz P=3.35 E=2.84 Minst=3638 IPC=3.88 mJ=223 pin=1 rdKB=0 fpMB=983
+[xp] 19:57:02.103 +1.15 dt=267 cpu=170 (thr 170) P=7 E=163 run=172 pgw=-1.0 GHz P=3.06 E=2.87 Minst=1881 IPC=3.85 mJ=123 pin=7 rdKB=168 fpMB=983
+[xp] 19:57:02.412 +1.46 dt=309 cpu=13 (thr 13) P=0 E=13 run=14 pgw=-1.0 GHz P=0.98 E=1.65 Minst=34 IPC=1.55 mJ=2 pin=0 rdKB=0 fpMB=983
+[xp] 19:57:02.670 +1.72 dt=258 cpu=14 (thr 14) P=0 E=14 run=16 pgw=-1.0 GHz P=0.00 E=1.58 Minst=32 IPC=1.41 mJ=2 pin=0 rdKB=0 fpMB=983
+[footprint] rev=ml358 phys=985 MB (peak 985) internal=980 MB compressed=3 MB external=116 MB reusable=6 MB (cycle=2)
+[xp] 19:57:02.971 +2.02 dt=301 cpu=29 (thr 29) P=0 E=29 run=29 pgw=-1.0 GHz P=0.00 E=1.52 Minst=57 IPC=1.29 mJ=3 pin=0 rdKB=0 fpMB=985
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 2048 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 2048 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[footprint] rev=ml1060 fast phys=985 MB compressed=3 MB internal=981 MB
+[19:57:03.443] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=986 MB (peak 986) internal=981 MB compressed=3 MB external=116 MB reusable=6 MB (cycle=3)
+[footprint] rev=ml358 phys=977 MB (peak 986) internal=972 MB compressed=3 MB external=116 MB reusable=15 MB (cycle=4)
+[footprint] rev=ml358 phys=981 MB (peak 986) internal=977 MB compressed=3 MB external=127 MB reusable=15 MB (cycle=5)
+[footprint] rev=ml358 phys=982 MB (peak 986) internal=978 MB compressed=3 MB external=128 MB reusable=15 MB (cycle=6)
+[footprint] rev=ml358 phys=982 MB (peak 986) internal=978 MB compressed=3 MB external=128 MB reusable=14 MB (cycle=7)
+[footprint] rev=ml358 phys=982 MB (peak 986) internal=978 MB compressed=3 MB external=128 MB reusable=14 MB (cycle=8)
+[footprint] rev=ml358 phys=983 MB (peak 986) internal=979 MB compressed=3 MB external=131 MB reusable=14 MB (cycle=9)
+[xp] 19:57:17.816 +16.87 dt=327 cpu=24 (thr 24) P=0 E=24 run=25 pgw=-1.0 GHz P=0.00 E=1.64 Minst=63 IPC=1.58 mJ=3 pin=0 rdKB=0 fpMB=983
+[xp] 19:57:18.142 +17.19 dt=327 cpu=46 (thr 46) P=11 E=35 run=49 pgw=-1.0 GHz P=1.72 E=2.02 Minst=139 IPC=1.56 mJ=14 pin=2 rdKB=16 fpMB=983
+[xp] 19:57:18.469 +17.52 dt=327 cpu=39 (thr 39) P=9 E=29 run=41 pgw=-1.0 GHz P=1.58 E=1.89 Minst=114 IPC=1.63 mJ=11 pin=0 rdKB=0 fpMB=983
+[xp] 19:57:18.732 +17.78 dt=263 cpu=47 (thr 47) P=1 E=46 run=51 pgw=-1.0 GHz P=1.49 E=2.01 Minst=124 IPC=1.31 mJ=9 pin=0 rdKB=0 fpMB=983
+[xp] 19:57:19.052 +18.10 dt=320 cpu=70 (thr 70) P=30 E=40 run=75 pgw=-1.0 GHz P=2.28 E=2.04 Minst=273 IPC=1.81 mJ=44 pin=11 rdKB=212 fpMB=983
+[footprint] rev=ml358 phys=983 MB (peak 986) internal=979 MB compressed=3 MB external=131 MB reusable=14 MB (cycle=10)
+[xp] 19:57:19.307 +18.36 dt=255 cpu=16 (thr 16) P=0 E=16 run=17 pgw=-1.0 GHz P=0.00 E=1.99 Minst=46 IPC=1.44 mJ=3 pin=0 rdKB=0 fpMB=983
+5 cpu=16 (thr 16) P=0 E=16 run=17 pgw=-1.0 GHz P=0.00 E=1.99 Minst=46 IPC=1.44 mJ=3 pin=0 rdKB=0 fpMB=983

@@ -1481,6 +1481,26 @@ static void register_builtins(void)
     KeUserModeCallback( NtUserInitBuiltinClasses, NULL, 0, &ret_ptr, &ret_len );
 }
 
+/* madeira-bcd (round 630; Discord report, agent D: FINAL FANTASY VII's Steam launcher 03ZW5E and MMJZ8K, Messiah J0R6MM,
+ * Battle.net's setup 6KW9QM): upstream's init_user registers the built-in "Message" class (register_desktop_class) in every
+ * process. Here init_user runs once, for the session's first pseudo-process, and register_builtin_classes below registers only
+ * the controls per pseudo-process, so in every later one CreateWindow(L"Message", ..., HWND_MESSAGE) fails with
+ * ERROR_INVALID_HANDLE (the server's grab_class finds no such class in that process). winmm's devices thread needs that
+ * window: it exits at once, waveOutOpen answers MMSYSERR_NODRIVER, and a program that keeps asking starts a thread each
+ * time (486 in FF7's launcher, 2,967 in Messiah) until the thread registry is full. env.MADEIRA_MESSAGE_CLASS = 1 registers
+ * the class per pseudo-process too. Off unless set: Fallout: New Vegas, Fallout 3, Portal 2 and Left 4 Dead 2 ask winmm
+ * once (waveOutGetNumDevs answers 0 today) and run as they are. Read once. */
+static int ios_message_class_on(void)
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        const char *v = getenv( "MADEIRA_MESSAGE_CLASS" );
+        on = v && (!strcmp( v, "1" ) || !strcmp( v, "on" ) || !strcmp( v, "true" ) || !strcmp( v, "yes" ));
+    }
+    return on;
+}
+
 /***********************************************************************
  *           register_builtin_classes
  */
@@ -1516,6 +1536,9 @@ void register_builtin_classes(void)
         }
     }
     register_builtins();
+    /* madeira-bcd (round 630): the Message class too, with env.MADEIRA_MESSAGE_CLASS = 1 (above). The session's first
+     * process already has it from init_user: the server answers CLASS_ALREADY_EXISTS, which register_builtin tolerates. */
+    if (ios_message_class_on()) register_builtin( &message_builtin_class );
     if (done_count < ARRAYSIZE(done))
     {
         done[done_count].pid = pid;
@@ -1523,7 +1546,8 @@ void register_builtin_classes(void)
         done_count++;
     }
     else dprintf(2, "[builtin-classes] registry FULL — pid=%04x will re-register per call\n", (int)pid);
-    dprintf(2, "[builtin-classes] registered builtin classes for pid=%04x peb=%p\n", (int)pid, peb);
+    dprintf(2, "[builtin-classes] registered builtin classes for pid=%04x peb=%p%s\n", (int)pid, peb,
+            ios_message_class_on() ? " + Message (MADEIRA_MESSAGE_CLASS) rev=r630" : "");
     pthread_mutex_unlock( &builtin_lock );
 }
 

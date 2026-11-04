@@ -112,6 +112,8 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(!R.isCrash(0) && !R.isCrash(1) && !R.isCrash(3) && !R.isCrash(0xFF) && !R.isCrash(0x2329) && !R.isCrash(0xEAC9),
                 "exit code 0 and small plain codes are not crashes (a game may end with 1 after a quit)")
         require(!R.isCrash(0x8007054F), "an installer's HRESULT-like exit code is not a crash")
+        // Round 630 (agent G3 S19; RVW5FD): Wine's stub end ("unimplemented function ... aborting") is a crash; its neighbours are not.
+        require(R.isCrash(0x80000100) && !R.isCrash(0x80000101) && !R.isCrash(0x100), "Wine's stub status 0x80000100 is a crash")
 
         // ---- the grace key
         require(R.grace(nil) == 10 && R.defaultGrace == 10, "no key: 10 s")

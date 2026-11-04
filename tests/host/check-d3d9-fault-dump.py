@@ -104,7 +104,8 @@ if ds:
 d = dict(lines)
 check("Darksiders II's list sets env.MADEIRA_D3D9_LAST = 1 from build 597", ("env.MADEIRA_D3D9_LAST = 1", 597) in lines, str(lines))
 # Round 624 (agent A): Fallout 3 (seven logs, the same Gamebryo render path) carries New Vegas's lines, this one from build 598.
-others = [r["id"] for r in rules if r.get("id") not in ("darksiders-ii-deathinitive", "fallout-new-vegas", "fallout-3") and any(
+# Round 630 (agent O3 S14): the Half-Life engine's diagnostic list (hl.exe with sw.dll) carries it too, from build 626.
+others = [r["id"] for r in rules if r.get("id") not in ("darksiders-ii-deathinitive", "fallout-new-vegas", "fallout-3", "goldsrc-hl-exe") and any(
     "MADEIRA_D3D9_LAST" in (ln["line"] if isinstance(ln, dict) else ln) for ln in r.get("config", []))]
 check("no other list sets it (Fallout: New Vegas's carries it too since build 598: four logs end in a NULL object of its own code; Fallout 3 since round 624)",
       not others, str(others))

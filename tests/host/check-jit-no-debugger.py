@@ -123,11 +123,27 @@ check("the pool request asks P_TRACED, and only asks JITNoDebuggerPool with CS_D
       and "defer { releaseNoDebuggerEntries() }" in pool)
 check("it arms the trap fallback whenever nothing is traced and the pool is the debugger's",
       'if !debuggerAttached && !noDebugger && MadeiraConfig.flag("MADEIRA_JIT_TRAP_FALLBACK") {' in pool
-      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(poolSize, attempt: attempt)"))
+      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(poolSize, attempt: attempt, region: \"A\")"))
 check("no exit() in the pool request: a failure refuses the launch and keeps BCD up",
       "exit(" not in code(pool) and "Killing in 10s" not in pool and "exiting now" not in pool)
 check("an unanswered request reads P_TRACED again before calling it 'no debugger'",
       "if requestUnanswered && !isDebuggerTraced() {" in pool and "poolFailure = poolNoDebuggerMessage" in pool)
+# Round 630 (agent G3 S1; NKMBSV, 9202VT, RGRQCJ, S6JC0R): the attach's age goes into the log at the request, and a debugger that was
+# attached at the request and went away unanswered gets its own words (an attach 45 s old or more failed 14 of 27 times).
+wait = braced(stik, "static func waitForDebugger(")
+unanswered = pool[pool.index("if requestUnanswered && !isDebuggerTraced() {"):]
+unanswered = unanswered[:unanswered.index("return nil")]
+check("the attach's age: set when Enable JIT sees the debugger attach, else counted from the process start; one [jit-age] line at the request",
+      "if traced { debuggerAttachedAt = ProcessInfo.processInfo.systemUptime }" in wait
+      and "let attachAgeAtRequest = debuggerAttached ? attachAge() : nil" in pool
+      and '"[jit-age] attach age=\\(age.seconds)s source=\\(age.source)"' in pool
+      and pool.index("let attachAgeAtRequest") < pool.index("requestRegion(poolSize, attempt: attempt, region: \"A\")")
+      and "info.kp_proc.p_un.__p_starttime" in braced(stik, "static func attachAge()"))
+check("an unanswered request from a debugger that was attached at it gets the stale-attach words and one log line",
+      "if debuggerAttached, let age = attachAgeAtRequest {" in unanswered
+      and "poolFailure = poolStaleDebuggerMessage(ageSeconds: age.seconds)" in unanswered
+      and "[jit-debugger] unanswered: traced at the request=1, traced now=0" in unanswered
+      and unanswered.index("poolFailure = poolNoDebuggerMessage") < unanswered.index("poolFailure = poolStaleDebuggerMessage("))
 counts = {k: code(stik).count(k) for k in ("jit26_prepare_region(", "vm_remap(", "requestRegion(", "remapRW(")}
 check("no direct region request or vm_remap left in StikJITHelper outside the two helpers",
       counts == {"jit26_prepare_region(": 1, "vm_remap(": 1, "requestRegion(": 6, "remapRW(": 8}, str(counts))
@@ -136,7 +152,7 @@ remap = braced(stik, "private static func remapRW(")
 # round 624 (agent R S2): the debugger branch records the request first (BCDBrkTrail, an fsynced file line) and still makes the same call
 check("their debugger branches are the pool's old calls, unchanged (the request recorded first, round 624)",
       "guard noDebugger else {" in request and "return jit26_prepare_region(nil, size)" in request
-      and request.index("BCDBrkTrail.begin(site: site, size: size, attempt: attempt)") < request.index("return jit26_prepare_region(nil, size)")
+      and request.index("BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)") < request.index("return jit26_prepare_region(nil, size)")
       and "return vm_remap(mach_task_self_, &address, size, 0, flags, mach_task_self_, rx, 0, &cur, &max, VM_INHERIT_NONE)" in remap
       and "if let region = noDebuggerEntries[rx] {" in remap)
 detach = braced(stik, "static func detachDebugger()")

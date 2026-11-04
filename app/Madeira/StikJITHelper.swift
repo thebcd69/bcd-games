@@ -111,6 +111,7 @@ enum StikJITHelper {
                                   flagged: SigningStatus.current.debugged, traced: traced, sawTraced: sawTraced)
             if poll == .ready {
                 timer.invalidate()
+                if traced { debuggerAttachedAt = ProcessInfo.processInfo.systemUptime }   // round 630 (G3 S1): the attach's age at the pool request
                 LogStore.shared.log(traced || !JITNoDebuggerPool.usable ? "JIT enabled and debugger attached."
                                     : "JIT enabled: CS_DEBUGGED is set and BCD builds its JIT memory without a debugger "
                                       + "(\(JITNoDebuggerPool.current.reason)).", level: .success)
@@ -179,6 +180,32 @@ enum StikJITHelper {
     static var poolNoDebuggerMessage: String {
         noDebuggerMessage + " This launch can't be repeated in the same run: quit BCD (swipe it away in the app "
             + "switcher) and open it again first."
+    }
+
+    /// madeira-bcd (round 630, agent G3 S1; Rotfront NKMBSV, TITAN 9202VT, Tomb Raider RGRQCJ, Trackmania S6JC0R and 20 archive logs):
+    /// a debugger that was attached at the pool request and did not answer it. Over the archive, 14 of 27 requests made 45 s or more after
+    /// an attach failed, against 4 of 331 under 30 s; the old words ("no debugger is attached") sent the player to the wrong setting.
+    static func poolStaleDebuggerMessage(ageSeconds: Int) -> String {
+        "StikDebug was attached to BCD but did not answer when the game started (it had been attached for \(ageSeconds) seconds; "
+            + "an attach that old often goes quiet on iOS 26 and later). This launch can't be repeated in the same run: quit BCD "
+            + "(swipe it away in the app switcher), open it, tap Enable JIT and start the game within half a minute."
+    }
+
+    /// madeira-bcd (round 630, agent G3 S1): when this run's Enable JIT saw the debugger attach (system uptime); nil when it was already
+    /// attached when BCD started (from StikDebug's own list) or never was.
+    private(set) static var debuggerAttachedAt: TimeInterval?
+    /// How long the debugger has been attached and how it came: "enable-jit" (this run's Enable JIT) or "at-start" (before BCD started:
+    /// counted from the process start). Nil when the process start cannot be read.
+    static func attachAge() -> (seconds: Int, source: String)? {
+        if let at = debuggerAttachedAt { return (max(0, Int(ProcessInfo.processInfo.systemUptime - at)), "enable-jit") }
+        var info = kinfo_proc()
+        var size = MemoryLayout<kinfo_proc>.stride
+        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+        guard sysctl(&mib, UInt32(mib.count), &info, &size, nil, 0) == 0 else { return nil }
+        let start = info.kp_proc.p_un.__p_starttime
+        let started = Double(start.tv_sec) + Double(start.tv_usec) / 1_000_000
+        guard started > 0 else { return nil }
+        return (max(0, Int(Date().timeIntervalSince1970 - started)), "at-start")
     }
 
     /// This app run's pool exists. The debugger detaches right after the pool is
@@ -395,6 +422,9 @@ enum StikJITHelper {
         _ = rwAliasHint()
 
         LogStore.shared.log("[jit-debugger] attached=\(debuggerAttached ? 1 : 0) at the pool request")
+        // Round 630 (agent G3 S1): how old the attach is when the request goes out (log only).
+        let attachAgeAtRequest = debuggerAttached ? attachAge() : nil
+        if let age = attachAgeAtRequest { LogStore.shared.log("[jit-age] attach age=\(age.seconds)s source=\(age.source)") }
         // With no debugger attached, a JIT request fails the launch with a message; 0 lets it crash the app as before.
         // CS_DEBUGGED stays set after a debugger detaches (JIT enabled by a tool
         // that attaches and leaves, or without Madeira's script), and the pool
@@ -861,7 +891,7 @@ enum StikJITHelper {
         var rxPtrOpt: UnsafeMutableRawPointer? = nil
         var requestUnanswered = false
         for attempt in 0..<3 {
-            guard let p = requestRegion(poolSize, attempt: attempt), p != UnsafeMutableRawPointer(bitPattern: 0) else {
+            guard let p = requestRegion(poolSize, attempt: attempt, region: "A"), p != UnsafeMutableRawPointer(bitPattern: 0) else {
                 LogStore.shared.log(noDebugger ? "BCD could not map \(poolSize >> 20)MB of JIT memory without a debugger (attempt \(attempt))"
                                                : "Debugger failed to allocate RX memory (attempt \(attempt))", level: .error)
                 requestUnanswered = true
@@ -921,7 +951,7 @@ enum StikJITHelper {
                         rxPtrOpt = nil
                     }
                     var replaced = false
-                    if let q = requestRegion(pairSingle), q != UnsafeMutableRawPointer(bitPattern: 0) {
+                    if let q = requestRegion(pairSingle, region: "A-single"), q != UnsafeMutableRawPointer(bitPattern: 0) {
                         let qa = Int(bitPattern: q)
                         let qGuest = qa + pairSingle > guestLo && qa < guestHi
                         if qa >= goodLow && !qGuest && !overlapsExeWindow(vm_address_t(qa), vm_address_t(pairSingle)) {
@@ -965,6 +995,12 @@ enum StikJITHelper {
                 // Nothing answered the BRK: there is no pool and no placement to
                 // re-roll, so the app stays up and says what to do.
                 poolFailure = poolNoDebuggerMessage
+                // Round 630 (agent G3 S1): a debugger WAS attached at the request and went away without answering it.
+                if debuggerAttached, let age = attachAgeAtRequest {
+                    poolFailure = poolStaleDebuggerMessage(ageSeconds: age.seconds)
+                    LogStore.shared.log("[jit-debugger] unanswered: traced at the request=1, traced now=0, attach age=\(age.seconds)s "
+                                        + "source=\(age.source)", level: .error)
+                }
                 LogStore.shared.log("[jit-debugger] the pool request was not answered: no debugger is attached. "
                     + "Enable JIT with BCD's Enable JIT button, so that StikDebug attaches with BCD's "
                     + "script and stays attached until the game starts.", level: .error)
@@ -1549,7 +1585,7 @@ enum StikJITHelper {
                     if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
                 }
             }
-            let got = requestRegion(Int(size))
+            let got = requestRegion(Int(size), region: "B")
             for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
             guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
                 LogStore.shared.log("[pool-split] the debugger did not allocate the second region (\(size >> 20)MB) — the pool "
@@ -1592,7 +1628,7 @@ enum StikJITHelper {
                         if a == h.base { mplugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
                     }
                 }
-                let mgot = requestRegion(Int(msize))
+                let mgot = requestRegion(Int(msize), region: "B-mid")
                 for (a, sz) in mplugs { vm_deallocate(mach_task_self_, a, sz) }
                 if let mp = mgot, mp != UnsafeMutableRawPointer(bitPattern: 0) {
                     let m = vm_address_t(bitPattern: mp)
@@ -1687,7 +1723,7 @@ enum StikJITHelper {
                 if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
             }
         }
-        let got = requestRegion(Int(size))
+        let got = requestRegion(Int(size), region: "C")
         for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
         guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
             LogStore.shared.log("[pool-low] the debugger did not allocate region C (\(size >> 20)MB) -- code buffers stay "
@@ -1838,11 +1874,11 @@ enum StikJITHelper {
     /// `_M` (BRK #0xf00d, x16 = 1, answered by madeira-jit.js), or for the debugger-less pool
     /// a memory entry BCD maps RX itself (jit_nodebug_region), so the census and its plugs
     /// steer both the same way. nil when neither gave one.
-    private static func requestRegion(_ size: Int, attempt: Int? = nil, site: Int = #line) -> UnsafeMutableRawPointer? {
+    private static func requestRegion(_ size: Int, attempt: Int? = nil, region: String, site: Int = #line) -> UnsafeMutableRawPointer? {
         guard noDebugger else {
             // madeira-bcd (round 624, agent R S2): the process stops inside this BRK until the debugger answers and may be killed there;
             // the record is on disk first (BCDBrkTrail, BCDSessionRecorderLive.swift). `site` is the caller's line (#line as a default).
-            BCDBrkTrail.begin(site: site, size: size, attempt: attempt)
+            BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)
             defer { BCDBrkTrail.end() }
             return jit26_prepare_region(nil, size)
         }

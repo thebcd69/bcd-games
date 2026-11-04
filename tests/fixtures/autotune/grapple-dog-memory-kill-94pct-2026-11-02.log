@@ -1,0 +1,340 @@
+[15:31:56.519] [INFO] Checking entitlements...
+[15:31:56.519] [INFO] [build] v0.1.626 (626)
+[15:31:56.520] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 26.6.2 (Build 23G90) ram=5662MB available=4071MB cores=6
+[15:31:56.520] [INFO] [device] address-map=[0x1049bc000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[15:31:56.539] [INFO] [device] settings: low-power=0 thermal=serious screen=1179x2556@3.0x max-fps=120 utc-offset=+11:00 free-disk=100GB stikdebug-url=1
+[15:31:56.547] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:32:36.615] [INFO] [bcd] library launch Grapple Dog: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[15:32:36.615] [INFO] Requesting JIT with StikDebug...
+[15:32:36.630] [INFO] Opening StikDebug to enable JIT...
+[15:32:42.801] [INFO] [dock-launch] image-retire=1
+[15:32:42.801] [INFO] [dock-launch] image-map-guard=1
+[15:32:42.809] [INFO] [dock-installers] app=1345860 scripts=0 programs=0
+[15:32:42.810] [INFO] [madeira-dock] starting the host for app 1345860; Valve's client authenticates and authorizes the launch
+[15:32:42.824] [INFO] Running full Wine sequence...
+[15:32:42.824] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1049bc000,0xfc0000000) 63GB available=4054MB low-power=0 thermal=serious
+[15:32:42.826] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[15:32:42.833] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:32:42.833] [INFO] Allocating 896MB JIT pool via debugger...
+[15:32:42.833] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:32:42.833] [INFO] [jit-debugger] attached=1 at the pool request
+[15:32:47.047] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  4.337s rev=ml526
+[15:32:47.170] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/c525afd47801dc26.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x11da30000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[15:32:47.507] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+ml992: os_proc_available_memory=3142 MB + phys_footprint=953 MB = 4096 MB (hw.memsize says 5662 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11fc90000+0x70000 (?) → pool 0x300004000 used=0x78000/0x38000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcf0000+0x110000 (ntdll.dll) → pool 0x300078000 used=0x190000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[jit-pool] image 0xfbfc50000+0xa0000 (KERNEL32.dll) → pool 0x300190000 used=0x238000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[jit-pool] image 0xfbfae0000+0x170000 (kernelbase.dll) → pool 0x300238000 used=0x3b8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=850 peb=0xfbfff0000
+[jit-pool] image 0xfbfa10000+0xd0000 (rpcrt4.dll) → pool 0x3003b8000 used=0x48c000/0x38000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[jit-pool] image 0xfbf980000+0x90000 (advapi32.dll) → pool 0x30048c000 used=0x520000/0x38000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[window] 0x12ac00000..0xb30000000 regions=100001 occupied=7844 MB of 41044 MB free=33199 MB maxhole=31974 MB@0x361964000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=966 MB (peak 966) internal=965 MB compressed=0 MB external=80 MB reusable=55 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x12b740000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1424x656, winstation visible, input desktop set
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #3 hwnd=0x10020 class='#32769' text="madeira - Wine Desktop" rev=ml853
+[win-name] #4 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-name] #5 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-name] #6 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  4.937s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x1201b0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301a0c000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x301aa0000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  5.019s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e74000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 1201B0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m6167067 "wine-x18-exc"
+[xp] 15:32:48.155 +0.58 dt=303 cpu=617 (thr 577) P=313 E=304 run=617 pgw=-1.0 GHz P=3.17 E=1.61 Minst=5241 IPC=3.53 mJ=748 pin=2 rdKB=136 fpMB=1047
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x2000000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> FAILED, falling back 0x0
+[xp] 15:32:48.413 +0.84 dt=259 cpu=520 (thr 520) P=262 E=257 run=534 pgw=-1.0 GHz P=3.14 E=1.64 Minst=4752 IPC=3.81 mJ=687 pin=4 rdKB=1124 fpMB=1131
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e91000)
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=000000030212E32C
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x301f7cc08 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301f7cc08 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FB8F70000
+E 4C [iOS-xins] tracker=0x301f7cc08 WININET.dll sec=0xfb8f80000-0xfb8fbb029
+E 4C [iOS-xins] tracker=0x301f7cc08 WININET.dll sec=0xfb8fc0000-0xfb8fc0f90
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[xp] 15:32:48.707 +1.13 dt=294 cpu=813 (thr 471) P=425 E=388 run=861 pgw=-1.0 GHz P=3.05 E=1.85 Minst=7451 IPC=3.70 mJ=1062 pin=198 rdKB=6468 fpMB=1238
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 15:32:49.013 +1.44 dt=306 cpu=657 (thr 628) P=352 E=304 run=657 pgw=-1.0 GHz P=2.89 E=1.64 Minst=6722 IPC=4.43 mJ=865 pin=0 rdKB=304 fpMB=1226
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 15:32:49.270 +1.69 dt=257 cpu=287 (thr 280) P=29 E=258 run=296 pgw=-1.0 GHz P=2.23 E=1.59 Minst=1702 IPC=3.59 mJ=97 pin=0 rdKB=0 fpMB=1216
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000110 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[xp] 15:32:49.588 +2.01 dt=318 cpu=442 (thr 384) P=116 E=326 run=452 pgw=-1.0 GHz P=2.85 E=1.63 Minst=3137 IPC=3.64 mJ=299 pin=3 rdKB=244 fpMB=1242
+[footprint] rev=ml358 phys=1257 MB (peak 1257) internal=1256 MB compressed=0 MB external=151 MB reusable=55 MB (cycle=2)
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=000000030212E32C
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+[footprint] rev=ml358 phys=1424 MB (peak 1424) internal=1423 MB compressed=0 MB external=155 MB reusable=55 MB (cycle=3)
+[file-wfail] ml669 #79 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #80 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[unixlib] opengl32 (GL-absent stub table) (module 0xfb6030000) -> 64-bit table (0x10784c828)
+0050:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 0000000135517ED0.
+0050:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery.exe" cmdline=L".\\bin\\vulkandriverquery.exe"
+[file-wfail] ml669 #81 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=1428 MB (peak 1428) internal=1427 MB compressed=0 MB external=157 MB reusable=45 MB (cycle=4)
+[sock-big] send ERROR fd=390 errno=65 rev=ml464
+[sock-big] send ERROR fd=389 errno=65 rev=ml464
+[footprint] rev=ml358 phys=1428 MB (peak 1428) internal=1427 MB compressed=0 MB external=157 MB reusable=45 MB (cycle=5)
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grapple Dog\\Grapple Dog.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grapple Dog\\Grapple Dog.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grapple Dog\\Grapple Dog.exe" t+ 14.079s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grapple Dog\\Grapple Dog.exe\"" (fd=363, unixdir=364, dup_unixdir=428) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grapple Dog"
+[Wine child thread] calling wine_ios_child_main...
+[exe-window] 0x140000000+0x950000 is under the 64MB floor but its relocations are stripped: it can only run at this base, so it gets the window (MADEIRA_EXE_WINDOW_SMALL_FIXED=0 refuses it as before)
+ml957: ? backing 0x140000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x11da38000
+[nls-getptr] type=11 id=850 peb=0x11da38000
+[nls-getptr] type=11 id=20127 peb=0x11da38000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[15:32:57.075] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=1252 peb=0x11da38000
+[nls-getptr] type=11 id=850 peb=0x11da38000
+E A4 [iOS-xins] tracker=0x30add4c08 WININET.dll sec=0xfb5460000-0xfb5460f90
+D A4 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FB5410000
+[copy-verify] gdi32.dll: OK, 20 .text pages executable (copy @0x30bbc0000)
+E A4 [iOS-xins] tracker=0x30add4c08 WININET.dll sec=0xfb5420000-0xfb545b029
+E A4 [iOS-xins] tracker=0x30add4c08 WININET.dll sec=0xfb5460000-0xfb5460f90
+E A4 [img-map] ml710 #14 intervals-only WININET.dll base=0xfb5410000
+00a4:err:module:iat_life_sweep [iat-life] ml701 sweep#3 after=WININET.dll modules=41 slots=7821 pooled=7821 pe0=0 pool0=0
+00a4:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=0 first=0000000000000000
+[file-wfail] ml669 #85 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2727 full-path-hits=1355 component-lookups=5997 shortcut-hits=3368 misses=2510 scans=2629 entries-scanned=277385 us-in-lookup=886527 (8% of the window) slowest=1.216 ms ...vices/c:/Program Files (x86)/Steam/userdata/<steamid>/config
+[copy-verify] tier0_s64.dll: OK, 18 .text pages executable (copy @0x310458000)
+00a4:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a4:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a4 | STAGE=fixed-map err=1 at 0xffff70000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=grapple dog.exe tid=00a4 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml358 phys=1605 MB (peak 1605) internal=1604 MB compressed=0 MB external=209 MB reusable=45 MB (cycle=6)
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x2000000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> FAILED, falling back 0x0
+[footprint] rev=ml1060 fast phys=1609 MB compressed=0 MB internal=1608 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #86 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[sock-big] send ERROR fd=389 errno=65 rev=ml464
+[sock-big] send ERROR fd=389 errno=65 rev=ml464
+[alloc-fail] ml814 #3 status=c0000018 hint=0xfb6028000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=grapple dog.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0xfb6028000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0xfb6029000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=grapple dog.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0xfb6029000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0xfb602a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=grapple dog.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0xfb602a000 zb=0x0 hits=3 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #6 req_addr=0xfb602b000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #6 status=c0000018 hint=0xfb602b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=grapple dog.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0xfb602b000 zb=0x0 hits=4 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #7 req_addr=0xfb602c000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #7 status=c0000018 hint=0xfb602c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #8 req_addr=0xfb602d000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #8 status=c0000018 hint=0xfb602d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #9 req_addr=0xfb602e000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #9 status=c0000018 hint=0xfb602e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #10 req_addr=0xfb602f000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #10 status=c0000018 hint=0xfb602f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=1 at 0xfffe50000+0x1ac000
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=grapple dog.exe tid=00a4 size=0x1000 type=0x3000 prot=0x40 hint=0xfb602f000 zb=0x0 hits=8 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #11 req_addr=0xfb6190000 size=0x1000 type=0x3000 protect=0x40
+[bigres] tid=00a4 #1 size=0x14950000 (329 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=329 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x14950000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #3 size=0x14950000 reserved_total=329MB armed=va-pressure -> FAILED, falling back 0x0
+[15:32:58.825] [INFO] [dock-report] launch-game-running=1
+[mem-burst] rev=624 +305 MB in 251 ms phys=1914 internal=1798 compressed=113 other=3 | guest commits since the last sample: n=124, 576 MB, biggest 329 MB tid=00a4 | swap backed=0 MB | pool head=266 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=1914 MB compressed=113 MB internal=1798 MB
+00b0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b0 status=00000001 caller=000000030AF8632C
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[jit-pool] image 0xfafd20000+0x20d000 (fmod.dll) → pool 0x310cf1000 used=0x10f05000/0x38000000 tramp+0x0
+D A4 Load module fmod.dll (fmod.dll-01cd33ffd2c961b6): FAFD20000
+[jit-pool] image 0xfafbb0000+0x168000 (fmodstudio.dll) → pool 0x310f05000 used=0x11071000/0x38000000 tramp+0x0
+D A4 Load module fmodstudio.dll (fmodstudio.dll-12eddc9425ab7c70): FAFBB0000
+[jit-pool] image 0xfafa80000+0x130000 (msvcp140.dll) → pool 0x311070000 used=0x111a4000/0x38000000 tramp+0x4000
+D A4 Load module MSVCP140.dll (msvcp140.dll-fd8e26e91ed9d4a2): FAFA80000
+[jit-pool] image 0xfafa00000+0x80000 (vcruntime140.dll) → pool 0x3111a4000 used=0x11228000/0x38000000 tramp+0x4000
+D A4 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): FAFA00000
+[jit-pool] image 0xfaf970000+0x90000 (vcruntime140_1.dll) → pool 0x311228000 used=0x112bc000/0x38000000 tramp+0x4000
+D A4 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9099dd3d46b520): FAF970000
+[footprint] rev=ml1060 fast phys=1943 MB compressed=390 MB internal=1550 MB
+[jit-pool] image 0xfaf8e0000+0x90000 (concrt140.dll) → pool 0x3112bc000 used=0x11350000/0x38000000 tramp+0x4000
+D A4 Load module concrt140.dll (concrt140.dll-7f7bd0536697a14b): FAF8E0000
+[footprint] rev=ml1060 fast phys=1966 MB compressed=420 MB internal=1544 MB
+[footprint] rev=ml1060 fast phys=1988 MB compressed=457 MB internal=1528 MB
+[footprint] rev=ml1060 fast phys=2008 MB compressed=477 MB internal=1528 MB
+[bigres] tid=00a4 #2 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=585 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x10010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #4 size=0x10010000 reserved_total=585MB armed=va-pressure -> FAILED, falling back 0x0
+[mem-burst] rev=624 +275 MB in 506 ms phys=2330 internal=1628 compressed=699 other=3 | guest commits since the last sample: n=109, 320 MB, biggest 256 MB tid=00a4 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[bigres] tid=00a4 #3 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=841 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x10010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #5 size=0x10010000 reserved_total=841MB armed=va-pressure -> FAILED, falling back 0x0
+[mem-burst] rev=624 +265 MB in 254 ms phys=2595 internal=1884 compressed=702 other=9 | guest commits since the last sample: n=4, 266 MB, biggest 256 MB tid=00a4 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=2595 MB compressed=702 MB internal=1884 MB
+[footprint] rev=ml1060 fast phys=2657 MB compressed=708 MB internal=1940 MB
+[win-name] #42 hwnd=0x20088 class='Wine IME' text="" rev=ml853
+[win-name] #43 hwnd=0x20088 class='Wine IME' text="" rev=ml853
+[win-name] #44 hwnd=0x20088 class='Wine IME' text="" rev=ml853
+[win-name] #45 hwnd=0x2005e class='YYGameMakerYY' text="Grapple Dog" rev=ml853
+[win-name] #46 hwnd=0x2005e class='YYGameMakerYY' text="Grapple Dog" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x11da38000
+[mem-burst] rev=624 +843 MB in 252 ms phys=3500 internal=1775 compressed=855 other=870 | guest commits since the last sample: n=298, 186 MB, biggest 8 MB tid=00f4 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=3500 MB compressed=855 MB internal=1775 MB
+[win-name] #47 hwnd=0x2005e class='YYGameMakerYY' text="Grapple Dog" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[footprint] rev=ml1060 fast phys=3526 MB compressed=852 MB internal=1782 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bea1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16b4421d0
+[thread-stacks] port=0x2f03 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16b66dca0
+[thread-stacks] port=0x4007 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=4 x8=0x11396f381 x18=0x0 sp=0x16b6fab30
+[thread-stacks] port=0xca43 "com.apple.NSURLConnectionLoader" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16bc71c60
+[thread-stacks] port=0x8da3 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=112 x8=0x1fed8fec0 x18=0x0 sp=0x16b5e0c50
+[thread-stacks] port=0xc13b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=1 x8=0x110a86a01 x18=0x0 sp=0x16b812b30
+[thread-stacks] port=0xc633 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16bea1020
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[ios_audio] ml1230 pacing stream=0x120446000 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[hwinput] keyboard focus: program (poll)
+[file-census] r624 13s: case-sensitive=1 full-path-tries=1104 full-path-hits=559 component-lookups=2862 shortcut-hits=1799 misses=1030 scans=1063 entries-scanned=46005 us-in-lookup=350668 (2% of the window) slowest=1.308 ms ...F26-793C55D16706/Documents/wine/dosdevices/c:/windows/sysx64
+[sock-big] send ERROR fd=389 errno=65 rev=ml464
+[sock-big] send ERROR fd=389 errno=65 rev=ml464
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[ios_audio] ml1230 pacing stream=0x120447000 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2197..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[15:33:17.282] [INFO] detach-wait: presents=723 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=63 resident=1504MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x120446000 lead 60 ms: client wrote 10.00 s of audio in 10.01 s (99.9%) over 233 wakes; device short 6.7 ms in 1 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x120447000 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 234 wakes; device short 9.6 ms in 1 of 469 passes (largest pass 1024 frames); ring 2197..4799 frames; worst late wake 0.1 ms; clamped 0 samples
+[bigres] tid=00a4 #4 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=1097 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x10010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #6 size=0x10010000 reserved_total=1097MB armed=va-pressure -> FAILED, falling back 0x0
+[mem-burst] rev=624 +269 MB in 255 ms phys=3209 internal=1555 compressed=838 other=816 | guest commits since the last sample: n=74, 269 MB, biggest 256 MB tid=00a4 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[mem-burst] rev=624 +302 MB in 252 ms phys=3512 internal=1438 compressed=846 other=1228 | guest commits since the last sample: n=127, 58 MB, biggest 8 MB tid=0108 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[thread-stacks] port=0xc633 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=2 x8=0x0 x18=0x0 sp=0x16bea1020
+[thread-stacks] port=0x16793 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16b5440e0 x18=0x0 sp=0xd34afe9d0
+[thread-stacks] port=0x16e27 "com.apple.UIKit.inProcessAnimationManager" pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 run=3 susp=0 cpu=0 x8=0x9173 x18=0x0 sp=0x171286c40
+[thread-stacks] port=0x1e43b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=6 x8=0x113b75681 x18=0x0 sp=0x171312b30
+[thread-stacks] port=0x179e7 "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16c0640e0 x18=0x0 sp=0xd34efe9d0
+[thread-stacks] port=0x15493 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=3 x8=0x16c06c0e0 x18=0x0 sp=0xd350fe9d0
+[thread-stacks] port=0x92cf "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=1 x8=0x2710 x18=0x0 sp=0xd352ffb00
+[ios_audio] ml1230 pacing stream=0x120446000 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bea1020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=3243 MB (peak 3528) internal=1317 MB compressed=846 MB external=213 MB reusable=0 MB (cycle=24)
+[ios_audio] ml1230 pacing stream=0x120447000 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2196..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=3239 MB (peak 3528) internal=1314 MB compressed=846 MB external=213 MB reusable=0 MB (cycle=25)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=3240 MB (peak 3528) internal=1315 MB compressed=846 MB external=213 MB reusable=0 MB (cycle=26)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[ios_audio] ml1230 pacing stream=0x120446000 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=3242 MB (peak 3528) internal=1316 MB compressed=846 MB external=213 MB reusable=0 MB (cycle=27)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml358 phys=3242 MB (peak 3528) internal=1317 MB compressed=846 MB external=213 MB reusable=0 MB (cycle=28)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[xp] 15:33:43.442 +55.87 dt=252 cpu=48 (thr 48) P=45 E=3 run=56 pgw=-1.0 GHz P=3.18 E=1.40 Minst=391 IPC=2.65 mJ=91 pin=152 rdKB=5628 fpMB=3239
+[bigres] tid=00a4 #5 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=1353 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x10010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #7 size=0x10010000 reserved_total=1353MB armed=va-pressure -> FAILED, falling back 0x0
+[xp] 15:33:43.700 +56.12 dt=258 cpu=147 (thr 146) P=143 E=4 run=155 pgw=-1.0 GHz P=3.39 E=1.40 Minst=1136 IPC=2.31 mJ=274 pin=0 rdKB=544 fpMB=3494
+[xp] 15:33:43.974 +56.40 dt=274 cpu=287 (thr 287) P=284 E=4 run=285 pgw=-1.0 GHz P=3.45 E=1.15 Minst=2318 IPC=2.36 mJ=520 pin=0 rdKB=1056 fpMB=3494
+[bigres] tid=00a4 #6 size=0x10010000 (256 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x11da38000 total=1609 MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x10010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #8 size=0x10010000 reserved_total=1609MB armed=va-pressure -> FAILED, falling back 0x0
+[valloc] ml959 BIG base=0x390010000 size=0x10010000 type=0x1000 prot=0x4 tid=00a4 | req_hint=0x390010000 zero_bits=0x0 limit=0x0
+[mem-burst] rev=624 +256 MB in 254 ms phys=3750 internal=1766 compressed=912 other=1072 | guest commits since the last sample: n=4, 266 MB, biggest 256 MB tid=00a4 | swap backed=0 MB | pool head=275 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=3750 MB compressed=912 MB internal=1766 MB
+[footprint] rev=r624 90% of the limit: phys=3750 MB limit=4095 MB (345 MB left) threads=65; the next full cycle walks the physical map
+[xp] 15:33:44.297 +56.72 dt=323 cpu=306 (thr 306) P=301 E=5 run=319 pgw=-1.0 GHz P=3.45 E=1.24 Minst=2329 IPC=2.23 mJ=593 pin=0 rdKB=0 fpMB=3750
+[footprint] rev=ml358 phys=3750 MB (peak 3750) internal=1766 MB compressed=912 MB external=205 MB reusable=0 MB (cycle=29)
+[xp] 15:33:44.619 +57.03 dt=310 cpu=483 (thr 482) P=475 E=8 run=497 pgw=-1.0 GHz P=3.43 E=1.20 Minst=4000 IPC=2.44 mJ=981 pin=0 rdKB=0 fpMB=3822
+[guest-reserve] #30 0x1761b0000+0x810000 hinted=0 tid=00a4 prot=0x4 running_total=1967MB
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x8010000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #9 size=0x8010000 reserved_total=1609MB armed=va-pressure -> FAILED, falling back 0x0
+[guest-reserve] #31 0x390010000+0x8010000 hinted=0 tid=00a4 prot=0x4 running_total=2095MB
+[valloc] ml959 BIG base=0x390010000 size=0x8010000 type=0x2000 prot=0x4 tid=00a4 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 BIG base=0x390010000 size=0x8010000 type=0x1000 prot=0x4 tid=00a4 | req_hint=0x390010000 zero_bits=0x0 limit=0x0
+[footprint] rev=ml1060 fast phys=3873 MB compressed=1029 MB internal=1772 MB
+[xp] 15:33:44.883 +57.31 dt=276 cpu=257 (thr 258) P=253 E=4 run=260 pgw=-1.0 GHz P=3.45 E=1.40 Minst=2029 IPC=2.31 mJ=475 pin=0 rdKB=1040 fpMB=3871
+[ios_audio] ml1230 pacing stream=0x120447000 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2197..4799 frames; worst late wake 0.0 ms; clamped 0 samples

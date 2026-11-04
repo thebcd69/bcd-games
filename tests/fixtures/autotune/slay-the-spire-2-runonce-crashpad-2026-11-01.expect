@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "runonce-stale-waiter-keyed-event"
+ ],
+ "next": [
+  "env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1"
+ ],
+ "note": "Slay the Spire 2 (Steam 2868840, Godot 4 + .NET), build 626, iPad16,10: the game reaches its menu; 34 s into play a Godot WorkerThread dies at the ARM64EC ntdll's +0x68008 (RtlRunOnceComplete) on a read of 0x4865027b34ec058b (8 bytes of x86 code a waiter had left on its stack) after the release returned c0000024 (only in the SEGV handler's dump: the two [fault-full] dumps went to earlier handled faults); Sentry's crashpad ends the game with 0xffff7001 and Wine prints no page-fault text. Tester log 58D8SD, scrubbed.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

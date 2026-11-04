@@ -103,8 +103,12 @@ static void ios_rwx_fault_diag( const arm_thread_state64_t *st, int exception )
     ios_rwx_fault_prot( rp, rprot );
     ios_rwx_fault_prot( rm, rmax );
     if (rprot < 0) trap = "unknown (host region unreadable)";
-    else if ((rprot & 2) && !(this_vp & 0x02)) trap = (any_vp & 0x02)
-        ? "OFF: Wine's table says this page is read-only, its host page is writable, and a neighbouring 4 KB page of it has W"
+    /* Round 630 (agent G1 S15): Wine maps a WRITECOPY page (0x08) writable as well; FINAL FANTASY RESONANCE's protected pages are 0x2d,
+     * and the line named no cause for them. */
+    else if ((rprot & 2) && !(this_vp & 0x02)) trap = (this_vp & 0x08)
+        ? "OFF: Wine's table says this page is WRITECOPY, which keeps its host page writable"
+        : (any_vp & 0x02) ? "OFF: Wine's table says this page is read-only, its host page is writable, and a neighbouring 4 KB page of it has W"
+        : (any_vp & 0x08) ? "OFF: Wine's table says this page is read-only, its host page is writable, and a neighbouring 4 KB page of it is WRITECOPY"
         : "OFF: Wine's table says this page is read-only, its host page is writable";
     else if (rprot & 2) trap = "writable (not armed)";
     else trap = "armed (a guest store here faults)";

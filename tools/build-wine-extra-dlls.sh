@@ -186,7 +186,13 @@ fi
 # Processor MFT (CLSID_VideoProcessorMFT, registered in the prefix as C:\windows\system32\msvproc.dll) to turn the media source's NV12
 # into the RGB picture Unity asks for; only the 32-bit set has msvproc.dll. With env.MADEIRA_WG_VPROC = 1 BCD's winegstreamer does the
 # conversion (winegstreamer_vproc_ios.c). Its imports (combase, mfplat, uuid libraries) all ship.
-OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc"
+# xinputuap (2026-11-03, round 630, agent G1 S8; Dead or Alive 6 / Last Round 4TK0QP, KEG3T2, build 626): the program imports
+# XInputUap.dll, Windows 10's XInput for modern apps; only the 32-bit set has it (c0000135). Wine's xinputuap is built from
+# xinput1_3's main.c (PARENTSRC), patched for the host pad before this make like the xinput DLLs; its imports (hid, setupapi,
+# advapi32, user32, win32u) all ship.
+# httpapi (2026-11-03, round 630, agent G2 S7; GrandChase QB5XMM, build 626): the game's cpprest_2_10.dll imports HTTPAPI.dll, which
+# only the 32-bit set has (c0000135 at the loader). Wine's httpapi imports only advapi32, which ships.
+OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc xinputuap httpapi"
 OPT=""
 if [ "${MADEIRA_OPTIN_BUILD:-1}" != 0 ]; then
     for d in $OPTIN_WANT; do

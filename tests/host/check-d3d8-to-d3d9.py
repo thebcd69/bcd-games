@@ -283,7 +283,9 @@ with_d8 = [r["id"] for r in recs["rules"] if "MADEIRA_D3D8" in json.dumps(r["con
 # round 624 (agent D2): Red Faction's launcher (8R8V3Z) is the fifth.
 check("only the five Direct3D 8 games of the logs carry env.MADEIRA_D3D8 = d3d9, each from build 602 only, after the standard line",
       with_d8 == ["grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2", "red-faction"]
-      and all(next(r for r in recs["rules"] if r["id"] == i)["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602}] for i in with_d8))
+      # round 630 (agent A2 S15): Hotline Miami v2 also carries the 32-bit fault report, from build 624
+      and all(next(r for r in recs["rules"] if r["id"] == i)["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602}]
+              + ([{"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 624}] if i == "hotline-miami" else []) for i in with_d8))
 matches = {r["id"]: r["match"] for r in recs["rules"] if r["id"] in with_d8}
 check("their matches are the games' Steam App IDs (12100, 223470, 219150, 12150, 20530), install folders and programs",
       matches == {"grand-theft-auto-iii": {"steamAppIDs": [12100], "steamFolders": ["grand theft auto 3"], "programs": [{"name": "gta3.exe"}]},

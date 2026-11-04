@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": false
+ },
+ "matched": [
+  "syscall-fault-loop-guard"
+ ],
+ "next": [],
+ "note": "Round 630 (agent O2 S2): Mighty No. 9 probes memory with ReadProcessMemory in a loop; each fault is answered by NtReadVirtualMemory's __TRY, but the Mach loop breaker counted the repeats and ended the main thread. Fixed in build 630. Send Log DT9961, build 626.",
+ "outcome": "exited-early",
+ "stage": 3,
+ "status": "known"
+}

@@ -204,7 +204,13 @@ typedef struct { uint64_t __x[29]; uint64_t __fp, __lr, __sp, __pc; } fake_arm_t
 #define __darwin_arm_thread_state64_get_pc(ts) ((ts).__pc)
 #define __darwin_arm_thread_state64_get_sp(ts) ((ts).__sp)
 /* round 624 (agent N S9): ios_noexec_note sits in this block and reads TEB.ClientId; the real layout keeps ClientId at 0x40, Peb at 0x60 */
-typedef struct { char pad0[0x40]; struct { void *UniqueProcess, *UniqueThread; } ClientId; char pad1[0x60 - 0x50]; void *Peb; } TEB;
+typedef struct { char pad0[0x40]; struct { void *UniqueProcess, *UniqueThread; } ClientId; char pad1[0x60 - 0x50]; void *Peb;
+                 char pad2[0x2f0 - 0x68]; unsigned char GdiTebBatch[0x4e8]; char pad3[0x180c - 0x7d8]; int WowTebOffset; } TEB;
+/* round 630: TEB64's GdiTebBatch (0x2f0, where ntdll keeps its per-thread data) and WowTebOffset (0x180c); the members of that data
+ * the Mach thread's syscall check reads (ios_mach_syscall_try_active, agent O2 S2), in a stand-in */
+struct ntdll_thread_data { void *jmp_buf; void *kernel_stack; void *syscall_frame; };
+/* round 630 (agent U S5): the syscall frame's members the thread sampler's helper reads (ios_syscall_frame_user), in a stand-in */
+struct syscall_frame { uint64_t x[29], fp, lr, sp, pc; uint32_t cpsr, restore_flags; void *prev_frame, *syscall_cfa; uint32_t syscall_id; };
 typedef unsigned long ULONG_PTR;
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 typedef struct { uint64_t pLdrInitializeThunk, pKiUserExceptionDispatcher, pKiUserApcDispatcher,
@@ -297,6 +303,7 @@ int main(int argc, char **argv)
         static TEB teb;
         fake_window = win;
         teb.Peb = (void *)0x1234;
+        teb.WowTebOffset = 0x2000;                                                       /* a WoW64 thread (round 630) */
         blk.pKiUserExceptionDispatcher = 0x00401000UL; blk.ntdll_handle = 0xffe90000UL; blk.pLdrInitializeThunk = 0xffedeed0UL;
         pLdrSystemDllInitBlock = &blk;
         w32(w.pool + 0x350, 0x52800001); w32(w.pool + 0x354, 0xf9400021);               /* the NoExec thunk */
@@ -306,6 +313,20 @@ int main(int argc, char **argv)
         w64(w.frame + 0x18, 0x00401000UL); w64(w.frame + 0x40, 0x00300ff0UL);
         ios_ajan2_fault_diag(&w.st, (uintptr_t)&teb, EXC_BAD_ACCESS, 0);
         fprintf(stdout, "win=%llx\n", (unsigned long long)win);
+    } else if (!strcmp(s, "noexec64")) {
+        /* round 630 (agent U S2; Football Manager 27 88YTP3): a 64-bit thread (no WowTebOffset) whose program branched below 4 GB */
+        struct world w = make(0x47fe0000UL, 0, 0x354, 0x1d8);
+        static TEB teb;
+        uint64_t rsp = w.stack + 0x100, ret = w.mod + 0x192;
+        static const unsigned char callsite[] = { 0x48,0x8b,0x05,0x11,0x22,0x33,0x44,0xff,0xd0 };
+        teb.Peb = (void *)0x1234;
+        pLdrSystemDllInitBlock = NULL;
+        w32(w.pool + 0x350, 0x52800001); w32(w.pool + 0x354, 0xf9400021);               /* the NoExec thunk */
+        memcpy((void *)(ret - sizeof(callsite)), callsite, sizeof(callsite));
+        w64(rsp, ret);
+        w64(w.frame + 0x18, 0x47fe0000UL); w64(w.frame + 0x40, rsp);
+        ios_ajan2_fault_diag(&w.st, (uintptr_t)&teb, EXC_BAD_ACCESS, 0);
+        fprintf(stdout, "mod=%llx ret=%llx\n", (unsigned long long)w.mod, (unsigned long long)ret);
     } else if (!strcmp(s, "badrip") || !strcmp(s, "badrip-noload") || !strcmp(s, "badrip-lr")) {
         uint64_t rip = 0xb800000071eafb37ULL;
         struct world w = make(rip, 0, 0x15c, 0x138);
@@ -434,6 +455,14 @@ with tempfile.TemporaryDirectory(prefix='guest-fail-diag-') as directory:
           len(err) > 3 and 'ntdll_handle=0xffe90000' in err[3] and 'RIP equals pKiUserExceptionDispatcher' in err[3],
           err[3] if len(err) > 3 else '')
     check('noexec32: 4 lines', len(err) == 4, r.stderr)
+
+    # --- round 630 (agent U S2): a 64-bit program's branch below 4 GB is not a 32-bit guest
+    r = run(exe, 'noexec64')
+    info = kv(r.stdout)
+    err = r.stderr.splitlines()
+    check('noexec64: a 64-bit thread (no WowTebOffset) below 4 GB is not called a 32-bit guest, and the return address and its call bytes are dumped',
+          err and 'guest RIP=0x47fe0000' in err[0] and '32-bit guest' not in r.stderr
+          and any(('[RSP]=0x' + info.get('ret', 'x')) in l and '48 8b 05 11 22 33 44 ff d0 ' in l for l in err), r.stderr)
 
     # --- non-canonical RIP (Vampire Survivors / art of rally shape)
     r = run(exe, 'badrip')

@@ -64,7 +64,7 @@ check('a listed one is linked as <name>.dll in sysx64, and system32 too in an AR
       'use_arm64ec\n                    ? @[ [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"], sys32Dir ]' in blk
       and 'createSymbolicLinkAtPath:dst withDestinationPath:src' in blk)
 check('one not listed loses only a link of ours', '[to.lastPathComponent isEqualToString:file]' in blk and
-      blk.count('removeItemAtPath:dst') == 2)
+      blk.count('removeItemAtPath:dst') == 4)   # two for the *-optin.dll links, two for dbgcore's (round 630)
 # Round 626 (Slay the Spire 2 through BCD Dock, 1FJAWW): in an ARM64 (explorer.exe) session system32 holds the ARM64 set plus the
 # ARM64EC files it lacks (the cross-link pass), and an x64 program loads system32's dcomp.dll before it ever looks in sysx64 (the
 # loader's mixed-arch fallback runs only on a wrong-architecture or missing file): the game ran Wine's dcomp.dll, not dcomp-optin.dll.
@@ -137,8 +137,22 @@ NEW3 = {'oledlg': ('oledlg.dll', 'digimon-story-cyber-sleuth-2026-10-22'), 'fwpu
         'sensapi': ('SensApi.dll', 'borderlands-3-2026-10-22'), 'glu32': ('GLU32.dll', 'amnesia-rebirth-2026-10-24'),
         'tdh': ('tdh.dll', 'aniimo-2026-10-25'),
         # gamingtcui (round 620): Forza Horizon 4's exe imports it under its API set name (YFK3A6, c0000135 at once).
-        'gamingtcui': ('api-ms-win-gaming-tcui-l1-1-0.dll', 'forza-horizon-4-2026-10-27')}
-check('OPTIN_WANT also lists oledlg, fwpuclnt, sensapi, glu32, tdh and gamingtcui', set(NEW3) <= set(names))
+        'gamingtcui': ('api-ms-win-gaming-tcui-l1-1-0.dll', 'forza-horizon-4-2026-10-27'),
+        # xinputuap (round 630, agent G1 S8): Dead or Alive 6 / Last Round imports XINPUTUAP.dll (KEG3T2, c0000135 at once).
+        'xinputuap': ('XINPUTUAP.dll', 'dead-or-alive-6-xinputuap-2026-11-03'),
+        # httpapi (round 630, agent G2 S7): GrandChase's cpprest_2_10.dll imports HTTPAPI.dll (QB5XMM, c0000135 at the loader).
+        'httpapi': ('HTTPAPI.dll', 'grandchase-httpapi-2026-11-02')}
+check('OPTIN_WANT also lists oledlg, fwpuclnt, sensapi, glu32, tdh, gamingtcui, xinputuap and httpapi', set(NEW3) <= set(names))
+# round 630 (agent G2 S18): dbgcore has no -optin.dll; the bridge links dbgcore.dll to the shipped dbghelp.dll for a game that lists it,
+# and takes a link of ours away in a session that does not.
+bridge = (root / 'app/Madeira/WineProcessBridge.m').read_text()
+check('dbgcore: linked to the shipped dbghelp.dll only when listed, removed otherwise, said in the log',
+      'NSString *dbghelp = [ecDir stringByAppendingPathComponent:@"dbghelp.dll"];' in bridge
+      and 'BOOL wantDbgcore = [wanted containsObject:@"dbgcore"];' in bridge
+      and '[fm createSymbolicLinkAtPath:dst withDestinationPath:dbghelp error:nil];' in bridge
+      and 'else if (to && [to isEqualToString:dbghelp]) [fm removeItemAtPath:dst error:nil];' in bridge
+      and 'MADEIRA_OPTIN_DLLS: dbgcore.dll -> dbghelp.dll' in bridge
+      and bridge.index('BOOL wantDbgcore') < bridge.index('which this build does not ship as %s-optin.dll'))
 check('none of the three is in the list shipped under its own name', not any(re.search(r'\b%s\b' % n, want) for n in NEW3))
 wine = Path(os.environ.get('WINE_SRC') or (root / 'wine'))
 shipdir = root / 'app/Madeira/arm64ec-windows'

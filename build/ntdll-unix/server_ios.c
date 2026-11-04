@@ -855,7 +855,9 @@ static void ios_thread_sampler_pass(int burst)
         arm_thread_state64_t st; mach_msg_type_number_t cnt = ARM_THREAD_STATE64_COUNT;
         char tname[40] = ""; pthread_t pt; int running, is_game;
         uint64_t pc, lr, sp, x28, x17, x18, x23, bb = 0, rip = 0, cr[16], stk[64], nstk[64];
-        int have_bb, have_cr, have_stk, have_nstk;
+        uint64_t upc = 0, ulr = 0, usp = 0, ustk[64];   /* round 630 (U S5): the user state of the last system call */
+        unsigned sid = 0;
+        int have_bb, have_cr, have_stk, have_nstk, have_user = 0, have_ustk = 0;
         const char *why = "";
         if (tlist[k] == self_port) continue;
         if (thread_info(tlist[k], THREAD_BASIC_INFO, (thread_info_t)&bi, &bic) != KERN_SUCCESS) continue;
@@ -874,6 +876,11 @@ static void ios_thread_sampler_pass(int burst)
         have_cr  = ios_ts_read(x17, cr, sizeof(cr));
         have_stk = !(x23 & 7) && ios_ts_read(x23, stk, sizeof(stk));
         have_nstk = !(sp & 7) && ios_ts_read(sp, nstk, sizeof(nstk));
+        if (!have_bb) {
+            extern int ios_syscall_frame_user( uintptr_t teb, uint64_t *pc, uint64_t *lr, uint64_t *sp, unsigned *id );
+            have_user = x18 && ios_syscall_frame_user((uintptr_t)x18, &upc, &ulr, &usp, &sid) && usp > 0x10000;
+            have_ustk = have_user && !(usp & 7) && ios_ts_read(usp, ustk, sizeof(ustk));
+        }
         thread_resume(tlist[k]);
         if (have_bb) rip = ios_native_rip_from_hostpc(bb, pc, &why);
         {
@@ -909,6 +916,23 @@ static void ios_thread_sampler_pass(int burst)
                     n += snprintf(line + n, sizeof(line) - n, " %s+0x%llx", mn, (unsigned long long)rva); shown++;
                 }
                 n += snprintf(line + n, sizeof(line) - n, " ]");
+                /* round 630 (agent U S5): where a thread parked in a system call entered it: its user pc and lr (module+RVA) and the
+                 * return addresses on its user stack, from its syscall frame (signal_arm64_ios.c) */
+                if (have_user && n < (int)sizeof(line) - 300) {
+                    const char *pn = ios_ts_mod_for(mp, upc, &rva);
+                    uint64_t lrva = 0;
+                    const char *ln = ios_ts_mod_for(mp, ulr, &lrva);
+                    if (pn) n += snprintf(line + n, sizeof(line) - n, " last-syscall id=0x%x pc=%s+0x%llx", sid, pn, (unsigned long long)rva);
+                    else n += snprintf(line + n, sizeof(line) - n, " last-syscall id=0x%x pc=0x%llx", sid, (unsigned long long)upc);
+                    if (ln) n += snprintf(line + n, sizeof(line) - n, " lr=%s+0x%llx", ln, (unsigned long long)lrva);
+                    n += snprintf(line + n, sizeof(line) - n, " user-sp=0x%llx user-cand=[", (unsigned long long)usp);
+                    for (i = 0, shown = 0; have_ustk && i < 64 && shown < 12 && n < (int)sizeof(line) - 80; i++) {
+                        mn = ios_ts_mod_for(mp, ustk[i], &rva);
+                        if (!mn || rva < 0x1000) continue;
+                        n += snprintf(line + n, sizeof(line) - n, " %s+0x%llx", mn, (unsigned long long)rva); shown++;
+                    }
+                    n += snprintf(line + n, sizeof(line) - n, " ]");
+                }
             }
             wine_log_write("%s", line);
             printed++;
@@ -4088,11 +4112,13 @@ struct ios_wait_entry ios_wait_reg[IOS_WAITREG_SLOTS];
 
 static struct ios_wait_entry *ios_wait_slot(void)
 {
-    /* Stable per-thread slot: TEB pointer hashed. Collisions only cost
-     * fidelity of the report, never correctness — a colliding thread
-     * overwrites the entry and the stuck one is simply not reported. */
-    uintptr_t t = (uintptr_t)NtCurrentTeb();
-    return &ios_wait_reg[(t >> 16) % IOS_WAITREG_SLOTS];
+    /* Stable per-thread slot. Collisions only cost fidelity of the report, never correctness — a colliding thread
+     * overwrites the entry and the stuck one is simply not reported.
+     * madeira-bcd (round 630, agent O1 S17; Gothic II AMDWS5, A6WWNQ): by the Wine thread id, not the TEB. Every 32-bit
+     * program's main thread has its TEB at its 4 GB window + 0x300000, so (teb >> 16) % 512 was 48 for all of them and their
+     * waits were never reported; thread ids are 4 apart, so (tid >> 2) gives 512 consecutive threads their own slots. */
+    unsigned int tid = (unsigned int)(uintptr_t)NtCurrentTeb()->ClientId.UniqueThread;
+    return &ios_wait_reg[(tid >> 2) % IOS_WAITREG_SLOTS];
 }
 
 static void ios_wait_enter( const union select_op *op, data_size_t size,
@@ -4102,7 +4128,7 @@ static void ios_wait_enter( const union select_op *op, data_size_t size,
     struct timespec ts;
     int i, n = 0;
 
-    e->seq++;                       /* -> odd: entry is being written  */
+    e->seq = (e->seq + 1) | 1;      /* -> odd: entry is being written (round 630: odd whatever a colliding thread did) */
     __sync_synchronize();
     e->teb      = NtCurrentTeb();
     e->wine_tid = (unsigned int)(uintptr_t)NtCurrentTeb()->ClientId.UniqueThread;
@@ -4127,7 +4153,7 @@ static void ios_wait_leave(void)
 {
     struct ios_wait_entry *e = ios_wait_slot();
     __sync_synchronize();
-    e->seq++;                       /* -> even: no longer waiting */
+    e->seq = (e->seq + 1) & ~1u;    /* -> even: no longer waiting (round 630: even whatever a colliding thread did) */
 }
 
 unsigned int server_wait( const union select_op *select_op, data_size_t size, UINT flags,

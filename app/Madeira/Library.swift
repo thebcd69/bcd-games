@@ -429,10 +429,14 @@ struct LibraryEntry: Codable, Identifiable {
         var batch = isBatch
         if servicesScript != nil { path = servicesScriptPath; extra = ""; batch = true }
         func withExtra(_ s: String) -> String { extra.isEmpty ? s : s + " " + extra }
+        /// madeira-bcd (round 630, agent G1 S6; Call of Duty batch starts 4VHEPN, Q6Q7Q8): cmd.exe /c strips the quotes round a path that
+        /// holds any of & < > ( ) @ ^ | (Windows' rule, Wine's cmd the same) and then reads "C:\Program" as the command: every batch file
+        /// under "Program Files (x86)" failed with "Can't recognize". CALL first keeps the quotes; any other path keeps today's form.
+        func cmdTarget(_ s: String) -> String { (s.contains { "&<>()@^|".contains($0) } ? "call " : "") + quoted(s) }
         if runsInDesktop {
-            return ("explorer.exe", "/desktop=shell,\(resolution) " + withExtra(batch ? "cmd /c \(quoted(path))" : quoted(path)))
+            return ("explorer.exe", "/desktop=shell,\(resolution) " + withExtra(batch ? "cmd /c \(cmdTarget(path))" : quoted(path)))
         }
-        if batch { return ("C:\\windows\\system32\\cmd.exe", withExtra("/c \(quoted(path))")) }
+        if batch { return ("C:\\windows\\system32\\cmd.exe", withExtra("/c \(cmdTarget(path))")) }
         return (path, programArguments)   // upstream's direct launch, arguments verbatim
     }
     /// The details page's "command that runs" line: the program's file name and
@@ -622,6 +626,11 @@ struct LibraryEntry: Codable, Identifiable {
             let pairs = try MadeiraConfig.applyGame(gameConfigText)
             if !pairs.isEmpty {
                 LogStore.shared.log("[game-cfg] " + pairs.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " "))
+                // Round 630 (agent T1 S26; The Amazing Spider-Man VTX0DG): which FEX memory-order preset the game's file amounts to, in one word.
+                let preset = BCDFEXPresets.current(pairs)
+                if !preset.isEmpty {
+                    LogStore.shared.log("[fex-preset] \(preset) (the game's file sets FEX's memory-order lines; BCD's own choice sets none)")
+                }
             }
         } catch {
             LogStore.shared.log("[game-cfg] this game's config could not be written: \(error.localizedDescription)")
@@ -796,6 +805,12 @@ final class LibraryModel: ObservableObject {
                 LogStore.shared.log("[exit-report] the program (\(program) MB) is larger than the executable window (\(window) MB)")
                 return words
             }
+        }
+        // madeira-bcd (round 630, agent G3 S19; RVW5FD): Wine's stub status; the log names the function the game asked for.
+        if status == 0x80000100 {
+            let name = ExitWords.unimplementedFunction(inTail: Self.sessionLogTail())
+            if let name { LogStore.shared.log("[exit-report] the function the game called: \(name)") }
+            return ExitWords.stubAbort(name)
         }
         // madeira-bcd (round 624, agent E1 S1, VMJ4WV): 0xC0000135 is a DLL the program imports that was not found (Aliens: Colonial Marines
         // without its steam_api.dll); the game's page names the file when the readiness check finds it missing.
@@ -1872,6 +1887,24 @@ enum DesktopExitRules {
 /// Hogwarts Legacy's Epic copy (GBQRKH) ended with c0000018 because its 451.9 MiB program did not fit the 448 MB window its settings
 /// keep. Pure: the tail of the session's log goes in, words come out (tests/host/check-session-end.py).
 enum ExitWords {
+    /// madeira-bcd (round 630, agent G3 S19): the function of the last "... to unimplemented function NAME, aborting" line (Wine's stub
+    /// end, status 0x80000100), at most 120 characters; nil when the line is not there.
+    static func unimplementedFunction(inTail tail: String) -> String? {
+        guard let r = tail.range(of: " to unimplemented function ", options: .backwards) else { return nil }
+        let rest = tail[r.upperBound...]
+        guard let c = rest.range(of: ", aborting") else { return nil }
+        let name = String(rest[..<c.lowerBound])
+        guard !name.isEmpty, name.count <= 120, !name.contains("\n") else { return nil }
+        return name
+    }
+
+    /// Status 0x80000100: the game called a Windows function BCD does not have yet, named when the log has it.
+    static func stubAbort(_ name: String?) -> String {
+        "The game quit with Windows error 0x80000100: it called a Windows function that BCD does not have yet"
+            + (name.map { $0.uppercased() == "COMCTL32.DLL.345" ? " (\($0): the game's own error message box)" : " (\($0))" } ?? "")
+            + ". To report the problem, export the diagnostic log."
+    }
+
     /// The library whose start failed, from the last `loader_init "NAME" failed to initialize` line.
     static func failedLibrary(inTail tail: String) -> String? {
         guard let r = tail.range(of: "loader_init \"", options: .backwards) else { return nil }

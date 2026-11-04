@@ -75,6 +75,12 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                 BCDSettingsInfoRow(title: "BCD can use",
                                    note: "Measured now. Past this, iOS closes BCD and the game with it.",
                                    value: status.limitBytes.map(memoryText) ?? "Not measured")
+                // madeira-bcd (round 630): helper memory never raises iOS's limit above; it holds game data outside it.
+                if let poolMB = Int64(backend.value(.memoryPool)), poolMB > 0 {
+                    BCDSettingsInfoRow(title: "Helper memory adds",
+                                       note: "A game's data can also sit outside the limit above, up to this much, while the device has memory to spare. Graphics memory always counts against the limit.",
+                                       value: "Up to " + memoryText(poolMB << 20))
+                }
                 BCDSettingsInfoRow(title: "Increased memory limit",
                                    note: status.increasedLimit
                                        ? "This copy of BCD carries Apple's increased-memory entitlement."
@@ -98,11 +104,10 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                     row(.swap, "Swap file",
                         "When memory runs short, game data moves into a file on this device, up to this size. It costs some speed.")
                     row(.swapCoverage, "What can move",
-                        "Which of a game's allocations may move into the swap file. The wider, the more memory it saves and the more it can slow a game.",
-                        enabled: backend.value(.swap) != "")
+                        "Which of a game's allocations may move into helper memory or the swap file. The wider, the more memory it saves and the more it can slow a game.",
+                        enabled: backend.value(.swap) != "" || backend.value(.memoryPool) != "")
                     row(.memoryPool, "Helper memory",
-                        "Memory from BCD's helper extension, outside BCD's own limit, used before the swap file while the device has some to spare. Experimental; needs the swap file.",
-                        enabled: backend.value(.swap) != "")
+                        "Memory from BCD's helper extension, outside BCD's own limit, used first while the device has some to spare. Works without the swap file. On a device with 8 GB or less, keep it to a quarter of its memory. Not available when BCD runs inside LiveContainer. Experimental.")
                 }
                 BCDSettingsGroup(title: "Speed and power") {
                     row(.syncEngine, "Thread sync",

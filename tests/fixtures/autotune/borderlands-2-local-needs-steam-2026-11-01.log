@@ -1,0 +1,194 @@
+[15:45:47.420] [INFO] Checking entitlements...
+[15:45:47.421] [INFO] [build] v0.1.626 (626)
+[15:45:47.421] [INFO] [device] model=iPhone15,4 idiom=phone os=iOS Version 27.0 (Build 24A437) ram=5687MB available=4073MB cores=6
+[15:45:47.421] [INFO] [device] address-map=[0x1046e8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[15:45:47.434] [INFO] [device] settings: low-power=0 thermal=nominal screen=1179x2556@3.0x max-fps=60 utc-offset=-05:00 free-disk=20GB stikdebug-url=1
+[15:45:47.438] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:45:51.964] [INFO] Requesting JIT with StikDebug...
+[15:45:51.989] [INFO] Opening StikDebug to enable JIT...
+[15:45:57.730] [INFO] [bcd] library launch Borderlands2.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[15:45:57.746] [INFO] Running full Wine sequence...
+[15:45:57.746] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1046e8000,0x8000000000) 512GB available=4061MB low-power=0 thermal=nominal
+[15:45:57.747] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[15:45:57.758] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:45:57.758] [INFO] Allocating 896MB JIT pool via debugger...
+[15:45:57.758] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:45:57.758] [INFO] [jit-debugger] attached=1 at the pool request
+[15:45:57.762] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:46:00.439] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  2.783s rev=ml526
+[15:46:00.542] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/b3804623fec8e9d3.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[15:46:00.937] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[15:46:00.937] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3487 MB + phys_footprint=608 MB = 4096 MB (hw.memsize says 5687 MB)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x23000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[window] 0x7048000000..0x7400000000 regions=134 occupied=12289 MB of 15232 MB free=2942 MB maxhole=2942 MB@0x7048000000 rev=ml787 (periodic)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148554000 used=0x678000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x148678000 used=0x720000/0x23000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148720000 used=0x8a0000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[window] 0x123400000..0x7803000000 regions=71919 occupied=466172 MB of 486908 MB free=37167 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=647 MB (peak 647) internal=646 MB compressed=0 MB external=72 MB reusable=7 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7023120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7023220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7023420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7023820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7024020000+0xfd0000 held for 2000 ms (5 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x107570828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Borderlands2.exe (borderlands2.exe-016289a357194269): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module steam_api.dll (steam_api.dll-b442ace9a6e82edc): 717BC10000
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40424e11a1fef28): 717BBC0000
+ml957: ? backing 0x717bba8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b050000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a474000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a3e0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[xp] 15:46:02.268 +0.63 dt=323 cpu=47 (thr 46) P=46 E=0 run=50 pgw=-1.0 GHz P=3.11 E=1.68 Minst=573 IPC=3.96 mJ=111 pin=4 rdKB=12857 fpMB=705
+ml957: ? backing 0x717a088000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7179f74000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-fail] ml665 #58 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\External\Borderlands 2\Binaries\Win32\WININET.dll
+E 24 [iOS-xins] tracker=0x148510e60 WININET.dll sec=0x7179bb1000-0x7179be4f6c
+D 24 Load module WININET.dll (wininet.dll-7ed1ba985c3d2fb3): 7179BB0000
+[xp] 15:46:02.521 +0.88 dt=253 cpu=81 (thr 81) P=81 E=0 run=86 pgw=-1.0 GHz P=3.30 E=1.50 Minst=1133 IPC=4.22 mJ=217 pin=13 rdKB=13342 fpMB=716
+[jit-pool] image 0x71791d0000+0x67000 (?) → pool 0x148abc000 used=0xb24000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 13 .text pages executable (copy @0x148abc000)
+ml957: ? backing 0x7179234000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x7179180000+0x1b000 (?) → pool 0x148b27000 used=0xb47000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148b27000)
+ml957: ? backing 0x7179198000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x7179160000+0x7000 (?) → pool 0x148b44000 used=0xb4c000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b44000)
+ml957: ? backing 0x7179164000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7026110000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+D 24 Load module Kerberos.dll (kerberos.dll-a465a4dc50305be6): 7179140000
+D 24 Load module MSV1_0.dll (msv1_0.dll-fe14d415176d3c17): 7179140000
+[jit-pool] image 0x7179110000+0x1f000 (?) → pool 0x148b4c000 used=0xb6c000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148b4c000)
+ml957: ? backing 0x717912c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module netapi32.dll (netapi32.dll-67f045b4a9a3190e): 7179110000
+[jit-pool] image 0x71790f0000+0x7000 (?) → pool 0x148b6c000 used=0xb74000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b6c000)
+ml957: ? backing 0x71790f4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module netutils.dll (netutils.dll-77547757313e0e94): 71790F0000
+[image-reload] unmapped image 0x7179110000+0x1f000: 1 pool copy marked
+[image-reload] unmapped image 0x71790f0000+0x7000: 1 pool copy marked
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445f3c30): 7179120000
+[image-reload] unmapped image 0x7179120000+0x2e000: 1 pool copy marked
+[unixlib] opengl32 (GL-absent stub table) (module 0x7179690000) -> wow64 table (0x107578828)
+[xp] 15:46:02.812 +1.17 dt=291 cpu=191 (thr 191) P=191 E=0 run=196 pgw=-1.0 GHz P=3.39 E=1.51 Minst=2361 IPC=3.65 mJ=523 pin=61 rdKB=4173 fpMB=716
+[stale-heal]   3 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[jit-pool] image 0x7179140000+0xe000 (?) → pool 0x148b76000 used=0xb8a000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148b76000)
+ml957: ? backing 0x717914c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module netprofm.dll (netprofm.dll-b56b2150cf1cb232): 7179140000
+[xp] 15:46:03.130 +1.49 dt=318 cpu=164 (thr 147) P=164 E=1 run=168 pgw=-1.0 GHz P=3.09 E=1.42 Minst=1902 IPC=3.76 mJ=371 pin=1 rdKB=210 fpMB=826
+[xp] 15:46:03.445 +1.81 dt=315 cpu=207 (thr 207) P=207 E=0 run=211 pgw=-1.0 GHz P=3.33 E=1.52 Minst=3168 IPC=4.60 mJ=560 pin=0 rdKB=325 fpMB=828
+0024:err:seh:ios_steam_api_diag [steam-api] steam_api found no running Steam; process 0020 sees:
+[footprint] rev=ml358 phys=832 MB (peak 832) internal=830 MB compressed=0 MB external=75 MB reusable=7 MB (cycle=2)
+[guest-stk] sp+0x198 0x1481a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x1c0 0x14836e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x1d0 0x1481a7a0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x3d8 0x148294768 = libwow64fex.dll+0x103768
+[guest-stk] sp+0x438 0x1482946ec = libwow64fex.dll+0x1036ec
+[guest-stk] sp+0x558 0x1482946e4 = libwow64fex.dll+0x1036e4
+[xp] 15:46:03.748 +2.11 dt=302 cpu=193 (thr 193) P=189 E=4 run=206 pgw=-1.0 GHz P=3.31 E=2.00 Minst=2502 IPC=3.94 mJ=500 pin=0 rdKB=103 fpMB=832
+0024:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Message" / L"Steam must be running in order to launch Borderlands 2. Please restart Borderlands 2 after starting the Steam client.": main exe base 00400000 size 0x1b36000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #3 hwnd=0x10030 class='#32770' text="" rev=ml853
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x10030 class='#32770' text="" rev=ml853
+[win-name] #71 hwnd=0x10042 class='Button' text="OK" rev=ml853
+[win-name] #72 hwnd=0x10030 class='#32770' text="Message" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[launch-view] dismissed reason=surface logs=0
+[xp-names] m5534097 "wine-x18-exc"
+[hwinput] keyboard focus: program (program cursor)
+[footprint] rev=ml358 phys=827 MB (peak 832) internal=826 MB compressed=0 MB external=76 MB reusable=7 MB (cycle=3)
+[srv-input] btn msg=0x201 at (710,356) hit win=00010030 thread=0x11c845e00
+[srv-input] btn msg=0x201 at (710,356) hit win=00010030 thread=0x11c845e00
+[srv-input] btn msg=0x201 at (710,356) hit win=00010030 thread=0x11c845e00
+[win-name] #73 hwnd=0x10030 class='#32770' text="Message" rev=ml853
+[win-name] #74 hwnd=0x10030 class='#32770' text="Message" rev=ml853
+[win-name] #75 hwnd=0x10030 class='#32770' text="Message" rev=ml853
+[win-name] #76 hwnd=0x10030 class='#32770' text="Message" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x3) syscalls=0 unix_calls=541
+[srv-kill] kill_thread tid=0040 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0044 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0048 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=004c pid=0020 violent=1 rev=ml586
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x717bc52f79 pc=148135be8 nparams=2 p0=3a p1=710273f5f4
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x717bc52f79 pc=148135be8 nparams=2 p0=2 p1=7179b610a0
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=544
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(3)
+[Wine ntdll/server] process_exit_wrapper(3)
+[WineProc] Wine exited with code 3 (caught by longjmp)
+[WineProc] stopping wineserver...
+[15:46:06.749] [INFO] [session] length=9s play=0s frames=0 stalls=0/0s peak=833MB limit=4095MB thermal=nominal lpm=0 api=D3D9/32 res=1424x656 cap=60 game=Borderlands 2
+[frontend] returned to library
+[15:46:06.921] [INFO] [steam-start] a program added by hand said it found no Steam and closed
+[footprint] rev=ml358 phys=837 MB (peak 837) internal=836 MB compressed=0 MB external=79 MB reusable=6 MB (cycle=4)
+[15:46:08.634] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=838 MB (peak 838) internal=836 MB compressed=0 MB external=79 MB reusable=6 MB (cycle=5)
+[footprint] rev=ml358 phys=838 MB (peak 838) internal=836 MB compressed=0 MB external=79 MB reusable=6 MB (cycle=6)
+[xp] 15:46:13.021 +11.38 dt=322 cpu=63 (thr 62) P=29 E=34 run=62 pgw=-1.0 GHz P=1.51 E=1.19 Minst=164 IPC=1.93 mJ=15 pin=0 rdKB=0 fpMB=838
+[hwinput] keyboard focus: elsewhere (responder)
+[xp] 15:46:13.317 +11.68 dt=296 cpu=131 (thr 132) P=114 E=17 run=148 pgw=-1.0 GHz P=3.12 E=1.90 Minst=984 IPC=2.54 mJ=214 pin=29 rdKB=448 fpMB=842
+[xp] 15:46:13.633 +11.99 dt=315 cpu=54 (thr 49) P=0 E=54 run=59 pgw=-1.0 GHz P=0.00 E=1.09 Minst=78 IPC=1.31 mJ=4 pin=106 rdKB=3360 fpMB=840
+[footprint] rev=ml358 phys=840 MB (peak 840) internal=838 MB compressed=0 MB external=88 MB reusable=8 MB (cycle=7)
+[xp] 15:46:13.964 +12.33 dt=332 cpu=61 (thr 62) P=5 E=56 run=65 pgw=-1.0 GHz P=1.22 E=1.14 Minst=132 IPC=1.90 mJ=6 pin=0 rdKB=0 fpMB=840
+[xp] 15:46:14.290 +12.65 dt=325 cpu=38 (thr 37) P=0 E=38 run=39 pgw=-1.0 GHz P=0.00 E=0.77 Minst=50 IPC=1.69 mJ=2 pin=0 rdKB=0 fpMB=840
+[xp] 15:46:14.554 +12.92 dt=264 cpu=70 (thr 70) P=33 E=37 run=87 pgw=-1.0 GHz P=1.76 E=1.13 Minst=170 IPC=1.71 mJ=21 pin=0 rdKB=0 fpMB=840
+70) P=33 E=37 run=87 pgw=-1.0 GHz P=1.76 E=1.13 Minst=170 IPC=1.71 mJ=21 pin=0 rdKB=0 fpMB=840

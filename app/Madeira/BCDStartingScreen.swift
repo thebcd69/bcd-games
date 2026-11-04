@@ -107,8 +107,10 @@ enum BCDDockStart {
             return (.waiting, note("update", "Steam is installing content this game needs. The game starts right after."))
         }
         if fields["launch-session-wait"] != nil && fields["launch-client-error"] == "35" {
+            // Round 630 (agent A1 S10; Baldur's Gate 3 1FKVEB, 7WK27C, W9T2C7, ZK4Z2Y: one player, four starts in 15 minutes): every
+            // start closed while it waited left one more session for Steam to count. Text only.
             return (.waiting, note("session", "Steam still counts this account as playing somewhere else. BCD waits up to "
-                                   + "3 minutes for Steam to end that session.", .warm))
+                                   + "3 minutes for Steam to end that session; closing and starting again does not help, so wait here.", .warm))
         }
         if fields["launch-config-wait"] != nil && (fields["launch-client-error"] == "22" || fields["launch-client-error"] == "23") {
             return (.waiting, note("config", "Steam is still loading this game's settings."))

@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "unreal-fire-smc-moffs"
+ ],
+ "next": [
+  "env.MADEIRA_FEX_MOFFS_RIP = 1"
+ ],
+ "note": "Unreal Gold (Steam 13250, 32-bit Unreal.exe, BCD Dock), build 627, iPad17,3: the fire texture code in Fire.dll patches its own loop with MOV [address],EAX stores on the running page; FEX resumed in front of each store and ran the INC/SUB/ADD between them twice, so the loop ran past its buffer (Fire.dll+0x15E62, 24 s in). Send Log Y1G0A7, trimmed. From build 630 auto-tune proposes env.MADEIRA_FEX_MOFFS_RIP = 1.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

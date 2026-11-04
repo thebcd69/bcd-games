@@ -58,7 +58,10 @@ check('the helper is evaluated only behind the switch, with the thread\'s TEB, t
       block.count(call) == 1 and src.count('ios_fault_loop_guest_progress(') == 2)
 check('the restart is stuck_page = 0, after the NULL-page rule and before the two tests, so the old "new run" branch runs and nothing else changes',
       block.index('if (!fpage) fpage = 1;') < block.index(call) < block.index('stuck_page = 0;')
-      < block.index('if (fpage == stuck_page && fault_pc_check == stuck_pc &&') and block.count('stuck_page = 0;') == 1)
+      < block.index('if (fpage == stuck_page && fault_pc_check == stuck_pc &&')
+      # round 630 (agent O2 S2): the second restart is the __TRY rule's (a fault the system call answers), between the hook and the tests
+      and block.count('stuck_page = 0;') == 2 and block.index(call) < block.index('if (ios_mach_syscall_try_active(')
+      < block.index('if (fpage == stuck_page && fault_pc_check == stuck_pc &&'))
 check('the old text of the breaker is all still there (the 50 mark, the abort_thread diversion, the 20000 page ceiling, the region map)',
       'if (n >= 50)' in block and 'abort_thread' in block and 'if (pn >= 20000) stuck_n = 49;' in block and '[fault-stuck] BREAKING LOOP: page' in block
       and '[fault-stuck] ml876 page' in block and 'region map around it' in block)
@@ -89,6 +92,8 @@ typedef void *vm_region_info_t;
 typedef struct { int protection, max_protection; } vm_region_basic_info_data_64_t;
 typedef struct { uint64_t pc, sp, __x[29]; } arm_thread_state64_t;
 static unsigned killed, progress_lines;
+/* round 630 (agent O2 S2): a fault inside a system call's __TRY is no livelock; off here (check-syscall-fault-loop.py runs it) */
+static int ios_mach_syscall_try_active(uintptr_t teb, uint64_t sp) { (void)teb; (void)sp; return 0; }
 static int mach_task_self(void) { return 0; }
 static int mach_vm_region(int task, mach_vm_address_t *q, mach_vm_size_t *rs,
                          int f, vm_region_info_t r, mach_msg_type_number_t *rc, mach_port_t *ro)

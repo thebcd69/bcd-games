@@ -195,6 +195,28 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
     /// Madeira Dock's session ended, or its start failed.
     func releaseDock() { heldForDock = false }
 
+    /// Round 630 (agent A1 S17; Muv-Luv photonflowers PYVTE8, build 625): runs `work` and answers true when it ends within `seconds`,
+    /// false when the time runs out first. Nothing is cancelled: the work goes on by itself either way.
+    static func endsWithin(seconds: Double, _ work: @escaping @Sendable @MainActor () async -> Void) async -> Bool {
+        let once = OnceFlag()
+        return await withCheckedContinuation { (done: CheckedContinuation<Bool, Never>) in
+            Task { @MainActor in
+                await work()
+                if once.take() { done.resume(returning: true) }
+            }
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: UInt64(max(0, seconds) * 1_000_000_000))
+                if once.take() { done.resume(returning: false) }
+            }
+        }
+    }
+
+    /// The first of the two endings above resumes the wait; the other finds it taken.
+    @MainActor private final class OnceFlag {
+        private var taken = false
+        func take() -> Bool { defer { taken = true }; return !taken }
+    }
+
     /// The app takes the account back while the game session still runs, to upload
     /// its saves before the app quits. One way: the session's client loses its
     /// logon and the app does not hand the account back.
@@ -981,11 +1003,31 @@ final class SteamOwnedLibrary: ObservableObject {
     /// `dockEnded()` and the end of the session.
     func prepareDock() async {
         let running = active?.task
+        let begin = Date()
         sessionChanged(active: true)
-        await running?.value
-        await gate.holdForDock()
-        SteamLog.event("[steam-library] connection closed for BCD Dock")
+        // Round 630 (agent A1 S17; Muv-Luv photonflowers PYVTE8, build 625): the only Dock hand-off of 3,009 logs that stopped after the
+        // pause line: a resumed download ran and the connection had two lookups pending; neither the download's pause nor the close
+        // was logged, and the log ends 3.5 s later (a hang or a kill: the file cannot tell). Each step now says when it ended, and
+        // neither wait holds the start longer than dockStepLimit (the 21 healthy hand-offs with a running download took 1.6 s at most):
+        // the closing task frees the account, and Valve's client's sign-in replaces a socket that is still open.
+        if let running {
+            if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await running.value }) {
+                SteamLog.event(String(format: "[steam-depot] prepareDock: the stopped download ended after %.1f s", Date().timeIntervalSince(begin)))
+            } else {
+                SteamLog.event("[steam-depot] prepareDock: the stopped download did not end in \(Int(Self.dockStepLimit)) s; going on")
+            }
+        }
+        let gate = self.gate
+        if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await gate.holdForDock() }) {
+            SteamLog.event("[steam-library] connection closed for BCD Dock")
+        } else {
+            SteamLog.event("[steam-library] the connection's close did not end in \(Int(Self.dockStepLimit)) s; BCD Dock goes on "
+                           + "(Valve's client's sign-in replaces it)")
+        }
     }
+
+    /// Round 630 (agent A1 S17): the longest either step of prepareDock may hold a Dock start.
+    static let dockStepLimit: Double = 30
 
     /// Madeira Dock's session ended, or its start failed (MadeiraDockModel,
     /// ContentView.startDock): the connection comes back once no session runs.

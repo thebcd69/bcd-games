@@ -114,7 +114,7 @@ check('the 32-bit module build applies it after the required patches, a drifted 
       'OPDISPF="FEXCore/Source/Interface/Core/OpcodeDispatcher.cpp"' in w
       and w.index('patch-fex-ios-wow-threads-ctor.py') < w.index('patch-fex-ios-op82-alias.py') < w.index('trap restore EXIT')
       and 'python3 "$R/tools/patch-fex-ios-op82-alias.py" "$R/FEX/$OPDISPF" || echo "::warning::the 0x82 alias patch was not applied' in w
-      and re.search(r'restore\(\) \{ git -C "\$R/FEX" checkout -- [^}]*"\$OPDISPF"; \}', w) is not None)
+      and re.search(r'restore\(\) \{ git -C "\$R/FEX" checkout -- [^}]*"\$OPDISPF"[^}]*; \}', w) is not None)
 x64 = root / 'tools/build-xtajit64.sh'
 check('the 64-bit (ARM64EC) module build does not apply it', not x64.is_file() or 'op82' not in x64.read_text())
 
@@ -152,11 +152,15 @@ spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/to
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 rule = next((r for r in mod.RULES if r['id'] == 'x86-op82-protection-exit'), None)
-check('auto-tune names the stop as fixed in build 624, with no line', rule is not None and rule['lines'] == [] and rule.get('fixedIn') == 624
-      and 'Unknown ALU Op: 0x1' in json.dumps(rule['all']) and 'exit_code=0xdeadc0de' in json.dumps(rule.get('any', [])))
-exp = root / 'tests/fixtures/autotune/ubisoft-connect-op82-2026-10-29.expect'
+# Round 630 (agent O1 S1; Ubisoft Connect MSFM7W, build 626): upc.exe ends itself after its protection's self-check whatever the build, so
+# Ubisoft Connect's logs (P4KC3V among them) are ubisoft-launcher-protection-exit's; this rule keeps the uplay_r1_loader.dll case.
+check('auto-tune names the loader\'s stop as fixed in build 624, with no line', rule is not None and rule['lines'] == [] and rule.get('fixedIn') == 624
+      and 'Unknown ALU Op: 0x1' in json.dumps(rule['all']) and 'uplay_r1_loader.dll' in json.dumps(rule['all']))
+exp = root / 'tests/fixtures/autotune/ubisoft-uplay-loader-op82-2026-10-27.expect'
 data = json.loads(exp.read_text()) if exp.is_file() else {}
-check('its fixture (Ubisoft Connect P4KC3V) matches it', (data.get('matched') or [None])[0] == 'x86-op82-protection-exit', data)
+check('its fixture (Assassin\'s Creed III Liberation HD XSSVTQ) matches it', (data.get('matched') or [None])[0] == 'x86-op82-protection-exit', data)
+p4 = json.loads((root / 'tests/fixtures/autotune/ubisoft-connect-op82-2026-10-29.expect').read_text())
+check('Ubisoft Connect P4KC3V is the protection self-check\'s (round 630)', (p4.get('matched') or [None])[0] == 'ubisoft-launcher-protection-exit', p4)
 check('the CI runs this check', 'python3 tests/host/check-fex-op82-alias.py' in (root / '.github/workflows/build-ipa.yml').read_text())
 
 print('PASS: FEX 0x82 alias' if ok else 'FAIL: FEX 0x82 alias')

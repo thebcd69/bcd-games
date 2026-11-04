@@ -215,13 +215,21 @@ python3 "$R/tools/patch-fex-ios-mono-bp-unlocked-miss.py" "$R/FEX/FEXCore/Source
 # Whichever pin (round 626, agent C S4; Clair Obscur's crash reporter HWMBZ2, DQQR62, CDPEFN, 1FJAWW): an exception that arrives after the
 # emulator's context was torn down goes on to Wine instead of faulting on the null context ("[fex-fault] pc=...+0x1123c4" in 624-625).
 python3 "$R/tools/patch-fex-ios-ec-teardown-ctx.py" "$R/FEX" || echo "::warning::the torn-down context guard was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (round 630, agent A2 S18; Enshrouded PG716Q, 0CAY0F, 2TKD32): a process whose exit re-enters the emulator its own DLL
+# detach tore down (a host-address guest RIP, compiled for ever) is ended the way the loader was about to end it ("[exit-runaway]").
+python3 "$R/tools/patch-fex-ios-exit-runaway.py" "$R/FEX" || echo "::warning::the exit-runaway stop was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (round 630, agent O2 S7; Outlast Y09766): the code-invalidation walk skips a thread state without its caches ([inval-null]).
+python3 "$R/tools/patch-fex-ios-inval-null-thread.py" "$R/FEX" || echo "::warning::the invalidation-walk guard was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (round 630, agent G3 S11; Hearts of Iron IV's dowser.exe TM3HCY): RDTSCP/RDPID report processor 0 instead of the translation
+# ending the process ("A <tid> Unsupported").
+python3 "$R/tools/patch-fex-ios-processorid.py" "$R/FEX/FEXCore/Source/Interface/Core/JIT/MiscOps.cpp" || echo "::warning::the ProcessorID fix was not applied (FEX anchor changed); xtajit64.dll is built without it"
 # Opt-in, whichever pin (round 626, agent G1 S7; Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE.
 python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/FEXCore/Source/Interface/Core/CPUID.cpp" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit64.dll is built without it"
 # Opt-in, whichever pin (round 624, agent A S7; Borderlands GOTY Enhanced V0FQAS): the alias table has room for 1024 image copies,
 # the limit in force stays 256 unless env.MADEIRA_FEX_ALIAS_MAX names more; the miss line says how full the table is.
 python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"
 build
-git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp
+git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp
 git -C FEX/External/rpmalloc checkout -- rpmalloc/rpmalloc.c
 cp "$B/Bin/libarm64ecfex.dll" "$SHIP"
 cp "$B/Bin/libarm64ecfex.dll" "$AVX"

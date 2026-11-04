@@ -24,6 +24,11 @@
 #    alias of 0x80 (ADD/OR/AND/SUB/XOR r/m8, imm8): "Unknown ALU Op: 0x10..0x16" and c000001d in
 #    Ubisoft's protection code (Ubisoft Connect, South Park, Assassin's Creed 2). Optional like the
 #    guard: a drifted anchor only skips it. The ARM64EC module needs nothing (0x82 is invalid in 64-bit mode).
+#  - patch-fex-ios-thread-init-nomem.py (round 630, A2 S3): a thread for which FEXCore's CreateThread returns
+#    NULL (the emulator's window full: the 32-bit Steam client on a 63 GB map) ends alone with STATUS_NO_MEMORY
+#    instead of dereferencing it and ending the whole process. Optional like the guard.
+#  - patch-fex-ios-moffs-rip.py (round 630, O3 S9): opt-in (MADEIRA_FEX_MOFFS_RIP=1): MOV moffs (A0-A3) records its
+#    guest RIP, so an inline self-modifying store of that form resumes at itself (Unreal Gold's fire textures).
 set -eu
 R="$(pwd)"
 MINGW="${MINGW:-$R/toolchains/llvm-mingw-20260421-ucrt-macos-universal/bin}"
@@ -40,9 +45,16 @@ python3 "$R/tools/patch-fex-ios-teb-tsd.py" "$R/FEX/Source/Windows/Common/Priv.h
 # the safety net must never cost the two required fixes above: a drifted anchor only skips it
 python3 "$R/tools/patch-fex-ios-wow-threads-ctor.py" "$R/FEX" || echo "::warning::the thread-map guard was not applied (FEX anchor changed); xtajit.dll is built without it"
 python3 "$R/tools/patch-fex-ios-op82-alias.py" "$R/FEX/$OPDISPF" || echo "::warning::the 0x82 alias patch was not applied (FEX anchor changed); xtajit.dll is built without it"
+python3 "$R/tools/patch-fex-ios-thread-init-nomem.py" "$R/FEX" || echo "::warning::the thread-init guard was not applied (FEX anchor changed); xtajit.dll is built without it"
+# round 630 (O2 S7, Outlast Y09766): the code-invalidation walk skips a thread state without its caches ([inval-null])
+python3 "$R/tools/patch-fex-ios-inval-null-thread.py" "$R/FEX" || echo "::warning::the invalidation-walk guard was not applied (FEX anchor changed); xtajit.dll is built without it"
+# round 630 (G3 S11): RDTSCP/RDPID report processor 0 instead of the translation ending the process
+python3 "$R/tools/patch-fex-ios-processorid.py" "$R/FEX/FEXCore/Source/Interface/Core/JIT/MiscOps.cpp" || echo "::warning::the ProcessorID fix was not applied (FEX anchor changed); xtajit.dll is built without it"
+# opt-in (round 630, O3 S9, Unreal Gold Y1G0A7): MADEIRA_FEX_MOFFS_RIP=1 gives MOV moffs a guest-RIP entry; unchanged without it
+python3 "$R/tools/patch-fex-ios-moffs-rip.py" "$R/FEX/FEXCore/Source/Interface/Core/Core.cpp" || echo "::warning::the MOV moffs RIP opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
 # opt-in (round 626, Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE; EDX unchanged without it
 python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/$CPUIDF" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
-restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF"; }
+restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF" FEXCore/Source/Interface/Core/Core.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp; }
 trap restore EXIT
 
 cmake -S "$R/FEX" -B "$B" -G Ninja -DCMAKE_BUILD_TYPE=Release \

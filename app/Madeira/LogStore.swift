@@ -169,7 +169,13 @@ final class LogStore: ObservableObject {
             try fm.linkItem(at: logFileURL, to: url)
             log("Session log: logs/\(url.lastPathComponent)")
         } catch {
-            log("Session log: could not link logs/\(url.lastPathComponent) (\(error.localizedDescription))", level: .error)
+            // Round 630 (agent T2 S2 extra; 416C0V): a second start of the same program in the same second finds the link the first one
+            // made (the same file): nothing went wrong, and no ERR line is written for it.
+            let existing = (try? fm.attributesOfItem(atPath: url.path))?[.systemFileNumber] as? NSNumber
+            let ours = (try? fm.attributesOfItem(atPath: logFileURL.path))?[.systemFileNumber] as? NSNumber
+            if existing == nil || existing != ours {
+                log("Session log: could not link logs/\(url.lastPathComponent) (\(error.localizedDescription))", level: .error)
+            }
         }
         let runs = ((try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey])) ?? [])
             .filter { $0.pathExtension == "txt" }

@@ -903,6 +903,11 @@ struct BCDGamePagePlan: Equatable {
             // it on no iOS version in the logs (126 logs on iOS 27, 6 on iOS 18.3/26.6.1), so a missing VA+ gets no note.
             if let limit = system.memoryLimitBytes, !system.increasedMemoryLimit {
                 notes.append(Note(text: "iOS gives BCD only \(BCDFormat.bytes(limit)) here: this install lacks the increased memory limit, so large games close early. Add it with GetMoreRam, or sign BCD with a paid developer account.", warning: true))
+            } else if let limit = system.memoryLimitBytes, limit <= Self.tinyLimitBytes, game.size == nil || (game.size ?? 0) >= Self.largeGameBytes {
+                // Round 630 (agent U S9; SCP: Secret Laboratory 1CKN4G, The Alto Collection 2BQN2G and JD41AM): a 4 GB iPhone (11/12/13
+                // class) lets apps use about 2.3 GB even with the increased limit. A game started from its own folder has no size, so the
+                // note below never showed for it; on these devices it shows for such an entry too. Before Play, once; text only.
+                notes.append(Note(text: "iOS lets apps use about \(BCDFormat.bytes(limit)) on this device, which is little for most PC games. If iOS closes this one, BCD tries a swap file next (it needs about 3 GB of free storage); the lowest graphics settings in the game help most.", warning: false))
             } else if let limit = system.memoryLimitBytes, limit <= Self.smallLimitBytes, (game.size ?? 0) >= Self.largeGameBytes {
                 // Round 625 (owner's item 19, agent D3 S5; Sekiro XJ8YM3/ZJYGS9, Cloudpunk F88RB4): even with the increased limit, a 6 GB iPhone
                 // lets apps use 4095 MB, and a large game may need more. Before Play, once on the page; text only.
@@ -925,6 +930,8 @@ struct BCDGamePagePlan: Equatable {
     /// Round 625 (owner's item 19): the device class whose apps get about 4 GB (4.5 GiB or less) and a game that large (8 GiB or more).
     static let smallLimitBytes: Int64 = 9 << 29
     static let largeGameBytes: Int64 = 8 << 30
+    /// Round 630 (agent U S9): the device class whose apps get about 2.3 GB (2,700 MiB or less: iPhone 11, 12 and 13 with the increased limit).
+    static let tinyLimitBytes: Int64 = 2_700 << 20
 
     private static func progress(_ state: BCDGameState, _ download: BCDDownload?) -> Progress {
         var fraction = download?.fraction ?? 0

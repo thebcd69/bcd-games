@@ -1,0 +1,16 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": false
+ },
+ "matched": [
+  "stale-alias-child-heap"
+ ],
+ "next": [
+  "env.MADEIRA_ALIAS_RELEASE = 1"
+ ],
+ "note": "Round 630 (agent A2 S9): the EA app's first helper (EALocalHostSvc.exe) crashed in its first heap's setup: the heap got the address of another process's released anonymous-JIT page whose alias records lived on, the free-list store went to the stale alias and the load read 0 (x16 = 0, ntdll.dll+0x26b10). env.MADEIRA_ALIAS_RELEASE = 1 drops the records with the view (the EA app's own session has it from build 630). Send Log BPAGVS, build 626.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

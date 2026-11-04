@@ -218,19 +218,28 @@ OVERLAY = {
                         "[0x75d0000000, 0x7800000000) from boot for one 8960 MB reserve, the one "
                         "Red Dead Redemption 2 makes as it starts. Set it only in that game's own file; GTA V keeps "
                         "layout 2 as it is. Read at session start."},
+    "env.MADEIRA_POOL_LAZY_WINDOWS": {"category": "Memory & JIT pool", "title": "Helper memory: do not keep its regions mapped",
+                "kind": "bool", "default": "0",
+                "note": "Off unless set (build 630). Helper memory maps every region of its pool into BCD's address space for the whole "
+                        "session (6 GB at 6144 MB), used or not; a game that needs the room (the Rockstar launcher's Social Club) can run "
+                        "out of it. 1: a region is mapped only while part of it is being zeroed, at most 64 MB at a time. Taking and "
+                        "giving back memory work as before. Read from bcd.cfg or the game's settings when the session starts.",
+                "sources": ["build/ntdll-unix/virtual_ios.c", "app/Madeira/WineProcessBridge.m"]},
     "env.MADEIRA_POOL_MORE": {"category": "Memory & JIT pool", "title": "Helper memory: take more (Persona 3 Reload's changes)",
-                "kind": "bool", "default": "0", "sources": ["build/ntdll-unix/virtual_ios.c", "app/Madeira/WineProcessBridge.m", "app/Madeira/MemoryPool.m"],
-                "note": "Off unless set (build 625; from rtmtree's Persona 3 Reload fork). With helper memory (mempool-mb) on: its guard "
+                "kind": "bool", "default": "1", "sources": ["build/ntdll-unix/virtual_ios.c", "app/Madeira/WineProcessBridge.m", "app/Madeira/MemoryPool.m"],
+                "note": "On unless set (from build 630; the key came in build 625, off by default, from rtmtree's Persona 3 Reload fork). "
+                        "With helper memory (mempool-mb) on: its guard "
                         "counts the file cache iOS can drop as available and stops only at the system's critical memory pressure "
                         "(BCD's own limit warning no longer closes it), a range may span its 512 MB regions, it is asked before the "
                         "swap file's disk cap, a decommit inside it is zeroed in place, freed ranges merge, mempool-mb works without "
-                        "swap-mb (a 64 MB swap file is armed), and MADEIRA_POOL_MARGIN_MB from bcd.cfg is read. Off: helper memory "
-                        "as in build 624. Read at session start; not yet tried on a device."},
+                        "swap-mb (a 64 MB swap file is armed), and MADEIRA_POOL_MARGIN_MB from bcd.cfg is read. 0: helper memory "
+                        "as in build 624. Read at session start."},
     "env.MADEIRA_POOL_MARGIN_MB": {"category": "Memory & JIT pool", "title": "Helper memory: keep this much free (MB)",
                 "kind": "int", "default": "1024", "sources": ["build/ntdll-unix/virtual_ios.c"],
                 "note": "Helper memory (mempool-mb) takes no more of the device's RAM once less than this is available. "
-                        "With env.MADEIRA_POOL_MORE = 1: free pages plus file cache iOS can drop, what iOS itself counts before "
-                        "closing apps, and this line is read at session start from bcd.cfg or the game's config. Without it: free "
+                        "With env.MADEIRA_POOL_MORE on (the default from build 630): free pages plus file cache iOS can drop, what "
+                        "iOS itself counts before closing apps, and this line is read at session start from bcd.cfg or the game's "
+                        "config. With env.MADEIRA_POOL_MORE = 0: free "
                         "pages only, and the line is read when the app starts helper memory, before bcd.cfg's lines are exported, "
                         "so only a value already in BCD's environment counts. 0 turns the margin off."},
     "env.MADEIRA_POOL_MIN_KB": {"category": "Memory & JIT pool", "title": "Helper memory: smallest reservation (KB)",
@@ -800,6 +809,14 @@ OVERLAY = {
                         "Dogs: Definitive Edition, Call of Duty: Black Ops, Fallout: New Vegas), and for Batman's AMD Dual-Core "
                         "Optimizer (amd), which never closes. Set in the game's own settings only.",
                 "sources": ["app/Madeira/DockInstallers.swift"]},
+    # round 630 (agent A2 S14): read by DockInstallers.swift (SteamSignIn.flag, default off)
+    "env.MADEIRA_DOCK_DIRECTX_FIRST": {"category": "Steam & Dock", "title": "Skip DirectX's setup at the first start",
+                "kind": "bool", "default": "0",
+                "note": "Off by default. 1: a Steam game's DirectX runtime setup (DXSETUP.exe) is recorded as done at the first start "
+                        "instead of after it has failed once, whatever the game's install entry is called. BCD ships what it installs "
+                        "(D3DX9/10/11, D3DCompiler, XAudio2, X3DAudio, XAPOFX, XInput); the setup failed at the first start in 36 of 41 "
+                        "logged runs, and such a start runs only the one-time installs.",
+                "sources": ["app/Madeira/DockInstallers.swift"]},
     # round 626 (agent R S1; the Rockstar launcher M443E0, PN6QF2)
     "env.MADEIRA_SRV_POLLOUT_GUARD": {"category": "Steam & Dock", "title": "No connect completion without a peer",
                 "kind": "bool", "default": "0",
@@ -858,6 +875,51 @@ OVERLAY = {
                 "note": "Default on (build 626). A BCD Dock start whose one-time installs run the EA app's installer links msiexec.exe into "
                         "system32 for that session, so the installer's Windows Installer service can start. 0: it is left out (the installer "
                         "then stops at its service check with error 1923)."},
+    "env.MADEIRA_DOTNET_FUSION": {"category": "Steam & Dock", "title": "One-time installs: Wine's fusion.dll for managed setups", "kind": "bool",
+                "default": "1",
+                "note": "Default on. An installer with a managed step (DirectX's setup has one) loads fusion.dll from the .NET 2.0 folder, "
+                        "which Wine normally gets from its Mono package. Before a BCD Dock start that runs one-time installs, Wine's own "
+                        "32-bit fusion.dll is placed there when it is missing. 0: it is not placed.",
+                "sources": ["app/Madeira/DockInstallers.swift"]},
+    "env.MADEIRA_APP_UCRT": {"category": "Wine libraries", "title": "A program's own C runtime copy may load (64-bit)", "kind": "bool",
+                "default": "0",
+                "note": "Default off. A 64-bit program that ships its own copy of Microsoft's Universal C Runtime gets Wine's instead, "
+                        "as Windows 10 and later do: the program's copy ran its x64 start-up code before the loader was ready (c000001d, "
+                        "the Rockstar Games Launcher's service). 1: the program's own copy loads, as before.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    "env.MADEIRA_DOCK_LICENCE_WAIT": {"category": "Steam & Dock", "title": "Licence check: more time after a late sign-in", "kind": "bool",
+                "default": "1",
+                "note": "Default on (build 630). BCD Dock waits 90 s from the start of the sign-in for Steam to sign in and list the game's "
+                        "licence. On: when the sign-in itself came late, the licence list still gets 45 s after it (never past 180 s in all); "
+                        "a start that signs in within 45 s waits exactly as before. 0: 90 s in all, as before.",
+                "sources": ["tools/patch-dock-licence-wait.py"]},
+    "env.MADEIRA_DOCK_CEG_ZERO_JOBS": {"category": "Steam & Dock", "title": "Prepared executables: go on when Steam starts no job",
+                "kind": "bool", "default": "0",
+                "note": "Default off. For a game whose files Steam prepares for each account before it starts (custom executables), "
+                        "BCD Dock starts the game only after every job Steam started has finished. When Steam accepts the request but "
+                        "starts no job, the start ends with code 49. 1: such a start goes on to Steam's own launch, which decides; if the "
+                        "game's program is not ready, the game ends with its own error. Nothing else of the preparation changes.",
+                "sources": ["tools/patch-dock-ceg-zero-jobs.py"]},
+    "env.MADEIRA_DOCK_REGISTRY_RETRY": {"category": "Steam & Dock", "title": "Steam client entries: try a failed open again",
+                "kind": "bool", "default": "1",
+                "note": "Default on (build 630). Before it asks Steam to start the game, BCD Dock opens two keys of BCD's Windows registry "
+                        "for the Steam client's entries; when one cannot be opened, the start ended with code 42. On: a key that could "
+                        "not be opened is tried once more after a second (opening changes nothing). 0: no second try.",
+                "sources": ["tools/patch-dock-registry-events.py"]},
+    "env.MADEIRA_DOCK_EA_GECKO": {"category": "Steam & Dock", "title": "EA app installer: wait for Wine Gecko", "kind": "bool",
+                "default": "1",
+                "note": "Default on (build 630). The EA app's installer, which a Steam game from EA runs as a one-time install, shows a "
+                        "web page; without Wine's HTML engine Wine opened its own download prompt, which sat in front of the installer for "
+                        "the rest of the session. On: while Settings › HTML engine for installers has not downloaded it, the installer is "
+                        "held back (the note says so) and the other installs run. 0: it runs as before.",
+                "sources": ["app/Madeira/DockInstallers.swift"]},
+    "env.MADEIRA_DOCK_EA_SESSION": {"category": "Steam & Dock", "title": "EA app installer: the EA app entry's lines", "kind": "bool",
+                "default": "1",
+                "note": "Default on (build 630). A BCD Dock session of one-time installs that runs the EA app's installer gets the lines "
+                        "that installer runs with in BCD's own EA app entry (the custom-action wait queue, the opt-in Windows Installer "
+                        "libraries, an English locale ...), each only when the game's own file has no line with that key; such sessions "
+                        "ended with error 1603 without them. 0: none.",
+                "sources": ["app/Madeira/DockInstallers.swift", "app/Madeira/ContentView.swift"]},
     "env.MADEIRA_WOW_UNITY_PLAIN": {"category": "Memory & JIT pool", "title": "A Unity game's own Mono counts as Mono (32-bit)", "kind": "bool",
                 "default": "0",
                 "note": "Default off. 1: a 32-bit Unity game's own Mono runtime (mono-2.0-bdwgc.dll, or mono.dll in older Unity) makes its "
@@ -923,6 +985,13 @@ OVERLAY = {
                 "sources": ["app/Madeira/TouchControlPresets.swift"]},
     "env.MADEIRA_DINPUT_PAD": {"title": "DirectInput joystick from the host gamepad"},
     # ml2100: the HID controller (build/wineserver/hidpad_ios.c, docs/CONTROLLERS.md).
+    "env.MADEIRA_PAD_EARLY_SLOT": {"category": "Controllers", "title": "Player 1 connected from the start", "kind": "bool",
+                "default": "0",
+                "note": "Default off: player 1 shows up when a controller source appears (the touch controller mappings, or a paired "
+                        "controller). 1: when the session will have one, player 1 is connected at rest from the start, for games that look "
+                        "for controllers only once when they start; it then shows as connected for the whole session. Read from the game's "
+                        "own file, bcd.cfg or the environment when the session starts.",
+                "sources": ["app/Madeira/GamepadInput.swift"]},
     "env.MADEIRA_PAD_MODE": {"category": "Controllers", "title": "Controller API (player 1)", "kind": "choice",
                 "note": "XInput (default): every controller is an Xbox pad. hid: player 1 becomes a HID game controller, "
                         "a DualSense (054C:0CE6) when it is a PlayStation pad, else a generic HID gamepad, and leaves "
@@ -1318,6 +1387,30 @@ OVERLAY = {
                         "the features behind the two bits, so only a program that tests them sees a difference. Read once when "
                         "the game's process starts; a \"[fex-cpuid]\" line says it is on.",
                 "sources": ["tools/patch-fex-ios-cpuid-classic.py"]},
+    "env.MADEIRA_THREAD_FAULT_ISOLATE": {"category": "Exceptions & threads", "title": "A DLL's dying thread ends only itself",
+                "kind": "text", "default": "",
+                "note": "Empty: an unhandled exception in any thread ends the program, as on Windows. DLL file names, comma separated (up to "
+                        "four): a thread that one of these DLLs started and that dies with an unhandled exception ends only itself, and the "
+                        "program goes on (NVIDIA's GfeSDK.dll in TEKKEN 7: the SDK failed to start, and its leftover thread then used "
+                        "freed memory). A \"[thread-isolate]\" line says when it acted. Read when the program starts.",
+                "sources": ["build/ntdll-unix/thread_ios.c", "build/ntdll-unix/process_ios.c"]},
+    "env.MADEIRA_USD_OSVERSION": {"category": "Wine core (ntdll)", "title": "Windows version in the shared data page",
+                "kind": "bool", "default": "0",
+                "note": "Default off: the Windows version fields of the page every Windows program can read without a call "
+                        "(KUSER_SHARED_DATA: build number, product type, major and minor version, suite mask, system root) are "
+                        "empty, because BCD does not run Wine's wineboot, which fills them. 1: they hold what wineboot writes for "
+                        "the Windows 10 that BCD reports elsewhere (10.0.19045, a workstation). An experiment for games that read "
+                        "the version there before they stop; a \"[usd-ver]\" line says it is on. Read when the session starts.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    "env.MADEIRA_FEX_MOFFS_RIP": {"category": "x86 emulation (FEX)", "title": "Place MOV moffs stores exactly (32-bit)",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: in 32-bit programs, the emulator records the position of each MOV moffs instruction "
+                        "(a load or store with a fixed address, opcodes A0-A3) as it does for every other memory instruction. "
+                        "When such a store changes code on the page that is running, the emulator then resumes at the store "
+                        "itself instead of in front of it, where it ran the instructions in between a second time (Unreal "
+                        "Gold's fire textures). No host instruction is added. Read once when the game's process starts; a "
+                        "\"[fex-moffs]\" line says it is on.",
+                "sources": ["tools/patch-fex-ios-moffs-rip.py"]},
     "env.MADEIRA_FEX_SHA": {"category": "x86 emulation (FEX)", "title": "Report a processor without the SHA extension",
                 "kind": "bool", "default": "1", "sources": ["app/Madeira/WineProcessBridge.m"],
                 "note": "Default on: the program is told what the device has (the SHA extension, which every supported iPhone and iPad "
@@ -1616,9 +1709,12 @@ OVERLAY = {
                         "without them the service never starts and the MSI rolls back with 1627. gamingtcui is what Forza Horizon 4's program imports as "
                         "api-ms-win-gaming-tcui-l1-1-0.dll (c0000135 at once; build 620). qwave is Windows' quality-of-service library, which the Discord Social SDK "
                         "plugin of a Unity game imports (Bloons TD 6: the game ended with \"Unable to load DLL 'discord_partner_sdk'\", build 623). "
+                        "xinputuap is Windows 10's XInput for modern apps (Dead or Alive 6, build 630) and httpapi Windows' HTTP server API, which "
+                        "cpprest imports (GrandChase, build 630). dbgcore is no file of its own: an Unreal game's bundled dbghelp.dll forwards its "
+                        "minidump function to dbgcore.dll, and the line links that name to BCD's dbghelp.dll (build 630). "
                         "An earlier session's links are removed when a name is gone. "
                         "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint, oledlg, fwpuclnt, sensapi, gamingtcui, qwave, "
-                        "setupapi and (with env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},
+                        "xinputuap, httpapi, dbgcore, setupapi and (with env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},
     "env.MADEIRA_WINTYPES": {"category": "Wine libraries", "title": "Give the game Wine's wintypes.dll",
                 "kind": "bool", "default": "0",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh"],
@@ -1889,6 +1985,31 @@ OVERLAY = {
     # ajan6-arkham (2026-10-21): FEX's own switch, read by the emulator (FEX WOW64 Module.cpp, ml950), not by BCD's code, so the overlay
     # carries the whole entry. Auto-tune's rule x87-int64-roundtrip adds "0"; WineProcessBridge.m already treats the name as a
     # per-launch key (a game's own line wins over bcd.cfg's).
+    # round 630 (agent O2 S9; Resident Evil 5's self-decrypting stub): FEX reads it at start-up; the game's Setup page sets it too
+    "env.FEX_TSOENABLED": {"category": "x86 emulation (FEX)", "title": "x86 memory order (FEX_TSOENABLED)",
+                "kind": "bool", "default": "1", "sources": ["app/Madeira/BCDGameSetupTables.swift"],
+                "note": "On by default: loads and stores keep the order an Intel processor gives them, which multi-threaded games need. "
+                        "0 drops it: faster, and a game whose threads share data may fail. The game's setup page writes it with the "
+                        "presets. Read when a program starts."},
+    "env.FEX_VECTORTSOENABLED": {"category": "x86 emulation (FEX)", "title": "Ordered vector accesses (FEX_VECTORTSOENABLED)",
+                "kind": "bool", "default": "0", "sources": ["app/Madeira/BCDGameSetupTables.swift"],
+                "note": "Off by default: vector (SSE/AVX) loads and stores are not ordered against other threads. 1 orders them as an "
+                        "Intel processor does: slower, for a game that fails only on some runs. The Stability and Compatibility "
+                        "presets write it. Read when a program starts."},
+    "env.FEX_MEMCPYSETTSOENABLED": {"category": "x86 emulation (FEX)", "title": "Ordered block copies (FEX_MEMCPYSETTSOENABLED)",
+                "kind": "bool", "default": "0", "sources": ["app/Madeira/BCDGameSetupTables.swift"],
+                "note": "Off by default: block copies and fills (rep movs, rep stos) are not ordered against other threads. 1 orders "
+                        "them: every 16 bytes then costs a memory barrier, so a game that copies a lot gets much slower. The Stability "
+                        "and Compatibility presets write it. Read when a program starts."},
+    "env.FEX_HALFBARRIERTSOENABLED": {"category": "x86 emulation (FEX)", "title": "Half barriers for unaligned accesses (FEX_HALFBARRIERTSOENABLED)",
+                "kind": "bool", "default": "1", "sources": ["app/Madeira/BCDGameSetupTables.swift"],
+                "note": "On by default: an unaligned atomic access gets a half barrier, which is faster. 0 gives it the full order "
+                        "(the Stability preset). Read when a program starts."},
+    "env.FEX_MULTIBLOCK": {"category": "x86 emulation (FEX)", "title": "Translate several blocks at once (FEX_MULTIBLOCK)",
+                "kind": "bool", "default": "1", "sources": ["app/Madeira/BCDGameSetupTables.swift"],
+                "note": "On by default: the emulator translates a run of guest code blocks together, which is faster. 0 translates each "
+                        "block when it is reached: slower, but code a program decrypts or patches in place just before it runs is "
+                        "translated as it is then (Resident Evil 5's start-up stub). Read when a program starts."},
     "env.FEX_X87REDUCEDPRECISION": {"category": "x86 emulation (FEX)", "title": "Fast 64-bit x87 math (FEX_X87REDUCEDPRECISION)",
                 "kind": "bool", "default": "1", "sources": ["app/Madeira/WineProcessBridge.m"],
                 "note": "FEX's reduced-precision x87 does floating point in 64 bits instead of x87's 80, which is faster. A 32-bit "
@@ -1900,6 +2021,12 @@ OVERLAY = {
     # ajan7-arkham (2026-10-21): read by virtual_clear_tls_index through build/ntdll-unix/ios_tls_clear.h. An ATTEMPT (not proven) for
     # Batman: Arkham City GOTY's launcher (a .NET program run by Wine Mono, started by BatmanAC.exe), whose Mono thread info slot read
     # NULL while the parent was tearing down; auto-tune's rule mono-child-tls-null adds it.
+    "env.MADEIRA_WOW_PLACEHOLDER_SLOTS": {"category": "Memory & JIT pool", "title": "Reserve 32-bit program windows when the session starts",
+                "kind": "int", "default": "0", "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default off (build 630). A 32-bit program started by a 64-bit one (a launcher that starts the game) needs a 4 GB "
+                        "address window; a minute into the session the address map can be too full to find one and the program does not "
+                        "start (GTA IV through BCD Dock: its window was refused, the launcher's error 137). 1 or 2: that many windows are "
+                        "reserved when the session starts, before the launcher and its helpers take the space. Read once per session."},
     "env.MADEIRA_TLS_CLEAR_OWN_PROCESS": {"category": "Wine core (ntdll)", "title": "TlsFree only touches the calling program's threads",
                 "kind": "bool", "default": "0",
                 "note": "Default off. TlsFree clears the freed thread-local slot in every thread of the process; here every program of a "
@@ -1954,6 +2081,14 @@ OVERLAY = {
     # ajan19 (log round 2026-10-24): read through build/ntdll-unix/ios_keyed_event.h by loader_ios.c (wine_ios_child_main, ios_keyed_event) and
     # the Wine fork's dlls/ntdll/unix/sync.c (a NULL handle in NtWaitForKeyedEvent / NtReleaseKeyedEvent); auto-tune's rule
     # runonce-stale-waiter-keyed-event adds it and Control's list sets it.
+    "env.MADEIRA_MESSAGE_CLASS": {"category": "Windows, display & input", "title": "Every program gets the Message window class",
+                "kind": "bool", "default": "0", "sources": ["build/win32u-unix/class_ios.c"],
+                "note": "Default off (build 630). Windows registers the built-in \"Message\" window class in every program; BCD registered it "
+                        "only in the session's first program, so in a program started later (by BCD Dock, the Wine desktop, a .bat file or "
+                        "another program) a message-only window of that class cannot be created. winmm's sound-device thread needs one: "
+                        "it ends at once and waveOutOpen reports no device (FINAL FANTASY VII's launcher: \"NoDriver calling waveOutOpen\"); "
+                        "a program that keeps asking starts hundreds of threads. 1 registers the class in every program. Off by default "
+                        "because some games that ask once run today without winmm's devices (Fallout: New Vegas, Portal 2). Read at session start."},
     "env.MADEIRA_KEYED_EVENT_PER_PROCESS": {"category": "Exceptions & threads", "title": "Every program gets its own keyed event",
                 "kind": "bool", "default": "0",
                 "note": "Default off. Windows keeps one keyed event per program for the waits of an InitOnce (the second thread to ask for a "
@@ -1966,6 +2101,20 @@ OVERLAY = {
                 "sources": ["build/ntdll-unix/ios_keyed_event.h", "build/ntdll-unix/loader_ios.c"]},
     # ajan38 (round tur600, build 600): read by the Wine fork's dlls/kernelbase/process.c (GetProcessMitigationPolicy); auto-tune's rule
     # chakracore-cfg-policy-failfast adds it and Glyphica: Typing Survival's list sets it.
+    "env.MADEIRA_XAUDIO2_CALLBACK_ORDER": {"category": "Wine libraries", "title": "XAudio2: callbacks ready before they are counted (32-bit)",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: in 32-bit programs, XAudio2 (the sound engine) adds a game's engine callback to its list before "
+                        "it raises the list's count, and the sound thread reads the count before the list. In the other order the sound "
+                        "thread could read the new count while the list was still missing, and the game ended at the start (Skyrim, "
+                        "once in about 3,000 logs; a second start usually works). Off (or anything but 1) changes nothing. Read once per "
+                        "program; an \"[xaudio2-cb]\" line says it is on.",
+                "sources": ["tools/patch-wine-xaudio2-callbacks.py"]},
+    "env.MADEIRA_INPUT_DESKTOP_STEAL": {"category": "Wine server", "title": "Every new desktop window takes the touch input", "kind": "bool",
+                "default": "0",
+                "note": "Default off (build 630). A desktop window made later no longer takes the touch input from the desktop that has it: "
+                        "a service's own desktop took it from the Windows desktop's, and every tap was lost. 1: every desktop window takes "
+                        "the input, as before.",
+                "sources": ["build/wineserver/window_ios.c"]},
     "env.MADEIRA_ZERO_MITIGATION_POLICY": {"category": "Wine libraries", "title": "Windows' security-feature answers start empty",
                 "kind": "bool", "default": "0",
                 "note": "Default off. A program can ask Windows which security features (Control Flow Guard, dynamic-code limits ...) are on "

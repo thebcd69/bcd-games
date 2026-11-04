@@ -33,15 +33,16 @@ rec = (app / 'BCDSessionRecorderLive.swift').read_text()
 trail = rec[rec.index('enum BCDBrkTrail {'):]
 trail = trail[:trail.index('\n}\n') + 3]
 helper = (app / 'StikJITHelper.swift').read_text()
-req = helper[helper.index('    private static func requestRegion(_ size: Int, attempt: Int? = nil, site: Int = #line) -> UnsafeMutableRawPointer? {'):]
+req = helper[helper.index('    private static func requestRegion(_ size: Int, attempt: Int? = nil, region: String, site: Int = #line) -> UnsafeMutableRawPointer? {'):]
 req = req[:req.index('\n    }\n') + 7]
 debugger_path = req[req.index('guard noDebugger else {'):req.index('        }\n')]
 check('only the debugger path records (the debugger-less pool cannot stop the process), "returned" in a defer, the caller\'s line by #line',
-      'BCDBrkTrail.begin(site: site, size: size, attempt: attempt)' in debugger_path and 'defer { BCDBrkTrail.end() }' in debugger_path
+      'BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)' in debugger_path and 'defer { BCDBrkTrail.end() }' in debugger_path
       and debugger_path.index('BCDBrkTrail.begin(') < debugger_path.index('return jit26_prepare_region(nil, size)')
       and req.count('BCDBrkTrail.') == 2 and helper.count('BCDBrkTrail.') == 2)
-check('the pool loop passes its attempt; the other four call sites are unchanged',
-      helper.count('requestRegion(poolSize, attempt: attempt)') == 1 and helper.count('requestRegion(') == 6)
+check('the pool loop passes its attempt; every call site names its region (round 630, agent A1 S19: A, A-single, B, B-mid, C)',
+      helper.count('requestRegion(poolSize, attempt: attempt, region: "A")') == 1 and helper.count('requestRegion(') == 6
+      and all(helper.count('region: "%s")' % r) == 1 for r in ('A', 'A-single', 'B', 'B-mid', 'C')))
 facade = rec[rec.index('    static func appStarted() {'):]
 facade = facade[:facade.index('\n    }\n')]
 check('the next start reads the trail before the unclean-session question and logs [jit-brk-prev]',
@@ -65,7 +66,7 @@ BCDBrkTrail.url = URL(fileURLWithPath: dir + "/jit-brk-last.txt")
 let path = BCDBrkTrail.url!.path
 func say(_ s: String) { print(s) }
 // 1: a request that did not come back
-BCDBrkTrail.begin(site: 864, size: 268 << 20, attempt: 1)
+BCDBrkTrail.begin(site: 864, size: 268 << 20, attempt: 1, region: "A")
 let a = BCDBrkTrail.takeUnfinished()
 say("1 " + (a ?? "nil"))
 say("1gone " + String(!FileManager.default.fileExists(atPath: path)))
@@ -92,13 +93,13 @@ say("4 " + (BCDBrkTrail.takeUnfinished() ?? "nil"))
             got = dict((l.split(' ', 1) + [''])[:2] for l in out)
             first = got.get('1', '')
             check('a request that did not come back is read back whole: caller line, size, attempt, uptime, wall clock, heat, Low Power Mode, memory',
-                  first.startswith('begin site=L864 size=268MB attempt=1 uptime=') and ' wall=' in first and ' thermal=' in first
+                  first.startswith('begin site=L864 region=A size=268MB attempt=1 uptime=') and ' wall=' in first and ' thermal=' in first
                   and ' lpm=' in first and first.endswith(' avail=3072MB'), out)
             check('... and the file goes', got.get('1gone') == 'true', out)
             check('a request that came back has its "returned ms=" line and reads as nothing; the file goes',
                   got.get('2lines') == '2 true' and got.get('2') == 'nil' and got.get('2gone') == 'true', out)
             check('the file holds the last request only: the open one after a returned one is the one read back',
-                  got.get('3', '').startswith('begin site=L1690 size=32MB attempt=- '), out)
+                  got.get('3', '').startswith('begin site=L1690 region=? size=32MB attempt=- '), out)
             check('no file, nothing', got.get('4') == 'nil', out)
 else:
     print('skip the compiled part: no swiftc')

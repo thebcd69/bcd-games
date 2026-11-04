@@ -13,7 +13,8 @@ MADEIRA_DOCK_DIRECTX_PROVIDED does after one failure). Batman's "amd" (the AMD D
 Checks: the parser (DockInstallScripts.installSkipNames, cut from app/Madeira/DockInstallers.swift and run on the host): the game's
 last env.MADEIRA_DOCK_INSTALL_SKIP line wins, names split on commas, semicolons and spaces, lower-cased, comments and other keys
 ignored, an empty or missing line is the empty set; the plan's `provided` closure takes the listed entries by their logged name and
-the log line says why; the list policy (names only); the catalog; exactly the six rows carry the line from build 626; CI.
+the log line says why; the list policy (names only); the catalog; exactly the six rows of round 626 and the two of round 630
+(Batman: Arkham Asylum GOTY 60GN7A, Mafia II (Classic) BKXNYD; agent A2 S14) carry the line from build 626; CI.
 No auto-tune rule: a session that runs only the one-time installs is never judged.
 """
 from pathlib import Path
@@ -75,9 +76,21 @@ recs = json.loads((root / "recommended/recommendations.json").read_text())
 carriers = {r["id"]: next((c for c in r["config"] if isinstance(c, dict) and "MADEIRA_DOCK_INSTALL_SKIP" in c["line"]), None)
             for r in recs["rules"] if "MADEIRA_DOCK_INSTALL_SKIP" in json.dumps(r["config"])}
 want = {"dark-souls-ptde": "directx", "saints-row-the-third": "directx", "sleeping-dogs-definitive-edition": "directx",
-        "call-of-duty-black-ops": "directx", "fallout-new-vegas": "directx", "batman-arkham-city-goty": "directx,amd"}
-check("exactly the six rows carry it, from build 626", set(carriers) == set(want) and all(
+        "call-of-duty-black-ops": "directx", "fallout-new-vegas": "directx", "batman-arkham-city-goty": "directx,amd",
+        "batman-arkham-asylum-goty": "directx", "mafia-2": "directx",   # round 630 (A2 S14)
+        "dont-starve-together": "directx", "the-witcher-enhanced-edition": "directx"}   # round 630 (A1 S9, O3 S6)
+check("exactly the ten rows carry it, from build 626", set(carriers) == set(want) and all(
       carriers[k] == {"line": "env.MADEIRA_DOCK_INSTALL_SKIP = " + v, "minBuild": 626} for k, v in want.items()), carriers)
+# round 630 (agent A2 S14): env.MADEIRA_DOCK_DIRECTX_FIRST (off unless set) provides DirectX's setup at the first start too.
+check("DIRECTX_FIRST is read off by default and only widens the DirectX case to the first start",
+      'let directXFirst = SteamSignIn.flag("MADEIRA_DOCK_DIRECTX_FIRST", default: false)' in SRC
+      and "|| (directXProvided && DockInstallScripts.isDirectXSetup($0.executable)\n" in SRC
+      and "&& (directXFirst || failedBefore.contains($0.run.name)))" in SRC
+      and 'let why = failedBefore.contains(run.name) ? "it failed in this game before" : "env.MADEIRA_DOCK_DIRECTX_FIRST = 1 skips it at the first start"' in SRC)
+policy = (root / "app/Madeira/GameRecommendationsList.swift").read_text()
+check("the list may set it, 0 or 1", '"MADEIRA_DOCK_DIRECTX_FIRST",' in policy and 'case "MADEIRA_DOCK_DIRECTX_FIRST":' in policy
+      and "MADEIRA_DOCK_DIRECTX_FIRST is 0 or 1" in policy)
+check("the catalog names it, off", '"env.MADEIRA_DOCK_DIRECTX_FIRST": {"category": "Steam & Dock"' in (root / "build/tools/gen-config-catalog.py").read_text())
 wf = (root / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "python3 tests/host/check-dock-install-skip.py" in wf)
 print("PASS: Dock install skip" if ok else "FAILED: Dock install skip")

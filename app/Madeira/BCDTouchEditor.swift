@@ -15,7 +15,8 @@ import UIKit
 //     covers it: what the control does (keys, mouse and key sticks, controller inputs), its
 //     size, Lock (it then cannot be moved, resized or removed), To front / To back (which of
 //     two overlapping controls is on top), the controller button that also presses it in
-//     keyboard-and-mouse mode, Remove;
+//     keyboard-and-mouse mode, its look (a shape of its own: circle, square or rectangle, and
+//     words in place of its label, typed in a card under the bar, clear of the keyboard), Remove;
 //   - the layouts panel: switch, new, save as new, delete, and the controls' opacity and size
 //     in play.
 // Every change goes through BCDTouchEditorActions (BCDTouchLive in the app), which keeps the
@@ -51,6 +52,10 @@ struct BCDTouchEditorState: Equatable {
     func bringToFront(_ id: UUID)
     func sendToBack(_ id: UUID)
     func setPadLink(_ id: UUID, _ name: String?)
+    /// The control's own shape (nil: the one its action draws). A shape sizes the control, so a locked control keeps its own.
+    func setCustomShape(_ id: UUID, _ shape: BCDTouchCustomShape?)
+    /// Words drawn on the control in place of its label (cleaned: BCDTouchText); nil or empty: its label again.
+    func setCustomText(_ id: UUID, _ text: String?)
     func setOpacity(_ value: Double)
     func setLayoutScale(_ value: Double)
     /// What is on screen becomes a new layout of its own (named BCDTouchLayouts.nextName).
@@ -71,15 +76,20 @@ struct BCDTouchEditor: View {
 
     @State private var layoutsOpen: Bool
     @State private var tab: BCDTouchEditorTab?
+    /// The selected control whose words are being typed (BCDTouchTextCard), if any.
+    @State private var typing: UUID?
 
-    /// `showLayouts`: open on the layouts panel.
+    /// `showLayouts`: open on the layouts panel. `tab`: the selected control's panel opens on it; `typing`: on the card its
+    /// words are typed in (the preview app's cases).
     init(state: BCDTouchEditorState, screen: CGSize, insets: EdgeInsets, actions: BCDTouchEditorActions,
-         showLayouts: Bool = false) {
+         showLayouts: Bool = false, tab: BCDTouchEditorTab? = nil, typing: Bool = false) {
         self.state = state
         self.screen = screen
         self.insets = insets
         self.actions = actions
         _layoutsOpen = State(initialValue: showLayouts)
+        _tab = State(initialValue: tab)
+        _typing = State(initialValue: typing ? state.selected : nil)
     }
 
     /// The bar's height plus its gaps: the panels start below it.
@@ -89,13 +99,16 @@ struct BCDTouchEditor: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            if let item = selectedItem {
+            if let item = selectedItem, typing == item.id {
+                textCard(item)
+            } else if let item = selectedItem {
                 let rect = dock(avoiding: frame(of: item))
                 BCDTouchInspector(item: item, layoutScale: state.layoutScale, padLinks: state.padLinks,
                                   tab: Binding(get: { tab ?? BCDTouchEditorTab.of(item.action) }, set: { tab = $0 }),
                                   actions: actions, roomy: roomy,
                                   inFront: BCDTouchLayering.isFront(state.items, item.id),
-                                  atBack: BCDTouchLayering.isBack(state.items, item.id))
+                                  atBack: BCDTouchLayering.isBack(state.items, item.id),
+                                  editText: { typing = item.id })
                     .frame(width: rect.width, height: rect.height)
                     .background(BCDTouchPanelBackground())
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -115,14 +128,29 @@ struct BCDTouchEditor: View {
         .frame(width: screen.width, height: screen.height, alignment: .topLeading)
         .onChange(of: state.selected) { _, id in
             tab = nil
+            typing = nil
             if id != nil { layoutsOpen = false }
         }
         .transaction { $0.animation = nil }
     }
 
+    /// The card the selected control's words are typed in: under the bar, across the middle of the screen, above where the
+    /// keyboard comes up (on a phone on its side it covers the lower half, where the control's panel reaches). The panel
+    /// comes back when it closes.
+    private func textCard(_ item: BCDTouchItem) -> some View {
+        let sides = max(Double(insets.leading), 8) + max(Double(insets.trailing), 8)
+        let width = min(Double(screen.width) - sides - 16, roomy ? 560 : 460)
+        return BCDTouchTextCard(item: item, layoutScale: state.layoutScale, actions: actions, roomy: roomy) { typing = nil }
+            .frame(width: CGFloat(width))
+            .background(BCDTouchPanelBackground())
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .padding(.top, CGFloat(max(Double(insets.top), 8) + Self.barSpace))
+            .frame(width: screen.width)
+    }
+
     private func frame(of item: BCDTouchItem) -> CGRect {
         let d = BCDTouchGeometry.diameter(scale: item.scale, layoutScale: state.layoutScale)
-        let size = BCDTouchGeometry.size(item.action.shape, diameter: d)
+        let size = BCDTouchGeometry.size(item.shape, diameter: d)
         return CGRect(x: item.x * Double(screen.width) - Double(size.width) / 2,
                       y: item.y * Double(screen.height) - Double(size.height) / 2,
                       width: Double(size.width), height: Double(size.height))
@@ -220,7 +248,7 @@ struct BCDTouchEditor: View {
 // MARK: - A selected control's panel
 
 enum BCDTouchEditorTab: String, CaseIterable, Identifiable {
-    case keys, mouse, controller, link
+    case keys, mouse, controller, link, look
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -228,8 +256,11 @@ enum BCDTouchEditorTab: String, CaseIterable, Identifiable {
         case .mouse: return "Mouse & more"
         case .controller: return "Controller"
         case .link: return "Pad link"
+        case .look: return "Look"
         }
     }
+    /// A tab shown as a symbol: narrow, so the named tabs keep their room (the control's own look, the last tab).
+    var symbol: String? { self == .look ? "paintbrush.pointed" : nil }
     static func of(_ action: BCDTouchAction) -> BCDTouchEditorTab {
         switch action {
         case .key: return .keys
@@ -239,7 +270,7 @@ enum BCDTouchEditorTab: String, CaseIterable, Identifiable {
     }
 }
 
-/// What the selected control does, its size and its controller link.
+/// What the selected control does, its size, its controller link and its look.
 struct BCDTouchInspector: View {
     let item: BCDTouchItem
     let layoutScale: Double
@@ -251,9 +282,11 @@ struct BCDTouchInspector: View {
     /// The control is already the frontmost / the rearmost one.
     var inFront = false
     var atBack = false
+    /// Opens the card the control's words are typed in (BCDTouchEditor shows it under the bar).
+    var editText: () -> Void = {}
 
     private var tabs: [BCDTouchEditorTab] {
-        padLinks.isEmpty ? [.keys, .mouse, .controller] : BCDTouchEditorTab.allCases
+        padLinks.isEmpty ? [.keys, .mouse, .controller, .look] : BCDTouchEditorTab.allCases
     }
 
     var body: some View {
@@ -272,6 +305,7 @@ struct BCDTouchInspector: View {
                     case .mouse: mouse
                     case .controller: controller
                     case .link: link
+                    case .look: look
                     }
                 }
                 .padding(14)
@@ -281,7 +315,11 @@ struct BCDTouchInspector: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            BCDTouchFace(action: item.action, diameter: 34)
+            // A shape of the player's own is drawn small enough to fit; the others 34 points across, as always.
+            BCDTouchFace(action: item.action,
+                         diameter: CGFloat(item.ownShape == nil ? 34
+                             : BCDTouchGeometry.diameter(fitting: item.shape, in: CGSize(width: 44, height: 40), atMost: 34)),
+                         custom: item.customShape, words: item.words)
                 .frame(width: 44, height: 40)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
@@ -324,20 +362,35 @@ struct BCDTouchInspector: View {
         HStack(spacing: 4) {
             ForEach(tabs) { t in
                 Button { BCDTouchHaptic.tap(); tab = t } label: {
-                    Text(t.title)
-                        .font(BCDStyle.label(roomy ? 15 : 12.5)).lineLimit(1).minimumScaleFactor(0.7)
+                    tabFace(t)
                         .foregroundStyle(t == tab ? Color.white : BCDStyle.textSoft)
-                        .frame(maxWidth: .infinity, minHeight: 32)
                         .background(Capsule().fill(t == tab ? AnyShapeStyle(BCDStyle.glow) : AnyShapeStyle(Color.clear)))
                         .contentShape(Capsule())
                 }
                 .buttonStyle(BCDTouchPressStyle())
+                .accessibilityLabel(t.title)
                 .accessibilityAddTraits(t == tab ? .isSelected : [])
             }
         }
         .padding(3)
         .background(Capsule().fill(BCDStyle.ground.opacity(0.6)))
         .padding(.horizontal, 12).padding(.bottom, 4)
+    }
+
+    /// A named tab shares the bar's width with the others; a symbol's tab (Look) keeps to a narrow one. Beside it a long
+    /// name may scale a little further (0.65, was 0.7) before it is cut short: "Mouse & more" stays whole on a 318-point
+    /// panel (a small phone, the control in the middle, Pad link shown).
+    @ViewBuilder private func tabFace(_ t: BCDTouchEditorTab) -> some View {
+        if let symbol = t.symbol {
+            Image(systemName: symbol)
+                .font(.system(size: roomy ? 16 : 14, weight: .bold))
+                .frame(width: roomy ? 44 : 34)
+                .frame(minHeight: 32)
+        } else {
+            Text(t.title)
+                .font(BCDStyle.label(roomy ? 15 : 12.5)).lineLimit(1).minimumScaleFactor(0.65)
+                .frame(maxWidth: .infinity, minHeight: 32)
+        }
     }
 
     // MARK: Tabs
@@ -395,6 +448,82 @@ struct BCDTouchInspector: View {
         }
     }
 
+    // MARK: Look
+
+    /// The control's own look: a shape and words in place of its label. A stick keeps its ring and its labels.
+    private var look: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if item.action.isStick {
+                note("A stick keeps its ring and its own labels: the ring is where the thumb moves.")
+            } else {
+                shapeSection
+                wordsSection
+            }
+        }
+    }
+
+    private var shapeSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            BCDEyebrow(text: "Shape")
+            VStack(alignment: .leading, spacing: 8) {
+                grid(shapeChoices, wide: true) { label, choice in
+                    chip(label, on: Self.sameShape(item.customShape, choice)) { actions.setCustomShape(item.id, choice) }
+                }
+                if case .rectangle(let aspect) = item.customShape {
+                    BCDTouchSliderRow(title: "Width : height", value: BCDTouchCustomShape.slider(aspect: aspect), range: -2...2,
+                                      text: BCDTouchCustomShape.proportion(aspect)) {
+                        actions.setCustomShape(item.id, .rectangle(aspect: BCDTouchCustomShape.aspect(slider: $0)))
+                    }
+                }
+            }
+            .disabled(item.locked).opacity(item.locked ? 0.45 : 1)
+            note(item.locked ? "Locked: unlock it to change its shape."
+                             : "Standard is the shape it always had. Size and a pinch still make it larger or smaller.")
+        }
+    }
+
+    private var shapeChoices: [(String, BCDTouchCustomShape?)] {
+        [("Standard", nil), ("Circle", .circle), ("Square", .square),
+         ("Rectangle", .rectangle(aspect: item.customShape?.aspect ?? BCDTouchCustomShape.defaultAspect))]
+    }
+
+    private var wordsSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            BCDEyebrow(text: "Text")
+            BCDTouchPanelButton(title: item.customText.map { "\u{201C}\($0)\u{201D}" } ?? "Add text", symbol: "pencil") { editText() }
+                .accessibilityLabel(item.customText.map { "Text on this control, \($0). Change it" } ?? "Add text to this control")
+            if item.customText != nil {
+                BCDTouchPanelButton(title: "Remove text", symbol: "xmark", role: .destructive) { actions.setCustomText(item.id, nil) }
+            }
+            note(Self.wordsNote(item, layoutScale: layoutScale))
+        }
+    }
+
+    private func note(_ text: String) -> some View {
+        Text(text)
+            .font(BCDStyle.body(roomy ? 15 : 12.5)).foregroundStyle(BCDStyle.textSoft)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private static func sameShape(_ a: BCDTouchCustomShape?, _ b: BCDTouchCustomShape?) -> Bool {
+        switch (a, b) {
+        case (nil, nil), (.circle?, .circle?), (.square?, .square?), (.rectangle?, .rectangle?): return true
+        default: return false
+        }
+    }
+
+    /// What the words section says under the words: what they do, or that they are too long for the control as it is.
+    static func wordsNote(_ item: BCDTouchItem, layoutScale: Double) -> String {
+        guard let words = item.words else {
+            return "Words in place of its label, as large as they fit inside it: \u{201C}INV\u{201D} on an inventory key."
+        }
+        let frame = BCDTouchGeometry.size(item.shape, diameter: BCDTouchGeometry.diameter(scale: item.scale, layoutScale: layoutScale))
+        if BCDTouchTextFit.fit(words, in: item.shape, frame: frame, measure: BCDTouchTextMeasure.unit).whole {
+            return "Drawn in place of its label, as large as it fits inside the control."
+        }
+        return "Too long to show whole at this size, so it ends in \u{2026}. Shorter words or a larger control show all of it."
+    }
+
     // MARK: Chips
 
     private func section(_ title: String, _ choices: [(String, BCDTouchAction)], wide: Bool = false) -> some View {
@@ -428,6 +557,166 @@ struct BCDTouchInspector: View {
         }
         .buttonStyle(BCDTouchPressStyle())
         .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+// MARK: - The selected control's words
+
+/// The selected control's words, typed in a card under the editor's bar (BCDTouchEditor places it). They reach the control
+/// as they are typed: the control on the screen and the picture here show them at once, and nothing is left to save when
+/// the editor's Done ends the edit. Done, or Return, closes the card; empty words give the control its label back.
+struct BCDTouchTextCard: View {
+    let item: BCDTouchItem
+    let layoutScale: Double
+    let actions: BCDTouchEditorActions
+    var roomy = false
+    let close: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                BCDTouchFace(action: item.action,
+                             diameter: CGFloat(BCDTouchGeometry.diameter(fitting: item.shape, in: CGSize(width: 56, height: 44), atMost: 44)),
+                             custom: item.customShape, words: item.words)
+                    .frame(width: 56, height: 44)
+                    .accessibilityHidden(true)
+                BCDTouchTextField(text: item.customText ?? "", placeholder: "Text on this control", limit: BCDTouchText.maxCharacters,
+                                  roomy: roomy, changed: { actions.setCustomText(item.id, $0) }, done: close)
+                    .frame(height: roomy ? 44 : 40)
+                    .padding(.horizontal, 10)
+                    .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(BCDStyle.ground.opacity(0.7)))
+                    .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(BCDStyle.lavender.opacity(0.5), lineWidth: 1))
+                Button { BCDTouchHaptic.tap(); close() } label: {
+                    Text("Done")
+                        .font(BCDStyle.label(15)).foregroundStyle(.white)
+                        .padding(.horizontal, 16).frame(height: 36)
+                        .background(Capsule().fill(BCDStyle.glow))
+                }
+                .buttonStyle(BCDTouchPressStyle())
+                .accessibilityLabel("Done with the text")
+            }
+            Text(BCDTouchInspector.wordsNote(item, layoutScale: layoutScale))
+                .font(BCDStyle.body(roomy ? 14 : 12)).foregroundStyle(BCDStyle.textSoft)
+                .lineLimit(2).minimumScaleFactor(0.8)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .transaction { $0.animation = nil }
+    }
+}
+
+/// A one-line text field over a game, in UIKit. The overlay's window is never the key window (the game's window keeps the
+/// keyboard and the hardware keys), and UIKit types only into the key window: while this field is edited its window is the
+/// key window, and the window that was key before is key again as soon as editing ends or the field goes, as
+/// LibraryKeyboard does for its own window. While it is edited, the hardware keys are the field's, not the game's
+/// (HardwareInput sees another text input).
+struct BCDTouchTextField: UIViewRepresentable {
+    let text: String
+    let placeholder: String
+    let limit: Int
+    var roomy = false
+    /// Every change, as typed.
+    let changed: (String) -> Void
+    /// Return.
+    let done: () -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    func makeUIView(context: Context) -> BCDTouchTextFieldView {
+        let field = BCDTouchTextFieldView()
+        let size: CGFloat = roomy ? 19 : 17
+        let base = UIFont.systemFont(ofSize: size, weight: .semibold)
+        field.font = base.fontDescriptor.withDesign(.rounded).map { UIFont(descriptor: $0, size: size) } ?? base
+        field.text = text
+        field.textColor = UIColor(BCDStyle.text)
+        field.tintColor = UIColor(BCDStyle.fuchsia)
+        field.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [.foregroundColor: UIColor(BCDStyle.textSoft)])
+        field.keyboardAppearance = .dark
+        field.returnKeyType = .done
+        field.clearButtonMode = .whileEditing
+        field.autocorrectionType = .no
+        field.spellCheckingType = .no
+        field.autocapitalizationType = .words
+        field.smartQuotesType = .no
+        field.smartDashesType = .no
+        field.smartInsertDeleteType = .no
+        field.accessibilityLabel = "Text on this control"
+        field.delegate = context.coordinator
+        field.addTarget(context.coordinator, action: #selector(Coordinator.edited(_:)), for: .editingChanged)
+        field.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        // The card opens to type in: once the field is in its window.
+        DispatchQueue.main.async { _ = field.becomeFirstResponder() }
+        return field
+    }
+
+    func updateUIView(_ field: BCDTouchTextFieldView, context: Context) {
+        context.coordinator.parent = self
+        if !field.isEditing, field.text != text { field.text = text }
+    }
+
+    static func dismantleUIView(_ field: BCDTouchTextFieldView, coordinator: Coordinator) { field.finish() }
+
+    final class Coordinator: NSObject, UITextFieldDelegate {
+        var parent: BCDTouchTextField
+        init(_ parent: BCDTouchTextField) { self.parent = parent }
+
+        @objc func edited(_ field: UITextField) { parent.changed(field.text ?? "") }
+
+        /// At most `limit` characters; shortening is always allowed.
+        func textField(_ field: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            guard let current = field.text, let r = Range(range, in: current) else { return true }
+            let next = current.replacingCharacters(in: r, with: string)
+            return next.count <= parent.limit || next.count <= current.count
+        }
+
+        func textFieldShouldClear(_ field: UITextField) -> Bool {
+            parent.changed("")
+            return true
+        }
+
+        func textFieldShouldReturn(_ field: UITextField) -> Bool {
+            parent.done()
+            return false
+        }
+    }
+}
+
+final class BCDTouchTextFieldView: UITextField {
+    /// The window that was key when editing began: key again when it ends.
+    private weak var previousKey: UIWindow?
+
+    override func becomeFirstResponder() -> Bool {
+        if let window, !window.isKeyWindow {
+            previousKey = window.windowScene?.windows.first { $0.isKeyWindow }
+            window.makeKey()
+        }
+        let became = super.becomeFirstResponder()
+        if !became { giveKeyBack() }
+        return became
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let resigned = super.resignFirstResponder()
+        if resigned { giveKeyBack() }
+        return resigned
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil { giveKeyBack() }
+    }
+
+    /// The field goes: editing ends and the key window goes back.
+    func finish() {
+        if isFirstResponder { _ = resignFirstResponder() }
+        giveKeyBack()
+    }
+
+    private func giveKeyBack() {
+        guard let previous = previousKey else { return }
+        previousKey = nil
+        if previous.windowScene != nil, !previous.isHidden, !previous.isKeyWindow { previous.makeKey() }
     }
 }
 

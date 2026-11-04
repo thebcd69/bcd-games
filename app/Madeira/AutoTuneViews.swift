@@ -59,8 +59,24 @@ struct AutoTuneAlert: ViewModifier {
 
     private var presented: Binding<Bool> {
         Binding(get: { AutoTune.enabled && offers.offer != nil && library.error == nil && library.restartNotice == nil
+                       && Self.noGameRunning(offers.offer, library.current)
                        && gate.mayShow(offers.offer != nil) },
                 set: { if !$0 { offers.offer = nil } })
+    }
+
+    /// Round 630 (agent U S15a; THE HOUSE OF THE DEAD: Remake G3SF3A and 14 more archive logs): an earlier session's result came up over
+    /// a game that was running (its analysis ends whenever it ends, and a game fills the root screen without presenting anything), and its
+    /// Close BCD button ended that game. The result is written for the time after a session: it now waits while a game runs and comes up
+    /// when the session ends (LibraryModel is observed, so the binding is read again then). Tested before the gate, which marks the alert
+    /// as showing. One log line per held result.
+    private static var heldTitle: String?
+    private static func noGameRunning(_ offer: AutoTuneOffer?, _ running: UUID?) -> Bool {
+        guard let offer, running != nil else { heldTitle = nil; return true }
+        if heldTitle != offer.title {
+            heldTitle = offer.title
+            LogStore.shared.log("[autotune] result for \(offer.title) held until the session ends")
+        }
+        return false
     }
 }
 

@@ -41,7 +41,10 @@ check('the switch is read once, by name', src.count('getenv( "MADEIRA_ANON_CAS_F
 marker = 'if (!emulated && !in_jit &&\n                        (insn & 0xbfa07c00u) == 0x88a07c00u)'
 b = src.index(marker)
 undecoded = src.index('[store-undecoded] #%d rev=ml350', b)
-body = src[b:undecoded]
+# round 630: the LD<OP>/CAS case (Madeira b7640ef, ported last) sits between this branch and the report; it has its own check
+# (tests/host/check-jit-alias-atomics.py), so this one reads up to it
+_lse = src.find('/* madeira-bcd (2026-11-03, round 630): LD<OP> and CAS, the other read-modify-write', b)
+body = src[b:_lse if 0 <= _lse < undecoded else undecoded]
 cut = body[:body.index('/* ml350 DISCRIMINATOR')] if '/* ml350 DISCRIMINATOR' in body else body
 check('the hand-off is inside the anonymous-alias CAS branch (not the pool case), with the emulation\'s own conditions',
       'if (ios_anon_cas_flush_on() && !((uintptr_t)fault_addr & (cas_width - 1)) &&\n'

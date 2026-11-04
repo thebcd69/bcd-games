@@ -786,7 +786,9 @@ struct BCDSessionLiveLayer: View {
         return "This session shows player 1 as \(session). A game looks for its controllers when it starts, so a change "
             + "applies from its next start. The Xbox controller (XInput) is what almost every game knows; a 360 and an One are the same to it. "
             + "DualSense shows Sony's PC games the controller they look for, Generic gamepad is what DirectInput games list, and The controller "
-            + "itself is a DualSense when the paired one is and a generic gamepad otherwise; a game that reads only XInput then sees no controller."
+            + "itself is a DualSense when the paired one is and a generic gamepad otherwise; a game that reads only XInput then sees no controller. "
+            // Round 630 (agent T1 S7; GTA V Legacy D3QR11 on Generic gamepad: touch and buttons did nothing). Text only.
+            + "If the buttons do nothing in a game, choose the Xbox controller (XInput)."
     }
 }
 
@@ -970,9 +972,11 @@ enum BCDLiveMenuWords {
 
     static func pointer(_ mode: String) -> String {
         switch mode {
-        case "touch": return "The pointer jumps to your finger and a tap clicks there. Hold, then move, to drag; two fingers right-click or scroll."
+        // Round 630 (agent T1 S3; Iron Nest 520SKP: "can't move mouse" under Tap to click): a game that turns its view with the mouse needs
+        // mouse deltas, which only Mouse-look gives. Text only.
+        case "touch": return "The pointer jumps to your finger and a tap clicks there. Hold, then move, to drag; two fingers right-click or scroll. A game that looks around or aims with the mouse needs Mouse-look."
         case "relative": return "Dragging moves the mouse, for looking around. A tap clicks."
-        default: return "Drag to move the pointer, as on a trackpad. A tap clicks."
+        default: return "Drag to move the pointer, as on a trackpad. A tap clicks. A game that looks around or aims with the mouse needs Mouse-look."
         }
     }
 

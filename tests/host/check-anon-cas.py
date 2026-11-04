@@ -166,9 +166,12 @@ marker = 'if (!emulated && !in_jit &&\n                        (insn & 0xbfa07c0
 check('one anonymous-alias CAS branch', src.count(marker) == 1)
 b = src.index(marker)
 undecoded = src.index('[store-undecoded] #%d rev=ml350', b)
+# round 630: the LD<OP>/CAS case (Madeira b7640ef, ported last) sits between this branch and the report; it has its own check
+# (tests/host/check-jit-alias-atomics.py), so this one reads up to it
+_lse = src.find('/* madeira-bcd (2026-11-03, round 630): LD<OP> and CAS, the other read-modify-write', b)
 pool = src.index('if (!emulated && in_jit &&\n                        (insn & 0xbfa07c00u) == 0x88a07c00u)')
 check('it comes after the pool CAS case and before the [store-undecoded] report', pool < b < undecoded)
-body = src[b:undecoded]
+body = src[b:_lse if 0 <= _lse < undecoded else undecoded]
 check('naturally aligned access only', '!((uintptr_t)fault_addr & (cas_width - 1))' in body)
 check('the last byte must lie in the same alias run as the first',
       'ios_jit_anon_alias_lookup( fault_addr + cas_width - 1 ) == rw_addr + cas_width - 1' in body)

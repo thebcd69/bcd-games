@@ -1,0 +1,188 @@
+[18:59:03.821] [INFO] Checking entitlements...
+[18:59:03.821] [INFO] [build] v0.1.625 (625)
+[18:59:03.822] [INFO] [device] model=iPhone15,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=5637MB available=4077MB cores=6
+[18:59:03.822] [INFO] [device] address-map=[0x100cb4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[18:59:03.836] [INFO] [device] settings: low-power=0 thermal=serious screen=1290x2796@3.0x max-fps=120 utc-offset=-05:00 free-disk=9GB stikdebug-url=0
+[18:59:03.840] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[18:59:04.847] [INFO] Requesting JIT with Built-in StikJIT...
+[18:59:07.306] [INFO] [bcd] library launch Dungeons.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[18:59:07.341] [INFO] Running full Wine sequence...
+[18:59:07.342] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100cb4000,0x8000000000) 512GB available=4070MB low-power=0 thermal=serious
+[18:59:07.344] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[18:59:07.355] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[18:59:07.355] [INFO] Allocating 896MB JIT pool via debugger...
+[18:59:07.355] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[18:59:07.356] [INFO] [jit-debugger] attached=1 at the pool request
+[18:59:07.359] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[18:59:08.479] [INFO] RX pool at 0x148000000
+[18:59:08.502] [INFO] Detaching debugger...
+[18:59:09.336] [INFO] [session] length=2s partial=1 play=0s frames=0 stalls=0/0s peak=652MB limit=4095MB thermal=serious lpm=0 res=1424x656 cap=60 game=Dungeons
+[phase] wine-start             t+  2.115s rev=ml526
+[18:59:09.470] [wineserver] send_client_fd: fd=43 handle=0x3a2 msg_fd_unix=28 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/9b6c468b2038f8eb.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[18:59:09.806] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=40 reply=45/46 wait=47/48 rev=ml586
+[18:59:09.806] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=40 reply=45/46 wait=47/48 rev=ml586
+[Wine init_process] reply_pipe=46, sending init_first_thread...
+[18:59:09.806] [Wine init_process] reply_pipe=46, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3430 MB + phys_footprint=665 MB = 4096 MB (hw.memsize says 5637 MB)
+ml985: preferred base 0x140000000+0x32000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x34000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[hwinput] keyboard focus: program (app active)
+[jit-pool] image 0x10cef0000+0x32000 (?) → pool 0x148004000 used=0x38000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+ml957: ? backing 0x10cef0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148038000 used=0x170000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148038000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x148172000 used=0x592000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x148172000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x148590000 used=0x6c4000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148590000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x1486c4000 used=0x78c000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1486c4000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14878c000 used=0xa8c000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14878c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Dungeons.exe (dungeons.exe-130b1ffbcc615142): 10CEF0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x11e000000..0x77f7000000 regions=80068 occupied=462235 MB of 486800 MB free=40804 MB maxhole=16240 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=705 MB (peak 705) internal=704 MB compressed=0 MB external=72 MB reusable=1 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] CONCRT140.dll: OK, 12 .text pages executable (copy @0x149e3c000)
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x149e8c000)
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x149e98000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x149f2c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x149fc0000)
+[jit-pool] image 0x71fcd20000+0x80000 (cfgmgr32.dll) → pool 0x14a0a4000 used=0x2128000/0x27000000 tramp+0x4000
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a0a4000)
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71FCD20000
+[jit-pool] image 0x71fcc30000+0xf0000 (rpcrt4.dll) → pool 0x14a128000 used=0x221c000/0x27000000 tramp+0x4000
+D 24 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): 71FCC30000
+[jit-pool] image 0x71fcb80000+0xb0000 (uxtheme.dll) → pool 0x14a21c000 used=0x22d0000/0x27000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71FCB80000
+[image-reload] unmapped image 0x71fcb80000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #1 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #2 hwnd=0x10030 class='IME' text="" rev=ml853
+[win-name] #3 hwnd=0x10030 class='IME' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #5 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-name] #6 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-name] #53 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #54 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #55 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #56 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #57 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #58 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #59 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #60 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #61 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #62 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #64 hwnd=0x10048 class='Static' text="Couldn't start:?"C:\Minecraft Dungeons\Dungeons/Binaries/Win64/Dungeons-Win64-Shipping.exe" Dungeons ?CreateProcess() returned 2." rev=ml853
+[jit-pool] image 0x71fcb10000+0x120000 (ole32.dll) → pool 0x14a2d0000 used=0x23f4000/0x27000000 tramp+0x4000
+D 24 Load module ole32.dll (ole32.dll-424c26e02d7b7d0d): 71FCB10000
+[jit-pool] image 0x71fca60000+0xb0000 (combase.dll) → pool 0x14a3f4000 used=0x24a8000/0x27000000 tramp+0x4000
+D 24 Load module combase.dll (combase.dll-87add9b7d0a5b955): 71FCA60000
+[jit-pool] image 0x71fc9d0000+0x90000 (coml2.dll) → pool 0x14a4a8000 used=0x253c000/0x27000000 tramp+0x4000
+D 24 Load module coml2.dll (coml2.dll-735614df14a136bf): 71FC9D0000
+[win-name] #70 hwnd=0x1003c class='Button' text="OK" rev=ml853
+[win-name] #71 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[launch-view] dismissed reason=surface logs=0
+[xp] 18:59:10.424 +0.57 dt=267 cpu=29 (thr 28) P=2 E=27 run=33 pgw=-1.0 GHz P=1.28 E=0.93 Minst=34 IPC=1.25 mJ=2 pin=0 rdKB=0 fpMB=736
+[xp] 18:59:10.706 +0.85 dt=283 cpu=19 (thr 18) P=1 E=17 run=29 pgw=-1.0 GHz P=1.14 E=0.71 Minst=16 IPC=1.14 mJ=1 pin=0 rdKB=0 fpMB=736
+[xp] 18:59:11.001 +1.14 dt=295 cpu=11 (thr 12) P=0 E=11 run=19 pgw=-1.0 GHz P=0.00 E=0.62 Minst=11 IPC=1.55 mJ=0 pin=0 rdKB=0 fpMB=734
+[xp] 18:59:11.302 +1.45 dt=302 cpu=9 (thr 9) P=1 E=8 run=20 pgw=-1.0 GHz P=0.73 E=0.78 Minst=9 IPC=1.24 mJ=1 pin=0 rdKB=0 fpMB=734
+[xp] 18:59:11.619 +1.76 dt=317 cpu=10 (thr 10) P=0 E=10 run=16 pgw=-1.0 GHz P=0.00 E=0.82 Minst=11 IPC=1.41 mJ=1 pin=0 rdKB=0 fpMB=734
+[xp] 18:59:11.882 +2.03 dt=263 cpu=10 (thr 10) P=1 E=9 run=22 pgw=-1.0 GHz P=0.81 E=0.63 Minst=10 IPC=1.57 mJ=1 pin=0 rdKB=0 fpMB=734
+[footprint] rev=ml358 phys=739 MB (peak 739) internal=738 MB compressed=0 MB external=96 MB reusable=1 MB (cycle=2)
+[footprint] rev=ml358 phys=739 MB (peak 739) internal=738 MB compressed=0 MB external=96 MB reusable=1 MB (cycle=3)
+[xp-names] m808634 "wine-x18-exc"
+[footprint] rev=ml358 phys=739 MB (peak 739) internal=738 MB compressed=0 MB external=96 MB reusable=1 MB (cycle=4)
+[footprint] rev=ml358 phys=739 MB (peak 739) internal=738 MB compressed=0 MB external=96 MB reusable=1 MB (cycle=5)
+[srv-input] btn msg=0x201 at (719,380) hit win=00010028 thread=0x10d379500
+[srv-input] btn msg=0x201 at (719,380) hit win=00010028 thread=0x10d379500
+[srv-input] btn msg=0x201 at (719,380) hit win=00010028 thread=0x10d379500
+[win-name] #72 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #73 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #74 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #75 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x232d) syscalls=0 unix_calls=598
+[unwind] term ml661 begin rip=71fe700690 rsp=702780fed8 window=[702780fed8..702800fed8) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=702780fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=232d rbp=702780ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=702780ff60: d0ff8027 70000000 901aef0c 01000000 2d230000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=10cef5821 rsp=702780fee0  (exe)+0x5821
+[unwind] term ml662 #01 nv: rbx=232d rbp=702780ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   global @+0x69 -> 10cf012c8 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=1486f59cc rsp=702780ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 10cef5821  (exe)+0x5821
+[term-stack] ml660 sp+030: CALL 10cef57d7  (exe)+0x57d7
+[term-stack] ml660 sp+090: CALL 10cef1a90  (exe)+0x1a90
+[valloc] ml959 # base=0x7c004b1000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c004b1000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c02410000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c01410000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #1 0x7c01410000+0x1000000 tid=0024 live=0 rev=ml435
+[vfree] ml842 # base=0x16effc000 size=0x0 type=0x8000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x232d) syscalls=0 unix_calls=610
+[unwind] term ml661 begin rip=1480b616c rsp=702780fc48 window=[702780fc48..702800fc48) max=32
+[unwind] term ml661 #00 pc=1480b616c rsp=702780fc48  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+028:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0a0:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0e0: CALL 10cef7262  (exe)+0x7262
+[term-stack] ml660 sp+0e8:   ? 10cf03f68  (exe)+0x13f68
+[term-stack] ml660 sp+0f0:   ? 71fe450200  kernelbase.dll+0x80200
+[term-stack] ml660 sp+118:   ? 10cef3134  (exe)+0x3134
+[term-stack] ml660 sp+290: call* 10cef5821  (exe)+0x5821
+[term-stack] ml660 sp+2c0: CALL 10cef57d7  (exe)+0x57d7
+[term-stack] ml660 sp+320: CALL 10cef1a90  (exe)+0x1a90
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(9005)
+[Wine ntdll/server] process_exit_wrapper(9005)
+[WineProc] Wine exited with code 9005 (caught by longjmp)
+[WineProc] stopping wineserver...
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[18:59:19.341] [INFO] [session] length=12s play=0s frames=0 stalls=0/0s peak=744MB limit=4095MB thermal=serious lpm=0 res=1424x656 cap=60 game=Dungeons
+[frontend] returned to library
+[footprint] rev=ml358 phys=747 MB (peak 747) internal=746 MB compressed=0 MB external=133 MB reusable=1 MB (cycle=6)
+[18:59:21.095] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=751 MB (peak 751) internal=750 MB compressed=0 MB external=136 MB reusable=1 MB (cycle=7)
+[footprint] rev=ml358 phys=751 MB (peak 751) internal=750 MB compressed=0 MB external=136 MB reusable=1 MB (cycle=8)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=756 MB (peak 756) internal=755 MB compressed=0 MB external=143 MB reusable=1 MB (cycle=9)
+[xp] 18:59:26.168 +16.31 dt=314 cpu=227 (thr 227) P=162 E=65 run=272 pgw=-1.0 GHz P=2.96 E=1.37 Minst=1385 IPC=2.44 mJ=300 pin=260 rdKB=6596 fpMB=756
+[xp] 18:59:26.492 +16.64 dt=324 cpu=17 (thr 17) P=7 E=10 run=18 pgw=-1.0 GHz P=1.21 E=1.97 Minst=40 IPC=1.41 mJ=4 pin=0 rdKB=0 fpMB=756
+[xp] 18:59:26.763 +16.91 dt=271 cpu=59 (thr 59) P=0 E=59 run=63 pgw=-1.0 GHz P=1.79 E=1.42 Minst=137 IPC=1.62 mJ=7 pin=0 rdKB=0 fpMB=756
+[xp] 18:59:27.058 +17.20 dt=296 cpu=88 (thr 88) P=22 E=66 run=107 pgw=-1.0 GHz P=1.81 E=1.09 Minst=156 IPC=1.39 mJ=17 pin=3 rdKB=128 fpMB=756
+[xp] 18:59:27.353 +17.50 dt=294 cpu=16 (thr 16) P=7 E=9 run=30 pgw=-1.0 GHz P=2.47 E=1.59 Minst=39 IPC=1.22 mJ=7 pin=3 rdKB=132 fpMB=756
+88 (thr 88) P=22 E=66 run=107 pgw=-1.0 GHz P=1.81 E=1.09 Minst=156 IPC=1.39 mJ=17 pin=3 rdKB=128 fpMB=756
+[18:59:27.354] [xp] 18:59:27.353 +17.50 dt=294 cpu=16 (thr 16) P=7 E=9 run=30 pgw=-1.0 GHz P=2.47 E=1.59 Minst=39 IPC=1.22 mJ=7 pin=3 rdKB=132 fpMB=756

@@ -86,8 +86,11 @@ enum DockGameEndRules {
     /// A status that says the program crashed or failed hard: an NTSTATUS error or an exception code (0xC.......,
     /// 0xE.......: an access violation, a stack overrun, a C++ exception), the breakpoint exit (0x80000003), or a
     /// negative exit code (-1). Exit code 0 and plain small codes are not: a game may end with 1 after a quit.
+    /// Round 630 (agent G3 S19; RVW5FD and four older logs): Wine's EXCEPTION_WINE_STUB, the end after "wine: Call from ... to
+    /// unimplemented function X, aborting".
+    static let wineStubStatus: UInt32 = 0x8000_0100
     static func isCrash(_ status: UInt32) -> Bool {
-        status & 0xC000_0000 == 0xC000_0000 || status == 0x8000_0003
+        status & 0xC000_0000 == 0xC000_0000 || status == 0x8000_0003 || status == wineStubStatus
     }
 
     enum Verdict: Equatable {

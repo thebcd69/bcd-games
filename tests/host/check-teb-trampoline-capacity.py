@@ -46,7 +46,12 @@ static void sys_icache_invalidate(void *p, size_t size)
     assert((uintptr_t)p + size <= (uintptr_t)backing + 32 + 0x4000);
     __sync_fetch_and_add(&cache_calls, 1);
 }
-''' + defines + '\n' + functions + r'''
+''' + defines + '\n' + r'''
+/* round 630 (agent O3 S2): the free list of released slots (virtual_ios.c), used only once the page is used up */
+static int ios_jit_free_slots[IOS_JIT_MAX_SLOTS];
+static int ios_jit_free_slot_count;
+static pthread_mutex_t ios_jit_slot_lock = PTHREAD_MUTEX_INITIALIZER;
+''' + functions + r'''
 enum { WORKERS = 16, EACH = 64, TOTAL = WORKERS * EACH };
 static int slots[TOTAL];
 static uint64_t tebs[TOTAL];

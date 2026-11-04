@@ -115,7 +115,7 @@ enum BCDGameSetupPage {
         let components = componentsSummary(s.dll)
         let list: [BCDGameSetting] = [
             BCDGameSetting(id: version, title: "Windows version", kind: .choice(versions), value: s.windowsVersion, defaultValue: "",
-                           note: s.notes[version] ?? "The Windows version this game's programs are told they run on. Older games often ask for XP or 7. It reaches the programs the game starts from its folder, from the next start."),
+                           note: s.notes[version] ?? "The Windows version this game's programs are told they run on. Older games often ask for XP or 7; newer ones refuse XP and Vista (Grand Theft Auto V shows a message and stops), so leave those on Windows 10. It reaches the programs the game starts from its folder, from the next start."),
             BCDGameSetting(id: "setup.components", title: "Components", kind: .opens(.section(componentsGroup)), value: components, defaultValue: "As the games have them",
                            note: "Which DLLs the game uses: its own copies, or the ones BCD brings."),
         ]

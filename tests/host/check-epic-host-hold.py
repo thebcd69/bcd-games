@@ -93,8 +93,10 @@ carriers = sorted(r['id'] for r in lists['rules'] if 'BCD_EPIC_HOST_START' in js
 # Round 620: Farming Simulator 22 from the Epic store (5C4SAB) showed the same "host=1" start with "[bcd-host] no report" and Epic's
 # sign-in box; its list carries the line too, matched only outside a Steam library.
 # Round 626 (agent G1 S6; VV1JGH = 7ED7X7): BioShock Remastered from Epic, the same start through BCD Host.
-check('only the BioShock Infinite, BioShock Remastered and Farming Simulator 22 (Epic) lists set it, from build 598',
-      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
+# Round 630 (agent R S11): GTA V Enhanced and Legacy outside Steam (an Epic copy lost BCD Host's start the same way); the key is read only
+# by the Epic start (BCDEpicStart), so the rows' other copies are untouched.
+check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic) and (round 630) GTA V outside Steam lists set it, from build 598',
+      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'gta5e-other', 'gta5l-other'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
       next(r for r in lists['rules'] if r['id'] == i)['config'] for i in carriers))
 rules = (R / 'build/tools/autotune_rules.py').read_text()
 check('auto-tune: the rule epic-host-start-lost adds the line after an Epic game with the EOS SDK left with exit code 1 although the start line chose the host and the host left no report, never twice',

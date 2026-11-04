@@ -12,6 +12,7 @@
 
 int madeira_pool_add(unsigned int entry, unsigned long long size);
 void madeira_pool_set_pressure(int level);
+void madeira_pool_set_lazy_windows(int on);
 
 @protocol MPExtensionClass
 + (id)extensionWithIdentifier:(NSString *)identifier error:(NSError **)error;
@@ -43,10 +44,14 @@ void madeira_pool_set_pressure(int level);
 #define MP_MEMORYPRESSURE_PROC_LIMIT_WARN     0x10
 #define MP_MEMORYPRESSURE_PROC_LIMIT_CRITICAL 0x20
 
-// madeira-bcd (round 625, the owner's decision 38 b): env.MADEIRA_POOL_MORE = 1 (bcd.cfg or the game's
-// config; WineProcessBridge.m sets this before MadeiraMemoryPoolStart) takes the changes below; without it
-// the source is the one of build 624 and before, for every player who uses helper memory today.
+// madeira-bcd (round 625, the owner's decision 38 b): env.MADEIRA_POOL_MORE (bcd.cfg or the game's config;
+// WineProcessBridge.m sets this before MadeiraMemoryPoolStart) takes the changes below. Round 630 (the owner's
+// go, 2026-11-03): on unless a config sets it otherwise; env.MADEIRA_POOL_MORE = 0 gives the source of build
+// 624 and before.
 int MadeiraMemoryPoolMore;
+/// Round 630 (agent T2 S1): env.MADEIRA_POOL_LAZY_WINDOWS (WineProcessBridge.m sets it before MadeiraMemoryPoolStart): the regions keep no
+/// window in BCD's address space (virtual_ios.c madeira_pool_set_lazy_windows). Off unless set.
+int MadeiraMemoryPoolLazy;
 
 // madeira-bcd: a source that asks for the system's levels only is sent BCD's own
 // limit warning as DISPATCH_MEMORYPRESSURE_CRITICAL (xnu memorystatus_warn_process),
@@ -120,6 +125,7 @@ long MadeiraMemoryPoolStart(long megabytes) {
         return 0;
     }
     NSXPCConnection *connection = delegate.connection;
+    madeira_pool_set_lazy_windows(MadeiraMemoryPoolLazy);   /* round 630 (T2 S1): before the first region */
     for (long i = 0; i < regions; i++) {
         dispatch_semaphore_t reply = dispatch_semaphore_create(0);
         __block mach_port_t entry = MACH_PORT_NULL;

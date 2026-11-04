@@ -160,6 +160,31 @@ struct AutoTuneEngineChecks {
                    "scanner with \(chunk)-byte chunks: counts \(sc.counts), facts \(sc.facts.build ?? -1)/\(sc.facts.ramMB ?? -1)/\(sc.facts.aliveSeconds)")
         }
 
+        // 12a. Round 630: the quoted tail of the previous run is no evidence; a sinceLaunch signal counts from the last game launch on.
+        let tailSigs = [AutoTuneSignal(has: ["[present] ml1175"]), AutoTuneSignal(has: ["[present] ml1175"], sinceLaunch: true),
+                        AutoTuneSignal(has: ["Device error at frame"])]
+        let two = AutoTuneLogScanner(signals: tailSigs)
+        two.feed(Data(("[10:00:00.000] [INFO] [prev-tail] [09:59:00.000] [ERR] Device error at frame 12\n"
+                       + "[10:00:00.001] [INFO] [prev-tail] [09:59:01.000] [INFO] [bcd] library launch Old: avx=0\n"
+                       + "[10:00:01.000] [INFO] [bcd] library launch First Game: avx=0\n"
+                       + "warn:  [present] ml1175 commitBeforePresent=1\n"
+                       + "[10:05:00.000] [INFO] [bcd] library launch Second Game: avx=0\n"
+                       + "[10:05:30.000] [INFO] [session] length=22s play=0s frames=0 api=OpenGL/32 game=Second Game\n").utf8))
+        two.finish()
+        expect(two.counts == [1, 0, 0], "a [prev-tail] line counts nowhere; a sinceLaunch count restarts at a launch: \(two.counts)")
+        let oneRun = AutoTuneLogScanner(signals: tailSigs)
+        oneRun.feed(Data("[10:00:01.000] [INFO] [bcd] library launch Game: avx=0\nwarn:  [present] ml1175 commitBeforePresent=1\n".utf8))
+        oneRun.finish()
+        expect(oneRun.counts == [1, 1, 0] && oneRun.evidence.count == 2, "after the last launch a sinceLaunch signal counts as any other")
+        let again = AutoTuneLogScanner(signals: tailSigs)
+        again.feed(Data(("warn:  [present] ml1175 commitBeforePresent=1\n[10:00:01.000] [INFO] [bcd] library launch Game: avx=0\n"
+                         + "warn:  [present] ml1175 commitBeforePresent=1\n").utf8))
+        again.finish()
+        expect(again.counts == [2, 1, 0] && again.evidence.count == 2, "a count that starts again adds no second evidence line: \(again.evidence.count)")
+        expect(AutoTuneEngine.signals([AutoTuneRule(id: "t-since", lines: [], priority: 1, all: [tailSigs[0]], none: [tailSigs[1]], reason: "t")])
+                == [AutoTuneSignal(has: ["[present] ml1175"]), AutoTuneSignal(has: ["[present] ml1175"], sinceLaunch: true)],
+               "sinceLaunch keeps a signal of its own")
+
         // 12b. The quit line freezes the crash evidence seen so far.
         let qsig: [AutoTuneSignal] = []
         let crashFirst = AutoTuneLogScanner(signals: qsig)
@@ -933,6 +958,12 @@ struct AutoTuneEngineChecks {
                    "...not from a slow line, below 80 %, a plateau, after a frame or with a freeze the app saw: \"it froze\" stays hung")
             expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), bk) == "inconclusive",
                    "...and \"I closed it\" is still the player's")
+            // Round 630 (agent G2 S19; Pseudoregalia NCKW9M): 75 % of the limit is the line now.
+            var b78 = bk; b78.lastFootprintMB = 3195   // 78 % of 4096, 1.63 x the slow line
+            var b74 = bk; b74.lastFootprintMB = 3031   // 74 %
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true), b78) == "killed"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "froze"), b74) == "hung",
+                   "a burst at 78 % of the limit is a kill (NCKW9M), one at 74 % is not")
             // (d) alive two minutes after a few frames, 10 s or less of play (WRC 9 JDJ8KE: 122 s, play 4 s, 32 frames)
             var wr = AutoTuneLogFacts(); wr.stage = 3; wr.aliveSeconds = 122; wr.sessionPlaySeconds = 4; wr.presentsCounted = true; wr.presentsLogged = 32
             expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 122), wr) == "hung", "a loading screen that stayed two minutes: hung (WRC 9)")

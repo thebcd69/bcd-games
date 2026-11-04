@@ -48,10 +48,18 @@ final class GamepadInput: @unchecked Sendable {
     /// controller is in use. That is why it is opt-in: without the switch,
     /// slot 0 connects only when a real source appears, as before.
     @MainActor func reserveSessionSlot(touchControls: Bool) {
-        guard Self.enabled, Self.optIn("MADEIRA_PAD_EARLY_SLOT") else { return }
+        // Round 630 (agent T1 S1; Dokimon Quest N9PJHQ, DQKXK3: the game loads xinput1_3 and looks for pads once at start, the touch pad
+        // connected 0-5 s later): the switch is also read from the game's own file, so a list row can set it for one game, as
+        // MADEIRA_PAD_MODE is (configuredPadMode). optIn itself stays bcd.cfg and the environment for its other callers.
+        let gameSet = MadeiraConfig.gameValue("env.MADEIRA_PAD_EARLY_SLOT") == "1"
+        guard Self.enabled, gameSet || Self.optIn("MADEIRA_PAD_EARLY_SLOT") else { return }
         let touch = touchControls && Self.touchEnabled
         let paired = !GCController.controllers().isEmpty
-        guard touch || paired else { return }
+        guard touch || paired else {
+            LogStore.shared.log("[xinput] ml1990 early-slot switch set (\(gameSet ? "game" : "cfg")), slot=0 not reserved: no touch controller "
+                                + "mappings shown and no paired controller at the session start")
+            return
+        }
         queue.async { [self] in touchState.reserved = true; sample() }
         LogStore.shared.log("[xinput] ml1990 slot=0 reserved for the session touch=\(touch ? 1 : 0) paired=\(paired ? 1 : 0)")
     }

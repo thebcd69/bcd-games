@@ -90,6 +90,13 @@ static LONG nb_threads = 1;
 
 static inline int get_unix_exit_code( NTSTATUS status )
 {
+#ifdef WINE_IOS
+    /* madeira-bcd (round 630, agent G3 S19; the Resident Evil Requiem demo RVW5FD and four older Dock logs): the app reads a pseudo-process's
+     * end whole (the table of ended processes, DockGameEndRules, the exit report). Wine's stub status 0x80000100 ("unimplemented function
+     * ... aborting") has a zero low byte and became 1 below, a plain code, so nothing downstream saw an error. On iOS nothing truncates the
+     * value (wine_ios_exit keeps the int). */
+    if ((unsigned int)status >= 0x80000000u) return status;
+#endif
     /* prevent a nonzero exit code to end up truncated to zero in unix */
     if (status && !(status & 0xff)) return 1;
     return status;
@@ -1972,6 +1979,104 @@ void ios_thread_origin_report( unsigned int tid )
 /***********************************************************************
  *              NtCreateThreadEx   (NTDLL.@)
  */
+/* thread-isolate-test:begin (tests/host/check-thread-fault-isolate.py compiles this block on the host) */
+/* madeira-bcd (round 630, agent G3 S4; TEKKEN 7 37CPHE, FQEKA1, 1TQHPW, HFT0B5): NVIDIA's GfeSDK.dll starts a worker thread in
+ * NVGSDK_Create; Create fails without GeForce Experience ("Error creating message bus interface"), the object is freed, and about 2 s
+ * later the leftover thread enters the freed critical section: the unhandled c0000008 ended the whole game, which played at 57 FPS.
+ * env.MADEIRA_THREAD_FAULT_ISOLATE = <dll>[,<dll>...] (1-4 file names ending .dll; off unless set): a thread whose entry point lies in a
+ * listed DLL and that ends the process with an NTSTATUS error (the unhandled-exception exit) ends only itself (NtTerminateProcess,
+ * process_ios.c). The entry points are kept only while the key is set: one slot a TEB, a new thread on the same TEB overwrites it. */
+#define IOS_THR_ISOLATE_MAX 4
+#define IOS_THR_ENTRY_SLOTS 1024
+static char ios_thr_isolate_dll[IOS_THR_ISOLATE_MAX][65];
+static int ios_thr_isolate_count = -1;   /* -1: not read yet */
+static struct { uintptr_t teb, start; } ios_thr_entry[IOS_THR_ENTRY_SLOTS];
+static unsigned int ios_thr_entry_next;
+
+/* The names of a key value, or 0: 1-4 names separated by ',', each 1-64 characters of [A-Za-z0-9._-] ending ".dll" (any case);
+ * anything else turns the key off as a whole. */
+static int ios_thr_isolate_parse( const char *value, char out[][65], int max )
+{
+    int n = 0;
+    const char *p = value;
+
+    if (!value || !*value) return 0;
+    for (;;)
+    {
+        const char *end = p;
+        size_t len;
+        while (*end && *end != ',') end++;
+        len = (size_t)(end - p);
+        if (!len || len > 64 || n >= max) return 0;
+        for (size_t i = 0; i < len; i++)
+        {
+            char c = p[i];
+            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '_' || c == '-')) return 0;
+            out[n][i] = (c >= 'A' && c <= 'Z') ? (char)(c - 'A' + 'a') : c;
+        }
+        out[n][len] = 0;
+        if (len < 5 || strcmp( out[n] + len - 4, ".dll" )) return 0;
+        n++;
+        if (!*end) break;
+        p = end + 1;
+    }
+    return n;
+}
+
+/* Whether a module's file name is one of the listed DLLs (case-insensitive). */
+static int ios_thr_isolate_match( const char *name, char list[][65], int n )
+{
+    char low[65];
+    size_t len, i;
+
+    if (!name) return 0;
+    len = strlen( name );
+    if (!len || len > 64) return 0;
+    for (i = 0; i <= len; i++) low[i] = (name[i] >= 'A' && name[i] <= 'Z') ? (char)(name[i] - 'A' + 'a') : name[i];
+    for (i = 0; i < (size_t)n; i++) if (!strcmp( low, list[i] )) return 1;
+    return 0;
+}
+/* thread-isolate-test:end */
+
+/* The key, read once (a race reads the same value twice). */
+int ios_thr_isolate_on( void )
+{
+    int n = __atomic_load_n( &ios_thr_isolate_count, __ATOMIC_ACQUIRE );
+    if (n < 0)
+    {
+        n = ios_thr_isolate_parse( getenv( "MADEIRA_THREAD_FAULT_ISOLATE" ), ios_thr_isolate_dll, IOS_THR_ISOLATE_MAX );
+        __atomic_store_n( &ios_thr_isolate_count, n, __ATOMIC_RELEASE );
+    }
+    return n > 0;
+}
+
+int ios_thr_isolate_listed( const char *name )
+{
+    return ios_thr_isolate_on() && ios_thr_isolate_match( name, ios_thr_isolate_dll, ios_thr_isolate_count );
+}
+
+/* A new thread's entry point, by its TEB (only with the key). */
+static void ios_thr_entry_note( uintptr_t teb, uintptr_t start )
+{
+    unsigned int i, slot = IOS_THR_ENTRY_SLOTS;
+
+    for (i = 0; i < IOS_THR_ENTRY_SLOTS; i++) if (__atomic_load_n( &ios_thr_entry[i].teb, __ATOMIC_RELAXED ) == teb) { slot = i; break; }
+    if (slot == IOS_THR_ENTRY_SLOTS) slot = __atomic_fetch_add( &ios_thr_entry_next, 1, __ATOMIC_RELAXED ) % IOS_THR_ENTRY_SLOTS;
+    __atomic_store_n( &ios_thr_entry[slot].start, start, __ATOMIC_RELAXED );
+    __atomic_store_n( &ios_thr_entry[slot].teb, teb, __ATOMIC_RELEASE );
+}
+
+/* The entry point recorded for a TEB, or 0 (the process's first thread, or a thread made before the key was read). */
+uintptr_t ios_thr_entry_start( uintptr_t teb )
+{
+    unsigned int i;
+
+    if (!teb) return 0;
+    for (i = 0; i < IOS_THR_ENTRY_SLOTS; i++)
+        if (__atomic_load_n( &ios_thr_entry[i].teb, __ATOMIC_ACQUIRE ) == teb) return __atomic_load_n( &ios_thr_entry[i].start, __ATOMIC_RELAXED );
+    return 0;
+}
+
 NTSTATUS WINAPI NtCreateThreadEx( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr,
                                   HANDLE process, PRTL_THREAD_START_ROUTINE start, void *param,
                                   ULONG flags, ULONG_PTR zero_bits, SIZE_T stack_commit,
@@ -2133,6 +2238,7 @@ NTSTATUS WINAPI NtCreateThreadEx( HANDLE *handle, ACCESS_MASK access, OBJECT_ATT
         ios_note_thread_create_failure( "TEB", status, 0, stack_reserve, stack_commit );
         goto done;
     }
+    if (ios_thr_isolate_on()) ios_thr_entry_note( (uintptr_t)teb, (uintptr_t)start );   /* round 630 (G3 S4): only with the key */
 
     ios_its_step = NULL;
     if ((status = init_thread_stack( teb, get_zero_bits_limit( zero_bits ), stack_reserve, stack_commit )))

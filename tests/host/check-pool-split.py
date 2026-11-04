@@ -204,7 +204,7 @@ check = swift[swift.index('var pairSecond: (base: vm_address_t, size: vm_address
 assert 'if got == pa.base {' in check and 'pairSecond = takeSecondRegion(' in check
 # madeira-bcd ios18-jit: every region request goes through requestRegion (the debugger's
 # jit26_prepare_region(nil, size), or the debugger-less pool's own region).
-assert 'requestRegion(pairSingle)' in check, 'a missed pair falls back to the single-region size'
+assert 'requestRegion(pairSingle, region: "A-single")' in check, 'a missed pair falls back to the single-region size'
 assert 'pairSecond ?? takeSecondRegion(' in swift
 print('PASS: pool-pair takes two runs above the window only with pool-split, and falls back on a miss')
 

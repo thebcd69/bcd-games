@@ -196,7 +196,7 @@ static int ios_x86f_call_before( uint64_t win, uint32_t ret )
 }
 
 /* The report. gregs: the 8 registers in the order RAX RCX RDX RBX RSP RBP RSI RDI (32-bit values in the low halves); eip: the guest address
- * of the int3 or of the block that faulted; fault_addr: the guest address of the access (-1 for an int3); write: 1 for a store, 0 for a
+ * of the int3 or of the block that faulted; fault_addr: the guest address of the access (-1 for an int3, -2 for the return address of a call that went where no code is); write: 1 for a store, 0 for a
  * load, -1 when not known. */
 static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t thread_teb, const uint64_t *gregs, uint64_t eip64,
                                      int64_t fault_addr, int write, int resolve )
@@ -271,6 +271,11 @@ static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t t
                  "the PEB32 list; EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
                  num, write < 0 ? "at" : (write ? "writing" : "reading"), (uint32_t)fault_addr, eip, w[0] ? w : "no module",
                  (unsigned long long)base, nmods, eax, ecx, edx, ebx, esi, edi, ebp, esp );
+    else if (fault_addr == -2)   /* round 630: ios_x86_fault_branch_nowhere, the return address of the call */
+        dprintf( STDERR_FILENO,
+                 "[x86-fault] #%d the return address at ESP of a 32-bit call that went where no code is: guest 0x%08x (%s), window 0x%llx, "
+                 "%u modules in the PEB32 list; EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
+                 num, eip, w[0] ? w : "no module", (unsigned long long)base, nmods, eax, ecx, edx, ebx, esi, edi, ebp, esp );
     else
         dprintf( STDERR_FILENO,
                  "[x86-fault] #%d a 32-bit guest executed int3 at guest 0x%08x (%s), window 0x%llx, %u modules in the PEB32 list; "
@@ -408,7 +413,8 @@ static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t t
                 sites[nsite++] = stack[i];
         from_stack = nsite != 0;
     }
-    ios_x86f_code( base, fault_addr >= 0 ? (state_rip ? "eip" : "block") : "int3", eip, IOS_X86F_CODE_BEFORE, IOS_X86F_CODE_AFTER, mods, nmods );
+    ios_x86f_code( base, fault_addr >= 0 ? (state_rip ? "eip" : "block") : fault_addr == -2 ? "ret" : "int3", eip, IOS_X86F_CODE_BEFORE,
+                   IOS_X86F_CODE_AFTER, mods, nmods );
     for (k = 0; k < nsite; k++)
     {
         char tag[24];
@@ -463,6 +469,39 @@ static void ios_x86_fault_int3( const arm_thread_state64_t *st, uintptr_t thread
 {
     if (grip < 2) return;
     ios_x86_fault_report( st, thread_teb, gregs, grip - 1, -1, -1 );
+}
+
+/* round 630 (agents O3 S10/S15, A1 S22; Vampire: The Masquerade - Bloodlines ZGERG3, Jet Set Radio 2EZCT8, Need for Speed: Most Wanted
+ * SGQDPG): a 32-bit guest branched to an address where no code is (a call through a NULL pointer, or into a region nothing maps), and the
+ * logs named neither the caller nor the call. FEX's frame (x28) holds the guest registers at +0x20 (RAX RCX RDX RBX RSP RBP RSI RDI) and
+ * State.rip at +0x18; the dword at ESP is the return address when a call went there. The report then runs around that address with the
+ * int3 layout: its code window shows the call instruction and the source of the pointer, and the registers, stack, EBP chain and modules
+ * name the caller. Log only, with env.MADEIRA_X86_FAULT_DUMP = 1, three such headers a process and the report's own cap. */
+static __attribute__((noinline)) void ios_x86_fault_branch_nowhere( const arm_thread_state64_t *st, uintptr_t thread_teb, uint64_t frame,
+                                                                   uint64_t target, const char *how )
+{
+    static volatile int heads;
+    uint64_t g[8], base = st->__x[19];
+    uint32_t ret = 0;
+    uint8_t probe;
+
+    if (frame < 0x10000 || !((base & 0xffffffffULL) == 0 && base >= 0x100000000ULL)) return;
+    if (target > 0xffffffffULL) return;
+    if (target >= 0x10000 && ios_av_args_read( base + target, &probe, 1 )) return;           /* code can be there: not this case */
+    if (!ios_av_args_read( frame + 0x20, g, sizeof(g) )) return;
+    if ((uint32_t)g[4] < 0x10000 || !ios_av_args_read( base + (uint32_t)g[4], &ret, 4 )) return;
+    if (__sync_add_and_fetch( &heads, 1 ) > 3) return;
+    dprintf( STDERR_FILENO, "[x86-fault] %s: a 32-bit guest branched to 0x%08x, where no code is; the dword at ESP=0x%08x is 0x%08x "
+             "(the return address when a call went there)%s\n", how, (unsigned)target, (unsigned)g[4], ret,
+             ret >= 0x10000 ? "; the report below is around it" : "" );
+    if (ret >= 0x10000) ios_x86_fault_report( st, thread_teb, g, (uint64_t)ret, -2, -1 );
+    if (target >= 0x10000)
+    {
+        /* whether the target was ever allocated, freed or mapped, and what was asked for (the ring of virtual_ios.c) */
+        extern void ios_x86f_alloc_ring_dump( uint32_t fault );
+
+        ios_x86f_alloc_ring_dump( (uint32_t)target );
+    }
 }
 
 /* The access-violation call: the faulting thread's host state (x4 x7 x5 x6 x8 x9 x10 x11 are EAX ECX EDX EBX ESP EBP ESI EDI of a 32-bit

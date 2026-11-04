@@ -133,7 +133,25 @@ views = VIEWS.read_text()
 alert = views[views.index("struct AutoTuneAlert: ViewModifier {"):]
 check("the offer's alert shows only while auto-tune is on and after the exit report and any restart notice",
       "Binding(get: { AutoTune.enabled && offers.offer != nil && library.error == nil && library.restartNotice == nil\n"
+      "                       && Self.noGameRunning(offers.offer, library.current)\n"
       "                       && gate.mayShow(offers.offer != nil) }" in alert)
+# Round 630 (agent U S15a; G3SF3A and 14 more archive logs): an earlier session's result came up over a running game and its Close BCD
+# button ended the game. The result waits while a game runs (tested before the gate, which marks the alert as showing), one log line.
+held = alert[alert.index("private static func noGameRunning("):]
+held = held[:held.index("\n    }\n")]
+check("the result waits while a game runs and comes up when the session ends, one log line per held result",
+      "guard let offer, running != nil else { heldTitle = nil; return true }" in held and "return false" in held
+      and held.count("LogStore.shared.log(") == 1 and "held until the session ends" in held and "heldTitle = offer.title" in held)
+# Round 630 (agent U S15b): a recovered session's analysis that ends while the same game runs with the lines it asks for posts nothing.
+_at = (APP / "AutoTune.swift").read_text()
+_post = _at[_at.index("        DispatchQueue.main.async {\n            // Round 630 (agent U S15b"):]
+_post = _post[:_post.index("\n        }\n")]
+check("a result whose next lines the running session of the same game already carries is not shown (main thread, logged)",
+      "if let running = armed, running.windowsPath == m.windowsPath, let lines = after.candidate, !lines.isEmpty," in _post
+      and "Set(lines).isSubset(of: Set(running.layer ?? [])) {" in _post and "result not shown, the running session already carries" in _post
+      and _post.rstrip().endswith("AutoTuneOffers.shared.offer = offer")
+      and "var layer: [String]?" in _at
+      and "layer: state(entry.windowsPath).layerLines.filter { !userKeys(entry).contains(AutoTuneRules.key($0)) })" in _at)
 # 2026-10-24 (the owner): the alert hangs on ContentView, under every page and sheet; shown while a game's page was open, iOS took
 # the page down and the library's first screen came back whatever was pressed. It now waits while anything is presented over the
 # root screen, comes up once nothing is, and stays up until answered.
@@ -239,7 +257,7 @@ NOT_FROM_LAYER = {"metalfx-upscale", "fps-limit", "env.MADEIRA_PAD_MODE", "pool"
 LINE = re.compile(r"^([A-Za-z0-9._-]+) = (\S.*)$")
 FIELDS = {"id", "lines", "priority", "all", "any", "none", "outcomes", "session", "api", "ramMinMB", "ramMaxMB",
           "minStage", "maxStage", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "listUpgradeFailure", "noRetry", "reason",
-          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly"}
+          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "swapCapHit"}
 ids = [r["id"] for r in rules]
 check("rule ids are unique", len(ids) == len(set(ids)))
 for r in rules:
@@ -256,12 +274,16 @@ for r in rules:
             bad.append("a noFix rule has \"lines\": [], noFix true and no upgrade or retry flag")
     elif not r.get("lines"):
         bad.append("no lines")
-    if "evaluateWhenRan" in r and (r["evaluateWhenRan"] is not True or not r.get("noFix")):
+    if "evaluateWhenRan" in r and (r["evaluateWhenRan"] is not True or not (r.get("noFix") or r.get("fixedIn"))):
         # Round 624 (RETRO-2 RQ1): only a noFix rule may speak for a session scored ran/quit (it changes the text, never a setting).
-        bad.append("evaluateWhenRan is true and only on a noFix rule")
+        # 2026-11-01 (Messiah 9ACRYW): or a fixedIn rule, which has no lines either (a start that ends nothing, no crash).
+        bad.append("evaluateWhenRan is true and only on a noFix or fixedIn rule")
     if "ranOnly" in r and (r["ranOnly"] is not True or r.get("evaluateWhenRan") is not True):
         # Round 624 (Fallout 4 voices): ranOnly narrows an evaluateWhenRan rule to sessions that played.
         bad.append("ranOnly is true and only on an evaluateWhenRan rule")
+    if "swapCapHit" in r and r["swapCapHit"] is not True:
+        # Round 630 (agent T2 S12): a rule that needs the swap file to have reached its cap says true; there is no "false".
+        bad.append("swapCapHit is true when present")
     if r.get("exeMinMB") is not None and r.get("exeMaxMB") is not None and r["exeMinMB"] > r["exeMaxMB"]:
         bad.append("exeMinMB above exeMaxMB")
     for k in ("memoryMinPct",):
@@ -281,6 +303,10 @@ for r in rules:
             bad.append("%s is not read from the game's layer" % k)
     if not r.get("all") or any(not s.get("has") or any(not h for h in s["has"]) for s in r.get("all", []) + r.get("any", []) + r.get("none", [])):
         bad.append("an empty signal")
+    # round 630: a signal has its strings, an optional count and an optional sinceLaunch (true only)
+    if any(set(s) - {"has", "count", "sinceLaunch"} or s.get("sinceLaunch") not in (None, True)
+           for s in r.get("all", []) + r.get("any", []) + r.get("none", [])):
+        bad.append("a signal with an unknown field")
     if set(r.get("outcomes", [])) - {"crashed", "killed", "hung", "exited-early"}:
         bad.append("unknown outcome")
     if r.get("session") not in (None, "library", "dock") or r.get("api") not in (None, "d3d11", "d3d12"):

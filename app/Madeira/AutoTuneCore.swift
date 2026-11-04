@@ -23,6 +23,10 @@ struct AutoTuneSignal: Codable, Hashable {
     var has: [String]
     /// At least this many such lines (1 when absent).
     var count: Int?
+    /// madeira-bcd (round 630): counted only from the last game launch ("[bcd] library launch") on. One app run can hold several games
+    /// (KJTS7S: Ultimate Chicken Horse drew with Direct3D 11, then The Binding of Isaac found no OpenGL), and a line of the first game
+    /// must not speak for the last one. Absent: the whole log, as before.
+    var sinceLaunch: Bool?
 }
 
 /// One known fix: the lines an attempt adds when a session failed with these signals.
@@ -65,6 +69,10 @@ struct AutoTuneRule: Codable {
     /// or no limit passes. The swap rules for a memory kill use it: a kill with 2 GB of an 8 GB limit used is not iOS closing the game for memory
     /// (Albino Lullaby 41D565, round 591).
     var memoryMinPct: Int?
+    /// madeira-bcd (round 630, agent T2 S12): the swap file reached its cap in the session: the last "[swap] ml1077 stats" line counts a
+    /// disk-full refusal, or its disk use is 90 % of the cap or more. A rule with true is skipped when the stats line says the cap was far
+    /// (a larger file changes nothing: the memory that filled the limit was not the guest's); a log without the stats line passes.
+    var swapCapHit: Bool?
     /// May replace a line auto-tune kept earlier with the same key (a larger swap file
     /// after the first was not enough). Never a key the user sets.
     var upgrade: Bool?
@@ -159,6 +167,16 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var returnedToLibrary = false
     var exitStatus: UInt32?
     var unhandled = 0
+    /// madeira-bcd (round 630, agent O2 S6; No More Room in Hell N6EG31, X8FMD9): in a Dock session, the game's window came up
+    /// ("[launch-view] dismissed reason=game-window"), and the unhandled exceptions and error exits counted before it (the Dock's Steam
+    /// client crashing at its start, before the game needed it): those are not the game's.
+    var gameWindowSeen = false
+    var unhandledBeforeWindow = 0
+    var errorExitsBeforeWindow = 0
+    /// The Dock's Steam client crashed: BCD refused its crash reporter ("[proc-gate] REFUSING spawn of ...steamerrorreporter64.exe").
+    /// Only then is the evidence before the game's window the client's; a game's own launcher that crashes before the window (Batman:
+    /// Arkham City's Mono child, Pico Park, Rift Apart) stays the game's.
+    var steamClientCrashSeen = false
     /// madeira-bcd (round 626, agent T S2, Batman: Arkham City AE9TXK): Metal's "failed assertion `" was logged; the abort that follows it
     /// ("[task-exc] BREAKPOINT") then counts as an unhandled crash (the app died; the session was scored ran or inconclusive).
     var metalAssertion = false
@@ -254,6 +272,10 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var sessionAverageFPS: Int?
     var sessionLow1FPS: Int?
     var sessionPlaySeconds: Int?
+    /// madeira-bcd (round 630, agent T2 S12): the last "[swap] ml1077 stats" line: disk use, its cap and the disk-full refusals.
+    var swapDiskMB: Int?
+    var swapCapMB: Int?
+    var swapDiskRefusals: Int?
     /// The newest summary was the partial one written when the app went to the background (the session did not end after it).
     var sessionPartial = false
     /// madeira-bcd (round 624): "[fexlock] STUCK write-wait" lines: a thread waits for a FEX lock that is never released (R.E.P.O. AJ7RNE: the
@@ -264,13 +286,23 @@ struct AutoTuneLogFacts: Codable, Equatable {
     var presentsLast = -1
     var presentsFlat = 0
     /// A thread waited for a FEX lock it owned ("[fexlock] STUCK") and the frame counter had not moved for three readings (90 s): the game is frozen.
-    var lockFreeze: Bool { fexlockStuck > 0 && presentsCounted == true && presentsLast > 0 && presentsFlat >= 3 }
+    /// madeira-bcd (round 630, agent T2 S7, TerraTech VGJ1A5): "[fexlock] STUCK write-wait" lines whose own thread is the lock's owner
+    /// ("E 24 [fexlock] STUCK write-wait ... owner teb=... tid=0024"): a thread waiting for a lock it holds never wakes, whatever the frame
+    /// counter says (it stops being printed at the early detach, 3 s after the 40th frame).
+    var fexlockSelfWait = 0
+    var lockFreeze: Bool {
+        fexlockStuck > 0 && ((presentsCounted == true && presentsLast > 0 && presentsFlat >= 3) || fexlockSelfWait > 0)
+    }
     /// The same, as it stood when the player asked to quit (a frozen game the player closed is not one that was quit after playing).
     var lockFreezeAtQuit = false
     /// madeira-bcd (round 624, RETRO-1 R4, WRC 9 JDJ8KE/WV1P7T): "[spin] ml1140 ... look 1: x64->EC" reports (a guest thread in a tight loop).
     /// With the Dock's frame counter standing still for two readings (60 s) after frames, the game is frozen, like lockFreeze.
     var spinReports = 0
     var spinFreeze: Bool { spinReports > 0 && presentsCounted == true && presentsLast > 0 && presentsFlat >= 2 }
+    /// madeira-bcd (round 630, agent T1 S25; Eiyuden Chronicle with BepInEx C2698Z, the Baldur's Gate 3 launcher YZ6WCQ): a [spin] look (a
+    /// thread calling the same ntdll function millions of times a second) and the Dock's frame counter at 0 for five readings in a row (two
+    /// minutes): no frame ever came. Scored by the player's button before (ran, hung or inconclusive for the same freeze).
+    var spinNoFrames: Bool { spinReports > 0 && presentsCounted == true && presentsLast == 0 && presentsFlat >= 4 }
     var spinFreezeAtQuit = false
     /// madeira-bcd (round 624, RETRO-2 RQ3, Ghost of Tsushima JKJA9Q): the last error exit of a program of the session came after a frame had
     /// been seen (the game itself failing), not before the first frame (a helper such as crs-video.exe ending with an error while the game loads).
@@ -292,11 +324,17 @@ final class AutoTuneLogScanner {
     /// The first line that matched each signal (at most 24 lines, 240 bytes each).
     private(set) var evidence: [String] = []
     private let needles: [[[UInt8]]]
+    /// madeira-bcd (round 630): the signals marked sinceLaunch, whose counts start again at each game launch.
+    private let sinceLaunch: [Int]
+    /// Whether a signal's first line is already in `evidence` (a count that starts again does not add a second line).
+    private var evidenced: [Bool]
     private var carry: [UInt8] = []
 
     init(signals: [AutoTuneSignal]) {
         needles = signals.map { $0.has.map { Array($0.utf8) } }
         counts = Array(repeating: 0, count: signals.count)
+        sinceLaunch = signals.indices.filter { signals[$0].sinceLaunch == true }
+        evidenced = Array(repeating: false, count: signals.count)
     }
 
     /// Streams the whole file. bcd-log.txt holds one app run, which runs one Wine
@@ -355,9 +393,18 @@ final class AutoTuneLogScanner {
         // The same cut whether the line came whole from one chunk or through `carry`.
         let l = whole.count > Self.maxLine ? UnsafeRawBufferPointer(rebasing: whole[0..<Self.maxLine]) : whole
         guard l.count > 4 else { return }
+        // madeira-bcd (round 630, agents U S6 and G2 S0): the last lines of the previous run, which the app quotes at the top of this log
+        // ("[INFO] [prev-tail] ..." after an unclean end), are that run's, not this session's: no signal and no fact reads them. 21 of the
+        // 177 archive logs with such a block were scored by it (Cult of the Lamb 4DR32H "hung" from the previous run's GPU errors; Mina
+        // the Hollower W6PACT matched metal-texture-double-release through it).
+        if Self.find(l, Self.mPrevTail) != nil { return }
+        if !sinceLaunch.isEmpty, Self.find(l, Self.mLibraryLaunch) != nil {
+            for i in sinceLaunch { counts[i] = 0 }
+        }
         for i in needles.indices where Self.hasAll(l, needles[i]) {
             counts[i] += 1
-            if counts[i] == 1 && evidence.count < 24 {
+            if !evidenced[i] && evidence.count < 24 {
+                evidenced[i] = true
                 evidence.append(String(decoding: l.prefix(240), as: UTF8.self))
             }
         }
@@ -370,6 +417,23 @@ final class AutoTuneLogScanner {
             guard let hit = memmem(base, l.count, n.baseAddress!, n.count) else { return nil }
             return UnsafeRawPointer(hit) - base
         }
+    }
+
+    /// madeira-bcd (round 630): the thread of an "E <hex> ..." line (FEX's log prefix), if the line starts so.
+    private static func leadingThread(_ l: UnsafeRawBufferPointer) -> UInt64? {
+        guard l.count > 3, l[0] == 0x45, l[1] == 0x20 else { return nil }
+        var i = 2, value: UInt64 = 0, digits = 0
+        while i < l.count, digits < 8 {
+            let c = l[i], d: UInt64
+            if c >= 0x30 && c <= 0x39 { d = UInt64(c - 0x30) }
+            else if c >= 0x61 && c <= 0x66 { d = UInt64(c - 0x61 + 10) }
+            else if c >= 0x41 && c <= 0x46 { d = UInt64(c - 0x41 + 10) }
+            else { break }
+            value = value * 16 + d
+            digits += 1
+            i += 1
+        }
+        return digits > 0 && i < l.count && l[i] == 0x20 ? value : nil
     }
 
     private static func hasAll(_ l: UnsafeRawBufferPointer, _ list: [[UInt8]]) -> Bool {
@@ -425,6 +489,22 @@ final class AutoTuneLogScanner {
     /// The fast sampler's line ("[footprint] rev=ml1060 fast phys=N MB"): near the limit it is written more often than the
     /// ml358 census, so a kill's last reading is often only there (Miles Morales V4JGSJ: 8154 MB fast vs 7975 MB census).
     private static let mFootprintFast = Array("[footprint] rev=ml1060 fast phys=".utf8)
+    /// madeira-bcd (round 630, agent T2 S11; ZPN4G0, DYD7EN): the same physical footprint, fresher than the [footprint] lines (every
+    /// 2-3 s): a burst ("phys=") and the per-300-ms counters ("fpMB="). Not from a previous session's tail.
+    private static let mMemBurst = Array("[mem-burst] rev=624 +".utf8)
+    private static let mPhysEq = Array(" phys=".utf8)
+    private static let mXpLine = Array("[xp] ".utf8)
+    private static let mFpMB = Array(" fpMB=".utf8)
+    private static let mPrevTail = Array("[prev-tail]".utf8)
+    private static let mLibraryLaunch = Array("[bcd] library launch ".utf8)
+    /// madeira-bcd (round 630, agent T2 S7): the owner of a stuck FEX lock ("| owner teb=... tid=0024").
+    private static let mOwnerTid = Array("| owner teb=".utf8)
+    private static let mTidEq = Array(" tid=".utf8)
+    /// madeira-bcd (round 630, agent T2 S12): "[swap] ml1077 stats: ... coverage broad: disk N MB of C cap, ..., disk-full refusals R".
+    private static let mSwapStats = Array("[swap] ml1077 stats".utf8)
+    private static let mSwapDisk = Array("coverage broad: disk ".utf8)
+    private static let mSwapOfCap = Array(" MB of ".utf8)
+    private static let mSwapRefusals = Array("disk-full refusals ".utf8)
     private static let mPeak = Array("(peak ".utf8)
     private static let mQuit = Array("[frontend] graceful close requested".utf8)
     private static let mReturned = Array("[frontend] returned to library".utf8)
@@ -451,6 +531,8 @@ final class AutoTuneLogScanner {
     private static let mX18Zero = Array(" x18=0x0 ".utf8)
     private static let mDetachWait = Array("detach-wait: presents=".utf8)
     private static let mLaunchView = Array("[launch-view] dismissed reason=".utf8)
+    private static let mLaunchViewGameWindow = Array("[launch-view] dismissed reason=game-window".utf8)
+    private static let mSteamErrorReporterGate = Array("(steamerrorreporter gate)".utf8)
     private static let mCoverByPresent = Array("dismissed reason=present".utf8)
     private static let mDeviceError = Array("Device error at frame".utf8)
     /// madeira-bcd (round 624, Rise of the Tomb Raider): the game's own message (mirrored by [guest-log]) that its swapchain could not be
@@ -550,10 +632,33 @@ final class AutoTuneLogScanner {
             facts.lastFootprintMB = Int(v)
             facts.lastFootprintFast = true
             facts.peakFootprintMB = max(facts.peakFootprintMB ?? 0, Int(v))
+        } else if let v = S.find(l, S.mMemBurst) != nil ? S.number(l, after: S.mPhysEq)
+                        : S.find(l, S.mXpLine) != nil ? S.number(l, after: S.mFpMB) : nil, v >= 64 {
+            // madeira-bcd (round 630, agent T2 S11): a fresher sample of the same footprint, as the fast sampler's; a [footprint] line
+            // after it takes over again. ZPN4G0 ended 6649 MB (burst) of 6656 when the last [footprint] said 6330; DYD7EN 8076 (fpMB) of
+            // 8191 against 7671: both "killed" now, and the swap rules can answer.
+            facts.lastFootprintMB = Int(v)
+            facts.lastFootprintFast = true
+            facts.peakFootprintMB = max(facts.peakFootprintMB ?? 0, Int(v))
+        }
+        if let at = S.find(l, S.mSwapStats) {
+            let tail = UnsafeRawBufferPointer(rebasing: l[at...])
+            if let d = S.find(tail, S.mSwapDisk) {
+                let rest = UnsafeRawBufferPointer(rebasing: tail[d...])
+                facts.swapDiskMB = S.number(rest, after: S.mSwapDisk).map { Int($0) }
+                facts.swapCapMB = S.number(rest, after: S.mSwapOfCap).map { Int($0) }
+                facts.swapDiskRefusals = S.number(rest, after: S.mSwapRefusals).map { Int($0) }
+            }
         }
         if S.find(l, S.mQuit) != nil {
             if !facts.quitRequested {
-                facts.crashEvidenceAtQuit = facts.crashEvidence
+                // madeira-bcd (round 630, agent T1 S30; Marvel's Spider-Man: Miles Morales 569HA2): a helper's error exit before the first frame
+                // (crs-video.exe, c0000135) in a session that reached stage 4 is not the game's crash at the quit either; outcome() already
+                // exempts it (helperExitOnly), the quit's snapshot did not, and 13.6 minutes at 49 FPS were scored "hung".
+                let helperOnlyNow = facts.errorExits > 0 && facts.frameSeen && facts.stage >= 4 && !facts.lastErrorExitAfterFrame
+                // round 630 (agent O2 S6): nor the Dock's Steam client crashing before the game's window came up
+                let beforeWindowNow = facts.gameWindowSeen ? facts.unhandledBeforeWindow + (helperOnlyNow ? 0 : facts.errorExitsBeforeWindow) : 0
+                facts.crashEvidenceAtQuit = facts.crashEvidence - (helperOnlyNow ? facts.errorExits : 0) - beforeWindowNow
                 facts.launcherErrorBeforeQuit = facts.launcherErrors > 0
                 facts.lockFreezeAtQuit = facts.lockFreeze
                 facts.spinFreezeAtQuit = facts.spinFreeze
@@ -580,7 +685,14 @@ final class AutoTuneLogScanner {
         if S.find(l, S.mLauncherError) != nil { facts.launcherErrors += 1 }
         if S.find(l, S.mFreeze) != nil { facts.freezeGaps += 1 }
         if S.find(l, S.mMainStall) != nil { facts.mainStalls += 1 }
-        if S.find(l, S.mFexlockStuck) != nil { facts.fexlockStuck += 1 }
+        if S.find(l, S.mFexlockStuck) != nil {
+            facts.fexlockStuck += 1
+            // madeira-bcd (round 630, agent T2 S7): the line's own thread ("E 24 [fexlock] ...") is the owner it waits for.
+            if let owner = S.find(l, S.mOwnerTid).flatMap({ S.number(UnsafeRawBufferPointer(rebasing: l[$0...]), after: S.mTidEq, hex: true) }),
+               let me = S.leadingThread(l), owner == me {
+                facts.fexlockSelfWait += 1
+            }
+        }
         if S.find(l, S.mSpinLook) != nil { facts.spinReports += 1 }
         if S.find(l, S.mMachUnhandled1) != nil, S.find(l, S.mX18Zero) != nil { facts.machFaultNoTeb += 1 }
         if !facts.cleanMainExit, S.find(l, S.mSwapChainFail) != nil { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
@@ -599,6 +711,14 @@ final class AutoTuneLogScanner {
             if v >= 600 { facts.stage = max(facts.stage, 4) }   // about 20 s of frames
         }
         if facts.stage < 3, S.find(l, S.mLaunchView) != nil { facts.stage = 3 }
+        if !facts.steamClientCrashSeen, S.find(l, S.mSteamErrorReporterGate) != nil { facts.steamClientCrashSeen = true }
+        if !facts.gameWindowSeen, facts.dock, S.find(l, S.mLaunchViewGameWindow) != nil {
+            facts.gameWindowSeen = true
+            if facts.steamClientCrashSeen {
+                facts.unhandledBeforeWindow = facts.unhandled
+                facts.errorExitsBeforeWindow = facts.errorExits
+            }
+        }
         if S.find(l, S.mLaunchView) != nil, S.find(l, S.mCoverByPresent) != nil { facts.frameSeen = true }
         if S.find(l, S.mDeviceError) != nil { facts.gpuErrors += 1 }
         if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
@@ -672,6 +792,9 @@ struct AutoTuneReport: Codable, Equatable {
     /// madeira-bcd (round 624): the free storage in whole GB at the session's start (AutoTuneLogFacts.freeDiskGB); a swap attempt is sized to
     /// it. Optional, so that a saved state without it still loads.
     var freeDiskGB: Int?
+    /// madeira-bcd (round 630, agent T2 S12): whether the swap file reached its cap (AutoTuneRule.swapCapHit); nil when the log has no
+    /// stats line with the cap. Optional, so that a saved state without it still loads.
+    var swapCapHit: Bool?
 
     var failed: Bool { ["crashed", "killed", "hung", "exited-early"].contains(outcome) }
     var played: Bool { outcome == "ran" || outcome == "quit" }
@@ -697,8 +820,11 @@ enum AutoTuneEngine {
         // (crs-video.exe, c0000135), in a session that went on to draw and reached stage 4, is a helper, not the game's crash. An error exit after
         // a frame (the game itself failing) still counts, and so do an unhandled exception, a runtime-error box and an exit report.
         let helperExitOnly = f.errorExits > 0 && f.frameSeen && f.stage >= 4 && !f.lastErrorExitAfterFrame
-        let errorExitsEff = helperExitOnly ? 0 : f.errorExits
-        let crashedInLog = f.unhandled > 0 || f.runtimeErrorDialog || f.exitStatus != nil || errorExitsEff > 0
+        let errorExitsEff = helperExitOnly ? 0 : f.errorExits - (f.gameWindowSeen ? f.errorExitsBeforeWindow : 0)
+        // madeira-bcd (round 630, agent O2 S6; N6EG31, X8FMD9): in a Dock session whose game window came up, an unhandled exception before
+        // that window (the Dock's Steam client, not the game) is not the game's crash.
+        let unhandledEff = f.gameWindowSeen ? f.unhandled - f.unhandledBeforeWindow : f.unhandled
+        let crashedInLog = unhandledEff > 0 || f.runtimeErrorDialog || f.exitStatus != nil || errorExitsEff > 0
             || (!f.dialogs.isEmpty && f.stage < 4) || (f.dock && f.steamNotFound && !f.dialogs.isEmpty) || launcherFailed
         // madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): the game drew 3474 frames, then the Dock's counter stayed at that number for
         // 5 minutes while a thread waited for a FEX lock it owned; the player closed the frozen game, and "quit after playing" (and "ran") hid
@@ -710,7 +836,9 @@ enum AutoTuneEngine {
             // madeira-bcd (round 624, Cult of the Lamb VHRFNE): "I closed it" after a minute of nothing on screen, with a thread waiting
             // for a BCD lock it owns itself ("[fexlock] STUCK write-wait") and no frame ever drawn, is not a player leaving a game that
             // works: keep the evidence (the Dock's frame counter is there, it stayed at 0, nothing crashed or was quit).
-            let frozenWithoutFrames = f.fexlockStuck > 0 && f.presentsCounted == true && f.presentsLogged == 0 && !crashedInLog && !f.quitRequested
+            // Round 630 (agent T1 S25): a spin with no frame in two minutes is the same freeze.
+            let frozenWithoutFrames = (f.fexlockStuck > 0 || f.spinNoFrames) && f.presentsCounted == true && f.presentsLogged == 0 && !crashedInLog
+                && !f.quitRequested
             if end.userSaid == "i-closed" { return frozenWithoutFrames || (frozeLocked && !crashedInLog) ? "hung" : "inconclusive" }
             // madeira-bcd (round 591): the user asked a game that was playing to close ("graceful close requested" after the Dock counted frames
             // for 20 s or more), and the app was killed before it came back to the library: the game played, and the end is the app's, not a hang
@@ -730,10 +858,12 @@ enum AutoTuneEngine {
             // froze" scored it "hung" with no rule. Only below stage 4, with no freeze, GPU error, crash or quit, the newest footprint line the
             // fast sampler's at 80 % of the limit or more and 1.4 times the last slow line (a burst, not a plateau): 5 of 2,270 archive logs,
             // of which only these two change (the other three were already "killed").
+            // Round 630 (agent G2 S19; Pseudoregalia NCKW9M, build 626: 78.2 % of the limit, 1.92 times the slow line, then the session
+            // was gone): 75 %. A burst that steep is still climbing when the sampler (250 ms) last sees it.
             if f.stage <= 3, f.freezeGaps == 0, f.gpuErrors == 0, !f.quitRequested, !crashedInLog,
                let last = f.lastFootprintMB, let slow = f.lastSlowFootprintMB, f.lastFootprintFast,
                let limit = end.limitMB ?? f.limitMB, limit >= 2048,
-               last * 100 >= limit * 80, last * 10 >= slow * 14 { return "killed" }
+               last * 100 >= limit * 75, last * 10 >= slow * 14 { return "killed" }
             if end.userSaid == "froze" || f.freezeGaps > 0 || f.gpuErrors > 0 || frozeLocked
                 || (f.quitRequested && !f.returnedToLibrary) { return "hung" }
             // madeira-bcd 578 (lead, from ajan6-mm): a session killed at the memory limit whose only crash evidence is
@@ -781,7 +911,10 @@ enum AutoTuneEngine {
         // madeira-bcd (round 624, R.E.P.O. AJ7RNE): a thread waited for a FEX lock forever ("[fexlock] STUCK write-wait") and the Dock's frame
         // counter stayed at 0 for 6.5 minutes, yet the stage the clock raises (5 after five minutes) scored the session "ran, ok" and auto-tune
         // tried nothing. Only with the Dock's counter (a game that draws without it keeps the old rule, round 580) and no crash evidence.
-        if f.fexlockStuck > 0 && f.presentsCounted == true && f.presentsLogged == 0 && crashStatus == nil && !crashedInLog { return "hung" }
+        // Round 630 (agent T1 S25; C2698Z, YZ6WCQ): or a spin with no frame in two minutes.
+        if (f.fexlockStuck > 0 || f.spinNoFrames) && f.presentsCounted == true && f.presentsLogged == 0 && crashStatus == nil && !crashedInLog {
+            return "hung"
+        }
         // madeira-bcd (round 624, Farming Simulator 22 on Discord): a host fault in a thread with no TEB that nothing handled, and the Dock's frame
         // counter at 0 for a session that stayed alive two minutes or more (695 s): the game's process stopped there; the clock's stage 5 scored it
         // "ran". A session that ended soon after such a fault (MGS Ground Zeroes PFDA0D, 73 s; The Swapper 6AJPF0) keeps "exited-early".
@@ -829,11 +962,15 @@ enum AutoTuneEngine {
         if let last = f.lastFootprintMB, let limit = end.limitMB ?? f.limitMB ?? f.availableMB.map({ $0 + 256 }), limit > 0 {
             memoryPct = last * 100 / limit
         }
+        // madeira-bcd (round 630, agent T2 S12): the swap file reached its cap when the last stats line counts a disk-full refusal or a disk
+        // use of 90 % of the cap or more; nil without a stats line that names the cap.
+        var swapCapHit: Bool?
+        if let cap = f.swapCapMB, cap > 0, let disk = f.swapDiskMB { swapCapHit = (f.swapDiskRefusals ?? 0) > 0 || disk * 10 >= cap * 9 }
         let r = AutoTuneReport(outcome: out, stage: stage, seconds: max(end.seconds, Double(f.aliveSeconds)),
                                presents: presents, peakMB: f.peakFootprintMB, dock: f.dock,
                                d3d12: f.d3d12, ramMB: f.ramMB, matched: [], evidence: scanner.evidence,
                                dialogs: f.dialogs, build: f.build, jitImageFailMB: f.jitImageFailMB, fixedExeMB: f.fixedExeMB,
-                               memoryPct: memoryPct, freeDiskGB: f.freeDiskGB)
+                               memoryPct: memoryPct, freeDiskGB: f.freeDiskGB, swapCapHit: swapCapHit)
         var report = r
         if f.monoMissing && report.failed { report.monoMissing = true }
         report.matched = rules.filter { matches($0, report: r, counts: scanner.counts, signals: signals) }
@@ -855,7 +992,8 @@ enum AutoTuneEngine {
         var seen = Set<AutoTuneSignal>(), list: [AutoTuneSignal] = []
         for r in rules {
             for s in r.all + (r.any ?? []) + (r.none ?? []) {
-                let plain = AutoTuneSignal(has: s.has)
+                // The count is the rule's own threshold; sinceLaunch changes what is counted, so it is part of the signal (round 630).
+                let plain = AutoTuneSignal(has: s.has, sinceLaunch: s.sinceLaunch)
                 if seen.insert(plain).inserted { list.append(plain) }
             }
         }
@@ -865,11 +1003,12 @@ enum AutoTuneEngine {
     static func matches(_ rule: AutoTuneRule, report: AutoTuneReport, counts: [Int],
                         signals: [AutoTuneSignal]) -> Bool {
         func seen(_ s: AutoTuneSignal) -> Bool {
-            guard let i = signals.firstIndex(of: AutoTuneSignal(has: s.has)) else { return false }
+            guard let i = signals.firstIndex(of: AutoTuneSignal(has: s.has, sinceLaunch: s.sinceLaunch)) else { return false }
             return counts[i] >= (s.count ?? 1)
         }
         // madeira-bcd (round 624, RETRO-2 RQ1): a noFix rule marked evaluateWhenRan also speaks for a session scored ran/quit.
-        let ranRule = rule.evaluateWhenRan == true && rule.noFix == true && report.played
+        // 2026-11-01 (Messiah 9ACRYW): so does a fixedIn rule marked evaluateWhenRan (a start that ends nothing, no crash).
+        let ranRule = rule.evaluateWhenRan == true && (rule.noFix == true || rule.fixedIn != nil) && report.played
         guard report.failed || ranRule else { return false }
         if rule.ranOnly == true && !ranRule { return false }
         if !ranRule, let o = rule.outcomes, !o.contains(report.outcome) { return false }
@@ -883,6 +1022,7 @@ enum AutoTuneEngine {
         if let hi = rule.exeMaxMB, let exe = report.fixedExeMB, exe > hi { return false }
         if let lo = rule.exeMinMB, (report.fixedExeMB ?? 0) < lo { return false }
         if let lo = rule.memoryMinPct, let pct = report.memoryPct, pct < lo { return false }
+        if rule.swapCapHit == true, report.swapCapHit == false { return false }
         guard !rule.all.isEmpty, rule.all.allSatisfy(seen) else { return false }
         if let any = rule.any, !any.isEmpty, !any.contains(where: seen) { return false }
         if let none = rule.none, none.contains(where: seen) { return false }
@@ -1067,12 +1207,13 @@ extension AutoTuneEngine {
         // madeira-bcd (round 624, RETRO-2 RQ1): a session that looked played, with nothing kept, whose log carries the signals of a noFix rule
         // marked evaluateWhenRan: say what it was ("known") instead of "it played without changes". Nothing is tried.
         if report.played, s.kept.isEmpty,
-           let rule = report.matched.lazy.compactMap({ id in rules.first { $0.id == id } }).first(where: { $0.evaluateWhenRan == true && $0.noFix == true }) {
+           let rule = report.matched.lazy.compactMap({ id in rules.first { $0.id == id } })
+               .first(where: { $0.evaluateWhenRan == true && ($0.noFix == true || $0.fixedIn != nil) }) {
             s.status = "known"
             s.known = rule.id
             s.knownReason = rule.reason
-            s.knownFixedIn = nil
-            s.knownNoFix = true
+            s.knownFixedIn = rule.noFix == true ? nil : rule.fixedIn   // 2026-11-01: a fixedIn rule names its build
+            s.knownNoFix = rule.noFix == true ? true : nil
             s.knownBuild = report.build
             s.candidate = nil
             s.candidateRule = nil

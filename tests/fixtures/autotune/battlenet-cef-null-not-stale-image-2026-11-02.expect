@@ -1,0 +1,19 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": false
+ },
+ "matched": [
+  "winmm-devices-thread-no-message-class",
+  "thread-registry-full",
+  "lse-atomic-store-undecoded",
+  "x86-null-fault-diag"
+ ],
+ "next": [
+  "env.MADEIRA_MESSAGE_CLASS = 1"
+ ],
+ "note": "Round 630 (agent A2 S1): Battle.net's 32-bit CEF helper read NULL+7 after the Microsoft sign-in hand-off; the log has the three generic lines of fex-exports-stale-image-read (a BUS->AV line, a DELETED image view, unmapped images) but not the resolver in the fault report, so that fixed-in-626 rule must not answer (it said 'the fix failed'). Send Log 6KW9QM, build 626. Round 630: lse-atomic-store-undecoded and x86-null-fault-diag also match here, last (the lowest-priority rules; the verdict is unchanged).",
+ "outcome": "crashed",
+ "stage": 5,
+ "status": "trying"
+}

@@ -97,6 +97,14 @@ func require(_ condition: @autoclosure () -> Bool, _ label: String) {
         let grid = "0024:err:module:loader_init \"other.dll\" failed to initialize, aborting\n0024:err:module:loader_init \"steam_api.dll\" failed to initialize, aborting\n"
         require(X.failedLibrary(inTail: grid) == "steam_api.dll", "GRID 2 (26MVCW): the last library whose start failed")
         require(X.failedLibrary(inTail: "loader_init \"x.dll\" is fine\n") == nil && X.failedLibrary(inTail: "") == nil, "no such line: no name")
+        // Round 630 (agent G3 S19; RVW5FD): the function of Wine's stub end, and the words.
+        let stub = "wine: Call from 0000000140F5B5B9 to unimplemented function COMCTL32.dll.345, aborting\n"
+        require(X.unimplementedFunction(inTail: "x\n" + stub + "y\n") == "COMCTL32.dll.345", "the stub's function")
+        require(X.unimplementedFunction(inTail: "") == nil && X.unimplementedFunction(inTail: " to unimplemented function " + String(repeating: "a", count: 200) + ", aborting") == nil,
+                "no line, or an overlong name: none")
+        require(X.stubAbort("COMCTL32.dll.345").contains("(COMCTL32.dll.345: the game's own error message box)")
+                && X.stubAbort("d3dx9_43.dll.X").contains("(d3dx9_43.dll.X).") && X.stubAbort(nil).hasPrefix("The game quit with Windows error 0x80000100"),
+                "0x80000100 words with and without the name")
         require(X.libraryStart("steam_api.dll") == "The game quit with Windows error 0xC0000142 (a program library failed to start). Windows could not "
                 + "start steam_api.dll. To report the problem, export the diagnostic log.", "0xC0000142 with the name")
         require(X.libraryStart(nil) == "The game quit with Windows error 0xC0000142 (a program library failed to start). To report the problem, "

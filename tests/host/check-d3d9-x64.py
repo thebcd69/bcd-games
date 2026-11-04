@@ -174,7 +174,11 @@ check("no-more-room-in-hell: the line is from build 598 only, after the standard
       _nm["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}] and _nm["version"] == 1)
 for _id in ("pico-park", "dont-starve-together", "a-hat-in-time"):
     r_ = next(r for r in recs["rules"] if r["id"] == _id)
-    check(f"{_id}: the line is from build 602 only, after the standard line", r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 602}] and r_["version"] == 1)
+    # round 630 (agent A1 S9): Don't Starve Together v2 also skips DirectX's setup in its one-time installs, from build 626
+    extra = [{"line": "env.MADEIRA_DOCK_INSTALL_SKIP = directx", "minBuild": 626}] if _id == "dont-starve-together" else []
+    check(f"{_id}: the line is from build 602 only, after the standard line",
+          r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 602}] + extra
+          and r_["version"] == (2 if extra else 1))
 for _id in ("mudrunner", "indivisible"):
     r_ = next(r for r in recs["rules"] if r["id"] == _id)
     check(f"{_id}: the line is from build 598 only, after the standard line", r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}])
@@ -198,7 +202,8 @@ others = [r["id"] for r in recs["rules"] if r["id"] not in ("darksiders-ii-death
                                                            "pico-park", "dont-starve-together", "a-hat-in-time",
                                                            "grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2",   # these four and red-faction: env.MADEIRA_D3D8 = d3d9
                                                            "red-faction", "no-more-room-in-hell", "outlast",
-                                                           "fallout-3")   # round 624: Fallout 3 carries New Vegas's D3D9 last-calls ring
+                                                           "fallout-3",   # round 624: Fallout 3 carries New Vegas's D3D9 last-calls ring
+                                                           "goldsrc-hl-exe")   # round 630 (O3 S14): the Half-Life engine's last-calls ring
           and "d3d9" in json.dumps(r["config"]).lower()]
 check("no other list names d3d9 (the Direct3D 9 default of build 602 comes from the game's folder, BCDGraphicsDefaults.swift, not from a list)", others == [])
 print("note: the list's own version is not bumped here (the release does it); the rule's lines carry minBuild 595, so older builds skip it")

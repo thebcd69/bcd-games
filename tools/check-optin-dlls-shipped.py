@@ -19,6 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LINE = re.compile(r'env\.MADEIRA_OPTIN_DLLS\s*=\s*(.+)$')
+# Round 630 (agent G2 S18): a name the app provides as a link to a DLL BCD already ships, not as <name>-optin.dll
+# (WineProcessBridge.m: a game that lists dbgcore gets dbgcore.dll -> arm64ec-windows/dbghelp.dll). For these the shipped
+# target is what must be in DIR.
+LINKED = {'dbgcore': 'dbghelp.dll'}
 
 
 def wanted(recs_path, rules_path):
@@ -46,9 +50,14 @@ def wanted(recs_path, rules_path):
     return names
 
 
+def shipped_as(name):
+    """The file in DIR that provides an opt-in name: <name>-optin.dll, or the shipped DLL the app links it to."""
+    return LINKED.get(name, name + '-optin.dll')
+
+
 def missing(folder, names):
     have = {p.name.lower() for p in Path(folder).iterdir()} if Path(folder).is_dir() else set()
-    return {n: who for n, who in names.items() if n + '-optin.dll' not in have}
+    return {n: who for n, who in names.items() if shipped_as(n).lower() not in have}
 
 
 if __name__ == '__main__':
@@ -59,7 +68,7 @@ if __name__ == '__main__':
     names = wanted(recs, rules)
     gone = missing(sys.argv[1], names)
     for n, who in sorted(gone.items()):
-        print('::error::%s-optin.dll is not in %s, but %s name it in env.MADEIRA_OPTIN_DLLS' % (n, sys.argv[1], ', '.join(sorted(who))))
+        print('::error::%s is not in %s, but %s name %s in env.MADEIRA_OPTIN_DLLS' % (shipped_as(n), sys.argv[1], ', '.join(sorted(who)), n))
     if gone:
         sys.exit(1)
     print('opt-in DLLs: all %d named by the lists and auto-tune rules ship (%s)' % (len(names), ', '.join(sorted(names))))

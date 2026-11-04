@@ -1,0 +1,134 @@
+[21:21:53.997] [INFO] Checking entitlements...
+[21:21:53.998] [INFO] [build] v0.1.626 (626)
+[21:21:53.998] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6123MB cores=6
+[21:21:53.998] [INFO] [device] address-map=[0x1002f8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[21:21:54.012] [INFO] [device] settings: low-power=0 thermal=fair screen=1290x2796@3.0x max-fps=120 utc-offset=+08:00 free-disk=84GB stikdebug-url=1
+[21:21:54.017] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:21:55.499] [INFO] [bcd] library launch DOA6LR.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[21:21:55.519] [INFO] Running full Wine sequence...
+[21:21:55.519] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1002f8000,0x8000000000) 512GB available=6112MB low-power=0 thermal=fair
+[21:21:55.520] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[21:21:55.529] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[21:21:55.529] [INFO] Allocating 896MB JIT pool via debugger...
+[21:21:55.529] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:21:55.530] [INFO] [jit-debugger] attached=1 at the pool request
+[21:21:55.532] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:21:58.361] [INFO] RX pool at 0x148000000
+[21:21:58.412] [INFO] Detaching debugger...
+[21:21:58.420] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.930s rev=ml526
+[21:21:58.459] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/d7d55d66089437ac.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[21:21:58.804] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[21:21:58.804] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[21:21:58.804] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5475 MB + phys_footprint=668 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: map_image_view size=0x8ae3000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0x8ae3000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x8ae4000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x11ccb0000+0x8ae3000 (DOA6LR.exe) → pool 0x148004000 used=0x8ae8000/0x27000000 tramp+0x0
+[copy-verify] DOA6LR.exe: OK, 4190 .text pages executable (copy @0x148004000)
+[window] 0x11cab0000..0x7817000000 regions=80025 occupied=462371 MB of 487333 MB free=24962 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=946 MB (peak 946) internal=945 MB compressed=0 MB external=66 MB reusable=0 MB (cycle=1)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x150ae8000 used=0x8c20000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x150ae8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x150c22000 used=0x9042000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x150c22000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x151040000 used=0x9174000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x151040000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x151174000 used=0x923c000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x151174000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x15123c000 used=0x953c000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x15123c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module DOA6LR.exe (doa6lr.exe-9b47da5580c0530c): 11CCB0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FE2D0000
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FE220000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FE1A0000
+D 24 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FE090000
+[copy-verify] propsys.dll: OK, 3 .text pages executable (copy @0x1527b0000)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x152854000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x152908000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x15298c000)
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x153311000)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"XINPUTUAP.dll" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"XINPUTUAP.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library XINPUTUAP.dll (which is needed by L"C:\\Program Files (x86)\\Games\\DOA6\\DOA6LR.exe") not found
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x154884000)
+[jit-pool] image 0x71fa820000+0x160000 (opengl32.dll) → pool 0x154fc8000 used=0xd12c000/0x27000000 tramp+0x4000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71FA820000
+[valloc] ml959 # base=0x7c004d1000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c004d1000 zero_bits=0x0 limit=0x0
+[jit-pool] image 0x71f95a0000+0x1274000 (dxcompiler.dll) → pool 0x15512d000 used=0xe3a5000/0x27000000 tramp+0x0
+D 24 Load module dxcompiler.dll (dxcompiler.dll-261ebc19d4096d85): 71F95A0000
+[valloc] ml959 # base=0x7c005b0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c005b0000 zero_bits=0x0 limit=0x0
+[jit-pool] image 0x71f94d0000+0xd0000 (mfplat.dll) → pool 0x1563a4000 used=0xe478000/0x27000000 tramp+0x4000
+D 24 Load module MFPlat.DLL (mfplat.dll-d7c9f54ea3dcd997): 71F94D0000
+[jit-pool] image 0x71f9450000+0x80000 (rtworkq.dll) → pool 0x156478000 used=0xe4fc000/0x27000000 tramp+0x4000
+D 24 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71F9450000
+[jit-pool] image 0x71f93b0000+0xa0000 (mfreadwrite.dll) → pool 0x1564fc000 used=0xe5a0000/0x27000000 tramp+0x4000
+D 24 Load module MFReadWrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F93B0000
+[jit-pool] image 0x71f92f0000+0xc0000 (xaudio2_9.dll) → pool 0x1565a0000 used=0xe664000/0x27000000 tramp+0x4000
+[vfree] ml842 # base=0x7c004d1000 size=0xf000 type=0x4000 tid=0024
+[valloc] ml959 # base=0x7c004d1000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c004d1000 zero_bits=0x0 limit=0x0
+D 24 Load module XAudio2_9.dll (xaudio2_9.dll-b31aa379071159e6): 71F92F0000
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[jit-pool] anon RWX 0x7028180000 size=0x10000 → used=0xe674000/0x27000000 NEW off=0xe664000 tid=0024 peb=0x71ffff0000 rev=ml625
+[valloc] ml959 # base=0x7028180000 size=0x10000 type=0x3000 prot=0x40 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+0024:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Games\\DOA6\\DOA6LR.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=698
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[21:21:59.518] [INFO] [session] length=4s play=0s frames=0 stalls=0/0s peak=1104MB limit=6143MB thermal=fair lpm=0 api=D3D11/D3D12/Vulkan/64 res=1424x656 cap=60 game=DOA6LR
+[21:21:59.522] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[xp] 21:21:59.576 +0.60 dt=322 cpu=292 (thr 140) P=223 E=69 run=286 pgw=-1.0 GHz P=3.36 E=1.43 Minst=3333 IPC=3.93 mJ=559 pin=486 rdKB=27008 fpMB=1106
+[xp] 21:21:59.889 +0.91 dt=313 cpu=399 (thr 395) P=87 E=313 run=423 pgw=-1.0 GHz P=3.44 E=1.45 Minst=2566 IPC=3.41 mJ=322 pin=1 rdKB=108 fpMB=1111
+[xp] 21:22:00.200 +1.23 dt=312 cpu=317 (thr 318) P=5 E=312 run=321 pgw=-1.0 GHz P=3.38 E=1.52 Minst=1714 IPC=3.49 mJ=68 pin=0 rdKB=0 fpMB=1111
+[xp] 21:22:00.477 +1.50 dt=277 cpu=280 (thr 280) P=3 E=277 run=282 pgw=-1.0 GHz P=3.33 E=1.35 Minst=1320 IPC=3.45 mJ=47 pin=0 rdKB=0 fpMB=1111
+[xp] 21:22:00.795 +1.82 dt=318 cpu=325 (thr 325) P=3 E=322 run=322 pgw=-1.0 GHz P=3.18 E=1.35 Minst=1564 IPC=3.54 mJ=54 pin=0 rdKB=0 fpMB=1111
+[footprint] rev=ml358 phys=1113 MB (peak 1113) internal=1112 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=2)
+[xp] 21:22:01.058 +2.08 dt=263 cpu=378 (thr 377) P=108 E=270 run=384 pgw=-1.0 GHz P=3.77 E=1.35 Minst=2362 IPC=3.07 mJ=337 pin=0 rdKB=0 fpMB=1113
+[21:22:01.472] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1113 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1113 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1113 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1113 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=6)
+[footprint] rev=ml358 phys=1114 MB (peak 1114) internal=1113 MB compressed=0 MB external=121 MB reusable=0 MB (cycle=7)
+[footprint] rev=ml358 phys=1111 MB (peak 1114) internal=887 MB compressed=224 MB external=122 MB reusable=0 MB (cycle=8)
+[freeze] alive t+31s beats=1 gaps=1 iter=59 gen=1 threads=18 resident=700MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1097 MB (peak 1114) internal=576 MB compressed=519 MB external=122 MB reusable=1 MB (cycle=9)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fe49020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1098 MB (peak 1114) internal=577 MB compressed=518 MB external=123 MB reusable=1 MB (cycle=10)
+[footprint] rev=ml358 phys=1102 MB (peak 1114) internal=582 MB compressed=518 MB external=129 MB reusable=1 MB (cycle=11)
+[xp] 21:22:33.627 +34.65 dt=268 cpu=41 (thr 41) P=1 E=40 run=46 pgw=-1.0 GHz P=1.18 E=1.66 Minst=82 IPC=1.22 mJ=6 pin=87 rdKB=1672 fpMB=1102
+[xp] 21:22:33.920 +34.95 dt=293 cpu=37 (thr 37) P=0 E=37 run=44 pgw=-1.0 GHz P=0.00 E=1.58 Minst=83 IPC=1.41 mJ=5 pin=0 rdKB=0 fpMB=1109
+[xp] 21:22:34.247 +35.27 dt=327 cpu=30 (thr 30) P=0 E=30 run=32 pgw=-1.0 GHz P=0.00 E=0.93 Minst=40 IPC=1.46 mJ=2 pin=0 rdKB=0 fpMB=1109
+[xp] 21:22:34.524 +35.55 dt=277 cpu=87 (thr 87) P=30 E=58 run=114 pgw=-1.0 GHz P=1.93 E=1.37 Minst=199 IPC=1.45 mJ=23 pin=0 rdKB=0 fpMB=1109
+[xp] 21:22:34.797 +35.82 dt=273 cpu=43 (thr 43) P=6 E=36 run=66 pgw=-1.0 GHz P=2.27 E=1.55 Minst=93 IPC=1.31 mJ=9 pin=0 rdKB=0 fpMB=1109
+[21:22:34.798] [xp] 21:22:34.797 +35.82 dt=273 cpu=43 (thr 43) P=6 E=36 run=66 pgw=-1.0 GHz P=2.27 E=1.55 Minst=93 IPC=1.31 mJ=9 pin=0 rdKB=0 fpMB=1109

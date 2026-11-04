@@ -724,6 +724,9 @@ enum DockSessionOutcome: String, Sendable {
 /// - `MADEIRA_DOCK_DIRECTX_PROVIDED` (madeira-bcd): a DirectX setup that already failed once in a game is not run
 ///   again; BCD ships the DirectX runtime libraries itself, so its record is written like a finished run's
 ///   (off: it stays pending, as before). A DirectX setup that succeeds is never touched.
+/// - `MADEIRA_DOCK_DIRECTX_FIRST` (madeira-bcd, round 630; off unless set): with DIRECTX_PROVIDED on, DirectX's setup
+///   (isDirectXSetup, whatever the install-script entry is called) is recorded as provided at the FIRST start too, so that start
+///   plays the game instead of running only the one-time installs (it failed in 36 of 41 logged runs: A2 S14).
 /// - `MADEIRA_DOCK_INSTALL_RETRY` (madeira-bcd): installs whose session never started a single program (the app was
 ///   closed first, the session failed to boot) are offered once more at the next start instead of being skipped for good
 ///   (off: they are skipped, as before). A program that failed or never finished stays skipped.
@@ -773,34 +776,55 @@ enum DockInstallers {
 
     /// madeira-bcd: why a .NET Framework setup is held back on a device without Wine Mono (the note and the log).
     nonisolated static let dotNetNeedsMono = "needs Wine Mono; download it in Settings › .NET Framework"
+    /// madeira-bcd (round 630, agent A1 S20; Battlefield V S5F5M3, Mass Effect Legendary Edition 563J50): why the EA app's installer is held
+    /// back on a device without Wine Gecko. It shows a web page; without the HTML engine Wine opened its own download prompt, which sat in
+    /// front of the installer for the rest of the session (2 of 2 such batches), while with it the installer ran on (2 of 2).
+    nonisolated static let eaNeedsGecko = "needs Wine's HTML engine; download it in Settings › HTML engine for installers"
 
     /// madeira-bcd: for a session of one-time installs (the app sets MADEIRA_DOCK_INSTALLS_SESSION),
     /// the game's config file (MADEIRA_CFG_GAME) is replaced by a copy without
     /// `installSessionDroppedKeys`. Returns the keys left out. MADEIRA_DOCK_INSTALL_LAYOUT=0 keeps
-    /// every line.
-    nonisolated static func applyInstallSessionConfig(directory: URL? = MadeiraConfig.gameURL?.deletingLastPathComponent()) -> [String] {
-        guard ProcessInfo.processInfo.environment["MADEIRA_DOCK_INSTALLS_SESSION"] == "1",
-              flag("MADEIRA_DOCK_INSTALL_LAYOUT"),   // 0: a session of one-time installs keeps the game's layout lines
-              let path = ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"], !path.isEmpty,
-              let text = try? String(contentsOfFile: path, encoding: .utf8), let directory else { return [] }
+    /// every line. Round 630 (agent A1 S12): `extra` lines (eaInstallSessionLines) are added to the copy, each only when the game's
+    /// file has no line with its key (the game's own lines win). Returns the keys left out and the lines added.
+    nonisolated static func applyInstallSessionConfig(extra: [String] = [],
+                                                      directory: URL? = MadeiraConfig.gameURL?.deletingLastPathComponent()) -> (dropped: [String], added: [String]) {
+        func key(_ line: String) -> String { line.split(separator: "=", maxSplits: 1).first.map { $0.trimmingCharacters(in: .whitespaces) } ?? "" }
+        guard ProcessInfo.processInfo.environment["MADEIRA_DOCK_INSTALLS_SESSION"] == "1", let directory else { return ([], []) }
+        let layout = flag("MADEIRA_DOCK_INSTALL_LAYOUT")   // 0: a session of one-time installs keeps the game's layout lines
+        guard layout || !extra.isEmpty else { return ([], []) }
+        let path = ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"] ?? ""
+        let text = path.isEmpty ? "" : ((try? String(contentsOfFile: path, encoding: .utf8)) ?? "")
+        guard !path.isEmpty || !extra.isEmpty else { return ([], []) }
         var dropped: [String] = []
-        let kept = text.components(separatedBy: "\n").filter { line in
-            let key = line.split(separator: "=", maxSplits: 1).first.map { $0.trimmingCharacters(in: .whitespaces) } ?? ""
-            guard installSessionDroppedKeys.contains(key) else { return true }
-            dropped.append(key)
+        var kept = text.components(separatedBy: "\n").filter { line in
+            guard layout, installSessionDroppedKeys.contains(key(line)) else { return true }
+            dropped.append(key(line))
             return false
         }
-        guard !dropped.isEmpty else { return [] }
+        let present = Set(kept.map(key).filter { !$0.isEmpty && !$0.hasPrefix("#") })
+        let adding = extra.filter { !present.contains(key($0)) }
+        guard !dropped.isEmpty || !adding.isEmpty else { return ([], []) }
+        if !adding.isEmpty {
+            if kept.last == "" { kept.removeLast() }
+            kept.append("# BCD (this session of one-time installs runs the EA app's installer): its lines from the EA app's entry")
+            kept += adding + [""]
+        }
         let copy = directory.appendingPathComponent("bcd-game-installs.cfg")
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try kept.joined(separator: "\n").write(to: copy, atomically: true, encoding: .utf8)
         } catch {
-            return []
+            return ([], [])
         }
         setenv("MADEIRA_CFG_GAME", copy.path, 1)
-        return dropped
+        return (dropped, adding)
     }
+
+    /// madeira-bcd (round 630, agent A1 S12; EMN1B4 and XMTZMJ: INST-14-1603 after the first custom action, "[apc-requeue] ... dropped, no
+    /// waiting thread"): whether this start's session of one-time installs gets the lines the EA app's installer runs with in BCD's own
+    /// EA app flow (the caller passes them: BCDLauncherSpec.eaInstallerSessionLines; env.MADEIRA_APC_BUSY_QUEUE = 1 is the one for this
+    /// wall). Every such batch failed so far (Wine Gecko's prompt, then 1603). MADEIRA_DOCK_EA_SESSION=0: none.
+    static var eaInstallSession: Bool { runsEAAppInstaller && flag("MADEIRA_DOCK_EA_SESSION") }
     /// This start's batch, in batch order (the result lines refer to a program by its place): poll names a failed
     /// program's file type from it. Empty for a start without installs.
     private static var sessionPrograms: [SteamInstallProcess] = []
@@ -1088,6 +1112,7 @@ enum DockInstallers {
     static func prepare(_ game: DockGame, drive: URL, prefix: URL, others: [DockGame] = [],
                         has32Bit: Bool = DockInstallers.bundleHas32Bit, hasMsiexec: Bool = DockInstallers.bundleHasMsiexec,
                         hasWineMono: Bool = WineMonoModel.available,
+                        hasGecko: Bool = true,   // round 630 (A1 S20): the caller passes BCDGeckoFiles.ready; true holds nothing back
                         fusionSource: URL? = Bundle.main.resourceURL?.appendingPathComponent("i386-windows/fusion.dll")) {
         script = nil; serverSync = false; note = nil; finishedAt = nil; logged = []; runningSince = nil; installsOnly = false
         allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false; sessionAppID = 0; runsEAAppInstaller = false
@@ -1134,18 +1159,27 @@ enum DockInstallers {
         // never failed here (first run, a hung or never-started one) is planned as before. The setup failed in the fork's logs
         // with 6, -9 and 0xC0000018 (infinst.exe of Saints Row: The Third, T3P8HK) and exited 0 in Just Cause 2 (JYFG4D).
         let directXProvided = flag("MADEIRA_DOCK_DIRECTX_PROVIDED")   // 0: a failed DirectX setup stays pending, as before
+        // madeira-bcd (round 630, agent A2 S14; Batman: Arkham Asylum GOTY 60GN7A, Mafia II BKXNYD and 34 more logs): DirectX's setup
+        // failed at the first start in 36 of 41 logged runs, and the start then ran only the installs. 1: it is provided at the first
+        // start already, whatever the game's entry is called (the names differ per game). Off unless set (the game's file or bcd.cfg).
+        let directXFirst = SteamSignIn.flag("MADEIRA_DOCK_DIRECTX_FIRST", default: false)
         let failedBefore = Set(ledger.failedRuns(app))
+        // madeira-bcd (round 630, A1 S20): the EA app's installer waits for Wine Gecko (Settings) instead of stalling the batch on Wine's
+        // own download prompt. MADEIRA_DOCK_EA_GECKO=0 runs it as before.
+        let eaGecko = flag("MADEIRA_DOCK_EA_GECKO")
         let skip = DockInstallScripts.installSkipNames()   // madeira-bcd (round 626, A1 S7): the game's own list of provided installs; empty by default
         let items = DockInstallScripts.plan(found,
                                             done: { DockInstallScripts.marked($0, in: registry[$0.hive] ?? "") },
                                             exists: { resolve($0, drive: drive) != nil },
                                             runnable: {
                                                 if dotNetMono, !hasWineMono, DockInstallScripts.isDotNetFramework($0.executable) { return dotNetNeedsMono }
+                                                if eaGecko, !hasGecko, DockInstallScripts.isEAAppInstaller($0.executable) { return eaNeedsGecko }
                                                 return runnable($0, drive: drive, has32Bit: has32Bit, hasMsiexec: hasMsiexec)
                                             },
                                             provided: {
                                                 (dotNetMono && hasWineMono && DockInstallScripts.isDotNetFramework($0.executable))
-                                                    || (directXProvided && DockInstallScripts.isDirectXSetup($0.executable) && failedBefore.contains($0.run.name))
+                                                    || (directXProvided && DockInstallScripts.isDirectXSetup($0.executable)
+                                                        && (directXFirst || failedBefore.contains($0.run.name)))
                                                     || skip.contains(DockInstallScripts.label($0.run).lowercased())
                                             })
         let providedRuns = DockInstallScripts.providedRuns(items)
@@ -1162,6 +1196,9 @@ enum DockInstallers {
         // later start); Skip starts the game without them. MADEIRA_DOCK_INSTALL_CHOICE=0 ignores it.
         let choiceOn = flag("MADEIRA_DOCK_INSTALL_CHOICE")
         let skipped = choiceOn && !ledger.runsNext(app) && !pending.isEmpty
+        // madeira-bcd (round 630, agent A1 S13; The Sims 4 FJAXHK and five more logs): a skip that leaves out the EA app's installer leaves
+        // a game that cannot start; the note says so.
+        let skippedEA = skipped && pending.contains { DockInstallScripts.isEAAppInstaller($0.executable) }
         var turnedToSkip = false
         if skipped {
             // madeira-bcd: `why=` says how the choice came to be Skip (DockInstallLedger.skipWhy); GTA V Legacy's logs
@@ -1223,7 +1260,7 @@ enum DockInstallers {
                                 "key=\(run.hive == .machine ? "HKLM" : "HKCU")\\\(run.key) recorded=\(recorded) minimum=\(run.value)\(lastRun) " +
                                 "machine=\(machineText(item.process, drive: drive))")
         }
-        for item in items where item.status == .provided || (item.status == .unsupported && item.reason == dotNetNeedsMono) {
+        for item in items where item.status == .provided || (item.status == .unsupported && (item.reason == dotNetNeedsMono || item.reason == eaNeedsGecko)) {
             let run = item.process.run
             let file = item.process.executable.split(separator: "\\").last.map(String.init) ?? ""
             if item.status == .provided {
@@ -1233,13 +1270,18 @@ enum DockInstallers {
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the game's settings list it in " +
                                         "env.MADEIRA_DOCK_INSTALL_SKIP (BCD provides what it installs); file=\(file); record: \(recorded)")
                 } else if DockInstallScripts.provider(item.process) == "BCD" {
+                    let why = failedBefore.contains(run.name) ? "it failed in this game before" : "env.MADEIRA_DOCK_DIRECTX_FIRST = 1 skips it at the first start"
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by BCD; " +
-                                        "file=\(file) is DirectX's runtime setup, it failed in this game before, and BCD ships what it installs " +
+                                        "file=\(file) is DirectX's runtime setup, \(why), and BCD ships what it installs " +
                                         "(D3DX9/10/11, D3DCompiler, XAudio2, X3DAudio, XAPOFX, XInput) as Wine's builtin DLLs; record: \(recorded)")
                 } else {
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by Wine Mono; " +
                                         "file=\(file) is a .NET Framework setup, which does not finish under Wine, and the prefix already carries Wine's NDP markers; record: \(recorded)")
                 }
+            } else if item.reason == eaNeedsGecko {
+                LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) held: file=\(file) is the EA app's installer, which shows a " +
+                                    "web page, and this device has no Wine Gecko; Settings › HTML engine for installers downloads it, and the program runs " +
+                                    "at the start after that (MADEIRA_DOCK_EA_GECKO=0 runs it as before)")
             } else {
                 LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: file=\(file) is a .NET Framework setup and this device has no Wine Mono; " +
                                     "Settings › .NET Framework downloads it, and the program is recorded at the start after that")
@@ -1247,6 +1289,7 @@ enum DockInstallers {
         }
         if skipped {
             note = "The one-time installs were skipped this time. To have them run, pick Run at next start under One-time installs."
+            if skippedEA { note! += " This game cannot start without the EA app, whose installer is one of them." }
         } else {
             note = DockInstallScripts.note(items)
             if installsOnly {
@@ -1256,7 +1299,9 @@ enum DockInstallers {
             }
             // madeira-bcd: the last install session never started a program; they are offered once more (settleChoice).
             if offeredAgain && script != nil {
-                note = "The one-time installs did not get to start last time, so they run now. " + (note ?? "")
+                note = (offeredAfterBackgroundCut
+                        ? "The one-time installs were cut short last time (BCD went to the background), so they run again now. "
+                        : "The one-time installs did not get to start last time, so they run now. ") + (note ?? "")
             }
         }
         // Those still not recorded and not run again now are named in the note, so an
@@ -1266,7 +1311,12 @@ enum DockInstallers {
         }.map { DockInstallScripts.label($0.process.run) }
         if !stillUnfinished.isEmpty {
             let names = stillUnfinished.joined(separator: ", ")
-            let words = "Not finished last time: \(names) (its installer never closed). If it did install, choose Record as done under One-time installs."
+            var words = "Not finished last time: \(names) (its installer never closed). If it did install, choose Record as done under One-time installs."
+            // round 630 (A1 S13): the EA app's installer that never finished leaves a game that cannot start
+            if items.contains(where: { item in item.status != .done && item.status != .provided && unfinished.contains(item.process.run.name)
+                                           && !pending.contains(item.process) && DockInstallScripts.isEAAppInstaller(item.process.executable) }) {
+                words += " This game cannot start without the EA app: pick Run at next start so its installer runs again."
+            }
             note = (note.map { $0 + " " } ?? "") + words
             LogStore.shared.log("[dock-installers] app=\(app) unfinished=\(stillUnfinished.joined(separator: ",")): the last batch started it and saw no exit status")
         }
@@ -1300,6 +1350,12 @@ enum DockInstallers {
             return "placed"
         } catch { return "failed" }
     }
+
+    /// Round 630 (agent A1 S15; Borderlands: The Pre-Sequel FRKBN1): the last app run's session went to the background this many seconds
+    /// after its start and ended there (BCDSessionRecorderLive.recoverUnfinished sets it at start-up; nil: it ended cleanly or in front).
+    static var previousSessionBackgroundAfter: Double?
+    /// The installs are offered again because that session was cut short in the background (the note says so).
+    static var offeredAfterBackgroundCut = false
 
     /// The previous batch's exit statuses, read at the next Dock start (no session runs, so
     /// the registry is on disk): programs that succeeded are recorded done, one summary line
@@ -1349,9 +1405,20 @@ enum DockInstallers {
         } else {
             LogStore.shared.log("[dock-installers] app=\(app) results reason=\(reason) none: the batch did not start", level: .error)
         }
+        // Round 630 (agent A1 S15; FRKBN1): the last session went to the background 14 s after its start, while a Visual C++ installer ran, and
+        // ended there; read as "unfinished", every install was skipped until the player found Run at next start. A batch cut short that way
+        // (in the background within 30 s of the start) counts as one that did not get to run: offered once more, like one that never started.
+        offeredAfterBackgroundCut = false
+        if outcome == .unfinished, let cut = previousSessionBackgroundAfter, cut >= 0, cut < 30 {
+            outcome = .nothingRan
+            offeredAfterBackgroundCut = true
+            LogStore.shared.log("[dock-installers] app=\(app) the last session went to the background \(Int(cut)) s after its start and ended there: "
+                                + "its unfinished installs count as not run")
+        }
         // madeira-bcd: a session that never started a program leaves the programs unrecorded and the choice at Skip, which
         // would skip them for good (Halo: The Master Chief Collection, VJSK5K L40-45). Once, they are offered again.
         let offered = ledger.settleChoice(app, after: outcome, retry: flag("MADEIRA_DOCK_INSTALL_RETRY"))
+        if !offered { offeredAfterBackgroundCut = false }
         if offered {
             LogStore.shared.log("[dock-installers] app=\(app) choice=run again: the last session never started a program, so nothing was tried; " +
                                 "the installs are offered once more (MADEIRA_DOCK_INSTALL_RETRY=0 skips them as before)")
@@ -1671,6 +1738,43 @@ enum DockCEGService {
     static func logSteamLogs(drive: URL) {
         guard SteamSignIn.flag("MADEIRA_DOCK_CEG_SERVICE", default: true) else { return }
         for line in steamLogLines(drive: drive) { LogStore.shared.log("[ceg-log] " + line) }
+    }
+
+    /// madeira-bcd (round 630, agent U S3; 444TS8 and seven older starts that ended with code 34): the sign-in and connection part of
+    /// Valve's client's own log (logs/connection_log.txt) after a Dock start whose licence list never came (34) or whose sign-in failed
+    /// (15). Only lines about the logon, the connection and the licence list; a line that names an account or a person is dropped, and
+    /// every run of five or more digits is replaced. At most 40 lines.
+    private nonisolated static let connectionWords = ["logon", "logged on", "logged off", "licens", "connect", "timeout", "fail", "error", "retry"]
+    private nonisolated static let connectionDrop = ["steamid", "[u:", "[a:", "account", "user", "persona", "@", "token", "password", "name"]
+
+    nonisolated static func connectionLogLines(drive: URL, maxLines: Int = 40, maxBytes: Int = 64 * 1024) -> [String] {
+        guard let folder = DockInstallers.resolve("C:\\Program Files (x86)\\Steam\\logs", drive: drive),
+              let name = ((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? [])
+                  .first(where: { $0.caseInsensitiveCompare("connection_log.txt") == .orderedSame }),
+              let handle = try? FileHandle(forReadingFrom: folder.appendingPathComponent(name)) else { return ["no connection_log.txt"] }
+        defer { try? handle.close() }
+        let size = (try? handle.seekToEnd()) ?? 0
+        try? handle.seek(toOffset: size > UInt64(maxBytes) ? size - UInt64(maxBytes) : 0)
+        let lines = String(decoding: (try? handle.readToEnd()) ?? Data(), as: UTF8.self).split(whereSeparator: { $0.isNewline }).map(String.init)
+        let kept = lines.filter { line in
+            let lower = line.lowercased()
+            return connectionWords.contains { lower.contains($0) } && !connectionDrop.contains { lower.contains($0) }
+        }
+        func scrub5(_ line: String) -> String {
+            var result = "", digits = ""
+            func flush() { result += digits.count >= 5 ? "<n>" : digits; digits = "" }
+            for character in line.prefix(200) {
+                if character.isASCII, character.isNumber { digits.append(character) } else { flush(); result.append(character) }
+            }
+            flush()
+            return result.trimmingCharacters(in: .whitespaces)
+        }
+        return ["connection_log.txt lines=\(lines.count) matching=\(kept.count)"] + kept.suffix(maxLines).map(scrub5)
+    }
+
+    /// Writes `connectionLogLines` to the log, once per Dock start that ended with 34 or 15.
+    static func logConnectionLog(drive: URL) {
+        for line in connectionLogLines(drive: drive) { LogStore.shared.log("[steam-connection] " + line) }
     }
 }
 

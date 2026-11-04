@@ -1,0 +1,303 @@
+[03:50:57.479] [INFO] Checking entitlements...
+[03:50:57.480] [INFO] [build] v0.1.626 (626)
+[03:50:57.480] [INFO] [device] model=iPhone15,3 idiom=phone os=iOS Version 26.4.2 (Build 23E261) ram=5636MB available=4076MB cores=6
+[03:50:57.480] [INFO] [device] address-map=[0x100304000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[03:50:57.497] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=120 utc-offset=+03:00 free-disk=64GB stikdebug-url=0
+[03:50:57.501] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[03:51:01.134] [INFO] Requesting JIT with Built-in StikJIT...
+[03:51:03.162] [INFO] [bcd] library launch witcher3.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[03:51:03.190] [INFO] Running full Wine sequence...
+[03:51:03.190] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100304000,0xfc0000000) 63GB available=4061MB low-power=0 thermal=nominal
+[03:51:03.192] [INFO] [game-cfg] dxil-tess-max-factor=2 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_JUMBO_HALF=1 env.MADEIRA_POOL_MORE=1
+[03:51:03.200] [INFO] Allocating 256MB JIT pool (BRK will suspend process)...
+[03:51:03.200] [INFO] Allocating 256MB JIT pool via debugger...
+[03:51:03.200] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[03:51:03.201] [INFO] [jit-debugger] attached=1 at the pool request
+[03:51:03.644] [INFO] RX pool at 0x148000000
+[03:51:03.664] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.536s rev=ml526
+[03:51:03.736] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   dxil-tess-max-factor = 2
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x10f390000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[03:51:04.507] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3794 MB + phys_footprint=301 MB = 4096 MB (hw.memsize says 5636 MB)
+ml985: map_image_view size=0x5c57000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x1000000000
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x121c00000..0xc70000000 regions=32843 occupied=12900 MB of 46308 MB free=65919 MB maxhole=32512 MB@0x480000000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=486 MB (peak 486) internal=484 MB compressed=0 MB external=68 MB reusable=11 MB (cycle=1)
+[jit-pool] image 0x140000000+0x5c57000 (witcher3.exe) → pool 0x148005000 used=0x5c61000/0x10000000 tramp+0x0
+[copy-verify] witcher3.exe: OK, 2044 .text pages executable (copy @0x148005000)
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x14dc60000 used=0x5d98000/0x10000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14dc60000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf6b0000+0x418000 (libarm64ecfex.dll) → pool 0x14dd9a000 used=0x61ba000/0x10000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14dd9a000)
+[jit-pool] image 0xfbf580000+0x130000 (ucrtbase.dll) → pool 0x14e1b8000 used=0x62ec000/0x10000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14e1b8000)
+[jit-pool] image 0xfbf4c0000+0xc0000 (kernel32.dll) → pool 0x14e2ec000 used=0x63b4000/0x10000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14e2ec000)
+[jit-pool] image 0xfbf1d0000+0x2f0000 (kernelbase.dll) → pool 0x14e3b4000 used=0x66b4000/0x10000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14e3b4000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module witcher3.exe (witcher3.exe-45cce90df680a7ff): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): FBEF50000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): FBEE60000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): FBEDB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBED30000
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14f5d8000)
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14f65c000)
+[copy-verify] PhysX3Common_x64.dll: OK, 96 .text pages executable (copy @0x14f750000)
+[copy-verify] NvCameraSDK64.dll: OK, 1 .text pages executable (copy @0x14f927000)
+[copy-verify] msvcp120.dll: OK, 31 .text pages executable (copy @0x14f934000)
+[file-fail] ml665 #44 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\Games\The-Witcher-3-Wild-Hunt\The Witcher 3\bin\x64\WININET.dll
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0xfbcae0000-0xfbcb1b029
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0xfbcb20000-0xfbcb20f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FBCAD0000
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0xfbcae0000-0xfbcb1b029
+E 24 [iOS-xins] tracker=0x14e160c08 WININET.dll sec=0xfbcb20000-0xfbcb20f90
+E 24 [img-map] ml710 #26 intervals-only WININET.dll base=0xfbcad0000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x151b50000)
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> crypt32.dll: resolved=7 failed=0
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+[xp] 03:51:05.225 +0.58 dt=319 cpu=206 (thr 206) P=168 E=38 run=251 pgw=-1.0 GHz P=3.40 E=2.02 Minst=2584 IPC=3.98 mJ=454 pin=1797 rdKB=30348 fpMB=628
+[image-reload] unmapped image 0xfbab10000+0xb0000: 1 pool copy marked
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=1 first=00000001407F3128
+[swap] ml1077 backed 0x480000000+0x200000000 (whole reservation, ml1257) (file off 0 MB): 8192 MB in 1 extents, peak 8192 MB, 0 refused
+[jumbo#1] +0ms tid=16fdb3000 wtid=0024 peb=0xfbfff0000 nrip=0xfbf254f00 grip=0x0 size=0x200000000 (8192 MB) hint=0x0 -> 0x480000000 st=0x0 | granted=8192 MB ok=1 fail=0
+[xp] 03:51:05.509 +0.86 dt=284 cpu=228 (thr 228) P=7 E=221 run=287 pgw=-1.0 GHz P=2.01 E=2.02 Minst=991 IPC=2.15 mJ=57 pin=348 rdKB=736 fpMB=632
+[mmap-place] ml1027 NO GAP FITS size=0x800010000 after 33652 regions (ceiling=0xfc0000000 walk_stopped_at=0xfc0000000 tail=0 MB gaps_seen=0, largest gap 24320 MB, walk 239 ms) -- the map really is full for this size
+[jumbo] kernel-pick reserve failed (0xc0000017) for size=0x800000000 — top window is full
+[jumbo-half] madeira-bcd 32768 MB reserve found no aligned slot: gave 16384 MB unhinted at 0x680000000 (MADEIRA_JUMBO_HALF)
+[swap] ml1077 backed 0x680000000+0x64000000 (file off 8796093022208 MB): 9792 MB in 2 extents, peak 9792 MB, 0 refused
+[xp] 03:51:05.812 +1.17 dt=304 cpu=307 (thr 307) P=11 E=297 run=318 pgw=-1.0 GHz P=2.20 E=2.02 Minst=879 IPC=1.42 mJ=59 pin=12 rdKB=0 fpMB=638
+[xp-names] m37126 "wine-x18-exc"
+[xp] 03:51:06.084 +1.44 dt=271 cpu=173 (thr 173) P=12 E=161 run=280 pgw=-1.0 GHz P=2.76 E=2.01 Minst=690 IPC=1.93 mJ=52 pin=16 rdKB=0 fpMB=642
+[xp] 03:51:06.358 +1.71 dt=275 cpu=183 (thr 182) P=11 E=172 run=279 pgw=-1.0 GHz P=2.59 E=2.01 Minst=675 IPC=1.80 mJ=49 pin=13 rdKB=0 fpMB=646
+[footprint] rev=ml358 phys=656 MB (peak 656) internal=657 MB compressed=0 MB external=120 MB reusable=11 MB (cycle=2)
+[xp] 03:51:06.611 +1.96 dt=252 cpu=196 (thr 196) P=13 E=183 run=261 pgw=-1.0 GHz P=2.81 E=2.01 Minst=736 IPC=1.82 mJ=52 pin=24 rdKB=0 fpMB=656
+[swap] ml1077 stats: 9792 MB file-backed now (peak 9792), 2 extents, file used 8192 of 131072 MB, backs 2 releases 0 unbacks 0 refused 0 | coverage broad: disk 0 MB of 4096 cap, reservations 1, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 600 MB (peak 600), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 1600 MB in use (peak 1600), 1 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3700 MB available
+[bigres] tid=0024 #1 size=0x30000000 (768 MB) type=0x2000 prot=0x2 hint=0x0 peb=0xfbfff0000 total=768 MB
+[swap] ml1077 backed 0xa80000000+0x30000000 (whole reservation, ml1257) (file off 8796093023808 MB): 10560 MB in 3 extents, peak 10560 MB, 0 refused
+[swap] ml1077 backed 0xab0000000+0xc0000000 (whole reservation, ml1257) (file off 8796093024576 MB): 13632 MB in 4 extents, peak 13632 MB, 0 refused
+[jumbo#2] +1471ms tid=16fdb3000 wtid=0024 peb=0xfbfff0000 nrip=0x14139e465 grip=0x0 size=0xc0000000 (3072 MB) hint=0x0 -> 0xab0000000 st=0x0 | granted=11264 MB ok=2 fail=0
+[swap] ml1077 backed 0x127af0000+0x2800000 (whole reservation, ml1257) (file off 8796093027648 MB): 13672 MB in 5 extents, peak 13672 MB, 0 refused
+[footprint] rev=ml1060 fast phys=673 MB compressed=0 MB internal=689 MB
+[swap] ml1077 backed 0x12c030000+0x400000 (whole reservation, ml1257) (file off 8796093027688 MB): 13676 MB in 6 extents, peak 13676 MB, 0 refused
+[footprint] rev=ml358 phys=689 MB (peak 689) internal=706 MB compressed=0 MB external=122 MB reusable=11 MB (cycle=3)
+[footprint] rev=ml1060 fast phys=699 MB compressed=0 MB internal=718 MB
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"steam_api64.dll" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"steam_api64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library steam_api64.dll (which is needed by L"C:\\Games\\The-Witcher-3-Wild-Hunt\\The Witcher 3\\bin\\ddi\\Steam.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\Games\\The-Witcher-3-Wild-Hunt\\The Witcher 3\\bin\\ddi\\Steam.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=717 MB compressed=0 MB internal=739 MB
+[footprint] rev=ml358 phys=717 MB (peak 717) internal=739 MB compressed=0 MB external=124 MB reusable=11 MB (cycle=4)
+[footprint] rev=ml358 phys=717 MB (peak 717) internal=739 MB compressed=0 MB external=124 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=717 MB (peak 717) internal=739 MB compressed=0 MB external=124 MB reusable=11 MB (cycle=6)
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[footprint] rev=ml1060 fast phys=786 MB compressed=0 MB internal=812 MB
+[win-name] #3 hwnd=0x1002c class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #4 hwnd=0x1002c class='__wine_xinput_devnotify' text="" rev=ml853
+0078:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0078 status=00000001 caller=000000014E31232C
+[footprint] rev=ml1060 fast phys=803 MB compressed=0 MB internal=1116 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=24 resident=1542MB dbg=DEBUGGED rev=ml525
+[03:51:33.910] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[file-census] r624 10s: case-sensitive=1 full-path-tries=4438 full-path-hits=6 component-lookups=31024 shortcut-hits=22160 misses=8864 scans=8864 entries-scanned=310240 us-in-lookup=7530127 (75% of the window) slowest=2.715 ms ...Games/The-Witcher-3-Wild-Hunt/The Witcher 3/content/content0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2411 full-path-hits=65 component-lookups=16421 shortcut-hits=11729 misses=4692 scans=4692 entries-scanned=164220 us-in-lookup=3989438 (39% of the window) slowest=2.211 ms ...Games/The-Witcher-3-Wild-Hunt/The Witcher 3/content/content0
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x4000000 type=0x103000 protect=0x40
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x2000000 type=0x103000 protect=0x40
+[nt-fail] #3 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+0090:err:module:load_dll [dll-missing] rev=ml336 #3 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0090:err:module:load_dll [dll-missing] rev=ml336 #4 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jumbo#3] +53582ms tid=16fdb3000 wtid=0024 peb=0xfbfff0000 nrip=0x1406c787c grip=0x141c3d0ad size=0x40000000 (1024 MB) hint=0x0 -> 0xb7c400000 st=0x0 | granted=12288 MB ok=3 fail=0
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[window] 0x121c00000..0xc70000000 regions=33231 occupied=43558 MB of 46308 MB free=5491 MB maxhole=2741 MB@0xbc4a90000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 15008 MB file-backed now (peak 15008), 22 extents, file used 9216 of 131072 MB, backs 22 releases 0 unbacks 0 refused 0 | coverage broad: disk 93 MB of 4096 cap, reservations 21, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 1624 MB (peak 1624), 0 MB kept in memory by swap-mb
+[footprint] rev=ml1060 fast phys=844 MB compressed=532 MB internal=1306 MB
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=37 resident=2486MB dbg=DEBUGGED rev=ml525
+[03:52:04.020] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[file-census] r624 12s: case-sensitive=1 full-path-tries=469 full-path-hits=137 component-lookups=2258 shortcut-hits=1586 misses=660 scans=672 entries-scanned=29502 us-in-lookup=572965 (4% of the window) slowest=1.167 ms ...8-6A921F2EDE99/Documents/wine/dosdevices/c:/windows/system32
+[nt-fail] #4 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=2 rev=ajan5-rockstar
+[nt-fail] #5 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=2 rev=ajan5-rockstar
+[nt-fail] #6 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=2 rev=ajan5-rockstar
+[win-name] #5 hwnd=0x10030 class='W2ViewportClass' text="" rev=ml853
+[win-name] #6 hwnd=0x10032 class='IME' text="" rev=ml853
+[win-name] #13 hwnd=0x20038 class='Wine IME' text="" rev=ml853
+[win-name] #14 hwnd=0x10030 class='W2ViewportClass' text="The Witcher 3" rev=ml853
+err:   [bc-decode] ml679 #0 BC3 32x32 level=0 slice=0 -> 4B/texel 4096B
+err:   [bc-decode] ml679 #1 BC3 16x16 level=1 slice=0 -> 4B/texel 1024B
+err:   [bc-decode] ml679 #2 BC3 8x8 level=2 slice=0 -> 4B/texel 256B
+err:   [bc-decode] ml679 #3 BC3 4x4 level=3 slice=0 -> 4B/texel 64B
+err:   [bc-decode] ml679 #4 BC3 2x2 level=4 slice=0 -> 4B/texel 16B
+err:   [bc-decode] ml679 #5 BC3 1x1 level=5 slice=0 -> 4B/texel 4B
+err:   [bc-census] ml653 periodic: 64 BC resources, 380 subresources
+err:   [bc-census] ml653   BC1_UNORM n=34 20KB max=32x32 mips=6 arr=1 cube=0 | use def=0 imm=34 dyn=0 stg=0 | data y=34 n=0 | cpu r=0 w=0 | bind srv=34 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM n=30 37KB max=32x32 mips=6 arr=1 cube=0 | use def=0 imm=30 dyn=0 stg=0 | data y=30 n=0 | cpu r=0 w=0 | bind srv=30 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x34
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x29
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=0 CopyResource=0 CopySubresourceRegion=0 Map=0
+[win-name] #15 hwnd=0x1003e class='DIEmWin' text="" rev=ml853
+[win-name] #16 hwnd=0x1003e class='DIEmWin' text="DIEmWin" rev=ml853
+[mem-burst] rev=624 +280 MB in 252 ms phys=1201 internal=1310 compressed=901 other=0 | guest commits since the last sample: n=79, 87 MB, biggest 8 MB tid=00d0 | swap backed=1624 MB | pool head=180 MB tail=32 MB
+[03:52:12.351] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[jit-pool] image 0xfb9a20000+0xc0000 (xaudio2_7.dll) → pool 0x1534f0000 used=0xb5b4000/0x10000000 tramp+0x4000
+D 24 Load module xaudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): FB9A20000
+[jit-pool] image 0xfb9950000+0xd0000 (mfplat.dll) → pool 0x1535b4000 used=0xb688000/0x10000000 tramp+0x4000
+D 24 Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): FB9950000
+[jit-pool] image 0xfb98b0000+0xa0000 (propsys.dll) → pool 0x153688000 used=0xb72c000/0x10000000 tramp+0x4000
+D 24 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): FB98B0000
+[jit-pool] image 0xfb9830000+0x80000 (rtworkq.dll) → pool 0x15372c000 used=0xb7b0000/0x10000000 tramp+0x4000
+D 24 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): FB9830000
+[jit-pool] image 0xfb9790000+0xa0000 (mfreadwrite.dll) → pool 0x1537b0000 used=0xb854000/0x10000000 tramp+0x4000
+D 24 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): FB9790000
+[win-name] #17 hwnd=0x10030 class='W2ViewportClass' text="The Witcher 3" rev=ml853
+[win-name] #18 hwnd=0x10030 class='W2ViewportClass' text="The Witcher 3" rev=ml853
+[launch-view] dismissed reason=present logs=0
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014E3CC110 flags=1 nparams=4 tid=0024 hit=1
+[jit-pool] image 0xfb9580000+0x90000 (schannel.dll) → pool 0x153854000 used=0xb8e8000/0x10000000 tramp+0x4000
+D 94 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): FB9580000
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 10.07 s of audio in 10.00 s (100.7%) over 146 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[03:52:32.575] [OK] Early detach: game presenting and settled
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 147 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2048..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=67 resident=2674MB dbg=DEBUGGED rev=ml525
+[03:52:34.575] [INFO] Detaching debugger...
+[hwinput] keyboard focus: program (program cursor)
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 136 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2048..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[nt-fail] #7 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=3 rev=ajan5-rockstar
+[nt-fail] #8 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=3 rev=ajan5-rockstar
+[nt-fail] #9 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=3 rev=ajan5-rockstar
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=70 resident=2575MB dbg=DEBUGGED rev=ml525
+[window] 0x121c00000..0xc70000000 regions=33837 occupied=44384 MB of 46308 MB free=3630 MB maxhole=1706 MB@0xc05520000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 15016 MB file-backed now (peak 15021), 24 extents, file used 9216 of 131072 MB, backs 38 releases 14 unbacks 0 refused 0 | coverage broad: disk 232 MB of 4096 cap, reservations 37, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 1624 MB (peak 1624), 0 MB kept in memory by swap-mb
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029ca00 NATIVE (no FEX state) sp-cand=[ ]
+[file-census] r624 41s: case-sensitive=1 full-path-tries=55 full-path-hits=20 component-lookups=206 shortcut-hits=136 misses=70 scans=70 entries-scanned=926 us-in-lookup=56636 (0% of the window) slowest=1.039 ms ...Games/The-Witcher-3-Wild-Hunt/The Witcher 3/content/content0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=5969 tex<-stg=29 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=70 resident=2684MB dbg=DEBUGGED rev=ml525
+[exec-alloc] NtAllocateVirtualMemoryEx #15 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[nt-fail] #10 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=4 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #16 req_addr=0x0 size=0x4000000 type=0x103000 protect=0x40
+[nt-fail] #11 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=4 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #17 req_addr=0x0 size=0x2000000 type=0x103000 protect=0x40
+[nt-fail] #12 NtAllocateVirtualMemoryEx status=c0000017 proc=witcher3.exe tid=0024 size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=4 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #18 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[exec-alloc] NtAllocateVirtualMemoryEx #19 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #20 req_addr=0x0 size=0x4000000 type=0x103000 protect=0x40
+[swap] ml1077 backed 0xc0db40000+0xfd0000 (whole reservation, ml1257) (file off 8796093028000 MB): 15064 MB in 25 extents, peak 15064 MB, 0 refused
+[swap] ml1077 backed 0xc10350000+0x4010000 (whole reservation, ml1257) (file off 9260 MB): 15112 MB in 25 extents, peak 15112 MB, 0 refused
+[swap] ml1077 backed 0xc18360000+0x4010000 (whole reservation, ml1257) (file off 9260 MB): 15112 MB in 25 extents, peak 15112 MB, 0 refused
+[swap] ml1077 backed 0xc18360000+0x4010000 (whole reservation, ml1257) (file off 9260 MB): 15112 MB in 25 extents, peak 15112 MB, 0 refused
+[spin] ml1140 03:53:46.010 look 1: x64->EC 6903781/s, 95% of the sampled calls for 4 s go to ntdll.dll+0x71aac (0xfbfd41aac)
+[spin] ml1140 thread 0084 teb=0xfbff20000 cpu=87% host pc=0x14f106d4c (ARM64EC image copy) lr=0x14f04f744 sp=0x16c7fc540 x23=0x1d1118 | guest RIP exact=0x0 (hostPC outside block) State.rip=0x14ef37804
+[spin] ml1140   RAX=0x16c7fc6a0 RCX=0xc1abb7650 RDX=0x16c7fc6b0 RBX=0x16c7fc6f0 RSP=0x16c7fc540 RBP=0x16c7fd010 RSI=0x1000 RDI=0x4 R8=0x4 R9=0x0 R10=0x0 R11=0xff R12=0x3 R13=0xc1abb3650 R14=0xd84 R15=0xb838952a0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): f3 03 00 aa 66 55 06 94 e0 03 13 aa ce 65 06 94 20 00 20 d4 96 f5 ff 97 20 00 20 d4 19 11 1d 00 ff 43 01 d1 f3 53 03 a9 f5 7b 04 a9 e8 03 01 aa f5 03 00 aa e1 03 00 91 e0 03 08 aa f3 03 03 aa f4 03 02 aa ae d8 00 94 e1 03 00 91 e0 03 15 aa e2 03 14 aa e3 03 13 aa 7c 07 00 94 f5 7b 44 a9 f3 53 43 a9 ff 43 01 91 c0 03 5f d6 c9 10 1d 00 ff 43 01 d1 f3 53 03 a9 f5 7b 04 a9 e8 03 01 aa
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x16c7fc540: none in the first 96 qwords
+[spin] ml1140   first stack qwords: 14dd30000 ffffffffffffffff 16c7fc6dc c00c 16c7fc6d8 16c7fc6cc 800c c008
+err:   [bc-decode] ml679 #18944 BC1 64x64 level=3 slice=0 -> 4B/texel 16384B
+err:   [bc-decode] ml679 #19456 BC3 16x16 level=5 slice=0 -> 4B/texel 1024B
+[swap] ml1150 pool: system memory pressure warning; pool 5792 MB in use
+err:   [bc-decode] ml679 #19968 BC3 128x128 level=2 slice=1 -> 4B/texel 65536B
+err:   [bc-decode] ml679 #20480 BC3 16x16 level=5 slice=0 -> 4B/texel 1024B
+err:   [bc-decode] ml679 #20992 BC7 2x4 level=8 slice=0 -> 4B/texel 32B
+[footprint] rev=ml1060 fast phys=3331 MB compressed=1947 MB internal=928 MB
+[footprint] rev=ml1060 fast phys=3362 MB compressed=1948 MB internal=923 MB
+[file-census] r624 28s: case-sensitive=1 full-path-tries=444 full-path-hits=36 component-lookups=2831 shortcut-hits=2012 misses=816 scans=819 entries-scanned=27136 us-in-lookup=731056 (2% of the window) slowest=3.450 ms ...Games/The-Witcher-3-Wild-Hunt/The Witcher 3/content/content0
+[spin] ml1140 03:53:57.291 look 1: x64->EC 13153672/s, 98% of the sampled calls for 4 s go to ntdll.dll+0x71aac (0xfbfd41aac)
+[spin] ml1140   first stack qwords: 49abc5140 123cffb90 0 6a0591ae0 3d0a3b8d 0 1455355c0 14155b996
+[spin] ml1140 thread 00b8 teb=0xfbfe60000 cpu=90% host pc=0x14dcd1af0 (ARM64EC image copy) lr=0x14dcddfb8 sp=0xbc528fd70 x23=0xc4ec | guest RIP exact=0x0 (hostPC outside block) State.rip=0x141c3d884
+[spin] ml1140   RAX=0x14dd42000 RCX=0xbc528feb8 RDX=0x6b5762d10 RBX=0x520abe190 RSP=0xbc528fd70 RBP=0xbc528fe50 RSI=0x4972716d0 RDI=0x520a848cd R8=0x989680 R9=0x0 R10=0xbc528fe60 R11=0x12 R12=0x0 R13=0x14dd42000 R14=0x0 R15=0x0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): fe ff ff e9 7f 00 00 00 48 8b 46 50 48 89 46 60 48 8d 4c 24 58 4c 89 7c 24 58 ff 15 44 19 3b 00 48 8b 44 24 58 48 3b c7 0f 82 3e fe ff ff 48 3b c3 77 54 90 f0 44 09 3c 24 48 8b 56 60 90 f0 44 09 3c 24 0f 0d 0a 8b 02 0f 1f 40 00 8b c8 f0 0f b1 0a 75 f8 90 f0 44 09 3c 24 3d 54 53 45 52 74 1e 3d 43 45 58 45 0f 84 00 fe ff ff eb 19 48 8b 5c 24 60 48 83 c4 20 41 5f 41 5e 5f 5e 5d c3 48
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0xbc528fd70: sp+0xe8=witcher3.exe+0x1c3d884(call indirect) sp+0x138=witcher3.exe+0x1c3d53b(call rel32) sp+0x1d8=witcher3.exe+0x1c3d050(call indirect) sp+0x208=witcher3.exe+0xf5de1e(call indirect)
+[spin] ml1140   first stack qwords: 0 0 0 0 4972716d0 520a848cd 14dcddfb8 6b9805930
+[rb-tex] madeira-bcd new readback #1: fmt 70 1x1 level 0 (texture 1x1, 1 mips)
+[footprint] rev=ml1060 fast phys=3470 MB compressed=1860 MB internal=1115 MB
+[footprint] rev=ml1060 fast phys=3509 MB compressed=2285 MB internal=686 MB
+[swap] ml1150 pool: system memory pressure CRITICAL; pool 5792 MB in use, no new takes until it eases
+[footprint] rev=ml1060 fast phys=3539 MB compressed=2572 MB internal=431 MB
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=69 resident=1625MB dbg=DEBUGGED rev=ml525
+[window] 0x121c00000..0xc70000000 regions=35712 occupied=44801 MB of 46308 MB free=2998 MB maxhole=1492 MB@0xc12c00000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 15053 MB file-backed now (peak 15112), 25 extents, file used 9264 of 131072 MB, backs 83 releases 58 unbacks 0 refused 0 | coverage broad: disk 330 MB of 4096 cap, reservations 82, holes 0, disk-full refusals 0 | ml1258 churn: 3 sizes, 667 blocks left anonymous | committed data in the file 1670 MB (peak 1730), 0 MB kept in memory by swap-mb
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 15053 MB file-backed now (peak 15112), 25 extents, file used 9264 of 131072 MB, backs 87 releases 62 unbacks 0 refused 0 | coverage broad: disk 332 MB of 4096 cap, reservations 86, holes 0, disk-full refusals 0 | ml1258 churn: 4 sizes, 687 blocks left anonymous | committed data in the file 1670 MB (peak 1730), 0 MB kept in memory by swap-mb
+[mem-burst] rev=624 +334 MB in 609 ms phys=3854 internal=308 compressed=2820 other=726 | guest commits since the last sample: n=13, 17 MB, biggest 3 MB tid=0064 | swap backed=1670 MB | pool head=184 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=3854 MB compressed=2820 MB internal=308 MB
+[swap] ml1077 backed 0xc24b90000+0x4010000 (whole reservation, ml1257) (file off 9264 MB): 15117 MB in 26 extents, peak 15117 MB, 0 refused
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=70 resident=1570MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 backed 0xc2cba0000+0x4010000 (whole reservation, ml1257) (file off 9264 MB): 15117 MB in 26 extents, peak 15117 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+241s beats=8 gaps=0 iter=952 gen=1 threads=70 resident=1340MB dbg=DEBUGGED rev=ml525
+[window] 0x121c00000..0xc70000000 regions=35756 occupied=45149 MB of 46308 MB free=2235 MB maxhole=1076 MB@0xc2cba0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 15053 MB file-backed now (peak 15117), 25 extents, file used 9264 of 131072 MB, backs 89 releases 64 unbacks 0 refused 0 | coverage broad: disk 332 MB of 4096 cap, reservations 88, holes 0, disk-full refusals 0 | ml1258 churn: 4 sizes, 695 blocks left anonymous | committed data in the file 1670 MB (peak 1734), 0 MB kept in memory by swap-mb
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+271s beats=9 gaps=0 iter=1071 gen=1 threads=70 resident=1481MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 4.58 s of audio in 10.01 s (45.8%) over 668 wakes; device short 5376.0 ms in 253 of 470 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 3.16 s of audio in 10.00 s (31.6%) over 902 wakes; device short 6826.7 ms in 320 of 469 passes (largest pass 1024 frames); ring 0..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 4.64 s of audio in 10.01 s (46.4%) over 710 wakes; device short 5365.3 ms in 258 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 2.11 s of audio in 10.00 s (21.1%) over 945 wakes; device short 7872.0 ms in 369 of 468 passes (largest pass 1024 frames); ring 0..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=3698 MB (peak 3820) internal=452 MB compressed=2600 MB external=1034 MB reusable=0 MB (cycle=144)
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x1326
+err:   [bc-census] ml653   SRV view fmt 80 (BC4_UNORM) x6
+err:   [bc-census] ml653   SRV view fmt 83 (BC5_UNORM) x4
+err:   [bc-census] ml653   SRV view fmt 98 (BC7_UNORM) x125
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=34 CopyResource=0 CopySubresourceRegion=765 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 537419KB
+[swap] ml1150 pool: system memory pressure warning; pool 5792 MB in use
+[footprint] rev=ml358 phys=3775 MB (peak 3820) internal=572 MB compressed=2569 MB external=1041 MB reusable=0 MB (cycle=145)
+[footprint] rev=ml358 phys=3688 MB (peak 3820) internal=453 MB compressed=2600 MB external=1033 MB reusable=0 MB (cycle=146)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17029d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=3691 MB (peak 3820) internal=478 MB compressed=2579 MB external=1048 MB reusable=0 MB (cycle=147)
+[footprint] rev=ml358 phys=3848 MB (peak 3848) internal=458 MB compressed=2706 MB external=1033 MB reusable=0 MB (cycle=148)
+[ios_audio] ml1230 pacing stream=0x121bd0f00 lead 60 ms: client wrote 5.44 s of audio in 10.01 s (54.4%) over 664 wakes; device short 4640.0 ms in 221 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x121bd0c00 lead 60 ms: client wrote 1.81 s of audio in 10.01 s (18.1%) over 980 wakes; device short 8213.3 ms in 385 of 470 passes (largest pass 1024 frames); ring 0..4096 frames; worst late wake 0.0 ms; clamped 0 samples
+[xp] 03:56:04.041 +299.37 dt=391 cpu=151 (thr 92) P=65 E=86 run=2054 pgw=-1.0 GHz P=2.19 E=2.01 Minst=333 IPC=1.06 mJ=44 pin=57 rdKB=3840 fpMB=3890
+[waiters]  tid=0094 addr=0x6991af0d8 age=229s INF w0=00000001 w1=00000000
+[waiters]  tid=00a0 addr=0x6991af0d8 age=244s INF w0=00000001 w1=00000000
+[waiters]  tid=00a8 addr=0x4a56cacf8 age=107s INF w0=00000008 w1=00000000
+[waiters]  tid=011c addr=0x6b3eb2538 age=229s INF w0=00000001 w1=00000000
+[footprint] rev=ml358 phys=3745 MB (peak 3848) internal=497 MB compressed=2581 MB external=1035 MB reusable=0 MB (cycle=149)
+[xp] 03:56:04.324 +299.72 dt=348 cpu=170 (thr 229) P=132 E=39 run=1210 pgw=-1.0 GHz P=3.34 E=2.02 Minst=390 IPC=0.75 mJ=128 pin=855 rdKB=27320 fpMB=3745
+[xp] 03:56:04.620 +300.01 dt=295 cpu=111 (thr 111) P=10 E=101 run=605 pgw=-1.0 GHz P=2.32 E=2.02 Minst=391 IPC=1.73 mJ=30 pin=110 rdKB=4644 fpMB=3743
+[freeze] alive t+301s beats=10 gaps=0 iter=1190 gen=1 threads=71 resident=1517MB dbg=DEBUGGED rev=ml525
+[xp] 03:56:04.959 +300.35 dt=340 cpu=138 (thr 138) P=10 E=128 run=478 pgw=-1.0 GHz P=1.76 E=2.01 Minst=432 IPC=1.57 mJ=32 pin=201 rdKB=11904 fpMB=3743
+[valloc] ml959 BIG base=0xc2cba0000 size=0x1010000 type=0x2000 prot=0x4 tid=00b8 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 BIG base=0xc2cba0000 size=0x1010000 type=0x1000 prot=0x4 tid=00b8 | req_hint=0xc2cba0000 zero_bits=0x0 limit=0x0
+[xp] 03:56:05.257 +300.65 dt=298 cpu=253 (thr 251) P=9 E=244 run=377 pgw=-1.0 GHz P=1.70 E=2.01 Minst=1072 IPC=2.12 mJ=61 pin=326 rdKB=13440 fpMB=3745
+err:   [bc-decode] ml679 #21504 BC3 32x32 level=2 slice=0 -> 4B/texel 4096B
+[xp] 03:56:05.928 +301.06 dt=406 cpu=418 (thr 386) P=199 E=220 run=5275 pgw=-1.0 GHz P=3.19 E=2.02 Minst=1208 IPC=1.12 mJ=243 pin=1141 rdKB=41412 fpMB=3795

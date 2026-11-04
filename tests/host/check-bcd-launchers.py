@@ -159,16 +159,20 @@ check('sessionConfig: Self.commonSessionConfig + ["env.LC_ALL = en_US.UTF-8", "e
       '                                                   "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "pool-split = 1", "env.MADEIRA_X86_FAULT_DUMP = 1"]' in files["BCDLaunchers.swift"]
       and files["BCDLaunchers.swift"].count('"env.LC_ALL = en_US.UTF-8"') == 1
       and files["BCDLaunchers.swift"].count('"env.MADEIRA_APC_BUSY_QUEUE = 1"') == 1
-      and files["BCDLaunchers.swift"].count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 1,
+      and files["BCDLaunchers.swift"].count('"env.MADEIRA_X86_FAULT_DUMP = 1"') == 2,
       "the EA app (only) also gets an English locale (its installer died on a non-English locale, C7-2F79, build 593), keeps a finished "
       "answer for a busy thread (its MSI's first custom action lost one: JunoInitializeSession 1603) and (round 624, 7NKYWT) the 32-bit "
       "fault report for its installer's custom-action hosts")
 # ajan32/ea-cef (2026-10-24): the EA app's Chromium lines belong to the installed launcher's session only, never to its installer's.
 launchers = files["BCDLaunchers.swift"]
-check('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"], needsGecko: true, needsArticle: true,' in launchers
+check('launcherOnlyConfig: ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1", "env.MADEIRA_ALIAS_RELEASE = 1"], needsGecko: true, needsArticle: true,' in launchers
       and launchers.count('launcherOnlyConfig: ["') == 1 and launchers.count('"env.MADEIRA_EA_CEF = 1"') == 1
       and launchers.count('"env.MADEIRA_SC_PA_POOLS = 2"') == 1,
-      "only the EA app's table entry has launcherOnlyConfig: layout 2 and env.MADEIRA_EA_CEF = 1 (the EA app's Chromium, 2026-10-24)")
+      "only the EA app's table entry has launcherOnlyConfig: layout 2 and env.MADEIRA_EA_CEF = 1 (the EA app's Chromium, 2026-10-24) and "
+      "env.MADEIRA_ALIAS_RELEASE = 1 (its first helper's heap on a stale alias, round 630)")
+check('sessionConfig: Self.commonSessionConfig + ["env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1", "env.MADEIRA_INT3_X86_DUMP = 1",\n'
+      '                                                   "env.MADEIRA_X86_FAULT_DUMP = 1"],' in launchers,
+      "Battle.net's session also prints the 32-bit fault report (round 630, A2 S5: the browser's NULL+7 after the Microsoft sign-in)")
 check("var programSessionConfig: [String] { sessionConfig + launcherOnlyConfig }" in launchers
       and "sessionConfig: spec.programSessionConfig," in launchers   # round 625: the demand-start list follows
       and "BCDLauncherStart(windowsPath: spec.installerWindowsPath, arguments: spec.installerArguments, sessionConfig: spec.sessionConfig + spec.installerOnlyConfig," in launchers,
@@ -439,10 +443,10 @@ func touch(_ url: URL, _ data: Data = Data("x".utf8)) {
         let eaInstaller = BCDLauncherStart.installer(ea)
         let eaProgram = BCDLauncherStart.program(ea, relative: "Program Files/Electronic Arts/EA Desktop/EA Desktop/EADesktop.exe")
         check(bn.launcherOnlyConfig.isEmpty && bn.programSessionConfig == bn.sessionConfig, "Battle.net has no launcher-only lines: its program's lines are the table's")
-        check(ea.launcherOnlyConfig == ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"]
+        check(ea.launcherOnlyConfig == ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1", "env.MADEIRA_ALIAS_RELEASE = 1"]
               && !ea.sessionConfig.contains("env.MADEIRA_EA_CEF = 1") && !ea.sessionConfig.contains("env.MADEIRA_SC_PA_POOLS = 2"),
               "the EA app's Chromium lines are launcher-only")
-        check(eaProgram.sessionConfig == ea.sessionConfig + ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1"]
+        check(eaProgram.sessionConfig == ea.sessionConfig + ["env.MADEIRA_SC_PA_POOLS = 2", "env.MADEIRA_EA_CEF = 1", "env.MADEIRA_ALIAS_RELEASE = 1"]
               && eaInstaller.sessionConfig == ea.sessionConfig && !eaInstaller.sessionConfig.contains("env.MADEIRA_EA_CEF = 1"),
               "the EA app's program starts with them, its installer without")
         let lines = ["env.MADEIRA_GDI_SHARED_SECTION = 1", "env.MADEIRA_MSIEXEC_SYSTEM32 = 1"]

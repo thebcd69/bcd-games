@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "xaudio2-callbacks-null"
+ ],
+ "next": [
+  "env.MADEIRA_XAUDIO2_CALLBACK_ORDER = 1"
+ ],
+ "note": "The Elder Scrolls V: Skyrim (2011, 32-bit TESV.exe, Steam, BCD Dock), build 626, iPhone19,4: Wine's xaudio2 raised the engine-callback count before it allocated the array, and FAudio's audio thread read the NULL array (xaudio2_6.dll+0x6773) 29 s after the start. Send Log 93EMSH, trimmed. From build 630 auto-tune proposes env.MADEIRA_XAUDIO2_CALLBACK_ORDER = 1.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

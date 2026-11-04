@@ -168,6 +168,13 @@ private enum BCDLiveKey {
     /// The helper extension's memory experiment (MemoryHostTest.m); results in the log.
     func runExtensionTest() {
         guard !extensionTestRunning else { return }
+        // madeira-bcd (round 630; Discord agent D S10: 15 of 15 "no extension" logs since 10-31 are LiveContainer installs): inside
+        // LiveContainer the helper extension is not registered with iOS, so the test can only fail; say why instead.
+        if getenv("LC_HOME_PATH") != nil {
+            extensionTestLine = "Not available inside LiveContainer: the helper extension is there only when BCD is installed as its own app."
+            LogStore.shared.log("[memhost] test skipped: LiveContainer (lc=1), the helper extension is not registered there")
+            return
+        }
         extensionTestRunning = true
         extensionTestLine = "Starting…"
         MadeiraMemoryHostTest({ [weak self] line in

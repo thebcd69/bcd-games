@@ -1,0 +1,404 @@
+[10:15:40.609] [INFO] Checking entitlements...
+[10:15:40.610] [INFO] [build] v0.1.626 (626)
+[10:15:40.610] [INFO] [device] model=iPad16,1 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7908MB available=6121MB cores=6
+[10:15:40.610] [INFO] [device] address-map=[0x100070000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[10:15:40.622] [INFO] [device] settings: low-power=0 thermal=serious screen=1488x2266@2.0x max-fps=60 utc-offset=+07:00 free-disk=61GB stikdebug-url=0
+[10:15:40.625] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:15:41.639] [INFO] Requesting JIT with Built-in StikJIT...
+[10:15:43.456] [INFO] [epic-launch] start app=a2..52 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[10:15:43.458] [INFO] [bcd] library launch BloodstainedRotN.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[10:15:43.471] [INFO] Running full Wine sequence...
+[10:15:43.471] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100070000,0x8000000000) 512GB available=6101MB low-power=0 thermal=serious
+[10:15:43.473] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[10:15:43.478] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:15:43.478] [INFO] Allocating 896MB JIT pool via debugger...
+[10:15:43.478] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:15:43.478] [INFO] [jit-debugger] attached=1 at the pool request
+[10:15:43.480] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:15:44.304] [INFO] RX pool at 0x11d4a8000
+[10:15:44.327] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.902s rev=ml526
+[10:15:44.381] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/2fb7bf0f96e19fee.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[10:15:44.746] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5551 MB + phys_footprint=592 MB = 6144 MB (hw.memsize says 7908 MB)
+ml985: preferred base 0x140000000+0x4c000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x4c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x116960000+0x4c000 (?) → pool 0x11d4ac000 used=0x50000/0x22000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x11d4ac000)
+ml957: ? backing 0x116960000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x11d4f8000 used=0x188000/0x22000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x11d4f8000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x11d632000 used=0x5aa000/0x22000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x11d632000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x11da50000 used=0x6dc000/0x22000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x11da50000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x11db84000 used=0x7a4000/0x22000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x11db84000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x11dc4c000 used=0xaa4000/0x22000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x11dc4c000)
+[window] 0x159400000..0x7812000000 regions=35009 occupied=461394 MB of 486284 MB free=41561 MB maxhole=16672 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[footprint] rev=ml358 phys=608 MB (peak 608) internal=606 MB compressed=0 MB external=73 MB reusable=5 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module BloodstainedRotN.exe (bloodstainedrotn.exe-5e1d18f7ac348018): 116960000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[free-delay] #1 release of 0x70230b0000+0x100000 held for 2000 ms (1 in flight)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x11f358000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x11f3ec000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x11f480000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x11f564000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\BloodstainedRotN\\Binaries\\Win64\\BloodstainedRotN-Win64-Shipping.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\BloodstainedRotN/Binaries/Win64/BloodstainedRotN-Win64-Shipping.exe\" BloodstainedRotN -epicapp=a2ac59c83b704e40b4ab3a9e963fef52 -epicenv=Prod -EpicPortal -epiclocale=en"
+[phase] spawn:L"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\BloodstainedRotN\\Binaries\\Win64\\BloodstainedRotN-Win64-Shipping.exe" t+  1.485s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\BloodstainedRotN/Binaries/Win64/BloodstainedRotN-Win64-Shipping.exe\" BloodstainedRotN -epicapp=a2ac59c83b704e40b4ab3a9e963fef52 -epicenv=Prod -EpicPortal -epiclocale=en" (fd=81, unixdir=90, dup_unixdir=98) cwd=L"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\"
+ml985: map_image_view size=0xbe3e000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0xbe3e000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xbe40000 rev=ajan5-motor
+[xp] 10:15:45.360 +0.57 dt=301 cpu=603 (thr 603) P=303 E=300 run=607 pgw=-1.0 GHz P=3.22 E=2.11 Minst=8705 IPC=5.42 mJ=977 pin=0 rdKB=0 fpMB=1040
+[xp] 10:15:45.683 +0.89 dt=323 cpu=646 (thr 645) P=325 E=321 run=649 pgw=-1.0 GHz P=3.21 E=2.11 Minst=9690 IPC=5.64 mJ=1102 pin=0 rdKB=0 fpMB=1040
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x12c6ac000)
+[xp] 10:15:45.934 +1.14 dt=251 cpu=505 (thr 504) P=256 E=249 run=511 pgw=-1.0 GHz P=3.44 E=2.11 Minst=6725 IPC=4.79 mJ=971 pin=1 rdKB=0 fpMB=1093
+[xp] 10:15:46.199 +1.41 dt=265 cpu=544 (thr 542) P=281 E=263 run=549 pgw=-1.0 GHz P=3.38 E=2.11 Minst=7089 IPC=4.72 mJ=992 pin=0 rdKB=160 fpMB=1139
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9df0000) -> 64-bit table (0x102f00828)
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x107830000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10024 msg_window=0x10026
+[image-reload] unmapped image 0x71f9160000+0xb0000: 1 pool copy marked
+[xp] 10:15:46.462 +1.67 dt=263 cpu=525 (thr 527) P=263 E=262 run=530 pgw=-1.0 GHz P=3.39 E=2.11 Minst=5235 IPC=3.62 mJ=885 pin=42 rdKB=704 fpMB=1153
+[xp] 10:15:46.727 +1.94 dt=264 cpu=527 (thr 526) P=267 E=260 run=531 pgw=-1.0 GHz P=3.34 E=2.11 Minst=5041 IPC=3.51 mJ=837 pin=0 rdKB=0 fpMB=1279
+[footprint] rev=ml358 phys=1294 MB (peak 1294) internal=1292 MB compressed=0 MB external=139 MB reusable=5 MB (cycle=2)
+[footprint] rev=ml1060 fast phys=1318 MB compressed=0 MB internal=1316 MB
+[footprint] rev=ml1060 fast phys=1342 MB compressed=0 MB internal=1339 MB
+[footprint] rev=ml1060 fast phys=1387 MB compressed=0 MB internal=1385 MB
+[footprint] rev=ml1060 fast phys=1533 MB compressed=0 MB internal=1530 MB
+[xp-names] m1697385 "wine-x18-exc"
+[copy-verify] GFSDK_Aftermath_Lib.x64.dll: OK, 4 .text pages executable (copy @0x12f1fd000)
+[footprint] rev=ml1060 fast phys=1618 MB compressed=0 MB internal=1615 MB
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/BloodstainedRotN/Saved/Logs/BloodstainedRotN-backup-2026.11.02-03.15.31.log
+[guest-log] #1 tid=002c LogConsoleResponse: Display: Failed to find resolution value strings in scalability ini. Falling back to default.
+[guest-log] #2 tid=002c LogPakFile: Display: Found Pak file ../../../BloodstainedRotN/Content/Paks/pakchunk9-WindowsNoEditor.pak attempting to mount.
+[guest-log] #3 tid=002c LogPakFile: Display: Mounting pak file ../../../BloodstainedRotN/Content/Paks/pakchunk9-WindowsNoEditor.pak.
+[guest-log] #4 tid=002c LogPakFile: Display: Found Pak file ../../../BloodstainedRotN/Content/Paks/pakchunk12-WindowsNoEditor.pak attempting to mount.
+[guest-log] #5 tid=002c LogPakFile: Display: Mounting pak file ../../../BloodstainedRotN/Content/Paks/pakchunk12-WindowsNoEditor.pak.
+[guest-log] #6 tid=002c LogPakFile: Display: Found Pak file ../../../BloodstainedRotN/Content/Paks/pakchunk11-WindowsNoEditor.pak attempting to mount.
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".........................................................."
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "LogPakFile: Display: Mounting pak file ../../../BloodstainedRotN/Content/Paks/pakchunk9-WindowsNoEditor.pak..."
+[footprint] rev=ml358 phys=1633 MB (peak 1633) internal=1631 MB compressed=0 MB external=139 MB reusable=5 MB (cycle=3)
+[free-delay] #2 release of 0x7034140000+0x200000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7034340000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7034740000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #5 release of 0x7034f40000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #6 release of 0x7035f10000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #7 release of 0x7036ee0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #8 release of 0x7038010000+0xfd0000 held for 2000 ms (7 in flight)
+[image-reload] unmapped image 0x71f8950000+0xc0000: 1 pool copy marked
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1689 MB compressed=0 MB internal=1687 MB
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=10000 peb=0x107830000
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x20040 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x20040 class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[guest-log] #59 tid=008c [2026.11.02-03.15.50:359][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: Paper2D_SC and no native library supported.
+[win-name] #5 hwnd=0x20048 class='UnrealWindow' text="" rev=ml853
+[win-name] #6 hwnd=0x10050 class='IME' text="" rev=ml853
+[guest-log] #60 tid=008c .02-03.15.50:361][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: CriWare and no native library supported.
+[guest-log] #61 tid=008c [2026.11.02-03.15.50:362][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: CriWare_SC and no native library supported.
+[guest-log] #62 tid=008c [2026.11.02-03.15.50:363][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: CriWare and no native library supported.
+[guest-log] #63 tid=008c [2026.11.02-03.15.50:365][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: CriWare_SC and no native library supported.
+[guest-log] #64 tid=008c [2026.11.02-03.15.50:366][  0]LogShaderLibrary: Display: Failed to load Shared Shader Library: AnimationSharing and no native library supported.
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+[10:15:50.709] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[footprint] rev=ml358 phys=2149 MB (peak 2149) internal=2014 MB compressed=0 MB external=147 MB reusable=5 MB (cycle=4)
+002c:err:module:load_dll [dll-missing] rev=ml336 #8 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #9 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #10 L"../../../BloodstainedRotN/Plugins/OnlineSubsystemGOG/Source/ThirdParty/GalaxySDK/Libraries/Galaxy64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[launch-view] dismissed reason=present logs=0
+D 2C Load module libvorbis_64.dll (libvorbis_64.dll-28e815dd89bf571d): 71F5A50000
+D 2C Load module libvorbisfile_64.dll (libvorbisfile_64.dll-92c510c3dda9c57a): 71F5A40000
+[footprint] rev=ml358 phys=2585 MB (peak 2585) internal=2393 MB compressed=0 MB external=151 MB reusable=5 MB (cycle=5)
+D 2C Load module XAudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): 71F5980000
+[jit-pool] image 0x71f58e0000+0xa0000 (mfreadwrite.dll) → pool 0x131ae4000 used=0x146e0000/0x22000000 tramp+0x4000
+D 2C Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F58E0000
+[mem-burst] rev=624 +336 MB in 509 ms phys=2714 internal=2446 compressed=0 other=268 | guest commits since the last sample: n=1256, 569 MB, biggest 32 MB tid=011c | swap backed=0 MB | pool head=326 MB tail=160 MB
+err:   [bc-census] ml653 periodic: 64 BC resources, 396 subresources
+err:   [bc-census] ml653   BC1_TYPELESS n=24 2354KB max=1920x1080 mips=11 arr=6 cube=1 | use def=24 imm=0 dyn=0 stg=0 | data y=0 n=24 | cpu r=0 w=0 | bind srv=24 rt=0 uav=0
+err:   [bc-census] ml653   BC3_TYPELESS n=37 3675KB max=1920x1080 mips=10 arr=1 cube=0 | use def=37 imm=0 dyn=0 stg=0 | data y=0 n=37 | cpu r=0 w=0 | bind srv=37 rt=0 uav=0
+err:   [bc-census] ml653   BC4_UNORM n=1 2KB max=64x64 mips=7 arr=1 cube=0 | use def=1 imm=0 dyn=0 stg=0 | data y=0 n=1 | cpu r=0 w=0 | bind srv=1 rt=0 uav=0
+err:   [bc-census] ml653   BC5_UNORM n=2 10KB max=64x64 mips=7 arr=1 cube=0 | use def=2 imm=0 dyn=0 stg=0 | data y=0 n=2 | cpu r=0 w=0 | bind srv=2 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x24
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 256 BC resources, 595 subresources
+[win-name] #16 hwnd=0x10056 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #17 hwnd=0x10056 class='__wine_xinput_devnotify' text="" rev=ml853
+0150:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0150 status=00000001 caller=000000012BBD232C
+[win-name] #18 hwnd=0x20048 class='UnrealWindow' text="Bloodstained: Ritual of the Night  " rev=ml853
+[win-name] #19 hwnd=0x20048 class='UnrealWindow' text="Bloodstained: Ritual of the Night  " rev=ml853
+[win-name] #20 hwnd=0x20048 class='UnrealWindow' text="Bloodstained: Ritual of the Night  " rev=ml853
+[win-name] #21 hwnd=0x20048 class='UnrealWindow' text="Bloodstained: Ritual of the Night  " rev=ml853
+[footprint] rev=ml358 phys=3154 MB (peak 3154) internal=2676 MB compressed=0 MB external=153 MB reusable=5 MB (cycle=6)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2204 full-path-hits=290 component-lookups=11778 shortcut-hits=8013 misses=3682 scans=3765 entries-scanned=66884 us-in-lookup=1170057 (11% of the window) slowest=0.512 ms ...6-5BF7954AD8D0/Documents/wine/dosdevices/c:/windows/system32
+[hwinput] keyboard focus: elsewhere (poll)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=3882 MB compressed=0 MB internal=3195 MB
+[footprint] rev=ml1060 fast phys=3906 MB compressed=0 MB internal=3219 MB
+[footprint] rev=ml1060 fast phys=3926 MB compressed=0 MB internal=3239 MB
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml1060 fast phys=3968 MB compressed=0 MB internal=3286 MB
+[footprint] rev=ml1060 fast phys=3996 MB compressed=0 MB internal=3314 MB
+[footprint] rev=ml1060 fast phys=4082 MB compressed=0 MB internal=3279 MB
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+002c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\winebrowser.exe" cmdline=L"\"C:\\windows\\system32\\winebrowser.exe\"  \"https://www.epicgames.com/activate?userCode=<code>\""
+[phase] spawn:L"C:\\windows\\system32\\winebrowser.exe" t+ 24.797s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\winebrowser.exe\"  \"https://www.epicgames.com/activate?userCode=<code>\"" (fd=709, unixdir=710, dup_unixdir=714) cwd=L"C:\\Program Files\\Epic Games\\BloodstainedftBhx\\BloodstainedRotN\\Binaries\\Win64\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x15f9f0000+0xd000 (?) → pool 0x131b8a000 used=0x146f6000/0x22000000 tramp+0x0
+ml957: ? backing 0x15f9f0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x10784c000
+[nls-getptr] type=11 id=437 peb=0x10784c000
+[jit-pool] image 0x71f5340000+0x418000 (libarm64ecfex.dll) → pool 0x131cd6000 used=0x14c4e000/0x22000000 tramp+0x4000
+[jit-pool] image 0x71f5210000+0x130000 (ucrtbase.dll) → pool 0x1320f4000 used=0x14d80000/0x22000000 tramp+0x4000
+[jit-pool] image 0x71f5150000+0xc0000 (kernel32.dll) → pool 0x132228000 used=0x14e48000/0x22000000 tramp+0x8000
+[jit-pool] image 0x71f4e60000+0x2f0000 (kernelbase.dll) → pool 0x1322f0000 used=0x15148000/0x22000000 tramp+0x10000
+[nls-getptr] type=11 id=20127 peb=0x10784c000
+D 174 Load module winebrowser.exe (winebrowser.exe-b42e08e1b1cebd3c): 15F9F0000
+D 174 Load module  (-2d1580055211ffc7): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10784c000
+[nls-getptr] type=11 id=437 peb=0x10784c000
+0174:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[open-url] madeira-bcd: a program asks to open a page on www.epicgames.com (52 characters); BCD asks the player."
+0174:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=38894
+[unwind] term ml661 begin rip=1321851d4 rsp=7082affdb8 window=[7082affdb8..70832ffdb8) max=32
+[unwind] term ml661 #00 pc=1321851d4 rsp=7082affdb8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+628:   ? 15f9f1410  (exe)+0x1410
+0174:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=38905
+[unwind] term ml661 begin rip=1321851d4 rsp=7082affdb8 window=[7082affdb8..70832ffdb8) max=32
+[unwind] term ml661 #00 pc=1321851d4 rsp=7082affdb8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+628:   ? 15f9f1410  (exe)+0x1410
+0174:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=713
+[Wine ntdll/server] process_exit_wrapper(0)
+[10:16:08.472] [INFO] [open-url] Bloodstained: Ritual of the Night asks to open a page on www.epicgames.com; asking the player
+[10:16:10.782] [OK] Early detach: game presenting and settled
+[10:16:12.786] [INFO] Detaching debugger...
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=87 resident=3280MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.02 s of audio in 10.00 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[window] 0x7048000000..0x7400000000 regions=6283 occupied=9286 MB of 15232 MB free=5949 MB maxhole=5696 MB@0x7090df0000 rev=ml787 (periodic)
+[window] 0x159400000..0x7812000000 regions=44001 occupied=463258 MB of 486284 MB free=39697 MB maxhole=16672 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=86 resident=3275MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+91s beats=3 gaps=0 iter=357 gen=1 threads=86 resident=3254MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[window] 0x7048000000..0x7400000000 regions=6159 occupied=9277 MB of 15232 MB free=5958 MB maxhole=5696 MB@0x7090df0000 rev=ml787 (periodic)
+[window] 0x159400000..0x7812000000 regions=43876 occupied=463249 MB of 486284 MB free=39706 MB maxhole=16672 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[freeze] alive t+121s beats=4 gaps=0 iter=476 gen=1 threads=86 resident=3254MB dbg=DEBUGGED rev=ml525
+[10:17:48.440] [INFO] [open-url] Bloodstained: Ritual of the Night: a page on www.epicgames.com -> not now
+[hwinput] keyboard focus: program (poll)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[file-census] r624 108s: case-sensitive=1 full-path-tries=67 full-path-hits=25 component-lookups=291 shortcut-hits=207 misses=84 scans=84 entries-scanned=2598 us-in-lookup=32828 (0% of the window) slowest=0.508 ms ...6-5BF7954AD8D0/Documents/wine/dosdevices/c:/windows/system32
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=89 resident=3282MB dbg=DEBUGGED rev=ml525
+[cpu-split] ml1123 native top: Madeira`objc_msgSend$signaledValue+0=5 Madeira`__wine_unix_call_dispatcher+0x50=5 IOSurface`<redacted>+0xb4=4 libsystem_pthread.dylib`pthread_once+0x38=3 Madeira`_MTLSharedEvent_signaledValue+0x68=2 Madeira`__wine_syscall_dispatcher+0x250=1 Madeira`send_debug_event+0x18c=1 Madeira`__wine_unix_call_dispatcher+0x10=1 libobjcMsgSend.dylib`objc_msgSend+0=1 libsystem_platform.dylib`_platform_memmove+0xa0=1
+[exec-alloc] NtAllocateVirtualMemoryEx #8 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c0000017 proc=bloodstainedrotn-win64-shipping.exe tid=002c size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #9 req_addr=0x0 size=0x4000000 type=0x103000 protect=0x40
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c0000017 proc=bloodstainedrotn-win64-shipping.exe tid=002c size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #10 req_addr=0x0 size=0x2000000 type=0x103000 protect=0x40
+[nt-fail] #3 NtAllocateVirtualMemoryEx status=c0000017 proc=bloodstainedrotn-win64-shipping.exe tid=002c size=0x2000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #11 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[rb-tex] madeira-bcd new readback #1: fmt 115 1x1 level 0 (texture 1x1, 1 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 115 9x1 level 0 (texture 9x1, 1 mips)
+[exec-alloc] NtAllocateVirtualMemoryEx #12 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[spin] ml1140 10:18:39.408 look 1: x64->EC 19480225/s, 98% of the sampled calls for 4 s go to d3d11.dll+0x6be54 (0x12e54ee54)
+[spin] ml1140 thread 0164 teb=0x705ada0000 cpu=100% host pc=0x12b591af0 (ARM64EC image copy) lr=0x12b59dfb8 sp=0x706d8fee20 x23=0xc4ec | guest RIP exact=0x0 (hostPC outside block) State.rip=0x14f8cb5fd
+[spin] ml1140   RAX=0x12b602000 RCX=0x706d8fefc8 RDX=0x12b770ae8 RBX=0x1 RSP=0x706d8fee20 RBP=0x706d8fef00 RSI=0x7039bbdd40 RDI=0x7025030000 R8=0x706d8fede0 R9=0x4 R10=0x706d8fef10 R11=0xfffffffff9919828 R12=0x1 R13=0x12b602000 R14=0x7043e80a80 R15=0x0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): 00 4c 8d 84 24 a0 00 00 00 41 b9 04 00 00 00 44 89 7c 24 20 48 8b d6 48 8b 01 ff 90 e8 00 00 00 44 38 3d e8 4a af 03 8b d8 74 1e e8 73 84 b0 ff 84 c0 74 15 e8 4a 0a 55 00 84 c0 74 0c 48 8d 0d 07 12 b0 03 e8 9a 12 56 00 48 8d 8c 24 b8 00 00 00 ff 15 7c 50 8d 01 0f 57 c0 f2 48 0f 2a 84 24 b8 00 00 00 f2 0f 59 05 b7 19 8f 03 f2 0f 5c c6 66 0f 2f c7 77 3a 83 fb 01 0f 84 54 ff ff ff 48
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x706d8fee20: sp+0xe8=bloodstainedrotn-win64-shipping.exe+0x78cb634(call indirect) sp+0x188=bloodstainedrotn-win64-shipping.exe+0x78d2bdb(call rel32) sp+0x258=bloodstainedrotn-win64-shipping.exe+0x7e169eb(call indirect)
+[spin] ml1140   first stack qwords: 1 0 7043e80a80 0 7039bbdd40 7025030000 12b59dfb8 0
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=88 resident=2527MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=7949 occupied=9510 MB of 15232 MB free=5724 MB maxhole=5493 MB@0x709d840000 rev=ml787 (periodic)
+[window] 0x159400000..0x7812000000 regions=46660 occupied=463584 MB of 486284 MB free=39371 MB maxhole=16672 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 2 samples
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=94 resident=2567MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 236 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1312..4800 frames; worst late wake 0.0 ms; clamped 781 samples
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 236 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 76 samples
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x49
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x969
+err:   [bc-census] ml653   SRV view fmt 80 (BC4_UNORM) x67
+err:   [bc-census] ml653   SRV view fmt 83 (BC5_UNORM) x112
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=6725 CopyResource=0 CopySubresourceRegion=952 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 380586KB
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 372 samples
+[freeze] alive t+242s beats=8 gaps=0 iter=952 gen=1 threads=93 resident=2548MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=8301 occupied=9587 MB of 15232 MB free=5647 MB maxhole=5492 MB@0x709d840000 rev=ml787 (periodic)
+[window] 0x159400000..0x7812000000 regions=47246 occupied=463716 MB of 486284 MB free=39239 MB maxhole=16672 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170991020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+E 188 [cpu-area] ThreadInit-done tid=0x188 teb=0x705ad30000 tsd275=0x705ad30000 x18teb=0x705ad30000 area=0x16b630000 StateFrame(ED0)=0x7c3bc01140 ThreadState(ED1)=0x7c3bc01000 EnterEC=0x13e4a0108
+0188:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0188 status=00000000 caller=000000012BBD234C
+E 188 [thr-term] rev=ml435 deinit #14 tid=0x188
+[srv-own] read_request EOF tid=0188 pid=0028 request_unixfd=748 -> kill_thread rev=ml586
+[srv-kill] kill_thread tid=0188 pid=0028 violent=0 rev=ml586
+[footprint] rev=ml358 phys=4008 MB (peak 4216) internal=2364 MB compressed=539 MB external=168 MB reusable=1 MB (cycle=123)
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 1 samples
+[census-hold] idx=1 port=0x10127 teb=0x71fffd0000 tid=002c HOLDS fexlock @0x7c040e0108 run_state=1 susp=0 pc=0x13622be7c lr=0x13622ad60 sp=0x71fc310000 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=4008 MB (peak 4216) internal=2364 MB compressed=539 MB external=168 MB reusable=1 MB (cycle=124)
+[footprint] rev=ml358 phys=4005 MB (peak 4216) internal=2361 MB compressed=539 MB external=168 MB reusable=2 MB (cycle=125)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   Device error at frame 13810: Error Domain=MTLCommandBufferErrorDomain Code=2 "Caused GPU Hang Error (00000003:kIOGPUCommandBufferCallbackErrorHang)" UserInfo={NSLocalizedDescription=Caused GPU Hang Error (00000003:kIOGPUCommandBufferCallbackErrorHang), NSUnderlyingError=0x16b8746c0 {Error Domain=IOGPUCommandQueueErrorDomain Code=3 "(null)"}}
+err:   Device error at frame 13810: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x16b876ee0 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   Device error at frame 13812: Error Domain=MTLCommandBufferErrorDomain Code=2 "Caused GPU Hang Error (00000003:kIOGPUCommandBufferCallbackErrorHang)" UserInfo={NSLocalizedDescription=Caused GPU Hang Error (00000003:kIOGPUCommandBufferCallbackErrorHang), NSUnderlyingError=0x16b874960 {Error Domain=IOGPUCommandQueueErrorDomain Code=3 "(null)"}}
+err:   Device error at frame 13813: Error Domain=MTLCommandBufferErrorDomain Code=1 "Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim)" UserInfo={NSLocalizedDescription=Discarded (victim of GPU error/recovery) (00000005:kIOGPUCommandBufferCallbackErrorInnocentVictim), NSUnderlyingError=0x16b876eb0 {Error Domain=IOGPUCommandQueueErrorDomain Code=5 "(null)"}}
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   Device error at frame 13814: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874450 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13814: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874d50 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13814: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8751a0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13815: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8753b0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13815: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8750b0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13815: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874f60 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13816: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874330 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13816: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874ae0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13816: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b875050 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13817: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874360 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13817: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b876d30 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13817: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8749c0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[footprint] rev=ml358 phys=4003 MB (peak 4216) internal=2359 MB compressed=539 MB external=169 MB reusable=2 MB (cycle=126)
+err:   Device error at frame 13818: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b876fd0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[store-noalias] #1 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 [first] rev=ml555
+[rip-leak] guest RIP 0x12b59e16c IS POOL addr = PE 0x71ffd4e16c (module base 0x71ffcd0000 rva 0x7e16c)
+[mach_exc] UNHANDLED #1 pc=0x25cc2576c addr=0xa00 x18=0x703c920000 type=1 lr=0x25cc2575c sp=0x15b18fa00 x16=0x10000028a866b35 x17=0x20000028a866b35
+[guest-code] rev=ml333 pool_rip=0x1655c71 (PE 0x1655c71) -- NO pool copy for this address (identity translate)
+[fault-host] 25cc2566c: f944c908 52826ba9 8b090108 39400100 d65f03c0 d503237f d10243ff a9036ffc
+[fault-host] 25cc2568c: a90467fa a9055ff8 a90657f6 a9074ff4 a9087bfd 910203fd a9011fe4 aa0603f9
+[fault-host] 25cc256ac: f90003e3 aa0203f7 f0152ce8 b9895d08 a90203e8 8b080008 f9400115 91404ea8
+[fault-host] 25cc256cc: 913e4114 52994808 8b0802bb 528ff628 8b0802bc b947bea8 d0125d96 f94466d6
+[fault-host] 25cc256ec: b907c2a8 b98002c8 8b0800a8 927e74c9 a940a113 9240dd0a cb090108 eb09015f
+[fault-host] 25cc2570c: 9a9f8108 f90007e8 f97fe6a8 eb0800bf 54000220 aa0503fa f94402a0 aa0503e1
+[mach_exc] insn_stream PC-12..PC+8: b94013b6 91055f98 f9400308 [f9450109] f9451908 aa090108 f254091f
+[mach_exc] sym pc=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xec lr=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xdc
+[x86_seg] State.gs_cached=0x703c920000 TEB=0x703c920000 TEB[0x58]=0x702477d860 *(gs_cached+0x58)=0x702477d860
+[store-noalias] #2 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x25cc2576c addr=0xa00 x18=0x703c920000 type=1 lr=0x25cc2575c sp=0x15b18fa00 x16=0x10000028a866b35 x17=0x20000028a866b35
+[guest-code] rev=ml333 pool_rip=0x1655c71 (PE 0x1655c71) -- NO pool copy for this address (identity translate)
+[fault-host] 25cc256cc: 913e4114 52994808 8b0802bb 528ff628 8b0802bc b947bea8 d0125d96 f94466d6
+[fault-host] 25cc256ec: b907c2a8 b98002c8 8b0800a8 927e74c9 a940a113 9240dd0a cb090108 eb09015f
+[fault-host] 25cc2570c: 9a9f8108 f90007e8 f97fe6a8 eb0800bf 54000220 aa0503fa f94402a0 aa0503e1
+[fault-host] 25cc2572c: 52800022 97ed100c b98002c8 8b080348 f943d2a0 91008101 52800022 952cb09a
+[fault-host] 25cc2574c: f943caa0 b4000060 aa1a03e1 952cb122 f93fe6ba b94013b6 91055f98 f9400308
+[fault-host] 25cc2576c: f9450109 f9451908 aa090108 f254091f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: b94013b6 91055f98 f9400308 [f9450109] f9451908 aa090108 f254091f
+[mach_exc] sym pc=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xec lr=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xdc
+[x86_seg] State.gs_cached=0x703c920000 TEB=0x703c920000 TEB[0x58]=0x702477d860 *(gs_cached+0x58)=0x702477d860
+00d8:err:seh:segv_handler   [guest-exact] ml885 block=0xffffffff010000 unresolved: header unreadable
+00d8:err:seh:segv_handler   [sym] pc=AGXMetalG16P_B0`<redacted>+0xec
+err:   Device error at frame 13818: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874d20 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13818: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874990 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13819: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8755c0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[store-noalias] #3 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x25cc2576c addr=0xa00 x18=0x703c920000 type=1 lr=0x25cc2575c sp=0x15b18fa00 x16=0x10000028a866b35 x17=0x20000028a866b35
+[guest-code] rev=ml333 pool_rip=0x1655c71 (PE 0x1655c71) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: b94013b6 91055f98 f9400308 [f9450109] f9451908 aa090108 f254091f
+[mach_exc] sym pc=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xec lr=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xdc
+[x86_seg] State.gs_cached=0x703c920000 TEB=0x703c920000 TEB[0x58]=0x702477d860 *(gs_cached+0x58)=0x702477d860
+[store-noalias] #4 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x25cc2576c addr=0xa00 x18=0x703c920000 type=1 lr=0x25cc2575c sp=0x15b18fa00 x16=0x10000028a866b35 x17=0x20000028a866b35
+[guest-code] rev=ml333 pool_rip=0x1655c71 (PE 0x1655c71) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: b94013b6 91055f98 f9400308 [f9450109] f9451908 aa090108 f254091f
+[mach_exc] sym pc=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xec lr=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xdc
+00d8:err:seh:segv_handler   [guest-exact] ml885 block=0xffffffff010000 unresolved: header unreadable
+00d8:err:seh:segv_handler   [sym] pc=AGXMetalG16P_B0`<redacted>+0xec
+err:   Device error at frame 13819: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b875320 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13819: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8750e0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[footprint] rev=ml358 phys=3937 MB (peak 4216) internal=2359 MB compressed=539 MB external=169 MB reusable=2 MB (cycle=127)
+err:   Device error at frame 13820: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b877a80 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[store-noalias] #5 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x25cc2576c addr=0xa00 x18=0x703c920000 type=1 lr=0x25cc2575c sp=0x15b18fa00 x16=0x10000028a866b35 x17=0x20000028a866b35
+[guest-code] rev=ml333 pool_rip=0x1655c71 (PE 0x1655c71) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: b94013b6 91055f98 f9400308 [f9450109] f9451908 aa090108 f254091f
+[mach_exc] sym pc=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xec lr=/System/Library/Extensions/AGXMetalG16P_B0.bundle/AGXMetalG16P_B0`<redacted>+0xdc
+[store-noalias] #6 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+err:   Device error at frame 13820: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874540 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13820: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b876c40 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1273 tex<-stg=0 stg<-tex=4 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   Device error at frame 13821: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b876c10 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[store-noalias] #7 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #7 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=7 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+[store-noalias] #8 rev=ml348 addr=0xa00 insn=0xf9450109 pc=0x25cc2576c NO pool/anon alias | region 0x100070000+0x278c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #8 p0=READ p1=0xa00 hostpc=0x25cc2576c hinsn=0xf9450109 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=8 rip=0x12b59e16c pc=0x25cc2576c addr=0xa00 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100070000+0x278c000 rev=ml555
+err:   Device error at frame 13821: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b877090 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13821: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b875b90 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[ios_audio] ml1230 pacing stream=0x156e48800 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 236 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=3937 MB (peak 4216) internal=2359 MB compressed=539 MB external=169 MB reusable=2 MB (cycle=128)
+[xp] 10:20:03.502 +258.71 dt=300 cpu=339 (thr 339) P=322 E=17 run=364 pgw=-1.0 GHz P=3.05 E=1.49 Minst=5305 IPC=5.27 mJ=800 pin=0 rdKB=0 fpMB=3937
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 10:20:03.796 +259.00 dt=295 cpu=355 (thr 355) P=294 E=61 run=1178 pgw=-1.0 GHz P=3.07 E=2.03 Minst=5089 IPC=4.95 mJ=760 pin=0 rdKB=0 fpMB=3924
+err:   Device error at frame 13822: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b8776f0 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13822: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b877060 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+err:   Device error at frame 13822: Error Domain=MTLCommandBufferErrorDomain Code=4 "Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)" UserInfo={NSLocalizedDescription=Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored), NSUnderlyingError=0x16b874300 {Error Domain=IOGPUCommandQueueErrorDomain Code=4 "(null)"}}
+[xp] 10:20:04.055 +259.26 dt=259 cpu=292 (thr 292) P=274 E=18 run=327 pgw=-1.0 GHz P=3.02 E=1.77 Minst=4494 IPC=5.23 mJ=668 pin=0 rdKB=0 fpMB=3915
+[10:20:04.152] [INFO] [session] length=260s partial=1 play=253s frames=13821 avg=55.0 low1=34.5 low01=2.0 worst=2247ms stalls=1/2s peak=4217MB limit=6143MB thermal=serious lpm=0 res=1184x776 game=Bloodstained: Ritual of the Night
+[xp] 10:20:04.313 +259.52 dt=257 cpu=308 (thr 308) P=242 E=66 run=780 pgw=-1.0 GHz P=2.97 E=2.07 Minst=4124 IPC=4.83 mJ=593 pin=9 rdKB=424 fpMB=3915
+[xp] 10:20:04.591 +259.80 dt=278 cpu=312 (thr 312) P=288 E=24 run=695 pgw=-1.0 GHz P=2.91 E=2.09 Minst=4662 IPC=5.24 mJ=651 pin=0 rdKB=0 fpMB=3915
+[10:20:04.591] [xp] 10:20:04.591 +259.80 dt=278 cpu=312 (thr 312) P=288 E=24 run=695 pgw=-1.0 GHz P=2.91 E=2.09 Minst=4662 IPC=5.24 mJ=651 pin=0 rdKB=0 fpMB=3915

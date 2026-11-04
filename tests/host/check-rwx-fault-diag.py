@@ -165,10 +165,13 @@ int main(int argc, char **argv)
     const char *s = argc > 1 ? argv[1] : "";
     struct world w = make();
 
-    if (!strcmp(s, "off") || !strcmp(s, "armed") || !strcmp(s, "differ") || !strcmp(s, "nocopy")) {
+    if (!strcmp(s, "off") || !strcmp(s, "armed") || !strcmp(s, "differ") || !strcmp(s, "nocopy") || !strcmp(s, "wcsib") || !strcmp(s, "wcself")) {
         memcpy((void *)fake_copy + 0x1659, !strcmp(s, "differ") ? stale : plain, sizeof(plain));
-        if (!strcmp(s, "off")) {
-            fake_vp[0] = fake_vp[2] = fake_vp[3] = 0x27;  /* siblings still RWX; the rip's page armed (0x25) */
+        if (!strcmp(s, "off") || !strcmp(s, "wcsib") || !strcmp(s, "wcself")) {
+            /* "off": siblings still RWX; the rip's page armed (0x25). Round 630: "wcsib" siblings WRITECOPY (0x2d, FFRS), "wcself" the
+             * rip's page WRITECOPY itself. */
+            fake_vp[0] = fake_vp[2] = fake_vp[3] = !strcmp(s, "off") ? 0x27 : 0x2d;
+            if (!strcmp(s, "wcself")) fake_vp[1] = 0x2d;
             assert(mach_vm_protect(mach_task_self(), w.img, 0x4000, FALSE, VM_PROT_READ | VM_PROT_WRITE) == KERN_SUCCESS);
         } else {
             assert(mach_vm_protect(mach_task_self(), w.img, 0x4000, FALSE, VM_PROT_READ) == KERN_SUCCESS);
@@ -231,6 +234,14 @@ else:
               'and a neighbouring 4 KB page of it has W' in t, t)
         check('a pool copy exists and the 32 bytes of both views are printed and equal',
               'pool copy: 0x' in t and '48 89 e9 8b 89 3c 00 00 00 48 81 c1 08 01 00 00' in t and t.endswith('image and pool copy equal'), t)
+
+        # Round 630 (agent G1 S15): a WRITECOPY page (0x08) is host-writable too; the line says so for a sibling and for the page itself.
+        t = (lines(run('wcsib')) or [''])[0]
+        check('trap: OFF, naming the WRITECOPY neighbour (FFRS: 0x2d)', '2d 25 2d 2d (this page 25)' in t and 'trap: OFF: Wine\'s table says this page '
+              'is read-only, its host page is writable, and a neighbouring 4 KB page of it is WRITECOPY' in t, t)
+        t = (lines(run('wcself')) or [''])[0]
+        check('trap: OFF, the page itself WRITECOPY', '2d 2d 2d 2d (this page 2d)' in t
+              and "trap: OFF: Wine's table says this page is WRITECOPY, which keeps its host page writable" in t, t)
 
         r = run('armed')
         t = (lines(r) or [''])[0]

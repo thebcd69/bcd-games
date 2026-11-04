@@ -15,7 +15,9 @@ import UIKit
 // Touches: a controller control (A, LS, LT, ...) hands its touches to the touch gamepad's own
 // surface (BCDTouchInput.padSurface), the same one the game always got its input through. Every
 // other control has a BCDTouchKeySurface: one finger, from touch-down to lift, through
-// BCDTouchPress (BCDTouchCore.swift). Both cover exactly the area they always covered.
+// BCDTouchPress (BCDTouchCore.swift). Both cover exactly the area they always covered. A control
+// the player gave a shape of its own (BCD's editor, Look) is drawn, and takes touches, in that
+// shape, and the player's words on a control are drawn as large as they fit (BCDTouchTextFit).
 
 // MARK: - Where touches and edits go
 
@@ -120,11 +122,12 @@ struct BCDTouchControl: View, Equatable {
     }
 
     private var diameter: CGFloat { CGFloat(BCDTouchGeometry.diameter(scale: item.scale, layoutScale: layoutScale)) }
-    private var size: CGSize { BCDTouchGeometry.size(item.action.shape, diameter: Double(diameter)) }
+    /// The player's own shape when it has one (BCD's editor, Look), else its action's.
+    private var size: CGSize { BCDTouchGeometry.size(item.shape, diameter: Double(diameter)) }
 
     var body: some View {
         BCDTouchFace(action: item.action, diameter: diameter, down: down, direction: direction, vector: vector,
-                     opacity: opacity, selected: selected)
+                     opacity: opacity, selected: selected, custom: item.customShape, words: item.words)
             .environment(\.bcdTouchLook, look)
             .frame(width: size.width, height: size.height)
             .overlay { if !editing { surface } }
@@ -135,7 +138,7 @@ struct BCDTouchControl: View, Equatable {
             .onChange(of: item.action) { _, _ in rest() }
             .onDisappear { rest() }
             .accessibilityElement()
-            .accessibilityLabel(BCDTouchNames.title(item.action))
+            .accessibilityLabel(item.words.map { $0 + ", " + BCDTouchNames.title(item.action) } ?? BCDTouchNames.title(item.action))
     }
 
     @ViewBuilder private var surface: some View {
@@ -145,7 +148,7 @@ struct BCDTouchControl: View, Equatable {
                 down = held
             }
         } else {
-            BCDTouchKeySurface(action: item.action, diameter: Double(diameter), input: input) { held, toward in
+            BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input) { held, toward in
                 down = held
                 direction = toward
             }
@@ -190,10 +193,15 @@ struct BCDTouchFace: View {
     var opacity = 1.0
     /// Selected in the editor: a fuchsia ring around it.
     var selected = false
+    /// The player's own shape (BCD's editor, Look); nil: the action's. A stick stays a ring.
+    var custom: BCDTouchCustomShape? = nil
+    /// The player's own words in place of the label (BCDTouchText.clean); nil: the label. Not on a stick.
+    var words: String? = nil
     @Environment(\.bcdTouchLook) var look
 
     private var paint: BCDTouchPaint { BCDTouchPaint(look: look) }
-    private var size: CGSize { BCDTouchGeometry.size(action.shape, diameter: Double(diameter)) }
+    private var shape: BCDTouchShape { action.shape(custom: custom) }
+    private var size: CGSize { BCDTouchGeometry.size(shape, diameter: Double(diameter)) }
 
     var body: some View {
         Group {
@@ -208,10 +216,12 @@ struct BCDTouchFace: View {
     }
 
     private var outline: AnyShape {
-        switch action.shape {
+        switch shape {
         case .wide: return AnyShape(RoundedRectangle(cornerRadius: size.height * 0.32, style: .continuous))
         case .pill: return AnyShape(Capsule())
         case .round, .small: return AnyShape(Circle())
+        case .square, .rectangle:
+            return AnyShape(RoundedRectangle(cornerRadius: CGFloat(BCDTouchGeometry.cornerRadius(shape, size: size)), style: .continuous))
         }
     }
 
@@ -263,8 +273,31 @@ struct BCDTouchFace: View {
             .foregroundStyle(labelColor)
     }
 
+    /// The player's words, as large as they fit inside the outline (BCDTouchTextFit), in the label's colour. Words too
+    /// long for the control even at the smallest type end in "…".
+    private func ownWords(_ words: String) -> some View {
+        let fit = BCDTouchTextFit.fit(words, in: shape, frame: size, measure: BCDTouchTextMeasure.unit)
+        let box = BCDTouchTextFit.box(fit, in: shape, frame: size)
+        return Text(fit.lines.joined(separator: "\n"))
+            .font(.system(size: CGFloat(fit.size), weight: .bold, design: .rounded))
+            .lineLimit(fit.lines.count)
+            .multilineTextAlignment(.center)
+            .minimumScaleFactor(fit.whole ? 0.8 : 1)
+            .foregroundStyle(labelColor)
+            .frame(width: box.width, height: box.height)
+    }
+
     @ViewBuilder private var label: some View {
         let box = min(size.width, size.height)
+        if let words, !action.isStick {
+            ownWords(words)
+        } else {
+            standardLabel(box: box)
+        }
+    }
+
+    /// What a control of this action always showed.
+    @ViewBuilder private func standardLabel(box: CGFloat) -> some View {
         switch action {
         case .none:
             text("–", box: box)
@@ -393,22 +426,45 @@ struct BCDMouseGlyph: View {
     }
 }
 
+/// The player's words measured in the type a face draws them in (bold, rounded), at a size of 1
+/// point: what BCDTouchTextFit sizes them by. Each line is measured once (a face is drawn again on
+/// every press); faces are drawn on the main thread only.
+enum BCDTouchTextMeasure {
+    private static let font: UIFont = {
+        let bold = UIFont.systemFont(ofSize: 100, weight: .bold)
+        return bold.fontDescriptor.withDesign(.rounded).map { UIFont(descriptor: $0, size: 100) } ?? bold
+    }()
+    nonisolated(unsafe) private static var known: [String: CGSize] = [:]
+
+    static func unit(_ line: String) -> CGSize {
+        if let size = known[line] { return size }
+        let width = (line as NSString).size(withAttributes: [.font: font]).width
+        let size = CGSize(width: width / 100, height: font.lineHeight / 100)
+        if known.count >= 256 { known.removeAll() }
+        known[line] = size
+        return size
+    }
+}
+
 // MARK: - The key surface (UIKit)
 
 /// The touch area of a key, mouse, keyboard or key-stick control: the circle the control is
-/// drawn in. It follows the first finger down until that finger lifts (or is cancelled, or the
-/// app leaves the foreground, or the control leaves the screen); other fingers on it are held
-/// and ignored, so they never reach the game as a mouse.
+/// drawn in, or the shape the player gave it (`own`, BCDTouchItem.ownShape). It follows the first
+/// finger down until that finger lifts (or is cancelled, or the app leaves the foreground, or the
+/// control leaves the screen); other fingers on it are held and ignored, so they never reach the
+/// game as a mouse.
 struct BCDTouchKeySurface: UIViewRepresentable {
     let action: BCDTouchAction
     let diameter: Double
+    /// The player's own shape; nil: the circle, as always.
+    let own: BCDTouchShape?
     let input: BCDTouchInput
     /// Pressed, and a key stick's direction.
     let changed: (Bool, Int) -> Void
 
     func makeUIView(context: Context) -> BCDTouchKeyView { BCDTouchKeyView() }
     func updateUIView(_ view: BCDTouchKeyView, context: Context) {
-        view.configure(action: action, diameter: diameter, input: input, changed: changed)
+        view.configure(action: action, diameter: diameter, own: own, input: input, changed: changed)
     }
     static func dismantleUIView(_ view: BCDTouchKeyView, coordinator: ()) { view.finish() }
 }
@@ -420,6 +476,7 @@ final class BCDTouchKeyView: UIView {
     private var finger: ObjectIdentifier?
     private var start = CGPoint.zero
     private var diameter = 64.0
+    private var own: BCDTouchShape?
 
     init() {
         super.init(frame: .zero)
@@ -431,8 +488,10 @@ final class BCDTouchKeyView: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     deinit { NotificationCenter.default.removeObserver(self) }
 
-    func configure(action: BCDTouchAction, diameter: Double, input: BCDTouchInput, changed: @escaping (Bool, Int) -> Void) {
+    func configure(action: BCDTouchAction, diameter: Double, own: BCDTouchShape?, input: BCDTouchInput,
+                   changed: @escaping (Bool, Int) -> Void) {
         self.diameter = diameter
+        self.own = own
         self.input = input
         if let press {
             press.rebind(action)
@@ -447,9 +506,10 @@ final class BCDTouchKeyView: UIView {
         }
     }
 
-    /// A circle of the control's diameter around its centre.
+    /// A circle of the control's diameter around its centre; the player's own shape, if it has one.
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let dx = Double(point.x - bounds.midX), dy = Double(point.y - bounds.midY)
+        if let own { return BCDTouchGeometry.inside(CGPoint(x: dx, y: dy), own, diameter: diameter) }
         return (dx * dx + dy * dy).squareRoot() <= diameter / 2
     }
 

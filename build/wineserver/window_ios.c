@@ -22,6 +22,8 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdio.h>    /* madeira-bcd: fprintf, getenv (ios_desktop_window_made) */
+#include <stdlib.h>
 
 #include "ntstatus.h"
 #include "windef.h"
@@ -637,6 +639,43 @@ void post_desktop_message( struct desktop *desktop, unsigned int message,
     if (win && win->thread) post_message( win->handle, message, wparam, lparam );
 }
 
+#ifdef WINE_IOS
+/* iOS: a desktop just got its desktop window (the two paths below: the first top-level CreateWindowEx on a desktop
+ * without one, and get_desktop_window with force). Its winstation is marked visible and the desktop becomes the input
+ * desktop, so the touch events winios.drv sends without a target window (send_hardware_message( NULL, ...)) reach it.
+ * madeira-bcd (round 630, agent T2 S2; the Windows desktop on 416C0V, 0MYT4P and XYWN2M, one iPhone): not when the
+ * visible winstation's input desktop is ANOTHER desktop that already has its window. There a service on the Default
+ * desktop (the Google updater's crash handler, whose desktop window ios_child_desktop_fixup has made since round 624)
+ * took the input from explorer's virtual desktop, and every tap landed on its detached window 0x1004c and was dropped.
+ * The first desktop window of a session, and a desktop that already has the input, are marked as always; the virtual
+ * desktop explorer creates gets the input in winstation.c (set_input_desktop), as before. MADEIRA_INPUT_DESKTOP_STEAL=1
+ * gives every desktop window the input, as before round 630. Logged once per desktop that is refused. */
+static void ios_desktop_window_made( struct desktop *desktop )
+{
+    static int steal = -1;
+    struct winstation *visible;
+
+    if (!desktop->winstation) return;
+    if (steal < 0)
+    {
+        const char *env = getenv( "MADEIRA_INPUT_DESKTOP_STEAL" );
+        steal = env && env[0] == '1' && !env[1];
+    }
+    visible = get_visible_winstation();
+    if (!steal && visible && visible->input_desktop && visible->input_desktop != desktop && visible->input_desktop->top_window)
+    {
+        static int said;
+        if (said++ < 8)
+            fprintf( stderr, "[srv-desktop] a desktop window was made on another desktop (window %08x); the input stays on the "
+                     "desktop that has it (window %08x) rev=r630\n", desktop->top_window ? desktop->top_window->handle : 0,
+                     visible->input_desktop->top_window->handle );
+        return;
+    }
+    desktop->winstation->flags |= 1 /* WSF_VISIBLE */;
+    desktop->winstation->input_desktop = desktop;
+}
+#endif
+
 /* create a new window structure (note: the window is not linked in the window tree) */
 static struct window *create_window( struct window *parent, struct window *owner, atom_t atom,
                                      mod_handle_t class_instance, mod_handle_t instance )
@@ -680,11 +719,7 @@ static struct window *create_window( struct window *parent, struct window *owner
                  * synthesized touch events from winios.drv. Wine normally
                  * only flags WinSta0 visible, but is_service_process()=TRUE
                  * on iOS routes us into a non-WinSta0 default. */
-                if (desktop->winstation)
-                {
-                    desktop->winstation->flags |= 1 /* WSF_VISIBLE */;
-                    desktop->winstation->input_desktop = desktop;
-                }
+                ios_desktop_window_made( desktop );   /* madeira-bcd (round 630): not over another desktop's input */
                 /* iOS: monitors_get_union_rect returns (0,0,0,0) since we
                  * never report a monitor. That makes cursor.clip degenerate
                  * and update_desktop_cursor_pos clips every (x,y) to (0,0),
@@ -2396,11 +2431,7 @@ DECL_HANDLER(get_desktop_window)
             /* See companion patch in create_window: ensure winstation is
              * marked visible + has an input desktop so hardware-input
              * dispatch can deliver winios.drv-synthesized touches. */
-            if (desktop->winstation)
-            {
-                desktop->winstation->flags |= 1 /* WSF_VISIBLE */;
-                desktop->winstation->input_desktop = desktop;
-            }
+            ios_desktop_window_made( desktop );   /* madeira-bcd (round 630): not over another desktop's input */
             /* Initialize cursor.clip to screen size — monitors_get_union_rect
              * returns (0,0,0,0) on iOS so update_desktop_cursor_pos clips
              * every (x,y) to (0,0) by default. Hardcode 1024x768 to match

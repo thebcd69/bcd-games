@@ -1,0 +1,18 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": false
+ },
+ "matched": [
+  "orphan-check-protnone-read",
+  "fex-wow-window-arena-overlap",
+  "fex-runtime-fault",
+  "fex-avx-on",
+  "lock-orphan-stamped"
+ ],
+ "next": [],
+ "note": "Round 630 (agent A2 S2 and S3): the 32-bit Steam client on a 63 GB map: the WOW64 emulator's window [0xc00000000, 0xf00000000) starts inside the engine's 8 GB arena for the 64-bit emulator, so the window filled a few seconds into Big Picture; the next thread state got STATUS_NO_MEMORY, the emulator read the NULL and the client died; then the orphan-lock monitor read a lock word in the dead helper's released window and the app ended. Both fixed in build 630 (map_view's [wow-band] r630 retry and the thread-init NULL guard; the monitor's fault-safe read). Send Log 9PB1B5, build 626.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "known"
+}

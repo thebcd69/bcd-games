@@ -88,6 +88,8 @@ final class PassthroughSubject<Output, Failure: Error> {
     func sink(receiveValue: @escaping (Output) -> Void) -> AnyCancellable { receivers.append(receiveValue); return AnyCancellable() }
 }
 #endif
+// round 630 (agent T1 S26): the [fex-preset] line of the game's lines (BCDGameSetupTables.swift); no preset here.
+enum BCDFEXPresets { static func current(_ values: [String: String]) -> String { "" } }
 enum MadeiraConfig {
     static var values: [String: String] = [:]   // stands in for bcd.cfg
     static func flag(_ name: String, fallback: Bool = true) -> Bool { fallback }
@@ -281,6 +283,16 @@ expect(env("MADEIRA_EXE") == "C:\\windows\\system32\\cmd.exe" && env("MADEIRA_AR
        && env("MADEIRA_DESKTOP") == nil && env("MADEIRA_WORKDIR") == "C:\\Games\\Tool", "direct .bat: cmd.exe /c, in its folder")
 bat.launchMode = "desktop"; bat.configureLaunch()
 expect(env("MADEIRA_ARGS") == "/desktop=shell,1280x720 cmd /c \"C:\\Games\\Tool\\run game.bat\" fast", "desktop .bat: cmd /c inside the desktop")
+// Round 630 (agent G1 S6; 4VHEPN, Q6Q7Q8): a batch path with ( ) & and the like is CALLed, or cmd.exe strips its quotes.
+var batX86 = LibraryEntry(title: "MW4", relativePath: "Program Files (x86)/Steam/steamapps/common/CoD-MW4/!start_sp26.bat", bits: 0)
+batX86.resolution = "1280x720"; batX86.arguments = "fast"
+batX86.configureLaunch()
+expect(env("MADEIRA_EXE") == "C:\\windows\\system32\\cmd.exe"
+       && env("MADEIRA_ARGS") == "/c call \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\CoD-MW4\\!start_sp26.bat\" fast",
+       "direct .bat in a folder with parentheses: /c call \"path\" (\(env("MADEIRA_ARGS") ?? "nil"))")
+batX86.launchMode = "desktop"; batX86.configureLaunch()
+expect(env("MADEIRA_ARGS") == "/desktop=shell,1280x720 cmd /c call \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\CoD-MW4\\!start_sp26.bat\" fast",
+       "desktop .bat in a folder with parentheses: cmd /c call \"path\"")
 var svc = inDesk; svc.startServices = true
 let script = svc.servicesScript ?? ""
 expect(script.hasPrefix("@echo off\r\n") && script.contains("start \"\" \"C:\\windows\\system32\\services.exe\"\r\n")

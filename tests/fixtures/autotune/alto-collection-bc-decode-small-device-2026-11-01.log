@@ -1,0 +1,206 @@
+[22:57:53.530] [INFO] Checking entitlements...
+[22:57:53.531] [INFO] [build] v0.1.625 (625)
+[22:57:53.533] [INFO] [device] model=iPhone14,5 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=3661MB available=2330MB cores=6
+[22:57:53.534] [INFO] [device] address-map=[0x1025f8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[22:57:53.576] [INFO] [device] settings: low-power=1 thermal=serious screen=1170x2532@3.0x max-fps=60 utc-offset=+03:00 free-disk=30GB stikdebug-url=0
+[22:57:53.634] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:58:08.056] [INFO] Requesting JIT with Built-in StikJIT...
+[22:58:21.385] [INFO] Requesting JIT with Built-in StikJIT...
+[22:58:23.820] [INFO] [epic-launch] start app=Hornbill signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[22:58:23.829] [INFO] [bcd] library launch The Alto Collection.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[22:58:23.863] [INFO] Running full Wine sequence...
+[22:58:23.863] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1025f8000,0x8000000000) 512GB available=2308MB low-power=1 thermal=serious
+[22:58:23.866] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[22:58:23.878] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:58:23.878] [INFO] Allocating 896MB JIT pool via debugger...
+[22:58:23.878] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:58:23.879] [INFO] [jit-debugger] attached=1 at the pool request
+[22:58:23.884] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:58:25.178] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  1.476s rev=ml526
+[22:58:25.354] [wineserver] send_client_fd: fd=35 handle=0x3a2 msg_fd_unix=32 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/fdcfcf78d960663d.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[22:58:26.324] [Wine connect] fd_socket=33, receiving version fd...
+[Wine init_process] waiting for request_fd from wineserver...
+[22:58:26.324] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=33 reply=38/39 wait=40/41 rev=ml586
+[22:58:26.324] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=33 reply=38/39 wait=40/41 rev=ml586
+[Wine init_process] reply_pipe=39, sending init_first_thread...
+[22:58:26.324] [Wine init_process] reply_pipe=39, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=1708 MB + phys_footprint=639 MB = 2348 MB (hw.memsize says 3661 MB)
+ml985: preferred base 0x140000000+0xa3000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa4000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x1184d0000+0xa3000 (WindowsPlayer.exe) → pool 0x148004000 used=0xa8000/0x25000000 tramp+0x0
+[copy-verify] WindowsPlayer.exe: OK, 3 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1480a8000 used=0x1e0000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1480a8000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x1481e2000 used=0x602000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1481e2000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x148600000 used=0x734000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148600000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148734000 used=0x7fc000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148734000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1487fc000 used=0xafc000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487fc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[window] 0x11ffd4000..0x77f5000000 regions=75962 occupied=462164 MB of 486736 MB free=40779 MB maxhole=16208 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=652 MB (peak 652) internal=437 MB compressed=213 MB external=87 MB reusable=3 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module The Alto Collection.exe (the alto collection.exe-4594f32cf774cdfd): 1184D0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-56f3b47ec8dd030e): 71FCB60000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FC940000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FC850000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FC7A0000
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14ae4c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14aed0000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14afb4000)
+[xp] 22:58:26.990 +0.54 dt=264 cpu=203 (thr 203) P=202 E=1 run=207 pgw=-1.0 GHz P=1.59 E=1.41 Minst=938 IPC=2.90 mJ=104 pin=1146 rdKB=19264 fpMB=718
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14b038000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14b9bc000)
+[xp] 22:58:27.276 +0.83 dt=286 cpu=185 (thr 185) P=170 E=15 run=196 pgw=-1.0 GHz P=1.59 E=2.01 Minst=857 IPC=2.85 mJ=93 pin=1302 rdKB=21380 fpMB=720
+[copy-verify] iphlpapi.dll: OK, 4 .text pages executable (copy @0x14cb7c000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fb3a0000) -> 64-bit table (0x105463828)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\TheAltoCollection\\UnityCrashHandler64.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\TheAltoCollection\\UnityCrashHandler64.exe\" --attach 32 481680035840"
+[image-reload] unmapped image 0x71fa120000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[xp-names] m32198 "wine-x18-exc"
+[xp] 22:58:27.560 +1.11 dt=284 cpu=281 (thr 280) P=274 E=7 run=292 pgw=-1.0 GHz P=1.60 E=2.02 Minst=1766 IPC=3.92 mJ=183 pin=276 rdKB=4904 fpMB=764
+E 24 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f9a60000 xend=0x71f9de7520 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+D 24 Load module mono-2.0-bdwgc.dll (mono-2.0-bdwgc.dll-0f64b8a12155bd25): 71F9A60000
+E 24 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f9a60000 xend=0x71f9de7520 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp] 22:58:27.849 +1.40 dt=288 cpu=267 (thr 267) P=264 E=3 run=403 pgw=-1.0 GHz P=1.59 E=2.02 Minst=1422 IPC=3.33 mJ=165 pin=90 rdKB=6708 fpMB=811
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[stp-emul] ml629 #1 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110c30 rw=0x70055fcc30 base 0x7029110c30 -> 0x7029110c50 (writeback)
+[stp-emul] ml629 #2 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110c50 rw=0x70055fcc50 base 0x7029110c50 -> 0x7029110c70 (writeback)
+[stp-emul] ml629 #3 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110c70 rw=0x70055fcc70 base 0x7029110c70 -> 0x7029110c90 (writeback)
+[stp-emul] ml629 #4 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110c90 rw=0x70055fcc90 base 0x7029110c90 -> 0x7029110cb0 (writeback)
+[stp-emul] ml629 #5 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110cb0 rw=0x70055fccb0 base 0x7029110cb0 -> 0x7029110cd0 (writeback)
+[stp-emul] ml629 #6 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110cd0 rw=0x70055fccd0 base 0x7029110cd0 -> 0x7029110cf0 (writeback)
+[stp-emul] ml629 #7 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110cf0 rw=0x70055fccf0 base 0x7029110cf0 -> 0x7029110d10 (writeback)
+[stp-emul] ml629 #8 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7029110d10 rw=0x70055fcd10 base 0x7029110d10 -> 0x7029110d30 (writeback)
+[swp-emul] ml626 #1 insn=0xf8fa80da size=8 Rs=x26 Rt=x26 addr=0x7029110bb8 rw=0x70055fcbb8 in=0x7029110d50 old=0x7029110c0b
+[xp] 22:58:28.139 +1.69 dt=290 cpu=292 (thr 276) P=282 E=10 run=327 pgw=-1.0 GHz P=1.59 E=1.97 Minst=1438 IPC=3.07 mJ=174 pin=33 rdKB=532 fpMB=831
+[win-name] #3 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[xp] 22:58:28.442 +1.99 dt=304 cpu=474 (thr 329) P=352 E=122 run=550 pgw=-1.0 GHz P=1.60 E=2.01 Minst=1483 IPC=1.84 mJ=203 pin=91 rdKB=5016 fpMB=1066
+[footprint] rev=ml358 phys=1110 MB (peak 1110) internal=531 MB compressed=576 MB external=121 MB reusable=1 MB (cycle=2)
+[jit-pool] image 0x71f8ab0000+0x130000 (winspool.drv) → pool 0x14dcc4000 used=0x5df8000/0x25000000 tramp+0x4000
+D 24 Load module winspool.drv (winspool.drv-1d86ae048b0921a6): 71F8AB0000
+[jit-pool] image 0x71f8a10000+0xa0000 (compstui.dll) → pool 0x14ddf8000 used=0x5e9c000/0x25000000 tramp+0x4000
+D 24 Load module compstui.dll (compstui.dll-6caceb67ab4f8333): 71F8A10000
+[jit-pool] image 0x71f8890000+0x180000 (comctl32.dll) → pool 0x14de9c000 used=0x6020000/0x25000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71F8890000
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Team Alto/The Alto Collection/Player.log
+[guest-log] #1 tid=0024     Renderer: Apple A15 GPU (ID=0x0)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[jit-pool] image 0x71f87b0000+0xa0000 (mmdevapi.dll) → pool 0x14e020000 used=0x60c4000/0x25000000 tramp+0x4000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71F87B0000
+[jit-pool] image 0x71f86b0000+0x80000 (avrt.dll) → pool 0x14e0c4000 used=0x6148000/0x25000000 tramp+0x4000
+D A8 Load module avrt.dll (avrt.dll-cbf6d88ff1151c3b): 71F86B0000
+[image-reload] unmapped image 0x71f86b0000+0x80000: 1 pool copy marked
+[footprint] rev=ml1060 fast phys=1201 MB compressed=627 MB internal=539 MB
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\UnityEngine.AIModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/UnityEngine.AIModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1220 MB compressed=653 MB internal=531 MB
+0024:err:module:load_dll [dll-missing] rev=ml336 #55 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\UnityEngine.PerformanceReportingModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/UnityEngine.PerformanceReportingModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #57 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\UnityEngine.PhysicsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #58 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/UnityEngine.PhysicsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed\\UnityEngine.Physics2DModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files\\Epic Games\\TheAltoCollection\\The Alto Collection_Data\\Managed/mono/aot-cache/amd64/UnityEngine.Physics2DModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp] 22:58:29.867 +3.42 dt=299 cpu=307 (thr 306) P=302 E=5 run=318 pgw=-1.0 GHz P=1.60 E=1.02 Minst=2424 IPC=4.98 mJ=237 pin=0 rdKB=1320 fpMB=1223
+[xp] 22:58:30.153 +3.70 dt=286 cpu=291 (thr 290) P=287 E=4 run=298 pgw=-1.0 GHz P=1.60 E=1.10 Minst=2058 IPC=4.45 mJ=208 pin=32 rdKB=1360 fpMB=1220
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x7029120000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #1 status=c0000018 hint=0x7029120000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=the alto collection.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x7029120000 zb=0x0 hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[nls-getptr] type=11 id=1254 peb=0x71ffff0000
+[nls-getptr] type=11 id=1254 peb=0x71ffff0000
+[xp] 22:58:30.448 +4.00 dt=295 cpu=308 (thr 308) P=302 E=5 run=337 pgw=-1.0 GHz P=1.59 E=1.15 Minst=1649 IPC=3.39 mJ=188 pin=18 rdKB=144 fpMB=1224
+[exec-alloc] NtAllocateVirtualMemory #6 req_addr=0x7035960000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #2 status=c0000018 hint=0x7035960000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=the alto collection.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x7035960000 zb=0x0 hits=2 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #7 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001A8 status=00000000 native_pc=000000023ABD1EE8 is_ec=0 -> returned rip=000000023ABD1EE8 rsp=0000000118FBE9D0 flags=00100003
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=1243 MB (peak 1243) internal=536 MB compressed=672 MB external=127 MB reusable=2 MB (cycle=3)
+[xp] 22:58:30.703 +4.25 dt=255 cpu=322 (thr 321) P=298 E=24 run=343 pgw=-1.0 GHz P=1.59 E=1.85 Minst=1791 IPC=3.45 mJ=193 pin=93 rdKB=2676 fpMB=1245
+[footprint] rev=ml1060 fast phys=1246 MB compressed=672 MB internal=539 MB
+[xp] 22:58:30.990 +4.54 dt=287 cpu=329 (thr 329) P=301 E=28 run=332 pgw=-1.0 GHz P=1.60 E=1.75 Minst=2442 IPC=4.62 mJ=225 pin=2 rdKB=5276 fpMB=1244
+[xp] 22:58:31.308 +4.86 dt=317 cpu=384 (thr 385) P=329 E=55 run=407 pgw=-1.0 GHz P=1.59 E=1.88 Minst=2551 IPC=4.06 mJ=248 pin=45 rdKB=1820 fpMB=1249
+[win-name] #7 hwnd=0x2002e class='UnityWndClass' text="The Alto Collection" rev=ml853
+[jit-pool] image 0x71f85e0000+0x90000 (xinput1_3.dll) → pool 0x14e168000 used=0x61fc000/0x25000000 tramp+0x4000
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e6b91746084d992): 71F85E0000
+err:   [bc-decode] ml679 #0 BC3 2048x1536 level=0 slice=0 -> 4B/texel 12582912B
+00b8:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b8 status=00000001 caller=000000014875A32C
+[free-delay] #1 release of 0x703fb90000+0xc10000 held for 2000 ms (1 in flight)
+[win-name] #8 hwnd=0x2002e class='UnityWndClass' text="The Alto Collection" rev=ml853
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+[win-name] #9 hwnd=0x2003a class='Wine IME' text="" rev=ml853
+[win-name] #10 hwnd=0x2003a class='Wine IME' text="" rev=ml853
+[win-name] #11 hwnd=0x2003a class='Wine IME' text="" rev=ml853
+err:   [bc-decode] ml679 #1 BC1 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+[free-delay] #2 release of 0x7043480000+0x7f0000 held for 2000 ms (2 in flight)
+err:   [bc-decode] ml679 #2 BC1 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+err:   [bc-decode] ml679 #2 BC1 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+[free-delay] #3 release of 0x7044880000+0x7f0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7044090000+0x7f0000 held for 2000 ms (4 in flight)
+err:   [bc-decode] ml679 #4 BC1 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+err:   [bc-decode] ml679 #4 BC1 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+[free-delay] #5 release of 0x7045280000+0x7f0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7045a70000+0x7f0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7047080000+0x7f0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7046890000+0x7f0000 held for 2000 ms (8 in flight)
+[footprint] rev=ml1060 fast phys=1436 MB compressed=775 MB internal=590 MB
+[22:58:31.667] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[launch-view] dismissed reason=present logs=1
+[mem-burst] rev=624 +386 MB in 306 ms phys=1822 internal=677 compressed=840 other=305 | guest commits since the last sample: n=80, 525 MB, biggest 8 MB tid=00bc | swap backed=0 MB | pool head=97 MB tail=16 MB
+[footprint] rev=ml1060 fast phys=1822 MB compressed=840 MB internal=677 MB
+[footprint] rev=ml1060 fast phys=1968 MB compressed=855 MB internal=645 MB
+err:   [bc-census] ml653 periodic: 64 BC resources, 64 subresources
+err:   [bc-census] ml653   BC1_UNORM n=63 63787KB max=1920x1080 mips=1 arr=1 cube=0 | use def=63 imm=0 dyn=0 stg=0 | data y=63 n=0 | cpu r=0 w=0 | bind srv=63 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM n=1 3072KB max=2048x1536 mips=1 arr=1 cube=0 | use def=1 imm=0 dyn=0 stg=0 | data y=1 n=0 | cpu r=0 w=0 | bind srv=1 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x57
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x1
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=0 CopyResource=0 CopySubresourceRegion=0 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 66859KB
+[footprint] rev=ml1060 fast phys=2201 MB compressed=886 MB internal=623 MB
+[footprint] rev=r624 90% of the limit: phys=2201 MB limit=2346 MB (145 MB left) threads=65; the next full cycle walks the physical map
+[vfree] ml842 # base=0x704e9f0000 size=0x0 type=0x8000 tid=0034
+[vfree] ml842 # base=0x704aa70000 size=0x0 type=0x8000 tid=0034
+[vfree] ml842 # base=0x704f1e0000 size=0x0 type=0x8000 tid=0038
+[vfree] ml842 # base=0x704e200000 size=0x0 type=0x8000 tid=0038
+[vfree] ml842 # base=0x704da10000 size=0x0 type=0x8000 tid=003c
+[vfree] ml842 # base=0x704e9f0000 size=0x0 type=0x8000 tid=003c

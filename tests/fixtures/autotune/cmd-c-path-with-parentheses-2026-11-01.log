@@ -1,0 +1,113 @@
+[04:15:08.934] [INFO] Checking entitlements...
+[04:15:08.934] [INFO] [build] v0.1.626 (626)
+[04:15:08.935] [INFO] [device] model=iPhone19,7 idiom=phone os=iOS Version 27.2 (Build 24B115) ram=11600MB available=8169MB cores=6
+[04:15:08.935] [INFO] [device] address-map=[0x10257c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[04:15:08.952] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=+09:00 free-disk=157GB stikdebug-url=1
+[04:15:08.955] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[04:15:09.852] [INFO] Requesting JIT with StikDebug...
+[04:15:09.931] [INFO] Opening StikDebug to enable JIT...
+[04:15:13.437] [INFO] [bcd] library launch !start_sp26.bat: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[04:15:13.459] [INFO] Running full Wine sequence...
+[04:15:13.459] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10257c000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[04:15:13.460] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[04:15:13.466] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[04:15:13.467] [INFO] Allocating 896MB JIT pool via debugger...
+[04:15:13.467] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[04:15:13.469] [INFO] [jit-debugger] attached=1 at the pool request
+[04:15:13.471] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[04:15:15.132] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  1.740s rev=ml526
+[04:15:15.207] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/fc5a287b6b806c80.cfg (read)
+[WineProc] Target exe: C:\windows\system32\cmd.exe (bundle=aarch64-windows)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[04:15:15.394] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[04:15:15.394] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[04:15:15.394] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7550 MB + phys_footprint=641 MB = 8192 MB (hw.memsize says 11600 MB)
+ml985: preferred base 0x140000000+0xa0000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11c0f0000+0xa0000 (?) → pool 0x148004000 used=0xa8000/0x25000000 tramp+0x4000
+[copy-verify] ?: OK, 7 .text pages executable (copy @0x148004000)
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x1480a8000 used=0x1c0000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x1480a8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x1481c0000 used=0x268000/0x25000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x1481c0000)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148268000 used=0x3e8000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148268000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71ff200000+0x8e0000 (shell32.dll) → pool 0x1483e8000 used=0xccc000/0x25000000 tramp+0x4000
+[copy-verify] shell32.dll: OK, 30 .text pages executable (copy @0x1483e8000)
+[window] 0x7048000000..0x7400000000 regions=89 occupied=8205 MB of 15232 MB free=7026 MB maxhole=7026 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71ff170000+0x90000 (shlwapi.dll) → pool 0x148ccc000 used=0xd60000/0x25000000 tramp+0x4000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x148ccc000)
+[jit-pool] image 0x71fef00000+0x120000 (ucrtbase.dll) → pool 0x148ebc000 used=0xfe0000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148ebc000)
+[jit-pool] image 0x71fee10000+0xf0000 (msvcrt.dll) → pool 0x148fe0000 used=0x10d4000/0x25000000 tramp+0x4000
+[copy-verify] msvcrt.dll: OK, 30 .text pages executable (copy @0x148fe0000)
+[jit-pool] image 0x71fec20000+0x1f0000 (user32.dll) → pool 0x1490d4000 used=0x12cc000/0x25000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 35 .text pages executable (copy @0x1490d4000)
+[jit-pool] image 0x71feb50000+0xd0000 (gdi32.dll) → pool 0x1492cc000 used=0x13a4000/0x25000000 tramp+0x8000
+[copy-verify] gdi32.dll: OK, 19 .text pages executable (copy @0x1492cc000)
+[jit-pool] image 0x71feac0000+0x90000 (win32u.dll) → pool 0x1493a4000 used=0x1438000/0x25000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x1493a4000)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[valloc] ml959 # base=0x7025df0000 size=0xa000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7025f50000 size=0x180000 type=0x3000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[window] 0x123854000..0x7805000000 regions=76000 occupied=462160 MB of 486935 MB free=41239 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=662 MB (peak 662) internal=660 MB compressed=0 MB external=107 MB reusable=7 MB (cycle=1)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[jit-pool] image 0x71fea50000+0x70000 (imm32.dll) → pool 0x149438000 used=0x14ac000/0x25000000 tramp+0x4000
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x149438000)
+[valloc] ml959 # base=0x70260f0000 size=0x100000 type=0x2000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x70260f0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x70260f0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7026100000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7026100000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7026110000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7026110000 zero_bits=0x0 limit=0x0
+Can't recognize 'C:\Program Files (x86)\Steam\steamapps\common\CoD-MW4\!start_sp26.bat' as an internal or external command, or batch script.
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=83
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=86
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[04:15:15.960] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=663MB limit=8191MB thermal=nominal lpm=0 api=D3D12 res=1408x648 cap=60 game=Call of Duty®: Modern Warfare® 4
+[frontend] returned to library
+[xp] 04:15:16.076 +0.65 dt=323 cpu=230 (thr 229) P=75 E=155 run=224 pgw=-1.0 GHz P=3.58 E=2.19 Minst=2785 IPC=4.59 mJ=243 pin=0 rdKB=0 fpMB=664
+[xp] 04:15:16.376 +0.94 dt=299 cpu=321 (thr 270) P=119 E=202 run=365 pgw=-1.0 GHz P=4.76 E=2.62 Minst=4909 IPC=4.48 mJ=764 pin=0 rdKB=100 fpMB=672
+[xp] 04:15:16.700 +1.27 dt=325 cpu=18 (thr 18) P=0 E=18 run=20 pgw=-1.0 GHz P=0.00 E=1.23 Minst=38 IPC=1.70 mJ=2 pin=0 rdKB=0 fpMB=672
+[xp] 04:15:17.026 +1.60 dt=326 cpu=22 (thr 22) P=0 E=22 run=23 pgw=-1.0 GHz P=0.00 E=1.07 Minst=38 IPC=1.58 mJ=2 pin=0 rdKB=0 fpMB=672
+[xp] 04:15:17.282 +1.85 dt=256 cpu=36 (thr 35) P=0 E=36 run=41 pgw=-1.0 GHz P=0.00 E=1.24 Minst=75 IPC=1.68 mJ=3 pin=0 rdKB=0 fpMB=672
+[footprint] rev=ml358 phys=674 MB (peak 674) internal=672 MB compressed=0 MB external=112 MB reusable=7 MB (cycle=2)
+[xp] 04:15:17.603 +2.17 dt=321 cpu=142 (thr 142) P=91 E=52 run=140 pgw=-1.0 GHz P=3.64 E=1.49 Minst=1047 IPC=2.57 mJ=188 pin=0 rdKB=0 fpMB=674
+[04:15:17.719] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=671 MB (peak 674) internal=671 MB compressed=0 MB external=112 MB reusable=8 MB (cycle=3)
+[footprint] rev=ml358 phys=671 MB (peak 674) internal=670 MB compressed=0 MB external=112 MB reusable=8 MB (cycle=4)
+[footprint] rev=ml358 phys=671 MB (peak 674) internal=670 MB compressed=0 MB external=112 MB reusable=8 MB (cycle=5)
+[xp] 04:15:24.466 +9.04 dt=289 cpu=19 (thr 19) P=4 E=15 run=20 pgw=-1.0 GHz P=3.21 E=1.65 Minst=84 IPC=2.20 mJ=9 pin=0 rdKB=0 fpMB=671
+[xp] 04:15:24.783 +9.35 dt=317 cpu=165 (thr 165) P=110 E=55 run=194 pgw=-1.0 GHz P=3.93 E=1.53 Minst=1456 IPC=2.83 mJ=339 pin=0 rdKB=28 fpMB=678
+[xp] 04:15:25.092 +9.66 dt=309 cpu=26 (thr 25) P=2 E=23 run=29 pgw=-1.0 GHz P=2.89 E=1.59 Minst=65 IPC=1.48 mJ=5 pin=0 rdKB=0 fpMB=678
+[xp] 04:15:25.408 +9.98 dt=316 cpu=64 (thr 65) P=0 E=64 run=69 pgw=-1.0 GHz P=0.00 E=1.28 Minst=184 IPC=2.24 mJ=7 pin=0 rdKB=0 fpMB=678
+[footprint] rev=ml358 phys=678 MB (peak 678) internal=677 MB compressed=0 MB external=122 MB reusable=8 MB (cycle=6)
+[xp] 04:15:25.669 +10.24 dt=261 cpu=72 (thr 72) P=11 E=61 run=89 pgw=-1.0 GHz P=1.76 E=1.48 Minst=171 IPC=1.56 mJ=13 pin=0 rdKB=0 fpMB=678
+[xp] 04:15:25.983 +10.55 dt=310 cpu=71 (thr 67) P=7 E=64 run=92 pgw=-1.0 GHz P=1.74 E=1.38 Minst=183 IPC=1.82 mJ=7 pin=0 rdKB=4 fpMB=678
+=1.74 E=1.38 Minst=183 IPC=1.82 mJ=7 pin=0 rdKB=4 fpMB=678

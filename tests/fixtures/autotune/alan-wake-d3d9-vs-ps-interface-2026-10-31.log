@@ -1,0 +1,367 @@
+[13:03:07.161] [INFO] Checking entitlements...
+[13:03:07.163] [INFO] [build] v0.1.625 (625)
+[13:03:07.163] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11695MB available=6122MB cores=6
+[13:03:07.163] [INFO] [device] address-map=[0x1004c8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[13:03:07.176] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-04:00 free-disk=93GB stikdebug-url=1
+[13:03:07.181] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[13:03:22.241] [INFO] [bcd] library launch Alan Wake: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[13:03:22.241] [INFO] Requesting JIT with StikDebug...
+[13:03:22.261] [INFO] Opening StikDebug to enable JIT...
+[13:03:31.138] [INFO] [dock-launch] image-retire=1
+[13:03:31.139] [INFO] [dock-launch] image-map-guard=1
+[13:03:31.270] [INFO] [dock-installers] app=108710 choice=skip pending=1 why=failed
+[13:03:31.326] [INFO] [dock-installers] app=108710 program=vcredistributable file=vcredist_x86.exe status=pending key=HKLM\Software\Valve\Steam\Apps\108710 recorded=- minimum=1 machine=0x14c
+[13:03:31.380] [INFO] [dock-installers] app=108710 program=directx file=DXSETUP.exe status=done key=HKLM\Software\Valve\Steam\Apps\108710 recorded=1 minimum=1 machine=0x14c
+[13:03:31.380] [INFO] [dock-installers] app=108710 scripts=1 programs=2 pending=0 done=1 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[13:03:31.381] [INFO] [madeira-dock] starting the host for app 108710; Valve's client authenticates and authorizes the launch
+[13:03:31.400] [INFO] Running full Wine sequence...
+[13:03:31.400] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1004c8000,0x8000000000) 512GB available=8142MB low-power=0 thermal=nominal
+[13:03:31.403] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[13:03:31.451] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[13:03:31.451] [INFO] Allocating 896MB JIT pool via debugger...
+[13:03:31.451] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[13:03:31.451] [INFO] [jit-debugger] attached=1 at the pool request
+[13:03:31.455] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[13:03:38.602] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  7.284s rev=ml526
+[13:03:38.735] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/33480bbe8ee3329d.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[13:03:39.163] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+ml992: os_proc_available_memory=7504 MB + phys_footprint=687 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x119f30000+0x70000 (?) → pool 0x148004000 used=0x78000/0x27000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[window] 0x7048000000..0x7400000000 regions=82 occupied=8197 MB of 15232 MB free=7035 MB maxhole=7034 MB@0x7048000000 rev=ml787 (periodic)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71ffa10000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x27000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0x71ff980000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x27000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[window] 0x123800000..0x7817000000 regions=80086 occupied=462213 MB of 487224 MB free=41762 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=700 MB (peak 700) internal=699 MB compressed=0 MB external=82 MB reusable=16 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1408x648, winstation visible, input desktop set
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-name] #3 hwnd=0x10020 class='#32769' text="madeira - Wine Desktop" rev=ml853
+[win-name] #4 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-name] #5 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-name] #6 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  7.976s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[Wine child thread] calling wine_ios_child_main...
+ml957: ? backing 0x11b7a0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  8.065s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae74000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11B7A0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c590000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702c690000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702c890000+0x400000 held for 2000 ms (3 in flight)
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m670954 "wine-x18-exc"
+[xp] 13:03:39.836 +0.62 dt=321 cpu=305 (thr 271) P=303 E=2 run=313 pgw=-1.0 GHz P=3.56 E=1.53 Minst=4485 IPC=4.15 mJ=921 pin=1490 rdKB=49884 fpMB=845
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee91000)
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=000000014A12E32C
+[xp] 13:03:40.112 +0.89 dt=277 cpu=246 (thr 242) P=244 E=3 run=258 pgw=-1.0 GHz P=3.50 E=2.05 Minst=3647 IPC=4.25 mJ=744 pin=719 rdKB=16372 fpMB=870
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149e68bc8 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[xp] 13:03:40.370 +1.15 dt=258 cpu=441 (thr 121) P=367 E=74 run=482 pgw=-1.0 GHz P=3.16 E=2.54 Minst=5521 IPC=4.10 mJ=939 pin=320 rdKB=5228 fpMB=943
+[file-wfail] ml669 #10 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 13:03:40.621 +1.40 dt=251 cpu=201 (thr 144) P=192 E=10 run=213 pgw=-1.0 GHz P=3.27 E=2.36 Minst=3354 IPC=5.17 mJ=548 pin=137 rdKB=2492 fpMB=945
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000208 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[xp] 13:03:40.924 +1.71 dt=303 cpu=180 (thr 97) P=151 E=29 run=199 pgw=-1.0 GHz P=3.52 E=2.46 Minst=2136 IPC=3.55 mJ=442 pin=293 rdKB=8228 fpMB=981
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=000000014A12E32C
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[xp] 13:03:41.250 +2.03 dt=325 cpu=288 (thr 269) P=284 E=4 run=293 pgw=-1.0 GHz P=3.50 E=1.94 Minst=4036 IPC=4.02 mJ=799 pin=34 rdKB=3504 fpMB=1035
+[footprint] rev=ml358 phys=1047 MB (peak 1047) internal=1045 MB compressed=0 MB external=153 MB reusable=17 MB (cycle=2)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002CC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery.exe" cmdline=L".\\bin\\vulkandriverquery.exe"
+[footprint] rev=ml358 phys=1154 MB (peak 1154) internal=1153 MB compressed=0 MB external=157 MB reusable=21 MB (cycle=3)
+[file-wfail] ml669 #80 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #81 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #83 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1169 MB (peak 1169) internal=1168 MB compressed=0 MB external=157 MB reusable=21 MB (cycle=4)
+[footprint] rev=ml358 phys=1159 MB (peak 1169) internal=1157 MB compressed=0 MB external=157 MB reusable=21 MB (cycle=5)
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alan Wake\\AlanWake.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alan Wake\\.\\AlanWake.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alan Wake\\AlanWake.exe" t+ 16.210s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alan Wake\\.\\AlanWake.exe\"" (fd=370, unixdir=371, dup_unixdir=465) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alan Wake"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (PARTIALLY OCCUPIED: free 0x7100000000..0x71f5730000, then OCCUPIED 0x71f5730000+0x40000 prot=3/7 shared=0 (0xa8d0000 of the range is not free))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (FREE: all 0x100000000 bytes from 0x7a00000000 are free, next region 0x7c00000000 (+0x100000000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7b00000000 are free, next region 0x7c00000000 (+0xffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x7900310000
+00ac:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7900400000 transfer=0x79006030f5 window=0x7900000000 guest_base=0x400000
+[nls-getptr] type=11 id=1252 peb=0x7900310000
+[nls-getptr] type=11 id=850 peb=0x7900310000
+00ac:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x71f5300000+0x3bc000 (libwow64fex.dll) → pool 0x151b85000 used=0x9f49000/0x27000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x71f5300000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-wfail] ml669 #84 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[bigres] tid=00ac #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7900310000 total=256 MB
+[unixlib] libwow64fex.dll (module 0x71f5300000) -> 64-bit table (0x10332b828)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x7900310000
+[nls-getptr] type=11 id=850 peb=0x7900310000
+ml957: ? backing 0x797b518000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797afb8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a600000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a3cc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x797a308000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[13:03:47.899] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=20127 peb=0x7900310000
+[unixlib] opengl32 (GL-absent stub table) (module 0x797b780000) -> wow64 table (0x103333828)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x1524c9000)
+[jit-pool] image 0x7978940000+0x7000 (?) → pool 0x1524e5000 used=0xa4f1000/0x27000000 tramp+0x0
+ml957: ? backing 0x7978944000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x7978720000+0x1f000 (?) → pool 0x1524f0000 used=0xa510000/0x27000000 tramp+0x0
+ml957: ? backing 0x797873c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x7978700000+0x7000 (?) → pool 0x152510000 used=0xa518000/0x27000000 tramp+0x0
+ml957: ? backing 0x7978704000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[stale-heal]   3 slot(s) in the copy of 0x71f5300000 (libwow64fex.dll) -> 0x151a67294 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[file-wfail] ml669 #87 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #4 release of 0x703cfe0000+0xf10000 held for 2000 ms (1 in flight)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\DbgHelp.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #7 L"C:\\Program Files (x86)\\Steam\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #8 L"C:\\Program Files (x86)\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #9 L"C:\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #10 L"CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x797bb8e000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #2 status=c0000018 hint=0x797bb8e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=alanwake.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x797bb8e000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x797bb8d000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #3 status=c0000018 hint=0x797bb8d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=alanwake.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x797bb8d000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x797bb59000 size=0x1000 type=0x3000 protect=0x40
+[13:03:48.900] [INFO] [dock-report] launch-game-running=1
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2614 full-path-hits=1462 component-lookups=5358 shortcut-hits=3160 misses=2086 scans=2198 entries-scanned=249034 us-in-lookup=708066 (7% of the window) slowest=0.979 ms ...22E-06128CFF7E45/Documents/wine/dosdevices/c:/windows/sysx64
+[jit-pool] image 0x7978120000+0xe000 (?) → pool 0x152525000 used=0xa539000/0x27000000 tramp+0x0
+ml957: ? backing 0x797812c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=1370 MB (peak 1370) internal=1368 MB compressed=0 MB external=179 MB reusable=21 MB (cycle=6)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #11 L"nvapi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #5 release of 0x79131c0000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x79135c0000+0x800000 held for 2000 ms (3 in flight)
+[launch-view] dismissed reason=game-window logs=0
+[free-delay] #7 release of 0x7919000000+0x1d0000 held for 2000 ms (4 in flight)
+D AC Load module mfplat.dll (mfplat.dll-d7c0154ea355d1d7): 7978070000
+D AC Load module propsys.dll (propsys.dll-2e9d52b8b903ecf9): 7978030000
+D AC Load module rtworkq.dll (rtworkq.dll-2285c19464192386): 7978010000
+D AC Load module mfreadwrite.dll (mfreadwrite.dll-ba29d9fb7cb859a0): 7977FD0000
+[jit-pool] image 0x7977f90000+0x23000 (?) → pool 0x15253a000 used=0xa562000/0x27000000 tramp+0x0
+ml957: ? backing 0x7977fb0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D AC Load module mmdevapi.dll (mmdevapi.dll-57d37935cbfb9d98): 7977F90000
+[win-name] #46 hwnd=0x40066 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #47 hwnd=0x50066 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #48 hwnd=0x50066 class='OleMainThreadWndClass' text="" rev=ml853
+[jit-pool] image 0x7977f70000+0x7000 (?) → pool 0x152560000 used=0xa568000/0x27000000 tramp+0x0
+ml957: ? backing 0x7977f74000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D E4 Load module avrt.dll (avrt.dll-cbfea88ff171de27): 7977F70000
+[rb-tex] madeira-bcd new readback #1: fmt 1 1280x720 level 0 (texture 1280x720, 1 mips)
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[free-delay] #8 release of 0x7920300000+0xfd0000 held for 2000 ms (5 in flight)
+[stale-heal]   1 slot(s) in the copy of 0x71f5300000 (libwow64fex.dll) -> 0x1520a7ea4 for peb=0x7900310000 (owner=0x0 mapper=0x7900310000)
+[win-name] #49 hwnd=0x10070 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #50 hwnd=0x10070 class='__wine_xinput_devnotify' text="" rev=ml853
+0104:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0104 status=00000001 caller=7BEF40C8
+[wow-stack-free] #1 the dead thread 0104's 32-bit stack (guest 0x24160000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x24160000 is not a live view -> released at the old address (as before) rev=ajan11
+00e8:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00e8 status=00000001 caller=7BEF40C8
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle" UserInfo={NSLocalizedDescription=Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle}
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170309030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16f936230
+[thread-stacks] port=0x4403 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=3 x8=0x1f60611fc x18=0x0 sp=0x16fd04d70
+[thread-stacks] port=0xed03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f60611fc x18=0x0 sp=0x170049d80
+[thread-stacks] port=0x2427 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=101 x8=0x1f60611fc x18=0x0 sp=0x16f9bcc60
+[thread-stacks] port=0x1933 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f60611fc x18=0x0 sp=0x16fad6ac0
+[thread-stacks] port=0x260b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16fb62fc0
+[thread-stacks] port=0xd917 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x170309030
+[ios_audio] ml1230 pacing stream=0x123790700 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 890 samples
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle" UserInfo={NSLocalizedDescription=Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle}
+[file-census] r624 13s: case-sensitive=1 full-path-tries=1038 full-path-hits=295 component-lookups=5760 shortcut-hits=4163 misses=1478 scans=1597 entries-scanned=11115 us-in-lookup=420992 (3% of the window) slowest=1.349 ms ...evices/c:/Program Files (x86)/Steam/userdata/<steamid>/config
+[wow-stack-free] #2 the dead thread 00e8's 32-bit stack (guest 0x1cf10000) is in window 0x7900000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x1cf10000 is not a live view -> released at the old address (as before) rev=ajan11
+[free-refused] ml1285 #3 addr=0x1cf10000 size=0 type=0x8000 status=0xc00000a0 view=0x0+0 protect=0 valloc=-1 tid=0114
+010c:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=010c status=00000001 caller=7BEF40C8
+0110:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0110 status=00000001 caller=7BEF40C8
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+[sock-big] send ERROR fd=402 errno=65 rev=ml464
+0120:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0120 status=00000001 caller=7BEF40C8
+[13:04:08.824] [INFO] detach-wait: presents=553 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=63 resident=2195MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x123790700 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[rb-tex] madeira-bcd new readback #31: fmt 43 2432x2432 level 0 (texture 2432x2432, 1 mips)
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+[footprint] rev=ml358 phys=2616 MB (peak 2616) internal=1835 MB compressed=377 MB external=182 MB reusable=7 MB (cycle=18)
+[footprint] rev=ml1060 fast phys=2616 MB compressed=386 MB internal=1827 MB
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+[footprint] rev=ml1060 fast phys=2663 MB compressed=394 MB internal=1852 MB
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader" UserInfo={NSLocalizedDescription=Fragment input(s) `user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader}
+[footprint] rev=ml1060 fast phys=2708 MB compressed=384 MB internal=1907 MB
+[footprint] rev=ml1060 fast phys=2734 MB compressed=384 MB internal=1933 MB
+[footprint] rev=ml358 phys=2734 MB (peak 2734) internal=1933 MB compressed=384 MB external=183 MB reusable=7 MB (cycle=19)
+[footprint] rev=ml358 phys=2739 MB (peak 2739) internal=1938 MB compressed=384 MB external=185 MB reusable=7 MB (cycle=20)
+[thread-stacks] port=0xd917 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x170309030
+[footprint] rev=ml358 phys=2741 MB (peak 2741) internal=1940 MB compressed=384 MB external=185 MB reusable=7 MB (cycle=21)
+[ios_audio] ml1230 pacing stream=0x123790700 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=2711 MB (peak 2741) internal=1910 MB compressed=384 MB external=185 MB reusable=8 MB (cycle=22)
+[xp] 13:04:23.026 +43.81 dt=308 cpu=269 (thr 269) P=258 E=11 run=344 pgw=-1.0 GHz P=3.81 E=2.11 Minst=2838 IPC=2.82 mJ=885 pin=0 rdKB=12 fpMB=2667
+[xp] 13:04:23.280 +44.06 dt=254 cpu=219 (thr 219) P=211 E=8 run=281 pgw=-1.0 GHz P=3.80 E=2.23 Minst=2308 IPC=2.82 mJ=718 pin=0 rdKB=0 fpMB=2667
+[xp] 13:04:23.580 +44.36 dt=301 cpu=261 (thr 261) P=251 E=10 run=334 pgw=-1.0 GHz P=3.78 E=2.19 Minst=2745 IPC=2.82 mJ=847 pin=0 rdKB=12 fpMB=2667
+[footprint] rev=ml358 phys=2667 MB (peak 2741) internal=1910 MB compressed=384 MB external=185 MB reusable=8 MB (cycle=23)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=8% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170309030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[xp] 13:04:23.869 +44.65 dt=289 cpu=271 (thr 270) P=241 E=30 run=341 pgw=-1.0 GHz P=3.79 E=2.46 Minst=2844 IPC=2.89 mJ=823 pin=0 rdKB=0 fpMB=2665
+[xp] 13:04:24.149 +44.93 dt=280 cpu=245 (thr 245) P=235 E=10 run=314 pgw=-1.0 GHz P=3.77 E=2.10 Minst=2551 IPC=2.81 mJ=780 pin=0 rdKB=12 fpMB=2590
+[xp] 13:04:24.448 +45.23 dt=299 cpu=262 (thr 262) P=251 E=11 run=336 pgw=-1.0 GHz P=3.76 E=2.16 Minst=2721 IPC=2.82 mJ=828 pin=0 rdKB=12 fpMB=2590
+[swap-win] #3 pos-begin hwnd=0x2005e flags=00001837 window={0,0,1408,648} client={0,0,1408,648} tid=00ac
+[win-name] #51 hwnd=0x2005e class='AppWindowClass' text="Alan Wake - v1.06.17.0154" rev=ml853
+[swap-win] #3 pos hwnd=0x2005e after=0x0 flags=80001837 window={0,0,1408,648} client={0,0,1408,648} visible={0,0,1408,648} style=94000000 exstyle=00040008 shown=1 fg=0x2005e (this window) tid=00ac, 0.14 ms after pos-begin
+00fc:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00fc status=00000000 caller=7BEF40C8
+00c8:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00c8 status=00000000 caller=7BEF40C8
+00c4:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00c4 status=00000000 caller=7BEF40C8
+[store-noalias] #1 rev=ml348 addr=0x38269805c8 insn=0xf9401051 pc=0x188699974 NO pool/anon alias | region 0x1000000000+0x6000000000 prot=0 max=0 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x38269805c8 hostpc=0x188699974 hinsn=0xf9401051 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[vm-fault-wait] #1 a read fault at 0x38269805c8 of tid=00c8 teb=0x7900290000 waits for virtual_mutex
+[fault_rip] cnt=1 rip=0x0 pc=0x188699974 addr=0x38269805c8 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1000000000+0x6000000000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x188699974 addr=0x38269805c8 x18=0x0 type=1 lr=0x18869b418 sp=0x129f3f7a0 x16=0x6a8e9038269805ad x17=0x100000000000
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xf77a497d1a9f00df x9=0xf77a497d1a9f00df x10=0x0 x11=0x0 x0=0x118e7d0b0 x2=0x38269805a8 | teb=0x7900290000 peb=0x7900310000 peb->EcCodeBitMap=0x0
+[fault-host] 188699874: aa1003e1 c8b07f31 eb10003f 54fffe81 d65f03c0 ea1a0340 54ffceed f9400350
+[fault-host] 188699894: 927d9e11 f9401231 3617cd31 3607ce10 d377fe11 b4ffce11 d2e02011 ab110211
+[fault-host] 1886998b4: 54ffcd82 aa1003e1 c8b07f51 eb10003f 54fffe81 d65f03c0 ea1b0360 54ffcccd
+[fault-host] 1886998d4: f9400370 927d9e11 f9401231 3617cb11 3607cbf0 d377fe11 b4ffcbf1 d2e02011
+[fault-host] 1886998f4: ab110211 54ffcb62 aa1003e1 c8b07f71 eb10003f 54fffe81 d65f03c0 ea1c0380
+[fault-host] 188699914: 54ffcaad f9400390 927d9e11 f9401231 3617c8f1 3607c9d0 d377fe11 b4ffc9d1
+[mach_exc] insn_stream PC-12..PC+8: 54ffff6d f9400010 927d9e02 [f9401051] 36100331 360003b0 d377fe11
+[mach_exc] sym pc=/usr/lib/libobjc.A.dylib`objc_release+0x10 lr=/usr/lib/libobjc.A.dylib`<redacted>+0xcc
+[x86_seg] State.gs_cached=0x0 TEB=0x7900290000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x38269805c8 insn=0xf9401051 pc=0x188699974 NO pool/anon alias | region 0x1000000000+0x6000000000 prot=0 max=0 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x129f3f7a0 (pc=0x188699974 x18=0x0 registry=0x7900290000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x38269805c8 hostpc=0x188699974 hinsn=0xf9401051 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x188699974 addr=0x38269805c8 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1000000000+0x6000000000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x188699974 addr=0x38269805c8 x18=0x0 type=1 lr=0x18869b418 sp=0x129f3f7a0 x16=0x6a8e9038269805ad x17=0x100000000000
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xf77a497d1a9f00df x9=0xf77a497d1a9f00df x10=0x0 x11=0x0 x0=0x118e7d0b0 x2=0x38269805a8 | teb=0x7900290000 peb=0x7900310000 peb->EcCodeBitMap=0x0
+[fault-host] 1886998d4: f9400370 927d9e11 f9401231 3617cb11 3607cbf0 d377fe11 b4ffcbf1 d2e02011
+[fault-host] 1886998f4: ab110211 54ffcb62 aa1003e1 c8b07f71 eb10003f 54fffe81 d65f03c0 ea1c0380
+[fault-host] 188699914: 54ffcaad f9400390 927d9e11 f9401231 3617c8f1 3607c9d0 d377fe11 b4ffc9d1
+[fault-host] 188699934: d2e02011 ab110211 54ffc942 aa1003e1 c8b07f91 eb10003f 54fffe81 d65f03c0
+[fault-host] 188699954: d65f03c0 b03a9721 912bc021 15f4caf0 ea000000 54ffff6d f9400010 927d9e02
+[fault-host] 188699974: f9401051 36100331 360003b0 d377fe11 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 54ffff6d f9400010 927d9e02 [f9401051] 36100331 360003b0 d377fe11
+[mach_exc] sym pc=/usr/lib/libobjc.A.dylib`objc_release+0x10 lr=/usr/lib/libobjc.A.dylib`<redacted>+0xcc
+[x86_seg] State.gs_cached=0x0 TEB=0x7900290000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[host-fault] sig=10 pc=0x188699974 addr=0x38269805c8 on a NON-guest thread — declining to adopt (would have deadlocked in our own handler) rev=ml481
+[store-noalias] #3 rev=ml348 addr=0x38269805c8 insn=0xf9401051 pc=0x188699974 NO pool/anon alias | region 0x1000000000+0x6000000000 prot=0 max=0 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x129f3f7a0 (pc=0x188699974 x18=0x0 registry=0x7900290000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=READ p1=0x38269805c8 hostpc=0x188699974 hinsn=0xf9401051 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x188699974 addr=0x38269805c8 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1000000000+0x6000000000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x188699974 addr=0x38269805c8 x18=0x0 type=1 lr=0x18869b418 sp=0x129f3f7a0 x16=0x6a8e9038269805ad x17=0x100000000000
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xf77a497d1a9f00df x9=0xf77a497d1a9f00df x10=0x0 x11=0x0 x0=0x118e7d0b0 x2=0x38269805a8 | teb=0x7900290000 peb=0x7900310000 peb->EcCodeBitMap=0x0
+[mach_exc] insn_stream PC-12..PC+8: 54ffff6d f9400010 927d9e02 [f9401051] 36100331 360003b0 d377fe11
+[mach_exc] sym pc=/usr/lib/libobjc.A.dylib`objc_release+0x10 lr=/usr/lib/libobjc.A.dylib`<redacted>+0xcc
+[x86_seg] State.gs_cached=0x0 TEB=0x7900290000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #4 rev=ml348 addr=0x38269805c8 insn=0xf9401051 pc=0x188699974 NO pool/anon alias | region 0x1000000000+0x6000000000 prot=0 max=0 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x129f3f7a0 (pc=0x188699974 x18=0x0 registry=0x7900290000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #4 p0=READ p1=0x38269805c8 hostpc=0x188699974 hinsn=0xf9401051 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x188699974 addr=0x38269805c8 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x1000000000+0x6000000000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x188699974 addr=0x38269805c8 x18=0x0 type=1 lr=0x18869b418 sp=0x129f3f7a0 x16=0x6a8e9038269805ad x17=0x100000000000
+[guest-code] rev=ml333 pool_rip=0x0 (PE 0x0) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 54ffff6d f9400010 927d9e02 [f9401051] 36100331 360003b0 d377fe11
+[mach_exc] sym pc=/usr/lib/libobjc.A.dylib`objc_release+0x10 lr=/usr/lib/libobjc.A.dylib`<redacted>+0xcc

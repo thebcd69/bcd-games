@@ -2429,6 +2429,16 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
     {
         const char *extra = child_extra_args( getenv( "MADEIRA_CHILD_ARGS" ), params->ImagePathName.Buffer,
                                               params->ImagePathName.Length / sizeof(WCHAR) );
+        /* madeira-bcd (round 630, agent T2 S9: The Genesis Order S8QC9X): a Chromium program starts its crash handler as
+         * itself with --type=crashpad-handler, and that handler takes only its own switches: given the NW.js row's
+         * "--disable-accelerated-video-decode ..." it answered "invalid option -- `-d'" and exited 1. Its command line is
+         * left as it is; every other process of the program still gets the arguments. */
+        if (extra && sc_switch_end( params->CommandLine.Buffer, params->CommandLine.Length / sizeof(WCHAR),
+                                    "--type=crashpad-handler" ) >= 0)
+        {
+            dprintf( 2, "[child-args] env.MADEIRA_CHILD_ARGS: not appended to a crash handler (\"%s\") rev=r630\n", extra );
+            extra = NULL;
+        }
         if (extra)
         {
             int cl_len = params->CommandLine.Length / sizeof(WCHAR), n = (int)strlen( extra ), k;
@@ -4043,12 +4053,66 @@ void ios_wow32_stack_dump( const char *tag )
 /******************************************************************************
  *              NtTerminateProcess  (NTDLL.@)
  */
+#ifdef WINE_IOS
+/* madeira-bcd (round 630, agent T1 S30; Marvel's Spider-Man Remastered and Miles Morales 569HA2, Palworld QW0FG6, RoboCop 5SM9M3,
+ * Ride TC2KZ9): ExitProcess's first step, NtTerminateProcess( NULL, code ), names the status the process chose. When its DLL shutdown
+ * then faults in a storm and the storm breaker ends the process (signal_arm64_ios.c ios_storm_end_child_only), that status is the
+ * one reported, not c0000005: the Dock then sees the game end as it chose to, and the app no longer reads a quit as a crash. */
+static struct { void *peb; LONG code; } ios_exiting_tab[8];
+static unsigned int ios_exiting_next;
+
+static void ios_exiting_record( void *peb, LONG code )
+{
+    unsigned int i = __atomic_fetch_add( &ios_exiting_next, 1, __ATOMIC_RELAXED ) % 8;
+    __atomic_store_n( &ios_exiting_tab[i].peb, NULL, __ATOMIC_RELEASE );
+    __atomic_store_n( &ios_exiting_tab[i].code, code, __ATOMIC_RELEASE );
+    __atomic_store_n( &ios_exiting_tab[i].peb, peb, __ATOMIC_RELEASE );
+}
+
+/* 1 and the status a process gave ExitProcess, if it is exiting; 0 otherwise. */
+int ios_exiting_status( void *peb, LONG *code )
+{
+    unsigned int i;
+    for (i = 0; peb && i < 8; i++)
+    {
+        if (__atomic_load_n( &ios_exiting_tab[i].peb, __ATOMIC_ACQUIRE ) != peb) continue;
+        *code = __atomic_load_n( &ios_exiting_tab[i].code, __ATOMIC_ACQUIRE );
+        return 1;
+    }
+    return 0;
+}
+#endif
+
 NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
 {
     unsigned int ret;
     BOOL self;
 
 #ifdef WINE_IOS
+    if (!handle) ios_exiting_record( NtCurrentTeb()->Peb, exit_code );   /* madeira-bcd (round 630): see ios_exiting_status */
+    /* madeira-bcd (round 630, agent G3 S4; TEKKEN 7 37CPHE): env.MADEIRA_THREAD_FAULT_ISOLATE (thread_ios.c): a thread whose entry point
+     * lies in a listed DLL and that ends the process with an NTSTATUS error (the unhandled-exception exit) ends only itself. Nothing
+     * else here runs for it; without the key, with another status, the process's first thread or a thread of another module, nothing
+     * changes. */
+    extern int ios_thr_isolate_on( void );   /* thread_ios.c */
+    if (handle == NtCurrentProcess() && ((unsigned int)exit_code & 0xc0000000u) == 0xc0000000u && ios_thr_isolate_on())
+    {
+        extern uintptr_t ios_thr_entry_start( uintptr_t teb );
+        extern int ios_thr_isolate_listed( const char *name );
+        extern unsigned long long ios_jit_module_base_for_va( unsigned long long va, unsigned long long *size_out );
+        uintptr_t start = ios_thr_entry_start( (uintptr_t)NtCurrentTeb() );
+        unsigned long long msz = 0, mbase = start ? ios_jit_module_base_for_va( start, &msz ) : 0;
+        char mname[64];
+        const char *name = mbase ? ios_diag_module_name( mbase, msz, mname, sizeof(mname) ) : NULL;
+
+        if (name && ios_thr_isolate_listed( name ))
+        {
+            dprintf( 2, "[thread-isolate] r630 tid=%04x start=%s+0x%llx: unhandled %08x ends this thread only (env.MADEIRA_THREAD_FAULT_ISOLATE)\n",
+                     (unsigned int)HandleToULong( NtCurrentTeb()->ClientId.UniqueThread ), name,
+                     (unsigned long long)(start - mbase), (unsigned int)exit_code );
+            return NtTerminateThread( NtCurrentThread(), exit_code );
+        }
+    }
     if ((unsigned int)exit_code == 0xE0000008u && handle == NtCurrentProcess())
         ios_term_oom_record( NtCurrentTeb() );
     {

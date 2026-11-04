@@ -50,6 +50,10 @@ f0 = src.index("static int fex_arena_covers( const void *limit_low, const void *
 covers = src[f0:src.index("\n}\n", f0) + 3]
 
 # ---- the source
+check("round 630 (A2 S3): map_view retries exactly the WOW64 window with the overlap flag set, after the cage retry",
+      "if (!ptr && (char *)start == (char *)0xc00000000ULL && (char *)end == (char *)0xf00000000ULL)" in src
+      and "ios_fex_overlap_retry = 1;\n                ptr = map_reserved_area( start, end, host_size, top_down, unix_prot, align_mask );\n                ios_fex_overlap_retry = 0;" in src
+      and src.index("if (!ptr && ios_cage_release_on_exhaustion( start, end, view_size ))") < src.index("ios_fex_overlap_retry = 1;"))
 check("the switch is read once and only '1' turns the guard on",
       src.count('getenv( "MADEIRA_ARENA_GUARD" )') == 1 and "v = (e && e[0] == '1');" in guard)
 check("map_view asks the guard right before map_fixed_area",
@@ -94,6 +98,7 @@ static ULONG_PTR ios_fex_arena_base_unix, ios_fex_arena_end_unix;
 struct teb_stub { struct { void *UniqueThread; } ClientId; };
 static struct teb_stub the_teb __attribute__((unused));
 #define NtCurrentTeb() (&the_teb)
+static int ios_fex_overlap_retry;   /* round 630 (A2 S3): virtual_ios.c declares it right above fex_arena_covers */
 ''' + covers + guard + r'''
 static int fails;
 static void expect( const char *what, int got, int want, int want_lines )
@@ -155,6 +160,26 @@ int main( int argc, char **argv )
         ios_fex_arena_base_unix = 0x7000000000ull; ios_fex_arena_end_unix = 0x7400000000ull;
         expect( "an arena below the slot", ios_steer_top_slot_usable(), 1, before );
     }
+    else if (!strcmp( mode, "overlap" ))
+    {
+        /* round 630 (agent A2 S3): the WOW64 emulator's window on a 63 GB map, [0xc00000000, 0xf00000000), overlaps the arena */
+        areas( 0xb30000000ull, 0xd30000000ull );
+        expect( "outside the retry: not served", fex_arena_covers( (void *)0xc00000000ull, (void *)0xeffffffffull ), 0, lines );
+        ios_fex_overlap_retry = 1;
+        expect( "in the retry: the window (inclusive end) is served", fex_arena_covers( (void *)0xc00000000ull, (void *)0xeffffffffull ), 1, lines );
+        expect( "in the retry: the window (exclusive end) is served", fex_arena_covers( (void *)0xc00000000ull, (void *)0xf00000000ull ), 1, lines );
+        expect( "in the retry: another window is not", fex_arena_covers( (void *)0xc00000000ull, (void *)0xe00000000ull ), 0, lines );
+        expect( "in the retry: a generic request is not", fex_arena_covers( (void *)0, (void *)0x7fffffffffull ), 0, lines );
+        areas( 0x7c40000000ull, 0x8000000000ull );
+        expect( "in the retry: an arena that does not overlap the window", fex_arena_covers( (void *)0xc00000000ull, (void *)0xeffffffffull ), 0, lines );
+        ios_fex_overlap_retry = 0;
+    }
+    else if (!strcmp( mode, "overlap-off" ))
+    {
+        areas( 0xb30000000ull, 0xd30000000ull );
+        ios_fex_overlap_retry = 1;
+        expect( "MADEIRA_WOW_FEX_BAND=0: not served", fex_arena_covers( (void *)0xc00000000ull, (void *)0xeffffffffull ), 0, lines );
+    }
     if (!fails) printf( "harness ok\n" );
     return fails != 0;
 }
@@ -180,6 +205,11 @@ int main( int argc, char **argv )
             check("MADEIRA_ARENA_GUARD=1: the overlaps are refused, the rest passes, and the log is capped", r.returncode == 0, r.stdout)
             r = run("steer", "1")
             check("MADEIRA_ARENA_GUARD=1: the steering top slot is skipped while it holds the arena", r.returncode == 0, r.stdout)
+            r = run("overlap", None)
+            check("round 630 (A2 S3): the WOW64 window on a 63 GB map uses the arena it overlaps, in map_view's retry only", r.returncode == 0, r.stdout)
+            env = dict(os.environ, MADEIRA_WOW_FEX_BAND="0")
+            r = subprocess.run([exe, "overlap-off"], capture_output=True, text=True, env=env)
+            check("round 630: MADEIRA_WOW_FEX_BAND=0 turns the overlap off with the [wow-band] case", r.returncode == 0, r.stdout)
 
 print("PASS: arena guard" if ok else "FAIL: arena guard")
 sys.exit(0 if ok else 1)

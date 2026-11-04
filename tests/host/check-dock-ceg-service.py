@@ -284,6 +284,27 @@ let wineHead = "WINE REGISTRY Version 2\n;; All keys relative to REGISTRY\\\\Mac
         try FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
         require(DockCEGService.steamLogLines(drive: drive) == ["files="], "an empty logs folder: no file names, nothing else")
 
+        // ---- round 630 (agent U S3): Valve's client's connection lines after a start that ended with code 34
+        require(DockCEGService.connectionLogLines(drive: drive) == ["no connection_log.txt"], "no connection log: said so")
+        var connection = (1...50).map { "[2026-10-31 03:03:\($0 % 60)] [0,0] Connect() starting connection to CM 162.254.\($0).1:27017 attempt \($0)" }
+        connection += ["[2026-10-31 03:04:18] [U:1:123456789] Logged On [U:1:123456789]",
+                       "[2026-10-31 03:04:18] Log session started for user someplayer",
+                       "[2026-10-31 03:04:19] Logon: account name sent",
+                       "[2026-10-31 03:04:20] PICS: license list request timeout after 30000 ms",
+                       "[2026-10-31 03:04:21] Something unrelated 9999999"]
+        try write(logs.appendingPathComponent("Connection_Log.txt"), connection.joined(separator: "\r\n") + "\r\n")
+        let conn = DockCEGService.connectionLogLines(drive: drive)
+        require(conn.first == "connection_log.txt lines=55 matching=51" && conn.count == 41,
+                "the count is said, at most 40 lines follow (\(conn.first ?? "-"), \(conn.count))")
+        require(conn.last == "[2026-10-<n> <n>:<n>:<n>] PICS: license list request timeout after <n> ms" || conn.last?.contains("license list request timeout after <n> ms") == true,
+                "the licence line is kept, with every run of five or more digits replaced (\(conn.last ?? "-"))")
+        require(!conn.joined().contains("someplayer") && !conn.joined().contains("123456789") && !conn.contains { $0.lowercased().contains("account") }
+                && !conn.contains { $0.contains("[U:1:") } && !conn.joined().contains("Something unrelated"),
+                "no account, user name or Steam ID, and only lines about the logon, the connection and the licence list")
+        let connBase = LogStore.shared.lines.count
+        DockCEGService.logConnectionLog(drive: drive)
+        require(LogStore.shared.lines.count - connBase == conn.count && logged("[steam-connection] connection_log.txt lines=55"), "logged with the [steam-connection] tag")
+
         if failures > 0 { print("FAILURES: \(failures)"); exit(1) }
         print("PASS: all Dock CEG service Swift checks")
     }

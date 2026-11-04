@@ -20,7 +20,10 @@ Fields (AutoTuneRule in app/Madeira/AutoTuneCore.swift):
             AutoTuneEngine.resolve)
   priority  lower first, among the rules one failed session matches
   all       signals that must all be in the log; a signal is {"has": [strings
-            that must all be on one line], "count": at least that many lines}
+            that must all be on one line], "count": at least that many lines,
+            "sinceLaunch": true when only the lines after the last "[bcd] library launch"
+            count (one app run can hold several games; round 630)}. The quoted tail of
+            the previous run ("[prev-tail]" lines) never counts (round 630).
   any       at least one of these (optional)
   none      none of these (optional): the fix already ran, or the cause is another
   outcomes  "crashed", "killed", "hung", "exited-early" (every failure when absent)
@@ -34,6 +37,8 @@ Fields (AutoTuneRule in app/Madeira/AutoTuneCore.swift):
                many MiB (a log with no such line passes)
   exeMinMB     the same program was at least this many MiB (the log has to have such a line)
   memoryMinPct the last footprint line was at least this percent of the memory limit (a log with no footprint line or limit passes)
+  swapCapHit   true: the swap file reached its cap in the session (the last "[swap] ml1077 stats" line counts a disk-full refusal, or
+               its disk use is 90 % of the cap or more); a log without that stats line passes (round 630)
   listUpgrade  after a `killed` verdict the lines may replace the recommended list's own lines in the game's file, with a larger number
                (a line equal to the list's is already in force; a user's key is never replaced)
   minStage / maxStage   how far the session got: 1 Wine started, 2 the game's
@@ -59,10 +64,12 @@ Owner, 2026-10-17: every fix we make gets a rule here, a config line or a fix in
 """
 
 
-def s(*has, count=None):
+def s(*has, count=None, since_launch=False):
     d = {"has": list(has)}
     if count is not None:
         d["count"] = count
+    if since_launch:
+        d["sinceLaunch"] = True
     return d
 
 
@@ -98,12 +105,16 @@ def swap_rules():
         # the game's file, which kept the 12 GB tier's 6144 out as a "user key" (A24ES3); after this verdict the larger number may replace it.
         # Round 624 (Sekiro XJ8YM3 at 3957 of 4096 MB, ZJYGS9 at 4094): a kill at 95 % of the limit or more is iOS's memory limit for sure and
         # comes back the same on every start; the unchanged retry only loaded the game again for a minute. Same lines, first, no retry; the
-        # 50-95 % band keeps the retry below (Albino Lullaby's lesson).
-        out.append(dict(id="swap-%s-memory-kill-sure" % name, lines=base, priority=49, memoryMinPct=95, noRetry=True, listUpgrade=True,
+        # 50-90 % band keeps the retry below (Albino Lullaby's lesson).
+        # Round 630 (agent T1 S11; Grapple Dog RHT9F5 and JVQCN6 on a 4095 MB limit, God of War 9PF1EW, It Takes a War D4CKB2): the last
+        # footprint sample comes up to a few seconds before iOS's kill and the footprint climbs 100-300 MB between samples there, so real
+        # kills end at 91-95 % (3873 and 3884 of 4095 MB); 95 % sent them through the unchanged retry first. 90 %.
+        out.append(dict(id="swap-%s-memory-kill-sure" % name, lines=base, priority=49, memoryMinPct=90, noRetry=True, listUpgrade=True,
                         all=[s("[footprint] rev=ml358 phys=")], outcomes=["killed"],
                         reason="iOS closed the game at its memory limit; a %d MB swap file moves large "
                                "allocations out of RAM on this device." % first,
-                        evidence=[ev, "round 624: Sekiro XJ8YM3, ZJYGS9 (killed at 97-100 %% of the limit)"], **ram))
+                        evidence=[ev, "round 624: Sekiro XJ8YM3, ZJYGS9 (killed at 97-100 %% of the limit)",
+                                  "round 630: Grapple Dog RHT9F5, JVQCN6 (killed at 94-95 %% of the limit)"], **ram))
         out.append(dict(id="swap-%s-memory-kill" % name, lines=base, priority=50, memoryMinPct=50, listUpgrade=True,
                         all=[s("[footprint] rev=ml358 phys=")], outcomes=["killed"],
                         reason="iOS closed the game at its memory limit; a %d MB swap file moves large "
@@ -114,8 +125,11 @@ def swap_rules():
                         reason="The game said it ran out of memory; a %d MB swap file moves large allocations "
                                "out of RAM on this device." % first,
                         evidence=[ev], **ram))
+        # Round 630 (agent T2 S12): only when the file reached its cap. In 51YW0Y, T42FW2, 6C2JBM and the Witcher 3 runs the "more" step
+        # was matched with the disk at 3-48 % of the cap and no disk-full refusal: the memory that filled the limit was not the guest's,
+        # and a larger file changed nothing but cost a start (T42FW2 was already at 8192 MB).
         out.append(dict(id="swap-%s-more" % name, lines=["swap-mb = %d" % second], priority=55, upgrade=True, memoryMinPct=50,
-                        all=[s("[swap] ml1077 backed")], outcomes=["killed"],
+                        swapCapHit=True, all=[s("[swap] ml1077 backed")], outcomes=["killed"],
                         reason="The game was closed for memory again with the swap file in use; the line "
                                "raises it to %d MB." % second,
                         evidence=[ev], **ram))
@@ -340,7 +354,11 @@ RULES = [
         # know it; the 33 plain candidates lie within 2 MB. From build 623 the request's last attempt goes on past the region (ENOMEM only,
         # small address maps only, only for a request that would otherwise fail). This rule also covers the sessions whose log has no STAGE=fixed-map line
         # (small-map-window-refusals needs it).
-        "all": [s("[wow-window] small address map"), s("[reserved-area] #", "NOT placed", "small address map retry on")],
+        "all": [s("[wow-window] small address map"), s("[reserved-area] #", "NOT placed", "small address map retry on"),
+                # Round 630 (agent A2 S1): a refused first attempt is printed for every speculative spill, also when the next attempt
+                # places the image (portable Chrome YGY6Z4, build 626); the failures this rule is about ended in the program using the
+                # NULL it got (five such lines in each fixture).
+                s("the 32-bit guest used the NULL page", "[wow-null32]")],
         "reason": "On this device's smaller address map the system refused every memory placement inside a 32-bit program's window, "
                   "because regions left by libraries the program had loaded and dropped cannot be replaced; from this build on BCD places "
                   "the memory beyond them, or in a free stretch the system itself reports.",
@@ -606,6 +624,9 @@ RULES = [
         "all": [s("[device] model=")],
         "any": [s("[device] model=iPhone11,"), s("[device] model=iPad7,"), s("[device] model=iPad8,"),
                 s("[device] model=iPad11,"), s("[device] gpu=", "argument-buffers=tier1")],
+        # Round 630 (agent A2 S1): a program started inside the Desktop is not refused by the library's check, and its failure need not be
+        # the graphics chip's (JB8XTY, an iPhone XS, build 626: the OpenAL runtime installer, a corrupted code page).
+        "none": [s("[bcd-ui] play desktop")],
         "reason": "This device's graphics chip (A12 or older) cannot run Direct3D games in BCD; from this "
                   "build on BCD says so before a game starts instead of crashing.",
         "evidence": ["synthetic-device-gpu-tier1",
@@ -1140,6 +1161,76 @@ RULES = [
                      "UNPROVEN: the first session with the line decides"],
     },
     {
+        "id": "football-manager-27-mitigation-policy-wild-call",
+        "lines": ["env.MADEIRA_ZERO_MITIGATION_POLICY = 1"],
+        "priority": 30,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # AN EXPERIMENT (round 630, agent U S2; Football Manager 27, fm.exe 64-bit, Send Log 88YTP3 build 626, iPad M5): the game's plugin
+        # (game_plugin.dll) plays 26 s, asks GetProcessMitigationPolicy 13 times and then jumps to 0x47fe0000 (= 0x7ffe0000 - 0x38000000, the
+        # shared-data page through the plugin's own arithmetic) and stops. Wine's GetProcessMitigationPolicy answers TRUE without writing
+        # the buffer, so the plugin read 13 stale stack words; the line fills them with zeros (the opt-in kernelbase, which the key brings
+        # along from build 630, WineProcessBridge.m). If the next log stops at the same place the line does not help.
+        # Signals every session prints (a quiet log may drop the fixme lines): the plugin's image and the refused block at that address.
+        "all": [s("game_plugin.dll", "[iOS-xins] tracker="), s("[entry-fail]", "guest RIP=0x47fe0000")],
+        "none": [s("[madeira-env] game MADEIRA_ZERO_MITIGATION_POLICY=1")],
+        "reason": "The game's plugin asked Windows which security features are on, got answers BCD never filled in, and then stopped; this "
+                  "attempt fills the answers with zeros.",
+        "evidence": ["football-manager-27-mitigation-policy-2026-11-01 (Send Log 88YTP3, build 626)", "UNPROVEN: the first session with the line decides"],
+    },
+    {
+        "id": "unity-empty-display-list-null-read",
+        "lines": ["env.DXMT_WSI_MONITOR_IDENTITY = 1", "env.DXMT_WSI_MODE_TABLE = 1"],
+        "priority": 30,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # AN EXPERIMENT (round 630, agent U S4; Arcade Paradise EF6006 build 625 and Y3M2H4 build 592, TOEM PG5FMH build 626 and ESGSEG build
+        # 592): two seconds in, UnityPlayer.dll reads element 0 of an empty array of display records (mov r8,[rcx+rdx*8+8] with rcx = rdx = 0,
+        # the same bytes in all four logs and in no other log of the archive). Likely: Unity matches Direct3D's outputs with Windows'
+        # monitors, and DXMT's outputs name HMONITOR 1 while user32 answers 0x10001. The two DXMT keys give the outputs user32's monitor
+        # handle and mode table. The rows of the two games carry the lines; this rule is for a game with the same stop and no row.
+        "all": [s("[guest-exact] ml885", "x86=4c 8b 44 d1 08 44 8b 3c d1 44 0f 44 d0")],
+        "none": [s("[madeira-env] game DXMT_WSI_MONITOR_IDENTITY=1")],
+        "reason": "The game's engine found no display to draw on, likely because Direct3D and Windows name the screen differently here; this "
+                  "attempt gives Direct3D Windows' own screen and mode list.",
+        "evidence": ["arcade-paradise-empty-display-list-2026-10-31 (Send Log EF6006, build 625)", "Y3M2H4 (build 592)",
+                     "TOEM PG5FMH (build 626), ESGSEG (build 592)", "UNPROVEN: the first session with the lines decides"],
+    },
+    {
+        "id": "locale-en-us-ansi-nomem",
+        "lines": ["env.LC_ALL = en_US.UTF-8"],
+        "priority": 12,
+        "noRetry": True,
+        # AN EXPERIMENT, not a proven fix (round 630, agent O3 S17; Prototype 2, 32-bit prototype2.exe, Send Log E0FWD8, build 626, iPhone15,3):
+        # 2 s into the start the game raises STATUS_NO_MEMORY itself ("[exc-disp] dispatch ... code=c0000017 flags=1") on the line right after
+        # asking for the phone's own ANSI code page ("[nls-getptr] type=11 id=1254"); no allocation failed. Rift Apart (857) ran with LC_ALL,
+        # Dying Light (1254) is the standing experiment (locale-en-us-ansi); Spider-Man and GTA V ask for 1254 and run, so the request alone is
+        # not fatal: the NO_MEMORY raise is the bound. The first session with the line decides; then x86-raise-nomem-diag shows the raiser.
+        "all": [s("[nls-getptr] type=11 id=1254"), s("[exc-disp] dispatch", "code=c0000017")],
+        "any": UNHANDLED,
+        "none": [s("[madeira-env] game LC_ALL=")],
+        "reason": "The game asked for the phone's own (non-English) code page and then stopped itself with an out-of-memory error that was not "
+                  "one; this attempt gives Wine an English locale for this game.",
+        "evidence": ["prototype-2-no-memory-raise-2026-11-03 (Send Log E0FWD8, build 626)", "rift-apart (857, proved)",
+                     "UNPROVEN: the first session with the line decides"],
+    },
+    {
+        "id": "x86-raise-nomem-diag",
+        "lines": ["env.MADEIRA_X86_FAULT_DUMP = 1"],
+        "priority": 90,
+        "noRetry": True,
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent O3 S17; Prototype 2 E0FWD8): a 32-bit program that raises STATUS_NO_MEMORY itself while no allocation failed; no
+        # setting is known. From build 630 env.MADEIRA_X86_FAULT_DUMP = 1 prints the program's call chain at that raise ("[term-stack] 32-bit
+        # raise" lines: WoW64's saved registers and the return addresses, signal_arm64_ios.c ios_log_guest_exception). Log only; the lowest
+        # priority, so the locale experiment above goes first.
+        "all": [s("[exc-disp] dispatch", "code=c0000017"), s("libwow64fex.dll")],
+        "any": UNHANDLED,
+        "none": [s("[madeira-env] game MADEIRA_X86_FAULT_DUMP="), s("[term-stack] 32-bit raise")],
+        "reason": "The game stopped itself with an out-of-memory error that was not one; the line makes the next log show which code raised it.",
+        "evidence": ["prototype-2-no-memory-raise-2026-11-03 (Send Log E0FWD8, build 626)", "tests/host/check-x86-fault-diag.py"],
+    },
+    {
         "id": "alias-release-arena-reuse",
         "lines": ["env.MADEIRA_ALIAS_RELEASE = 1"],
         "priority": 14,
@@ -1323,6 +1414,22 @@ RULES = [
         "evidence": ["outlast-msvcr100-2026-10-29 (Send Log 056DW5, build 622)", "5KK967, ZEJDSW, 4GV864 (623), EHTTTF (600), W5KAG7, BKPNJG (614)"],
     },
     {
+        "id": "app-dll-shadow-msvcrt-x86",
+        "lines": ["env.MADEIRA_APP_DLL_SHADOW = msvcrt.dll"],
+        "priority": 10,
+        # Round 630 (agents O2 S1 and O1 S18; Hitman: Contracts 8JPXPD 626, DDFJM7 614, KBBQJK 578; Guacamelee! 0P65SX 623, KKBJNY 625,
+        # DNWRXA 600): the 32-bit game's folder carries Microsoft's own msvcrt.dll, which Windows never loads (a KnownDLL); BCD loaded it and
+        # its DllMain failed ('"msvcrt.dll" failed to initialize, aborting'). From build 630 MADEIRA_APP_DLL_SHADOW acts on a plain i386
+        # DLL too (virtual_ios.c ios_ucrt_shadow_refused, tests/host/check-app-dll-shadow.py), so the line makes the loader bind Wine's.
+        # "none": the shadow already ran.
+        "all": [s("\"msvcrt.dll\" failed to initialize")],
+        "none": [s("[app-dll-shadow]")],
+        "reason": "The game's folder carries its own copy of Microsoft's msvcrt.dll, which Windows would never load and whose start fails here; "
+                  "the line makes the loader use Wine's.",
+        "evidence": ["hitman-contracts-msvcrt-2026-11-02 (Send Log 8JPXPD, build 626; DDFJM7, KBBQJK)",
+                     "guacamelee-msvcrt-2026-10-31 (Send Log KKBJNY, build 625; 0P65SX, DNWRXA)", "tests/host/check-app-dll-shadow.py"],
+    },
+    {
         "id": "app-dll-shadow-vcruntime",
         "lines": ["env.MADEIRA_APP_DLL_SHADOW = vcruntime140.dll"],
         "priority": 10,
@@ -1420,6 +1527,27 @@ RULES = [
                   "game Wine's sfc, sfc_os and tbs.",
         "evidence": ["d2r-2026-10-20 (synthetic: the import lines quoted in bcd-games issue #3, in the Fort Solis "
                      "build 574 session frame; no Send Log of the game yet)"],
+    },
+    {
+        "id": "rockstar-launcher-tbs-import",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = tbs"],
+        # Before wow-window-slots-all-held (4): in S29BE1 the launcher's installer also lost a 32-bit window for its x86 VC++ setup, but
+        # the start ends at the launcher's tbs import (it ends there again on the next start, when nothing is installed any more).
+        "priority": 2,
+        "noRetry": True,
+        # Round 630 (a player on the owner's Discord, 2026-11-04: Rockstar updated its launcher the day before): the Rockstar Games
+        # Launcher 1.0.110.3139 (2026-11-03; a Steam copy brings it as Redistributables\Rockstar-Games-Launcher.exe and installs it at the
+        # first start) imports tbs.dll, which BCD gives a game only as an opt-in DLL. The launcher ends with c0000135 at its imports and the
+        # game's start program shows "Unable to launch game, please try reinstalling the game" (RDR2 S29BE1, JRBQ8D, Q2G5WK, 8JSG87; GTA V
+        # Legacy KTD37Z; build 626, the stage-3 end that sfc-tbs-dll-optin's maxStage 2 leaves out). The Rockstar rows carry the line from
+        # list v30 (minBuild 579: every build since ships tbs-optin.dll); this rule covers a copy without a row. Wine's tbs answers "no TPM",
+        # as a PC without one does; the launcher's Chromium already probed for tbs.dll at run time and went on without it.
+        "all": [s("err:module:import_dll Library tbs.dll (which is needed by", "Rockstar Games\\\\Launcher\\\\Launcher.exe", ") not found")],
+        "none": [s("MADEIRA_OPTIN_DLLS: tbs.dll -> tbs-optin.dll")],
+        "reason": "The Rockstar Games Launcher updated on 3 November 2026 needs tbs.dll, which BCD gives a game only on request; without it the "
+                  "launcher cannot start and the game says it cannot launch. The line gives this game Wine's tbs.",
+        "evidence": ["rockstar-launcher-tbs-import-2026-11-03 (Send Log S29BE1, build 626, Red Dead Redemption 2)",
+                     "JRBQ8D, Q2G5WK, 8JSG87 (RDR2), KTD37Z (GTA V Legacy)"],
     },
     {
         "id": "gdi-table-32bit-child",
@@ -1915,7 +2043,11 @@ RULES = [
         # Round 623: "none" also holds when the boot thread did return from __wine_main and waits for the program's children (the line below is
         # that wait); the session is then not stuck on a dead thread, it is waiting on purpose, and this rule's "update" verdict was wrong for it
         # (Trails in the Sky M5G99X, build 622: services.exe kept the wait going after the game died; PES2018 7Y5YFC, Crysis Z19V91, Fallout 4 C5Y6PW).
-        "none": [s("[WineProc] stopping wineserver"), s("[WineProc] madeira-bcd: the main process exited but")],
+        "none": [s("[WineProc] stopping wineserver"), s("[WineProc] madeira-bcd: the main process exited but"),
+                 # Round 630 (agents A2 S4 and G2 S0): the end work cannot run when the APP itself died: a fault BCD declined on a thread of its
+                 # own (the Steam client 9PB1B5, build 626), a Metal assertion's trap (Mina the Hollower W6PACT, build 626: "Command encoder
+                 # released without endEncoding"). Those are not this pre-578 hang.
+                 s("[host-fault] sig="), s("[task-exc] BREAKPOINT #"), s("Command encoder released without endEncoding")],
         "reason": "The game ended on a thread BCD was not watching, so BCD stayed on its last frame; "
                   "from this build on BCD notices, says that the game closed and returns to the library.",
         "evidence": ["gta-iv-2026-10-21 (gta4-freeze, build 576)", "Stranglehold RVBE4K (build 569)",
@@ -2211,6 +2343,69 @@ RULES = [
         "evidence": ["aniimo-2026-10-25 (9X37R0, build 600, c0000135 at once)"],
     },
     {
+        "id": "httpapi-dll-optin",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = httpapi"],
+        "priority": 10,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G2 S7; GrandChase, Steam 985810, QB5XMM build 626): the game's cpprest_2_10.dll imports HTTPAPI.dll, which the
+        # 64-bit set lacks: the loader ends with c0000135. Build 630 ships Wine's httpapi.dll as httpapi-optin.dll.
+        "all": [s("err:module:loader_init Importing dlls for", "failed, status c0000135")],
+        "any": [s("err:module:import_dll Library " + n, "not found") for n in ("HTTPAPI.dll", "httpapi.dll", "HTTPAPI.DLL", "Httpapi.dll")],
+        "none": [s("MADEIRA_OPTIN_DLLS: httpapi.dll -> httpapi-optin.dll")],
+        "reason": "A library of the game imports Windows' HTTP server API (HTTPAPI.dll), which BCD does not ship for every 64-bit game; the line "
+                  "gives this game Wine's httpapi.dll.",
+        "evidence": ["grandchase-httpapi-2026-11-02 (Send Log QB5XMM, build 626: c0000135 at the loader)", "tests/host/check-optin-dlls.py"],
+    },
+    {
+        "id": "dbgcore-forward-optin",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = dbgcore"],
+        "priority": 11,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G2 S18; Rotfront FFJ9EQ build 626, and 32 more archive logs: Banishers, Subnautica 2, Clair Obscur ...): an Unreal
+        # game's own dbghelp.dll forwards MiniDumpWriteDump to dbgcore.dll ("find_forwarded_export module not found for forward
+        # 'dbgcore.MiniDumpWriteDump'"); in the game's crash handler that became the delay-load exception c06d007f and an R6025 box, which
+        # hid the game's own fatal message. The line links dbgcore.dll to BCD's dbghelp.dll (WineProcessBridge.m). It is the second
+        # failure, after the game's own; a session that crashed with it gets the line once.
+        "all": [s("find_forwarded_export module not found for forward 'dbgcore.MiniDumpWriteDump'")],
+        "any": UNHANDLED,
+        "none": [s("MADEIRA_OPTIN_DLLS: dbgcore.dll -> dbghelp.dll")],
+        "reason": "The game's crash handler needs Windows' dbgcore.dll, which BCD does not have, so the handler failed as well and hid the "
+                  "game's own message. The line lets the game's crash report run; the game stopped for another reason first.",
+        "evidence": ["rotfront-dbgcore-forward-2026-11-01 (Send Log FFJ9EQ, build 626)", "tests/host/check-optin-dlls.py"],
+    },
+    {
+        "id": "xinputuap-dll-optin",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = xinputuap"],
+        "priority": 10,
+        "noRetry": True,
+        # Round 630 (agent G1 S8; Dead or Alive 6 / Last Round, DOA6.exe and DOA6LR.exe: 4TK0QP, KEG3T2 = PPKZVS, build 626): the program imports
+        # XInputUap.dll (Windows 10's XInput for modern apps), which the 64-bit set lacks: c0000135 four seconds in. Build 630 ships Wine's
+        # xinputuap.dll (built from xinput1_3's source with the host-pad patch) as xinputuap-optin.dll.
+        "all": [s("err:module:import_dll Library", "not found")],
+        "any": [s("err:module:import_dll Library " + n, "not found") for n in ("XINPUTUAP.dll", "xinputuap.dll", "XINPUTUAP.DLL", "XInputUap.dll")],
+        "none": [s("MADEIRA_OPTIN_DLLS: xinputuap.dll -> xinputuap-optin.dll")],
+        "reason": "The game imports Windows' XInputUap.dll (the controller library of modern apps), which BCD does not ship for every 64-bit game; "
+                  "the line gives this game Wine's xinputuap.dll.",
+        "evidence": ["dead-or-alive-6-xinputuap-2026-11-03 (Send Logs KEG3T2, 4TK0QP, build 626: c0000135 at once)", "tests/host/check-optin-dlls.py"],
+    },
+    {
+        "id": "eaapp-steam-launcher-rstrtmgr",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = rstrtmgr"],
+        "priority": 11,
+        "noRetry": True,
+        "session": "dock",
+        # Round 630 (agent G1 S14; FIFA 22 through BCD Dock, K8SR03 and RD2XDZ, build 626): Steam's launch entry is EA's EASteamLauncher.exe,
+        # which imports RstrtMgr.DLL, absent from the 64-bit set (c0000135); rstrtmgr-optin.dll ships since build 595. Only this helper's
+        # import line: a crash reporter's identical import elsewhere must not cost a retry.
+        "all": [s("err:module:import_dll Library RstrtMgr.DLL (which is needed by", "EASteamLauncher.exe", "not found")],
+        "none": [s("MADEIRA_OPTIN_DLLS: rstrtmgr.dll -> rstrtmgr-optin.dll")],
+        "reason": "The EA helper that Steam starts for this game needs Windows' Restart Manager (RstrtMgr.dll), which BCD does not ship for every "
+                  "program; the line gives this session Wine's copy. This is only the first step of starting an EA game through Steam.",
+        "evidence": ["fifa-22-easteamlauncher-rstrtmgr-2026-11-01 (Send Logs RD2XDZ, K8SR03, build 626: c0000135 at once)"],
+    },
+    {
         "id": "gamingtcui-dll-optin",
         "lines": ["env.MADEIRA_OPTIN_DLLS = gamingtcui"],
         "priority": 10,
@@ -2267,6 +2462,22 @@ RULES = [
         "reason": "The game's Discord plugin imports qwave.dll (Windows' quality-of-service library), which BCD does not ship for every game, "
                   "and the game ends when the plugin cannot load; the line gives this game Wine's qwave.dll.",
         "evidence": ["bloons-td-6-qwave-2026-10-28 (4EJFKD, build 622, exit 1 after 16 s)"],
+    },
+    {
+        "id": "qwave-dll-optin-main-import",
+        "lines": ["env.MADEIRA_OPTIN_DLLS = qwave"],
+        "priority": 10,
+        "noRetry": True,
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent G2 S6; PAYDAY 2 5GYAQA, build 626): the game's own program imports discord_partner_sdk.dll, which imports
+        # qwave.dll; the loader ends the start with c0000135 before any code runs, so qwave-dll-optin (Unity's fatal text) cannot match.
+        # A game that only prints the import failure and starts (Mycopunk) has no loader_init line.
+        "all": [s("failed, status c0000135", "err:module:loader_init Importing dlls for")],
+        "any": [s("err:module:import_dll Library " + n + e, "not found") for n in ("qwave", "QWAVE", "Qwave") for e in (".dll", ".DLL")],
+        "none": [s("MADEIRA_OPTIN_DLLS: qwave.dll -> qwave-optin.dll")],
+        "reason": "The game's Discord library imports qwave.dll (Windows' quality-of-service library), which BCD gives only to the games "
+                  "that need it, and Windows refused to start the game without it; the line gives this game Wine's qwave.dll.",
+        "evidence": ["payday-2-qwave-main-import-2026-11-01 (Send Log 5GYAQA, build 626)"],
     },
     {
         "id": "eaapp-background-service-msi-dll",
@@ -2596,6 +2807,57 @@ RULES = [
         "evidence": ["call-of-duty-black-ops-ceg-55-2026-10-22 (YFWA6Z, build 580)", "DG6N4E (same failure on a second device)"],
     },
     {
+        "id": "dock-ceg-no-job",
+        "lines": ["env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1"],
+        "session": "dock",
+        "priority": 5,
+        "noRetry": True,
+        # Round 630 (agent A1 S14; Borderlands: The Pre-Sequel FRKBN1, build 626): Valve's client accepted the request to prepare the game's
+        # per-account program (ceg-request-result=1) and said it started no job (ceg-request=0, the only such answer of the 23 archive logs
+        # with CEG events); the Dock counted that as a failure (ceg-result=0, host result 49) and the game never launched. Why the client
+        # had nothing to prepare is not in the log. The line (build 630, tools/patch-dock-ceg-zero-jobs.py, off by default) lets such a
+        # start go on to Valve's own launch, which decides: an experiment on a start that fails every time today.
+        "all": [s("[dock-report] ceg-request=0"), s("[dock-report] ceg-request-result=1"), s("[dock-report] ceg-result=0")],
+        "any": [s("[dock-game-end]"), s("[frontend] returned to library")],
+        "none": [s("[madeira-env] game MADEIRA_DOCK_CEG_ZERO_JOBS=1")],
+        "reason": "Steam's client was asked to prepare this game's own program and answered that it had nothing to do, and BCD stopped "
+                  "there. The line lets the start go on to Steam's own launch; if the program is not ready, the game ends with its own error.",
+        "evidence": ["borderlands-tps-ceg-zero-jobs-2026-11-01 (Send Log FRKBN1, build 626)", "tests/host/check-dock-ceg-zero-jobs.py"],
+    },
+    {
+        "id": "dock-offline-fallback-no-install-dir",
+        "lines": [],
+        "noFix": True,
+        "session": "dock",
+        "priority": 5,
+        # Round 630 (agent A1 S16; GP Bikes N14Q6D, build 626, a first start): no byte came from Steam's servers (session-connection-result=3,
+        # every [sock-tl] summary rx=0), the documented offline fallback ran after the host's 20 s (session-offline-fallback=1, the first
+        # device run of it in the archive) and the start ended with host result 41: the install folder could not be read back from Valve's
+        # client for an install that had never been started online. The 30 explicit offline starts of builds 579-626 all passed that check.
+        # From build 630 the host says which check failed (tools/patch-dock-install-dir-events.py). The network side is not BCD's to change.
+        "all": [s("[dock-report] session-offline-fallback=1"), s("[dock-report] probe-result=41")],
+        "any": [s("[dock-game-end]"), s("[frontend] returned to library")],
+        "reason": "Steam couldn't reach its servers, and the offline start BCD tried instead couldn't find this game's folder. Check the "
+                  "connection (a VPN or a content filter can block Steam), then try again: a game's first start has to be online.",
+        "evidence": ["dock-offline-fallback-no-install-dir-2026-11-02 (Send Log N14Q6D, build 626)", "tests/host/check-dock-install-dir-events.py"],
+    },
+    {
+        "id": "dock-registry-42",
+        "lines": [],
+        "fixedIn": 630,
+        "session": "dock",
+        "priority": 6,
+        # Round 630 (agent A1 S11; PlateUp! BN3SXW, build 625, and 7 more of 976 archive logs with a host result, builds 565-625): the Dock
+        # could not open or write the Steam client entries in BCD's Windows registry and ended the start with 42, with no event; BN3SXW's
+        # next start worked. From build 630 a key that could not be opened is tried once more after a second and the host says which part
+        # failed (tools/patch-dock-registry-events.py, MADEIRA_DOCK_REGISTRY_RETRY).
+        "all": [s("[dock-report] launch-host-result=42")],
+        "any": [s("[dock-game-end]"), s("[frontend] returned to library")],
+        "reason": "BCD Dock could not write the Steam client entries it needs and never asked Steam to start the game. From build 630 it "
+                  "tries that step once more by itself and says which part failed. Update BCD and start the game again.",
+        "evidence": ["dock-registry-42-2026-10-31 (Send Log BN3SXW, build 625)", "tests/host/check-dock-registry-events.py"],
+    },
+    {
         "id": "unity-gc-stopped-thread-context",
         "lines": ["env.MADEIRA_CTX_FRAME = 1"],
         "priority": 30,
@@ -2749,12 +3011,32 @@ RULES = [
         # no case for it ("Unknown ALU Op: 0x10..0x16"; only that opcode reaches the message), the first one executed raised c000001d and
         # the program ended itself with 0xdeadc0de (or its DLL failed to initialise). Build 624's 32-bit module translates it
         # (tools/patch-fex-ios-op82-alias.py). The agent's archive replay: exactly these six of the 34 logs with the message or the exit code.
-        "all": [s("Unknown ALU Op: 0x1")],
-        "any": [s("exit_code=0xdeadc0de"), s('loader_init "uplay_r1_loader.dll" failed to initialize')],
-        "reason": "The program's protection layer uses an x86 instruction form (opcode 0x82) that BCD's 32-bit emulation could not "
-                  "translate, and then stopped. This build translates it.",
-        "evidence": ["ubisoft-connect-op82-2026-10-29 (P4KC3V, build 623)", "S78B5M (574), AEKXPC (611): the same exit and trap address",
-                     "XSSVTQ (600): uplay_r1_loader.dll", "tests/host/check-fex-op82-alias.py", "tests/x86/op82-alias-x86.c (device test)"],
+        # Round 630 (agent O1 S1; Ubisoft Connect MSFM7W, build 626): the 0x82 forms are translated since 624 (no "Unknown ALU Op" line),
+        # yet upc.exe ends itself the same way after its protection's self-check (ubisoft-launcher-protection-exit says so, for any
+        # build). This rule keeps only the uplay_r1_loader.dll case (Assassin's Creed III Liberation HD XSSVTQ), whose 0x82 trap was in the
+        # loader's own initialisation; no log of it after 624 exists yet.
+        "all": [s("Unknown ALU Op: 0x1"), s('loader_init "uplay_r1_loader.dll" failed to initialize')],
+        "reason": "The game's Ubisoft loader uses an x86 instruction form (opcode 0x82) that BCD's 32-bit emulation could not translate, "
+                  "and it stopped. This build translates it.",
+        "evidence": ["ubisoft-uplay-loader-op82-2026-10-27 (XSSVTQ, build 600: uplay_r1_loader.dll)", "tests/host/check-fex-op82-alias.py",
+                     "tests/x86/op82-alias-x86.c (device test)"],
+    },
+    {
+        "id": "ubisoft-launcher-protection-exit",
+        "lines": [],
+        "noFix": True,
+        "priority": 2,
+        # Round 630 (agent O1 S1; Ubisoft Connect MSFM7W, build 626; the same chain in P4KC3V, W749H9, ZWB3JT 623, S78B5M 574, AEKXPC 611):
+        # build 624 translates the 0x82 instruction forms, and upc.exe still ends itself: its protection's TLS callback, "[bad-close]
+        # 0xdeadc0de", one trap (the x86 trap-flag single step after popf; rdtsc), then NtRaiseHardError and exit 0xdeadc0de. A self-check
+        # BCD's emulated CPU does not pass yet; nothing here touches the protection. Only with Ubisoft's launcher loaded (GTA V Enhanced's
+        # own 0xdeadc0de is gta5-enhanced-started-without-launcher's).
+        "all": [s("exit_code=0xdeadc0de")],
+        "any": [s("Load module upc.exe")],
+        "reason": "The Ubisoft launcher's own protection ended it after a start-up self-check that BCD's emulated processor does not pass "
+                  "yet. No setting changes this.",
+        "evidence": ["ubisoft-launcher-chain-2026-11-02 (Send Log MSFM7W, build 626)", "ubisoft-connect-op82-2026-10-29 (P4KC3V, build 623)",
+                     "W749H9, ZWB3JT (623), S78B5M (574), AEKXPC (611)"],
     },
     {
         "id": "app-text-livecontainer-unaligned",
@@ -3084,7 +3366,10 @@ RULES = [
         # bus_handler never asked handle_syscall_fault for the jmp_buf (only segv_handler did), so the memmove in the system call became a guest
         # exception on the kernel stack: "call_seh_handlers invalid frame", "Exception frame is not in stack limits", NtTerminateProcess with a
         # garbage code, two installer processes gone, the UI on "something is downloading". Build 593 returns to the __EXCEPT block. No line.
-        "all": [s("[mach_exc] sym pc=", "_platform_memmove", "NtReadVirtualMemory"), s("NtRaiseException Exception frame is not in stack limits")],
+        "all": [s("[mach_exc] sym pc=", "_platform_memmove", "NtReadVirtualMemory"), s("NtRaiseException Exception frame is not in stack limits"),
+                # Round 630 (agent U S1; Football Manager 27 88YTP3, build 626): the two lines above came from two unrelated places (a handled
+                # read inside NtReadVirtualMemory and a crash handler's teardown fault); the SIGBUS path of the 593 bug prints this one.
+                s("bus_handler BUS->AV: unreadable target")],
         # Round 624 (agent C): Gal*Gun 2's OpenSSL SHA-extension stop has these signals too (the engine's own RIP-32 read faults in any
         # wild-RIP crash); its jump to <pointer low half>0000003c (or to 0x3c) is fex-sha-off-openssl-shaext's.
         "none": [s("[syscall-fault]"), s("0000003c pc=0x", "[fault_rip] cnt="), s("rip=0x3c pc=0x", "[fault_rip] cnt=")],
@@ -3201,12 +3486,16 @@ RULES = [
         # (VQ3K21), and neither assertion is in any of the other 700 logs. The signals are the interpolator's ready line, which every
         # session with frame generation prints, and one of the two assertions.
         "all": [s("[framegen] interpolator ready:")],
+        # Round 630 (agent R S9; GTA V Legacy NBGXP8, build 626, iPhone19,7): one global frame-generation state serves every swap chain of
+        # every program and was rebuilt 185 times in the session; the driver faulted (AGXMetalG19P) and Metal asserted "encodeSignalEvent:
+        # value: with uncommitted encoder" (the same rebuild storm in 17 more logs). The two texts below; the per-layer state is open (P2).
         "any": [s("Assertion failed: (MAX(srcSize->width >> *srcMip"),
-                s("failed assertion `commit command buffer with uncommitted encoder'")],
+                s("failed assertion `commit command buffer with uncommitted encoder'"),
+                s("failed assertion `encodeSignalEvent:value: with uncommitted encoder'"), s("[sym] pc=AGXMetalG")],
         "outcomes": ["crashed"],
-        "reason": "Frame generation (experimental) was on with a very large picture (MetalFX upscaling on the screen's own resolution) and the "
-                  "graphics driver stopped the game. Turn Frame generation off in the game's settings, or use a lower resolution without MetalFX "
-                  "upscaling, then start the game again.",
+        "reason": "Frame generation (experimental) was on and the graphics driver stopped the game (most often with a very large picture: "
+                  "MetalFX upscaling on the screen's own resolution). Turn Frame generation off in the game's settings, or use a lower "
+                  "resolution without MetalFX upscaling, then start the game again.",
         "evidence": ["gta-v-enhanced-framegen-assert-2026-10-23 (S2B3GE, 03K0PX; AYMMDC the driver variant), build 592, iPhone18,3",
                      "VQ3K21 (build 592, iPhone18,2, 960x540, no frame generation): played"],
     },
@@ -3248,8 +3537,16 @@ RULES = [
         # before the fault always returned c0000024 ("[fault-full] x0=c0000024"). The prefix covers both loops; over all 2,270 archive logs
         # it is in exactly the 9 logs of this crash (Control x5, Slay the Spire 2 x2, 6TA2RD, 75TW3Y). The offsets are the ARM64EC ntdll.dll
         # committed since build 579 (tests/host/check-keyed-event-per-process.py checks the two instructions in the file).
+        # 2026-11-01 (58D8SD, Slay the Spire 2, build 626, iPad16,10): from build 626 the game reaches its menu, so its crash reporter
+        # (Sentry's crashpad, libsentry.windows.release.x86_64.dll) is running when a Godot "WorkerThread" dies here 34 s into play: the
+        # reporter ends the game with 0xffff7001 at once (crashpad's "no dump" code; the player sees that number) and Wine prints no
+        # page-fault text. The session's two [fault-full] dumps had gone to earlier, handled faults (.NET patching its write barrier), so
+        # the c0000024 the release returned shows only in the SEGV handler's dump ("segv_handler   x0=0xc0000024 x1=0x4865027b34ec058b",
+        # L26123). That form is the third signal. A grep of the archive finds the "all" line in 11 logs, all of this crash, and the new form
+        # in 10 of them (not GZFVM3, build 579); with FGTGM8 (its fixture) 12 logs now: the 9 above, Marvel's Spider-Man 2 JDJR1N (622),
+        # Slay the Spire 2 1R1NCG (625) and 58D8SD (626).
         "all": [s("[mach_exc] pc PE: ntdll.dll+0x680")],
-        "any": [s("Unhandled page fault on read access to"), s("[fault-full] x0=c0000024 x1=")],
+        "any": [s("Unhandled page fault on read access to"), s("[fault-full] x0=c0000024 x1="), s("x0=0xc0000024 x1=")],
         "none": [s("[madeira-env] game MADEIRA_KEYED_EVENT_PER_PROCESS=1"), s("[keyed-event] ml2200:")],
         "outcomes": ["crashed"],
         "reason": "Two threads of the game raced to run the same one-time initialisation and the one that waited never slept, because a program "
@@ -3259,6 +3556,7 @@ RULES = [
                      "control-launcher-child-runonce-2026-10-29 (FGTGM8, build 623)",
                      "spider-man-remastered-runonce-keyed-event-2026-10-28 (6TA2RD, build 622)",
                      "mechabellum-runonce-failpath-2026-10-29 (75TW3Y, build 622)",
+                     "slay-the-spire-2-runonce-crashpad-2026-11-01 (58D8SD, build 626)",
                      "tests/host/check-keyed-event-per-process.py (build 598)"],
     },
     # ajan38/tur600 ---------------------------------------------------------------------------------------------------------------------
@@ -3634,6 +3932,24 @@ RULES = [
                      "tests/host/check-anon-ldadd.py: LDADDAL W22,W6,[X8] and concurrent updates"],
     },
     {
+        "id": "dotnet-stub-page-tail-read",
+        "lines": ["env.FEX_VECTORTSOENABLED = 1", "env.FEX_MEMCPYSETTSOENABLED = 1"],
+        "priority": 30,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent U S14; Slay the Spire 2 62ZBCW and FGD7HC, the same tester three minutes apart, and 4K5NTH, build 626): a second
+        # after the window opens, a 39-byte function of the game's .NET 9.0.7 runtime (coreclr.dll+0x111a70) reads a pointer made of code
+        # bytes (AV READ of 91xxxxxxB848E0E4) at the tail of a runtime stub page (0xff0 page-end addresses in two stops), and the runtime
+        # ends the process (0x80131506, "internal error in the .NET Runtime"). Not the keyed event and not LDADDAL (ANON_LDADDAL32=1 was in
+        # force). The effective config printed vector=false memcpyset=false (FEX: TSO config). An experiment: the next start orders vector
+        # and block-copy accesses as x86 does; it costs speed, so it is never a list line, and auto-tune takes it back if it does not help.
+        "all": [s("AV READ of 91", "B848E0E4"), s("internal error in the .NET Runtime at IP")],
+        "reason": "A .NET game stopped inside the runtime a second after its window opened. The next start asks the emulator for stricter "
+                  "memory ordering, which costs speed; if it does not help the change is taken back.",
+        "evidence": ["dotnet-stub-page-tail-read-2026-11-01 (Send Log 62ZBCW, Slay the Spire 2, build 626)",
+                     "dotnet-stub-page-tail-read-2026-11-01b (Send Log FGD7HC)", "4K5NTH (build 626)"],
+    },
+    {
         "id": "portal-d3d9-native-illegal-thunk",
         "lines": ["env.MADEIRA_D3D9 = emulated"],
         "priority": 6,
@@ -3820,12 +4136,33 @@ RULES = [
         "evidence": ["subnautica-2-no-steam-2026-10-23 (build 592, iPhone16,2, Send Logs 0F0JDZ and 89THM6)"],
     },
     {
+        "id": "steam-error-box-no-client",
+        "lines": [],
+        "noFix": True,
+        "priority": 3,
+        "outcomes": ["crashed", "exited-early"],
+        "session": "library",
+        # Round 630 (agent U S17; The Long Drive 1VZMAH, Slay the Spire 2 S8HM8C, Ride TC2KZ9, all build 625, all started as program
+        # files): the game loads steam_api64.dll, finds no Steam client (only BCD Dock runs Valve's client) and its own Steamworks code
+        # shows a "Steam Error" box (1VZMAH L12744 on); the player pressed OK and the game ended itself (NtTerminateProcess 0, L13713). The
+        # scorer counts the box as a crash at stage 3 and no rule spoke ("no known fix"). The title is in exactly these three logs of the
+        # archive, none a Dock session; a Dock session never matches ("session": "library"). BCD does not stand in for Valve's client.
+        "all": [s("[win-name]", "class='#32770' text=\"Steam Error\"")],
+        "reason": "This game asks for Valve's Steam client when it starts, and a game started as a program file has none: it showed its "
+                  "\"Steam Error\" box and quit. If you own it on Steam, sign in to Steam in BCD and start it from your Steam library "
+                  "(BCD Dock), which runs Valve's client for it. No setting changes this box.",
+        "evidence": ["steam-error-box-no-client-2026-10-31 (Send Log 1VZMAH, The Long Drive, build 625)", "S8HM8C (Slay the Spire 2, build 625)",
+                     "TC2KZ9 (Ride, build 625)"],
+    },
+    {
         "id": "x86-null-fault-diag",
         "lines": ["env.MADEIRA_X86_FAULT_DUMP = 1"],
         "priority": 90,
         "noRetry": True,
         "outcomes": ["crashed", "exited-early"],
-        "maxStage": 3,
+        # Round 630 (agents O1 S6 and O3 S18; CrossCode M965XC reached stage 4 in its renderer, NFS Shift EC76S1 read NULL after play): a
+        # multi-process game or a crash after the first frames never got the dump; log only, the lowest priority, so stage 5 is fine.
+        "maxStage": 5,
         # Round 624 (a diagnostic, no behaviour change; the lowest priority, so it only speaks when no other rule matches): a 32-bit program that stops on
         # an empty pointer in its own code ("[wow-null32] ... the 32-bit guest used the NULL page", whether Wine prints "Unhandled page fault" or the game's own handler ends the process) is the biggest
         # class of the `bus` logs that no setting is known for (Deadpool P8SJBH, Need for Speed: Underground 2 B1MR64, Overlord 2 QJY0A4, osu! SV6C4C,
@@ -3833,10 +4170,65 @@ RULES = [
         # and 160 after the faulting block, the stack, the registers' objects and the module identity. It reads memory through a fault-safe read and
         # writes only to the log. "none": the dump is already in this log.
         "all": [s("[wow-null32] rev=", "the 32-bit guest used the NULL page")],
-        "none": [s("[x86-fault] #")],
+        # Round 630 (agent O1 S13; Fable: The Lost Chapters HK7PVB, build 626): a NULL read inside a dialog-procedure callback that BCD
+        # swallows as 32-bit Windows does ("dispatch_user_callback ignoring exception c0000005"); the game then played (57 FPS).
+        "none": [s("[x86-fault] #"), s("dispatch_user_callback ignoring exception c0000005")],
         "reason": "A 32-bit program stopped on an empty pointer in its own code, and no setting is known for it. The line makes the next log carry "
                   "the code and the registers around that place, so that the cause can be named.",
         "evidence": ["deadpool-null-write-after-atl-exception-2026-10-29 (Send Log P8SJBH, build 623)"],
+    },
+    {
+        "id": "install-script-registry-silent-exit",
+        "lines": ["env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1"],
+        "priority": 22,
+        "noRetry": True,
+        "session": "dock",
+        "outcomes": ["crashed", "exited-early"],
+        "maxStage": 3,
+        # Round 630 (agent O3 S6; The Witcher: Enhanced Edition STQXBJ = X69R0K build 625, 7V4CMS, 8T1DTY, V9H3T6): the game has an install script
+        # (scripts=1) and quits with -1 two seconds after it starts, without a box (install-script-registry-missing needs a launcher's box). The same
+        # player's V9H3T6 -> 50KKEW pair is the proof: only this key differs and the game plays. "none": the key is on already.
+        "all": [s(" scripts=1", "[dock-installers] app="), s("ended with status 0xffffffff after", "[dock-game-end]")],
+        "none": [s("[dock-script-registry] app=")],
+        "reason": "The game quit at once; its Steam install script has registry values the game may need, and BCD Dock never wrote them. The line has "
+                  "BCD write the script's missing registry values before the start.",
+        "evidence": ["the-witcher-enhanced-edition-silent-exit-2026-10-31 (Send Log STQXBJ, build 625)", "V9H3T6 failed, 50KKEW played (build 614)"],
+    },
+    {
+        "id": "chromium-soft-pool-arena-collision",
+        "lines": [],
+        "noFix": True,
+        "priority": 6,
+        "outcomes": ["crashed", "hung", "exited-early"],
+        # Round 630 (agent O3 S12; EVE Online's Electron launcher D31QTG, build 626; BeamNG.drive PBCJCA, 3TGW98, YXVV7W): the 64-bit program's
+        # Chromium allocator asks for a 32 GB block; the only 32 GB-aligned range BCD can hand out is 0x7800000000-0x8000000000, whose upper half is
+        # the emulator's own slot, so its commits there collide ("[soft-pool] COLLISION: commit 0x7c...") and it stops itself (0x80000003). The real
+        # fix is the owner's deferred decision (a layout-2 Chromium host). "none": the Social Club pool layout is already in force.
+        "all": [s("[soft-pool] GRANTED soft 0x7800000000", "size=0x800000000"), s("[soft-pool] COLLISION: commit 0x7c")],
+        "none": [s("[madeira-env] game MADEIRA_SC_PA_POOLS=")],
+        "reason": "This program contains a web browser (Chromium) whose memory manager asks for a 32 GB block of address space in one piece. iOS "
+                  "leaves BCD no free block that large, so the program stops itself while it starts. No setting changes this yet.",
+        "evidence": ["chromium-soft-pool-arena-collision-d31qtg-2026-11-03 (Send Log D31QTG, build 626)", "PBCJCA, 3TGW98, YXVV7W (BeamNG.drive)"],
+    },
+    {
+        "id": "nfs-blackbox-wild-pointer",
+        "lines": ["env.MADEIRA_WOW_RWX_PLAIN = 1", "env.FEX_X87REDUCEDPRECISION = 0"],
+        # Before nfs-underground-2-known-stop (20): an attempt first, the known verdict when it does not help.
+        "priority": 12,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent O2 S5; Need for Speed: Underground 2 Q8N31B, SESA0W, 4SM6TM, builds 625-626, and B1MR64, MVZAD0, TCDPR2; Most Wanted
+        # GEVT5A, 5C54B7): the track loader walks a record stream that holds the game allocator's 0xAA fill (SPEED2.EXE+0x326C9F, `p +=
+        # table[*p]`), or copies through a pointer made of it; no log has played past 31 s. Two of BCD's emulation shortcuts are the candidates
+        # the logs cannot exclude: the game's RWX heap chunks served through the Mach store emulator, and 64-bit x87 math. One attempt turns
+        # both off for this game; auto-tune keeps them only if the game then gets further. "none": already tried.
+        "all": [s("wine: Unhandled page fault on")],
+        "any": [s("at address 00726C9F", "wine: Unhandled page fault on"), s("at address 0071FEE1", "wine: Unhandled page fault on"),
+                s("at address 0081AB7A", "wine: Unhandled page fault on")],
+        "none": [s("[madeira-env] game MADEIRA_WOW_RWX_PLAIN=1")],
+        "reason": "The game's track loader reads a block that still holds the allocator's fill. This attempt turns off two of BCD's emulation "
+                  "shortcuts for this game (exact x87 math, plain RWX memory); they are kept only if the game then plays further.",
+        "evidence": ["nfs-underground-2-track-stream-2026-10-31 (Send Log Q8N31B, build 625; SESA0W, 4SM6TM; B1MR64, MVZAD0, TCDPR2; Most Wanted GEVT5A, 5C54B7)"],
     },
     {
         "id": "nfs-underground-2-known-stop",
@@ -3954,7 +4346,17 @@ RULES = [
                 # (NoSuitableGraphicsDeviceException over a NullReferenceException "at MonoGame.OpenGL.GL.GetString" / ".LoadExtensions()"):
                 # Jetboard Joust 08RHHF, HJ1AP4, M5FWTJ, R2B9SJ, VF87Q8 and Stardew Valley P417BE, QRHK94, WQM4P4 (build 623); in no other
                 # archive log.
-                s("at MonoGame.OpenGL.", "ReportEventW")],   # the specific text first: a fixture keeps the lines of a signal's first string
+                s("at MonoGame.OpenGL.", "ReportEventW"),   # the specific text first: a fixture keeps the lines of a signal's first string
+                # Round 630 (agent O3 S7; Titan Souls HC0NRK, build 626, a GOG copy): SDL2 + OpenGL only; every context attempt fails on the stub,
+                # the game stores the NULL context and reads NULL+0x523c four seconds in (TITAN.exe+0x131898); no box, no text.
+                s("Load module TITAN.exe"), s("Load module Titan.exe")],
+        # Round 630 (lead, from agent T2's CKCAAD): a Unity game imports opengl32.dll, so its summary says "api=OpenGL/32" although it draws
+        # with Direct3D 11; one that never played matched the summary signal above and was told it needs OpenGL (The Darkside Detective: A
+        # Fumble in the Dark CKCAAD, a store storm; Unturned 5D7QNJ). DXMT's Direct3D 11 swap chain line means the game draws with Direct3D.
+        # None of the OpenGL-only logs of 2026-10-31..11-03 has it (Jetboard Joust, Darkest Dungeon, Isaac, DOOM 3 BFG, DOOM 2016, Geometry
+        # Dash, Noita, Stardew Valley, LEGO Builder's Journey, Cry of Fear, gmod patch tool). Only from the last launch on: in KJTS7S (build
+        # 614) Ultimate Chicken Horse drew with Direct3D 11 and then The Binding of Isaac, in the same app run, found no OpenGL.
+        "none": [s("[present] ml1175", since_launch=True)],
         "reason": "This game draws with OpenGL, and BCD has no OpenGL yet: the game cannot make its window and stops. This is not a setting; "
                   "Direct3D games are not affected.",
         "evidence": ["gp-bikes-opengl-2026-10-23 (Send Log CCKWDR, build 592)", "gravity-circuit-love-opengl-2026-10-23 (Send Log HESXRX, build 592)",
@@ -3970,6 +4372,8 @@ RULES = [
                      "noita-opengl-2026-10-29 (Send Logs 61E2PY, XQS7Z8, build 623)",
                      "darkest-dungeon-opengl-2026-10-28 (Send Logs 2F5VGM, 5T6SWF, build 622)",
                      "fields-of-mistria-opengl-2026-10-30 (Send Logs VBAXWZ build 623, 02E0G4 build 600)",
+                     "isaac-opengl-after-d3d11-game-same-run-2026-10-28 (Send Log KJTS7S, build 614: after a Direct3D 11 game in the same app run)",
+                     "titan-souls-opengl-2026-11-02 (Send Log HC0NRK, build 626)",
                      "docs/OPENGL.md"],
     },
     {
@@ -4252,12 +4656,18 @@ RULES = [
         # address, which changes with a new version of the game.
         # Round 624 (agent B, G3Q5C0, build 623): the same stop at another address after an update of the demo; the signature no longer
         # names the address: the program, the fault, the wild-pointer verdict and the protection layer's own server, all four together.
-        "all": [s("FFRS-Win64-Shipping.exe"), s("Unhandled exception code c0000005"), s("UNMAPPED AT ENTRY (wild pointer)"),
-                s("antitamper.net", "[dns] madeira-bcd begin")],
-        "reason": "The game stopped inside its copy-protection layer, reading an address that does not exist, at the same place in every session. "
-                  "The log does not show why; no setting is known to change it, and BCD does not work on a game's copy protection.",
+        # Round 630 (agent G1 S15; 8KBQJM, ARCQD4, DA51S2 on iPads and PT0QQA, M24PVH on an iPhone, builds 625-626): the four-signal form matched
+        # none of the new stops (another address, no antitamper lookup in ARCQD4, c0000096 at a patched stub on the iPhone). The program's own
+        # [iOS-xins] line names its two executable sections, the second the protection's; over the 19 archive logs of the program it matches
+        # exactly the 13 stops (with the c0000 exception) and none of the six others.
+        "all": [s("FFRS-Win64-Shipping.exe sec=0x14ad84000-0x15d3c1381"), s("Unhandled exception code c0000")],
+        "reason": "The game stopped inside its copy-protection layer, about half a minute into the start, at a place that changes from one start "
+                  "to the next. The log does not show why. No setting is known to change it, and BCD does not work on a game's copy protection.",
         "evidence": ["ffrs-demo-protected-code-2026-10-28 (STD9KZ, H7WGNX, build 622; the same instruction in 1K4NC2, FVGKKQ, YVQ9XG, 3W6HJQ, A9YKAH)",
-                     "ffrs-demo-protected-code-g3q5c0-2026-10-29 (G3Q5C0, build 623)"],
+                     "ffrs-demo-protected-code-g3q5c0-2026-10-29 (G3Q5C0, build 623)",
+                     "ffrs-demo-protected-code-ipad-8kbqjm-2026-10-31 (8KBQJM, ARCQD4: builds 625/626)",
+                     "ffrs-demo-protected-code-ipad-da51s2-2026-11-01 (DA51S2: no antitamper lookup)",
+                     "ffrs-demo-protected-stub-iphone-pt0qqa-2026-10-31 (PT0QQA, M24PVH: c0000096 at a patched stub)"],
     },
     {
         "id": "pragmata-startup-wild-read",
@@ -4280,6 +4690,59 @@ RULES = [
         "reason": "The game stopped in the first code it runs, its own protected start-up code, reading an address that does not exist, "
                   "before it showed anything. The log does not show why, and no setting is known to change it.",
         "evidence": ["pragmata-startup-wild-read-2026-10-30 (NGEDJT, build 623, iPhone19,4)"],
+    },
+    {
+        "id": "shinobi-protected-code-wild-read",
+        "lines": [],
+        "noFix": True,
+        "priority": 2,
+        "outcomes": ["crashed"],
+        # Round 630 (agent U S10 (c); SHINOBI: Art of Vengeance, Steam 2361770, 5XMBFM build 626, the archive's only log of the game):
+        # GameAssembly.dll carries a 237 MB executable '.xcode' section (RWX) next to its IL2CPP code. The game loads kernelbase.dll by full
+        # path four times, reads the shared data page's version block 4,097 times or more ([subfloor] ml956, the last at +0x260) and two
+        # seconds after its process started reads a wild address (0xffffff9027fc0260) inside that section's junk arithmetic. The same family
+        # as ffrs-protected-code-wild-read and pragmata-startup-wild-read. The '.xcode' section is in this log only (of the whole archive).
+        # env.MADEIRA_USD_OSVERSION = 1 (build 630, off by default) fills the version block as upstream Wine's wineboot does: an experiment
+        # for a device test, so no line is offered here until it has a result.
+        "all": [s("[rwx-fault]", "'.xcode'", "(RWX CODE)"), s("UNMAPPED AT ENTRY (wild pointer)"), s("Unhandled exception code c0000005")],
+        "reason": "The game stopped inside a code-protection layer of its own, two seconds after its process started, reading an address "
+                  "that does not exist. The log does not show why. No setting is known to change it, and BCD does not work on a game's "
+                  "protection code.",
+        "evidence": ["shinobi-protected-code-wild-read-2026-11-01 (Send Log 5XMBFM, build 626)"],
+    },
+    {
+        "id": "gfesdk-worker-thread-fault",
+        "lines": ["env.MADEIRA_THREAD_FAULT_ISOLATE = GfeSDK.dll"],
+        "priority": 3,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G3 S4; TEKKEN 7 37CPHE, FQEKA1, 1TQHPW, HFT0B5, build 626): NVIDIA's GfeSDK.dll failed to start ("Error creating
+        # message bus interface", no GeForce Experience), its leftover worker thread (GfeSDK.dll+0x1f4878) entered the freed critical section
+        # about 2 s later, and the unhandled c0000008 ended the game, which had played at 57 FPS. The line (build 630, off by default) ends
+        # only that thread. Before cage-release-band-exhausted, whose generic signals also match the crash.
+        "all": [s("[guest-log] #", "Error creating message bus interface"), s("[cs-raise] ml671", "status=c0000008"),
+                s("Unhandled exception 0xc0000008", "thread")],
+        "any": [s("GfeSDK.dll+0x")],
+        "none": [s("[thread-isolate] "), s("[madeira-env] game MADEIRA_THREAD_FAULT_ISOLATE=")],
+        "reason": "NVIDIA's SDK library failed to start (there is no GeForce Experience here), and a leftover thread of it used freed memory "
+                  "and ended the game. The line ends only that thread, and the game goes on.",
+        "evidence": ["tekken-7-gfesdk-worker-fault-2026-11-02 (Send Log 37CPHE, build 626)", "FQEKA1, 1TQHPW, HFT0B5 (build 626)",
+                     "tests/host/check-thread-fault-isolate.py"],
+    },
+    {
+        "id": "yakuza5-lookup-minus-one",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G3 S8; Yakuza 5 Remastered 0T6XA7 build 625, and round 626's 15V8K3 and R6EYST): the game's own lookup returns -1
+        # and the next instruction uses it as an index (movsxd r10,[r11+8] at 0x140c4b7ac, the address of the read different every run): the
+        # same instruction in all three sessions, 11 s in, on the same iPad class. Why the lookup finds nothing is not in the logs (the
+        # function and its input are not printed); the player tests of round 626 G2 S15 (AVX off, a controller connected) separate the causes.
+        "all": [s("[guest-exact]", "rip=0x140c4b7ac", "x86=4d 63 53 08")],
+        "reason": "Yakuza 5 stops in its own code (a table lookup that finds nothing and is used anyway). No setting is known to change it yet; "
+                  "if you can, try one start with the AVX switch off in the game's settings and send the log.",
+        "evidence": ["yakuza-5-lookup-minus-one-2026-11-02 (Send Log 0T6XA7, build 625)", "15V8K3, R6EYST (round 626)"],
     },
     # Round 624 (lead), from the analysis reports B, D2 and E1 (tur624) ---------------------------------------------------------------
     {
@@ -4364,7 +4827,10 @@ RULES = [
         # the session stayed open (a 625 log says "(game-still-runs)"). From build 626 DockGameEndRules skips them after Close.
         "all": [s("[dock-report] launch-game-ended=1"), s("[madeira-dock] host finished (result 0)"), s("[frontend] graceful close requested"),
                 s("[phase] spawn:", "Rockstar Games", "Launcher.exe")],
-        "none": [s("[dock-game-end]", "the host finished and nothing of the game runs"), s("[frontend] returned to library")],
+        # Round 630 (agent R S1): the launcher that died at the game's exit (0xffff7001) after the game's TlsFree cleared its cells is
+        # rockstar-tls-clear-launcher-crash's.
+        "none": [s("[dock-game-end]", "the host finished and nothing of the game runs"), s("[frontend] returned to library"),
+                 s("abort_process: status=0xffff7001")],
         "reason": "The game closed, but BCD kept the session open because Rockstar's launcher was still running, and the Close button did "
                   "nothing; from build 626 Close ends the session.",
         "evidence": ["rdr2-close-launcher-session-open-2026-10-29 (Send Log BV5WT9, build 623)", "tests/host/check-dock-game-end.py (build 626)"],
@@ -4441,6 +4907,44 @@ RULES = [
         "evidence": ["mycopunk-bc-memory-kill-2026-10-30 (N9GXSB, build 623)", "oxygen-not-included-bc-memory-kill-2026-10-30 (6AYV8K, build 623)"],
     },
     {
+        "id": "bc-decode-memory-kill",
+        "lines": ["dxmt = d3d11.mipClampBC=1"],
+        "priority": 48,
+        "noRetry": True,
+        "outcomes": ["killed"],
+        "memoryMinPct": 85,
+        # Round 630 (agent U S13; the lead's policy decision): the per-game rules above and below (The Forest, Outlast 2, Metal Gear Solid 4,
+        # Mycopunk, Oxygen Not Included) named games proved to die of their BC textures and left the others to the swap tier. The census of
+        # the 2026-10-17..11-02 archive: 120 logs on phones whose GPU cannot read BC (bc=0, A13-A16) show the CPU expansion; 44 end killed at
+        # 85 % of the limit or more, and 22 of those had the swap tier running and were closed again: the swap file does not move this
+        # memory. 17 games were offered a swap file or nothing (Shroom and Gloom, Stray, The Witcher 3, RimWorld, Sekiro, Firewatch ...).
+        # One rule without game names, for a texture-heavy game (the census at 256 BC resources or more) killed on such a phone; tried once
+        # and kept only if the next session lasts longer; the per-game rules keep their own (the same line: no repeat).
+        "all": [s("[device] gpu=", "bc=0"), s("[bc-decode] ml679"), s("[bc-census] ml653 periodic: 256 BC resources")],
+        "none": [s("[device] address-map=", "increased-memory=0")],
+        "reason": "The phone's GPU cannot read this game's compressed textures, so they are expanded to four to eight times their size and "
+                  "iOS closes the game. The line drops the largest level of each texture.",
+        "evidence": ["shroom-and-gloom-bc-decode-memory-kill-2026-11-01 (Send Log Z2ZXBM, build 625, iPhone15,3)",
+                     "census of 120 archive logs on bc=0 phones (round 630, agent U S13)"],
+    },
+    {
+        "id": "bc-decode-memory-kill-small-device",
+        "lines": ["dxmt = d3d11.mipClampBC=1"],
+        "priority": 51,
+        "noRetry": True,
+        "outcomes": ["killed"],
+        "memoryMinPct": 85,
+        "ramMaxMB": 4200,
+        # Round 630 (agent U S16; The Alto Collection 2BQN2G and JD41AM, iPhone14,5 with a 2348 MB limit: 64 BC resources at the kill, so
+        # bc-decode-memory-kill does not apply): on a 4 GB phone the clamp is the attempt after the swap file (priority 51: after
+        # swap-*-memory-kill at 50, before swap-*-more at 55). In the archive: The Alto Collection x2, Cuphead, The Forest, RimWorld.
+        "all": [s("[device] gpu=", "bc=0"), s("[bc-decode] ml679"), s("[bc-census] ml653 periodic: 64 BC resources")],
+        "none": [s("[device] address-map=", "increased-memory=0")],
+        "reason": "The phone's GPU cannot read this game's compressed textures, so they are expanded to four to eight times their size and "
+                  "iOS closes the game. The line drops the largest level of each texture.",
+        "evidence": ["alto-collection-bc-decode-small-device-2026-11-01 (Send Log 2BQN2G, build 625, iPhone14,5)", "JD41AM"],
+    },
+    {
         "id": "outlast2-bc-decode-memory-kill",
         "lines": ["dxmt = d3d11.mipClampBC=1"],
         "priority": 48,
@@ -4474,6 +4978,9 @@ RULES = [
         # Red Dead Redemption 2 (DFRKWK, RS64VG), Moon Sweepers (P3REM4, 01AHFX) and Persona 3 Reload's fork (rtmtree, iPhone Air,
         # build 622: 0 takes, 178 guarded). env.MADEIRA_POOL_MORE = 1 asks for BCD's limit events apart and lets the pool go on
         # taking while the device has memory to spare. "none": the session already ran with it, or the install lacks the memory right.
+        # Round 630 (the owner's go, 2026-11-03): the key is on by default, so a session of build 630 or later prints the "none" line
+        # (and "system memory pressure" instead of the "all" text) unless the player set env.MADEIRA_POOL_MORE = 0, a key of his own
+        # this rule never replaces; the rule serves the logs of earlier builds, where the line is what 630 does by itself.
         "all": [s("[swap] ml1150 pool: regions of"), s("ml1150 pool: memory pressure CRITICAL")],
         "none": [s("[swap] ml1150 app: helper memory takes more"), s("[device] address-map=", "increased-memory=0")],
         "reason": "BCD's helper memory stopped taking memory as BCD neared its own limit, and iOS then closed the game. The line lets "
@@ -4642,11 +5149,14 @@ RULES = [
         "session": "library",
         # Round 626 (agent A2 S5; WBRCBX, Resident Evil 5, build 623): "Start with: The game's own program" without Steam's client; the
         # game's steam_api found no Steam and the program ended with exit code 0x35.
-        "all": [s("[steam-start] app=", " direct source="), s("[steam-api] steam_api found no running Steam"),
-                s("NtTerminateProcess", "exit_code=0x35")],
+        # Round 630 (agent G1 S16; FINAL FANTASY RESONANCE demo 9TX5G2, build 626): Unreal's own box "Unable to initialize SteamAPI" (the only
+        # such box in the archive) instead of Resident Evil 5's exit code.
+        "all": [s("[steam-start] app=", " direct source="), s("[steam-api] steam_api found no running Steam")],
+        "any": [s("NtTerminateProcess", "exit_code=0x35"), s("Unable to initialize SteamAPI", "[win-name] #")],
         "reason": "This game needs Steam's client and was started without it (Start with: The game's own program). Open the game's page, set "
                   "Start with to BCD Dock, and play it again.",
-        "evidence": ["steam-direct-start-needs-client-wbrcbx-2026-10-30 (Send Log WBRCBX, build 623)"],
+        "evidence": ["steam-direct-start-needs-client-wbrcbx-2026-10-30 (Send Log WBRCBX, build 623)",
+                     "steam-direct-start-ue-box-2026-10-31 (Send Log 9TX5G2, build 626: Unreal's box)"],
     },
     {
         "id": "dcomp-optin-shadowed-in-system32",
@@ -4838,7 +5348,10 @@ RULES = [
         # unreadable target", the region history listing the image view DELETED 129 ms before) that no guest handler could take. From
         # build 626 the resolver skips unmapped entries and reads names through the kernel (tests/host/check-pe-module-name-safe.py).
         "all": [s("bus_handler BUS->AV: unreadable target"), s("small-view history: view", "protect=0x180002d DELETED by tid"),
-                s("[image-reload] unmapped image")],
+                s("[image-reload] unmapped image"),
+                # Round 630 (agent A2 S1): the three lines above are in any 32-bit crash after refused loads (Battle.net's CEF helper
+                # 6KW9QM, build 626: a guest NULL+7 read); the fault report naming the resolver is this bug's own mark (GR49ZZ).
+                s("ios_resolve_fex_exports", "[mach_exc] sym pc=")],
         "reason": "BCD read the header of a DLL the game had already unloaded while the game started a helper program, and stopped. From "
                   "build 626 it does not read it. Update BCD.",
         "evidence": ["tomb-raider-goty-stale-image-bus-2026-10-30 (Send Log GR49ZZ, build 623)", "tests/host/check-pe-module-name-safe.py"],
@@ -4859,6 +5372,28 @@ RULES = [
                   "from the Steam tab.",
         "evidence": ["nier-automata-term-stack-unmapped-2026-10-31 (Send Log 8FWJCP, build 623)",
                      "TRVPN6, BS0146, QCWFAS, GX4MF5, TQ1QD7, D7Q84R, BTCX9J, K0EQG0 (build 572)", "tests/host/check-diag-module-name.py"],
+    },
+    {
+        "id": "bat-launch-64bit-cmd-missing-tool",
+        "lines": [],
+        "fixedIn": 627,
+        "evaluateWhenRan": True,   # nothing crashes: the session sits at the empty desktop and is scored "ran"
+        "priority": 5,
+        # 2026-11-01 (Messiah, Steam 577980; 9ACRYW build 626, 83H0WC 625, MZYTWC 622, ANV0TK and 2D4QK1/53W6G9 614; iPad17,3): Steam's only
+        # launch entry is "Launch Messiah.bat" ([bat-start] prints it), which Valve's 64-bit client runs as `cmd.exe /s/c "..."` with the
+        # 64-bit cmd.exe. Its first command is `reg Query "HKLM\Hardware\..." | find /i "x86" > NUL && ...`; the bundle had reg.exe, find.exe,
+        # xcopy.exe and sdbinst.exe only as i386, so nothing named reg resolved in the 64-bit system32, and Wine's cmd ends a batch whose pipe
+        # cannot start its left program with ExitProcess(255) (programs/cmd/wcmdmain.c, handle_pipe_command): "NtTerminateProcess(...,
+        # exit_code=0xff)" right after cmd read the script, no other program started, the session shows the empty desktop. From build 627
+        # a session links Windows' i386 command-line tools into the 64-bit system32 where the name is absent ("[x86-tools] system32: ..."),
+        # and Wine starts them as WoW64 (tests/host/check-system32-x86-tools.py).
+        "all": [s("[bat-start] launch option"), s("NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xff)")],
+        "none": [s("[x86-tools] system32:")],
+        "reason": "The game's start script runs Windows tools (reg, find, xcopy) that this BCD had only for 32-bit programs, so the command "
+                  "prompt that runs the script stopped at its first line and the game never started. From build 627 64-bit programs find "
+                  "those tools. Update BCD.",
+        "evidence": ["messiah-bat-x86-tools-2026-11-01 (Send Log 9ACRYW, build 626)", "83H0WC (625), MZYTWC (622), ANV0TK, 2D4QK1, 53W6G9 (614)",
+                     "tests/host/check-system32-x86-tools.py"],
     },
     {
         "id": "dshow-movie-refused-wait",
@@ -4890,7 +5425,9 @@ RULES = [
         # with RDX inside msvcp140's data. From build 626 the line binds them for images without a copy too.
         "all": [s("[x64-image]", "mapped without a pool copy"),
                 s("[av-args]", "NULL-class fault addr=0x4"),
-                s("[av-args]", "RDX=", "msvcp140.dll+0xe4")],
+                # Round 630 (agent G1 S4; REDprelauncher of Cyberpunk 2077 and The Witcher 3, 5GF9AV and ZTG3RE, build 626): std::clog
+                # (msvcp140.dll+0xe5060) in RCX/RDI, not std::cout in RDX: any of msvcp140's stream objects (RVA 0xe4000..0xefff), any register.
+                s("= msvcp140.dll+0xe", "[av-args]")],
         "none": [s("[madeira-env] game MADEIRA_X64_NOCOPY_DATAIMP=1")],
         "reason": "The game runs without a copy in BCD's code memory (needed because its program is large) and read data a Windows library "
                   "exports (std::cout) from the wrong place. The line makes BCD hand it the right one.",
@@ -4913,6 +5450,62 @@ RULES = [
                   "missing, and then says the processor has no SSE2. The line reports the flag as a real processor does.",
         "evidence": ["burnout-paradise-cpu-error-2026-10-30 (Send Log 7MSNGW, build 623)", "AQY7NM (build 574)",
                      "tests/host/check-fex-cpuid-classic.py"],
+    },
+    {
+        "id": "unreal-fire-smc-moffs",
+        "lines": ["env.MADEIRA_FEX_MOFFS_RIP = 1"],
+        "priority": 12,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent O3 S9; Unreal Gold, Steam 13250, 32-bit Unreal.exe; Send Logs EQ6DMS, X3HYP5 build 622, D1D3P2, 43QKTT build 625,
+        # Y1G0A7 build 627, iPad17,3): the fire texture code in Fire.dll patches the constants of its own loop with MOV [address],EAX stores on
+        # the page that is running. FEX gave MOV moffs no guest-RIP entry, so its inline self-modifying-code handler resumed in front of each
+        # such store and ran the INC/SUB/ADD between them a second time (Y1G0A7: "rip: 78D5DD5" then "rip: 78D5DD6" for one store); the loop
+        # then ran past its buffer (Fire.dll+0x15E62, every start, 24 s in). From build 630 the line gives those stores their RIP ("[fex-moffs]"
+        # says so); a build without the key ignores the line. The hash is Unreal Gold's Fire.dll (Postal 2's differs and has no such events);
+        # the count keeps a session with a handful of events out. Both count from the last game launch.
+        "all": [s("Load module Fire.dll (fire.dll-01295baca04d394d)", since_launch=True),
+                s("Handled inline self-modifying code", count=300, since_launch=True)],
+        "none": [s("[fex-moffs] MADEIRA_FEX_MOFFS_RIP=1")],
+        "reason": "The game's fire textures change their own code, and BCD's x86 emulation ran part of that code twice, so the texture loop "
+                  "ran past its buffer. The line makes the emulator resume exactly at those stores.",
+        "evidence": ["unreal-gold-fire-smc-moffs-2026-11-01 (Send Log Y1G0A7, build 627)", "43QKTT, D1D3P2 (build 625)",
+                     "EQ6DMS, X3HYP5 (build 622)", "tests/host/check-fex-moffs-rip.py"],
+    },
+    {
+        "id": "xaudio2-callbacks-null",
+        "lines": ["env.MADEIRA_XAUDIO2_CALLBACK_ORDER = 1"],
+        "priority": 5,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent O3 S5; The Elder Scrolls V: Skyrim, 32-bit TESV.exe, Send Log 93EMSH build 626): Wine's xaudio2 raised the
+        # engine-callback count before it allocated the array; FAudio's audio thread ("FAudio_AudioClientThread") read the new count with
+        # the array still NULL while the game thread was inside RegisterForCallbacks (xaudio2_6.dll+0x6773, 29 s after the start). The
+        # only crash inside xaudio2 in about 3,000 logs; a second start usually wins the race. From build 630 the line makes
+        # RegisterForCallbacks publish the array before the count ("[xaudio2-cb]" says so; the i386 farm's xaudio2_0..9). The two
+        # [wow-null32] lines place the NULL read in xaudio2's code (a register on its code, its return address on the stack).
+        "all": [s("[wow-null32]", "registers that point into a module:", "(xaudio2_"),
+                s("[wow-null32]", "guest stack from ESP", "(xaudio2_"),
+                s("Unhandled page fault on read access to 00000000")],
+        "none": [s("[xaudio2-cb] MADEIRA_XAUDIO2_CALLBACK_ORDER=1")],
+        "reason": "The game's sound engine (XAudio2) stopped the game at the start: its sound thread could read the list of the game's "
+                  "callbacks before the list was ready. The line makes the list ready before it is counted.",
+        "evidence": ["skyrim-xaudio2-callbacks-null-2026-11-03 (Send Log 93EMSH, build 626)", "tests/host/check-xaudio2-callbacks.py"],
+    },
+    {
+        "id": "hlsl-point-keyword-name",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 4,
+        # Round 630 (agent O3 S19; S.T.A.L.K.E.R. Clear Sky, 32-bit xrEngine.exe, Send Log RVFPNE build 623): the game compiles its Direct3D 9
+        # shaders at run time and one names a variable `point`; Wine's HLSL compiler (vkd3d-shader) made `point` a keyword everywhere
+        # ("error is <anonymous>:400:40: E5000: syntax error, unexpected KW_POINT", mirrored by [guest-log] from the engine's own log) and
+        # the game stopped. From build 630 the lexer reads `point` as a name unless white space and a type or a modifier follow it
+        # (tools/patch-wine-vkd3d-point-ident.py; the i386 farm).
+        "all": [s("unexpected KW_POINT")],
+        "reason": "The game's shaders name a value \"point\", which BCD's shader compiler took for a keyword, so a shader did not compile and "
+                  "the game stopped. From build 630 the compiler reads it as a name. Update BCD.",
+        "evidence": ["stalker-clear-sky-hlsl-point-2026-10-30 (Send Log RVFPNE, build 623)", "tests/host/check-vkd3d-point-ident.py"],
     },
     {
         "id": "fixed-window-2n-unavailable",
@@ -5189,6 +5782,41 @@ RULES = [
         "evidence": ["the-witcher-3-jumbo-reserve-2026-10-29 (VCBB6X, build 623)", "the-witcher-3-d3d12-2026-10-27 (GEF8YA, build 614)"],
     },
     {
+        "id": "witcher3-user-va-cap",
+        "lines": ["env.MADEIRA_USER_VA_GB = 60"],
+        "priority": 21,
+        "noRetry": True,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G3 S6; The Witcher 3 DirectX 12 build 1S6N3J, build 625, iPhone 17 Pro, a 512 GB map): with the half in force the
+        # 32 GB request was served (16 GB at 0x7800000000) and the game still died at the same NULL read: its first request was 64 GB, refused
+        # whole and halved ("no free 32768 MB slot"), and the manager it should have set up stayed zero. The game sizes that first request from
+        # the address space it is told: on 63 GB maps it asks 32 GB first and plays (3B72FZ, 962Z11, NY4WEF, T657V1). The line tells it 60 GB
+        # (an existing key, [user-va]), so it asks 32 GB and gets the half, as there. An experiment; the list row stays as it is.
+        "all": [s("[jumbo-half] madeira-bcd 65536 MB reserve: no free 32768 MB slot below"),
+                s("[nt-fail]", "NtAllocateVirtualMemory status=c0000017 proc=witcher3.exe", "size=0x1000000000"),
+                s("Unhandled page fault on read access to 0000000000000010")],
+        "none": [s("[user-va]"), s("[madeira-env] game MADEIRA_USER_VA_GB=")],
+        "reason": "The game sized a 64 GB reservation from the address space it was told, and the phone cannot give that much in one piece, "
+                  "not even half of it; the line tells it 60 GB, as on the phones where it runs, so it asks for 32 GB and gets half.",
+        "evidence": ["witcher3-dx12-64gb-reserve-2026-11-01 (Send Log 1S6N3J, build 625)"],
+    },
+    {
+        "id": "witcher3-copy-missing-own-dlls",
+        "lines": [],
+        "noFix": True,
+        "priority": 3,
+        "maxStage": 2,
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent G3 S5; The Witcher 3, a local copy started from its own folder, 4H2GT7 build 626): bin\x64 lacks libcurl.dll,
+        # REDGalaxy64.dll and GFSDK_SSAO_D3D11.win64.dll, which witcher3.exe imports; the loader stops with c0000135 before the game runs.
+        # The first two are the game's own store and network libraries: an incomplete copy, which no setting and no BCD file can complete.
+        # Keyed on REDGalaxy64.dll, a file only this game's folder holds, so a missing system DLL of another game never reads as this.
+        "all": [s("import_dll Library REDGalaxy64.dll", "witcher3.exe", "not found"), s("loader_init Importing dlls for", "witcher3.exe", "c0000135")],
+        "reason": "This copy of The Witcher 3 lacks files of its own (REDGalaxy64.dll, libcurl.dll and others beside witcher3.exe), so it "
+                  "cannot start. Install the game again, or copy the whole game folder again, and try once more.",
+        "evidence": ["witcher3-missing-dlls-2026-11-03 (Send Log 4H2GT7, build 626)"],
+    },
+    {
         "id": "godot-d3d12-composition-swapchain",
         "lines": ["env.MADEIRA_DXGI_SRC = 1", "env.MADEIRA_DXGI_COMPOSITION = 1", "env.MADEIRA_OPTIN_DLLS = dcomp"],
         "priority": 8,
@@ -5296,9 +5924,14 @@ RULES = [
         # Need for Speed: Porsche Unleashed (R6ZKTW and ZQNYQR, build 622): Direct3D 7 goes through Wine's ddraw to wined3d's OpenGL backend
         # ("wined3d_adapter_gl_init Failed to get a GL context") and the game shows "3D graphics hardware could not be initialized"; the box
         # stays up for minutes and the clock scored the session "ran" (RETRO-2 RQ1). The D3D7 converter (dd7to9) is paused by the owner.
-        "all": [s("wined3d_adapter_gl_init Failed to get a GL context"), s("[win-name] #", "3D graphics hardware")],
+        # Round 630 (agent O1 S15; Gothic II A6WWNQ, build 625): its statically linked D3DX says it in other words, "X: XD3D_InitPerDX:
+        # Can't create D3DX context ! Error: D3DXERR_INVALIDMODE".
+        "all": [s("wined3d_adapter_gl_init Failed to get a GL context")],
+        "any": [s("[win-name] #", "3D graphics hardware"), s("Can't create D3DX context", "[win-name] #"),
+                s("Can't create D3DX context", "[msgbox-origin] box")],
         "reason": "This game draws with Direct3D 7, which needs OpenGL in Wine, and BCD has no OpenGL yet; no setting changes it.",
-        "evidence": ["porsche-unleashed-d3d7-2026-10-28 (Send Log R6ZKTW, build 622)", "ZQNYQR (build 622)"],
+        "evidence": ["porsche-unleashed-d3d7-2026-10-28 (Send Log R6ZKTW, build 622)", "ZQNYQR (build 622)",
+                     "gothic-2-d3d7-d3dx-context-2026-11-01 (Send Log A6WWNQ, build 625)"],
     },
     {
         "id": "xwma-voices-need-wmadmod",
@@ -5339,6 +5972,73 @@ RULES = [
                   "menu (shadows, reflections, anti-aliasing, post effects, texture quality) and start again; if it happens again at the same "
                   "place, send the log.",
         "evidence": ["gta-v-legacy-gpu-dead-played-2026-10-29 (Send Log 8PDF19, build 622)"],
+    },
+    {
+        "id": "gpu-hang-then-dead",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 27,
+        # Round 630 (agent T1 S20; Bloodstained: Ritual of the Night DTF7TH, build 626, iPad16,1): after 3.5 minutes of play the GPU hung
+        # (kIOGPUCommandBufferCallbackErrorHang, twice), iOS ignored the app's next 27 submissions and the game then read a NULL object and
+        # ended; scored "ran" (only 2 command buffers were discarded as victims, so gpu-dead-after-play's 4 did not match). What hung is not
+        # in the log; the player's guess was the controller's vibration.
+        "all": [s("kIOGPUCommandBufferCallbackErrorHang"), s("SubmissionsIgnored", count=20)],
+        "reason": "The phone's GPU hung while the game was drawing and then stopped taking its work (iOS ignores what the app submits after a "
+                  "hang), so the game stopped. Lower the options in the game's Graphics menu (shadows, reflections, anti-aliasing, post effects, "
+                  "texture quality), let the device cool down and start again; if it happens again at the same place, send the log.",
+        "evidence": ["gpu-hang-then-dead-2026-11-02 (Send Log DTF7TH, build 626)"],
+    },
+    {
+        "id": "helper-memory-windows-hold-address-space",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 4,
+        # Round 630 (agent T2 S1; Red Dead Redemption 2 N1P94T and WCDNS2, build 626, "Social Club error"): with mempool-mb = 6144 helper
+        # memory mapped its 12 regions into BCD's address space for the whole session (6 GB of the band, used or not), and the Rockstar
+        # launcher could not load socialclub.dll for lack of room (c0000017); the session played on and was scored "ran". From build 630
+        # env.MADEIRA_POOL_LAZY_WINDOWS = 1 keeps no windows (off by default; a list line for the Rockstar rows is the owner's decision).
+        "all": [s("[swap] ml1150 pool: ", " x 512 MB registered"), s("load_dll [dll-missing]", "socialclub.dll", "status=c0000017")],
+        "none": [s("[swap] ml1150 app: helper memory keeps no windows")],
+        "reason": "Helper memory keeps its whole pool mapped in BCD's address space, and the game could not load Social Club's library for "
+                  "lack of room. Lower Helper memory in Settings (or turn it off), or from build 630 add env.MADEIRA_POOL_LAZY_WINDOWS = 1 to "
+                  "the game's settings, and start again.",
+        "evidence": ["helper-memory-windows-hold-address-space-2026-11-03 (Send Log N1P94T, build 626)", "WCDNS2 (build 626)",
+                     "tests/host/check-helper-memory.py (lazy windows)"],
+    },
+    {
+        "id": "gpu-timeout-then-crawl",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 28,
+        # Round 630 (agent T1 S5; GTA V Legacy ZPJ6C8 and FKSR9R, build 626, iPhone19,7; BW8EZZ and SS1WY8, build 579): one of the game's
+        # command buffers caused a GPU timeout mid-play, iOS discarded the app's GPU work around it (100+ "InnocentVictim"), and the game
+        # ran at 1-9 FPS afterwards, scored "ran, ok". Not the dead queue of gpu-dead-after-play (SubmissionsIgnored stays under 20). Which
+        # pass timed out is not in the log. The archive has these four logs with a caused timeout and no dead queue, all GTA V.
+        "all": [s("kIOGPUCommandBufferCallbackErrorInnocentVictim", count=20), s("Caused GPU Timeout Error")],
+        "none": [s("SubmissionsIgnored", count=20)],
+        "reason": "The phone's GPU timed out while the game was drawing (iOS then throws away the app's GPU work) and the game ran very "
+                  "slowly afterwards. Lower the options in the game's Graphics menu (shadows, reflections, anti-aliasing, post effects, texture "
+                  "quality), close other apps, let the phone cool down and start again; if it happens again after the same time, send the log.",
+        "evidence": ["gta5-legacy-gpu-timeout-crawl-2026-11-01 (Send Log ZPJ6C8, build 626)", "FKSR9R (build 626)", "BW8EZZ, SS1WY8 (build 579)"],
+    },
+    {
+        "id": "gta5-windows-xp-refused",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 3,
+        "session": "dock",
+        # Round 630 (agent T1 S4; GTA V Legacy VDS7HV, build 626): the game's own file said win.version = winxp (the player's pick in the
+        # game's Windows settings; no list row sets it), PlayGTAV.exe showed its refusal box within a second (Windows XP and Vista are not
+        # supported) and no frame came in two minutes; scored "ran". Of the 5 archive logs with that line, the only GTA V one.
+        "all": [s("[game-cfg]   win.version = winxp"), s("[phase] spawn:", "PlayGTAV.exe")],
+        "none": [s("Game is presenting (#1"), s("Early detach: game presenting")],
+        "reason": "This game's own settings tell it to run on Windows XP, and Grand Theft Auto V refuses to start on Windows XP or Vista. Set "
+                  "Windows version back to Windows 10 (BCD's default) in the game's settings and start it again.",
+        "evidence": ["gta5-legacy-windows-xp-2026-11-01 (Send Log VDS7HV, build 626)"],
     },
     {
         "id": "gpu-reset-any-game",
@@ -5382,6 +6082,355 @@ RULES = [
         "reason": "The game's folder lacks steam_api.dll (or steam_api64.dll), which the game's program needs; this copy of the game is "
                   "incomplete. Add the missing file (or install the game again). No BCD setting changes this.",
         "evidence": ["aliens-colonial-marines-steam-api-missing-2026-10-29 (Send Log VMJ4WV, build 623)"],
+    },
+    {
+        "id": "winmm-devices-thread-no-message-class",
+        "lines": ["env.MADEIRA_MESSAGE_CLASS = 1"],
+        # Before thread-registry-full (3), dotnet-winforms-thread-exception and fex-runtime-fault (4): the launcher's exception box,
+        # the full thread registry and the crash after it all follow from this churn.
+        "priority": 2,
+        "noRetry": True,
+        # Round 630 (Discord, agent D S3; FINAL FANTASY VII's Steam launcher 03ZW5E, build 626, and MMJZ8K, 622; Messiah J0R6MM, 627;
+        # Battle.net's setup 6KW9QM, 626, and five Battle.net logs of 611-614): in every pseudo-process after the session's first the
+        # built-in Message window class was never registered (class_ios.c: init_user runs once), so winmm's devices thread cannot create
+        # its window, exits with status 1, and waveOutOpen answers MMSYSERR_NODRIVER ("NoDriver calling waveOutOpen" in FF7's launcher).
+        # A program that keeps asking starts a new thread each time: 486 in 03ZW5E, 2,967 in J0R6MM, 130 in the Battle.net logs, until
+        # the thread registry is full. 50 such exits is the line: no other log of 2026-10-17..11-03 has more than 6; the games that ask
+        # winmm once (Fallout: New Vegas, Fallout 3, Portal 2, Left 4 Dead 2: one exit each) run and are left as they are, which is why
+        # env.MADEIRA_MESSAGE_CLASS is off by default. "none": the session already registered the class.
+        "all": [s("status=00000001 caller=", "[thr-exit] ml806 RtlExitUserThread", count=50)],
+        "none": [s("+ Message (MADEIRA_MESSAGE_CLASS)")],
+        "reason": "The program kept starting Windows' sound-device thread, and it failed every time: a built-in window class was missing "
+                  "in the program's process, so Windows reported no sound device. The line registers that class in every process "
+                  "(experimental).",
+        "evidence": ["ffvii-launcher-message-class-2026-11-02 (Send Log 03ZW5E, build 626)", "Messiah J0R6MM (build 627)",
+                     "Battle.net setup 6KW9QM (build 626)"],
+    },
+    {
+        "id": "thread-registry-full",
+        "lines": [],
+        "fixedIn": 630,
+        # Also for a session scored ran (agent T1 S18; Aviassembly PY3JA7, build 623): the registry filled and BCD's lock reaper then
+        # released a lock a live thread held (it looked for the holder in the registry); the game froze while the clock said "played".
+        "evaluateWhenRan": True,
+        # Before the rules that read what happened on the unregistered thread next: Naruto's thread-name exception went unhandled and was
+        # read as mono-chunk-in-assembly-slack (5); Fallout: New Vegas matched nothing.
+        "priority": 3,
+        # Round 630 (found with agent D's S3): the Mach thread registry has 512 slots and never gave one back (a registered name is pinned,
+        # so an exited thread's name is never recycled); every thread after the 512th of a session went unregistered and its Mach events
+        # resolved to slot 0, another process's TEB. NARUTO SHIPPUDEN: Ultimate Ninja STORM 3 (XB8E37, build 600): thread "Xfbin read",
+        # the first unregistered one, raised the thread-name exception 406d1388, the unwinder stalled on the wrong TEB, and the game
+        # ended. Fallout: New Vegas (H1TRKP, build 611): 1,526 short-lived threads, 1,055 FULL lines, c0000026 raised on an unregistered
+        # thread. Build 630 gives a full registry the slots of threads that ended (signal_arm64_ios.c ios_thread_registry_reclaim) and
+        # their x18 trampoline slots (virtual_ios.c: from the 1,025th thread every new one shared slot 0, the session's first thread's;
+        # Messiah J0R6MM, agent O3 S2: explorer's main thread then ran another thread's syscall and the session ended).
+        "all": [s("[thread-registry] FULL (512 slots)")],
+        "reason": "The game started more than 512 threads, and BCD's table of threads had no room for the later ones, so Windows "
+                  "exceptions on them went to the wrong place. BCD 0.1.630 reuses the places of threads that ended.",
+        "evidence": ["naruto-storm3-thread-registry-full-2026-10-24 (Send Log XB8E37, build 600)",
+                     "fallout-nv-thread-registry-full-2026-10-30 (Send Log H1TRKP, build 611)",
+                     "aviassembly-thread-registry-full-2026-11-02 (Send Log PY3JA7, build 623)"],
+    },
+    {
+        "id": "nwjs-crashpad-child-args",
+        "lines": [],
+        "fixedIn": 630,
+        "evaluateWhenRan": True,
+        "priority": 3,
+        # Round 630 (agent T2 S9; The Genesis Order, RPG Maker on NW.js, S8QC9X, build 614, iPad M1): list v21's nwjs-game-exe row appends
+        # "--disable-accelerated-video-decode --disable-accelerated-video-encode" to every Game.exe process (env.MADEIRA_CHILD_ARGS), and
+        # NW.js starts its crash handler as Game.exe --type=crashpad-handler: the handler answered "invalid option -- `-d'" and exited 1,
+        # the browser's crash registration broke ("TransactNamedPipe: Broken pipe") and no GPU, renderer or utility process followed; the
+        # window stayed blank (the session is scored ran: evaluateWhenRan). Build 630 never appends to a crash handler (process_ios.c), and
+        # the row's line is for 630 and later only.
+        "all": [s("[child-args] env.MADEIRA_CHILD_ARGS: appended"), s("invalid option -- `-")],
+        "reason": "BCD added settings to the game's program, and the game's crash reporter, which is the same program, refused them and "
+                  "closed; the game's window then stayed empty. BCD 0.1.630 no longer gives those settings to the crash reporter.",
+        "evidence": ["nwjs-crashpad-child-args-2026-11-03 (Send Log S8QC9X, build 614)"],
+    },
+    {
+        "id": "explorer-input-desktop-stolen",
+        "lines": [],
+        "fixedIn": 630,
+        "evaluateWhenRan": True,
+        "priority": 6,
+        # Round 630 (agent T2 S2; the Windows desktop on one iPhone13,4: 416C0V and 0MYT4P, build 626, XYWN2M, 625): explorer's virtual
+        # desktop had the input; the Google updater's crash handler, a service on the Default desktop, got its desktop window through
+        # ios_child_desktop_fixup (round 624), and the server made the Default desktop the input desktop. Every tap then hit that
+        # detached window (0x1004c, no thread) and was dropped: "taps on Start button never reach it". Build 630 leaves the input on
+        # the desktop that has its window (window_ios.c ios_desktop_window_made). The handle is the one all three logs share (the
+        # order explorer makes its windows in is fixed): a hint; the code is the cure. The session is scored ran: evaluateWhenRan.
+        "all": [s("[srv-desktop] virtual desktop created"), s("[child-desktop]", "top_window=0x1004c"),
+                s("[srv-input] btn msg=0x201", "hit win=0001004c thread=0x0", count=5)],
+        "reason": "A Windows service that starts with the desktop took the touch input away from it, so taps no longer reached the "
+                  "desktop (the Start button, icons). BCD 0.1.630 keeps the input on the desktop.",
+        "evidence": ["explorer-input-desktop-stolen-2026-11-01 (Send Log 416C0V, build 626)", "0MYT4P (626)", "XYWN2M (625)"],
+    },
+    {
+        "id": "avx-code-in-played-session",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "ranOnly": True,
+        "priority": 20,
+        # Round 630 (agent T2 S8; JACKAL 1P2B55, build 626, "Error" in the tutorial): libwhisper.dll (speech recognition) ran VEX code
+        # (vpxor at whisper.dll+0x1dc8) with AVX off; the instruction raised c000001d, the game caught it, showed its own error box and
+        # went on for 3,911 frames. Only for a session that played (ranOnly): a game that dies of it keeps the AVX rule (fex-avx-on).
+        "all": [s("[bcd] library launch", "avx=0"), s("invalid instruction (hlt thunk)", "[entry-fail]"),
+                s("code=c000001d", "[exc-disp] raise")],
+        "reason": "A part of the game that uses AVX instructions (in JACKAL, its speech recognition) failed, because AVX is off for this "
+                  "game; the game went on without that part. If it matters, turn on AVX in the game's settings (games run slower with it).",
+        "evidence": ["avx-code-in-played-session-2026-11-02 (Send Log 1P2B55, build 626)"],
+    },
+    {
+        "id": "unity32-store-storm-rwx-plain",
+        "lines": ["env.MADEIRA_WOW_RWX_PLAIN = 1"],
+        "priority": 16,
+        "outcomes": ["hung"],
+        "noRetry": True,
+        # Round 630 (agent T2 S10; The Darkside Detective: A Fumble in the Dark CKCAAD, build 625, 32-bit Unity on its own Mono, Low Power
+        # Mode): BCD's store handler completed 17 million stores of the game's code patching in 5 minutes (116 s of handler time) and no
+        # frame came (engine verdict: hung since round 630). The line makes the game's executable memory plain read/write (From the
+        # Darkness row; Breakneck, Aegis Defenders: 0-4 emulated stores with it). "all": the key unset, the storm, a 32-bit Unity game.
+        # For a session that ended hung (the player says it froze); the game's own row (the-darkside-detective-2) carries the line.
+        "all": [s("[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset)"), s("[fault-cost] ml685 emulated-store faults=", count=3),
+                s("UnityCrashHandler32.exe")],
+        "reason": "The game's code kept rewriting itself, and every change went through BCD's slow path millions of times, so it never "
+                  "finished loading. The line makes the game's executable memory plain read/write.",
+        "evidence": ["unity32-store-storm-2026-10-31 (Send Log CKCAAD, build 625)"],
+    },
+    {
+        "id": "d3d12-gpu-heaps-memory-kill",
+        "lines": [],
+        "noFix": True,
+        # After the swap tier's lines (49, 50, 55): this speaks once the swap file is already in use and the game was closed again.
+        "priority": 56,
+        "outcomes": ["killed"],
+        "memoryMinPct": 85,
+        # Round 630 (agent T2 S13; Marvel's Spider-Man Remastered 6C2JBM, build 626): Metal held 5475 MB (application heaps 3240, texture
+        # heaps 704, buffers 1193) with the guest's own memory at 1144 MB and a 9216 MB swap file in force: what filled the limit was the
+        # game's graphics memory, which no swap file can hold. After swap-12gb-more the engine said "stuck" and the player read nothing.
+        "all": [s("application heaps", "[madeira-d3d12] metal-gap:"), s("[swap] ml1077 backed")],
+        "reason": "iOS closed the game at its memory limit while the swap file was already in use: what fills the memory is the game's "
+                  "graphics memory (textures and buffers), which cannot move to a file. Lower the game's own graphics options (texture "
+                  "quality first, then the resolution) and start it again.",
+        "evidence": ["d3d12-gpu-heaps-memory-kill-2026-11-03 (Send Log 6C2JBM, build 626)"],
+    },
+    {
+        "id": "helper-memory-system-pressure-kill",
+        "lines": [],
+        "noFix": True,
+        "priority": 57,
+        "outcomes": ["killed"],
+        "ramMaxMB": 7000,
+        # Round 630 (agent T2 S15; The Witcher 3 on 6 GB phones, NY4WEF and T657V1, build 626): helper memory of 2-6 GB on a phone with
+        # 6 GB of RAM; the game's graphics memory alone nearly filled BCD's 4 GB, the pool was refused ("system has 74 MB available") or
+        # held 5.8 GB, and iOS ended the game for the whole phone's memory shortage. Only on phones under 7 GB of RAM. The footprint
+        # stays far below BCD's limit, so the verdict is a kill only when the player says the game closed by itself.
+        "all": [s("[swap] ml1150 pool: regions of"), s("system memory pressure")],
+        "reason": "iOS closed the game because the whole phone ran out of memory while helper memory held a large part of it. On this "
+                  "phone, set Helper memory to at most a quarter of its RAM, or turn it off, in Settings > Memory & performance.",
+        "evidence": ["helper-memory-system-pressure-2026-11-01 (Send Log NY4WEF, build 626)"],
+    },
+    {
+        "id": "dock-steam-account-playing-elsewhere",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 2,
+        "session": "dock",
+        # Round 630 (agent T2 S16; Baldur's Gate 3 1FKVEB, build 626): Steam refused the start because the account was still playing in
+        # another session; the Dock printed its own sentence, and auto-tune spent the unchanged retry on a "hang".
+        "all": [s("[madeira-dock] Steam still reports this account as playing in another session")],
+        "reason": "Steam still counts this account as playing in another session (another device, or a run of the game here that was "
+                  "closed while it was open). Quit the game there, or wait a few minutes, then start it again; settings here do not change it.",
+        "evidence": ["dock-steam-account-playing-elsewhere-2026-11-03 (Send Log 1FKVEB, build 626)"],
+    },
+    {
+        "id": "dock-ea-app-installer-skipped",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 7,
+        "session": "dock",
+        # Round 630 (agent T2 S17; Battlefield V YQEMGS, build 626; also The Sims 4 W2A0QS of round 626): the EA app's installer
+        # (eadesktopsetup) had never finished, so the Dock skipped the one-time installs; the game's start then asked Windows to open an
+        # EA link and got "There is no Windows program configured to open this type of file."
+        # The specific text first in each signal: a fixture keeps the lines of a signal's first string.
+        "all": [s("program=eadesktopsetup", "[dock-installers]", "status=pending"), s("choice=skip", "[dock-installers]"),
+                s("There is no Windows program configured to open this type of file.", "[win-name]")],
+        # Round 630 (agent A1 S13): the text names Wine Gecko too (the installer waits for it from build 630, A1 S20).
+        "reason": "This EA game needs the EA app, and its installer was skipped because its last run never finished. Download Wine's "
+                  "HTML engine in Settings › HTML engine for installers if the game's page asks for it, set One-time installs to Run at "
+                  "the next start, start the game, and let the EA app's installer finish (it can take several minutes).",
+        "evidence": ["dock-ea-app-installer-skipped-2026-11-01 (Send Log YQEMGS, build 626)"],
+    },
+    {
+        "id": "dock-licence-list-timeout",
+        "lines": [],
+        "noFix": True,
+        "priority": 4,
+        "session": "dock",
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent U S3; 444TS8 build 626 and seven older logs: 57S3MR, BWEG6E, CK8YK9, CR4SPY, PCQ7TA, 0M2RZC, 6XBJKH): Valve's client
+        # signed in (or never did) but did not list the game's licence within the Dock's wait, and the start ended with code 34. In 444TS8 the
+        # sign-in itself took 64 s of the 90; from build 630 a late sign-in gets 45 s more (tools/patch-dock-licence-wait.py). In the others
+        # the client signed in within 1 to 7 s and its licence list stayed empty (0 apps) for the whole wait: Steam's side or the connection.
+        "all": [s("session-auth-test-result=34", "[dock-report]"), s("the host reported the launch failed (code 34)")],
+        "reason": "Steam did not send this game's licence within the wait. Check the connection and start again; from build 630 a slow "
+                  "sign-in gets more time. If it keeps timing out on a good connection, send the log.",
+        "evidence": ["dock-licence-list-timeout-2026-10-31 (Send Log 444TS8, build 626)", "tests/host/check-dock-licence-wait.py"],
+    },
+    {
+        "id": "dock-ea-installer-gecko-prompt",
+        "lines": [],
+        "fixedIn": 630,
+        "session": "dock",
+        "evaluateWhenRan": True,
+        "priority": 7,
+        # Round 630 (agent A1 S20; Battlefield V S5F5M3 build 626, Mass Effect Legendary Edition 563J50 build 623): the EA app's installer
+        # in a Dock batch shows a web page; without Wine Gecko on the device Wine opened its own download prompt ("Wine Gecko Installer"),
+        # which sat in front of the installer for the rest of the session (2 of 2 such batches; with Gecko 2 of 2 ran on). From build 630
+        # the Dock holds the installer back until Settings › HTML engine for installers has the files (DockInstallers, MADEIRA_DOCK_EA_GECKO).
+        # The next wall of the chain, INST-14-1603 (A1 S12, EMN1B4/XMTZMJ; fixed in 630 by MADEIRA_DOCK_EA_SESSION), ends a session of
+        # one-time installs only, which auto-tune does not score ("inconclusive"); the game start after it is dock-ea-app-installer-skipped.
+        "all": [s('text="Wine Gecko Installer"', "[win-name]"), s("program=eadesktopsetup", "[dock-installers] start")],
+        "none": [s("[gecko] downloaded Wine Gecko")],
+        "reason": "The EA app's installer shows a web page, and Wine's HTML engine (Wine Gecko) was not on this device, so the installer "
+                  "waited behind Wine's own download prompt. From build 630 BCD holds it until Settings › HTML engine for installers has "
+                  "downloaded it. Update BCD.",
+        "evidence": ["dock-ea-installer-gecko-prompt-2026-11-01 (Send Log S5F5M3, build 626)", "563J50 (build 623)",
+                     "tests/host/check-dock-installers.py"],
+    },
+    {
+        "id": "rockstar-tls-clear-launcher-crash",
+        "lines": ["env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1"],
+        "priority": 12,
+        "noRetry": True,
+        "session": "dock",
+        # Round 630 (agent R S1; GTA V Legacy GJDXG6, 78H1BH, SBQ18C, build 626; A24ES3, 580): the game's own shutdown freed thread-local
+        # slots (12/13/31/33), BCD cleared them in the threads of every program of the session (TlsFree walks every pseudo-process's
+        # threads), and Rockstar's launcher then died at the game's exit (0xffff7001) while PlayGTAV.exe waited on a message box. The
+        # existing opt-in key (build 579, the EA app and Batman: Arkham City use it) clears only the calling program's threads, as Windows
+        # does. A fixed session prints SPARED, never CLEARED.
+        "all": [s("CLEARED the live cell", "[tls-cross-clear]"), s("[phase] spawn:", "Rockstar Games", "Launcher.exe"),
+                s("abort_process: status=0xffff7001")],
+        "reason": "Rockstar's launcher crashed when the game closed: the game's shutdown cleared data of the launcher's threads too. The line "
+                  "makes BCD clear only the game's own, as Windows does.",
+        "evidence": ["rockstar-tls-clear-launcher-crash-2026-11-02 (Send Log GJDXG6, build 626)", "78H1BH, SBQ18C (626)", "A24ES3 (580)"],
+    },
+    {
+        "id": "gta4-dock-wow-window-reservation",
+        "lines": ["env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1"],
+        "priority": 9,
+        "noRetry": True,
+        "session": "dock",
+        # Round 630 (agent R S4; GTA IV through BCD Dock, 97Y30K and 9P6C62, build 626; the same wall in 8DC0PJ, ZCB1X1, E5SSTR, GGM7A9): the
+        # launcher reaches the game and GTAIV.exe asks for its 4 GB window a minute into the session; every candidate slot was taken (REJECTED)
+        # and the child failed at guest-window-reserve. The line reserves one window when the session starts. wow-window-min-free-gb (also 9)
+        # is for a map too small, which this excludes.
+        # GTAIV.exe started (the RDR2 sessions whose 32-bit helper failed the same way are not this rule's: unproven there).
+        "all": [s("[wow-window] session armed: a 32-bit process is expected"), s("REJECTED", "[wow-window] B="),
+                s("BOOT FAILED at stage 'guest-window-reserve'"), s("GTAIV.exe", "[phase] spawn:")],
+        "none": [s("[wow-window] refused: map too small"), s("[wow-window] main-process window reserved (i386 main image)"),
+                 s("[device] address-map=", "increased-memory=0")],
+        "reason": "A 32-bit program the launcher started could not get its 4 GB address window: the address space was already full a minute "
+                  "into the session. The line reserves the window when the session starts.",
+        "evidence": ["gta4-dock-wow-window-reservation-2026-11-02 (Send Log 97Y30K, build 626)", "9P6C62 (626)"],
+    },
+    {
+        "id": "epic-rockstar-host-start-lost",
+        "lines": ["env.BCD_EPIC_HOST_START = 1"],
+        "priority": 7,
+        "noRetry": True,
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent R S11; Epic GTA V Enhanced FP88DP, E7Y124, Z2ETS7, builds 625-626): the Epic start logged host=1, but its first
+        # program was PlayGTAV.exe and BCD Host never reported (since build 590 configureLaunch puts the game's own program back; the key,
+        # build 598, holds the host's values): the Windows services Rockstar's installer needs never started. None of the 24 Epic GTA V logs
+        # of builds 592-626 ever started the game. "none": the start was already held.
+        "all": [s("host=1", "[epic-launch] start"), s("PlayGTAV.exe", "[WineProc] Target exe:"), s("[bcd-host] no report")],
+        "none": [s("[epic-launch] host start held")],
+        "reason": "BCD meant to start the Epic copy of GTA V through its helper (which starts the Windows services Rockstar's launcher needs) "
+                  "but started the game's own program instead; the line makes it start through the helper.",
+        "evidence": ["epic-rockstar-host-start-lost-2026-11-01 (Send Log FP88DP, build 626)", "E7Y124, Z2ETS7 (625, 626)"],
+    },
+    {
+        "id": "rockstar-social-club-small-map",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        "session": "dock",
+        # Round 630 (agent R S5; GTA V 2P3Q68, build 626, iPhone17,2 on iOS 26.7.1): Social Club's browser asks for two 16 GB PartitionAlloc
+        # pools in one 32 GB-aligned piece; a 63 GB address map (iOS 26 and older) has none (NO GAP FITS size=0x800010000) and the launcher
+        # shows its error. A limit of the device's iOS, no setting.
+        "all": [s("asks for PartitionAlloc's glued 32 GB pools", "[sc-cef] SocialClubHelper.exe"),
+                s("size=0x800010000", "[mmap-place] ml1027 NO GAP FITS"), s("[device] address-map=", "63GB")],
+        "reason": "Rockstar's launcher shows its pages with a built-in browser that needs two 16 GB memory pools in one piece. On this iOS the "
+                  "device gives BCD 63 GB of address space, which has no piece that large, so the launcher stops with an error. No setting "
+                  "changes this; iOS 27 gives BCD far more address space.",
+        "evidence": ["rockstar-social-club-small-map-2026-11-02 (Send Log 2P3Q68, build 626, iOS 26.7.1)"],
+    },
+    {
+        "id": "rockstar-launcher-local-steam-edition-no-steam",
+        "lines": [],
+        "noFix": True,
+        "priority": 54,
+        "session": "library",
+        # Round 630 (agent R S10; WQDZYF = ZGFXRE, build 626): a folder of the Steam edition started from the library: Rockstar's launcher
+        # runs with -steamAppId=271590, asks Valve's client and fails (113). rockstar-launcher-direct-start-no-steam's text is for a Steam
+        # library entry (set Start with to BCD Dock), which a local entry has not.
+        "all": [s("LAUNCHER_ERR_STEAM_FAILED"), s("-steamAppId=", "NtCreateUserProcess", "Launcher.exe")],
+        "none": [s("[steam-start] app=", " direct source="), s("[epic-launch] start")],
+        "reason": "This folder is the Steam edition of the game: Rockstar's launcher asks Valve's Steam client for it, and a start from a "
+                  "folder has none. Sign in to Steam in BCD, install the game there and start it from its page with Start with set to BCD Dock.",
+        "evidence": ["rockstar-launcher-local-steam-edition-2026-11-01 (Send Log WQDZYF, build 626)"],
+    },
+    {
+        "id": "rdr1-exe-too-large-for-fixed-base",
+        "lines": [],
+        "noFix": True,
+        "priority": 7,
+        # Round 630 (agent R S13; Red Dead Redemption 9S1H26, build 626): RDR.exe is one 1445 MiB image with no relocations built for
+        # 0x140000000; the window there holds about 760 MiB, the base is refused, BCD maps it elsewhere and the game's absolute pointers
+        # point at nothing (c0000005). The image size is the signature (relocations are not stripped, so exeMinMB cannot see it).
+        "all": [s("ml985: map_image_view size=0x5a5ed000", "base=0x140000000"), s("preferred base 0x140000000+0x5a5ed000 REFUSED"),
+                s("exit_code=0xc0000005", "NtTerminateProcess")],
+        "reason": "Red Dead Redemption's program is one 1.4 GB file built to run at one fixed address; iOS gives BCD at most about 760 MB "
+                  "there, so BCD runs it at another address and the game's own code then uses addresses that are not there. No setting "
+                  "changes this, and BCD cannot run it yet.",
+        "evidence": ["rdr1-exe-too-large-2026-11-02 (Send Log 9S1H26, build 626)"],
+    },
+    {
+        "id": "renpy-platform-mac-ver-exit",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 2,
+        # Round 630 (agent O1 S14; Doki Doki Literature Club 45E18B, 86QH9P, build 625; the same exit in 6AHQMM 622, 48B1X4 611, NTR3Y8 600,
+        # TS8ME1 623 and Coming Out on Top NQZKVF 592): Ren'Py 6.99 calls Python's platform.mac_ver(), which found the iOS host's
+        # SystemVersion.plist through Wine's "absolute /path is a Unix path" rule and called os.uname(), missing in Python for Windows: the
+        # AttributeError ended the start-up (exit -1 right after pyexpat.pyd). Build 630 hides that one file from Windows programs
+        # (tools/patch-wine-hide-host-version-plist.py). In the archive pyexpat.pyd is loaded by 8 logs: these 7 and a Python 3 program.
+        "all": [s("Load module python27.dll"), s("Load module pyexpat.pyd"), s("NtTerminateProcess(handle=0x0, exit_code=0xffffffff)")],
+        "reason": "The game's Python start-up asked which operating system it runs on, found the iOS version file through Wine and stopped "
+                  "(Python for Windows cannot read it). BCD 0.1.630 hides that file, so the start-up goes on.",
+        "evidence": ["renpy-platform-mac-ver-2026-10-31 (Send Log 45E18B, build 625)", "86QH9P (625)", "NQZKVF (Coming Out on Top, 592)"],
+    },
+    {
+        "id": "cmd-c-path-with-parentheses",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 3,
+        "outcomes": ["exited-early", "crashed"],
+        "maxStage": 2,
+        # Round 630 (agent G1 S6; Call of Duty batch starts 4VHEPN, Q6Q7Q8, build 626): cmd.exe /c strips the quotes round a path that holds
+        # ( ) & and the like and then reads "C:\Program" as the command: every batch file under "Program Files (x86)" failed. Build 630
+        # starts such a path with CALL (Library.swift launchCommand).
+        "all": [s("[WineProc] Target exe: C:\\windows\\system32\\cmd.exe")],
+        "any": [s("as an internal or external command, or batch script.", "Can't recognize 'C:\\", "(", ".bat'"),
+                s("as an internal or external command, or batch script.", "Can't recognize 'C:\\", "(", ".cmd'")],
+        "reason": "The game's start file (.bat) is in a folder with parentheses in its name (Program Files (x86)), and Windows' command "
+                  "interpreter then drops the quotes round the path and cannot find the file. BCD 0.1.630 starts it with CALL.",
+        "evidence": ["cmd-c-path-with-parentheses-2026-11-01 (Send Log 4VHEPN, build 626)", "Q6Q7Q8 (626)"],
     },
     {
         "id": "dotnet-winforms-thread-exception",
@@ -5672,6 +6721,511 @@ RULES = [
         "evidence": ["gta-iv-rockstar-chain-pool-2026-10-29 (Send Log 3D66DG, build 622)"],
     },
     {
+        "id": "syscall-fault-loop-guard",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 1,
+        # Round 630 (agent O2 S2; Mighty No. 9 DT9961 build 626, Outlast 92JTXE 614 and KT2K8F 623, Satisfactory GEZ8HT 614): the program
+        # calls ReadProcessMemory on a bad source in a loop; each call's fault is answered by NtReadVirtualMemory's __TRY (the call fails,
+        # as on Windows), but BCD's loop guards counted the repeats: "[fault-stuck] BREAKING LOOP" ended the thread, "SEGV LOOP FATAL"
+        # corrupted the call. From build 630 both guards leave such faults alone (signal_arm64_ios.c, tests/host/check-syscall-fault-loop.py).
+        "all": [s("_platform_memmove", "NtReadVirtualMemory")],
+        "any": [s("[fault-stuck] BREAKING LOOP"), s("SEGV LOOP FATAL")],
+        "reason": "The game probes memory in a loop the way Windows allows, and BCD's own loop guard ended its thread. From build 630 such a "
+                  "probe simply fails, as on Windows. Update BCD.",
+        "evidence": ["mighty-no-9-readprocessmemory-2026-11-02 (Send Log DT9961, build 626; Outlast 92JTXE, KT2K8F; Satisfactory GEZ8HT)",
+                     "tests/host/check-syscall-fault-loop.py"],
+    },
+    {
+        "id": "porsche-unleashed-no-3d-driver",
+        "lines": [],
+        "noFix": True,
+        "priority": 3,
+        # Round 630 (agent O2 S8; Need for Speed: Porsche Unleashed, 6QXWP8 = EZ4B8W build 625, KY9RX0 = 5VSPEM build 626): the game's own
+        # driver choice (set3d.c) names a driver that does not exist and says "You have DirectX 0"; the same install picked dx7 in build 622
+        # and then met the Direct3D 7 / OpenGL stop (d3d7-needs-opengl-box). Behind both stops the game needs Direct3D 7.
+        "all": [s("You have DirectX 0. Please install DirectX 7.", "set3d.c")],
+        "reason": "The game could not pick a 3D driver (its start-up says \"You have DirectX 0\"), and behind that it draws with Direct3D 7, "
+                  "which needs OpenGL in Wine; BCD has no OpenGL yet. No setting changes it.",
+        "evidence": ["porsche-unleashed-set3d-2026-10-31 (Send Log 6QXWP8 = EZ4B8W, build 625; KY9RX0 = 5VSPEM, build 626)"],
+    },
+    {
+        "id": "re5-stale-translation-after-decrypt",
+        "lines": ["env.FEX_MULTIBLOCK = 0"],
+        "priority": 60,
+        "noRetry": True,
+        "outcomes": ["crashed", "exited-early"],
+        "maxStage": 3,
+        # Round 630 (agent O2 S9; Resident Evil 5: 63ZC32 build 626, 9TVFX1 623, 1B6MWZ 600, DQ18N2 601, MSJATP 600): a stub decrypts 1497 bytes
+        # of the program in place (xor [eax],dl at 0x01CFC0xx) and FEX had translated the bytes after the loop before they were decrypted
+        # (multiblock); the same address in every log.
+        "all": [s("wine: Unhandled page fault on read access to 1515299B at address 01CFC0E1")],
+        "reason": "A part of the program decrypts its own code in memory while it runs, and the emulator translated that code before it was "
+                  "decrypted; the line makes it translate code only when it is reached (slower, but it is the decrypted code).",
+        "evidence": ["resident-evil-5-stale-decrypt-2026-11-01 (Send Log 63ZC32, build 626; 9TVFX1, 1B6MWZ, DQ18N2, MSJATP)"],
+    },
+    {
+        "id": "xray-luajit-bad-call",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 3,
+        # Round 630 (agent O2 S10; S.T.A.L.K.E.R.: Clear Sky B2ZXF4 = GS2817, build 626): the X-Ray engine calls a function pointer that holds a
+        # data address (lua.JIT.1.1.4.dll+0x12EA3, target 0x0FFCF0E7); FEX answers "Invalid instruction in entry block" and the engine's own
+        # handler (xrDebugNew.cpp) reports "illegal instruction" in the game's log.
+        "all": [s("Invalid instruction in entry block:"), s("xrDebugNew.cpp", "[guest-log]"), s("Description   : illegal instruction", "[guest-log]")],
+        "reason": "The game's Lua engine called a function that is not there and the game's own crash handler took over. No setting changes "
+                  "this; send the log.",
+        "evidence": ["stalker-clear-sky-luajit-bad-call-2026-11-01 (Send Log B2ZXF4 = GS2817, build 626)"],
+    },
+    {
+        "id": "steam-api-dll-damaged",
+        "lines": [],
+        "noFix": True,
+        "priority": 6,
+        "outcomes": ["crashed"],
+        # Round 630 (agent O2 S12; The Binding of Isaac: Rebirth YH742J, build 626): the game folder's steam_api.dll has an empty PE header
+        # body (no import, export, TLS or relocation directories), so the loader runs it unrelocated and its entry point faults: '"steam_api.dll"
+        # failed to initialize' and the program ends with c0000005. The same module id loads healthily in 12 other logs.
+        "all": [s("\"steam_api.dll\" failed to initialize, aborting"), s("Initializing dlls for", "failed, status c0000005")],
+        "reason": "The game's steam_api.dll failed to start. The file may be damaged: if these are the game's own files, check them (Steam: "
+                  "Check and repair files) or install the game again.",
+        "evidence": ["isaac-steam-api-no-directories-2026-11-02 (Send Log YH742J, build 626)"],
+    },
+    {
+        "id": "abort-exit-3-early",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        "outcomes": ["exited-early"],
+        "maxStage": 2,
+        # Round 630 (agent O1 S5; Aliens: Colonial Marines PTF674, RWMCSH, build 625): the program called abort() half a second after two
+        # statistics threads started, before drawing anything ("_set_abort_behavior _WRITE_CALL_REPORTFAULT unhandled", exit code 3); no
+        # assert text, no exception, no missing DLL, and auto-tune spent an unchanged retry. The row's log-only lines carry more next time.
+        "all": [s("_set_abort_behavior _WRITE_CALL_REPORTFAULT unhandled"), s("NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3)")],
+        "reason": "The program ended itself with abort() very early, before drawing anything. No setting is known for it; send the log.",
+        "evidence": ["aliens-colonial-marines-abort-2026-10-31 (Send Log PTF674, build 625; RWMCSH)"],
+    },
+    {
+        "id": "webview2-runtime-cannot-install",
+        "lines": [],
+        "noFix": True,
+        "priority": 5,
+        # Round 630 (agent O1 S8; FINAL FANTASY XIV 4Y65QZ, 7N8WS4, build 626; K0FA8Z round 620): the launcher needs WebView2;
+        # MicrosoftEdgeWebview2Setup.exe runs, EdgeUpdate's /regsvc fails without a service manager (0x800706ba) and the update reports
+        # 0x80040905; the launcher then runs on an empty browser control and ends.
+        "all": [s("MicrosoftEdgeWebview2Setup.exe")],
+        "any": [s("0x80040905"), s("0x800706ba")],
+        "reason": "This program needs Microsoft's WebView2 runtime, and its installer cannot finish on BCD yet (it needs Windows services that "
+                  "BCD does not have). No setting changes that.",
+        "evidence": ["ffxiv-webview2-install-2026-11-03 (Send Log 7N8WS4, build 626; 4Y65QZ)"],
+    },
+    {
+        "id": "steam-local-program-needs-client",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        "session": "library",
+        # Round 630 (agent O1 S9; Borderlands 2 added by hand, KVV0FE build 626): the game's Steamworks found no client and it closed; BCD
+        # writes this line itself (Library.swift), and auto-tune had spent an unchanged retry.
+        "all": [s("[steam-start] a program added by hand said it found no Steam and closed")],
+        "reason": "This program needs Steam's client and was started without it (it was added by hand). If you own the game on Steam, add it "
+                  "from your Steam library in BCD (the Steam tab) and start it from there.",
+        "evidence": ["borderlands-2-local-needs-steam-2026-11-01 (Send Log KVV0FE, build 626)"],
+    },
+    {
+        "id": "fallout3-null-refcount",
+        "lines": [],
+        "noFix": True,
+        "priority": 5,
+        "outcomes": ["crashed"],
+        # Round 630 (agent O1 S10; Fallout 3 RAQP7J build 626, and SECAPX 611, AN31VQ/J2C7MB/XFPNGF 614, 60WG56 622: identical registers):
+        # a reference count through a NULL object at Fallout3.exe+0x61883E, with and without the GeForce identity, CPU count and TLS lines;
+        # the row's log-only fault report (v2) names the code next time.
+        "all": [s("[d3d9-last] dump (guest exception c0000005 at 00A1883E addr 00000004)")],
+        "reason": "Fallout 3 stops in its own code on an empty object, always at the same place; the settings tried so far did not change it. "
+                  "The recommended list now asks for the code around it so the cause can be named; send the log.",
+        "evidence": ["fallout3-null-refcount-a1883e-2026-11-02 (Send Log RAQP7J, build 626; SECAPX, AN31VQ, J2C7MB, XFPNGF, 60WG56)"],
+    },
+    {
+        "id": "binary-domain-needs-configuration",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        # Round 630 (agent O1 S12; Binary Domain DVWSKD, build 625): the game's first-run box; its configuration program (Steam's second
+        # launch option) was never run.
+        "all": [s("Configuration file not found, please run the configuration tool.", "[msgbox-origin] box")],
+        "reason": "Binary Domain wants its own configuration program run once before the first start. Start the configuration program from the "
+                  "game's page (Steam's second launch option), accept the settings, then start the game.",
+        "evidence": ["binary-domain-configuration-box-2026-10-31 (Send Log DVWSKD, build 625)"],
+    },
+    {
+        "id": "lse-atomic-store-undecoded",
+        "lines": [],
+        "fixedIn": 630,
+        # Last of all (round 630, lead): many sessions carry such a line and stop for another reason (a memory kill, a game's own error), and
+        # the line rules that fix them (MADEIRA_ANON_LDADDAL32, wow-rwx-plain-smc, ...) must keep their turn; this one speaks only for a
+        # crash nothing else explains.
+        "priority": 90,
+        "outcomes": ["crashed"],
+        # Round 630 (queue item 1; Madeira b7640ef, BCD 3b11cc6a): FEX lowers a guest LOCK ADD/SUB/XADD/INC/DEC, AND, OR, XOR and CMPXCHG to
+        # LDADDAL, LDCLRAL, LDEORAL, LDSETAL and CASAL; on memory BCD keeps writable only through an alias these stores fault, and when no
+        # case of the Mach store emulator handled them the log said "[store-undecoded] ... alias OK, ADD THIS ENCODING to the case-4
+        # emulator" and the fault ended the program (2026-10-30..11-02: 45 logs, 24 games; W forms 0xb8e5..., 0xb8f9...). From build 630
+        # ios_mach_emulate_rmw does them as one host atomic on the RW alias ("[mach-rmw] round630"; tests/host/check-jit-alias-atomics.py).
+        # The signals: an LSE atomic (LD<OP> W/X with acquire-release: 0xb8e/0xb8f/0xf8e/0xf8f; CASAL W/X: 0x88e/0x88f/0xc8e/0xc8f) whose
+        # alias was found.
+        "all": [s("alias OK, ADD THIS ENCODING", "[store-undecoded]")],
+        "any": [s("alias OK, ADD THIS ENCODING", "insn=0x" + p) for p in ("b8e", "b8f", "f8e", "f8f", "88e", "88f", "c8e", "c8f")],
+        # Not when the store is the second fault of a session whose anonymous CAS was handed to FEX (Jetboard Joust 7PCQ8V: the terminal .NET
+        # stop is unproven, the negative control jetboard-joust-anon-ldaddal-2026-10-26), nor in a session that ran a game's one-time
+        # installs (a helper of an installer is not the game: saints-row-the-third-directx-helper-2026-10-21).
+        "none": [s("handed to FEX", "[anon-cas]"), s("choice=run pending=", "[dock-installers]")],
+        "reason": "The game used an atomic operation on memory that BCD keeps writable through a second mapping, and this BCD could not carry "
+                  "it out there, so the game stopped. From build 630 BCD does it. Update BCD.",
+        "evidence": ["ffxiv-lse-ldaddal-2026-11-01 (Send Log 4Y65QZ, build 626: LDADDAL W 0xb8e50305)", "tests/host/check-jit-alias-atomics.py"],
+    },
+    {
+        "id": "dxmt-d3d9-vs-ps-interface",
+        "lines": [],
+        "fixedIn": 630,
+        "evaluateWhenRan": True,
+        "priority": 3,
+        # Round 630 (agent O1 S3; Alan Wake A6232G build 625, W5XXV1 build 614): 67 pipelines a run failed with AGX's "Fragment input(s)
+        # `user(TANGENT0),user(BINORMAL0),user(NORMAL0)` mismatching vertex shader output type(s) or not written by vertex shader": DXMT's
+        # SM3 vertex-output walk dropped every usage but Color, Texcoord and Fog, so those draws were skipped and the lit surfaces missing
+        # ("very dark"); the game itself ran. Build 630 emits them (tools/patch-dxmt-d9-sm3-vs-interface.py,
+        # tests/host/check-dxmt-d9-sm3-vs-interface.py). The point-size pipelines of the same log are not part of this fix.
+        "all": [s("d3d9: failed to create pipeline state", "not written by vertex shader")],
+        "any": [s("not written by vertex shader", "user(" + n + "0)") for n in ("NORMAL", "TANGENT", "BINORMAL", "BLENDWEIGHT", "BLENDINDICES", "DEPTH")],
+        "reason": "Some of the game's lit surfaces use shader outputs that BCD's Direct3D 9 layer did not pass on, so those draws were skipped "
+                  "and the picture was darker than it should be. From build 630 BCD passes them. Update BCD.",
+        "evidence": ["alan-wake-d3d9-vs-ps-interface-2026-10-31 (Send Log A6232G, build 625)", "W5XXV1 (614)",
+                     "tests/host/check-dxmt-d9-sm3-vs-interface.py"],
+    },
+    {
+        "id": "re9-demo-empty-hash-table",
+        "lines": [],
+        "noFix": True,
+        "priority": 40,
+        # Round 630 (agent G2 S15; Resident Evil Requiem demo 148HH2, KZ1HCB, build 626): round 592's d3d12-pso-cached-blob line works (its
+        # "GetCachedBlob answers a 16-byte blob" line is in both logs); the game then stops in its own hash table lookup, a NULL bucket
+        # (exe RVA 0x567cd83, `mov rcx,[rcx+r8*8]; mov rcx,[rcx]; cmp [rcx+0x10],rax`, the same bytes in both logs). Why the table is empty
+        # is not known; the row's log-only lines (v3) carry the game's own words next time.
+        "all": [s("x86=4a 8b 0c c1 48 8b 09 48 39 41 10", "[guest-exact] ml885"), s("[mach_exc] UNHANDLED #1")],
+        "reason": "The game stops in its own code: it reads a table that is still empty. No BCD setting changes that yet; send the log.",
+        "evidence": ["re9-demo-empty-hash-table-2026-11-01 (Send Log KZ1HCB, build 626; 148HH2)"],
+    },
+    {
+        "id": "needs-opengl-or-vulkan",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 40,
+        # Round 630 (agent G2 S16; No Man's Sky FE2GHX build 626, and 4KAT5E, 7MNGH9, K8MKG5, YF3H9F, EFFFQW, HX0S2H): a GLFW window (class
+        # GLFW30: the game draws with OpenGL or Vulkan only), then the game's own fatal dialog, TaskDialogIndirect, which the 64-bit
+        # comctl32.dll lacks ("to unimplemented function COMCTL32.dll.345"); the process stays alive and idle.
+        "all": [s("class='GLFW30'", "[win-name]"), s("to unimplemented function COMCTL32.dll.345")],
+        "reason": "This game draws with OpenGL or Vulkan only, and BCD has neither yet (docs/OPENGL.md); no setting changes that.",
+        "evidence": ["nms-needs-opengl-or-vulkan-2026-11-02 (Send Log FE2GHX, build 626)", "docs/OPENGL.md"],
+    },
+    {
+        "id": "ea-javelin-anti-cheat-refuses-wine",
+        "lines": [],
+        "noFix": True,
+        "priority": 2,
+        # Round 630 (agent G1 S2; Battlefield 6 HT7Y09, build 625; RKHZKR build 600 and HAM3HG build 574 the same box): EA's Javelin anti-cheat
+        # launcher (EAAntiCheat.GameServiceLauncher.exe) detects Wine and ends with its own box ("The program encountered E111000B ... Wine,
+        # Proton, and Steam Deck are not supported by this application!") and exit code 0xE111000B. Out of scope: an anti-cheat.
+        "all": [s("Wine, Proton, and Steam Deck are not supported by this application")],
+        "any": [s("exit_code=0xe111000b"), s("encountered E111000B")],
+        "reason": "The game starts EA's anti-cheat (Javelin), and it refuses to run under Wine (its box says Wine is not supported, error "
+                  "E111000B). No setting changes that, and BCD does not work around an anti-cheat: EA games that need it cannot be played here.",
+        "evidence": ["battlefield-6-javelin-2026-10-31 (Send Log HT7Y09, build 625)"],
+    },
+    {
+        "id": "blackops3-start-null-call",
+        "lines": [],
+        "noFix": True,
+        # Before d3d9-native-null-call (6), which matched one of these logs by accident.
+        "priority": 5,
+        "outcomes": ["crashed"],
+        # Round 630 (agent G1 S3, = tur626 G1 S8; Call of Duty: Black Ops III NEXN61 build 626, E8390Y 623, 097R76 614, 6WYH1H 592, 4G9XAM 579):
+        # the program's TLS callback walks the system DLLs' export tables for a hashed name and then calls through NULL ("AV EXEC of 0"); the
+        # hash constant is in R13 of every log. Which function it wants is not in any log; the guest code at the fault (round 630,
+        # "[guest-code-at-fault]") is printed from build 630 to decode it.
+        "all": [s("R13=0x72565c06461050bd", "[x86_live]"), s("Exception: Code: C0000005 Address: 0 AV EXEC of 0")],
+        "reason": "Call of Duty: Black Ops III stops inside its own start-up code, in the part that looks up system functions, before its first "
+                  "window. It fails the same way in every log and no setting changes it yet; send the log.",
+        "evidence": ["blackops3-tls-null-call-2026-11-03 (Send Log NEXN61, build 626; E8390Y 623, 097R76 614, 6WYH1H 592, 4G9XAM 579)"],
+    },
+    {
+        "id": "fixed-base-program-second-copy",
+        "lines": [],
+        "noFix": True,
+        "priority": 7,
+        "outcomes": ["crashed", "hung", "exited-early"],
+        # Round 630 (agent G1 S7; DELTARUNE PZQGPS build 625, 035KD6 574, 4HGMS7 579, QHSYEW 611): a fixed-base program (no relocations) can
+        # have one instance per session; DELTARUNE's runner starts a second copy of itself 5 s in (a command line with arguments) and the
+        # copy cannot get the window ("failed to create main module ... c0000018"). The first start by Steam has no arguments, which keeps
+        # this off a failure of the first instance (exe-window-fixed-base's). "none": a spawn swap already redirects it.
+        "all": [s("failed to create main module", "c0000018"), s("gets the window", "[exe-window]"), s("NtCreateUserProcess: image=", "cmdline=", " -")],
+        "none": [s("[spawn-swap]", "starts as", "(command line")],
+        "reason": "The game's program started a second copy of itself, and BCD cannot yet load two copies of the same program side by side (it "
+                  "must sit at one fixed address). No setting changes that.",
+        "evidence": ["deltarune-second-copy-2026-10-31 (Send Log PZQGPS, build 625; 035KD6 574, 4HGMS7 579, QHSYEW 611)"],
+    },
+    {
+        "id": "vulkan-instance-incompatible-driver",
+        "lines": [],
+        "noFix": True,
+        "priority": 3,
+        "outcomes": ["crashed", "exited-early"],
+        # Round 630 (agent G1 S9; Darksiders Warmastered Edition 01XE9K, build 626; WF6CDG the same): the game starts its Vulkan renderer and
+        # vkCreateInstance fails (Wine is built without Vulkan support), in the game's own log as mirrored by [guest-log].
+        "all": [s("Couldn't create vulkan instance", "[guest-log]"), s("VK_ERROR_INCOMPATIBLE_DRIVER")],
+        "reason": "The game starts its Vulkan renderer, and BCD has no Vulkan driver yet, so the game stops at its own 'Unable to initialize "
+                  "graphics subsystem' box. If the game has a Direct3D mode (a launcher option, a setting or a start option), use that.",
+        "evidence": ["darksiders-warmastered-vulkan-2026-11-02 (Send Log 01XE9K, build 626)", "docs/OPENGL.md Phase 4"],
+    },
+    {
+        "id": "launcher-target-program-missing",
+        "lines": [],
+        "noFix": True,
+        "priority": 4,
+        "outcomes": ["crashed", "exited-early"],
+        "maxStage": 3,
+        # Round 630 (agent G1 S12; Escape from Playtime Q33SXD, build 626: the folder has the launcher stub only; Minecraft Dungeons B7KNC2,
+        # RAH1HB, FPYKJX, build 625: the same box): an Unreal launcher stub shows "Couldn't start: <...-Win64-Shipping.exe> ... CreateProcess()
+        # returned 2". "none": the shipping program did start (a later failure is the game's).
+        "all": [s("Couldn't start:", "[win-name] #", "CreateProcess() returned 2")],
+        "none": [s("NtCreateUserProcess: image=", "-Win64-Shipping.exe")],
+        "reason": "The game's launcher could not start the game's main program: the file named in its box is not in this copy's folder (error 2, "
+                  "file not found). If these are the game's own files, the copy is incomplete or the file lies elsewhere: add it, or install "
+                  "the game again, and try again.",
+        "evidence": ["escape-from-playtime-launcher-target-2026-11-02 (Send Log Q33SXD, build 626)",
+                     "minecraft-dungeons-launcher-target-2026-10-31 (Send Log B7KNC2, build 625; RAH1HB, FPYKJX)"],
+    },
+    {
+        "id": "steamworks-version-mismatch",
+        "lines": [],
+        "noFix": True,
+        "priority": 3,
+        "session": "dock",
+        "outcomes": ["crashed", "exited-early", "hung"],
+        # Round 630 (agent G1 S13; Enshrouded PG716Q = F8WYGG, 0CAY0F, build 626; 2TKD32 build 600): the game's Steamworks library is newer
+        # than the Steam client BCD's Dock runs (pinned in SteamRuntime.swift): "Failed to initialize Steamworks ... Version Mismatch" in the
+        # game's own log (the [guest-log] mirror), then its "Your Steam client is not running" box. Ahead of fex-exit-runaway (4), which
+        # Enshrouded's exit then hit.
+        "all": [s("Failed to initialize Steamworks", "[guest-log]", "Version Mismatch")],
+        "reason": "The game's Steam library is newer than the Steam client that BCD's Dock runs (Steamworks reports a version mismatch), so the "
+                  "game cannot connect to Steam and stops with its own 'Your Steam client is not running' box. No setting changes this; it "
+                  "needs a newer Steam client in BCD.",
+        "evidence": ["enshrouded-exit-runaway-2026-11-02 (Send Log F8WYGG = PG716Q, build 626; 0CAY0F, 2TKD32)", "app/Madeira/SteamRuntime.swift"],
+    },
+    {
+        "id": "fex-exit-runaway",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 4,
+        "outcomes": ["crashed", "exited-early", "hung"],
+        # Round 630 (agent A2 S18; Enshrouded PG716Q = F8WYGG, 0CAY0F, 2TKD32, build 626): the game ended itself (NtTerminateProcess with
+        # handle 0, then the loader's DLL detaches), xtajit64.dll's detach tore the emulator down, and the same thread entered the freed
+        # dispatcher again with a "guest RIP" in the emulator's own heap ("[iOS-bogusrip] band=host-heap") and compiled one decommitted page
+        # for ever ("[fexlock] UNPUB-COMPILE rip=0x7c...", 270-280 % CPU) until iOS killed the app; the loader's second NtTerminateProcess
+        # was never reached. From build 630 the emulator ends such a process once the loader is shutting it down
+        # (tools/patch-fex-ios-exit-runaway.py, tests/host/check-fex-exit-runaway.py). A normal exit (Darksiders 01XE9K) never gets there.
+        "all": [s("NtTerminateProcess(handle=0x0"), s("band=host-heap", "[iOS-bogusrip]"), s("[fexlock] UNPUB-COMPILE rip=0x7c")],
+        "reason": "The game ended itself, and BCD then kept working on the closed game instead of ending its session. From build 630 BCD ends "
+                  "it. Update BCD.",
+        "evidence": ["enshrouded-exit-runaway-2026-11-02 (Send Log F8WYGG = PG716Q, build 626)", "0CAY0F, 2TKD32 (626)",
+                     "tests/host/check-fex-exit-runaway.py"],
+    },
+    {
+        "id": "stale-alias-child-heap",
+        "lines": ["env.MADEIRA_ALIAS_RELEASE = 1"],
+        "priority": 14,
+        # Round 630 (agent A2 S9; the EA app 13.813.1.6327: BPAGVS iPhone18,1, H22TJN iPad15,3, build 626): a freshly started process's first
+        # heap was given the address of an anonymous-JIT page another process had released while its alias records lived on; the heap's
+        # free-list store went to the stale pool alias and the next load read 0: ARM64EC ntdll's `str x17,[x16,#0x8]` with x16 = 0
+        # ("[x18-decline] #1 ... fault_addr=0x8 insn=f9000611", "[store-noalias] ... addr=0x8 ... NO pool/anon alias"). The line drops a
+        # released view's alias records with it (build/ntdll-unix/virtual_ios.c, tests/host/check-alias-release.py); the EA app's own
+        # session carries it from build 630 (BCDLaunchers.swift). "none": the line is already on.
+        "all": [s("insn=f9000611", "[x18-decline] #1", "fault_addr=0x8"), s("NO pool/anon alias", "[store-noalias]", "addr=0x8")],
+        "none": [s("[alias-release]")],
+        "reason": "A new program's first memory landed where another program had made code earlier, and BCD's records of that code outlived "
+                  "the memory. The line drops those records together with the memory.",
+        "evidence": ["ea-app-stale-alias-child-heap-2026-11-01 (Send Log BPAGVS, build 626)", "H22TJN (626)", "tests/host/check-alias-release.py"],
+    },
+    {
+        "id": "game-needs-origin",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        "priority": 40,
+        # Round 630 (agent A2 S11; Battlefield 3, Steam 1238820, started through the library as Core\EACoreServer.exe, ZQ84PG build 626): the
+        # game's own box "Origin is not installed, and is required to play your game. Please reinstall Origin." over "DisplayName field
+        # missing from registry." ([msgbox-origin], an error-channel line every session prints).
+        "all": [s("Origin is not installed, and is required to play your game", "[msgbox-origin] box")],
+        "reason": "This game is started through Origin or the EA app, and neither is installed in BCD's Windows. Install the EA app from the "
+                  "Launchers list, sign in there and start the game again; the game cannot start without it.",
+        "evidence": ["battlefield-3-needs-origin-2026-11-02 (Send Log ZQ84PG, build 626)"],
+    },
+    {
+        "id": "chromium-small-map-reserve",
+        "lines": [],
+        "noFix": True,
+        "priority": 45,   # after the specific rules of programs with a browser inside (rockstar-social-club-small-map, 40)
+        "outcomes": ["crashed"],
+        # Round 630 (agent A2 S8; portable Chrome and Google's installer, YGY6Z4 build 626, iPhone13,4, a 63 GB map: increased-memory=1
+        # extended-va=0): PartitionAlloc asks for a 32 GB pool and then ~64 GB in one piece ("[nt-fail] ... NtAllocateVirtualMemory
+        # status=c0000017 ... size=0xfffff0000"), which a 63 GB map cannot give, and its check ends the browser with an int3 (0x80000003).
+        # chromium-top-window-reserve is the 512 GB map's form of the same ask.
+        # The 512 GB map's failures of the same ask are chromium-top-window-reserve's and beamng-chromium-address-space's ("extended-va=0"
+        # is printed there too), so the map's own size is the signal.
+        "all": [s("size=0xfffff0000", "[nt-fail]", "NtAllocateVirtualMemory", "status=c0000017"), s("[device] address-map=", "GB increased-memory=")],
+        "none": [s("[device] address-map=", " 512GB ")],
+        "reason": "This program contains a web browser (Chromium) that asks for 32 to 64 GB of address space in one piece, which this install's "
+                  "smaller address map cannot give. Web browsers do not run in BCD yet; no setting changes this.",
+        "evidence": ["chrome-portable-small-map-no-null-2026-11-01 (Send Log YGY6Z4, build 626)"],
+    },
+    {
+        "id": "wow-window-no-address-space-desktop",
+        "lines": [],
+        "noFix": True,
+        "priority": 61,
+        # Round 630 (agent A2 S7; JB8XTY build 626, an iPhone XS with a 17 GB map: Yu-Gi-Oh! Power of Chaos started on the Desktop twice):
+        # wow-window-no-address-space says this for programs started from the library (maxStage 3); a Desktop session's own stage is 5, so
+        # a program started inside it got only Wine's box. The same words for the Desktop.
+        "all": [s("[bcd-ui] play desktop"), s("[wow-window] refused: map too small"),
+                s("[device] address-map=", "increased-memory=0", "extended-va=0")],
+        "any": [s("BOOT FAILED at stage 'guest-window-reserve'"), s("[wow-window] main-process reserve FAILED")],
+        "reason": "A 32-bit program started on the Desktop could not get the 4 GB address window it needs, because this install lacks the "
+                  "increased memory limit and extended virtual addressing that give BCD enough address space. Add them with GetMoreRam (with "
+                  "SideStore or LiveContainer), or sign BCD with a paid developer account.",
+        "evidence": ["a12-desktop-installer-not-gpu-tier-2026-11-03 (Send Log JB8XTY, build 626)"],
+    },
+    {
+        "id": "wow-window-small-map-slots",
+        "lines": [],
+        "noFix": True,
+        "priority": 62,
+        # Round 630 (agent A2 S12; Firefox's installer on the Desktop, CD4WEH build 626, iPhone13,4, a 63 GB map without extended virtual
+        # addressing): such a map holds at most two 4 GB windows for 32-bit programs at once ("[wow-window] small address map ... at most 2
+        # window(s)"); the SFX and the stub held both and the installer itself was refused ("refused: map too small for another window (2
+        # of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)", "BOOT FAILED at stage 'guest-window-reserve'"). A 512 GB map (extended virtual
+        # addressing) has room for more.
+        "all": [s("refused: map too small for another window", "[wow-window]"), s("BOOT FAILED at stage 'guest-window-reserve'")],
+        "reason": "This install can run only two 32-bit programs at the same time (its address map has no extended virtual addressing), and "
+                  "this one needed a third: installers that start several programs at once cannot finish. Extended virtual addressing (with "
+                  "GetMoreRam) gives room for more.",
+        "evidence": ["firefox-installer-small-map-slots-2026-11-01 (Send Log CD4WEH, build 626)"],
+    },
+    {
+        "id": "orphan-check-protnone-read",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 2,
+        # Round 630 (agent A2 S2): BCD's orphan-lock monitor (ios_orphan_check, wine/dlls/ntdll/unix/sync.c) read a lock word that three
+        # parked waiters of a dead 32-bit program pointed at; that program's window had been released (PROT_NONE), msync() still said
+        # yes, and the plain read faulted on BCD's own native thread, which ended the app ("[mach-deliver] ... NATIVE-THREAD DECLINE ...
+        # Madeira`ios_orphan_check", "[host-fault] sig=10 ... on a NON-guest thread"; the Steam client 9PB1B5, build 626, the only such
+        # log of 3,090). From build 630 both lock reads go through the fault-safe reader (tools/patch-wine-orphan-safe-read.py,
+        # tests/host/check-orphan-safe-read.py).
+        "all": [s("NATIVE-THREAD DECLINE", "ios_orphan_check")],
+        "reason": "BCD's watcher for locks left behind by a closed program read memory that had already been given back, and BCD closed. "
+                  "From build 630 it reads such memory safely. Update BCD.",
+        "evidence": ["steam-client-fex-window-arena-overlap-2026-11-02 (Send Log 9PB1B5, build 626)", "tests/host/check-orphan-safe-read.py"],
+    },
+    {
+        "id": "dock-game-stub-abort-session-open",
+        "lines": [],
+        "fixedIn": 630,
+        "session": "dock",
+        "priority": 13,
+        # Round 630 (agent G3 S19; Resident Evil Requiem demo RVW5FD build 625; E952YC, SAG071, 0FEAMR, PTSY5G build 592): the game called a
+        # function BCD does not have ("wine: Call from ... to unimplemented function COMCTL32.dll.345, aborting") and ended with Wine's stub
+        # status 0x80000100; the exit code reached the app as 1 (get_unix_exit_code), so the Dock watch never ended the session: the host
+        # reported "launch-game-ended=1", then "detach-wait: presents=0 running=1" until the player left. From build 630 the status is kept
+        # whole (thread_ios.c), the watch ends the session (DockGameEnd.swift) and the library names the function (Library.swift ExitWords).
+        "all": [s("[dock-report] launch-game-ended=1"), s("NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000100")],
+        "none": [s("[dock-game-end]"), s("[frontend] returned to library")],
+        "reason": "The game stopped itself because it called a Windows function BCD does not have yet, and BCD kept the session open on the empty "
+                  "desktop; from build 630 BCD ends the session after a few seconds and names the function. Update BCD.",
+        "evidence": ["dock-game-stub-abort-session-open-2026-10-31 (Send Log RVW5FD, build 625)", "tests/host/check-dock-game-end.py",
+                     "tests/host/check-session-end.py", "tests/host/check-exit-status-whole.py"],
+    },
+    {
+        "id": "fex-processorid-unsupported",
+        "lines": [],
+        "fixedIn": 630,
+        "priority": 3,
+        # Round 630 (agent G3 S11; Hearts of Iron IV's Paradox launcher stub dowser.exe TM3HCY, build 614): FEX's ProcessorID op (RDTSCP, RDPID)
+        # ended the process at translation time on a host without a CPU number in TPIDRRO_EL0 ("A <tid> Unsupported"; the only FEX assertion
+        # line in the archive). From build 630 it reports processor 0 (tools/patch-fex-ios-processorid.py, tests/host/check-fex-processorid.py).
+        "all": [s(" Unsupported", "A ")],
+        "any": [s("dowser.exe")],
+        "reason": "A program of the game used an instruction that asks for the processor number, and the emulator stopped instead of answering. "
+                  "From build 630 it answers. Update BCD.",
+        "evidence": ["hearts-of-iron-iv-dowser-processorid-2026-11-02 (Send Log TM3HCY, build 614)", "tests/host/check-fex-processorid.py"],
+    },
+    {
+        "id": "il2cpp-gc-klass-race-lost",
+        "lines": [],
+        "fixedIn": 630,
+        # Before unity-gc-stopped-thread-context, which this log kept although it did not help.
+        "priority": 4,
+        "outcomes": ["crashed"],
+        # Round 630 (agent U S8; Lonely Mountains: Snow Riders F6JNBQ, build 626): BCD repaired seven virtual calls that read their vtable slot
+        # one byte off while the collector marked the klass word, then the collector cleared the mark before the eighth fault and the repair
+        # found no odd pointer; the game died. From build 630 a third pass repairs it from the clean table (signal_arm64_ios.c,
+        # tests/host/check-il2cpp-gc-vtable.py). "none": the third pass already ran.
+        "all": [s("repaired odd vtable", "[il2cpp-gc-vtable] #"), s("d352fd8b [f86b794a]", "[mach_exc] insn_stream PC-12..PC+8:"),
+                s("NtRaiseException Unhandled exception code c0000005")],
+        "none": [s("repaired even vtable")],
+        "reason": "A Unity game read its own method table while the garbage collector was marking it; BCD repaired that until the collector had "
+                  "already finished, and then the game stopped. From build 630 BCD repairs that case too. Update BCD.",
+        "evidence": ["lonely-mountains-gc-race-lost-2026-10-31 (Send Log F6JNBQ, build 626)", "tests/host/check-il2cpp-gc-vtable.py"],
+    },
+    {
+        "id": "fex-inval-null-thread",
+        "lines": [],
+        "fixedIn": 630,
+        # Ahead of fex-runtime-fault (4).
+        "priority": 3,
+        # Round 630 (agent O2 S7; Outlast Y09766, build 623): FEX's walk over every registered thread, dropping the cached code of a freed
+        # range, faulted on a thread state without a decoder (ContextImpl::InvalidateThreadCachedCodeRange, `stp xzr,xzr,[x8,#0x68]`) with its
+        # locks held, and every game thread waited for ever. From build 630 such a thread is skipped ("[inval-null]";
+        # tools/patch-fex-ios-inval-null-thread.py, tests/host/check-fex-inval-null-thread.py). The instruction words are the function's, the
+        # same in the 623 and 626 modules.
+        "all": [s("insn_stream PC-12..PC+8: f9401668 aa0203e1 aa0303e2 [a906fd1f]"), s("[reclaim-census] rev=ml329 at=fatal-segv fault=0x68 ")],
+        "reason": "The emulator walked its thread list to drop cached code, found a thread whose caches were missing and faulted while it held its "
+                  "locks, so every game thread waited for ever. From build 630 such a thread is skipped. Update BCD.",
+        "evidence": ["outlast-fex-inval-null-thread-2026-10-31 (Send Log Y09766, build 623)", "tests/host/check-fex-inval-null-thread.py"],
+    },
+    {
+        "id": "fex-wow-window-arena-overlap",
+        "lines": [],
+        "fixedIn": 630,
+        # Ahead of fex-runtime-fault (4), which the same logs match through the emulator's NULL read.
+        "priority": 3,
+        # Round 630 (agent A2 S3): the 32-bit Steam client (steam.exe, steamwebhelper.exe; Big Picture) on a 63 GB address map (an iPad mini:
+        # R883EG build 625, W2J15H and 9PB1B5 build 626). The engine holds an 8 GB arena for the 64-bit emulator ("[fex-arena] ml793 PUBLISHED
+        # [0xb30000000,0xd30000000)"); the 32-bit emulator, which is never handed it, picked the window [0xc00000000, 0xf00000000) that
+        # starts inside it ("FEX host arena = [0xc00000000, 0xeffffffff]"), so it had 7.25 GB instead of 12, and a few seconds into the
+        # play its next thread state found no room ("[nt-fail] ... c0000017 ... ext={addr[low=0xc00000000 high=0xeffffffff"); the
+        # emulator read the NULL it got and the client died (in 9PB1B5 the app too). From build 630 map_view serves that window from the
+        # arena part it overlaps once the generic search found nothing ("[wow-band] r630", build/ntdll-unix/virtual_ios.c, MADEIRA_WOW_FEX_BAND=0
+        # reverts; tests/host/check-arena-guard.py), and a thread that still gets no state ends alone (tools/patch-fex-ios-thread-init-nomem.py,
+        # tests/host/check-fex-thread-init-nomem.py). The three signals are in these three logs only (of 3,090).
+        "all": [s("[fex-arena] ml793 PUBLISHED"), s("FEX host arena = [0xc00000000, 0xeffffffff]"),
+                s("ext={addr[low=0xc00000000 high=0xeffffffff", "[nt-fail]", "c0000017")],
+        "reason": "On this install's smaller address map the 32-bit Steam client ran out of room for the emulator's own memory, because part "
+                  "of its range was held back for 64-bit programs. From build 630 BCD lets it use that part too. Update BCD.",
+        "evidence": ["steam-client-fex-window-arena-overlap-2026-11-02 (Send Log 9PB1B5, build 626)", "W2J15H (626), R883EG (625)",
+                     "tests/host/check-arena-guard.py", "tests/host/check-fex-thread-init-nomem.py"],
+    },
+    {
         "id": "fex-runtime-fault",
         "lines": [],
         "noFix": True,
@@ -5689,6 +7243,44 @@ RULES = [
         "reason": "The emulator (FEX) itself crashed inside its own code while the game ran; this is a defect in BCD, not a setting. Sending the "
                   "log helps: it names the place and the lock it held.",
         "evidence": ["synthetic-fex-runtime-fault (the [fex-fault] line of build 624 on a Minecraft Dungeons-like hang)"],
+    },
+    {
+        "id": "fex-irlist-fault-window-stays",
+        "lines": [],
+        "noFix": True,
+        "evaluateWhenRan": True,
+        # After fex-runtime-fault (4), whose words a crashed session keeps.
+        "priority": 5,
+        # Round 630 (agent T1 S6; GTA V Legacy SXEV6S and EX7S2C, Mycopunk 0K4CBK and B2SZF0, builds 625-626): FEX faulted at the same place
+        # (libarm64ecfex.dll+0xf52b0, IREmitter::ResetWorkingList, fault address 0x800010) on a new thread's first compile and the game's
+        # process ended with c0000005. In SXEV6S the game's window stayed on screen for 5.5 minutes after it and the session was scored "ran",
+        # so no rule spoke. Why the emitter's list is bad is not in the log.
+        "all": [s("[fex-fault] pc=libarm64ecfex.dll+", "fault-addr=0x800010"), s("[unhandled] madeira-bcd code=c0000005", "p1=800010")],
+        "reason": "The emulator (FEX) crashed inside the game's own process; the game's window may stay on screen, but nothing runs any more. "
+                  "This is a defect in BCD, not a setting. Close BCD completely (swipe it away) and start the game again; sending the log helps.",
+        "evidence": ["fex-irlist-fault-window-stays-2026-11-01 (Send Log SXEV6S, build 626)", "EX7S2C, 0K4CBK, B2SZF0"],
+    },
+    {
+        "id": "fex-arena-exhausted-thread-start",
+        "lines": [],
+        "noFix": True,
+        # With fex-irlist-fault-window-stays (5); socialclub-helper-va-exhausted (3) keeps its words where Social Club's helper ran out first.
+        "priority": 5,
+        # Round 630 (agent R S8; GTA V Legacy through the Dock J5DGX2 (iPhone19,7) and BGGECJ (iPad17,4), build 626; the same end in RDR2
+        # 4E2HK7, T3H9ZG, C6T0SR and GTA V W6X6TR, build 614): the emulator's address band filled during a Rockstar session (82-92 % used,
+        # 1,300-2,000 views), FEX refused new threads ("[callret] RESERVE FAILED" for a call-return stack, or "THREADSTATE ALLOC FAILED")
+        # and the game died soon after. 12 archive logs carry the refusal; the 6 scored crashed are all Rockstar sessions (the others ran or
+        # are inconclusive). Every thread's call-return stack reserves 8 MiB although the iOS JIT never reads it (212 threads = 1.66 GiB in
+        # J5DGX2): a keyed small reservation is R S8 (a), left to the owner (it changes FEX's thread start for every 64-bit game and goes
+        # into his working Rockstar rows). Until then the player is told what happened.
+        "all": [s("[FEX-iOS] ThreadInit: ", "returning STATUS_NO_MEMORY")],
+        "any": [s("[callret] RESERVE FAILED:"), s("THREADSTATE ALLOC FAILED")],
+        "outcomes": ["crashed", "hung", "exited-early"],
+        "reason": "The emulator's address area, shared by the game, its launcher and their helpers, filled up during this session, so the "
+                  "game's new threads could not start and it stopped. No BCD setting avoids this yet. Close BCD completely (swipe it away) "
+                  "and start the game again: a new start has the whole area free. Sending the log helps.",
+        "evidence": ["fex-arena-exhausted-callret-2026-11-02 (Send Log J5DGX2, build 626)",
+                     "fex-arena-exhausted-thread-state-2026-11-03 (Send Log BGGECJ, build 626)", "4E2HK7, T3H9ZG, C6T0SR, W6X6TR (build 614)"],
     },
     {
         "id": "wined3d-no-gl-context-no3d",
@@ -5848,12 +7440,17 @@ RULES = [
         # "Unable to launch GTAIV.exe". The EA app's 32-bit children had the same wall and run with the line (its session config, BCDLaunchers).
         # Installs without the memory rights have their own verdict (wow-window-no-address-space, noFix).
         "all": [s("[wow-window] refused: map too small"), s("MADEIRA_WOW_MIN_FREE_GB=8 left over")],
-        "any": [s("BOOT FAILED at stage 'guest-window-reserve'")],
+        # Round 630 (agent A1 S21; a 32-bit game started from the library on a 3.8 GB iPad, 5E1ZK9 build 626, and Call of Duty 2 AJM1B2
+        # build 600): the refused window of a main program ends in "[wow-window] main-process reserve FAILED 0xc0000017" instead of the
+        # boot-stage line; 6,488 and 6,417 MB were free, so 4,096 MB plus the line's 2 GB fit.
+        "any": [s("BOOT FAILED at stage 'guest-window-reserve'"), s("[wow-window] main-process reserve FAILED")],
         # Round 626 (agent R S8): not after a c0000096 (RDR1: the refusal is the Launcher's dllhost.exe after the game died).
         "none": [s("[device] address-map=", "increased-memory=0"), s("Unhandled exception code c0000096")],
         "reason": "A 32-bit program was refused its 4 GB address window because less than 8 GB of address space would have been left; the "
                   "line allows it with 2 GB left.",
-        "evidence": ["gta-iv-wow-window-min-free-2026-10-23 (Send Log D0BTY0, build 592)", "R30A6C (build 592), HXQWMH (build 614)"],
+        "evidence": ["gta-iv-wow-window-min-free-2026-10-23 (Send Log D0BTY0, build 592)", "R30A6C (build 592), HXQWMH (build 614)",
+                     "wow-window-main-image-2026-11-01 (Send Log 5E1ZK9, build 626)",
+                     "call-of-duty-2-wow-window-main-image-2026-10-24 (Send Log AJM1B2, build 600)"],
     },
 ] + SWAP_RULES
 

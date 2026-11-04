@@ -53,8 +53,15 @@ enum MemoryRights {
     /// (BCDSessionRecorderLive.recoverUnfinished reads the start-up phase file). Said once, in this box, before and never together with the
     /// memory-limit words (those wait for the next run).
     static let poolStopTitle = "The last start stopped early"
+    /// Round 630 (agent A1 S6): the box's title for a copy that cannot use JIT.
+    static let notDebuggableTitle = "JIT can't turn on"
+    /// Round 630 (agent A1 S8 and S19; Cult of the Lamb 4CTGPT, GTA V Legacy RT7HMV): over 1,057 archive starts with a JIT memory request, a
+    /// request more than 30 s after JIT turned on stopped 20 to 25 times as often, and the games that ask several times (the Rockstar shape:
+    /// three requests) 9.4 % against 1.4 %; the built-in way answers the first request in 0.74 s, StikDebug in 1.8 s. Text only.
     static let poolStopWords = "Last time BCD stopped while JIT was being set up for the game: its JIT memory request did not come back. "
-        + "Check in Settings › JIT that JIT turns on, that LocalDevVPN is connected and that the pairing file is set, then press Play again."
+        + "Check in Settings › JIT that JIT turns on, that LocalDevVPN is connected and that the pairing file is set, then press Play again. "
+        + "It happens more often when JIT turned on long before Play, and with games that ask for JIT memory several times (GTA V): press "
+        + "Play soon after JIT turns on. The built-in way answers these requests faster than StikDebug."
     func lastStartStoppedInPoolRequest() {
         if started {
             if message == nil { title = Self.poolStopTitle; message = Self.poolStopWords }
@@ -71,6 +78,13 @@ enum MemoryRights {
             poolStop = nil
             title = Self.poolStopTitle
             message = words
+            return
+        }
+        // Round 630 (agent A1 S6; YKKBBN): a copy signed without get-task-allow can never turn JIT on, and said so only when Play was
+        // pressed. Said at the first library screen of every run, before the memory-limit words (which then wait for a later run).
+        if !SigningStatus.current.debuggable {
+            title = Self.notDebuggableTitle
+            message = SigningStatus.notDebuggableMessage
             return
         }
         title = "Memory limit"

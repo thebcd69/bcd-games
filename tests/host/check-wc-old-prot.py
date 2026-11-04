@@ -197,7 +197,9 @@ common = re.search(r'static let commonSessionConfig = \[(.*?)\]', launchers).gro
 line = '"env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1"'
 check('Battle.net\'s launcher entry sets env.MADEIRA_PROTECT_WRITECOPY_AS_RW = 1, once, and nothing else of the file does',
       launchers.count(line) == 1 and line in bn and 'MADEIRA_PROTECT_WRITECOPY_AS_RW' not in ea.split('\n}\n')[0] and 'MADEIRA_PROTECT_WRITECOPY_AS_RW' not in common
-      and 'sessionConfig: Self.commonSessionConfig + [' + line + ', "env.MADEIRA_INT3_X86_DUMP = 1"],' in bn)
+      # round 630 (agent A2 S5): the 32-bit fault report follows on the next line of the same list
+      and 'sessionConfig: Self.commonSessionConfig + [' + line + ', "env.MADEIRA_INT3_X86_DUMP = 1",\n' in bn
+      and '"env.MADEIRA_X86_FAULT_DUMP = 1"],' in bn)
 
 
 def tracked(rootdir):
@@ -212,6 +214,8 @@ allowed = {
     'build/ntdll-unix/ios_wc_old_prot.h', 'build/ntdll-unix/virtual_ios.c', 'app/Madeira/BCDLaunchers.swift', 'build/tools/gen-config-catalog.py',
     'app/Madeira/ConfigCatalog.generated.swift', 'tests/host/check-wc-old-prot.py', 'tests/host/check-int3-x86-diag.py',
     '.github/workflows/build-ipa.yml', 'build/tools/autotune_rules.py', 'app/Madeira/AutoTuneRules.generated.swift', 'tools/int3x86-match.py',
+    # round 630 (agent A2 S5): the launcher check pins Battle.net's session lines, this switch among them
+    'tests/host/check-bcd-launchers.py',
 }
 users = []
 for f in tracked(root):

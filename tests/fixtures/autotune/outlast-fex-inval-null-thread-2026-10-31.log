@@ -1,0 +1,269 @@
+[20:13:58.550] [INFO] Checking entitlements...
+[20:13:58.551] [INFO] [build] v0.1.623 (623)
+[20:13:58.551] [INFO] [device] model=iPad15,7 idiom=pad os=iPadOS Version 26.6.1 (Build 23G83) ram=5914MB available=4077MB cores=5
+[20:13:58.552] [INFO] [device] address-map=[0x100208000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[20:13:58.564] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+02:00 free-disk=45GB stikdebug-url=0
+[20:13:58.569] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:14:00.518] [INFO] Requesting JIT with Built-in StikJIT...
+[20:14:02.098] [INFO] [bcd] library launch OLGame.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[20:14:02.132] [INFO] Running full Wine sequence...
+[20:14:02.132] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100208000,0xfc0000000) 63GB available=4065MB low-power=0 thermal=nominal
+[20:14:02.134] [INFO] [game-cfg] env.MADEIRA_APP_DLL_SHADOW=msvcr100.dll;msvcp100.dll env.MADEIRA_D3D9_X64=dxmt env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_PAUSE_IN_BACKGROUND=1
+[20:14:02.141] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:14:02.141] [INFO] Allocating 896MB JIT pool via debugger...
+[20:14:02.141] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:14:02.141] [INFO] [jit-debugger] attached=1 at the pool request
+[20:14:03.598] [INFO] RX pool at 0x300000000
+[20:14:03.630] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.545s rev=ml526
+[20:14:03.686] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[gpu-pause] Metal work waits while the app is not active (env.MADEIRA_PAUSE_IN_BACKGROUND = 1)
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; sysx64 only)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x10f360000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x47ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x47ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x47fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x47ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x47ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[20:14:04.121] [Wine connect] fd_socket=36, receiving version fd...
+[Wine init_process] waiting for request_fd from wineserver...
+[20:14:04.121] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x47ffd0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[Wine init_process] reply_pipe=43, sending init_first_thread...
+[20:14:04.121] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3153 MB + phys_footprint=942 MB = 4096 MB (hw.memsize says 5914 MB)
+[fex-arena] ml793 PUBLISHED [0xb40000000,0xd40000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x3ffef0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=850 peb=0x47ffd0000
+[jit-pool] image 0x3ffe80000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x300191000 used=0x555000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x300191000)
+ml957: libwow64fex.dll backing 0x3ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x3ff9a0000+0x120000 (ucrtbase.dll) → pool 0x300554000 used=0x678000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300554000)
+[window] 0x120400000..0xb40000000 regions=100001 occupied=7850 MB of 41468 MB free=33617 MB maxhole=32230 MB@0x361984000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=978 MB compressed=0 MB external=84 MB reusable=5 MB (cycle=1)
+[jit-pool] image 0x3ff900000+0xa0000 (KERNEL32.dll) → pool 0x300678000 used=0x720000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300678000)
+[jit-pool] image 0x3ff790000+0x170000 (kernelbase.dll) → pool 0x300720000 used=0x8a0000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300720000)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=olgame.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+[swap] ml1077 backed 0xd40000000+0x10000000 (whole reservation, ml1257) (file off 0 MB): 256 MB in 1 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0xd41000000+0x1000000 (whole reservation, ml1257) (file off 0 MB): 16 MB in 1 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0x120d00000+0x400000 (whole reservation, ml1257) (file off 16 MB): 20 MB in 2 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0x120d00000+0x800000 (whole reservation, ml1257) (file off 16 MB): 24 MB in 2 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0x120d00000+0xfd0000 (whole reservation, ml1257) (file off 16 MB): 31 MB in 2 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0x120d00000+0xfd0000 (whole reservation, ml1257) (file off 16 MB): 31 MB in 2 extents, peak 256 MB, 0 refused
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ffac0000) -> 64-bit table (0x102fe0d00)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module OLGame.exe (olgame.exe-3360521efbad3d80): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c8381c): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d5cb2b): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aadde34): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=850 peb=0x47ffd0000
+D 24 Load module steam_api.dll (steam_api.dll-b442ace9a65d0580): 47BC10000
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40424e11a1bfe07): 47BBC0000
+ml957: ? backing 0x47bba8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47b050000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47abf8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47a878000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x47a84c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[file-fail] ml665 #47 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\OutlastWhistleblowerDLC\Outlast + Whistleblower\Outlast Whistleblower\Binaries\Win32\WININET.dll
+E 24 [iOS-xins] tracker=0x300510e50 WININET.dll sec=0x47a7c1000-0x47a7f4f6c
+D 24 Load module WININET.dll (wininet.dll-7ed1ba985c393969): 47A7C0000
+ml957: ? backing 0x47a218000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] ?: OK, 8 .text pages executable (copy @0x300ad0000)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300b1d000)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300b28000)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x121e20000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x47a300000) -> wow64 table (0x102fe8d00)
+[stale-heal]   3 slot(s) in the copy of 0x3ffac0000 (libwow64fex.dll) -> 0x300073294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+[xp] 20:14:04.817 +0.60 dt=277 cpu=194 (thr 180) P=194 E=0 run=197 pgw=-1.0 GHz P=3.39 E=1.46 Minst=2349 IPC=3.58 mJ=540 pin=4481 rdKB=1008 fpMB=1057
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/My Games/Outlast/OLGame/Logs/Launch-backup-2026.10.31-18.14.04.log
+[guest-log] #1 tid=0024 [0001.07] Log: Using D3D9 device (0): Apple A16 GPU
+[guest-log] #2 tid=0024 [0001.21] Log: PhysX GPU Support: DISABLED
+[guest-log] #3 tid=0024 [0007.41] Warning: Warning, Failed to load 'Class None.': Failed to find object 'Class None.'
+[guest-log] #4 tid=0024 [0007.41] Warning: Warning, Failed to find object 'Class None.'
+[guest-log] #5 tid=0024 [0007.41] Warning: Warning, Failed to load 'Class None.': Failed to find object 'Class None.'
+[guest-log] #6 tid=0024 [0007.41] Warning: Warning, Failed to find object 'Class None.'
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300b31000)
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300b4c000)
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300b6c000)
+[image-reload] unmapped image 0x478340000+0x1f000: 1 pool copy marked
+[image-reload] unmapped image 0x478320000+0x7000: 1 pool copy marked
+[xp] 20:14:05.140 +0.92 dt=323 cpu=289 (thr 289) P=289 E=0 run=290 pgw=-1.0 GHz P=3.40 E=1.65 Minst=4050 IPC=4.13 mJ=844 pin=190 rdKB=23288 fpMB=1081
+[image-reload] unmapped image 0x478580000+0x17000: 1 pool copy marked
+[alloc-fail] ml814 #1 status=c0000018 hint=0x4ffeeffee size=0x1 type=0x2000 protect=0x1 tid=0024 | STAGE=none err=3 at 0xc00000000+0x8c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=olgame.exe tid=0024 size=0x1 type=0x2000 prot=0x1 hint=0x4ffeeffee zb=0xffffffff hits=1 rev=ajan5-rockstar
+[jit-pool] image 0x478320000+0x7000 (?) → pool 0x300b6c000 used=0xb74000/0x38000000 tramp+0x0
+ml957: ? backing 0x478324000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[image-reload] unmapped image 0x478340000+0x1f000: 1 pool copy marked
+[image-reload] unmapped image 0x478320000+0x7000: 1 pool copy marked
+[jit-pool] image 0x478240000+0xe000 (?) → pool 0x300b75000 used=0xb89000/0x38000000 tramp+0x0
+ml957: ? backing 0x47824c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=7BEF40C8
+[xp] 20:14:05.409 +1.19 dt=269 cpu=392 (thr 205) P=345 E=47 run=400 pgw=-1.0 GHz P=3.43 E=1.98 Minst=4427 IPC=3.47 mJ=995 pin=4994 rdKB=1852 fpMB=1110
+[jit-pool] image 0x4780d0000+0x13000 (?) → pool 0x300b88000 used=0xb9c000/0x38000000 tramp+0x0
+ml957: ? backing 0x4780e0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\Program Files (x86)\\Steam\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\Program Files (x86)\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+0064:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0064 status=00000001 caller=7BEF40C8
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"nvapi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0xd81400000+0x400000 (file off 359 MB): 496 MB in 99 extents, peak 512 MB, 0 refused
+[xp] 20:14:05.731 +1.52 dt=322 cpu=728 (thr 650) P=578 E=150 run=781 pgw=-1.0 GHz P=3.41 E=2.00 Minst=8221 IPC=3.62 mJ=1755 pin=191 rdKB=3264 fpMB=1219
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"PhysXUpdateLoader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"AgPerfMon.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x477750000+0x23000 (?) → pool 0x300b9e000 used=0xbc6000/0x38000000 tramp+0x0
+ml957: ? backing 0x477770000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 50 Load module winhttp.dll (winhttp.dll-940f13fb9f3561c2): 477700000
+[jit-pool] image 0x4776d0000+0x16000 (?) → pool 0x300bc7000 used=0xbe3000/0x38000000 tramp+0x0
+ml957: ? backing 0x4776e4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 50 Load module jsproxy.dll (jsproxy.dll-cf9d2b9ca23f0234): 4776D0000
+D 74 Load module dhcpcsvc.dll (dhcpcsvc.dll-dddaa5dc76d7da01): 4776B0000
+[win-name] #5 hwnd=0x10036 class='' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x10030 class='' text="Outlast" rev=ml853
+[win-name] #7 hwnd=0x10030 class='' text="Outlast" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[xp-names] m786566 "wine-x18-exc"
+[xp] 20:14:06.053 +1.84 dt=323 cpu=601 (thr 359) P=549 E=52 run=637 pgw=-1.0 GHz P=3.40 E=1.96 Minst=7225 IPC=3.67 mJ=1766 pin=4931 rdKB=6204 fpMB=1251
+[footprint] rev=ml358 phys=1256 MB (peak 1256) internal=1254 MB compressed=0 MB external=173 MB reusable=5 MB (cycle=2)
+[xp] 20:14:06.366 +2.15 dt=313 cpu=714 (thr 714) P=614 E=100 run=733 pgw=-1.0 GHz P=3.30 E=1.97 Minst=7650 IPC=3.44 mJ=1834 pin=38 rdKB=3024 fpMB=1258
+[swap] ml1077 stats: 790 MB file-backed now (peak 790), 146 extents, file used 902 of 131072 MB, backs 177 releases 90 unbacks 0 refused 0 | coverage broad: disk 0 MB of 4096 cap, reservations 17, holes 1222, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 766 MB (peak 766), 0 MB kept in memory by swap-mb
+[launch-view] dismissed reason=surface logs=0
+[swap] ml1077 backed 0x4187a0000+0xbbd0000 (file off 902 MB): 962 MB in 147 extents, peak 962 MB, 0 refused
+[footprint] rev=ml358 phys=1399 MB (peak 1399) internal=1397 MB compressed=0 MB external=426 MB reusable=5 MB (cycle=3)
+[footprint] rev=ml358 phys=1476 MB (peak 1476) internal=1474 MB compressed=0 MB external=364 MB reusable=5 MB (cycle=4)
+[swap] ml1077 backed 0xd61c00000+0x400000 (file off 679 MB): 669 MB in 145 extents, peak 962 MB, 0 refused
+[jit-pool] image 0x4110b0000+0x72000 (?) → pool 0x300be1000 used=0xc59000/0x38000000 tramp+0x0
+ml957: ? backing 0x411120000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module FonixTtsDtSimpleus.dll (fonixttsdtsimpleus.dll-919c6e48cdd1ea66): 4110B0000
+D 24 Load module MSVCR80.dll (msvcr80.dll-7a4431b2dca48e4c): 4775F0000
+[swap] ml1077 backed 0x41dce0000+0x5d68000 (file off 855 MB): 834 MB in 159 extents, peak 962 MB, 0 refused
+[win-name] #8 hwnd=0x10030 class='' text="Outlast" rev=ml853
+[swap] ml1077 backed 0xdc3c00000+0x400000 (file off 1324 MB): 1206 MB in 203 extents, peak 1206 MB, 0 refused
+[win-name] #12 hwnd=0x10030 class='' text="Outlast" rev=ml853
+[win-name] #13 hwnd=0x10030 class='' text="Outlast" rev=ml853
+[rb-tex] madeira-bcd new readback #1: fmt 10 1280x720 level 0 (texture 1280x720, 1 mips)
+[guest-log] #15 tid=0024 [0007.11] Warning: Warning, Failed to load 'Class None.': Failed to find object 'Class None.'
+[guest-log] #16 tid=0024 [0007.12] Warning: Warning, Failed to find object 'Class None.'
+[guest-log] #17 tid=0024 [0007.12] Warning: Warning, Failed to load 'Class None.': Failed to find object 'Class None.'
+[guest-log] #18 tid=0024 [0007.12] Warning: Warning, Failed to find object 'Class None.'
+[guest-log] #19 tid=0024 [0007.12] Warning: Warning, Failed to load 'Class None.': Failed to find object 'Class None.'
+[guest-log] #20 tid=0024 [0007.12] Warning: Warning, Failed to find object 'Class None.'
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"NVCPL.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #9 L"ATIMGPUD.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 24 Load module ddraw.dll (ddraw.dll-edef63215b265e8d): 477580000
+[20:14:12.030] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[win-name] #15 hwnd=0x10040 class='' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 4678FC00.
+[swap] ml1077 backed 0xdeec00000+0x400000 (file off 1683 MB): 1505 MB in 265 extents, peak 1505 MB, 0 refused
+[win-name] #17 hwnd=0x20040 class='' text="DIEmWin" rev=ml853
+[footprint] rev=ml358 phys=1833 MB (peak 1833) internal=1543 MB compressed=123 MB external=627 MB reusable=5 MB (cycle=5)
+[srv-input] btn msg=0x201 at (523,202) hit win=00010030 thread=0x10ff49200
+[srv-input] btn msg=0x201 at (523,202) hit win=00010030 thread=0x10ff49200
+[srv-input] btn msg=0x201 at (523,202) hit win=00010030 thread=0x10ff49200
+[rb-tex] madeira-bcd new readback #6: fmt 10 1024x1024 level 0 (texture 1024x1024, 1 mips)
+[footprint] rev=ml358 phys=1960 MB (peak 1960) internal=1110 MB compressed=612 MB external=620 MB reusable=5 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x1203e7800 lead 60 ms: client wrote 9.39 s of audio in 10.00 s (93.9%) over 180 wakes; device short 592.0 ms in 7 of 117 passes (largest pass 4096 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1971 MB (peak 1972) internal=1112 MB compressed=611 MB external=619 MB reusable=5 MB (cycle=9)
+[ios_audio] ml1230 pacing stream=0x11cdcd000 lead 60 ms: client wrote 9.39 s of audio in 10.01 s (93.8%) over 169 wakes; device short 587.3 ms in 7 of 117 passes (largest pass 4096 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[store-noalias] #1 rev=ml348 addr=0x68 insn=0xa906fd1f pc=0x3001a555c NO pool/anon alias | region 0x100208000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x68 hostpc=0x3001a555c hinsn=0xa906fd1f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x3001a555c addr=0x68 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100208000+0x26ec000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x3001a555c addr=0x68 x18=0x403390000 type=1 lr=0x3002accf8 sp=0x13579eee0 x16=0x3000714cc x17=0x13579efc0
+[guest-code] rev=ml333 pool_rip=0x280000 (PE 0x280000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xd410d0118 x10=0x80000000 x11=0x110b1 x0=0xd410d0080 x2=0x170000 | teb=0x403390000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 3001a545c: 54ffff81 17ffffea aa1403f5 14000006 aa1403e0 94049ab5 eb1702bf aa1503f4
+[fault-host] 3001a547c: 54000340 f9400688 b40000a8 aa0803f5 f9400108 b5ffffc8 14000006 aa1503e8
+[fault-host] 3001a549c: f9400ab5 f94002a9 eb09011f 54ffff81 f940ba68 eb14011f 54000041 f900ba75
+[fault-host] 3001a54bc: a957a260 aa1403e1 d1000508 f900c268 97ffd767 f9401680 b4fffcc0 f9001a80
+[fault-host] 3001a54dc: 94049a9a 17ffffe3 394023e8 7100051f 54000061 f94003e0 97ffd369 f94023fe
+[fault-host] 3001a54fc: a94363f7 a9425bf5 a94153f3 910143ff d65f03c0 f81f0ff3 f90007fe aa0103f3
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0x79400008d65f03c0  PE[pe+0xc04e0]=0x91001108f9402808  (x16=0x3000714cc pe=0x3ffac0000 rva_pc=0xa555c)
+[mach_exc] insn_stream PC-12..PC+8: f9401668 aa0203e1 aa0303e2 [a906fd1f] f9401260 9400000d 360000e0
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] pc PE: libwow64fex.dll+0x1455c (va=0x3ffad455c)
+[x86_seg] State.gs_cached=0x0 TEB=0x403390000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x68 insn=0xa906fd1f pc=0x3001a555c NO pool/anon alias | region 0x100208000+0x26ec000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x68 hostpc=0x3001a555c hinsn=0xa906fd1f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x3001a555c addr=0x68 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100208000+0x26ec000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x3001a555c addr=0x68 x18=0x403390000 type=1 lr=0x3002accf8 sp=0x13579eee0 x16=0x3000714cc x17=0x13579efc0
+[guest-code] rev=ml333 pool_rip=0x280000 (PE 0x280000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xd410d0118 x10=0x80000000 x11=0x110b1 x0=0xd410d0080 x2=0x170000 | teb=0x403390000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 3001a54bc: a957a260 aa1403e1 d1000508 f900c268 97ffd767 f9401680 b4fffcc0 f9001a80
+[fault-host] 3001a54dc: 94049a9a 17ffffe3 394023e8 7100051f 54000061 f94003e0 97ffd369 f94023fe
+[fault-host] 3001a54fc: a94363f7 a9425bf5 a94153f3 910143ff d65f03c0 f81f0ff3 f90007fe aa0103f3
+[fault-host] 3001a551c: 52b00008 91026009 885ffd2a 3500034a 880afd28 35ffffaa 140e9ef2 f9005008
+[fault-host] 3001a553c: b4000048 b9404908 b940ac09 11000529 29152408 f9401668 aa0203e1 aa0303e2
+[fault-host] 3001a555c: a906fd1f f9401260 9400000d 360000e0 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0x79400008d65f03c0  PE[pe+0xc04e0]=0x91001108f9402808  (x16=0x3000714cc pe=0x3ffac0000 rva_pc=0xa555c)
+[mach_exc] insn_stream PC-12..PC+8: f9401668 aa0203e1 aa0303e2 [a906fd1f] f9401260 9400000d 360000e0
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] pc PE: libwow64fex.dll+0x1455c (va=0x3ffad455c)
+[exit-stk] sp+0x270: 0x30029165c = libwow64fex.dll+0x10065c copy_owner=0x0
+[exit-stk] sp+0x278: 0x3001a7ba0 = libwow64fex.dll+0x16ba0 copy_owner=0x0
+[exit-stk] sp+0x2a0: 0x30036e4f9 = libwow64fex.dll+0x1dd4f9 copy_owner=0x0
+[exit-stk] sp+0x2b0: 0x3001a7a0c = libwow64fex.dll+0x16a0c copy_owner=0x0
+[exit-stk] sp+0x4b8: 0x3002945f8 = libwow64fex.dll+0x1035f8 copy_owner=0x0
+[exit-stk] sp+0x518: 0x30029457c = libwow64fex.dll+0x10357c copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x403390000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[reclaim-census] rev=ml329 at=fatal-segv fault=0x68 : 0 pages zero-filled this run, 0 of the last 0 are in FEX's host heap band [0x7c,0x80) -- none in FEX's heap; #53 does NOT explain this crash
+00b0:err:seh:segv_handler   insn_stream PC-12..PC+8: f9401668 aa0203e1 aa0303e2 [a906fd1f] f9401260 9400000d 360000e0
+[footprint] rev=ml358 phys=1958 MB (peak 1972) internal=1112 MB compressed=609 MB external=619 MB reusable=5 MB (cycle=10)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170425020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1936 MB (peak 1972) internal=1112 MB compressed=609 MB external=619 MB reusable=5 MB (cycle=11)
+[ios_audio] ml1230 pacing stream=0x1203e7800 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 233 wakes; device short 0.0 ms in 0 of 117 passes (largest pass 4096 frames); ring 256..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1936 MB (peak 1972) internal=1112 MB compressed=609 MB external=619 MB reusable=5 MB (cycle=12)
+E 50 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+E 24 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+E 98 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+E E8 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+[footprint] rev=ml358 phys=1936 MB (peak 1972) internal=1112 MB compressed=609 MB external=619 MB reusable=5 MB (cycle=13)
+E E0 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+[xp] 20:14:30.106 +25.89 dt=274 cpu=51 (thr 51) P=0 E=51 run=59 pgw=-1.0 GHz P=0.00 E=0.65 Minst=93 IPC=2.81 mJ=3 pin=0 rdKB=0 fpMB=1936
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 20:14:30.401 +26.19 dt=295 cpu=60 (thr 60) P=2 E=58 run=96 pgw=-1.0 GHz P=1.16 E=1.23 Minst=118 IPC=1.61 mJ=6 pin=0 rdKB=0 fpMB=1936
+E 60 [fexlock] STUCK read-wait on mutex 0xd410d0118 word=c0000000 (write-owned=true read-waiter=true write-waiters=0 read-owners=0) expected=c0000000 | owner teb=403390000 tid=00b0 depth=17719
+[footprint] rev=ml358 phys=1936 MB (peak 1972) internal=1112 MB compressed=609 MB external=619 MB reusable=5 MB (cycle=14)
+[xp] 20:14:30.703 +26.49 dt=302 cpu=41 (thr 40) P=1 E=40 run=55 pgw=-1.0 GHz P=1.83 E=1.38 Minst=113 IPC=1.98 mJ=5 pin=0 rdKB=0 fpMB=1936
+[20:14:30.894] [INFO] [session] length=28s partial=1 play=11s frames=302 avg=28.5 low1=21.9 worst=939ms stalls=0/0s peak=2005MB limit=4095MB thermal=nominal lpm=0 api=D3D11/D3D9/DirectDraw/OpenGL/32 res=944x656 mfx=2 cap=60 game=Outlast
+[xp] 20:14:31.004 +26.79 dt=300 cpu=62 (thr 62) P=2 E=60 run=93 pgw=-1.0 GHz P=1.94 E=1.64 Minst=157 IPC=1.54 mJ=10 pin=0 rdKB=4 fpMB=1936
+[ios_audio] ml1230 pacing stream=0x11cdcd000 lead 60 ms: client wrote 1.37 s of audio in 10.01 s (13.7%) over 877 wakes; device short 8606.0 ms in 101 of 118 passes (largest pass 4096 frames); ring 0..4800 frames; worst late wake 0.2 ms; clamped 0 samples
+[xp] 20:14:31.331 +27.11 dt=327 cpu=45 (thr 45) P=0 E=45 run=113 pgw=-1.0 GHz P=0.00 E=1.36 Minst=115 IPC=1.87 mJ=5 pin=0 rdKB=0 fpMB=1936
+[xp] 20:14:31.626 +27.41 dt=295 cpu=27 (thr 26) P=0 E=27 run=70 pgw=-1.0 GHz P=0.00 E=1.09 Minst=55 IPC=1.91 mJ=2 pin=0 rdKB=0 fpMB=1936
+27.41 dt=295 cpu=27 (thr 26) P=0 E=27 run=70 pgw=-1.0 GHz P=0.00 E=1.09 Minst=55 IPC=1.91 mJ=2 pin=0 rdKB=0 fpMB=1936

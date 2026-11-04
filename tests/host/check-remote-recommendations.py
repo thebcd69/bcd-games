@@ -439,7 +439,7 @@ check(kind(editRule("rdr2-steam") { $0["switches"] = ["fpsMode": 9] }) == .forma
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["resolution": "huge"] }) == .format, "a resolution that is not WxH")
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["display": "zoom"] }) == .format, "a display mode that does not exist")
 check(kind(editRule("rdr2-steam") { $0["version"] = "11" }) == .format, "a version as text")
-check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 12,", with: "\"version\": 12.5,").utf8)) == .format,
+check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 13,", with: "\"version\": 13.5,")   /* rdr2-steam v13 (round 630) */.utf8)) == .format,
       "a version that is not whole")
 check(kind(editRule("breakneck") { $0["match"] = ["programs": [["name": #"C:\Games\breakneck.exe"#]]] }) == .format, "a program with a folder")
 check(kind(editRule("breakneck") { $0["match"] = ["steamFolders": ["Breakneck"]] }) == .format, "a Steam folder not lowercased")
@@ -466,9 +466,10 @@ check(kind(addLine("breakneck", #"env.MADEIRA_PRELOAD_DLLS = C:\x\evil.dll"#)) =
 check(kind(addLine("breakneck", "dxmt = d3d11.mipClampBC=1")) == .ok && kind(addLine("breakneck", "swap-min-kb = 64")) == .ok,
       "the two app-level keys that are game settings")
 check(kind(addLine("breakneck", "env.MADEIRA_FEX_AVX = 1")) == .ok, "auto-tune's known fix")
-check(kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg")) == .ok && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = fwpuclnt,SensApi")) == .ok
-      && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = sensapi;oledlg")) == .ok && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg,evil")) == .policy
-      && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg32")) == .policy, "the opt-in DLLs oledlg, fwpuclnt and sensapi are allowed, another name is not")
+// god-of-war: a row without an opt-in line of its own (the Rockstar rows carry tbs since round 630, and a key may not come twice)
+check(kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = oledlg")) == .ok && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = fwpuclnt,SensApi")) == .ok
+      && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = sensapi;oledlg")) == .ok && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = oledlg,evil")) == .policy
+      && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = oledlg32")) == .policy, "the opt-in DLLs oledlg, fwpuclnt and sensapi are allowed, another name is not")
 check(kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 400000000")) == .ok && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 0x400000000")) == .ok
       && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 40000000")) == .ok && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 1000000000")) == .ok,
       "the .NET GC's address range, 1 GB to 64 GB in hexadecimal (with or without 0x)")

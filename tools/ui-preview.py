@@ -49,12 +49,13 @@ DEFAULT_DEVICES = ["BCD iPhone 13 Pro", "BCD iPhone 14 Pro", "BCD iPhone 15", "i
                    "iPad Air 11-inch (M2)", "iPad Pro 13-inch (M4)"]
 SCREENS = ["home", "library", "downloads", "settings", "game", "add"]
 # BCD's touch controls on the engine (their views: BCDTouchControls/Editor/Layouts.swift); their screens are
-# touch, touch-keys, touch-editor, touch-layouts, touch-picker and touch-menu (app/BCDPreview/BCDTouchPreview.swift).
+# touch, touch-keys, touch-editor, touch-layouts, touch-picker, touch-menu, and a look of their own: touch-custom,
+# touch-look and touch-text (app/BCDPreview/BCDTouchPreview.swift).
 ENGINE_BOUND |= {"BCDTouchLive.swift"}
 # Steam's public store pictures for the sample library (app/BCDPreview/BCDPreviewData.swift),
 # fetched once into ~/Library/Caches and copied into the preview app only. The pictures belong
 # to their publishers: never commit them.
-PREVIEW_STEAM_APPS = [432940, 367520, 620, 894020, 1374970, 271590, 1715130, 2420110, 1895880, 20900]
+PREVIEW_STEAM_APPS = [107100, 367520, 620, 894020, 1374970, 271590, 1715130, 2420110, 1895880, 20900]
 ART_FILES = ["library_600x900.jpg", "header.jpg", "library_hero.jpg", "logo.png"]
 ART_CACHE = Path.home() / "Library" / "Caches" / "bcd-ui-preview-art"
 ART_SOURCES = ["https://cdn.cloudflare.steamstatic.com/steam/apps/{app}/{name}",

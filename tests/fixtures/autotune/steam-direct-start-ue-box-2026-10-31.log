@@ -1,0 +1,193 @@
+[15:11:23.581] [INFO] Checking entitlements...
+[15:11:23.581] [INFO] [build] v0.1.625 (625)
+[15:11:23.581] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=11443MB available=12263MB cores=9
+[15:11:23.581] [INFO] [device] address-map=[0x104afc000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[15:11:23.590] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+03:00 free-disk=20GB stikdebug-url=1
+[15:11:23.593] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:11:24.569] [INFO] [steam-start] app=4474710 launch-entries=1 programs=2 source=steam
+[15:11:28.271] [INFO] [steam-start] app=4474710 direct source=steam args=0 folder=program
+[15:11:28.272] [INFO] Requesting JIT with Built-in StikJIT...
+[15:11:29.614] [INFO] [bcd] library launch FINAL FANTASY RESONANCE DEMO: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[15:11:29.639] [INFO] Running full Wine sequence...
+[15:11:29.639] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104afc000,0x8000000000) 512GB available=12245MB low-power=0 thermal=nominal
+[15:11:29.640] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_VCRT_ARM64_KEY=1 env.MADEIRA_X64_IMAGE_NOCOPY=1 exe-window-mb=512
+[15:11:29.647] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:11:29.647] [INFO] Allocating 896MB JIT pool via debugger...
+[15:11:29.647] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:11:29.648] [INFO] [jit-debugger] attached=1 at the pool request
+[15:11:29.649] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[15:11:29.650] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 416MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:11:29.650] [ERR] ⚠️ SMALL JIT POOL (416MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[15:11:30.114] [INFO] RX pool at 0x125f88000
+[15:11:30.125] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.522s rev=ml526
+[15:11:30.169] [wineserver] send_client_fd: fd=46 handle=0x3a2 msg_fd_unix=43 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   exe-window-mb = 512
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[Wine init_process] waiting for request_fd from wineserver...
+[15:11:30.356] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=44 reply=49/50 wait=51/52 rev=ml586
+[15:11:30.356] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=44 reply=49/50 wait=51/52 rev=ml586
+[Wine init_process] reply_pipe=50, sending init_first_thread...
+[15:11:30.356] [Wine init_process] reply_pipe=50, sending init_first_thread...
+[vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[15:11:30.358] [vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[iOS env] INCLUDED: SteamAppId=4474710
+ml992: os_proc_available_memory=11813 MB + phys_footprint=474 MB = 12288 MB (hw.memsize says 11443 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11443 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x113000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x114000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS.exe" 0x11fa30000+0x113000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x11fa30000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11fa30000+0x14000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11fa44000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11fa44000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11fa50000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x125f8c000 used=0x13c000/0x1a000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x125f8c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x418000 (libarm64ecfex.dll) → pool 0x1260c6000 used=0x55e000/0x1a000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x1260c6000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x1264e4000 used=0x690000/0x1a000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1264e4000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x126618000 used=0x758000/0x1a000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x126618000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1266e0000 used=0xa58000/0x1a000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1266e0000)
+[window] 0x16bc50000..0x780a000000 regions=26775 occupied=461258 MB of 485859 MB free=41145 MB maxhole=16544 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=491 MB (peak 491) internal=484 MB compressed=0 MB external=78 MB reusable=9 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module FFRS.exe (ffrs.exe-a924da65560d9992): 11FA30000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe150000+0x220000 (user32.dll) → pool 0x1269e4000 used=0xc84000/0x1a000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x1269e4000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS\\Binaries\\Win64\\FFRS-Win64-Shipping.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS\\Binaries\\Win64\\FFRS-Win64-Shipping.exe\" FFRS "
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS\\Binaries\\Win64\\FFRS-Win64-Shipping.exe" t+  0.874s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\FFRS\\Binaries\\Win64\\FFRS-Win64-Shipping.exe\" FFRS " (fd=91, unixdir=94, dup_unixdir=102) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x1da1b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x10000..0x73fffeffff
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x127f5e000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x12837c000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1284b0000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x128578000)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+E 2C [iOS-xins] tracker=0x128324bc8 FFRS-Win64-Shipping.exe sec=0x14ad84000-0x15d3c1381
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x12887d000)
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x12954c000)
+[x64-image] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll" 0x71f9e50000+0xc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fa160000) -> 64-bit table (0x107967828)
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71f9b60000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+002c:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=6 first=000000014E084CCB
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x100000 type=0x3000 protect=0x40
+[xp-names] m1042370 "wine-x18-exc"
+[xp] 15:11:30.957 +0.56 dt=310 cpu=312 (thr 312) P=312 E=0 run=324 pgw=-1.0 GHz P=4.25 E=1.98 Minst=4933 IPC=3.71 mJ=1623 pin=1 rdKB=0 fpMB=1094
+[image-reload] unmapped image 0x71f9aa0000+0xc0000: 1 pool copy marked
+[image-reload] unmapped image 0x71f9aa0000+0xc0000: 1 pool copy marked
+[jit-pool] image 0x71f9a40000+0x80000 (imagehlp.dll) → pool 0x12b580000 used=0x567c000/0x1a000000 tramp+0x4000
+[jit-pool] image 0x71f9980000+0xc0000 (rsaenh.dll) → pool 0x12b604000 used=0x5740000/0x1a000000 tramp+0x4000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY RESONANCE DEMO\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv157\\Win64\\steam_api64.dll" 0x71f9930000+0x4c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[steam-api] steam_api found no running Steam; process 0028 sees:
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71f8070000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71f7fe0000+0x90000 (psapi.dll) → pool 0x12b6c8000 used=0x57d4000/0x1a000000 tramp+0x4000
+D 2C Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 71F7FE0000
+[jit-pool] image 0x71f7f50000+0x90000 (version.dll) → pool 0x12b75c000 used=0x5868000/0x1a000000 tramp+0x4000
+D 2C Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71F7F50000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71f7db0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module tier0_s64.dll (tier0_s64.dll-46fed3100444d04b): 71F7DB0000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71f7ce0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module vstdlib_s64.dll (vstdlib_s64.dll-0805e0d24f89e963): 71F7CE0000
+[jit-pool] image 0x71f7c50000+0x90000 (mswsock.dll) → pool 0x12b7f0000 used=0x58fc000/0x1a000000 tramp+0x4000
+D 2C Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 71F7C50000
+[jit-pool] image 0x71f7bc0000+0x90000 (secur32.dll) → pool 0x12b884000 used=0x5990000/0x1a000000 tramp+0x4000
+D 2C Load module Secur32.dll (secur32.dll-f6ff7e0cf92170a6): 71F7BC0000
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=002c | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=ffrs-win64-shipping.exe tid=002c size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp] 15:11:31.281 +0.89 dt=324 cpu=346 (thr 346) P=346 E=0 run=365 pgw=-1.0 GHz P=4.22 E=2.18 Minst=5889 IPC=4.04 mJ=1851 pin=4 rdKB=176 fpMB=1133
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c0b000000
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x10c0b4000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x14); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[image-reload] unmapped image 0x71f7c50000+0x90000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[win-name] #1 hwnd=0x1002c class='CustomerMessageDialog1' text="" rev=ml853
+[win-name] #2 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-name] #3 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x1002c class='CustomerMessageDialog1' text="" rev=ml853
+[win-name] #5 hwnd=0x1002c class='CustomerMessageDialog1' text="" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[win-name] #6 hwnd=0x10036 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #12 hwnd=0x1003e class='Static' text="Unable to initialize SteamAPI.?Please make sure Steam is running and you are logged in to an account entitled to the game." rev=ml853
+[win-name] #13 hwnd=0x1003e class='Static' text="Unable to initialize SteamAPI.?Please make sure Steam is running and you are logged in to an account entitled to the game." rev=ml853
+[win-name] #14 hwnd=0x1002c class='CustomerMessageDialog1' text="Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10c0b4000
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[win-name] #15 hwnd=0x10040 class='Button' text="" rev=ml853
+[win-name] #16 hwnd=0x10040 class='Button' text="Exit" rev=ml853
+[win-name] #17 hwnd=0x10040 class='Button' text="Exit" rev=ml853
+[win-name] #18 hwnd=0x1002c class='CustomerMessageDialog1' text="Error" rev=ml853
+[xp] 15:11:31.562 +1.17 dt=280 cpu=119 (thr 119) P=119 E=0 run=124 pgw=-1.0 GHz P=4.21 E=1.54 Minst=1744 IPC=3.48 mJ=604 pin=6 rdKB=16 fpMB=1224
+[launch-view] dismissed reason=surface logs=0
+[xp] 15:11:31.858 +1.46 dt=296 cpu=34 (thr 34) P=2 E=33 run=43 pgw=-1.0 GHz P=1.55 E=1.31 Minst=64 IPC=1.40 mJ=5 pin=0 rdKB=0 fpMB=1224
+[xp] 15:11:32.109 +1.71 dt=251 cpu=20 (thr 20) P=0 E=20 run=27 pgw=-1.0 GHz P=0.00 E=1.12 Minst=40 IPC=1.79 mJ=2 pin=0 rdKB=0 fpMB=1224
+[xp] 15:11:32.426 +2.03 dt=317 cpu=17 (thr 17) P=0 E=17 run=20 pgw=-1.0 GHz P=0.00 E=1.03 Minst=35 IPC=1.99 mJ=1 pin=0 rdKB=0 fpMB=1235
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=1227 MB compressed=0 MB external=144 MB reusable=9 MB (cycle=2)
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=1228 MB compressed=0 MB external=144 MB reusable=9 MB (cycle=3)
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=1228 MB compressed=0 MB external=144 MB reusable=9 MB (cycle=4)
+[vfree] ml842 # base=0x7c04921000 size=0xf000 type=0x4000 tid=002c
+[vfree] ml842 # base=0x7c05131000 size=0xf000 type=0x4000 tid=002c
+[valloc] ml959 # base=0x7c05131000 size=0xf000 type=0x1000 prot=0x4 tid=002c | req_hint=0x7c05131000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c04881000 size=0xf000 type=0x4000 tid=002c
+[valloc] ml959 # base=0x7c04881000 size=0xf000 type=0x1000 prot=0x4 tid=002c | req_hint=0x7c04881000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x7c04921000 size=0xf000 type=0x1000 prot=0x4 tid=002c | req_hint=0x7c04921000 zero_bits=0x0 limit=0x0
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=1227 MB compressed=0 MB external=144 MB reusable=9 MB (cycle=5)
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[srv-input] btn msg=0x201 at (725,499) hit win=0001002c thread=0x11eb47c00
+[footprint] rev=ml358 phys=1234 MB (peak 1234) internal=1227 MB compressed=0 MB external=144 MB reusable=9 MB (cycle=6)
+[xp] 15:11:41.217 +10.82 dt=325 cpu=11 (thr 11) P=0 E=11 run=19 pgw=-1.0 GHz P=0.00 E=0.97 Minst=23 IPC=2.12 mJ=1 pin=0 rdKB=0 fpMB=1234
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 15:11:41.540 +11.14 dt=323 cpu=26 (thr 26) P=1 E=24 run=36 pgw=-1.0 GHz P=2.32 E=1.95 Minst=70 IPC=1.39 mJ=7 pin=0 rdKB=0 fpMB=1234
+[xp] 15:11:41.800 +11.40 dt=260 cpu=14 (thr 14) P=0 E=14 run=18 pgw=-1.0 GHz P=0.00 E=1.90 Minst=35 IPC=1.33 mJ=3 pin=0 rdKB=0 fpMB=1234
+[xp] 15:11:42.077 +11.68 dt=278 cpu=4 (thr 4) P=0 E=4 run=8 pgw=-1.0 GHz P=0.00 E=1.94 Minst=9 IPC=1.11 mJ=1 pin=0 rdKB=0 fpMB=1234
+[xp] 15:11:42.378 +11.98 dt=300 cpu=6 (thr 6) P=0 E=6 run=10 pgw=-1.0 GHz P=0.00 E=2.01 Minst=24 IPC=2.04 mJ=2 pin=0 rdKB=0 fpMB=1234
+[15:11:42.433] [INFO] [session] length=12s partial=1 play=0s frames=0 stalls=0/0s peak=1235MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=FINAL FANTASY RESONANCE DEMO
+[15:11:42.378] [xp] 15:11:42.378 +11.98 dt=300 cpu=6 (thr 6) P=0 E=6 run=10 pgw=-1.0 GHz P=0.00 E=2.01 Minst=24 IPC=2.04 mJ=2 pin=0 rdKB=0 fpMB=1234

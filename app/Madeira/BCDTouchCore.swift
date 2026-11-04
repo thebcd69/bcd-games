@@ -9,7 +9,9 @@ import CoreGraphics
 // Foundation and CoreGraphics only: tests/host/check-bcd-touch.py compiles this file on the
 // host, next to the stored layout types, to prove that every control sends the game the same
 // events and takes touches in the same places as before, and that layouts convert both ways
-// without changing a byte.
+// without changing a byte. A control the player gave a shape or words of its own (BCD's editor,
+// Look: 2026-11-03) is drawn, and takes touches, in that shape, with the words as large as fit;
+// every other control is drawn and touched exactly as before.
 //
 // The views (BCDTouchControls.swift, BCDTouchEditor.swift) work on these values. BCDTouchLive
 // converts them to and from the stored controls and carries the events to the game.
@@ -49,6 +51,13 @@ enum BCDTouchAction: Hashable {
         default: return .round
         }
     }
+
+    /// The outline of a control with this action and the player's own shape (BCD's editor, Look): the
+    /// player's, except on a stick, which stays the ring its thumb moves in.
+    func shape(custom: BCDTouchCustomShape?) -> BCDTouchShape {
+        guard !isStick, let custom else { return shape }
+        return custom.drawn
+    }
 }
 
 enum BCDKeyStick: Hashable {
@@ -62,7 +71,86 @@ enum BCDKeyStick: Hashable {
     }
 }
 
-enum BCDTouchShape: Hashable { case round, wide, pill, small }
+/// A control's outline: the four its action draws (`BCDTouchAction.shape`), and the two the player can
+/// choose besides a circle (`BCDTouchCustomShape`).
+enum BCDTouchShape: Hashable {
+    case round, wide, pill, small
+    /// As wide and as tall as a round control.
+    case square
+    /// `aspect` times as wide as it is tall, with a square's area.
+    case rectangle(aspect: Double)
+}
+
+/// A shape the player gives a control in BCD's editor (Look), in place of the one its action draws. The
+/// stored control keeps it as words (TouchControl.Face: "circle", "square" or "rectangle" and a
+/// rectangle's aspect), written only when set, so a layout without one is the file it always was; a
+/// name this build does not know draws the control's standard shape.
+enum BCDTouchCustomShape: Hashable {
+    case circle
+    case square
+    /// `aspect` times as wide as it is tall (below 1, taller than wide), within `aspects`.
+    case rectangle(aspect: Double)
+
+    /// How far a rectangle stretches either way: four times as wide as it is tall, or as tall as wide.
+    static let aspects = 0.25...4.0
+    /// A new rectangle is twice as wide as it is tall.
+    static let defaultAspect = 2.0
+
+    /// A rectangle's aspect, inside `aspects`; one that cannot be read is the default.
+    static func clampAspect(_ value: Double?) -> Double {
+        guard let value, value.isFinite, value > 0 else { return defaultAspect }
+        return min(max(value, aspects.lowerBound), aspects.upperBound)
+    }
+
+    /// From a stored control: nil for no shape of its own, or for one this build does not know.
+    init?(name: String?, aspect: Double?) {
+        switch name?.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "circle": self = .circle
+        case "square": self = .square
+        case "rectangle": self = .rectangle(aspect: Self.clampAspect(aspect))
+        default: return nil
+        }
+    }
+
+    /// Its stored name.
+    var name: String {
+        switch self {
+        case .circle: return "circle"
+        case .square: return "square"
+        case .rectangle: return "rectangle"
+        }
+    }
+
+    /// A rectangle's width over its height, as stored; nil for the others.
+    var aspect: Double? {
+        if case .rectangle(let value) = self { return Self.clampAspect(value) }
+        return nil
+    }
+
+    /// How it is drawn.
+    var drawn: BCDTouchShape {
+        switch self {
+        case .circle: return .round
+        case .square: return .square
+        case .rectangle(let value): return .rectangle(aspect: Self.clampAspect(value))
+        }
+    }
+
+    /// The editor's slider for a rectangle runs from four times as tall (-2) through a square (0) to four
+    /// times as wide (2); the aspect it sets is kept to two decimals.
+    static func aspect(slider value: Double) -> Double {
+        (pow(2, min(max(value.isFinite ? value : 0, -2), 2)) * 100).rounded() / 100
+    }
+
+    /// Where the slider stands for an aspect.
+    static func slider(aspect: Double) -> Double { log2(clampAspect(aspect)) }
+
+    /// "2.0 : 1" for a wide rectangle, "1 : 2.0" for a tall one.
+    static func proportion(_ aspect: Double) -> String {
+        let a = clampAspect(aspect)
+        return a >= 1 ? String(format: "%.1f : 1", a) : String(format: "1 : %.1f", 1 / a)
+    }
+}
 
 /// One control on screen, as the views see it.
 struct BCDTouchItem: Identifiable, Hashable {
@@ -78,6 +166,20 @@ struct BCDTouchItem: Identifiable, Hashable {
     var padLink: String?
     /// The editor cannot move, resize or remove it.
     var locked = false
+    /// The player's own shape for it (BCD's editor, Look); nil: the one its action draws.
+    var customShape: BCDTouchCustomShape? = nil
+    /// The player's own words on it in place of its label (BCDTouchText.clean); nil: its label.
+    var customText: String? = nil
+}
+
+extension BCDTouchItem {
+    /// The outline it is drawn in.
+    var shape: BCDTouchShape { action.shape(custom: customShape) }
+    /// The player's shape as drawn, where it counts (never on a stick); nil: the action's own, drawn
+    /// and touched as always.
+    var ownShape: BCDTouchShape? { action.isStick ? nil : customShape?.drawn }
+    /// The words drawn in place of its label; nil: its label (a stick keeps its own).
+    var words: String? { action.isStick ? nil : customText }
 }
 
 // MARK: - Size and where touches count
@@ -93,6 +195,12 @@ enum BCDTouchGeometry {
     /// A control's diameter: its own size times the whole layout's (the game's Control size).
     static func diameter(scale: Double, layoutScale: Double) -> Double { base * scale * layoutScale }
 
+    /// The diameter at which a control of `shape` fits in `room`, at most `largest`: a picture of it in a panel.
+    static func diameter(fitting shape: BCDTouchShape, in room: CGSize, atMost largest: Double) -> Double {
+        let unit = size(shape, diameter: 1)
+        return min(largest, Double(room.width) / Double(unit.width), Double(room.height) / Double(unit.height))
+    }
+
     /// The drawn frame. A round control is `diameter` across.
     static func size(_ shape: BCDTouchShape, diameter d: Double) -> CGSize {
         switch shape {
@@ -100,6 +208,23 @@ enum BCDTouchGeometry {
         case .pill: return CGSize(width: d * 1.2, height: d * 0.5)
         case .small: return CGSize(width: d * 0.8, height: d * 0.8)
         case .round: return CGSize(width: d, height: d)
+        case .square: return CGSize(width: d, height: d)
+        case .rectangle(let aspect):
+            // The square's area, stretched: √aspect wider and as much lower.
+            let k = BCDTouchCustomShape.clampAspect(aspect).squareRoot()
+            return CGSize(width: d * k, height: d / k)
+        }
+    }
+
+    /// How round an outline's corners are, for a control drawn `size`: every outline is a rounded
+    /// rectangle (a circle and a pill round all the way; a square and a rectangle by a fifth of their
+    /// shorter side, drawn continuous as the shoulders are).
+    static func cornerRadius(_ shape: BCDTouchShape, size: CGSize) -> Double {
+        let w = Double(size.width), h = Double(size.height)
+        switch shape {
+        case .round, .small, .pill: return min(w, h) / 2
+        case .wide: return h * 0.32
+        case .square, .rectangle: return min(w, h) * 0.2
         }
     }
 
@@ -112,6 +237,33 @@ enum BCDTouchGeometry {
         guard action.isPad else { return true }
         let s = size(action.shape, diameter: d)
         return abs(Double(p.x)) <= Double(s.width) / 2 && abs(Double(p.y)) <= Double(s.height) / 2
+    }
+
+    /// Whether `p`, from the centre, is inside an outline of `diameter`: a circle within its radius,
+    /// any other outline within its frame (its rounded corners count: a few points of slop cost nothing).
+    static func inside(_ p: CGPoint, _ shape: BCDTouchShape, diameter d: Double) -> Bool {
+        let s = size(shape, diameter: d)
+        switch shape {
+        case .round, .small:
+            return (Double(p.x) * Double(p.x) + Double(p.y) * Double(p.y)).squareRoot() <= Double(s.width) / 2
+        case .wide, .pill, .square, .rectangle:
+            return abs(Double(p.x)) <= Double(s.width) / 2 && abs(Double(p.y)) <= Double(s.height) / 2
+        }
+    }
+
+    /// Where a control takes a touch, the overlay's window and the control's own surface together:
+    /// with a shape of the player's own (`own`, BCDTouchItem.ownShape), anywhere in that shape; without
+    /// one, as it always did (`takes(_:action:diameter:)`).
+    static func takes(_ p: CGPoint, action: BCDTouchAction, own: BCDTouchShape?, diameter d: Double) -> Bool {
+        guard let own else { return takes(p, action: action, diameter: d) }
+        return inside(p, own, diameter: d)
+    }
+
+    /// The overlay window's part of it (TouchControlsModel.hitsInteractive): within half a diameter of
+    /// the centre, as always, or the player's own shape.
+    static func windowTakes(_ p: CGPoint, own: BCDTouchShape?, diameter d: Double) -> Bool {
+        guard let own else { return (Double(p.x) * Double(p.x) + Double(p.y) * Double(p.y)).squareRoot() <= d / 2 }
+        return inside(p, own, diameter: d)
     }
 
     /// Where an added control goes: a little apart from the last one, so repeated adds do not
@@ -409,6 +561,152 @@ enum BCDTouchNames {
     /// The built-in layouts' names, in BCD's words (the stored names stay as they are).
     static func layoutName(id: String, stored: String) -> String {
         id == "builtin.xbox" ? "Full controller" : stored
+    }
+}
+
+// MARK: - The player's words on a control
+
+/// Words the player puts on a control in place of its label (BCD's editor, Look): "INV" on an
+/// inventory key.
+enum BCDTouchText {
+    /// The most characters kept, and Unicode scalars (an emoji can take several; a shared layout file
+    /// allows 64 to a text: BCDControlShare.maxStringLength).
+    static let maxCharacters = 20
+    static let maxScalars = 48
+
+    /// One line of words: control and format characters out (but the joiners emoji and some scripts
+    /// are written with), line breaks and tabs a space, every run of spaces one space, trimmed, cut to
+    /// the limits; nil when nothing is left to show.
+    static func clean(_ text: String?) -> String? {
+        guard let text else { return nil }
+        var scalars = String.UnicodeScalarView()
+        for s in text.unicodeScalars {
+            if s == "\u{200C}" || s == "\u{200D}" {
+                scalars.append(s)
+            } else if s.properties.isWhitespace {
+                scalars.append(" ")
+            } else if s.properties.generalCategory != .control && s.properties.generalCategory != .format {
+                scalars.append(s)
+            }
+        }
+        let words = String(scalars).split(separator: " ", omittingEmptySubsequences: true).joined(separator: " ")
+        var out = "", characters = 0, count = 0
+        for c in words {
+            let n = c.unicodeScalars.count
+            guard characters < maxCharacters, count + n <= maxScalars else { break }
+            out.append(c)
+            characters += 1
+            count += n
+        }
+        out = out.trimmingCharacters(in: CharacterSet.whitespaces.union(CharacterSet(charactersIn: "\u{200C}\u{200D}")))
+        return out.isEmpty ? nil : out
+    }
+}
+
+/// How large the player's words are drawn: the largest type at which they fit inside the control's
+/// outline, `padding` in from its rim, on one line; on two (broken at a space) only when that makes
+/// the type clearly larger; never below `minimumSize`, where words too long for the control are cut
+/// short. The face measures its own type (BCDTouchTextMeasure) and hands the measure in, so the
+/// rules are checked on the host with a measure of their own.
+enum BCDTouchTextFit {
+    /// The smallest type the words are drawn in, in points.
+    static let minimumSize = 8.0
+    /// Two lines only when they make the type at least this much larger than one line does.
+    static let twoLineGain = 1.15
+    /// Continuous corners reach a little further in than a circle's arc of the same radius.
+    static let continuousCorner = 1.15
+
+    struct Fit: Equatable {
+        /// The words as drawn: one line, or two.
+        var lines: [String]
+        /// The type size, in points.
+        var size: Double
+        /// All of the words show at `size`; false: even at `minimumSize` they are too long for the
+        /// control and are cut short.
+        var whole: Bool
+        /// The lines' width and height at `size`.
+        var block: CGSize
+    }
+
+    /// The room the words keep from the rim, for a control drawn `frame`.
+    static func padding(_ frame: CGSize) -> Double { max(2, 0.08 * Double(min(frame.width, frame.height))) }
+
+    /// Half the width inside an outline drawn `frame`, `inset` in from its rim, at `y` above or below
+    /// its middle; nil beyond its top or bottom (BCDTouchGeometry.cornerRadius: every outline is a
+    /// rounded rectangle).
+    static func halfWidth(_ shape: BCDTouchShape, frame: CGSize, inset: Double, at y: Double) -> Double? {
+        let w = Double(frame.width) - 2 * inset, h = Double(frame.height) - 2 * inset
+        guard w > 0, h > 0, abs(y) <= h / 2 else { return nil }
+        var r = BCDTouchGeometry.cornerRadius(shape, size: frame)
+        switch shape {
+        case .wide, .square, .rectangle: r *= continuousCorner
+        case .round, .small, .pill: break
+        }
+        r = min(max(r - inset, 0), min(w, h) / 2)
+        let over = abs(y) - (h / 2 - r)
+        guard over > 0 else { return w / 2 }
+        return w / 2 - r + max(r * r - over * over, 0).squareRoot()
+    }
+
+    /// Whether a block, centred on the control, lies inside its outline, `inset` in from the rim.
+    static func contains(_ block: CGSize, in shape: BCDTouchShape, frame: CGSize, inset: Double) -> Bool {
+        guard let half = halfWidth(shape, frame: frame, inset: inset, at: Double(block.height) / 2) else { return false }
+        return Double(block.width) / 2 <= half
+    }
+
+    /// The largest type size at which lines measuring `unit` at 1 point fit inside the outline.
+    static func largest(_ unit: CGSize, in shape: BCDTouchShape, frame: CGSize) -> Double {
+        let inset = padding(frame)
+        let a = Double(unit.width), b = Double(unit.height)
+        let w = Double(frame.width) - 2 * inset, h = Double(frame.height) - 2 * inset
+        guard a > 0, b > 0, w > 0, h > 0, a.isFinite, b.isFinite else { return 0 }
+        func fits(_ s: Double) -> Bool { contains(CGSize(width: a * s, height: b * s), in: shape, frame: frame, inset: inset) }
+        var hi = min(w / a, h / b)
+        if fits(hi) { return hi }
+        var lo = 0.0
+        for _ in 0..<48 {
+            let mid = (lo + hi) / 2
+            if fits(mid) { lo = mid } else { hi = mid }
+        }
+        return lo
+    }
+
+    /// The words' lines and type for a control drawn `frame` in `shape`. `measure` gives a line's width
+    /// and height at a type size of 1 point. `text` is one clean line (BCDTouchText.clean).
+    static func fit(_ text: String, in shape: BCDTouchShape, frame: CGSize, measure: (String) -> CGSize) -> Fit {
+        let one = measure(text)
+        var best = (lines: [text], unit: one, size: largest(one, in: shape, frame: frame))
+        let words = text.split(separator: " ")
+        if words.count > 1 {
+            // Two lines, broken at the space that leaves them most even.
+            var even: (lines: [String], unit: CGSize)?
+            for i in 1..<words.count {
+                let top = words[..<i].joined(separator: " "), bottom = words[i...].joined(separator: " ")
+                let a = measure(top), b = measure(bottom)
+                let unit = CGSize(width: max(a.width, b.width), height: a.height + b.height)
+                if let known = even, known.unit.width <= unit.width { continue }
+                even = ([top, bottom], unit)
+            }
+            if let even {
+                let size = largest(even.unit, in: shape, frame: frame)
+                if size >= best.size * twoLineGain { best = (even.lines, even.unit, size) }
+            }
+        }
+        let size = max(best.size, minimumSize)
+        return Fit(lines: best.lines, size: size, whole: best.size >= minimumSize,
+                   block: CGSize(width: Double(best.unit.width) * size, height: Double(best.unit.height) * size))
+    }
+
+    /// The frame the face lays the words out in: their block's height and a little more (so rounding
+    /// never clips a line), as wide as the outline is where the block's top and bottom edges are. Words
+    /// that fit have room to spare in it; words cut short end at the rim's padding (at its widest
+    /// row when even one line is taller than the control).
+    static func box(_ fit: Fit, in shape: BCDTouchShape, frame: CGSize) -> CGSize {
+        let inset = padding(frame)
+        let inner = max(Double(frame.height) - 2 * inset, 0)
+        let edge = Double(fit.block.height) <= inner ? Double(fit.block.height) / 2 : 0
+        let half = halfWidth(shape, frame: frame, inset: inset, at: edge) ?? 0
+        return CGSize(width: max(2 * half, fit.whole ? Double(fit.block.width) : 0), height: Double(fit.block.height) + 4)
     }
 }
 

@@ -1,0 +1,386 @@
+[14:10:04.680] [INFO] Checking entitlements...
+[14:10:04.682] [INFO] [build] v0.1.625 (625)
+[14:10:04.683] [INFO] [device] model=iPhone14,2 idiom=phone os=iOS Version 27.0 (Build 24A5390f) ram=5666MB available=4077MB cores=6
+[14:10:04.683] [INFO] [device] address-map=[0x1002c8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[14:10:04.711] [INFO] [device] settings: low-power=1 thermal=nominal screen=1170x2532@3.0x max-fps=120 utc-offset=+01:00 free-disk=50GB stikdebug-url=0
+[14:10:04.729] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[14:17:46.884] [INFO] Requesting JIT with Built-in StikJIT...
+[14:18:44.466] [INFO] [epic-launch] start app=be..c8 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[14:18:44.474] [INFO] [bcd] library launch TheDarksideDetective2.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[14:18:44.504] [INFO] Running full Wine sequence...
+[14:18:44.505] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1002c8000,0x8000000000) 512GB available=4039MB low-power=1 thermal=nominal
+[14:18:44.507] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[14:18:47.229] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[14:18:47.229] [INFO] Allocating 896MB JIT pool via debugger...
+[14:18:47.230] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[14:18:47.230] [INFO] [jit-debugger] attached=1 at the pool request
+[14:18:47.236] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[14:18:48.583] [INFO] RX pool at 0x148000000
+[14:18:48.630] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.492s rev=ml526
+[14:18:48.722] [wineserver] send_client_fd: fd=44 handle=0x3a2 msg_fd_unix=40 proc=0020 tid=0000
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[game-cfg] <container>/Library/Application Support/GameConfigs/9ed3b32f47604755.cfg (read)
+[shell-dir] user folders for madeira, mobile: 11 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x70e7000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=41 reply=47/48 wait=49/50 rev=ml586
+[14:18:50.051] [Wine init_process] reply_pipe=48, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3330 MB + phys_footprint=765 MB = 4096 MB (hw.memsize says 5666 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x27000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x27000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148554000 used=0x678000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x148678000 used=0x720000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148720000 used=0x8a0000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[window] 0x7048000000..0x7400000000 regions=31908 occupied=14849 MB of 15232 MB free=382 MB maxhole=382 MB@0x70e793c000 rev=ml787 (periodic)
+[window] 0x70e7000000..0x78e7000000 regions=160 occupied=12305 MB of 32768 MB free=40542 MB maxhole=20080 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=779 MB (peak 779) internal=777 MB compressed=2 MB external=89 MB reusable=54 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x70e7a40000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70e7b40000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70e7d40000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x70e8140000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x70e8940000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x70e9910000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x70ea8e0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x70eb8b0000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x10312b828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module TheDarksideDetective2.exe (thedarksidedetective2.exe-7cd9c3c3a01b3532): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cf1c34): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d2e732): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aaafa1c): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-564e347eca5893f9): 717A850000
+D 24 Load module USER32.dll (user32.dll-7d7be97280ded113): 717A690000
+ml957: ? backing 0x717a598000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a100000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a058000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7179528000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x7179438000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x71793b4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x70ef940000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[xp] 14:18:50.736 +0.53 dt=267 cpu=238 (thr 237) P=237 E=1 run=242 pgw=-1.0 GHz P=1.60 E=1.67 Minst=1447 IPC=3.82 mJ=150 pin=49 rdKB=24644 fpMB=851
+[unixlib] opengl32 (GL-absent stub table) (module 0x7179610000) -> wow64 table (0x103133828)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\UnityCrashHandler32.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\UnityCrashHandler32.exe\" --attach 32 26611712"
+[phase] spawn:L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\UnityCrashHandler32.exe" t+  3.709s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\UnityCrashHandler32.exe\" --attach 32 26611712" (fd=129, unixdir=130, dup_unixdir=134) cwd=L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x7100000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[wow-window] slot 1 B=0x7200000000 bound to peb=0x7200310000
+[main-exe] open_dll_file('<container>/Documents/wine/dosdevices/c:/Program Files/Epic Games/TheDarksideDetectiveSh5t8/UnityCrashHandler32.exe') = 0x0
+002c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x72004345a6 window=0x7200000000 guest_base=0x400000
+[xp] 14:18:51.057 +0.85 dt=321 cpu=324 (thr 219) P=322 E=1 run=333 pgw=-1.0 GHz P=1.59 E=1.62 Minst=1909 IPC=3.70 mJ=192 pin=78 rdKB=1388 fpMB=856
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x1490fc000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x1491a4000)
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x149324000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x1493a8000)
+[bigres] tid=002c #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x7200310000 total=512 MB
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+E 2C [iOS-xins] tracker=0x148f94e50 UnityCrashHandler32.exe sec=0x7200401000-0x720046bb64
+D 2C Load module UnityCrashHandler32.exe (unitycrashhandler32.exe-f28fcca4db8c8eb3): 7200400000
+[swap] ml1077 backed 0x7102bf0000+0x800000 (file off 0 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x7200310000
+[nls-getptr] type=11 id=850 peb=0x7200310000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x14943e000)
+E 24 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x7178df0000 xend=0x71790bf906 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+D 24 Load module mono-2.0-bdwgc.dll (mono-2.0-bdwgc.dll-0f51c8a123c785b1): 7178DF0000
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x14945d000)
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+E 2C [iOS-xins] tracker=0x148f94e50 WININET.dll sec=0x7278d51000-0x7278d84f6c
+D 2C Load module WININET.dll (wininet.dll-7ed1ba985c3e1a82): 7278D50000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed\\mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed/mono/aot-cache/x86/mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=20127 peb=0x7200310000
+[xp-names] m740049 "wine-x18-exc"
+[xp] 14:18:51.382 +1.18 dt=325 cpu=557 (thr 556) P=547 E=10 run=581 pgw=-1.0 GHz P=1.60 E=1.62 Minst=3220 IPC=3.62 mJ=341 pin=539 rdKB=1204 fpMB=945
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[stp-emul] ml629 #1 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0de8 rw=0x70414bcde8 base 0x71044f0de8 -> 0x71044f0e08 (writeback)
+[stp-emul] ml629 #2 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0e08 rw=0x70414bce08 base 0x71044f0e08 -> 0x71044f0e28 (writeback)
+[stp-emul] ml629 #3 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0e28 rw=0x70414bce28 base 0x71044f0e28 -> 0x71044f0e48 (writeback)
+[stp-emul] ml629 #4 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0e48 rw=0x70414bce48 base 0x71044f0e48 -> 0x71044f0e68 (writeback)
+[stp-emul] ml629 #5 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0e68 rw=0x70414bce68 base 0x71044f0e68 -> 0x71044f0e88 (writeback)
+[swp-emul] ml626 #1 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0da4 rw=0x70414bcda4 in=0xf8 old=0x24
+[stp-emul] ml629 #6 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0f38 rw=0x70414bcf38 base 0x71044f0f38 -> 0x71044f0f58 (writeback)
+[stp-emul] ml629 #7 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0f58 rw=0x70414bcf58 base 0x71044f0f58 -> 0x71044f0f78 (writeback)
+[stp-emul] ml629 #8 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71044f0f78 rw=0x70414bcf78 base 0x71044f0f78 -> 0x71044f0f98 (writeback)
+[swp-emul] ml626 #2 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0f28 rw=0x70414bcf28 in=0xb4 old=0xffffffe0
+[swp-emul] ml626 #3 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0eb4 rw=0x70414bceb4 in=0x28 old=0x18
+[swp-emul] ml626 #4 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0ef0 rw=0x70414bcef0 in=0x184 old=0xc
+[swp-emul] ml626 #5 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0ec8 rw=0x70414bcec8 in=0x1ec old=0xfffffef4
+[swp-emul] ml626 #6 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0db8 rw=0x70414bcdb8 in=0x2fc old=0x4
+[swp-emul] ml626 #7 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f10e4 rw=0x70414bd0e4 in=0xfffffdb8 old=0xfffffce4
+[swp-emul] ml626 #8 insn=0xb8ea830a size=4 Rs=x10 Rt=x10 addr=0x71044f0eb4 rw=0x70414bceb4 in=0x28 old=0x28
+[xp] 14:18:51.680 +1.47 dt=299 cpu=498 (thr 481) P=487 E=11 run=527 pgw=-1.0 GHz P=1.60 E=1.72 Minst=2716 IPC=3.41 mJ=302 pin=3 rdKB=44 fpMB=976
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=81 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=82 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=87 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=82 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[win-name] #3 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[swap] ml1077 backed 0x7110cf0000+0x800000 (file off 8 MB): 16 MB in 2 extents, peak 16 MB, 0 refused
+[xp] 14:18:51.987 +1.78 dt=306 cpu=402 (thr 235) P=318 E=83 run=501 pgw=-1.0 GHz P=1.60 E=2.01 Minst=1446 IPC=2.14 mJ=177 pin=15 rdKB=4832 fpMB=1236
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=87 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=82 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists) OCCUPIED 0x7020000000+0x8000000 prot=3/3 shared=0  --> relaxing ceiling, retrying unclamped
+[wow-window] #11 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7300000000..0x8000000000
+[wow-window] #12 band below the 32-bit windows full: 0x800000 bytes placed above them in 0x7300000000..0x8000000000
+[wow-window] #13 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7300000000..0x8000000000
+[wow-window] #14 band below the 32-bit windows full: 0x800000 bytes placed above them in 0x7300000000..0x8000000000
+[jit-pool] image 0x71786d0000+0x13000 (?) → pool 0x1494e0000 used=0x14f4000/0x27000000 tramp+0x0
+ml957: ? backing 0x71786e0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[xp] 14:18:52.275 +2.07 dt=288 cpu=108 (thr 75) P=97 E=11 run=116 pgw=-1.0 GHz P=1.59 E=1.81 Minst=413 IPC=2.36 mJ=51 pin=32 rdKB=956 fpMB=1293
+[jit-pool] image 0x7178520000+0x12000 (?) → pool 0x1494f7000 used=0x150f000/0x27000000 tramp+0x0
+ml957: ? backing 0x7178530000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[footprint] rev=ml358 phys=1300 MB (peak 1300) internal=1207 MB compressed=92 MB external=107 MB reusable=1 MB (cycle=2)
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/Spooky Doorway/The Darkside Detective 2/Player.log
+[guest-log] #1 tid=0024     Renderer: Apple A15 GPU (ID=0x0)
+[wow-window] #15 band below the 32-bit windows full: 0x100000 bytes placed above them in 0x7300000000..0x8000000000
+[wow-window] #16 band below the 32-bit windows full: 0x800000 bytes placed above them in 0x7300000000..0x8000000000
+[swap] ml1077 backed 0x7114ba0000+0x2010000 (file off 16 MB): 48 MB in 3 extents, peak 48 MB, 0 refused
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[swap] ml1077 backed 0x7116bb0000+0x810000 (file off 48 MB): 56 MB in 4 extents, peak 56 MB, 0 refused
+[jit-pool] image 0x71784c0000+0x23000 (?) → pool 0x14950e000 used=0x1536000/0x27000000 tramp+0x0
+ml957: ? backing 0x71784e0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x71784a0000+0x7000 (?) → pool 0x149534000 used=0x153c000/0x27000000 tramp+0x0
+ml957: ? backing 0x71784a4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D B4 Load module avrt.dll (avrt.dll-cbfea88ff171de27): 71784A0000
+[image-reload] unmapped image 0x71784a0000+0x7000: 1 pool copy marked
+[swap] ml1077 stats: 56 MB file-backed now (peak 56), 4 extents, file used 56 of 4096 MB, backs 4 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 56 MB (peak 56), 0 MB kept in memory by swap-mb
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 4 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 77 MB available
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed\\UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed/mono/aot-cache/x86/UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #55 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed\\UnityEngine.PhysicsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed/mono/aot-cache/x86/UnityEngine.PhysicsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #57 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed\\UnityEngine.Physics2DModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #58 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed/mono/aot-cache/x86/UnityEngine.Physics2DModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed\\UnityEngine.ProfilerModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files\\Epic Games\\TheDarksideDetectiveSh5t8\\TheDarksideDetective2_Data\\Managed/mono/aot-cache/x86/UnityEngine.ProfilerModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-stk] sp+0x2a8 0x148d1a6ac = libwow64fex.dll+0x1056ac
+[guest-stk] sp+0x2b8 0x148d18574 = libwow64fex.dll+0x103574
+[guest-stk] sp+0x2d0 0x148d15558 = libwow64fex.dll+0x100558
+[guest-stk] sp+0x340 0x148d1565c = libwow64fex.dll+0x10065c
+[guest-stk] sp+0x348 0x148c2bba0 = libwow64fex.dll+0x16ba0
+[alloc-fail] ml814 #1 status=c0000018 hint=0x7104500000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=thedarksidedetective2.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x7104500000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[stale-heal]   1 slot(s) in the copy of 0x70ffac0000 (libwow64fex.dll) -> 0x1486b3ea4 for peb=0x717ffd0000 (owner=0x0 mapper=0x717ffd0000)
+[footprint] rev=ml358 phys=1162 MB (peak 1300) internal=968 MB compressed=190 MB external=111 MB reusable=1 MB (cycle=3)
+err:   [bc-decode] ml679 #0 BC7 1920x1080 level=0 slice=0 -> 4B/texel 8294400B
+[jit-pool] image 0x71784a0000+0xe000 (?) → pool 0x14954f000 used=0x1563000/0x27000000 tramp+0x0
+ml957: ? backing 0x71784ac000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e62717460843fd8): 71784A0000
+00d8:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00d8 status=00000001 caller=7BEF40C8
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+[swap] ml1077 backed 0x7121840000+0xfac000 (file off 56 MB): 71 MB in 5 extents, peak 71 MB, 0 refused
+err:   [bc-decode] ml679 #1 BC3 64x64 level=0 slice=0 -> 4B/texel 16384B
+[swap] ml1077 backed 0x71227f0000+0xfac000 (file off 71 MB): 87 MB in 6 extents, peak 87 MB, 0 refused
+[alloc-fail] ml814 #2 status=c0000018 hint=0x711b3a0000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=thedarksidedetective2.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x711b3a0000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[srv-conn-done] dport=443 event=|HUP err=61 fd=483 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[srv-conn-done] dport=443 event=|HUP err=61 fd=490 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[guest-log] #2 tid=004c Curl error 7: Failed to connect to config.uca.cloud.unity3d.com port 443: Connection refused
+err:   [bc-decode] ml679 #2 BC3 128x128 level=0 slice=0 -> 4B/texel 65536B
+err:   [bc-decode] ml679 #3 BC7 128x128 level=0 slice=0 -> 4B/texel 65536B
+err:   [bc-decode] ml679 #4 BC3 128x128 level=0 slice=0 -> 4B/texel 65536B
+err:   [bc-decode] ml679 #5 BC3 128x128 level=0 slice=0 -> 4B/texel 65536B
+[footprint] rev=ml358 phys=1290 MB (peak 1300) internal=905 MB compressed=373 MB external=217 MB reusable=1 MB (cycle=4)
+[footprint] rev=ml358 phys=1290 MB (peak 1300) internal=905 MB compressed=373 MB external=217 MB reusable=1 MB (cycle=5)
+[footprint] rev=ml358 phys=1284 MB (peak 1300) internal=869 MB compressed=401 MB external=249 MB reusable=1 MB (cycle=6)
+[swap] ml1077 backed 0x712cca0000+0xb94000 (file off 196 MB): 208 MB in 11 extents, peak 208 MB, 0 refused
+[swap] ml1077 backed 0x712d840000+0x12b0000 (file off 208 MB): 227 MB in 12 extents, peak 227 MB, 0 refused
+[swap] ml1077 backed 0x712eb00000+0x1158000 (file off 227 MB): 244 MB in 13 extents, peak 244 MB, 0 refused
+[swap] ml1077 backed 0x712fc60000+0xb94000 (file off 244 MB): 256 MB in 14 extents, peak 256 MB, 0 refused
+[swap] ml1077 backed 0x7130800000+0x1d68000 (file off 256 MB): 285 MB in 15 extents, peak 285 MB, 0 refused
+[swap] ml1077 backed 0x7132570000+0x1024000 (file off 285 MB): 301 MB in 16 extents, peak 301 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: program (responder)
+[14:19:18.773] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=65 resident=1194MB dbg=DEBUGGED rev=ml525
+[fault-cost] ml685 emulated-store faults=198279 total=1372 ms avg=6921 ns dropped=0 (one handler thread serves all threads)
+err:   [bc-census] ml653 periodic: 64 BC resources, 70 subresources
+err:   [bc-census] ml653   BC1_UNORM n=2 16KB max=128x128 mips=1 arr=1 cube=0 | use def=2 imm=0 dyn=0 stg=0 | data y=2 n=0 | cpu r=0 w=0 | bind srv=2 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM n=50 777KB max=128x128 mips=7 arr=1 cube=0 | use def=50 imm=0 dyn=0 stg=0 | data y=50 n=0 | cpu r=0 w=0 | bind srv=50 rt=0 uav=0
+err:   [bc-census] ml653   BC7_UNORM n=12 2201KB max=1920x1080 mips=1 arr=1 cube=0 | use def=12 imm=0 dyn=0 stg=0 | data y=12 n=0 | cpu r=0 w=0 | bind srv=12 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x1
+err:   [bc-census] ml653   SRV view fmt 98 (BC7_UNORM) x1
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71209b0000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=thedarksidedetective2.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x71209b0000 zb=0xffffffff hits=3 rev=ajan5-rockstar
+[file-census] r624 40s: case-sensitive=1 full-path-tries=1532 full-path-hits=801 component-lookups=4547 shortcut-hits=3142 misses=1344 scans=1405 entries-scanned=136387 us-in-lookup=1100295 (2% of the window) slowest=1.512 ms ...6FB8/Documents/wine/dosdevices/c:/windows/syswow64/psapi.dll
+[srv-conn-done] dport=443 event=|HUP err=61 fd=491 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[srv-conn-done] dport=443 event=|HUP err=61 fd=493 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[guest-log] #3 tid=006c Curl error 7: Failed to connect to cdp.cloud.unity3d.com port 443: Connection refused
+err:   [bc-decode] ml679 #512 BC3 256x256 level=0 slice=0 -> 4B/texel 262144B
+[fault-cost] ml685 emulated-store faults=398079 total=2745 ms avg=6896 ns dropped=0 (one handler thread serves all threads)
+[launch-view] dismissed reason=button logs=1
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=65% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595110 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=65% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170593cc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=65% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+D 24 Load module rsaenh.dll (rsaenh.dll-6cdd9371ff8cd2e5): 7178440000
+err:   [bc-census] ml653   BC7_UNORM n=90 11903KB max=1920x1080 mips=1 arr=1 cube=0 | use def=90 imm=0 dyn=0 stg=0 | data y=90 n=0 | cpu r=0 w=0 | bind srv=90 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x8
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x541
+err:   [bc-census] ml653   SRV view fmt 98 (BC7_UNORM) x89
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=0 CopyResource=0 CopySubresourceRegion=0 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 40934KB
+[rb-tex] madeira-bcd new readback #1: fmt 115 8x8 level 0 (texture 8x8, 1 mips)
+[srv-conn-done] dport=443 event=|HUP err=61 fd=540 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[srv-conn-done] dport=443 event=|HUP err=61 fd=541 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[14:19:37.441] [INFO] Game is presenting (#1, splash) — early detach in 20s
+D 24 Load module InControlNative.dll (incontrolnative.dll-e16f072c68d70581): 71783E0000
+D 24 Load module DINPUT8.dll (dinput8.dll-fa6b381494d15059): 7178390000
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71187d0000 size=0x20000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=thedarksidedetective2.exe tid=0024 size=0x20000 type=0x3000 prot=0x40 hint=0x71187d0000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #15 req_addr=0x7120350000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #5 status=c0000018 hint=0x7120350000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=thedarksidedetective2.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x7120350000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #16 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[fault-cost] ml685 emulated-store faults=597963 total=4219 ms avg=7056 ns dropped=0 (one handler thread serves all threads)
+[exec-alloc] NtAllocateVirtualMemory #17 req_addr=0x711d2f0000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #6 status=c0000018 hint=0x711d2f0000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=3 at 0x7027000000+0x800000
+[exec-alloc] NtAllocateVirtualMemory #18 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #19 req_addr=0x71242c0000 size=0x10000 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #20 req_addr=0x71242d0000 size=0x10000 type=0x3000 protect=0x40
+[file-census] r624 11s: case-sensitive=1 full-path-tries=169 full-path-hits=93 component-lookups=687 shortcut-hits=536 misses=150 scans=151 entries-scanned=4611 us-in-lookup=134174 (1% of the window) slowest=0.812 ms ...B8/Documents/wine/dosdevices/c:/windows/syswow64/dinput8.dll
+[jit-pool] image 0x7178370000+0xe000 (?) → pool 0x149633000 used=0x1647000/0x27000000 tramp+0x0
+ml957: ? backing 0x717837c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 104 Load module XInput1_4.dll (xinput1_4.dll-a61d7d3778d997a2): 7178370000
+[win-name] #14 hwnd=0x1003e class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #15 hwnd=0x1003e class='__wine_xinput_devnotify' text="" rev=ml853
+[win-name] #16 hwnd=0x10042 class='InControl' text="" rev=ml853
+[win-name] #17 hwnd=0x10046 class='IME' text="" rev=ml853
+[win-name] #18 hwnd=0x10046 class='IME' text="Default IME" rev=ml853
+[win-name] #19 hwnd=0x10042 class='InControl' text="InControl Message Window" rev=ml853
+[fault-cost] ml685 emulated-store faults=797891 total=5601 ms avg=7020 ns dropped=0 (one handler thread serves all threads)
+[14:19:48.792] [INFO] detach-wait: presents=1 running=1 elapsed=60s
+[window] 0x7048000000..0x7400000000 regions=33198 occupied=15229 MB of 15232 MB free=2 MB maxhole=0 MB@0x70ee740000 rev=ml787 (periodic)
+[window] 0x70e7000000..0x78e7000000 regions=1494 occupied=12852 MB of 32768 MB free=39828 MB maxhole=19913 MB@0x740a6f0000 rev=ml787 (layerkit-span)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=72 resident=1586MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 stats: 668 MB file-backed now (peak 668), 31 extents, file used 668 of 4096 MB, backs 31 releases 0 unbacks 0 refused 0 | coverage classic: disk 423 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 668 MB (peak 668), 0 MB kept in memory by swap-mb
+[fault-cost] ml685 emulated-store faults=997871 total=7027 ms avg=7042 ns dropped=0 (one handler thread serves all threads)
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=110 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=105 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=110 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=105 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x100000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=110 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x7100000000 size=0x800000 align=0x10000 bottom-up tries=8 skips=8 | seen=0x7027000000..0x7100000000 views=105 maxgap=0xc0000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7027000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[fault-cost] ml685 emulated-store faults=1197800 total=8419 ms avg=7029 ns dropped=0 (one handler thread serves all threads)
+[14:19:57.618] [OK] Early detach: game presenting and settled
+[fault-cost] ml685 emulated-store faults=1397796 total=9780 ms avg=6997 ns dropped=0 (one handler thread serves all threads)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=62% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[14:19:59.619] [INFO] Detaching debugger...
+[fault-cost] ml685 emulated-store faults=1597791 total=11149 ms avg=6978 ns dropped=0 (one handler thread serves all threads)
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=73 resident=1611MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=71 resident=1592MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 stats: 668 MB file-backed now (peak 668), 31 extents, file used 668 of 4096 MB, backs 31 releases 0 unbacks 0 refused 0 | coverage classic: disk 660 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 668 MB (peak 668), 0 MB kept in memory by swap-mb
+[freeze] alive t+150s beats=5 gaps=0 iter=595 gen=1 threads=70 resident=1585MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+180s beats=6 gaps=0 iter=714 gen=1 threads=71 resident=1593MB dbg=DEBUGGED rev=ml525
+[swap] ml1077 stats: 684 MB file-backed now (peak 684), 32 extents, file used 684 of 4096 MB, backs 32 releases 0 unbacks 0 refused 0 | coverage classic: disk 671 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 684 MB (peak 684), 0 MB kept in memory by swap-mb
+[thread-sample] ml876 b1 "" teb=0x0 cpu=4% RUN pc=libsystem_platform.dylib`_platform_memmove+0xb4 lr=SwiftUICore`<redacted>+0x1c sp=0x16fb350d0 NATIVE (unresolved: header unreadable) sp-cand=[ ]
+[swap] ml1077 stats: 684 MB file-backed now (peak 684), 32 extents, file used 684 of 4096 MB, backs 32 releases 0 unbacks 0 refused 0 | coverage classic: disk 681 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 684 MB (peak 684), 0 MB kept in memory by swap-mb
+[freeze] alive t+270s beats=9 gaps=0 iter=1072 gen=1 threads=69 resident=1580MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[freeze] alive t+301s beats=10 gaps=0 iter=1192 gen=1 threads=69 resident=1580MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=33257 occupied=15228 MB of 15232 MB free=3 MB maxhole=1 MB@0x70e7c40000 rev=ml787 (periodic)
+[window] 0x70e7000000..0x78e7000000 regions=1559 occupied=12892 MB of 32768 MB free=39743 MB maxhole=19868 MB@0x740d3f0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 700 MB file-backed now (peak 700), 33 extents, file used 700 of 4096 MB, backs 33 releases 0 unbacks 0 refused 0 | coverage classic: disk 683 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 700 MB (peak 700), 0 MB kept in memory by swap-mb
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[14:24:02.579] [INFO] [session] length=318s partial=1 play=0s frames=0 stalls=0/0s peak=1844MB limit=4095MB thermal=nominal lpm=1 api=OpenGL/32 res=1416x656 cap=60 game=The Darkside Detective A Fumble in the Dark
+[hwinput] keyboard focus: program (app active)
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[freeze] alive t+331s beats=11 gaps=0 iter=1310 gen=1 threads=71 resident=1222MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+[freeze] alive t+361s beats=12 gaps=0 iter=1429 gen=1 threads=73 resident=1079MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=33257 occupied=15228 MB of 15232 MB free=3 MB maxhole=1 MB@0x70e7c40000 rev=ml787 (periodic)
+[window] 0x70e7000000..0x78e7000000 regions=1559 occupied=12892 MB of 32768 MB free=39743 MB maxhole=19868 MB@0x740d3f0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 700 MB file-backed now (peak 700), 33 extents, file used 700 of 4096 MB, backs 33 releases 0 unbacks 0 refused 0 | coverage classic: disk 684 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 700 MB (peak 700), 0 MB kept in memory by swap-mb
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[fault-cost] ml685 emulated-store faults=15597242 total=106895 ms avg=6853 ns dropped=1 (one handler thread serves all threads)
+[freeze] alive t+391s beats=13 gaps=0 iter=1549 gen=1 threads=69 resident=1085MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=62% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595110 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[thread-sample] ml876 b1 "wine-x18-exc" teb=0x0 cpu=62% RUN pc=libsystem_kernel.dylib`_kernelrpc_mach_port_deallocate_trap+0x8 lr=libsystem_kernel.dylib`mach_port_deallocate+0x1c sp=0x1705951b0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=62% RUN pc=libsystem_kernel.dylib`_kernelrpc_mach_port_deallocate_trap+0x8 lr=libsystem_kernel.dylib`mach_port_deallocate+0x1c sp=0x1705951b0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=62% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[fault-cost] ml685 emulated-store faults=15797235 total=108247 ms avg=6852 ns dropped=1 (one handler thread serves all threads)
+[fault-cost] ml685 emulated-store faults=15997229 total=109605 ms avg=6851 ns dropped=1 (one handler thread serves all threads)
+[fault-cost] ml685 emulated-store faults=16197223 total=110968 ms avg=6851 ns dropped=1 (one handler thread serves all threads)
+[fault-cost] ml685 emulated-store faults=16397213 total=112324 ms avg=6850 ns dropped=1 (one handler thread serves all threads)
+[fault-cost] ml685 emulated-store faults=16597202 total=113683 ms avg=6849 ns dropped=1 (one handler thread serves all threads)
+[footprint] rev=ml358 phys=1675 MB (peak 1843) internal=638 MB compressed=676 MB external=446 MB reusable=15 MB (cycle=204)
+[footprint] rev=ml358 phys=1667 MB (peak 1843) internal=631 MB compressed=676 MB external=446 MB reusable=15 MB (cycle=205)
+[footprint] rev=ml358 phys=1666 MB (peak 1843) internal=630 MB compressed=676 MB external=447 MB reusable=16 MB (cycle=206)
+[frontend] graceful close requested
+[fault-cost] ml685 emulated-store faults=16797191 total=115073 ms avg=6850 ns dropped=1 (one handler thread serves all threads)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=61% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1705950a0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x7200310000 modules=9 first=UnityCrashHandler32.exe@0x7200400000
+[thread-sample] ml876 b1 "wine-x18-exc" teb=0x0 cpu=61% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170595030 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1666 MB (peak 1843) internal=630 MB compressed=676 MB external=447 MB reusable=16 MB (cycle=207)
+[srv-input] btn msg=0x201 at (680,323) hit win=0002002e thread=0x138b3b900
+[footprint] rev=ml358 phys=1667 MB (peak 1843) internal=631 MB compressed=676 MB external=447 MB reusable=15 MB (cycle=208)
+[freeze] alive t+421s beats=14 gaps=0 iter=1668 gen=1 threads=73 resident=1095MB dbg=DEBUGGED rev=ml525
+[fault-cost] ml685 emulated-store faults=16997188 total=116445 ms avg=6850 ns dropped=1 (one handler thread serves all threads)
+[waiters]  tid=00c8 addr=0x711b1ee358 age=416s INF w0=00000001 w1=00000000
+[waiters]  tid=00d4 addr=0x71130783b4 age=416s INF w0=00000000 w1=00000000
+[waiters]  tid=00d0 addr=0x71130783b4 age=416s INF w0=00000000 w1=00000000
+[waiters]  tid=00c4 addr=0x711b1ee350 age=416s INF w0=00000001 w1=00000000
+[waiters]  tid=00ec addr=0x7112d174ec age=373s INF w0=00000018 w1=24ec0a68
+[waiters]  tid=0100 addr=0x7112d174ec age=373s INF w0=00000018 w1=24ec0a68
+[footprint] rev=ml358 phys=1668 MB (peak 1843) internal=631 MB compressed=676 MB external=448 MB reusable=15 MB (cycle=209)
+[xp] 14:25:51.280 +421.08 dt=255 cpu=287 (thr 288) P=276 E=11 run=335 pgw=-1.0 GHz P=1.59 E=1.86 Minst=1239 IPC=2.69 mJ=146 pin=2 rdKB=0 fpMB=1667
+[frontend] graceful close requested
+[xp] 14:25:51.569 +421.37 dt=289 cpu=343 (thr 342) P=331 E=12 run=398 pgw=-1.0 GHz P=1.59 E=1.62 Minst=1668 IPC=3.06 mJ=183 pin=4 rdKB=0 fpMB=1668
+[xp] 14:25:51.874 +421.67 dt=305 cpu=323 (thr 323) P=311 E=11 run=377 pgw=-1.0 GHz P=1.58 E=1.62 Minst=1598 IPC=3.13 mJ=174 pin=3 rdKB=0 fpMB=1666
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 14:25:52.178 +421.98 dt=304 cpu=317 (thr 316) P=255 E=63 run=575 pgw=-1.0 GHz P=1.59 E=2.00 Minst=1149 IPC=2.16 mJ=136 pin=3 rdKB=0 fpMB=1666
+[xp] 14:25:52.439 +422.24 dt=261 cpu=269 (thr 270) P=210 E=58 run=452 pgw=-1.0 GHz P=1.56 E=2.01 Minst=1029 IPC=2.31 mJ=115 pin=2 rdKB=0 fpMB=1666
+[xp] 14:25:52.764 +422.56 dt=324 cpu=344 (thr 343) P=315 E=29 run=422 pgw=-1.0 GHz P=1.58 E=1.93 Minst=1666 IPC=3.00 mJ=180 pin=5 rdKB=0 fpMB=1666
+[14:25:52.781] [INFO] [session] length=428s partial=1 play=0s frames=0 stalls=0/0s peak=1844MB limit=4095MB thermal=nominal lpm=1 api=OpenGL/32 res=1416x656 cap=60 game=The Darkside Detective A Fumble in the Dark

@@ -2,12 +2,13 @@
  "dialogs": [],
  "end": {},
  "matched": [
-  "d3d12-pso-cached-blob-fatal"
+  "d3d12-pso-cached-blob-fatal",
+  "dock-game-stub-abort-session-open"
  ],
  "next": [
   "d3d12-pso-cached-blob = 1"
  ],
- "note": "Resident Evil Requiem demo (Steam 4459100, re9demo.exe, Direct3D 12), build 592, iPhone18,3: after its first two pipelines the engine calls GetCachedBlob (E_NOTIMPL) and its error dialog hits an unimplemented comctl32 ordinal. Send Log SAG071, trimmed. From build 598 auto-tune proposes d3d12-pso-cached-blob = 1.",
+ "note": "Resident Evil Requiem demo (Steam 4459100, re9demo.exe, Direct3D 12), build 592, iPhone18,3: after its first two pipelines the engine calls GetCachedBlob (E_NOTIMPL) and its error dialog hits an unimplemented comctl32 ordinal. Send Log SAG071, trimmed. From build 598 auto-tune proposes d3d12-pso-cached-blob = 1. Round 630: the comctl32 stub abort (exit 0x80000100) also left the Dock session open (launch-game-ended=1, then detach-wait running=1), so dock-game-stub-abort-session-open (fixedIn 630) matches as well; the proposal stays d3d12-pso-cached-blob = 1.",
  "outcome": "crashed",
  "stage": 3,
  "status": "trying"

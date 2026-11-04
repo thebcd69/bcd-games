@@ -549,8 +549,12 @@ check('a listed name is linked over its shipped name (setupapi-optin.dll -> setu
       'NSString *dll = [name stringByAppendingString:@".dll"];' in blk and
       'use_arm64ec\n                    ? @[ [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"], sys32Dir ]' in blk and
       'createSymbolicLinkAtPath:dst withDestinationPath:src' in blk)
+# Round 630 (agent G2 S18): the dbgcore.dll link to the shipped dbghelp.dll adds two removals, of dbgcore.dll only (its own link, and a
+# stale one that points at dbghelp.dll).
+_dbg = blk[blk.index('[dir stringByAppendingPathComponent:@"dbgcore.dll"]'):] if '@"dbgcore.dll"' in blk else ''
 check('a name that is not listed loses only a link to its -optin file: never the shipped setupapi.dll the farm just linked',
-      '[to.lastPathComponent isEqualToString:file]' in blk and blk.count('removeItemAtPath:dst') == 2 and
+      '[to.lastPathComponent isEqualToString:file]' in blk and blk.count('removeItemAtPath:dst') == 2 + _dbg.count('removeItemAtPath:dst') and
+      _dbg.count('removeItemAtPath:dst') == 2 and 'else if (to && [to isEqualToString:dbghelp]) [fm removeItemAtPath:dst error:nil];' in _dbg and
       'destinationOfSymbolicLinkAtPath:dst' in blk)
 check('it says what it linked', 'MADEIRA_OPTIN_DLLS: %s -> %s' in blk)
 
