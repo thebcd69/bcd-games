@@ -97,6 +97,9 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
     private var owns = false
     private var last: UInt16 = 0
     private var announced = false
+    private var heldNavigation: UInt16 = 0
+    private var nextNavigationRepeat: TimeInterval = 0
+    private let duoNavigation = BCDDuoFeatures.active
     private let allowed = MadeiraConfig.flag("MADEIRA_FRONTEND_CONTROLLER")
     /// BCD (2026-10-18): holding the Home button opens and closes the in-game menu (BCDSessionLive.swift).
     static let homeHold = MadeiraConfig.flag("MADEIRA_MENU_HOME_HOLD", fallback: false)   // 1: holding a controller's Home (PS) button for half a second opens and closes BCD's in-game menu; iOS hands Home over at once only with env.MADEIRA_PAD_SYSTEM_GESTURES = 1. Off (default): Back + Start and the menu button only
@@ -106,7 +109,12 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
     private var chord = BCDChordTracker()   // madeira-bcd (round 604): hold Start opens the menu, when the player chose it in the menu (BCDSessionFeel.swift)
     var ownsInput: Bool { lock.lock(); defer { lock.unlock() }; return enabled && owns }
     func configure(enabled: Bool, ownsInput: Bool) {
-        lock.lock(); self.enabled = enabled && allowed; owns = ownsInput; lock.unlock()
+        lock.lock()
+        if self.enabled != (enabled && allowed) || owns != ownsInput {
+            heldNavigation = 0; nextNavigationRepeat = 0
+        }
+        self.enabled = enabled && allowed; owns = ownsInput
+        lock.unlock()
     }
     /// One sample of player 1's pad, in XInput button bits and stick units.
     func sample(buttons raw: UInt16, lx: Int16, ly: Int16) {
@@ -117,7 +125,20 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
             if lx < -16000 { buttons |= 4 }; if lx > 16000 { buttons |= 8 }
             if ly > 16000 { buttons |= 1 }; if ly < -16000 { buttons |= 2 }
         }
-        let pressed = buttons & ~last; last = buttons
+        var pressed = buttons & ~last; last = buttons
+        // The live frontend uses this sampler, not BCDFocus's preview polling loop.
+        // Repeat only directions; never repeat A/B, tab changes, or a destructive action.
+        if duoNavigation {
+            let direction = owns ? buttons & 0x0f : 0
+            let now = ProcessInfo.processInfo.systemUptime
+            if direction != heldNavigation {
+                heldNavigation = direction
+                nextNavigationRepeat = now + 0.35
+            } else if direction != 0 && now >= nextNavigationRepeat {
+                if pressed & ~UInt16(0x0f) == 0 { pressed |= direction }
+                nextNavigationRepeat = now + 0.12
+            }
+        }
         let own = owns, announce = !announced; announced = true
         var homeHeld = false
         if holdHome || BCDChordSetting.mode == .holdGuide { homeHeld = holdingHome(buttons) }   // BCD: env.MADEIRA_MENU_HOME_HOLD (opt-in), or the menu's "Hold Home"; off, nothing is timed
@@ -716,6 +737,31 @@ final class LibraryModel: ObservableObject {
     }
     @Published var error: String?
     @Published var sessionMessage = ""
+    @Published var desktopHome = false
+    @Published var desktopCloseError: String?
+    var desktopClosing: Bool { activeEntry?.desktop == true && quitRequested }
+
+    func showDesktopHome() {
+        guard BCDDuoFeatures.active, activeEntry?.desktop == true, !launching else { return }
+        LibraryKeyboard.hide()
+        if HardwareInput.shared.pointerHeldByProgram { HardwareInput.shared.togglePointerLock(why: "BCD Home") }
+        menu = false
+        desktopHome = true
+        MetalHostView.shared.isHidden = true
+        winios_compositor_set_backgrounded(1)
+        GamepadInput.shared.setKeyboardMouse(nil)
+        LibraryController.shared.configure(enabled: true, ownsInput: true)
+        NotificationCenter.default.post(name: Notification.Name("BCDDesktopDidQuit"), object: nil)
+    }
+
+    func showWindowsDesktop() {
+        guard current != nil, activeEntry?.desktop == true, !quitRequested else { return }
+        desktopHome = false
+        winios_compositor_set_backgrounded(0)
+        MetalHostView.shared.isHidden = false
+        applyControllerMode()
+        LibraryController.shared.configure(enabled: true, ownsInput: false)
+    }
     @Published var launching = false
     @Published var overlayFields = ["FPS", "Frame time", "RAM", "Battery"]
     private var launchPresent: UInt64 = 0
@@ -1220,6 +1266,9 @@ final class LibraryModel: ObservableObject {
     /// `dock`: the game a Madeira Dock start launches (DockStartScreen).
     func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil) {
         wine_exit_status_reset()
+        desktopHome = BCDDuoFeatures.active && entry.desktop == true
+        desktopCloseError = nil
+        winios_compositor_set_backgrounded(desktopHome ? 1 : 0)
         quitRequested = false
         endedByWatch = nil; endWatchNote = ""
         endedByDockGame = false; dockEndNote = ""; dockFailedAt = nil; endedByDockFailure = nil; endedByDockShortExit = nil
@@ -1264,7 +1313,11 @@ final class LibraryModel: ObservableObject {
         padMouseVertical = GamepadInput.keyboardMouseAvailable ? (entry.padMouseVertical ?? 1) : 1
         controllerMode = GamepadInput.keyboardMouseAvailable ? entry.controllerMode : nil
         applyControllerMode()
-        MetalHostView.shared.isHidden = false
+        if desktopHome {
+            GamepadInput.shared.setKeyboardMouse(nil)
+            LibraryController.shared.configure(enabled: true, ownsInput: true)
+        }
+        MetalHostView.shared.isHidden = desktopHome
         ProMotionIntent.apply(mode: entry.effectiveFPSMode)
         // madeira-bcd (round 626, agent H S1): the display rate this session holds and the one Windows programs are told (log only)
         LogStore.shared.log("[display-rate] session start: limit=mode \(entry.effectiveFPSMode) panel_max=\(ProMotionIntent.panelMaxFPS) Hz "
@@ -1664,11 +1717,38 @@ final class LibraryModel: ObservableObject {
         saveCurrentProfile()
     }
     func showMenu() {
+        LogStore.shared.log("[session-menu] requested home=\(desktopHome) current=\(current != nil)")
         LibraryKeyboard.hide()
         LibraryController.shared.configure(enabled: true, ownsInput: true)
         menu = true
     }
     func requestQuit() {
+        guard current != nil else { return }
+        if BCDDuoFeatures.active, activeEntry?.desktop == true {
+            guard !quitRequested, !launching else { return }
+            quitRequested = true
+            BCDPauseLive.resume()
+            LibraryKeyboard.hide()
+            sessionMessage = "Closing Windows…"
+            menu = false
+            let session = current
+            DispatchQueue.global(qos: .userInitiated).async {
+                let result = wine_session_quit_desktop()
+                if result <= 0 {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self, self.current == session else { return }
+                        if result == 0 {
+                            self.quitRequested = false
+                            self.sessionMessage = "Windows is not ready to close. Try again once startup finishes."
+                            return
+                        }
+                        self.desktopCloseError = "Windows could not finish closing. Restart BCD to recover."
+                        self.sessionMessage = self.desktopCloseError ?? ""
+                    }
+                }
+            }
+            return
+        }
         BCDPauseLive.resume()   // madeira-bcd (round 604): a paused game could not answer Alt+F4; nothing when it is not paused
         LibraryKeyboard.hide()
         quitRequested = true
@@ -1721,6 +1801,7 @@ final class LibraryModel: ObservableObject {
         }
     }
     private func finish() {
+        let returnHome = quitRequested && activeEntry?.desktop == true
         BCDSessionRecorder.sessionEnded()   // madeira-bcd: the [session] summary line, and the open-session marker goes (BCDSessionRecorderLive.swift)
         // madeira-bcd: auto-tune reads this session's log afterwards (AutoTune.swift); off, nothing.
         if AutoTune.enabled { autoTuneSessionEnded() }
@@ -1748,6 +1829,7 @@ final class LibraryModel: ObservableObject {
         controls.controls = savedControls; controls.visible = savedVisible; controls.sizeScale = savedSize
         if ControlPresetsModel.enabled { controls.layoutID = savedLayout }
         current = nil; activeEntry = nil; menu = false; sessionMessage = ""
+        desktopHome = false
         desktopEndsAfter = nil; desktopNotices = []
         displayMode = .fit
         LogStore.shared.setDisplayActive(true)
@@ -1760,6 +1842,9 @@ final class LibraryModel: ObservableObject {
         BCDOrientationLive.sessionEnded()   // madeira-bcd: the interface follows the device again; with no lock on, nothing to undo
         BCDFeelLive.sessionEnded()   // madeira-bcd (round 604): the menu's session settings are put back; the gate of Pause opens
         ThermalPacing.shared.end()
+        if returnHome {
+            NotificationCenter.default.post(name: Notification.Name("BCDDesktopDidQuit"), object: nil)
+        }
         fputs("[frontend] returned to library\n", stderr)
     }
     /// madeira-bcd: what auto-tune needs from a session that ended (AutoTune.swift).

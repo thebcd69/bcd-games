@@ -218,11 +218,22 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
         store.games = [portal, wc3]
         check("X on a Library card names its game", BCDMenuModel.gameID(focused: "library.game.steam.620", store: store) == "steam.620")
         check("X on a recent card names its game", BCDMenuModel.gameID(focused: "home.recent.local.1", store: store) == "local.1")
+        check("Duo hero names its visible game even when another entry was played last",
+              BCDMenuModel.gameID(focused: "home.continue.local.other", store: store) == "local.other")
         check("X on Continue playing names the game to continue", BCDMenuModel.gameID(focused: "home.continue", store: store) == "steam.620")
         check("X anywhere else names nothing",
               BCDMenuModel.gameID(focused: "library.add", store: store) == nil && BCDMenuModel.gameID(focused: "home.add", store: store) == nil
               && BCDMenuModel.gameID(focused: "menu.item.play", store: store) == nil && BCDMenuModel.gameID(focused: nil, store: store) == nil)
 
+        var dismissedPrompt = 0
+        let prompt = BCDMenuModel()
+        prompt.show(BCDMenuContent(title: "Steam Cloud", items: [], message: "Choose saves", cancel: { dismissedPrompt += 1 }))
+        prompt.dismiss()
+        check("prompt B waits until its controller layer closes", dismissedPrompt == 0)
+        prompt.closed()?()
+        check("prompt cancellation runs exactly once after restoration", dismissedPrompt == 1)
+        prompt.closed()?()
+        check("a closed prompt cannot replay its callback", dismissedPrompt == 1)
         print(failures == 0 ? "menu rules: all passed" : "menu rules: \(failures) failed")
         exit(failures == 0 ? 0 : 1)
     }

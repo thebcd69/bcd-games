@@ -76,6 +76,8 @@ void winios_cursor_move(int x, int y);
  * mapping (0 when there is no desktop). */
 unsigned long long winios_surface_present_count(void);
 int winios_compositor_set_hidden(int hidden);
+// Duo Home can keep the desktop running before its compositor view exists.
+void winios_compositor_set_backgrounded(int backgrounded);
 
 /* Game-mode windows (Winios.m). The window a game session's swapchain
  * presents from (IOSDisplayShim) is never drawn as a GDI window; a Wine

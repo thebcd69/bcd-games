@@ -378,6 +378,15 @@ int send_thread_signal( struct thread *thread, int sig )
 {
     int ret = -1;
     mach_port_t process_port = get_process_port( thread->process );
+#ifdef WINE_IOS
+    // Confirmed desktop shutdown only: all Wine pseudo-processes live in this
+    // task, and unix_tid is their registered Mach thread port. The regular path
+    // deliberately lacks a task port on iOS; keep it unchanged for other signals.
+    extern int g_wineserver_desktop_shutdown;
+    if (!process_port && sig == SIGQUIT &&
+        __atomic_load_n(&g_wineserver_desktop_shutdown, __ATOMIC_ACQUIRE) == 2)
+        process_port = mach_task_self();
+#endif
 
     if (thread->unix_pid != -1 && process_port)
     {

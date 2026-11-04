@@ -18,6 +18,10 @@ const char *wineserver_fatal_message(void);
  * its main loop: the point from which Wine may start. */
 int wineserver_is_ready(void);
 
+// Confirmed desktop Quit: request guest termination on the server thread.
+// Stops Windows only; call wineserver_stop off the main queue to await completion.
+int wineserver_request_desktop_shutdown(void);
+
 // Stop the wineserver (signals the thread to exit)
 void wineserver_stop(void);
 

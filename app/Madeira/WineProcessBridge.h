@@ -52,6 +52,9 @@ void wine_exit_status_reset(void);
 // the wineserver stopped). Blocks until the wineserver thread is joined: call it off the main queue.
 int wine_launched_exit_stuck(int32_t *code, double *seconds);
 void wine_session_abandon(void);
+// Confirmed Windows desktop Quit; terminates the whole guest, keeps BCD alive.
+// Blocks for server shutdown: call off the main queue.
+int wine_session_quit_desktop(void);
 // Processes the program started that still run, not counting Wine's own (explorer, services, winedevice,
 // conhost, plugplay, rpcss, svchost, the Dock host) or crash reporters and helpers (process_ios.c). Their
 // file names go to names. A child that could not be tracked counts as running.

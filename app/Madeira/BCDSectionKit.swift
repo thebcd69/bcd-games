@@ -107,12 +107,26 @@ extension BCDSectionKit {
                             guard focus.controllerActive, let id, id.hasPrefix(focusPrefix) else { return }
                             withAnimation(.easeOut(duration: 0.2)) { reader.scrollTo(id, anchor: .center) }
                         }
+                        .onChange(of: focus.controllerActive) { _, active in
+                            if BCDDuoFeatures.active && active { reveal(reader) }
+                        }
+                        .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in
+                            if BCDDuoFeatures.active { reveal(reader) }
+                        }
                     }
                 } else {
                     stack
                 }
             }
             .environment(\.bcdSectionScale, pad ? 1.12 : 1)
+        }
+
+        private func reveal(_ reader: ScrollViewProxy) {
+            guard focus.controllerActive, let id = focus.focused, id.hasPrefix(focusPrefix) else { return }
+            DispatchQueue.main.async {
+                guard focus.focused == id else { return }
+                withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
+            }
         }
 
         private var stack: some View {

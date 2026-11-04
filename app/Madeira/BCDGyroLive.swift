@@ -92,7 +92,7 @@ final class BCDGyroLive: @unchecked Sendable {
         let entry = library.activeEntry
         let wanted = entry.map { BCDGyroStore.settings($0.windowsPath) } ?? BCDGyroSettings()
         if observers.isEmpty { appActive = UIApplication.shared.applicationState == .active }
-        let playing = library.current != nil && !library.launching && !library.menu && appActive
+        let playing = library.current != nil && !library.desktopHome && !library.launching && !library.menu && appActive
         let on = wanted.isOn && playing && entry != nil
         let wasStick = Self.stickActive
         lock.lock()
@@ -251,7 +251,7 @@ struct BCDGyroSessionHook: ViewModifier {
     /// so the change is read a moment later.
     @MainActor private static let changes: AnyPublisher<Void, Never> = {
         let library = LibraryModel.shared
-        return Publishers.Merge3(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () })
+        return Publishers.Merge4(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () }, library.$desktopHome.map { _ in () })
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }()

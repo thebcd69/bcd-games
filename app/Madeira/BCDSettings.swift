@@ -242,9 +242,9 @@ struct BCDSettingsReading: Identifiable {
     /// Shows a section beside the list; its rows report their order once drawn.
     private func show(_ section: BCDSettingsSection) {
         guard section != selected else { return }
-        selected = section
         order = []
         focusFirst = false
+        selected = section
     }
 
     /// The ring reached a row of the list some other way (the nearest-control rule from a
@@ -289,24 +289,24 @@ struct BCDSettingsReading: Identifiable {
     private func enter(_ section: BCDSettingsSection, first: String?) {
         let sameSection = section == selected
         let fresh = !sameSection || (mode == .stacked && !pushed)
+        let immediate: String?
+        if retainsDetail && sameSection { immediate = first ?? order.first }
+        else if !fresh { immediate = first }
+        else { immediate = nil }
+        // Publishing selection can synchronously deliver the new page's row preferences.
+        // Establish entry intent first; never clear those fresh rows after publishing it.
+        if immediate != nil { focusFirst = false }
+        else { order = []; focusFirst = true }
         selected = section
         if (retainsDetail || mode == .stacked) && !pushed { withAnimation(.easeOut(duration: 0.22)) { pushed = true } }
-        if retainsDetail && sameSection, let target = first ?? order.first {
-            focusFirst = false
-            setFocus(target)
-        } else if !fresh, let first {
-            setFocus(first)
-        } else {
-            order = []
-            focusFirst = true
-        }
+        if let immediate { setFocus(immediate) }
     }
 
     private func leave(_ section: BCDSettingsSection) {
         if retainsDetail || mode == .stacked {
-            withAnimation(.easeOut(duration: 0.22)) { pushed = false }
             if !retainsDetail { order = [] }
             focusFirst = false
+            withAnimation(.easeOut(duration: 0.22)) { pushed = false }
         }
         setFocus(BCDSettingsID.list(section))
     }
@@ -430,7 +430,7 @@ struct BCDSettingsReading: Identifiable {
 
     /// The buttons and their hints for where the ring is.
     func installButtons() {
-        guard let focus else { return }
+        guard let focus, !focus.layerOpen || coveredLayer.map(focus.ownsLayer) == true else { return }
         let id = focus.focused
         var list: [(BCDHint, () -> Void)] = []
         if let covered {
@@ -443,7 +443,12 @@ struct BCDSettingsReading: Identifiable {
             list = [(BCDHint(button: .b, title: "Close"), { [weak self] in self?.back() })]
         } else {
             let onList = id.flatMap(BCDSettingsID.listSection) != nil
-            list.append((BCDHint(button: .a, title: onList ? "Open" : steps(id) ? "Next" : "Choose"), {}))
+            list.append((BCDHint(button: .a, title: onList ? "Open" : steps(id) ? "Next" : "Choose"), { [weak self] in
+                // A native List may not have materialized the newly selected sidebar row yet.
+                guard let self, self.retainsDetail, let id = self.focus?.focused,
+                      let section = BCDSettingsID.listSection(id) else { return }
+                self.open(section)
+            }))
             if let id, resetters[id] != nil {
                 list.append((BCDHint(button: .y, title: "Default"), { [weak self] in self?.resetFocused() }))
             }
@@ -1284,7 +1289,8 @@ struct BCDDuoSettingsRoot: View {
         .onDisappear { if active { BCDDuoPageOwner.release(owner) } }
         .onChange(of: active) { _, value in if value { start() } else { BCDDuoPageOwner.release(owner) } }
         .onChange(of: requestID) { _, _ in if let section { model.go(to: section) } }
-        .onChange(of: focus.focused) { _, id in
+        .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, id in
             guard active else { return }
             model.focusMoved(to: id); model.installButtons()
         }
@@ -1343,11 +1349,26 @@ struct BCDDuoSettingsRoot: View {
             .background { BCDBackdrop() }
             .navigationTitle("Settings")
             .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
             .onChange(of: focus.focused) { _, id in
                 guard focus.controllerActive, let id, BCDSettingsID.listSection(id) != nil else { return }
-                withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo(id) }
+                revealSidebar(id, proxy)
             }
-            .onAppear { proxy.scrollTo(BCDSettingsID.list(model.selected)) }
+            .onChange(of: focus.controllerActive) { _, active in
+                if active, let id = focus.focused { revealSidebar(id, proxy) }
+            }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in
+                if focus.controllerActive, let id = focus.focused { revealSidebar(id, proxy) }
+            }
+            .onAppear { proxy.scrollTo(BCDSettingsID.list(model.selected), anchor: .center) }
+        }
+    }
+
+    private func revealSidebar(_ id: String, _ proxy: ScrollViewProxy) {
+        guard BCDSettingsID.listSection(id) != nil else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { proxy.scrollTo(id, anchor: .center) }
         }
     }
 
@@ -1396,6 +1417,7 @@ struct BCDDuoSettingsRoot: View {
             }
         }
         .padding(.horizontal, layout == .phonePortrait ? 16 : layout.gutter).frame(height: 40)
+        .background(BCDStyle.ground.ignoresSafeArea(edges: .bottom))
         .overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke.opacity(0.7)).frame(height: 1) }
     }
 }

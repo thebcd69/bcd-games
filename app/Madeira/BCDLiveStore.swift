@@ -105,7 +105,29 @@ import os
             .sink { [weak self] in self?.refreshSystem() }
             .store(in: &watchers)
         // A game runs from LibraryModel.begin until its session ends (finish, or a failed launch).
-        library.$current.sink { [weak self] current in self?.session(running: current != nil) }.store(in: &watchers)
+        Publishers.CombineLatest4(library.$current, library.$desktopHome, library.$sessionMessage, library.$launching)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] current, home, _, launching in
+                guard let self else { return }
+                self.store.windowsRunning = current != nil && library.activeEntry?.desktop == true
+                self.store.windowsStarting = self.store.windowsRunning && launching
+                self.store.windowsClosing = library.desktopClosing
+                self.store.windowsError = library.desktopCloseError
+                self.store.windowsNeedsRestart = current == nil && LibraryModel.sessionsThisRun > 0
+                self.session(running: current != nil && !home)
+            }.store(in: &watchers)
+        store.showWindows = { library.showWindowsDesktop() }
+        store.stopWindows = { library.requestQuit() }
+        store.restartWindows = { library.restartNotice = LibraryModel.restartMessage }
+        store.closeForRestart = {
+            BCDSessionRecorder.closingOnPurpose()
+            exit(0)
+        }
+        library.$restartNotice.compactMap { $0 }.receive(on: DispatchQueue.main).sink { [weak self] message in
+            guard BCDDuoFeatures.active else { return }
+            library.restartNotice = nil
+            self?.store.restartMessage = message
+        }.store(in: &watchers)
         rebuild()
         refreshSystem()
     }
@@ -235,6 +257,7 @@ import os
         let isDesktop = entry.desktop == true
         var game = BCDGame(id: BCDLiveID.local(entry.id), title: isDesktop ? "Windows desktop" : entry.title,
                            store: .local, state: .ready, size: entry.folderBytes)
+        game.isWindowsDesktop = isDesktop
         game.lastPlayed = entry.lastPlayed
         game.thirtyTwoBit = entry.bits == 32
         // A game on the SSD folder chosen in Settings > Storage (C:\External).
@@ -520,7 +543,12 @@ import os
     // MARK: - BCDActions
 
     func play(_ game: BCDGame) {
-        guard !starting, LibraryModel.shared.current == nil else { return }
+        let library = LibraryModel.shared
+        if library.desktopHome, library.current != nil {
+            library.error = "Windows is still running. On Home, choose Show Windows to return to it, or Stop before starting a game."
+            return
+        }
+        guard !starting, library.current == nil else { return }
         starting = true
         settled { [weak self] in
             self?.starting = false

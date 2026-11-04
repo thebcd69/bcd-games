@@ -12,10 +12,12 @@ struct BCDDownloadsView: View {
     @EnvironmentObject private var store: BCDStore
     @EnvironmentObject private var focus: BCDFocus
     @Environment(\.bcdLayout) private var layout
+    var nativeControllerNavigation = false
     /// The download whose Cancel waits for an answer.
     @State private var stopping: String?
 
     var body: some View {
+        ScrollViewReader { reader in
         ScrollView(.vertical, showsIndicators: false) {
             if layout == .phonePortrait {
                 VStack(spacing: 14) { queue; roomCard; finishedCard }
@@ -27,6 +29,19 @@ struct BCDDownloadsView: View {
                 }
                 .padding(.horizontal, layout.gutter).padding(.vertical, 8)
             }
+        }
+        .onScrollPhaseChange { _, phase in if nativeControllerNavigation && phase == .interacting { focus.touched() } }
+        .onChange(of: focus.focused) { _, _ in reveal(reader) }
+        .onChange(of: focus.controllerActive) { _, _ in reveal(reader) }
+        .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in reveal(reader) }
+        }
+    }
+
+    private func reveal(_ reader: ScrollViewProxy) {
+        guard nativeControllerNavigation, focus.controllerActive, let id = focus.focused, id.hasPrefix("downloads.") else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
         }
     }
 
@@ -146,6 +161,7 @@ struct BCDDownloadsView: View {
         }
         .buttonStyle(.plain)
         .bcdFocusable(id, cornerRadius: 22, action: action)
+        .id(id)
     }
 
     /// Speed and time left on one line, the time first when the row is narrow.

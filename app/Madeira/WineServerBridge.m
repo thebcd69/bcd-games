@@ -80,6 +80,11 @@ extern int debug_level;
 // Stop flag checked by wineserver event loop (fd_ios.c)
 volatile int g_wineserver_should_stop = 0;
 
+// Desktop shutdown is consumed by fd_ios.c on the server thread: 0 idle, 1 queued, 2 draining.
+int g_wineserver_desktop_shutdown = 0;
+static pthread_mutex_t g_wineserver_join_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t g_wineserver_join_condition = PTHREAD_COND_INITIALIZER;
+static int g_wineserver_join_state; // 0 unclaimed, 1 joining, 2 joined
 static pthread_t g_wineserver_thread;
 static char *g_prefix_path = NULL;
 
@@ -205,16 +210,41 @@ int wineserver_is_ready(void) {
     return __atomic_load_n(&wineserver_ready, __ATOMIC_ACQUIRE);
 }
 
+int wineserver_request_desktop_shutdown(void) {
+    pthread_mutex_lock(&g_wineserver_join_mutex);
+    int expected = 0;
+    int accepted = g_wineserver_running && g_wineserver_join_state == 0 && !g_wineserver_should_stop &&
+        __atomic_compare_exchange_n(&g_wineserver_desktop_shutdown, &expected, 1, 0,
+                                    __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
+    pthread_mutex_unlock(&g_wineserver_join_mutex);
+    return accepted;
+}
+
 void wineserver_stop(void) {
-    wine_log_msg("Wineserver stop requested");
-    g_wineserver_should_stop = 1;
-    // Join the wineserver thread to ensure it actually stops before we return.
-    // This prevents iOS from killing us for excessive CPU from a spinning wineserver.
-    pthread_t t = g_wineserver_thread;
-    if (t) {
+    // A desktop Quit must drain Wine's guest termination and registry flush.
+    // Breaking the loop here would leave Windows threads and unsaved registry state.
+    pthread_mutex_lock(&g_wineserver_join_mutex);
+    if (!__atomic_load_n(&g_wineserver_desktop_shutdown, __ATOMIC_ACQUIRE))
+        g_wineserver_should_stop = 1;
+    while (g_wineserver_join_state == 1)
+        pthread_cond_wait(&g_wineserver_join_condition, &g_wineserver_join_mutex);
+    if (g_wineserver_join_state == 2) {
+        pthread_mutex_unlock(&g_wineserver_join_mutex);
+        return;
+    }
+    g_wineserver_join_state = 1;
+    pthread_t thread = g_wineserver_thread;
+    pthread_mutex_unlock(&g_wineserver_join_mutex);
+    if (thread) {
         wine_log_msg("Joining wineserver thread...");
-        pthread_join(t, NULL);
+        pthread_join(thread, NULL);
         wine_log_msg("Wineserver thread joined");
     }
+    pthread_mutex_lock(&g_wineserver_join_mutex);
+    // The shutdown timer may pthread_exit before the server wrapper's normal tail.
     g_wineserver_running = 0;
+    g_wineserver_thread = 0;
+    g_wineserver_join_state = 2;
+    pthread_cond_broadcast(&g_wineserver_join_condition);
+    pthread_mutex_unlock(&g_wineserver_join_mutex);
 }

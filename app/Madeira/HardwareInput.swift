@@ -1346,6 +1346,7 @@ final class HardwareInput: ObservableObject {
     /// and no sheet, alert, picker or menu controller is presented over any of
     /// the scene's windows.
     private func computeBaseFocus() -> Bool {
+        guard !LibraryModel.shared.desktopHome else { return false }
         guard appActive, UIApplication.shared.applicationState == .active else { return false }
         guard Self.focusEnabled else { return true }
         guard let v = MetalBackedView.keyboardTarget, let w = v.window,

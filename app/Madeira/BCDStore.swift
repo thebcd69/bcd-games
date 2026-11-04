@@ -48,6 +48,8 @@ enum BCDGameState: Hashable {
 }
 
 struct BCDGame: Identifiable, Hashable {
+    /// The built-in Windows environment is a utility, not a game.
+    var isWindowsDesktop = false
     var id: String
     var title: String
     var store: BCDStoreFront
@@ -170,6 +172,16 @@ struct BCDSystemStatus: Hashable {
     @Published var system = BCDSystemStatus()
     /// A game is running: the interface is torn down and draws nothing until it ends.
     @Published var inGame = false
+    @Published var windowsRunning = false
+    @Published var windowsStarting = false
+    @Published var windowsClosing = false
+    @Published var windowsError: String?
+    @Published var restartMessage: String?
+    var closeForRestart: (() -> Void)?
+    @Published var windowsNeedsRestart = false
+    var showWindows: (() -> Void)?
+    var stopWindows: (() -> Void)?
+    var restartWindows: (() -> Void)?
     /// The game whose Play is turning JIT on before it starts (its Play reads so); nil otherwise.
     @Published var startingJIT: String?
     /// The games whose Steam Cloud saves differ from this device's: they wait for a choice on each

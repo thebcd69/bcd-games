@@ -33,7 +33,7 @@ import UIKit
     /// The running game's entry: a library session in progress.
     var runningEntry: LibraryEntry? {
         let library = LibraryModel.shared
-        return library.current != nil ? library.activeEntry : nil
+        return library.current != nil && !library.desktopHome ? library.activeEntry : nil
     }
 
     /// Looks at the running game's choices and tells each feature. Called when the session, its menu or the app's state changes,
@@ -68,7 +68,7 @@ import UIKit
 struct BCDInputSessionHook: ViewModifier {
     @MainActor private static let changes: AnyPublisher<Void, Never> = {
         let library = LibraryModel.shared
-        return Publishers.Merge3(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () })
+        return Publishers.Merge4(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () }, library.$desktopHome.map { _ in () })
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }()

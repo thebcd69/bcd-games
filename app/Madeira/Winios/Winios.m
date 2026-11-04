@@ -1376,6 +1376,21 @@ void winios_set_compositor_frame(double x, double y, double w, double h) {
  * on the app window above the library and keeps showing the last frame after
  * the session ended, so the library hides it then and shows it again for the
  * next session. Returns 1 when there was a view to change. */
+static int g_compositor_backgrounded;
+void winios_compositor_set_backgrounded(int backgrounded) {
+    __atomic_store_n(&g_compositor_backgrounded, backgrounded != 0, __ATOMIC_RELEASE);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (g_compositor_view) {
+            BOOL hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
+            g_compositor_view.hidden = hidden;
+            // A background-started desktop precedes the Metal host's first
+            // attachment. Restore the desktop above that opaque host on Open.
+            if (!hidden && !g_comp_game)
+                [g_compositor_view.superview bringSubviewToFront:g_compositor_view];
+        }
+    });
+}
+
 int winios_compositor_set_hidden(int hidden) {
     if (!g_compositor_view) return 0;
     if (g_comp_game) {   /* an ended game session's windows go away */
@@ -1564,6 +1579,7 @@ static void winios_ensure_compositor(void) {
         if (!g_px_rects) g_px_rects = [NSMutableDictionary new];
         if (!g_surf_sizes) g_surf_sizes = [NSMutableDictionary new];
         g_compositor_view = [[UIView alloc] initWithFrame:win.bounds];
+        g_compositor_view.hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
         g_compositor_view.userInteractionEnabled = NO;  /* touches fall through */
         g_compositor_view.clipsToBounds = YES;
         g_compositor_view.backgroundColor = UIColor.clearColor;
@@ -1592,6 +1608,7 @@ static void winios_ensure_compositor(void) {
     g_px_rects = [NSMutableDictionary new];
     g_surf_sizes = [NSMutableDictionary new];
     g_compositor_view = [[UIView alloc] initWithFrame:win.bounds];
+        g_compositor_view.hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
     g_compositor_view.userInteractionEnabled = NO;  /* touches fall through */
     g_compositor_view.clipsToBounds = YES;
     /* letterbox area: black, like the rest of a session's screen (the game

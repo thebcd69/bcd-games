@@ -507,6 +507,7 @@ struct BCDGameQuestion: Equatable {
     var destructive: Bool
     /// A second way to say yes, shown between Cancel and the confirm button (the DLC question's "Game only").
     var alternative: String? = nil
+    var defaultCancel: Bool = false
 }
 
 extension BCDGameAction {
@@ -1575,7 +1576,7 @@ struct BCDGamePage: View {
     /// there is one, B back; in Options A chooses, Y puts a setting back to its default, B goes
     /// back or closes.
     private func installButtons() {
-        guard !embeddedInNavigation || visible else { return }
+        guard (!embeddedInNavigation || visible), !focus.layerOpen || focus.ownsLayerTree(Self.layer) else { return }
         // The DLC chooser: A switches a row or presses a button, X selects all, Y none, B goes back to the question (short words: four hints must fit an upright phone).
         if model.chooser != nil {
             focus.setHandlers([(BCDHint(button: .a, title: "Switch"), {}),
@@ -1747,6 +1748,7 @@ struct BCDGamePage: View {
     private func landscape(_ game: BCDGame, _ m: BCDGamePageMetrics) -> some View {
         let plan = model.plan
         return ZStack(alignment: .topLeading) {
+            ScrollViewReader { scroller in
             ScrollView(.vertical, showsIndicators: false) {
                 HStack(alignment: .bottom, spacing: m.columnGap) {
                     mainColumn(game, plan, m)
@@ -1760,6 +1762,12 @@ struct BCDGamePage: View {
                 .frame(minHeight: m.size.height, alignment: .bottom)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .onChange(of: focus.focused) { _, id in
+                guard embeddedInNavigation, focus.controllerActive, let id, id.hasPrefix(Self.layer),
+                      !id.hasPrefix(Self.panelLayer), !id.hasPrefix(Self.askLayer), !id.hasPrefix(Self.dlcLayer) else { return }
+                withAnimation(.easeOut(duration: 0.18)) { scroller.scrollTo(id, anchor: .center) }
+            }
+            }
             if !embeddedInNavigation { backButton.padding(.leading, m.gutter).padding(.top, m.pad ? 18 : 10) }
         }
     }
@@ -1991,7 +1999,9 @@ struct BCDGamePage: View {
                     .padding(.leading, m.gutter)
                     .padding(.trailing, panel ? m.panelWidth + m.gutter : m.gutter)
                     .background {
-                        if !panel {
+                        if embeddedInNavigation {
+                            BCDStyle.ground.ignoresSafeArea(edges: .bottom)
+                        } else if !panel {
                             LinearGradient(colors: [BCDStyle.ground.opacity(0), BCDStyle.ground.opacity(0.92)],
                                            startPoint: .top, endPoint: .bottom)
                                 .ignoresSafeArea(edges: .bottom)

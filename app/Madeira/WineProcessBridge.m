@@ -3359,9 +3359,13 @@ static void *wine_process_thread(void *arg) {
 
 /* What the boot thread does after __wine_main: the session is over, stop the wineserver. Once per session,
  * whoever gets here first (the boot thread, or wine_session_abandon). */
-static void wine_session_end(void)
+static void wine_session_end_work(void)
 {
-    if (__atomic_exchange_n(&g_session_end_claim, 1, __ATOMIC_ACQ_REL)) return;
+    // Desktop Quit must finish server-driven guest termination before publishing
+    // completion or clearing environment that the closing guests still use.
+    extern int g_wineserver_desktop_shutdown;
+    int desktop_closing = __atomic_load_n(&g_wineserver_desktop_shutdown, __ATOMIC_ACQUIRE);
+    if (desktop_closing) wineserver_stop();
     g_wine_running = 0;
     wine_progname_restore();
     /* ml1184: these belong to the launch that just ended; a later session in this app
@@ -3406,7 +3410,94 @@ static void wine_session_end(void)
 
     // Stop wineserver to prevent CPU spin (iOS kills for excessive CPU)
     dprintf(STDERR_FILENO, "[WineProc] stopping wineserver...\n");
+    if (!desktop_closing) wineserver_stop();
+}
+
+static void wine_session_end(void)
+{
+    if (__atomic_exchange_n(&g_session_end_claim, 1, __ATOMIC_ACQ_REL)) return;
+    wine_session_end_work();
+}
+
+extern int ios_thread_registry_count(void);
+extern thread_t ios_thread_registry_mach(int i);
+
+// Retained send rights keep Mach names stable while shutdown unregisters guests.
+static int desktop_thread_is_gone(thread_t port)
+{
+    mach_port_type_t type = 0;
+    kern_return_t kr = mach_port_type(mach_task_self(), port, &type);
+    if (kr == KERN_SUCCESS && (type & MACH_PORT_TYPE_DEAD_NAME)) return 1;
+    thread_basic_info_data_t info;
+    mach_msg_type_number_t size = THREAD_BASIC_INFO_COUNT;
+    kr = thread_info(port, THREAD_BASIC_INFO, (thread_info_t)&info, &size);
+    return kr == KERN_INVALID_ARGUMENT || kr == MACH_SEND_INVALID_DEST || kr == KERN_TERMINATED;
+}
+
+int wine_session_quit_desktop(void)
+{
+    int unclaimed = 0;
+    if (!g_wine_running || !__atomic_compare_exchange_n(&g_session_end_claim, &unclaimed, 1, 0,
+                                                        __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) return 0;
+    // Reserve finalization on this host worker before guests receive SIGQUIT.
+    // The guest boot thread's normal end must not publish completion or wait for itself.
+    enum { max_threads = 8192 };
+    thread_t *ports = calloc(max_threads, sizeof(*ports));
+    int used = 0, scanned = 0, unknown = !ports;
+    int initial_count = ios_thread_registry_count();
+    if (initial_count > max_threads) { unknown = 1; initial_count = max_threads; }
+    if (ports) for (; scanned < initial_count; ++scanned) {
+        thread_t port = ios_thread_registry_mach(scanned);
+        if (!port || desktop_thread_is_gone(port)) continue;
+        int duplicate = 0;
+        for (int j = 0; j < used; ++j) if (ports[j] == port) { duplicate = 1; break; }
+        if (duplicate) continue;
+        if (mach_port_mod_refs(mach_task_self(), port, MACH_PORT_RIGHT_SEND, 1) == KERN_SUCCESS)
+            ports[used++] = port;
+        else if (!desktop_thread_is_gone(port)) unknown = 1;
+    }
+    if (!wineserver_request_desktop_shutdown()) {
+        for (int j = 0; j < used; ++j) mach_port_deallocate(mach_task_self(), ports[j]);
+        free(ports);
+        dprintf(STDERR_FILENO, "[desktop-quit] shutdown request refused; completion unverified\n");
+        return -1;
+    }
+    // Thread registry keeps historic slots. New registrations are included on every
+    // pass; after server shutdown no guest can create another server thread.
+    dprintf(STDERR_FILENO, "[desktop-quit] confirmed; awaiting Windows shutdown\n");
     wineserver_stop();
+    int alive = 0, stable = 0;
+    for (int attempt = 0; attempt < 800; ++attempt) {
+        int count = ios_thread_registry_count();
+        if (count > max_threads) { unknown = 1; count = max_threads; }
+        if (ports) for (int slot = 0; slot < count; ++slot) {
+            thread_t port = ios_thread_registry_mach(slot);
+            if (!port || desktop_thread_is_gone(port)) continue;
+            int duplicate = 0;
+            for (int j = 0; j < used; ++j) if (ports[j] == port) { duplicate = 1; break; }
+            if (duplicate) continue;
+            if (used == max_threads) { unknown = 1; break; }
+            if (mach_port_mod_refs(mach_task_self(), port, MACH_PORT_RIGHT_SEND, 1) == KERN_SUCCESS)
+                ports[used++] = port;
+            else if (!desktop_thread_is_gone(port)) unknown = 1;
+        }
+        alive = 0;
+        for (int j = 0; j < used; ++j) if (!desktop_thread_is_gone(ports[j])) ++alive;
+        if (!alive && !unknown) {
+            if (++stable >= 3) break;
+        } else stable = 0;
+        usleep(10000);
+    }
+    for (int j = 0; j < used; ++j) mach_port_deallocate(mach_task_self(), ports[j]);
+    free(ports);
+    dprintf(STDERR_FILENO, "[desktop-quit] native guests retained=%d alive=%d unknown=%d\n", used, alive, unknown);
+    if (alive || unknown || stable < 3) {
+        dprintf(STDERR_FILENO, "[desktop-quit] incomplete; not publishing successful session completion\n");
+        return -1;
+    }
+    __atomic_store_n(&g_wine_exit_code, 0, __ATOMIC_RELEASE);
+    wine_session_end_work();
+    return 1;
 }
 
 /* The library's call (a background queue) once SessionEndRules says the session is over although __wine_main

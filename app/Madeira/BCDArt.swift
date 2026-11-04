@@ -371,8 +371,14 @@ struct BCDArtRequest: Equatable {
     let pixels: CGSize
 }
 
+/// Decoration identities must not collide with the String IDs of scroll/focus targets.
+struct BCDGlowRenderID: Hashable {
+    let source: String
+}
+
 struct BCDGlowItem {
     let id: String
+    var renderID: BCDGlowRenderID { BCDGlowRenderID(source: id) }
     let glow: BCDGlow
     let bounds: Anchor<CGRect>
     let strength: Double
@@ -392,7 +398,7 @@ extension View {
     func bcdGlowLayer() -> some View {
         backgroundPreferenceValue(BCDGlowKey.self) { items in
             GeometryReader { proxy in
-                ForEach(items, id: \.id) { item in
+                ForEach(items, id: \.renderID) { item in
                     let frame = proxy[item.bounds]
                     Image(uiImage: item.glow.image)
                         .resizable()

@@ -54,6 +54,9 @@ private struct BCDOriginalFrontEnd: View {
                 shell
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("BCDDesktopDidQuit"))) { _ in
+            tab = .home
+        }
         .onChange(of: store.inGame) { _, playing in
             focus.enabled = !playing
             // The game gets the memory the pictures held; they decode again afterwards.
@@ -308,7 +311,8 @@ private struct BCDDuoFrontEnd: View {
 
     /// The hint bar under the screen: a controller was the last input and the screen has buttons.
     /// (Never on an upright iPhone, which has the tab bar there.) The screens read it as `\.bcdHintBar`.
-    private var hintBarShown: Bool { layout != .phonePortrait && focus.controllerActive && !focus.hints.isEmpty }
+    private var hintBarShown: Bool { focus.controllerActive && !focus.hints.isEmpty }
+    private var hideTabsForController: Bool { focus.controllerActive && (!focus.layerOpen || tab == .settings) }
 
     var body: some View {
         Group {
@@ -318,6 +322,16 @@ private struct BCDDuoFrontEnd: View {
                 shell
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("BCDDesktopDidQuit"))) { _ in
+            select(.home)
+        }
+        .onChange(of: store.restartMessage) { _, message in
+            guard let message else { return }
+            store.restartMessage = nil
+            cardMenu.confirm(BCDGameQuestion(title: "Close BCD to restart?", message: message,
+                confirm: "Close BCD", destructive: false, defaultCancel: true)) { store.closeForRestart?() }
+        }
+        .simultaneousGesture(TapGesture().onEnded { focus.touched() })
         .onChange(of: store.inGame) { _, playing in
             focus.enabled = !playing
             // The game gets the memory the pictures held; they decode again afterwards.
@@ -326,7 +340,12 @@ private struct BCDDuoFrontEnd: View {
     }
 
     private var shell: some View {
-        nativeTabs
+        VStack(spacing: 0) {
+            if focus.controllerActive && hideTabsForController { controllerTabs }
+            // Reserve actual layout space: TabView's UIKit containers do not
+            // consistently propagate an ancestor's safe-area inset to pages.
+            nativeTabs.frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
             .coordinateSpace(name: BCDFocus.space)
             .modifier(BCDMenuHost(model: cardMenu))
             .environment(\.bcdLayout, layout)
@@ -337,7 +356,7 @@ private struct BCDDuoFrontEnd: View {
             .foregroundStyle(BCDStyle.text)
             .tint(BCDStyle.lavender)
             .preferredColorScheme(.dark)
-            .onAppear { cardMenu.store = store; installButtons() }
+            .onAppear { focus.scope(to: tab.rawValue + "."); cardMenu.store = store; installButtons() }
             .onChange(of: tab) { _, _ in DispatchQueue.main.async { installButtons() } }
             .onChange(of: focus.focused) { _, _ in installButtons() }
     }
@@ -349,6 +368,7 @@ private struct BCDDuoFrontEnd: View {
             ForEach(BCDDuoTab.allCases) { item in
                 Tab(item.title, systemImage: item.symbol, value: item) {
                     page(item)
+                        .toolbarVisibility(hideTabsForController ? .hidden : .visible, for: .tabBar)
                 }
                 .badge(item == .downloads ? store.downloads.count : 0)
             }
@@ -400,9 +420,9 @@ private struct BCDDuoFrontEnd: View {
 
     @ViewBuilder private func content(for item: BCDDuoTab) -> some View {
         switch item {
-        case .home: BCDHomeView(openLibrary: { select(.library) }, openDownloads: { select(.downloads) })
+        case .home: BCDHomeView(desktopAsUtility: true, openLibrary: { select(.library) }, openDownloads: { select(.downloads) })
         case .library: BCDDuoLibraryView(searchRequest: librarySearch)
-        case .downloads: BCDDownloadsView()
+        case .downloads: BCDDownloadsView(nativeControllerNavigation: true)
         case .settings: EmptyView()
         }
     }
@@ -428,6 +448,7 @@ private struct BCDDuoFrontEnd: View {
     private func select(_ next: BCDDuoTab) {
         guard next != tab else { return }
         BCDDuoPageOwner.end()
+        focus.scope(to: next.rawValue + ".")
         tab = next
     }
 
@@ -450,6 +471,36 @@ private struct BCDDuoFrontEnd: View {
             .accessibilityLabel(ready ? "JIT is enabled" : "JIT is not enabled")
     }
 
+    /// The system bar yields space to gamepad browsing, but destinations remain visible.
+    private var controllerTabs: some View {
+        let canCycle = focus.hints.contains { $0.button == .leftShoulder }
+            && focus.hints.contains { $0.button == .rightShoulder }
+        return HStack(spacing: 8) {
+            Text("LB").font(.caption2.bold()).padding(6).background(BCDStyle.surfaceRaised, in: Capsule())
+            ForEach(BCDDuoTab.allCases) { item in
+                Button { select(item) } label: {
+                    Label(item.title, systemImage: item.symbol)
+                        .font(.caption.weight(tab == item ? .bold : .medium))
+                        .lineLimit(1).minimumScaleFactor(0.8)
+                        .padding(.horizontal, 10).padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                        .background(tab == item ? BCDStyle.violet : .clear, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .disabled(!canCycle)
+                .accessibilityAddTraits(tab == item ? .isSelected : [])
+            }
+            Text("RB").font(.caption2.bold()).padding(6).background(BCDStyle.surfaceRaised, in: Capsule())
+        }
+        .foregroundStyle(BCDStyle.text)
+        .opacity(canCycle ? 1 : 0.55)
+        .padding(.horizontal, 12).padding(.vertical, 6)
+        .background(BCDStyle.ground)
+        .overlay(alignment: .bottom) { Rectangle().fill(BCDStyle.stroke).frame(height: 1) }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Main tabs. Use the left and right shoulder buttons to switch.")
+    }
+
     private var hintBar: some View {
         HStack(spacing: 22) {
             Spacer()
@@ -457,6 +508,7 @@ private struct BCDDuoFrontEnd: View {
         }
         .opacity(focus.layerOpen ? 0 : 1)
         .padding(.horizontal, layout.gutter).frame(height: 40)
-        .background(.regularMaterial)
+        .background(BCDStyle.ground.ignoresSafeArea(edges: .bottom))
+        .overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke).frame(height: 1) }
     }
 }

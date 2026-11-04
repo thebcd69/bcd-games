@@ -89,16 +89,16 @@ check("Library cards and Home's recent games are BCDGameButtons (BCDCoverCard)",
 check("Home's Continue playing banner is a BCDGameButton",
       "BCDGameButton(gameID: game.id, tap: { store.actions?.play(game) }) {" in home)
 check("Home and the Library let the menu open a game's page over themselves",
-      ".onAppear { menu?.openPage = { opened = $0 } }" in home and ".onAppear { menu?.openPage = { opened = $0 } }" in library)
+      ".onAppear { menu?.openPage = { opened = $0 }; installRecentNavigation() }" in home and ".onAppear { menu?.openPage = { opened = $0 } }" in library)
 
 # ---- controller: X ----------------------------------------------------------------------------------
 check("X opens the menu of the game under the ring, on Home and the Library, with the hint \"Menu\"",
       'if tab != .downloads, let game = BCDMenuModel.gameID(focused: focus.focused, store: store) {' in shell
       and 'BCDHint(button: .x, title: "Menu"), { cardMenu.showCard(game) }' in shell)
 check("a card's focus ids name its game: library.game.<id>, home.recent.<id>, home.continue",
-      'static let cardPrefixes = ["library.game.", "home.recent."]' in menu and 'static let continueID = "home.continue"' in menu
+      'static let cardPrefixes = ["library.game.", "home.recent.", "home.continue."]' in menu and 'static let continueID = "home.continue"' in menu
       and 'focusID: "library.game.\\(game.id)"' in library and 'focusID: "home.recent.\\(game.id)"' in home
-      and '.bcdFocusable("home.continue"' in home)
+      and 'desktopAsUtility ? "home.continue.\\(game.id)" : "home.continue"' in home)
 check("the hint follows the ring", ".onChange(of: focus.focused) { _, _ in installButtons() }" in shell)
 check("the shell's buttons are not set over a page, a menu or Settings",
       "guard !focus.layerOpen, !showSettings else { return }" in shell and "var layerOpen: Bool { !layers.isEmpty }" in focus)
@@ -110,13 +110,13 @@ check("a control's registration belongs to the latest view of its id: a turn of 
       and "focus.setAction(id, action, owner: owner)" in focus and "focus.unregister(id, owner: owner)" in focus
       and "@State private var owner = UUID()" in focus)
 check("the menu is a layer: the D-pad and A reach only its rows; B closes; the shell's buttons and ring come back",
-      'static let layer = "menu."' in menu and "focus.openLayer(Self.layer)" in menu and "focus.closeLayer(Self.layer)" in menu
+      'static let layer = "menu."' in menu and "focus.openLayer(prefix)" in menu and "focus.closeLayer(prefix)" in menu
       and 'BCDHint(button: .b, title: "Close"), { model.dismiss() }' in menu
       and 'BCDHint(button: .b, title: "Cancel"), { model.answer(false) }' in menu
-      and '.bcdFocusable(BCDMenuHost.layer + "item." + item.id' in menu)
+      and '.bcdFocusable(prefix + "item." + item.id' in menu)
 check("what a choice does runs after the controller is back under the menu",
-      "model.closed()?()" in menu and menu.index("focus.closeLayer(Self.layer)") < menu.index("model.closed()?()"))
-check("a question that deletes starts on Cancel", 'asked.question.destructive ? Self.layer + "ask.no" : Self.layer + "ask.yes"' in menu)
+      "model.closed()?()" in menu and menu.index("focus.closeLayer(prefix)") < menu.index("model.closed()?()"))
+check("a question that deletes starts on Cancel", '(asked.question.destructive || asked.question.defaultCancel) ? prefix + "ask.no" : prefix + "ask.yes"' in menu)
 check("a menu that is on screen when the shell goes lets the controller go (a game starts)",
       ".onDisappear {" in menu and "model.dismiss()" in menu)
 check("the shell's hint bar gives way to the menu's own", ".opacity(focus.layerOpen ? 0 : 1)" in shell and "ForEach(focus.hints) { BCDHintView(hint: $0) }" in menu)
@@ -133,7 +133,7 @@ check("the items are the game page's: its plan's main action and Update, Game pa
       and 'add(.uninstall, "Uninstall", "trash"' in menu and 'add(.removeFromLibrary, "Remove from library", "minus.circle"' in menu)
 check("Uninstall and Remove ask first, with the page's own question", "question: action.question(for: game, details: details)" in menu)
 check("the question is the page's view, under its own focus ids",
-      "BCDGameQuestionView(question: asked.question, prefix: Self.layer" in menu and 'var prefix = "game.ask."' in page)
+      "BCDGameQuestionView(question: asked.question, prefix: prefix" in menu and 'var prefix = "game.ask."' in page)
 perform = menu[menu.index("private static func perform"):]
 for call in ("actions?.play(game)", "actions?.install(game, place: place)", "actions?.update(game)", "actions?.pauseDownload(game.id)",
              "actions?.resumeDownload(game.id)", "actions?.verify(game)", "actions?.uninstall(game)"):

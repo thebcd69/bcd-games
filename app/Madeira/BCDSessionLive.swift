@@ -52,6 +52,7 @@ struct BCDSessionLiveLayer: View {
     init() {
         // @Published announces a change before it is stored: read the model a moment later.
         let changes: [AnyPublisher<Void, Never>] = [
+            model.$desktopHome.map { _ in () }.eraseToAnyPublisher(),
             model.$launching.map { _ in () }.eraseToAnyPublisher(),
             model.$menu.map { _ in () }.eraseToAnyPublisher(),
             model.$performance.map { _ in () }.eraseToAnyPublisher(),
@@ -88,7 +89,7 @@ struct BCDSessionLiveLayer: View {
     // MARK: What is on screen
 
     private func refresh() {
-        let running = model.current != nil
+        let running = model.current != nil && !model.desktopHome
         hud.message = running ? model.sessionMessage : ""
         hud.showsMenuButton = running && !model.launching
         if running && model.launching { startStarting() } else { stopStarting() }
@@ -220,7 +221,7 @@ struct BCDSessionLiveLayer: View {
         menuSource?.dispose()
         menuSource = nil
         hud.menu = nil
-        LibraryController.shared.configure(enabled: true, ownsInput: false)
+        LibraryController.shared.configure(enabled: true, ownsInput: model.desktopHome || model.current == nil)
         if save { model.saveCurrentProfile() }
     }
 
@@ -230,7 +231,7 @@ struct BCDSessionLiveLayer: View {
     /// LibraryController's commands: Back + Start (and, opted in, a held Home button) open and
     /// close the menu; while it is open the D-pad, A, B and the shoulders drive it.
     func command(_ name: String) {
-        guard model.current != nil else { return }
+        guard model.current != nil, !model.desktopHome else { return }
         if name == "menu" || name == "home" {
             if model.menu { model.menu = false } else { model.showMenu() }
             return
@@ -243,7 +244,12 @@ struct BCDSessionLiveLayer: View {
 
     // MARK: Touch regions (ControlsWindow lets these through to the layer)
 
-    func menuButtonFrame(_ frame: CGRect) { model.menuButtonRect = frame }
+    func menuButtonFrame(_ frame: CGRect) {
+        // A retiring SwiftUI layer must not erase its replacement's live hit region.
+        if BCDDuoFeatures.active && frame.isEmpty { return }
+        model.menuButtonRect = frame
+        if BCDDuoFeatures.active { LogStore.shared.log("[session-menu] hit region \(frame)") }
+    }
     func overlayFrame(_ frame: CGRect) { model.performanceRect = frame }
 
     // MARK: Overlay and log
@@ -417,13 +423,16 @@ struct BCDSessionLiveLayer: View {
                        symbol: "keyboard", kind: .action()),
             BCDExtraKeysMenu.row(),   // madeira-bcd (2026-10-25, round 603): the key bar over the game
         ]))
+        if BCDDuoFeatures.active, model.activeEntry?.desktop == true {
+            out.append(BCDMenuSection(id: "home", rows: [BCDMenuRow(id: "desktop.home", title: "BCD Home", detail: "Keep Windows running in the background.", symbol: "house", kind: .action())]))
+        }
         if let cloud = cloudSection { out.append(cloud) }
         out.append(BCDMenuSection(id: "quit", rows: [
-            BCDMenuRow(id: "quit", title: "Quit game", detail: "Progress you haven't saved is lost.", symbol: "stop.circle",
+            BCDMenuRow(id: "quit", title: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close Windows" : "Quit game", detail: "Progress you haven't saved is lost.", symbol: "stop.circle",
                        kind: .action(destructive: true),
                        confirm: BCDConfirm(title: "Quit the game?",
-                                           message: "BCD asks the game to close, as Alt+F4 does. What you haven't saved is lost, and the game may ask you to confirm.",
-                                           answers: [.init(id: "quit", title: "Quit game", destructive: true)])),
+                                           message: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close all Windows programs and return to BCD Home. Save your work first; unsaved changes will be lost." : "BCD asks the game to close, as Alt+F4 does. What you haven't saved is lost, and the game may ask you to confirm.",
+                                           answers: [.init(id: "quit", title: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close Windows" : "Quit game", destructive: true)])),
         ]))
         return out
     }
@@ -640,6 +649,7 @@ struct BCDSessionLiveLayer: View {
         if BCDInputMenu.handles(row), BCDInputMenuLive.act(row) { menu?.changed(); return }   // madeira-bcd (2026-10-25, round 604): choosing a controller for a player
         switch row {
         case "resume": close()
+        case "desktop.home": model.showDesktopHome()
         case "keyboard":
             model.menu = false
             LibraryKeyboard.show()

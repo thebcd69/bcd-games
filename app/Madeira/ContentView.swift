@@ -312,6 +312,11 @@ final class MetalBackedView: UIView {
         // the games' Metal layer — never over the whole phone screen.
         let full = convert(bounds, to: w)
         winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
+        if BCDDuoFeatures.active, LibraryModel.shared.activeEntry?.desktop == true,
+           !LibraryModel.shared.desktopHome {
+            // The desktop can already exist when Open first mounts this host.
+            winios_compositor_set_backgrounded(0)
+        }
         if !Self.layerRegistered {
             Self.layerRegistered = true
             madeira_display_set_layer(host.metalLayer)
@@ -1038,19 +1043,19 @@ struct ContentView: View {
     private var appContent: some View {
         ZStack {
             Group {
-                if library.current != nil {
+                if library.current != nil && !library.desktopHome {
                     sessionBody
                         .navigationBarHidden(true)
                 } else {
                     // BCD's own interface (BCDLiveFrontEnd.swift), with Play, Enable JIT and the
                     // Dock start (BCD, 2026-10-18; the only interface since wave 3, 2026-10-19).
                     BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,
-                                    startDock: { startDock($0, compactPool: $1) })
+                                    startDock: { startDock($0, compactPool: $1) }, waitForCloud: cloudWait)
                 }
             }
             .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): on the foldable iPhone, a window under 700 pt reads as compact, independently of the experimental game-support switch
             // A second session cannot start in this process; offer to close Madeira.
-            .alert("BCD needs a restart", isPresented: Binding(get: { library.restartNotice != nil },
+            .alert("BCD needs a restart", isPresented: Binding(get: { !BCDDuoFeatures.active && library.restartNotice != nil },
                                                                set: { if !$0 { library.restartNotice = nil } })) {
                 Button("Close BCD") {
                     LogStore.shared.log("[session-once] closed by the user for a restart")
@@ -1061,14 +1066,14 @@ struct ContentView: View {
             } message: { Text(library.restartNotice ?? "") }
             .modifier(AutoTuneAlert())   // madeira-bcd: auto-tune's result (AutoTuneViews.swift); never shown while it is off
             // CS_DEBUGGED without a debugger (JIT enabled outside Madeira): offer Madeira's own request.
-            .alert("Enable JIT", isPresented: Binding(get: { library.jitNotice != nil },
+            .alert("Enable JIT", isPresented: Binding(get: { !BCDDuoFeatures.active && library.jitNotice != nil },
                                                       set: { if !$0 { library.jitNotice = nil } })) {
                 Button("Enable JIT") { library.jitNotice = nil; enableJIT() }
                 Button("Later", role: .cancel) { library.jitNotice = nil }
             } message: { Text(library.jitNotice ?? "") }
             .sheet(isPresented: $jitCoordinator.showSetup) { BCDJITSetupSheet(enableJIT: { enableJIT() }) }   // madeira-bcd 2026-10-18: BCD's JIT setup (BCDJITLive.swift)
             // A Steam game's saves may not be the latest (cloudClear).
-            .alert(library.cloudNotice?.title ?? "Steam Cloud", isPresented: Binding(get: { library.cloudNotice != nil },
+            .alert(library.cloudNotice?.title ?? "Steam Cloud", isPresented: Binding(get: { !BCDDuoFeatures.active && library.cloudNotice != nil },
                                                                                      set: { if !$0 { library.cloudNotice = nil } })) {
                 if let notice = library.cloudNotice {
                     switch notice.kind {
@@ -2838,6 +2843,8 @@ final class ControlsWindow: UIWindow {
     }
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let sessionModel = LibraryModel.shared
+        if sessionModel.desktopHome || (BCDDuoFeatures.active && sessionModel.current == nil) { return nil }
         let m = TouchControlsModel.shared
         // Edit mode owns the whole screen: drags and the scale pinch must not
         // leak through and swing the camera while you are arranging buttons.
@@ -2888,6 +2895,7 @@ enum TouchControlsHost {
             // keep a portrait-sized frame after the first rotation.
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
             let w = ControlsWindow(windowScene: scene)
+            if BCDDuoFeatures.active { MainActor.assumeIsolated { GamepadEventClaim.install(on: w) } }
             // Above the joystick pad's +100. A higher windowLevel is the only
             // ordering nothing inside the app window can undo.
             w.windowLevel = .normal + 101
@@ -2919,7 +2927,7 @@ struct TouchControlsOverlay: View {
             let session = library.current != nil
             let landscape = geo.size.width > geo.size.height || session
             ZStack(alignment: .top) {
-                if landscape {
+                if landscape && !library.desktopHome && (!BCDDuoFeatures.active || session) {
                     if (m.visible || m.editing) && !library.blocksGameplayTouch {
                         if !feel.hidden {   // madeira-bcd (round 604): hidden for want of a touch, the controls have no view at all
                             controls(geo.size, session: session)

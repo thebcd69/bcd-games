@@ -1639,6 +1639,19 @@ void main_loop(void)
         ios_srv_loop_enter();   /* madeira-bcd: MADEIRA_SRV_DIRECT; the lock is let go only to sleep */
         while (active_users)
         {
+            // Confirmed desktop Quit is handled here, never on UIKit's thread.
+            // Keep pumping after shutdown_master_socket: guest termination and
+            // registry flushing complete through Wine's normal shutdown timers.
+            {
+                extern int g_wineserver_desktop_shutdown;
+                int queued = 1;
+                if (__atomic_compare_exchange_n(&g_wineserver_desktop_shutdown, &queued, 2, 0,
+                                                __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+                {
+                    ws_log("[desktop-quit] terminating Windows session");
+                    shutdown_master_socket();
+                }
+            }
             /* Check stop flag */
             if (g_wineserver_should_stop)
             {

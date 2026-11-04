@@ -397,6 +397,7 @@ enum BCDLibraryFilter: Identifiable, Hashable, CaseIterable {
 // Modified 2026-11-04: native search, toolbars and even cover grids for Duo only.
 struct BCDDuoLibraryView: View {
     @EnvironmentObject private var store: BCDStore
+    @EnvironmentObject private var focus: BCDFocus
     @Environment(\.bcdLayout) private var layout
     /// Y in the shell (BCDFrontEnd): each press opens the search, or closes an open one.
     var searchRequest = 0
@@ -405,6 +406,7 @@ struct BCDDuoLibraryView: View {
     /// play and name, kept in `sortByName`; it still decides until a sort is chosen from the menu.
     @AppStorage("bcd.library.sort") private var sortKey = ""
     @AppStorage("bcd.library.sortByName") private var sortByName = false
+    @State private var navigationOwner = UUID()
     @State private var searching = false
     @State private var query = ""
     @State private var gridWidth: CGFloat = 0
@@ -412,6 +414,8 @@ struct BCDDuoLibraryView: View {
     @State private var opened: BCDGame?
     @Environment(\.bcdMenu) private var menu
 
+    private var libraryGames: [BCDGame] { store.games.filter { !$0.isWindowsDesktop } }
+    private func gameCount(_ store: BCDStoreFront) -> Int { libraryGames.filter { $0.store == store }.count }
     private var filter: BCDLibraryFilter { BCDLibraryFilter.allCases.first { $0.rawValue == filterKey } ?? .all }
     private var sort: BCDLibrarySort { BCDLibrarySort(rawValue: sortKey) ?? (sortByName ? .name : .played) }
     /// The launcher whose chip is chosen (BCDLaunchers.swift); nil for every other filter.
@@ -423,14 +427,18 @@ struct BCDDuoLibraryView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             filters
+            ScrollViewReader { reader in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     if let launcher { BCDLauncherPanel(spec: launcher) }   // a launcher's chip (Battle.net, EA app): its Install / Open card, no games
                     notices
                     savesNotice
                     LazyVGrid(columns: columns, alignment: .leading, spacing: layout == .pad ? 26 : 20) {
-                        ForEach(shown) { game in
+                        ForEach(shown.map { BCDDuoLibraryGame(game: $0) }) { item in
+                            let game = item.game
                             BCDCoverCard(game: game, focusID: "library.game.\(game.id)") { opened = game }
+                                .id(item.id)
+
                         }
                     }
                     .bcdGlowLayer()
@@ -448,6 +456,11 @@ struct BCDDuoLibraryView: View {
             }
             .modifier(BCDSoftTopEdge())
             .refreshable { store.actions?.refreshLibrary() }
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, _ in revealGame(reader) }
+            .onChange(of: focus.controllerActive) { _, _ in revealGame(reader) }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in revealGame(reader) }
+            }
         }
         .padding(.top, 4)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
@@ -467,8 +480,41 @@ struct BCDDuoLibraryView: View {
         }
         .bcdGamePage($opened, from: "Library")
         // The game menu's "Game page" opens the page over the Library.
-        .onAppear { menu?.openPage = { opened = $0 } }
+        .onAppear { menu?.openPage = { opened = $0 }; installNavigation() }
+        .onDisappear { focus.removeNavigator("library.game.", owner: navigationOwner) }
+        .onChange(of: shown.map(\.id)) { _, _ in installNavigation() }
+        .onChange(of: columns.count) { _, _ in installNavigation() }
         .onChange(of: searchRequest) { _, _ in toggleSearch() }
+    }
+
+    /// Ordered movement can reach cards the lazy grid has not created yet.
+    private func installNavigation() {
+        let ids = shown.map { "library.game." + $0.id }
+        let width = columns.count
+        focus.setNavigator("library.game.", owner: navigationOwner) { direction in
+            guard let current = focus.focused, let index = ids.firstIndex(of: current) else { return false }
+            guard let next = BCDGridNavigation.target(index: index, columns: width, count: ids.count,
+                                                       direction: direction) else { return false }
+            focus.focused = ids[next]
+            return true
+        }
+    }
+
+    private func revealGame(_ reader: ScrollViewProxy) {
+        guard focus.controllerActive, let id = focus.focused, id.hasPrefix("library.game.") else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
+        }
+    }
+
+    private func revealFilter(_ reader: ScrollViewProxy) {
+        let prefix = "library.filter."
+        guard focus.controllerActive, let id = focus.focused, id.hasPrefix(prefix) else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(String(id.dropFirst(prefix.count)), anchor: .center) }
+        }
     }
 
     // MARK: Filters and the row's buttons
@@ -500,6 +546,10 @@ struct BCDDuoLibraryView: View {
             // The launchers' chips sit at the end of a row that scrolls: a chosen one is brought into view (the other chips stay where they were).
             .onAppear { if filter.isLauncher { proxy.scrollTo(filter.rawValue, anchor: .center) } }
             .onChange(of: filterKey) { _, _ in if filter.isLauncher { proxy.scrollTo(filter.rawValue, anchor: .center) } }
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, _ in revealFilter(proxy) }
+            .onChange(of: focus.controllerActive) { _, _ in revealFilter(proxy) }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in revealFilter(proxy) }
         }
     }
 
@@ -543,7 +593,7 @@ struct BCDDuoLibraryView: View {
             }
             .buttonStyle(.plain)
             .bcdFocusable("library.signin", cornerRadius: 18) { store.actions?.signIn(.steam) }
-        } else if steamShown, let steam, steam.name != nil, store.count(.steam) == 0, query.isEmpty {
+        } else if steamShown, let steam, steam.name != nil, gameCount(.steam) == 0, query.isEmpty {
             Text("There are no Windows games on this Steam account yet. Refresh reads the account's list again.")
                 .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true)
@@ -594,14 +644,14 @@ struct BCDDuoLibraryView: View {
 
     /// No game added by hand yet (the Wine desktop is always there): say how they get in.
     private var showsDriveHint: Bool {
-        (filter == .all || filter == .store(.local)) && query.isEmpty && store.count(.local) <= 1
+        (filter == .all || filter == .store(.local)) && query.isEmpty && gameCount(.local) == 0
     }
 
     private var availableFilters: [BCDLibraryFilter] {
         BCDLibraryFilter.allCases.filter { item in
             switch item {
             case .all, .installed: return true
-            case .store(let s): return store.count(s) > 0 || store.accounts.contains { $0.store == s && $0.available }
+            case .store(let s): return gameCount(s) > 0 || store.accounts.contains { $0.store == s && $0.available }
             case .launcher: return BCDLauncherModel.shared.available
             }
         }
@@ -609,15 +659,16 @@ struct BCDDuoLibraryView: View {
 
     private func count(_ item: BCDLibraryFilter) -> Int {
         switch item {
-        case .all: return store.games.count
-        case .installed: return store.installedCount
-        case .store(let s): return store.count(s)
+        case .all: return libraryGames.count
+        case .installed: return libraryGames.filter { $0.state.isInstalled }.count
+        case .store(let s): return gameCount(s)
         case .launcher: return 0
         }
     }
 
     private var shown: [BCDGame] {
         var list = store.games.filter { game in
+            guard !game.isWindowsDesktop else { return false }
             switch filter {
             case .all: return true
             case .installed: return game.state.isInstalled
@@ -642,4 +693,10 @@ struct BCDDuoLibraryView: View {
         let count = max(2, fitting - fitting % 2)
         return Array(repeating: GridItem(.flexible(), spacing: gap, alignment: .top), count: count)
     }
+}
+
+/// The lazy grid can resolve an unrealized controller target from its data identity.
+private struct BCDDuoLibraryGame: Identifiable {
+    let game: BCDGame
+    var id: String { "library.game." + game.id }
 }

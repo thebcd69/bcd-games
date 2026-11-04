@@ -30,6 +30,68 @@ struct BCDHint: Identifiable, Equatable {
     static func == (a: BCDHint, b: BCDHint) -> Bool { a.button == b.button && a.title == b.title }
 }
 
+enum BCDRailPosition {
+    static func offset(index: Int, count: Int, width: CGFloat, spacing: CGFloat, viewport: CGFloat, padding: CGFloat = 2) -> CGFloat {
+        guard count > 0, width > 0, viewport > 0 else { return 0 }
+        let content = CGFloat(count) * width + CGFloat(max(0, count - 1)) * spacing + 2 * padding
+        let center = padding + CGFloat(max(0, min(index, count - 1))) * (width + spacing) + width / 2
+        return max(0, min(max(0, content - viewport), center - viewport / 2))
+    }
+}
+
+/// Home follows its visible sections rather than distances between moving scroll frames.
+enum BCDHomeNavigation {
+    static func target(from id: String, direction: BCDMove, recent: [String], desktop: [String],
+                       hero: String, downloadsBelow: Bool, downloadsVisible: Bool = true, remembered: String?) -> String? {
+        let returning = remembered.flatMap { recent.contains($0) ? $0 : nil } ?? recent.first
+        if let index = recent.firstIndex(of: id) {
+            switch direction {
+            case .left: return recent[max(0, index - 1)]
+            case .right: return recent[min(recent.count - 1, index + 1)]
+            case .up: return hero
+            case .down: return downloadsBelow ? "home.downloads" : desktop.first ?? id
+            }
+        }
+        if let index = desktop.firstIndex(of: id) {
+            switch direction {
+            case .left: return desktop[max(0, index - 1)]
+            case .right: return desktop[min(desktop.count - 1, index + 1)]
+            case .up: return downloadsBelow ? "home.downloads" : returning ?? hero
+            case .down: return id
+            }
+        }
+        if id == hero {
+            switch direction {
+            case .down: return returning ?? id
+            case .right: return downloadsBelow || !downloadsVisible ? id : "home.downloads"
+            case .left, .up: return id
+            }
+        }
+        if id == "home.downloads" {
+            switch direction {
+            case .up: return downloadsBelow ? returning ?? hero : id
+            case .down: return downloadsBelow ? desktop.first ?? id : returning ?? hero
+            case .left: return downloadsBelow ? id : hero
+            case .right: return id
+            }
+        }
+        return nil
+    }
+}
+
+/// Logical grid positions remain reachable when a lazy grid has not materialized their views.
+enum BCDGridNavigation {
+    static func target(index: Int, columns: Int, count: Int, direction: BCDMove) -> Int? {
+        guard count > 0, columns > 0, (0..<count).contains(index) else { return nil }
+        switch direction {
+        case .left: return max(0, index - 1)
+        case .right: return min(count - 1, index + 1)
+        case .up: return index < columns ? nil : index - columns
+        case .down: return min(count - 1, index + columns)
+        }
+    }
+}
+
 @MainActor final class BCDFocus: ObservableObject {
     static let space = "bcd.focus"
 
@@ -42,6 +104,7 @@ struct BCDHint: Identifiable, Equatable {
     private var actions: [String: () -> Void] = [:]
     private var owners: [String: UUID] = [:]
     private var handlers: [BCDButton: () -> Void] = [:]
+    private var navigators: [String: (UUID, (BCDMove) -> Bool)] = [:]
     private var observers: [NSObjectProtocol] = []
     private var repeatTask: Task<Void, Never>?
     private var heldMove: BCDMove?
@@ -100,6 +163,13 @@ struct BCDHint: Identifiable, Equatable {
         hints = list.map(\.0)
     }
 
+    func setNavigator(_ prefix: String, owner: UUID, move: @escaping (BCDMove) -> Bool) {
+        navigators[prefix] = (owner, move)
+    }
+    func removeNavigator(_ prefix: String, owner: UUID) {
+        if navigators[prefix]?.0 == owner { navigators[prefix] = nil }
+    }
+
     // MARK: Layers (a page over the shell)
 
     /// A page shown over the shell (a game's page, a panel on it, a question) holds the
@@ -111,12 +181,21 @@ struct BCDHint: Identifiable, Equatable {
         let handlers: [BCDButton: () -> Void]
         let hints: [BCDHint]
         let focused: String?
+        let steer: ((BCDMove) -> Bool)?
     }
     private var layers: [Layer] = []
+    private var rootPrefix: String?
+
+    /// Native tabs may retain offscreen views; only the selected tab owns root focus.
+    func scope(to prefix: String) {
+        rootPrefix = prefix
+        if let id = focused, !reachable(id) { focused = nil }
+    }
 
     func openLayer(_ prefix: String) {
         guard layers.last?.prefix != prefix else { return }
-        layers.append(Layer(prefix: prefix, handlers: handlers, hints: hints, focused: focused))
+        layers.append(Layer(prefix: prefix, handlers: handlers, hints: hints, focused: focused, steer: steer))
+        steer = nil
         if let id = focused, !id.hasPrefix(prefix) { focused = nil }
     }
 
@@ -126,15 +205,23 @@ struct BCDHint: Identifiable, Equatable {
         layers.removeSubrange(index...)
         handlers = below.handlers
         hints = below.hints
+        steer = below.steer
         focused = below.focused
     }
 
     /// A page or menu is up over the shell: its buttons are in force, not the shell's.
     var layerOpen: Bool { !layers.isEmpty }
+    func ownsLayer(_ prefix: String) -> Bool { layers.last?.prefix == prefix }
+    func ownsLayerTree(_ prefix: String) -> Bool { layers.last?.prefix.hasPrefix(prefix) == true }
 
-    private func reachable(_ id: String) -> Bool { layers.last.map { id.hasPrefix($0.prefix) } ?? true }
+    private func reachable(_ id: String) -> Bool {
+        if let layer = layers.last { return id.hasPrefix(layer.prefix) }
+        return rootPrefix.map { id.hasPrefix($0) } ?? true
+    }
 
     // MARK: Input
+
+
 
     func touched() { if controllerActive { controllerActive = false } }
 
@@ -156,6 +243,7 @@ struct BCDHint: Identifiable, Equatable {
         let wasActive = controllerActive
         controllerActive = true
         if wasActive, let steer, steer(direction) { return }
+        if wasActive, let id = focused, reachable(id), let route = navigators.first(where: { id.hasPrefix($0.key) }), route.value.1(direction) { return }
         guard let current = focused.flatMap({ reachable($0) ? frames[$0] : nil }) else {
             focused = topLeft(); return
         }
@@ -330,6 +418,13 @@ extension View {
     /// through the control's own button.
     func bcdFocusable(_ id: String, cornerRadius: CGFloat = 16, action: @escaping () -> Void) -> some View {
         modifier(BCDFocusable(id: id, cornerRadius: cornerRadius, action: action))
+    }
+
+    /// Disabled actions are omitted from custom controller navigation as well as touch.
+    @ViewBuilder func bcdFocusable(_ id: String, enabled: Bool, cornerRadius: CGFloat = 16,
+                                  action: @escaping () -> Void) -> some View {
+        if enabled { bcdFocusable(id, cornerRadius: cornerRadius, action: action) }
+        else { self }
     }
 
     /// The buttons a screen uses and their hints in the bottom bar.
