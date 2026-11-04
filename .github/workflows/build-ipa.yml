@@ -2170,6 +2170,11 @@ jobs:
       # build/dxmt-ios/shader-headers/ is gitignored and nothing generated it,
       # so airconv_context.cpp could not find air_msad.h / air_samplepos.h.
       # Mirrors the metalir + hexdump generators in dxmt/meson.build.
+      - name: Use public Metal atomics (Xcode 27 compatibility)
+        run: |
+          python3 tools/patch-dxmt-metal-atomics.py
+          python3 tests/host/check-dxmt-metal-atomics.py --require-metal
+
       - name: Generate DXMT shader headers
         shell: bash
         run: |
