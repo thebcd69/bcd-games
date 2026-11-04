@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Comments updated for independent Duo interface sizing, 2026-11-04.
 
 import Foundation
 import CoreGraphics
@@ -8,12 +9,13 @@ import CoreGraphics
 // Experimental support for the foldable iPhone (iPhone Duo, 2026-10-25): the gate, the display shape BCD
 // assumes for its inner screen and the pure part of the scene-size follower (docs/HANDOFF.md, 2026-10-25).
 //
-// EVERYTHING NEW HERE RUNS ONLY WHEN BOTH ARE TRUE:
+// THE EXPERIMENTAL GAME AND RESOLUTION HOOKS RUN ONLY WHEN BOTH ARE TRUE:
 //   1. this device's model identifier is the foldable iPhone's (`BCDFoldableDevice.identifiers`), and
 //   2. the experimental switch is on (Settings › Graphics › "Foldable iPhone support (experimental)", shown on
 //      that model only; off unless a person turns it on).
 // `BCDFoldable.active` is that gate. It is read once per app run (a change of the switch applies from the next
-// start), and every hook elsewhere in the app is one line that tests it first. On any other iPhone or iPad the
+// start), and every engine hook elsewhere in the app is one line that tests it first. Interface sizing in
+// BCDFoldableUI.swift runs independently on the Duo, so its toolbar fits even with this switch off. On any other iPhone or iPad the
 // gate is false whatever the switch holds: no new layout, no new call, no new log line, and Settings has no new
 // row. tests/host/check-bcd-foldable.py runs the gate over the identifiers of other devices and lists the hooks.
 //
@@ -45,6 +47,40 @@ enum BCDFoldableDevice {
     }()
 
     static var isThisDevice: Bool { isFoldable(machine: machine) }
+}
+
+/// Native Duo interface improvements. Other devices cannot opt in, even with a stored override.
+enum BCDDuoFeatures {
+    static let key = "bcd.duo.enhancements"
+    static func enabled(machine: String, stored: String?) -> Bool {
+        BCDFoldableDevice.isFoldable(machine: machine) && stored?.trimmingCharacters(in: .whitespacesAndNewlines) != "0"
+    }
+    static let active = enabled(machine: BCDFoldableDevice.machine, stored: UserDefaults.standard.string(forKey: key))
+    static func store(_ on: Bool) { UserDefaults.standard.set(on ? "1" : "0", forKey: key) }
+}
+
+/// A native tab hands shared controller/backend resources over before another page activates.
+@MainActor enum BCDDuoPageOwner {
+    private static var owner: UUID?
+    private static var cleanup: (() -> Void)?
+
+    static func claim(_ id: UUID, cleanup next: @escaping () -> Void) {
+        end()
+        owner = id
+        cleanup = next
+    }
+
+    static func end() {
+        let previous = cleanup
+        owner = nil
+        cleanup = nil
+        previous?()
+    }
+
+    static func release(_ id: UUID) {
+        guard owner == id else { return }
+        end()
+    }
 }
 
 /// The experimental switch: one string in UserDefaults, "1" on and "0" off.

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Modified 2026-11-04: Duo-only native interface and navigation support.
 """BCD's Settings (app/Madeira/BCDSettings*.swift, docs/BCD-UI-ARCHITECTURE.md).
 
   1. Every Settings file carries BCD's three licence lines.
@@ -252,6 +253,17 @@ for s in all {
     check(page.back(from: list(s)) == .close, "upright: B on the list closes Settings")
 }
 
+// Persistent Settings has no modal Done control: no direction may lead to it.
+for mode in [N.Mode.split, .stacked] {
+    let native = N(mode: mode, selected: .accounts, hasDone: false)
+    check(native.move(.up, from: list(.accounts)) == .stay,
+          "native Settings: Up at the first section stays on a visible target")
+    var detail = native
+    detail.pushed = true
+    check(detail.move(.right, from: BCDSettingsID.back) == .stay,
+          "native Settings: Right from Back never targets removed Done")
+}
+
 // The words.
 check(BCDSettingsText.key("env.MADEIRA_ONBOARDING") == "env.ONBOARDING", "a key is shown without the old name")
 check(BCDSettingsText.realKey("env.ONBOARDING", known: ["env.MADEIRA_ONBOARDING"]) == "env.MADEIRA_ONBOARDING",
@@ -500,12 +512,18 @@ check(not [t for t in shown_text if re.search(r"page|absoluteString|html_url|htt
       "updates: no address is drawn as text; Go to update opens the page")
 check("if checker.showsChip" in chip and "var showsChip: Bool { autoCheck && state == .updateAvailable }" in updates
       and 'Text("Update available")' in chip, "updates: the chip shows only while checking automatically and a newer release exists")
-chips = block(front, "private var statusChips: some View")
-check("BCDUpdateChip { settingsSection = .updates; showSettings = true }" in chips
-      and "section: settingsSection" in front, "updates: the chip sits with the JIT chip and opens Settings at Updates")
+chips = block(front, "private func page(_ item: BCDDuoTab) -> some View")
+check("BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }" in chips
+      and "section: settingsSection" in front, "updates: the native toolbar keeps the update action and opens Settings at Updates")
 check('Label("Go to update"' in updates_view and "checker.checkNow()" in updates_view and "checker.autoCheck = $0" in updates_view
       and "model.go(to: .updates)" in views["BCDSettingsAbout.swift"],
       "updates: Go to update, Check for updates and Check automatically in Settings, reachable from About")
+# Native presentation must register the IDs that the compiled navigator returns.
+check('horizontal == .compact || geometry.size.width < 700 ? .stacked : .split' in root,
+      "native split navigation collapses by width, including compact landscape")
+check('.bcdFocusable(BCDSettingsID.back, cornerRadius: 22, action: model.leaveToList)' in root
+      and 'ToolbarItem(placement: .topBarLeading) { backButton }' in root,
+      "compact detail registers the navigator's Back target as a native toolbar action")
 # ---- 11. every classic function has a place ---------------------------------------------
 COVERED = [  # (the classic function, where it is now, the code that does it)
     ("Extended logging", "Logs", "input.diagnostics = on"),

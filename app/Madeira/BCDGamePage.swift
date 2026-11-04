@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified for native Duo navigation, 2026-11-04.
 
 import Combine
 import Foundation
@@ -1342,11 +1343,31 @@ private struct BCDGamePagePresenter: ViewModifier {
     @Binding var game: BCDGame?
     let from: String
 
-    func body(content: Content) -> some View {
-        content.fullScreenCover(item: $game, onDismiss: BCDPresentation.didClose) { opened in
-            BCDGamePage(gameID: opened.id, from: from) { game = nil }
-                .environmentObject(store)
-                .environmentObject(focus)
+    @ViewBuilder func body(content: Content) -> some View {
+        if BCDDuoFeatures.active {
+            content.navigationDestination(isPresented: Binding(get: { game != nil }, set: { if !$0 { game = nil } })) {
+                if let opened = game {
+                    BCDGamePage(gameID: opened.id, from: from, embeddedInNavigation: true) { game = nil }
+                        .environmentObject(store)
+                        .environmentObject(focus)
+                        .navigationTitle(opened.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarBackButtonHidden()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button { game = nil } label: { Label(from, systemImage: "chevron.left") }
+                                    .bcdFocusable("game.back", cornerRadius: 22) { game = nil }
+                            }
+                        }
+                }
+            }
+            .onChange(of: game?.id) { old, new in if old != nil && new == nil { BCDPresentation.didClose() } }
+        } else {
+            content.fullScreenCover(item: $game, onDismiss: BCDPresentation.didClose) { opened in
+                BCDGamePage(gameID: opened.id, from: from) { game = nil }
+                    .environmentObject(store)
+                    .environmentObject(focus)
+            }
         }
     }
 }
@@ -1397,10 +1418,14 @@ struct BCDGamePage: View {
     @StateObject private var model: BCDGamePageModel
     /// Options: nil while closed. A panel from the right, a sheet from the bottom on an upright
     /// phone; turning the phone moves it from one to the other.
+    @State private var pageWidth: CGFloat = 0
+    @State private var visible = false
+    @State private var owner = UUID()
     @State private var options: BCDGameOptionsPage?
     /// The layout as the size classes last said. Closures handed to the focus outlive the render
     /// that made them, so they read this, never the environment they captured.
     @State private var phoneUpright = false
+    let embeddedInNavigation: Bool
     let from: String
     let close: () -> Void
     private let preview: (panel: BCDGameOptionsPage?, ask: BCDGameAction?, after: Double)
@@ -1410,14 +1435,18 @@ struct BCDGamePage: View {
     /// saves, the Library section for a game just added, the preview app's screenshots (which
     /// turn the screen first).
     init(gameID: String, from: String, backend: BCDGameDetailBackend? = nil,
-         panel: BCDGameOptionsPage? = nil, ask: BCDGameAction? = nil, after: Double = 1, close: @escaping () -> Void) {
+         panel: BCDGameOptionsPage? = nil, ask: BCDGameAction? = nil, after: Double = 1, embeddedInNavigation: Bool = false, close: @escaping () -> Void) {
+        self.embeddedInNavigation = embeddedInNavigation
         self.from = from
         self.close = close
         preview = (panel, ask, after)
         _model = StateObject(wrappedValue: BCDGamePageModel(gameID: gameID, backend: backend ?? BCDGameDetailSource.backend))
     }
 
-    private var layout: BCDLayout { BCDLayout.of(horizontal: horizontal, vertical: vertical) }
+    private var layout: BCDLayout {
+        if embeddedInNavigation && pageWidth > 0 && pageWidth < 700 { return .phonePortrait }
+        return BCDLayout.of(horizontal: horizontal, vertical: vertical)
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -1457,16 +1486,18 @@ struct BCDGamePage: View {
                 hintBar(m, beside: options != nil && !phoneUpright && model.pending == nil)
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { pageWidth = $0 }
         .coordinateSpace(name: BCDFocus.space)
         .environment(\.bcdLayout, layout)
         .foregroundStyle(BCDStyle.text)
         .preferredColorScheme(.dark)
         .onAppear(perform: appeared)
         .onDisappear {
-            model.leave()
-            focus.closeLayer(Self.layer)
+            if embeddedInNavigation { BCDDuoPageOwner.release(owner) }
+            else { model.leave(); focus.closeLayer(Self.layer) }
         }
         .onChange(of: model.pending) { old, new in
+            guard !embeddedInNavigation || visible else { return }
             if old == nil, new != nil {
                 focus.openLayer(Self.askLayer)
                 focus.focused = new?.question.destructive == true ? "game.ask.no" : "game.ask.yes"
@@ -1477,6 +1508,7 @@ struct BCDGamePage: View {
         }
         // The DLC chooser: it holds the controller (layer "game.dlc.") and starts with the ring on its first row.
         .onChange(of: model.chooser != nil) { _, open in
+            guard !embeddedInNavigation || visible else { return }
             if open {
                 focus.openLayer(Self.dlcLayer)
                 focus.focused = model.chooser?.rows.first.map { BCDDLCChooserView.rowID($0.id) } ?? "game.dlc.install"
@@ -1497,6 +1529,7 @@ struct BCDGamePage: View {
         .onChange(of: model.details) { _, _ in installButtons() }
         // A game BCD finds it cannot install (a store's look at its files) loses Install while the page is open: the focus goes to Back.
         .onChange(of: model.plan.main == nil) { _, none in
+            guard !embeddedInNavigation || visible else { return }
             if none, focus.focused == "game.main" { focus.focused = "game.back" }
         }
         .onChange(of: layout) { _, now in phoneUpright = now == .phonePortrait }
@@ -1509,7 +1542,18 @@ struct BCDGamePage: View {
     static let askLayer = "game.ask."
     static let dlcLayer = BCDDLCChooserView.layer
 
+    private func deactivateEmbeddedPage() {
+        guard visible else { return }
+        visible = false
+        if model.pending != nil { model.answer(false) }
+        closeOptions()
+        model.leave()
+        focus.closeLayer(Self.layer)
+    }
+
     private func appeared() {
+        if embeddedInNavigation { BCDDuoPageOwner.claim(owner, cleanup: deactivateEmbeddedPage) }
+        visible = true
         phoneUpright = layout == .phonePortrait
         model.close = close
         model.open(store)
@@ -1518,6 +1562,7 @@ struct BCDGamePage: View {
         installButtons()
         if preview.panel != nil || preview.ask != nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + preview.after) {
+                guard !embeddedInNavigation || visible else { return }
                 if let first = preview.panel { openOptions(first) }
                 if let ask = preview.ask { model.request(ask) }
             }
@@ -1530,6 +1575,7 @@ struct BCDGamePage: View {
     /// there is one, B back; in Options A chooses, Y puts a setting back to its default, B goes
     /// back or closes.
     private func installButtons() {
+        guard !embeddedInNavigation || visible else { return }
         // The DLC chooser: A switches a row or presses a button, X selects all, Y none, B goes back to the question (short words: four hints must fit an upright phone).
         if model.chooser != nil {
             focus.setHandlers([(BCDHint(button: .a, title: "Switch"), {}),
@@ -1714,7 +1760,7 @@ struct BCDGamePage: View {
                 .frame(minHeight: m.size.height, alignment: .bottom)
             }
             .scrollBounceBehavior(.basedOnSize)
-            backButton.padding(.leading, m.gutter).padding(.top, m.pad ? 18 : 10)
+            if !embeddedInNavigation { backButton.padding(.leading, m.gutter).padding(.top, m.pad ? 18 : 10) }
         }
     }
 
@@ -1746,7 +1792,7 @@ struct BCDGamePage: View {
                     withAnimation(.easeOut(duration: 0.2)) { scroller.scrollTo(id, anchor: .center) }
                 }
             }
-            backButton.padding(.leading, m.gutter).padding(.top, 8)
+            if !embeddedInNavigation { backButton.padding(.leading, m.gutter).padding(.top, 8) }
         }
     }
 

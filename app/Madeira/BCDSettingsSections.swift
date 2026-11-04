@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified 2026-11-04: Duo-only native interface and navigation support.
 
 import SwiftUI
 import UIKit
@@ -258,7 +259,10 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                 }
             }
             if BCDFoldableDevice.isThisDevice {   // madeira-bcd foldable (experimental, BCDFoldable.swift): the foldable iPhone's Settings only; every other device's Graphics page is unchanged
-                BCDSettingsGroup(title: "Foldable iPhone") { BCDFoldableSettingsRow() }
+                BCDSettingsGroup(title: "Foldable iPhone") {
+                    BCDDuoEnhancementsSettingsRow()
+                    BCDFoldableSettingsRow()
+                }
             }
             if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
             BCDSettingsGroup {

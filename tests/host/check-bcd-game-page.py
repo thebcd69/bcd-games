@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Modified 2026-11-04: Duo-only native interface and navigation support.
 """BCD's game page (app/Madeira/BCDGamePage.swift; docs/BCD-UI-ARCHITECTURE.md).
 
 Checks:
@@ -225,7 +226,8 @@ views = page[page.index("// MARK: - Opening the page"):]
 appeared = views[views.index("private func appeared() {"):]
 appeared = appeared[:appeared.index("\n    }\n")]
 check("the page opens its focus layer on appearing and closes it on leaving",
-      "focus.openLayer(Self.layer)" in appeared and ".onDisappear {\n            model.leave()\n            focus.closeLayer(Self.layer)" in views)
+      "focus.openLayer(Self.layer)" in appeared and "else { model.leave(); focus.closeLayer(Self.layer) }" in views
+      and "BCDDuoPageOwner.release(owner)" in views and "cleanup: deactivateEmbeddedPage" in appeared)
 buttons = views[views.index("private func installButtons() {"):]
 buttons = buttons[:buttons.index("\n    }\n")]
 for button, title in (("a", None), ("x", "Options"), ("y", "Update"), ("y", "Default"), ("b", "Back"), ("b", "Close")):

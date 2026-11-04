@@ -28,6 +28,7 @@ Checks:
   - the preview build compiles (tools/ui-preview.py --build-only; --no-preview leaves it out);
   - CI runs this check.
 """
+# Modified 2026-11-04: assert native search and toolbar presentation.
 import argparse
 import re
 import shutil
@@ -104,18 +105,19 @@ for name in ("BCDAddGame.swift", "BCDAddGameLive.swift"):
 
 # ---- the library ---------------------------------------------------------------------------------
 check("Library: a search field that filters the games by name",
-      'TextField("Find a game", text: $query)' in library
+      '.searchable(text: $query, isPresented: $searching, prompt: "Find a game")' in library
       and "list = list.filter { $0.title.localizedCaseInsensitiveContains(words) }" in library)
-check("Library: Add a game, Search and Refresh stay in sight at the end of the filter row",
-      'round("library.search", searching ? "xmark" : "magnifyingglass"' in library
-      and 'rowButton("library.add", "Add a game", "plus") { store.actions?.addGameFromFiles() }' in library
-      and "so turning the phone does not replace it" in library)
+check("Library: native search and toolbar actions adapt to the device's reserved bars",
+      '.searchable(text: $query, isPresented: $searching' in library
+      and 'ToolbarItemGroup(placement: .primaryAction)' in library
+      and 'Label("Add a game", systemImage: "plus")' in library
+      and 'Label("Refresh library", systemImage: "arrow.clockwise")' in library)
 check("Library: Y on the library tab opens the search (and closes it again)",
       'if tab == .library { list.append((BCDHint(button: .y, title: "Search"), { librarySearch += 1 })) }' in shell
       and "case .library: BCDLibraryView(searchRequest: librarySearch)" in shell
-      and ".onChange(of: searchRequest) { _, _ in toggleSearch() }" in library and "typing = searching" in library)
+      and ".onChange(of: searchRequest) { _, _ in toggleSearch() }" in library and "searching.toggle()" in library)
 check("Library: Refresh, a button and pull to refresh, calls the store's refreshLibrary",
-      'round("library.refresh", "arrow.clockwise", "Refresh the library") { store.actions?.refreshLibrary() }' in library
+      'Button { store.actions?.refreshLibrary() } label:' in library
       and ".refreshable { store.actions?.refreshLibrary() }" in library)
 check("Library: signed out of Steam, a card offers the sign-in",
       "if steamShown, let steam, steam.available, steam.name == nil {" in library
@@ -142,7 +144,7 @@ check("Library: the filter and the order are kept across games and launches (the
 check("Library: BCD's own sort menu offers every sort the classic library had (Library.swift's Sort by: played, name, added, size)",
       'case played, name, added, size' in library and 'return "Last played"' in library and 'return "Recently added"' in library
       and 'return "Folder size"' in library and 'case .name: return "Name"' in library
-      and 'rowButton("library.sort", sort.title, "arrow.up.arrow.down", label: "Sort by: \\(sort.title)") { showSortMenu() }' in library
+      and 'Button { showSortMenu() } label:' in library and 'Label("Sort by: \\(sort.title)", systemImage: "arrow.up.arrow.down")' in library
       and 'BCDMenuContent(title: "Sort by", items: BCDLibrarySort.allCases.map' in library
       and "return sort.sorted(list)" in library)
 # Wave 3 (2026-10-19): the classic library's Sort by picker (played, name, added, size) is deleted; the four sorts

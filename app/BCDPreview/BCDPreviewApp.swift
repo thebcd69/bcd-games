@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified locally for the iOS 27.1 Duo build, 2026-11-04.
+// Modified 2026-11-04: Duo-only native interface and navigation support.
 
 import SwiftUI
 import UIKit
@@ -84,6 +86,7 @@ struct BCDPreviewApp: App {
                 }
                 .modifier(BCDPreviewSessionScreens(store: store, focus: focus))   // -BCDTab ingame-menu|starting|overlay (BCDPreviewSession.swift)
                 .modifier(BCDPreviewStage())   // -BCDStage WxH[:regular|compact,regular|compact] (BCDPreviewStage.swift): a window of that size, centred; outermost, so the in-game screens are inside it
+                .modifier(BCDFoldableWatch())
         }
     }
 
@@ -92,7 +95,11 @@ struct BCDPreviewApp: App {
         if tab == "settings" {
             let section = UserDefaults.standard.string(forKey: "BCDSection")
                 .flatMap { BCDSettingsSection(name: String($0.split(separator: "+").first ?? "")) }
-            BCDSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            if BCDDuoFeatures.active {
+                BCDDuoSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            } else {
+                BCDSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            }
         } else if tab == "controllers" {
             BCDControllerPreview(focus: focus)
         } else if tab.hasPrefix("game") {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified for native Duo navigation, 2026-11-04.
 
 import Foundation
 
@@ -156,6 +157,8 @@ struct BCDSettingsNavigator {
     var order: [String] = []
     /// The value rows among them: left and right step these.
     var adjustable: Set<String> = []
+    /// Persistent-tab Settings has no modal Done action.
+    var hasDone = true
 
     /// The list is what the ring is on, or what B returns to.
     private var onList: Bool { mode == .split || !pushed }
@@ -179,7 +182,7 @@ struct BCDSettingsNavigator {
         if id == BCDSettingsID.back {
             switch move {
             case .down: return order.first.map { .focus($0) } ?? .stay
-            case .right: return .focus(BCDSettingsID.done)
+            case .right: return hasDone ? .focus(BCDSettingsID.done) : .stay
             case .left: return .leave(selected)
             case .up: return .stay
             }
@@ -188,7 +191,7 @@ struct BCDSettingsNavigator {
             guard let index = sections.firstIndex(of: section) else { return .pass }
             switch move {
             case .up:
-                guard index > 0 else { return .focus(BCDSettingsID.done) }
+                guard index > 0 else { return hasDone ? .focus(BCDSettingsID.done) : .stay }
                 return mode == .split ? .select(sections[index - 1]) : .focus(BCDSettingsID.list(sections[index - 1]))
             case .down:
                 guard index + 1 < sections.count else { return .stay }

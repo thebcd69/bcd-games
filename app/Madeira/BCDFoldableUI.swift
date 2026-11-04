@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified for the native iPhone Duo interface, 2026-11-04.
 
 import SwiftUI
 import UIKit
@@ -15,7 +16,8 @@ import UIKit
 // together. A window that appears later gets it when it becomes visible. (Tried in the simulator, 2026-10-25: the same override on
 // the UIWindowScene itself did nothing to the SwiftUI environment; on each window, and on each window's root controller, it did.)
 //
-// Nothing here runs unless `BCDFoldable.active`: BCDFoldableWatch adds nothing to the view then.
+// Native Duo navigation uses the real UIKit traits and sizes page content locally. The window
+// override is retained only for the original interface with experimental gameplay support enabled.
 
 enum BCDFoldableSceneClass {
     /// What the windows should have now: set by `follow`, applied to a window that appears afterwards.
@@ -50,11 +52,11 @@ enum BCDFoldableSceneClass {
     }
 }
 
-/// A modifier for the app's root: on the foldable iPhone with its switch on, a zero-cost UIKit view behind the content follows the
+/// A modifier for the app's root: on the foldable iPhone, a zero-cost UIKit view behind the content follows the
 /// window's width on every layout pass (the library, a game's session: the root shows one or the other). Otherwise the content as it is.
 struct BCDFoldableWatch: ViewModifier {
     @ViewBuilder func body(content: Content) -> some View {
-        if BCDFoldable.active {
+        if !BCDDuoFeatures.active && BCDFoldable.active {
             content.background(BCDFoldableProbe())
         } else {
             content

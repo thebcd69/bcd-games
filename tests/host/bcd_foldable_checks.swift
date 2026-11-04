@@ -3,6 +3,7 @@
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
 // The foldable-iPhone gate, the inner display's shape and the scene-size tracker, compiled on the host by
 // tests/host/check-bcd-foldable.py with app/Madeira/BCDFoldable.swift and app/Madeira/GuestDisplay.swift.
+// Modified 2026-11-04: Duo-only native interface and navigation support.
 
 import Foundation
 import CoreGraphics
@@ -17,7 +18,7 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
 }
 
 @main enum Run {
-    static func main() {
+    @MainActor static func main() {
         // ---------------------------------------------------------------- the gate: model AND switch
         check("the foldable model's identifier is iPhone19,4 and no other", BCDFoldableDevice.identifiers == ["iPhone19,4"])
         check("the model is recognised", BCDFoldableDevice.isFoldable(machine: "iPhone19,4"))
@@ -28,6 +29,11 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
         check("the foldable model with its switch on opens the gate", BCDFoldableSwitch.gate(machine: "iPhone19,4", stored: "1"))
         check("the foldable model with its switch off, stored 0, unset or garbled keeps it shut",
               ["0", nil, "", "maybe", "true"].allSatisfy { !BCDFoldableSwitch.gate(machine: "iPhone19,4", stored: $0) })
+
+        check("native Duo enhancements default on for Duo", BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: nil))
+        check("the Duo interface can opt out explicitly", !BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: "0")
+              && !BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: " 0\n"))
+        check("Duo can opt back in", BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: "1"))
 
         // A different model identifier: nothing new runs, whatever the switch holds.
         var others: [String] = []
@@ -43,8 +49,23 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
             if BCDFoldableDevice.isFoldable(machine: m) { leaked.append("\(m)/model") }
         }
         check("with any other model identifier the gate is shut for every switch value (\(others.count) identifiers, five values each)", leaked.isEmpty, leaked.joined(separator: ", "))
+        check("no other model can enable native Duo enhancements, even with an override", others.allSatisfy { model in
+            [nil, "0", "1", "true", ""] .allSatisfy { !BCDDuoFeatures.enabled(machine: model, stored: $0) }
+        })
         check("the identifier list holds exactly one entry, so nothing but iPhone19,4 can ever match", BCDFoldableDevice.identifiers.count == 1)
         check("this host is not the foldable model, so its gate is shut", !BCDFoldableDevice.isThisDevice && !BCDFoldable.active)
+
+        // A late disappearance from the previous tab cannot release the new page's resources.
+        let firstOwner = UUID(), nextOwner = UUID()
+        var handoff: [String] = []
+        BCDDuoPageOwner.claim(firstOwner) { handoff.append("first closed") }
+        BCDDuoPageOwner.claim(nextOwner) { handoff.append("next closed") }
+        check("claiming another native page first cleans up the outgoing page", handoff == ["first closed"])
+        BCDDuoPageOwner.release(firstOwner)
+        check("late outgoing cleanup cannot release the incoming page", handoff == ["first closed"])
+        BCDDuoPageOwner.release(nextOwner)
+        BCDDuoPageOwner.end()
+        check("the active page cleans up exactly once", handoff == ["first closed", "next closed"])
 
         // ---------------------------------------------------------------- the display shape
         check("a shut gate returns no screen, so the existing reading of the screen stays", BCDFoldable.screen(active: false) == nil && BCDFoldable.innerScreen == nil)

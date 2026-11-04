@@ -4,6 +4,36 @@
 
 import SwiftUI
 
+// Modified 2026-11-04: glass styling is enabled only by the Duo enhancements flag.
+
+/// Glass belongs to the control layer. Content cards retain an opaque reading surface.
+private struct BCDGlassSurface<S: Shape>: ViewModifier {
+    let shape: S
+    var tint: Color?
+    var interactive: Bool
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.isEnabled) private var enabled
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if reduceTransparency {
+            content.background(BCDStyle.surfaceRaised, in: shape)
+                .overlay(shape.stroke(BCDStyle.textSoft.opacity(0.5), lineWidth: 1))
+        } else if #available(iOS 26.0, *) {
+            content.glassEffect(.regular.tint(tint).interactive(interactive && enabled), in: shape)
+        } else {
+            content.background(.regularMaterial, in: shape)
+                .overlay(shape.stroke(BCDStyle.stroke, lineWidth: 1))
+        }
+    }
+}
+
+extension View {
+    func bcdGlass<S: Shape>(in shape: S, tint: Color? = nil, interactive: Bool = false) -> some View {
+        modifier(BCDGlassSurface(shape: shape, tint: tint, interactive: interactive))
+    }
+}
+
+
 /// BCD's look (2026-10-18): the night-violet ground and the violet-to-fuchsia light of
 /// the BCD logo, rounded heavy type, and soft glowing cards. The setup screens use it
 /// first; the new library screens will share it.
@@ -26,8 +56,8 @@ enum BCDStyle {
 
     static func title(_ size: CGFloat = 32) -> Font { .system(size: size, weight: .heavy, design: .rounded) }
     static func heading(_ size: CGFloat = 19) -> Font { .system(size: size, weight: .bold, design: .rounded) }
-    static func body(_ size: CGFloat = 16) -> Font { .system(size: size, weight: .regular, design: .rounded) }
-    static func label(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .semibold, design: .rounded) }
+    static func body(_ size: CGFloat = 16) -> Font { .system(size: size, weight: .regular, design: BCDDuoFeatures.active ? .default : .rounded) }
+    static func label(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .semibold, design: BCDDuoFeatures.active ? .default : .rounded) }
 }
 
 /// The full-screen ground behind BCD's own screens, with the logo's glow at the top.
@@ -63,7 +93,15 @@ struct BCDLogoMark: View {
 /// The main action: a glowing violet-to-fuchsia capsule.
 struct BCDPrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var enabled
-    func makeBody(configuration: Configuration) -> some View {
+    @ViewBuilder func makeBody(configuration: Configuration) -> some View {
+        if BCDDuoFeatures.active {
+        configuration.label
+            .font(BCDStyle.label(17))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .bcdGlass(in: Capsule(), tint: BCDStyle.violet, interactive: true)
+            .opacity(enabled ? 1 : 0.45)
+        } else {
         configuration.label
             .font(BCDStyle.label(17))
             .foregroundStyle(.white)
@@ -73,6 +111,7 @@ struct BCDPrimaryButtonStyle: ButtonStyle {
             .opacity(enabled ? 1 : 0.45)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+        }
     }
 }
 
@@ -89,13 +128,21 @@ struct BCDSecondaryButtonStyle: ButtonStyle {
 
 /// An outlined alternative to the primary action.
 struct BCDOutlineButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
+    @ViewBuilder func makeBody(configuration: Configuration) -> some View {
+        if BCDDuoFeatures.active {
+        configuration.label
+            .font(BCDStyle.label(16))
+            .foregroundStyle(BCDStyle.text)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .bcdGlass(in: Capsule(), interactive: true)
+        } else {
         configuration.label
             .font(BCDStyle.label(16))
             .foregroundStyle(BCDStyle.text)
             .frame(maxWidth: .infinity, minHeight: 50)
             .background(BCDStyle.surface.opacity(configuration.isPressed ? 0.6 : 1), in: Capsule())
             .overlay(Capsule().strokeBorder(BCDStyle.glow, lineWidth: 1.5))
+        }
     }
 }
 

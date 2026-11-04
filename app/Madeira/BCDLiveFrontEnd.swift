@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Modified 2026-11-04: Duo-only native interface and navigation support.
 
 import SwiftUI
 import UIKit
@@ -44,10 +45,14 @@ struct BCDLiveFrontEnd: View {
         presenting(watching(shell))
     }
 
-    private var shell: some View {
+    @ViewBuilder private var shell: some View {
         // The settings button and Menu open BCD's own Settings (BCDFrontEnd's).
-        BCDFrontEnd(store: live.store, focus: focus)
-            .toolbar(.hidden, for: .navigationBar)
+        if BCDDuoFeatures.active {
+            BCDFrontEnd(store: live.store, focus: focus)
+        } else {
+            BCDFrontEnd(store: live.store, focus: focus)
+                .toolbar(.hidden, for: .navigationBar)
+        }
     }
 
     // MARK: What the library's screen did around itself

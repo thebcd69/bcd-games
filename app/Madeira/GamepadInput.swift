@@ -472,11 +472,36 @@ final class GamepadInput: @unchecked Sendable {
 }
 
 /// iOS 18 otherwise routes stick input into UIKit/SwiftUI focus navigation.
+// Modified 2026-11-04: claim on the window without wrapping native bars in a
+// safe-area-sized SwiftUI interaction view. That wrapper drew the Duo bars
+// outside its hit-test bounds, so their buttons appeared but could not be tapped.
 struct ClaimGamepadEvents: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 18.0, *), GamepadInput.enabled {
+    @ViewBuilder func body(content: Content) -> some View {
+        if BCDDuoFeatures.active {
+            content.background(GamepadWindowClaimProbe())
+        } else if #available(iOS 18.0, *), GamepadInput.enabled {
             content.handlesGameControllerEvents(matching: .gamepad)
-        } else { content }
+        } else {
+            content
+        }
+    }
+}
+
+private struct GamepadWindowClaimProbe: UIViewRepresentable {
+    func makeUIView(context: Context) -> GamepadWindowClaimView { GamepadWindowClaimView() }
+    func updateUIView(_ view: GamepadWindowClaimView, context: Context) {}
+}
+
+private final class GamepadWindowClaimView: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isUserInteractionEnabled = false
+        backgroundColor = .clear
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if let window { GamepadEventClaim.install(on: window) }
     }
 }
 

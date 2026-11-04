@@ -4,6 +4,17 @@
 
 import SwiftUI
 
+// Modified 2026-11-04: one Duo-only switch controls the native interface redesign.
+struct BCDDuoEnhancementsSettingsRow: View {
+    @State private var on = BCDDuoFeatures.enabled(machine: BCDFoldableDevice.machine,
+        stored: UserDefaults.standard.string(forKey: BCDDuoFeatures.key))
+    var body: some View {
+        BCDSettingsToggleRow(id: BCDSettingsID.control(.graphics, "duo-interface"),
+            title: "Duo enhancements", note: "Liquid Glass and native navigation for iPhone Duo. Turn off to use the original interface. Applies the next time BCD starts.",
+            isOn: on) { value in BCDDuoFeatures.store(value); on = value }
+    }
+}
+
 // Settings › Graphics › Foldable iPhone: the experimental switch (BCDFoldable.swift). Shown on the foldable model only
 // (BCDSettingsSections.swift tests BCDFoldableDevice.isThisDevice before it adds the group), so no other device's Settings
 // has the row. It keeps its answer in UserDefaults, not in bcd.cfg, and the answer applies from the next start of BCD

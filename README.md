@@ -94,12 +94,15 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
 - **.NET games** through Wine Mono, downloaded in the app.
 - **Feedback from the app:** Settings › Feedback to tell us what is broken or what to improve,
   and Send Log after a crash.
-- **iPhone Duo (experimental):** on the foldable iPhone, turn on Settings › Graphics › Foldable
-  iPhone support (experimental). A game you add then starts at a resolution shaped like the inner
-  display, the touch controls follow the screen when you fold or unfold the phone, and BCD uses its
-  phone layout in a window narrower than 700 points. Installed directly, iOS shows BCD in a small
-  window on the inner display; inside LiveContainer it fills the screen. The switch is off by
-  default and changes nothing on other iPhones and iPads.
+- **iPhone Duo:** Duo enhancements adds native adaptive navigation and Liquid Glass on the foldable
+  iPhone only. Settings › Graphics › Duo enhancements restores the original interface when turned
+  off; restart BCD to apply the change. Other iPhones and iPads keep the original interface, even
+  if that preference is enabled. On Duo the interface uses its phone layout below 700 points.
+  For experimental gameplay resizing and inner-display resolution defaults, separately turn on
+  Settings › Graphics › Foldable iPhone support (experimental). That switch remains off by default.
+  Direct builds linked with the iOS 26 SDK run in a small compatibility window on the inner display;
+  use the native iOS 27 SDK for a Duo build, or LiveContainer for an existing release built with the
+  older SDK.
 
 ## Games
 

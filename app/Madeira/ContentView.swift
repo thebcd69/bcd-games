@@ -4,6 +4,7 @@ import QuartzCore
 import Metal
 import os.log
 
+
 // 2026-07-03 window-hosted Metal layer.
 //
 // The presenting CAMetalLayer must NOT be a SwiftUI-hosted view's backing
@@ -1018,15 +1019,24 @@ struct ContentView: View {
         case unavailable
     }
 
-    var body: some View {
-        /* ml658: was NavigationView, which is deprecated and — the reason this
-         * matters — defaults to a SPLIT VIEW on iPad. TARGETED_DEVICE_FAMILY is
-         * "1,2", so iPad is a shipping target, and the whole UI was being forced
-         * into a sidebar/detail arrangement it was never laid out for.
-         * NavigationStack is single-column on every device. Safe here: there are
-         * no NavigationLinks anywhere in the app, so nothing depended on the
-         * two-column selection behaviour. */
-        NavigationStack {
+    @ViewBuilder var body: some View {
+        // Modified 2026-11-04: only the Duo path owns per-tab navigation stacks.
+        // All other devices retain the original navigation container and styling.
+        if BCDDuoFeatures.active {
+            appContent
+        } else {
+            NavigationStack {
+                appContent
+                    .navigationTitle("BCD")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(.regularMaterial, for: .navigationBar)
+                    .toolbarBackground(!Self.systemScrollEdge ? .visible : .automatic, for: .navigationBar)
+            }
+        }
+    }
+
+    private var appContent: some View {
+        ZStack {
             Group {
                 if library.current != nil {
                     sessionBody
@@ -1038,15 +1048,7 @@ struct ContentView: View {
                                     startDock: { startDock($0, compactPool: $1) })
                 }
             }
-            .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): adds nothing off the foldable iPhone with its switch on; there, a window under 700 pt reads as compact so the iPad layout is not drawn in it
-            .navigationTitle("BCD")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.regularMaterial, for: .navigationBar)
-            // The library keeps a material bar only before iOS 26. From iOS 26 the
-            // system draws its soft scroll edge effect instead: content scrolls
-            // under the title, the buttons and the search field behind a
-            // progressive blur (as in the App Store), with no hard edge.
-            .toolbarBackground(!Self.systemScrollEdge ? .visible : .automatic, for: .navigationBar)
+            .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): on the foldable iPhone, a window under 700 pt reads as compact, independently of the experimental game-support switch
             // A second session cannot start in this process; offer to close Madeira.
             .alert("BCD needs a restart", isPresented: Binding(get: { library.restartNotice != nil },
                                                                set: { if !$0 { library.restartNotice = nil } })) {
