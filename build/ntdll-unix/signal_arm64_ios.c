@@ -1,3 +1,5 @@
+/* Portions copyright 2026 ft7t8drgwf-wq, 125hz, Ash Hopkins and Nikita Kiselov: code taken from https://github.com/willfaust/Madeira (pull requests #461, #469, #517 and #526; commits 459dfa9 and 0db1b82)
+ * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * ARM64 signal handling routines
  *
@@ -42,6 +44,7 @@
 #include <mach/mach.h>
 #include <mach-o/dyld.h>
 #include <mach-o/getsect.h>
+#include <sys/sysctl.h>
 
 /* iOS-Madeira ml674: XZR/WZR AS A STORE SOURCE MUST READ ZERO.
  *
@@ -1181,6 +1184,169 @@ static void ios_lock_census(void)
 uintptr_t ios_beacon_teb_list[4];
 int ios_beacon_teb_count;
 
+/* ml2250: SRW-LOCK HANGS IN 32-BIT PROCESSES (logs 116-119, 2026-10-28).
+ *
+ * Steam's 32-bit web helper stopped at start in three runs of four: its renderer
+ * thread waited without a timeout at an address inside libcef.dll's data that is
+ * 2 mod 4 with the word there reading 2. That is Wine's SRW lock: an exclusive
+ * acquire waits on the `owners` half (offset 2), and 2 means two shared owners
+ * that never let go. The census showed only the waiter, so the holders stayed
+ * unknown.
+ *
+ * Each census cycle, a 32-bit thread waiting like that for
+ * env.MADEIRA_SRW_HANG_DIAG_S (30; 0 = off) has every 32-bit thread of its
+ * process logged once: the x86 registers from the WoW64 CPU area (FEX stores
+ * them before every system call, so a thread parked in a wait has them current),
+ * the EBP chain and the module-resolved words above ESP, named from the
+ * process's own loader list.
+ *
+ * madeira-bcd: the census only. Upstream also has env.MADEIRA_SRW_HANG_KILL_S
+ * (unset = never; its Steam Big Picture list sets 40), which hands the pid to
+ * the wineserver's main loop to end the process; BCD has no such row and this
+ * port leaves the ending out altogether, so nothing here can stop a program. */
+
+#define IOS_WOW_MODS 160
+struct ios_wow_mod { uint32_t base, size; char name[32]; };
+
+static int ios_wow_rd( uint64_t a, void *out, size_t n )
+{
+    mach_vm_size_t got = 0;
+    return a > 0x10000 && mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)a, n,
+                                                  (mach_vm_address_t)(uintptr_t)out, &got ) == KERN_SUCCESS && got == n;
+}
+
+/* The 32-bit process's modules, from PEB32->Ldr's load-order list (B = its window). */
+static int ios_wow_mods( uint64_t B, uint64_t teb64, struct ios_wow_mod *mods )
+{
+    uint32_t peb = 0, ldr = 0, head, link;
+    int n = 0, steps = 0;
+
+    if (!ios_wow_rd( teb64 + 0x2000 + 0x30, &peb, 4 ) || !peb ||
+        !ios_wow_rd( B + peb + 0x0c, &ldr, 4 ) || !ldr) return 0;
+    head = ldr + 0x0c;
+    if (!ios_wow_rd( B + head, &link, 4 )) return 0;
+    while (link && link != head && n < IOS_WOW_MODS && steps++ < 512)
+    {
+        uint32_t ent[13];   /* LDR_DATA_TABLE_ENTRY32 up to BaseDllName */
+        uint16_t wname[31];
+        int k, len;
+
+        if (!ios_wow_rd( B + link, ent, sizeof(ent) )) break;
+        mods[n].base = ent[6]; mods[n].size = ent[8];
+        len = (ent[11] & 0xffff) / 2;
+        if (len > 31) len = 31;
+        memset( wname, 0, sizeof(wname) );
+        if (!len || !ios_wow_rd( B + ent[12], wname, len * 2 )) len = 0;
+        for (k = 0; k < len; k++) mods[n].name[k] = (wname[k] >= 0x20 && wname[k] < 0x7f) ? (char)wname[k] : '?';
+        mods[n].name[len] = 0;
+        if (mods[n].base && mods[n].size) n++;
+        link = ent[0];
+    }
+    return n;
+}
+
+static const struct ios_wow_mod *ios_wow_mod_at( uint32_t va, const struct ios_wow_mod *mods, int n )
+{
+    int i;
+    for (i = 0; i < n; i++) if (va >= mods[i].base && va - mods[i].base < mods[i].size) return &mods[i];
+    return NULL;
+}
+
+static void ios_wow_dump_process( uint64_t B, uint32_t pid, uint64_t any_teb, int count )
+{
+    static struct ios_wow_mod mods[IOS_WOW_MODS];   /* census thread only */
+    int nmods = ios_wow_mods( B, any_teb, mods ), i, shown = 0;
+
+    dprintf( 2, "[srw-hang] ml2250 pid=%04x window=0x%llx: every 32-bit thread of the process, %d modules\n",
+             pid, (unsigned long long)B, nmods );
+    for (i = 0; i < count && shown < 128; i++)
+    {
+        extern int ios_alert_waiter_lookup( unsigned int tid, const void **addr, int *age_s, int *inf );
+        uint64_t teb = ios_thread_registry[i].teb, cpu = 0, tpid = 0, ttid = 0;
+        uint32_t ctx[0x34], ebp, eip, esp, w = 0;
+        uint16_t machine = 0;
+        const void *waddr = NULL;
+        int wage = 0, winf = 0, f;
+        char bt[400], st[400];
+        size_t bl = 0, sl = 0;
+        const struct ios_wow_mod *m;
+
+        if (!teb || (teb & ~0xffffffffull) != B) continue;
+        if (!ios_wow_rd( teb + 0x40, &tpid, 8 ) || (uint32_t)tpid != pid || !ios_wow_rd( teb + 0x48, &ttid, 8 )) continue;
+        if (!ios_wow_rd( teb + 0x1488, &cpu, 8 ) || !cpu || !ios_wow_rd( cpu + 2, &machine, 2 ) || machine != 0x14c) continue;
+        if (!ios_wow_rd( cpu + 4, ctx, sizeof(ctx) )) continue;
+        ebp = ctx[0xb4 / 4]; eip = ctx[0xb8 / 4]; esp = ctx[0xc4 / 4];
+        shown++;
+        if (ios_alert_waiter_lookup( (unsigned int)ttid, &waddr, &wage, &winf ))
+            ios_wow_rd( (uint64_t)(uintptr_t)waddr & ~3ull, &w, 4 );
+        bt[0] = st[0] = 0;
+        for (f = 0; f < 16 && ebp > 0x1000 && bl < sizeof(bt) - 48; f++)
+        {
+            uint32_t rec[2];
+            if (!ios_wow_rd( B + ebp, rec, sizeof(rec) )) break;
+            m = ios_wow_mod_at( rec[1], mods, nmods );
+            bl += snprintf( bt + bl, sizeof(bt) - bl, " %s+0x%x", m ? m->name : "?", m ? rec[1] - m->base : rec[1] );
+            if (rec[0] <= ebp) break;
+            ebp = rec[0];
+        }
+        for (f = 0; f < 256 && sl < sizeof(st) - 48; f++)
+        {
+            uint32_t v;
+            if (!ios_wow_rd( B + esp + 4u * f, &v, 4 )) break;
+            if ((m = ios_wow_mod_at( v, mods, nmods )))
+                sl += snprintf( st + sl, sizeof(st) - sl, " +%x:%s+0x%x", 4 * f, m->name, v - m->base );
+        }
+        m = ios_wow_mod_at( eip, mods, nmods );
+        dprintf( 2, "[srw-hang] tid=%04x eip=%08x(%s+0x%x) esp=%08x ebp=%08x wait=%p %ds %s w=%08x\n",
+                 (unsigned)ttid, eip, m ? m->name : "?", m ? eip - m->base : 0, esp, ctx[0xb4 / 4],
+                 waddr, wage, waddr ? (winf ? "INF" : "TMO") : "-", w );
+        dprintf( 2, "[srw-hang]   ebp:%s\n", bt );
+        dprintf( 2, "[srw-hang]   stack:%s\n", st );
+    }
+}
+
+static int ios_srw_hang_env( const char *name, int fallback )
+{
+    const char *e = getenv( name );
+    return e && *e ? atoi( e ) : fallback;
+}
+
+static void ios_srw_hang_census( int count )
+{
+    static int diag_s = -2;
+    static uint32_t dumped[8];
+    static int ndumped;
+    int i, j;
+
+    if (diag_s == -2) diag_s = ios_srw_hang_env( "MADEIRA_SRW_HANG_DIAG_S", 30 );
+    if (diag_s <= 0) return;
+    for (i = 0; i < count; i++)
+    {
+        extern int ios_alert_waiter_lookup( unsigned int tid, const void **addr, int *age_s, int *inf );
+        uint64_t teb = ios_thread_registry[i].teb, cpu = 0, tpid = 0, ttid = 0;
+        uint16_t machine = 0, owners = 0;
+        const void *waddr = NULL;
+        int wage = 0, winf = 0, seen;
+
+        if (!teb || !ios_wow_rd( teb + 0x1488, &cpu, 8 ) || !cpu ||
+            !ios_wow_rd( cpu + 2, &machine, 2 ) || machine != 0x14c) continue;
+        if (!ios_wow_rd( teb + 0x40, &tpid, 8 ) || !ios_wow_rd( teb + 0x48, &ttid, 8 )) continue;
+        if (!ios_alert_waiter_lookup( (unsigned int)ttid, &waddr, &wage, &winf ) || !winf) continue;
+        if (((uintptr_t)waddr & 3) != 2 || !ios_wow_rd( (uint64_t)(uintptr_t)waddr, &owners, 2 ) || !owners) continue;
+        if (wage >= diag_s)
+        {
+            for (seen = 0, j = 0; j < ndumped; j++) if (dumped[j] == (uint32_t)tpid) seen = 1;
+            if (!seen && ndumped < 8)
+            {
+                dumped[ndumped++] = (uint32_t)tpid;
+                dprintf( 2, "[srw-hang] ml2250 tid=%04x of pid %04x waits %ds for an SRW lock at %p held by %u shared owner(s)%s\n",
+                         (unsigned)ttid, (unsigned)tpid, wage, waddr, owners, owners == 0xffff ? " (exclusive)" : "" );
+                ios_wow_dump_process( teb & ~0xffffffffull, (uint32_t)tpid, teb, count );
+            }
+        }
+    }
+}
+
 #define IOS_PUMP_MAX 4
 extern void ios_alert_ring_dump(void);   /* ml439 (#74): unix/sync.c alert-flow probe */
 extern void ios_alert_waiter_dump(void); /* ml440 (#74): >60s parkers + their lock words */
@@ -1196,6 +1362,7 @@ void ios_pump_sample(void)
 
     ios_alert_ring_dump();   /* ml439: static ring during a parked-stall = wakes dying PE-side */
     ios_alert_waiter_dump(); /* ml440: name the lock the parked crowd is starving on */
+    ios_srw_hang_census( count );   /* ml2250: who holds a 32-bit SRW lock a thread starves on */
     /* ml447: orphan-lock detector — collect live threads' TEB Instr[6]
      * CodeBufferWriteMutex stamps; a held-exclusive SRW with >=3 waiters that
      * NO live thread stamps (3 cycles running) has a vanished dead owner. */
@@ -1574,6 +1741,81 @@ static int ios_mach_emulate_ldaddal32(uint32_t insn, uintptr_t rw_addr, uint64_t
     old = __atomic_fetch_add((uint32_t *)rw_addr, value, __ATOMIC_SEQ_CST);
     if (rt != 31) gpr[rt] = old;
     return 1;
+}
+
+/* ml2190 (upstream Madeira #518, b0742a7): a misaligned SWP that stays inside one 16-byte granule.
+ *
+ * The Escapists 2 (32-bit Unity, its own mono.dll) died at load: Mono rewrote
+ * the rel32 of a call in its own RWX code buffer with an x86 XCHG, FEX ran it as
+ * `swpal w4, w4, [x24]` (0xb8e48304) on 0x...0207 (3 mod 4), the page was the
+ * RX view of a JIT-pool alias, and ml626 refused it as unaligned. The fault
+ * went back to the guest as c0000005, Mono's handler VirtualProtect'ed the
+ * byte to PAGE_EXECUTE_READWRITE and retried, and ml461 counted 2,000
+ * identical redeliveries before terminating the process.
+ *
+ * With FEAT_LSE2 a misaligned LSE atomic that does not cross a 16-byte
+ * boundary neither alignment-faults nor loses single-copy atomicity, so the
+ * same hardware SWPAL on the RW alias is the genuine atomic (the faulting one
+ * hit a permission fault, not an alignment fault, for exactly that reason).
+ * A swap that crosses 16 bytes, or a host without LSE2, still returns 0 and is
+ * refused as before. SWPAL whatever A/R ask for, as the aligned case does.
+ * (MADEIRA_WOW_RWX_PLAIN=1 keeps such a 32-bit buffer out of the pool alias
+ * altogether; this is for when it is aliased.)
+ * The sysctl is read once; no Wine logging here.
+ *
+ * madeira-bcd: env.MADEIRA_SWP_LSE2 = 1 (default off), reached only from the branch of the ml626 SWP case that used to
+ * refuse (`rw_addr & align_mask`); the aligned path above it is untouched. Off, the refusal and its log line are as before: every 64-bit
+ * session in BCD's archive with that line (Cuphead, Blasphemous, KTANE: 20 logs) is a HEALTHY one (285 and 505 s of play), the guest's
+ * own Mono handler recovers from the two access violations, and what the guest's recovery leaves behind (the page FEX untrapped) is
+ * not what this path leaves (the page stays a read-only alias and every later store to it is an emulated one), so turning it on for
+ * everybody could cost those games speed. For a game that does die of the refusal (upstream's The Escapists 2). */
+static int ios_swp_lse2_on(void)
+{
+    const char *e = getenv( "MADEIRA_SWP_LSE2" );
+    return e && e[0] == '1' && !e[1];
+}
+
+static int ios_host_lse2 = -1;
+static int ios_mach_swp_lse2( uintptr_t rw_addr, int size_lg2, uint64_t in, uint64_t *old )
+{
+    const unsigned nbytes = 1u << size_lg2;
+
+    if (ios_host_lse2 < 0)
+    {
+        int v = 0;
+        size_t len = sizeof(v);
+        if (sysctlbyname( "hw.optional.arm.FEAT_LSE2", &v, &len, NULL, 0 )) v = 0;
+        ios_host_lse2 = v ? 1 : 0;
+    }
+    if (!ios_host_lse2 || !rw_addr || (rw_addr & 15) + nbytes > 16) return 0;
+    switch (size_lg2)
+    {
+    case 1:
+    {
+        uint32_t v = (uint16_t)in, o;
+        asm volatile(".arch_extension lse\n\tswpalh %w1, %w0, [%2]"
+                     : "=&r"(o) : "r"(v), "r"(rw_addr) : "memory");
+        *old = o;
+        return 1;
+    }
+    case 2:
+    {
+        uint32_t v = (uint32_t)in, o;
+        asm volatile(".arch_extension lse\n\tswpal %w1, %w0, [%2]"
+                     : "=&r"(o) : "r"(v), "r"(rw_addr) : "memory");
+        *old = o;
+        return 1;
+    }
+    case 3:
+    {
+        uint64_t o;
+        asm volatile(".arch_extension lse\n\tswpal %1, %0, [%2]"
+                     : "=&r"(o) : "r"(in), "r"(rw_addr) : "memory");
+        *old = o;
+        return 1;
+    }
+    }
+    return 0;
 }
 
 /* ml938/ml939: defined far below, next to the store emulator they reuse.
@@ -5690,17 +5932,32 @@ static void *ios_mach_exception_thread( void *arg )
                         int rt = insn & 0x1f;           /* old value lands here */
                         uint64_t align_mask = (1ULL << size_lg2) - 1;
 
-                        /* An unaligned atomic cannot be emulated atomically. Fall through
-                         * to the discriminator rather than quietly doing something weaker. */
+                        /* An unaligned atomic cannot be emulated with the builtins. Inside
+                         * one 16-byte granule ml2190 runs the hardware SWPAL (LSE2);
+                         * anything else falls through to the discriminator rather than
+                         * quietly doing something weaker. */
                         if (rw_addr & align_mask)
                         {
+                            /* __x holds x0..x28 only: an FP/LR operand is refused */
+                            const int regs_ok = (rs < 29 || rs == 31) && (rt < 29 || rt == 31);
+                            uint64_t in = (rs == 31 || !regs_ok) ? 0 : state.__x[rs];
+                            uint64_t old = 0;
+                            /* madeira-bcd: env.MADEIRA_SWP_LSE2 = 1 (default off), see ios_mach_swp_lse2 */
+                            const int lse2 = regs_ok && ios_swp_lse2_on() && ios_mach_swp_lse2( rw_addr, size_lg2, in, &old );
                             static int swp_unalign_n;
+
+                            if (lse2)
+                            {
+                                if (rt != 31) state.__x[rt] = old;
+                                emulated = 1;
+                            }
                             if (swp_unalign_n < 4)
                                 dprintf(STDERR_FILENO,
-                                    "[swp-emul] ml626 #%d REFUSING unaligned atomic: insn=0x%08x size=%d "
-                                    "addr=0x%llx rw=0x%llx\n",
-                                    ++swp_unalign_n, insn, 1 << size_lg2,
-                                    (unsigned long long)fault_addr, (unsigned long long)rw_addr);
+                                    "[swp-emul] ml626 #%d %s unaligned atomic: insn=0x%08x size=%d "
+                                    "addr=0x%llx rw=0x%llx%s\n",
+                                    ++swp_unalign_n, lse2 ? "LSE2 SWPAL for" : "REFUSING", insn, 1 << size_lg2,
+                                    (unsigned long long)fault_addr, (unsigned long long)rw_addr,
+                                    lse2 ? " (ml2190)" : "");
                         }
                         else
                         {
@@ -11604,6 +11861,118 @@ static void ios_guest_code_at_fault( unsigned long long rip )
         ERR( "%s\n", line );
     }
 }
+
+/* ml1291: where a fatal guest fault came from, for code we cannot look at.
+ *
+ * Grounded's browser GPU process (UnrealCEFSubProcess.exe --type=gpu-process) died
+ * in libcef.dll on `cmp [r9], dil` with r9 = 0x30, right after ANGLE and Media
+ * Foundation loaded, with no Wine call logged in between. The game's own libcef.dll
+ * is ~120 MB, so the log has to carry what is needed to read the faulting function
+ * and its callers: for the exact guest RIP and every return address found on the
+ * guest stack, the image (an "MZ"/"PE" header at a 64 KB boundary below it, the
+ * way Wine maps images), the RVA, and the code bytes around it. A return address
+ * only counts when the bytes before it are a CALL (E8 rel32, or FF /2 in its 2, 3,
+ * 6 and 7 byte forms), so stale stack data stays out. Every read goes through Mach,
+ * as the rest of this path does. The first 4 faults that get here are described;
+ * MADEIRA_GUEST_CTX=0 turns it off. */
+static int ios_guest_ctx_read( uint64_t va, void *buf, size_t len )
+{
+    mach_vm_size_t got = 0;
+    if (va < 0x10000) return 0;
+    return mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)va, len,
+                                   (mach_vm_address_t)buf, &got ) == KERN_SUCCESS && got == len;
+}
+
+/* The image containing va (Wine maps images at 64 KB boundaries), or 0. */
+static uint64_t ios_guest_ctx_image( uint64_t va, uint32_t *size )
+{
+    uint64_t a;
+    int n;
+
+    for (a = va & ~0xffffull, n = 0; n < 4096 && a >= 0x10000; a -= 0x10000, n++)
+    {
+        uint8_t mz[2];
+        uint32_t lfanew = 0, sig = 0, soi = 0;
+
+        if (!ios_guest_ctx_read( a, mz, 2 ) || mz[0] != 'M' || mz[1] != 'Z') continue;
+        if (!ios_guest_ctx_read( a + 0x3c, &lfanew, 4 ) || lfanew > 0x1000 - 0x100) continue;
+        if (!ios_guest_ctx_read( a + lfanew, &sig, 4 ) || sig != 0x00004550) continue;
+        if (!ios_guest_ctx_read( a + lfanew + 0x50, &soi, 4 )) continue;   /* SizeOfImage */
+        if (va >= a + soi) return 0;     /* the nearest image below does not cover va */
+        *size = soi;
+        return a;
+    }
+    return 0;
+}
+
+static void ios_guest_ctx_hex( const char *what, uint64_t base, uint64_t from, int len )
+{
+    uint8_t b[32];
+    int off, k;
+
+    for (off = 0; off < len; off += 32)
+    {
+        char hex[32 * 3 + 1];
+        if (!ios_guest_ctx_read( from + off, b, sizeof(b) )) { ERR("  [guest-ctx] %s rva %#llx: unreadable\n", what,
+                                                                  (unsigned long long)(from + off - base) ); break; }
+        for (k = 0; k < 32; k++) snprintf( hex + k * 3, 4, "%02x ", b[k] );
+        ERR("  [guest-ctx] %s rva %#llx: %s\n", what, (unsigned long long)(from + off - base), hex);
+    }
+}
+
+static int ios_guest_ctx_is_call( uint64_t ret )
+{
+    uint8_t c[7];
+
+    if (!ios_guest_ctx_read( ret - 7, c, sizeof(c) )) return 0;
+    if (c[2] == 0xe8) return 1;                                   /* E8 rel32 */
+    if (c[5] == 0xff && (c[6] & 0x38) == 0x10 && (c[6] >> 6) == 3) return 1;   /* FF /2 reg */
+    if (c[4] == 0xff && (c[5] & 0x38) == 0x10 && (c[5] >> 6) == 1) return 1;   /* FF /2 [r+d8] */
+    if (c[1] == 0xff && (c[2] & 0x38) == 0x10 && ((c[2] >> 6) == 2 || (c[2] & 0xc7) == 0x05)) return 1;   /* d32 / rip */
+    if (c[0] == 0xff && (c[1] & 0x38) == 0x10 && (c[1] & 0xc7) == 0x84) return 1;   /* FF /2 [SIB+d32] */
+    if (c[3] == 0xff && (c[4] & 0x38) == 0x10 && (c[4] & 0xc7) == 0x44) return 1;   /* FF /2 [SIB+d8] */
+    return 0;
+}
+
+/* rsp is the live SRA RSP (x23); gregs_rsp, the saved one, is used when it cannot be read. */
+static void ios_guest_fault_context( uint64_t rip, uint64_t rsp, uint64_t gregs_rsp )
+{
+    static int count = -1;
+    uint64_t stack[256], base;
+    uint32_t size = 0;
+    int i, found = 0;
+
+    if (count < 0)
+    {
+        const char *e = getenv( "MADEIRA_GUEST_CTX" );
+        count = (e && *e == '0') ? 4 : 0;
+    }
+    if (count >= 4) return;
+    count++;
+
+    base = ios_guest_ctx_image( rip, &size );
+    ERR("  [guest-ctx] ml1291 rip=%p image=%p size=%#x rva=%#llx rsp=%p\n", (void *)rip, (void *)base, size,
+        base ? (unsigned long long)(rip - base) : 0ull, (void *)rsp);
+    if (base) ios_guest_ctx_hex( "rip", base, rip - 0x180, 0x200 );
+
+    if (!ios_guest_ctx_read( rsp, stack, sizeof(stack) ))
+    {
+        if (gregs_rsp == rsp || !ios_guest_ctx_read( gregs_rsp, stack, sizeof(stack) )) return;
+        ERR("  [guest-ctx] live rsp unreadable, using saved rsp=%p\n", (void *)gregs_rsp);
+    }
+    for (i = 0; i < 256 && found < 16; i++)
+    {
+        uint64_t q = stack[i], b;
+        uint32_t sz = 0;
+
+        if (q < 0x10000 || q >= 0x8000000000ull) continue;
+        if (!ios_guest_ctx_is_call( q ) || !(b = ios_guest_ctx_image( q, &sz ))) continue;
+        found++;
+        ERR("  [guest-ctx] ret #%d [rsp+%#x]=%p image=%p rva=%#llx\n", found, i * 8, (void *)q, (void *)b,
+            (unsigned long long)(q - b));
+        ios_guest_ctx_hex( "ret", b, q - 0x60, 0x80 );
+    }
+}
 #endif
 
 static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
@@ -12201,6 +12570,7 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
                                     (void*)bb, (void*)xrip, xb[0],xb[1],xb[2],xb[3],xb[4],xb[5],xb[6],xb[7],xb[8],xb[9],xb[10],xb[11],xb[12],xb[13],xb[14],xb[15]);
                             else
                                 ERR("  [guest-exact] ml885 block=%p rip=%p (bytes unreadable)\n", (void*)bb, (void*)xrip);
+                            ios_guest_fault_context( xrip, REGn_sig(23, context), cs[5] );   /* ml1291 */
                         }
                         else ERR("  [guest-exact] ml885 block=%p unresolved: %s\n", (void*)bb, why);
                     }
@@ -14728,6 +15098,36 @@ static int ios_subfloor_service( ucontext_t *ctx, void *fault_addr, const char *
 #endif
 
 
+#ifdef WINE_IOS
+/* madeira-bcd (ajan62, S19 step 1; upstream Madeira 0db1b82, Nikita Kiselov): env.MADEIRA_ALIAS_HONOR_PROT = 1 (default off).
+ *
+ * An executable alias (the JIT pool's RX view, or the RX view of an anonymous RWX allocation) is read-only on the host BY DESIGN: the
+ * writable view is another mapping of the same pages, and a guest store to the RX view faults so that FEX can invalidate the
+ * translated code first. The [wr-strip] heal below ("wine_want=7 host_prot=5 <== HOST STRIPPED WRITE") cannot tell that from iOS
+ * stripping the write bit behind Wine's back, and mprotect()s the alias RWX: FEX never sees the write, so it never invalidates, and
+ * a .NET runtime that patches its own prestub keeps executing the old one (Stardew Valley: every session since build 614 ends after
+ * 2-38 s with play=0s; the heal is in 118 archive logs). With the key on, a fault in such an alias is NOT healed here and goes on
+ * to the exception path like any other unexpected write fault. The decision to keep the switch off is BCD's: Jetboard Joust,
+ * Kingdom Hearts HD and others run through this heal today. Alone this is step 1 of upstream's rework (its step 2 completes stores
+ * through the writable view only after consulting FEX's logical protection, ios_alias_write). */
+static int ios_alias_honor_prot_on(void)
+{
+    const char *e = getenv( "MADEIRA_ALIAS_HONOR_PROT" );
+    return e && e[0] == '1' && !e[1];
+}
+
+static int ios_addr_in_exec_alias( uintptr_t addr )
+{
+    extern void *ios_jit_rx_base_global;
+    extern size_t ios_jit_pool_size_global;
+    uintptr_t rx = (uintptr_t)ios_jit_rx_base_global;
+
+    if (rx && addr >= rx && addr - rx < ios_jit_pool_size_global) return 1;
+    if (ios_jit_low_contains( addr )) return 1;
+    return ios_jit_anon_alias_lookup( addr ) != 0;
+}
+#endif
+
 /**********************************************************************
  *		bus_handler
  *
@@ -15306,7 +15706,9 @@ static void bus_handler( int signal, siginfo_t *siginfo, void *sigcontext )
 
                 {
                     static unsigned long wr_seen, wr_healed;
-                    int stripped = (is_write && (want & PROT_WRITE) &&
+                    /* madeira-bcd (S19 step 1): env.MADEIRA_ALIAS_HONOR_PROT = 1 leaves an executable alias alone, see above */
+                    int aliased = ios_alias_honor_prot_on() && ios_addr_in_exec_alias( (uintptr_t)siginfo->si_addr );
+                    int stripped = (is_write && (want & PROT_WRITE) && !aliased &&
                                     host_prot >= 0 && !(host_prot & VM_PROT_WRITE));
                     ++wr_seen;
                     if (wr_seen <= 12 || (wr_seen % 4096) == 0)
@@ -15314,6 +15716,7 @@ static void bus_handler( int signal, siginfo_t *siginfo, void *sigcontext )
                             "wine_want=%d host_prot=%d %s (seen=%lu healed=%lu) rev=ml552\n",
                             wr_seen, siginfo->si_addr, pc, (unsigned long long)esr,
                             is_write, want, host_prot,
+                            aliased ? "(intentional alias protection, MADEIRA_ALIAS_HONOR_PROT)" :
                             stripped ? "<== HOST STRIPPED WRITE" : "(not a strip)",
                             wr_seen, wr_healed);
 

@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2026 125hz
 # Madeira Converter Exception: see LICENSE-EXCEPTION.md
+# Portions copyright 2026 ft7t8drgwf-wq and wamei: code taken from https://github.com/willfaust/Madeira (pull requests #381 and #490)
+# under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 """Host checks for the owned Steam library and downloads (docs/STEAM_LIBRARY.md).
 
 Never contacts Steam. It needs swiftc (Linux), cc, python3 with `cryptography`
@@ -43,6 +45,7 @@ import os
 import random
 import re
 import shutil
+import socket
 import socketserver
 import struct
 import subprocess
@@ -85,7 +88,7 @@ library_swift = [
     'SwiftSteam/Core/CMServerList.swift', 'SwiftSteam/Core/LicenseListBox.swift', 'SwiftSteam/Core/SteamCMSession.swift',
     'SwiftSteam/Core/SteamConnection.swift', 'SwiftSteam/Core/SteamMessageCodec.swift', 'SwiftSteam/Core/SteamProtocol.swift',
     'SwiftSteam/Core/SteamSession.swift', 'SwiftSteam/Content/ContentDecryptor.swift', 'SwiftSteam/Content/DepotDownloader.swift',
-    'SwiftSteam/Content/DepotManifest.swift', 'SwiftSteam/Library/SteamAppInfo.swift',
+    'SwiftSteam/Content/DepotManifest.swift', 'SwiftSteam/Content/SteamLANPeer.swift', 'SwiftSteam/Library/SteamAppInfo.swift',
     'SwiftSteam/Library/SteamLibraryFetcher.swift', 'SwiftSteam/Install/AppManifestWriter.swift']
 c_files = ['SwiftSteam/chunk_zip.c', 'SwiftSteam/chunk_zip.h', 'SwiftSteam/lzma_shim.c', 'SwiftSteam/lzma_shim.h',
            'SwiftSteam/zstd_edu.c', 'SwiftSteam/zstd_edu.h']
@@ -148,15 +151,19 @@ permitted = re.findall(r'<key>BGTaskSchedulerPermittedIdentifiers</key>\s*<array
 require(len(permitted) == 1 and re.findall(r'<string>([^<]*)</string>', permitted[0])
         == ['$(PRODUCT_BUNDLE_IDENTIFIER).download.*', '$(PRODUCT_BUNDLE_IDENTIFIER).pairing.*'],
         "Info.plist permits only the bundle's own .download.* (background downloads) and .pairing.* (JIT pairing) tasks")
-require('UIBackgroundModes' not in info, 'Info.plist asks for no background mode')
+# BackgroundRun.swift (Madeira #498, a feature that is off until Settings > Memory & performance > In the background turns it on) declares the audio mode;
+# while it is off the app halts the audio endpoint when it enters the background, so iOS suspends it as before (tests/host/check-background-run.py).
+require(re.findall(r'<key>UIBackgroundModes</key>\s*<array>(.*?)</array>', info, re.S) != [] and
+        re.findall(r'<string>([^<]*)</string>', re.findall(r'<key>UIBackgroundModes</key>\s*<array>(.*?)</array>', info, re.S)[0]) == ['audio'],
+        'Info.plist asks for one background mode, audio (BackgroundRun.swift, off until the player turns it on)')
 background = sources['SteamDownloadBackground.swift']
 require('hasSuffix(".download.*")' in background and '+ "queue"' in background and 'BGContinuedProcessingTaskRequest(identifier: identifier' in background,
         'the continued-processing task uses the permitted identifier, made concrete')
 require('SteamSignIn.flag("MADEIRA_BACKGROUND_DOWNLOADS", default: true)' in background and
         'SteamSignIn.flag("MADEIRA_DOWNLOAD_NOTIFICATIONS", default: true)' in background,
         'background downloads and notifications each have a switch, on by default')
-require('if #available(iOS 26.0, *), Self.continuedEnabled { submitContinued() }' in background and 'beginBackgroundTask(' in background
-        and 'pauseForBackground()' in background, 'iOS 26 continues in the background; otherwise the grace period ends in a clean pause')
+require('if #available(iOS 26.0, *), Self.continuedEnabled { submitContinued() }' in background and 'BackgroundRun.shared.beginTask(' in background
+        and 'pauseForBackground()' in background, 'iOS 26 continues in the background; otherwise the grace period (BackgroundRun.beginTask, the same iOS task) ends in a clean pause')
 owned_text = sources['SteamOwnedLibrary.swift']
 require('SteamDownloadBackground.shared.downloadStarted(appID: appID' in owned_text and 'SteamDownloadBackground.shared.progress(progress)' in owned_text
         and 'outcome: outcome, queueEmpty: queue.isEmpty)' in owned_text, 'every download reports its start, progress and outcome')
@@ -293,6 +300,7 @@ class Depot:
     def __init__(self, depot_id, key, entries, encrypt_names=True):
         self.id, self.key, self.entries = depot_id, key, entries
         self.chunks = {}     # sha hex -> served bytes
+        self.plain = {}      # sha hex -> the container before encryption: what a PC's Steam client sends (decrypted, still compressed)
         self.files = []      # manifest order: dict(name, flags, size, chunks=[(sha, offset, ulen, clen, adler)], data)
         for entry in entries:
             name, flags = entry['name'], entry.get('flags', 0)
@@ -303,6 +311,7 @@ class Depot:
                 served = steam_encrypt(key, container(kind, part))
                 sha = hashlib.sha1(part).digest()
                 self.chunks[sha.hex()] = served
+                self.plain[sha.hex()] = container(kind, part)
                 pieces.append((sha, offset, len(part), len(served), adler(part)))
                 offset += length
             self.files.append(dict(name=name, flags=flags, size=len(data), chunks=pieces, data=data))
@@ -403,6 +412,8 @@ class State:
         self.chunk_requests = []  # sha hex, every request
         self.manifest_requests = []
         self.denied = 0
+        self.refuse_manifests = False   # every manifest request is refused with 403, whatever the authorization
+        self.chunk_hook = None          # called with the chunk's sha (hex) just before the healthy server serves it
 
     def reset_counters(self):
         with self.lock:
@@ -430,6 +441,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if parts[2] == 'manifest':
                 gid, code = int(parts[3]), parts[5] if len(parts) > 5 else ''
                 with state.lock: state.manifest_requests.append((depot, gid))
+                if state.refuse_manifests:
+                    return self.reply(403)
                 if parts[4] != '5' or code != str(state.request_code) or (depot, gid) not in state.manifests:
                     return self.reply(404)
                 return self.reply(200, state.manifests[(depot, gid)])
@@ -442,6 +455,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 blob = state.depots[depot].chunks.get(sha)
                 if blob is None:
                     return self.reply(404)
+                if server.mode == 'good' and state.chunk_hook:
+                    state.chunk_hook(sha)
                 if server.mode == 'flaky' and sha not in server.corrupted:
                     server.corrupted.add(sha)
                     blob = blob[:40] + bytes([blob[40] ^ 0xff]) + blob[41:]
@@ -457,6 +472,97 @@ def serve(server):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     return thread
+
+
+class PeerPC:
+    """A scripted PC whose Steam client serves chunks over the local network (BCD, 2026-11-05: downloads from a PC on this network).
+    Frames are Steam's TCP framing (length, 'VT01', message type with the protobuf flag, header length 0, body); a request is
+    k_EMsgClientPeerChunkRequest (9902: app, depot, chunk SHA-1, token), the answer k_EMsgClientPeerChunkResponse (9903) with the chunk decrypted
+    and still compressed. mode: 'good' serves every chunk it has, 'corrupt' serves wrong bytes, 'partial' refuses every other chunk (result 15)."""
+    TOKEN = 1792925733377421794
+
+    def __init__(self, depots, mode):
+        self.depots, self.mode = depots, mode
+        self.requests = []        # sha hex of every request, in arrival order
+        self.refused_token = 0
+        self.server = socket.socket()
+        self.server.bind(('127.0.0.1', 0))
+        self.server.listen(4)
+        self.port = self.server.getsockname()[1]
+        self.threads = []
+        thread = threading.Thread(target=self.accept, daemon=True)
+        thread.start()
+
+    def accept(self):
+        while True:
+            try:
+                conn, _ = self.server.accept()
+            except OSError:
+                return
+            thread = threading.Thread(target=self.talk, args=(conn,), daemon=True)
+            thread.start()
+            self.threads.append(thread)
+
+    @staticmethod
+    def read(conn, count):
+        data = b''
+        while len(data) < count:
+            part = conn.recv(count - len(data))
+            if not part:
+                raise EOFError
+            data += part
+        return data
+
+    def talk(self, conn):
+        with conn:
+            while True:
+                try:
+                    length, magic = struct.unpack('<I4s', self.read(conn, 8))
+                    payload = self.read(conn, length)
+                except (EOFError, OSError, struct.error):
+                    return
+                if magic != b'VT01' or struct.unpack_from('<I', payload)[0] & 0x7fffffff != 9902:
+                    return
+                body, app, depot, sha, token, i = payload[8:], 0, 0, b'', 0, 0
+                while i < len(body):   # the request's fields: appid, depotid, chunk sha, access token
+                    key = body[i]; i += 1
+                    number, wire = key >> 3, key & 7
+                    if wire == 0:
+                        value, shift = 0, 0
+                        while True:
+                            b = body[i]; i += 1
+                            value |= (b & 0x7f) << shift; shift += 7
+                            if b < 0x80: break
+                        if number == 1: app = value
+                        elif number == 2: depot = value
+                        elif number == 4: token = value
+                    else:
+                        size, shift = 0, 0
+                        while True:
+                            b = body[i]; i += 1
+                            size |= (b & 0x7f) << shift; shift += 7
+                            if b < 0x80: break
+                        if number == 3: sha = body[i:i + size]
+                        i += size
+                self.requests.append(sha.hex())
+                held = self.depots.get(depot)
+                blob = held.plain.get(sha.hex()) if held else None
+                result = 1
+                if token != self.TOKEN:
+                    self.refused_token += 1; result, blob = 5, b''
+                elif blob is None or (self.mode == 'partial' and len(self.requests) % 2 == 0):
+                    result, blob = 15, b''
+                elif self.mode == 'corrupt':
+                    blob = blob[:20] + bytes([blob[20] ^ 0xff]) + blob[21:]
+                answer = (f_varint(1, result) + f_varint(2, app) + f_varint(3, depot) + f_bytes(4, sha) + f_varint(5, 0) + f_varint(6, 1) + f_bytes(7, blob))
+                message = struct.pack('<II', 9903 | 0x80000000, 0) + answer
+                try:
+                    conn.sendall(struct.pack('<I', len(message)) + b'VT01' + message)
+                except OSError:
+                    return
+
+    def close(self):
+        self.server.close()
 
 
 # ---------------------------------------------------------------- Swift harness
@@ -588,6 +694,16 @@ func le(_ v: UInt32) -> [UInt8] { [UInt8(v & 0xff), UInt8(v >> 8 & 0xff), UInt8(
     var authRequests: [(depot: UInt32, host: String, app: UInt32)] = []
     var picsAppRequests: [[UInt32]] = []
     var connects = 0
+    /// Beta codes Steam accepts: code -> (branch, hex key) entries; private
+    /// depot sections by "branch hexkey"; the branch each request code named.
+    var betaCodes: [String: [(String, String)]] = [:]
+    var privateSections: [String: Data] = [:]
+    var branchRequests: [String] = []
+    /// When set, the content authorization tokens are answered in turn (the last one repeats); `authExpiry` is their unix expiry.
+    var authTokens: [String] = []
+    var authExpiry: UInt64 = 0
+    /// When set, the header EResult of each manifest request code answer, in turn (the last repeats); an EResult other than 1 has no code.
+    var codeEResults: [Int32] = []
 
     func ensureConnected() async throws { connects += 1 }
     func awaitLicenseList(timeout: TimeInterval) async throws -> [UInt32] { licenses }
@@ -633,6 +749,29 @@ func le(_ v: UInt32) -> [UInt8] { [UInt8(v & 0xff), UInt8(v >> 8 & 0xff), UInt8(
             } else {
                 out.writeInt32(fieldNumber: 1, value: 15); out.writeUInt32(fieldNumber: 2, value: depot)
             }
+        case .clientCheckAppBetaPassword:
+            var d = ProtobufDecoder(body); var code = ""
+            while let tag = try d.readTag() {
+                if tag.fieldNumber == 2 { code = try d.readString() } else { try d.skip(wireType: tag.wireType) }
+            }
+            out.writeInt32(fieldNumber: 1, value: 1)
+            for (name, hex) in betaCodes[code] ?? [] {
+                var entry = ProtobufEncoder(); entry.writeString(fieldNumber: 1, value: name); entry.writeString(fieldNumber: 2, value: hex)
+                out.writeSubmessage(fieldNumber: 4, value: entry.data)
+            }
+        case .clientPICSPrivateBetaRequest:
+            var d = ProtobufDecoder(body); var name = "", key = Data(), token: UInt64 = 0
+            while let tag = try d.readTag() {
+                if tag.fieldNumber == 2 { token = try d.readVarint() }
+                else if tag.fieldNumber == 3 { name = try d.readString() }
+                else if tag.fieldNumber == 4 { key = try d.readBytes() }
+                else { try d.skip(wireType: tag.wireType) }
+            }
+            if token > 0, let section = privateSections[name + " " + key.map { String(format: "%02x", $0) }.joined()] {
+                out.writeInt32(fieldNumber: 1, value: 1); out.writeBytes(fieldNumber: 2, value: section)
+            } else {
+                out.writeInt32(fieldNumber: 1, value: 15)
+            }
         default: throw SteamError.invalidMessage
         }
         return message(out.data)
@@ -662,6 +801,7 @@ func le(_ v: UInt32) -> [UInt8] { [UInt8(v & 0xff), UInt8(v >> 8 & 0xff), UInt8(
                 if tag.fieldNumber == 1 { app = UInt32(truncatingIfNeeded: try d.readVarint()) }
                 else if tag.fieldNumber == 2 { depot = UInt32(truncatingIfNeeded: try d.readVarint()) }
                 else if tag.fieldNumber == 3 { gid = try d.readVarint() }
+                else if tag.fieldNumber == 4 { branchRequests.append(try d.readString()) }
                 else { try d.skip(wireType: tag.wireType) }
             }
             codeRequests.append((app, depot, gid))
@@ -676,10 +816,20 @@ func le(_ v: UInt32) -> [UInt8] { [UInt8(v & 0xff), UInt8(v >> 8 & 0xff), UInt8(
                 else { try d.skip(wireType: tag.wireType) }
             }
             authRequests.append((depot, host, app))
-            out.writeString(fieldNumber: 1, value: authToken)
+            let token = authTokens.isEmpty ? authToken : authTokens[min(authRequests.count - 1, authTokens.count - 1)]
+            out.writeString(fieldNumber: 1, value: token)
+            if authExpiry > 0 { out.writeUInt64(fieldNumber: 2, value: authExpiry) }
         default: throw SteamError.invalidMessage
         }
         return out.data
+    }
+    func callServiceMethodWithResult(method: SteamServiceMethod, body: Data, timeout: TimeInterval) async throws -> (eresult: Int32, body: Data) {
+        let answer = try await callServiceMethod(method: method, body: body, timeout: timeout)
+        if method == .getManifestRequestCode, !codeEResults.isEmpty {
+            let eresult = codeEResults[min(codeRequests.count - 1, codeEResults.count - 1)]
+            return (eresult, eresult == 1 ? answer : Data())
+        }
+        return (1, answer)
     }
 }
 
@@ -881,6 +1031,90 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     require(sharing.depots.first { $0.depotID == 7109 }?.fromApp == 7100 && sharing.installDepots().map(\.depotID) == [7201], "a depot from another app has no manifest of its own")
     require(sharing.inheritDepots(from: owners) == 1 && sharing.installDepots().map(\.depotID) == [7109, 7201], "it inherits the owner's manifest")
 
+    // ---- beta branches (SteamBranch): the list, a public beta, a password-protected one, the record
+    var beta = SteamAppInfo.parse(appID: 9200, from: appVDF(#"""
+    "common" { "name" "Beta" "type" "Game" "oslist" "windows" }
+    "depots" {
+      "9201" { "config" { "oslist" "windows" } "manifests" { "public" { "gid" "11" } "preview" { "gid" "12" } } }
+      "9202" { "config" { "oslist" "windows" } "manifests" { "public" { "gid" "21" } } }
+      "branches" { "public" { "buildid" "100" } "preview" { "buildid" "105" "description" "Next update" "timeupdated" "1700000000" }
+                   "secret" { "buildid" "107" "pwdrequired" "1" } "bad name" { "buildid" "1" } }
+    }
+    """#))!
+    let branchNames: [String] = beta.branches.map(\.name)
+    let previewEntry: SteamAppInfo.Branch = beta.branches[1]
+    require(branchNames == ["public", "preview", "secret"] && previewEntry.description == "Next update" && previewEntry.updated == 1_700_000_000,
+            "branches: public first, the betas by name, a name Madeira cannot keep left out")
+    require(beta.branches[2].passwordRequired && !previewEntry.passwordRequired, "a password-protected branch is marked")
+    func gids(_ app: SteamAppInfo) -> [UInt64] { app.installDepots().compactMap { $0.manifestID(app.branch) } }
+    require(beta.branch == "public" && gids(beta) == [11, 21] && beta.branchBuildID == 100, "public by default")
+    beta.branch = "preview"
+    require(gids(beta) == [12, 21] && beta.branchBuildID == 105, "a beta takes its own manifests, and the public one of a depot it does not change")
+    require(beta.depots.first { $0.depotID == 9201 }!.hasOwnManifest("preview") && !beta.depots.first { $0.depotID == 9202 }!.hasOwnManifest("preview")
+            && !beta.depots.first { $0.depotID == 9201 }!.hasOwnManifest("public"), "only a beta's own manifest is requested under its branch")
+    // depots { 9201 { manifests { secret { gid "77" } } } 9203 { config { oslist "windows" } manifests { secret { gid <uint64 88> } } } }
+    func kvKey(_ type: UInt8, _ name: String) -> [UInt8] { [type] + Array(name.utf8) + [0] }
+    var section: [UInt8] = kvKey(0, "depots")
+    for part: [UInt8] in [kvKey(0, "9201"), kvKey(0, "manifests"), kvKey(0, "secret"), kvKey(1, "gid"), Array("77".utf8), [0, 8, 8, 8],
+                          kvKey(0, "9203"), kvKey(0, "config"), kvKey(1, "oslist"), Array("windows".utf8), [0, 8],
+                          kvKey(0, "manifests"), kvKey(0, "secret"), kvKey(7, "gid"), [88, 0, 0, 0, 0, 0, 0, 0], [8, 8, 8], [8, 8]] {
+        section += part
+    }
+    let parsed = VDFParser.parseBinaryVDF(from: Data(section))
+    require(((((parsed["depots"] as? [String: Any])?["9203"] as? [String: Any])?["manifests"] as? [String: Any])?["secret"] as? [String: Any])?["gid"] as? String == "88",
+            "binary KeyValues: sections, strings and 64-bit numbers as decimal text")
+    for cut in [1, 5, 9, 20, section.count - 3] { _ = VDFParser.parseBinaryVDF(from: Data(section.prefix(cut))) }
+    _ = VDFParser.parseBinaryVDF(from: Data(repeating: 0, count: 4096))
+    require(true, "a cut or hostile binary KeyValues blob is read without trapping")
+    let betaSession = ScriptedSession()
+    betaSession.betaCodes["letmein"] = [("secret", "00ff10"), ("bad name", "01")]
+    betaSession.privateSections["secret 00ff10"] = Data(section)
+    let betaFetcher = SteamLibraryFetcher(session: betaSession)
+    let opened = try await betaFetcher.checkBetaCode(appID: 9200, code: "letmein")
+    let refusedCode = try await betaFetcher.checkBetaCode(appID: 9200, code: "nope")
+    require(opened == ["secret": Data([0, 0xff, 0x10])] && refusedCode.isEmpty, "a beta code opens its private branches; a wrong one opens none")
+    var locked = beta
+    for code in [nil, "nope"] as [String?] {
+        do {
+            try await betaFetcher.applyBranch(&locked, branch: "secret", code: code)
+            require(false, "a password-protected branch without an accepted code stops the install")
+        } catch {
+            require((error as? SteamError) == .betaCodeNeeded("secret"), "a password-protected branch without an accepted code stops the install")
+        }
+    }
+    try await betaFetcher.applyBranch(&locked, branch: "secret", code: "letmein")
+    require(locked.branch == "secret" && gids(locked) == [77, 21, 88] && locked.branchBuildID == 107,
+            "the code's private depot section gives the branch's manifests, a depot only the branch has included")
+    var gone = beta
+    try await betaFetcher.applyBranch(&gone, branch: "removed", code: nil)
+    require(gone.branch == "public" && gids(gone) == [11, 21], "a branch Steam no longer lists falls back to public")
+    var preview = beta
+    preview.branch = "public"
+    try await betaFetcher.applyBranch(&preview, branch: "preview", code: nil)
+    require(preview.branch == "preview" && gids(preview) == [12, 21], "a beta without a password needs no code")
+    SteamBranch.choose("preview", for: 9200)
+    require(SteamBranch.chosen(9200) == "preview" && SteamBranch.chosen(9201) == "public", "the choice is kept per game")
+    SteamBranch.choose("bad name", for: 9200)
+    require(SteamBranch.chosen(9200) == "preview", "a branch name Madeira cannot keep is not taken")
+    SteamBranch.setCode("letmein", branches: ["secret"], for: 9200)
+    SteamBranch.choose("secret", for: 9200)
+    require(SteamBranch.code(9200) == "letmein" && SteamBranch.unlocked(9200) == ["secret"], "the code and the branches it opened are kept")
+    SteamBranch.setCode(nil, branches: [], for: 9200)
+    require(SteamBranch.code(9200) == nil && SteamBranch.unlocked(9200).isEmpty && SteamBranch.chosen(9200) == "public",
+            "removing the code forgets it, and a chosen private branch goes back to public")
+    let recordDir = FileManager.default.temporaryDirectory.appendingPathComponent("madeira-beta-record-\(getpid())", isDirectory: true)
+    try FileManager.default.createDirectory(at: recordDir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: recordDir) }
+    try AppManifestWriter.writeManifest(appID: 9200, name: "Beta", installDir: "Beta", buildID: 107, steamID: 1,
+                                        steamAppsPath: recordDir.path, installedDepots: [], betaKey: "secret")
+    let betaRecord = try String(contentsOf: recordDir.appendingPathComponent("appmanifest_9200.acf"), encoding: .utf8)
+    require(betaRecord.components(separatedBy: "\"BetaKey\"\t\t\"secret\"").count == 3 && SteamInstallFiles.betaKey(appID: 9200, steamApps: recordDir) == "secret",
+            "a beta install names its branch in UserConfig and MountedConfig")
+    try AppManifestWriter.writeManifest(appID: 9200, name: "Beta", installDir: "Beta", buildID: 100, steamID: 1,
+                                        steamAppsPath: recordDir.path, installedDepots: [])
+    let publicRecord = try String(contentsOf: recordDir.appendingPathComponent("appmanifest_9200.acf"), encoding: .utf8)
+    require(!publicRecord.contains("BetaKey") && SteamInstallFiles.betaKey(appID: 9200, steamApps: recordDir) == nil, "a public install names no branch")
+
     // ---- decrypt and decompress the known vectors
     let key = hexData(fx["key"] as! String)
     let plainVector = hexData(fx["vectorPlain"] as! String)
@@ -1024,27 +1258,42 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     session.authToken = fx["auth"] as! String
     session.licenses = [21]
     session.packageBuffers = [21: packageBuffer(apps: [9000, 9100], depots: [9001, 9003])]
-    let version = phase == "update" ? 2 : 1
+    // "beta": the game, installed as version 2 (public), is switched to the beta branch "preview" (version 1's files); "beta-back" goes
+    // back to the public build (BCD, 2026-11-05: version selection).
+    let beta = phase == "beta" || phase == "beta-back"
+    let version = phase == "update" || beta ? 2 : 1
     let gid = (fx["gid\(version)"] as! Int)
     let gidShared = fx["gidShared"] as! Int
     let build = version == 1 ? 1000 : 1001
     session.appInfo = [
         9000: "\"appinfo\" { \"common\" { \"name\" \"Fixture Game\" \"type\" \"Game\" \"oslist\" \"windows\" } \"config\" { \"installdir\" \"Fixture Game\" } " +
             "\"depots\" { " +
-            "\"9001\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"\(gid)\" \"size\" \"1\" \"download\" \"1\" } } } " +
+            "\"9001\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"\(gid)\" \"size\" \"1\" \"download\" \"1\" } " +
+            (beta ? "\"preview\" { \"gid\" \"\(fx["gid1"] as! Int)\" \"size\" \"1\" \"download\" \"1\" } " : "") + "} } " +
             "\"9002\" { \"config\" { \"oslist\" \"windows\" \"language\" \"german\" } \"manifests\" { \"public\" { \"gid\" \"222\" } } } " +
             "\"9003\" { \"config\" { \"oslist\" \"windows\" } \"depotfromapp\" \"9100\" } " +
             "\"9004\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"444\" } } } " +
-            "\"branches\" { \"public\" { \"buildid\" \"\(build)\" } } } }",
+            "\"branches\" { \"public\" { \"buildid\" \"\(build)\" } " + (beta ? "\"preview\" { \"buildid\" \"1002\" \"description\" \"Next\" } " : "") + "} } }",
         9100: "\"appinfo\" { \"common\" { \"name\" \"Fixture Base\" \"type\" \"Game\" \"oslist\" \"windows\" } \"config\" { \"installdir\" \"Fixture Game\" } " +
             "\"depots\" { \"9003\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"\(gidShared)\" \"download\" \"1\" } } } " +
             "\"branches\" { \"public\" { \"buildid\" \"7\" } } } }"]
     let fetcher = SteamLibraryFetcher(session: session)
-    guard let app = try await fetcher.fetchInstallInfo(appID: 9000) else { require(false, "app info"); return }
+    guard var app = try await fetcher.fetchInstallInfo(appID: 9000) else { require(false, "app info"); return }
+    if beta { try await fetcher.applyBranch(&app, branch: phase == "beta" ? "preview" : "public", code: nil) }
     require(app.depots.first { $0.depotID == 9003 }?.publicManifestID == UInt64(gidShared), "the shared depot got its manifest from the owning app")
     require(app.sharedOwners[9100]?.installDir == "Fixture Game", "the owner of the shared depot is known for the record")
     let downloader = DepotDownloader(session: session)
     downloader.contentHosts = { _ in hosts }
+    downloader.manifestCacheFolder = nil   // these phases ask for every list (the cache has its own phases below)
+    // The "lan" phases (BCD, 2026-11-05, downloads from a PC on this network): the player turned the setting on and a scripted PC of the
+    // account serves the main depot (not the shared one). Off again afterwards: the other phases run with it off, as every install does by default.
+    let lan = phase.hasPrefix("lan")
+    if lan {
+        SteamLANSetting.enabled = true
+        let port = UInt16(fx["lanPort"] as! Int), token = UInt64(fx["lanToken"] as! Int)
+        downloader.lanPeerSourceForTests = { appID in SteamPeerChunkSource(host: "127.0.0.1", port: port, appID: appID, depots: [9001], accessToken: token, name: "TEST-PC") }
+    }
+    defer { SteamLANSetting.enabled = false }
     var lastProgress = SteamDownloadProgress()
     let licensed: Set<UInt32> = phase == "refused-licensed" ? [9001, 9003, 9004] : [9001, 9003]
     do {
@@ -1071,7 +1320,7 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         require(SteamInstallPaths.isManaged(library: game.library), "it is in the library Madeira manages")
         do { try MadeiraDock.validate(game, drive: drive, bundled: true) ; require(false, "validate needs the client files") }
         catch { require(error.localizedDescription.contains("client"), "Dock's launch check passes the record and stops at the missing client files only") }
-        require(SteamInstallFiles.buildID(appID: 9000, steamApps: steamApps) == build, "the record's build id")
+        require(SteamInstallFiles.buildID(appID: 9000, steamApps: steamApps) == (phase == "beta" ? 1002 : build), "the record's build id")
         // The owner of the shared depot has its own record on disk (checked from Python below); Madeira Dock's list hides an app that only lends depots (cb293856, MadeiraDock.games).
         require(found.first(where: { $0.id == 9100 }) == nil, "the owning app only lends its depot: Madeira Dock's list hides it, its record stays on disk")
         let events = loggedEvents.joined(separator: "\n")
@@ -1084,12 +1333,108 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         let ownedNow = SteamOwnedGame(app)
         require(ownedNow.buildID == 1001 && ownedNow.folderName == "Fixture Game", "the owned game carries the build")
     }
+    if lan {
+        let events = loggedEvents.joined(separator: "\n")
+        print("RESULT lanDone=\(events.contains("[steam-lan] done app=9000") ? 1 : 0) lanOff=\(events.contains("[steam-lan] off host=127.0.0.1 after") ? 1 : 0) pcName=\(lastProgress.pcName ?? "-") pcDropped=\(lastProgress.pcDropped ? 1 : 0)")
+        require(lastProgress.pcName == "TEST-PC", "the progress names the PC the chunks came from")
+        require(!events.contains("token") && !events.contains("1792925733377421794"), "the PC's access token is not in the log")
+    }
+    if beta {
+        // The beta's manifest is requested under its branch (depot 9001 has one); a depot it does not change (the shared 9003) and every
+        // public request carry no branch at all, as before.
+        print("RESULT branches=\(session.branchRequests.joined(separator: ","))")
+        require(session.branchRequests == (phase == "beta" ? ["preview"] : []), "only a beta's own manifest request names the branch (\(session.branchRequests))")
+        let events = loggedEvents.joined(separator: "\n")
+        require(events.contains("[steam-depot] selection app=9000 build=\(phase == "beta" ? "1002 branch=preview" : "1001") language="),
+                "the selection line names the branch only for a beta (\(phase))")
+        require(SteamInstallFiles.betaKey(appID: 9000, steamApps: steamApps) == (phase == "beta" ? "preview" : nil), "the record names the beta, or nothing for public")
+        // The update badge: against the build of the branch the record names. A public install is told by a newer number only, as before.
+        let listed = SteamOwnedGame(app)
+        require(listed.buildID == 1001 && listed.buildID(branch: nil) == 1001 && listed.buildID(branch: "public") == 1001
+                && listed.buildID(branch: "preview") == 1002 && listed.buildID(branch: "gone") == 1001, "the game's build per branch: the branch's own, else the public one")
+        require(!listed.hasUpdate(installedBuild: 1001, installedBranch: nil) && listed.hasUpdate(installedBuild: 1000, installedBranch: nil)
+                && !listed.hasUpdate(installedBuild: 1002, installedBranch: nil), "a public install is updated by a newer public build only (a higher installed number is left alone)")
+        require(!listed.hasUpdate(installedBuild: 1002, installedBranch: "preview") && listed.hasUpdate(installedBuild: 1001, installedBranch: "preview")
+                && listed.hasUpdate(installedBuild: 1003, installedBranch: "preview"), "a beta install is updated when the beta's build differs, up or down")
+        require(!listed.hasUpdate(installedBuild: 1001, installedBranch: "gone") && listed.hasUpdate(installedBuild: 1000, installedBranch: "gone"),
+                "a branch Steam no longer lists is compared with the public build")
+    }
     if phase == "uninstall" {
         SteamInstallFiles.delete(appID: 9000, folderName: "Fixture Game", steamApps: steamApps)
         require(MadeiraDock.games(drive: drive).isEmpty, "an uninstalled game is no longer found (its shared owner record went with it)")
         require(!FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("common/Fixture Game").path), "its folder is gone")
         require(FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("common").path) , "the common folder stays")
     }
+}
+
+/// Round 632 scenarios (upstream Madeira #486, #524, #493): one app with its own depots, taken from the fixture.
+@MainActor func extra(_ fx: [String: Any], phase: String) async throws {
+    let tmp = URL(fileURLWithPath: fx["tmp"] as! String)
+    let drive = tmp.appendingPathComponent("drive_c")
+    let steamApps = SteamInstallPaths.steamApps(drive: drive)
+    let hosts = fx["hosts"] as! [String]
+    let appID = UInt32(fx["app"] as! Int)
+    let depots = fx["depots"] as! [[String: Any]]
+    let session = ScriptedSession()
+    session.requestCode = UInt64(fx["requestCode"] as! Int)
+    session.authToken = fx["auth"] as! String
+    session.authTokens = (fx["authTokens"] as? [String]) ?? []
+    session.authExpiry = UInt64((fx["authExpiry"] as? Int) ?? 0)
+    session.codeEResults = ((fx["codeEResults"] as? [Int]) ?? []).map { Int32($0) }
+    var depotSection = ""
+    for depot in depots {
+        let id = UInt32(depot["id"] as! Int)
+        session.keys[id] = hexData(depot["key"] as! String)
+        depotSection += "\"\(id)\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"\(depot["gid"] as! Int)\" \"size\" \"1\" \"download\" \"1\" } } } "
+    }
+    session.licenses = [31]
+    session.packageBuffers = [31: packageBuffer(apps: [appID], depots: depots.map { UInt32($0["id"] as! Int) })]
+    let name = fx["name"] as! String
+    session.appInfo = [appID: "\"appinfo\" { \"common\" { \"name\" \"\(name)\" \"type\" \"Game\" \"oslist\" \"windows\" } \"config\" { \"installdir\" \"\(name)\" } " +
+        "\"depots\" { \(depotSection) \"branches\" { \"public\" { \"buildid\" \"5000\" } } } }"]
+    let fetcher = SteamLibraryFetcher(session: session)
+    guard let app = try await fetcher.fetchInstallInfo(appID: appID) else { require(false, "app info"); return }
+    let downloader = DepotDownloader(session: session)
+    downloader.contentHosts = { _ in hosts }
+    downloader.manifestCacheFolder = (fx["manifestCache"] as? String).map { URL(fileURLWithPath: $0) }
+    var lastProgress = SteamDownloadProgress()
+    do {
+        _ = try await downloader.install(app, steamApps: steamApps) { lastProgress = $0 }
+        print("RESULT install=ok")
+    } catch {
+        print("RESULT install=failed reason=\(SteamOwnedLibrary.reason(error))")
+        print("MESSAGE \(error.localizedDescription)")
+        if case SteamError.contentRefused = error { downloader.forgetAuthorization() }
+    }
+    print("RESULT codes=\(session.codeRequests.count) auths=\(session.authRequests.count) keys=\(session.keyRequests.count) done=\(lastProgress.doneBytes) total=\(lastProgress.totalBytes)")
+    for line in loggedEvents where line.hasPrefix("[steam-depot]") { print("LOG \(line)") }
+}
+
+// A Steam Workshop item (BCD, 2026-11-05): one manifest of the app's own Workshop depot (depot ID = app ID), through the same chunk path.
+@MainActor func workshop(_ fx: [String: Any]) async throws {
+    let tmp = URL(fileURLWithPath: fx["tmp"] as! String)
+    let steamApps = SteamInstallPaths.steamApps(drive: tmp.appendingPathComponent("drive_c"))
+    let session = ScriptedSession()
+    session.keys = [9001: hexData(fx["key"] as! String)]
+    session.requestCode = UInt64(fx["requestCode"] as! Int)
+    session.authToken = fx["auth"] as! String
+    let downloader = DepotDownloader(session: session)
+    downloader.manifestCacheFolder = nil   // asks for the list itself (the manifest cache has its own phases; on the Mac it would be ~/Library/Caches)
+    let hosts = fx["hosts"] as! [String]
+    downloader.contentHosts = { _ in hosts }
+    let gid = UInt64(fx["gid1"] as! Int)
+    let folder = steamApps.appendingPathComponent("workshop/content/9001/555", isDirectory: true)
+    let journal = steamApps.appendingPathComponent("workshop/downloads/bcd/9001_555", isDirectory: true)
+    var last = SteamDownloadProgress()
+    let size = try await downloader.installWorkshopItem(appID: 9001, itemID: 555, manifestGID: gid, into: folder, journalDir: journal) { last = $0 }
+    print("RESULT workshop=ok bytes=\(size)")
+    require(last.phase == .finishing && last.doneBytes == last.totalBytes && last.totalBytes > 0, "the item's progress ends complete: \(last.doneBytes)/\(last.totalBytes)")
+    require(session.keyRequests.contains { $0.depot == 9001 && $0.app == 9001 } && session.keyRequests.count == 1, "the item's key is asked for under the app's own Workshop depot, and for nothing else")
+    require(session.codeRequests.contains { $0.depot == 9001 && $0.app == 9001 && $0.gid == gid } && session.branchRequests.isEmpty, "its manifest is requested by ID, with no branch")
+    require(session.authRequests.contains { $0.depot == 9001 && $0.app == 9001 && $0.host == "127.0.0.1" }, "content authorization is asked for the Workshop depot")
+    require(!FileManager.default.fileExists(atPath: journal.path), "the item's journal goes when it is complete")
+    require(!FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("appmanifest_9001.acf").path)
+            && !FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("depotcache").path), "no game record and no depotcache come of an item")
 }
 
 @main struct Harness {
@@ -1099,7 +1444,10 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         guard args.count >= 3, let raw = FileManager.default.contents(atPath: args[2]),
               let fx = try? JSONSerialization.jsonObject(with: raw) as? [String: Any] else { print("FAIL: fixture"); exit(2) }
         do {
-            if args[1] == "units" { try await units(fx) } else { try await install(fx, phase: args[1]) }
+            if args[1] == "units" { try await units(fx) }
+            else if args[1] == "workshop" { try await workshop(fx) }
+            else if args[1].hasPrefix("x-") { try await extra(fx, phase: args[1]) }
+            else { try await install(fx, phase: args[1]) }
         } catch {
             print("FAIL: \(args[1]) threw \(error)"); failures += 1
         }
@@ -1130,6 +1478,12 @@ space = ('let values = try? installURL.resourceValues(forKeys: [.volumeAvailable
 assert space in downloader_host
 downloader_host = downloader_host.replace(space, 'let available = UInt64.max')
 fetcher_source = sources['SwiftSteam/Library/SteamLibraryFetcher.swift']
+require('encoder.writeString(fieldNumber: 4, value: branch)' in downloader and 'branch: depot.hasOwnManifest(app.branch) ? app.branch : nil' in downloader
+        and 'buildID: app.branchBuildID' in downloader and 'betaKey: app.branch' in downloader,
+        "a beta download asks for its manifests under the branch and records the branch's build and BetaKey")
+require('try await fetcher.applyBranch(&info, branch: branchToDownload(appID), code: SteamBranch.code(appID))' in owned_source
+        and 'Self.branchesEnabled ? SteamBranch.chosen(appID) : SteamAppInfo.publicBranch' in owned_source,
+        "every download takes the version chosen on the game's page (the public build with the feature off)")
 
 work = Path(tempfile.mkdtemp(prefix='madeira-steam-library-'))
 servers = []
@@ -1173,7 +1527,7 @@ try:
     (work / 'downloader.swift').write_text(downloader_host)
     production = [steam / 'Proto/SteamProtoMessages.swift', steam / 'Core/SteamError.swift', steam / 'Core/SteamProtocol.swift',
                   steam / 'Core/SteamMessageCodec.swift', steam / 'Core/SteamCMSession.swift',
-                  steam / 'Content/ContentDecryptor.swift', steam / 'Content/DepotManifest.swift',
+                  steam / 'Content/ContentDecryptor.swift', steam / 'Content/DepotManifest.swift', steam / 'Content/SteamLANPeer.swift',
                   steam / 'Library/SteamAppInfo.swift', steam / 'Library/SteamLibraryFetcher.swift',
                   steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift',
                   app / 'BCDSteamDLC/BCDSteamDLC.swift', app / 'BCDSteamDLC/BCDSteamDLCDownload.swift']   # the downloader's DLC steps (Foundation only)
@@ -1215,7 +1569,7 @@ try:
     state = State()
     version1, version2, shared = main_depot(1), main_depot(2), shared_depot()
     class Merged: pass
-    merged = Merged(); merged.chunks = {**version1.chunks, **version2.chunks}
+    merged = Merged(); merged.chunks = {**version1.chunks, **version2.chunks}; merged.plain = {**version1.plain, **version2.plain}
     state.depots = {9001: merged, 9003: shared}
     gid1, gid2, gid_shared = 111111, 222222, 333333
     m1, binary1 = version1.manifest_zip()
@@ -1305,6 +1659,58 @@ try:
     require(tree_matches(expected2), 'the updated files have the new bytes, and the file that shrank has no stale tail')
     require('"buildid"\t\t"1001"' in (steam_apps / 'appmanifest_9000.acf').read_text(), 'the record has the new build')
 
+    # ---- a beta (BCD, 2026-11-05, version selection): the installed public build is switched to the beta branch and back; only what differs is fetched
+    state.reset_counters()
+    result = run('beta', fixture)
+    require(result.get('install') == 'ok' and result.get('branches') == 'preview', 'a beta install asks for its manifest under its branch')
+    require(tree_matches(expected1), "the beta's files are in place (the file that grew has its tail, the changed chunk is back)")
+    beta_record = (steam_apps / 'appmanifest_9000.acf').read_text()
+    require(beta_record.count('"BetaKey"\t\t"preview"') == 2 and '"buildid"\t\t"1002"' in beta_record, "the record names the beta in UserConfig and MountedConfig, with the beta's build")
+    require(f'"9001"\n\t\t{{\n\t\t\t"manifest"\t\t"{gid1}"' in beta_record, "InstalledDepots names the beta's manifest")
+    require(hashlib.sha1(data(60000, 99)).hexdigest() not in state.chunk_requests, "the chunk only the public build has is not fetched for the beta")
+    state.reset_counters()
+    result = run('beta-back', fixture)
+    require(result.get('install') == 'ok' and result.get('branches') == '' and set(state.chunk_requests) == {new_sha},
+            'going back to the public build fetches only the chunk that differs, and sends no branch')
+    require(tree_matches(expected2), 'the public files are back')
+    back_record = (steam_apps / 'appmanifest_9000.acf').read_text()
+    require('BetaKey' not in back_record and '"buildid"\t\t"1001"' in back_record, 'the record is the public one again: no BetaKey, the public build')
+
+    # ---- a Steam Workshop item (BCD, 2026-11-05): the files of one manifest of the app's own depot land in workshop/content/<app>/<item>
+    state.reset_counters()
+    shop = dict(fixture, tmp=str(work / 'root3'))
+    result = run('workshop', shop)
+    item_folder = work / 'root3/drive_c/Program Files (x86)/Steam/steamapps/workshop/content/9001/555'
+    shop_expected = {k: v for k, v in expected1.items() if k != 'shared/lib.dat'}
+    shop_found = {str(p.relative_to(item_folder)): p.read_bytes() for p in item_folder.rglob('*') if p.is_file()}
+    require(result.get('workshop') == 'ok' and shop_found == shop_expected,
+            f'a Workshop item downloads exactly the bytes of its manifest ({len(shop_found)} files) into its own folder')
+    require(not (work / 'root3/drive_c/Program Files (x86)/Steam/steamapps/workshop/downloads/bcd/9001_555').exists(), "and leaves no journal behind")
+
+    # ---- downloads from a PC on this network (BCD, 2026-11-05): a scripted PC serves the main depot, the content servers the rest
+    main_shas = {sha for sha in version1.plain}
+    for mode, label in [('good', 'every chunk it has'), ('corrupt', 'wrong bytes (refused, then fetched from the content servers)'),
+                        ('partial', 'every other chunk (the rest from the content servers)')]:
+        pc = PeerPC({9001: version1}, mode)
+        state.reset_counters()
+        lan_root = work / f'root-lan-{mode}'
+        result = run(f'lan-{mode}', dict(fixture, tmp=str(lan_root), lanPort=pc.port, lanToken=PeerPC.TOKEN))
+        lan_folder = lan_root / 'drive_c/Program Files (x86)/Steam/steamapps/common/Fixture Game'
+        found_lan = {str(p.relative_to(lan_folder)): p.read_bytes() for p in lan_folder.rglob('*') if p.is_file()}
+        require(result.get('install') == 'ok' and found_lan == expected1, f'with a PC serving {label} the install is the same files, byte for byte')
+        shared_shas = {sha for sha in shared.chunks}
+        wanted = {sha for sha in pc.requests}
+        require(wanted and wanted <= main_shas, f'the PC is asked only for chunks of the depot it serves ({len(wanted)} chunks), never for the shared depot')
+        if mode == 'good':
+            require(not (set(state.chunk_requests) & main_shas), 'a PC that has every chunk leaves the content servers only the shared depot')
+            require(set(state.chunk_requests) == shared_shas and result.get('lanDone') == '1' and result.get('lanOff') == '0',
+                    'and the download ends with its [steam-lan] summary, the PC still in use')
+        else:
+            require(set(state.chunk_requests) & main_shas, 'what the PC did not serve properly came from the content servers')
+        if mode == 'corrupt':
+            require(result.get('lanOff') == '1' and result.get('pcDropped') == '1', 'a PC that keeps failing is dropped (four in a row) and the log says so')
+        pc.close()
+
     # ---- uninstall: everything the install wrote goes; the scanner no longer finds the game
     run('uninstall', fixture)
     require(not folder.exists() and not (steam_apps / 'appmanifest_9000.acf').exists() and not (steam_apps / 'appmanifest_9100.acf').exists()
@@ -1316,6 +1722,164 @@ try:
     result = run('refused-licensed', other)
     require(result.get('install') == 'failed' and result.get('listed') == '0' and
             not list((work / 'root2').rglob('appmanifest_*.acf')), 'a refused licensed depot fails the install without a record')
+
+    # ================================================================ round 632: upstream Madeira #486, #524, #493 (the Steam depot fixes)
+    def add_depot(depot, gid):
+        state.depots[depot.id] = depot
+        state.manifests[(depot.id, gid)] = depot.manifest_zip()[0]
+        return dict(id=depot.id, key=depot.key.hex(), gid=gid)
+
+    def scenario(name, app, depot_list, root, **more):
+        return dict(fixture, tmp=str(work / root), app=app, name=name, depots=depot_list, **more)
+
+    def logs(phase):
+        return [line[4:] for line in output_lines[phase] if line.startswith('LOG ')]
+
+    output_lines = {}
+    def run_extra(phase, fx, tag=None):
+        key = tag or phase
+        path = work / f'fixture-{key}.json'
+        path.write_text(json.dumps(fx))
+        result = subprocess.run([str(exe), phase, str(path)], env=env, capture_output=True, text=True, timeout=300)
+        sys.stdout.write(result.stdout)
+        if result.returncode:
+            sys.stdout.write(result.stderr[-3000:])
+        require(result.returncode == 0, f'Swift phase "{key}" ran clean under AddressSanitizer')
+        results = {}
+        output_lines[key] = result.stdout.splitlines()
+        for line in result.stdout.splitlines():
+            if line.startswith('RESULT '):
+                for kv in line[len('RESULT '):].split():
+                    k, _, v = kv.partition('=')
+                    results[k] = v
+        return results
+
+    def tree(folder):
+        return {str(p.relative_to(folder)): p.read_bytes() for p in sorted(folder.rglob('*')) if p.is_file()}
+
+    # ---- #524: two depots list one file (any case, either slash): only the later depot's copy is installed
+    A_EXE, B_EXE, A_PAK, B_PAK = data(50000, 11), data(30000, 12), data(20000, 13), data(15000, 14)
+    KEY_OA, KEY_OB = rng.randbytes(32), rng.randbytes(32)
+    depot_a = Depot(9201, KEY_OA, [dict(name='Bin', flags=0x40), dict(name='Bin/Game.exe', data=A_EXE, chunks=[('zstd', 25000), ('zip', 25000)]),
+                                   dict(name='Bin/a-only.dll', data=data(3000, 15), chunks=[('zip', 3000)]),
+                                   dict(name='data/shared.pak', data=A_PAK, chunks=[('lzma', 20000)]),
+                                   dict(name='data/a-only.dat', data=data(2000, 16), chunks=[('zstd', 2000)]),
+                                   dict(name='only-base.txt', data=b'base', chunks=[('zip', 4)])])
+    depot_b = Depot(9202, KEY_OB, [dict(name='bin/GAME.exe', data=B_EXE, chunks=[('zip', 30000)]),
+                                   dict(name='Data\\Shared.PAK', data=B_PAK, chunks=[('zstd', 15000)]),
+                                   dict(name='only-dlc.txt', data=b'dlc', chunks=[('zip', 3)])])
+    overlap_fx = scenario('Overlap Game', 9200, [add_depot(depot_a, 91), add_depot(depot_b, 92)], 'root-overlap')
+    state.reset_counters()
+    result = run_extra('x-overlap', overlap_fx)
+    over = work / 'root-overlap/drive_c/Program Files (x86)/Steam/steamapps/common/Overlap Game'
+    want = {'Bin/GAME.exe': B_EXE, 'Bin/a-only.dll': data(3000, 15), 'data/Shared.PAK': B_PAK, 'data/a-only.dat': data(2000, 16),
+            'only-base.txt': b'base', 'only-dlc.txt': b'dlc'}
+    require(result.get('install') == 'ok' and tree(over) == want,
+            f'#524: a file two depots list is installed once, from the later depot, with exactly its bytes and size (no stale tail): {sorted(tree(over))}')
+    shared_shas = {hashlib.sha1(A_EXE[:25000]).hexdigest(), hashlib.sha1(A_EXE[25000:]).hexdigest(), hashlib.sha1(A_PAK).hexdigest()}
+    require(not (set(state.chunk_requests) & shared_shas), "#524: the earlier depot's copy of a shared file is never downloaded")
+    require(any(line.startswith('[steam-depot] overlap files=2 ') for line in logs('x-overlap')), '#524: the log says two files were overridden')
+    state.reset_counters()
+    result = run_extra('x-overlap', overlap_fx, 'x-overlap-repair')
+    require(result.get('install') == 'ok' and tree(over) == want and not state.chunk_requests,
+            '#524: a Repair finds every file as it is: nothing is fetched again and the files do not flip between depots')
+
+    # ---- #486: a disk error on a verified chunk ends the install at once, without fetching it again
+    import collections, stat as stat_module
+    KEY_W = rng.randbytes(32)
+    depot_w = Depot(9301, KEY_W, [dict(name='big.bin', data=data(90000, 21), chunks=[('zstd', 30000), ('zip', 30000), ('lzma', 30000)])])
+    write_fx = scenario('Write Fail', 9300, [add_depot(depot_w, 93)], 'root-write')
+    target = work / 'root-write/drive_c/Program Files (x86)/Steam/steamapps/common/Write Fail/big.bin'
+    state.reset_counters()
+    state.chunk_hook = lambda sha: os.chmod(target, 0)    # the disk refuses the next write
+    result = run_extra('x-write', write_fx)
+    state.chunk_hook = None
+    if target.exists(): os.chmod(target, 0o644)
+    counts = collections.Counter(sha for _, sha in state.served_ok)
+    require(result.get('install') == 'failed' and result.get('reason') == 'chunk',
+            '#486: a chunk that cannot be written ends the install with the chunk reason')
+    require(counts and max(counts.values()) == 1,
+            f'#486: a verified chunk the disk refused is not fetched again from other servers (served OK once each: {dict(counts)})')
+    require(any('MESSAGE ' in line and 'errno 13' in line for line in output_lines['x-write']) and
+            any(line.startswith('[steam-depot] local write failed step=open errno=13') for line in logs('x-write')),
+            '#486: the error says what failed (errno 13) in the message and in one log line')
+
+    # ---- #493: a refused file list (401/403): fresh authorization, then a fresh request code; the cache; no re-open of full-size files
+    KEY_R = rng.randbytes(32)
+    depot_r = Depot(9401, KEY_R, [dict(name='g.bin', data=data(40000, 31), chunks=[('zip', 20000), ('zstd', 20000)])])
+    refused_fx = scenario('Refused Game', 9400, [add_depot(depot_r, 94)], 'root-refused-once', authTokens=['stale', 'stale', 'tok'])
+    state.reset_counters()
+    result = run_extra('x-refused-once', refused_fx)
+    require(result.get('install') == 'ok' and state.denied == 1 and result.get('codes') == '1',
+            f'#493: a file list refused once (an expired token) is asked again with fresh authorization, with the same request code (denied={state.denied})')
+    gb = work / 'root-refused-once/drive_c/Program Files (x86)/Steam/steamapps/common/Refused Game/g.bin'
+    require(gb.read_bytes() == data(40000, 31), '#493: and the game installs')
+    state.reset_counters(); state.refuse_manifests = True
+    all_fx = dict(refused_fx, tmp=str(work / 'root-refused-all'), authTokens=[])
+    result = run_extra('x-refused-all', all_fx)
+    state.refuse_manifests = False
+    lines = logs('x-refused-all')
+    require(result.get('install') == 'failed' and result.get('reason') == 'refused-403' and result.get('codes') == '2',
+            f'#493: a file list every server refuses fails with its own reason after one more round with a fresh request code ({result})')
+    require(sum('manifest refused' in l for l in lines) == 2 and any('retry=fresh-code' in l for l in lines) and any('retry=none' in l for l in lines),
+            '#493: the refusal is logged once per round')
+    require(not any(('auth=' in l or 'stale' in l or "tok" in l.replace('tokens=', '')) for l in lines), '#493: no token in the log')
+    require(any('HTTP 403' in l and 'Try again' in l for l in output_lines['x-refused-all'] if l.startswith('MESSAGE ')),
+            '#493: the message says what happened and what to do')
+    refuse_code = scenario('Code Game', 9400, [add_depot(depot_r, 94)], 'root-code', codeEResults=[2, 2, 1])
+    result = run_extra('x-code-retry', refuse_code)
+    require(result.get('install') == 'ok' and result.get('codes') == '3', '#493: a request code Steam refuses twice is asked for a third time')
+    refuse_code = scenario('Code Game', 9400, [add_depot(depot_r, 94)], 'root-code2', codeEResults=[2])
+    result = run_extra('x-code-retry', refuse_code, 'x-code-refused')
+    require(result.get('install') == 'failed' and result.get('codes') == '3' and
+            any(l.startswith('[steam-depot] manifest-code refused app=9400 depot=9401 eresult=2 tries=3') for l in logs('x-code-refused')),
+            '#493: a request code refused three times is logged with its EResult, and the manifest is then tried without one')
+
+    KEY_C = rng.randbytes(32)
+    CUSTOM_C = data(12000, 41)
+    depot_c1 = Depot(9501, KEY_C, [dict(name='bin/c.exe', data=data(30000, 42), chunks=[('zip', 30000)]),
+                                   dict(name='tool/custom.bin', flags=0x80, data=CUSTOM_C, chunks=[('lzma', 12000)])])
+    depot_c2 = Depot(9501, KEY_C, [dict(name='bin/c.exe', data=data(30000, 42), chunks=[('zip', 30000)]),
+                                   dict(name='tool/custom.bin', flags=0x80, data=CUSTOM_C, chunks=[('lzma', 12000)]),
+                                   dict(name='new.txt', data=b'build 2', chunks=[('zip', 7)])])
+    cache_dir = work / 'mcache'
+    cache_fx = scenario('Cache Game', 9500, [add_depot(depot_c1, 951)], 'root-cache', manifestCache=str(cache_dir))
+    cache_apps = work / 'root-cache/drive_c/Program Files (x86)/Steam/steamapps'
+    state.reset_counters()
+    result = run_extra('x-cache', cache_fx, 'x-cache-1')
+    require(result.get('install') == 'ok' and result.get('codes') == '1' and len(state.manifest_requests) == 1 and len(list(cache_dir.glob('9501_*'))) == 1,
+            '#493: the first install asks for the file list and keeps it in the cache folder (one file for the depot)')
+    state.reset_counters()
+    (cache_apps / 'depotcache' / f'9501_951.manifest').unlink()
+    result = run_extra('x-cache', cache_fx, 'x-cache-2')
+    require(result.get('install') == 'ok' and result.get('codes') == '0' and not state.manifest_requests and not state.chunk_requests,
+            '#493: a repair reads the file list from the cache: neither Steam nor a content server is asked, and nothing is downloaded')
+    require((cache_apps / 'depotcache/9501_951.manifest').is_file(), "#493: the cached list still goes to Valve's depotcache for a depot with a per-user executable")
+    require(any('manifest-cached=1/1' in l for l in logs('x-cache-2')), '#493: the log line says the list came from the cache')
+    # every file complete but read-only (a repair of a game on a locked folder): no open, no failure
+    game_dir = cache_apps / 'common/Cache Game'
+    for f in game_dir.rglob('*'):
+        if f.is_file(): os.chmod(f, 0o444)
+    state.reset_counters()
+    result = run_extra('x-cache', cache_fx, 'x-cache-3')
+    require(result.get('install') == 'ok' and not state.chunk_requests,
+            '#493: a file already at its manifest length is not opened again (a complete read-only file no longer fails the repair)')
+    for f in game_dir.rglob('*'):
+        if f.is_file(): os.chmod(f, 0o644)
+    # a corrupt cache entry is asked for again and replaced
+    entry = next(cache_dir.glob('9501_*'))
+    entry.write_bytes(b'not a manifest')
+    state.reset_counters()
+    result = run_extra('x-cache', cache_fx, 'x-cache-4')
+    require(result.get('install') == 'ok' and len(state.manifest_requests) == 1 and entry.read_bytes() != b'not a manifest',
+            '#493: an unreadable cache entry is dropped, the list is asked for again and kept')
+    # a new build replaces the depot's cached list
+    cache_fx2 = scenario('Cache Game', 9500, [add_depot(depot_c2, 952)], 'root-cache', manifestCache=str(cache_dir))
+    state.reset_counters()
+    result = run_extra('x-cache', cache_fx2, 'x-cache-5')
+    files = [p.name for p in cache_dir.glob('9501_*')]
+    require(result.get('install') == 'ok' and len(files) == 1 and files[0].startswith('9501_952_') and (game_dir / 'new.txt').read_bytes() == b'build 2',
+            f'#493: a new build is fetched and replaces the older list of that depot in the cache ({files})')
 finally:
     for server in servers:
         server.shutdown(); server.server_close()

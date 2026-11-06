@@ -51,6 +51,8 @@ enum BCDGameScreen: Equatable {
     case coverPicture
     /// A picture from Files as the Wine desktop's wallpaper (round 604).
     case wallpaperPicture
+    /// The game's Steam Workshop page (BCDWorkshopView.swift), full screen over the page.
+    case workshop
 }
 
 /// One setting of a game, as a row of Options.
@@ -85,6 +87,8 @@ struct BCDGameSetting: Identifiable, Equatable {
     var heading: String? = nil
     /// Quick picks under a text setting's field (launch flags, round 604); empty for every other setting.
     var chips: [BCDGameChip] = []
+    /// What a text setting's row says while the text is empty, in place of "None" (a field that is typed in and never shown, as a beta code).
+    var blank: String? = nil
 
     var isOn: Bool { value == "1" }
     var isDefault: Bool { value == defaultValue }
@@ -108,7 +112,7 @@ struct BCDGameSetting: Identifiable, Equatable {
             if isDefault && !label.localizedCaseInsensitiveContains("default") { return "Default · " + label }
             return label
         case .toggle: return isOn ? "On" : "Off"
-        case .text: return value.isEmpty ? "None" : value
+        case .text: return value.isEmpty ? (blank ?? "None") : value
         case .info, .opens: return value
         case .action: return ""
         }
@@ -138,7 +142,25 @@ struct BCDGameSettingGroup: Identifiable, Equatable {
     }
 }
 
-/// A game's Steam Cloud saves, as far as the page tells them.
+/// The setting id the page's cloud rows use for a store's per-game cloud switch (the live backend writes the game's own config line).
+enum BCDCloudSetting {
+    static let enabled = "cloud.enabled"
+}
+
+/// What a store calls its cloud saves, in the page's words (Steam's by default; a store's own comes from the live backend).
+struct BCDCloudNames: Equatable {
+    var store = "Steam"
+    var cloud = "Steam Cloud"
+    var backups = "Steam Cloud Backups"
+    var front: BCDStoreFront = .steam
+    /// The cloud saves are off until the player turns them on for the game, because a sync writes to the player's account (build 632): the page
+    /// shows Off with a Turn on that asks first, and a Turn off.
+    var optIn = false
+    /// A sync only adds snapshots: what the cloud holds is never replaced or deleted, so the page says the older ones stay.
+    var keepsOlder = false
+}
+
+/// A game's cloud saves (Steam Cloud's, or another store's), as far as the page tells them.
 enum BCDCloudSaves: Equatable {
     case signedOut
     case notChecked
@@ -150,10 +172,17 @@ enum BCDCloudSaves: Equatable {
     /// Saves that differ on both sides: the player picks which to keep.
     case differ(Int)
     case failed(String)
+    /// This game's cloud saves are off (they are off until the player turns them on, for a store whose names say so).
+    case off
+    /// The game has no cloud saves.
+    case unsupported
 
-    var summary: String {
+    var summary: String { summary(.init()) }
+    var explanation: String { explanation(.init()) }
+
+    func summary(_ names: BCDCloudNames) -> String {
         switch self {
-        case .signedOut: return "Sign in to Steam"
+        case .signedOut: return "Sign in to \(names.store)"
         case .notChecked: return "Not checked yet"
         case .checking: return "Checking…"
         case .moving(let up, let done, let total): return up ? "Sending \(done) of \(total)" : "Receiving \(done) of \(total)"
@@ -161,23 +190,28 @@ enum BCDCloudSaves: Equatable {
         case .waiting(let count): return "\(count) waiting"
         case .differ(let count): return "\(count) differ"
         case .failed: return "Couldn't sync"
+        case .off: return "Off"
+        case .unsupported: return "Not available"
         }
     }
 
-    var explanation: String {
+    func explanation(_ names: BCDCloudNames) -> String {
         switch self {
-        case .signedOut: return "Cloud saves need a Steam sign-in."
-        case .notChecked: return "BCD hasn't compared this game's saves with Steam Cloud yet."
-        case .checking: return "Comparing the saves on this device with Steam Cloud."
+        case .signedOut: return "Cloud saves need a \(names.store) sign-in."
+        case .notChecked: return "BCD hasn't compared this game's saves with \(names.cloud) yet."
+        case .checking: return "Comparing the saves on this device with \(names.cloud)."
         case .moving(let up, let done, let total):
-            return up ? "Sending saves to Steam Cloud: \(done) of \(total)." : "Bringing saves from Steam Cloud: \(done) of \(total)."
+            return up ? "Sending saves to \(names.cloud): \(done) of \(total)." : "Bringing saves from \(names.cloud): \(done) of \(total)."
         case .synced(let matching):
-            return matching == 0 ? "Neither Steam Cloud nor this device has saves of this game yet."
-                : "This device and Steam Cloud hold the same \(BCDGameText.saves(matching))."
+            return matching == 0 ? "Neither \(names.cloud) nor this device has saves of this game yet."
+                : "This device and \(names.cloud) hold the same \(BCDGameText.saves(matching))."
         case .waiting(let count): return "\(BCDGameText.saves(count).capitalizedFirst) on one side only go across at the next sync."
         case .differ(let count):
-            return "Steam Cloud and this device disagree on \(BCDGameText.saves(count)). BCD changes neither until you pick the copies to keep."
+            return "\(names.cloud) and this device disagree on \(BCDGameText.saves(count)). BCD changes neither until you pick the copies to keep."
         case .failed(let why): return why
+        case .off:
+            return "BCD isn't syncing this game's saves with \(names.cloud). Turning it on writes to your \(names.store) account: this game's save files are sent to \(names.cloud) and newer ones come back."
+        case .unsupported: return "\(names.cloud) has no saves for this game."
         }
     }
 }
@@ -193,11 +227,13 @@ struct BCDCloudConflict: Identifiable, Equatable {
     var id: String { name }
 
     /// "Steam Cloud: 18 Oct 2026 at 14:05 · 2 MB · newer", and the same for this device.
-    var lines: (cloud: String, device: String) {
+    var lines: (cloud: String, device: String) { lines("Steam Cloud") }
+
+    func lines(_ name: String) -> (cloud: String, device: String) {
         func when(_ date: Date?) -> String { date.map { BCDFormat.dateTime($0) } ?? "date unknown" }
         let cloudNewer = deviceDate != nil && (cloudDate ?? .distantPast) > (deviceDate ?? .distantPast)
         let deviceNewer = deviceDate != nil && (deviceDate ?? .distantPast) > (cloudDate ?? .distantPast)
-        let cloud = "Steam Cloud: \(when(cloudDate)) · \(BCDFormat.bytes(cloudBytes))" + (cloudNewer ? " · newer" : "")
+        let cloud = "\(name): \(when(cloudDate)) · \(BCDFormat.bytes(cloudBytes))" + (cloudNewer ? " · newer" : "")
         guard deviceDate != nil else { return (cloud, "This device: missing, though it was synced here before") }
         return (cloud, "This device: \(when(deviceDate)) · \(BCDFormat.bytes(deviceBytes))" + (deviceNewer ? " · newer" : ""))
     }
@@ -334,6 +370,8 @@ struct BCDGameDetails: Equatable {
     /// The game's settings, in sections: filled only while Options is open (memory comes first).
     var groups: [BCDGameSettingGroup] = []
     var cloud: BCDCloudSaves? = nil
+    /// What the game's store calls its cloud saves (Steam's unless the live backend says another store's).
+    var cloudNames = BCDCloudNames()
     /// The saves Steam Cloud and this device disagree on.
     var cloudConflicts: [BCDCloudConflict] = []
     /// Why the last sync stopped, beside what it compared.
@@ -376,9 +414,8 @@ struct BCDGameDetails: Equatable {
     /// The lookup behind `dlcOffer` is still running (Install waits for it), or failed (Install does not wait or ask).
     var dlcCheck: BCDDLCCheck = .none
 
-    /// Check and repair files for this game: what the backend offers, and never for a GOG game
-    /// (its file check comes with a later version of BCD, as its updates do).
-    func offersRepair(_ game: BCDGame?) -> Bool { canRepair && game?.store != .gog }
+    /// Check and repair files for this game: what the backend offers (a Steam game BCD downloaded, a GOG game BCD installed).
+    func offersRepair(_ game: BCDGame?) -> Bool { canRepair }
 
     func setting(_ id: String) -> (group: BCDGameSettingGroup, setting: BCDGameSetting)? {
         for group in groups {
@@ -474,6 +511,8 @@ enum BCDGameAction: Hashable {
     case applyRecommended(changes: Int)
     case syncCloud
     case keepCloud(fromCloud: Bool)
+    /// Turn this game's cloud saves on (asked first: it writes to the player's account); off is a plain setting.
+    case turnOnCloud
     case setTuning(Bool)
     case undoTuning
     case writeTuningLines
@@ -539,13 +578,23 @@ extension BCDGameAction {
                                    message: "\(changes) change\(changes == 1 ? "" : "s") to this game's config and switches. Your own changes to them are replaced.",
                                    confirm: "Use them", destructive: true)
         case .keepCloud(let fromCloud):
+            let names = details.cloudNames
+            // A store that only adds snapshots keeps every older one: its cloud is not changed, a new snapshot is added.
+            let keepsOlder = names.keepsOlder ? " \(names.cloud) keeps its older snapshots." : ""
             return fromCloud
-                ? BCDGameQuestion(title: "Use Steam Cloud's saves?",
-                                  message: "Where the copies differ, Steam Cloud's replace the ones on this device. BCD backs up this device's copies first, in Files › BCD › Steam Cloud Backups.",
-                                  confirm: "Use Steam Cloud's", destructive: true)
+                ? BCDGameQuestion(title: "Use \(names.cloud)'s saves?",
+                                  message: "Where the copies differ, \(names.cloud)'s replace the ones on this device. BCD backs up this device's copies first, in Files › BCD › \(names.backups).",
+                                  confirm: "Use \(names.cloud)'s", destructive: true)
                 : BCDGameQuestion(title: "Keep this device's saves?",
-                                  message: "Where the copies differ, this device's replace Steam Cloud's, for every device you play on. BCD backs up the cloud's copies first, in Files › BCD › Steam Cloud Backups.",
+                                  message: names.keepsOlder
+                                      ? "This device's saves are sent to \(names.cloud) as its newest snapshot, for every device you play on.\(keepsOlder)"
+                                      : "Where the copies differ, this device's replace Steam Cloud's, for every device you play on. BCD backs up the cloud's copies first, in Files › BCD › \(names.backups).",
                                   confirm: "Keep this device's", destructive: true)
+        case .turnOnCloud:
+            let names = details.cloudNames
+            return BCDGameQuestion(title: "Turn on \(names.cloud) for this game?",
+                                   message: "This writes to your \(names.store) account. When this page opens and when BCD starts, BCD compares this game's saves with \(names.cloud) and brings newer cloud saves here, after backing up the ones they replace (Files › BCD › \(names.backups)). This device's newer saves go up when you choose Sync now. \(names.cloud) keeps its older snapshots.",
+                                   confirm: "Turn on", destructive: false)
         case .undoTuning:
             return BCDGameQuestion(title: "Undo auto-tune for \(game.title)?",
                                    message: "The lines it added and what it tried so far are removed. Your own config stays.",
@@ -833,11 +882,8 @@ struct BCDGamePagePlan: Equatable {
             playable = true
         case .updateAvailable(let bytes):
             main = Choice(action: .play, title: "Play", symbol: "play.fill")
-            // GOG's updates come with a later version of BCD: no Update that would do nothing.
-            if game.store != .gog {
-                others.append(Choice(action: .update, title: bytes > 0 ? "Update · \(BCDFormat.bytes(bytes))" : "Update",
-                                     symbol: "arrow.down.circle"))
-            }
+            others.append(Choice(action: .update, title: bytes > 0 ? "Update · \(BCDFormat.bytes(bytes))" : "Update",
+                                 symbol: "arrow.down.circle"))
             playable = true
         case .broken(let reason):
             let repairable = details.offersRepair(game)
@@ -914,7 +960,7 @@ struct BCDGamePagePlan: Equatable {
                 notes.append(Note(text: "iOS lets apps use about \(BCDFormat.bytes(limit)) on this device, and large games can need more. If iOS closes this one, BCD tries a swap file next; it needs about 3 GB of free storage.", warning: false))
             }
             if case .differ(let count)? = details.cloud {
-                notes.append(Note(text: "Steam Cloud and this device disagree on \(BCDGameText.saves(count)). Pick the copies to keep in Options.", warning: true))
+                notes.append(Note(text: "\(details.cloudNames.cloud) and this device disagree on \(BCDGameText.saves(count)). Pick the copies to keep in Options.", warning: true))
             }
             if let note = details.storeNote { notes.append(Note(text: note, warning: false)) }
             if otherDownloads {
@@ -1218,6 +1264,7 @@ struct BCDGamePending: Equatable {
             messages["recommended"] = "Updated: \(changes) change\(changes == 1 ? "" : "s")"
         case .syncCloud: backend?.syncCloud(game)
         case .keepCloud(let fromCloud): backend?.keepCloudSaves(game, fromCloud: fromCloud)
+        case .turnOnCloud: backend?.set(BCDCloudSetting.enabled, to: "1", for: game)
         case .setTuning(let on): backend?.setTuning(on, for: game)
         case .undoTuning:
             configDraft = nil
@@ -1398,6 +1445,8 @@ struct BCDGamePage: View {
     /// Options: nil while closed. A panel from the right, a sheet from the bottom on an upright
     /// phone; turning the phone moves it from one to the other.
     @State private var options: BCDGameOptionsPage?
+    /// The Steam Workshop page, full screen over this one while it is up (it holds the controller's buttons).
+    @State private var workshop: BCDWorkshopRoute?
     /// The layout as the size classes last said. Closures handed to the focus outlive the render
     /// that made them, so they read this, never the environment they captured.
     @State private var phoneUpright = false
@@ -1494,6 +1543,14 @@ struct BCDGamePage: View {
         .onChange(of: hasOptions) { _, has in if !has { closeOptions() } }
         .onChange(of: focus.focused) { _, _ in installButtons() }
         .onChange(of: options) { _, _ in installButtons() }
+        .onChange(of: workshop) { old, new in
+            // Back from the Workshop page: this page's buttons are back, with the ring on the row that opened it.
+            if old != nil, new == nil {
+                installButtons()
+                focus.focused = "game.panel.row.workshop"
+            }
+        }
+        .bcdWorkshop($workshop)
         .onChange(of: model.details) { _, _ in installButtons() }
         // A game BCD finds it cannot install (a store's look at its files) loses Install while the page is open: the focus goes to Back.
         .onChange(of: model.plan.main == nil) { _, none in
@@ -1530,6 +1587,8 @@ struct BCDGamePage: View {
     /// there is one, B back; in Options A chooses, Y puts a setting back to its default, B goes
     /// back or closes.
     private func installButtons() {
+        // The Steam Workshop page is up over this one: its buttons are in force.
+        guard workshop == nil else { return }
         // The DLC chooser: A switches a row or presses a button, X selects all, Y none, B goes back to the question (short words: four hints must fit an upright phone).
         if model.chooser != nil {
             focus.setHandlers([(BCDHint(button: .a, title: "Switch"), {}),
@@ -1623,7 +1682,8 @@ struct BCDGamePage: View {
 
     private func optionsList(_ game: BCDGame, _ page: BCDGameOptionsPage) -> BCDGameOptionsList {
         BCDGameOptionsList(game: game, model: model, page: page,
-                           show: { showOptions($0, focusing: $1) }, close: closeOptions)
+                           show: { showOptions($0, focusing: $1) }, close: closeOptions,
+                           openWorkshop: { if let id = Int(game.id.dropFirst("steam.".count)), game.id.hasPrefix("steam.") { workshop = .game(id) } })
     }
 
     /// An upright phone: Options rises from the bottom over most of the screen.
@@ -2117,6 +2177,8 @@ private struct BCDGameOptionsList: View {
     let page: BCDGameOptionsPage
     let show: (BCDGameOptionsPage, String?) -> Void
     let close: () -> Void
+    /// The Steam Workshop row: opens the game's Workshop page over the page.
+    var openWorkshop: () -> Void = {}
     @EnvironmentObject private var focus: BCDFocus
     @State private var sharing: BCDGameShare?
     /// A saves backup handed to the share sheet: a copy, removed once the sheet closes.
@@ -2336,7 +2398,7 @@ private struct BCDGameOptionsList: View {
         if let cloud = d.cloud {
             var tone = BCDGameRow.Tone.normal
             if case .differ = cloud { tone = .warning }
-            rows.append(BCDGameRow(id: "cloud", title: "Cloud saves", symbol: "icloud", value: cloud.summary, tone: tone, chevron: true,
+            rows.append(BCDGameRow(id: "cloud", title: "Cloud saves", symbol: "icloud", value: cloud.summary(d.cloudNames), tone: tone, chevron: true,
                                    run: { commands?.show(.cloud, nil) }))
         }
         if d.canReset {
@@ -2369,7 +2431,7 @@ private struct BCDGameOptionsList: View {
         }
         if d.offersRepair(game) {
             rows.append(BCDGameRow(id: "repair", title: "Check and repair files", symbol: "wrench.and.screwdriver",
-                                   detail: "Compares every file with Steam and downloads what's missing or changed.",
+                                   detail: "Compares every file with \(game?.store == .ea ? "EA's current build" : "Steam") and downloads what's missing or changed.",
                                    run: request(.repair)))
         }
         if d.report {
@@ -2425,6 +2487,7 @@ private struct BCDGameOptionsList: View {
             case .storeSearch: row.run = { show(.storeSearch, nil) }
             case .coverPicture: row.run = { importFile(.cover) }
             case .wallpaperPicture: row.run = { importFile(.wallpaper) }
+            case .workshop: row.run = { openWorkshop() }
             }
         case .choice:
             row.value = setting.summary
@@ -2585,35 +2648,48 @@ private struct BCDGameOptionsList: View {
             }
         }()
         let d = model.details
+        let names = d.cloudNames
         var rows: [BCDGameRow] = []
         if cloud == .signedOut {
-            rows.append(BCDGameRow(id: "sync", title: "Sign in to Steam", symbol: "person.crop.circle",
-                                   detail: "Cloud saves come with your Steam sign-in.", run: { model.request(.signIn(.steam)) }))
-        } else {
+            rows.append(BCDGameRow(id: "sync", title: "Sign in to \(names.store)", symbol: "person.crop.circle",
+                                   detail: "Cloud saves come with your \(names.store) sign-in.", run: { model.request(.signIn(names.front)) }))
+        } else if cloud == .off {
+            rows.append(BCDGameRow(id: "cloudon", title: "Turn on \(names.cloud)", symbol: "icloud.and.arrow.up",
+                                   detail: "Asks first: it writes to your \(names.store) account.", run: { model.request(.turnOnCloud) }))
+        } else if cloud != .unsupported {
             var title = "Sync now"
             if working { title = "Syncing…" } else if case .failed = cloud { title = "Try again" }
             rows.append(BCDGameRow(id: "sync", title: title, symbol: "arrow.triangle.2.circlepath", enabled: !working,
                                    run: { model.request(.syncCloud) }))
         }
         if case .differ = cloud {
-            rows.append(BCDGameRow(id: "cloudwins", title: "Use Steam Cloud's saves",
+            rows.append(BCDGameRow(id: "cloudwins", title: "Use \(names.cloud)'s saves",
                                    detail: "This device's copies are backed up first.", run: { model.request(.keepCloud(fromCloud: true)) }))
             rows.append(BCDGameRow(id: "devicewins", title: "Keep this device's saves",
-                                   detail: "Steam Cloud's copies are backed up first. Saves missing here stay missing, and Steam Cloud keeps them.",
+                                   detail: names.keepsOlder
+                                       ? "They go up to \(names.cloud) as its newest snapshot. \(names.cloud) keeps its older ones."
+                                       : "\(names.cloud)'s copies are backed up first. Saves missing here stay missing, and \(names.cloud) keeps them.",
                                    run: { model.request(.keepCloud(fromCloud: false)) }))
+        }
+        if names.optIn, cloud != .off, cloud != .unsupported, cloud != .signedOut {
+            rows.append(BCDGameRow(id: "cloudoff", title: "Turn off \(names.cloud) for this game", symbol: "icloud.slash",
+                                   detail: "Nothing more is read or sent. What is in the cloud stays.", run: { model.request(.set(BCDCloudSetting.enabled, "0")) }))
         }
         let files = d.cloudConflicts.map { conflict in
             BCDGameRow(id: "save." + conflict.id, title: conflict.name,
-                       detail: conflict.lines.cloud + "\n" + conflict.lines.device, still: true)
+                       detail: conflict.lines(names.cloud).cloud + "\n" + conflict.lines(names.cloud).device, still: true)
         }
         var history: [String] = []
         if d.cloudReceived > 0 {
-            history.append("Received \(BCDGameText.saves(d.cloudReceived)) from Steam Cloud"
+            history.append("Received \(BCDGameText.saves(d.cloudReceived)) from \(names.cloud)"
                            + (d.cloudBackedUp > 0 ? ", after backing up the \(BCDGameText.saves(d.cloudBackedUp)) it replaced." : "."))
         }
-        if d.cloudSent > 0 { history.append("Sent \(BCDGameText.saves(d.cloudSent)) to Steam Cloud.") }
+        if d.cloudSent > 0 { history.append("Sent \(BCDGameText.saves(d.cloudSent)) to \(names.cloud).") }
+        let footer = names.optIn
+            ? "BCD syncs this game's saves when BCD starts and when this page opens, never during play: a newer cloud save comes down, and this device's newer saves go up when you choose Sync now. Every save a sync replaces is kept in Files › BCD › \(names.backups). \(names.cloud) keeps its older snapshots."
+            : "BCD syncs a game's saves when BCD starts and when this page opens, never during play. After playing, choose Upload saves and close BCD in the game's menu, or they go up the next time BCD starts. Every save a sync replaces is kept in Files › BCD › \(names.backups)."
         return VStack(alignment: .leading, spacing: 10) {
-            Text(cloud.explanation).font(BCDStyle.body(15)).fixedSize(horizontal: false, vertical: true)
+            Text(cloud.explanation(names)).font(BCDStyle.body(15)).fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 4).padding(.bottom, 4)
             if let problem = d.cloudProblem, cloud != .failed(problem) {
                 Label(problem, systemImage: "exclamationmark.triangle.fill")
@@ -2629,7 +2705,7 @@ private struct BCDGameOptionsList: View {
                 Text(line).font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft)
                     .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)
             }
-            Text("BCD syncs a game's saves when BCD starts and when this page opens, never during play. After playing, choose Upload saves and close BCD in the game's menu, or they go up the next time BCD starts. Every save a sync replaces is kept in Files › BCD › Steam Cloud Backups.")
+            Text(footer)
                 .font(BCDStyle.body(12)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4).padding(.top, 4)
         }
@@ -2804,6 +2880,7 @@ private struct BCDGameTextPage: View {
                 .lineLimit(1...5)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .bcdSmartPunctuationOff()   // round 632: "--" stays two hyphens, quotes stay straight
                 .focused($typing)
                 .padding(14)
                 .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))

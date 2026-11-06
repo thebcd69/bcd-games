@@ -1,3 +1,5 @@
+/* Copyright 2026 Connor Gow. This file was taken from https://github.com/willfaust/Madeira (pull request #227)
+ * under GPL-3.0-or-later. See THIRD-PARTY-NOTICES.md. */
 /* Thin reservations (build/ntdll-unix/virtual_ios.c, ios_thin_reserve).
  *
  * Reserves many 1 GB read-write ranges and commits a little of each, the way

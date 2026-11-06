@@ -2,6 +2,9 @@
 // Copyright 2026 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
 // Modified by BCD (thebcd69), 2026-10-24: Steam launch option choice for a Dock start (SteamDirectStart.dockOptions, dockLaunch).
+// Modified by BCD (thebcd69), 2026-11-05: `SteamGamesModel.branches`, the beta branch each install record names (version selection).
+// Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (pull request #381)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 
@@ -467,6 +470,8 @@ enum SteamDirectStart {
     @Published private(set) var languages: [Int: String] = [:]
     /// The depots each of those install records holds.
     @Published private(set) var depots: [Int: Set<Int>] = [:]
+    /// The beta branch each of those install records names (`BetaKey`); none for public.
+    @Published private(set) var branches: [Int: String] = [:]
     private var scanning = false
     /// A refresh was asked for while a scan ran (an install record was just
     /// written): scan again once it ends.
@@ -482,6 +487,7 @@ enum SteamDirectStart {
         Task.detached(priority: .utility) {
             let found = MadeiraDock.games(drive: drive)
             var builds: [Int: Int] = [:], languages: [Int: String] = [:], depots: [Int: Set<Int>] = [:]
+            var branches: [Int: String] = [:]
             for game in found where SteamInstallPaths.isManaged(library: game.library) && game.installed {
                 let steamApps = SteamInstallPaths.steamApps(drive: drive)
                 if let build = SteamInstallFiles.buildID(appID: game.id, steamApps: steamApps) {
@@ -489,8 +495,10 @@ enum SteamDirectStart {
                 }
                 languages[game.id] = SteamInstallFiles.language(appID: game.id, steamApps: steamApps)
                 depots[game.id] = SteamInstallFiles.depots(appID: game.id, steamApps: steamApps)
+                branches[game.id] = SteamInstallFiles.betaKey(appID: game.id, steamApps: steamApps)
             }
             let recorded = builds, recordedLanguages = languages, recordedDepots = depots
+            let recordedBranches = branches
             await MainActor.run {
                 self.scanning = false
                 let again = self.rescan
@@ -499,6 +507,7 @@ enum SteamDirectStart {
                 if self.builds != recorded { self.builds = recorded }
                 if self.languages != recordedLanguages { self.languages = recordedLanguages }
                 if self.depots != recordedDepots { self.depots = recordedDepots }
+                if self.branches != recordedBranches { self.branches = recordedBranches }
                 if found.count != self.lastCount {
                     self.lastCount = found.count
                     LogStore.shared.log("[steam-games] installed=\(found.count) ready=\(found.filter(\.installed).count)")

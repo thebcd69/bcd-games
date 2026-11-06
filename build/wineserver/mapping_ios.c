@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #462)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Server-side file mapping management
  *
@@ -19,6 +21,14 @@
  */
 
 #include "config.h"
+
+/* The bcd.cfg reader comes before Wine's headers: winnt.h poisons strncpy, which the header-only reader uses.
+ * env.MADEIRA_ILONLY_WOW64 is read through it because the server starts before the bridge exports the env. lines
+ * (as in storage_device_ios.c). Upstream Madeira v0.2.0 (#516) placed it here for the same switch. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#include "../madeira_cfg.h"
+#pragma GCC diagnostic pop
 
 #include <assert.h>
 #include <errno.h>
@@ -182,6 +192,7 @@ struct mapping
 
 static void mapping_dump( struct object *obj, int verbose );
 static struct fd *mapping_get_fd( struct object *obj );
+extern int madeira_luajit_compat_fd( int unix_fd, off_t file_size );   /* luajit_compat.c */
 static void mapping_destroy( struct object *obj );
 static enum server_fd_type mapping_get_fd_type( struct fd *fd );
 
@@ -802,6 +813,23 @@ static int load_cfg_header( IMAGE_LOAD_CONFIG_DIRECTORY64 *cfg, size_t va, size_
  * the native set has no mscoree.dll, so a set that gets one runs AnyCPU images natively
  * again. tests/host/check-ilonly-machine.py compiles both functions. */
 
+/* Kill switch, read once (upstream Madeira v0.2.0, #516): env.MADEIRA_ILONLY_WOW64 = 0 (bcd.cfg or the environment) gives an AnyCPU
+ * IL-only image upstream's ComPlusNativeReady again, so it runs as a native ARM64 process as before round 579. Unset or anything else:
+ * the behaviour above. Lets a device prove or rule out this change for a .NET program. */
+static int ios_ilonly_wow64_enabled( void )
+{
+    static int enabled = -1;
+
+    if (enabled < 0)
+    {
+        char buf[16];
+        const char *v = madeira_cfg_get( "env.MADEIRA_ILONLY_WOW64", buf, sizeof(buf) ) ? buf
+                        : getenv( "MADEIRA_ILONLY_WOW64" );
+        enabled = !(v && !strcmp( v, "0" ));
+    }
+    return enabled;
+}
+
 /* Can the native machine run an IL-only image: is there an mscoree.dll in its set under
  * one of the WINEDLLPATH directories? 1 when it cannot be told (no path, a native machine
  * other than ARM64), which is upstream's answer. */
@@ -840,7 +868,7 @@ static void ios_ilonly_say( DWORD clr_flags, unsigned short machine )
     if (said++ < 6)
         fprintf( stderr, "[ilonly-machine] an IL-only PE32 image (CLR flags=%#x, machine=%#x) is not promoted to the "
                  "native machine %#x: its set has no mscoree.dll, so it runs as its own machine (WoW64) "
-                 "(it ended in c000007b before; tests/host/check-ilonly-machine.py)\n",
+                 "(it ended in c000007b before; env.MADEIRA_ILONLY_WOW64 = 0 restores the native promotion; tests/host/check-ilonly-machine.py)\n",
                  (unsigned int)clr_flags, (unsigned int)machine, (unsigned int)native_machine );
 }
 
@@ -1083,7 +1111,8 @@ static unsigned int get_image_params( struct mapping *mapping, file_pos_t file_s
         if (nt.opt.hdr32.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
         {
             /* madeira-bcd ilonly-i386: ComPlusNativeReady only while the native machine has an mscoree.dll */
-            int native_ilonly = ios_native_has_mscoree( getenv( "WINEDLLPATH" ), native_machine );
+            int native_ilonly = !ios_ilonly_wow64_enabled() ||
+                                ios_native_has_mscoree( getenv( "WINEDLLPATH" ), native_machine );
             mapping->image.image_flags |= ios_ilonly_image_flags( clr.Flags, native_ilonly );
             if (!native_ilonly && !(clr.Flags & COMIMAGE_FLAGS_32BITREQUIRED))
                 ios_ilonly_say( clr.Flags, nt.FileHeader.Machine );
@@ -1198,7 +1227,27 @@ static struct mapping *create_mapping( struct object *root, const struct unicode
         }
         if (flags & SEC_IMAGE)
         {
-            unsigned int err = get_image_params( mapping, st.st_size, unix_fd );
+            unsigned int err;
+            /* Madeira: an x64 LuaJIT that needs memory below 2 GB is mapped from
+             * the bundled GC64 build instead (luajit_compat.c). madeira-bcd: only
+             * in a session whose game has gl-backend on; otherwise it answers -1
+             * at once and nothing below runs. */
+            int compat_fd = madeira_luajit_compat_fd( unix_fd, st.st_size );
+            if (compat_fd != -1)
+            {
+                struct stat compat_st;
+                struct fd *compat = create_anonymous_fd( &mapping_fd_ops, compat_fd, &mapping->obj,
+                                                         FILE_SYNCHRONOUS_IO_NONALERT );
+                if (compat && fstat( compat_fd, &compat_st ) != -1)
+                {
+                    release_object( mapping->fd );
+                    mapping->fd = compat;
+                    unix_fd = compat_fd;
+                    st = compat_st;
+                }
+                else if (compat) release_object( compat );
+            }
+            err = get_image_params( mapping, st.st_size, unix_fd );
             if (!err) return mapping;
             set_error( err );
             goto error;

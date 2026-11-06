@@ -58,6 +58,11 @@ def needles():
             keep = max(6, (sig.get("count") or 1) + 5)
             first = sig["has"][0]
             out[first] = max(out.get(first, 0), keep)
+            # Round 631: a signal of several parts also keeps the lines that have all of them, which thinning by the first part
+            # alone could drop ("[nt-fail] #" is on hundreds of lines; the one with the V8 table's size and type is in the middle).
+            if len(sig["has"]) > 1:
+                whole = tuple(sig["has"])
+                out[whole] = max(out.get(whole, 0), keep)
     return out
 
 
@@ -128,6 +133,11 @@ ERROR_WORDS = ("error", "Error", "ERROR", "could not", "Could not", "Could Not",
                "not supported", "unable", "Unable", "cannot", "Cannot", "Fatal", "fatal")
 
 
+def _has_all(line, parts):
+    """Every part on one line, in any order, as the scanner reads a signal (AutoTuneCore.swift hasAll)."""
+    return all(part in line for part in parts)
+
+
 def cut(log, wanted):
     hits = {n: [] for n in wanted}
     keep = set()
@@ -135,7 +145,7 @@ def cut(log, wanted):
         for i, raw in enumerate(f):
             line = raw.decode("utf-8", "replace").rstrip("\r\n")
             for n in wanted:
-                if n in line:
+                if (n in line) if isinstance(n, str) else _has_all(line, n):
                     hits[n].append(i)
             if "[win-name] #" in line and ' text="' in line and any(w in line for w in ERROR_WORDS) and len(keep) < 4000:
                 keep.add(i)

@@ -15,6 +15,9 @@ import Foundation
 /// - `env.BCD_GOG = 0` hides everything GOG (installed GOG games stay as ordinary library games).
 /// - `env.BCD_GOG_SFC = 1` cuts small files from their depot's small-files container (one fetch
 ///   instead of one per file); off until a device run shows the container downloads.
+/// - `env.BCD_GOG_SCRIPT` (build 632; unset follows the install, 1 on, 0 off; also in a game's own config): the registry values of a
+///   game's install script (`goggame-<id>.script`) are written into the prefix before each start (BCDGOGRegistry). Unset, only a game
+///   BCD installed or repaired from build 632 on gets them; a game installed before starts as it always did.
 /// - Not in M1: updates, verify and repair, DLC, a language picker, redistributables and GOG's
 ///   support setups (a build's redistributables are listed on its record), the Galaxy stand-in.
 /// Log tags: [gog-signin], [gog-library], [gog-content], [gog-install] (product IDs, counts,
@@ -26,6 +29,14 @@ import Foundation
     static var enabled: Bool { MadeiraConfig.flag("BCD_GOG", fallback: true) }
     /// Small files from their depot's container (one download for hundreds of files). Off by default.
     static var containers: Bool { MadeiraConfig.flag("BCD_GOG_SFC", fallback: false) }
+    /// A game's redistributables (GOG's dependencies: Open AL, Visual C++ 2010-2013, ...) are downloaded into its folder with the
+    /// game, and their installers run once at its first start (on by default). `env.BCD_GOG_SETUP = 0` in bcd.cfg downloads none for
+    /// the games installed from then on; in a game's own config it runs none of that game's installers. It concerns only games
+    /// installed or repaired from build 632 on (their record lists the installers): a game installed before runs none.
+    static var redistributables: Bool { MadeiraConfig.flag("BCD_GOG_SETUP", fallback: true) }
+    /// Owned DLC is installed with the game and by an update or a repair (on by default). `env.BCD_GOG_DLC = 0` in bcd.cfg installs the
+    /// game alone and looks for no DLC when it checks for updates.
+    static var dlc: Bool { MadeiraConfig.flag("BCD_GOG_DLC", fallback: true) }
     static let root = BCDInstallRoot(drive: "C", folder: "GOG Games")
     static var folder: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -40,6 +51,12 @@ import Foundation
     @Published private(set) var refreshing = false
     @Published private(set) var updated: Date?
     @Published var error: String?
+    /// Installed games GOG has an update for (a newer build, or owned DLC the game lacks), found when a game's page opened.
+    @Published private(set) var updates: [String: BCDGOGContent.Available] = [:]
+    private var checked: [String: Date] = [:]
+    /// What the next plan of an installed game's job is (set by update() and repair(), kept until the job is done or cancelled; a
+    /// job that outlived the app is read from its pending file).
+    private var requested: [String: BCDGOGJobKind] = [:]
 
     let store = "gog"
     let storeTitle = "GOG"
@@ -131,6 +148,8 @@ import Foundation
         userName = nil
         products = []
         updated = nil
+        updates = [:]
+        checked = [:]
         try? FileManager.default.removeItem(at: Self.folder.appendingPathComponent("library.json"))
         BCDContentLog.write("[gog-signin] signed out")
     }
@@ -223,9 +242,137 @@ import Foundation
         queue.enqueue(key(id), title: product(id)?.title ?? queue.job(key(id))?.title ?? "GOG game")
     }
 
+    // MARK: Updates, repair and DLC (build 632)
+
+    /// What a job of this game is: an installed game never installs again.
+    func kind(_ id: String) -> BCDGOGJobKind {
+        guard installs[id] != nil else { return .install }
+        let kind = requested[id] ?? pending(id)?.kind ?? .install
+        return kind == .install ? .update : kind
+    }
+
+    /// A job runs for a game that is installed (an update or a repair, which Stop only stops).
+    func isUpdating(_ id: String) -> Bool { installs[id] != nil && queue.job(key(id)) != nil }
+
+    /// The Update button: the files that changed, and the owned DLC the game lacks.
+    func update(_ id: String) { enqueueInstalled(id, .update) }
+
+    /// The Repair button: every installed file is read and compared with the build.
+    func repair(_ id: String) { enqueueInstalled(id, .repair) }
+
+    /// Resume of a paused job: an installed game's update or repair goes on, an install is installed again.
+    func resume(_ id: String) {
+        if installs[id] != nil { enqueueInstalled(id, kind(id)) } else { install(id) }
+    }
+
+    private func enqueueInstalled(_ id: String, _ kind: BCDGOGJobKind) {
+        guard Self.enabled, BCDGOGCatalog.validID(id), let record = installs[id] else { return }
+        guard signedIn else { tell(BCDGOGError.signedOut.errorDescription!); return }
+        guard LibraryModel.shared.current == nil, wine_process_is_running() == 0 else { tell("Close the game first."); return }
+        start()
+        if queue.job(key(id)) == nil || !queue.hasPartial(key(id)) { requested[id] = kind }
+        BCDContentLog.write("[gog-install] \(requested[id]?.rawValue ?? kind.rawValue) asked product=\(id)")
+        queue.enqueue(key(id), title: record.title)
+    }
+
+    /// Looks for an update of an installed game (when its page opens; at most once in six hours, never while a job runs for it, never
+    /// signed out): GOG's build list, and for the same build the owned DLC the game lacks. A failure is logged and forgotten.
+    func checkForUpdate(_ id: String, force: Bool = false) {
+        guard Self.enabled, signedIn, let record = installs[id], queue.job(key(id)) == nil else { return }
+        if !force, let last = checked[id], Date().timeIntervalSince(last) < 6 * 3600 { return }
+        checked[id] = Date()
+        let api = self.api
+        let fetch: BCDGOGContent.Fetch = { url, signedIn in try await api.json(url, signedIn: signedIn, limit: 64 << 20) }
+        Task { [weak self] in
+            do {
+                let found = try await BCDGOGContent.available(product: id, buildID: record.buildID, depots: record.depots, language: record.language,
+                                                              dlc: Self.dlc, fetch: fetch)
+                guard let self, self.installs[id]?.buildID == record.buildID else { return }
+                if self.updates[id] != found { self.updates[id] = found }
+                BCDContentLog.write("[gog-install] update check product=\(id) newer=\(found?.newerBuild == true ? 1 : 0) dlc=\(found?.dlc.count ?? 0)")
+            } catch {
+                self?.checked[id] = nil
+                if !(error is CancellationError) { BCDContentLog.write("[gog-install] update check failed product=\(id) reason=\(Self.reason(error))") }
+            }
+        }
+    }
+
+    // MARK: Starting an installed game
+
+    /// An `env.` switch for one game: its own config line (its settings file, then the entry's own lines), else bcd.cfg's; nil when
+    /// none says. An empty value means unset.
+    static func gameSwitch(_ name: String, for entry: LibraryEntry) -> Bool? {
+        let key = "env." + name
+        for text in [GameProfile(windowsPath: entry.windowsPath).get(key), MadeiraConfig.parse(entry.gameConfigText ?? "")[key], MadeiraConfig.get(key)] {
+            if let text, !text.isEmpty { return text != "0" }
+        }
+        return nil
+    }
+
+    /// `env.BCD_GOG_SCRIPT` for one game (the install decides when none says, BCDGOGRegistry.applies).
+    static func scriptSwitch(for entry: LibraryEntry) -> Bool? { gameSwitch("BCD_GOG_SCRIPT", for: entry) }
+
+    /// The installed game whose folder holds the entry's program: the entry Play starts, or a program the player added from the
+    /// game's folder (The Witcher's System\witcher.exe). Reads the records itself when the store has not started (no network, no queue).
+    func record(forEntry entry: LibraryEntry) -> BCDGOGInstallRecord? {
+        let all = started ? installs : BCDGOGInstall.loadRecords(Self.folder)
+        if let own = all.values.first(where: { $0.entryID == entry.id }) { return own }
+        let path = entry.relativePath.lowercased()
+        return all.values.first { path.hasPrefix(($0.root.folder + "/" + $0.folder + "/").lowercased()) }
+    }
+
+    /// Called by ContentView.startLibraryEntry for every library start, before the launch is configured, while no session runs:
+    /// - the install script's registry values of a GOG game go into the prefix (BCDGOGRegistry), for a game BCD installed or repaired
+    ///   with the script in mind, or one the game's env.BCD_GOG_SCRIPT line asks for;
+    /// - the redistributable installers a game BCD installed from build 632 on has not run yet go into the services batch that
+    ///   starts it (LibraryEntry.setGOGSetup, GOGSetup.batchLines), unless the game's env.BCD_GOG_SETUP line is 0.
+    /// Any other start is not touched.
+    func prepareStart(_ entry: LibraryEntry) {
+        guard Self.enabled, entry.desktop != true, let record = record(forEntry: entry), let folder = record.hostFolder,
+              wineserver_is_running() == 0, wine_process_is_running() == 0 else { return }
+        BCDContentLog.sink = { LogStore.shared.log($0) }
+        if record.entryID == entry.id { prepareSetup(entry, record) }
+        guard BCDGOGRegistry.applies(scripts: record.scripts, switch: Self.scriptSwitch(for: entry)) else { return }
+        let prepared = BCDGOGRegistry.prepared(folder: folder, windowsFolder: record.windowsFolder, language: record.language)
+        guard prepared.scripts > 0 || prepared.unreadable > 0 else { return }   // a game without a script: nothing to do, nothing to say
+        guard !prepared.values.isEmpty else {
+            BCDContentLog.write(BCDGOGRegistry.logLine(product: record.productID, prepared: prepared, outcome: nil))
+            return
+        }
+        do {
+            let outcome = try BCDGOGRegistry.apply(prepared.values, prefix: LibraryEntry.hostDrive.deletingLastPathComponent())
+            BCDContentLog.write(BCDGOGRegistry.logLine(product: record.productID, prepared: prepared, outcome: outcome))
+        } catch {
+            BCDContentLog.write("[gog-script] product=\(record.productID) registry not written reason=\(Self.reason(error))")
+        }
+    }
+
+    /// The batch lines of the game's redistributable installers not yet run in this prefix, or none (LibraryEntry.servicesScript
+    /// starts the game as before when there are none).
+    private func prepareSetup(_ entry: LibraryEntry, _ record: BCDGOGInstallRecord) {
+        var lines: [String] = []
+        if let programs = record.setup, !programs.isEmpty, Self.gameSwitch("BCD_GOG_SETUP", for: entry) ?? true {
+            // A batch file is read with the console's code page (see LibraryEntry.servicesScriptEnvironment): a folder name outside ASCII
+            // would not reach the installer, so such a game runs none (its files are downloaded all the same).
+            if record.windowsFolder.allSatisfy(\.isASCII) {
+                lines = GOGSetup.batchLines(programs, folder: record.windowsFolder, drive: LibraryEntry.hostDrive)
+            } else {
+                BCDContentLog.write("[gog-setup] installers not run product=\(record.productID) reason=folder-not-ascii")
+            }
+        }
+        LibraryEntry.setGOGSetup(lines.isEmpty ? nil : lines.joined(separator: "\r\n"), for: entry.id)
+        if !lines.isEmpty {
+            BCDContentLog.write("[gog-setup] this start runs installers product=\(record.productID) count=\(lines.filter { $0.hasPrefix("echo [gog-setup]") }.count)")
+        }
+    }
+
     /// The library entry Play starts, made again if the library lost it.
     func playEntry(_ id: String) -> Result<LibraryEntry, BCDGOGPlayRefusal> {
         guard var record = installs[id] else { return .failure(.init(message: "This GOG game isn't installed.")) }
+        // An update puts its files in place in one short step at its end: not while the game starts.
+        if let job = queue.job(key(id)), job.state == .active, job.progress.phase == .finishing {
+            return .failure(.init(message: "BCD is finishing this game's update. Try again in a moment."))
+        }
         guard record.play != nil else { return .failure(.init(message: BCDGOGError.noPlayTask.errorDescription!)) }
         if record.entryID.flatMap({ id in LibraryModel.shared.entries.first { $0.id == id } }) == nil {
             makeEntry(&record)
@@ -277,10 +424,11 @@ import Foundation
     /// Something the player asked for went wrong: BCD's interface shows the library's message.
     private func tell(_ message: String) { LibraryModel.shared.error = message }
 
-    /// What an installed game's build names that BCD doesn't install yet (M2): its
-    /// redistributables, in words, for the game's page.
+    /// What an installed game's build names as redistributables, in words, for the game's page. A game installed from build 632 on
+    /// says what BCD did with them (BCDGOGInstall.setupNote); an older one, that BCD did not download them.
     func note(_ id: String) -> String? {
         guard let record = installs[id], !record.dependencies.isEmpty else { return nil }
+        if let setup = record.setup { return BCDGOGInstall.setupNote(setup: setup, notes: record.setupNotes ?? []) }
         let names = record.dependencies.prefix(6).map(Self.readable)
         return "May need: " + names.joined(separator: ", ") + ". BCD doesn't install these from GOG yet."
     }
@@ -304,18 +452,33 @@ import Foundation
 
     func blocker(_ key: BCDContentKey) -> String? {
         if !signedIn { return BCDGOGError.signedOut.errorDescription }
-        if installs[key.id] != nil { return "This game is already installed." }
+        // An installed game's update or repair is allowed (asked for just now, or found in the job's pending file after a restart).
+        if installs[key.id] != nil, requested[key.id] == nil, (pending(key.id)?.kind ?? .install) == .install { return "This game is already installed." }
         return nil
     }
 
     func plan(for key: BCDContentKey, stored: BCDContentPlan?) async throws -> BCDContentPlan {
         let api = self.api
         let fetch: BCDGOGContent.Fetch = { url, signedIn in try await api.json(url, signedIn: signedIn, limit: 64 << 20) }
-        let build = try await BCDGOGContent.newest(key.id, fetch: fetch)
-        if let stored, stored.version == build.id, pending(key.id) != nil { return stored }
-        let title = product(key.id)?.title ?? queue.job(key)?.title ?? "GOG game"
+        let id = key.id
+        let record = installs[id]
+        let kind: BCDGOGJobKind = record == nil ? .install : self.kind(id)
+        let build = try await BCDGOGContent.newest(id, fetch: fetch)
+        if let stored, stored.version == build.id, let info = pending(id), (info.kind ?? .install) == kind { return stored }
+        let title = product(id)?.title ?? queue.job(key)?.title ?? "GOG game"
+        // Owned DLC comes with the game; an update or a repair must have GOG's list (see BCDGOGContent.owned), and with DLC off keeps
+        // the DLC the game already has.
+        let owned: Set<String> = Self.dlc || kind != .install ? try await BCDGOGContent.owned(fetch: fetch, required: kind != .install) : []
+        let dlc = Self.dlc ? owned : owned.intersection(record?.dlc ?? [])
+        var current: BCDGOGContent.Current?
+        if kind != .install, let record, let folder = record.hostFolder {
+            let queue = self.queue
+            current = BCDGOGContent.Current(kind: kind, folder: folder, oldDepots: record.depots, language: record.language,
+                                            report: { done, total in Task { @MainActor in queue.planning(key, done: done, of: total) } })
+        }
         let made = try await BCDGOGContent.plan(key, title: title, build: build, preferred: Locale.preferredLanguages,
-                                                containers: Self.containers, fetch: fetch)
+                                                containers: Self.containers, redistributables: Self.redistributables,
+                                                hasMsiexec: DockInstallers.bundleHasMsiexec, ownedDLC: dlc, current: current, fetch: fetch)
         try savePending(made.info)
         return made.plan
     }
@@ -323,7 +486,10 @@ import Foundation
     func source(for plan: BCDContentPlan) async throws -> BCDChunkSource {
         let api = self.api
         return BCDGOGChunkSource(fetch: { product in
-            try await api.json(BCDGOGContent.secureLinkURL(product), signedIn: true, limit: 1 << 20)
+            // The redistributables' chunks come from GOG's open link: no sign-in.
+            product == BCDGOGContent.redistGroup
+                ? try await api.json(BCDGOGContent.openLinkURL, signedIn: false, limit: 1 << 20)
+                : try await api.json(BCDGOGContent.secureLinkURL(product), signedIn: true, limit: 1 << 20)
         })
     }
 
@@ -332,18 +498,36 @@ import Foundation
     func options(for plan: BCDContentPlan) -> BCDContentOptions { BCDContentOptions() }
 
     func finish(_ plan: BCDContentPlan, stage: URL) async throws {
-        guard let info = pending(plan.key.id) else { throw BCDGOGError.badReply("pending") }
-        let root = Self.root
-        var record = try await Task.detached(priority: .utility) {
-            try BCDGOGInstall.finish(plan, info: info, stage: stage, root: root)
-        }.value
-        makeEntry(&record)
-        try BCDGOGInstall.save(record, base: Self.folder)
-        installs[record.productID] = record
-        try? FileManager.default.removeItem(at: pendingURL(plan.key.id))
+        let id = plan.key.id
+        guard let info = pending(id) else { throw BCDGOGError.badReply("pending") }
+        if let old = installs[id], (info.kind ?? .install) != .install {
+            var record = try await Task.detached(priority: .utility) {
+                try BCDGOGInstall.finishUpdate(plan, info: info, stage: stage, record: old).record
+            }.value
+            makeEntry(&record)
+            try BCDGOGInstall.save(record, base: Self.folder)
+            installs[id] = record
+            // A repair runs the game's redistributable installers again at the next start; an update only the ones it brings.
+            let had = Set((old.setup ?? []).map(\.id))
+            let ids = (info.setup ?? []).map(\.id)
+            GOGSetup.forget(info.kind == .repair ? ids : ids.filter { !had.contains($0) }, drive: LibraryEntry.hostDrive)
+            updates[id] = nil
+            checked[id] = Date()
+        } else {
+            let root = Self.root
+            var record = try await Task.detached(priority: .utility) {
+                try BCDGOGInstall.finish(plan, info: info, stage: stage, root: root)
+            }.value
+            makeEntry(&record)
+            try BCDGOGInstall.save(record, base: Self.folder)
+            installs[record.productID] = record
+        }
+        requested[id] = nil
+        try? FileManager.default.removeItem(at: pendingURL(id))
     }
 
     func cancelled(_ key: BCDContentKey) {
+        requested[key.id] = nil
         try? FileManager.default.removeItem(at: pendingURL(key.id))
     }
 

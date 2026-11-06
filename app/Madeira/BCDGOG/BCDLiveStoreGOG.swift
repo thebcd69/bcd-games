@@ -108,11 +108,14 @@ extension BCDLiveStore {
         guard BCDGOG.enabled, let product = Self.gogProduct(id) else { return false }
         let gog = BCDGOG.shared, queue = BCDContentQueue.shared
         switch action {
-        case .install, .resume:
+        case .install:
             gog.install(product)
-        case .update, .verify:
-            // M2: a GOG game's updates and file checks come with the next milestone.
-            BCDContentLog.write("[gog-install] \(action == .update ? "update" : "verify") not in this version product=\(product)")
+        case .resume:
+            gog.resume(product)   // an installed game's paused update or repair goes on; any other game installs
+        case .update:
+            gog.update(product)
+        case .verify:
+            gog.repair(product)   // the page's Repair: every installed file is read and compared with the build
         case .uninstall:
             gog.uninstall(product)
         case .pause:
@@ -135,6 +138,18 @@ extension BCDLiveStore {
     func gogNote(_ id: String) -> String? {
         guard BCDGOG.enabled, let product = Self.gogProduct(id) else { return nil }
         return BCDGOG.shared.note(product)
+    }
+
+    /// Hook in the game page's `opened`: a look for an update of an installed GOG game (once in six hours; BCDGOG.checkForUpdate).
+    func gogOpened(_ id: String) {
+        guard BCDGOG.enabled, let product = Self.gogProduct(id) else { return }
+        BCDGOG.shared.checkForUpdate(product)
+    }
+
+    /// For the game's page: a download runs for an installed GOG game (an update or a repair, which Stop only stops).
+    func gogUpdating(_ id: String) -> Bool {
+        guard BCDGOG.enabled, let product = Self.gogProduct(id) else { return false }
+        return BCDGOG.shared.isUpdating(product)
     }
 
     /// Hook in refreshLibrary(): GOG's list read again.
@@ -178,6 +193,9 @@ extension BCDLiveStore {
             }
         }
         guard let installed else { return .notInstalled }
-        return installed.play == nil ? .broken(reason: BCDGOGError.noPlayTask.errorDescription ?? "") : .ready
+        if installed.play == nil { return .broken(reason: BCDGOGError.noPlayTask.errorDescription ?? "") }
+        // GOG has a newer build, or DLC the account owns that the game lacks (found when the game's page opened): Update is offered.
+        // The size is not known before the update's own plan (it holds only the files that change).
+        return BCDGOG.shared.updates[id] != nil && queue.job(BCDGOG.shared.key(id)) == nil ? .updateAvailable(bytes: 0) : .ready
     }
 }

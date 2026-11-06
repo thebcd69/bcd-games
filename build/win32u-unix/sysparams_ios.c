@@ -3023,6 +3023,7 @@ static const struct { UINT16 vendor, device; } ios_known_gpus[] =
 {
     { 0x106b, 0x0001 }, { 0x10de, 0x2544 }, { 0x1002, 0x73df }, { 0x1002, 0x67df }, { 0x8086, 0x3e92 }, { 0x8086, 0x56a0 },
     { 0x10de, 0x0292 },   /* build 623: NVIDIA GeForce 7900 GS (older Direct3D 9 games) */
+    { 0x10de, 0x1c03 },   /* build 632: NVIDIA GeForce GTX 1060 6GB (games that only know cards up to 2016-2018) */
 };
 
 /* Every game shares one prefix and the registry is saved, so a launch with the

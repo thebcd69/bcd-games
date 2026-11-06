@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
+# Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (commit 8deb759)
+# under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 """swap-mb caps the disk in broad mode (swap-mode = 2), for commits into reservations as well (madeira-bcd, build 622).
 
 The owner's Spider-Man 2 logs (build 620): with swap-mb = 256 and swap-mode = 2 the swap file held 2,445 MB on the disk. broad
@@ -9,13 +11,16 @@ only then, when the file was still empty; later commits into them grew it withou
 instead, and that was wrong: Spider-Man 2 commits ~9.3 GB into the file for 2.4 GB on the disk, so swap-mb 2048-4096 filled at
 load, the rest stayed in memory and iOS closed the game at 8 GB (owner's logs 2026-10-28 16:00-16:02); RDR2 commits 10-13.5 GB
 for 4.2-4.5 GB on the disk against its 8192. Build 622: the cap is the disk again, and it is also asked for every fresh commit
-into a reservation that is in the file; past it the commit gets fresh anonymous memory.
+into a reservation that is in the file; past it the commit gets fresh anonymous memory. Build 634 (the owner's go, 2026-11-06): that
+cut stopped RDR2 at the step where it enters the world (the owner's test B1, swap-mb 768; B2 with 8192 never reached the cap and
+played), so past swap-mb a commit into a reservation that is in the file stays in it (the disk can pass swap-mb, as before build 622)
+and only NEW reservations stay out of the file.
 
 This compiles the production swap-tier core (virtual_ios.c, between the "swap-tier core" markers) on macOS against small stubs
 for Wine's view and protection helpers and runs it on real memory with a real sparse file (Darwin's own F_PUNCHHOLE): committed
 data past swap-mb stays in the file while the disk is under it; once the written-back disk reaches it the next commit stays in
-memory with zeroed, writable pages and leaves the reservation's extent, and the data beside it stays intact; executable commits
-are never moved; a decommit takes its pages off the disk and the next commit goes to the file again; a committed reservation
+the reservation's extent too, zeroed and writable, counted as committed past swap-mb, nothing is kept in memory and the data beside
+it stays intact; so does an executable commit; a decommit takes its pages off the disk and the next commit is not past the cap; a committed reservation
 twice the cap is mapped while the disk is empty and a new one is refused once the disk is past it; the disk figure is cached for
 20 ms; the HUD shows the disk; the start, "reached", census and stats lines name the figures. Source checks cover the call sites.
 Off Darwin the runtime part is skipped (CI is macOS).
@@ -136,6 +141,7 @@ static void *anon_mmap_fixed( void *a, size_t l, int prot, int flags )
 harness = r'''
 static unsigned long long ios_swap_footprint_mb( void ) { return 4321; }
 static void ios_swap_cfg( int *mode, int *min_mb ) { *mode = 2; *min_mb = 0; }
+static int ios_avail_phys_chromium( void ) { return 0; }   /* defined after the core in virtual_ios.c: MADEIRA_DONOR_BROWSERS reads it only with the key at 0 */
 static unsigned long long ios_swap_disk_used( void )
 {
     struct stat st;
@@ -202,7 +208,7 @@ int main( void )
     commit( r + 64 * MB, 48 * MB, &v );
     memset( r + 64 * MB, 0x42, 48 * MB );
     CHECK( ios_swap_live == 80 * MB && ios_swap_overlaps( r, 32 * MB ) && ios_swap_overlaps( r + 64 * MB, 48 * MB ), "committed data past swap-mb stays in the file while the disk is under it" );
-    CHECK( ios_swap_cap_anon == 0 && ios_swap_cap_anon_n == 0, "... and nothing is kept in memory" );
+    CHECK( ios_swap_cap_anon == 0 && ios_swap_past_cap == 0, "... nothing is kept in memory and nothing is past the cap" );
     CHECK( consistent(), "counts consistent after the two commits" );
 
     /* written back: the disk holds 80 MB, past the cap */
@@ -220,32 +226,35 @@ int main( void )
         ios_swap_disk_seen = seen;
     }
 
-    /* the next fresh commit stays in memory, zeroed and writable, and leaves the extent; the data beside it is intact */
+    /* build 634: the next fresh commit stays in the file as well, zeroed and writable, counted as committed past swap-mb; nothing
+     * is cut out of the reservation (the cut of builds 622-633 stopped RDR2 at its world entry, the owner's B1); the data beside
+     * it is intact */
     commit( r + 160 * MB, 16 * MB, &v );
-    CHECK( !ios_swap_overlaps( r + 160 * MB, 16 * MB ), "the commit after the cap left the reservation's extent" );
-    CHECK( ios_swap_cap_anon == 16 * MB && ios_swap_cap_anon_n == 1, "... and is reported as kept in memory" );
-    CHECK( ios_swap_live == 80 * MB, "... and is not counted as file data" );
+    CHECK( ios_swap_overlaps( r + 160 * MB, 16 * MB ) && ios_swap_n == 1, "the commit after the cap stays in the reservation's extent" );
+    CHECK( ios_swap_cap_anon == 0 && ios_swap_past_cap == 16 * MB, "... nothing is kept in memory, it is counted as committed past swap-mb" );
+    CHECK( ios_swap_live == 96 * MB, "... and as file data" );
     CHECK( all( r + 160 * MB, 16 * MB, 0 ), "the memory it got reads zero" );
     memset( r + 160 * MB, 0x43, 16 * MB );
     CHECK( all( r + 160 * MB, 16 * MB, 0x43 ), "... and is writable" );
     CHECK( all( r, 32 * MB, 0x41 ) && all( r + 64 * MB, 48 * MB, 0x42 ), "the file data beside it is intact" );
-    CHECK( ios_swap_overlaps( r + 112 * MB, 48 * MB ) && ios_swap_overlaps( r + 176 * MB, 80 * MB ), "the rest of the reservation is still mapped from the file" );
-    CHECK( consistent(), "counts consistent after the split" );
-    CHECK( ios_swap_disk_used() >= 79 * MB && ios_swap_disk_used() <= 81 * MB, "the disk did not grow" );
+    CHECK( consistent(), "counts consistent after it" );
+    msync( r + 160 * MB, 16 * MB, MS_SYNC );
+    disk = ios_swap_disk_used();
+    CHECK( disk >= 95 * MB && disk <= 97 * MB, "written back, the disk passes swap-mb (96 MB, as before build 622)" );
 
-    /* an executable commit past the cap is never moved (counted only) */
+    /* an executable commit past the cap stays in the file too, and counts */
     mprotect( r + 228 * MB, 8 * MB, PROT_READ | PROT_WRITE );
     ios_swap_commit( r + 228 * MB, 8 * MB, VPROT_READ | VPROT_WRITE | VPROT_EXEC, &v );
-    CHECK( ios_swap_cap_anon == 16 * MB && ios_swap_overlaps( r + 228 * MB, 8 * MB ) && ios_swap_live == 88 * MB, "an executable commit is not moved" );
+    CHECK( ios_swap_overlaps( r + 228 * MB, 8 * MB ) && ios_swap_live == 104 * MB && ios_swap_past_cap == 24 * MB, "an executable commit stays in the file" );
 
-    /* a decommit of the 48 MB: punched, out of the count and off the disk; the next commit goes to the file again */
+    /* a decommit of the 48 MB: punched, out of the count and off the disk; under the cap the next commit is not past it */
     CHECK( ios_swap_punch_resv( r + 64 * MB, 48 * MB ) == 1, "decommit punches in place" );
-    CHECK( ios_swap_live == 40 * MB, "the decommitted data leaves the count" );
+    CHECK( ios_swap_live == 56 * MB, "the decommitted data leaves the count" );
     disk = ios_swap_disk_used();
-    CHECK( disk >= 31 * MB && disk <= 33 * MB, "... and the disk (32 MB left)" );
+    CHECK( disk >= 47 * MB && disk <= 49 * MB, "... and the disk (48 MB left)" );
     ios_swap_disk_seen_ns = 0;
     commit( r + 192 * MB, 16 * MB, &v );
-    CHECK( ios_swap_overlaps( r + 192 * MB, 16 * MB ) && ios_swap_live == 56 * MB && ios_swap_cap_anon == 16 * MB, "under the cap again: the commit is file data" );
+    CHECK( ios_swap_overlaps( r + 192 * MB, 16 * MB ) && ios_swap_live == 72 * MB && ios_swap_past_cap == 24 * MB, "under the cap again: the commit is file data, not past the cap" );
     CHECK( consistent(), "counts consistent after it" );
 
     /* MEM_RELEASE of the whole reservation: nothing left in the table, the count or on the disk */
@@ -294,17 +303,19 @@ else:
             print('\n'.join(l for l in r.stdout.splitlines() if l.startswith('disk after')))
             check(r.returncode == 0 and not fails, 'runtime: %d checks' % r.stdout.count('ok: ') + ('' if not fails else ':\n' + '\n'.join(fails)))
             err = r.stderr
-            check('swap-mb caps the disk the file occupies (past it, new commits stay in memory)' in err, 'the start line says what swap-mb caps')
+            check('swap-mb caps the disk the file occupies (past it, new reservations stay out of the file; commits into those in it stay in it)' in err,
+                  'the start line says what swap-mb caps')
             reached = [l for l in err.splitlines() if l.startswith('[swap] swap-mb reached:')]
             check(len(reached) == 1 and re.fullmatch(r'\[swap\] swap-mb reached: the swap file holds (79|80|81) MB on the disk \(cap 64 MB\); '
-                                                    r'later commits stay in memory', reached[0]) is not None,
-                  'the first commit kept in memory is announced once, with the disk and the cap')
+                                                    r'commits into reservations already in the file stay in it, new reservations stay out of it \(r634\)',
+                                                    reached[0]) is not None,
+                  'the first commit past the cap is announced once, with the disk and the cap')
             census = [l for l in err.splitlines() if l.startswith('[swap] census file-backed now=')]
-            check(bool(census) and re.search(r' disk=\d+MB.* committed=\d+MB kept-in-memory=\d+MB', census[-1]) is not None,
-                  'the census carries the disk, the committed data and what swap-mb kept in memory')
+            check(bool(census) and re.search(r' disk=\d+MB.* committed=\d+MB kept-in-memory=0MB past-cap=\d+MB', census[-1]) is not None,
+                  'the census carries the disk, the committed data, nothing kept in memory and what was committed past the cap')
             check(re.search(r'\| coverage broad: disk \d+ MB of 64 cap, .* disk-full refusals 1 .*'
-                            r'\| committed data in the file 0 MB \(peak 128\), 16 MB kept in memory by swap-mb$', err, re.M) is not None,
-                  'the stats line carries the disk, the refusal, the committed data (peak 128) and what was kept in memory')
+                            r'\| committed data in the file 0 MB \(peak 128\), 0 MB kept in memory by swap-mb, 24 MB committed past it$', err, re.M) is not None,
+                  'the stats line carries the disk, the refusal, the committed data (peak 128), nothing kept in memory and 24 MB committed past the cap')
 
 # --------------------------------------------------------------- source checks
 avm = body_of(virt, 'static NTSTATUS allocate_virtual_memory(')
@@ -319,8 +330,9 @@ check('if (!ios_pool_more && ios_swap_broad && ios_swap_disk_used() >= ios_swap_
       and 'if (ios_pool_more && ios_swap_broad && ios_swap_disk_used() >= ios_swap_cap) { ios_swap_disk_refused++; ios_swap_refused++; return IOS_SW_REFUSED; }' in smap,
       'a reservation is not mapped once the disk has reached swap-mb (the ml1257 rule; before helper memory, or after it with MADEIRA_POOL_MORE)')
 present = body_of(virt, 'static void ios_swap_present( void *base, size_t size, unsigned int vprot )\n{')
-check('full = ios_swap_broad && plain && ios_swap_disk_full();' in present and 'if (full && !ios_swap_ext[i].img && ncut < 16)' in present,
-      'a fresh commit into a reservation in the file stays in memory once the disk has reached swap-mb')
+check('past = ios_swap_broad && ios_swap_disk_full();' in present and 'ios_swap_past_cap += ob - oa;' in present
+      and 'anon_mmap_fixed' not in present and 'ios_swap_release_range' not in present and 'ios_swap_cap_anon' not in present,
+      'a fresh commit into a reservation in the file stays in it past swap-mb, counted (build 634: the cut to anonymous memory stopped RDR2, B1)')
 check('ios_swap_live + len > ios_swap_cap' not in virt and 'ios_swap_live + (uint64_t)(ob - oa) > ios_swap_cap' not in virt,
       'nothing caps the committed data (build 621: Spider-Man 2 commits ~4x, RDR2 ~3x what they write)')
 full = body_of(virt, 'static int ios_swap_disk_full( void )\n{')
@@ -334,4 +346,4 @@ check('python3 tests/host/check-swap-cap.py' in wf, 'CI runs this check')
 if failures:
     print('FAILED: swap-mb cap')
     sys.exit(1)
-print('PASS: swap-mb caps the disk in broad mode, for commits into reservations as well')
+print('PASS: swap-mb caps the disk in broad mode for new reservations; commits into reservations in the file stay in it (build 634)')

@@ -224,6 +224,24 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
                 "an earlier RockstarService.exe that ended with c0000135 is not shown as the game's crash")
         require(verdict([dockhost, ended(rdr2, 0, ago: 60), runs(rLauncher)]) == .none,
                 "without the Close the launcher still counts (today's behaviour)")
+        // ---- round 631 (round 630 agent R S2; GJDXG6): after Close, Rockstar's Steam entry program waiting on its box is not the game
+        let playGTAV = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\PlayGTAV.exe"
+        let gta5 = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto V\\GTA5.exe"
+        let scHelper = "C:\\Program Files\\Rockstar Games\\Social Club\\SocialClubHelper.exe"
+        require(verdictAsked([dockhost, runs(playGTAV), ended(gta5, 0, ago: 44, lived: 900), ended(rLauncher, 0xFFFF7001, ago: 40),
+                              ended(scHelper, 0xC0000005, ago: 40)]) == .end(status: 0, file: "gta5.exe", lived: 900),
+                "Close, GTA V ended 0, the Launcher died, PlayGTAV.exe waits on its box: end with the game's status")
+        require(verdict([dockhost, runs(playGTAV), ended(gta5, 0, ago: 44, lived: 900), ended(rLauncher, 0xFFFF7001, ago: 40)])
+                    == .wait(status: 0xFFFF7001, file: "launcher.exe", why: "game-still-runs"),
+                "without the Close the entry program still counts (today's behaviour: the Launcher's crash waits on it)")
+        require(verdictAsked([dockhost, runs(playGTAV), runs(gta5), ended(rLauncher, 0xFFFF7001, ago: 40)]) == .none,
+                "Close while GTA5.exe still runs: nothing ends")
+        require(verdictAsked([dockhost, runs(playGTAV), runs(gta5), ended(gta5, 0, ago: 44, lived: 30)])
+                    == .wait(status: 0, file: "gta5.exe", why: "game-still-runs"),
+                "Close while a second GTA5.exe runs: the game keeps it waiting")
+        require(R.isRockstarEntryStub(playGTAV) && R.isRockstarEntryStub("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe")
+                && !R.isRockstarEntryStub("C:\\Games\\Grand Theft Auto V\\PlayGTAV.exe") && !R.isRockstarEntryStub(gta5) && !R.isRockstarEntryStub(cuphead),
+                "an entry program is one of Rockstar's names inside a Steam game folder")
         require(R.isResidentLauncher("C:\\Program Files (x86)\\Rockstar Games\\Social Club\\SocialClubHelper.exe")
                 && !R.isResidentLauncher(rdr2) && !R.isResidentLauncher(cuphead),
                 "the resident launcher is Rockstar's folder only")
@@ -584,6 +602,7 @@ static volatile int g_wine_running = 0;
 volatile int g_madeira_srv_fgetpath = 0, g_madeira_srv_eco_follow = 0, g_madeira_srv_direct = 0, g_madeira_srv_idle_us = 0, g_madeira_srv_log_all = 0;
 static int g_stops;
 static int g_wine_exit_code = 0;   /* wine_process_exit_code()'s plain global (the boot thread copies the thread-local status into it) */
+static int g_gl_love_hint_set;   /* round 632 (OpenGL): bcd_gl_session_setup's LOVE hint, defined elsewhere in the bridge; the session end drops it */
 _Thread_local volatile int wine_ios_exit_code = 0;
 void wineserver_stop(void) { g_stops++; }
 void wine_session_note_launch_exit(int status);
@@ -727,6 +746,13 @@ require(re.search(r'\bView\b|SwiftUI|MadeiraConfig|MadeiraDock\b|LogStore|getenv
 additions = '\n'.join([process[process.index('static void ios_child_path_text('):process.index('static int ios_child_slot_take(')],
                        block(process, 'int ios_child_slot_note_exit( void *peb, int status )'),
                        block(process, 'int madeira_child_report( char *buf, int len )')])
+# Round 631 (round 630 agent R S2): the one named exception, Rockstar's Steam entry programs (they live in the game's own folder
+# beside the game, so no place tells them apart); only these five names, only after the player's Close.
+stubs = re.findall(r'^    static let rockstarEntryStubs: Set<String> = \[(.*)\]$', code, re.M)
+require(len(stubs) == 1 and sorted(re.findall(r'"([^"]+)"', stubs[0])) ==
+        ['playgtaiv.exe', 'playgtasanandreas.exe', 'playgtav.exe', 'playrdr.exe', 'playrdr2.exe'],
+        'the only program names in the rules are Rockstar\'s five Steam entry programs')
+code = '\n'.join(l for l in code.splitlines() if not l.startswith('    static let rockstarEntryStubs: Set<String> = ['))
 require(not re.findall(r'"[^"\n]*\.exe"', code) and not re.findall(r'"[^"\n]*\.exe"', additions)
         and not re.findall(r'"[^"\n]*\.exe"', block(bridge, 'int wine_session_dock_game_ended(int32_t status)')),
         'no program names in the rules, the table additions or the bridge function: the game is found by where it lives')

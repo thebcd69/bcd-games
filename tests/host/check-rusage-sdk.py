@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 Jelly-RayTian. This file was taken from https://github.com/willfaust/Madeira (pull request #399)
+# under GPL-3.0-or-later. See THIRD-PARTY-NOTICES.md.
 """Compile the real diagnostic expression through build.sh's SDK probe/flags.
 Synthetic SDK headers cover both member layouts; on macOS also syntax-check
 against the installed iPhoneOS SDK. No Wine build or downloaded binaries needed.

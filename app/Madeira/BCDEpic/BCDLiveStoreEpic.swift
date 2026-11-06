@@ -153,6 +153,7 @@ extension BCDLiveStore {
     func epicOpened(_ id: String) {
         guard let app = BCDEpicRules.claimedApp(id, enabled: BCDEpic.enabled) else { return }
         BCDEpic.shared.preflight(app)
+        Task { await BCDEpicCloud.shared.check(app) }   // build 632: acts only for a game whose cloud saves the player turned on
     }
 
     /// Hook in the game page's watch: the page reads its details again when a look at a manifest has answered.

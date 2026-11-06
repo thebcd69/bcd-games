@@ -325,6 +325,12 @@ enum BCDContentLog {
         pump()
     }
 
+    /// A driver reports how far its own planning has come (a repair reading the files the game has): the job's progress, in the
+    /// verifying phase, until the download begins.
+    func planning(_ key: BCDContentKey, done: Int64, of total: Int64) {
+        update(key, BCDContentProgress(phase: .verifying, doneBytes: done, totalBytes: max(total, done)))
+    }
+
     private func update(_ key: BCDContentKey, _ progress: BCDContentProgress) {
         guard active?.key == key, jobs[key]?.state == .active, jobs[key]?.progress != progress else { return }
         jobs[key]?.progress = progress

@@ -42,7 +42,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .accounts: return "Steam, Epic Games and GOG"
         case .jit: return "How BCD gets JIT on this device"
         case .dock: return "Valve's client for your Steam games"
-        case .memory: return "Limits, the swap file, sync and eco mode"
+        case .memory: return "Limits, the swap file, sync, eco mode and the background"
         case .graphics: return "Resolution, frame cap and the display"
         case .controls: return "Touch controls, pointer and controllers"
         case .storage: return "What BCD keeps on this device"

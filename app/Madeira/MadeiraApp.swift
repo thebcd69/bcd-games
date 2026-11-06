@@ -25,6 +25,10 @@ struct MadeiraApp: App {
             if FileManager.default.fileExists(atPath: packs.path) { try? FileManager.default.removeItem(at: packs) }
         }
         UserDefaults.standard.removeObject(forKey: "madeira.packs.enabled")
+        // madeira-bcd (from Madeira #498): games and downloads keep going when BCD leaves the screen, if Settings >
+        // Memory & performance > In the background says so (BackgroundRun.swift). Off: it only halts the audio
+        // endpoint when BCD enters the background, which the "audio" background mode would otherwise keep alive.
+        BackgroundRun.shared.start()
     }
 
     var body: some Scene {

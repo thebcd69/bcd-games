@@ -1,3 +1,5 @@
+/* Portions copyright 2026 SirDank: code taken from https://github.com/willfaust/Madeira (pull request #360; commits ba617bb and 4e568c1)
+ * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 #pragma once
 #include <stdint.h>
 

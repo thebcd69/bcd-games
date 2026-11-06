@@ -142,6 +142,12 @@ with tempfile.TemporaryDirectory(prefix='madeira-sc-native-') as d:
 # 2 + 3. the patch's code and madeira_d3d12.c's shader cache, on this host
 # ---------------------------------------------------------------------------
 pe_slice = pe[pe.index('#define MAD_SC_MAGIC'):pe.index('/* madeira-bcd: SHARED METAL LIBRARIES.')]
+# Build 632 (pso-archive, tests/host/check-pso-archive.py): mad_pso_archive_init sits between mad_scn_init and mad_sc_init and is called
+# from the same `if (on)` line; this harness is about the shader cache, so its body (Win32 file and module calls it has no shims for) is
+# replaced by an empty function here. The archive's own checks are in check-pso-archive.py.
+_arch_a, _arch_b = pe_slice.find('/* PIPELINE ARCHIVE (bcd.cfg'), pe_slice.find('static int mad_sc_init(void) {')
+if _arch_a >= 0 and _arch_b > _arch_a:
+    pe_slice = pe_slice[:_arch_a] + 'static void mad_pso_archive_init(void) {}\n' + pe_slice[_arch_b:]
 check('static int mad_scn_has(const UINT64 key[2]);' in pe[:pe.index('#define MAD_SC_MAGIC')] or
       'static int mad_scn_has(const UINT64 key[2]);' in pe_slice, 'the cut includes the native helpers')
 
@@ -966,7 +972,7 @@ check(rd.index('if (g_scn) {') < rd.index('mad_sc_path(key, path, 0);') and
       ex.index('if (g_scn) {') < ex.index('return GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES;'),
       'each native branch sits in front of the unchanged Wine code, which takes over when it cannot')
 sc_init = body(pe, 'static int mad_sc_init(void) {')
-check(sc_init.index('if (on) { mad_scn_init(); MemoryBarrier(); }') < sc_init.index('g_sc_on = on;'),
+check(sc_init.index('if (on) { mad_scn_init(); mad_pso_archive_init(); MemoryBarrier(); }') < sc_init.index('g_sc_on = on;'),
       'the store is opened before the cache is published')
 conv = body(pe, 'static obj_handle_t mad_convert_stage_opts(struct mad_device *d, struct mad_rootsig *rs,')
 check('if (!mad_scn_key_again(&a, o->lz->key)) mad_sc_key(&a, o->lz->key); o->lz->ok = mad_sc_exists(o->lz->key);' in conv,

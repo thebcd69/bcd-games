@@ -228,6 +228,9 @@ python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/FEXCore/Source/Interfa
 # Opt-in, whichever pin (round 624, agent A S7; Borderlands GOTY Enhanced V0FQAS): the alias table has room for 1024 image copies,
 # the limit in force stays 256 unless env.MADEIRA_FEX_ALIAS_MAX names more; the miss line says how full the table is.
 python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"
+# Opt-in, whichever pin (round 631; round 630 agent R S8: GTA V Legacy J5DGX2, BGGECJ, SXEV6S, the FEX arena full of 8 MiB call-ret
+# regions nothing touches since the stack is elided): MADEIRA_FEX_CALLRET_RESERVE_KB sizes each thread's region (unset keeps 8 MiB).
+python3 "$R/tools/patch-fex-ios-callret-small.py" "$R/FEX"
 build
 git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp
 git -C FEX/External/rpmalloc checkout -- rpmalloc/rpmalloc.c

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-11-05: `betaKey` (the branch an install record names; version selection).
+// Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (pull request #381)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -42,6 +45,20 @@ enum SteamInstallFiles {
         guard let state = record(appID: appID, steamApps: steamApps),
               let language = state["UserConfig"]?["language"]?.string, !language.isEmpty else { return nil }
         return language.lowercased()
+    }
+
+    /// The beta branch the install record names (`UserConfig.BetaKey`, as BCD's
+    /// downloads and Valve's client write it), or nil for public.
+    static func betaKey(appID: Int, steamApps: URL) -> String? {
+        guard let state = record(appID: appID, steamApps: steamApps) else { return nil }
+        return betaKey(in: state)
+    }
+
+    /// The same, from a record already read (`AppState`).
+    static func betaKey(in state: SteamValue) -> String? {
+        guard let key = (state["MountedConfig"]?["BetaKey"] ?? state["UserConfig"]?["BetaKey"])?.string,
+              !key.isEmpty, key.lowercased() != "public", key.utf8.count <= 64 else { return nil }
+        return key
     }
 
     /// The depots the install record holds: its own (`InstalledDepots`) and

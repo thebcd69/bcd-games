@@ -31,6 +31,24 @@ import SwiftUI
                 (20, "Anniversary Skins", 41_000_000), (21, "Night Lights", 780_000_000), (22, "Winter Maps", 1_600_000_000),
                 (23, "Harbour Missions", 2_050_000_000), (24, "Director's Cut Extras", 530_000_000)],
     ]
+    /// A Steam game's version (BCDGameVersion.swift) for the sample games Steam lists a beta for: the branches, the one chosen, the
+    /// one installed, and a kept beta code. (-BCDTab game-367520-version, game-620-version.)
+    private static let versionChoices: [String: [BCDVersionChoice]] = [
+        "367520": [BCDVersionChoice(name: "public"), BCDVersionChoice(name: "beta", description: "The next patch, for testing before it goes out"),
+                   BCDVersionChoice(name: "playtest", description: "Private playtest build", protected: true)],
+        "620": [BCDVersionChoice(name: "public"), BCDVersionChoice(name: "ptb", description: "Public test build")],
+    ]
+    private var versionChosen: [String: String] = [:]
+    private var versionInstalled: [String: String] = ["367520": "public"]
+    private var versionCode = Set<String>()
+    private var versionNote: [String: String] = [:]
+    private func versionGroup(_ game: BCDGame) -> BCDGameSettingGroup? {
+        guard let listed = Self.versionChoices[game.id] else { return nil }
+        let choices = listed.filter { !$0.protected || versionCode.contains(game.id) }
+        return BCDGameVersion.group(BCDVersionState(
+            choices: choices, chosen: versionChosen[game.id] ?? "public", installed: game.state.isInstalled ? (versionInstalled[game.id] ?? "public") : nil,
+            hasProtected: listed.contains(where: \.protected), codeKept: versionCode.contains(game.id), codeNote: versionNote[game.id]))
+    }
     private var dlcInstalled: [String: Set<UInt32>] = ["367520": [1, 2]]
     private var dlcWanted: [String: Set<UInt32>] = [:]
     private var dlcAsked = Set<String>()
@@ -62,6 +80,10 @@ import SwiftUI
         case "epic.courier": d.installWarning = "Epic says this game must be online to start. BCD starts it signed in to your Epic account, so it needs an internet connection."
         case "epic.gtav": d.installWarning = "This game's anti-cheat (BattlEye) guards only GTA Online. BCD starts the game with its own -nobattleye option, so Story Mode plays and GTA Online stays off."
         default: break
+        }
+        if steam, case .notInstalled = game.state, let version = versionGroup(game) {
+            d.offersDownloadOptions = true
+            if settings { d.groups = [version] }
         }
         guard game.state.isInstalled else { return d }
         let keys = value(game, "controller", game.store == .local ? "keys" : "") == "keys"
@@ -99,6 +121,7 @@ import SwiftUI
                 choice("dxil-tess-max-factor", "Direct3D 12 tessellation", "", [("", "Standard (3)"), ("2", "Light (2)"), ("8", "Fine (8)")]),
                 choice("async-submit", "Direct3D 12 command encoding", "", [("", "On the game's thread"), ("1", "On a worker thread")]),
                 choice("fence-chain", "Direct3D 12 GPU sync", "", [("", "One pass after another"), ("6", "Where barriers allow")]),
+                choice(BCDOpenGL.key, "OpenGL", "", BCDOpenGL.choices, note: BCDOpenGL.pageNote),
                 toggle("nvidia", "Show the game an NVIDIA card", game.id == "271590",
                        note: "For games that stop with \"no graphics card\": Windows then reports an NVIDIA card and driver."),
             ]),
@@ -137,6 +160,8 @@ import SwiftUI
                                   question: BCDGameQuestion(title: "Take out the one-time installs?", message: "At the next start…",
                                                             confirm: "At the next start", destructive: true)),
                 ]), value: value(game, "installrequest", ""), defaultValue: ""),
+                BCDGameSetting(id: "workshop", title: "Steam Workshop", kind: .opens(.workshop), value: "2 items installed", defaultValue: "2 items installed",
+                               note: "Items for this game from Steam's Workshop. Opening it asks Steam for the items your account subscribes to; nothing is subscribed to or downloaded until you press it."),
                 BCDGameSetting(id: "appid", title: "App ID", kind: .info, value: game.id),
             ], headline: value(game, "startwith", "") == "game" ? "The game's own program" : "Through BCD Dock"))
         } else {
@@ -161,6 +186,9 @@ import SwiftUI
                                       note: "A picture from Files, shown in place of the store's."))
         library.append(BCDGameSetting(id: "path", title: "Program", kind: .info, value: "C:\\Games\\\(game.title)\\game.exe"))
         d.groups.append(BCDGameSettingGroup(id: "library", title: "Library", symbol: "books.vertical", settings: library, headline: game.title))
+        if steam, game.state.isInstalled, let version = versionGroup(game), let at = d.groups.firstIndex(where: { $0.id == "library" }) {
+            d.groups.insert(version, at: at)
+        }
         if steam, let owned = Self.dlcOwned[game.id] {
             let installed = dlcInstalled[game.id] ?? [], wanted = dlcWanted[game.id] ?? installed
             let rows = owned.map { BCDDLCRow(id: $0.id, name: $0.name, bytes: $0.bytes, installed: installed.contains($0.id), wanted: wanted.contains($0.id)) }
@@ -275,6 +303,27 @@ import SwiftUI
                     if value == "1" { wanted.insert(dlc) } else { wanted.remove(dlc) }
                     dlcWanted[game.id] = wanted
                 }
+            }
+            return
+        }
+        if setting == BCDGameVersion.choiceID || setting.hasPrefix(BCDGameVersion.choiceID + ".") {
+            switch setting {
+            case BCDGameVersion.choiceID: versionChosen[game.id] = value == "public" ? nil : value
+            case BCDGameVersion.codeID:
+                // The sample accepts the code "open" and refuses every other.
+                if value.trimmingCharacters(in: .whitespaces) == "open" {
+                    versionCode.insert(game.id)
+                    versionNote[game.id] = "Opened: playtest."
+                    versionChosen[game.id] = "playtest"
+                } else {
+                    versionNote[game.id] = "Steam did not accept that code for this game."
+                }
+            case BCDGameVersion.forgetID:
+                versionCode.remove(game.id)
+                versionNote[game.id] = nil
+                if versionChosen[game.id] == "playtest" { versionChosen[game.id] = nil }
+            case BCDGameVersion.downloadID: versionInstalled[game.id] = versionChosen[game.id] ?? "public"
+            default: break
             }
             return
         }
@@ -446,7 +495,7 @@ struct BCDGamePreviewRoot: View {
         case "tuning": .tuning
         case "config": .config
         case "findstore": .storeSearch
-        case "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds", "dlc", "help", "sound",
+        case "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds", "dlc", "version", "help", "sound",
              "windows", "components", "fex", "saveplace", "fixes", "desktop", "start": .group(what)   // the last seven: round 604 (BCDGameSetupPage.swift, BCDGameStart.swift)
         case _ where BCDInputPage.groupIDs.contains(what): .group(what)
         case "resolution", "fps", "scaling", "arguments", "installrequest": .setting(what)

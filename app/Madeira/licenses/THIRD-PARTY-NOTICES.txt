@@ -19,6 +19,41 @@ Steam sign-in, owned library and downloads (SwiftSteam): derived from
 Jfishin's Madeira Steam client and used with his permission; GPL-3.0-or-later
 with the exception, (C) 2026 Jfishin, 125hz.
 
+Epic Cloud saves (app/Madeira/BCDEpic/EpicFormats.swift and EpicCloudSaves.swift):
+upstream Madeira's files, GPL-3.0-or-later with the exception; EpicFormats.swift is
+(C) 2026 Akshay CM. EpicCloudSaves.swift is a port of parts of Legendary
+(https://github.com/derrod/legendary, GPL-3.0-or-later: api/egs.py, core.py,
+utils/savegame_helper.py, models/chunk.py, models/manifest.py, utils/rolling_hash.py).
+The rest of BCD's Epic code is BCD's own, written from protocol facts.
+
+GOG install script and redistributables (app/Madeira/BCDGOG/GOGInstallScript.swift
+and GOGSetup.swift): upstream Madeira's files, GPL-3.0-or-later with the
+exception, (C) 2026 Madeira contributors, which follow Playport's GOGInstallScript
+and GOGDependencies (https://github.com/playportdev/playport at 412de5f,
+GPL-3.0-or-later; legal/PLAYPORT.txt). The rest of BCD's GOG code is BCD's own,
+written from GOG's public replies; the protocol work follows Heroic's gogdl
+(GPL-3.0) and no gogdl code is included.
+
+itch.io store (SwiftItch) and the experimental EA store (SwiftEA): taken from
+Madeira (v0.2.0); GPL-3.0-or-later with the exception, (C) 2026 ft7t8drgwf-wq
+and the Madeira contributors (SwiftEA/EARegistry.swift: 125hz). The itch.io
+calls follow go-itchio (MIT) and the EA protocol work follows Maxima (GPL-3.0)
+as knowledge only: no go-itchio and no Maxima code is included. The .7z reader
+(itch_7z.c) is written from 7-Zip's published format description and uses the
+iOS SDK's zlib and liblzma, linked dynamically.
+
+Code from Madeira after BCD's fork (https://github.com/willfaust/Madeira, forked at its commit 279fd0f of
+2026-10-15): 16,769 lines in 161 files of BCD are identical to code that 23 people wrote for Madeira, taken
+between 2026-09-29 and 2026-11-05. It is Madeira's code: GPL-3.0-or-later with the exception (its lines in the Wine unix side:
+LGPL-2.1-or-later), (C) 2026 its authors,
+who are named in the headers of the files that hold it, in the "Code from Madeira after BCD's fork" section of
+THIRD-PARTY-NOTICES.md (with a table of every file, source and author) and in the README. BCD's additional terms
+(LICENSE-BCD) do not apply to that code. Authors, by lines: ft7t8drgwf-wq (insertfloppy), 125hz, Connor Gow, Ash
+Hopkins, llamajose, Tabîrcă Nicolae-Eduard, alantangok, Will Faust, Akshay CM, wamei, meshoklv, spitefulowl,
+Jelly-RayTian, SirDank, Ixion, intraducine, domainus, NevesHenry, Tomba247, byKAYRA, JMRBDev, Kesavamoorthi G and
+Nikita Kiselov. The commits that BCD's forks of Wine, FEX-Emu and DXMT took from Madeira's forks are listed in each fork's
+LICENSE-MADEIRA.md.
+
 BCD Dock (Madeira Dock; arm64ec-windows/dockhost.exe, when built):
 GPL-3.0-or-later with the exception, (C) 2026 125hz. Source:
 https://github.com/125hz/madeira-dock (the madeira-dock submodule). Its licence
@@ -69,6 +104,17 @@ Separate Windows DLLs built from unmodified third-party source (opt-in per game;
   a DirectDraw replacement (legal/LICENSES/MIT-cnc-ddraw.txt). It contains LodePNG (zlib licence, (c) 2005-2018 Lode
   Vandevenne; legal/LICENSES/zlib-lodepng.txt) and DetourEnumerateModules from Microsoft Detours (MIT, (c) Microsoft
   Corporation; legal/LICENSES/MIT-Detours.txt).
+
+Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend setting is zink or gles; nothing runs without it):
+- Mesa 25.0.7 (https://mesa3d.org; OSMesa, Zink and softpipe), MIT and other permissive licences (legal/LICENSES/MIT-Mesa.txt,
+  Mesa-license.rst): gl/libOSMesa.dylib, built from the unmodified release with BCD's patches
+  (build/mesa-ios/patches, offered under MIT).
+- MoltenVK 1.4.2 (Khronos Group; The Brenwill Workshop Ltd), Apache-2.0 (MoltenVK-Apache-2.0.txt): gl/libMoltenVK.dylib, unmodified.
+  It contains SPIRV-Cross and SPIRV-Tools (Apache-2.0: SPIRV-Cross-Apache-2.0.txt, SPIRV-Tools-Apache-2.0.txt) and cereal
+  (BSD-3-Clause: cereal-BSD-3-Clause.txt).
+- LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built from the unmodified source
+  (build/luajit-x64/build.sh), loaded in place of a LOVE game's lua51.dll when that is an x64 LuaJIT needing memory below 2 GB;
+  the game's file is not modified.
 
 Separate Windows programs built from unmodified third-party source (started from the Start menu; nothing of them is linked into BCD):
 - 7-Zip 26.05 (https://www.7-zip.org/, https://github.com/ip7z/7zip), (C) 1999-2026 Igor Pavlov: arm64ec-windows/7zFM.exe (the File

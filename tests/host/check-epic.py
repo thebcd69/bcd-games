@@ -110,7 +110,9 @@ pbx = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
 _start = (EPIC / "BCDEpicStart.swift").read_text()
 check("tell(BCDEpicHostFiles.notStartedWords)" in _start and "couldn't start this game signed in to Epic" not in _start,
       "round 624 (Discord forum item 7): a host that stopped before the game shows BCD Host's words, not an Epic sign-in message")
-check(sorted(p.name for p in EPIC.glob("*.swift")) == sorted(FILES), "app/Madeira/BCDEpic holds exactly Epic's files",
+# Build 632: Epic's cloud saves are four more files (upstream Madeira's two, and BCD's two; tests/host/check-epic-cloud.py checks them, headers included).
+CLOUD_FILES = ["EpicFormats.swift", "EpicCloudSaves.swift", "BCDEpicCloudCore.swift", "BCDEpicCloud.swift", "BCDGamePageLiveCloud.swift"]
+check(sorted(p.name for p in EPIC.glob("*.swift")) == sorted(FILES + CLOUD_FILES), "app/Madeira/BCDEpic holds exactly Epic's files",
       sorted(p.name for p in EPIC.glob("*.swift")))
 sources = {}
 for name in FILES:
@@ -130,7 +132,7 @@ check(ASK.read_text().startswith(HEADER) and len(re.findall(r"A1000F55 /\* BCDAs
       and pbx.count("A2000F55 /* BCDAsk.swift */,") == 1 and pbx.count("A1000F55 /* BCDAsk.swift in Sources */,") == 1,
       "BCDAsk.swift (the generic question alert, shared with the preview app): BCD's licence header, built by the Xcode project (F55)")
 check(not re.search(r"(?i)epic|BCDEpic", code(ASK.read_text())), "...and it names no store")
-check(len(set(re.findall(r"A[12]000(?:D5|E5|F5)[0-9A-F]\b", pbx))) == (len(FILES) + 1) * 2, "the Epic ID ranges (D50-D5F, E50-E5F, F50-F5F) hold only Epic's files and BCDAsk.swift (a build ID and a file ID each)")
+check(len(set(re.findall(r"A[12]000(?:D5|E5|F5)[0-9A-F]\b", pbx))) == (len(FILES) + 1 + len(CLOUD_FILES)) * 2, "the Epic ID ranges (D50-D5F, E50-E5F, F50-F5F) hold only Epic's files and BCDAsk.swift (a build ID and a file ID each)")
 
 preview = (R / "tools/ui-preview.py").read_text()
 # The cache recursively hashes resource bundles; only the compiler's source
@@ -411,7 +413,7 @@ check(start.count("BCDEpicAudit.run(") == 1 and "Task.detached(priority: .utilit
       "the container search runs once per signed-in session, off the main thread, and the values it looks for are forgotten at once")
 check('flags.insert(.tree)' in start and 'flags.insert(.services)' in start and 'entry.startServices == true' in start and "root: record.root.windowsPath()" in start,
       "the request asks for the tree wait (env.BCD_EPIC_TREE), services.exe when the entry starts services, and names the install root")
-check('if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true || BCDEpicRules.startsRockstarLauncher(record.exceptionID)) {' in start
+check('if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true\n                         || BCDEpicRules.startsRockstarLauncher(record.exceptionID, program: entry.launchWindowsPath)) {' in start
       and start.count('flags.insert(.services)') == 1,
       "round 624 (R S24): services.exe also for Epic's GTA V (Rockstar's launcher needs the service manager); env.BCD_EPIC_SERVICES = 0 turns it off")
 check('Self.flag("BCD_EPIC_SIGNIN", entry: entry)' in start and 'Self.flag("BCD_EPIC_HOST", entry: entry)' in start and 'Self.flag("BCD_EPIC_TREE", entry: entry)' in start,

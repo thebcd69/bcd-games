@@ -126,13 +126,15 @@ start = code(block(store, "private func start(_ game: BCDGame)"))
 # otherwise hands the entry to the connected Play; the tip's OK hands it over too.
 begin = code(block(store, "private func begin(_ entry: LibraryEntry, _ launch: (LibraryEntry) -> Void)"))
 answered = code(block(store, "func graphicsTipAnswered()"))
-check(start.count("begin(entry, launch)") == 4 and "launch(entry)" not in start.replace("begin(entry, launch)", "")
+check(start.count("begin(entry, launch)") == 6 and "launch(entry)" not in start.replace("begin(entry, launch)", "")
       and "guard let launch else { return }" in start
       and "if let entry = gogPlayEntry(game) { begin(entry, launch); return }" in start
       and "if let entry = epicPlayEntry(game) { begin(entry, launch); return }" in start
+      and "if let entry = itchPlayEntry(game) { begin(entry, launch); return }" in start
+      and "if let entry = eaPlayEntry(game) { begin(entry, launch); return }" in start
       and "if BCDGraphicsTip.due(entry) {" in begin and begin.count("launch(entry)") == 1
       and "launch?(entry)" in answered and "BCDGraphicsTip.markShown(entry)" in answered,
-      "BCDLiveStore.start: the connected Play is its only way to start a game (GOG, Epic, a game from Files or the desktop, Steam), "
+      "BCDLiveStore.start: the connected Play is its only way to start a game (GOG, Epic, itch.io, EA, a game from Files or the desktop, Steam), "
       "after a heavy game's one-time graphics tip")
 check("library.entries.first(where: { $0.id == id })\n"
       "                    ?? (id == LibraryEntry.desktopID ? LibraryEntry.desktopEntry : nil)" in start,

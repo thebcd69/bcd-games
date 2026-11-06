@@ -43,7 +43,8 @@ final class BCDEpicURLSession: NSObject, BCDEpicTransport, URLSessionTaskDelegat
 
     func send(_ request: URLRequest) async throws -> (status: Int, body: Data) {
         var request = request
-        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        // A request that names its own user agent keeps it (the save service wants the launcher's long one, BCDEpicCloudHTTP).
+        if request.value(forHTTPHeaderField: "User-Agent") == nil { request.setValue(userAgent, forHTTPHeaderField: "User-Agent") }
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         return (http.statusCode, data)
@@ -216,6 +217,22 @@ final class BCDEpicAPI: @unchecked Sendable {
         var request = URLRequest(url: url)
         request.timeoutInterval = 30
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("bearer " + (try await session.accessToken()), forHTTPHeaderField: "Authorization")
+        var (status, body) = try await transport.send(request)
+        if status == 401 {
+            request.setValue("bearer " + (try await session.refresh().accessToken), forHTTPHeaderField: "Authorization")
+            (status, body) = try await transport.send(request)
+        }
+        guard (200...299).contains(status) else { throw BCDEpicAuth.failure(status: status, body: body) }
+        guard body.count <= limit else { throw BCDEpicError.badReply("size") }
+        return (status, body)
+    }
+
+    /// Any call with the token (a POST with a body too), on the same rules as `get`: only Epic's hosts get the token, a refused token
+    /// is refreshed once. The request's own headers stay (a content type, a user agent). Any status outside 200...299 throws.
+    func send(_ request: URLRequest, limit: Int = 16 << 20) async throws -> (status: Int, data: Data) {
+        guard let url = request.url, Self.trusted(url) else { throw BCDEpicError.badReply("host") }
+        var request = request
         request.setValue("bearer " + (try await session.accessToken()), forHTTPHeaderField: "Authorization")
         var (status, body) = try await transport.send(request)
         if status == 401 {

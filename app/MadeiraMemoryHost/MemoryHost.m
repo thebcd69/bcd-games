@@ -1,3 +1,5 @@
+/* Copyright 2026 Will Faust. This file was taken from https://github.com/willfaust/Madeira (commit a15332c)
+ * under GPL-3.0-or-later and modified for BCD in September 2026. See THIRD-PARTY-NOTICES.md. */
 // MadeiraMemoryHost: an app extension on com.apple.ar.viewer, the extension
 // point iOS 27's jetsam table gives no memory limit. It creates memory objects
 // for Madeira on request (the extension memory experiment, see

@@ -328,6 +328,8 @@ enum SteamDLCRecord {
         var depots: [Depot]
         var shared: [SharedDepot]
         var customExecutables: [String]
+        /// The beta branch the record names (`BetaKey`), "public" for none: a DLC taken away keeps the game on its version.
+        var betaKey = "public"
     }
 
     static func url(appID: Int, steamApps: URL) -> URL { steamApps.appendingPathComponent("appmanifest_\(appID).acf") }
@@ -356,7 +358,8 @@ enum SteamDLCRecord {
                      buildID: record["buildid"]?.string.flatMap { UInt32($0) } ?? 0,
                      lastOwner: record["LastOwner"]?.string.flatMap { UInt64($0) } ?? 0,
                      sizeOnDisk: record["SizeOnDisk"]?.string.flatMap { UInt64($0) } ?? 0,
-                     depots: depots, shared: shared, customExecutables: custom)
+                     depots: depots, shared: shared, customExecutables: custom,
+                     betaKey: SteamInstallFiles.betaKey(in: record) ?? "public")
     }
 
     /// The DLC the record states as installed, by DLC app (every depot of it that is recorded).
@@ -410,7 +413,7 @@ enum SteamDLCRecord {
             steamID: state.lastOwner, sizeOnDisk: state.sizeOnDisk > freed ? state.sizeOnDisk - freed : 0,
             steamAppsPath: steamApps.path, installedDepots: kept,
             sharedDepots: state.shared.map { (depotID: $0.depotID, ownerAppID: $0.ownerAppID) },
-            customExecutables: state.customExecutables)
+            customExecutables: state.customExecutables, betaKey: state.betaKey)
     }
 }
 

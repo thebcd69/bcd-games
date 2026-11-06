@@ -27,9 +27,16 @@ echo "  $(($(wc -l < "$OUT/winemetal.def") - 2)) exports"
 "$MINGW/llvm-dlltool" -m arm64ec -d "$OUT/winemetal.def" -l "$OUT/libwinemetal.a"
 
 echo "=== vtable stubs ==="
+# The regenerated header goes to $OUT and must equal the committed one: a toolchain header that
+# changes the vtables stops the build for a review instead of changing the source header behind
+# the build's back (upstream Madeira #516).
 python3 "$SRC/gen_vtables.py" \
     "$R/toolchains/llvm-mingw-20260421-ucrt-macos-universal/generic-w64-mingw32/include/d3d12.h" \
-    "$SRC/madeira_d3d12_stubs.h" > /dev/null
+    "$OUT/madeira_d3d12_stubs.h" > /dev/null
+cmp -s "$OUT/madeira_d3d12_stubs.h" "$SRC/madeira_d3d12_stubs.h" || {
+    echo "::error::D3D12 stubs differ from the pinned headers; regenerate and review the source header"
+    exit 1
+}
 
 # madeira-bcd: the shader cache's converter identity (madeira_d3d12.c,
 # MAD_SC_CONVERTER_ID) -- a hash of everything that shapes a conversion: the
@@ -108,11 +115,19 @@ if command -v xcrun > /dev/null 2>&1 &&
 else
     echo "::warning::helper kernels did not build -- indirect tessellation draws stay skipped"
     cat "$OUT/mad_kernels.err" 2> /dev/null | head -20 || true
+    # MADEIRA_REQUIRE_KERNELS=1: fail the build instead of shipping without them (upstream Madeira #516; off unless set)
+    [ "${MADEIRA_REQUIRE_KERNELS:-0}" != 1 ] || { echo "::error::MADEIRA_REQUIRE_KERNELS=1 and the helper kernels did not build"; exit 1; }
 fi
 
 echo "=== madeira_d3d12.dll (arm64ec) ==="
+# ml1310 (upstream Madeira): DXMT's BCn block decoders, for BC uploads on GPUs without BC sampling (bcd.cfg d3d12-bc-decode, off by default)
+for cpp in "$SRC/mad_bcn.cpp" "$R/dxmt/src/dxmt/dxmt_bcn.cpp"; do
+    "$MINGW/arm64ec-w64-mingw32-clang++" -c -O2 -std=c++17 -fno-exceptions -fno-rtti \
+        -I"$R/dxmt/src/dxmt" -o "$OUT/$(basename "$cpp" .cpp).o" "$cpp" 2> "$OUT/bcn.err" \
+        || { grep -m 20 "error:" "$OUT/bcn.err"; exit 1; }
+done
 "$MINGW/arm64ec-w64-mingw32-clang" -shared -O2 -Wall -DMAD_SC_CONVERTER_ID="\"$SCID\"" $KDEF ${BUILDDEF[@]+"${BUILDDEF[@]}"} \
-    -o "$OUT/madeira_d3d12.dll" "$SRC/madeira_d3d12.c" "$SRC/d3d12.def" \
+    -o "$OUT/madeira_d3d12.dll" "$SRC/madeira_d3d12.c" "$OUT/mad_bcn.o" "$OUT/dxmt_bcn.o" "$SRC/d3d12.def" \
     -I"$SRC" -I"$OUT" -I"$R/madeira-d3d12/src" -I"$R/dxmt/src/winemetal" \
     -L"$OUT" -lwinemetal -luuid -lole32 2> "$OUT/madeira_d3d12.err" \
     || { grep -m 20 "error:" "$OUT/madeira_d3d12.err"; exit 1; }

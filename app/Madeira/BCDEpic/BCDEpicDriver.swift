@@ -134,6 +134,8 @@ extension BCDEpic: BCDContentDriver {
     /// The library entry Play starts, made again if the library lost it, with Epic's public arguments.
     func playEntry(_ app: String) -> Result<LibraryEntry, BCDEpicPlayRefusal> {
         guard var record = installs[app] else { return .failure(.init(message: "This Epic game isn't installed.")) }
+        // Build 632: a cloud-save sync of this game (only ever running when the player turned it on) finishes first.
+        if BCDEpicCloud.shared.isSyncing(app) { return .failure(.init(message: "BCD is syncing this game's saves with Epic Cloud. Try again in a moment.")) }
         guard let folder = record.hostFolder, FileManager.default.fileExists(atPath: folder.appendingPathComponent(record.launchPath).path) else {
             return .failure(.init(message: "BCD can't find this game's files. Uninstall it, then install it again."))
         }
@@ -177,6 +179,7 @@ extension BCDEpic: BCDContentDriver {
         if let folder = record.hostFolder, let trash = record.root.stagingURL?.appendingPathComponent("trash", isDirectory: true) {
             Task { await BCDContentEngine.remove(folder, trash: trash) }
         }
+        BCDEpicCloud.shared.forget(app)   // build 632: the remembered save rule and common state go; Epic's cloud is not touched
         BCDEpicLog.write("[epic-install] uninstalled app=\(BCDEpicLog.app(app))")
     }
 

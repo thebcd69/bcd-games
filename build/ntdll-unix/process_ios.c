@@ -1,3 +1,5 @@
+/* Portions copyright 2026 125hz and Ash Hopkins: code taken from https://github.com/willfaust/Madeira (pull requests #240, #461 and #549)
+ * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * NT process handling
  *
@@ -79,8 +81,31 @@
 #include "wine/condrv.h"
 #include "wine/server.h"
 #include "wine/debug.h"
+#define MADEIRA_REDACT_WINE
+#include "../madeira_redact.h"   /* command lines are logged with credential-like values redacted */
 
 WINE_DEFAULT_DEBUG_CHANNEL(process);
+
+/* madeira-bcd (D12, upstream Madeira's log redaction): the last 128 characters of a command line for the "cmdline-tail" lines
+ * ([proc-gate] steamwebhelper, [sc-cef], [ea-cef]), cut from the REDACTED copy of the whole line (build/madeira_redact.h): a
+ * credential value cut by the tail's start could no longer be recognised. Anything but printable ASCII prints as '?'. If the
+ * copy cannot be made the tail is empty. tail needs 136 bytes. The command line the program receives is never touched. */
+static void ios_cmdline_tail( const WCHAR *line, int n, char tail[136] )
+{
+    size_t cap = 2 * (size_t)(n > 0 ? n : 0) + 64, sn;
+    unsigned short *shown = malloc( cap * sizeof(*shown) );
+    int tstart, ti = 0;
+
+    if (shown)
+    {
+        sn = madeira_redact_line_w( (const unsigned short *)line, (size_t)(n > 0 ? n : 0), shown, cap );
+        tstart = sn > 128 ? (int)sn - 128 : 0;
+        for (; ti + tstart < (int)sn && ti < 135; ti++)
+            tail[ti] = (shown[tstart + ti] >= 0x20 && shown[tstart + ti] < 0x7f) ? (char)shown[tstart + ti] : '?';
+        free( shown );
+    }
+    tail[ti] = 0;
+}
 
 
 static ULONG execute_flags = MEM_EXECUTE_OPTION_DISABLE;
@@ -576,6 +601,16 @@ void ios_child_slot_bind_peb( void *peb )
     pthread_mutex_unlock( &ios_child_lock );
 }
 
+/* The Windows image path of the child whose boot thread this is, NULL for a child without a slot (upstream Madeira v0.2.0, #549). The slot
+ * is this thread's until its boot thread returns, so no lock. Read by virtual_ios.c: a guest-window placeholder held for the game's folder
+ * (MADEIRA_WOW_HOLD_FOR) goes only to a program from that folder. */
+const char *ios_child_image_path( void )
+{
+    int slot = ios_child_slot_current;
+    if (slot < 0 || slot >= IOS_CHILD_SLOTS || !ios_child_slots[slot].used) return NULL;
+    return ios_child_slots[slot].path;
+}
+
 /* The child process with this PEB ended (process_exit_wrapper). Marks the slot that holds it, whichever thread
  * ended it; the slot itself is released when the child's boot thread returns, if it ever does. */
 void ios_child_slot_exited( void *peb )
@@ -956,7 +991,7 @@ static NTSTATUS spawn_process( const RTL_USER_PROCESS_PARAMETERS *params, int so
      * against the wrong directory is a question, not a finding: no line of any log said what directory a
      * Steam-launched child has, and this one does. */
     ERR("spawn_process: creating child thread for %s (fd=%d, unixdir=%d, dup_unixdir=%d) cwd=%s\n",
-        debugstr_us(&params->CommandLine), socketfd, unixdir, args->unixdir,
+        madeira_debugstr_cmdline_us(&params->CommandLine), socketfd, unixdir, args->unixdir,
         debugstr_us(&params->CurrentDirectory.DosPath));
 
     ret = pthread_create( &child_thread, NULL, ios_child_thread_entry, args );
@@ -1906,7 +1941,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
     if (!process_attr) process_attr = &empty_attr;
 
     TRACE( "%s image %s cmdline %s parent %p machine %x\n", debugstr_us( &path ),
-           debugstr_us( &params->ImagePathName ), debugstr_us( &params->CommandLine ), parent, machine );
+           debugstr_us( &params->ImagePathName ), madeira_debugstr_cmdline_us( &params->CommandLine ), parent, machine );
 #ifdef WINE_IOS
     {
         /* Modified by BCD (2026-10-22, Epic Games milestone 2): a game started signed in has Epic's one-time sign-in code, the account's ID
@@ -1922,7 +1957,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
             shown.MaximumLength = shown.Length + sizeof(WCHAR);
         }
         ERR("NtCreateUserProcess: image=%s cmdline=%s\n",
-            debugstr_us( &params->ImagePathName ), debugstr_us( &shown ));
+            debugstr_us( &params->ImagePathName ), madeira_debugstr_cmdline_us( &shown ));
         free( masked );
     }
 
@@ -2414,10 +2449,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
                      * this line, not by binary greps or Valve's log. */
                     {
                         char tail[136];
-                        int tstart = o > 128 ? o - 128 : 0, ti;
-                        for (ti = 0; ti + tstart < o && ti < 135; ti++)
-                            tail[ti] = (char)nbuf[tstart + ti];
-                        tail[ti] = 0;
+                        ios_cmdline_tail( nbuf, o, tail );
                         dprintf(2, "[proc-gate] cmdline-tail(ml428): ...%s\n", tail);
                     }
                 }
@@ -2543,19 +2575,20 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
         }
         if (kind == SC_BROWSER)
         {
+            extern void ios_sc_reap_before_spawn( void );   /* virtual_ios.c, round 631 (R4 S1) */
             const char *jl = getenv( "MADEIRA_JITLESS" );
             const char *extra = getenv( "MADEIRA_SC_CEF_FLAGS" );
             int cl_len = params->CommandLine.Length / sizeof(WCHAR), how = 0, o = -1;
             int cap = cl_len + 160 + (extra ? (int)strlen( extra ) : 0);
             WCHAR *nbuf = malloc( cap * sizeof(WCHAR) );   /* leaks once per launch, as above */
 
+            ios_sc_reap_before_spawn();   /* a helper that ended out of memory gives its V8 reservations back first */
             if (nbuf)
                 o = sc_browser_cmdline( params->CommandLine.Buffer, cl_len, !(jl && jl[0] == '0'), extra,
                                         nbuf, cap, &how );
             if (o >= 0)
             {
                 char tail[136];
-                int tstart = o > 128 ? o - 128 : 0, ti;
 
                 params->CommandLine.Buffer = nbuf;
                 params->CommandLine.Length = o * sizeof(WCHAR);
@@ -2572,12 +2605,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
                                                    : "JIT (MADEIRA_JITLESS=0)",
                          (how & SC_NOPROXY_ADDED) ? "--no-proxy-server added" : "its own proxy switch kept",
                          (how & SC_EXTRA_ADDED) ? "appended" : "unset" );
-                for (ti = 0; ti + tstart < o && ti < 135; ti++)
-                {
-                    WCHAR c = nbuf[tstart + ti];
-                    tail[ti] = (c >= 0x20 && c < 0x7f) ? (char)c : '?';
-                }
-                tail[ti] = 0;
+                ios_cmdline_tail( nbuf, o, tail );
                 dprintf( 2, "[sc-cef] cmdline-tail: ...%s\n", tail );
             }
             else
@@ -2622,17 +2650,11 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
                 if (o >= 0)
                 {
                     char tail[136];
-                    int tstart = o > 128 ? o - 128 : 0, ti;
 
                     params->CommandLine.Buffer = nbuf;
                     params->CommandLine.Length = o * sizeof(WCHAR);
                     params->CommandLine.MaximumLength = params->CommandLine.Length + sizeof(WCHAR);
-                    for (ti = 0; ti + tstart < o && ti < 135; ti++)
-                    {
-                        WCHAR c = nbuf[tstart + ti];
-                        tail[ti] = (c >= 0x20 && c < 0x7f) ? (char)c : '?';
-                    }
-                    tail[ti] = 0;
+                    ios_cmdline_tail( nbuf, o, tail );
                     dprintf( 2, "[ea-cef] EADesktop.exe browser: %s; BackupRefPtr off (%s); V8 %s; %s; "
                                 "MADEIRA_EA_CEF_FLAGS %s\n",
                              (how & SC_SINGLE_ADDED) ? "--single-process added" : "already --single-process",
@@ -4114,7 +4136,11 @@ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
         }
     }
     if ((unsigned int)exit_code == 0xE0000008u && handle == NtCurrentProcess())
+    {
+        extern void ios_sc_note_oom_exit( void );   /* virtual_ios.c, round 631 (R4 S1) */
         ios_term_oom_record( NtCurrentTeb() );
+        ios_sc_note_oom_exit();   /* a SocialClubHelper.exe's V8 reservations are released before the next one starts */
+    }
     {
         static int term_log_count = 0;
         /* iOS-Madeira [term-stack] (task#29): also fire on ANY nonzero exit_code

@@ -161,8 +161,9 @@ with tempfile.TemporaryDirectory(prefix='madeira-oom-exit-') as directory:
 
 term = source[source.index('NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )'):]
 term = term[:term.index('static int term_log_count')]
-assert ('if ((unsigned int)exit_code == 0xE0000008u && handle == NtCurrentProcess())\n'
-        '        ios_term_oom_record( NtCurrentTeb() );') in term, \
+oom_branch = term[term.index('if ((unsigned int)exit_code == 0xE0000008u && handle == NtCurrentProcess())'):]
+oom_branch = oom_branch[:oom_branch.index('\n    }\n') + 7]   # round 631: the branch also notes a Social Club helper's end
+assert '        ios_term_oom_record( NtCurrentTeb() );' in oom_branch, \
     'NtTerminateProcess must look for the record before the capped [term-stack] dump'
 print('PASS: NtTerminateProcess looks for the record for exit code 0xE0000008 of the current process, before the capped dump')
 

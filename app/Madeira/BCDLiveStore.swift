@@ -76,6 +76,8 @@ import os
             SteamSignInModel.shared.$accountName.map { _ in () }.eraseToAnyPublisher(),
             gogChanges,
             epicChanges,
+            itchChanges,   // BCDItch/BCDLiveStoreItch.swift: says something only once itch.io is in use
+            eaChanges,     // BCDEA/BCDLiveStoreEA.swift: only while the experimental EA store is switched on
         ]
         // @Published sends before the value is stored: the rebuild runs a moment later, and at
         // most a few times a second while a download reports its progress.
@@ -127,6 +129,8 @@ import os
     func libraryAppeared() {
         SteamGamesModel.shared.refresh()
         if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.start(); SteamOwnedLibrary.shared.reconcileSession() }
+        itchAppeared()
+        eaAppeared()
         rebuild()
         refreshSystem()
         refreshMetadata()
@@ -137,7 +141,9 @@ import os
     /// BCD came back to the front.
     func becameActive() {
         SteamGamesModel.shared.refresh()
-        if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.reconcileSession() }
+        if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.reconcileSession(); SteamOwnedLibrary.shared.refreshAfterForeground() }
+        itchBecameActive()
+        eaBecameActive()
         refreshSystem()
     }
 
@@ -205,18 +211,21 @@ import os
         }
         gogMerge(&games)
         epicMerge(&games)
+        itchMerge(&games)
+        eaMerge(&games)
         games.sort { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         if store.games != games { store.games = games }
 
         let downloads = downloadList(names: names) + gogDownloads() + epicDownloads()
-        if store.downloads != downloads { store.downloads = downloads }
+        let allDownloads = downloads + itchDownloads() + eaDownloads()   // itch.io's and the EA store's downloads (BCDItch/, BCDEA/)
+        if store.downloads != allDownloads { store.downloads = allDownloads }
         let today = finished.filter { Calendar.current.isDateInToday($0.finished) }
         if store.finishedToday != today { store.finishedToday = today }
         let accounts = [
             BCDAccount(store: .steam, name: SteamSignInModel.shared.accountName, available: SteamSignIn.isEnabled || MadeiraDock.enabled),
             epicAccount(),
             gogAccount(),
-        ]
+        ] + itchAccounts() + eaAccounts()
         if store.accounts != accounts { store.accounts = accounts }
         noteSavesDiffer()
         refreshStorage()
@@ -283,7 +292,8 @@ import os
         } else if let installed {
             if !installed.installed {
                 state = .broken(reason: SteamGamesRules.blocker(installed: false, client: true, signedIn: true) ?? "")
-            } else if account.updateAvailable(appID: item.id, installedBuild: SteamGamesModel.shared.builds[item.id]) {
+            } else if account.updateAvailable(appID: item.id, installedBuild: SteamGamesModel.shared.builds[item.id],
+                                              installedBranch: SteamGamesModel.shared.branches[item.id]) {
                 state = .updateAvailable(bytes: 0)   // Steam names no size before the download starts
             } else {
                 state = .ready
@@ -357,6 +367,15 @@ import os
             var item = BCDDownload(id: BCDLiveID.steam(appID), title: names[appID] ?? "Steam game", store: .steam,
                                    doneBytes: Int64(clamping: progress.doneBytes), totalBytes: Int64(clamping: progress.totalBytes),
                                    bytesPerSecond: download.state == .active ? progress.bytesPerSecond : 0)
+            // Downloads from a PC on this network (off by default): while it is on, where the bytes come from now.
+            if SteamLANSetting.enabled, download.state == .active, progress.phase == .downloading {
+                if let pc = progress.pcName {
+                    let sent = progress.pcBytes > 0 ? " · \(BCDFormat.bytes(Int64(clamping: progress.pcBytes))) so far" : ""
+                    item.source = progress.pcDropped ? "From Steam's servers (\(pc) stopped answering)" : "From \(pc) on this network\(sent)"
+                } else {
+                    item.source = "From Steam's servers"
+                }
+            }
             let rank: Int
             switch download.state {
             case .active: rank = 0
@@ -543,6 +562,8 @@ import os
         startingGame = game.id
         if let entry = gogPlayEntry(game) { begin(entry, launch); return }
         if let entry = epicPlayEntry(game) { begin(entry, launch); return }
+        if let entry = itchPlayEntry(game) { begin(entry, launch); return }
+        if let entry = eaPlayEntry(game) { begin(entry, launch); return }
         let library = LibraryModel.shared
         switch BCDLiveID.parse(game.id) {
         case .local(let id)?:
@@ -602,6 +623,8 @@ import os
     func install(_ game: BCDGame, place: BCDInstallPlace) {
         if gog(.install, game.id) { return }
         if epic(.install, game.id, place: place) { return }
+        if itch(.install, game.id) { return }
+        if ea(.install, game.id) { return }
         // A game from Files is added, not installed.
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         if place == .externalDrive { LogStore.shared.log("[bcd-ui] no external drive in this build: app=\(appID) goes to the device") }
@@ -611,6 +634,8 @@ import os
     func update(_ game: BCDGame) {
         if gog(.update, game.id) { return }
         if epic(.update, game.id) { return }
+        if itch(.update, game.id) { return }
+        if ea(.update, game.id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         download(appID)
     }
@@ -634,6 +659,7 @@ import os
     func verify(_ game: BCDGame) {
         if gog(.verify, game.id) { return }
         if epic(.verify, game.id) { return }
+        if ea(.repair, game.id) { return }   // itch.io has no file check (the archive is checked as it is unpacked)
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         guard let installed = SteamGamesModel.shared.games.first(where: { $0.id == appID }),
               SteamOwnedLibrary.enabled, SteamInstallPaths.isManaged(library: installed.library) else {
@@ -648,6 +674,8 @@ import os
     func uninstall(_ game: BCDGame) {
         if gog(.uninstall, game.id) { return }
         if epic(.uninstall, game.id) { return }
+        if itch(.uninstall, game.id) { return }
+        if ea(.uninstall, game.id) { return }
         switch BCDLiveID.parse(game.id) {
         case .steam(let appID)?:
             settled {
@@ -669,6 +697,8 @@ import os
     func pauseDownload(_ id: String) {
         if gog(.pause, id) { return }
         if epic(.pause, id) { return }
+        if itch(.pause, id) { return }
+        if ea(.pause, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.pause(appID)
     }
@@ -676,6 +706,8 @@ import os
     func resumeDownload(_ id: String) {
         if gog(.resume, id) { return }
         if epic(.resume, id) { return }
+        if itch(.resume, id) { return }
+        if ea(.resume, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         download(appID)
     }
@@ -685,6 +717,8 @@ import os
     func cancelDownload(_ id: String) {
         if gog(.cancel, id) { return }
         if epic(.cancel, id) { return }
+        if itch(.cancel, id) { return }
+        if ea(.cancel, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.cancelInstall(appID, installed: SteamGamesModel.shared.games.contains { $0.id == appID })
     }
@@ -713,6 +747,8 @@ import os
     func signIn(_ front: BCDStoreFront) {
         if gogAccountAction(signIn: true, front) { return }
         if epicAccountAction(signIn: true, front) { return }
+        if itchAccountAction(signIn: true, front) { return }
+        if eaAccountAction(signIn: true, front) { return }
         guard front == .steam else { return }
         settled { [weak self] in self?.sheet = .steamSignIn }
     }
@@ -720,16 +756,28 @@ import os
     func signOut(_ front: BCDStoreFront) {
         if gogAccountAction(signIn: false, front) { return }
         if epicAccountAction(signIn: false, front) { return }
+        if itchAccountAction(signIn: false, front) { return }
+        if eaAccountAction(signIn: false, front) { return }
         guard front == .steam else { return }
         SteamSignInModel.shared.signOut()
     }
 
     func addGameFromFiles() { settled { [weak self] in self?.sheet = .addGame } }
 
+    /// A store's own tool, over the library (itch.io's Find a game).
+    func openStoreTool(_ store: BCDStoreFront) {
+        if store == .itch { presentItchFind() }
+    }
+
+    /// Shows one of BCD's sheets once nothing covers the interface (the sheets of the stores added after GOG and Epic).
+    func present(_ sheet: BCDLiveSheet) { settled { [weak self] in self?.sheet = sheet } }
+
     func refreshLibrary() {
         Task { await SteamGamesModel.refreshAll() }
         gogRefresh()
         epicRefresh()
+        itchRefresh()
+        eaRefresh()
         rebuild()
     }
 }
@@ -741,12 +789,16 @@ enum BCDLiveSheet: Identifiable {
     case addGame
     /// A game's page (the "+" flow, and a Steam Cloud choice).
     case details(LibraryEntry)
+    /// itch.io's API key (BCDItch/BCDItchViews.swift) and its Find a game.
+    case itchKey, itchFind
 
     var id: String {
         switch self {
         case .steamSignIn: return "steam-sign-in"
         case .addGame: return "add-game"
         case .details(let entry): return "details." + entry.id.uuidString
+        case .itchKey: return "itch-key"
+        case .itchFind: return "itch-find"
         }
     }
 }

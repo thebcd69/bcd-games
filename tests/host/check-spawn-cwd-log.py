@@ -49,7 +49,7 @@ if cur.strip():
     args.append(cur.strip())
 
 assert len(args) == len(re.findall(r'%[sd]', fmt)) == 5, args
-assert args[0] == 'debugstr_us(&params->CommandLine)', args
+assert args[0] == 'madeira_debugstr_cmdline_us(&params->CommandLine)', args   # madeira-bcd (ajan62, D12): upstream's redacting form
 assert args[1:4] == ['socketfd', 'unixdir', 'args->unixdir'], args
 assert args[4] == 'debugstr_us(&params->CurrentDirectory.DosPath)', args
 
@@ -61,7 +61,8 @@ for folder in ('tools', 'app', 'tests'):
                 text = p.read_text()
             except UnicodeDecodeError:
                 continue
-            if p.name != 'check-spawn-cwd-log.py' and 'creating child thread for' in text:
+            # check-log-redaction.py reads the same line for its redacted command line, which the cwd field keeps (as in upstream Madeira).
+            if p.name not in ('check-spawn-cwd-log.py', 'check-log-redaction.py') and 'creating child thread for' in text:
                 # Round 624: auto-tune's signals are substrings of one line (nwjs-gpu-media-dlls-fatal reads the child's command line);
                 # they stay in step as long as none names a field of the line's tail (fd=, unixdir=, dup_unixdir=, cwd=).
                 if p.name in ('autotune_rules.py', 'AutoTuneRules.generated.swift'):

@@ -1,3 +1,5 @@
+// Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (commits bbe0b12 and 20c5218)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 import UIKit
 
 /// Helper to enable JIT via StikDebug/StikJIT URL scheme.

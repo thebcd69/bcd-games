@@ -90,10 +90,11 @@ for line in rest.split('\n'):
 check(hook_lines == [
     'static void ios_ea_grants_owner_died( void *peb );',
     'ios_ea_grants_owner_died( peb );',
+    'const char *app = getenv( "MADEIRA_EA_CEF" );',   # round 631: MADEIRA_SC_ALIGN1G stays off beside the EA app's Chromium
     'int ea = ios_ea_cef_app();',
     'if (ea == 1 && ios_ea_route( hint, *size_ptr, type, protect, &pick, &sz, &st2 ))',
     'if (ea && ios_ea_slot_busy( slot, off )) continue;',
-], 'outside the EA block, virtual_ios.c has exactly five lines that name the EA code, all of them gated', hook_lines)
+], 'outside the EA block, virtual_ios.c has exactly six lines that name the EA code, all of them gated', hook_lines)
 
 nt = native[native.index('static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemory( HANDLE process'):]
 nt = nt[:nt.index('static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemoryEx(')]

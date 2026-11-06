@@ -19,6 +19,15 @@ require(cards.allSatisfy { !$0.name.isEmpty && $0.name.utf8.count < 100 && !$0.n
         "every name is short and has no ; or \" (DXMT's option separators)")
 require(BCDGPUCards.card("nvidia").map { $0.vendor == 0x10DE && $0.device == 0x2544 && $0.name == "NVIDIA GeForce RTX 3060" } == true,
         "the nvidia card is the 10DE:2544 GeForce RTX 3060 the older switch reports")
+// Build 632: the GeForce GTX 1060 6GB (upstream Madeira #528), for games that only know cards up to 2016-2018.
+require(BCDGPUCards.card("nvidia-gtx1060").map { $0.vendor == 0x10DE && $0.device == 0x1C03 && $0.name == "NVIDIA GeForce GTX 1060 6GB" && $0.isNVIDIA && $0.driver == nil } == true,
+        "the nvidia-gtx1060 card is 10DE:1C03, an NVIDIA card that keeps DXMT's own Direct3D 9 driver name")
+require(BCDGPUCards.dxmtOptions(BCDGPUCards.card("nvidia-gtx1060")!) == [
+    "dxgi.customVendorId=10de", "dxgi.customDeviceId=1c03", "d3d9.customVendorId=10de", "d3d9.customDeviceId=1c03",
+    "dxgi.customDeviceDesc=\"NVIDIA GeForce GTX 1060 6GB\"", "d3d9.customDeviceDesc=\"NVIDIA GeForce GTX 1060 6GB\"",
+], "the GTX 1060 6GB options: ids for DXGI and Direct3D 9, then the quoted names")
+require(BCDGPUCards.choices.map(\.0) == ["", "nvidia", "nvidia-gtx1060", "amd", "amd-rx580", "intel", "intel-arc", "nvidia-7900gs", "apple"],
+        "the picker order: the default, the RTX 3060, the GTX 1060 6GB, then the others as before")
 require(BCDGPUCards.card("apple").map { $0.vendor == 0x106B && $0.device == 0x0001 && $0.isApple } == true, "the apple card is BCD's own 106B:0001")
 require(BCDGPUCards.card("nope") == nil && BCDGPUCards.card("") == nil, "an unknown or empty id is no card")
 require(BCDGPUCards.choices.first?.0 == "" && BCDGPUCards.choices.count == cards.count + 1, "the picker is the default, then every card")

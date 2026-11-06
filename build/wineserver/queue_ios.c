@@ -1,3 +1,5 @@
+/* Portions copyright 2026 alantangok: code taken from https://github.com/willfaust/Madeira (pull request #510)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Server-side message queues
  *
@@ -3199,9 +3201,12 @@ DECL_HANDLER(set_queue_mask)
     if (!queue) return;
     queue_shm = queue->shared;
 
-    if (req->poll_events)
+    /* Winios drains an app-side ring without a driver fd. Still install the
+     * wait masks after that drain; otherwise a message waiter can sleep with
+     * zero masks while WM_INPUT accumulates without signalling its queue.
+     * (upstream Madeira #510, 340aa6c; the same code a queue with a driver fd runs) */
+    if (req->poll_events && queue->fd)
     {
-        if (!queue->fd) return;
         clear_queue_bits( queue, QS_DRIVER );
         set_fd_events( queue->fd, POLLIN );
     }

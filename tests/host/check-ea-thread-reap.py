@@ -9,6 +9,11 @@ same-address replacements before/during join, and join failure. The join must
 run without the VM lock; freeing must run with it, after identity validation.
 The original non-EA exit path is also executed for absent/invalid switches.
 No Windows or iOS application runs.
+
+madeira-bcd (ajan62, X9; upstream Madeira ml2290): the raw hand-off of every other session no longer joins or frees the TEB of
+the thread that is exiting (the 608 failure outside EA: GTA V Legacy's launcher setup, vcredist chains), and
+env.MADEIRA_THREAD_REAP_CHECKED = 1 (default off) takes the checked hand-off for every process. The build-631 branch is kept below as
+the negative control.
 """
 from pathlib import Path
 import shutil
@@ -22,6 +27,20 @@ block = virtual.split('/* ios-ea-thread-reap begin */', 1)[1].split('/* ios-ea-t
 exit_body = thread.split('static DECLSPEC_NORETURN void exit_thread( int status )', 1)[1].split('\n}\n', 1)[0]
 dispatch = exit_body[exit_body.index('    const char *ea_cef'):exit_body.index('    pthread_exit_wrapper( status );')]
 legacy = dispatch[dispatch.index('else if ((teb ='):].replace('else if', 'if', 1)
+# the raw branch exactly as build 631 shipped it (before the self-TEB guard): the negative control of the 608 failure
+legacy_631 = """if ((teb = InterlockedExchangePointer( &prev_teb, NtCurrentTeb() )))
+    {
+        struct ntdll_thread_data *thread_data = (struct ntdll_thread_data *)&teb->GdiTebBatch;
+
+        if (thread_data->pthread_id)
+        {
+            pthread_join( thread_data->pthread_id, NULL );
+            virtual_free_teb( teb );
+        }
+    }
+"""
+assert 'if (teb == NtCurrentTeb())' in legacy and 'if (teb == NtCurrentTeb())' not in legacy_631
+assert 'getenv( "MADEIRA_THREAD_REAP_CHECKED" )' in dispatch and '(checked && !strcmp( checked, "1" ))' in dispatch
 assert thread.count('ios_ea_reap_exited_thread( NtCurrentTeb() );') == 1
 assert virtual.count('PTHREAD_MUTEX_RECURSIVE') >= 1
 
@@ -110,6 +129,11 @@ static void old_free(TEB *t) { assert(t==current_teb); old_live_releases++; }
 #define virtual_free_teb old_free
 static void reproduce_608(void) {
     void *prev_teb=current_teb; TEB *teb;
+''' + legacy_631 + r'''
+}
+/* the production raw branch on the same situation: the exiting thread's own TEB is the previous one */
+static void self_case_production(void) {
+    void *prev_teb=current_teb; TEB *teb;
 ''' + legacy + r'''
 }
 #undef pthread_join
@@ -148,7 +172,9 @@ int main(void) {
     TEB old, live, other;
     memset(&live,0,sizeof(live)); live.GdiTebBatch.pthread_id=pthread_self(); current_teb=&live;
     reproduce_608(); assert(old_failed_joins==1 && old_live_releases==1);
-    puts("PASS negative control: actual 608 branch releases live stack despite self-join EDEADLK");
+    puts("PASS negative control: the build-631 branch releases the live stack despite self-join EDEADLK");
+    self_case_production(); assert(old_failed_joins==1 && old_live_releases==1);
+    puts("PASS the production raw branch on the same situation joins nothing and frees nothing (the 608 failure outside EA)");
     reset(); init(&old,0x31c,0x324,new_worker()); init(&live,0x330,0x338,pthread_self());
     current_teb=&live; seed(&old); ios_ea_reap_exited_thread(&live);
     assert(joins==1 && frees==1 && last_freed==&old);
@@ -225,6 +251,21 @@ int main(void) {
         assert((ios_ea_pending_thread.teb!=NULL)==(i==6));
     }
     puts("PASS actual exit branch: only exact EA=1 uses new cleanup; other sessions retain legacy handoff");
+
+    /* madeira-bcd: env.MADEIRA_THREAD_REAP_CHECKED = 1 (exactly) takes the checked cleanup for every process; default off */
+    unsetenv("MADEIRA_EA_CEF"); ios_ea_pending_thread.teb=NULL;
+    const char *checked_values[]={NULL,"","0","2","true","1x","1"};
+    for (unsigned i=0;i<sizeof(checked_values)/sizeof(checked_values[0]);i++) {
+        if (checked_values[i]) setenv("MADEIRA_THREAD_REAP_CHECKED",checked_values[i],1); else unsetenv("MADEIRA_THREAD_REAP_CHECKED");
+        unsigned before=legacy_exchanges;
+        memset(&ios_ea_pending_thread,0,sizeof(ios_ea_pending_thread));
+        live.GdiTebBatch.pthread_id=(i==6 ? pthread_self() : (pthread_t)0);
+        dispatch_exit();
+        assert(legacy_exchanges-before==(i==6 ? 0 : 1));
+        assert((ios_ea_pending_thread.teb!=NULL)==(i==6));
+    }
+    unsetenv("MADEIRA_THREAD_REAP_CHECKED");
+    puts("PASS env.MADEIRA_THREAD_REAP_CHECKED: only exactly 1 takes the checked cleanup; unset, 0 and anything else keep the raw hand-off");
     return 0;
 }
 '''

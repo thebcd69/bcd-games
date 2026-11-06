@@ -66,6 +66,10 @@ struct BCDDownloadsView: View {
                     Text(download.paused ? "Paused" : progressDetail(download))
                 }
                 .font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft).monospacedDigit().lineLimit(1)
+                if let source = download.source, !download.paused {
+                    Label(source, systemImage: source.hasPrefix("From Steam") ? "cloud" : "desktopcomputer")
+                        .font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft).lineLimit(1)
+                }
                 if let failed = download.failed {
                     Label(failed, systemImage: "exclamationmark.triangle.fill").font(BCDStyle.body(13)).foregroundStyle(BCDStyle.alert)
                 }

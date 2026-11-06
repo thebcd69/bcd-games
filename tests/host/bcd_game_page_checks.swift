@@ -543,19 +543,53 @@ func dateChecks() {
         let file = await model.backUpSaves()
         check("Back up saves hands over the zip and says what is in it",
               file?.lastPathComponent == "x.zip" && model.messages["saves"] == "2 files, \(BCDFormat.bytes(2048)).", model.messages)
-        // GOG: no Update and no file check yet (a later version of BCD), and its note about runtimes.
+        // GOG (build 632): Update when GOG has a newer build or DLC the game lacks, Repair for a broken game and in Options, and its note about runtimes.
         var gogGame = BCDGame(id: "gog.1207658924", title: "The Witcher", store: .gog, state: .updateAvailable(bytes: 0), size: 1_000)
         var gogDetails = BCDGameDetails()
         gogDetails.storeNote = "May need: Visual C++ 2017, DirectX (June 2010)."
         gogDetails.canRepair = true
         let gogPlan = BCDGamePagePlan(game: gogGame, download: nil, system: system, otherDownloads: false, details: gogDetails)
-        check("GOG: no Update, and the store's note under Play", gogPlan.main?.action == .play && gogPlan.others.isEmpty
+        check("GOG: Update beside Play (no size before the update's own plan), and the store's note under Play",
+              gogPlan.main?.action == .play && gogPlan.others.map(\.action) == [.update] && gogPlan.others.first?.title == "Update"
               && gogPlan.notes.contains { $0.text.hasPrefix("May need") && !$0.warning }, gogPlan)
         gogGame.state = .broken(reason: "No program to start.")
         let gogBroken = BCDGamePagePlan(game: gogGame, download: nil, system: system, otherDownloads: false, details: gogDetails)
-        check("GOG: no Repair either", gogBroken.main?.action == .play, gogBroken.main as Any)
-        check("GOG: Options offer no Check and repair files", !gogDetails.offersRepair(gogGame)
+        check("GOG: a broken game offers Repair", gogBroken.main?.action == .repair, gogBroken.main as Any)
+        var gogBusy = gogDetails
+        gogBusy.canRepair = false
+        check("GOG: Options offer Check and repair files when the backend says so, and not while an update runs",
+              gogDetails.offersRepair(gogGame) && !gogBusy.offersRepair(gogGame)
               && gogDetails.offersRepair(BCDGame(id: "steam.1", title: "S", store: .steam, state: .ready, size: nil)))
+
+        // Epic Cloud (build 632): the page's cloud words are Epic's for an Epic game and Steam's by default; off until the player turns it on, and turning on asks first.
+        let epicNames = BCDCloudNames(store: "Epic Games", cloud: "Epic Cloud", backups: "Epic Cloud Backups", front: .epic, optIn: true, keepsOlder: true)
+        check("Steam Cloud's words are what they were",
+              BCDCloudSaves.signedOut.summary == "Sign in to Steam" && BCDCloudSaves.signedOut.explanation == "Cloud saves need a Steam sign-in."
+              && BCDCloudSaves.differ(2).explanation.hasPrefix("Steam Cloud and this device disagree on") && BCDCloudNames().cloud == "Steam Cloud")
+        check("Epic Cloud: the same states in Epic's words, Off and Not available beside them",
+              BCDCloudSaves.signedOut.summary(epicNames) == "Sign in to Epic Games" && BCDCloudSaves.off.summary(epicNames) == "Off"
+              && BCDCloudSaves.unsupported.summary(epicNames) == "Not available" && BCDCloudSaves.differ(2).explanation(epicNames).hasPrefix("Epic Cloud and this device disagree on")
+              && BCDCloudSaves.off.explanation(epicNames).contains("writes to your Epic Games account"))
+        var epicCloudDetails = BCDGameDetails()
+        epicCloudDetails.cloudNames = epicNames
+        epicCloudDetails.cloud = .off
+        let epicInstalled = BCDGame(id: "epic.Fixture", title: "Fixture", store: .epic, state: .ready, size: 1)
+        let turnOn = BCDGameAction.turnOnCloud.question(for: epicInstalled, details: epicCloudDetails)
+        check("Epic Cloud: turning it on asks first, and says it writes to the Epic account and that the older snapshots stay",
+              turnOn?.confirm == "Turn on" && turnOn?.destructive == false && turnOn?.message.contains("This writes to your Epic Games account.") == true
+              && turnOn?.message.contains("keeps its older snapshots") == true && turnOn?.title == "Turn on Epic Cloud for this game?", turnOn as Any)
+        check("Epic Cloud: Keep this device's saves sends a new snapshot and the older ones stay; Use Epic Cloud's saves backs up this device's copies first",
+              BCDGameAction.keepCloud(fromCloud: false).question(for: epicInstalled, details: epicCloudDetails)?.message.contains("as its newest snapshot") == true
+              && BCDGameAction.keepCloud(fromCloud: true).question(for: epicInstalled, details: epicCloudDetails)?.message.contains("Epic Cloud Backups") == true)
+        check("Steam's questions are the ones they were",
+              BCDGameAction.keepCloud(fromCloud: true).question(for: BCDGame(id: "steam.1", title: "S", store: .steam, state: .ready, size: nil), details: BCDGameDetails())?.message
+              == "Where the copies differ, Steam Cloud's replace the ones on this device. BCD backs up this device's copies first, in Files › BCD › Steam Cloud Backups.")
+        let epicConflict = BCDCloudConflict(name: "slot1.sav", cloudDate: Date(timeIntervalSince1970: 100), cloudBytes: 2048, deviceDate: Date(timeIntervalSince1970: 50), deviceBytes: 1024)
+        check("a differing save names the store's cloud", epicConflict.lines("Epic Cloud").cloud.hasPrefix("Epic Cloud: ") && epicConflict.lines.cloud.hasPrefix("Steam Cloud: "))
+        var epicDiffer = epicCloudDetails
+        epicDiffer.cloud = .differ(1)
+        let differPlan = BCDGamePagePlan(game: epicInstalled, download: nil, system: system, otherDownloads: false, details: epicDiffer)
+        check("Epic Cloud: saves that differ are said under Play in Epic's name", differPlan.notes.contains { $0.text.hasPrefix("Epic Cloud and this device disagree on") && $0.warning }, differPlan)
 
         // Epic (milestone 1): a game BCD cannot install shows the reason and no Install; one that may not start says so beside
         // Install; with neither, the page is what it was.

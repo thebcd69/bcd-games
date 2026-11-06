@@ -49,6 +49,11 @@ require(prep.index('absorbResults(') < prep.index('DockScriptRegistry.prepare(ga
         'DockInstallers.prepare writes the registry values right before it looks at the installers switch (so also with installers off)')
 require(installers.count('SteamSignIn.flag("MADEIRA_DOCK_SCRIPT_REGISTRY", default: false)') == 1,
         'the environment / bcd.cfg switch is read once, off by default')
+info_text = (app / 'SwiftSteam/Library/SteamAppInfo.swift').read_text(encoding='utf-8')
+steam_languages = set(re.findall(r'\("([a-z]+)", "[^"]+"\)', info_text[info_text.index('static let all: [(code: String, name: String)]'):info_text.index('static func name(')]))
+reader_languages = set(re.findall(r'"([a-z]+)"', installers[installers.index('private static let languageNames: Set<String> = ['):][:900].split(']')[0]))
+require(steam_languages and steam_languages == reader_languages,
+        'round 632: the install-script reader knows exactly the Steam language names of SteamLanguage.all (%d)' % len(steam_languages))
 require('reg.exe' not in installers, 'nothing runs reg.exe (it is not in the bundle); the files are rewritten while no session runs')
 require(content.index('DockInstallers.prepare(game, drive: MadeiraDock.drive') < content.index('runWineFullSequence(profile: profile)', content.index('private func startDock(')),
         'a Dock start plans its installs (and so writes the values) before the session begins')
@@ -350,11 +355,28 @@ let script = """
                 "a shape that is not read: nothing written; the log names the type and the key (\(registryLines()))")
 
         // Round 623: entries a language section leaves out show their shape; stored() names what the registry text holds.
-        let oddLang = "\"InstallScript\" { \"Registry\" { \"HKEY_LOCAL_MACHINE\\\\Software\\\\Odd Lang\" { \"string\" { \"english\" { \"Name\" \"Odd\" } \"french\" { \"Name\" \"Impair\" \"Q\" \"x\" } } } } }"
+        // Round 632: a value that has texts for other languages only (no English, no installed language) is still left out and described.
+        let oddLang = "\"InstallScript\" { \"Registry\" { \"HKEY_LOCAL_MACHINE\\\\Software\\\\Odd Lang\" { \"string\" { \"Name\" { \"french\" \"Impair\" \"polish\" \"Nieparzysty\" } \"Q\" { \"german\" \"x\" } } } } }"
         let shapes = SteamInstallRegistry.parse(script: Data(oddLang.utf8), installDir: dir, language: "english")
         require(shapes.values.isEmpty && shapes.skipped == ["language", "language"]
-                && shapes.languageShapes == ["HKEY_LOCAL_MACHINE\\Software\\Odd Lang | string | english | name", "HKEY_LOCAL_MACHINE\\Software\\Odd Lang | string | french | name,q"],
-                "entries a language section leaves out are described: key, type, name and the names under it (\(shapes.languageShapes))")
+                && shapes.languageShapes == ["HKEY_LOCAL_MACHINE\\Software\\Odd Lang | string | Name | french,polish", "HKEY_LOCAL_MACHINE\\Software\\Odd Lang | string | Q | german"],
+                "entries left out for want of a text in the installed language or English are described: key, type, name and the languages (\(shapes.languageShapes))")
+        // Round 632 (Far Cry 3: 34 entries left out in 7 logs, builds 614-623; upstream Madeira #550): the type holds one section per language,
+        // each with the name/text pairs of that language.
+        let fc3 = "\"InstallScript\" { \"Registry\" { \"HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Ubisoft\\\\Far Cry 3\" { \"string\" { \"danish\" { \"language\" \"Dansk\" } \"english\" { \"language\" \"English\" \"Extra\" \"e\" } \"german\" { \"language\" \"Deutsch\" } } \"dword\" { \"english\" { \"Region\" \"3\" } } } } }"
+        let fcEnglish = SteamInstallRegistry.parse(script: Data(fc3.utf8), installDir: dir, language: "english")
+        func fc(_ parsed: SteamInstallRegistry.Parsed, _ name: String) -> SteamInstallRegistryValue.Payload? { parsed.values.first { $0.name == name }?.payload }
+        require(fc(fcEnglish, "language") == .string("English") && fc(fcEnglish, "Extra") == .string("e") && fc(fcEnglish, "Region") == .dword(3)
+                && fcEnglish.values.count == 3 && fcEnglish.skipped.isEmpty && fcEnglish.languageShapes.isEmpty,
+                "Far Cry 3's layout, a language section holding name/text pairs: the installed language's text (English), nothing left out (\(fcEnglish.skipped))")
+        let fcGerman = SteamInstallRegistry.parse(script: Data(fc3.utf8), installDir: dir, language: "german")
+        require(fc(fcGerman, "language") == .string("Deutsch") && fc(fcGerman, "Extra") == .string("e") && fcGerman.values.count == 3,
+                "another installed language is used, a value that language lacks falls back to English")
+        let fcPolish = SteamInstallRegistry.parse(script: Data(fc3.utf8), installDir: dir, language: "polish")
+        require(fc(fcPolish, "language") == .string("English") && fcPolish.values.count == 3, "a language the script lacks falls back to English")
+        let both = SteamInstallRegistry.parse(script: Data("\"InstallScript\" { \"Registry\" { \"HKLM\\\\Software\\\\Both\" { \"string\" { \"Language\" { \"english\" \"E\" \"german\" \"G\" } \"english\" { \"english\" \"same\" } \"french\" { \"Name\" \"N\" } } } } }".utf8), installDir: dir, language: "english")
+        require(fc(both, "Language") == .string("E") && fc(both, "english") == .string("same") && both.skipped == ["language"],
+                "both layouts in one script: a value name holding languages stays one; a language section whose pair is a language name is a value named so; a language with no English text is left out (\(both.skipped))")
         let sixMany = "\"InstallScript\" { \"Registry\" { \"HKLM\\\\Software\\\\S\" { \"string\" { " + (0..<9).map { "\"l\($0)\" { \"A\\\"B\" \"c\" }" }.joined(separator: " ") + " } } } }"
         let capped6 = SteamInstallRegistry.parse(script: Data(sixMany.utf8), installDir: dir, language: "english")
         require(capped6.skipped.count == 9 && capped6.languageShapes.count == 6 && !capped6.languageShapes.joined().contains("\""), "at most six shapes, quotes taken out (\(capped6.languageShapes.first ?? ""))")
@@ -374,13 +396,13 @@ let script = """
         // prepare(): the shapes come before the summary, which stays the last line.
         let langGame = DockGame(id: 7, name: "Lang", installDir: "Lang", library: "Program Files (x86)/Steam/steamapps", installed: true, customExecutables: false)
         try write(common.appendingPathComponent("Lang/installscript.vdf"),
-                  "\"InstallScript\" { \"Registry\" { \"HKLM\\\\Software\\\\Lang Vendor\" { \"string\" { \"Dir\" \"%INSTALLDIR%\" } } \"HKLM\\\\Software\\\\Lang Vendor2\" { \"string\" { \"english\" { \"N\" \"x\" } } } } }")
+                  "\"InstallScript\" { \"Registry\" { \"HKLM\\\\Software\\\\Lang Vendor\" { \"string\" { \"Dir\" \"%INSTALLDIR%\" } } \"HKLM\\\\Software\\\\Lang Vendor2\" { \"string\" { \"N\" { \"french\" \"x\" } } } } }")
         try write(common.appendingPathComponent("Lang/appmanifest.txt"), "x")
         LogStore.shared.lines.removeAll()
         _ = DockScriptRegistry.prepare(langGame, drive: drive, prefix: prefix, gameConfigPath: cfg.path)
         let langLines = registryLines()
         require(langLines.count >= 3 && langLines.last?.contains("scripts=1 values=1") == true && langLines.last?.contains("skipped=language(1)") == true
-                && langLines.contains { $0.contains("app=7 left out for language: HKLM\\Software\\Lang Vendor2 | string | english | n") }
+                && langLines.contains { $0.contains("app=7 left out for language: HKLM\\Software\\Lang Vendor2 | string | N | french") }
                 && langLines.firstIndex { $0.contains("left out for language") }! < langLines.count - 1,
                 "prepare logs the shape of a language entry it left out, before the summary (\(langLines))")
 

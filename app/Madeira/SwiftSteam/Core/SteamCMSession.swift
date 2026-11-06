@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-11-05: `callServiceMethodWithResult` (the Steam Workshop's subscribe calls answer with an empty body either way)
+// and `sendServiceNotification` (the local network transfer).
+// Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #493)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -25,4 +29,17 @@ protocol SteamCMSession: AnyObject {
     func sendAndWaitPICS(eMsg: EMsg, body: Data, timeout: TimeInterval) async throws -> [SteamMessageCodec.IncomingMessage]
     /// Calls a unified-service method and returns the response body.
     func callServiceMethod(method: SteamServiceMethod, body: Data, timeout: TimeInterval) async throws -> Data
+    /// The same, with the response header's EResult (1 = OK).
+    func callServiceMethodWithResult(method: SteamServiceMethod, body: Data, timeout: TimeInterval) async throws -> (eresult: Int32, body: Data)
+    /// Sends a unified-service notification (a method without a response).
+    func sendServiceNotification(method: SteamServiceMethod, body: Data) async throws
+}
+
+extension SteamCMSession {
+    /// A connection that reports no EResults answers OK.
+    func callServiceMethodWithResult(method: SteamServiceMethod, body: Data, timeout: TimeInterval) async throws -> (eresult: Int32, body: Data) {
+        (1, try await callServiceMethod(method: method, body: body, timeout: timeout))
+    }
+    /// Sessions that never send notifications (the scripted ones in tests) need not implement it.
+    func sendServiceNotification(method: SteamServiceMethod, body: Data) async throws {}
 }

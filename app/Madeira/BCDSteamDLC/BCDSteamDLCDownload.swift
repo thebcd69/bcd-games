@@ -49,7 +49,7 @@ extension DepotDownloader {
         let contentApp = dlc == nil && !app.freeToDownload ? (info?.fromApp ?? app.appID) : issued.appID
         var candidates: [UInt64] = []
         if let recorded = depot.manifest { candidates.append(recorded) }
-        if let current = info?.publicManifestID, !candidates.contains(current) { candidates.append(current) }
+        if let current = info?.manifestID(app.branch), !candidates.contains(current) { candidates.append(current) }
         var failure: Error = SteamError.manifestFetchFailed("Steam has no manifest for it.")
         for gid in candidates {
             try Task.checkCancellation()

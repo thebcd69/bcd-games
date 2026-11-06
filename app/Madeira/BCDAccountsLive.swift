@@ -77,6 +77,7 @@ struct BCDSteamSignInSheet: View {
             NotificationCenter.default.publisher(for: SteamSignIn.didChange).map { _ in () }.eraseToAnyPublisher(),
             BCDGOG.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
             BCDEpic.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
+            BCDStoresUI.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),   // itch.io's and the EA store's cards (BCDStores/)
         ]
         // objectWillChange fires before the value changes: read on the next turn of the main queue.
         Publishers.MergeMany(changes).receive(on: DispatchQueue.main)
@@ -95,7 +96,8 @@ struct BCDSteamSignInSheet: View {
         let account = BCDSteamAccount(available: SteamSignIn.isEnabled, accountName: model.accountName,
                                       personaName: nil, avatar: nil,
                                       cloudAvailable: SteamOwnedLibrary.enabled, cloudOn: SteamCloudSetting.shared.on,
-                                      setupAvailable: OnboardingModel.shared.available)
+                                      setupAvailable: OnboardingModel.shared.available,
+                                      lanAvailable: SteamOwnedLibrary.enabled, lanOn: SteamLANSetting.enabled, lanHost: SteamLANSetting.host)
         if account != steam { steam = account }
         let progress = BCDSteamSignIn(busy: model.signInBusy, steamGuard: model.guardPrompt.map(Self.steamGuard),
                                       qrImage: model.qrImage, qrLink: model.qrLink, error: model.signInError)
@@ -126,6 +128,20 @@ struct BCDSteamSignInSheet: View {
     func signOut() { SteamSignInModel.shared.signOut() }
 
     func setCloud(_ on: Bool) { SteamCloudSetting.shared.on = on }
+
+    /// Downloads from a PC on this network (SteamLANSetting, SteamLANPeer.swift): off until the player turns it on. A defaults value does not
+    /// publish, so the section is read again here.
+    func setLAN(_ on: Bool) {
+        SteamLANSetting.enabled = on
+        SteamLog.event("[steam-lan] setting \(on ? "on" : "off")")
+        read()
+    }
+
+    func setLANHost(_ address: String) {
+        guard address.isEmpty || SteamLANSetting.isValidAddress(address) else { return }
+        SteamLANSetting.host = address
+        read()
+    }
     func runSetup() { OnboardingModel.shared.rerun() }
 
     /// GOG's own sign-in page and its sign-out, through the store's GOG hooks (gogAccountAction).
@@ -135,4 +151,9 @@ struct BCDSteamSignInSheet: View {
     /// Epic's own sign-in page and its sign-out, through the store's Epic hooks (epicAccountAction).
     func signInEpic() { BCDLiveStore.shared.signIn(.epic) }
     func signOutEpic() { BCDLiveStore.shared.signOut(.epic) }
+
+    /// itch.io's and the experimental EA store's cards under GOG's (BCDStores/BCDStoreCards.swift); they read their own stores.
+    var extraStoreCards: AnyView { AnyView(BCDStoreCards()) }
+    var extraStoreKey: String { BCDStoresUI.shared.key }
+    func closeExtraStoreQuestion() -> Bool { BCDStoresUI.shared.close() }
 }

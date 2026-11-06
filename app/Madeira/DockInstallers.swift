@@ -1802,11 +1802,18 @@ struct SteamInstallRegistryValue: Equatable, Sendable {
 /// appear to be installed and the installer could not be found" without it (GA6QN2). The section's shape, as the
 /// scripts of the Bethesda games have it: the registry key in full, then the value type ("string", "dword"), then the
 /// values; a value written straight under the key is a string. A value may be a section of language names ("english"
-/// ...) instead of a text: the installed language's text is taken, else English's. `%INSTALLDIR%` and `%LANGUAGE%`
+/// ...) instead of a text: the installed language's text is taken, else English's. Far Cry 3's script nests it the other way
+/// round: the type holds one section per language, each with the name/text pairs of that language. `%INSTALLDIR%` and `%LANGUAGE%`
 /// are the two tokens understood; a value with any other `%` is left out, and so is a type this does not know.
 /// Only keys below Software\ are taken, and only HKLM and HKCU.
 enum SteamInstallRegistry {
     static let maxValues = 64
+
+    /// Steam's API language names (SteamLanguage.all): what tells a language section from a value name in a script's "Registry" section.
+    private static let languageNames: Set<String> = [
+        "arabic", "bulgarian", "schinese", "tchinese", "czech", "danish", "dutch", "english", "finnish", "french", "german", "greek",
+        "hungarian", "indonesian", "italian", "japanese", "koreana", "norwegian", "polish", "portuguese", "brazilian", "romanian",
+        "russian", "spanish", "latam", "swedish", "thai", "turkish", "ukrainian", "vietnamese"]
 
     struct Parsed: Equatable, Sendable {
         var values: [SteamInstallRegistryValue] = []
@@ -1879,14 +1886,21 @@ enum SteamInstallRegistry {
                     raws.append(Raw(key: below[0], type: "string", name: name, text: text, languages: [:]))
                 case 2:   // key, type
                     raws.append(Raw(key: below[0], type: below[1].lowercased(), name: name, text: text, languages: [:]))
-                case 3:   // key, type, value name: the text of one language
-                    let id = below.joined(separator: "\u{1}").lowercased()
+                case 3:   // key, type, then either a value name holding one text per language, or a language holding name/text pairs
+                    // Round 632 (Far Cry 3, The Witcher; upstream Madeira #550): "string" { "danish" { "language" "Dansk" } "english" { ... } }
+                    // is a language section (the section is a language name and the pair is not), not a value named "danish"; the value is
+                    // the pair's name and the installed language's text (else English's) is taken. A section that is no language name
+                    // is a value name, as before.
+                    let languageSection = languageNames.contains(below[2].lowercased()) && !languageNames.contains(name.lowercased())
+                    let valueName = languageSection ? name : below[2]
+                    let language = languageSection ? below[2].lowercased() : name.lowercased()
+                    let id = [below[0], below[1], valueName].joined(separator: "\u{1}").lowercased()
                     let index = languageIndex[id] ?? raws.count
                     if languageIndex[id] == nil {
                         languageIndex[id] = index
-                        raws.append(Raw(key: below[0], type: below[1].lowercased(), name: below[2], text: nil, languages: [:]))
+                        raws.append(Raw(key: below[0], type: below[1].lowercased(), name: valueName, text: nil, languages: [:]))
                     }
-                    raws[index].languages[name.lowercased()] = text
+                    raws[index].languages[language] = text
                 default:
                     break
                 }

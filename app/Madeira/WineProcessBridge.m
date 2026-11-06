@@ -1,3 +1,5 @@
+/* Portions copyright 2026 SirDank, ft7t8drgwf-wq and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #349, #360 and #363; commits 4e568c1, ba617bb and ada55ec)
+ * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 // WineProcessBridge.m - Initialize Wine's ntdll Unix-side on iOS
 // This calls __wine_main() to bootstrap the Wine process, connecting
 // to the already-running wineserver thread.
@@ -26,6 +28,7 @@
 #include <dirent.h>
 #include "../../build/madeira_cfg.h"   /* ml1095: one config file */
 #include "../../build/bcd_epic_mask.h"   /* madeira-bcd (2026-10-22): Epic's sign-in arguments masked in the argv lines */
+#include "../../build/madeira_redact.h"   /* the arguments are logged with credential-like values redacted */
 #include "BCDGraphicsRoutes.h"   /* madeira-bcd (round 602): env.MADEIRA_D3D8 = d3d9 and env.MADEIRA_DDRAW = cnc replace Wine's d3d8.dll and ddraw.dll in syswow64 */
 #include <sys/stat.h>
 #include <pwd.h>
@@ -501,6 +504,7 @@ static int madeira_cfg_off_word(const char *v)
 {
     return v && (!strcmp(v, "0") || !strcmp(v, "off") || !strcmp(v, "no"));
 }
+
 static const char *madeira_docs_dir_early(void)
 {
     char docs[1024], v[16];
@@ -520,6 +524,49 @@ static const char *madeira_docs_dir_early(void)
 __attribute__((constructor)) static void madeira_docs_dir_ctor(void)
 {
     g_madeira_docs_early = madeira_docs_dir_early();
+}
+
+/* madeira-bcd (OpenGL, docs/OPENGL.md): the game's `gl-backend` key (bcd.cfg, or the game's own file, which wins; an
+ * env.MADEIRA_GL_BACKEND line works the same) turns the winios OpenGL driver on for THIS session:
+ *   zink  desktop OpenGL: Mesa OSMesa + Zink on MoltenVK, from the bundle's gl/ folder (build/mesa-ios, build/moltenvk-ios);
+ *         if Zink cannot start the driver falls back to gles by itself and says so in the log
+ *   gles  Apple's OpenGL ES 3.0 through EAGL; a desktop-GL-only game fails its own version check
+ * Only these two words count. Unset, empty or anything else: OpenGL stays off, MADEIRA_GL_BACKEND is not exported, and every OpenGL
+ * path in the engine (the driver in win32u, the real opengl32 unix tables and the opt-in opengl32.dll, the x18 store patching, the
+ * wineserver's LuaJIT substitution) stays where it was; the session is what it was before OpenGL existed. Nothing is logged then.
+ * One session runs per app run, so nothing needs undoing; wine_session_end() drops the variables for tidiness. */
+static int g_gl_love_hint_set;
+static void bcd_gl_session_setup(NSString *bundlePath)
+{
+    char want[32] = "";
+    const char *pre = getenv("MADEIRA_GL_BACKEND");
+    NSString *glDir = [bundlePath stringByAppendingPathComponent:@"gl"];
+
+    if (!madeira_cfg_get("gl-backend", want, sizeof(want)) || !want[0]) {
+        if (pre) strlcpy(want, pre, sizeof(want));
+    }
+    for (char *c = want; *c; c++) if (*c >= 'A' && *c <= 'Z') *c += 'a' - 'A';
+    if (!strcmp(want, "zink") || !strcmp(want, "gles")) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        BOOL haveZink = [fm fileExistsAtPath:[glDir stringByAppendingPathComponent:@"libOSMesa.dylib"]]
+                     && [fm fileExistsAtPath:[glDir stringByAppendingPathComponent:@"libMoltenVK.dylib"]];
+        setenv("MADEIRA_GL_BACKEND", want, 1);
+        setenv("MADEIRA_GL_DIR", glDir.UTF8String, 1);
+        /* LOVE 11 checks this SDL hint (read from the environment) before it tries desktop GL; with the GLES backend there is no
+         * desktop GL context, and SDL then makes the ES context through WGL_EXT_create_context_es2_profile, which that backend
+         * advertises. overwrite=0: a value the game's file sets wins. */
+        if (!strcmp(want, "gles") && !getenv("LOVE_GRAPHICS_USE_OPENGLES")) {
+            setenv("LOVE_GRAPHICS_USE_OPENGLES", "1", 1);
+            g_gl_love_hint_set = 1;
+        }
+        dprintf(STDERR_FILENO, "[WineProc] gl-backend=%s: OpenGL is on for this session (winios WGL driver; Zink and MoltenVK bundled: %s; %s)\n",
+                want, haveZink ? "yes" : "no", !strcmp(want, "zink") ? (haveZink ? "desktop OpenGL" : "no Zink here: the driver falls back to OpenGL ES") : "OpenGL ES");
+    } else {
+        unsetenv("MADEIRA_GL_BACKEND");
+        unsetenv("MADEIRA_GL_DIR");
+        if (want[0])
+            dprintf(STDERR_FILENO, "[WineProc] gl-backend=%s is not zink or gles: OpenGL stays off\n", want);
+    }
 }
 
 /* The profile's AppData\LocalLow folder.
@@ -873,6 +920,45 @@ static void madeira_link_wbem(NSFileManager *fm, NSString *prefix, NSString *sys
     }
     dprintf(STDERR_FILENO, "[WineProc] %s\\wbem: %d/%zu links\n", system_dir.UTF8String,
             linked, sizeof(wbem) / sizeof(wbem[0]));
+}
+
+/* The empty system directories wine.inf creates in every Wine prefix
+ * ([FakeDlls] for system32, [FakeDllsWow64] for syswow64) that the shipped
+ * template and the runtime farms leave out. Madeira's syswow64 is a farm built
+ * at session start, not a wineboot result, so it never got wine.inf's mui
+ * folder, and the template's system32 has no mui, catroot or spool\printers.
+ *
+ * Valve's Steam service checks a few fixed Windows folders while it prepares a
+ * per-account (CEG) executable. A trace of Black Ops's CEG job (build 34) shows
+ * C:\windows\system32\mui (syswow64\mui for the 32-bit service) answering
+ * c0000034 on Madeira, where every Wine, Proton and Windows install has it;
+ * Valve's server then refuses the job (Fail) for Black Ops and Borderlands 2
+ * alike. Empty folders only, the same ones stock Wine makes; nothing else
+ * changes. Idempotent: an existing folder is left alone. */
+static void madeira_ensure_wine_inf_dirs(NSFileManager *fm, NSString *prefix, BOOL wow64)
+{
+    static const char * const sys32[] = { "mui", "catroot", "spool/printers" };
+    static const char * const wow[]   = { "mui" };
+    NSString *windows = [prefix stringByAppendingPathComponent:@"drive_c/windows"];
+    int made = 0, present = 0, failed = 0;
+
+    for (int pass = 0; pass < (wow64 ? 2 : 1); pass++)
+    {
+        NSString *base = [windows stringByAppendingPathComponent:pass ? @"syswow64" : @"system32"];
+        const char * const *names = pass ? wow : sys32;
+        size_t count = pass ? sizeof(wow) / sizeof(wow[0]) : sizeof(sys32) / sizeof(sys32[0]);
+
+        for (size_t i = 0; i < count; i++)
+        {
+            NSString *dir = [base stringByAppendingPathComponent:[NSString stringWithUTF8String:names[i]]];
+            BOOL isDir = NO;
+            if ([fm fileExistsAtPath:dir isDirectory:&isDir] && isDir) { present++; continue; }
+            if ([fm createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil]) made++;
+            else failed++;
+        }
+    }
+    dprintf(STDERR_FILENO, "[WineProc] wine.inf system folders: %d made, %d already there, %d failed\n",
+            made, present, failed);
 }
 
 static void madeira_link_syswow64_wbem(NSFileManager *fm, NSString *prefix, NSString *bundle)
@@ -2354,6 +2440,8 @@ static void *wine_process_thread(void *arg) {
                 madeira_link_syswow64_wbem(fm, prefix, bundlePath);
                 madeira_seed_winsxs_x86(fm, prefix, bundlePath);
             }
+            /* Steam CEG (Madeira #519, ada55ec): the empty folders stock Wine makes and the template lacks. */
+            madeira_ensure_wine_inf_dirs(fm, prefix, has_i386_set);
             madeira_link_wine_mono(fm, prefix, bundlePath);
 
             /* madeira-bcd (2026-10-22): MADEIRA_MSIEXEC_SYSTEM32=1 (set for an Epic game's session by ContentView, or by a
@@ -2718,6 +2806,9 @@ static void *wine_process_thread(void *arg) {
                 }
             }
 
+            /* madeira-bcd (OpenGL): the game's gl-backend key, decided before the opt-in DLLs below (opengl32 is one) and before Wine starts. */
+            bcd_gl_session_setup(bundlePath);
+
             /* madeira-bcd: env.MADEIRA_OPTIN_DLLS = dxva2,evr (comma or semicolon separated) runs each
              * listed <name>-optin.dll that this build ships (tools/build-wine-extra-dlls.sh, OPTIN_WANT)
              * as <name>.dll, as MADEIRA_WER and MADEIRA_WINTYPES above. Fort Solis and DRAGON BALL
@@ -2753,6 +2844,13 @@ static void *wine_process_thread(void *arg) {
                         [wanted addObject:@"kernelbase"];
                         dprintf(STDERR_FILENO, "[WineProc] MADEIRA_ZERO_MITIGATION_POLICY=1: the opt-in kernelbase is added to MADEIRA_OPTIN_DLLS\n");
                     }
+                }
+                /* madeira-bcd (OpenGL): a session with gl-backend on runs the opt-in opengl32.dll (the tree's, with the default image base;
+                 * the shipped one is based at 0x7a800000, where its thunks lose the TEB); the key brings it along, as above. A session
+                 * without the key lists nothing and keeps the shipped file. */
+                if (getenv("MADEIRA_GL_BACKEND") && ![wanted containsObject:@"opengl32"]) {
+                    [wanted addObject:@"opengl32"];
+                    dprintf(STDERR_FILENO, "[WineProc] gl-backend: the opt-in opengl32 is added to MADEIRA_OPTIN_DLLS\n");
                 }
                 if (([wanted containsObject:@"wmadmod"] || [wanted containsObject:@"wmvdecod"] || [wanted containsObject:@"mfasfsrcsnk"]) && !getenv("MADEIRA_WG_64BIT")) setenv("MADEIRA_WG_64BIT", "1", 0);
                 NSString *ecDir = [bundlePath stringByAppendingPathComponent:@"arm64ec-windows"];
@@ -3195,13 +3293,18 @@ static void *wine_process_thread(void *arg) {
         for (int i = 0; i < extra_argc; i++) argv[argc++] = extra_argv[i];
         argv[argc] = NULL;
         dprintf(STDERR_FILENO, "[WineProc] argv[1] = %s\n", exe_path);
+        /* An argument may be a credential (a sign-in token, a password): each is logged as a redacted copy
+         * (build/madeira_redact.h, upstream Madeira's log redaction); argv itself is passed on unchanged. */
+        int credential_next = 0;
         for (int i = 0; i < extra_argc; i++) {
             /* madeira-bcd (2026-10-22, Epic Games milestone 2): Epic's sign-in code, account ID and name print as "*" (build/bcd_epic_mask.h);
              * a signed-in start passes none of them here (BCD Host reads them from a one-use file), so this is a second line of defence. */
             char masked[sizeof(args_buf) + 1];
+            char shown[sizeof(args_buf) + 64];
             long masked_len = bcd_epic_mask_a(extra_argv[i], strlen(extra_argv[i]), masked);
             if (masked_len >= 0) masked[masked_len] = 0;
-            dprintf(STDERR_FILENO, "[WineProc] argv[%d] = %s\n", 2 + i, masked_len >= 0 ? masked : extra_argv[i]);
+            madeira_redact_arg_a(masked_len >= 0 ? masked : extra_argv[i], &credential_next, shown, sizeof(shown));
+            dprintf(STDERR_FILENO, "[WineProc] argv[%d] = %s\n", 2 + i, shown);
         }
 
         /* iOS-Madeira: chdir to the unix path that maps to the exe's Wine
@@ -3379,6 +3482,8 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_UCRT_X64_MATH"); unsetenv("MADEIRA_SRV_FGETPATH");
     unsetenv("MADEIRA_NTDLL_SYNC");   /* madeira-bcd: a game's switch is its own */
     unsetenv("MADEIRA_ANON_LDADDAL32"); /* build 608: opt-in belongs only to the game that enabled it */
+    unsetenv("MADEIRA_REAL_SUSPEND");   /* a game's switch is its own: the server reads it per session now (mach_ios.c ios_real_suspend_enabled), so a later game must not inherit it */
+    unsetenv("MADEIRA_FIRST_PROC_OWN_EXIT_FLAG");   /* a game's switch is its own (server_ios.c ios_process_exiting_ptr reads it when a process exits) */
     /* madeira-bcd: Diablo II: Resurrected's executable-section switches (thebcd69/bcd-games#4), likewise */
     unsetenv("MADEIRA_NTDLL_XSEC"); unsetenv("MADEIRA_SHARED_SECTION_EXEC"); unsetenv("MADEIRA_NTDLL_DATA_SYNC_RANGE");
     unsetenv("MADEIRA_FAULT_LOOP_GUEST_PROGRESS"); unsetenv("MADEIRA_D2R_PROBE_RECOVERY");
@@ -3388,6 +3493,8 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_X64_MACHINE");  /* madeira-bcd: likewise (BeamNG.drive's launcher) */
     unsetenv("MADEIRA_TINY_WINDOW_FIX"); /* madeira-bcd: likewise (American Truck Simulator's tiny window) */
     unsetenv("MADEIRA_OPTIN_DLLS");   /* madeira-bcd: likewise */
+    unsetenv("MADEIRA_GL_BACKEND"); unsetenv("MADEIRA_GL_DIR");   /* madeira-bcd (OpenGL): likewise (the game's gl-backend key) */
+    if (g_gl_love_hint_set) { unsetenv("LOVE_GRAPHICS_USE_OPENGLES"); g_gl_love_hint_set = 0; }
     unsetenv("MADEIRA_NLS_EXTRA");    /* madeira-bcd: likewise (env_ios.c reads it at every code page request) */
     unsetenv("MADEIRA_WG_64BIT");     /* madeira-bcd: likewise (Resident Evil 2's decoders; a later game keeps the stub table) */
     unsetenv("MADEIRA_VCRT_ARM64_KEY"); /* madeira-bcd: likewise (the Runtimes\\arm64 marker is per game) */

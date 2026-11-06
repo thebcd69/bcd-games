@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (pull request #404)
+// under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Steam Cloud saves for games in Madeira Dock's Steam library
 // (docs/STEAM_CLOUD.md). Written from Steam's published service messages

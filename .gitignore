@@ -1,3 +1,5 @@
+# Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #462)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # Reference repos (not part of the project, just for research)
 box64/
 LiveContainer/
@@ -239,3 +241,19 @@ build/bcd-helper/
 # BCD winebrowser.exe (tools/build-bcd-openurl.sh, round 625): the build directory is not committed; the programs are tracked in
 # arm64ec-windows, aarch64-windows and (the i386 farm is not tracked) bcd-openurl/winebrowser-x86.exe
 build/bcd-openurl/
+
+# Script-built OpenGL and LOVE support (see the README in each folder; CI builds them, nothing here is committed):
+#   build/luajit-x64/build.sh   -> compat/love/lua51.dll, licenses/LuaJIT-MIT.txt
+#   build/mesa-ios/build.sh     -> gl/libOSMesa.dylib, licenses/Mesa-license.rst
+#   build/moltenvk-ios/build.sh -> gl/libMoltenVK.dylib and the MoltenVK, SPIRV-Cross, SPIRV-Tools, cereal licence texts
+build/mesa-ios/obj/
+app/Madeira/compat/love/lua51.dll
+app/Madeira/compat/love/*.version
+app/Madeira/gl/*.dylib
+app/Madeira/gl/*.version
+app/Madeira/licenses/LuaJIT-MIT.txt
+app/Madeira/licenses/Mesa-license.rst
+app/Madeira/licenses/MoltenVK-Apache-2.0.txt
+app/Madeira/licenses/SPIRV-Cross-Apache-2.0.txt
+app/Madeira/licenses/SPIRV-Tools-Apache-2.0.txt
+app/Madeira/licenses/cereal-BSD-3-Clause.txt

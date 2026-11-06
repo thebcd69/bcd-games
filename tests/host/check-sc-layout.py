@@ -95,7 +95,8 @@ assert 'if (cand + alloc_size <= pool_limit\n            && IOS_POOL_IN_REACH(ca
 
 nt = native[native.index('static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemory( HANDLE process'):]
 nt = nt[:nt.index('static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemoryEx(')]
-assert 'if (is_jumbo && ios_sc_grant_dead_n && ios_sc_cef_enabled() && ios_sc_current_is_helper())' in nt
+# round 631 (R4 S1): the same reap also releases a helper's V8 reservations when it ended out of memory
+assert 'if (is_jumbo && (ios_sc_grant_dead_n || ios_sc_tbl_dead_n) && ios_sc_cef_enabled() && ios_sc_current_is_helper())' in nt
 assert nt.index('ios_sc_reap_dead();') < nt.index('ios_sc2_route(')
 assert 'if (sc2 && ios_sc2_route( hint, *size_ptr, type, protect, &pick, &sz, &st2 ))' in nt
 assert nt.index('goto sc_decided;') < nt.index('sc_decided:') < nt.index('[jumbo] hinted reserve %p')
@@ -111,11 +112,12 @@ assert ex.index('if (process != NtCurrentProcess())') < ex.index('/* madeira-bcd
 assert 'int sc2 = is_jumbo && ios_sc_layout_mode == 2 && ios_sc_cef_enabled() && ios_sc_current_is_helper();' in exb
 assert 'if ((type & MEM_COMMIT) && *ret && ios_sc_layout_mode == 2 && (ULONG_PTR)*ret < ios_sc2_arena_lo)\n' \
        '                ios_sc2_note_commit( *ret, *size_ptr );' in exb
-order = [exb.index(x) for x in ('if (sc2 && ios_sc_grant_dead_n) ios_sc_reap_dead();',
+order = [exb.index(x) for x in ('if (sc2 && (ios_sc_grant_dead_n || ios_sc_tbl_dead_n))\n            {\n                ios_sc_reap_dead();',
                                 'if (sc2 && ios_sc2_ex_cage( *size_ptr, type, protect, limit_low, limit_high, align, attributes,\n'
                                 '                                        ios_cage_holdback_live ))',
                                 'st = ios_cage_grant( type, protect, *size_ptr, &pick, &sz, "sc2-ex" );',
-                                'if (!caged)\n                st = allocate_virtual_memory( ret, size_ptr, type, protect,',
+                                'if (!caged)\n            {\n                void *ask_at = *ret;',
+                                'st = allocate_virtual_memory( ret, size_ptr, type, protect,\n                                              limit_low',
                                 'if (sc2 && !st) ios_sc_grant_note( *ret, *size_ptr );',
                                 'if (is_jumbo) ios_jumbo_census(')]
 assert order == sorted(order), 'Ex path: reap, cage, generic, grant note, census'

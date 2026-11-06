@@ -222,6 +222,19 @@ final class GamepadInput: @unchecked Sendable {
     private var touchState = TouchGamepadState()
     @MainActor private var observers: [NSObjectProtocol] = []
     @MainActor private var started = false
+    /// madeira-bcd (from Madeira #517, 58c8990 "ml2190"): every 2 s a controller whose extendedGamepad is no longer the
+    /// profile its slot reads gets the live one. The old object can keep reporting buttons with its axes frozen at rest
+    /// (an upstream device log: buttons and triggers reached the game, the sticks never left zero). It acts only on a
+    /// replaced profile object, so a slot whose profile is the live one is not touched. MADEIRA_XINPUT_PROFILE_CHECK = 0
+    /// (env line in bcd.cfg) leaves a slot with the profile its controller had when it joined, as before.
+    static let profileCheck: Bool = flag("MADEIRA_XINPUT_PROFILE_CHECK")
+    @MainActor private var profileTimer: Timer?
+    /// The first few times a slot's profile was replaced (queue-owned), so a controller that hands out a new object at every
+    /// look cannot fill the log.
+    private var profileLogsLeft = [8, 8, 8, 8]
+    /// ml2190: the first 8 times each slot's sticks leave rest, with GameController's raw values (queue-owned; log only).
+    private var stickDiagLeft = [8, 8, 8, 8]
+    private var stickDiagLive = [false, false, false, false]
 
     @MainActor func start() {
         guard !started else { return }
@@ -247,6 +260,59 @@ final class GamepadInput: @unchecked Sendable {
         })
         refreshControllers()
         setActive(UIApplication.shared.applicationState == .active)
+        if Self.profileCheck {
+            profileTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+                MainActor.assumeIsolated { self?.recheckProfiles() }
+            }
+        }
+    }
+
+    /// Slot i reads `profile`; its changes sample at once (queue-owned).
+    private func attach(_ profile: GCExtendedGamepad, slot i: Int) {
+        profiles[i]?.valueChangedHandler = nil
+        profiles[i] = profile
+        profile.valueChangedHandler = { [weak self] _, _ in
+            // Explicit queue hop also serializes callbacks already in flight
+            // when a controller is disconnected or the app resigns active.
+            self?.queue.async { [weak self] in self?.sample() }
+        }
+    }
+
+    /// madeira-bcd (Madeira #517): the 2 s look. Only the profiles are compared; the rest of refreshControllers (the players'
+    /// card, the system gestures, the rumble slots) is not run again, so a tick with nothing replaced costs one
+    /// GCController.controllers() and a hop to the queue.
+    @MainActor private func recheckProfiles() {
+        // Capture the live profiles on main, as refreshControllers does (the slots belong to the queue).
+        let live = GCController.controllers().compactMap { controller -> (GCController, GCExtendedGamepad)? in
+            guard let profile = controller.extendedGamepad else { return nil }
+            return (controller, profile)
+        }
+        queue.async { [self] in replaceStaleProfiles(live) }
+    }
+
+    /// The slots whose controller is live but reads another extendedGamepad object than the live one (pure; tests/host/check-gamepad-profile.py
+    /// compiles this function). A controller with no slot, and a slot whose profile is the live object, are not in the answer.
+    static func staleProfileSlots(controllers: [GCController?], profiles: [GCExtendedGamepad?],
+                                  live: [(GCController, GCExtendedGamepad)]) -> [(slot: Int, profile: GCExtendedGamepad)] {
+        var stale: [(slot: Int, profile: GCExtendedGamepad)] = []
+        for (controller, profile) in live {
+            guard let i = controllers.firstIndex(where: { $0 === controller }), i < profiles.count, profiles[i] !== profile else { continue }
+            stale.append((slot: i, profile: profile))
+        }
+        return stale
+    }
+
+    /// A controller that already has a slot but a different extendedGamepad object than the slot reads: the slot reads the live one. Queue-owned.
+    private func replaceStaleProfiles(_ live: [(GCController, GCExtendedGamepad)]) {
+        guard Self.profileCheck else { return }
+        for (i, profile) in Self.staleProfileSlots(controllers: controllers, profiles: profiles, live: live) {
+            attach(profile, slot: i)
+            if profileLogsLeft[i] > 0 {
+                profileLogsLeft[i] -= 1
+                LogStore.shared.log("[xinput] ml2190 slot=\(i) controller has a new input profile: the slot reads the live one")
+            }
+            sample()
+        }
     }
 
     @MainActor private func refreshControllers() {
@@ -270,20 +336,16 @@ final class GamepadInput: @unchecked Sendable {
                 winios_gamepad_set_vibration(Int32(i), 0, 0)
                 fputs("[xinput] ml1920 slot=\(i) disconnected\n", stderr)
             }
+            replaceStaleProfiles(live)   // madeira-bcd (Madeira #517): a controller that came back with a new profile object
             for (controller, profile) in live {
                 // madeira-bcd (round 604): the slot the player chose for this controller when it is free, else the first free one as always.
                 guard !controllers.contains(where: { $0 === controller }),
                       let i = BCDPlayersLive.slot(forKey: playerKeys[ObjectIdentifier(controller)], occupied: controllers.map { $0 != nil }) else { continue }
                 controllers[i] = controller
-                profiles[i] = profile
                 // A pad joining a slot starts still, before sample() publishes it,
                 // rather than replaying the level the slot had before.
                 winios_gamepad_set_vibration(Int32(i), 0, 0)
-                profile.valueChangedHandler = { [weak self] _, _ in
-                    // Explicit queue hop also serializes callbacks already in flight
-                    // when a controller is disconnected or the app resigns active.
-                    self?.queue.async { [weak self] in self?.sample() }
-                }
+                attach(profile, slot: i)   // madeira-bcd (Madeira #517): the same two lines as before, now shared with the profile check
                 fputs("[xinput] ml1920 slot=\(i) connected\n", stderr)
             }
             // ml2106: the pad in each slot is where that slot's rumble plays
@@ -375,6 +437,17 @@ final class GamepadInput: @unchecked Sendable {
                 state.ly = Self.axis(pad.leftThumbstick.yAxis.value)
                 state.rx = Self.axis(pad.rightThumbstick.xAxis.value)
                 state.ry = Self.axis(pad.rightThumbstick.yAxis.value)
+                if stickDiagLeft[i] > 0 {   // madeira-bcd (Madeira #517 ml2190): the first times a stick leaves rest, raw (log only)
+                    let moved = abs(Int(state.lx)) > 7849 || abs(Int(state.ly)) > 7849
+                        || abs(Int(state.rx)) > 8689 || abs(Int(state.ry)) > 8689
+                    if moved != stickDiagLive[i] {
+                        stickDiagLive[i] = moved
+                        if moved {
+                            stickDiagLeft[i] -= 1
+                            LogStore.shared.log("[xinput] ml2190 app slot=\(i) sticks: left \(pad.leftThumbstick.xAxis.value),\(pad.leftThumbstick.yAxis.value) right \(pad.rightThumbstick.xAxis.value),\(pad.rightThumbstick.yAxis.value)")
+                        }
+                    }
+                }
                 // The library front end navigates with player 1's pad (Library.swift).
                 // While it owns input (no session, or its menu is open) the game
                 // sees a connected pad at rest.

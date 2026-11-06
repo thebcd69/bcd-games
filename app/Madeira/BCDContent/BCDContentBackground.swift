@@ -15,8 +15,9 @@ import UserNotifications
 ///   Info.plist's "$(PRODUCT_BUNDLE_IDENTIFIER).download.*" entry; Steam keeps its own
 ///   ".download.queue" (SteamDownloadBackground), and the queue never runs beside a Steam download,
 ///   so the two never run at once.
-/// - Earlier iOS, or when iOS refuses: the short background grace period, then a clean pause (the
-///   journal keeps every finished chunk) until BCD is active again.
+/// - Earlier iOS, or when iOS refuses: the short background grace period (or, with Settings > Memory & performance >
+///   In the background > Downloads on, BCD keeps itself running for that long: BackgroundRun.swift), then a clean pause
+///   (the journal keeps every finished chunk) until BCD is active again.
 /// - Notifications when a download finishes, fails or pauses while BCD is in the background.
 /// - The same two switches as Steam's downloads (read from SteamDownloadBackground, so a line in
 ///   bcd.cfg governs both): `env.MADEIRA_BACKGROUND_DOWNLOADS = 0`, no continued processing;
@@ -26,7 +27,7 @@ import UserNotifications
     static let shared = BCDContentBackground()
 
     private weak var queue: BCDContentQueue?
-    private var grace: UIBackgroundTaskIdentifier = .invalid
+    private var grace: BackgroundRun.Token?   // BackgroundRun.swift (madeira-bcd: it was an iOS background task of its own)
     private var task: AnyObject?          // BGContinuedProcessingTask (iOS 26+)
     private var waitingForTask = false
     private var registeredIdentifier: String?
@@ -155,8 +156,8 @@ import UserNotifications
     // MARK: Grace period (every iOS)
 
     private func beginGrace() {
-        guard grace == .invalid, task == nil, queueBusy else { return }
-        grace = UIApplication.shared.beginBackgroundTask(withName: "BCD store download") { [weak self] in
+        guard grace == nil, task == nil, queueBusy else { return }
+        grace = BackgroundRun.shared.beginTask("store download") { [weak self] in
             MainActor.assumeIsolated {
                 guard let self else { return }
                 if self.task == nil {
@@ -171,9 +172,9 @@ import UserNotifications
     }
 
     private func endGrace() {
-        guard grace != .invalid else { return }
-        UIApplication.shared.endBackgroundTask(grace)
-        grace = .invalid
+        guard let held = grace else { return }
+        grace = nil
+        BackgroundRun.shared.endTask(held)
     }
 
     // MARK: Notifications

@@ -413,7 +413,8 @@ struct RecommendationsPolicy {
     /// category, which holds the app's own experiments and switches (a remote Metal host, launch
     /// arguments, fault injection); of those, only the two game settings below.
     static let appLevelCategory = "App & front end"
-    static let appLevelGameKeys: Set<String> = ["dxmt", "swap-min-kb"]
+    /// Build 634 (the owner's RDR2 test B2, 2026-11-06): mempool-mb, helper memory, which a game's own file sets like swap-mb.
+    static let appLevelGameKeys: Set<String> = ["dxmt", "swap-min-kb", "mempool-mb"]
 
     /// Environment lines: the names the built-in lists use and auto-tune's known fixes add
     /// (build/tools/autotune_rules.py), nothing else. A new name joins this list in the build
@@ -450,6 +451,7 @@ struct RecommendationsPolicy {
         "MADEIRA_D2R_PROBE_RECOVERY", "MADEIRA_FAULT_LOOP_GUEST_PROGRESS", "MADEIRA_NTDLL_DATA_SYNC_RANGE", "MADEIRA_NTDLL_XSEC", "MADEIRA_SHARED_SECTION_EXEC",   // Diablo II: Resurrected's executable-section switches (build 598; thebcd69/bcd-games#4)
         "MADEIRA_X64_GRAPHICS_ENTRY", "MADEIRA_X64_IMAGE_NOCOPY", "MADEIRA_X64_MACHINE", "SteamDeck", "WINEDEBUG",
         "MADEIRA_FEX_ALIAS_MAX",   // build 624 (agent A S7, Borderlands GOTY Enhanced): FEX's alias table limit, 256 to 1024 (checked below)
+        "MADEIRA_FEX_CALLRET_RESERVE_KB",   // build 631 (round 630 agent R S8, the Rockstar Launcher chain): KB per thread's call-ret region, 64 to 8191 (checked below)
         "MADEIRA_DXGI_COMPOSITION",   // build 624 (agent E2 S2b, Slay the Spire 2): dxgi-src.dll serves a composition swap chain on the game's window; 0 or 1
         "MADEIRA_ZERO_MITIGATION_POLICY",   // build 600 (Glyphica: Typing Survival, ChakraCore's fail-fast over an unwritten policy buffer)
         "MADEIRA_KUSER_KEEP_REGS",   // build 602 (The Adventures of Elliot: registers that only hold a KUSER-looking value stay as the guest set them)
@@ -461,6 +463,9 @@ struct RecommendationsPolicy {
         "MADEIRA_BUFFER_RTV_EMPTY",   // build 620: a render target view on a buffer gets S_OK and no view (DXMT, opt-in; Frostbite 2: Need for Speed: The Run)
         "MADEIRA_PAUSE_IN_BACKGROUND",   // build 623: commits and presents wait while BCD is not active (auto-tune's gpu-work-refused-in-background; F1 2020)
         "MADEIRA_MZ_VIEW_CHECK",   // build 624: a Mono code chunk behind a plain-mapped assembly is not that file's image tail (R.E.P.O., ios_mz_view.h)
+        "MADEIRA_JUMBO_CODE_DUMP",   // build 634: the program's code, registers and stack around the first two reservations of 64 GB or more, as hex (The Last of Us Part I; log only, checked below)
+        "MADEIRA_DONOR_BROWSERS",   // build 634 (read since 632): 0 keeps helper memory for the game, Chromium browsers' memory goes to the swap file (RDR2 rows; checked below)
+        "MADEIRA_BIG_HINT_EXACT",   // build 634: a reservation of 256 GB or more that cannot fit is answered with its own address (The Last of Us Part I; ios_big_hint.h, an experiment, checked below)
         "MADEIRA_KEYED_EVENT_PER_PROCESS",   // build 624 (read since 598): every pseudo-process its own keyed event (Control: RtlRunOnceComplete)
         "MADEIRA_SRV_GETDESC_RESOLVE",   // build 624: an SRV's GetDesc reports the real mip count (Dark Souls III; tools/patch-dxmt-srv-getdesc-mips.py)
         "MADEIRA_FEX_SHA",   // build 624: 0 tells the guest the processor has no SHA extension (Gal*Gun 2, Hello Neighbor: OpenSSL 1.0.2's SHA-NI routine)
@@ -474,6 +479,7 @@ struct RecommendationsPolicy {
         "MADEIRA_USD_OSVERSION",   // build 630 (SHINOBI and the protected family, agent U S10): the shared page's Windows version block as wineboot writes it; 0 or 1 (checked below)
         "MADEIRA_PAD_EARLY_SLOT",   // build 630 (Dokimon Quest, agent T1 S1): player 1 connected from the session start, read from the game's file; 0 or 1 (checked below)
         "MADEIRA_POOL_LAZY_WINDOWS",   // build 630 (RDR2 Social Club, agent T2 S1): helper memory keeps no windows in BCD's address space; 0 or 1 (checked below)
+        "MADEIRA_SC_ALIGN1G",   // build 631 (agent R1 S2, GTA IV MCYQ0H/FM66KY): Social Club's 1 GB on a 4 GB boundary from a held slot; 0 or 1 (checked below)
         "MADEIRA_THREAD_FAULT_ISOLATE",   // build 630 (TEKKEN 7, agent G3 S4): a listed DLL's dying thread ends only itself; 1-4 DLL names (checked below)
         "MADEIRA_REPORT_HZ",   // build 626 (Silksong, agent H S2): Windows programs are told the rate the session holds; 0 or 1 (checked below)
         "MADEIRA_X64_NOCOPY_DATAIMP",   // build 626 (Poppy Playtime, agent A2 S7): a no-copy x64 program's data imports bound live; 0 or 1 (checked below)
@@ -483,6 +489,10 @@ struct RecommendationsPolicy {
         "MADEIRA_MESSAGE_CLASS",   // build 630 (FINAL FANTASY VII's launcher, Discord/agent D S3): the Message window class in every program; 0 or 1 (checked below)
         "MADEIRA_WOW_PLACEHOLDER_SLOTS",   // build 630 (GTA IV through BCD Dock, agent R S4): 32-bit windows reserved at the start; 0, 1 or 2 (checked below)
         "MADEIRA_DOCK_DIRECTX_FIRST",   // build 630 (Dock one-time installs, agent A2 S14): DirectX's setup provided at the first start; 0 or 1 (checked below)
+        "MADEIRA_SWP_LSE2",   // build 632 (Unity Mono games that die of a refused misaligned swap, upstream Madeira ml2190): the swap is completed on LSE2 devices; 0 or 1 (checked below)
+        "MADEIRA_ALIAS_HONOR_PROT",   // build 632 (Stardew Valley and other .NET games, upstream Madeira 0db1b82): executable aliases keep their write protection; 0 or 1 (checked below)
+        "MADEIRA_DIRCACHE",   // build 632 (Wine fork commit 11f6aa3a9; Source-engine rows): case-insensitive lookups answered from cached directory listings, off unless 1; 0 or 1 (checked below)
+        "MADEIRA_D3D9_DIRECT_MAP",   // build 632 (dxmt 880241a, TF2 42.8 -> 83.7 fps upstream): a 64-bit Direct3D 9 game locks its dynamic buffers in place, off unless 1; 0 or 1 (checked below)
     ]
 
     var configKeys: Set<String>
@@ -548,6 +558,16 @@ struct RecommendationsPolicy {
                       names.allSatisfy({ $0.count <= 64 && $0.allSatisfy { $0.isLetter || $0.isNumber || "._-".contains($0) } }) else {
                     throw RecommendationsError.policy("\(path): MADEIRA_DOCK_INSTALL_SKIP names up to eight install programs (letters, digits, . _ -)")
                 }
+            case "MADEIRA_SWP_LSE2":
+                // build 632: signal_arm64_ios.c completes a misaligned SWPAL inside one 16-byte block on an LSE2 device; off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_SWP_LSE2 is 0 or 1")
+                }
+            case "MADEIRA_ALIAS_HONOR_PROT":
+                // build 632: the [wr-strip] heal in signal_arm64_ios.c leaves an executable alias alone, so FEX sees the write; off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_ALIAS_HONOR_PROT is 0 or 1")
+                }
             case "MADEIRA_SRV_POLLOUT_GUARD":
                 // build 626: the wineserver's poll loop withholds POLLOUT for a TCP socket without a peer (fd_ios.c); off unless 1.
                 guard value == "0" || value == "1" else {
@@ -562,6 +582,11 @@ struct RecommendationsPolicy {
                 // build 630: the built-in Message window class in every pseudo-process (class_ios.c); off unless 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_MESSAGE_CLASS is 0 or 1")
+                }
+            case "MADEIRA_D3D9_DIRECT_MAP":
+                // build 632: the 64-bit Direct3D 9 frontend (d3d9-dxmt.dll) locks DEFAULT + DYNAMIC buffers in place (d3d9_buffer.cpp); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_D3D9_DIRECT_MAP is 0 or 1")
                 }
             case "MADEIRA_REPORT_HZ":
                 // build 626: the virtual monitor reports the session's rate (sysparams_ios.c ios_report_hz); off unless 1.
@@ -596,6 +621,11 @@ struct RecommendationsPolicy {
                 // build 630 (agent T2 S1): virtual_ios.c madeira_pool_set_lazy_windows through WineProcessBridge.m; off unless 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_POOL_LAZY_WINDOWS is 0 or 1")
+                }
+            case "MADEIRA_SC_ALIGN1G":
+                // build 631 (agent R1 S2): virtual_ios.c ios_sc2_align1g_key, read with Social Club's layout 2; off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_SC_ALIGN1G is 0 or 1")
                 }
             case "MADEIRA_PAD_EARLY_SLOT":
                 // build 630 (Dokimon Quest): GamepadInput.reserveSessionSlot reads it from the game's own file; off unless 1.
@@ -641,6 +671,11 @@ struct RecommendationsPolicy {
                 // FEX's alias table limit (build 624, tools/patch-fex-ios-alias-capacity.py): a whole number from 256 to 1024.
                 guard let n = Int(value), (256...1024).contains(n), String(n) == value else {
                     throw RecommendationsError.policy("\(path): MADEIRA_FEX_ALIAS_MAX is a whole number from 256 to 1024")
+                }
+            case "MADEIRA_FEX_CALLRET_RESERVE_KB":
+                // Each 64-bit thread's call-ret region (build 631, tools/patch-fex-ios-callret-small.py): a whole number of KB from 64 to 8191.
+                guard let n = Int(value), (64...8191).contains(n), String(n) == value else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_FEX_CALLRET_RESERVE_KB is a whole number from 64 to 8191")
                 }
             case "MADEIRA_STEAM_IDENTITY":
                 // No Steam game identity for this session (build 598, Rockstar's launcher of the Epic GTA V / RDR2): the one value, none.
@@ -754,6 +789,11 @@ struct RecommendationsPolicy {
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_WOW_UNITY_PLAIN is 0 or 1")
                 }
+            case "MADEIRA_DIRCACHE":
+                // build 632: off unless a game's list says 1 (Counter-Strike: Source, No More Room in Hell: their lookups of absent paths).
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_DIRCACHE is 0 or 1")
+                }
             case "MADEIRA_GDI_SHARED_SECTION":
                 // build 626 lists (read since 580): 1 gives a 32-bit program started from a 64-bit one the shared GDI table, 0 keeps it private.
                 guard value == "0" || value == "1" else {
@@ -779,6 +819,24 @@ struct RecommendationsPolicy {
                 // nearest MZ page is handled as anonymous RWX instead of that image's tail (virtual_ios.c, ios_mz_view.h); 0 or 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_MZ_VIEW_CHECK is 0 or 1")
+                }
+            case "MADEIRA_DONOR_BROWSERS":
+                // Build 634 (the owner's RDR2 test B2): 0 gives helper memory to the game alone, Social Club's browser goes to the swap file
+                // (virtual_ios.c, ios_swap_browser_file_only); 0 or 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_DONOR_BROWSERS is 0 or 1")
+                }
+            case "MADEIRA_JUMBO_CODE_DUMP":
+                // Build 634 (The Last of Us Part I): at the first two reservations of 64 GB or more the log gets the code around the caller and
+                // its return address, the saved registers and the stack as hex ([jumbo-code], virtual_ios.c); log only; 0 or 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_JUMBO_CODE_DUMP is 0 or 1")
+                }
+            case "MADEIRA_BIG_HINT_EXACT":
+                // Build 634 (The Last of Us Part I): a reservation of 256 GB or more at a named address whose range ends above the address
+                // space is answered with that address and nothing behind it (virtual_ios.c, ios_big_hint.h); an experiment; 0 or 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_BIG_HINT_EXACT is 0 or 1")
                 }
             case "MADEIRA_ANON_LDADDAL32":
                 // Build 608: default off; only a matching game's auto-tune opts into the runtime code-write workaround.
@@ -867,6 +925,12 @@ struct RecommendationsPolicy {
         } else {
             guard configKeys.contains(key) else {
                 throw RecommendationsError.policy("\(path): \(key) is not a game setting in the settings catalog")
+            }
+            if key == "gl-backend" {
+                // OpenGL (build 632, BCDOpenGL.swift): a list turns the game's OpenGL driver on, never off, and only with one of the two backends it knows.
+                guard value == "zink" || value == "gles" else {
+                    throw RecommendationsError.policy("\(path): \(key) is zink or gles")
+                }
             }
         }
         guard value.count <= 512 else { throw RecommendationsError.policy("\(path): the value is longer than 512 characters") }

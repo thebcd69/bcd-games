@@ -4,13 +4,12 @@
  ],
  "end": {},
  "matched": [
+  "rdr2-reserve-28gb-cap",
   "rdr2-reserve-28gb-totalphys"
  ],
- "next": [
-  "totalphys = 8191"
- ],
- "note": "Red Dead Redemption 2 (Steam, through the Rockstar launcher), build 592, iPad17,4 (M5, 15389 MB reported, 365-day profile with the memory rights): RDR2.exe asks for one MEM_RESERVE of 0x700000000 (28672 MB), [jumbo#90] and [nt-fail] show st=c0000017 (L82877), the game shows its own error box (German, Fehler) and ends on an int3 (exit 0x80000003, L84719). Every RDR2 log of a device that reports 6143 or 7455 MB asked for the 8960 MB the list keeps free and got it. The fix line reports 8191 MB, as the owner's iPhone18,2 does. Tester log P8H75J, scrubbed.",
+ "next": [],
+ "note": "Red Dead Redemption 2 (Steam, through the Rockstar launcher), build 592, iPad17,4 (M5, 15389 MB reported, 365-day profile with the memory rights): RDR2.exe asks for one MEM_RESERVE of 0x700000000 (28672 MB), [jumbo#90] and [nt-fail] show st=c0000017 (L82877), the game shows its own error box (German, Fehler) and ends on an int3 (exit 0x80000003, L84719). Every RDR2 log of a device that reports 6143 or 7455 MB asked for the 8960 MB the list keeps free and got it. The fix line reports 8191 MB, as the owner's iPhone18,2 does. Tester log P8H75J, scrubbed. Round 631: rdr2-reserve-28gb-cap (fixedIn 631, the lists cap the report) speaks first.",
  "outcome": "crashed",
  "stage": 5,
- "status": "trying"
+ "status": "known"
 }

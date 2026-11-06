@@ -65,7 +65,7 @@ extension BCDStore {
             store.games = store.games.map { game in steamApp[game.id].map { withArt(game, steam: $0) } ?? game }
             store.downloads = [
                 BCDDownload(id: "107100", title: "Bastion", store: .steam, doneBytes: 816_000_000, totalBytes: 2_400_000_000,
-                            bytesPerSecond: 23_600_000),
+                            bytesPerSecond: 23_600_000, source: "From DESKTOP-PC on this network · 790 MB so far"),
                 BCDDownload(id: "epic.salt", title: "Salt Harbor", store: .epic, doneBytes: 1_680_000_000, totalBytes: 4_000_000_000,
                             bytesPerSecond: 31_000_000),
                 // A paused and a failed one, so the Downloads tab shows each kind of row's buttons.

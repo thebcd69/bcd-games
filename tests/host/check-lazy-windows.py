@@ -134,6 +134,9 @@ static void *ios_jit_current_peb( void ) { return NULL; }
 int win32u_wow_session; void *ios_win32u_session_peb;
 """ + block + r"""
 static int teardowns;
+/* the image path of the process whose boot thread this is (process_ios.c ios_child_image_path; NULL: a child the table does not know) */
+static const char *next_image; static __thread const char *tl_image;
+const char *ios_child_image_path( void ) { return tl_image; }
 int ios_thread_registry_range_busy( uintptr_t base, uintptr_t size ) { (void)base; (void)size; return 0; }
 int ios_thread_registry_end_dead_range( uintptr_t base, uintptr_t size, void *dead_peb, int *kept ) { (void)base; (void)size; (void)dead_peb; if (kept) *kept = 0; return 0; }   /* wow-reap (build 593), signal_arm64_ios.c */
 /* round 624: the "already have one" line of ios_wow_window_reserve_once names the slot's process state (signal_arm64_ios.c) */
@@ -147,6 +150,7 @@ static pthread_mutex_t gate = PTHREAD_MUTEX_INITIALIZER; static pthread_cond_t c
 static int done, quit;
 static void *proc( void *arg ) {                /* one 32-bit pseudo-process boot thread */
     int release = arg != NULL; ULONG_PTR b;
+    tl_image = next_image;
     last_status = ios_wow_window_reserve();
     b = ios_wow_base();
     if (!last_status) {
@@ -190,6 +194,16 @@ int main( int argc, char **argv ) {
                     (unsigned long long)last_base, mmap_calls - before );
         }
         printf( "teardowns=%d\n", teardowns );
+        return 0;
+    }
+    if (!strcmp( mode, "holdfor" )) {          /* argv[3...]: the image of each 32-bit process in turn ("-": unknown) */
+        int i;
+        for (i = 3; i < argc; i++) {
+            int before = mmap_calls;
+            next_image = strcmp( argv[i], "-" ) ? argv[i] : NULL;
+            run_proc( 0 );
+            printf( "proc%d status=%x base=%llx new_mappings=%d\n", i - 3, (unsigned)last_status, (unsigned long long)last_base, mmap_calls - before );
+        }
         return 0;
     }
     if (!strcmp( mode, "main-i386" )) {
@@ -278,3 +292,44 @@ with tempfile.TemporaryDirectory() as t:
     out, err = run(exe, "bias", BIG)      # no holdback: 0x71 is taken by the first process, 0x72 is the candidate
     assert "bias end=7200000000" in out, out + err
     print("PASS: once armed, top-down furniture is kept below the free candidate slot")
+
+    # Upstream #549 (SC2b), BCD's form: MADEIRA_WOW_HOLD_FOR names the folder whose 32-bit programs alone may adopt the placeholders
+    # MADEIRA_WOW_PLACEHOLDER_SLOTS holds at the session start; a program from elsewhere gets any other free slot.
+    game = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\"
+    steam_service = "C:\\Program Files (x86)\\Common Files\\Steam\\SteamService.exe"
+    game_exe = game + "GTAIV.exe"
+    held = {"MADEIRA_WOW_PLACEHOLDER_SLOTS": "1"}
+    # no folder named: the first 32-bit program takes the held window, whoever it is (today's behaviour, byte for byte)
+    out, err = run(exe, "holdfor", BIG, steam_service, game_exe, env=held)
+    assert re.search(r"proc0 status=0 base=7100000000 new_mappings=0\n", out), out + err   # SteamService.exe adopts the placeholder
+    assert "held for the game's folder" not in err and "held placeholder" not in err, err
+    print("PASS: SLOTS alone, no folder named: the first 32-bit program takes the held window (unchanged)")
+    # the folder named: SteamService.exe is refused the placeholder, takes another slot; the game's program adopts it
+    for extra in ({"MADEIRA_WOW_HOLD_FOR": "c:/program files (x86)/steam/steamapps/common/grand theft auto iv"},
+                  {"MADEIRA_WOW_HOLD_FOR": "\\\\?\\" + game}, {"MADEIRA_WOW_HOLD_FOR_GAME": "1", "MADEIRA_STEAM_HOST_EXPECTED_INSTALL": game[:-1]}):
+        out, err = run(exe, "holdfor", BIG, steam_service, game_exe, env=dict(held, **extra))
+        assert "1 held placeholder reserved for 32-bit programs in c:\\program files (x86)\\steam\\steamapps\\common\\grand theft auto iv\\" in err, err
+        assert "B=0x7100000000 REJECTED: its placeholder is held for the game's folder" in err and "SteamService.exe is outside it" in err, err
+        p0 = re.search(r"proc0 status=0 base=(\w+) new_mappings=(\d)\n", out)
+        p1 = re.search(r"proc1 status=0 base=(\w+) new_mappings=(\d)\n", out)
+        assert p0 and p1 and p0.group(1) != "7100000000" and p0.group(2) == "1", out + err   # the service took a fresh slot
+        assert p1.group(1) == "7100000000" and p1.group(2) == "0", out + err                  # the game's program adopted the held window
+        print("PASS: the held window is for the game's folder (%s): the service was refused it and took another slot" % list(extra)[0])
+    # the same two programs the other way round: the game's own program takes the held window
+    out, err = run(exe, "holdfor", BIG, game_exe, env=dict(held, MADEIRA_WOW_HOLD_FOR=game))
+    assert re.search(r"proc0 status=0 base=7100000000 new_mappings=0\n", out), out + err
+    # a program the process table does not know (no image path) is not refused
+    out, err = run(exe, "holdfor", BIG, "-", env=dict(held, MADEIRA_WOW_HOLD_FOR=game))
+    assert re.search(r"proc0 status=0 base=7100000000 new_mappings=0\n", out), out + err
+    # a folder that is a prefix of a sibling folder is not the game's (trailing backslash): "Grand Theft Auto IV" vs "...IV Extra"
+    out, err = run(exe, "holdfor", BIG, game[:-1] + " Extra\\x.exe", env=dict(held, MADEIRA_WOW_HOLD_FOR=game[:-1]))
+    assert "outside it" in err and not re.search(r"proc0 status=0 base=7100000000", out), out + err
+    # HOLD_FOR_GAME without the Dock's folder, an empty folder, or a 32-bit main image: nothing is held for a folder
+    for env in (dict(held, MADEIRA_WOW_HOLD_FOR_GAME="1"), dict(held, MADEIRA_WOW_HOLD_FOR=""), dict(held, MADEIRA_WOW_HOLD_FOR_GAME="0", MADEIRA_STEAM_HOST_EXPECTED_INSTALL=game)):
+        out, err = run(exe, "holdfor", BIG, steam_service, env=env)
+        assert re.search(r"proc0 status=0 base=7100000000 new_mappings=0\n", out) and "held for the game's folder" not in err, out + err
+    out, err = run(exe, "main-i386", BIG, env=dict(MADEIRA_WOW_HOLD_FOR=game))
+    assert re.search(r"main status=0 base=7100000000 new_mappings=0", out) and "held placeholder" not in err, out + err
+    out, err = run(exe, "holdfor", BIG, steam_service, env={"MADEIRA_WOW_HOLD_FOR": game})   # the key without SLOTS reserves nothing to hold
+    assert "held placeholder" not in err, out + err
+    print("PASS: a program of the game's folder adopts the held window; unknown programs, sibling folders, HOLD_FOR_GAME without a folder, and a 32-bit main image behave as stated")

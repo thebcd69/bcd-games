@@ -266,7 +266,8 @@ enum MadeiraDock {
                 switch fields["ceg-result"].flatMap(Int.init) {
                 case -1: return "Preparing this game's executable took Steam too long. Check your connection, then try again."
                 // Round 630 (agent A1 S14, FRKBN1): Valve's client accepted the request and said it started no job (ceg-request=0); the
-                // old words ("never began") read as a timeout. Auto-tune's dock-ceg-no-job tries env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1 next.
+                // old words ("never began") read as a timeout. Build 632 starts such a game (the Dock reports ceg-already-prepared); this
+                // answer is left for an OK with no job after a request that had to be repeated (the files were not prepared).
                 case 0: return "Steam started no job to prepare this game's executable, so BCD did not start the game. Use Check and repair files in the game's options, then try again; if it keeps happening, export the log."
                 case 10: return "Steam is still busy with this game, updating or running it. Wait a moment, then try again."
                 case -4: return "Steam couldn't prepare this game's executable because the Windows service manager it needs didn't start."
@@ -358,6 +359,8 @@ enum MadeiraDock {
         "session-timeout-subscription-count", "session-timeout-app-listed", "session-timeout-still-online",
         // round 630 (444TS8; tools/patch-dock-licence-wait.py): the licence wait moved after a late sign-in, ms from the logon start
         "session-licence-wait-ms",
+        // round 632 (tools/patch-dock-licence-ask.py): ms from the sign-in to an ownership answer that came before the old fixed 5 s
+        "session-licence-answer-ms",
         "session-online-blip", "session-online-blips", "session-online-lost", "session-entitlement-source",
         "session-offline-abi", "session-offline-requested", "session-offline-can", "session-offline-logon-result",
         "session-offline-logon-retry", "session-offline-logon-state", "session-offline-callback-id",
@@ -368,8 +371,9 @@ enum MadeiraDock {
         "launch-config-wait", "launch-config-gave-up", "launch-session-wait", "launch-session-gave-up",
         "ceg-request", "ceg-request-result", "ceg-request-busy", "ceg-server-result", "ceg-job-result",
         "ceg-finished-jobs", "ceg-result", "ceg-disabled", "ceg-unsupported-client",
-        // round 630 (FRKBN1; tools/patch-dock-ceg-zero-jobs.py): an accepted request with zero jobs went on to the launch (the key's experiment)
-        "ceg-zero-jobs-launch",
+        // round 632 (upstream Madeira #519; tools/patch-dock-ceg-service-start.py, -retry.py, -already-prepared.py): the start of Valve's
+        // client service (0 running, a Win32 error, -1 it stopped again; the 1053 retry), the number of a repeated request, and an OK with no job
+        "ceg-service-start", "ceg-service-start-retry", "ceg-request-retry", "ceg-already-prepared",
         "ceg-scm", "ceg-scm-started", "ceg-scm-error", "ceg-service-registered", "ceg-service-install", "ceg-service-stop", "ceg-scm-stopped",
         "game-scm", "game-scm-timeout", "launch-keep-alive",
         // round 624 (Steam 113; tools/patch-dock-steam-readback.py): the published values read back while the game starts (bits:

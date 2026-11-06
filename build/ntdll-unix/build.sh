@@ -1,4 +1,6 @@
 #!/bin/bash
+# Portions copyright 2026 Jelly-RayTian, meshoklv and Connor Gow: code taken from https://github.com/willfaust/Madeira (pull requests #399, #401 and #462)
+# under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 set -e
 
 BUILD_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -164,6 +166,13 @@ compile_unixlib "$BUILD_DIR/winegstreamer_unixlib_ios.c" "winegstreamer_unixlib"
 # unixlib.h (not winegstreamer's) is the one on the include path.
 compile_unixlib "$BUILD_DIR/winedmo_unixlib_ios.c" "winedmo_unixlib" "winedmo" \
     -I"$WINE_SRC/dlls/winedmo" -I"$FFMPEG_PREFIX/include"
+# madeira-bcd (OpenGL): opengl32's unix side (the wrappers and the generated thunks of wine/dlls/opengl32, as the Wine fork patches them
+# for the winios driver). It dispatches to win32u's WGL layer, whose iOS driver is build/win32u-unix/opengl_ios.c. virtual_ios.c binds
+# these tables only for a session whose game has gl-backend = zink or gles; every other opengl32 keeps the GL-absent stub table.
+compile_unixlib "$WINE_SRC/dlls/opengl32/unix_wgl.c" "opengl32_wgl" "opengl32" \
+    -I"$WINE_SRC/dlls/opengl32"
+compile_unixlib "$WINE_SRC/dlls/opengl32/unix_thunks.c" "opengl32_thunks" "opengl32" \
+    -I"$WINE_SRC/dlls/opengl32"
 # MADEIRA ml1990: the wg_parser's H.264/HEVC (VideoToolbox) and AAC
 # (AudioToolbox) decoders.  Its own translation unit with NO Wine header --
 # CoreFoundation and winnt.h disagree about several names -- so it is compiled
@@ -262,7 +271,7 @@ ar rcs "$OBJ_DIR/libntdll_unix.a" \
     "$OBJ_DIR/nsi_network_ios.o" "$OBJ_DIR/nsi_ndis.o" "$OBJ_DIR/nsi_ip.o" \
     "$OBJ_DIR/gnutls_symtab_ios.o" "$OBJ_DIR/ws2_32_unixlib.o" \
     "$OBJ_DIR/bcrypt_unixlib.o" "$OBJ_DIR/secur32_unixlib.o" "$OBJ_DIR/crypt32_unixlib.o" \
-    "$OBJ_DIR/dwrite_unixlib.o" "$OBJ_DIR/dnsapi_unixlib.o" \
+    "$OBJ_DIR/dwrite_unixlib.o" "$OBJ_DIR/dnsapi_unixlib.o" "$OBJ_DIR/opengl32_wgl.o" "$OBJ_DIR/opengl32_thunks.o" \
     "$OBJ_DIR/winegstreamer_unixlib.o" "$OBJ_DIR/wg_parser_apple_ios.o" "$OBJ_DIR/winedmo_unixlib.o" \
     "$OBJ_DIR/bcd_midi_ios.o" "$OBJ_DIR/bcd_midi_synth_ios.o" \
     "$OBJ_DIR/cdrom.o" "$OBJ_DIR/debug.o" "$OBJ_DIR/env.o" "$OBJ_DIR/file.o" \

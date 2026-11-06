@@ -65,6 +65,8 @@ import UniformTypeIdentifiers
             }
             // An installed Epic game is the library entry its install made (BCDLiveStoreEpic).
             if let id = BCDLiveStore.shared.epicEntryID(game.id) { return library.entries.first { $0.id == id } }
+            // An installed itch.io game, and one of the experimental EA store, is the library entry its install made (BCDLiveStoreItch, BCDLiveStoreEA).
+            if let id = BCDLiveStore.shared.itchEntryID(game.id) ?? BCDLiveStore.shared.eaEntryID(game.id) { return library.entries.first { $0.id == id } }
             guard game.store == .local else { return nil }
             return library.entries.first { $0.desktop != true && $0.steamAppID == nil && $0.title == game.title }
         }
@@ -79,7 +81,7 @@ import UniformTypeIdentifiers
 
     /// A line of the game's own file, written only when it changes; an entry the library does not
     /// hold yet (a Steam game's first settings, the desktop's) is saved with it.
-    private func setLine(_ game: BCDGame, _ key: String, _ value: String) {
+    func setLine(_ game: BCDGame, _ key: String, _ value: String) {
         guard let entry = entry(for: game) else { return }
         let file = GameProfile(windowsPath: entry.windowsPath)
         if (file.get(key) ?? "") != value { file.set(key, value.isEmpty ? nil : value) }
@@ -106,13 +108,20 @@ import UniformTypeIdentifiers
         let advice = BCDLiveStore.shared.epicInstallAdvice(game.id)
         d.installBlocker = advice.blocker
         d.installWarning = advice.warning
+        // The same for an itch.io game (the upload it would install) and an EA game (no PC download, anti-cheat).
+        let others = [BCDLiveStore.shared.itchInstallAdvice(game.id), BCDLiveStore.shared.eaInstallAdvice(game.id)]
+        if d.installBlocker == nil { d.installBlocker = others.compactMap(\.blocker).first }
+        if d.installWarning == nil { d.installWarning = others.compactMap(\.warning).first }
         // A Steam game before its install: what Steam says it downloads and takes (the selected depots), and its language.
         if let id, !game.state.isInstalled, let owned = steam.game(id) {
             d.downloadBytes = owned.downloadBytes.map { Int64(clamping: $0) }
             d.installBytes = owned.installBytes.map { Int64(clamping: $0) }
             if steam.downloads[id] == nil {
                 d.offersDownloadOptions = true
-                if settings { d.groups = [downloadGroup(id, owned)] }
+                if settings {
+                    d.groups = [downloadGroup(id, owned)]
+                    if let version = versionGroup(game) { d.groups.append(version) }   // the game's version (BCDSteamBranches/BCDGamePageLiveVersion.swift): only for a game Steam lists a beta for
+                }
             }
         }
         guard game.state.isInstalled, let entry = entry(for: game) else { return d }
@@ -126,6 +135,7 @@ import UniformTypeIdentifiers
         d.readiness = BCDReadinessLive.shared.note(for: entry) { [weak self] in self?.onChange?() }   // round 604: what the game's programs import that this device lacks
         // GOG's runtimes the game's build names that BCD does not install yet.
         d.storeNote = BCDLiveStore.shared.gogNote(game.id) ?? BCDLiveStore.shared.epicNote(game.id)
+            ?? BCDLiveStore.shared.itchNote(game.id) ?? BCDLiveStore.shared.eaNote(game.id)
         // The sections only while Options is open: nothing is built for what is not on screen.
         if settings {
             d.groups = [display(entry, profile), direct3D(entry, profile), compatibility(entry), controls(entry, profile), gyro(entry)]
@@ -135,11 +145,14 @@ import UniformTypeIdentifiers
             if let launch = launch(entry) { d.groups.append(launch) }
             if let id { d.groups.append(steamGroup(entry, id)) }
             if let dlc = dlcGroup(game) { d.groups.append(dlc) }
+            if let version = versionGroup(game) { d.groups.append(version) }   // the game's version (BCDSteamBranches/BCDGamePageLiveVersion.swift): only for a game Steam lists a beta for
             if !desktop { d.groups.append(midiGroup(entry)) }   // round 603: BCDMidi/BCDGamePageLiveMidi.swift
             if !desktop, let sound = d.groups.lastIndex(where: { $0.id == "sound" }) { d.groups[sound].settings += soundSettings(entry) }   // round 604: BCDGamePageLiveSound.swift (audio delay, volume, resume)
             if !desktop { d.groups.append(saveBackupsGroup(game, entry)) }   // round 603: BCDSaveBackups/BCDGamePageLiveSaves.swift
             if !desktop { d.groups.append(helpGroup(game, entry)) }   // round 604: BCDGamePageLiveHelp.swift (debug run, game feedback, launch check)
             if !desktop { d.groups.append(libraryGroup(entry, gog: game.store == .gog || game.store == .epic)) }
+            // An itch.io or EA game's name and pictures are the store's too: its Library group is GOG's and Epic's (no Name or Find on Steam row).
+            if !desktop, game.store == .itch || game.store == .ea, let at = d.groups.lastIndex(where: { $0.id == "library" }) { d.groups[at] = libraryGroup(entry, gog: true) }
         }
         if let id {
             let installed = SteamGamesModel.shared.games.first { $0.id == id }
@@ -152,6 +165,17 @@ import UniformTypeIdentifiers
         } else if game.store == .gog || game.store == .epic {
             // Uninstall deletes a GOG or Epic game's files through the store (BCDLiveStoreGOG, BCDLiveStoreEpic).
             d.removal = .uninstall(frees: entry.folderBytes ?? game.size)
+            if game.store == .gog {
+                // Build 632: Repair (every installed file compared with the build) and Update's download, which Stop only stops.
+                d.updating = BCDLiveStore.shared.gogUpdating(game.id)
+                d.canRepair = BCDGOG.enabled && BCDGOG.shared.signedIn && !d.updating
+            }
+            storeCloudDetails(game, entry, into: &d)   // build 632: another store's cloud saves (off until the player turns them on)
+        } else if game.store == .itch || game.store == .ea {
+            // The same for an itch.io or EA game (BCDLiveStoreItch, BCDLiveStoreEA). The EA store checks every installed file against EA's
+            // current build (Check files); GOG's Repair is above (build 632), Epic and itch.io have no such check.
+            d.removal = .uninstall(frees: entry.folderBytes ?? game.size)
+            if game.store == .ea { d.canRepair = BCDLiveStore.shared.eaCanRepair(game.id) }
         } else if !desktop {
             d.removal = .removeFromLibrary
         }
@@ -307,6 +331,9 @@ import UniformTypeIdentifiers
             Self.line("fence-chain", "Direct3D 12 GPU sync", profile,
                       Self.named(GameProfile.gpuSyncChoices, ["": "One pass after another", "6": "Where barriers allow"]),
                       note: "Where barriers allow lets the GPU run passes side by side wherever the game's barriers permit; one after another is the safe default."),
+            // OpenGL (docs/OPENGL.md): BCD's own OpenGL driver, per game and off until it is chosen here (or a recommended list or auto-tune turns it on).
+            Self.line(BCDOpenGL.key, "OpenGL", profile, BCDOpenGL.choices,
+                      note: BCDOpenGL.pageNote),
             Self.toggle("nvidia", "Show the game an NVIDIA card", LibraryPrefs.nvidia(entry.windowsPath),
                         note: "For games that stop with \"no graphics card\" or \"failed to get GPU driver info\": Windows then reports an NVIDIA card and driver."),
             // madeira-bcd (2026-10-25, round 603): the same, for any maker (BCDGPUCards.swift), and the video memory a game is told it has.
@@ -665,6 +692,17 @@ import UniformTypeIdentifiers
                                                note: "Adds the game's \(SteamLanguage.name(wanted)) content and tells Steam to start it in that language. The files of the current language stay."))
             }
         }
+        // Steam Workshop (BCDWorkshopView.swift, BCDSteamWorkshop/): a row for an installed game Steam has not said has no Workshop. It opens the
+        // page; nothing is asked of Steam, subscribed to or downloaded until the page is open and a button is pressed.
+        if SteamOwnedLibrary.workshopEnabled, steam.signedIn, SteamGamesModel.shared.games.contains(where: { $0.id == appID && $0.installed }) {
+            let items = SteamWorkshopModel.shared.records[UInt32(clamping: appID)]?.installed.count ?? 0
+            if steam.game(appID)?.workshop != false || items > 0 {
+                let shown = items == 0 ? "" : BCDWorkshop.installedCount(items)
+                settings.append(BCDGameSetting(id: "workshop", title: "Steam Workshop", kind: .opens(.workshop),
+                                               value: shown, defaultValue: shown,
+                                               note: "Items for this game from Steam's Workshop. Opening it asks Steam for the items your account subscribes to; nothing is subscribed to or downloaded until you press it."))
+            }
+        }
         settings.append(BCDGameSetting(id: "appid", title: "App ID", kind: .info, value: String(appID)))
         let free = (try? URL.documentsDirectory.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
             .volumeAvailableCapacityForImportantUsage
@@ -818,8 +856,12 @@ import UniformTypeIdentifiers
     /// yet compared with Steam Cloud in this run is, and "The game's own program" finds its program.
     func opened(_ game: BCDGame) {
         dlcOpened(game)
+        versionOpened(game)
+        BCDLiveStore.shared.itchOpened(game.id)
+        BCDLiveStore.shared.eaOpened(game.id)
         BCDLiveStore.shared.epicOpened(game.id)
         guard game.state.isInstalled else { return }
+        BCDLiveStore.shared.gogOpened(game.id)   // build 632: a look for an update of an installed GOG game (once in six hours)
         if var entry = entry(for: game) {
             var changed = moveOldFields(&entry)
             let isNew = !LibraryModel.shared.entries.contains { $0.id == entry.id }
@@ -906,10 +948,12 @@ import UniformTypeIdentifiers
         if helpSet(setting, to: value, for: game) { return }   // round 604: the "Help with this game" section's rows (BCDGamePageLiveHelp.swift)
         if soundSet(setting, to: value, for: game) { return }   // round 604: the Sound section's audio delay, volume and resume rows (BCDGamePageLiveSound.swift)
         if dlcSet(setting, to: value, for: game) { return }
+        if versionSet(setting, to: value, for: game) { return }   // the Version section's rows (BCDSteamBranches/BCDGamePageLiveVersion.swift)
         if saveBackupsSet(setting, to: value, for: game) { return }   // round 603: the "Save backups" section's rows
         if midiSet(setting, to: value, for: game) { return }   // round 603: the Sound section's MIDI music row
         if inputSet(setting, to: value, for: game) { return }   // round 604: BCDInputPage.swift's rows (turbo and macros, ...)
         if setupSet(setting, to: value, for: game) { return }   // round 604: the setup sections' rows (BCDGameSetup/BCDGamePageLiveSetup.swift)
+        if storeCloudSet(setting, to: value, for: game) { return }   // build 632: a store's cloud saves on or off (the game's own config line)
         let on = value == "1"
         switch setting {
         case "resolution": change(game) { $0.resolution = value }
@@ -921,6 +965,9 @@ import UniformTypeIdentifiers
             guard value.isEmpty || BCDOrientationChoice(rawValue: value) != nil else { return }
             change(game) { $0.orientationLock = value.isEmpty ? nil : value }
         case "metalfx-upscale", "dxil-tess-max-factor", "async-submit", "fence-chain", GamepadInput.padModeKey, BCDGPUCards.key, BCDGPUCards.memoryKey:
+            setLine(game, setting, value)
+        case BCDOpenGL.key:
+            // OpenGL (docs/OPENGL.md): a plain line in the game's own file, like the Direct3D choices above.
             setLine(game, setting, value)
         case "framegen":
             if #available(iOS 26.0, *) {
@@ -970,7 +1017,7 @@ import UniformTypeIdentifiers
             let folder = value.trimmingCharacters(in: .whitespaces)
             change(game) { $0.workingDirectory = folder.isEmpty ? nil : folder }
         case "services": change(game) { $0.startServices = on ? true : nil }
-        case "arguments": change(game) { $0.arguments = value }
+        case "arguments": change(game) { $0.arguments = LaunchArgumentText.plain(value) }   // round 632: Smart Punctuation's dashes and quotes put back
         case let flag where flag.hasPrefix("flag-"):
             let word = String(flag.dropFirst(4))
             change(game) { entry in
@@ -1057,11 +1104,13 @@ import UniformTypeIdentifiers
     }
 
     func syncCloud(_ game: BCDGame) {
+        if storeCloudSync(game) { return }   // build 632: another store's cloud saves (off until turned on)
         guard let id = appID(game) else { return }
         Task { await SteamOwnedLibrary.shared.syncCloud(id) }
     }
 
     func keepCloudSaves(_ game: BCDGame, fromCloud: Bool) {
+        if storeCloudKeep(game, fromCloud: fromCloud) { return }
         guard let id = appID(game) else { return }
         Task { await SteamOwnedLibrary.shared.resolveCloud(id, useCloud: fromCloud) }
     }
@@ -1305,7 +1354,11 @@ import UniformTypeIdentifiers
             lists.$version.dropFirst().map { _ in () }.eraseToAnyPublisher(),
             lists.$lastChecked.dropFirst().map { _ in () }.eraseToAnyPublisher(),
             dlcChanges,
+            versionChanges,
             BCDLiveStore.shared.epicDetailChanges,
+            storeCloudChanges,   // build 632: a sync of another store's cloud saves moved on
+            BCDLiveStore.shared.itchDetailChanges,
+            BCDLiveStore.shared.eaDetailChanges,
         ]
         Publishers.MergeMany(changes)
             .debounce(for: .milliseconds(250), scheduler: RunLoop.main)

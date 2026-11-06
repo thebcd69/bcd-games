@@ -799,11 +799,13 @@ struct AutoTuneEngineChecks {
                    "only the two window rules carry the failure mark, both with listUpgrade")
 
             // (c) A failure no setting changes: the retry is not spent, and the advice does not promise a build.
-            let ceg = "dock-ceg-result-55", mina = "metal-texture-double-release"
+            // Round 632: the CEG result 55 rule is fixedIn 632 now (the Dock starts Valve's service first and asks again), so the noFix example is
+            // another Dock rule: a start whose first online start found no install folder (a failure no BCD build is known to change).
+            let ceg = "dock-offline-fallback-no-install-dir", mina = "metal-texture-double-release"
             var c = AutoTuneEngine.advance(AutoTuneState(), report: report("exited-early", stage: 2, matched: [ceg], dock: true), rules: rules,
                                            userKeys: [], fingerprint: "c1", log: nil)
             expect(c.status == "known" && c.known == ceg && c.knownNoFix == true && c.knownFixedIn == nil && c.candidate == nil && !c.retried && c.tried.isEmpty,
-                   "CEG result 55: known at once, no retry")
+                   "a Dock failure no build is known to change: known at once, no retry")
             expect(c.knownLead == "No setting changes this" && c.knownAdvice.hasPrefix("No setting changes this: ")
                    && !c.knownAdvice.contains("Fixed in build") && !c.knownAdvice.contains("update BCD") && !c.knownAdvice.contains("A crash in BCD"),
                    "its advice names no build and no crash of BCD's (\(c.knownAdvice))")
@@ -811,7 +813,16 @@ struct AutoTuneEngineChecks {
                                        userKeys: [], fingerprint: "c2", log: nil)
             expect(c.status == "known" && c.known == mina && c.candidate == nil, "Mina the Hollower: the open release bug wins over the swap rule")
             expect(rules.first { $0.id == ceg }?.session == "dock" && rules.first { $0.id == ceg }?.lines == [] && rules.first { $0.id == mina }?.priority == 2,
-                   "the CEG rule is a Dock rule; the release rule runs before every swap rule")
+                   "that rule is a Dock rule; the release rule runs before every swap rule")
+            // Round 632: Steam's CEG result 55 and "nothing to prepare" are fixed in code (the Dock patches of build 632): known at once, no retry,
+            // the advice names the build.
+            for cegFixed in ["dock-ceg-result-55", "dock-ceg-no-job"] {
+                let f = AutoTuneEngine.advance(AutoTuneState(), report: report("exited-early", stage: 2, matched: [cegFixed], dock: true), rules: rules,
+                                               userKeys: [], fingerprint: "c632", log: nil)
+                expect(f.status == "known" && f.known == cegFixed && f.knownFixedIn == 632 && f.knownNoFix != true && f.candidate == nil && !f.retried && f.tried.isEmpty
+                       && f.knownAdvice.contains("Fixed in build 632"), "\(cegFixed): known at once, no retry, fixed in build 632 (\(f.knownAdvice))")
+                expect(rules.first { $0.id == cegFixed }?.session == "dock" && rules.first { $0.id == cegFixed }?.lines == [], "\(cegFixed) is a Dock rule with no line")
+            }
             let oldKnown = AutoTuneEngine.advance(AutoTuneState(), report: report("crashed", stage: 2, matched: ["metal-layer-format"]), rules: rules,
                                                   userKeys: [], fingerprint: "c3", log: nil)
             expect(oldKnown.knownNoFix == nil && oldKnown.knownLead == "A crash in BCD itself, not a setting" && oldKnown.knownAdvice.contains("Fixed in build 560"),
@@ -820,11 +831,11 @@ struct AutoTuneEngineChecks {
                 expect(back == c && back.knownNoFix == true, "a noFix state round-trips through JSON")
             } else { expect(false, "the noFix state encodes") }
             let cegLines = "[dock-launch] app 42700\n[dock-report] ceg-job-result=55\n[dock-report] ceg-result=55\n[dock-report] launch-host-result=49\n[dock-report] probe-result=49\n"
-            expect(!session(head + cegLines + exitLine("0xc0000135")).matched.contains(ceg),
+            expect(!session(head + cegLines + exitLine("0xc0000135")).matched.contains("dock-ceg-result-55"),
                    "a build 579 log of the same failure (the session never ended itself) keeps the fixedIn rule's words")
-            expect(session(head + cegLines + "[dock-game-end] the host reported the launch failed (code 49) and no game process runs\n" + exitLine("0xc0000135")).matched.contains(ceg),
+            expect(session(head + cegLines + "[dock-game-end] the host reported the launch failed (code 49) and no game process runs\n" + exitLine("0xc0000135")).matched.contains("dock-ceg-result-55"),
                    "from build 580, which ends the session, the CEG rule matches")
-            expect(!session(head + cegLines.replacingOccurrences(of: "ceg-result=55", with: "ceg-result=0") + "[dock-game-end] x\n" + exitLine("0xc0000135")).matched.contains(ceg),
+            expect(!session(head + cegLines.replacingOccurrences(of: "ceg-result=55", with: "ceg-result=0") + "[dock-game-end] x\n" + exitLine("0xc0000135")).matched.contains("dock-ceg-result-55"),
                    "another CEG result is not this rule")
             let overrideOff = AutoTuneRules.load(builtIn: AutoTuneBuiltInRules.json, override: nil)
             expect(overrideOff.contains { $0.id == ceg } && overrideOff.contains { $0.id == mina }, "noFix rules with no lines stay in the table")

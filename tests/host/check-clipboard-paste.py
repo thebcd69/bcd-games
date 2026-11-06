@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 alantangok. This file was taken from https://github.com/willfaust/Madeira (commits abca30a, 9806664, 91e1e57 and facd2cc)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """Compile the production paste planner, bounded queue and Unicode driver on a host."""
 from pathlib import Path
 import os

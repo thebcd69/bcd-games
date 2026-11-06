@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
+# Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (commit 8deb759)
+# under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 """Helper memory (bcd.cfg mempool-mb, the ml1150 pool in virtual_ios.c) reaches more of a game's memory (madeira-bcd, 2026-10-29).
 
 The pool maps guest data from memory entries the MadeiraMemoryHost extension created and left behind when it exited: memory owned
@@ -154,6 +156,8 @@ static void *anon_mmap_fixed( void *a, size_t l, int prot, int flags )
 harness = r'''
 static unsigned long long ios_swap_footprint_mb( void ) { return 4321; }
 static void ios_swap_cfg( int *mode, int *min_mb ) { *mode = 2; *min_mb = 0; }
+static int browser_now;   /* defined after the core in virtual_ios.c: 1 when the calling process is SocialClubHelper.exe or steamwebhelper.exe */
+static int ios_avail_phys_chromium( void ) { return browser_now; }
 static unsigned long long ios_swap_disk_used( void )
 {
     struct stat st;
@@ -369,6 +373,58 @@ static int main_lazy( void )
     return bad != 0;
 }
 
+/* Upstream Madeira v0.2.0 (#516, SC3b): env.MADEIRA_DONOR_BROWSERS = 0 keeps a Chromium browser's ranges off helper memory. The run is
+ * the round 625 core (MADEIRA_POOL_MORE unset, as main_off) with the key as the parent set it. */
+static int main_browsers( int key_off )
+{
+    char path[] = "/tmp/madeira-helpermem-browsers-XXXXXX";
+    struct file_view v = { 0, 0, 0 }, v2 = { 0, 0, 0 }, v3 = { 0, 0, 0 };
+    char *r, *r2, *r3;
+    int i, fd = mkstemp( path );
+    if (fd < 0) return 2;
+    close( fd );
+    setenv( "MADEIRA_SWAP_FILE", path, 1 );
+    setenv( "MADEIRA_SWAP_MB", "64", 1 );
+    setenv( "MADEIRA_SWAP_COVERAGE", "broad", 1 );
+    setenv( "MADEIRA_POOL_MARGIN_MB", "0", 1 );
+    unsetenv( "MADEIRA_POOL_MORE" ); unsetenv( "MADEIRA_POOL_MIN_KB" ); unsetenv( "MADEIRA_POOL_FEX" );
+    ios_swap_init();
+    if (ios_swap_fd < 0 || !ios_swap_broad) { printf( "FAIL: the tier did not start in broad\n" ); return 1; }
+    unlink( path );
+    for (i = 0; i < NREG; i++)
+    {
+        memory_object_size_t size = REGION;
+        mach_port_t entry = MACH_PORT_NULL;
+        vm_prot_t flags = VM_PROT_READ | VM_PROT_WRITE | MAP_MEM_NAMED_CREATE;
+#ifdef MAP_MEM_LEDGER_TAGGED
+        flags |= MAP_MEM_LEDGER_TAGGED;
+#endif
+        if (mach_make_memory_entry_64( mach_task_self(), &size, 0, flags, &entry, MACH_PORT_NULL ) != KERN_SUCCESS)
+        { printf( "FAIL: mach_make_memory_entry_64\n" ); return 2; }
+        CHECK( madeira_pool_add( entry, REGION ) == 0, "a region is registered" );
+    }
+    /* a browser's 24 MB reservation: the file with the key at 0, the pool otherwise */
+    r = region( 0x7160000000ULL, 24 * MB ); v.base = r; v.size = 24 * MB;
+    browser_now = 1;
+    CHECK( ios_swap_whole_resv( &v, VPROT_READ | VPROT_WRITE ) == 1 && ext_of( r ) >= 0, "a browser's reservation is backed" );
+    if (key_off)
+        CHECK( !is_pool( r ) && ios_pool_takes == 0 && ios_pool_bytes == 0, "MADEIRA_DONOR_BROWSERS=0: the browser's range is on the file, the pool untouched" );
+    else
+        CHECK( is_pool( r ) && ios_pool_takes == 1, "key unset: the browser's range takes the pool, as before" );
+    /* another process (the game): always the pool */
+    r2 = region( 0x7168000000ULL, 24 * MB ); v2.base = r2; v2.size = 24 * MB;
+    browser_now = 0;
+    CHECK( ios_swap_whole_resv( &v2, VPROT_READ | VPROT_WRITE ) == 1 && is_pool( r2 ), "the game's reservation takes the pool in both cases" );
+    CHECK( ios_pool_takes == (key_off ? 1u : 2u), "pool takes as expected" );
+    /* a browser's commit-time range (a heap block inside a reservation made while the key was off for it) follows the same rule */
+    r3 = region( 0x7170000000ULL, 8 * MB ); v3.base = r3; v3.size = 8 * MB;
+    browser_now = 1;
+    CHECK( ios_swap_whole_resv( &v3, VPROT_READ | VPROT_WRITE ) == 1, "a second browser reservation is backed" );
+    CHECK( is_pool( r3 ) == !key_off, "... on the pool unless the key is 0" );
+    printf( "%d failures\n", bad );
+    return bad != 0;
+}
+
 int main( int argc, char **argv )
 {
     char path[] = "/tmp/madeira-helpermem-XXXXXX";
@@ -378,6 +434,7 @@ int main( int argc, char **argv )
     unsigned long long refused;
     int i, fd;
     if (argc > 1 && !strcmp( argv[1], "off" )) return main_off();
+    if (argc > 1 && !strcmp( argv[1], "browsers" )) return main_browsers( argc > 2 && !strcmp( argv[2], "key0" ) );
     if (argc > 1 && !strcmp( argv[1], "lazy" )) return main_lazy();
     fd = mkstemp( path );
     if (fd < 0) return 2;
@@ -647,6 +704,14 @@ else:
                   'lazy windows: %d checks' % lz.stdout.count('ok: ') + ('' if not lfails else ':\n' + '\n'.join(lfails)))
             check('no windows kept (MADEIRA_POOL_LAZY_WINDOWS): a range is mapped only while it is zeroed' in lz.stderr,
                   'lazy windows: the first region says so in its line')
+            # upstream #516 (SC3b): env.MADEIRA_DONOR_BROWSERS, one process each (the key is read once)
+            import os
+            benv = {k: v for k, v in os.environ.items() if not k.startswith('MADEIRA_')}
+            for label, extra, key0 in (('unset', {}, False), ('0', {'MADEIRA_DONOR_BROWSERS': '0'}, True), ('1', {'MADEIRA_DONOR_BROWSERS': '1'}, False)):
+                br = subprocess.run([str(exe), 'browsers'] + (['key0'] if key0 else []), capture_output=True, text=True, env=dict(benv, **extra))
+                bfails = [l for l in br.stdout.splitlines() if l.startswith('FAIL')]
+                check(br.returncode == 0 and not bfails and br.stdout.count('ok: ') >= 8,
+                      'MADEIRA_DONOR_BROWSERS=%s: %d checks%s' % (label, br.stdout.count('ok: '), '' if not bfails else ':\n' + '\n'.join(bfails)))
             r = subprocess.run([str(exe)], capture_output=True, text=True)
             fails = [l for l in r.stdout.splitlines() if l.startswith('FAIL')]
             check(r.returncode == 0 and not fails, 'runtime: %d checks' % r.stdout.count('ok: ') + ('' if not fails else ':\n' + '\n'.join(fails)))

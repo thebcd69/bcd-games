@@ -125,8 +125,13 @@ enum BCDEpicRules {
     /// madeira-bcd (round 624, agent R S24; 7Z8VKR, TV6H06): Epic's GTA V (both editions) starts Rockstar's launcher, which installs and starts
     /// a Windows service (RockstarService.exe); without the service manager every start failed ("Unable to open SC manager! (1722)" five times,
     /// "RockstarService.exe install/start" exit 1). The Dock does the same for the Steam copies (env.MADEIRA_DOCK_GAME_SCM).
-    static func startsRockstarLauncher(_ exceptionID: String?) -> Bool {
-        exceptionID == "gta5-enhanced" || exceptionID == "gta5-legacy"
+    /// Round 631 (agent R3 S6; 6XG0C2): Epic's Red Dead Redemption 2 starts the same launcher and service, but its build has no anti-cheat
+    /// exception to name it, so its launch program does (the programs the list's rdr2-other row matches).
+    static let rockstarLauncherPrograms: Set<String> = ["playrdr2.exe", "rdr2.exe", "rdr2launcher.exe"]
+    static func startsRockstarLauncher(_ exceptionID: String?, program: String = "") -> Bool {
+        if exceptionID == "gta5-enhanced" || exceptionID == "gta5-legacy" { return true }
+        let name = program.replacingOccurrences(of: "\\", with: "/").split(separator: "/").last.map { String($0).lowercased() } ?? ""
+        return rockstarLauncherPrograms.contains(name)
     }
 
     static let gtaReason = "This game's anti-cheat (BattlEye) guards only GTA Online. BCD starts the game with its own -nobattleye option, so Story Mode plays and GTA Online stays off."

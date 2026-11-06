@@ -56,6 +56,15 @@ struct BCDMemoryStatus: Hashable {
     func set(_ key: BCDMemoryKey, _ value: String)
     var eco: Bool { get }
     func setEco(_ on: Bool)
+    /// In the background (BackgroundRun.swift): minutes a running game, and a download, keep going after BCD leaves the screen. "" is off, the
+    /// default: iOS pauses them within seconds, as it always did. The effect starts the next time BCD is left, so it never asks for a restart.
+    var backgroundGame: String { get }
+    func setBackgroundGame(_ minutes: String)
+    var backgroundDownload: String { get }
+    func setBackgroundDownload(_ minutes: String)
+    /// Whether the game's sound plays meanwhile (muted unless this is on).
+    var backgroundSound: Bool { get }
+    func setBackgroundSound(_ on: Bool)
     /// A switch changed this run: it applies from BCD's next start.
     var restartNeeded: Bool { get }
     var extensionTestAvailable: Bool { get }
@@ -63,6 +72,25 @@ struct BCDMemoryStatus: Hashable {
     var extensionTestLine: String? { get }
     func runExtensionTest()
     func refresh()
+}
+
+/// The minutes Memory & performance's In the background rows offer ("" is off, the engine's own default). Outside the generic view: Swift
+/// keeps no stored statics in a generic type.
+enum BCDBackgroundRows {
+    static let gameSteps = ["5", "10", "20", "30"]
+    static let downloadSteps = ["30", "60", "120"]
+
+    static func choices(current: String, steps: [String]) -> [BCDSettingsChoice] {
+        var list = [BCDSettingsChoice(value: "", label: "Off")] + steps.map { BCDSettingsChoice(value: $0, label: label($0)) }
+        if !current.isEmpty, !steps.contains(current) { list.append(BCDSettingsChoice(value: current, label: label(current))) }   // a value set by hand stays reachable
+        return list
+    }
+
+    static func label(_ minutes: String) -> String {
+        guard let m = Int(minutes) else { return minutes }
+        if m >= 60, m % 60 == 0 { return m == 60 ? "1 hour" : "\(m / 60) hours" }
+        return "\(m) min"
+    }
 }
 
 struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
@@ -117,6 +145,20 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                                          isOn: backend.eco) { backend.setEco($0) }
                 }
                 if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
+            }
+            BCDSettingsGroup(title: "In the background",
+                             footer: "Off, BCD behaves as it always has: iOS pauses a game and a download within seconds of leaving BCD. On, BCD stays running with a silent audio session, so the phone may run warmer and use more battery meanwhile; it holds its own CPU use down so iOS does not end it, and a game loads slower than in front. iOS can still close BCD in the background when another app needs the memory.") {
+                BCDSettingsValueRow(id: BCDSettingsID.control(.memory, "background-game"), title: "Keep a game running",
+                                    note: "When you switch apps or lock the screen, a running game keeps loading for this long instead of being paused. It draws nothing until you are back, and its sound is muted. Then it pauses, and a notification says so if you allowed them. Applies the next time you leave BCD.",
+                                    choices: BCDBackgroundRows.choices(current: backend.backgroundGame, steps: BCDBackgroundRows.gameSteps),
+                                    value: backend.backgroundGame) { backend.setBackgroundGame($0) }
+                BCDSettingsValueRow(id: BCDSettingsID.control(.memory, "background-download"), title: "Keep downloads running",
+                                    note: "A Steam, Epic, GOG, EA or itch.io download goes on for this long after you leave BCD, where iOS would otherwise stop it. iOS 26 and later often keeps a download going by itself.",
+                                    choices: BCDBackgroundRows.choices(current: backend.backgroundDownload, steps: BCDBackgroundRows.downloadSteps),
+                                    value: backend.backgroundDownload) { backend.setBackgroundDownload($0) }
+                BCDSettingsToggleRow(id: BCDSettingsID.control(.memory, "background-sound"), title: "Hear the game meanwhile",
+                                     note: "Off: the game's sound is muted while BCD is in the background, and other apps' audio plays normally. On: you keep hearing the game.",
+                                     isOn: backend.backgroundSound, enabled: backend.backgroundGame != "") { backend.setBackgroundSound($0) }
             }
             if backend.extensionTestAvailable {
                 BCDSettingsGroup(title: "Experiments") {
@@ -261,6 +303,10 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                 BCDSettingsGroup(title: "Foldable iPhone") { BCDFoldableSettingsRow() }
             }
             if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
+            // OpenGL is a game's choice (its page, Options, Direct3D): this says so, once, where graphics are chosen for every game.
+            BCDSettingsGroup(title: "OpenGL") {
+                BCDSettingsInfoRow(title: BCDOpenGL.settingsTitle, note: BCDOpenGL.settingsNote, value: BCDOpenGL.settingsValue)
+            }
             BCDSettingsGroup {
                 BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "more"), title: "More graphics options",
                                      note: "Direct3D, DXMT and MetalFX in All settings.", symbol: "slider.horizontal.3") {

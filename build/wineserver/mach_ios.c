@@ -1,3 +1,5 @@
+/* Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #469)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Server-side debugger support using Mach primitives
  *
@@ -512,11 +514,16 @@ static int ios_safe_read( uint64_t addr, void *buf, unsigned int size )
  * the timing this changes. Failures are always reported (capped). */
 int ios_real_suspend_enabled(void)
 {
-    static int env = -1;
-    if (env < 0)
+    /* Read on every call: the app sets it per session (a game's "Pause threads
+     * fully" switch, BCDLaunch.realSuspend), and this server runs again in the
+     * same process for the next session of the app run. Logged when it changes.
+     * (upstream Madeira, ml730 follow-up; madeira-bcd: the first session of an app
+     * run reads and logs exactly what the cached version did) */
+    static int logged = -1;
+    const char *e = getenv( "MADEIRA_REAL_SUSPEND" );
+    int env = (e && e[0] == '1') ? 1 : 0;
+    if (env != __atomic_exchange_n( &logged, env, __ATOMIC_RELAXED ))
     {
-        const char *e = getenv( "MADEIRA_REAL_SUSPEND" );
-        env = (e && e[0] == '1') ? 1 : 0;
         fprintf( stderr, "[real-susp] ml730 MADEIRA_REAL_SUSPEND=%d\n", env );
     }
     return env;

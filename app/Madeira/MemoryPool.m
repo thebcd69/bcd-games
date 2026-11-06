@@ -1,3 +1,5 @@
+/* Copyright 2026 Will Faust. This file was taken from https://github.com/willfaust/Madeira (commit a15332c)
+ * under GPL-3.0-or-later and modified for BCD in September to November 2026. See THIRD-PARTY-NOTICES.md. */
 // ml1150: fills the swap tier's memory pool (virtual_ios.c) before Wine starts.
 //
 // The MadeiraMemoryHost extension creates owned memory regions without touching

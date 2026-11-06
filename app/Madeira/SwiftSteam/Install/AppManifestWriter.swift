@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 ft7t8drgwf-wq and wamei: code taken from https://github.com/willfaust/Madeira (pull requests #381 and #490)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Reduced to
 // the install record writer and extended by 125hz (docs/STEAM_LIBRARY.md).
+// Modified by BCD (thebcd69), 2026-11-05: `betaKey` (version selection): a beta install names its branch, a public one is unchanged.
 
 import Foundation
 
@@ -40,7 +43,8 @@ struct AppManifestWriter {
         installedDepots: [InstalledDepot]? = nil,
         sharedDepots: [(depotID: Int, ownerAppID: Int)] = [],
         customExecutables: [String] = [],
-        language: String = "english"
+        language: String = "english",
+        betaKey: String = "public"
     ) throws {
         let manifestPath = (steamAppsPath as NSString).appendingPathComponent("appmanifest_\(appID).acf")
 
@@ -130,14 +134,21 @@ struct AppManifestWriter {
         // writes; Steam uses them to select language-pack depots and reports
         // the language to the game. The downloader passes the language it
         // installed (SteamAppInfo.gameLanguage).
+        // A beta install names its branch in both (`BetaKey`), as Valve's
+        // client writes it: the client then keeps the game on that branch
+        // instead of "updating" it back to the public build. A public install
+        // writes no BetaKey: the record is the one it always was.
         let language = escapeVDFString(language)
+        let beta = betaKey == "public" || betaKey.isEmpty ? nil : escapeVDFString(betaKey)
         lines.append("\t\"UserConfig\"")
         lines.append("\t{")
         lines.append("\t\t\"language\"\t\t\"\(language)\"")
+        if let beta { lines.append("\t\t\"BetaKey\"\t\t\"\(beta)\"") }
         lines.append("\t}")
         lines.append("\t\"MountedConfig\"")
         lines.append("\t{")
         lines.append("\t\t\"language\"\t\t\"\(language)\"")
+        if let beta { lines.append("\t\t\"BetaKey\"\t\t\"\(beta)\"") }
         lines.append("\t}")
 
         lines.append("}")

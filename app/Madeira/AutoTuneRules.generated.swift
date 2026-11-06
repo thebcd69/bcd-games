@@ -1903,6 +1903,51 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[jumbo] kernel-pick reserve failed",
+     "for size=0x4003ffffff"
+    ]
+   },
+   {
+    "has": [
+     "[nt-fail] #",
+     "proc=fft_",
+     "size=0x4003ffffff"
+    ]
+   }
+  ],
+  "evidence": [
+   "fft-ivalice-256gib-reserve-2026-10-27 (X4WZ5E, build 611, iPad17,3)",
+   "DR8613, 7QVF78 (builds 580, 579) and eight more of the same ask",
+   "tests/host/check-oversize-reserve.py"
+  ],
+  "id": "fft-256gib-reserve-oversize",
+  "lines": [
+   "oversize-reserve = 1",
+   "fft-arena-patch = 1"
+  ],
+  "maxStage": 2,
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[oversize] ml1298 unhinted reserve of",
+     "real "
+    ]
+   },
+   {
+    "has": [
+     "[game-cfg]",
+     "oversize-reserve=1"
+    ]
+   }
+  ],
+  "priority": 1,
+  "reason": "The game reserves 256 GB of address space in one piece, which this device's address map cannot hold, and quits at start. The lines give it a real 16 GB at the start of that reservation and size its memory pool to match."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[mmap-place] ml1027 NO GAP FITS"
     ]
    }
@@ -3375,6 +3420,30 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "HALT: Coudln't find any available virtual memory start addresses"
+    ]
+   }
+  ],
+  "evidence": [
+   "the-last-of-us-part-1-address-block-halt-2026-11-06 (a direct start of tlou-i-l.exe, build 633, iPhone18,2)",
+   "the-last-of-us-part-1-address-block-halt-launcher-2026-11-06 (the same game started by its launcher)",
+   "24TC8Y, W5M7YN (builds 579, 580, iPhone17,2), S0M36P, 8GRXB9 (build 630, iPhone19,2): the same sixteen requests and the same message",
+   "tests/host/check-big-hint.py"
+  ],
+  "id": "tlou1-virtual-memory-area-halt",
+  "lines": [],
+  "noFix": true,
+  "outcomes": [
+   "crashed",
+   "exited-early"
+  ],
+  "priority": 60,
+  "reason": "The Last of Us Part I asks for a block of 512 GB of address space at fixed addresses, sixteen times, and stops itself when it does not get exactly those. iOS gives BCD far less address space than that, so the game ends right after the start. No setting changes it, and no BCD build fixes it yet."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[store-undecoded]",
      "ADD THIS ENCODING"
     ]
@@ -4757,10 +4826,42 @@ enum AutoTuneBuiltInRules {
      "[dock-script-registry] app=",
      " values=0 "
     ]
+   },
+   {
+    "has": [
+     "[dock-script-registry] app=",
+     "skipped=language("
+    ]
    }
   ],
   "priority": 5,
   "reason": "The game's updater says it cannot find essential information in the registry, although BCD has put every registry value it could read from the game's Steam install script there already. No BCD setting is known to change this; the log lists what BCD checked, for the next report.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[msgbox-origin] box",
+     "Cannot find essential information in the registry"
+    ]
+   },
+   {
+    "has": [
+     "[dock-script-registry] app=",
+     "skipped=language("
+    ]
+   }
+  ],
+  "evidence": [
+   "far-cry-3-install-script-language-layout-2026-10-29 (Send Log 0AME71, build 622)",
+   "tests/host/check-dock-script-registry.py"
+  ],
+  "fixedIn": 632,
+  "id": "install-script-registry-language-layout",
+  "lines": [],
+  "priority": 5,
+  "reason": "The game's updater says it cannot find essential information in the registry. Its Steam install script lists registry values per language, which BCD did not read before build 632 (34 values of this game's script were left out); build 632 writes them.",
   "session": "dock"
  },
  {
@@ -4959,6 +5060,56 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "<== HOST STRIPPED WRITE"
+    ]
+   },
+   {
+    "has": [
+     "[anon-cas] build591 MADEIRA_ANON_CAS_FLUSH",
+     "handed to FEX"
+    ]
+   },
+   {
+    "has": [
+     "[spin] ml1140",
+     "look 1: x64->EC"
+    ]
+   }
+  ],
+  "evidence": [
+   "stardew-valley-alias-write-protection-2026-10-26 (Send Log KV411E, build 600, iPad13,16)",
+   "YE31F9",
+   "tests/host/check-alias-honor-prot.py"
+  ],
+  "id": "alias-write-protection-coreclr",
+  "lines": [
+   "env.MADEIRA_ALIAS_HONOR_PROT = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_ALIAS_HONOR_PROT=1"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] ml1062 MADEIRA_ALIAS_HONOR_PROT=1"
+    ]
+   },
+   {
+    "has": [
+     "(intentional alias protection, MADEIRA_ALIAS_HONOR_PROT)"
+    ]
+   }
+  ],
+  "priority": 31,
+  "reason": "The game patches its own code, the emulator's write notice reached BCD, and BCD undid the protection that notice needed. The line leaves that protection in place."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "failed to create main module",
      "c0000018"
     ]
@@ -5023,13 +5174,14 @@ enum AutoTuneBuiltInRules {
   ],
   "evidence": [
    "call-of-duty-black-ops-ceg-55-2026-10-22 (YFWA6Z, build 580)",
-   "DG6N4E (same failure on a second device)"
+   "DG6N4E (same failure on a second device)",
+   "tests/host/check-dock-ceg-prepare.py"
   ],
+  "fixedIn": 632,
   "id": "dock-ceg-result-55",
   "lines": [],
-  "noFix": true,
   "priority": 5,
-  "reason": "Valve's copy protection (CEG) could not prepare this game's program: the Steam client in BCD Dock reported result 55 and the game never ran. It is not a game setting, and starting again gives the same result.",
+  "reason": "Valve's copy protection (CEG) could not prepare this game's program: the Steam client in BCD Dock reported result 55 because its own Windows service was not up when it asked. Build 632 starts the service first and asks again.",
   "session": "dock"
  },
  {
@@ -5064,22 +5216,13 @@ enum AutoTuneBuiltInRules {
   ],
   "evidence": [
    "borderlands-tps-ceg-zero-jobs-2026-11-01 (Send Log FRKBN1, build 626)",
-   "tests/host/check-dock-ceg-zero-jobs.py"
+   "tests/host/check-dock-ceg-prepare.py"
   ],
+  "fixedIn": 632,
   "id": "dock-ceg-no-job",
-  "lines": [
-   "env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1"
-  ],
-  "noRetry": true,
-  "none": [
-   {
-    "has": [
-     "[madeira-env] game MADEIRA_DOCK_CEG_ZERO_JOBS=1"
-    ]
-   }
-  ],
+  "lines": [],
   "priority": 5,
-  "reason": "Steam's client was asked to prepare this game's own program and answered that it had nothing to do, and BCD stopped there. The line lets the start go on to Steam's own launch; if the program is not ready, the game ends with its own error.",
+  "reason": "Steam's client was asked to prepare this game's own program and answered that it had nothing to do (it already did), and BCD stopped there. Build 632 goes on to Steam's own launch, which decides.",
   "session": "dock"
  },
  {
@@ -5983,6 +6126,72 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "ml1011 VS via the sm5/dxbc backend"
+    ]
+   },
+   {
+    "has": [
+     "[device] gpu=",
+     "family=apple9"
+    ]
+   }
+  ],
+  "any": [
+   {
+    "has": [
+     "library launch Spider-Man.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/Spider-Man.exe-"
+    ]
+   },
+   {
+    "has": [
+     "library launch Marvel's Spider-Man Remastered:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Marvel's Spider-Man Miles Morales:"
+    ]
+   },
+   {
+    "has": [
+     "library launch MilesMorales.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/MilesMorales.exe-"
+    ]
+   }
+  ],
+  "api": "d3d12",
+  "evidence": [
+   "spider-man-remastered-dxbc-flat-views-2026-11-04 (Send Log BZQMTZ, build 626, A18)",
+   "6NN9D6, 92W7NF (build 626)",
+   "PD7S1E (Miles Morales, iPad Pro M4)",
+   "tests/host/check-sm5-flat-views.py"
+  ],
+  "fixedIn": 632,
+  "id": "d3d12-dxbc-texture2d-array-view-below-apple10",
+  "lines": [],
+  "none": [
+   {
+    "has": [
+     "ml1308 DXBC texture2d bindings get 2D views"
+    ]
+   }
+  ],
+  "priority": 80,
+  "reason": "On this GPU the game's older shaders read their textures through the wrong kind of view, so the picture came out as one colour; from this build on BCD gives them the right view on GPUs older than Apple10."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[redeliv] terminating process"
     ]
    },
@@ -6218,6 +6427,63 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[nt-fail]",
+     "NtAllocateVirtualMemory status=c0000017",
+     "proc=rdr2.exe",
+     "size=0x700000000"
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "rdr2-reserve-28gb-cap-2026-10-26 (Send Log NKSXWK, build 611, iPad17,4, scored ran)",
+   "QKWFC3, P8H75J, 91C75Y",
+   "4DTB43 (build 611, iPad16,6, totalphys = 8191: 193 s played)",
+   "tests/host/check-totalphys-cap.py"
+  ],
+  "fixedIn": 631,
+  "id": "rdr2-reserve-28gb-cap",
+  "lines": [],
+  "none": [
+   {
+    "has": [
+     "ml993: totalphys"
+    ]
+   }
+  ],
+  "priority": 5,
+  "reason": "RDR2 asked for 28 GB of address space, sized from the 16 GB of memory this iPad reports, and BCD has no such room, so the game showed its own error and stopped. Update BCD: from build 631 RDR2's recommended settings report at most 8 GB (the game then asks for the 9 GB they keep free). Today: add totalphys = 8191 to the game's settings."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[swap] swap-mb reached: the swap file holds",
+     "later commits stay in memory"
+    ]
+   },
+   {
+    "has": [
+     "RDR2.exe"
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "rdr2-swap-cap-world-entry-stall-2026-11-06 (the owner's test B1, build 633, iPhone18,2: swap-mb 768, stopped at world entry)",
+   "B2 (the same lines with swap-mb 8192: never reached the cap, played 522 s)",
+   "tests/host/check-swap-cap.py"
+  ],
+  "fixedIn": 634,
+  "id": "rdr2-swap-cap-world-entry-stall",
+  "lines": [],
+  "priority": 5,
+  "reason": "The swap file reached its size limit (swap-mb) while Red Dead Redemption 2 was loading, and this BCD then handled the game's new memory in a way that stopped the game where it enters the world. Update BCD: build 634 fixes it. Today: set swap-mb = 8192 in the game's settings (the recommended value)."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[framegen] interpolator ready:"
     ]
    }
@@ -6246,16 +6512,18 @@ enum AutoTuneBuiltInRules {
   ],
   "evidence": [
    "gta-v-enhanced-framegen-assert-2026-10-23 (S2B3GE, 03K0PX; AYMMDC the driver variant), build 592, iPhone18,3",
-   "VQ3K21 (build 592, iPhone18,2, 960x540, no frame generation): played"
+   "VQ3K21 (build 592, iPhone18,2, 960x540, no frame generation): played",
+   "rdr2-framegen-assert-2026-10-24 (EKSHQ5, RDR2, build 572)",
+   "tests/host/check-dxmt-framegen-one-layer.py"
   ],
+  "fixedIn": 632,
   "id": "framegen-interpolator-assert",
   "lines": [],
-  "noFix": true,
   "outcomes": [
    "crashed"
   ],
   "priority": 3,
-  "reason": "Frame generation (experimental) was on and the graphics driver stopped the game (most often with a very large picture: MetalFX upscaling on the screen's own resolution). Turn Frame generation off in the game's settings, or use a lower resolution without MetalFX upscaling, then start the game again."
+  "reason": "Frame generation (experimental) was on and the graphics driver stopped the game: the launcher's window and the game's took turns on the one frame-generation state, or the picture was very large (MetalFX upscaling on the screen's own resolution). Update BCD: from build 632 frame generation follows only the game's window. Until then, or if it still stops, turn Frame generation off in the game's settings, or use a lower resolution without MetalFX upscaling."
  },
  {
   "all": [
@@ -7007,6 +7275,50 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "(LAUNCHER_ERR_STEAM_FAILED)",
+     "Code:"
+    ]
+   },
+   {
+    "has": [
+     "[dock-report] launch-client-discovery-published=1"
+    ]
+   }
+  ],
+  "evidence": [
+   "rockstar-launcher-steam-113-trace-2026-11-04 (Send Log BFWFM3, build 630, GTA IV)",
+   "5J82N9, GE4WQN, PWMWKA (626)"
+  ],
+  "id": "rockstar-launcher-steam-113-trace",
+  "lines": [
+   "env.MADEIRA_REG_TRACE = 1",
+   "env.MADEIRA_FILE_TRACE = 1",
+   "env.MADEIRA_FILE_TRACE_LIMIT = 30000"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[epic-launch] start"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_FILE_TRACE="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed"
+  ],
+  "priority": 6,
+  "reason": "Rockstar's launcher did not find the Steam client that BCD Dock had started for it (error 113; its \"reinstall the game\" box is the launcher's generic text, not a damaged install). The cause is not known yet: the next start records what the launcher's Steam library looks for. Send the log from that start.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[epic-launch] start",
      "services=0"
     ]
@@ -7742,6 +8054,57 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[win-name] #",
+     "Application load error"
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "isaac-rebirth-steam-stub-load-error-2026-11-06 (Send Log 78YRXH, build 632, first online start of the game)"
+  ],
+  "id": "steam-stub-application-load-error-dock",
+  "lines": [],
+  "noFix": true,
+  "priority": 3,
+  "ranOnly": true,
+  "reason": "The game's own Steam start check got no answer from Valve's client when it started and showed \"Steam Error: Application load error\". That is Steam's side of the start, not a setting and not OpenGL. In the report we have, starting the game again worked: start it once more, and send the log if it keeps happening.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "Load module GeometryDash.exe"
+    ]
+   },
+   {
+    "has": [
+     "SteamAPI_Init(): Loaded"
+    ]
+   },
+   {
+    "has": [
+     "NtTerminateProcess",
+     "exit_code=0x1)"
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "geometry-dash-exit-after-steam-sign-in-2026-11-06 (Send Log RA70NM, build 632)",
+   "5T7THJ, 2P392A, 6K0CJK, VDFZHN, 96NMHJ"
+  ],
+  "id": "geometry-dash-exits-after-steam-sign-in",
+  "lines": [],
+  "noFix": true,
+  "priority": 1,
+  "reason": "Geometry Dash ends itself about two seconds after Valve's Steam client signs it in, before it opens a window or asks for OpenGL. It does the same on every start through BCD Dock in the logs (with no OpenGL, Desktop OpenGL and OpenGL ES), so neither OpenGL choice changes it and no setting does yet. It is an open problem of BCD's."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[wow-null32] rev=",
      "the 32-bit guest used the NULL page"
     ]
@@ -7955,10 +8318,12 @@ enum AutoTuneBuiltInRules {
    "docs/OPENGL.md"
   ],
   "id": "gamemaker-opengl-runner",
-  "lines": [],
-  "noFix": true,
+  "lines": [
+   "gl-backend = zink"
+  ],
+  "noRetry": true,
   "priority": 1,
-  "reason": "This is the OpenGL version of a GameMaker Studio game, and BCD has no OpenGL yet. If the game's launcher offers a Direct3D version (Hotline Miami's launcher: \"Original\"), choose that one."
+  "reason": "This is the OpenGL version of a GameMaker Studio game, and BCD gives a game no OpenGL until it is turned on: the line turns on BCD's OpenGL (new, not yet tried on this game). If it does not help, choose the Direct3D version in the game's launcher (Hotline Miami's launcher: \"Original\")."
  },
  {
   "all": [
@@ -8163,18 +8528,26 @@ enum AutoTuneBuiltInRules {
    "docs/OPENGL.md"
   ],
   "id": "opengl-only-no-context",
-  "lines": [],
-  "noFix": true,
+  "lines": [
+   "gl-backend = zink"
+  ],
+  "noRetry": true,
   "none": [
    {
     "has": [
      "[present] ml1175"
     ],
     "sinceLaunch": true
+   },
+   {
+    "has": [
+     "[win-name] #",
+     "Unable to initialize Vulkan video driver"
+    ]
    }
   ],
   "priority": 2,
-  "reason": "This game draws with OpenGL, and BCD has no OpenGL yet: the game cannot make its window and stops. This is not a setting; Direct3D games are not affected."
+  "reason": "This game draws with OpenGL, and BCD gives a game no OpenGL until it is turned on: it cannot make its window and stops. The line turns on BCD's OpenGL, which is new and not tried on every game. Direct3D games are not affected."
  },
  {
   "all": [
@@ -8204,7 +8577,7 @@ enum AutoTuneBuiltInRules {
   "lines": [],
   "noFix": true,
   "priority": 2,
-  "reason": "This game's engine (Godot 4.0 to 4.2) draws only with Vulkan or OpenGL, and BCD has neither yet: the game cannot start its renderer. This is not a setting; games made with Godot 4.3 or later can use Direct3D 12."
+  "reason": "This game's engine (Godot 4.0 to 4.2) starts its Vulkan renderer first, and BCD has no Vulkan: the game cannot start its renderer. This is not a setting; games made with Godot 4.3 or later can use Direct3D 12."
  },
  {
   "all": [
@@ -9723,8 +10096,15 @@ enum AutoTuneBuiltInRules {
   "id": "dock-steam-ipc-not-found",
   "lines": [],
   "noFix": true,
+  "none": [
+   {
+    "has": [
+     "SteamAPI_Init(): Loaded '"
+    ]
+   }
+  ],
   "priority": 50,
-  "reason": "The game could not find the Steam client that BCD Dock keeps running for it (its Steam library said no Steam was running). This is a known stop that comes and goes; no setting is known to change it.",
+  "reason": "The game's Steam library could not find the Steam client BCD Dock runs for it; Dock, the registry and the client were intact when it asked. This is a known stop that comes and goes; no setting is known to change it.",
   "session": "dock"
  },
  {
@@ -10141,6 +10521,27 @@ enum AutoTuneBuiltInRules {
   ],
   "priority": 4,
   "reason": "Rockstar's launcher was told its connection was ready before it was, its first message failed and it said the update service was unavailable. The line makes BCD wait for the real connection."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[thread-sample] ml876",
+     "Madeira`unregister_view+0x4",
+     "Madeira`delete_view+"
+    ]
+   }
+  ],
+  "evidence": [
+   "gta-v-legacy-thread-frees-own-stack-2026-10-21 (Send Log BT9TE3, build 576)",
+   "0DHNMC, PY5TEX",
+   "tests/host/check-ea-thread-reap.py"
+  ],
+  "fixedIn": 632,
+  "id": "thread-exit-frees-own-stack",
+  "lines": [],
+  "priority": 1,
+  "reason": "A program that ended left BCD freeing the memory of the thread it was running on, and the setup waited on it forever. This build no longer frees it."
  },
  {
   "all": [
@@ -11000,6 +11401,120 @@ enum AutoTuneBuiltInRules {
      "[swap] ml1077 stats",
      "00 MB kept in memory by swap-mb"
     ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "1 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "2 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "3 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "4 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "5 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "6 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "7 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "8 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "9 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "10 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "20 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "30 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "40 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "50 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "60 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "70 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "80 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "90 MB committed past it"
+    ]
+   },
+   {
+    "has": [
+     "[swap] ml1077 stats",
+     "00 MB committed past it"
+    ]
    }
   ],
   "outcomes": [
@@ -11067,14 +11582,338 @@ enum AutoTuneBuiltInRules {
    }
   ],
   "evidence": [
-   "socialclub-helper-va-exhausted-2026-10-29 (S59TH0, build 623)"
+   "socialclub-helper-va-exhausted-2026-10-20 (Send Log 4N1GNN, build 574, GTA V)",
+   "socialclub-helper-va-exhausted-2026-10-29 (S59TH0, build 623; socialclub-helper-v8-tables-no-room's from round 631)"
   ],
   "id": "socialclub-helper-va-exhausted",
   "lines": [],
   "noFix": true,
+  "none": [
+   {
+    "has": [
+     "[nt-fail] #",
+     "proc=socialclubhelper.exe",
+     "size=0x20000000 type=0x42000"
+    ]
+   }
+  ],
   "priority": 3,
-  "reason": "Rockstar's Social Club helper (a Chromium process) ran out of address space and its restarts could not get any; BCD cannot change that inside a running session. Close BCD completely (swipe it away) and start the game again; this has nothing to do with your settings.",
+  "reason": "Rockstar's Social Club helper (a Chromium process) ran out of address space, and its restarts could not get any because the closed helper's reservations were still taken. Build 631 gives a helper that closed out of memory its reservations back before the next one starts. Closing BCD completely (swipe it away) also frees them, but the helper may run out again in the same way; send the report from the app if it does.",
   "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[sc-rph] madeira-bcd: SocialClubHelper.exe at",
+     "not patched: another build"
+    ]
+   }
+  ],
+  "evidence": [
+   "socialclub-helper-unknown-build-2026-11-04 (Send Log MCYQ0H, build 630, GTA IV)",
+   "FM66KY (build 630)",
+   "socialclub-helper-unknown-build-2026-11-06 (Send Log AD5K87, build 632, GTA V, Social Club 2.4.0.302)",
+   "WBX862 (build 631)",
+   "tests/host/check-sc-helper-binary.py (the real 2.4.0.296 and 2.4.0.302 helpers)"
+  ],
+  "fixedIn": 633,
+  "id": "socialclub-helper-unknown-build",
+  "lines": [],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 1,
+  "reason": "Rockstar updated its Social Club (on 2026-11-03 and again on 2026-11-04), and this build of BCD does not know the new SocialClubHelper.exe, so the Rockstar launcher's pages cannot load and the game does not start. Update BCD: from build 633 it knows the 2026-11-04 helper (Social Club 2.4.0.302)."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[chromium-oom] at exit"
+    ]
+   },
+   {
+    "has": [
+     "[jumbo#",
+     "size=0x13fff0000 (5119 MB)",
+     "st=0xc0000017"
+    ]
+   }
+  ],
+  "evidence": [
+   "socialclub-helper-aligned-gb-no-room-2026-10-20 (Send Log 6M831K, build 574, GTA V, 6144 MB helper memory)",
+   "MCYQ0H, FM66KY (build 630, GTA IV)",
+   "tests/host/check-sc-align1g.py",
+   "tests/host/check-jumbo-aligned.py"
+  ],
+  "id": "socialclub-helper-aligned-gb-no-room",
+  "lines": [
+   "env.MADEIRA_SC_ALIGN1G = 1",
+   "env.MADEIRA_JUMBO_ALIGNED = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[sc-cef] layout 2: SocialClubHelper.exe's 1 GB reserve on a 4 GB boundary"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_SC_ALIGN1G="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 2,
+  "reason": "Rockstar's Social Club browser asks for 1 GB of address space on a 4 GB boundary; no such stretch was free (helper memory's regions or a 32-bit game's window had taken the room), so it asked for 5 GB, found none and closed: the launcher's \"CEF browser crashed\". The lines keep one aligned 1 GB stretch for it and, if that is taken, look for another aligned stretch before settling for an unaligned one. With helper memory on, env.MADEIRA_POOL_LAZY_WINDOWS = 1 also gives its room back."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[chromium-oom] at exit"
+    ]
+   },
+   {
+    "has": [
+     "[jumbo#",
+     "size=0x13fff0000 (5119 MB)",
+     "st=0xc0000017"
+    ]
+   },
+   {
+    "has": [
+     "[wow-window] B=",
+     "reserved 4GB + own guard page"
+    ]
+   }
+  ],
+  "evidence": [
+   "socialclub-helper-aligned-gb-window-guard-2026-11-05 (Send Log SHJEE7, build 630, GTA IV, held window at 0x7200000000)",
+   "GTA V Enhanced 9NNP2Q (build 614, Valve's SteamService.exe window at 0x7200000000, hole from 0x7300004000)",
+   "tests/host/check-wow-guard.py"
+  ],
+  "id": "socialclub-helper-aligned-gb-window-guard",
+  "lines": [
+   "env.MADEIRA_WOW_GUARD_INSIDE = 1",
+   "env.MADEIRA_JUMBO_ALIGNED = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[wow-window] B=",
+     "the overrun guard is the window's top page"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_WOW_GUARD_INSIDE="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 3,
+  "reason": "A 32-bit program's address window keeps one extra page above it, which leaves the room above it one page short of the 4 GB boundary Rockstar's Social Club browser needs for its 1 GB; it asked for 5 GB, found none and closed. The line keeps the window's guard page inside it, so the gigabyte above is free."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[chromium-oom] at exit"
+    ]
+   },
+   {
+    "has": [
+     "[wow-window] slot",
+     "released (owner",
+     "exited); torn down when the next 32-bit process starts"
+    ]
+   },
+   {
+    "has": [
+     "[wow-window] adopted placeholder"
+    ]
+   },
+   {
+    "has": [
+     "[nt-fail] #",
+     "NtAllocateVirtualMemoryEx status=c0000017 proc=socialclubhelper.exe",
+     "size=0x20000000 type=0x42000"
+    ]
+   }
+  ],
+  "evidence": [
+   "socialclub-helper-idle-window-release-2026-10-23 (Send Log 1HB5J4, build 592, GTA V Enhanced)",
+   "tests/host/check-wow-pressure-release.py"
+  ],
+  "id": "socialclub-helper-idle-window-release",
+  "lines": [
+   "env.MADEIRA_WOW_PRESSURE_RELEASE_MB = 256"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[wow-window] ml2030"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_WOW_PRESSURE_RELEASE_MB="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 1,
+  "reason": "A short-lived 32-bit helper of the Rockstar launcher left its 4 GB address window reserved and idle, and Rockstar's Social Club browser ran out of room for its page workers and closed. The line hands an idle window back when the address space runs low. A 32-bit program that starts after that needs a free window of its own.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[chromium-oom] at exit"
+    ]
+   },
+   {
+    "has": [
+     "[nt-fail] #",
+     "NtAllocateVirtualMemoryEx status=c0000017 proc=socialclubhelper.exe",
+     "size=0x20000000 type=0x42000"
+    ]
+   }
+  ],
+  "evidence": [
+   "socialclub-helper-v8-tables-no-room-2026-11-02 (Send Log 30WE7B, build 626, GTA V Enhanced)",
+   "JYYM0T, EX7S2C (626)",
+   "DFRKWK, RS64VG (592)",
+   "1HB5J4, 9NNP2Q, 3A27ZN, S59TH0",
+   "tests/host/check-sc-reap-tables.py"
+  ],
+  "fixedIn": 631,
+  "id": "socialclub-helper-v8-tables-no-room",
+  "lines": [],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 2,
+  "reason": "Rockstar's Social Club browser reserves about 1.5 GB of address space for every page worker it runs (memory it hardly touches). Here the launcher's page kept more workers than there was room for, so the browser closed, and its restarts found the closed browser's reservations still taken (the launcher's \"could not restart\"). Update BCD: from build 631 a browser that closed out of memory gives its reservations back before it restarts."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[swap] ml1150 pool: ",
+     " x 512 MB registered"
+    ]
+   },
+   {
+    "has": [
+     "[chromium-oom] at exit"
+    ]
+   },
+   {
+    "has": [
+     "[nt-fail] #",
+     "NtAllocateVirtualMemoryEx status=c0000017 proc=socialclubhelper.exe",
+     "size=0x20000000 type=0x42000"
+    ]
+   }
+  ],
+  "evidence": [
+   "helper-memory-windows-starve-socialclub-2026-10-25 (Send Log DFRKWK, build 592, RDR2, 6144 MB helper memory)",
+   "RS64VG (592)"
+  ],
+  "id": "helper-memory-windows-starve-socialclub",
+  "lines": [
+   "env.MADEIRA_POOL_LAZY_WINDOWS = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[swap] ml1150 app: helper memory keeps no windows"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_POOL_LAZY_WINDOWS="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 1,
+  "reason": "Helper memory keeps its whole pool mapped in BCD's address space (6 GB at 6144 MB), and Rockstar's Social Club browser ran out of room for its page workers and closed. The line keeps helper memory's regions unmapped until they are used."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[device] signing:",
+     "profile-increased-memory=0"
+    ]
+   },
+   {
+    "has": [
+     "[phase] spawn:",
+     "Rockstar Games\\\\Launcher\\\\Launcher.exe"
+    ]
+   },
+   {
+    "has": [
+     "[FEX-iOS] ThreadInit: ",
+     "returning STATUS_NO_MEMORY"
+    ]
+   }
+  ],
+  "any": [
+   {
+    "has": [
+     "[callret] RESERVE FAILED:"
+    ]
+   },
+   {
+    "has": [
+     "THREADSTATE ALLOC FAILED"
+    ]
+   }
+  ],
+  "evidence": [
+   "rockstar-launcher-no-memory-rights-2026-11-04 (Send Log PQT83G, build 630, GTA IV)"
+  ],
+  "id": "rockstar-launcher-no-memory-rights",
+  "lines": [],
+  "noFix": true,
+  "outcomes": [
+   "crashed",
+   "hung",
+   "exited-early"
+  ],
+  "priority": 2,
+  "reason": "This install of BCD lacks the increased memory limit and extended virtual addressing. Rockstar's launcher runs a Chromium browser that needs far more address space than such an install has, so games that start through the Rockstar launcher cannot start here. Reinstall BCD with those entitlements (GetMoreRam, or a paid developer account)."
  },
  {
   "all": [
@@ -11093,13 +11932,51 @@ enum AutoTuneBuiltInRules {
   "evidence": [
    "far-cry-primal-protector-counter-2026-10-28 (P5GYTQ, build 622)",
    "watch-dogs-2-protector-counter-2026-10-29 (JKG9PZ, build 623)",
+   "mad-max 6PW4S0 (build 614) and P61AP9 (build 579): the NOCOPY line already on, the same loop",
+   "far-cry-primal-protector-counter-hot-on-synthetic (the same log with the line the key prints)",
+   "tests/host/check-fex-hot-smc-pages.py"
+  ],
+  "id": "protector-incode-counter-hot-page",
+  "lines": [
+   "env.MADEIRA_SMC_HOT_PAGE = 64"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[smc-hot]",
+     "hot SMC pages on"
+    ]
+   }
+  ],
+  "priority": 5,
+  "reason": "The game's protection updates a counter inside its own code thousands of times a second, and BCD treated every update as a change of the game's code, which is slow on a phone; the start-up did not finish. The line stops BCD from trapping that page."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "87 01 8b 44 24 20 99 b9 ff 7f 00 00 f7 f9"
+    ]
+   },
+   {
+    "has": [
+     "[smc-hot]",
+     "hot SMC pages on"
+    ]
+   }
+  ],
+  "evidence": [
+   "far-cry-primal-protector-counter-hot-on-synthetic (a session that ran with env.MADEIRA_SMC_HOT_PAGE = 64)",
+   "far-cry-primal-protector-counter-2026-10-28 (P5GYTQ, build 622)",
+   "watch-dogs-2-protector-counter-2026-10-29 (JKG9PZ, build 623)",
    "mad-max 6PW4S0 (build 614) and P61AP9 (build 579): the NOCOPY line already on, the same loop"
   ],
   "id": "protector-incode-counter-loop",
   "lines": [],
   "noFix": true,
   "priority": 5,
-  "reason": "The game's protection repeats a check inside its own code thousands of times a second, and every repetition is slow on a phone; the start-up did not finish. No setting changes it yet: this is being worked on in BCD."
+  "reason": "The game's protection repeats a check inside its own code thousands of times a second, and every repetition is slow on a phone; the start-up did not finish, with the page left writable as well. No other setting changes it yet: this is being worked on in BCD."
  },
  {
   "all": [
@@ -12990,6 +13867,24 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[x86-fault] #1 a 32-bit guest faulted at guest 0x00000000",
+     "GTAIV.exe+0x4b8166"
+    ]
+   }
+  ],
+  "evidence": [
+   "gta4-null-object-4b8166-2026-11-03 (Send Log GWJW1Q, build 626)"
+  ],
+  "id": "gta4-null-object-4b8166",
+  "lines": [],
+  "noFix": true,
+  "priority": 52,
+  "reason": "The game stopped inside its own code (a missing object, GTAIV.exe+0x4b8166) after it set its video mode; nothing in BCD's settings is known to change it. If frame generation or MetalFX is on, switch both off and try once."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[jit-pool] EXHAUSTED (image"
     ]
    },
@@ -14088,15 +14983,24 @@ enum AutoTuneBuiltInRules {
    "4E2HK7, T3H9ZG, C6T0SR, W6X6TR (build 614)"
   ],
   "id": "fex-arena-exhausted-thread-start",
-  "lines": [],
-  "noFix": true,
+  "lines": [
+   "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_FEX_CALLRET_RESERVE_KB="
+    ]
+   }
+  ],
   "outcomes": [
    "crashed",
    "hung",
    "exited-early"
   ],
   "priority": 5,
-  "reason": "The emulator's address area, shared by the game, its launcher and their helpers, filled up during this session, so the game's new threads could not start and it stopped. No BCD setting avoids this yet. Close BCD completely (swipe it away) and start the game again: a new start has the whole area free. Sending the log helps."
+  "reason": "The emulator's address area, shared by the game, its launcher and their helpers, filled up during this session, so the game's new threads could not start and it stopped. Every 64-bit thread kept 8 MB of it for a stack nothing uses; the line (build 631) makes that 64 KB."
  },
  {
   "all": [
@@ -14367,16 +15271,19 @@ enum AutoTuneBuiltInRules {
    }
   ],
   "evidence": [
-   "balatro-luajit-low-memory-2026-10-29 (Send Logs 23P09D, 8GT4NX, Z4J3VN, DHH5JA, build 623)"
+   "balatro-luajit-low-memory-2026-10-29 (Send Logs 23P09D, 8GT4NX, Z4J3VN, DHH5JA, build 623)",
+   "docs/OPENGL.md"
   ],
   "id": "luajit-no-low-memory",
-  "lines": [],
-  "noFix": true,
+  "lines": [
+   "gl-backend = gles"
+  ],
+  "noRetry": true,
   "outcomes": [
    "crashed"
   ],
   "priority": 3,
-  "reason": "This game's Lua engine (a 64-bit LuaJIT) asks for memory below 2 GB and stops when it gets none: iOS keeps the first 4 GB of every process for itself, so no setting changes this. The game also draws with OpenGL, which BCD does not have yet."
+  "reason": "This game's Lua engine (a 64-bit LuaJIT) asks for memory below 2 GB and stops when it gets none: iOS keeps the first 4 GB of every process for itself. BCD can run a LuaJIT of its own in its place when OpenGL is turned on for the game, which a LOVE game such as this one also needs: the line turns on OpenGL ES. New, not yet tried on this game."
  },
  {
   "all": [
@@ -14474,6 +15381,112 @@ enum AutoTuneBuiltInRules {
   ],
   "priority": 9,
   "reason": "A 32-bit program was refused its 4 GB address window because less than 8 GB of address space would have been left; the line allows it with 2 GB left."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[msgbox-origin] box",
+     "Failed to load asset",
+     "block Terraria"
+    ]
+   }
+  ],
+  "evidence": [
+   "terraria-asset-pixelshader-2026-10-21 (Send Log 76XNE6, build 578)",
+   "terraria-asset-item-stack-2026-10-23 (Send Log R7BAJJ, build 592)",
+   "tests/host/check-dir-by-path.py (build 632)"
+  ],
+  "fixedIn": 632,
+  "id": "terraria-asset-dir-read",
+  "lines": [],
+  "priority": 4,
+  "reason": "Terraria could not find a file that is on the disk: BCD read the game's Content folder through a working folder that other programs of the session also use, and sometimes read the wrong one. From build 632 BCD reads it by its full path. Update BCD."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "err:module:import_dll Library",
+     "GOG Games",
+     "not found"
+    ]
+   }
+  ],
+  "any": [
+   {
+    "has": [
+     "err:module:import_dll Library mfc100",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library mfc110",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library mfc120",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcr100",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcr110",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcr120",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcp100",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcp110",
+     "GOG Games",
+     "not found"
+    ]
+   },
+   {
+    "has": [
+     "err:module:import_dll Library msvcp120",
+     "GOG Games",
+     "not found"
+    ]
+   }
+  ],
+  "evidence": [
+   "the-witcher-2-gog-redistributable-2026-11-02 (Send Log HSGX5P, build 622: Launcher.exe, mfc100u.dll not found)",
+   "tests/host/check-gog-setup.py: the redistributables of a build are planned, downloaded and installed once"
+  ],
+  "fixedIn": 632,
+  "id": "gog-redistributable-missing",
+  "lines": [],
+  "priority": 1,
+  "reason": "This GOG game imports a Visual C++ runtime (2010 to 2013) that its GOG build lists as a redistributable, and BCD did not install those from GOG before build 632: update BCD, then use Repair on the game's page, which downloads them and installs them at the game's next start."
  },
  {
   "all": [

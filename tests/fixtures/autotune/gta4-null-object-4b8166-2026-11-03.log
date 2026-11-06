@@ -1,0 +1,262 @@
+[06:33:33.743] [INFO] Checking entitlements...
+[06:33:33.743] [INFO] [build] v0.1.626 (626)
+[06:33:33.743] [INFO] [device] model=iPad17,1 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11524MB available=12266MB cores=9
+[06:33:33.743] [INFO] [device] address-map=[0x104b6c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[06:33:33.744] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[06:33:33.750] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@2.0x max-fps=120 utc-offset=-06:00 free-disk=28GB stikdebug-url=1
+[06:33:33.753] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[06:33:39.418] [INFO] [bcd] library launch GTAIV.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=2.0 lc=1
+[06:33:39.419] [INFO] Session log: logs/GTAIV.exe-2026-11-03_06-33-39.txt
+[06:33:39.434] [INFO] Running full Wine sequence...
+[06:33:39.434] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104b6c000,0x8000000000) 512GB available=12259MB low-power=0 thermal=nominal
+[06:33:39.435] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FRAMEGEN=1 env.MADEIRA_X86_FAULT_DUMP=1 metalfx-upscale=2
+[06:33:39.436] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): GTAIV.exe names dxgi (Grand Theft Auto IV, remembered)
+[06:33:39.438] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[06:33:39.439] [INFO] Allocating 896MB JIT pool via debugger...
+[06:33:39.439] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[06:33:39.439] [INFO] [jit-debugger] attached=1 at the pool request
+[06:33:39.440] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[06:33:41.032] [INFO] RX pool at 0x148000000
+[06:33:41.059] [INFO] Detaching debugger...
+[06:33:41.066] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.657s rev=ml526
+[06:33:41.095] [wineserver] send_client_fd: fd=36 handle=0x3a2 msg_fd_unix=33 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   metalfx-upscale = 2
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] Target exe: C:\Grand-Theft-Auto-IV-<redacted>\Game\Grand Theft Auto IV\GTAIV.exe (bundle=aarch64-windows)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[WineProc] argv[1] = C:\Grand-Theft-Auto-IV-<redacted>\Game\Grand Theft Auto IV\GTAIV.exe
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[06:33:41.324] [Wine init_process] reply_pipe=40, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11679 MB + phys_footprint=608 MB = 12288 MB (hw.memsize says 11524 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11524 MB), so it is a sentinel, not a limit
+[main-exe] open_dll_file('<container>/Documents/Data/Application/<uuid>/Documents/wine/dosdevices/c:/Grand-Theft-Auto-IV-<redacted>/Game/Grand Theft Auto IV/GTAIV.exe') = 0x0
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x23000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #2 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+[window] 0x7048000000..0x7400000000 regions=135 occupied=12293 MB of 15232 MB free=2938 MB maxhole=2938 MB@0x7048000000 rev=ml787 (periodic)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148554000 used=0x678000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x148678000 used=0x720000/0x23000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148720000 used=0x8a0000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7023120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7023220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7023420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7023820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7024020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7024ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7025fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7026f90000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x115688828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module GTAIV.exe (gtaiv.exe-43183eba905d71e5): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x127800000..0x7803000000 regions=71962 occupied=466284 MB of 486840 MB free=36987 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=653 MB (peak 653) internal=652 MB compressed=0 MB external=118 MB reusable=3 MB (cycle=1)
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=850 peb=0x717ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280dde402): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5abda131): 717B9F0000
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b764000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b488000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b254000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717b1c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+ml957: ? backing 0x717a568000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x702b020000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x716bec0000 size=0x10000 type=0x3000 protect=0x40
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x717bc52f79 pc=148135be8 nparams=2 p0=83 p1=717b35129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x717bc52f79 pc=148135be8 nparams=2 p0=2 p1=717b3510a0
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #3 hwnd=0x20028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #4 hwnd=0x20028 class='OleMainThreadWndClass' text="" rev=ml853
+[xp] 06:33:41.908 +0.55 dt=290 cpu=80 (thr 68) P=76 E=4 run=88 pgw=-1.0 GHz P=3.38 E=2.47 Minst=904 IPC=3.38 mJ=218 pin=62 rdKB=0 fpMB=899
+[xp] 06:33:42.161 +0.80 dt=253 cpu=23 (thr 22) P=2 E=21 run=31 pgw=-1.0 GHz P=1.71 E=1.13 Minst=80 IPC=2.97 mJ=5 pin=0 rdKB=0 fpMB=899
+[xp] 06:33:42.455 +1.09 dt=294 cpu=28 (thr 28) P=0 E=28 run=37 pgw=-1.0 GHz P=0.00 E=1.75 Minst=129 IPC=2.62 mJ=9 pin=0 rdKB=0 fpMB=899
+[xp] 06:33:42.744 +1.38 dt=289 cpu=33 (thr 33) P=0 E=33 run=43 pgw=-1.0 GHz P=0.00 E=0.99 Minst=91 IPC=2.78 mJ=4 pin=0 rdKB=0 fpMB=899
+[xp] 06:33:43.023 +1.66 dt=279 cpu=30 (thr 30) P=0 E=30 run=39 pgw=-1.0 GHz P=0.00 E=0.98 Minst=87 IPC=2.98 mJ=4 pin=0 rdKB=0 fpMB=899
+[xp] 06:33:43.335 +1.97 dt=312 cpu=36 (thr 36) P=0 E=36 run=46 pgw=-1.0 GHz P=0.00 E=1.00 Minst=99 IPC=2.72 mJ=4 pin=0 rdKB=0 fpMB=899
+[guest-stk] sp+0x28 0x148296bec = libwow64fex.dll+0x105bec
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=900 MB compressed=0 MB external=122 MB reusable=3 MB (cycle=2)
+[footprint] rev=ml358 phys=902 MB (peak 902) internal=901 MB compressed=0 MB external=122 MB reusable=3 MB (cycle=3)
+[win-name] #5 hwnd=0x2002c class='grcWindow' text="" rev=ml853
+[win-name] #6 hwnd=0x10034 class='IME' text="" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[blit] #1 rop=cc0020  SRC phys=4,30 696x480 vis={4,30,700,510}  DST phys=0,0 696x480 vis={0,0,696,480}  <<< SRC!=DST OFFSET rev=ml506
+info:  [d3d9-caps] ... capped at 256 lines; further distinct queries are not printed
+[store-noalias] #1 rev=ml348 addr=0x7100000000 insn=0xfc674a70 pc=0x16a4df560 NO pool/anon alias | region 0x7100000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x7100000000 hostpc=0x16a4df560 hinsn=0xfc674a70 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16a4df560 addr=0x7100000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7100000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16a4df560 addr=0x7100000000 x18=0x717ffc0000 type=1 lr=0x16affc14c sp=0x703891f350 x16=0x148069e94 x17=0x703891f2b0
+[x86-fault] #1 a 32-bit guest faulted at guest 0x00000000 at EIP 0x008b8166 (GTAIV.exe+0x4b8166) [exact: the block table of FEX for host pc 0x16a4df560; State.rip=0x008b985c is only the last block entry], window 0x7100000000, 44 modules in the PEB32 list; EAX=0x0 ECX=0x0 EDX=0x0 EBX=0x0 ESI=0x3447b00 EDI=0x0 EBP=0x0 ESP=0x27ef54c
+[x86-fault]   stack words that point into a module (2): +0x010=0059e50b(GTAIV.exe+0x19e50b) +0x02c=7b8b2a97(ucrtbase.dll+0x32a97)
+[x86-fault]   code eip: 256 bytes before and 160 after guest 0x008b8166 (GTAIV.exe+0x4b8166) (416 of 416 readable); rows are 32 bytes, the first at 0x008b8066
+[x86-fault]   code stk#0: 64 bytes before and 8 after guest 0x0059e50b (GTAIV.exe+0x19e50b) (72 of 72 readable); rows are 32 bytes, the first at 0x0059e4cb
+[x86-fault]   [ESI=0x3447b00]+0x00: e8b2a4(GTAIV.exe+0xa8b2a4) ff000000 f6554959 9 f655496d 9 f6554977 9
+[guest-code] rev=ml333 pool_rip=0x8b985c (PE 0x8b985c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x27ef54c x9=0x0 x10=0x3447b00 x11=0x0 x0=0x16a4df4f0 x2=0x13 | teb=0x717ffc0000 peb=0x717ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 16a4df460: 00000000 00000000 00df8aae 00000000 ffffff38 ffffffff 6affc108 00000001
+[fault-host] 16a4df480: 00000478 00000000 0059e470 00000000 000000b3 00000000 0000002f 00000028
+[fault-host] 16a4df4a0: 00000000 00000000 0b8d0180 1230078c 83008102 31038011 12011230 83008157
+[fault-host] 16a4df4c0: 31038011 11831201 10650380 45331445 3004891d 30013001 03897201 45720130
+[fault-host] 16a4df4e0: 058c0380 00005545 d503201f d503201f 00000150 10ffffe0 f9000380 f90f639f
+[fault-host] 16a4df500: 51004108 52917694 72a022d4 8b344278 78bfc304 d503201f 5281d014 72a022d4
+[mach_exc] insn_stream PC-12..PC+8: b8bfc314 d503201f 0b1400e7 [fc674a70] fc284a70 910020f8 fc784a70
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0xa8: 0x1482946ec = libwow64fex.dll+0x1036ec copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x1482946e4 = libwow64fex.dll+0x1036e4 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x7100000000 insn=0xfc674a70 pc=0x16a4df560 NO pool/anon alias | region 0x7100000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x7100000000 hostpc=0x16a4df560 hinsn=0xfc674a70 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16a4df560 addr=0x7100000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7100000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16a4df560 addr=0x7100000000 x18=0x717ffc0000 type=1 lr=0x16affc14c sp=0x703891f350 x16=0x148069e94 x17=0x703891f2b0
+[guest-code] rev=ml333 pool_rip=0x8b985c (PE 0x8b985c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x27ef54c x9=0x0 x10=0x3447b00 x11=0x0 x0=0x16a4df4f0 x2=0x13 | teb=0x717ffc0000 peb=0x717ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 16a4df4c0: 31038011 11831201 10650380 45331445 3004891d 30013001 03897201 45720130
+[fault-host] 16a4df4e0: 058c0380 00005545 d503201f d503201f 00000150 10ffffe0 f9000380 f90f639f
+[fault-host] 16a4df500: 51004108 52917694 72a022d4 8b344278 78bfc304 d503201f 5281d014 72a022d4
+[fault-host] 16a4df520: 8b344278 b8bfc307 d503201f 52800005 6b0400ff 1a87a0a7 8b344278 d503201f
+[fault-host] 16a4df540: 889fff07 531c6ce7 52917614 72a022d4 8b344278 b8bfc314 d503201f 0b1400e7
+[fault-host] 16a4df560: fc674a70 fc284a70 910020f8 fc784a70 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: b8bfc314 d503201f 0b1400e7 [fc674a70] fc284a70 910020f8 fc784a70
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x148294768 = libwow64fex.dll+0x103768 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x1482946ec = libwow64fex.dll+0x1036ec copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x1482946e4 = libwow64fex.dll+0x1036e4 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x7100000000 pc=0x16a4df560 rw=0 rev=ml420
+[wow-null32] rev=ajan7-arkham #1 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x16a4df560; EAX=0x0 ECX=0x0 EDX=0x0 EBX=0x0 ESI=0x3447b00 EDI=0x0 EBP=0x0 ESP=0x27ef54c (44 modules in the PEB32 list)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:3447b00 +04:0 +08:0 +0c:0 +10:59e50b(GTAIV.exe+0x19e50b) +14:27ef57c +18:27ef580 +1c:27ef578 +20:27ef573 +24:10 +28:31dc918 +2c:7b8b2a97(ucrtbase.dll+0x32a97) +30:290000 +34:0 +38:544d5844 +3c:654d2820
+[wow-null32]   TEB32=0x7ffc2000 PEB32=0x7ffd1000 TlsBitmapBits=0x00000000003fffff TlsExpansionSlots=0x0; 2 cell(s) hold a value: [19]=0x297c88 [20]=0x29fb60
+[wow-null32]   20 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 21
+[unixlib] opengl32 (GL-absent stub table) (module 0x7179c80000) -> wow64 table (0x115690828)
+[unixlib] call with NULL handle from libwow64fex.dll+0x105cc8 code=1 handle=0x0 -> STATUS_NOT_IMPLEMENTED (this module has no unix side on this port; further calls from it are silent)
+[win-name] #17 hwnd=0x20040 class='WineD3D_OpenGL' text="" rev=ml853
+[win-name] #18 hwnd=0x20040 class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 03256650.
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148af0000)
+[jit-pool] image 0x7179ac0000+0x16000 (?) → pool 0x148afa000 used=0xb16000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148afa000)
+ml957: ? backing 0x7179ad4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module quartz.dll (quartz.dll-0b037268ac600a2e): 7179A30000
+[xp-names] m48071 "wine-x18-exc"
+[jit-pool] image 0x71799e0000+0xb000 (?) → pool 0x148b16000 used=0xb26000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b16000)
+ml957: ? backing 0x71799e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[image-reload] unmapped image 0x71799e0000+0xb000: 1 pool copy marked
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"ir50_32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71799e0000+0xa000 (?) → pool 0x148b25000 used=0xb35000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b25000)
+ml957: ? backing 0x71799e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x71799c0000+0x7000 (?) → pool 0x148b34000 used=0xb3c000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b34000)
+ml957: ? backing 0x71799c4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[win-name] #19 hwnd=0x30040 class='WineD3D_OpenGL' text="" rev=ml853
+[win-name] #20 hwnd=0x30040 class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 0326DE60.
+D 24 Load module msrle32.dll (msrle32.dll-a301bb193525a40f): 71799A0000
+D 24 Load module msvidc32.dll (msvidc32.dll-94652812bd168e8a): 71799A0000
+[jit-pool] image 0x71799a0000+0xb000 (?) → pool 0x148b3e000 used=0xb4e000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x148b3e000)
+ml957: ? backing 0x71799a8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module iccvid.dll (iccvid.dll-18c680a1e49baadd): 71799A0000
+[image-reload] unmapped image 0x71799a0000+0xb000: 1 pool copy marked
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"ir50_32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #21 hwnd=0x40040 class='WineD3D_OpenGL' text="" rev=ml853
+[win-name] #22 hwnd=0x40040 class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 03277350.
+[image-reload] unmapped image 0x7179980000+0x21000: 1 pool copy marked
+[image-reload] unmapped image 0x7179980000+0x21000: 1 pool copy marked
+[image-reload] unmapped image 0x7179970000+0x3d000: 1 pool copy marked
+[image-reload] unmapped image 0x7179970000+0x3d000: 1 pool copy marked
+[image-reload] unmapped image 0x7179990000+0x1d000: 1 pool copy marked
+[image-reload] unmapped image 0x7179990000+0x1a000: 1 pool copy marked
+[image-reload] unmapped image 0x7179990000+0x1a000: 1 pool copy marked
+D 24 Load module msrle32.dll (msrle32.dll-a301bb193525a40f): 71799A0000
+[image-reload] unmapped image 0x71799a0000+0xd000: 1 pool copy marked
+D 24 Load module msvidc32.dll (msvidc32.dll-94652812bd168e8a): 71799A0000
+[image-reload] unmapped image 0x71799a0000+0x9000: 1 pool copy marked
+[jit-pool] image 0x71799a0000+0xb000 (?) → pool 0x148b3e000 used=0xb4e000/0x23000000 tramp+0x0
+ml957: ? backing 0x71799a8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module iccvid.dll (iccvid.dll-18c680a1e49baadd): 71799A0000
+[image-reload] unmapped image 0x71799a0000+0xb000: 1 pool copy marked
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"ir50_32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+wine: Unhandled page fault on read access to 00000000 at address 008B8166 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=682
+[srv-kill] kill_thread tid=0048 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=004c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0050 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0054 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0058 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=005c pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[06:33:47.435] [INFO] [session] length=8s play=0s frames=0 stalls=0/0s peak=1022MB limit=12287MB thermal=nominal lpm=0 api=D3D9/DirectDraw/32 res=696x480 mfx=2 cap=40 game=Grand Theft Auto IV: The Complete Edition
+[06:33:47.441] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=1034 MB (peak 1034) internal=1031 MB compressed=0 MB external=125 MB reusable=3 MB (cycle=4)
+[hwinput] keyboard focus: elsewhere (poll)
+[06:33:49.199] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1033 MB (peak 1034) internal=1031 MB compressed=0 MB external=125 MB reusable=3 MB (cycle=5)
+[footprint] rev=ml358 phys=1026 MB (peak 1034) internal=1024 MB compressed=0 MB external=125 MB reusable=5 MB (cycle=6)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bc65020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x717ffd0000 modules=9 first=GTAIV.exe@0x7100400000
+[footprint] rev=ml358 phys=1026 MB (peak 1034) internal=1025 MB compressed=0 MB external=126 MB reusable=5 MB (cycle=12)
+[footprint] rev=ml358 phys=1026 MB (peak 1034) internal=1025 MB compressed=0 MB external=126 MB reusable=5 MB (cycle=13)
+[footprint] rev=ml358 phys=1026 MB (peak 1034) internal=1025 MB compressed=0 MB external=126 MB reusable=5 MB (cycle=14)
+[footprint] rev=ml358 phys=1026 MB (peak 1034) internal=1025 MB compressed=0 MB external=125 MB reusable=5 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=27 resident=1171MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1033 MB (peak 1034) internal=1032 MB compressed=0 MB external=134 MB reusable=5 MB (cycle=16)
+[xp] 06:34:12.184 +30.82 dt=256 cpu=31 (thr 31) P=0 E=31 run=35 pgw=-1.0 GHz P=0.00 E=1.28 Minst=109 IPC=2.74 mJ=5 pin=0 rdKB=0 fpMB=1033
+[xp] 06:34:12.511 +31.15 dt=326 cpu=33 (thr 33) P=0 E=33 run=39 pgw=-1.0 GHz P=0.00 E=1.13 Minst=111 IPC=2.94 mJ=4 pin=0 rdKB=0 fpMB=1033
+[xp] 06:34:12.789 +31.43 dt=278 cpu=98 (thr 98) P=51 E=47 run=105 pgw=-1.0 GHz P=2.86 E=2.14 Minst=682 IPC=2.76 mJ=102 pin=68 rdKB=1920 fpMB=1034
+[xp] 06:34:13.051 +31.69 dt=262 cpu=18 (thr 18) P=6 E=12 run=21 pgw=-1.0 GHz P=2.38 E=2.38 Minst=101 IPC=2.38 mJ=11 pin=0 rdKB=0 fpMB=1034
+[xp] 06:34:13.379 +32.02 dt=328 cpu=93 (thr 93) P=42 E=51 run=101 pgw=-1.0 GHz P=2.50 E=2.04 Minst=489 IPC=2.34 mJ=65 pin=8 rdKB=328 fpMB=1034
+[footprint] rev=ml358 phys=1034 MB (peak 1034) internal=1032 MB compressed=0 MB external=135 MB reusable=5 MB (cycle=17)
+:34:13.379 +32.02 dt=328 cpu=93 (thr 93) P=42 E=51 run=101 pgw=-1.0 GHz P=2.50 E=2.04 Minst=489 IPC=2.34 mJ=65 pin=8 rdKB=328 fpMB=1034
+[06:34:13.676] [xp] 06:34:13.676 +32.31 dt=297 cpu=102 (thr 102) P=1 E=101 run=106 pgw=-1.0 GHz P=1.89 E=2.29 Minst=782 IPC=3.37 mJ=47 pin=5 rdKB=128 fpMB=1035

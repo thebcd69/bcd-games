@@ -215,6 +215,29 @@ static macdrv_metal_view my_view_create_metal_view(macdrv_view v, macdrv_metal_d
     return (macdrv_metal_view)CFBridgingRetain(layer);
 }
 
+// madeira-bcd, for the OpenGL presenter (Winios/WiniosGL.m): the layer a GL window presents to, found the way
+// my_view_create_metal_view finds a swapchain's (desktop mode: the window's own layer in the compositor; game mode: the game's
+// singleton) and noted the same way, so the window of a GL game is logged as a swapchain's ([swap-win]) and its GDI surface is
+// not drawn over the picture ([winios] game window ... presents through Metal). Unretained. Only the GL presenter calls it, and
+// only in a session whose gl-backend key is on: the DXMT path above is not touched.
+CAMetalLayer *madeira_display_layer_for_hwnd(void *hwnd) {
+    winios_note_swapchain_hwnd(hwnd);
+    if (madeira_desktop_mode()) {
+        CAMetalLayer *layer = winios_metal_layer_for_hwnd(hwnd);
+        if (!layer) NSLog(@"[madeira-display] desktop metal layer creation failed for the GL window hwnd=%p", hwnd);
+        return layer;
+    }
+    pthread_mutex_lock(&g_lock);
+    CAMetalLayer *layer = g_layer;
+    pthread_mutex_unlock(&g_lock);
+    if (!layer) {
+        NSLog(@"[madeira-display] the GL window hwnd=%p asked for the metal layer before one was registered!", hwnd);
+        return nil;
+    }
+    winios_note_game_metal_hwnd(hwnd);
+    return layer;
+}
+
 static macdrv_metal_layer my_view_get_metal_layer(macdrv_metal_view v) {
     return (macdrv_metal_layer)v;
 }

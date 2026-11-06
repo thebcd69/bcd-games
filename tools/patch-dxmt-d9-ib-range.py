@@ -228,7 +228,7 @@ BUF_HPP_DECL_OLD = '''  bool
     return m_dirty;
   }
   void refreshWholeMirror();
-  // Host-mapped pointer to the current index data: the host mirror, which is'''
+  // Host-mapped pointer to the current index data:'''
 BUF_HPP_DECL_NEW = '''  bool
   isDirty() const {
     return m_dirty;
@@ -241,14 +241,13 @@ BUF_HPP_DECL_NEW = '''  bool
   noteWholeRead() {
     m_range.onWholeRead(m_size);
   }
-  // Host-mapped pointer to the current index data: the host mirror, which is'''
-BUF_HPP_MEMBER_OLD = '''  bool m_writeLocked = false;
-  D3D9BufferLockCount m_lockCount;
+  // Host-mapped pointer to the current index data:'''
+# (the anchor starts at m_lockCount: dxmt 880241a adds m_direct between m_writeLocked and it)
+BUF_HPP_MEMBER_OLD = '''  D3D9BufferLockCount m_lockCount;
   UINT m_size;
   DWORD m_usage;
   D3DFORMAT m_format;'''
-BUF_HPP_MEMBER_NEW = '''  bool m_writeLocked = false;
-  // madeira-bcd: DXMT_D9_IB_RANGE. Which bytes of the current generation draws read and which hold the mirror (d3d9_ib_range.hpp);
+BUF_HPP_MEMBER_NEW = '''  // madeira-bcd: DXMT_D9_IB_RANGE. Which bytes of the current generation draws read and which hold the mirror (d3d9_ib_range.hpp);
   // unused with DXMT_D9_IB_RANGE=0.
   d9ib::RangeState m_range;
   D3D9BufferLockCount m_lockCount;
@@ -257,20 +256,20 @@ BUF_HPP_MEMBER_NEW = '''  bool m_writeLocked = false;
   D3DFORMAT m_format;'''
 
 # ---------------------------------------------------------------- d3d9_buffer.cpp
+# A direct-mapped index buffer (env.MADEIRA_D3D9_DIRECT_MAP = 1, dxmt 880241a; off unless set) has no host mirror and no refresh: the
+# draws read the allocation the application locked, so there is nothing for refreshRange to store (m_hostPtr is null). The guard is in
+# only when the dxmt checkout has the direct map (m_direct); an older one gets no guard and compiles as before.
+DIRECT_GUARD = '''  if (m_direct)   // madeira-bcd: a direct-mapped buffer (MADEIRA_D3D9_DIRECT_MAP=1) has no mirror to store from
+    return;
+'''
 BUF_CPP = D / "d3d9_buffer.cpp"
 BUF_CPP_INC_OLD = '#include "log/log.hpp"\n#include "wsi_platform.hpp"\n'
 BUF_CPP_INC_NEW = '#include "log/log.hpp"\n#include "util_env.hpp"\n#include "wsi_platform.hpp"\n'
-BUF_CPP_KEY_OLD = '''  dynamic->updateImmediateName(current_seq, std::move(fresh), 0, false);
-  return D3D_OK;
-}
+# (the anchor is the end of the anonymous namespace: dxmt 880241a adds the direct map's helpers between renameDynamicBuffer and it)
+BUF_CPP_KEY_OLD = '''} // namespace
 
-} // namespace
-'''
-BUF_CPP_KEY_NEW = '''  dynamic->updateImmediateName(current_seq, std::move(fresh), 0, false);
-  return D3D_OK;
-}
-
-} // namespace
+MTLD3D9VertexBuffer::MTLD3D9VertexBuffer('''
+BUF_CPP_KEY_NEW = '''} // namespace
 
 // madeira-bcd: DXMT_D9_IB_RANGE (round 624). On unless the environment says 0; read once, said once.
 bool
@@ -283,7 +282,8 @@ d9ib::rangeRefreshEnabled() {
   }();
   return on;
 }
-'''
+
+MTLD3D9VertexBuffer::MTLD3D9VertexBuffer('''
 BUF_CPP_VB_OLD = '''  // tracks refresh COUNT as much as bytes.
   {
     m_dynamic->immediateName()->updateContents(0, m_hostPtr, m_size, m_dynamic->immediateSuballocation());
@@ -325,7 +325,7 @@ BUF_CPP_IB_NEW = '''  // into the fresh name and why it is charged to the stagin
 // m_dirty stays set and a draw that reads the buffer without a range takes the whole-mirror refresh. Calling thread, device lock.
 void
 MTLD3D9IndexBuffer::refreshRange(uint32_t lo, uint32_t hi) {
-  const d9ib::Action action = m_range.onRangeDraw(lo, hi, m_writeLocked);
+@DIRECT_GUARD@  const d9ib::Action action = m_range.onRangeDraw(lo, hi, m_writeLocked);
   if (action == d9ib::Action::Skip) {
     census::bufferRefresh(census::kRefreshIbRangeSkip, 0);
     return;
@@ -600,7 +600,8 @@ def main():
         b = once(t[BUF_CPP], BUF_CPP_INC_OLD, BUF_CPP_INC_NEW, "d3d9_buffer.cpp includes")
         b = once(b, BUF_CPP_KEY_OLD, BUF_CPP_KEY_NEW, "d3d9_buffer.cpp renameDynamicBuffer")
         b = once(b, BUF_CPP_VB_OLD, BUF_CPP_VB_NEW, "d3d9_buffer.cpp MTLD3D9VertexBuffer::refreshWholeMirror store")
-        b = once(b, BUF_CPP_IB_OLD, BUF_CPP_IB_NEW, "d3d9_buffer.cpp MTLD3D9IndexBuffer::refreshWholeMirror store")
+        guard = DIRECT_GUARD if "bool m_direct = false;" in t[BUF_HPP] else ""
+        b = once(b, BUF_CPP_IB_OLD, BUF_CPP_IB_NEW.replace("@DIRECT_GUARD@", guard), "d3d9_buffer.cpp MTLD3D9IndexBuffer::refreshWholeMirror store")
         ib_lock = b.index("MTLD3D9IndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void **ppbData, DWORD Flags) {")
         ib_unlock = b.index("MTLD3D9IndexBuffer::Unlock() {")
         region = b[ib_lock:ib_unlock]

@@ -141,10 +141,13 @@ sh = (root / 'tools/build-xtajit64.sh').read_text()
 fi = sh.index('python3 "$R/tools/patch-fex-ios-mono-bp-unlocked-miss.py"')
 check('tools/build-xtajit64.sh applies it to every pin (after the pin branches), before the build, and puts both files back',
       sh.count('python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"') == 1 and sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"') > fi
-      and sh[sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'):].split('\n')[1] == 'build'
-      and sh[sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'):].split('\n')[2].startswith('git -C FEX checkout -- ')
-      and 'Source/Windows/ARM64EC/Module.cpp' in sh[sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'):].split('\n')[2]
-      and 'Source/Windows/ARM64EC/IosJitAlias.cpp' in sh[sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'):].split('\n')[2])
+      # round 631: the opt-in call-ret overlay (patch-fex-ios-callret-small.py) may follow it; the build comes after both
+      and sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"') < sh.index('\nbuild\n', sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'))
+      and all(l.startswith(('#', 'python3 "$R/tools/patch-fex-ios-')) for l in
+              sh[sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'):sh.index('\nbuild\n', sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"'))].split('\n')[1:] if l)
+      and sh[sh.index('\nbuild\n', sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"')):].split('\n')[2].startswith('git -C FEX checkout -- ')
+      and 'Source/Windows/ARM64EC/Module.cpp' in sh[sh.index('\nbuild\n', sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"')):].split('\n')[2]
+      and 'Source/Windows/ARM64EC/IosJitAlias.cpp' in sh[sh.index('\nbuild\n', sh.index('patch-fex-ios-alias-capacity.py" "$R/FEX"')):].split('\n')[2])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('a list may set the key, a whole number from 256 to 1024', '"MADEIRA_FEX_ALIAS_MAX",' in pol and 'case "MADEIRA_FEX_ALIAS_MAX":' in pol
       and 'guard let n = Int(value), (256...1024).contains(n), String(n) == value else {' in pol)

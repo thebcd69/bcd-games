@@ -1,3 +1,5 @@
+/* Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #498)
+ * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 #import "JITAllocator.h"
 #import "FEXBridge.h"
 #import "WineServerBridge.h"
@@ -10,6 +12,8 @@
 #import "MemoryHostTest.h"
 // Steam content decoders (liblzma shim, zstd decoder, zip chunks), used by the owned library's downloads.
 #import "SwiftSteam/lzma_shim.h"
+// itch.io downloads: the .7z reader (SwiftItch/ItchArchive.swift unpacks with it; zlib and liblzma are system libraries).
+#import "SwiftItch/itch_7z.h"
 // On-device remote pairing for Built-in StikJIT (build/rppairing-ios, JITPairing.swift).
 #import "MadeiraRPPairing.h"
 // BCD (round 604): the phone shaking with a game's rumble (BCDPhoneRumble.m), switched by the in-game menu.
@@ -29,6 +33,24 @@ void wine_log_set_file(const char *path);
 // UI log callback (wine_log_ios.c) — forwards C logs to Swift UI
 typedef void (*wine_ui_log_callback_t)(const char *message);
 void wine_set_ui_log_callback(wine_ui_log_callback_t cb);
+
+// BCD in the background (audio_null_ios.c, BackgroundRun.swift; Madeira #498): keep the
+// RemoteIO endpoint running with no client (keepalive), render silence (mute),
+// or stop it so iOS can suspend BCD (halt). Returns 1 when it runs.
+int madeira_audio_background(int keepalive, int mute, int halt);
+// Start the endpoint again after an audio interruption ended.
+void madeira_audio_resume_after_interruption(void);
+// Restart a running endpoint that rendered nothing since the last call (1 = restarted).
+int madeira_audio_check(void);
+// CPU cap while BCD runs in the background (Winios/BackgroundCPUCap.c):
+// percent of one core, 0 = off (returns once every held thread runs again).
+void madeira_bg_cpu_cap(int percent);
+void madeira_bg_cpu_stats(double *cpu_s, double *wall_s, double *held_s);
+// Metal command buffers off the main thread wait while BCD is inactive
+// (Winios/MetalBackgroundGate.m). Returns the number of classes wrapped.
+int madeira_metal_gate_install(void);
+// madeira-bcd: hold (1) or release (0) that wait by hand, for a gate made after the notification.
+void madeira_metal_gate_hold(int inactive);
 
 // DXMT present counter (winemetal_unix.c) — for SwiftUI FPS overlay
 #include <stdint.h>

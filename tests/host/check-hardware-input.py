@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 NevesHenry: code taken from https://github.com/willfaust/Madeira (pull request #413)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """Hardware keyboard and mouse: compile the production mapping on a POSIX host.
 
 Four parts:

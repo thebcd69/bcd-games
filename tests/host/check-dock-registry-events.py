@@ -67,7 +67,7 @@ else:
         lc = t / "src/launch.c"
         lc.write_text(orig)
         for patch in ("tools/patch-dock-game-scm.py", "tools/patch-dock-keep-alive.py", "tools/patch-dock-steam-readback.py",
-                      "tools/patch-dock-ceg-zero-jobs.py", "tools/patch-dock-install-dir-events.py"):
+                      "tools/patch-dock-install-dir-events.py"):
             r = subprocess.run([sys.executable, str(root / patch), str(lc)], capture_output=True, text=True)
             check("the workflow's earlier patch %s applies to the copy" % patch, r.returncode == 0, r.stdout + r.stderr)
         before = lc.read_text()

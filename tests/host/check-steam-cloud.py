@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (pull request #237)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """Steam Cloud sync decisions (app/Madeira/SteamCloud.swift SteamCloudPlan); no Steam runs. Compiles
 the production SteamCloudEntry and SteamCloudPlan and checks what each comparison leads to against
 the record of the last sync: one-sided changes are copied, two-sided ones wait for a choice, and a
