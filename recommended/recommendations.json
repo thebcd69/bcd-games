@@ -4381,7 +4381,7 @@
     {
       "id": "far-cry-3",
       "title": "Far Cry 3",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [220240],
         "steamFolders": ["far cry 3"],
@@ -4394,7 +4394,15 @@
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1", "minBuild": 591},
-        {"line": "env.MADEIRA_REG_TRACE = 1", "minBuild": 624}
+        {"line": "env.MADEIRA_REG_TRACE = 1", "minBuild": 624},
+        {"line": "dxmt = dxgi.customVendorId=1002;dxgi.customDeviceId=7340", "minBuild": 577},
+        "pool-split = 1",
+        {"line": "pool-split-retry = 1", "minBuild": 598},
+        {"line": "env.MADEIRA_AUDIO_LEAD_MS = 0", "minBuild": 635},
+        {"line": "env.MADEIRA_POOL_CODE_FOREGROUND = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_SLEEP_KERNEL_APC = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_WOA_RECHECK = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_KILL_REAP = 1", "minBuild": 635}
       ],
       "notes": [
         "Far Cry 3 (Steam 220240, BCD Dock), round 620, iPad17,3, build 614 (Send Logs 2H38A0 = 65GSHJ, 7VRX47 = WMGAZ8, X9ZXFB):",
@@ -4407,7 +4415,20 @@
         "entries were left out as language sections without English text and their layout is not known; the keys the updater reads are not known",
         "either. Build 623 logs which script values are present and the shape of the entries it left out. Not solved.",
         "Version 2 (round 624, 0AME71, 8N7HRS, A7587D: the same box on builds 622-623): env.MADEIRA_REG_TRACE = 1 (build 624, log only) prints",
-        "every registry request that fails as [reg-miss] lines, so the next log names the key the updater looks for."
+        "every registry request that fails as [reg-miss] lines, so the next log names the key the updater looks for.",
+        "Version 3 (build 635; one iPhone18,2, a Steam copy started through BCD Dock and Ubisoft Connect): dxmt = dxgi.customVendorId=1002;",
+        "dxgi.customDeviceId=7340 shows the game's Direct3D 11 renderer (farcry3_d3d11.exe) an AMD adapter through DXMT's DXGI. With Apple's",
+        "id (106B) it draws hard-edged darker rectangles over the 3D scene (not the HUD): Far Cry 3 and 4 assume a vendor-dependent result for",
+        "a clear of 0.5 on a UNORM target (DXVK issue 3758). Four sessions with the line, the rectangles gone in each (\"Found config env:",
+        "dxgi.customVendorId=1002;dxgi.customDeviceId=7340\" in the log); set Overall Quality to Custom first, the Optimal preset reads the",
+        "detected GPU. Only DXGI changes; gpu-card = amd would change more and was not tried. pool-split = 1 with pool-split-retry = 1: Ubisoft",
+        "Connect's processes and the game need more than one JIT-pool region holds (every session with a pool under 650 MB ran out; the split",
+        "sessions peaked at 96-98 % of about 880 MB; in 2 of 11 starts the second region first landed below the first). env.MADEIRA_AUDIO_LEAD_MS",
+        "= 0: the game's FAudio voices played cleanly with the plain 10 ms beat (three sessions) and broke up with the 60 ms lead (three).",
+        "The four switches of build 635 are what the game was played with: the program being played keeps its code-buffer budget while Ubisoft",
+        "Connect's processes get at most 16 MB each (POOL_CODE_FOREGROUND), a non-alertable sleep runs queued I/O completions as on Windows",
+        "(SLEEP_KERNEL_APC), an infinite wait on an address in Ubisoft Connect re-checks every second (WOA_RECHECK), and a process the game",
+        "starter ends releases what it held (KILL_REAP). Game sessions ran at 35-39 fps average (1 % low 24-29)."
       ]
     },
     {
@@ -5165,7 +5186,7 @@
     {
       "id": "ubisoft-connect",
       "title": "Ubisoft Connect",
-      "version": 1,
+      "version": 2,
       "match": {
         "programs": [{"name": "ubisoftconnect.exe"}, {"name": "upc.exe"}]
       },
@@ -5173,13 +5194,18 @@
         "# BCD's recommended settings for Ubisoft Connect.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598}
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598},
+        {"line": "env.MADEIRA_WOA_RECHECK = 1", "minBuild": 635}
       ],
       "notes": [
         "Ubisoft Connect (UbisoftConnect.exe starts the 32-bit upc.exe -upc_desktop_mode), build 623, Send Logs P4KC3V, W749H9 and ZWB3JT (2026-10-29, one iPhone18,2): the",
         "client's TLS callback (0x02A06419) runs instructions FEX could not translate (\"Unknown ALU Op: 0x11\" ... 36 times), one of them traps at guest EIP 0x29490CB",
         "(c000001d), and the program ends itself with 0xdeadc0de after NtRaiseHardError 0x50000018. FEX_SMCCHECKS=full changes nothing. Build 624 translates the opcode",
-        "0x82 forms. env.MADEIRA_X86_FAULT_DUMP = 1 prints the code bytes at the next trap. Log only."
+        "0x82 forms. env.MADEIRA_X86_FAULT_DUMP = 1 prints the code bytes at the next trap. Log only.",
+        "Version 2 (build 635): the 0xdeadc0de exit was the client's protection reading back its own WriteProcessMemory, which BCD sent",
+        "to the server and lost; build 635 does a program's write into itself in ntdll, as Windows does (on by default). With it and",
+        "build 635's Chromium switches (env.MADEIRA_UBI_CEF, on by default) the client signs in and starts games. env.MADEIRA_WOA_RECHECK",
+        "= 1: an infinite wait on an address in the 32-bit client re-checks the address every second, so a wake it misses only delays it."
       ]
     },
     {
@@ -7271,6 +7297,51 @@
         "emulator's saved registers and its stack, so the next log shows what the game compares. env.MADEIRA_BIG_HINT_EXACT = 1 (build 634, an experiment)",
         "answers such a reservation with its own address and nothing behind it: the log then shows whether the game accepts that and what it asks for next",
         "([big-hint] lines; a commit inside the block is refused, nothing can be mapped there)."
+      ]
+    },
+    {
+      "id": "far-cry-4",
+      "title": "Far Cry 4",
+      "version": 1,
+      "minBuild": 635,
+      "match": {
+        "steamAppIDs": [298110],
+        "steamFolders": ["far cry 4"],
+        "programs": [{"name": "farcry4.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Far Cry 4.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "pool-split = 1",
+        "pool-split-retry = 1",
+        "env.MADEIRA_D3D9_X64 = dxmt",
+        {"line": "env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw", "minBuild": 635},
+        {"line": "env.MADEIRA_GL_EMPTY_EXTENSIONS = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_X64_HOOK_ZONE = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_POOL_CODE_FOREGROUND = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_SLEEP_KERNEL_APC = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_WOA_RECHECK = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_KILL_REAP = 1", "minBuild": 635},
+        {"line": "env.MADEIRA_PAD_MODE = xbox360", "minBuild": 635},
+        {"line": "env.MADEIRA_AUDIO_LEAD_MS = 0", "minBuild": 635}
+      ],
+      "notes": [
+        "Far Cry 4 (Steam 298110, 64-bit, started by Ubisoft Connect): build 635, one iPhone, a Steam copy through BCD Dock; two sessions of",
+        "8 and 12 minutes played (58.6 fps average, then 36 fps at thermal state serious). The game's start needs, in order: Ubisoft's",
+        "systemdetection64.dll creates the DxDiag provider (dxdiagn, which imports ddraw; without it the game read a null pointer), probes",
+        "OpenGL and searches its extension list without checking it (env.MADEIRA_GL_EMPTY_EXTENSIONS = 1; without it an int3, exit",
+        "0x80000003), and reads Direct3D 9's adapter (env.MADEIRA_D3D9_X64 = dxmt gives an identity; Wine's d3d9 without OpenGL gave an",
+        "empty one). The game's 64-bit ntdll hooks need free address space right above ntdll (env.MADEIRA_X64_HOOK_ZONE = 1). The game",
+        "starter ends a suspended copy of the game it could not inject into; env.MADEIRA_KILL_REAP = 1 releases what that copy held, and",
+        "env.MADEIRA_POOL_CODE_FOREGROUND = 1 keeps FarCry4.exe's code buffers for it while Ubisoft Connect's processes get at most 16 MB",
+        "each. The JIT pool must be split (about 835 MB needed); a session whose pool stayed at 560-720 MB did not start. Ubisoft Connect's",
+        "lines (SLEEP_KERNEL_APC, WOA_RECHECK) are as Far Cry 3's. The game reads a controller through XInput only after it finds an",
+        "Xbox controller among the devices: env.MADEIRA_PAD_MODE = xbox360 adds the device Windows lists beside a wired Xbox 360 pad (on",
+        "the device test the on-screen controller then worked; without it the pad and the on-screen controller did nothing, and a",
+        "generic HID pad got the game's fallback map: LB the pause menu, RB the map). Its audio breaks up with the 60 ms audio lead and",
+        "plays cleanly with the plain beat (env.MADEIRA_AUDIO_LEAD_MS = 0), as Far Cry 3's does."
       ]
     },
     {

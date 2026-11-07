@@ -166,9 +166,10 @@ carry = [r["id"] for r in recs["rules"] if "MADEIRA_D3D9_X64" in json.dumps(r["c
 # 2026-10-24 (ajan23/loglar): MudRunner and Indivisible crash on the NULL result of the failed Direct3DCreate9 as well; their lists carry the line from build 598.
 # Round 602 (ajan41): PICO PARK, Don't Starve Together and A Hat in Time (their own programs fail the same probe) carry the line too, from build 602.
 # Round 624 (agent C): No More Room in Hell's 64-bit Source engine (8E0JH6, Z6VXH7, ZSY2WM) carries the line from build 598, as Counter-Strike: Source.
-check("only Darksiders II Deathinitive Edition's, MudRunner's, Indivisible's, Counter-Strike: Source's, (round 602) PICO PARK's, Don't Starve Together's and A Hat in Time's and (round 624) No More Room in Hell's lists carry the line",
+# Build 635: Far Cry 4's hardware detection reads the Direct3D 9 adapter (Wine's d3d9 without OpenGL gave an empty one); its rule starts with 635.
+check("only Darksiders II Deathinitive Edition's, MudRunner's, Indivisible's, Counter-Strike: Source's, (round 602) PICO PARK's, Don't Starve Together's and A Hat in Time's, (round 624) No More Room in Hell's and (build 635) Far Cry 4's lists carry the line",
       carry == ["darksiders-ii-deathinitive", "mudrunner", "indivisible", "counter-strike-source", "pico-park", "dont-starve-together", "a-hat-in-time",
-                "no-more-room-in-hell", "outlast"])
+                "no-more-room-in-hell", "outlast", "far-cry-4"])
 _nm = next(r for r in recs["rules"] if r["id"] == "no-more-room-in-hell")
 # round 632 (ajan63 W13): v2 adds the opt-in directory listing cache after it, from build 632 (check-game-recommendations.py)
 check("no-more-room-in-hell: the line is from build 598 only, after the standard line",
@@ -207,7 +208,8 @@ others = [r["id"] for r in recs["rules"] if r["id"] not in ("darksiders-ii-death
                                                            "grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2",   # these four and red-faction: env.MADEIRA_D3D8 = d3d9
                                                            "red-faction", "no-more-room-in-hell", "outlast",
                                                            "fallout-3",   # round 624: Fallout 3 carries New Vegas's D3D9 last-calls ring
-                                                           "goldsrc-hl-exe")   # round 630 (O3 S14): the Half-Life engine's last-calls ring
+                                                           "goldsrc-hl-exe",   # round 630 (O3 S14): the Half-Life engine's last-calls ring
+                                                           "far-cry-4")   # build 635: env.MADEIRA_D3D9_X64 = dxmt
           and "d3d9" in json.dumps(r["config"]).lower()]
 check("no other list names d3d9 (the Direct3D 9 default of build 602 comes from the game's folder, BCDGraphicsDefaults.swift, not from a list)", others == [])
 print("note: the list's own version is not bumped here (the release does it); the rule's lines carry minBuild 595, so older builds skip it")

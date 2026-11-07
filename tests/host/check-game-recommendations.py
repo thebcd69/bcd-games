@@ -181,6 +181,7 @@ assert list(presets) == ['rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other
                          'the-binding-of-isaac-rebirth', 'mewgenics', 'doom-3-bfg-edition', 'darkest-dungeon', 'battle-brothers', 'balatro',   # build 632: gl-backend (OpenGL)
                          'borderlands-2', 'the-escapists-2', 'dark-souls-remastered',   # round 632 (the Steam CEG fix; D1.8, D1.9, D1.5)
                          'the-last-of-us-part-1',   # round 634 (the sixteen 512 GB reservations; tlou1-2026-11-06)
+                         'far-cry-4',   # build 635 (Ubisoft Connect's games)
                          'standard'], list(presets)
 
 catalog_keys = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog))
@@ -736,6 +737,11 @@ _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_X64_IMAGE_
 # Round 624 (agent E1 S9, Far Cry 3's updater): v2 logs the failed registry requests (MADEIRA_REG_TRACE, build 624). Marvel Cosmic Invasion v2
 # (Discord W6): the program match no longer needs a Steam copy (the ParisEngine.dll check beside it stays); its lines are unchanged.
 _r620['far-cry-3'] = _r620['far-cry-3'] + ['env.MADEIRA_REG_TRACE = 1']
+# Build 635: v3 shows DXMT's DXGI an AMD adapter (the clear-value assumption), splits the pool with its retry, plays the plain 10 ms audio beat, and
+# turns on the four Ubisoft Connect switches of build 635 the game was played with.
+_r620['far-cry-3'] = _r620['far-cry-3'] + ['dxmt = dxgi.customVendorId=1002;dxgi.customDeviceId=7340', 'pool-split = 1', 'pool-split-retry = 1',
+                                           'env.MADEIRA_AUDIO_LEAD_MS = 0', 'env.MADEIRA_POOL_CODE_FOREGROUND = 1', 'env.MADEIRA_SLEEP_KERNEL_APC = 1',
+                                           'env.MADEIRA_WOA_RECHECK = 1', 'env.MADEIRA_KILL_REAP = 1']
 # Round 624 (agent E2, S2b: BMVD7C): v3 serves Godot 4.5's composition swap chain on the game's window (build 624).
 _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_DXGI_SRC = 1', 'env.MADEIRA_DXGI_COMPOSITION = 1', 'env.MADEIRA_OPTIN_DLLS = dcomp']
 # Round 625 (agent L4 S1-a: ZXCXT5, BMVD7C): v4 switches the .NET runtime's write-xor-execute code memory off (the fail-fast at its write
@@ -744,12 +750,13 @@ _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.DOTNET_EnableWrite
 # 2026-11-01 (58D8SD build 626, 1R1NCG build 625): v5 gives the game its own keyed event (RtlRunOnceComplete, Control's line) from build 624,
 # the build whose list policy takes the key.
 _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1']
-_r620_v = {'slay-the-spire-2': 5, 'far-cry-3': 2, 'marvel-cosmic-invasion': 2}
+_r620_v = {'slay-the-spire-2': 5, 'far-cry-3': 3, 'marvel-cosmic-invasion': 2}
 for _id, _lines in _r620.items():
     assert presets[_id]['version'] == _r620_v.get(_id, 1) and presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0'] + _lines, (_id, presets[_id])
 assert presets['slay-the-spire-2']['line_builds'][-7:] == [(576, 1000000000), (624, 1000000000), (624, 1000000000), (624, 1000000000),
                                                           (576, 1000000000), (608, 1000000000), (624, 1000000000)], presets['slay-the-spire-2']['line_builds']
-assert presets['far-cry-3']['line_builds'][-1] == (624, 1000000000), presets['far-cry-3']['line_builds']
+assert presets['far-cry-3']['line_builds'][-9:] == [(624, 1000000000), (577, 1000000000), (0, 1000000000), (598, 1000000000)] + [(635, 1000000000)] * 5, \
+    presets['far-cry-3']['line_builds']
 for _id, _line in (('forza-horizon-4', 'env.MADEIRA_OPTIN_DLLS = dxva2,gamingtcui'), ('big-walk', 'env.MADEIRA_REAL_SUSPEND = 1'),
                    ('ball-x-pit', 'env.MADEIRA_REAL_SUSPEND = 1')):
     _i = presets[_id]['lines'].index(_line)
@@ -932,7 +939,7 @@ assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE' in json.dum
 for _id, _line in (('mudrunner', 'env.MADEIRA_D3D9_X64 = dxmt'), ('indivisible', 'env.MADEIRA_D3D9_X64 = dxmt'), ('sekiro-shadows-die-twice', 'env.MADEIRA_NLS_EXTRA = 1')):
     assert presets[_id]['lines'][2:] == [_std, _line] and presets[_id]['version'] == 1 and presets[_id]['switches'] == '', (_id, presets[_id])
     assert {'line': _line, 'minBuild': 598} in _cfg(_id), _id
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_X64' in json.dumps(r['config'])) == ['a-hat-in-time', 'counter-strike-source', 'darksiders-ii-deathinitive', 'dont-starve-together', 'indivisible', 'mudrunner', 'no-more-room-in-hell', 'outlast', 'pico-park'], 'only Darksiders II, MudRunner, Indivisible, Counter-Strike: Source (round 2026-10-24), PICO PARK, Don\'t Starve Together, A Hat in Time (round 602) and No More Room in Hell, Outlast (round 624) carry the 64-bit D3D9 line'
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_X64' in json.dumps(r['config'])) == ['a-hat-in-time', 'counter-strike-source', 'darksiders-ii-deathinitive', 'dont-starve-together', 'far-cry-4', 'indivisible', 'mudrunner', 'no-more-room-in-hell', 'outlast', 'pico-park'], 'only Darksiders II, MudRunner, Indivisible, Counter-Strike: Source (round 2026-10-24), PICO PARK, Don\'t Starve Together, A Hat in Time (round 602), No More Room in Hell, Outlast (round 624) and Far Cry 4 (build 635) carry the 64-bit D3D9 line'
 assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_NLS_EXTRA' in json.dumps(r['config'])) == ['sekiro-shadows-die-twice', 'sword-and-fairy-3'], 'only Sword and Fairy 3 and Sekiro carry the extra code pages'
 assert presets['counter-strike-source']['lines'][2:] == [_std, 'env.MADEIRA_D3D9_X64 = dxmt', 'env.MADEIRA_DIRCACHE = 1'] and {'line': 'env.MADEIRA_D3D9_X64 = dxmt', 'minBuild': 598} in _cfg('counter-strike-source') and presets['counter-strike-source']['version'] == 2
 # build 632 (ajan63, Wine fork commit 11f6aa3a9): the two Source-engine rows turn the opt-in directory listing cache on, from build 632 only; lists may set the key to 0 or 1.
@@ -1355,6 +1362,7 @@ MATCH = {
     'the-last-of-us-part-1': {'steamAppIDs': [1888930], 'steamFolders': ['the last of us part i'],
                               'programs': [{'name': 'tlou-i.exe'}, {'name': 'tlou-i-l.exe'},
                                            {'name': 'launcher.exe', 'beside': 'tlou-i.exe'}]},   # round 634 (24TC8Y, W5M7YN, S0M36P, 8GRXB9, the four of 633)
+    'far-cry-4': {'steamAppIDs': [298110], 'steamFolders': ['far cry 4'], 'programs': [{'name': 'farcry4.exe', 'steam': True}]},   # build 635
 }
 # Round 632 (the Steam CEG fix of build 632, upstream Madeira #519 and the recipes that ride on it; agent ajan68). Every new line is for build 632 on or an
 # older key that is already allowed; the three new rules start with build 632, so no older build gets them (they keep the standard rule).
@@ -1375,6 +1383,21 @@ _tlou = _rules632['the-last-of-us-part-1']
 assert _tlou['version'] == 1 and _tlou['minBuild'] == 634 and _tlou['switches'] == {'avx': True}, _tlou
 assert presets['the-last-of-us-part-1']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_JUMBO_CODE_DUMP = 1', 'env.MADEIRA_BIG_HINT_EXACT = 1'] \
     and presets['the-last-of-us-part-1']['line_builds'][3:] == [(634, 1000000000), (634, 1000000000)], presets['the-last-of-us-part-1']
+# Build 635 (Ubisoft Connect's games): Far Cry 4 starts with build 635, whose switches it needs (the DxDiag provider, the OpenGL extension list,
+# the hook zone, the code-buffer policy, the three Ubisoft Connect lines, the Xbox 360 controller identity and the plain audio beat), so no older build gets the rule; Ubisoft Connect v2 re-checks its
+# infinite waits on an address from build 635.
+_fc4 = _rules632['far-cry-4']
+assert _fc4['version'] == 1 and _fc4['minBuild'] == 635 and 'switches' not in _fc4, _fc4
+assert presets['far-cry-4']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'pool-split = 1', 'pool-split-retry = 1',
+                                             'env.MADEIRA_D3D9_X64 = dxmt', 'env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw', 'env.MADEIRA_GL_EMPTY_EXTENSIONS = 1',
+                                             'env.MADEIRA_X64_HOOK_ZONE = 1', 'env.MADEIRA_POOL_CODE_FOREGROUND = 1', 'env.MADEIRA_SLEEP_KERNEL_APC = 1',
+                                             'env.MADEIRA_WOA_RECHECK = 1', 'env.MADEIRA_KILL_REAP = 1', 'env.MADEIRA_PAD_MODE = xbox360',
+                                             'env.MADEIRA_AUDIO_LEAD_MS = 0'] \
+    and presets['far-cry-4']['line_builds'][2:] == [(0, 1000000000)] * 5 + [(635, 1000000000)] * 9, presets['far-cry-4']
+_uc = _rules632['ubisoft-connect']
+assert _uc['version'] == 2 and presets['ubisoft-connect']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1',
+                                                                           'env.MADEIRA_WOA_RECHECK = 1'] \
+    and presets['ubisoft-connect']['line_builds'][3:] == [(598, 1000000000), (635, 1000000000)], presets['ubisoft-connect']
 assert 'MADEIRA_CONTROLS_XBOX_DEFAULT' not in json.dumps(recs) and 'IMAGE_LOW_ALIAS' not in json.dumps(recs), 'names the list policy does not know yet'
 for ident, p in presets.items():
     assert p['match'] == MATCH.get(ident), (ident, p['match'])
