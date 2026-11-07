@@ -969,6 +969,11 @@ jobs:
       - name: Check the EA app's Chromium
         run: python3 tests/host/check-ea-cef.py
 
+      # madeira-bcd: env.MADEIRA_UBI_CEF (on unless 0): Ubisoft Connect's browser (upc.exe) gets Chromium's process-count switches,
+      # and a checked libcef.dll build keeps them (two bytes changed in memory); the command line, the locator and the rewrite.
+      - name: Check Ubisoft Connect's Chromium
+        run: python3 tests/host/check-ubi-cef.py
+
       # BCD's menus (BCDMenu.swift): a game's menu on a long press or X (Play or Install, Game
       # page, Uninstall or Remove after a question), the Library's sort menu, the controller layer.
       - name: Check BCD's menus

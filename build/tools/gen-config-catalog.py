@@ -1630,6 +1630,17 @@ OVERLAY = {
                 "note": "With pool-low on: how much of the free run below the executable window stays free for "
                         "programs that load there (child processes' main executables). A run with a free run at "
                         "least this large below it keeps none. 128 by default."},
+    # madeira-bcd ubi-cef (build 635): Ubisoft Connect's Chromium (CEF 135, 32-bit): process-count switches for upc.exe, and the libcef.dll edit that lets them work
+    "env.MADEIRA_UBI_CEF": {"category": "Wine core (ntdll)", "title": "Ubisoft Connect's Chromium: fewer processes",
+                "kind": "bool", "default": "1",
+                "note": "Default on (build 635): Ubisoft Connect's browser (upc.exe) runs with --in-process-gpu "
+                        "--disable-site-isolation-trials --renderer-process-limit=1 --disable-component-update and V8 "
+                        "--jitless (MADEIRA_JITLESS = 0 keeps V8's JIT), each only if its command line lacks it, as BCD does "
+                        "for Steam's and Social Club's browsers, and its libcef.dll is changed in memory (two bytes, only for "
+                        "a build BCD has checked; any other build is left alone and the log says so) so it keeps them: "
+                        "Ubisoft's CEF otherwise drops the browser's whole command line and the launcher needs more 32-bit "
+                        "windows than the session has. Its helper processes are not refused. 0 turns both off. Logged as [ubi-cef].",
+                "sources": ["build/ntdll-unix/process_ios.c", "build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_SC_CEF": {"category": "Wine core (ntdll)", "title": "Social Club's Chromium in one process",
                 "kind": "bool", "default": "1",
                 "note": "On by default; 0 turns it off. SocialClubHelper.exe runs --single-process with "

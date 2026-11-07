@@ -274,9 +274,9 @@ helper = proc[proc.index("static void ios_cmdline_tail("):]
 helper = helper[:helper.index("\n}\n")]
 check("madeira_redact_line_w( (const unsigned short *)line" in helper and "shown[tstart + ti]" in helper and "(char)line" not in helper,
       "the cmdline-tail echo is cut from the redacted line")
-check(len(re.findall(r"ios_cmdline_tail\( nbuf, o, tail \);", proc)) == 3
+check(len(re.findall(r"ios_cmdline_tail\( nbuf, o, tail \);", proc)) == 4
       and "tail[ti] = (char)nbuf[" not in proc and "WCHAR c = nbuf[tstart + ti];" not in proc,
-      "all three cmdline-tail echoes ([proc-gate] steamwebhelper, [sc-cef], [ea-cef]) use it")
+      "all four cmdline-tail echoes ([proc-gate] steamwebhelper, [sc-cef], [ea-cef], [ubi-cef]) use it")
 check('#include "../../build/madeira_redact.h"' in bridge
       and "madeira_redact_arg_a(masked_len >= 0 ? masked : extra_argv[i], &credential_next, shown, sizeof(shown));" in bridge
       and 'argv[%d] = %s\\n", 2 + i, shown);' in bridge
