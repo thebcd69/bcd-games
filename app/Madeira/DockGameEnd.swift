@@ -157,9 +157,16 @@ enum DockGameEndRules {
 
     /// Round 626 (agent P S11): Rockstar's Games Launcher, its service and Social Club live under C:\Program Files\Rockstar Games\
     /// (or the x86 folder) and stay resident after the game closes. Consulted only after the player's Close (`anyStatus`).
+    /// madeira-bcd: so does Ubisoft Connect's client (upc.exe, UplayService.exe, UplayWebCore.exe, UbisoftGameLauncher.exe), but only the
+    /// programs directly in its folder: the games the client installs itself live below it (...\Ubisoft Game Launcher\games\<game>\).
     static func isResidentLauncher(_ image: String) -> Bool {
         let p = SteamLaunchScene.path(image)
-        return p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\")
+        if p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\") { return true }
+        for folder in ["c:\\program files (x86)\\ubisoft\\ubisoft game launcher\\", "c:\\program files\\ubisoft\\ubisoft game launcher\\"]
+        where p.hasPrefix(folder) {
+            return !p.dropFirst(folder.count).contains("\\")
+        }
+        return false
     }
 
     /// Round 631 (round 630 agent R S2; GTA V Legacy GJDXG6: the Launcher crashed at the game's exit, PlayGTAV.exe waited on its box, and
