@@ -1716,6 +1716,12 @@ jobs:
       - name: Patch wine with the opt-in yield mode
         run: python3 tools/patch-wine-yield-mode.py wine/dlls/ntdll/unix/sync.c
 
+      # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC = 1 (default off): a non-alertable sleep waits in the server with
+      # SELECT_INTERRUPTIBLE, so an I/O completion queued for the sleeping thread runs during the sleep, as on Windows.
+      # Checked by "Check sleep-kernel-apc".
+      - name: Patch wine so non-alertable sleeps can run I/O completions
+        run: python3 tools/patch-wine-sleep-kernel-apc.py wine/dlls/ntdll/unix/sync.c
+
       # bcd.cfg avail-phys = 1 (opt-in): GlobalMemoryStatusEx's available
       # physical memory is what remains before this app's memory limit, so
       # Chromium (Social Club, Steam) sees memory pressure before iOS kills the
@@ -3616,6 +3622,10 @@ jobs:
       # madeira-bcd: bcd.cfg yield-mode (tools/patch-wine-yield-mode.py), opt-in.
       - name: Check yield-mode
         run: python3 tests/host/check-yield-mode.py
+
+      # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC (tools/patch-wine-sleep-kernel-apc.py).
+      - name: Check sleep-kernel-apc
+        run: python3 tests/host/check-sleep-kernel-apc.py
 
       # madeira-bcd: render-pass traffic (gpu-traffic counters, clear-defer;
       # opt-in rp-carry, rp-discard and its winemetal op 24, f6-rar).

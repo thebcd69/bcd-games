@@ -1936,6 +1936,15 @@ OVERLAY = {
                         "Rockstar Games Launcher installer, whose status text and finish page run on a timer, "
                         "stayed at \"Preparing to Install...\" after its work was done. A timer that has waited "
                         "100 ms now goes before such a paint. 0: the strict order, as before. Read once per app run."},
+    # madeira-bcd sleep-kernel-apc (build 635; Far Cry 3)
+    "env.MADEIRA_SLEEP_KERNEL_APC": {"category": "Synchronisation", "title": "Non-alertable sleeps run I/O completions",
+                "kind": "bool", "default": "0",
+                "note": "Default off (build 635). 1: a non-alertable Sleep waits in BCD's Windows server, so an I/O completion queued "
+                        "for the sleeping thread (an overlapped pipe or socket read) runs during the sleep, as on Windows; otherwise it "
+                        "waits until the thread next enters the server, which a thread that only sleeps never does (Far Cry 3 behind "
+                        "Ubisoft Connect exited after 15 s). Sleep(0) is unchanged; each other non-alertable sleep costs one server "
+                        "round trip. Set it in the game's own file; read at each sleep.",
+                "sources": ["tools/patch-wine-sleep-kernel-apc.py"]},
     # madeira-bcd: the yield primitive (tools/patch-wine-yield-mode.py, wine/dlls/ntdll/unix/sync.c).
     "yield-mode": {"category": "Synchronisation", "title": "Yield primitive (SwitchToThread, Sleep(0))",
                 "kind": "choice", "default": "", "sources": ["tools/patch-wine-yield-mode.py"],
