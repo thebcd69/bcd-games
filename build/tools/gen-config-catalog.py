@@ -2405,6 +2405,14 @@ OVERLAY = {
                         "so it is for a game that needs it. Read once, at the first unused load the emulator meets; a \"[fex-keep-loads]\" "
                         "line says it is on.",
                 "sources": ["FEX/FEXCore/Source/Interface/IR/Passes/RedundantFlagCalculationElimination.cpp"]},
+    "env.MADEIRA_FEX_SPLIT_LOCK": {"category": "x86 emulation (FEX)", "title": "Atomics across a 16-byte boundary done inline",
+                "kind": "bool", "default": "1",
+                "note": "On by default (build 635). An x86 atomic (xchg with memory, lock xadd/add/sub/and/or/xor) whose operand crosses a "
+                        "16-byte boundary faults on Apple's processors, and BCD's exception thread did each one, 25-30 microseconds apiece "
+                        "(Far Cry 4 does about 450,000 at each of its three starts, Ubisoft Connect about 200,000). With this the emulator "
+                        "tests the operand first and does such an operation inline under a lock, with the same result; every other "
+                        "atomic runs as before. 0 keeps the trap. Read when each program starts.",
+                "sources": ["tools/patch-fex-ios-split-lock.py"]},
     "env.MADEIRA_FEX_CALLRET_ELIDE": {"category": "x86 emulation (FEX)", "title": "64-bit JIT without the call-return shadow stack",
                 "kind": "bool", "default": "1", "sources": ["tools/patch-fex-ios-callret-elide.py"],
                 "note": "Default on. The 64-bit (ARM64EC) JIT no longer keeps FEX's call-return shadow stack, which "

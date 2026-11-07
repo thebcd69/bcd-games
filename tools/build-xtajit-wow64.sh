@@ -54,7 +54,10 @@ python3 "$R/tools/patch-fex-ios-processorid.py" "$R/FEX/FEXCore/Source/Interface
 python3 "$R/tools/patch-fex-ios-moffs-rip.py" "$R/FEX/FEXCore/Source/Interface/Core/Core.cpp" || echo "::warning::the MOV moffs RIP opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
 # opt-in (round 626, Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE; EDX unchanged without it
 python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/$CPUIDF" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
-restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF" FEXCore/Source/Interface/Core/Core.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp; }
+# a guest atomic whose operand crosses a 16-byte boundary is done inline under a lock instead of trapping (Ubisoft Connect's
+# upc.exe: about 200,000 per start); MADEIRA_FEX_SPLIT_LOCK=0 keeps the trap
+python3 "$R/tools/patch-fex-ios-split-lock.py" "$R/FEX" || echo "::warning::the split-lock fast path was not applied (FEX anchor changed); xtajit.dll is built without it"
+restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF" FEXCore/Source/Interface/Core/Core.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp FEXCore/Source/Interface/Core/JIT/AtomicOps.cpp; }
 trap restore EXIT
 
 cmake -S "$R/FEX" -B "$B" -G Ninja -DCMAKE_BUILD_TYPE=Release \

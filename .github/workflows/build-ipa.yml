@@ -4476,6 +4476,11 @@ jobs:
           python3 tests/host/check-pool-carve-merge.py
           python3 tests/host/check-pool-code-policy.py
 
+      # madeira-bcd split-lock: a guest atomic whose operand crosses a 16-byte boundary is done inline under a lock instead of
+      # trapping (tools/patch-fex-ios-split-lock.py, both FEX builds); the patch, and the emitted code on the host (unicorn when present).
+      - name: Check the FEX split-lock fast path
+        run: python3 tests/host/check-fex-split-lock.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.
