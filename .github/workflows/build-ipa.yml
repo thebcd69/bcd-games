@@ -3377,6 +3377,11 @@ jobs:
       - name: Check the Windows desktop's exit watch
         run: ASAN_OPTIONS=symbolize=0 python3 tests/host/check-desktop-exit.py
 
+      # madeira-bcd gl-empty-extensions: with env.MADEIRA_GL_EMPTY_EXTENSIONS = 1 the OpenGL stub table answers a 64-bit
+      # glGetString(GL_EXTENSIONS) with "" (Far Cry 4's hardware detection); the tables per value, and code 130 from the shipped DLL.
+      - name: Check the OpenGL stub's empty extension list
+        run: python3 tests/host/check-gl-empty-extensions.py
+
       # madeira-bcd (round 579, Tomb Raider: Underworld ZWAA2K): a 32-bit main program that cannot get its 4 GB window ended the boot
       # thread with pthread_exit (fatal_error), so the session never ended and the app showed "running" for three minutes. The failure
       # now reports its status and leaves by exit(): the shim long-jumps back to wine_process_thread on the boot thread.

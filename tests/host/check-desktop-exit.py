@@ -70,8 +70,11 @@ c_stubs = r'''
 #include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 typedef int NTSTATUS;
+typedef struct { int WowTebOffset; } TEB;
+static TEB *NtCurrentTeb(void) { static TEB teb; return &teb; }
 typedef NTSTATUS (*unixlib_entry_t)(void *);
 #define STATUS_SUCCESS ((NTSTATUS)0)
 #define STATUS_NOT_SUPPORTED ((NTSTATUS)0xC00000BB)

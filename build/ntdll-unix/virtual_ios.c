@@ -13055,6 +13055,32 @@ static NTSTATUS ios_gl_stub_unix_call(void *args) {
     return STATUS_NOT_SUPPORTED;
 }
 
+/* madeira-bcd gl-empty-extensions: with env.MADEIRA_GL_EMPTY_EXTENSIONS = 1 (default off) a 64-bit program's
+ * glGetString(GL_EXTENSIONS) gets "" (no extensions) instead of NULL. Far Cry 4's hardware detection (Ubisoft's
+ * systemdetection64.dll) ignores that its OpenGL context could not be created, asks for the extension list and hands the
+ * result to its own strstr, whose ASSERT(string) ends in an int3: the game exits with 0x80000003 right after its
+ * "DetectionOpenGlWindow". Every other name and every other call fails as before and still marks the process; a 32-bit
+ * caller (its arguments are 32-bit) gets no answer. Read at each call. unix_glGetString is code 130 in the pinned Wine's
+ * dlls/opengl32/unixlib.h and in the shipped opengl32.dll; its 64-bit arguments are { TEB *teb; GLenum name; const GLubyte
+ * *ret; }. */
+#define IOS_GL_UNIX_GLGETSTRING 130
+#define IOS_GL_EXTENSIONS 0x1f03
+struct ios_gl_get_string_params { void *teb; unsigned int name; const unsigned char *ret; };
+
+static NTSTATUS ios_gl_stub_get_string( void *args )
+{
+    static const unsigned char empty[1];
+    static _Thread_local int said;
+    const char *e = getenv( "MADEIRA_GL_EMPTY_EXTENSIONS" );
+    struct ios_gl_get_string_params *p = args;
+    NTSTATUS status = ios_gl_stub_unix_call( args );   /* fails and marks the process, as every OpenGL call does */
+
+    if (!e || e[0] != '1' || e[1] || NtCurrentTeb()->WowTebOffset || p->name != IOS_GL_EXTENSIONS) return status;
+    p->ret = empty;
+    if (!said++) dprintf( 2, "[gl-empty-ext] glGetString(GL_EXTENSIONS) -> \"\" (env.MADEIRA_GL_EMPTY_EXTENSIONS = 1)\n" );
+    return STATUS_SUCCESS;
+}
+
 /* iOS-Madeira 2026-07-10: the unixlib "funcs" value handed back to the PE
  * side is a TABLE that __wine_unix_call_dispatcher indexes as
  * funcs[code](args) — storing a bare function there makes UNIX_CALL read
@@ -13082,6 +13108,7 @@ static void ios_init_stub_tables(void)
     ios_gl_stub_unix_call_table[0] = ios_stub_unix_call_ok;  /* process_attach */
     ios_gl_stub_unix_call_table[1] = ios_stub_unix_call_ok;  /* thread_attach */
     ios_gl_stub_unix_call_table[2] = ios_stub_unix_call_ok;  /* process_detach */
+    ios_gl_stub_unix_call_table[IOS_GL_UNIX_GLGETSTRING] = ios_gl_stub_get_string;   /* gl-empty-extensions */
 }
 
 /* DXMT's unix call table, statically linked into Madeira.app via

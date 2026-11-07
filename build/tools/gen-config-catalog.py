@@ -1292,6 +1292,14 @@ OVERLAY = {
                         "folder per libOSMesa build (the folders of older builds are removed), up to 256 MB, so a second start converts far less. "
                         "0: no cache; every start converts and compiles all shaders again.",
                 "sources": ["build/win32u-unix/opengl_ios.c"]},
+    "env.MADEIRA_GL_EMPTY_EXTENSIONS": {"category": "Graphics", "title": "OpenGL extension list: empty instead of none (64-bit, no OpenGL)",
+                "kind": "bool", "default": "0",
+                "note": "Default off (build 635). 1: in a session without gl-backend, a 64-bit program that asks OpenGL for its extension list "
+                        "(glGetString(GL_EXTENSIONS)) gets an empty list instead of nothing; there is still no OpenGL, and every other OpenGL "
+                        "call fails as before. Far Cry 4's hardware detection searched that list without checking it and ended the game right "
+                        "after \"DetectionOpenGlWindow\" (exit code 0x80000003). With gl-backend the real OpenGL answers and this does nothing. "
+                        "Set it in the game's own file; read at each call; a \"[gl-empty-ext]\" line says it answered.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_GL_EXTENSIONS_MAX": {"category": "Graphics", "title": "OpenGL: longest GL_EXTENSIONS text for a 32-bit game (bytes)", "kind": "int",
                 "default": "3072",
                 "note": "id Tech 2 and 3 era games (Jedi Academy, Quake III) copy GL_EXTENSIONS into a fixed stack buffer, and Zink's list is about "
