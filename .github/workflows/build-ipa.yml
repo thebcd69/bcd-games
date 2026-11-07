@@ -1722,6 +1722,13 @@ jobs:
       - name: Patch wine so non-alertable sleeps can run I/O completions
         run: python3 tools/patch-wine-sleep-kernel-apc.py wine/dlls/ntdll/unix/sync.c
 
+      # madeira-bcd: env.MADEIRA_WOA_RECHECK = 1 (default off): an infinite RtlWaitOnAddress in the 32-bit ntdll (the i386 farm's)
+      # waits in one-second slices and returns when a waker removed its entry but the alert never came; the unix side keeps the
+      # [waiters] registry's park across the slices, and without the switch waits a slice out as the infinite wait it stands for.
+      # Checked by "Check woa-recheck".
+      - name: Patch wine so an infinite wait on an address can re-check every second
+        run: python3 tools/patch-wine-woa-recheck.py wine/dlls/ntdll/sync.c wine/dlls/ntdll/unix/sync.c
+
       # bcd.cfg avail-phys = 1 (opt-in): GlobalMemoryStatusEx's available
       # physical memory is what remains before this app's memory limit, so
       # Chromium (Social Club, Steam) sees memory pressure before iOS kills the
@@ -3626,6 +3633,10 @@ jobs:
       # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC (tools/patch-wine-sleep-kernel-apc.py).
       - name: Check sleep-kernel-apc
         run: python3 tests/host/check-sleep-kernel-apc.py
+
+      # madeira-bcd: env.MADEIRA_WOA_RECHECK (tools/patch-wine-woa-recheck.py).
+      - name: Check woa-recheck
+        run: python3 tests/host/check-woa-recheck.py
 
       # madeira-bcd: render-pass traffic (gpu-traffic counters, clear-defer;
       # opt-in rp-carry, rp-discard and its winemetal op 24, f6-rar).

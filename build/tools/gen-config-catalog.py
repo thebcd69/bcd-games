@@ -1945,6 +1945,14 @@ OVERLAY = {
                         "Ubisoft Connect exited after 15 s). Sleep(0) is unchanged; each other non-alertable sleep costs one server "
                         "round trip. Set it in the game's own file; read at each sleep.",
                 "sources": ["tools/patch-wine-sleep-kernel-apc.py"]},
+    # madeira-bcd woa-recheck (build 635; Ubisoft Connect)
+    "env.MADEIRA_WOA_RECHECK": {"category": "Synchronisation", "title": "A 32-bit wait on an address re-checks every second",
+                "kind": "bool", "default": "0",
+                "note": "Default off (build 635). 1: an infinite wait on an address in a 32-bit program (SRW locks, condition variables, "
+                        "WaitOnAddress) waits in one-second slices and returns when a waker already removed it but its wake-up never "
+                        "arrived, a spurious wake-up its caller handles; logged as [woa-rescue]. Ubisoft Connect's browser otherwise "
+                        "sometimes stopped for good on a free lock. Set it in the game's own file; read at each slice.",
+                "sources": ["tools/patch-wine-woa-recheck.py"]},
     # madeira-bcd: the yield primitive (tools/patch-wine-yield-mode.py, wine/dlls/ntdll/unix/sync.c).
     "yield-mode": {"category": "Synchronisation", "title": "Yield primitive (SwitchToThread, Sleep(0))",
                 "kind": "choice", "default": "", "sources": ["tools/patch-wine-yield-mode.py"],

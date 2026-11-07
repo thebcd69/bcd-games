@@ -3500,6 +3500,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_VCRT_ARM64_KEY"); /* madeira-bcd: likewise (the Runtimes\\arm64 marker is per game) */
     unsetenv("MADEIRA_X64_HOOK_ZONE"); /* madeira-bcd: likewise (Far Cry 4's hook zone) */
     unsetenv("MADEIRA_SLEEP_KERNEL_APC"); /* madeira-bcd: likewise (Far Cry 3's sleeps) */
+    unsetenv("MADEIRA_WOA_RECHECK"); /* madeira-bcd: likewise (Ubisoft Connect's waits) */
     unsetenv("MADEIRA_SELF_WRITE"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_TAIL_CARVE_EXEC_CHECK"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_POOL_CLAMP_SECTIONS"); /* madeira-bcd: likewise */
