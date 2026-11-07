@@ -803,6 +803,15 @@ OVERLAY = {
                         "ntdll and otherwise quits with 'Error at hooking'). Set it in the game's own file; read when each 64-bit "
                         "program starts. Logged as [hook-zone].",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    # madeira-bcd self-write (build 635; Ubisoft Connect, Far Cry 4)
+    "env.MADEIRA_SELF_WRITE": {"category": "Memory & JIT pool", "kind": "bool", "default": "1",
+                "title": "A program writes its own memory",
+                "note": "Default on (build 635). A program's WriteProcessMemory into itself (the hooks Ubisoft Connect and Far Cry 4's "
+                        "FC64.dll install) is done by BCD, page by page as on Windows: a 32-bit program inside its own window, a 64-bit "
+                        "program inside its DLLs and EXE or its hook zone (env.MADEIRA_X64_HOOK_ZONE). Before build 635 every such "
+                        "write was refused and those programs ended with 0xdeadc0de. 0: refused as before. Read at each such write; "
+                        "a process's first one is logged as [self-write].",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_THIN_RESERVE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0", "title": "Thin 1-2 GB reservations",
                 "note": "Default off. 1: after the first 8 GB of read-write reservations of 1 to 2 GB (no address given), each new one gets a real 63 MB head and the program is told it got "
                         "the full size; a commit that grows past the head fails and is logged ([thin] OVERFLOW). For a game that reserves dozens of 1 GB blocks and commits little of "

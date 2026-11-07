@@ -3118,19 +3118,21 @@ RULES = [
     {
         "id": "ubisoft-launcher-protection-exit",
         "lines": [],
-        "noFix": True,
+        "fixedIn": 635,
         "priority": 2,
         # Round 630 (agent O1 S1; Ubisoft Connect MSFM7W, build 626; the same chain in P4KC3V, W749H9, ZWB3JT 623, S78B5M 574, AEKXPC 611):
-        # build 624 translates the 0x82 instruction forms, and upc.exe still ends itself: its protection's TLS callback, "[bad-close]
-        # 0xdeadc0de", one trap (the x86 trap-flag single step after popf; rdtsc), then NtRaiseHardError and exit 0xdeadc0de. A self-check
-        # BCD's emulated CPU does not pass yet; nothing here touches the protection. Only with Ubisoft's launcher loaded (GTA V Enhanced's
-        # own 0xdeadc0de is gta5-enhanced-started-without-launcher's).
+        # build 624 translates the 0x82 instruction forms, and upc.exe still ends itself with NtRaiseHardError 0x50000018 and exit
+        # 0xdeadc0de. Build 635: the hard error's text is Ubisoft's hook installer's "Error at hooking API ...": upc.exe hooks its own
+        # ntdll, user32 and kernelbase with WriteProcessMemory on itself, which the server refused (no task port for a pseudo-process).
+        # Since build 635 ntdll does such a write itself (env.MADEIRA_SELF_WRITE, virtual_ios.c ios_self_write); the trap-flag single
+        # step seen before it is handled and harmless. Only with Ubisoft's launcher loaded (GTA V Enhanced's own 0xdeadc0de is
+        # gta5-enhanced-started-without-launcher's).
         "all": [s("exit_code=0xdeadc0de")],
         "any": [s("Load module upc.exe")],
-        "reason": "The Ubisoft launcher's own protection ended it after a start-up self-check that BCD's emulated processor does not pass "
-                  "yet. No setting changes this.",
+        "reason": "The Ubisoft launcher hooks its own code with WriteProcessMemory, which BCD refused, and it stopped. This build "
+                  "does a program's writes into its own memory.",
         "evidence": ["ubisoft-launcher-chain-2026-11-02 (Send Log MSFM7W, build 626)", "ubisoft-connect-op82-2026-10-29 (P4KC3V, build 623)",
-                     "W749H9, ZWB3JT (623), S78B5M (574), AEKXPC (611)"],
+                     "W749H9, ZWB3JT (623), S78B5M (574), AEKXPC (611)", "tests/host/check-self-write.py"],
     },
     {
         "id": "app-text-livecontainer-unaligned",

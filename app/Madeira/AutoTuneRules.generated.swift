@@ -5596,13 +5596,14 @@ enum AutoTuneBuiltInRules {
   "evidence": [
    "ubisoft-launcher-chain-2026-11-02 (Send Log MSFM7W, build 626)",
    "ubisoft-connect-op82-2026-10-29 (P4KC3V, build 623)",
-   "W749H9, ZWB3JT (623), S78B5M (574), AEKXPC (611)"
+   "W749H9, ZWB3JT (623), S78B5M (574), AEKXPC (611)",
+   "tests/host/check-self-write.py"
   ],
+  "fixedIn": 635,
   "id": "ubisoft-launcher-protection-exit",
   "lines": [],
-  "noFix": true,
   "priority": 2,
-  "reason": "The Ubisoft launcher's own protection ended it after a start-up self-check that BCD's emulated processor does not pass yet. No setting changes this."
+  "reason": "The Ubisoft launcher hooks its own code with WriteProcessMemory, which BCD refused, and it stopped. This build does a program's writes into its own memory."
  },
  {
   "all": [

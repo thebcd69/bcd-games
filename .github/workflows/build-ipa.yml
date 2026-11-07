@@ -4415,6 +4415,11 @@ jobs:
       - name: Check the 64-bit hook zone
         run: python3 tests/host/check-x64-hook-zone.py
 
+      # madeira-bcd: env.MADEIRA_SELF_WRITE (on unless 0): a program's WriteProcessMemory into itself is done in ntdll, page by page
+      # as on Windows; the page rules, the reach (a 32-bit window; a 64-bit image view or hook zone) and the wiring.
+      - name: Check a program's writes into its own memory
+        run: python3 tests/host/check-self-write.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.
