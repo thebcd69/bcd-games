@@ -82,6 +82,20 @@ require(net_fn is not None and not any(n in net_fn.group(0).lower() for n in ('d
         'isDotNetFramework names only .NET Framework files')
 require(dx_fn is not None and re.findall(r'"([^"]+\.exe)"', dx_fn.group(0)) == ['dxsetup.exe', 'dxwebsetup.exe'],
         'isDirectXSetup names only the two DirectX setup files')
+# madeira-bcd: a shared launcher's installer (Ubisoft Connect's, which every Ubisoft game's script runs) is not run again when the launcher
+# is already in the prefix: a small table of installer file name -> marker programs, the plan's existing `provided:` path, no new
+# parameter (the checks that compile this file standalone keep compiling).
+table = installers[installers.index('    static let sharedLauncherInstallers: [String: [String]] = ['):]
+table = table[:table.index('\n    ]\n')]
+require(re.findall(r'"([^"]+)":', table) == ['ubisoftconnectinstaller.exe']
+        and re.findall(r'"(C:[^"]+)"', table) == ['C:\\\\Program Files (x86)\\\\Ubisoft\\\\Ubisoft Game Launcher\\\\UbisoftConnect.exe',
+                                                   'C:\\\\Program Files (x86)\\\\Ubisoft\\\\Ubisoft Game Launcher\\\\upc.exe'],
+        'the shared launcher table: Ubisoft Connect\'s installer and its two programs, nothing else')
+code_only = '\n'.join(l for l in installers.replace(table, '').splitlines() if not l.strip().startswith('//'))
+require(installers.count('sharedLauncherInstallers[') == 2 and 'ubisoft' not in code_only.lower() and 'upc.exe' not in code_only.lower(),
+        'the launcher\'s names live in the table only (and in comments)')
+require('|| DockInstallScripts.installsPresentLauncher($0.executable, exists: { path in isFile(path, drive: drive) })' in installers,
+        'prepare() plans a run of it as provided when one of its programs is a file in drive_c')
 require('SteamSignIn.flag(name, default: true)' in installers, 'every installer switch defaults on and reads env.NAME')
 for switch in ('MADEIRA_DOCK_INSTALLERS', 'MADEIRA_INSTALL_DEFAULT_KEY', 'MADEIRA_DOCK_INSTALL_CHOICE',
                'MADEIRA_DOCK_INSTALL_SCM', 'MADEIRA_DOCK_INSTALL_SERVER_SYNC', 'MADEIRA_DOTNET_FUSION', 'MADEIRA_DOCK_DOTNET_MONO',
@@ -770,6 +784,58 @@ func pe(_ url: URL, machine: UInt16) throws {
         require(plainCopy.dropped.isEmpty && plainCopy.added.isEmpty && ProcessInfo.processInfo.environment["MADEIRA_CFG_GAME"] == gameCfg.path,
                 "no hold and no EA lines: the game's file is used as it is")
         unsetenv("MADEIRA_DOCK_INSTALLS_SESSION"); unsetenv("MADEIRA_CFG_GAME")
+        // ---- madeira-bcd: a shared launcher's installer whose launcher is already in the prefix is provided: not run, recorded as done
+        func ubiGame(_ id: Int, _ name: String) throws -> DockGame {
+            let g = DockGame(id: id, name: name, installDir: name, library: "Program Files (x86)/Steam/steamapps", installed: true, customExecutables: false)
+            try write(common.appendingPathComponent(name + "/installscript.vdf"),
+                      "\"installscript\" { \"run process\" {" +
+                      " \"ubisoft connect pc client\" { \"process 1\" \"%INSTALLDIR%\\\\Support\\\\Ubisoft\\\\UbisoftConnectInstaller.exe\" \"command 1\" \"/S\" }" +
+                      " \"runtime\" { \"process 1\" \"%INSTALLDIR%\\\\Setup\\\\vc.exe\" }" +
+                      " } }")
+            for file in ["Support/Ubisoft/UbisoftConnectInstaller.exe", "Setup/vc.exe"] { try pe(common.appendingPathComponent(name + "/" + file), machine: 0x14c) }
+            return g
+        }
+        let ubiFolder = drive.appendingPathComponent("Program Files (x86)/Ubisoft/Ubisoft Game Launcher")
+        let anyCase = DockInstallScripts.installsPresentLauncher("C:\\g\\Support\\Ubisoft\\UbisoftConnectInstaller.EXE", exists: { _ in true })
+        let noProgram = DockInstallScripts.installsPresentLauncher("C:\\g\\Support\\Ubisoft\\UbisoftConnectInstaller.exe", exists: { _ in false })
+        let otherInstaller = DockInstallScripts.installsPresentLauncher("C:\\g\\Setup\\vc.exe", exists: { _ in true })
+        let longerName = DockInstallScripts.installsPresentLauncher("C:\\g\\xubisoftconnectinstaller.exe", exists: { _ in true })
+        require(anyCase && !noProgram && !otherInstaller && !longerName,
+                "a shared launcher's installer, by file name and any case, and only when one of its programs exists")
+        // No launcher in the prefix: the installer runs as before.
+        let ubiFirst = try ubiGame(7050, "Ubi")
+        DockInstallers.prepare(ubiFirst, drive: drive, prefix: prefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, fusionSource: nil)
+        let ubiBatch0 = (try? String(contentsOf: drive.appendingPathComponent("bcd-dock-installers.cmd"), encoding: .utf8)) ?? ""
+        require(ubiBatch0.contains("UbisoftConnectInstaller.exe") && ubiBatch0.contains("vc.exe") && !logged("app=7050 program=ubisoft connect pc client skipped"),
+                "no launcher in the prefix: the batch runs the installer")
+        try FileManager.default.createDirectory(at: ubiFolder.appendingPathComponent("upc.exe"), withIntermediateDirectories: true)
+        require(!DockInstallers.isFile("C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe", drive: drive), "a folder named upc.exe is no launcher")
+        try FileManager.default.removeItem(at: ubiFolder.appendingPathComponent("upc.exe"))
+        try write(ubiFolder.appendingPathComponent("UbisoftGameLauncher.exe"), "x")
+        require(!DockInstallScripts.installsPresentLauncher("C:\\g\\UbisoftConnectInstaller.exe", exists: { DockInstallers.isFile($0, drive: drive) }),
+                "the game starter alone is not the launcher")
+        try write(ubiFolder.appendingPathComponent("UPC.EXE"), "x")
+        require(DockInstallScripts.installsPresentLauncher("C:\\g\\UbisoftConnectInstaller.exe", exists: { DockInstallers.isFile($0, drive: drive) }),
+                "upc.exe in the launcher's folder, any case of its name, says the launcher is installed")
+        // The launcher is there now (a Dock game's run, or the player's own install): another game's run of the same installer is provided.
+        let ubiSecond = try ubiGame(7051, "Ubi2")
+        DockInstallers.prepare(ubiSecond, drive: drive, prefix: prefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, fusionSource: nil)
+        let ubiBatch = (try? String(contentsOf: drive.appendingPathComponent("bcd-dock-installers.cmd"), encoding: .utf8)) ?? ""
+        let ubiSystem = (try? String(contentsOf: prefix.appendingPathComponent("system.reg"), encoding: .utf8)) ?? ""
+        let ubiFound = DockInstallers.found(ubiSecond, drive: drive, defaultKey: true).processes
+        require(DockInstallers.script != nil && ubiBatch.contains("vc.exe") && !ubiBatch.contains("UbisoftConnectInstaller"),
+                "prepare: the batch holds the other program and not the launcher's installer")
+        require(DockInstallScripts.provider(ubiFound[0]) == DockInstallScripts.launcherProvider
+                && DockInstallScripts.marked(ubiFound[0].run, in: ubiSystem) && !DockInstallScripts.marked(ubiFound[1].run, in: ubiSystem),
+                "prepare: the launcher's installer is recorded as done for this game under Valve's per-app key, the other program is not")
+        require(logged("app=7051 program=ubisoft connect pc client skipped: the launcher it installs is already in the prefix") && logged("record: yes, ")
+                && (DockInstallers.note ?? "").contains("Provided by the installed launcher, not run: ubisoft connect pc client"),
+                "prepare: the log and the sheet's note say it was skipped because the launcher is already there")
+        let ubiBefore = LogStore.shared.lines.count
+        DockInstallers.prepare(ubiSecond, drive: drive, prefix: prefix, has32Bit: true, hasMsiexec: true, hasWineMono: true, fusionSource: nil)
+        require(LogStore.shared.lines.dropFirst(ubiBefore).joined(separator: "\n").contains("program=ubisoft connect pc client file=UbisoftConnectInstaller.exe status=done"),
+                "the next start: the record makes it done, nothing is skipped again")
+        try FileManager.default.removeItem(at: ubiFolder)
 
         // ---- madeira-bcd (round 579, ajan7-installers): DirectX's setup that failed once, and the choice after a session that never started
         require(["C:\\x\\DXSETUP.exe", "C:\\x\\DXSetup.exe", "C:\\x\\dxsetup.exe", "C:\\x\\DXWebSetup.exe", "dxsetup.exe"].allSatisfy { DockInstallScripts.isDirectXSetup($0) } &&

@@ -49,8 +49,12 @@ for name, text in [('MadeiraDock.swift', dock), ('MadeiraDockModel.swift', view)
     # madeira-bcd (round 626, agent A1 S12, 1a47d821): DockInstallers.isEAAppInstaller tells the EA app's installer (EAappInstaller.exe), which
     # a Steam game from EA runs as a one-time install, by its file name; it is EA's client installer, not a game's program, and only its
     # install session gets msiexec in system32 (tests/host/check-dock-ea-installer.py).
+    # madeira-bcd: DockInstallScripts.sharedLauncherInstallers names Ubisoft Connect's installer (UbisoftConnectInstaller.exe), which every
+    # Ubisoft game's install script runs, and the two programs that say the launcher is already in the shared prefix (UbisoftConnect.exe,
+    # upc.exe); they are the launcher's, not a game's, and only a run of that installer is planned as provided (check-dock-installers.py).
     require(names <= {'dockhost.exe', 'explorer.exe', 'steam.exe', '.exe', 'msiexec.exe', 'steamservice.exe',
-                      'dxsetup.exe', 'dxwebsetup.exe', 'eaappinstaller.exe'},
+                      'dxsetup.exe', 'dxwebsetup.exe', 'eaappinstaller.exe',
+                      'ubisoftconnectinstaller.exe', 'ubisoftconnect.exe', 'upc.exe'},
             f'{name}: no program-name list ({sorted(names)})')
     for line in text.splitlines():
         if re.search(r'SteamLog\.(event|trace)|LogStore|print\(|NSLog', line):

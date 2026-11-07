@@ -380,7 +380,7 @@ enum DockInstallScripts {
         var parts: [String] = []
         if !names(.pending).isEmpty { parts.append("To run: " + names(.pending)) }
         if !names(.done).isEmpty { parts.append("Done earlier: " + names(.done)) }
-        for by in ["Wine Mono", "BCD"] {
+        for by in ["Wine Mono", "BCD", launcherProvider] {
             var seen: [String] = []
             for item in items where item.status == .provided && provider(item.process) == by {
                 let text = label(item.process.run)
@@ -460,8 +460,31 @@ enum DockInstallScripts {
     }
 
     /// madeira-bcd: who provides what a plan's provided program would have installed: "BCD" for DirectX's runtime libraries,
-    /// "Wine Mono" for a .NET Framework.
-    static func provider(_ process: SteamInstallProcess) -> String { isDirectXSetup(process.executable) ? "BCD" : "Wine Mono" }
+    /// "Wine Mono" for a .NET Framework, "the installed launcher" for a shared launcher's installer.
+    static func provider(_ process: SteamInstallProcess) -> String {
+        if sharedLauncherInstallers[fileName(process.executable)] != nil { return launcherProvider }
+        return isDirectXSetup(process.executable) ? "BCD" : "Wine Mono"
+    }
+    static let launcherProvider = "the installed launcher"
+
+    /// madeira-bcd: the installers of launchers that every game of their company carries in its install script, by file name (lower
+    /// case), and the programs (Windows paths) any one of which says that launcher is already installed. The prefix is one for every
+    /// Dock game and the library (MadeiraDock.prefix, Documents/wine), so the launcher is installed once: a run of its installer for
+    /// the next game only repeats it. Ubisoft Connect, whose ~250 MB installer every Ubisoft game's script runs (Far Cry 3:
+    /// `ubisoft connect pc client`, file=UbisoftConnectInstaller.exe, in tests/fixtures/autotune/far-cry-3-registry-2026-10-27.log).
+    static let sharedLauncherInstallers: [String: [String]] = [
+        "ubisoftconnectinstaller.exe": ["C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+                                        "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe"],
+    ]
+
+    /// madeira-bcd: whether `executable` is such an installer and one of its launcher's programs exists (`exists`: a Windows path is a file).
+    static func installsPresentLauncher(_ executable: String, exists: (String) -> Bool) -> Bool {
+        (sharedLauncherInstallers[fileName(executable)] ?? []).contains(where: exists)
+    }
+
+    static func fileName(_ executable: String) -> String {
+        (executable.split(separator: "\\").last.map(String.init) ?? executable).lowercased()
+    }
 
     /// madeira-bcd: the entries whose provided programs are recorded as done at this start (every
     /// program of the entry is provided or done), and those held back: another program of the same
@@ -926,6 +949,13 @@ enum DockInstallers {
         return current
     }
 
+    /// madeira-bcd: a Windows path on drive C that is a file (not a folder), any case of its names.
+    nonisolated static func isFile(_ windowsPath: String, drive: URL) -> Bool {
+        var folder: ObjCBool = false
+        guard let url = resolve(windowsPath, drive: drive) else { return false }
+        return FileManager.default.fileExists(atPath: url.path, isDirectory: &folder) && !folder.boolValue
+    }
+
     /// The PE machine of an executable (0x14c: 32-bit x86, 0x8664: x64), nil when unreadable.
     nonisolated static func machine(_ file: URL) -> UInt16? {
         guard let handle = try? FileHandle(forReadingFrom: file) else { return nil }
@@ -1181,6 +1211,7 @@ enum DockInstallers {
                                                     || (directXProvided && DockInstallScripts.isDirectXSetup($0.executable)
                                                         && (directXFirst || failedBefore.contains($0.run.name)))
                                                     || skip.contains(DockInstallScripts.label($0.run).lowercased())
+                                                    || DockInstallScripts.installsPresentLauncher($0.executable, exists: { path in isFile(path, drive: drive) })
                                             })
         let providedRuns = DockInstallScripts.providedRuns(items)
         var providedWritten = 0
@@ -1269,6 +1300,9 @@ enum DockInstallers {
                 if skip.contains(DockInstallScripts.label(run).lowercased()) {
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the game's settings list it in " +
                                         "env.MADEIRA_DOCK_INSTALL_SKIP (BCD provides what it installs); file=\(file); record: \(recorded)")
+                } else if DockInstallScripts.provider(item.process) == DockInstallScripts.launcherProvider {
+                    LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the launcher it installs is already in the prefix " +
+                                        "(file=\(file) is a shared launcher's installer, and every Dock game shares the prefix); record: \(recorded)")
                 } else if DockInstallScripts.provider(item.process) == "BCD" {
                     let why = failedBefore.contains(run.name) ? "it failed in this game before" : "env.MADEIRA_DOCK_DIRECTX_FIRST = 1 skips it at the first start"
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by BCD; " +
