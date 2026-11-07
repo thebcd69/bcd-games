@@ -3504,6 +3504,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_UBI_CEF"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_KILL_REAP"); /* madeira-bcd: likewise (the game starter's ended copy) */
     unsetenv("MADEIRA_SELF_WRITE"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
+    unsetenv("MADEIRA_APC_BUSY_QUEUE"); /* madeira-bcd: likewise (the Dock sets it for a Ubisoft game's session, ContentView.startDock) */
     unsetenv("MADEIRA_TAIL_CARVE_EXEC_CHECK"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_POOL_CLAMP_SECTIONS"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_LUM_PROBE");      /* madeira-bcd: likewise */

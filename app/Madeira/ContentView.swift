@@ -2434,6 +2434,14 @@ struct ContentView: View {
             } else {
                 unsetenv("MADEIRA_MADSYNC_SESSION")
             }
+            // madeira-bcd: a game whose install script runs a shared launcher's installer (Ubisoft Connect) runs that launcher in its
+            // session, so the session gets the launcher's own lines (DockInstallScripts.sharedLauncherSessionEnv); a start without one
+            // clears them. bcd.cfg's lines, exported after this, win.
+            for name in DockInstallScripts.sharedLauncherSessionNames where DockInstallers.launcherSessionEnv[name] == nil { unsetenv(name) }
+            for (name, value) in DockInstallers.launcherSessionEnv.sorted(by: { $0.key < $1.key }) {
+                setenv(name, value, 1)
+                logStore.log("[dock-installers] the game's install script runs a shared launcher: \(name)=\(value) for this session")
+            }
             // A Dock session starts 64-bit (explorer, then the host), but the programs it starts
             // later are often 32-bit: one-time installers and the 32-bit games Valve's client
             // launches. win32u decides once, when the session's first program initialises it,

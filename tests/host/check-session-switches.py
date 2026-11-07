@@ -23,7 +23,8 @@ want = ["MADEIRA_WER", "MADEIRA_WINTYPES", "MADEIRA_OPTIN_DLLS", "MADEIRA_VCRT_A
         "MADEIRA_WOA_RECHECK",
         "MADEIRA_SLEEP_KERNEL_APC",
         "MADEIRA_SELF_WRITE",
-        "MADEIRA_X64_HOOK_ZONE"]
+        "MADEIRA_X64_HOOK_ZONE",
+        "MADEIRA_APC_BUSY_QUEUE"]
 missing = [n for n in want if n not in unset]
 for n in want:
     print(("ok   " if n in unset else "FAIL ") + n + " is cleared at the end of a session")
