@@ -4401,6 +4401,11 @@ jobs:
       - name: Check thin reservations
         run: python3 tests/host/check-thin-reserve.py
 
+      # madeira-bcd tls-index-sync: the loader's TLS slot for a module reaches the pool copy it runs from; the parse and the copy on a
+      # synthetic image, and where the protect-time sync calls it.
+      - name: Check the TLS slot in pool copies
+        run: python3 tests/host/check-tls-index-sync.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.

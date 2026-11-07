@@ -6711,6 +6711,61 @@ static int ios_img_off_is_exec( const void *img, size_t img_size, size_t off )
     return 0;   /* outside every section: headers/padding, not code */
 }
 
+/* madeira-bcd tls-index-sync: the loader's TLS slot reaches the pool copy a module runs from.
+ *
+ * The loader gives a module with a TLS directory a slot and stores it in the module's _tls_index (alloc_tls_slot:
+ * *AddressOfIndex = slot), in the image it sees. An ARM64EC module runs from its pool copy and reads _tls_index ADRP-relative
+ * there, where the file's 0 stayed, so its thread_local data came from slot 0, the main program's block. d3d9-dxmt.dll
+ * (env.MADEIRA_D3D9_X64 = dxmt) loaded by Steam's client got slot 12, used dockhost.exe's 8-byte block as its own, took the text
+ * after it for a pointer (AV reading 0x6c42646c69754535 at d3d9.dll+0x5a0b8) and Steam's crash handler ended the client.
+ *
+ * Only the loader writes _tls_index, so the image holds the right value. The protect-time sync below calls this for the image
+ * it syncs: fixup_imports calls alloc_tls_slot first, then protects each import's thunks, all before DllMain and the TLS
+ * callbacks. A module with a TLS directory and no import whose thunks get protected is not covered. The 4 bytes are copied
+ * only when they differ and AddressOfIndex lies in a non-executable part of the image; nothing else in the copy changes. */
+static int ios_tls_index_off( const unsigned char *img, size_t img_size, uintptr_t img_va, size_t *index_off )
+{
+    uint32_t lfanew, nrva, rva, dsz;
+    uint16_t magic;
+    uint64_t va;
+
+    if (img_size < 0x40 || img[0] != 'M' || img[1] != 'Z') return 0;
+    memcpy( &lfanew, img + 0x3c, 4 );
+    if (lfanew > img_size || img_size - lfanew < 24 + 112 + 10 * 8) return 0;   /* PE32+ header up to DataDirectory[9] */
+    if (memcmp( img + lfanew, "PE\0\0", 4 )) return 0;
+    memcpy( &magic, img + lfanew + 24, 2 );
+    if (magic != 0x20b) return 0;                                          /* IMAGE_NT_OPTIONAL_HDR64_MAGIC */
+    memcpy( &nrva, img + lfanew + 24 + 108, 4 );
+    if (nrva <= 9) return 0;                                               /* IMAGE_DIRECTORY_ENTRY_TLS */
+    memcpy( &rva, img + lfanew + 24 + 112 + 9 * 8, 4 );
+    memcpy( &dsz, img + lfanew + 24 + 112 + 9 * 8 + 4, 4 );
+    if (!rva || dsz < 40 || rva > img_size || img_size - rva < 40) return 0;   /* IMAGE_TLS_DIRECTORY64 */
+    memcpy( &va, img + rva + 16, 8 );                                      /* AddressOfIndex */
+    if (va < img_va || va - img_va > img_size - 4) return 0;
+    *index_off = (size_t)(va - img_va);
+    return 1;
+}
+
+static void ios_tls_index_sync( uintptr_t pe_start, size_t img_size, char *rw_image )
+{
+    static int said;
+    size_t off;
+    uint32_t live, copy;
+
+    if (!ios_tls_index_off( (const unsigned char *)pe_start, img_size, pe_start, &off )) return;
+    if (ios_img_off_is_exec( (const void *)pe_start, img_size, off )) return;
+    memcpy( &live, (const char *)pe_start + off, 4 );
+    memcpy( &copy, rw_image + off, 4 );
+    if (live == copy) return;
+    memcpy( rw_image + off, &live, 4 );
+    if (said < 32)
+    {
+        said++;
+        dprintf( 2, "[tls-index-sync] image %p: _tls_index (rva 0x%lx) = %u in its pool copy (it held %u)\n",
+                 (void *)pe_start, (unsigned long)off, live, copy );
+    }
+}
+
 /* madeira-bcd round 626 (agent A2 S7; Poppy Playtime's launcher 6DS3FK, build 623; WC6QN0, build 611): a pure x64 image run without a
  * pool copy (VPROT_X64DATA, MADEIRA_X64_IMAGE_NOCOPY or the NOCOPY fallback) is in no ios_jit_mappings[] entry, so the binder below
  * returned at once and its IAT slots for DATA exports of ARM64EC DLLs (msvcp140's std::cout) kept the PE address, where the DLL's live
@@ -38627,6 +38682,8 @@ NTSTATUS WINAPI NtProtectVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T 
                     uintptr_t pool_offset = (uintptr_t)ios_jit_mappings[idx].jit_base
                                           - (uintptr_t)ios_jit_rx_base_global;
                     char *jit_rw_dest = (char *)ios_jit_rw_base_global + pool_offset + off;
+                    /* madeira-bcd tls-index-sync: the loader's TLS slot for this image, in the copy that runs (above). */
+                    ios_tls_index_sync( pe_start, pe_end - pe_start, (char *)ios_jit_rw_base_global + pool_offset );
                     /* madeira-bcd: MADEIRA_NTDLL_DATA_SYNC_RANGE (thebcd69/bcd-games#4 by mckenna654): off, never reached. */
                     if (ios_ntdll_data_sync_range_enabled())
                     {
