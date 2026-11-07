@@ -3477,6 +3477,7 @@ static void wine_session_end(void)
     unsetenv("DXMT_ENABLE_NVEXT"); unsetenv("DXMT_WSI_MONITOR_IDENTITY"); unsetenv("DXMT_WSI_MODE_TABLE");
     unsetenv("BCD_SERVICES_DIR"); unsetenv("BCD_SERVICES_TARGET");   /* round 620 */
     unsetenv("BCD_SESSION_HZ");   /* round 626 (agent H S2): the next launch publishes its own */
+    unsetenv("BCD_GAME_FOLDER");  /* madeira-bcd pool-fg: the next launch publishes its own game's folder, or none */
     /* madeira-bcd: Horizon Zero Dawn's per-game switches must not reach a later game
      * of this app run (GTA V Enhanced runs without them). */
     unsetenv("MADEIRA_UCRT_X64_MATH"); unsetenv("MADEIRA_SRV_FGETPATH");
@@ -3501,6 +3502,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_X64_HOOK_ZONE"); /* madeira-bcd: likewise (Far Cry 4's hook zone) */
     unsetenv("MADEIRA_SLEEP_KERNEL_APC"); /* madeira-bcd: likewise (Far Cry 3's sleeps) */
     unsetenv("MADEIRA_WOA_RECHECK"); /* madeira-bcd: likewise (Ubisoft Connect's waits) */
+    unsetenv("MADEIRA_POOL_CODE_FOREGROUND"); /* madeira-bcd: likewise (the code-buffer policy) */
     unsetenv("MADEIRA_POOL_CARVE_MERGE"); /* madeira-bcd: likewise (the code-buffer merge) */
     unsetenv("MADEIRA_UBI_CEF"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_KILL_REAP"); /* madeira-bcd: likewise (the game starter's ended copy) */

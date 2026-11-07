@@ -137,6 +137,7 @@ desk.resolution = "1280x720"
 expect(desk.launchArguments == "/desktop=shell,1280x720 C:\\windows\\system32\\services.exe", "desktop arguments")
 desk.configureLaunch()
 expect(env("MADEIRA_EXE") == "explorer.exe" && env("MADEIRA_DESKTOP") == "1", "desktop starts explorer in desktop mode")
+expect(env("BCD_GAME_FOLDER") == nil, "pool-fg: the Desktop entry publishes no game folder")
 expect(env("MADEIRA_SCREEN_W") == "1280" && env("MADEIRA_SCREEN_H") == "720", "desktop size exported")
 expect(published == (1280, 720), "desktop size published to the display shim")
 
@@ -147,6 +148,7 @@ game.configureLaunch()
 expect(env("MADEIRA_EXE") == "C:\\Games\\Some Game\\bin\\game.exe", "direct executable path")
 expect(env("MADEIRA_ARGS") == "-windowed \"-name=a b\"", "direct arguments verbatim")
 expect(env("MADEIRA_DESKTOP") == nil, "desktop state cleared")
+expect(env("BCD_GAME_FOLDER") == "C:\\Games\\Some Game\\bin", "pool-fg: the program's own folder is the game's")
 // Every entry's Resolution becomes the session's virtual monitor.
 expect(game.resolution == "1152x800", "ml1172: new entries default to the screen's shape at 720p's pixels (1152x800 on an 11-inch iPad)")
 expect(env("MADEIRA_SCREEN_W") == "1152" && env("MADEIRA_SCREEN_H") == "800" && env("MADEIRA_SCREEN_SRC") == "knob",
@@ -160,8 +162,9 @@ game.resolution = "1280x720"; game.configureLaunch()
 // A Steam game: Madeira Dock sets what starts, so its profile leaves MADEIRA_EXE alone...
 var steamGame = LibraryEntry(title: "Steam game", relativePath: "Program Files (x86)/Steam/steamapps/common/Some Game", bits: 0)
 steamGame.steamAppID = 4242
-setenv("MADEIRA_EXE", "set-by-dock", 1); setenv("MADEIRA_STEAM_APPID", "1", 1)
+setenv("MADEIRA_EXE", "set-by-dock", 1); setenv("MADEIRA_STEAM_APPID", "1", 1); setenv("BCD_GAME_FOLDER", "set-by-dock", 1)
 steamGame.configureLaunch()
+expect(env("BCD_GAME_FOLDER") == "set-by-dock", "pool-fg: a Dock start's folder is MadeiraDock.configure's")
 expect(env("MADEIRA_EXE") == "set-by-dock" && env("MADEIRA_STEAM_APPID") == nil, "Madeira Dock (the default): the profile sets nothing that starts")
 // ...and "Start with: The game" starts the game's own program, with the game's own Steam identity.
 steamGame.steamStart = "game"; steamGame.steamProgram = "bin/game.exe"; steamGame.steamProgramArguments = "-dx11 \"-name=a b\""
@@ -174,6 +177,7 @@ expect(env("MADEIRA_ARGS") == "-dx11 \"-name=a b\"", "The game: Steam's argument
 expect(env("MADEIRA_STEAM_APPID") == "4242" && env("MADEIRA_STEAM_APPPATH") == steamFolder,
        "The game: its own App ID and install folder for the bridge")
 expect(env("MADEIRA_WORKDIR") == steamFolder + "\\data", "The game: Steam's working folder")
+expect(env("BCD_GAME_FOLDER") == steamFolder, "pool-fg: The game's folder is its install folder, not its program's")
 steamGame.steamProgramFolder = ""; steamGame.configureLaunch()
 expect(env("MADEIRA_WORKDIR") == steamFolder, "working folder \"\": the install folder")
 steamGame.steamProgramFolder = nil; steamGame.configureLaunch()

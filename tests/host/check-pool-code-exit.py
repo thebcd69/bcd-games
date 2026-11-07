@@ -31,6 +31,7 @@ def function(signature):
     return source[start:source.index('\n}', start) + 2] + '\n'
 
 
+fg_policy = '\n'.join(line for line in source.splitlines() if line.startswith(('#define IOS_POOL_OTHER_MAX ', '#define IOS_POOL_FG_HOLD_SEC '))) + '\n' + function('static int ios_pool_fg_held(')
 helpers = next(line for line in source.splitlines() if line.startswith('#define IOS_POOL_CUT_MIN ')) + '\n' + ''.join(function(signature) for signature in (
     'static size_t ios_pool_hole_tail_start(',
     'static size_t ios_pool_hole_between(',
@@ -106,6 +107,10 @@ static pthread_mutex_t ios_tail_carve_lock = PTHREAD_MUTEX_INITIALIZER;
 static uintptr_t owner;
 static int scan_busy, scans, occupied;
 static void *ios_jit_current_peb(void) { return (void *)owner; }
+/* madeira-bcd pool-fg: the policy is off in this fixture (tests/host/check-pool-code-policy.py covers it) */
+enum { IOS_POOL_FG_OFF = 0, IOS_POOL_FG_OTHER = 1, IOS_POOL_FG_GAME = 2 };
+static int ios_pool_fg_class(void) { return IOS_POOL_FG_OFF; }
+''' + fg_policy + r'''
 static uintptr_t ios_wow_base(void) { return 0; }
 static int ios_tail_carve_scan(const void *base, size_t size, int strict)
 { (void)base; (void)size; CHECK(strict == 1); CHECK(++scans < 64); return scan_busy; }   /* < 64: no retry loop */

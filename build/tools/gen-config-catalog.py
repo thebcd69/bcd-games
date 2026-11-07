@@ -813,12 +813,23 @@ OVERLAY = {
                         "a process's first one is logged as [self-write].",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
     # madeira-bcd pool-merge (build 635; Ubisoft Connect with Far Cry 3 and Far Cry 4)
+    # madeira-bcd pool-fg (build 635; Ubisoft Connect with Far Cry 3 and Far Cry 4)
+    "env.MADEIRA_POOL_CODE_FOREGROUND": {"category": "Memory & JIT pool", "kind": "bool", "default": "0",
+                "title": "Code buffers for the program you launched",
+                "note": "Default off (build 635). 1: the session's programs other than the one you launched (a launcher, its helpers, "
+                        "Steam's client) get FEX code buffers of at most 16 MB, also from free ones, and a buffer the launched program "
+                        "freed or left behind when it exited is kept for it for 120 s; free buffers also merge and are cut to the size "
+                        "asked (env.MADEIRA_POOL_CARVE_MERGE). For a game behind a launcher whose helpers would otherwise take the pool "
+                        "first (Far Cry 3 and Far Cry 4 behind Ubisoft Connect). The launched program is the one whose folder the app "
+                        "names for the session (a Steam game's install folder, else the library entry's program's). Set it in the game's "
+                        "own file; read at each new buffer; [pool-fg] names each program's class.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_POOL_CARVE_MERGE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0",
                 "title": "Free code buffers merge and are cut to the size asked",
                 "note": "Default off (build 635). 1: a code buffer FEX releases merges with the free buffers next to it, and a free buffer "
                         "1 MB or more larger than a request is cut to the size asked: a pool whose free buffers add up to hundreds of MB "
                         "no longer refuses one large buffer, and a 16 KB request no longer takes a whole free 16-32 MB buffer. "
-                        "Set it in the game's own file; read at each request.",
+                        "env.MADEIRA_POOL_CODE_FOREGROUND = 1 turns it on too. Set it in the game's own file; read at each request.",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_THIN_RESERVE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0", "title": "Thin 1-2 GB reservations",
                 "note": "Default off. 1: after the first 8 GB of read-write reservations of 1 to 2 GB (no address given), each new one gets a real 63 MB head and the program is told it got "

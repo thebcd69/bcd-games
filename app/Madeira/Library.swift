@@ -497,6 +497,13 @@ struct LibraryEntry: Codable, Identifiable {
     }
 
     var windowsPath: String { "C:\\" + relativePath.replacingOccurrences(of: "/", with: "\\") }
+    /// madeira-bcd: the folder of the program the player plays (BCD_GAME_FOLDER): a Steam game's install folder, else the folder of the
+    /// entry's program. With env.MADEIRA_POOL_CODE_FOREGROUND = 1 the session's other programs get smaller FEX code buffers than
+    /// its processes (virtual_ios.c ios_pool_fg_class); nil for the Desktop entry.
+    var gameFolder: String? {
+        if desktop == true { return nil }
+        return steamAppID != nil ? windowsPath : Self.folder(of: launchWindowsPath)
+    }
 
     /// The vsync mode to apply: a saved 30 or 40 FPS limit runs as 60 when it is
     /// not offered (DXMT without that cap would present uncapped).
@@ -686,6 +693,9 @@ struct LibraryEntry: Codable, Identifiable {
         setenv("MADEIRA_EXE", command.exe, 1)
         setenv("MADEIRA_ARGS", LaunchArgumentText.plain(command.args), 1)   // round 632: Smart Punctuation's dashes and quotes put back (ASCII is unchanged)
         if desktop == true || runsInDesktop { setenv("MADEIRA_DESKTOP", "1", 1) } else { unsetenv("MADEIRA_DESKTOP") }
+        // madeira-bcd: the folder of the program the player plays, for the session's code-buffer budget (virtual_ios.c
+        // ios_pool_fg_class); a Dock start publishes its game's in MadeiraDock.configure.
+        if let gameFolder { setenv("BCD_GAME_FOLDER", gameFolder, 1) } else { unsetenv("BCD_GAME_FOLDER") }
         if startsSteamGameDirectly, let steamAppID {
             // The game's own Steam identity (SteamAppId, SteamGameId, SteamAppPath = its install
             // folder) instead of the bridge's fixed one.

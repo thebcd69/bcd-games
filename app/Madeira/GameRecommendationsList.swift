@@ -498,6 +498,7 @@ struct RecommendationsPolicy {
         "MADEIRA_WOA_RECHECK",   // build 635 (Ubisoft Connect's 32-bit browser): an infinite wait on an address re-checks every second; 0 or 1 (checked below)
         "MADEIRA_KILL_REAP",   // build 635 (Ubisoft Connect's game starter): a process ended by another one releases its code buffers and window as an exit; 0 or 1 (checked below)
         "MADEIRA_POOL_CARVE_MERGE",   // build 635 (Far Cry 3/4 behind Ubisoft Connect): free code buffers merge and are cut to the size asked; 0 or 1 (checked below)
+        "MADEIRA_POOL_CODE_FOREGROUND",   // build 635 (Far Cry 3/4 behind Ubisoft Connect): the session's other programs get code buffers of at most 16 MB; 0 or 1 (checked below)
     ]
 
     var configKeys: Set<String>
@@ -612,6 +613,11 @@ struct RecommendationsPolicy {
                 // build 630 (Unreal Gold): MOV moffs gets a guest-RIP entry in the 32-bit emulator (tools/patch-fex-ios-moffs-rip.py); off unless 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_FEX_MOFFS_RIP is 0 or 1")
+                }
+            case "MADEIRA_POOL_CODE_FOREGROUND":
+                // build 635: code buffers for the program being played (virtual_ios.c pool-fg); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_POOL_CODE_FOREGROUND is 0 or 1")
                 }
             case "MADEIRA_POOL_CARVE_MERGE":
                 // build 635: free code buffers merge and are cut to the size asked (virtual_ios.c pool-merge); off unless 1.
