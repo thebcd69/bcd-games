@@ -4406,6 +4406,10 @@ jobs:
       - name: Check the TLS slot in pool copies
         run: python3 tests/host/check-tls-index-sync.py
 
+      # madeira-bcd: a generic reserved area never swallows a FEX or thin area that follows it (mmap_add_reserved_area).
+      - name: Check reserved-area merges keep special areas
+        run: python3 tests/host/check-reserved-area-merge.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.
