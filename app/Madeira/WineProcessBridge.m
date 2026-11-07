@@ -3498,6 +3498,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_NLS_EXTRA");    /* madeira-bcd: likewise (env_ios.c reads it at every code page request) */
     unsetenv("MADEIRA_WG_64BIT");     /* madeira-bcd: likewise (Resident Evil 2's decoders; a later game keeps the stub table) */
     unsetenv("MADEIRA_VCRT_ARM64_KEY"); /* madeira-bcd: likewise (the Runtimes\\arm64 marker is per game) */
+    unsetenv("MADEIRA_X64_HOOK_ZONE"); /* madeira-bcd: likewise (Far Cry 4's hook zone) */
     unsetenv("MADEIRA_TAIL_CARVE_EXEC_CHECK"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_POOL_CLAMP_SECTIONS"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_LUM_PROBE");      /* madeira-bcd: likewise */

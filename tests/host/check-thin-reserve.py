@@ -101,8 +101,8 @@ check("the commit, decommit, release and query hooks run only with a thin reserv
       and "if (ios_thin_live_n && type == MEM_DECOMMIT && base && ios_thin_decommit_fixup( base, &size ))" in src
       and "if ((type & MEM_RELEASE) && ios_thin_live_n) ios_thin_released( base );" in src
       and "if (ios_thin_live_n) ios_thin_fix_query( addr, info );" in src)
-check("every reserved area is made with thin_only set (0 for generic and FEX areas)",
-      len(re.findall(r"area->thin_only = 0;", src)) == 2 and "new_area->thin_only = area->thin_only;" in src
+check("every reserved area is made with thin_only set (0 for generic, FEX and x64 hook-zone areas)",
+      len(re.findall(r"area->thin_only = 0;", src)) == 3 and "new_area->thin_only = area->thin_only;" in src
       and src.count("area->thin_only = 1;") == 1)
 check("generic placement never searches a thin arena", src.count("if (area->thin_only) continue;") == 2)
 check("the device program is there", (R / "tests/x64/thinreserve-x64.c").is_file())

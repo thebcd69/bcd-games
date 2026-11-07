@@ -17,7 +17,8 @@ unset = set(re.findall(r'unsetenv\("(MADEIRA_[A-Z0-9_]+)"\);', bridge))
 want = ["MADEIRA_WER", "MADEIRA_WINTYPES", "MADEIRA_OPTIN_DLLS", "MADEIRA_VCRT_ARM64_KEY",
         "MADEIRA_TAIL_CARVE_EXEC_CHECK", "MADEIRA_LUM_PROBE", "MADEIRA_FEX_BAND_KEEP_MB", "MADEIRA_X64_MACHINE",
         "MADEIRA_POOL_CLAMP_SECTIONS", "MADEIRA_TINY_WINDOW_FIX", "MADEIRA_WG_64BIT", "MADEIRA_NLS_EXTRA",
-        "MADEIRA_REAL_SUSPEND", "MADEIRA_FIRST_PROC_OWN_EXIT_FLAG"]
+        "MADEIRA_REAL_SUSPEND", "MADEIRA_FIRST_PROC_OWN_EXIT_FLAG",
+        "MADEIRA_X64_HOOK_ZONE"]
 missing = [n for n in want if n not in unset]
 for n in want:
     print(("ok   " if n in unset else "FAIL ") + n + " is cleared at the end of a session")

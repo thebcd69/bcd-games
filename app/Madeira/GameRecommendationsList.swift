@@ -493,6 +493,7 @@ struct RecommendationsPolicy {
         "MADEIRA_ALIAS_HONOR_PROT",   // build 632 (Stardew Valley and other .NET games, upstream Madeira 0db1b82): executable aliases keep their write protection; 0 or 1 (checked below)
         "MADEIRA_DIRCACHE",   // build 632 (Wine fork commit 11f6aa3a9; Source-engine rows): case-insensitive lookups answered from cached directory listings, off unless 1; 0 or 1 (checked below)
         "MADEIRA_D3D9_DIRECT_MAP",   // build 632 (dxmt 880241a, TF2 42.8 -> 83.7 fps upstream): a 64-bit Direct3D 9 game locks its dynamic buffers in place, off unless 1; 0 or 1 (checked below)
+        "MADEIRA_X64_HOOK_ZONE",   // build 635 (Far Cry 4's FC64.dll): 16 MB free above each 64-bit program's ntdll for hook code; 0 or 1 (checked below)
     ]
 
     var configKeys: Set<String>
@@ -607,6 +608,11 @@ struct RecommendationsPolicy {
                 // build 630 (Unreal Gold): MOV moffs gets a guest-RIP entry in the 32-bit emulator (tools/patch-fex-ios-moffs-rip.py); off unless 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_FEX_MOFFS_RIP is 0 or 1")
+                }
+            case "MADEIRA_X64_HOOK_ZONE":
+                // build 635 (Far Cry 4): a 16 MB hook zone above each 64-bit program's ntdll (virtual_ios.c x64-hook-zone); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_X64_HOOK_ZONE is 0 or 1")
                 }
             case "MADEIRA_THREAD_FAULT_ISOLATE":
                 // build 630 (TEKKEN 7, agent G3 S4): 1 to 4 DLL file names, comma separated (thread_ios.c ios_thr_isolate_parse).

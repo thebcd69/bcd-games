@@ -4410,6 +4410,11 @@ jobs:
       - name: Check reserved-area merges keep special areas
         run: python3 tests/host/check-reserved-area-merge.py
 
+      # madeira-bcd: env.MADEIRA_X64_HOOK_ZONE = 1 (default off): 16 MB free above each 64-bit process's ntdll for hook code (a FIXED_ONLY
+      # reserved area); the kind, the placement, the release and FC64's probe on a fake map.
+      - name: Check the 64-bit hook zone
+        run: python3 tests/host/check-x64-hook-zone.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.

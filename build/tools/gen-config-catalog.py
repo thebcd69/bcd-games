@@ -794,6 +794,15 @@ OVERLAY = {
     "env.MADEIRA_QUERY_CLIP": {"category": "Memory & JIT pool", "kind": "bool", "default": "0", "title": "VirtualQuery calls only allocatable memory free",
                 "note": "Default off. 1: VirtualQuery reports memory no allocation can land in (below the map floor, mappings of iOS itself, the JIT pool) as reserved, not free, "
                         "for a program that looks for a free block near its exe. It asks the kernel about the host's mappings for it. Set it in the game's own file; read at session start."},
+    # madeira-bcd x64-hook-zone (build 635; Far Cry 4)
+    "env.MADEIRA_X64_HOOK_ZONE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0",
+                "title": "Free room above a 64-bit program's ntdll for hook code",
+                "note": "Default off (build 635). 1: each 64-bit program's ntdll gets 16 MB of free address space directly above it, which "
+                        "only a request for a fixed address uses, and the program's other DLLs go below it: a hook that needs its jump "
+                        "target within 2 GB of the function finds room there, as on Windows (Far Cry 4's FC64.dll searches upward from "
+                        "ntdll and otherwise quits with 'Error at hooking'). Set it in the game's own file; read when each 64-bit "
+                        "program starts. Logged as [hook-zone].",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_THIN_RESERVE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0", "title": "Thin 1-2 GB reservations",
                 "note": "Default off. 1: after the first 8 GB of read-write reservations of 1 to 2 GB (no address given), each new one gets a real 63 MB head and the program is told it got "
                         "the full size; a commit that grows past the head fails and is logged ([thin] OVERFLOW). For a game that reserves dozens of 1 GB blocks and commits little of "
