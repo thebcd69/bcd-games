@@ -496,6 +496,7 @@ struct RecommendationsPolicy {
         "MADEIRA_X64_HOOK_ZONE",   // build 635 (Far Cry 4's FC64.dll): 16 MB free above each 64-bit program's ntdll for hook code; 0 or 1 (checked below)
         "MADEIRA_SLEEP_KERNEL_APC",   // build 635 (Far Cry 3 behind Ubisoft Connect): a non-alertable sleep runs I/O completions; 0 or 1 (checked below)
         "MADEIRA_WOA_RECHECK",   // build 635 (Ubisoft Connect's 32-bit browser): an infinite wait on an address re-checks every second; 0 or 1 (checked below)
+        "MADEIRA_KILL_REAP",   // build 635 (Ubisoft Connect's game starter): a process ended by another one releases its code buffers and window as an exit; 0 or 1 (checked below)
     ]
 
     var configKeys: Set<String>
@@ -610,6 +611,11 @@ struct RecommendationsPolicy {
                 // build 630 (Unreal Gold): MOV moffs gets a guest-RIP entry in the 32-bit emulator (tools/patch-fex-ios-moffs-rip.py); off unless 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_FEX_MOFFS_RIP is 0 or 1")
+                }
+            case "MADEIRA_KILL_REAP":
+                // build 635 (Ubisoft Connect): a killed process's resources are released as an exit's (process_ios.c kill-reap); off unless 1.
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_KILL_REAP is 0 or 1")
                 }
             case "MADEIRA_WOA_RECHECK":
                 // build 635 (Ubisoft Connect): a 32-bit infinite RtlWaitOnAddress re-checks its entry every second (tools/patch-wine-woa-recheck.py); off unless 1.

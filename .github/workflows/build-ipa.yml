@@ -4441,6 +4441,11 @@ jobs:
       - name: Check a program's writes into its own memory
         run: python3 tests/host/check-self-write.py
 
+      # madeira-bcd: env.MADEIRA_KILL_REAP = 1 (default off): a process ended by another one releases its code buffers, window and
+      # handles as an exit does (process_ios.c NtTerminateProcess); the switch and the order around the server request.
+      - name: Check kill-reap
+        run: python3 tests/host/check-kill-reap.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.

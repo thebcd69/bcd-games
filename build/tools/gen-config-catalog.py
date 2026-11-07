@@ -2694,6 +2694,15 @@ OVERLAY = {
                         "freed only after a check that the earlier thread is really gone and the same one (the way the EA app already "
                         "works), which takes the memory lock twice at every thread end. Read when a thread ends.",
                 "sources": ["build/ntdll-unix/thread_ios.c"]},
+    # madeira-bcd kill-reap (build 635; Ubisoft Connect's game starter)
+    "env.MADEIRA_KILL_REAP": {"category": "Wine core (ntdll)", "title": "A killed program's resources are released as an exit's",
+                "kind": "bool", "default": "0",
+                "note": "Default off (build 635). 1: when one program ends another with TerminateProcess (Ubisoft Connect's game starter "
+                        "ends the suspended copy of the game it could not inject into this way), the ended program's FEX code buffers, "
+                        "window and handles are released as its exit would release them; otherwise they stay allocated until the "
+                        "session ends and count against every later program. Set it in the game's own file; read at each such call; "
+                        "[kill-reap] lines say when it ran.",
+                "sources": ["build/ntdll-unix/process_ios.c"]},
     "env.MADEIRA_FIRST_PROC_OWN_EXIT_FLAG": {"category": "Exceptions & threads", "title": "A launcher that exits first does not unlock memory",
                 "kind": "bool", "default": "0",
                 "note": "Default off. After the first program of a session (a launcher or a batch file that started the game) has "
