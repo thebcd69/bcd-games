@@ -148,8 +148,8 @@ baseline = json.loads((root / "tools/farm-baseline.json").read_text())
 check("the committed baseline knows the three farms, each with required files, a minimum and gap lists",
       set(baseline["farms"]) == {"arm64ec-windows", "aarch64-windows", "i386-windows"}
       and all(f["required"] and f["minFiles"] > 50 and "staticGaps" in f and "delayGaps" in f for f in baseline["farms"].values()))
-check("its accepted static gaps are the opt-in modules' (evr-optin, msi-optin) and the Bluetooth control panel's",
-      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "evr-optin.dll", "msi-optin.dll"}
+check("its accepted static gaps are the opt-in modules' (dxdiagn-optin, evr-optin, msi-optin) and the Bluetooth control panel's",
+      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "dxdiagn-optin.dll", "evr-optin.dll", "msi-optin.dll"}
       and baseline["farms"]["aarch64-windows"]["staticGaps"] == {} and baseline["farms"]["i386-windows"]["staticGaps"] == {})
 wf = (root / ".github/workflows/build-ipa.yml").read_text()
 step_at = wf.index("      - name: Verify the Windows farms are complete")

@@ -2115,7 +2115,8 @@ OVERLAY = {
     "env.MADEIRA_OPTIN_DLLS": {"category": "Wine libraries", "title": "Give the game more of Wine's DLLs",
                 "kind": "text", "default": "",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh",
-                            "tools/patch-wine-setupapi-devinst-lock.py", "tools/patch-wine-mfasfsrcsnk-winedmo.py"],
+                            "tools/patch-wine-setupapi-devinst-lock.py", "tools/patch-wine-mfasfsrcsnk-winedmo.py",
+                            "tools/patch-wine-dxdiagn-directshow.py"],
                 "note": "A comma-separated list (dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore, setupapi): each named DLL, which BCD ships as "
                         "<name>-optin.dll and never for every game, runs as <name>.dll for this game. For a program that "
                         "imports one and exits at once with c0000135 (\"Library dxva2.dll ... not found\"; Fort Solis, "
@@ -2138,6 +2139,8 @@ OVERLAY = {
                         "xinputuap is Windows 10's XInput for modern apps (Dead or Alive 6, build 630) and httpapi Windows' HTTP server API, which "
                         "cpprest imports (GrandChase, build 630). dbgcore is no file of its own: an Unreal game's bundled dbghelp.dll forwards its "
                         "minidump function to dbgcore.dll, and the line links that name to BCD's dbghelp.dll (build 630). "
+                        "dxdiagn is Wine's DxDiag provider, which the prefix registers at system32\\dxdiagn.dll; a 64-bit program that asks for it "
+                        "got none (Far Cry 4's hardware detection, which then read a null result; build 635). List it with ddraw, which it imports. "
                         "An earlier session's links are removed when a name is gone. "
                         "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint, oledlg, fwpuclnt, sensapi, gamingtcui, qwave, "
                         "xinputuap, httpapi, dbgcore, setupapi and (with env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},

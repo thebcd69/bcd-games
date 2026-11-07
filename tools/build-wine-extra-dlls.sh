@@ -202,7 +202,12 @@ fi
 # advapi32, user32, win32u) all ship.
 # httpapi (2026-11-03, round 630, agent G2 S7; GrandChase QB5XMM, build 626): the game's cpprest_2_10.dll imports HTTPAPI.dll, which
 # only the 32-bit set has (c0000135 at the loader). Wine's httpapi imports only advapi32, which ships.
-OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc xinputuap httpapi"
+# dxdiagn (Far Cry 4): the prefix registers CLSID_DxDiagProvider at system32\dxdiagn.dll, but only the 32-bit set has the DLL, so
+# CoCreateInstance failed in a 64-bit program; Ubisoft's systemdetection64.dll logged "Can't get the IDxDiagProvider (CoCreateInstance
+# failed)" and the game read a null result. Wine's dxdiagn imports ddraw (opt-in, above), d3d9, dsound, version, ole32, oleaut32,
+# user32 and advapi32: a game lists both, "dxdiagn,ddraw". Many programs ask for the provider and go on without it, hence opt-in.
+# Built with tools/patch-wine-dxdiagn-directshow.py (below): without devenum.dll, Initialize failed on the DirectShow section.
+OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc xinputuap httpapi dxdiagn"
 OPT=""
 if [ "${MADEIRA_OPTIN_BUILD:-1}" != 0 ]; then
     for d in $OPTIN_WANT; do
@@ -302,11 +307,27 @@ if [ -n "$MFA" ]; then
         MFA=""
     fi
 fi
+# dxdiagn-optin.dll: Wine's DxDiag provider, patched so a missing DirectShow device enumerator (devenum.dll) leaves that section
+# empty instead of failing IDxDiagProvider::Initialize (see the script). A patch that does not apply drops the DLL (an unpatched
+# one fails Initialize here, which a program treats as no provider).
+DXD=""
+case " $OPT " in *" dxdiagn "*) DXD=dxdiagn ;; esac
+if [ -n "$DXD" ]; then
+    if python3 "$R/tools/patch-wine-dxdiagn-directshow.py" "$R/wine"; then
+        rm -f "$B/dlls/dxdiagn/arm64ec-windows/dxdiagn.dll" "$B"/dlls/dxdiagn/arm64ec-windows/*.o
+    else
+        echo "::warning::dxdiagn DirectShow patch did not apply; dxdiagn-optin.dll not shipped"
+        targets="${targets/ dlls\/dxdiagn\/arm64ec-windows\/dxdiagn.dll/}"
+        OPT="${OPT/ dxdiagn/}"
+        DXD=""
+    fi
+fi
 [ -n "$targets" ] && make -C "$B" -k -j"$JOBS" $targets > "$B.build.log" 2>&1
 git -C "$R/wine" checkout -- dlls/msvcrt/main.c dlls/xinput1_3/main.c dlls/d2d1/dc_render_target.c \
     dlls/windows.gaming.input/provider.c dlls/windows.gaming.input/main.c
 for d in $undelayed; do git -C "$R/wine" checkout -- "dlls/$d/Makefile.in"; done
 [ -n "$MFA" ] && git -C "$R/wine" checkout -- dlls/mfsrcsnk/media_source.c
+[ -n "$DXD" ] && git -C "$R/wine" checkout -- dlls/dxdiagn/provider.c
 [ -n "$undelayed" ] && echo "::notice::delay imports linked as plain imports:$undelayed"
 # madeira-bcd: ucrtbase-x64math.dll (see UCX above), from the restored tree:
 # msvcrt/main.c no longer carries the data-sync patch, so the DLL differs from a
@@ -699,6 +720,13 @@ if [ -n "$MFA" ]; then
     f="$B/dlls/mfasfsrcsnk/arm64ec-windows/mfasfsrcsnk.dll"
     if [ -f "$f" ] && ! python3 "$R/tools/patch-wine-mfasfsrcsnk-winedmo.py" --verify "$f"; then
         echo "::warning::mfasfsrcsnk.dll failed its check (no winedmo patch); not shipped"
+        rm -f "$f"
+    fi
+fi
+if [ -n "$DXD" ]; then
+    f="$B/dlls/dxdiagn/arm64ec-windows/dxdiagn.dll"
+    if [ -f "$f" ] && ! python3 "$R/tools/patch-wine-dxdiagn-directshow.py" --verify "$f"; then
+        echo "::warning::dxdiagn.dll failed its check (no DirectShow patch); not shipped"
         rm -f "$f"
     fi
 fi

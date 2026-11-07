@@ -535,12 +535,13 @@ struct RecommendationsPolicy {
                 // xinputuap (round 630, Dead or Alive 6): the program imports XInputUap.dll (xinputuap-optin.dll, from build 630).
                 // httpapi (round 630, GrandChase): cpprest_2_10.dll imports HTTPAPI.dll (httpapi-optin.dll, from build 630).
                 // dbgcore (round 630, UE games' bundled dbghelp forwards MiniDumpWriteDump to it): a link to the shipped dbghelp.dll (build 630).
+                // dxdiagn (Far Cry 4): Wine's DxDiag provider for 64-bit programs, listed with ddraw, which it imports (dxdiagn-optin.dll, from build 635).
                 let names = value.lowercased().split(whereSeparator: { ",; ".contains($0) })
                 guard !names.isEmpty, names.allSatisfy({ ["dxva2", "evr", "xpsprint", "sfc", "sfc_os", "tbs", "twinapi.appcore", "setupapi"].contains($0)
-                        || ["mfasfsrcsnk", "wmvdecod", "wmadmod"].contains($0) || ["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0)
+                        || ["mfasfsrcsnk", "wmvdecod", "wmadmod"].contains($0) || ["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0) || $0 == "dxdiagn"
                         || ["msi", "mspatcha", "odbccp32", "sxs", "rstrtmgr"].contains($0) || ["glu32", "tdh", "gamingtcui", "qwave"].contains($0)
                         || $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" || $0 == "xinputuap" || $0 == "httpapi" || $0 == "dbgcore" }) else {
-                    throw RecommendationsError.policy("\(path): MADEIRA_OPTIN_DLLS may only name dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore or setupapi, or mfasfsrcsnk, wmvdecod, wmadmod, or oledlg, fwpuclnt, sensapi, ddraw, or msi, mspatcha, odbccp32, sxs, rstrtmgr, or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc, xinputuap, httpapi, dbgcore")
+                    throw RecommendationsError.policy("\(path): MADEIRA_OPTIN_DLLS may only name dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore or setupapi, or mfasfsrcsnk, wmvdecod, wmadmod, or oledlg, fwpuclnt, sensapi, ddraw, dxdiagn, or msi, mspatcha, odbccp32, sxs, rstrtmgr, or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc, xinputuap, httpapi, dbgcore")
                 }
             case "MADEIRA_WG_VPROC":
                 // build 626 (Unity cutscenes): BCD's raw video converter (winegstreamer_vproc_ios.c); off unless a game's list says 1.

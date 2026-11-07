@@ -3430,6 +3430,11 @@ jobs:
       - name: Check opt-in DLLs
         run: python3 tests/host/check-optin-dlls.py
 
+      # madeira-bcd: env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw: Wine's DxDiag provider for a 64-bit program, with the patch that lets
+      # IDxDiagProvider::Initialize finish without DirectShow's device enumerator.
+      - name: Check the DxDiag provider opt-in DLL
+        run: python3 tests/host/check-dxdiagn-optin.py
+
       # madeira-bcd (round 620): NtMapViewOfSection judges a 32-bit program's explicit base by its guest address inside
       # its WoW64 window (DirectPlay's static data at 0x50000000: Requiem, Hotline Miami); the real block runs on the host.
       - name: Check WoW64 explicit section base
@@ -4109,6 +4114,13 @@ jobs:
           for d in winedmo.dll wmvdecod-optin.dll wmadmod-optin.dll; do
             [ -f "app/Madeira/arm64ec-windows/$d" ] || echo "::warning::$d missing: Resident Evil 2's cutscenes still end the game in this IPA"
           done
+          # And the DxDiag provider of env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw (Far Cry 4): never ship one without the DirectShow
+          # patch (an unpatched one fails IDxDiagProvider::Initialize without devenum.dll, which a program treats as no provider).
+          if [ -f app/Madeira/arm64ec-windows/dxdiagn-optin.dll ]; then
+            python3 tools/patch-wine-dxdiagn-directshow.py --verify app/Madeira/arm64ec-windows/dxdiagn-optin.dll
+          else
+            echo "::warning::dxdiagn-optin.dll missing: env.MADEIRA_OPTIN_DLLS = dxdiagn does nothing in this IPA"
+          fi
           # And its ntdll-sync.dll, which the unix loader maps by default: never
           # ship one whose SRW and critical-section exports are not the x64 bodies
           # or whose exports are not the shipped ntdll.dll's plus madeira_sync_x64_off.
