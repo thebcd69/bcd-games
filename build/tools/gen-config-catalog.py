@@ -812,6 +812,14 @@ OVERLAY = {
                         "write was refused and those programs ended with 0xdeadc0de. 0: refused as before. Read at each such write; "
                         "a process's first one is logged as [self-write].",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    # madeira-bcd pool-merge (build 635; Ubisoft Connect with Far Cry 3 and Far Cry 4)
+    "env.MADEIRA_POOL_CARVE_MERGE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0",
+                "title": "Free code buffers merge and are cut to the size asked",
+                "note": "Default off (build 635). 1: a code buffer FEX releases merges with the free buffers next to it, and a free buffer "
+                        "1 MB or more larger than a request is cut to the size asked: a pool whose free buffers add up to hundreds of MB "
+                        "no longer refuses one large buffer, and a 16 KB request no longer takes a whole free 16-32 MB buffer. "
+                        "Set it in the game's own file; read at each request.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_THIN_RESERVE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0", "title": "Thin 1-2 GB reservations",
                 "note": "Default off. 1: after the first 8 GB of read-write reservations of 1 to 2 GB (no address given), each new one gets a real 63 MB head and the program is told it got "
                         "the full size; a commit that grows past the head fails and is logged ([thin] OVERFLOW). For a game that reserves dozens of 1 GB blocks and commits little of "

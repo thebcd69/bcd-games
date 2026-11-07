@@ -4451,6 +4451,11 @@ jobs:
       - name: Check kill-reap
         run: python3 tests/host/check-kill-reap.py
 
+      # madeira-bcd: env.MADEIRA_POOL_CARVE_MERGE = 1 (free code buffers merge and are cut to the size asked; default off). The production
+      # allocator and release paths on a model of the pool.
+      - name: Check the code-buffer merge
+        run: python3 tests/host/check-pool-carve-merge.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.

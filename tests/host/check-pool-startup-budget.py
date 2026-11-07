@@ -35,7 +35,7 @@ assert ec.count('ios_tail_carve_ready( &ios_tail_carves[') == 2, 'cap lift and r
 assert 'if (kept_large_carve && !reuse_all_carves)' in ec
 assert 'reuse_all_carves = 1;\n                low_fits = 0;' in ec
 assert ec.count('(low_ok || !ios_tail_carve_in_low( ios_tail_carves[') == 2
-helpers = ''.join(function(native, signature) for signature in (
+helpers = next(line for line in native.splitlines() if line.startswith('#define IOS_POOL_CUT_MIN ')) + '\n' + ''.join(function(native, signature) for signature in (
     'static size_t ios_pool_hole_between(',
     'static size_t ios_pool_code_cap(',
     'int ios_jit_low_contains(',
@@ -43,6 +43,8 @@ helpers = ''.join(function(native, signature) for signature in (
     'static int ios_tail_carve_in_low(',
     'static int ios_pool_preserve_code_carve(',
     'static int ios_tail_carve_ready(',
+    'static unsigned ios_tail_carve_cut(',
+    'static int ios_pool_carve_merge_enabled(',
 ))
 carve_start = native.index('#define IOS_TAIL_CARVE_MAX ')
 carve_table = native[carve_start:native.index('\n\n', carve_start)]

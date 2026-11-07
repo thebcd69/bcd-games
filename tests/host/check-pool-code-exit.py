@@ -31,7 +31,7 @@ def function(signature):
     return source[start:source.index('\n}', start) + 2] + '\n'
 
 
-helpers = ''.join(function(signature) for signature in (
+helpers = next(line for line in source.splitlines() if line.startswith('#define IOS_POOL_CUT_MIN ')) + '\n' + ''.join(function(signature) for signature in (
     'static size_t ios_pool_hole_tail_start(',
     'static size_t ios_pool_hole_between(',
     'static size_t ios_pool_code_cap(',
@@ -42,6 +42,10 @@ helpers = ''.join(function(signature) for signature in (
     'static int ios_tail_carve_in_low(',
     'static int ios_pool_preserve_code_carve(',
     'static int ios_tail_carve_ready(',
+    'static int ios_tail_carve_mergeable(',
+    'static unsigned ios_tail_carves_merge(',
+    'static unsigned ios_tail_carve_cut(',
+    'static int ios_pool_carve_merge_enabled(',
     'static unsigned ios_tail_carves_retire_owner(',
     'static int ios_tail_carve_foreign_release(',
     'static void ios_tail_carves_owner_died(',

@@ -4133,6 +4133,65 @@ static unsigned ios_tail_carves_retire_owner( struct ios_tail_carve *carves, uns
     return retired;
 }
 
+/* pool-carve-merge-test:begin (tests/host/check-pool-code-exit.py compiles this region) */
+/* madeira-bcd pool-merge (env.MADEIRA_POOL_CARVE_MERGE = 1; default off): carves are cut once and never merged, so a pool whose free
+ * carves add up to hundreds of MB can still refuse one 128 MB buffer, and a 16 KB dispatcher request takes a whole free 16-32 MB
+ * buffer (Ubisoft Connect with Far Cry 3: the game was refused 32 MB beside two adjacent free 16 MB carves; a renderer's 16 KB
+ * request took a free 32 MB one). With the switch a buffer FEX releases merges with the free carves on either side, and a free carve
+ * 1 MB or more larger than a request is cut: the request gets exactly its size from the carve's top, the rest stays free. A dead
+ * process's carve (`retired`) merges with nothing until it is reused, so its grace and thread scan cover exactly the range they are
+ * about; carves of region C and of the pool never merge (C may end where the pool begins, and a run is classed by its base). */
+#define IOS_POOL_CUT_MIN 0x100000
+
+/* 1 when the free carves `a` and `b` touch and may form one run. */
+static int ios_tail_carve_mergeable( const struct ios_tail_carve *a, const struct ios_tail_carve *b )
+{
+    return a->free && b->free && !a->retired && !b->retired &&
+           (a->off + a->size == b->off || b->off + b->size == a->off);
+}
+
+/* Merge carve `i` with every free neighbour; the caller holds ios_tail_carve_lock. A merged neighbour's entry is filled with the
+ * table's last one. The run keeps the latest release time. Returns the entry that now holds `i`'s range. */
+static unsigned ios_tail_carves_merge( struct ios_tail_carve *carves, unsigned *n, unsigned i )
+{
+    unsigned j = 0;
+
+    while (j < *n)
+    {
+        if (j == i || !ios_tail_carve_mergeable( &carves[i], &carves[j] ) ||
+            ios_tail_carve_in_low( carves[i].off ) != ios_tail_carve_in_low( carves[j].off ))   /* never across region C's edge */
+        { j++; continue; }
+        if (carves[j].off < carves[i].off) carves[i].off = carves[j].off;
+        carves[i].size += carves[j].size;
+        if (carves[j].freed_at > carves[i].freed_at) carves[i].freed_at = carves[j].freed_at;
+        carves[j] = carves[--*n];
+        if (i == *n) i = j;   /* the last entry, now at j, was the run */
+        j = 0;                /* the grown run may touch another */
+    }
+    return i;
+}
+
+/* Cut `size` bytes from the top of the free carve `i` when it is at least IOS_POOL_CUT_MIN larger and the table has a free entry;
+ * the caller holds ios_tail_carve_lock. Returns the entry of the piece to hand out (`i` itself when it is not cut). */
+static unsigned ios_tail_carve_cut( struct ios_tail_carve *carves, unsigned *n, unsigned max, unsigned i, size_t size )
+{
+    if (carves[i].size < size || carves[i].size - size < IOS_POOL_CUT_MIN || *n >= max) return i;
+    carves[*n] = carves[i];
+    carves[*n].off = carves[i].off + carves[i].size - size;
+    carves[*n].size = size;
+    carves[i].size -= size;
+    return (*n)++;
+}
+/* pool-carve-merge-test:end */
+
+/* Read at each carve and each release, so the switch is the session's own. */
+static int ios_pool_carve_merge_enabled(void)
+{
+    const char *e = getenv( "MADEIRA_POOL_CARVE_MERGE" );
+
+    return e && e[0] == '1' && !e[1];
+}
+
 /* A release by a thread of another process than the carve's owner: a dead
  * process's late release of a buffer that has since been handed on. */
 static int ios_tail_carve_foreign_release( const struct ios_tail_carve *carve, void *caller_peb )
@@ -37322,6 +37381,9 @@ retry_code_carve_reuse:
             }
             if (best != ~0u)
             {
+                size_t from = ios_tail_carves[best].size;   /* madeira-bcd pool-merge: cut to the size asked */
+                if (ios_pool_carve_merge_enabled())
+                    best = ios_tail_carve_cut( ios_tail_carves, &ios_tail_carve_n, IOS_TAIL_CARVE_MAX, best, alloc_size );
                 void *jit_rx = (char *)ios_jit_rx_base_global + ios_tail_carves[best].off;
                 void *jit_rw = (char *)ios_jit_rw_base_global + ios_tail_carves[best].off;
                 size_t got = ios_tail_carves[best].size;
@@ -37337,10 +37399,11 @@ retry_code_carve_reuse:
                 }
                 *ret = jit_rx;
                 *size_ptr = got;
-                dprintf(2, "[jit-pool] tail REUSE rx=%p size=0x%lx (asked 0x%lx) free_left=%u rev=ml438%s%s\n",
+                dprintf(2, "[jit-pool] tail REUSE rx=%p size=0x%lx (asked 0x%lx) free_left=%u rev=ml438%s%s%s\n",
                         jit_rx, (unsigned long)got, (unsigned long)alloc_size, ios_tail_carve_n,
                         ios_jit_low_contains( (uintptr_t)jit_rx ) ? " [pool-low] region C" : "",
-                        was_retired ? " (a dead process's buffer)" : "");
+                        was_retired ? " (a dead process's buffer)" : "",
+                        got != from ? " (cut from a free run, madeira-bcd pool-merge)" : "");
                 return STATUS_SUCCESS;
             }
             pthread_mutex_unlock( &ios_tail_carve_lock );
@@ -38573,7 +38636,7 @@ NTSTATUS WINAPI NtFreeVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T *si
     {
         unsigned i;
         size_t off = (size_t)((char *)base - (char *)ios_jit_rx_base_global);
-        size_t carve_size = 0;
+        size_t carve_size = 0, run_off = 0, run_size = 0;
         void *caller_peb = ios_jit_current_peb();
         pthread_mutex_lock( &ios_tail_carve_lock );
         for (i = 0; i < ios_tail_carve_n; i++)
@@ -38605,14 +38668,25 @@ NTSTATUS WINAPI NtFreeVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T *si
             ios_tail_carves[i].free = 1;
             ios_tail_carves[i].freed_at = time( NULL );
             carve_size = ios_tail_carves[i].size;
+            if (ios_pool_carve_merge_enabled())   /* madeira-bcd pool-merge */
+            {
+                i = ios_tail_carves_merge( ios_tail_carves, &ios_tail_carve_n, i );
+                run_off = ios_tail_carves[i].off;
+                run_size = ios_tail_carves[i].size;
+            }
             break;
         }
         pthread_mutex_unlock( &ios_tail_carve_lock );
         if (carve_size)
         {
-            dprintf(2, "[jit-pool] tail FREE rx=%p size=0x%lx -> free-list rev=ml438%s\n",
+            char run[80] = "";
+
+            if (run_size > carve_size)
+                snprintf( run, sizeof(run), " (in a free run rx=%p size=0x%lx, madeira-bcd pool-merge)",
+                          (void *)((uintptr_t)ios_jit_rx_base_global + run_off), (unsigned long)run_size );
+            dprintf(2, "[jit-pool] tail FREE rx=%p size=0x%lx -> free-list rev=ml438%s%s\n",
                     (void *)base, (unsigned long)carve_size,
-                    ios_jit_low_contains( (uintptr_t)base ) ? " [pool-low] region C" : "");
+                    ios_jit_low_contains( (uintptr_t)base ) ? " [pool-low] region C" : "", run);
             *addr_ptr = base;
             *size_ptr = carve_size;
             return STATUS_SUCCESS;
