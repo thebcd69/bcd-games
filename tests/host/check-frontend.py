@@ -126,6 +126,7 @@ swift += block(lib, 'struct LibraryEntry: Codable, Identifiable') + '\n'
 swift += block(lib, 'enum SyncEngine: String, CaseIterable, Identifiable') + '\n'
 swift += '\n'.join(l for l in display.splitlines() if not l.startswith('import ')) + '\n'
 swift += block(lib, 'final class LibraryController: ObservableObject, @unchecked Sendable') + '\n'
+swift += block(lib, 'enum LaunchArgumentText {') + '\n'   # round 632: configureLaunch exports MADEIRA_ARGS through it (check-launch-argument-text.py)
 swift += r'''
 var failed = 0
 func expect(_ cond: Bool, _ what: String) { print((cond ? "PASS: " : "FAIL: ") + what); if !cond { failed += 1 } }

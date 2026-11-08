@@ -77,6 +77,8 @@ enum BCDDuoFeatures {
         previous?()
     }
 
+    static func owns(_ id: UUID) -> Bool { owner == id }
+
     static func release(_ id: UUID) {
         guard owner == id else { return }
         end()

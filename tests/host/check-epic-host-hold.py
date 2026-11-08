@@ -78,7 +78,7 @@ env = [l.strip() for l in lc[lc.index('func applyEnvironment() {'):].splitlines(
 check('LibraryEntry.applyEnvironment restores right after its configureLaunch, for its own entry (its first two statements)',
       env[1:3] == ['configureLaunch()', 'Self.restoreEpicHostStart(for: id)'], str(env[:4]))
 check('configureLaunch itself is not changed (it still sets the game\'s program; only applyEnvironment puts the host back)',
-      'let command = desktop == true ? (exe: "explorer.exe", args: launchArguments) : launchCommand\n        setenv("MADEIRA_EXE", command.exe, 1)\n        setenv("MADEIRA_ARGS", command.args, 1)' in lc)
+      'let command = desktop == true ? (exe: "explorer.exe", args: launchArguments) : launchCommand\n        setenv("MADEIRA_EXE", command.exe, 1)\n        setenv("MADEIRA_ARGS", LaunchArgumentText.plain(command.args), 1)' in lc)   # round 632: the arguments' dashes and quotes (check-launch-argument-text.py)
 # check-epic's invariants for this file
 check('BCDEpicStart.swift still sets the environment in five places only and unsets only BCD_HOST_REQUEST',
       len([l for l in sc.splitlines() if re.search(r'(?<![un])\bsetenv\(', l)]) == 5
@@ -95,8 +95,9 @@ carriers = sorted(r['id'] for r in lists['rules'] if 'BCD_EPIC_HOST_START' in js
 # Round 626 (agent G1 S6; VV1JGH = 7ED7X7): BioShock Remastered from Epic, the same start through BCD Host.
 # Round 630 (agent R S11): GTA V Enhanced and Legacy outside Steam (an Epic copy lost BCD Host's start the same way); the key is read only
 # by the Epic start (BCDEpicStart), so the rows' other copies are untouched.
-check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic) and (round 630) GTA V outside Steam lists set it, from build 598',
-      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'gta5e-other', 'gta5l-other'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
+# Round 631 (agent R3 S6; 6XG0C2): Red Dead Redemption 2 outside Steam too (Epic's RDR2 starts the same Rockstar chain).
+check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic), (round 630) GTA V and (round 631) RDR2 outside Steam lists set it, from build 598',
+      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'gta5e-other', 'gta5l-other', 'rdr2-other'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
       next(r for r in lists['rules'] if r['id'] == i)['config'] for i in carriers))
 rules = (R / 'build/tools/autotune_rules.py').read_text()
 check('auto-tune: the rule epic-host-start-lost adds the line after an Epic game with the EOS SDK left with exit code 1 although the start line chose the host and the host left no report, never twice',

@@ -81,6 +81,15 @@ assert len(dmo) == 1, len(dmo)
 assert dmo[0].split("\n")[0].rstrip().endswith("&& !wow) {"), dmo[0].split("\n")[0]
 assert "funcs64 = (const void *)winedmo_unix_call_funcs;" in dmo[0] and "funcs_wow64" not in dmo[0], dmo[0]
 branches = [b for b in branches if b is not dmo[0]]
+# the real opengl32 branch is new too (OpenGL, madeira-bcd): it is entered only when ios_gl_real_unixlib() says so (the session has
+# gl-backend on, and for a 64-bit module it is not the shipped base-0x7a800000 file), it offers a 32-bit caller opengl32's own
+# wow64 table (never the 64-bit one), and it stands BEFORE upstream's GL-absent stub branch, which stays the compared one below.
+glr = [b for b in branches if 'strstr(match, "opengl32") && ios_gl_real_unixlib( module, wow )' in b.split("\n")[0]]
+assert len(glr) == 1, len(glr)
+assert "funcs64 = (const void *)opengl32_unix_call_funcs;" in glr[0] and "funcs_wow64 = (const void *)opengl32_unix_call_wow64_funcs;" in glr[0], glr[0]
+stub_gl = [i for i, b in enumerate(branches) if 'strstr(match, "opengl32")' in b.split("\n")[0] and b is not glr[0]]
+assert len(stub_gl) == 1 and branches.index(glr[0]) == stub_gl[0] - 1, ("the real opengl32 branch stands right before the stub one", stub_gl)
+branches = [b for b in branches if b is not glr[0]]
 assert len(branches) == len(upstream) + 1, len(branches)
 for (test, table), body in zip(upstream, branches):
     assert test in body.split("\n")[0], (test, body.split("\n")[0])

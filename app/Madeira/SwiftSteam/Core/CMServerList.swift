@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 intraducine: code taken from https://github.com/willfaust/Madeira (pull request #477)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
 // the owned library and downloads (docs/STEAM_LIBRARY.md).
+// Endpoint exclusion adapted from kuscholar/iDeck; see docs/STEAM_LIBRARY.md.
 
 import Foundation
 
@@ -32,20 +35,22 @@ actor CMServerList {
     // MARK: - Public API
 
     /// Get the best available CM server to connect to
-    func getServer() async throws -> CMServer {
+    func getServer(excluding: Set<String> = []) async throws -> CMServer {
         if servers.isEmpty || isListStale {
             try await refreshServerList()
         }
 
-        guard let server = servers
+        let available = servers.filter { !excluding.contains($0.endpoint) }
+        guard !available.isEmpty else { throw SteamError.noServersAvailable }
+        guard let server = available
             .filter({ $0.isHealthy })
             .sorted(by: { ($0.lastAttempt ?? .distantPast) < ($1.lastAttempt ?? .distantPast) })
             .first
         else {
-            for i in servers.indices {
+            for i in servers.indices where !excluding.contains(servers[i].endpoint) {
                 servers[i].failCount = 0
             }
-            guard let server = servers.first else {
+            guard let server = servers.first(where: { !excluding.contains($0.endpoint) }) else {
                 throw SteamError.noServersAvailable
             }
             return server

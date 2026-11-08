@@ -72,8 +72,12 @@ tool = (R / "tools/ui-preview.py").read_text()
 gen = (R / "build/tools/gen-config-catalog.py").read_text()
 
 # ---- 1. licence ---------------------------------------------------------------------------------
-for name, text in (("BCDGPUCards.swift", cards_src), ("BCDGPUCardsLive.swift", live_src), ("bcd_gpu_cards_checks.swift", harness)):
-    check(text.startswith(HEADER), f"{name}: BCD's licence header")
+# BCDGPUCards.swift and BCDGPUCardsLive.swift hold Madeira code (adec653): BCD's copyright, no "BCD Material" line
+# (LICENSE-BCD.md section 1), and the "Portions copyright" credit (owner 2026-11-06).
+MIXED = HEADER.split("// BCD Material")[0] + "// Portions copyright 2026 ft7t8drgwf-wq"
+for name, text in (("BCDGPUCards.swift", cards_src), ("BCDGPUCardsLive.swift", live_src)):
+    check(text.startswith(MIXED), f"{name}: BCD's copyright and the Madeira credit, no BCD Material line")
+check(harness.startswith(HEADER), "bcd_gpu_cards_checks.swift: BCD's licence header")
 check(Path(__file__).read_text().startswith("#!/usr/bin/env python3\n# SPDX-License-Identifier: GPL-3.0-only\n# Copyright 2026 thebcd69 (BCD)\n"),
       "this check: BCD's licence header")
 
@@ -91,7 +95,7 @@ for name in ("BCDGPUCards.swift", "BCDGPUCardsLive.swift"):
 VENDORS = {"apple": 0x106B, "nvidia": 0x10DE, "amd": 0x1002, "intel": 0x8086}
 # Build 623: a card may name Direct3D 9's driver file too (the GeForce 7900 GS: nv4_disp.dll).
 swift_cards = re.findall(r'\.init\(id: "([\w-]+)", title: "([^"]+)", vendor: (\w+), device: (0x[0-9A-Fa-f]+), name: "([^"]+)"(?:, driver: "[^"]+")?\)', cards_src)
-check(len(swift_cards) == 7, "the app has seven cards (build 623: the GeForce 7900 GS)", len(swift_cards))
+check(len(swift_cards) == 8, "the app has eight cards (build 623: the GeForce 7900 GS; build 632: the GTX 1060 6GB)", len(swift_cards))
 swift_pairs = {(VENDORS[v], int(d, 16)) for _, _, v, d, _ in swift_cards}
 block = re.search(r"static const struct \{ UINT16 vendor, device; \} ios_known_gpus\[\] =\s*\{(.*?)\};", sysparams, re.S)
 check(block is not None, "win32u lists the identities it may find in a prefix")

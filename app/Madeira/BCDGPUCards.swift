@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
-// BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (commit adec653)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -55,6 +56,8 @@ enum BCDGPUCards {
     static let cards: [BCDGPUCard] = [
         // The identity BCD already used for "Show the game an NVIDIA card" (10DE:2544).
         .init(id: "nvidia", title: "NVIDIA GeForce RTX 3060", vendor: nvidia, device: 0x2544, name: "NVIDIA GeForce RTX 3060"),
+        // Build 632 (upstream Madeira #528): for games that only know cards up to 2016-2018 (a GeForce GTX 1060 6GB, 10DE:1C03).
+        .init(id: "nvidia-gtx1060", title: "NVIDIA GeForce GTX 1060 6GB", vendor: nvidia, device: 0x1C03, name: "NVIDIA GeForce GTX 1060 6GB"),
         .init(id: "amd", title: "AMD Radeon RX 6700 XT", vendor: amd, device: 0x73DF, name: "AMD Radeon RX 6700 XT"),
         .init(id: "amd-rx580", title: "AMD Radeon RX 580", vendor: amd, device: 0x67DF, name: "AMD Radeon RX 580 Series"),
         .init(id: "intel", title: "Intel UHD Graphics 630", vendor: intel, device: 0x3E92, name: "Intel(R) UHD Graphics 630"),

@@ -27,6 +27,33 @@ struct BCDSteamAccount: Equatable {
     var cloudOn = true
     /// First-run setup can be opened again.
     var setupAvailable = false
+    /// Downloads from a PC on the same network can be switched in this copy, whether they are on, and the fixed PC address ("" finds the PC through Steam).
+    var lanAvailable = false
+    var lanOn = false
+    var lanHost = ""
+}
+
+/// Settings › Accounts › Steam › Downloads from a PC on this network: the words, and the one rule the page keeps for the address it takes.
+enum BCDSteamLAN {
+    static let title = "Downloads from a PC on this network"
+
+    /// Under the switch, on or off: what it does and that it adds a device to the Steam account.
+    static func detail(on: Bool) -> String {
+        (on ? "On. A download asks a PC of your Steam account on this network first, and takes the rest from Steam's servers. " : "Off. Games download from Steam's servers. ")
+            + "Turning it on adds this device to your Steam account's devices as \"BCD\", which shows in Steam on your PC."
+    }
+
+    /// Under the address field, while the switch is on.
+    static let note = "On the PC: the same Steam account, Steam's Settings › Downloads › Game file transfer over local network on, and no download or game running. "
+        + "Both devices must use the same router. PC address: only if BCD doesn't find the PC; its IP address on this network."
+
+    /// An IPv4 address: four numbers from 0 to 255 with dots between (what the field takes).
+    static func isAddress(_ text: String) -> Bool {
+        let parts = text.split(separator: ".", omittingEmptySubsequences: false)
+        return parts.count == 4 && parts.allSatisfy { part in
+            !part.isEmpty && part.count <= 3 && part.allSatisfy(\.isASCII) && part.allSatisfy(\.isNumber) && Int(part).map { $0 <= 255 } ?? false
+        }
+    }
 }
 
 /// What Steam Guard asks for after the password: a code (from the Steam app or an email),
@@ -64,6 +91,10 @@ struct BCDSteamSignIn: Equatable {
     func clearSignInError()
     func signOut()
     func setCloud(_ on: Bool)
+    /// Downloads from a PC on this network (SteamLANSetting): on or off, and the PC's address ("" finds it through Steam; only an address
+    /// BCDSteamLAN.isAddress accepts, or "", is handed over).
+    func setLAN(_ on: Bool)
+    func setLANHost(_ address: String)
     func runSetup()
     /// GOG's account: `name` nil while signed out, `available` false when this copy has no GOG.
     var gogAccount: BCDAccount { get }
@@ -75,6 +106,19 @@ struct BCDSteamSignIn: Equatable {
     /// Opens Epic's own sign-in page.
     func signInEpic()
     func signOutEpic()
+    /// The cards of the stores added after GOG and Epic Games (itch.io, the experimental EA store), drawn under GOG's. Empty where a copy has none
+    /// (the preview app); BCDAccountsLive brings them (BCDStores/BCDStoreCards.swift).
+    var extraStoreCards: AnyView { get }
+    /// Changes whenever one of those cards opens or closes a question: the section sets A and B and the ring's order again.
+    var extraStoreKey: String { get }
+    /// B: closes the question one of those cards has open. False when none is.
+    func closeExtraStoreQuestion() -> Bool
+}
+
+extension BCDAccountsBackend {
+    var extraStoreCards: AnyView { AnyView(EmptyView()) }
+    var extraStoreKey: String { "" }
+    func closeExtraStoreQuestion() -> Bool { false }
 }
 
 enum BCDAccountsPage: Equatable {
@@ -99,6 +143,9 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
     @State private var confirmingSignOut = false
     @State private var confirmingGOGSignOut = false
     @State private var confirmingEpicSignOut = false
+    /// The PC's address as typed (Downloads from a PC on this network); read from the backend when the page opens.
+    @State private var lanHost = ""
+    @FocusState private var lanFieldFocused: Bool
 
     init(backend: Backend, showsTitle: Bool = true, scrolls: Bool = true, startOn page: BCDAccountsPage = .main,
          back: (() -> Void)? = nil, backHook: BCDSectionKit.BackHook? = nil) {
@@ -123,9 +170,12 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                 }
             }
         }
-        .modifier(BCDSectionKit.Buttons(focus: focus, key: "\(page)-\(confirmingSignOut)-\(confirmingGOGSignOut)-\(confirmingEpicSignOut)",
+        .modifier(BCDSectionKit.Buttons(focus: focus, key: "\(page)-\(confirmingSignOut)-\(confirmingGOGSignOut)-\(confirmingEpicSignOut)-\(backend.extraStoreKey)",
                                         inner: closeInner, back: back, hook: backHook))
-        .onAppear { backend.refresh() }
+        .onAppear {
+            backend.refresh()
+            lanHost = backend.steam.lanHost
+        }
         .onChange(of: backend.steam.accountName) { _, name in
             if name == nil { confirmingSignOut = false }
         }
@@ -139,6 +189,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
 
     /// B inside the section: the question closes, then the sign-in page. False: nothing was open.
     private func closeInner() -> Bool {
+        if backend.closeExtraStoreQuestion() { return true }
         if confirmingEpicSignOut {
             confirmingEpicSignOut = false
             if focus.controllerActive { focus.focused = Self.prefix + "epic.signout" }
@@ -177,6 +228,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
             } right: {
                 epicCard
                 gogCard
+                backend.extraStoreCards
                 keptNote
             }
         }
@@ -197,10 +249,35 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                 BCDSectionKit.SwitchRow(title: "Steam Cloud saves", detail: cloudDetail(steam), isOn: steam.cloudOn,
                                         id: Self.prefix + "steam.cloud") { backend.setCloud($0) }
             }
+            if steam.available && steam.lanAvailable { lanRows(steam) }
             if steam.setupAvailable {
                 BCDSectionKit.ActionButton(title: "Run setup again", symbol: "wand.and.stars", kind: .quiet,
                                            id: Self.prefix + "setup") { backend.runSetup() }
             }
+        }
+    }
+
+    /// Downloads from a PC on this network: the switch, with what it does to the Steam account under it; once on, the PC's address and what the
+    /// PC needs. Nothing happens by turning the page: the switch is off until it is pressed.
+    @ViewBuilder private func lanRows(_ steam: BCDSteamAccount) -> some View {
+        Divider().overlay(BCDStyle.stroke)
+        BCDSectionKit.SwitchRow(title: BCDSteamLAN.title, detail: BCDSteamLAN.detail(on: steam.lanOn), isOn: steam.lanOn,
+                                id: Self.prefix + "steam.lan") { backend.setLAN($0) }
+        if steam.lanOn {
+            BCDSectionKit.FieldBox(id: Self.prefix + "steam.lanhost", activate: { lanFieldFocused = true }) {
+                TextField("", text: $lanHost, prompt: Text("PC address (optional)").foregroundStyle(BCDStyle.textSoft))
+                    .keyboardType(.decimalPad)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .focused($lanFieldFocused)
+                    .foregroundStyle(lanHost.isEmpty || BCDSteamLAN.isAddress(lanHost.trimmingCharacters(in: .whitespaces)) ? BCDStyle.text : BCDStyle.alert)
+                    .onChange(of: lanHost) { _, value in
+                        let trimmed = value.trimmingCharacters(in: .whitespaces)
+                        if trimmed.isEmpty || BCDSteamLAN.isAddress(trimmed) { backend.setLANHost(trimmed) }
+                    }
+                    .bcdKeyboardDone { lanFieldFocused = false }   // the decimal pad has no Return key
+            }
+            BCDSectionKit.Note(text: BCDSteamLAN.note, symbol: "desktopcomputer")
         }
     }
 

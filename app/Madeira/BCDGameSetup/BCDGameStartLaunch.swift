@@ -49,7 +49,7 @@ extension BCDGameSetup {
             if !secondExists { lines.append("[game-start] \(title): the second program is not there; left out") }
         }
 
-        let main: BCDStartScript.Main = entry.startServices == true
+        let main: BCDStartScript.Main = entry.servicesScript != nil   // startServices, or a GOG game's installers still to run (build 632)
             ? .servicesBatch(path: entry.servicesScriptPath)
             : .program(path: entry.launchWindowsPath, arguments: entry.programArguments, isBatch: entry.isBatch)
         let script = BCDStartScript.batch(title: title, plan: plan, main: main, workdir: entry.launchDirectory, configPath: configPath,

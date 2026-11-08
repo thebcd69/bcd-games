@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2026 125hz
 # Madeira Converter Exception: see LICENSE-EXCEPTION.md
+# Portions copyright 2026 meshoklv: code taken from https://github.com/willfaust/Madeira (pull request #389)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """Madeira Dock's client-component setup (SteamRuntime.swift): the production ZIP
 reader and Steam discovery-registry writer, compiled on the host with synthetic
 archives. Never downloads anything and never runs Steam or Wine.

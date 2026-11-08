@@ -128,6 +128,9 @@ enum DockGameEndRules {
                 // Round 626 (agent P S11; BV5WT9 and 13 archive Rockstar sessions): after the player's Close, Rockstar's resident
                 // launcher, its service and Social Club are not the game; counting them kept the session open for good.
                 if anyStatus, isResidentLauncher(p.path) { break }
+                // Round 631 (round 630 agent R S2; GJDXG6): Rockstar's Steam entry program (PlayGTAV.exe ...) waits for the Launcher and
+                // shows its own box when the Launcher dies; after the player's Close it is not the game either.
+                if anyStatus, isRockstarEntryStub(p.path) { break }
                 if p.running { running += 1 }
                 else if last.map({ p.endedAgo < $0.endedAgo }) ?? true { last = p }
             case .unknown:
@@ -157,6 +160,17 @@ enum DockGameEndRules {
     static func isResidentLauncher(_ image: String) -> Bool {
         let p = SteamLaunchScene.path(image)
         return p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\")
+    }
+
+    /// Round 631 (round 630 agent R S2; GTA V Legacy GJDXG6: the Launcher crashed at the game's exit, PlayGTAV.exe waited on its box, and
+    /// Close left the session open). Rockstar's entry programs in a Steam game folder start the Launcher and wait for it; they are not the
+    /// game. Consulted only after the player's Close (`anyStatus`), so a session nobody closes is untouched, and a game program that still
+    /// runs (GTA5.exe) keeps Close waiting.
+    static let rockstarEntryStubs: Set<String> = ["playgtav.exe", "playgtaiv.exe", "playrdr2.exe", "playrdr.exe", "playgtasanandreas.exe"]
+    static func isRockstarEntryStub(_ image: String) -> Bool {
+        let p = SteamLaunchScene.path(image)
+        guard p.contains("\\steamapps\\common\\") else { return false }
+        return rockstarEntryStubs.contains(p.split(separator: "\\").last.map(String.init) ?? "")
     }
 
     // MARK: A launch that failed (round 580)

@@ -1,3 +1,5 @@
+/* Portions copyright 2026 alantangok: code taken from https://github.com/willfaust/Madeira (commit abca30a)
+ * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Graphics driver management functions
  *
@@ -59,6 +61,10 @@ extern void winios_pDestroyWindow( HWND hwnd ) __attribute__((weak));
 extern UINT winios_pShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp ) __attribute__((weak));
 extern void winios_pWindowPosChanged( HWND hwnd, HWND insert_after, HWND owner_hint, UINT swp_flags,
                                       const struct window_rects *new_rects, struct window_surface *surface ) __attribute__((weak));
+
+/* opengl_ios.c: the winios WGL driver. Installed only for a session whose gl-backend key is on (see load_display_driver). */
+extern UINT winios_OpenGLInit( UINT version, const struct opengl_funcs *opengl_funcs,
+                               const struct opengl_driver_funcs **driver_funcs );
 
 static struct user_driver_funcs winios_user_driver;
 
@@ -2646,6 +2652,10 @@ static void load_display_driver(void)
                         "(MADEIRA_GAME_WINDOWS=0 hides them)\n" );
         }
         winios_user_driver.pUpdateDisplayDevices = winios_UpdateDisplayDevices;
+        /* madeira-bcd: OpenGL behind WGL (opengl_ios.c), only in a session whose game (or bcd.cfg) has gl-backend = zink or gles:
+         * WineProcessBridge.m then exports MADEIRA_GL_BACKEND. Without it pOpenGLInit stays unset and takes nulldrv_OpenGLInit
+         * (STATUS_NOT_IMPLEMENTED: no context can be made), exactly as before. */
+        if (getenv( "MADEIRA_GL_BACKEND" )) winios_user_driver.pOpenGLInit = winios_OpenGLInit;
         __wine_set_user_driver( &winios_user_driver, WINE_GDI_DRIVER_VERSION );
 #else
         __wine_set_user_driver( &null_user_driver, WINE_GDI_DRIVER_VERSION );

@@ -19,6 +19,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LINE = re.compile(r'env\.MADEIRA_OPTIN_DLLS\s*=\s*(.+)$')
+# OpenGL: a game whose gl-backend key is on runs the opt-in opengl32.dll (WineProcessBridge.m adds opengl32 to the opt-in list for it), so a list
+# line or a rule line `gl-backend = zink` or `= gles` wants opengl32-optin.dll too.
+GL_LINE = re.compile(r'gl-backend\s*=\s*(zink|gles)\s*$', re.I)
 # Round 630 (agent G2 S18): a name the app provides as a link to a DLL BCD already ships, not as <name>-optin.dll
 # (WineProcessBridge.m: a game that lists dbgcore gets dbgcore.dll -> arm64ec-windows/dbghelp.dll). For these the shipped
 # target is what must be in DIR.
@@ -29,6 +32,8 @@ def wanted(recs_path, rules_path):
     names = {}
 
     def add(line, who):
+        if GL_LINE.match(line.strip()):
+            names.setdefault('opengl32', set()).add(who)
         m = LINE.match(line.strip())
         if m:
             for n in re.split(r'[,; ]+', m.group(1).strip().lower()):
@@ -68,7 +73,7 @@ if __name__ == '__main__':
     names = wanted(recs, rules)
     gone = missing(sys.argv[1], names)
     for n, who in sorted(gone.items()):
-        print('::error::%s is not in %s, but %s name %s in env.MADEIRA_OPTIN_DLLS' % (shipped_as(n), sys.argv[1], ', '.join(sorted(who)), n))
+        print('::error::%s is not in %s, but %s name %s in env.MADEIRA_OPTIN_DLLS (or, for opengl32, in gl-backend)' % (shipped_as(n), sys.argv[1], ', '.join(sorted(who)), n))
     if gone:
         sys.exit(1)
     print('opt-in DLLs: all %d named by the lists and auto-tune rules ship (%s)' % (len(names), ', '.join(sorted(names))))

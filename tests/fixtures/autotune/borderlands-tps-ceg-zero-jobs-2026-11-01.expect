@@ -4,11 +4,9 @@
  "matched": [
   "dock-ceg-no-job"
  ],
- "next": [
-  "env.MADEIRA_DOCK_CEG_ZERO_JOBS = 1"
- ],
- "note": "Borderlands: The Pre-Sequel through BCD Dock (build 626, Send Log FRKBN1, trimmed): Valve's client accepted the request to prepare the game's per-account program and started no job (ceg-request=0); the Dock ended with host result 49 and the game never launched. The experiment lets such a start go on to Valve's launch.",
+ "next": [],
+ "note": "Borderlands: The Pre-Sequel through BCD Dock (build 626, Send Log FRKBN1, trimmed): Valve's client accepted the request to prepare the game's per-account program and started no job (ceg-request=0), which the Dock counted as a failure (host result 49). Build 632 goes on to Valve's launch for such a first request (tools/patch-dock-ceg-already-prepared.py), so the rule is fixedIn 632 and auto-tune stops at once instead of trying a key.",
  "outcome": "exited-early",
  "stage": 2,
- "status": "trying"
+ "status": "known"
 }

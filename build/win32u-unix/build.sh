@@ -137,6 +137,10 @@ for src in $WINE_SRC/dlls/win32u/*.c $WINE_SRC/dlls/win32u/dibdrv/*.c; do
     compile_one "$src" "$name"
 done
 
+# madeira-bcd: the winios OpenGL driver (WGL over Mesa/Zink on MoltenVK, or Apple's OpenGL ES; the app half is
+# app/Madeira/Winios/WiniosGL.m). Installed by driver_ios.c only for a session with gl-backend = zink or gles.
+compile_one "$BUILD_DIR/opengl_ios.c" "opengl_ios"
+
 echo ""
 echo "Results: $SUCCEEDED succeeded, $FAILED failed"
 if [ -n "$FAILED_FILES" ]; then

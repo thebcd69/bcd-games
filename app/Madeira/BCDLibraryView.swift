@@ -22,6 +22,8 @@ struct BCDLibraryView: View {
     @State private var query = ""
     @FocusState private var typing: Bool
     @State private var opened: BCDGame?
+    /// The Steam Workshop area, open over the Library (BCDWorkshopView.swift).
+    @State private var workshop: BCDWorkshopRoute?
     @Environment(\.bcdMenu) private var menu
 
     private var filter: BCDLibraryFilter { BCDLibraryFilter.allCases.first { $0.rawValue == filterKey } ?? .all }
@@ -40,6 +42,7 @@ struct BCDLibraryView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     if let launcher { BCDLauncherPanel(spec: launcher) }   // a launcher's chip (Battle.net, EA app): its Install / Open card, no games
                     notices
+                    BCDLibraryItchTool(filter: filter, query: query)
                     savesNotice
                     LazyVGrid(columns: columns, alignment: .leading, spacing: layout == .pad ? 26 : 20) {
                         ForEach(shown) { game in
@@ -64,6 +67,7 @@ struct BCDLibraryView: View {
         }
         .padding(.top, 4)
         .bcdGamePage($opened, from: "Library")
+        .bcdWorkshop($workshop)
         // The game menu's "Game page" opens the page over the Library.
         .onAppear { menu?.openPage = { opened = $0 } }
         .onChange(of: searchRequest) { _, _ in toggleSearch() }
@@ -71,11 +75,18 @@ struct BCDLibraryView: View {
 
     // MARK: Filters and the row's buttons
 
+    /// The Workshop button: under the Steam chip, when the Workshop is part of this copy, BCD is signed in to Steam and a Steam game is installed.
+    private var workshopOffered: Bool {
+        filter == .store(.steam) && BCDWorkshopSource.backend?.available == true
+            && store.games.contains { $0.store == .steam && $0.state.isInstalled }
+    }
+
     /// The filters scroll sideways; Add a game, the order, Search and Refresh stay in sight at the end
     /// of the row (Add a game and the order as round buttons alone on an upright phone).
     private var filters: some View {
         HStack(spacing: 8) {
             chips
+            if workshopOffered { rowButton("library.workshop", "Workshop", "square.stack.3d.up", label: "Steam Workshop") { workshop = .area } }
             rowButton("library.add", "Add a game", "plus") { store.actions?.addGameFromFiles() }
             rowButton("library.sort", sort.title, "arrow.up.arrow.down", label: "Sort by: \(sort.title)") { showSortMenu() }
             round("library.search", searching ? "xmark" : "magnifyingglass", searching ? "Close the search" : "Search") { toggleSearch() }
@@ -412,6 +423,7 @@ struct BCDDuoLibraryView: View {
     @State private var gridWidth: CGFloat = 0
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var opened: BCDGame?
+    @State private var workshop: BCDWorkshopRoute?
     @Environment(\.bcdMenu) private var menu
 
     private var libraryGames: [BCDGame] { store.games.filter { !$0.isWindowsDesktop } }
@@ -432,6 +444,7 @@ struct BCDDuoLibraryView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     if let launcher { BCDLauncherPanel(spec: launcher) }   // a launcher's chip (Battle.net, EA app): its Install / Open card, no games
                     notices
+                    BCDLibraryItchTool(filter: filter, query: query)
                     savesNotice
                     LazyVGrid(columns: columns, alignment: .leading, spacing: layout == .pad ? 26 : 20) {
                         ForEach(shown.map { BCDDuoLibraryGame(game: $0) }) { item in
@@ -468,6 +481,10 @@ struct BCDDuoLibraryView: View {
         .onChange(of: searching) { _, shown in if !shown { query = "" } }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                if workshopOffered {
+                    Button { workshop = .area } label: { Label("Steam Workshop", systemImage: "square.stack.3d.up") }
+                        .bcdFocusable("library.workshop", cornerRadius: 22) { workshop = .area }
+                }
                 Button { store.actions?.addGameFromFiles() } label: { Label("Add a game", systemImage: "plus") }
                     .bcdFocusable("library.add", cornerRadius: 22) { store.actions?.addGameFromFiles() }
                 Button { showSortMenu() } label: { Label("Sort by: \(sort.title)", systemImage: "arrow.up.arrow.down") }
@@ -479,12 +496,18 @@ struct BCDDuoLibraryView: View {
             }
         }
         .bcdGamePage($opened, from: "Library")
+        .bcdWorkshop($workshop)
         // The game menu's "Game page" opens the page over the Library.
         .onAppear { menu?.openPage = { opened = $0 }; installNavigation() }
         .onDisappear { focus.removeNavigator("library.game.", owner: navigationOwner) }
         .onChange(of: shown.map(\.id)) { _, _ in installNavigation() }
         .onChange(of: columns.count) { _, _ in installNavigation() }
         .onChange(of: searchRequest) { _, _ in toggleSearch() }
+    }
+
+    private var workshopOffered: Bool {
+        filter == .store(.steam) && BCDWorkshopSource.backend?.available == true
+            && libraryGames.contains { $0.store == .steam && $0.state.isInstalled }
     }
 
     /// Ordered movement can reach cards the lazy grid has not created yet.
@@ -699,4 +722,43 @@ struct BCDDuoLibraryView: View {
 private struct BCDDuoLibraryGame: Identifiable {
     let game: BCDGame
     var id: String { "library.game." + game.id }
+}
+
+/// Shared store controls so the native Duo library offers the same actions as the original layout.
+private struct BCDLibraryItchTool: View {
+    @EnvironmentObject private var store: BCDStore
+    let filter: BCDLibraryFilter
+    let query: String
+
+    var body: some View {
+        let signedIn = store.accounts.contains { $0.store == .itch && $0.name != nil }
+        if filter == .store(.itch), signedIn, query.isEmpty {
+            Button { store.actions?.openStoreTool(.itch) } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "magnifyingglass.circle.fill").font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(BCDStyle.lavender)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Find a game on itch.io").font(BCDStyle.heading(17))
+                        Text("Search itch.io or paste a game's link, add a free game to this library and install it here.")
+                            .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right").font(.system(size: 13, weight: .bold)).foregroundStyle(BCDStyle.textSoft)
+                }
+                .padding(16)
+                .frame(maxWidth: 620, alignment: .leading)
+                .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(BCDStyle.glow, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .bcdFocusable("library.itch.find", cornerRadius: 18) { store.actions?.openStoreTool(.itch) }
+            if store.count(.itch) == 0 {
+                Text("No Windows games yet. Games you buy or claim on itch.io show here, and so do the games in your itch.io collections. Refresh reads the account's list again.")
+                    .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
 }

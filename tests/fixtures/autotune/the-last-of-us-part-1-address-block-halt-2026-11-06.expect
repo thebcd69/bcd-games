@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "tlou1-virtual-memory-area-halt"
+ ],
+ "next": [],
+ "note": "The Last of Us Part I (tlou-i-l.exe in a folder of its own, started directly), build 633, iPhone18,2, iOS 27.2, auto-tune's env.MADEIRA_FEX_AVX = 1 in force (the start before it, with AVX off, is the c000001d of the-last-of-us-part-1-2026-10-21): 2 s after the start, before any Direct3D call, the game asks sixteen times for a 512 GB reservation at 0x1000000000 + n * 0x8000000000 ([jumbo#1]..[jumbo#16]; the first got a soft grant at 0x7800000000 that the game never freed, the other fifteen c0000018) and stops itself with its own message (HALT: Coudln't find any available virtual memory start addresses after 16 tries; Memory::FindAvailableVirtualMemoryStartAddress, memory-area.cpp:65), an int3, exit 0x80000003. The same in 24TC8Y/W5M7YN (builds 579/580), S0M36P/8GRXB9 (630). No setting changes it, so auto-tune stops at once and says why.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "known"
+}

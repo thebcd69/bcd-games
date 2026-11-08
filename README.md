@@ -273,25 +273,12 @@ respective owners; BCD is not affiliated with or endorsed by them.
 
 ## Credits
 
-**Madeira**, which BCD is a fork of:
+**Madeira**, which BCD is a fork of, by Will Faust ([willfaust](https://github.com/willfaust)) and its contributors. BCD carries
+code from Madeira and from the people who contribute to it; every file, author and source is listed in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-- **Will Faust** ([willfaust](https://github.com/willfaust)): created Madeira
-- **Nick** ([125hz](https://github.com/125hz)): 32-bit game support, the game library and
-  Madeira Dock (BCD Dock here)
-- **Jfishin** ([Jfishin](https://github.com/Jfishin)): the original native Steam sign-in,
-  library and downloads
-- **Jesse** ([JesseLovelace](https://github.com/JesseLovelace)): Steam Cloud saves, faster
-  game launches, and fixes that let more games run
-- **Dan Perks** ([danperks](https://github.com/danperks)): in-app JIT without StikDebug, and
-  pairing without a computer
-- **spitefulowl** ([spitefulowl](https://github.com/spitefulowl)): Wine and FEX runtime
-  fixes, DXMT texture and memory fixes, audio, the swap tier, and library launch options
-- **meshoklv** ([meshoklv](https://github.com/meshoklv)): controller fixes, touch taps that
-  stay off the mouse, and a crash-guard fix
-- **TheHadesc** ([TheHadesc](https://github.com/TheHadesc)): Madeira Dock starts for more
-  games, and a touch gamepad that survives the in-game keyboard
-- **vancez** ([vancez](https://github.com/vancez)): Steam download checksums, and the idea for
-  the download-server fallback in regions without HTTPS servers
+**Contributors to BCD:** [mckenna654](https://github.com/mckenna654), [Pardoxum](https://github.com/Pardoxum),
+[le0-VV](https://github.com/le0-VV) and [rtmtree](https://github.com/rtmtree).
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by

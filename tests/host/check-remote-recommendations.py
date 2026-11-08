@@ -270,7 +270,7 @@ do {
     check(false, "the built-in list fails the download policy: \(error)")
 }
 let active = GameRecommendations.active
-check(active.origin == .builtIn && active.version == builtInFile.version && active.rules.count == builtInFile.rules.count,
+check(active.origin == .builtIn && active.version == builtInFile.version && active.rules.count == builtInFile.list(build: 602, origin: .builtIn).rules.count,   // round 632: three rules start with build 632
       "the app starts with the built-in list")
 var same = 0, newer = 0
 for ram: UInt64 in [11_695 << 20, 7_500 << 20, 16 << 30] {
@@ -439,7 +439,7 @@ check(kind(editRule("rdr2-steam") { $0["switches"] = ["fpsMode": 9] }) == .forma
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["resolution": "huge"] }) == .format, "a resolution that is not WxH")
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["display": "zoom"] }) == .format, "a display mode that does not exist")
 check(kind(editRule("rdr2-steam") { $0["version"] = "11" }) == .format, "a version as text")
-check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 13,", with: "\"version\": 13.5,")   /* rdr2-steam v13 (round 630) */.utf8)) == .format,
+check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 15,", with: "\"version\": 15.5,")   /* rdr2-steam v15 (build 634) */.utf8)) == .format,
       "a version that is not whole")
 check(kind(editRule("breakneck") { $0["match"] = ["programs": [["name": #"C:\Games\breakneck.exe"#]]] }) == .format, "a program with a folder")
 check(kind(editRule("breakneck") { $0["match"] = ["steamFolders": ["Breakneck"]] }) == .format, "a Steam folder not lowercased")

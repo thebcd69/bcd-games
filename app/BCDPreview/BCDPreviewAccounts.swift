@@ -21,7 +21,7 @@ import UIKit
     init(variant: String) {
         let signedOut = ["out", "signin", "qr", "guard", "error"].contains(variant)
         steam = BCDSteamAccount(available: true, accountName: signedOut ? nil : "player", personaName: nil, avatar: nil,
-                                cloudAvailable: true, cloudOn: true, setupAvailable: true)
+                                cloudAvailable: true, cloudOn: true, setupAvailable: true, lanAvailable: true, lanOn: variant == "lan", lanHost: variant == "lan" ? "192.168.1.20" : "")
         gogAccount = BCDAccount(store: .gog, name: signedOut ? nil : "gogplayer", available: true)
         epicAccount = BCDAccount(store: .epic, name: signedOut ? nil : "epicplayer", available: true)
         switch variant {
@@ -63,6 +63,8 @@ import UIKit
     func clearSignInError() { signInProgress.error = nil }
     func signOut() { steam.accountName = nil }
     func setCloud(_ on: Bool) { steam.cloudOn = on }
+    func setLAN(_ on: Bool) { steam.lanOn = on }
+    func setLANHost(_ address: String) { steam.lanHost = address }
     func runSetup() {}
     func signInGOG() { gogAccount.name = "gogplayer" }
     func signOutGOG() { gogAccount.name = nil }

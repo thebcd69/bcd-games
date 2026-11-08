@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 llamajose and ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull requests #491 and #505)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
 // the owned library and downloads (docs/STEAM_LIBRARY.md): the session is
 // suspended while a game runs, and the sign-in stays in SteamSignIn.
+// Modified by BCD (thebcd69), 2026-11-05: `callServiceMethodWithResult` (the Steam Workshop's subscribe calls answer with an empty body either way);
+// `callServiceMethod` is that call without the EResult.
+// Modified by BCD (thebcd69), 2026-11-05: `sendServiceNotification` and the relayed LAN packets (`handleRelayed`): the local network transfer
+// (Settings › Accounts › Steam, off by default); nothing in them runs while it is off.
 
 import Foundation
 
@@ -256,6 +262,7 @@ class SteamSession {
         logon.accessToken = accessToken
         logon.machineName = SteamDevice.name
         logon.clientOSType = -102  // macOS
+        logon.lanAddress = SteamLANSetting.enabled   // the Wi-Fi address as the private one, only with the local network transfer on
 
         let logonData = SteamMessageCodec.encodeClientMessage(
             eMsg: .clientLogon,
@@ -544,6 +551,15 @@ class SteamSession {
         body: Data,
         timeout: TimeInterval = 10
     ) async throws -> Data {
+        try await callServiceMethodWithResult(method: method, body: body, timeout: timeout).body
+    }
+
+    /// The same, with the response header's EResult (1 = OK).
+    func callServiceMethodWithResult(
+        method: SteamServiceMethod,
+        body: Data,
+        timeout: TimeInterval = 10
+    ) async throws -> (eresult: Int32, body: Data) {
         resetIdleTimer()
         let jobID = nextJobID()
 
@@ -585,9 +601,43 @@ class SteamSession {
         }
 
         if response.header.eresult != 1 {
-            SteamLog.trace("\(method.rawValue) header eresult=\(response.header.eresult)")
+            if method.rawValue.hasPrefix("RemoteClient.") || method == .requestPeerContentServer || method == .getPeerContentInfo {
+                SteamLog.event("[steam-lan] \(method.rawValue) eresult=\(response.header.eresult)")
+            } else {
+                SteamLog.trace("\(method.rawValue) header eresult=\(response.header.eresult)")
+            }
         }
-        return response.body
+        return (response.header.eresult, response.body)
+    }
+
+    /// A unified-service notification (a method that returns NoResponse):
+    /// no source job, so the CM neither answers nor rejects it as a call.
+    func sendServiceNotification(method: SteamServiceMethod, body: Data) async throws {
+        resetIdleTimer()
+        var header = CMsgProtoBufHeader()
+        header.steamid = steamID
+        header.clientSessionid = sessionID
+        header.targetJobName = method.rawValue
+        let data = SteamMessageCodec.encode(eMsg: .serviceMethodCallFromClient, header: header, body: body)
+        try await connection.send(data)
+    }
+
+    /// A packet another client of this account sent through Steam: a status
+    /// is kept for SteamLANPeer; a discovery is answered with this device's
+    /// status, once it has one. (Only a download with the local network
+    /// transfer turned on ever announces this device, so nothing else arrives.)
+    private func handleRelayed(method: String, body: Data) {
+        guard method.hasPrefix("RemoteClientSteamClient.NotifySteamBroadcastPacket"),
+              let packet = SteamLANPeer.relayedPacket(body) else { return }
+        let relay = SteamLANRelay.shared
+        if let status = SteamLANPeer.parseStatus(packet.payload) {
+            if relay.record(status) {
+                SteamLog.event("[steam-lan] relayed status host=\(status.hostname) client=\(status.clientID) addresses=\(status.addresses.count)")
+            }
+        } else if SteamLANPeer.packetType([UInt8](packet.payload)) == 0, let own = relay.ownStatus, packet.clientID != own.clientID {
+            let reply = SteamLANPeer.steamBroadcast(steamID: steamID, clientID: own.clientID, payload: own.status)
+            Task { try? await self.sendServiceNotification(method: .remoteClientSendSteamBroadcastPacket, body: reply) }
+        }
     }
 
     /// Send a message without waiting for response
@@ -654,6 +704,13 @@ class SteamSession {
         // Log unmatched service method responses for debugging
         if message.rawEMsg == EMsg.serviceMethodResponse.rawValue {
             SteamLog.trace("ServiceMethodResponse not matched: jobTarget=\(message.header.jobidTarget), pending=\(Array(pendingJobs.keys))")
+        }
+
+        // What Steam relays between this account's devices (SteamLANPeer):
+        // the other clients' discovery answers and connection packets.
+        if message.rawEMsg == EMsg.serviceMethod.rawValue, message.header.targetJobName.hasPrefix("RemoteClientSteamClient.") {
+            handleRelayed(method: message.header.targetJobName, body: message.body)
+            return
         }
 
         // Dispatch to registered handlers

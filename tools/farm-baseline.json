@@ -1,0 +1,204 @@
+{
+ "version": 1,
+ "comment": [
+  "Package-time baseline of tools/check-farm-imports.py (round 632, D17), taken on the build-631 farms (app/Madeira/<farm>/).",
+  "required: files every build ships; minFiles: 90% of the files of that build; staticGaps: imports no file of the farm resolves and that are",
+  "accepted (opt-in modules resolve through MADEIRA_OPTIN_DLLS, bthprops.cpl's bluetoothapis.dll is a control panel nothing loads);",
+  "delayGaps: delay imports without a file in the farm, reported only when they are new. Regenerate an entry with --write-baseline on a good farm."
+ ],
+ "farms": {
+  "arm64ec-windows": {
+   "delayGaps": {
+    "mf.dll": [
+     "evr.dll"
+    ],
+    "opengl32.dll": [
+     "glu32.dll"
+    ],
+    "shell32.dll": [
+     "shdocvw.dll"
+    ],
+    "urlmon.dll": [
+     "advpack.dll"
+    ]
+   },
+   "minFiles": 290,
+   "required": [
+    "advapi32.dll",
+    "avifil32.dll",
+    "cabinet.dll",
+    "combase.dll",
+    "comctl32.dll",
+    "d2d1.dll",
+    "d3d10.dll",
+    "d3d10core.dll",
+    "d3d11.dll",
+    "d3d12.dll",
+    "d3d9.dll",
+    "d3dcompiler_43.dll",
+    "d3dcompiler_47.dll",
+    "d3dx10_43.dll",
+    "d3dx11_43.dll",
+    "d3dx9_43.dll",
+    "dinput.dll",
+    "dinput8.dll",
+    "dsound.dll",
+    "dxgi.dll",
+    "gdi32.dll",
+    "gdiplus.dll",
+    "kernel32.dll",
+    "kernelbase.dll",
+    "madeira_d3d12.dll",
+    "mlang.dll",
+    "msctf.dll",
+    "msftedit.dll",
+    "msvcp100.dll",
+    "msvcp110.dll",
+    "msvcp120.dll",
+    "msvcr100.dll",
+    "msvcr110.dll",
+    "msvcr80.dll",
+    "msvcr90.dll",
+    "msvcrt.dll",
+    "msxml3.dll",
+    "msxml6.dll",
+    "ntdll.dll",
+    "ole32.dll",
+    "oleaut32.dll",
+    "riched20.dll",
+    "rpcrt4.dll",
+    "shell32.dll",
+    "shlwapi.dll",
+    "srvcli.dll",
+    "ucrtbase.dll",
+    "user32.dll",
+    "usp10.dll",
+    "vcomp140.dll",
+    "wbemprox.dll",
+    "win32u.dll",
+    "winedmo.dll",
+    "winegstreamer.dll",
+    "winemetal.dll",
+    "winmm.dll",
+    "wmvcore.dll",
+    "ws2_32.dll",
+    "x3daudio1_7.dll",
+    "xapofx1_5.dll",
+    "xaudio2_7.dll",
+    "xaudio2_9.dll",
+    "xinput1_3.dll",
+    "xinput1_4.dll",
+    "xmllite.dll",
+    "xtajit64.dll"
+   ],
+   "staticGaps": {
+    "bthprops.cpl": [
+     "bluetoothapis.dll"
+    ],
+    "evr-optin.dll": [
+     "dxva2.dll"
+    ],
+    "msi-optin.dll": [
+     "mspatcha.dll",
+     "odbccp32.dll",
+     "sxs.dll"
+    ]
+   }
+  },
+  "aarch64-windows": {
+   "delayGaps": {
+    "advapi32.dll": [
+     "cryptsp.dll"
+    ],
+    "comdlg32.dll": [
+     "winspool.drv"
+    ],
+    "gdi32.dll": [
+     "winspool.drv"
+    ],
+    "iexplore.exe": [
+     "advpack.dll"
+    ],
+    "mf.dll": [
+     "evr.dll"
+    ],
+    "mshtml.dll": [
+     "inetcomm.dll"
+    ],
+    "opengl32.dll": [
+     "glu32.dll"
+    ],
+    "setupapi.dll": [
+     "cabinet.dll"
+    ],
+    "shell32.dll": [
+     "gdiplus.dll",
+     "shdocvw.dll"
+    ],
+    "shlwapi.dll": [
+     "mlang.dll"
+    ],
+    "urlmon.dll": [
+     "advpack.dll"
+    ]
+   },
+   "minFiles": 122,
+   "required": [
+    "advapi32.dll",
+    "cmd.exe",
+    "d3d10core.dll",
+    "d3d11.dll",
+    "d3d9.dll",
+    "dsound.dll",
+    "dxgi.dll",
+    "explorer.exe",
+    "gdi32.dll",
+    "kernel32.dll",
+    "kernelbase.dll",
+    "msvcrt.dll",
+    "ntdll.dll",
+    "services.exe",
+    "ucrtbase.dll",
+    "user32.dll",
+    "win32u.dll",
+    "wineboot.exe",
+    "wined3d.dll",
+    "winemetal.dll",
+    "ws2_32.dll"
+   ],
+   "staticGaps": {}
+  },
+  "i386-windows": {
+   "delayGaps": {},
+   "minFiles": 662,
+   "required": [
+    "advapi32.dll",
+    "cmd.exe",
+    "d3d10core.dll",
+    "d3d11.dll",
+    "d3d8.dll",
+    "d3d9.dll",
+    "d3dx9_43.dll",
+    "ddraw.dll",
+    "dsound.dll",
+    "dxgi.dll",
+    "explorer.exe",
+    "gdi32.dll",
+    "kernel32.dll",
+    "kernelbase.dll",
+    "msvcp100.dll",
+    "msvcr100.dll",
+    "msvcrt.dll",
+    "ntdll.dll",
+    "ucrtbase.dll",
+    "user32.dll",
+    "win32u.dll",
+    "wined3d.dll",
+    "winemetal.dll",
+    "ws2_32.dll",
+    "xinput1_3.dll"
+   ],
+   "staticGaps": {}
+  }
+ }
+}

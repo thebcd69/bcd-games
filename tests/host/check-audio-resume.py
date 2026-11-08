@@ -70,7 +70,7 @@ check("the output is held only by the event function and by a failed start with 
       and src.count("atomic_store_explicit(&g_dev_suspended, 0,") == 1
       and re.search(r"if \(err\) \{\n.*null-mode.*\n\s*if \(ios_audio_resume_on\(\)\) \{[^\n]*\n\s*ios_dev_suspend_locked\(\);", resume) is not None)
 check("a client's start starts nothing while iOS holds the output",
-      "if (g_dev.au && !g_dev.running && !atomic_load_explicit(&g_dev_suspended, memory_order_acquire)) {" in resume)
+      "if (g_dev.au && !g_dev.running && !g_bg_halt\n        && !atomic_load_explicit(&g_dev_suspended, memory_order_acquire)) {" in resume)   # BackgroundRun's halt (check-background-run.py) is the only other thing that holds a start
 first = loop[loop.index("while (s->valid) {"):]
 check("the timer loop drains only while the output is held, before its other branches",
       "if (atomic_load_explicit(&g_dev_suspended, memory_order_acquire))\n            ios_stream_drain(s);" in first

@@ -1,3 +1,5 @@
+/* Copyright 2026 Will Faust. This file was taken from https://github.com/willfaust/Madeira (commit a15332c)
+ * under GPL-3.0-or-later and modified for BCD in September 2026. See THIRD-PARTY-NOTICES.md. */
 // Extension memory experiment (2026-09-29), shared by Madeira and its
 // MadeiraMemoryHost extension.
 //

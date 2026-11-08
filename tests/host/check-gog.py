@@ -79,15 +79,17 @@ HEADER = ("// SPDX-License-Identifier: GPL-3.0-only\n"
           "// Copyright 2026 thebcd69 (BCD)\n"
           "// BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.\n")
 FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift", "BCDGOG.swift",
-         "BCDLiveStoreGOG.swift"]
-HOST_FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift"]
+         "BCDLiveStoreGOG.swift", "BCDGOGRegistry.swift", "BCDGOGUpdate.swift"]
+# Upstream Madeira's files, as they came (their own licence headers; tests/host/check-gog-script.py checks them): not BCD Material.
+UPSTREAM_FILES = ["GOGInstallScript.swift", "GOGSetup.swift"]
+HOST_FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift", "GOGInstallScript.swift", "GOGSetup.swift", "BCDGOGUpdate.swift"]
 CONTENT_HOST_FILES = ["BCDContentPlan.swift", "BCDContentCodec.swift", "BCDContentJournal.swift", "BCDContentFetch.swift",
                       "BCDContentEngine.swift", "BCDContentQueue.swift", "BCDContentSecrets.swift"]
 SECRET = "9d85c43b1482497dbbce61f6e4aa173a433796eeae2ca8c5f6129f2dc4de46d9"
 
 # ---- source checks ------------------------------------------------------------------------
 pbx = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
-check(sorted(p.name for p in GOG.glob("*.swift")) == sorted(FILES), "app/Madeira/BCDGOG holds exactly GOG's files",
+check(sorted(p.name for p in GOG.glob("*.swift")) == sorted(FILES + UPSTREAM_FILES), "app/Madeira/BCDGOG holds exactly GOG's files",
       sorted(p.name for p in GOG.glob("*.swift")))
 sources = {}
 for name in FILES:

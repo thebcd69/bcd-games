@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 llamajose: code taken from https://github.com/willfaust/Madeira (commit d6857d5)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). The protobuf
@@ -8,6 +10,7 @@
 // CM logon, license, product-info (PICS), depot-key and service-call messages
 // were added for the owned library and downloads (docs/STEAM_LIBRARY.md).
 // Field numbers are Valve's, from its public protocol definitions.
+// Modified by BCD (thebcd69), 2026-11-05: `CMsgClientLogon.localIPv4()`, the logon's LAN address, sent only with the local network transfer turned on.
 
 import Foundation
 
@@ -516,6 +519,34 @@ struct CMsgClientLogon {
     var machineID: Data = Data()
     var supportsRateLimitResponse: Bool = true
     var clientPackageVersion: UInt32 = 1771
+    /// Send the Wi-Fi address (`localIPv4()`) as the private address instead of the first interface's: set by the session only while the
+    /// local network transfer is on (SteamLANSetting); otherwise the logon is what it always was.
+    var lanAddress = false
+
+    /// The machine's LAN IPv4 address in host byte order (for obfuscation),
+    /// and its interface. Wi-Fi/Ethernet (en*) first: on iOS the cellular
+    /// interface (pdp_ip*) usually comes first in the list, and Steam uses
+    /// this address to tell which of an account's devices share a network.
+    /// The logon sends it only with the local network transfer turned on
+    /// (`lanAddress`); otherwise `getLocalIPv4` is the address it always sent.
+    static func localIPv4() -> (ip: UInt32, interface: String) {
+        var addrList: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&addrList) == 0, let first = addrList else { return (0, "") }
+        defer { freeifaddrs(addrList) }
+        var best: (ip: UInt32, interface: String, rank: Int)?
+        for ifa in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            guard let sa = ifa.pointee.ifa_addr, sa.pointee.sa_family == sa_family_t(AF_INET) else { continue }
+            let name = String(cString: ifa.pointee.ifa_name)
+            if name.hasPrefix("lo") { continue }
+            let raw = sa.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr.s_addr }
+            let ip = UInt32(bigEndian: raw)  // same byte order as a<<24|b<<16|c<<8|d
+            if ip >> 16 == 0xA9FE { continue }  // 169.254/16, link-local
+            let rank = name == "en0" ? 0 : name.hasPrefix("en") ? 1 :
+                (name.hasPrefix("pdp_ip") || name.hasPrefix("utun") || name.hasPrefix("ipsec")) ? 3 : 2
+            if best == nil || rank < best!.rank { best = (ip, name, rank) }
+        }
+        return best.map { ($0.ip, $0.interface) } ?? (0, "")
+    }
 
     /// Get the machine's primary IPv4 address in host byte order (for obfuscation).
     /// getifaddrs works on both macOS and iOS — Host.current() doesn't exist on iOS.
@@ -540,7 +571,7 @@ struct CMsgClientLogon {
         // obfuscated_private_ip (field 11) — CMsgIPAddress sub-message with local IPv4 XOR'd with mask.
         // Valve's own client always sends this; without it some CM servers silently ignore the logon.
         // NOTE: field 2 is deprecated_obfustucated_private_ip (uint32), field 11 is the correct CMsgIPAddress.
-        let localIP = CMsgClientLogon.getLocalIPv4()
+        let localIP = lanAddress ? CMsgClientLogon.localIPv4().ip : CMsgClientLogon.getLocalIPv4()
         let obfuscatedIP = localIP ^ 0xBAADF00D
         var ipEncoder = ProtobufEncoder()
         ipEncoder.writeFixed32(fieldNumber: 1, value: obfuscatedIP)

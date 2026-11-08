@@ -1,3 +1,5 @@
+// Portions copyright 2026 alantangok, 125hz and wamei: code taken from https://github.com/willfaust/Madeira (pull request #244; commits abca30a, facd2cc and bbe0b12)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 import SwiftUI
 import UIKit
 import QuartzCore
@@ -1383,6 +1385,13 @@ struct ContentView: View {
         // madeira-bcd (2026-10-22): an Epic game BCD installed starts signed in: its one-time code is fetched first and this start runs
         // again with it (BCDEpicStart.swift). Any other entry, and Epic off (env.BCD_EPIC = 0), go straight on.
         guard !BCDEpic.enabled || BCDEpic.shared.preLaunch(entry, retry: { startLibraryEntry(entry) }) else { return }
+        // madeira-bcd (round 632, GOG parts): an installed GOG game's install script writes its registry values into the prefix before
+        // the start (BCDGOG.prepareStart, BCDGOGRegistry). No session runs here; any other entry, and GOG off, are not touched.
+        if BCDGOG.enabled { BCDGOG.shared.prepareStart(entry) }
+        // madeira-bcd (2026-11-05): the experimental EA store (off by default): an EA game BCD installed first gets its licence, the registry keys, the EA
+        // app's environment and the stand-in for the EA app's local service, and this start runs again (SwiftEA/EALibrary.preLaunch). Any other
+        // start clears that environment if an EA start set it. EA off (env.BCD_EA unset or 0): nothing here.
+        guard !EALibrary.enabled || EALibrary.shared.preLaunch(entry, retry: { startLibraryEntry(entry) }) else { return }
         // madeira-bcd (lead, 2026-10-24): a launcher's own library entry (Battle.net, EA app) started from its library tile takes the
         // launcher's current block of lines too, as the Launchers tab's Open does (BCDLaunchersLive.entry). Build 597's Battle.net
         // fix never reached the owner's session because it was started from the tile and the block was still build 594's. Only the

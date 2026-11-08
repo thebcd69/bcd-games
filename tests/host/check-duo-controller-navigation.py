@@ -48,6 +48,88 @@ enum BCDSettingsSection { case accounts, graphics }
  private func setFocus(_ id: String) { focus?.focused = id }
 """ + method("func orderChanged(_ ids:") + method("private func show(_ section:") + method("private func enter(_ section:") + "\n}\n"
 
+# Exercise actual native-page lifecycle callbacks against the actual focus-layer core.
+page = (root / "app/Madeira/BCDGamePage.swift").read_text()
+page = page[page.index("struct BCDGamePage: View {"):]
+foldable = (root / "app/Madeira/BCDFoldable.swift").read_text()
+def extract(text, signature):
+    start = text.index(signature)
+    brace = text.index("{", start)
+    depth, end = 1, brace + 1
+    while depth:
+        depth += (text[end] == "{") - (text[end] == "}")
+        end += 1
+    return text[start:end]
+owner = extract(foldable, "@MainActor enum BCDDuoPageOwner {")
+disappear = extract(page, ".onDisappear {").split("{", 1)[1][:-1]
+returned = extract(page, ".onChange(of: workshop)").split("{ old, new in", 1)[1][:-1]
+guards = page[page.index("    private func installButtons() {"):]
+guards = guards[guards.index("{") + 1:guards.index("        // The DLC chooser:")]
+page_fixture = owner + r'''
+@MainActor final class LifecycleModel {
+ var pending: Bool?
+ var close: () -> Void = {}
+ var opens = 0, leaves = 0
+ var plan: (main: String?, unused: Bool) = ("Play", false)
+ func answer(_ value: Bool) { pending = nil }
+ func leave() { leaves += 1 }
+ func open(_ store: Int) { opens += 1 }
+ func request(_ action: String) {}
+}
+@MainActor final class PageLifecycleFixture {
+ enum Layout { case phonePortrait, other }
+ static let layer = "game.", panelLayer = "game.panel."
+ let embeddedInNavigation = true
+ let owner = UUID(), model = LifecycleModel()
+ let focus: BCDFocus
+ let store = 0
+ let close: () -> Void = {}
+ var visible = false, phoneUpright = false
+ let layout = Layout.other
+ let preview: (panel: String?, ask: String?, after: Double) = (nil, nil, 0)
+ var options: String?, workshop: String?
+ var handlersInstalled = 0
+ init(_ focus: BCDFocus) { self.focus = focus }
+ func openOptions(_ option: String) { options = option; focus.openLayer(Self.panelLayer) }
+ func closeOptions() { options = nil; focus.closeLayer(Self.panelLayer) }
+''' + extract(page, "    private func deactivateEmbeddedPage()").replace("private func", "func") + "\n" + extract(page, "    private func appeared()").replace("private func", "func") + "\nfunc disappeared() {" + disappear + "}\nfunc returned(old: String?, new: String?) {" + returned + "}\nfunc installButtons() {" + guards + "handlersInstalled += 1\n}\n}\n"
+page_fixture = page_fixture.replace("DispatchQueue.main.async {", "DispatchQueue.main.async { [self] in").replace("+ preview.after) {", "+ preview.after) { [self] in")
+lifecycle_tests = r'''
+  for closeFirst in [false, true] {
+   let modalFocus = BCDFocus(), page = PageLifecycleFixture(BCDFocus())
+   let covered = PageLifecycleFixture(modalFocus)
+   covered.appeared(); covered.openOptions("main")
+   modalFocus.focused = "game.panel.row.workshop"
+   covered.workshop = "area"
+   if closeFirst { modalFocus.openLayer("workshop."); covered.disappeared() }
+   else { covered.disappeared(); modalFocus.openLayer("workshop.") }
+   modalFocus.focused = "workshop.close"
+   precondition(covered.visible && covered.options == "main" && covered.model.leaves == 0)
+   precondition(modalFocus.ownsLayer("workshop."), "cover keeps its layer in either appearance order")
+   if closeFirst { modalFocus.closeLayer("workshop.") }
+   covered.workshop = nil; covered.returned(old: "area", new: nil)
+   RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+   if !closeFirst { modalFocus.closeLayer("workshop.") }
+   covered.appeared()
+   precondition(covered.options == "main" && covered.model.opens == 1, "return must not reopen/reset the game page")
+   precondition(modalFocus.ownsLayer("game.panel.") && modalFocus.focused == "game.panel.row.workshop")
+   // A delayed dismissal from an outgoing game cannot focus a newly active page.
+   covered.workshop = "area"
+   page.appeared()
+   covered.workshop = nil; covered.returned(old: "area", new: nil)
+   RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+   precondition(!covered.visible && !BCDDuoPageOwner.owns(covered.owner))
+   precondition(modalFocus.focused != "game.panel.row.workshop")
+   BCDDuoPageOwner.end()
+  }
+  let rootFocus = BCDFocus()
+  rootFocus.scope(to: "home."); precondition(rootFocus.ownsRoot("home."))
+  rootFocus.openLayer("system."); precondition(!rootFocus.ownsRoot("home."))
+  rootFocus.closeLayer("system."); rootFocus.scope(to: "library.")
+  precondition(!rootFocus.ownsRoot("home."), "late Home state cannot take another tab's focus")
+  print("PASS: Workshop cover/dismiss ordering, preserved Options, outgoing-page ownership and root focus")
+'''
+
 stubs = r"""
 import Foundation
 import Combine
@@ -61,6 +143,7 @@ enum BCDFocusSteppers { static func step(_ id: String?, _ move: BCDMove) -> Bool
 tests = r"""
 @main struct Checks {
  @MainActor static func main() {
+""" + lifecycle_tests + r"""
   let entryFocus = BCDFocus()
   let direct = SettingsEntryFixture(entryFocus)
   let entryRows = ["settings.graphics.resolution", "settings.graphics.frame-cap"]
@@ -187,6 +270,6 @@ tests = r"""
 with tempfile.TemporaryDirectory(prefix="bcd-duo-navigation-") as folder:
     source = Path(folder) / "Checks.swift"
     binary = Path(folder) / "checks"
-    source.write_text(stubs + glow_identity + sampler + core + settings_fixture + tests)
+    source.write_text(stubs + glow_identity + sampler + core + settings_fixture + page_fixture + tests)
     subprocess.run(["xcrun", "swiftc", "-swift-version", "5", "-parse-as-library", str(source), "-o", str(binary)], check=True)
     subprocess.run([str(binary)], check=True, timeout=20)

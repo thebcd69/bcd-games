@@ -37,6 +37,18 @@ struct BCDGOGInstallRecord: Codable, Equatable {
     /// The library entry Play starts.
     var entryID: UUID?
     var installed: Date
+    /// Installed (or repaired) by BCD with the install script in mind: the game's `goggame-<id>.script` registry values are written
+    /// before each start (BCDGOGRegistry; env.BCD_GOG_SCRIPT). nil in a record from before: such a game starts exactly as it
+    /// always did unless the key asks for the values.
+    var scripts: Bool?
+    /// Build 632: the redistributables' installers the game's first start runs (GOGSetup; each once per prefix), and the redistributables
+    /// left out with the reason (the game's page says so). nil in a record from before: such a game has none of its redistributables
+    /// downloaded and runs no installer (Repair adds them).
+    var setup: [GOGSetupProgram]?
+    var setupNotes: [GOGSetupNote]?
+    /// Build 632: the DLC products whose files the game has (`depots` holds their depots). nil in a record from before: such a game
+    /// has none, and its first update or repair installs the DLC the account owns.
+    var dlc: [String]?
 
     var windowsFolder: String { root.windowsPath(folder) }
     var hostFolder: URL? { root.url?.appendingPathComponent(folder, isDirectory: true) }
@@ -128,7 +140,8 @@ enum BCDGOGInstall {
         var record = BCDGOGInstallRecord(productID: plan.key.id, title: info.title, buildID: info.buildID, versionName: info.version,
                                          language: info.language, root: root, folder: folder, bytes: plan.totalBytes,
                                          depots: info.depots, dependencies: info.dependencies, supportFiles: info.supportFiles,
-                                         play: nil, entryID: nil, installed: now)
+                                         play: nil, entryID: nil, installed: now, scripts: true,
+                                         setup: info.setup, setupNotes: info.setupNotes, dlc: info.dlc)
         if let file = infoFile(in: gameFolder, productID: plan.key.id), let data = try? Data(contentsOf: file),
            var play = try? playTask(fromInfo: data), let program = onDisk(play.path, in: gameFolder, directory: false) {
             play.path = program
@@ -138,6 +151,62 @@ enum BCDGOGInstall {
         BCDContentLog.write("[gog-install] installed product=\(plan.key.id) files=\(plan.files.count) bytes=\(plan.totalBytes) " +
                             "play=\(record.play == nil ? 0 : 1) redist=\(info.dependencies.count)")
         return record
+    }
+
+    // MARK: Updates and repairs
+
+    /// An update or a repair is done: the downloaded files in `stage` go into the game's folder (BCDGOGUpdate.merge: a rename each, the
+    /// files the new build no longer has removed), and the record takes the new build: its id and version, depots, DLC, size,
+    /// redistributables and the script mark (the game is now installed with them in mind). The play task is read again from the build's
+    /// own info file; the one the record had stays when the new build names none that is on the disk. Off the main thread.
+    static func finishUpdate(_ plan: BCDContentPlan, info: BCDGOGPlanInfo, stage: URL, record: BCDGOGInstallRecord)
+        throws -> (record: BCDGOGInstallRecord, merged: BCDGOGUpdate.MergeResult) {
+        guard let gameFolder = record.hostFolder else { throw BCDContentError.driveUnavailable(record.root.drive) }
+        let merged = try BCDGOGUpdate.merge(plan, stage: stage, into: gameFolder, remove: info.removed ?? [])
+        var record = record
+        record.buildID = info.buildID
+        record.versionName = info.version
+        record.depots = info.depots
+        record.dependencies = info.dependencies
+        record.supportFiles = info.supportFiles
+        record.bytes = info.installBytes ?? plan.totalBytes
+        record.scripts = true
+        record.dlc = info.dlc ?? record.dlc
+        if info.setup != nil { record.setup = info.setup; record.setupNotes = info.setupNotes }
+        if let file = infoFile(in: gameFolder, productID: record.productID), let data = try? Data(contentsOf: file),
+           var play = try? playTask(fromInfo: data), let program = onDisk(play.path, in: gameFolder, directory: false) {
+            play.path = program
+            play.workingDirectory = onDisk(play.workingDirectory, in: gameFolder, directory: true) ?? ""
+            record.play = play
+        }
+        try? FileManager.default.removeItem(at: stage)
+        BCDContentLog.write("[gog-install] \(info.kind?.rawValue ?? "update") done product=\(record.productID) replaced=\(merged.replaced) added=\(merged.added) " +
+                            "removed=\(merged.removed) dlc=\(record.dlc?.count ?? 0) play=\(record.play == nil ? 0 : 1)")
+        return (record, merged)
+    }
+
+    // MARK: Redistributables
+
+    /// The line on a game's page about its redistributables (build 632): the installers its first start runs (once for the whole prefix,
+    /// so a game that needs the same one finds it done), and what was left out and why. nil: nothing to say.
+    static func setupNote(setup: [GOGSetupProgram], notes: [GOGSetupNote]) -> String? {
+        func sentence(_ text: String) -> String { text.prefix(1).lowercased() + text.dropFirst() }
+        func more(_ count: Int) -> String { count > 6 ? " and \(count - 6) more" : "" }
+        var parts: [String] = []
+        if !setup.isEmpty {
+            let names: String = setup.prefix(6).map { $0.name }.joined(separator: ", ")
+            parts.append("Redistributables BCD installs once, at the game's first start: " + names + more(setup.count) + ".")
+        }
+        let left = notes.filter { !$0.note.isEmpty }
+        if !left.isEmpty {
+            var items: [String] = []
+            for note in left.prefix(6) {
+                let name: String = note.name.isEmpty ? note.id : note.name
+                items.append(name + " (" + sentence(note.note) + ")")
+            }
+            parts.append("Left out: " + items.joined(separator: "; ") + more(left.count) + ".")
+        }
+        return parts.isEmpty ? nil : String(parts.joined(separator: " ").prefix(600))
     }
 
     // MARK: Records

@@ -1,3 +1,5 @@
+/* Portions copyright 2026 alantangok and 125hz: code taken from https://github.com/willfaust/Madeira (pull request #243; commits abca30a and 9806664)
+ * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 /* Winios.m — iOS user_driver implementation for Wine.
  *
  * The Wine win32u-unix side declares weak externs `winios_pCreateWindow`,

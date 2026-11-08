@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 alantangok. This file was taken from https://github.com/willfaust/Madeira (pull request #377)
+# under GPL-3.0-or-later. See THIRD-PARTY-NOTICES.md.
 """Exercise the production allocator with variable-sized shared object payloads.
 
 SimCity 4's startup allocated a class with four extra bytes, then a window.

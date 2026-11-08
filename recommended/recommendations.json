@@ -1,12 +1,12 @@
 {
   "format": 1,
-  "version": 30,
-  "generated": "2026-11-04",
+  "version": 35,
+  "generated": "2026-11-06",
   "rules": [
     {
       "id": "rdr2-steam",
       "title": "Red Dead Redemption 2 (Steam)",
-      "version": 13,
+      "version": 15,
       "match": {
         "steamAppIDs": [1174180],
         "steamFolders": ["red dead redemption 2"],
@@ -70,6 +70,11 @@
         "env.MADEIRA_DEVICE_STATS = 1",
         "env.MADEIRA_METAL_HUD_MAIN = 1",
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "totalphys-cap = 8191", "minBuild": 631},
+        {"line": "mempool-mb = 4096", "minBuild": 634},
+        {"line": "env.MADEIRA_DONOR_BROWSERS = 0", "minBuild": 634},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "fastSync": true, "semaphoreFastPath": false, "fpsMode": 3, "resolution": "screen@720", "display": "fit"},
@@ -111,13 +116,24 @@
         "auto-tune's layer and a key the game's file sets is never proposed). Not tried on a device with a played session after it.",
         "Version 12 (owner, 2026-10-28): the frame-rate limit is 30 FPS at first sight (the player can change it), and",
         "low-graphics-tip = 1 (build 622) shows once, before the first start, that the game's own graphics go to the lowest",
-        "preset and AMD FSR, where the game has it, to Balanced or Performance."
+        "preset and AMD FSR, where the game has it, to Balanced or Performance.",
+        "Version 14 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "totalphys-cap = 8191 (build 631; P8H75J, 91C75Y, NKSXWK, QKWFC3, AHCPZW, M4ZD8Z): on a device that reports more than 8 GB (the 16",
+        "GB iPads, 15,389 MB) RDR2.exe reserved 7/8 of 32 GB, 28,672 MB, which no address map here can place, and showed its own error box.",
+        "The cap reports at most 8191 MB (a smaller report stays); the game then reserves the 8960 MB this list holds free (4DTB43: 193 s,",
+        "11,201 frames).",
+        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk."
       ]
     },
     {
       "id": "rdr2-other",
       "title": "Red Dead Redemption 2 (not Steam)",
-      "version": 4,
+      "version": 6,
       "match": {
         "programs": [
           {"name": "rdr2.exe", "steam": false},
@@ -180,6 +196,13 @@
         "env.MADEIRA_METAL_HUD_MAIN = 1",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "totalphys-cap = 8191", "minBuild": 631},
+        {"line": "env.MADEIRA_STEAM_IDENTITY = none", "minBuild": 624},
+        {"line": "env.BCD_EPIC_HOST_START = 1", "minBuild": 598},
+        {"line": "mempool-mb = 4096", "minBuild": 634},
+        {"line": "env.MADEIRA_DONOR_BROWSERS = 0", "minBuild": 634},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "fastSync": true, "semaphoreFastPath": false, "fpsMode": 3, "resolution": "screen@720", "display": "fit"},
@@ -195,13 +218,26 @@
         "reporter off.",
         "Version 3 (owner, 2026-10-28): the frame-rate limit is 30 FPS at first sight (the player can change it), and",
         "low-graphics-tip = 1 (build 622) shows once, before the first start, that the game's own graphics go to the lowest",
-        "preset and AMD FSR, where the game has it, to Balanced or Performance."
+        "preset and AMD FSR, where the game has it, to Balanced or Performance.",
+        "Version 5 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "totalphys-cap = 8191 (build 631; P8H75J, 91C75Y, NKSXWK, QKWFC3, AHCPZW, M4ZD8Z): on a device that reports more than 8 GB (the 16",
+        "GB iPads, 15,389 MB) RDR2.exe reserved 7/8 of 32 GB, 28,672 MB, which no address map here can place, and showed its own error box.",
+        "The cap reports at most 8191 MB (a smaller report stays); the game then reserves the 8960 MB this list holds free (4DTB43: 193 s,",
+        "11,201 frames). env.MADEIRA_STEAM_IDENTITY = none (build 624) and env.BCD_EPIC_HOST_START = 1 (build 598), as GTA V's Epic rows:",
+        "Epic's RDR2 starts through BCD Host, which build 631 also gives Windows' service manager for RockstarService.exe; BCD's Steam",
+        "values are not published to a copy that is not Steam's (6XG0C2: the Launcher's error 113). Not tried on a device yet.",
+        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk."
       ]
     },
     {
       "id": "gta5e-steam",
       "title": "GTA V Enhanced (Steam)",
-      "version": 7,
+      "version": 8,
       "match": {
         "steamAppIDs": [3240220],
         "steamFolders": ["grand theft auto v enhanced"],
@@ -250,6 +286,9 @@
         "env.MADEIRA_PAD_MODE = hid",
         "env.MADEIRA_METAL_HUD_MAIN = 1",
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64", "minBuild": 631},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "smallRAMConfig": ["swap-mb = 8192", "swap-mode = 2"],
@@ -277,13 +316,22 @@
         "swap-mode = 2 after the list. On an iPhone18,3 with a 6143 MB limit (build 623) classic swap was killed at 6142 MB",
         "after 120 s of play with the list's 3072 MB cap (AK97GE) and at 6140 MB after 321 s with an 8192 MB cap (CKTRQX); broad",
         "coverage with the 8192 MB cap ran 15 minutes at 6.0-6.1 GB and used 1.2 GB of disk (4HHFA0). Auto-tune's swap ladder",
-        "(625) is the second line if it still dies. 12 GB and 16 GB devices keep the lines above."
+        "(625) is the second line if it still dies. 12 GB and 16 GB devices keep the lines above.",
+        "Version 8 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64 (build 631; J5DGX2, BGGECJ, SXEV6S, EX7S2C): every 64-bit thread reserved 8 MB of the",
+        "emulator's 12 GB band for a call-return stack nothing reads; with the Launcher, Social Club and the Steam client beside the game",
+        "the band filled and the game's new threads could not start. Each thread now takes 64 KB."
       ]
     },
     {
       "id": "gta5e-other",
       "title": "GTA V Enhanced (not Steam)",
-      "version": 7,
+      "version": 8,
       "match": {
         "programs": [
           {"name": "playgtav.exe", "steam": false, "beside": "GTA5_Enhanced.exe"},
@@ -329,6 +377,9 @@
         {"line": "env.MADEIRA_STEAM_IDENTITY = none", "minBuild": 624},
         {"line": "env.BCD_EPIC_HOST_START = 1", "minBuild": 598},
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64", "minBuild": 631},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "smallRAMConfig": ["swap-mb = 8192", "swap-mode = 2"],
@@ -350,13 +401,22 @@
         "after 120 s of play with the list's 3072 MB cap (AK97GE) and at 6140 MB after 321 s with an 8192 MB cap (CKTRQX); broad",
         "coverage with the 8192 MB cap ran 15 minutes at 6.0-6.1 GB and used 1.2 GB of disk (4HHFA0). Auto-tune's swap ladder",
         "(625) is the second line if it still dies. 12 GB and 16 GB devices keep the lines above.",
-        "Version 6 (round 630, agent R S11; Epic copies, Send Logs E7Y124, FP88DP and Z2ETS7, builds 625-626): the Epic start logged host=1 but its first program was PlayGTAV.exe and BCD Host never reported, so build 624's service fixes did nothing; none of the 24 Epic GTA V logs of builds 592-626 ever started the game. env.BCD_EPIC_HOST_START = 1 (build 598) keeps BCD Host as the first program of an Epic start; any other start (Rockstar's store, a folder) is not touched. Not tried on a device yet."
+        "Version 6 (round 630, agent R S11; Epic copies, Send Logs E7Y124, FP88DP and Z2ETS7, builds 625-626): the Epic start logged host=1 but its first program was PlayGTAV.exe and BCD Host never reported, so build 624's service fixes did nothing; none of the 24 Epic GTA V logs of builds 592-626 ever started the game. env.BCD_EPIC_HOST_START = 1 (build 598) keeps BCD Host as the first program of an Epic start; any other start (Rockstar's store, a folder) is not touched. Not tried on a device yet.",
+        "Version 8 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64 (build 631; J5DGX2, BGGECJ, SXEV6S, EX7S2C): every 64-bit thread reserved 8 MB of the",
+        "emulator's 12 GB band for a call-return stack nothing reads; with the Launcher, Social Club and the Steam client beside the game",
+        "the band filled and the game's new threads could not start. Each thread now takes 64 KB."
       ]
     },
     {
       "id": "gta5l-steam",
       "title": "GTA V Legacy (Steam)",
-      "version": 5,
+      "version": 6,
       "match": {
         "steamAppIDs": [271590],
         "steamFolders": ["grand theft auto v"],
@@ -397,6 +457,9 @@
         "env.MADEIRA_DEVICE_STATS = 1",
         "env.MADEIRA_METAL_HUD_MAIN = 1",
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64", "minBuild": 631},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "smallRAMConfig": ["swap-mb = 3072"],
@@ -425,13 +488,22 @@
         "auto-tune's layer and a key the game's file sets is never proposed). Not tried on a device with a played session after it.",
         "Version 4 (owner, 2026-10-28): the frame-rate limit is 30 FPS at first sight (it was 40 FPS; the player can change",
         "it), and low-graphics-tip = 1 (build 622) shows once, before the first start, that the game's own graphics go to the",
-        "lowest preset and AMD FSR, where the game has it, to Balanced or Performance."
+        "lowest preset and AMD FSR, where the game has it, to Balanced or Performance.",
+        "Version 6 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64 (build 631; J5DGX2, BGGECJ, SXEV6S, EX7S2C): every 64-bit thread reserved 8 MB of the",
+        "emulator's 12 GB band for a call-return stack nothing reads; with the Launcher, Social Club and the Steam client beside the game",
+        "the band filled and the game's new threads could not start. Each thread now takes 64 KB."
       ]
     },
     {
       "id": "gta5l-other",
       "title": "GTA V Legacy (not Steam)",
-      "version": 4,
+      "version": 5,
       "match": {
         "programs": [
           {"name": "playgtav.exe", "steam": false, "beside": "GTA5.exe", "notBeside": "GTA5_Enhanced.exe"},
@@ -470,6 +542,9 @@
         {"line": "env.MADEIRA_STEAM_IDENTITY = none", "minBuild": 598},
         {"line": "env.BCD_EPIC_HOST_START = 1", "minBuild": 598},
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64", "minBuild": 631},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "smallRAMConfig": ["swap-mb = 3072"],
@@ -488,7 +563,16 @@
         "Version 2 (owner, 2026-10-28): the frame-rate limit is 30 FPS at first sight (it was 40 FPS; the player can change",
         "it), and low-graphics-tip = 1 (build 622) shows once, before the first start, that the game's own graphics go to the",
         "lowest preset and AMD FSR, where the game has it, to Balanced or Performance.",
-        "Version 3 (round 630, agent R S11; Epic copies, Send Logs E7Y124, FP88DP and Z2ETS7, builds 625-626): the Epic start logged host=1 but its first program was PlayGTAV.exe and BCD Host never reported, so build 624's service fixes did nothing; none of the 24 Epic GTA V logs of builds 592-626 ever started the game. env.BCD_EPIC_HOST_START = 1 (build 598) keeps BCD Host as the first program of an Epic start; any other start (Rockstar's store, a folder) is not touched. Not tried on a device yet."
+        "Version 3 (round 630, agent R S11; Epic copies, Send Logs E7Y124, FP88DP and Z2ETS7, builds 625-626): the Epic start logged host=1 but its first program was PlayGTAV.exe and BCD Host never reported, so build 624's service fixes did nothing; none of the 24 Epic GTA V logs of builds 592-626 ever started the game. env.BCD_EPIC_HOST_START = 1 (build 598) keeps BCD Host as the first program of an Epic start; any other start (Rockstar's store, a folder) is not touched. Not tried on a device yet.",
+        "Version 5 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 580; rounds 630/631, GJDXG6, 78H1BH, SBQ18C, A24ES3, VAGKWJ): the",
+        "game's shutdown freed thread-local slots and BCD cleared them in the Launcher's and Social Club's threads too (Windows touches",
+        "only the calling program); the Launcher crashed at the game's exit. The line clears only the calling program's threads.",
+        "env.MADEIRA_FEX_CALLRET_RESERVE_KB = 64 (build 631; J5DGX2, BGGECJ, SXEV6S, EX7S2C): every 64-bit thread reserved 8 MB of the",
+        "emulator's 12 GB band for a call-return stack nothing reads; with the Launcher, Social Club and the Steam client beside the game",
+        "the band filled and the game's new threads could not start. Each thread now takes 64 KB."
       ]
     },
     {
@@ -2031,7 +2115,7 @@
     {
       "id": "gta4-steam",
       "title": "Grand Theft Auto IV: The Complete Edition (Steam)",
-      "version": 7,
+      "version": 8,
       "match": {
         "steamAppIDs": [12210],
         "steamFolders": ["grand theft auto iv"],
@@ -2060,7 +2144,9 @@
         {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 800", "minBuild": 626},
         {"line": "env.MADEIRA_SRV_POLLOUT_GUARD = 1", "minBuild": 626},
         {"line": "env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1", "minBuild": 630},
-        {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579}
+        {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
+        {"line": "env.MADEIRA_SC_ALIGN1G = 1", "minBuild": 631}
       ],
       "notes": [
         "Grand Theft Auto IV: The Complete Edition (Steam 12210), build 576, iPad13,6 (Send Log 4GAWSA; no memory",
@@ -2106,7 +2192,13 @@
         "Version 5 (round 626; M443E0, PN6QF2): the Launcher's connection to Rockstar's update service was told it was connected before",
         "it was (a new socket on a reused slot of BCD's server), its first send failed with \"not connected\" and the Launcher said the",
         "service was unavailable. env.MADEIRA_SRV_POLLOUT_GUARD = 1 (build 626) waits for the real connection. Not tried on a device yet.",
-        "Version 6 (round 630, agent R S4; Send Logs 97Y30K and 9P6C62, build 626; the same wall in 8DC0PJ, ZCB1X1, E5SSTR, GGM7A9): with WOW_MIN_FREE_GB = 2 in force the launcher reaches the game, and GTAIV.exe is refused its 4 GB address window because every slot is taken a minute into the session (BOOT FAILED at guest-window-reserve, the launcher's error 137). env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1 (build 630) reserves one window when the session starts. Not tried on a device yet."
+        "Version 6 (round 630, agent R S4; Send Logs 97Y30K and 9P6C62, build 626; the same wall in 8DC0PJ, ZCB1X1, E5SSTR, GGM7A9): with WOW_MIN_FREE_GB = 2 in force the launcher reaches the game, and GTAIV.exe is refused its 4 GB address window because every slot is taken a minute into the session (BOOT FAILED at guest-window-reserve, the launcher's error 137). env.MADEIRA_WOW_PLACEHOLDER_SLOTS = 1 (build 630) reserves one window when the session starts. Not tried on a device yet.",
+        "Version 8 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed. env.MADEIRA_SC_ALIGN1G = 1 (build 631; MCYQ0H, FM66KY, 6M831K): Social Club's browser asks for 1 GB on a 4 GB",
+        "boundary; when no such stretch was free it asked for 5 GB, found none (helper memory's regions, build 630's 32-bit window",
+        "placeholder) and died: the Launcher's \"CEF browser crashed\". BCD now keeps one aligned 1 GB slot for it."
       ]
     },
     {
@@ -2682,7 +2774,7 @@
     {
       "id": "rdr1-steam",
       "title": "Red Dead Redemption (Steam)",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [2668510],
         "steamFolders": ["red dead redemption"],
@@ -2695,7 +2787,8 @@
         {"line": "env.MADEIRA_DOCK_GAME_SCM = 1", "minBuild": 576},
         {"line": "env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler", "minBuild": 576},
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
-        {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579}
+        {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
+        {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630}
       ],
       "notes": [
         "Red Dead Redemption (Steam 2668510), build 579, iPad17,3 (M5, 15.4 GB; Send Log CM53SJ, 2026-10-21): PlayRDR.exe starts Rockstar's",
@@ -2709,7 +2802,11 @@
         "    image and of ntdll in the pool; blocking it is the line GTA IV, GTA San Andreas DE and GTA V use.",
         "Left out from GTA IV's list: env.MADEIRA_FEX_AVX = 0 (a pin that only keeps auto-tune's AVX line out of the Launcher; this log has no",
         "c000001d and the rule already stays away from Rockstar Launcher sessions). The Launcher never reached the game, so what follows is",
-        "unknown. Not tried on a device yet."
+        "unknown. Not tried on a device yet.",
+        "Version 3 (round 631): env.MADEIRA_POOL_LAZY_WINDOWS = 1 (build 630; MCYQ0H, FM66KY, N1P94T, WCDNS2, 6M831K): with",
+        "helper memory on, its regions stayed mapped in BCD's address space for the whole session (6 GB at 6144 MB) and Social Club's",
+        "browser or the game ran out of room (the Launcher's \"CEF browser crashed\", RDR2's Social Club error); the line maps a region only",
+        "while it is zeroed."
       ]
     },
     {
@@ -3103,7 +3200,7 @@
     {
       "id": "final-fantasy-tactics-ivalice-chronicles",
       "title": "FINAL FANTASY TACTICS - The Ivalice Chronicles",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [1004640],
         "steamFolders": ["final fantasy tactics - the ivalice chronicles"],
@@ -3113,7 +3210,11 @@
         "# BCD's recommended settings for FINAL FANTASY TACTICS - The Ivalice Chronicles.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_USER_VA_GB = 32", "minBuild": 591}
+        {"line": "env.MADEIRA_USER_VA_GB = 32", "minBuild": 591},
+        {"line": "d3d12-list8 = 1", "minBuild": 632},
+        {"line": "d3d12-hold-view-lists = 1", "minBuild": 632},
+        {"line": "d3d12-bc-decode = 1", "minBuild": 632},
+        {"line": "attachless-split = 1", "minBuild": 632}
       ],
       "notes": [
         "FINAL FANTASY TACTICS - The Ivalice Chronicles (Steam 1004640, Madeira Dock), iPad17,3 (15 GB, 512 GB map; Send Logs DR8613, build",
@@ -3131,7 +3232,14 @@
         "Round 623: env.MADEIRA_USER_VA_GB = 32 does not change the game's single 256 GiB reserve (round 620, X4WZ5E);",
         "the address map has at most 32 GiB free in one piece, so the reserve fails either way. Auto-tune's rule reserve-256gib-no-gap names the stop.",
         "Version 2 (round 624): the program match no longer needs a Steam install; nothing in these lines is about Steam, so every copy of",
-        "the game gets them."
+        "the game gets them.",
+        "Version 3 (build 632, upstream Madeira's Final Fantasy Tactics set, ml1300-ml1311, 2026-10-09, an 11-inch iPad with an A16): d3d12-list8 = 1",
+        "answers ID3D12GraphicsCommandList8 (the game creates its lists as List8 and shows a \"Success.\" box when it is refused),",
+        "d3d12-hold-view-lists = 1 holds the view lists' lock until each draw is encoded (a loader thread freeing a texture crashed the driver behind the",
+        "loading screen), d3d12-bc-decode = 1 decodes BC uploads on a GPU without BC sampling (the enhanced mode's BC7 art came out as noise on an",
+        "A15 or A16) and attachless-split = 1 gives each draw of a pass without render targets its own encoder (the enhanced mode's UI layers lost",
+        "blocks). All four are off for every other game; none is tried on a device in BCD yet, and the game still stops at its 256 GiB reserve",
+        "before any of them matters."
       ]
     },
     {
@@ -3203,7 +3311,8 @@
         "FalloutPrefs.ini on the card's name (the game reopens its launcher when that name changes). Likely (same address and engine; not yet",
         "seen on a BCD device). The list matches the Steam copy; for any other copy the auto-tune rule fallout-nv-older-nvidia-card gives the",
         "same line after this crash, and the prefs sync finds the file by the program's name (FalloutNV.exe, FalloutNVLauncher.exe).",
-        "Version 4 (round 626, agent A1 S7): env.MADEIRA_DOCK_INSTALL_SKIP = directx (build 626): the first start's DirectX setup fails here as in five other games (CY5HAV); BCD ships what it installs. Not tried on a device yet."
+        "Version 4 (round 626, agent A1 S7): env.MADEIRA_DOCK_INSTALL_SKIP = directx (build 626): the first start's DirectX setup fails here as in five other games (CY5HAV); BCD ships what it installs. Not tried on a device yet.",
+        "Ported on 2026-10-28 from the tested list of ft7t8drgwf-wq (willfaust/Madeira adec653, with willfaust/dxmt f25e556): the older NVIDIA card, gpu-card = nvidia-7900gs."
       ]
     },
     {
@@ -3314,7 +3423,7 @@
     {
       "id": "jetboard-joust",
       "title": "Jetboard Joust",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [1181600],
         "steamFolders": ["jetboardjoust"],
@@ -3324,7 +3433,8 @@
         "# BCD's recommended settings for Jetboard Joust.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_ANON_CAS_FLUSH = 1", "minBuild": 591}
+        {"line": "env.MADEIRA_ANON_CAS_FLUSH = 1", "minBuild": 591},
+        {"line": "gl-backend = zink", "minBuild": 632}
       ],
       "notes": [
         "Jetboard Joust (Steam 1181600, MonoGame on CoreCLR, Madeira Dock), iPad16,3 (Send Logs GHVYNG, T9CQD7, RTSYP6 and CTR7BV, build 580,",
@@ -3337,7 +3447,8 @@
         "env.MADEIRA_ANON_CAS_FLUSH = 1 (build 591) drops FEX's translation of the written range after the emulated CAS; off, nothing",
         "changes. Not tried on a device yet.",
         "Version 2 (round 624): the program match no longer needs a Steam install; nothing in these lines is about Steam, so every copy of",
-        "the game gets them."
+        "the game gets them.",
+        "Version 3 (build 632): the game is a MonoGame DesktopGL program and ends with the .NET runtime's report of NoSuitableGraphicsDeviceException over a NullReferenceException at MonoGame.OpenGL.GL.GetString (Send Logs 08RHHF, HJ1AP4, M5FWTJ, R2B9SJ, VF87Q8, build 623) because opengl32 was the GL-absent stub; gl-backend = zink turns on BCD's OpenGL for it. Not tried on a device yet."
       ]
     },
     {
@@ -3663,7 +3774,7 @@
     {
       "id": "stardew-valley",
       "title": "Stardew Valley",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [413150],
         "steamFolders": ["stardew valley"],
@@ -3673,7 +3784,8 @@
         "# BCD's recommended settings for Stardew Valley.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_ANON_CAS_FLUSH = 1", "minBuild": 598}
+        {"line": "env.MADEIRA_ANON_CAS_FLUSH = 1", "minBuild": 598},
+        {"line": "gl-backend = zink", "minBuild": 632}
       ],
       "notes": [
         "Stardew Valley (Steam 413150, .NET 6 on CoreCLR: hostfxr, coreclr, clrjit; BCD Dock), build 592, iPad16,3 (Send Log 7FZXF2, 2026-10-23;",
@@ -3684,13 +3796,14 @@
         "go to ntdll.dll+0x23c0c\", L11679; guest RIP coreclr.dll+0x39590, return addresses coreclr.dll+0x231f1 on, L11684). That is the signature of",
         "Jetboard Joust (MonoGame on CoreCLR), whose list carries env.MADEIRA_ANON_CAS_FLUSH = 1 (build 591): the CAS goes to FEX, which drops its",
         "translation of the patched range and does the CAS itself. Jetboard's build 592 logs with the line show the spin gone (no \"[spin]\" report); what",
-        "follows there is another failure, not this one. Not tried on a device with Stardew Valley yet."
+        "follows there is another failure, not this one. Not tried on a device with Stardew Valley yet.",
+        "Version 2 (build 632): the 1.6 DesktopGL build ends with the same MonoGame report (NoSuitableGraphicsDeviceException over a NullReferenceException at MonoGame.OpenGL.GL.GetString, Send Logs P417BE, QRHK94, WQM4P4, build 623) because opengl32 was the GL-absent stub; gl-backend = zink turns on BCD's OpenGL for it. Not tried on a device yet."
       ]
     },
     {
       "id": "counter-strike-source",
       "title": "Counter-Strike: Source",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [240],
         "steamFolders": ["counter-strike source"],
@@ -3700,7 +3813,8 @@
         "# BCD's recommended settings for Counter-Strike: Source.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}
+        {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598},
+        {"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632}
       ],
       "notes": [
         "Counter-Strike: Source (Steam 240, launch option 4 = cstrike_win64.exe, the 64-bit Source engine on Direct3D 9, BCD Dock), build 592, iPad17,2",
@@ -3714,7 +3828,8 @@
         "options (hl2.exe) keep what they have. Not tried on a device with this game yet; whether the engine accepts DXMT's device is unknown.",
         "Round 624 (W69RYK, CB02MM, build 622): the first menu click starts a second Steam engine inside the game process (+0.5-0.65 GB);",
         "a phone whose app limit is 2.3 GB is closed by iOS there. W69RYK also waited for ever on a Direct3D 9 query after 139 s of menu;",
-        "auto-tune tries env.DXMT_QUERY_SETTLE_EMPTY = 1 after such a freeze."
+        "auto-tune tries env.DXMT_QUERY_SETTLE_EMPTY = 1 after such a freeze.",
+        "Build 632: env.MADEIRA_DIRCACHE = 1 answers case-insensitive file lookups from cached directory listings (Wine fork commit 11f6aa3a9). The Source engine probes thousands of absent paths while loading (QJKJZJ stalled in a CreateFileA storm, before the census existed; the [file-census] lines of the other Source-engine games show a ten-second window with 55 to 87 percent in lookups: Garry's Mod 7K4VP1 and EPE022, No More Room in Hell X8FMD9 and N6EG31, builds 626); upstream measured Team Fortress 2 at ten minutes to a map, 55 seconds with it. Not tried on a device with this game yet."
       ]
     },
     {
@@ -4678,7 +4793,7 @@
     {
       "id": "no-more-room-in-hell",
       "title": "No More Room in Hell",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [224260],
         "steamFolders": ["nmrih"],
@@ -4688,7 +4803,8 @@
         "# BCD's recommended settings for No More Room in Hell.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}
+        {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598},
+        {"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632}
       ],
       "notes": [
         "No More Room in Hell (Steam 224260; nmrih.exe is a 32-bit launcher that starts nmrih_win64.exe, the 64-bit Source engine on Direct3D 9; BCD Dock), build 623,",
@@ -4700,7 +4816,8 @@
         "env.MADEIRA_D3D9_X64 = dxmt (build 595) makes DXMT's Direct3D 9, built for ARM64EC, the game's d3d9.dll, as for Counter-Strike: Source's 64-bit program, which draws",
         "on it at 28-56 fps (QJKJZJ, W69RYK, builds 622). Only a 64-bit program's d3d9.dll changes; the 32-bit launcher keeps what it has. Not tried on a device with this",
         "game yet. The Dock's Steam client ends 2-4 s after the start in all three logs (a jump to 0 or a stack overflow in its crash reporter; the same sequence is in the",
-        "Dock logs of five other games); it is not what stops the game."
+        "Dock logs of five other games); it is not what stops the game.",
+        "Build 632: env.MADEIRA_DIRCACHE = 1 answers case-insensitive file lookups from cached directory listings (Wine fork commit 11f6aa3a9), as for the other Source-engine game with a row. X8FMD9 and N6EG31 (build 626) show ten-second windows with 77 and 55 percent in lookups. Not tried on a device with this game yet."
       ]
     },
     {
@@ -4974,7 +5091,8 @@
         "driver file; the generic 'gpu-card = nvidia' did not help (AN31VQ, MK1WAB). gpu-card = nvidia-7900gs (a GeForce 7900 GS on nv4_disp.dll, build 623, what lets New Vegas load",
         "a save) is the same difference; BCD's prefs sync already knows Fallout 3's FalloutPrefs.ini. Not seen on a device. MADEIRA_DOCK_SCRIPT_REGISTRY (auto-tune's line in",
         "XFPNGF and 60WG56) lets the launcher find the install; MADEIRA_D3D9_LAST names the next failing Direct3D 9 call (it costs one emulated locked RMW per call; drop it after a device run).",
-        "Version 2 (round 630, agent O1 S10; RAQP7J, build 626): the Apple-adapter-name idea was tested on a device (the game got NVIDIA GeForce 7900 GS) and the crash is unchanged: a reference count through a NULL object at Fallout3.exe+0x61883E, the same registers in six logs of five devices. env.MADEIRA_X86_FAULT_DUMP = 1 (log only) prints the code, the stack and the registers' objects at that fault, so the caller can be named."
+        "Version 2 (round 630, agent O1 S10; RAQP7J, build 626): the Apple-adapter-name idea was tested on a device (the game got NVIDIA GeForce 7900 GS) and the crash is unchanged: a reference count through a NULL object at Fallout3.exe+0x61883E, the same registers in six logs of five devices. env.MADEIRA_X86_FAULT_DUMP = 1 (log only) prints the code, the stack and the registers' objects at that fault, so the caller can be named.",
+        "Ported on 2026-10-28 from the tested list of ft7t8drgwf-wq (willfaust/Madeira adec653, with willfaust/dxmt f25e556): the older NVIDIA card, gpu-card = nvidia-7900gs."
       ]
     },
     {
@@ -6774,7 +6892,7 @@
     {
       "id": "call-of-duty-black-ops",
       "title": "Call of Duty: Black Ops",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [42700],
         "steamFolders": ["call of duty black ops"]
@@ -6783,13 +6901,22 @@
         "# BCD's recommended settings for Call of Duty: Black Ops.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_DOCK_INSTALL_SKIP = directx", "minBuild": 626}
+        {"line": "env.MADEIRA_DOCK_INSTALL_SKIP = directx", "minBuild": 626},
+        {"line": "gpu-card = nvidia-7900gs", "minBuild": 632}
       ],
+      "switches": {"resolution": "1280x720"},
       "notes": [
         "Call of Duty: Black Ops (Steam 42700): the first start's DirectX setup failed (QJYC1M).",
         "BCD ships what DirectX's runtime setup installs (D3DX9/10/11, D3DCompiler, XAudio2, X3DAudio, XAPOFX, XInput), so",
         "env.MADEIRA_DOCK_INSTALL_SKIP = directx (build 626) records the setup as done and the first Play starts the game. Builds",
-        "before 626 skip it from the second start on, after it failed once."
+        "before 626 skip it from the second start on, after it failed once.",
+        "Version 2 (build 632): 10 logs of this game ended in Steam's copy protection step (\"ceg-job-result=55\", host result 49: YFWA6Z, DG6N4E, 88C3MN,",
+        "1JVT2H, QM4ZBX, B9VFC8, ND3Q1Z, 38R97Z, 44NG94, JV6BVB, builds 580-630) before the game was ever started. Build 632 starts Steam's own",
+        "service first, asks again after a 55 and goes on when Steam reports nothing left to prepare, and the prefix has the empty system folders",
+        "Steam's service looks at, so the game now reaches Direct3D 9. The game picks its render path from the adapter's name and driver file: gpu-card =",
+        "nvidia-7900gs (a GeForce 7900 GS on NVIDIA's driver file, as Fallout 3 and Fallout: New Vegas get since build 623) and 1280x720 are the first",
+        "settings to try. Not seen on a BCD device log yet.",
+        "Ported on 2026-11-05 from the tested list of ft7t8drgwf-wq (willfaust/Madeira #519): the older NVIDIA card, gpu-card = nvidia-7900gs, and the 1280x720 resolution."
       ]
     },
     {
@@ -6901,6 +7028,249 @@
       ],
       "notes": [
         "Football Manager 26 (Steam 3551340, Unity IL2CPP, 64-bit), Send Log KT8N4X, build 626, iPad16,8 (Discord: \"Failed to load il2cpp\"): GameAssembly.dll imports api-ms-win-core-winrt-robuffer-l1-1-0.dll, which needs wintypes.dll (c0000135), and Unity shows \"Failed to load il2cpp\". The same three lines as Football Manager 27 (round 626): WINTYPES is proved for this game by the log; X64_IMAGE_NOCOPY and tbs come from FM27's engine (a large x64 plugin that imports tbs.dll). Round 630, Discord check (agent D S7). Not tried on a device with this row yet."
+      ]
+    },
+    {
+      "id": "the-binding-of-isaac-rebirth",
+      "title": "The Binding of Isaac: Rebirth",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [250900],
+        "steamFolders": ["the binding of isaac rebirth"],
+        "programs": [{"name": "isaac-ng.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for The Binding of Isaac: Rebirth.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = zink", "minBuild": 632}
+      ],
+      "notes": [
+        "The Binding of Isaac: Rebirth (Steam 250900, isaac-ng.exe, GLFW and OpenGL only, BCD Dock): GLFW says \"WGL: The driver does not appear to support OpenGL\" and \"Failed to create OpenGL window / context\"",
+        "(Send Logs F2X5S9, build 614; 5HSJCG, build 623; WVBQ7V says \"WGL: No pixel formats found\"): the game stops at its start, in 36 of the archive's logs, because opengl32 was the GL-absent stub.",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "mewgenics",
+      "title": "Mewgenics",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [686060],
+        "steamFolders": ["mewgenics"],
+        "programs": [{"name": "mewgenics.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Mewgenics.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = zink", "minBuild": 632}
+      ],
+      "notes": [
+        "Mewgenics (Steam 686060, Mewgenics.exe, SDL and OpenGL only, BCD Dock): \"Could not create window: No matching GL pixel format available\" (Send Logs 0CBF7Q, W4AJG1, Y6RAEH, build 600;",
+        "F0KN1C): the game stops at its start because opengl32 was the GL-absent stub.",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "doom-3-bfg-edition",
+      "title": "DOOM 3: BFG Edition",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [208200],
+        "steamFolders": ["doom 3 bfg edition"],
+        "programs": [{"name": "doom3bfg.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for DOOM 3: BFG Edition.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = zink", "minBuild": 632}
+      ],
+      "notes": [
+        "DOOM 3: BFG Edition (Steam 208200, Doom3BFG.exe, 32-bit, OpenGL only): it prints nothing about OpenGL; its next call after \"enabled Denormals-Are-Zero mode\" reads a string through the value a GL call",
+        "returned, and every call of the stub table returns STATUS_NOT_SUPPORTED, so the wild pointer is 0xC00000BB (\"Unhandled page fault on read access to C00000BB at address 0075CC7E\", Send Logs HVZ6P1, build 622;",
+        "XAY19N, build 614; J787G9). A 32-bit game needs the 32-bit GL thunks the Wine fork now carries.",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "darkest-dungeon",
+      "title": "Darkest Dungeon",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [262060],
+        "steamFolders": ["darkestdungeon"],
+        "programs": [{"name": "darkest.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Darkest Dungeon.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = zink", "minBuild": 632}
+      ],
+      "notes": [
+        "Darkest Dungeon (Steam 262060, Darkest.exe, SDL2 and OpenGL, BCD Dock): SDL's window for the OpenGL context cannot be made, the game's app.log says \"Invalid window SDL Error\" and it shows its \"Error\" box",
+        "\"Invalid window\" (Send Logs 2F5VGM and 5T6SWF, build 622).",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "battle-brothers",
+      "title": "Battle Brothers",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [365360],
+        "steamFolders": ["battle brothers"],
+        "programs": [{"name": "battlebrothers.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Battle Brothers.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = zink", "minBuild": 632}
+      ],
+      "notes": [
+        "Battle Brothers (Steam 365360, BattleBrothers.exe, 32-bit, OpenGL only, BCD Dock): the same read of 0xC00000BB as DOOM 3: BFG Edition, then the game's own crash handler faults on the NULL page",
+        "(Send Logs MRV768, G35FN1, 195VJ5 = S8J6MS, build 622). A 32-bit game needs the 32-bit GL thunks the Wine fork now carries.",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "balatro",
+      "title": "Balatro",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2379780],
+        "steamFolders": ["balatro"],
+        "programs": [{"name": "balatro.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Balatro.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "gl-backend = gles", "minBuild": 632}
+      ],
+      "notes": [
+        "Balatro (Steam 2379780, Balatro.exe, LOVE 11 with a LuaJIT built for 32-bit GC references, BCD Dock): the game's LuaJIT needs memory below 2 GB, which iOS never gives, so luaL_newstate() returned NULL and the first Lua call",
+        "ended the game (Send Logs J96GK6 and E88HSV, build 574 and later). Build 632 maps a GC64 LuaJIT in place of the game's lua51.dll (compat/love/lua51.dll, the wineserver; the game's file is never changed)",
+        "when a game has gl-backend on, and LOVE draws through OpenGL: gles is the backend whose context LOVE gets with its OpenGL ES hint (LOVE_GRAPHICS_USE_OPENGLES=1, which gles sets). zink is the other one to try.",
+        "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "borderlands-2",
+      "title": "Borderlands 2",
+      "version": 1,
+      "minBuild": 632,
+      "match": {
+        "steamAppIDs": [49520],
+        "steamFolders": ["borderlands 2"],
+        "programs": [{"name": "borderlands2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Borderlands 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0"
+      ],
+      "notes": [
+        "Borderlands 2 (Steam 49520): the standard line only. The game's start needs Steam's custom-executable (CEG) step, which ended with result 55",
+        "on the builds before 632 (24 logs of 12 games with the same ending). Build 632 starts Steam's own service first and asks again, and its",
+        "downloader keeps only the later depot's copy of a file two depots list (a Repair re-fetched the same 552 MB each time, and Steam's step then",
+        "ended with 53, data corruption). Not seen on a BCD device log yet.",
+        "Ported on 2026-11-05 from the tested list of ft7t8drgwf-wq (willfaust/Madeira #531): the standard line only."
+      ]
+    },
+    {
+      "id": "the-escapists-2",
+      "title": "The Escapists 2",
+      "version": 1,
+      "minBuild": 632,
+      "match": {
+        "steamAppIDs": [641990],
+        "steamFolders": ["the escapists 2"],
+        "programs": [{"name": "theescapists2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for The Escapists 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_WOW_RWX_PLAIN = 1", "minBuild": 563}
+      ],
+      "notes": [
+        "The Escapists 2 (Steam 641990, a 32-bit Unity game on its own old mono.dll). Mono's XCHG code patches at unaligned addresses fault through the",
+        "JIT pool's alias, so its code memory stays plain read/write (env.MADEIRA_WOW_RWX_PLAIN = 1, as Breakneck, PWAAT and The Darkside Detective 2",
+        "have it). No BCD log of this game yet; the line is the one those games run with.",
+        "Ported on 2026-11-05 from the tested list of ft7t8drgwf-wq (willfaust/Madeira #548): env.MADEIRA_WOW_RWX_PLAIN = 1."
+      ]
+    },
+    {
+      "id": "dark-souls-remastered",
+      "title": "Dark Souls: Remastered",
+      "version": 1,
+      "minBuild": 632,
+      "match": {
+        "steamAppIDs": [570940],
+        "steamFolders": ["dark souls remastered"],
+        "programs": [{"name": "darksoulsremastered.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Dark Souls: Remastered.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
+        {"line": "env.MADEIRA_PAD_EARLY_SLOT = 1", "minBuild": 630}
+      ],
+      "notes": [
+        "Dark Souls: Remastered (Steam 570940, 64-bit, Direct3D 11): the first experiment, not proven. Five BCD logs (940J20 build 579, ZK8VQ0, WHVV4H and",
+        "ZJC49F build 623, YV18JB build 625, iPads) never reached a first frame (play 0 s, frames 0). In ZK8VQ0 and YV18JB the game gets as far as its own image:",
+        "\"[smc-byte] ... DECLINED backpatch\" (4 times) and \"[store-noalias]\" (8 times) on the game's own code page, most likely its copy protection",
+        "rewriting the image, the family of Dark Souls III's stop before env.MADEIRA_X64_IMAGE_NOCOPY = 1 (the pure x64 image runs from its loaded copy).",
+        "The game also enumerates controllers only at start, so env.MADEIRA_PAD_EARLY_SLOT = 1 (build 630) publishes player 1 from the start. A device",
+        "run decides which of the two matters; the pad line alone would not make these logs play.",
+        "Ported on 2026-11-05 from the list in willfaust/Madeira #461 (combined by intraducine): env.MADEIRA_PAD_EARLY_SLOT = 1."
+      ]
+    },
+    {
+      "id": "the-last-of-us-part-1",
+      "title": "The Last of Us Part I",
+      "version": 1,
+      "minBuild": 634,
+      "match": {
+        "steamAppIDs": [1888930],
+        "steamFolders": ["the last of us part i"],
+        "programs": [
+          {"name": "tlou-i.exe"},
+          {"name": "tlou-i-l.exe"},
+          {"name": "launcher.exe", "beside": "tlou-i.exe"}
+        ]
+      },
+      "config": [
+        "# BCD's recommended settings for The Last of Us Part I.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_JUMBO_CODE_DUMP = 1", "minBuild": 634},
+        {"line": "env.MADEIRA_BIG_HINT_EXACT = 1", "minBuild": 634}
+      ],
+      "switches": {"avx": true},
+      "notes": [
+        "The Last of Us Part I (Steam 1888930, Direct3D 12): builds 576 to 633 (Send Logs JP833A, R2NFT1, 24TC8Y, W5M7YN, S0M36P, 8GRXB9 and four more",
+        "of build 633, iPhone17,2 to iPhone19,2). With AVX off the emulator meets an instruction it does not decode (c000001d, the HLT word 0xd4400000);",
+        "the AVX switch (the line auto-tune kept, env.MADEIRA_FEX_AVX = 1) is the proven answer to that. With it the game gets 2 to 5 s further and stops itself",
+        "before any Direct3D call: it asks Windows sixteen times for a 512 GB reservation at 0x1000000000 + n * 0x8000000000 ([jumbo#1] to [jumbo#16]), takes none",
+        "of the answers and prints \"HALT: Coudln't find any available virtual memory start addresses after 16 tries\" (Memory::FindAvailableVirtualMemoryStartAddress,",
+        "corelib/memory/memory-area.cpp:65), then an int3 (exit 0x80000003). Windows answers a reservation at a named address with exactly that address or fails,",
+        "and BCD cannot: every one of the sixteen ranges ends above the address space (0x8000000000, 512 GB) and the first starts at the floor of the GPU carveout.",
+        "No setting is known to change the stop. env.MADEIRA_JUMBO_CODE_DUMP = 1 (build 634, log only) prints the game's code around the place that asks, the",
+        "emulator's saved registers and its stack, so the next log shows what the game compares. env.MADEIRA_BIG_HINT_EXACT = 1 (build 634, an experiment)",
+        "answers such a reservation with its own address and nothing behind it: the log then shows whether the game accepts that and what it asks for next",
+        "([big-hint] lines; a commit inside the block is refused, nothing can be mapped there)."
       ]
     },
     {

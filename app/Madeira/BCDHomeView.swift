@@ -79,12 +79,19 @@ struct BCDHomeView: View {
         .bcdGamePage($opened, from: "Home")
         .onChange(of: store.windowsRunning) { _, running in
             if desktopAsUtility && focus.controllerActive && running && focus.focused == "home.windows" {
-                DispatchQueue.main.async { focus.focused = "home.windows.open" }
+                DispatchQueue.main.async {
+                    guard focus.controllerActive, focus.ownsRoot("home."), store.windowsRunning,
+                          focus.focused == "home.windows" else { return }
+                    focus.focused = "home.windows.open"
+                }
             }
         }
         .onChange(of: store.windowsNeedsRestart) { _, required in
             if desktopAsUtility && focus.controllerActive && required {
-                DispatchQueue.main.async { focus.focused = "home.windows.restart" }
+                DispatchQueue.main.async {
+                    guard focus.controllerActive, focus.ownsRoot("home."), store.windowsNeedsRestart else { return }
+                    focus.focused = "home.windows.restart"
+                }
             }
         }
         // The game menu's "Game page" opens the page over Home.

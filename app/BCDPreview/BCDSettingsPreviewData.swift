@@ -21,6 +21,9 @@ extension BCDSettingsBackends {
 @MainActor final class BCDPreviewMemory: BCDMemoryBackend {
     @Published private var values: [BCDMemoryKey: String] = [.videoMemory: "4352", .swap: "3072", .syncEngine: "fastsync"]
     @Published private(set) var eco = false
+    @Published private(set) var backgroundGame = "10"   // sample: on, so the preview shows the rows lit (the app's default is off)
+    @Published private(set) var backgroundDownload = ""
+    @Published private(set) var backgroundSound = false
     @Published private(set) var restartNeeded = false
     @Published private(set) var extensionTestRunning = false
     @Published private(set) var extensionTestLine: String?
@@ -42,6 +45,9 @@ extension BCDSettingsBackends {
     func value(_ key: BCDMemoryKey) -> String { values[key] ?? "" }
     func set(_ key: BCDMemoryKey, _ value: String) { values[key] = value; restartNeeded = true }
     func setEco(_ on: Bool) { eco = on; restartNeeded = true }
+    func setBackgroundGame(_ minutes: String) { backgroundGame = minutes }
+    func setBackgroundDownload(_ minutes: String) { backgroundDownload = minutes }
+    func setBackgroundSound(_ on: Bool) { backgroundSound = on }
     func runExtensionTest() { extensionTestLine = "The helper's memory stayed outside BCD's limit (sample)." }
     func refresh() {}
 }

@@ -92,6 +92,8 @@ static struct device *get_device( dev_t dev, int unix_fd )
     return device_known && dev == test_device.dev ? &test_device : NULL;
 }
 static void release_object( void *obj ) { (void)obj; }
+static int dircache_reports;   /* ntdll's directory cache hook (check-dircache.py) */
+static void dircache_changed( void ) { dircache_reports++; }
 '''
 
 harness_main = r'''

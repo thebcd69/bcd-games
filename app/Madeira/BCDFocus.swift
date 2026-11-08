@@ -209,6 +209,9 @@ enum BCDGridNavigation {
         focused = below.focused
     }
 
+    /// An asynchronous root update may focus only the selected tab with no covering page.
+    func ownsRoot(_ prefix: String) -> Bool { rootPrefix == prefix && layers.isEmpty }
+
     /// A page or menu is up over the shell: its buttons are in force, not the shell's.
     var layerOpen: Bool { !layers.isEmpty }
     func ownsLayer(_ prefix: String) -> Bool { layers.last?.prefix == prefix }

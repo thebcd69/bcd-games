@@ -203,7 +203,8 @@ for focus_id in ('"add.close"', '"add.back"', '"add.every"', '"add.item." + item
 
 # ---- the app shows BCD's screens -----------------------------------------------------------------
 check("the app shows Add a game and the game page full screen, never the classic browser or Game details",
-      ".fullScreenCover(item: pageShown, onDismiss: BCDPresentation.didClose) { page in pageScreen(page) }" in front and "BCDAddGame(close:" in front
+      ".fullScreenCover(item: pageShown, onDismiss: appSheetClosed) { page in pageScreen(page) }" in front
+      and "private func appSheetClosed()" in front and "BCDPresentation.didClose()" in front and "BCDAddGame(close:" in front
       and "BCDGamePage(gameID:" in front and "ExecutableBrowser" not in code(front) and "LibraryDetail" not in code(front))
 check("a game just added opens on its Library section; Choose saves opens on Cloud saves",
       'opening = .group("library")' in front

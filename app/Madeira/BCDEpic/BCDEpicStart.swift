@@ -206,7 +206,8 @@ extension BCDEpic {
         if Self.flag("BCD_EPIC_TREE", entry: entry) { flags.insert(.tree) }
         // madeira-bcd (round 624, agent R S24): Epic's GTA V needs Windows' service manager for Rockstar's launcher; env.BCD_EPIC_SERVICES = 0 in the
         // game's config turns it off, = 1 turns it on for any game (as "Start Windows services first" does).
-        if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true || BCDEpicRules.startsRockstarLauncher(record.exceptionID)) {
+        if Self.flag("BCD_EPIC_SERVICES", entry: entry, fallback: entry.startServices == true
+                         || BCDEpicRules.startsRockstarLauncher(record.exceptionID, program: entry.launchWindowsPath)) {
             flags.insert(.services)
         }
         let request = BCDEpicHostRequest(program: entry.launchWindowsPath, workingFolder: entry.launchDirectory,

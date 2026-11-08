@@ -38,6 +38,9 @@ def check(what, cond):
 
 def cut(sig):
     i = SRC.index(sig)
+    # the definition, not a prototype: ml1308 (flat views) declares mad_texture_view_id ahead of mad_air_flat_view (round 632)
+    while SRC.find(";", i) < SRC.find("{", i):
+        i = SRC.index(sig, i + 1)
     j = SRC.index("{", i)
     depth = 0
     for k in range(j, len(SRC)):

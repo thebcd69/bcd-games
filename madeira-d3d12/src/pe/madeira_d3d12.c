@@ -1,3 +1,5 @@
+/* Portions copyright 2026 spitefulowl and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #462 and #516)
+ * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*  madeira-d3d12: M2 native D3D12 ABI slice.
  *
  *  The minimum set of objects the design's M2 gate names: a device that can
@@ -350,6 +352,7 @@ static int mad_name_in_list(const char *list, const char *name) {
     return 0;
 }
 static LONG g_barrier_renc_closed, g_stencil_srv, g_barrier_seen;
+static int g_attachless_split = -1; static LONG g_attachless_split_n;   /* ml1311 */
 struct mad_obj {
     void *vtbl;
     LONG refs;
@@ -428,7 +431,7 @@ struct mad_device {
      * old lookup walked the TEXTURE registries, which a buffer never enters, so
      * every typed-buffer binding failed and its draw or dispatch was skipped. */
     CRITICAL_SECTION view_lock;
-    struct mad_viewrec { UINT64 id; UINT32 a, b; } *vmap; unsigned vmap_cap, vmap_used, vmap_live;
+    struct mad_viewrec { UINT64 id; UINT32 a, b; UINT64 flat; } *vmap; unsigned vmap_cap, vmap_used, vmap_live;   /* ml1308: flat = the non-array sibling view (1 = none needed), 0 = not yet known */
     /* ml1061: GPU timeline. Every committed batch signals `gpu_event` with its
      * serial, so "has the GPU finished X" is a read of one value instead of a
      * blocking wait. Fences are delivered by a worker thread; argument-ring
@@ -597,7 +600,7 @@ static void mad_vmap_put_locked(struct mad_device *d, UINT64 id, UINT32 a, UINT3
     i = mad_vmap_slot(id, d->vmap_cap);
     while (d->vmap[i].id && d->vmap[i].id != id) i = (i + 1) & (d->vmap_cap - 1);
     if (!d->vmap[i].id) { d->vmap_used++; d->vmap_live++; }
-    d->vmap[i].id = id; d->vmap[i].a = a; d->vmap[i].b = b;
+    d->vmap[i].id = id; d->vmap[i].a = a; d->vmap[i].b = b; d->vmap[i].flat = 0;
 }
 static void mad_vmap_del_locked(struct mad_device *d, UINT64 id) {
     unsigned i;
@@ -1099,8 +1102,8 @@ static void mad_skip_report(void) {
     d3d12_log("[madeira-d3d12] ml1088 occlusion queries: %ld begun, %ld results delivered, %ld queries counted samples > 0, %ld pass restarts; "
               "ml1089 SRVs with a min-LOD clamp folded into the view: %ld (largest clamp %.1f)\n",
               g_vis_begun, g_vis_resolved, g_vis_nonzero, g_vis_restarts, g_srv_clamped, (double)g_srv_clamp_max);
-    d3d12_log("[madeira-d3d12] ml1091 encoder fence chain: %ld waits, %ld updates; %ld ResourceBarrier calls recorded (%ld closed a render pass); ml1094 zero-instance draws elided %ld; ml1101 stencil SRVs %ld\n",
-              g_fence_waits, g_fence_updates, g_barriers, g_barrier_renc_closed, g_zero_inst, g_stencil_srv);
+    d3d12_log("[madeira-d3d12] ml1091 encoder fence chain: %ld waits, %ld updates; %ld ResourceBarrier calls recorded (%ld closed a render pass); ml1311 attachment-less passes split %ld; ml1094 zero-instance draws elided %ld; ml1101 stencil SRVs %ld\n",
+              g_fence_waits, g_fence_updates, g_barriers, g_barrier_renc_closed, g_attachless_split_n, g_zero_inst, g_stencil_srv);
     mad_acct_report();
     d3d12_log("[madeira-d3d12] ml1050 residency set: %ld added, %ld removed (%ld members); tessellation: %ld pipelines (%ld built as mesh pipelines), "
               "%ld draws dropped, %ld drawn (%ld non-indexed); ml1147 DXBC geometry: %ld mesh pipelines, %ld draws; DXIL tessellation: %ld drawn (%ld indirect)\n",
@@ -1267,6 +1270,8 @@ static void mad_view_list_del(struct mad_device *d, int uav, struct mad_resource
 }
 
 DEFINE_GUID(IID_IMTLDXGIDevice, 0x6bfa1657, 0x9cb1, 0x471a, 0xa4, 0xfb, 0x7c, 0xac, 0xf8, 0xa8, 0x12, 0x07);
+/* ml1300 (upstream Madeira, bcd.cfg d3d12-list8): not in the toolchain's d3d12.h (it ends at List7); value from Microsoft's DirectX-Headers d3d12.idl */
+DEFINE_GUID(IID_ID3D12GraphicsCommandList8, 0xee936ef9, 0x599d, 0x4d28, 0x93, 0x8e, 0x23, 0xc4, 0xad, 0x05, 0xce, 0x51);
 
 #define MAD_ROOT_PARAM_MAX 32
 #define MAD_ROOT_RANGE_MAX 32        /* ml1009: the OLD fixed cap; now only a log reference */
@@ -1333,6 +1338,7 @@ struct mad_pso {
     char *il_tag; int il_int;      /* madeira-bcd skin-check-trace: the input layout in short; il_int: an integer element (blend indices) */
     LONG first_used; LONG64 born_present; DWORD born_tick;   /* madeira-bcd: pso-first-use */
     SRWLOCK rlock;                 /* madeira-bcd: serialises this pipeline's lazy build (zero = SRWLOCK_INIT) */
+    volatile LONG async_q;         /* pso-async: handed to the background builders */
     /* madeira-bcd pso-lazy-libs: lz = the stage libraries were dropped once the
      * pipeline was created and come back from the shader cache under these keys
      * at its first draw (mad_lzlib_restore); lz_has_ps never changes after creation */
@@ -1943,7 +1949,7 @@ struct mad_cmd {
 #define MAD_ARG_VBTABLE_OFF    576u /* ml927: IRRuntimeVertexBuffers (31 x {addr, length, stride} = 496 bytes) at kIRVertexBufferBindPoint, object stage */
 
 struct mad_list {
-    ID3D12GraphicsCommandList7Vtbl *vtbl;   /* ml1144: full List7 slot table, List1..7 answered */
+    ID3D12GraphicsCommandList7Vtbl *vtbl;   /* ml1144: full List7 slot table, List1..7 answered; ml1300: List8's slot follows it (g_list_vtbl8) */
     LONG refs;
     const IID *iid;
     const char *name;
@@ -1991,17 +1997,32 @@ static void mad_list_note_used(struct mad_list *l, struct mad_resource *r) {
     if (mad_grow((void **)&l->used, &l->ucap, l->nused + 1, sizeof *l->used)) l->used[l->nused++] = r;
 }
 
+/* ml1300 (upstream Madeira; bcd.cfg / a game's config d3d12-list8, default 0): answer ID3D12GraphicsCommandList8 (List7 plus
+ * OMSetFrontAndBackStencilRef). Final Fantasy Tactics - The Ivalice Chronicles creates its command lists as List8 and stops with a "Success." box
+ * when QueryInterface refuses it. Off, List8 is refused exactly as before: GTA V, RDR2 and others log QueryInterface refusals (their IIDs are
+ * redacted in Send Log) and play on, so what they are told stays as it is unless a game's list asks for it. */
+static int mad_list8_on(void) {
+    static int on = -1;
+    if (on < 0) {
+        on = mad_cfg_int_pe("d3d12-list8", 0) ? 1 : 0;   /* 1: ID3D12GraphicsCommandList8 is answered (Final Fantasy Tactics); 0: refused, as before */
+        if (on) d3d12_log("[madeira-d3d12] ml1300 d3d12-list8 = 1: ID3D12GraphicsCommandList8 is answered\n");
+    }
+    return on;
+}
 static HRESULT STDMETHODCALLTYPE list_QI(ID3D12GraphicsCommandList *This, REFIID riid, void **out) {
     struct mad_obj *o = (struct mad_obj *)This;
     /* ml1144: every D3D12 runtime answers GraphicsCommandList1..7 whatever the
      * hardware supports; the optional methods are gated by CheckFeatureSupport,
      * which reports them all off. UE 5.0 queries List4 for ray tracing whenever
-     * the device answers Device5, and a refusal is a LowLevelFatalError. */
+     * the device answers Device5, and a refusal is a LowLevelFatalError.
+     * ml1300: List8 too, only with bcd.cfg d3d12-list8 = 1 (default 0: refused as before;
+     * its one method is gated by OPTIONS14, reported off). */
     if (out && (IsEqualGUID(riid, &IID_ID3D12CommandList) ||
                 IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList1) || IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList2) ||
                 IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList3) || IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList4) ||
                 IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList5) || IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList6) ||
-                IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList7))) {
+                IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList7) ||
+                (IsEqualGUID(riid, &IID_ID3D12GraphicsCommandList8) && mad_list8_on()))) {
         InterlockedIncrement(&o->refs);
         *out = o;
         return S_OK;
@@ -6223,11 +6244,12 @@ static obj_handle_t mad_pso_realize(struct mad_pso *p) {
     if (p->rps || !p->lazy) return p->rps;
     AcquireSRWLockExclusive(&p->rlock);   /* per pipeline: builds of different pipelines run in parallel */
     if (!p->rps && p->lazy) {
-        obj_handle_t err = 0;
+        obj_handle_t err = 0, built = 0;
         LONG64 t0 = mad_qpc();   /* madeira-bcd */
         if (!p->lz || mad_lzlib_restore(p))   /* madeira-bcd pso-lazy-libs: the libraries come back first */
-            p->rps = p->has_vd ? MTLDevice_newRenderPipelineStateVD(p->device_handle, &p->rp, &p->vd, &err)
-                               : MTLDevice_newRenderPipelineState(p->device_handle, &p->rp, &err);
+            built = p->has_vd ? MTLDevice_newRenderPipelineStateVD(p->device_handle, &p->rp, &p->vd, &err)
+                              : MTLDevice_newRenderPipelineState(p->device_handle, &p->rp, &err);
+        if (built) { MemoryBarrier(); p->rps = built; }   /* pso-async: draws on other threads read rps without the lock */
         if (err) mad_log_nserror(p->vs_name, err);
         InterlockedExchangeAdd64(&g_pt_realize, mad_qpc() - t0); InterlockedIncrement(&g_pn_realize);
         if (p->rps) {
@@ -6264,6 +6286,94 @@ static obj_handle_t mad_cpso_realize(struct mad_pso *p) {
     }
     ReleaseSRWLockExclusive(&p->rlock);
     return p->cps;
+}
+
+/* madeira-bcd: PIPELINES BUILT OFF THE RENDER THREAD (bcd.cfg / a game's config
+ * pso-async, opt-in, default 0; upstream Madeira #516). A lazy pipeline Metal has not compiled before takes 35-50 ms at its first
+ * draw, on the thread that submits the frame: a scene that brings in dozens of
+ * new materials at once (a new district, a cutscene) holds that thread for
+ * hundreds of milliseconds and the frame rate drops to 3-10 for seconds (log
+ * 2026-10-26 22:40: 252 such builds, 12.3 s of the submitting thread, in under
+ * two minutes, while pso-warm had 4,989 pipelines still to compile). With
+ * pso-async = 1 the first draw hands the pipeline to two background threads and
+ * its draws are skipped until it is built: an object or effect shows up a few
+ * frames late instead of the frame waiting for the compiler. Only plain render
+ * pipelines go this way; a compute dispatch can produce data later passes depend
+ * on, so a compute pipeline is still built where it is first used. A queue that
+ * is full builds at the first draw as before. 0 = at the first draw (as before). */
+#define MAD_PA_MAX 2048
+static int g_pso_async = -1;
+static struct mad_pso *g_pa_q[MAD_PA_MAX];
+static LONG g_pa_head, g_pa_tail;
+static SRWLOCK g_pa_lock = SRWLOCK_INIT;
+static HANDLE g_pa_sem;
+static volatile LONG g_pa_queued, g_pa_built, g_pa_failed, g_pa_inline, g_pa_skips;
+static ULONG STDMETHODCALLTYPE pso_Release(ID3D12PipelineState *T);
+static int mad_pso_async_on(void) {
+    if (g_pso_async < 0) {
+        int on = mad_pso_lazy_on() && mad_cfg_int_pe("pso-async", 0) > 0;   /* bcd.cfg pso-async: 1 = a new render pipeline is built on a background thread and its draws are skipped until it is ready (no frame waits for the compiler); 0 = built at its first draw */
+        if (on) d3d12_log("[madeira-d3d12] pso-async = 1: new render pipelines are built on 2 background threads; their draws are skipped until they are ready\n");
+        g_pso_async = on;
+    }
+    return g_pso_async;
+}
+static DWORD WINAPI mad_pa_worker(void *arg) {
+    (void)arg;
+    for (;;) {
+        struct mad_pso *p = NULL; obj_handle_t pool; LONG n = 0;
+        WaitForSingleObject(g_pa_sem, INFINITE);
+        AcquireSRWLockExclusive(&g_pa_lock);
+        if (g_pa_head != g_pa_tail) { p = g_pa_q[(ULONG)g_pa_head % MAD_PA_MAX]; g_pa_head++; }
+        ReleaseSRWLockExclusive(&g_pa_lock);
+        if (!p) continue;
+        pool = NSAutoreleasePool_alloc_init();
+        if (mad_pso_realize(p)) n = InterlockedIncrement(&g_pa_built);
+        else InterlockedIncrement(&g_pa_failed);
+        if (n == 1 || (n && !(n % 250)))
+            d3d12_log("[madeira-d3d12] pso-async: %ld pipelines built off the render thread (%ld failed, %ld waiting, %ld built at the draw with the queue full); "
+                      "%ld draws skipped while their pipeline was being built\n", (long)g_pa_built, (long)g_pa_failed,
+                      (long)(g_pa_queued - g_pa_built - g_pa_failed), (long)g_pa_inline, (long)g_pa_skips);
+        if (pool) NSObject_release(pool);
+        pso_Release((ID3D12PipelineState *)p);   /* the queue's reference */
+    }
+    return 0;
+}
+static int mad_pa_start(void) {
+    static volatile LONG state;   /* 0 not started, 1 starting, 2 running, 3 no threads */
+    LONG s = InterlockedCompareExchange(&state, 1, 0);
+    if (s == 0) {
+        unsigned t, n = 0;
+        g_pa_sem = CreateSemaphoreA(NULL, 0, MAD_PA_MAX, NULL);
+        for (t = 0; g_pa_sem && t < 2; t++) {
+            HANDLE h = CreateThread(NULL, 256 << 10, mad_pa_worker, NULL, 0, NULL);
+            if (h) { CloseHandle(h); n++; }
+        }
+        if (!n) d3d12_log("[madeira-d3d12] pso-async: no background thread could be created; pipelines are built at their first draw\n");
+        InterlockedExchange(&state, n ? 2 : 3);
+        return n ? 1 : 0;
+    }
+    while (s == 1) { Sleep(0); s = InterlockedCompareExchange(&state, 1, 1); }
+    return s == 2;
+}
+/* 1: the pipeline is queued (now or earlier) or built; 0: the caller builds it itself. */
+static int mad_pso_async_queue(struct mad_pso *p) {
+    if (p->rps || !p->lazy) return 1;
+    if (InterlockedCompareExchange(&p->async_q, 1, 0)) return 1;   /* queued earlier */
+    if (!mad_pa_start()) { InterlockedExchange(&p->async_q, 0); return 0; }
+    AcquireSRWLockExclusive(&g_pa_lock);
+    if (g_pa_tail - g_pa_head >= MAD_PA_MAX) {
+        ReleaseSRWLockExclusive(&g_pa_lock);
+        InterlockedExchange(&p->async_q, 0);
+        InterlockedIncrement(&g_pa_inline);
+        return 0;
+    }
+    InterlockedIncrement(&p->refs);   /* the worker releases it once the pipeline is built */
+    g_pa_q[(ULONG)g_pa_tail % MAD_PA_MAX] = p; g_pa_tail++;
+    ReleaseSRWLockExclusive(&g_pa_lock);
+    ReleaseSemaphore(g_pa_sem, 1, NULL);
+    if (InterlockedIncrement(&g_pa_queued) == 1)
+        d3d12_log("[madeira-d3d12] pso-async: first pipeline handed to the background builders\n");
+    return 1;
 }
 
 /* madeira-bcd: PARALLEL FIRST USE. A lazy pipeline is compiled by Metal at
@@ -6325,6 +6435,7 @@ static void mad_prebuild_lists(UINT count, ID3D12CommandList *const *lists) {
             struct mad_pso *p = l->cmds[k].kind == MC_PSO ? l->cmds[k].u.pso : NULL;
             if (!p) continue;
             if (p->is_compute ? (p->cps || !p->lazy_cs) : (p->rps || !p->lazy)) continue;
+            if (!p->is_compute && mad_pso_async_on() && mad_pso_async_queue(p)) continue;   /* pso-async: built in the background */
             for (j = 0; j < (UINT)n && v[j] != p; j++) ;
             if (j == (UINT)n) v[n++] = p;
         }
@@ -6503,6 +6614,71 @@ static struct mad_resource *mad_texture_of_view(struct mad_device *d, UINT64 id,
 /* The view's array length, which the backend packs above the min LOD clamp.
  * mad_texture_of_view already reverses a view id to its resource and view
  * index; the view records how many slices it spans. */
+/* ml1308: the NON-ARRAY view a DXBC shader must be given for a texture it declares
+ * as texture2d / texture2d_ms. Every 1D/2D texture is allocated as an array and
+ * every SRV/UAV view made as an array view (ml932), which is what Apple's converter
+ * wants (IRCompatibilityFlagForceTextureArray). The DXBC compiler declares the
+ * D3D type instead, and a texture2d sample through a 2D ARRAY view samples at the
+ * origin whatever the coordinate (the four corner texels with WRAP): Final Fantasy
+ * Tactics - The Ivalice Chronicles' video and UI passes drew one colour each on the
+ * iPad, and the same AIR on a Mac does exactly that once its planes are 2D arrays
+ * (toolchains/airconv-host/tools/render-video --array). Reads (ld) happened to work.
+ * The sibling is a 2D (2D multisample) view of the same levels and first slice,
+ * remembered in the view map entry, which dies with the resource's views. */
+static int g_flat_views = -1;   /* bcd.cfg sm5-flat-views: 2 (default) on below Apple10, 1 on, 0 off (madeira-bcd) */
+/* madeira-bcd: MTLGPUFamilyApple10. The array-view sample reads the origin on Apple9 and older GPUs (A16 iPad upstream; A17 Pro, A18,
+ * M3 and M4 in BCD's Spider-Man Remastered / Miles Morales logs: the whole picture one colour per pass), while Spider-Man draws on the
+ * owner's Apple10 phone. So the default turns the 2D views on only where the GPU lacks Apple10 and leaves Apple10 GPUs as they are. */
+#define MAD_MTL_FAMILY_APPLE10_FV 1010
+static UINT64 mad_texture_view_id(struct mad_device *d, struct mad_resource *r, enum WMTTextureType want,
+                                  UINT lvl0, UINT nlvl, UINT sl0, UINT nsl, enum WMTPixelFormat pf, UINT swz);
+static UINT64 mad_air_flat_view(struct mad_device *d, UINT64 id) {
+    unsigned i; UINT64 flat = 0; int xv = -1;
+    struct mad_resource *r;
+    UINT type, lvl0, nlvl, sl0, pf, swz;
+    enum WMTTextureType want;
+    if (!id || id == MAD_VREC_TOMB) return id;
+    EnterCriticalSection(&d->view_lock);
+    if (d->vmap_cap) {
+        i = mad_vmap_slot(id, d->vmap_cap);
+        while (d->vmap[i].id) {
+            if (d->vmap[i].id == id) { flat = d->vmap[i].flat; break; }
+            i = (i + 1) & (d->vmap_cap - 1);
+        }
+    }
+    LeaveCriticalSection(&d->view_lock);
+    if (flat) return flat == 1 ? id : flat;
+    r = mad_texture_of_view(d, id, &xv);
+    if (!r || !r->texture) return id;
+    if (xv >= 0) {
+        type = r->xview[xv].type; lvl0 = r->xview[xv].lvl0; nlvl = r->xview[xv].nlvl;
+        sl0 = r->xview[xv].sl0; pf = r->xview[xv].pf; swz = r->xview[xv].swz;
+    } else {
+        type = (UINT)r->tex_type; lvl0 = 0; nlvl = r->tex_mips; sl0 = 0; pf = (UINT)r->tex_pf; swz = MAD_SWZ_IDENTITY;
+    }
+    if (type == (UINT)WMTTextureType2DArray && r->desc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D) want = WMTTextureType2D;
+    else if (type == (UINT)WMTTextureType2DMultisampleArray) want = WMTTextureType2DMultisample;
+    else want = (enum WMTTextureType)~0u;
+    flat = 1;
+    if (want != (enum WMTTextureType)~0u) {
+        static unsigned said;
+        UINT64 v = mad_texture_view_id(d, r, want, lvl0, nlvl, sl0, 1, (enum WMTPixelFormat)pf, swz);
+        if (v && v != r->gpu_resource_id) flat = v;
+        if (said++ < 8)
+            d3d12_log("[madeira-d3d12] ml1308 DXBC texture2d binding: array view %#llx of %ux%u (%s) -> 2D view %#llx\n",
+                      (unsigned long long)id, r->width, r->height, r->name ? r->name : "?", (unsigned long long)(flat == 1 ? id : flat));
+    }
+    EnterCriticalSection(&d->view_lock);
+    if (d->vmap_cap) {
+        i = mad_vmap_slot(id, d->vmap_cap);
+        while (d->vmap[i].id) {
+            if (d->vmap[i].id == id) { d->vmap[i].flat = flat; break; }
+            i = (i + 1) & (d->vmap_cap - 1);
+        }
+    }
+    LeaveCriticalSection(&d->view_lock);
+    return flat == 1 ? id : flat;
+}
 static UINT mad_air_array_len(struct mad_device *d, UINT64 view_id) {
     int xv = -1;
     struct mad_resource *r;
@@ -7656,8 +7832,18 @@ static int mad_air_build_tables_ex_body(struct mad_exec *e, const struct mad_roo
                 tab[off + 0] = de.texture_view_id;
                 tab[off + 1] = ((UINT64)count << 32) | (UINT64)first;
             } else {
-                tab[off + 0] = de.texture_view_id;
-                tab[off + 1] = ((UINT64)mad_air_array_len(d, de.texture_view_id) << 32)
+                UINT64 vid = de.texture_view_id;
+                if (g_flat_views < 0) {
+                    long long fv = mad_cfg_int_pe("sm5-flat-views", 2);
+                    int apple10 = MTLDevice_supportsFamily(d->mtl_device, MAD_MTL_FAMILY_APPLE10_FV) ? 1 : 0;
+                    g_flat_views = fv == 2 ? !apple10 : fv ? 1 : 0;   /* madeira-bcd: 2 = automatic by GPU family */
+                    d3d12_log("[madeira-d3d12] ml1308 DXBC texture2d bindings get %s (bcd.cfg sm5-flat-views=%lld%s)\n",
+                              g_flat_views ? "2D views of the array textures" : "the array views (old behaviour)", fv,
+                              fv == 2 ? (apple10 ? ", automatic: Apple10 GPU" : ", automatic: GPU older than Apple10") : "");
+                }
+                if (g_flat_views && !(rg->flags & MADEIRA_IR_AIR_F_TEXTURE_ARRAY)) vid = mad_air_flat_view(d, vid);   /* ml1308 */
+                tab[off + 0] = vid;
+                tab[off + 1] = ((UINT64)mad_air_array_len(d, vid) << 32)
                              | (de.metadata & 0xffffffffull);     /* min LOD clamp */
             }
         } else {
@@ -8388,6 +8574,23 @@ static struct wmtcmd_base *mad_dd_buf(struct mad_dd *d, struct wmtcmd_render_set
     d->b[st][s->index].buf = s->buffer; d->b[st][s->index].off = s->offset;
     return (struct wmtcmd_base *)s;
 }
+/* ml1302 (upstream Madeira, b1386ac; bcd.cfg / a game's config d3d12-hold-view-lists, default 0). While the device has 256 SRV views or fewer
+ * (loading screens, or any device without a residency set), every draw and dispatch also declares every resource in the device's SRV and UAV
+ * lists resident. The lists are read under list_lock (shared), but the lock was released before the commands were encoded, while res_Release on
+ * another thread takes it exclusively, removes the resource and releases its Metal objects. D3D12 lets an application release a resource that the
+ * command list never uses at any time, so a loader thread could free a texture between the list read and the encode, and useResource met a dead
+ * object: Final Fantasy Tactics - The Ivalice Chronicles crashed in AGX's objc_retain while streaming behind its loading screen. With the switch on,
+ * exec_draw reads the lists right before the final encode (after every early return) and keeps list_lock shared until the chain has reached Metal
+ * (a draw-batched chain is sent at once for that); exec_dispatch releases its shared hold after the encode instead of before. Command buffers retain
+ * what they reference, so a release after the encode is safe. Off, the lock is released where it always was. Not reproduced on demand upstream. */
+static int mad_hold_view_lists_on(void) {
+    static int on = -1;
+    if (on < 0) {
+        on = mad_cfg_int_pe("d3d12-hold-view-lists", 0) ? 1 : 0;   /* 1: the SRV/UAV list lock is held until the draw or dispatch is encoded; 0: released before it, as before */
+        if (on) d3d12_log("[madeira-d3d12] ml1302 d3d12-hold-view-lists = 1: the view lists' lock is held until each draw and dispatch is encoded\n");
+    }
+    return on;
+}
 static void exec_draw(struct mad_exec *e, const struct mad_cmd *c) {
     struct wmtcmd_render_setpso c_pso;
     struct wmtcmd_render_draw_indirect c_di;
@@ -8419,7 +8622,11 @@ static void exec_draw(struct mad_exec *e, const struct mad_cmd *c) {
      * (Astra). An engine that zeroes the count of a culled draw would have drawn
      * one instance of it. Not a skip: there is nothing to draw. */
     if ((c->kind == MC_DRAW && !c->u.draw.icount) || (c->kind == MC_DRAW_INDEXED && !c->u.drawi.inst)) { InterlockedIncrement(&g_zero_inst); return; }
-    if (e->pso && !e->pso->rps && e->pso->lazy) mad_pso_realize(e->pso);
+    if (e->pso && !e->pso->rps && e->pso->lazy) {
+        if (!e->pso->tess && mad_pso_async_on() && mad_pso_async_queue(e->pso)) {
+            if (!e->pso->rps) { InterlockedIncrement(&g_pa_skips); MAD_SKIP(e); return; }   /* pso-async: still being built */
+        } else mad_pso_realize(e->pso);
+    }
     if (!e->pso || (!e->pso->rps && !e->pso->tess)) {   /* ml1086: a tessellation pipeline may have no plain pipeline */
         if (!said_nopso++) d3d12_log("[madeira-d3d12] draw without a pipeline state; skipped\n");
         MAD_SKIP(e);
@@ -8446,6 +8653,22 @@ static void exec_draw(struct mad_exec *e, const struct mad_cmd *c) {
     }
     if (g_census_on) { exec_capture_draw(e, c); exec_desc_check(e, e->rs, e->root, e->pso->vs_name); }   /* ml910/ml913 */
     if (g_skin_check > 0) mad_skin_draw(e, c);   /* madeira-bcd skin-check: before the pass, its captures are blits */
+    /* ml1311 (upstream Madeira; bcd.cfg / a game's config attachless-split = 1, default 0) gives every draw of an
+     * attachment-less pass its own encoder. On Apple GPUs the fragment work of
+     * consecutive draws in one pass overlaps unless the shader uses raster
+     * order groups. Final Fantasy Tactics - The Ivalice Chronicles composites
+     * its UI layers with draws that read back and rewrite one UAV in such a
+     * pass, with no barrier between them (it works on PC GPUs in practice), and
+     * whole SIMD-group blocks of a layer vanished. A pass with no attachments
+     * has nothing to load or store; the fence chain orders the next one after
+     * it. Opt-in: Nanite-style passes run many UAV-atomic draws that need no
+     * order, and splitting them would serialise them. */
+    if (g_attachless_split < 0) { g_attachless_split = mad_cfg_int_pe("attachless-split", 0) ? 1 : 0;
+                                  if (g_attachless_split) d3d12_log("[madeira-d3d12] ml1311 attachless-split = 1 (one draw per attachment-less pass)\n"); }
+    if (g_attachless_split && e->renc && !e->enc_nrt && !e->enc_depth && !e->nrt && !e->depth && e->pass_draws) {
+        InterlockedIncrement(&g_attachless_split_n);
+        exec_end(e);
+    }
     if (!exec_begin_render(e)) { MAD_SKIP(e); return; }
     if (g_skip_ps_state && mad_skip_ps_match(e->pso)) { MAD_SKIP(e); return; }   /* madeira-bcd: diagnostic, off unless skip-ps is set */
     g_dump_tables = 0;
@@ -8729,7 +8952,9 @@ tess_go:
      * samples, 26,000 draws per 600 lists). Skip them exactly when they are
      * meaningless; small applications keep the old behaviour. */
     const int ml1060_skip_lists = dev->resset && dev->nsrv > 256;
-    if (!ml1060_skip_lists) {
+    const int ml1302_hold = !ml1060_skip_lists && mad_hold_view_lists_on();   /* ml1302: the lists are declared right before the encode, below */
+    int ml1302_held = 0;
+    if (!ml1060_skip_lists && !ml1302_hold) {
         AcquireSRWLockShared(&dev->list_lock);   /* views are created on other threads */
         for (i = 0; i < dev->nsrv && nur < 256; i++) {
             struct mad_resource *r = dev->srv_res[i];
@@ -8917,6 +9142,34 @@ tess_go:
         c_draw.base_instance = c->u.draw.istart;
         MAD_APPEND(&c_draw);
     }
+    if (ml1302_hold) {   /* ml1302: the device-wide view lists, read under list_lock and declared in front of everything else in this batch. The lock stays
+                          * held until the chain has reached Metal: released earlier, a resource released on another thread in between had its Metal object
+                          * freed while the batch still named it. Read here, after every early return above, so the lock is never left held. */
+        struct wmtcmd_base *dl_head = NULL, *dl_tail = NULL;
+        unsigned nur0 = nur;
+#define MAD_USE_DL(h, u) do { if ((h) && nur < 256 && !mad_use_seen(e, e->renc, (h), (UINT32)(u), use_stages)) { \
+        memset(&ur[nur], 0, sizeof ur[nur]); ur[nur].type = WMTRenderCommandUseResource; ur[nur].resource = (h); \
+        ur[nur].usage = (enum WMTResourceUsage)(u); ur[nur].stages = (enum WMTRenderStages)use_stages; \
+        if (dl_tail) dl_tail->next.ptr = &ur[nur]; else dl_head = (struct wmtcmd_base *)&ur[nur]; \
+        dl_tail = (struct wmtcmd_base *)&ur[nur]; nur++; } } while (0)
+        AcquireSRWLockShared(&dev->list_lock);   /* views are created and released on other threads */
+        ml1302_held = 1;
+        for (i = 0; i < dev->nsrv && nur < 256; i++) {
+            struct mad_resource *r = dev->srv_res[i];
+            if (r) MAD_USE_DL(r->texture ? r->texture : r->buffer, WMTResourceUsageRead);
+        }
+        for (i = 0; i < dev->nuav && nur < 256; i++) {
+            struct mad_resource *r = dev->uav_res[i];
+            if (r) MAD_USE_DL(r->texture ? r->texture : r->buffer, WMTResourceUsageRead | WMTResourceUsageWrite);
+        }
+#undef MAD_USE_DL
+        if (dl_head) {   /* after the pipeline, before every draw command of this batch */
+            dl_tail->next.ptr = c_pso.next.ptr;
+            c_pso.next.ptr = dl_head;
+            if (tail == (struct wmtcmd_base *)&c_pso) tail = dl_tail;
+        }
+        InterlockedExchangeAdd(&g_es_use_n, (LONG)(nur - nur0));   /* madeira-bcd: encode split */
+    }
     {   /* ml1088: count this draw into the current slot while a query is open.
          * Placed last so a skipped draw above never leaves the encoder's mode
          * out of step with vis_prev. The mode command goes FIRST in the chain
@@ -8942,6 +9195,10 @@ tess_go:
      * cache and released by any thread once the cache is full (mad_pso_for_strides);
      * one is never left queued, so Metal holds it as soon as it was chosen. */
     if (c_pso.type == WMTRenderCommandSetPSO && !tv && c_pso.pso != e->pso->rps) mad_eb_flush_cur(EBF_VARIANT);
+    if (ml1302_held) {   /* ml1302: the chain is sent to Metal before the lock goes (an encode-batched chain is queued, not encoded) */
+        mad_eb_flush_cur(EBF_OTHER);
+        ReleaseSRWLockShared(&dev->list_lock);
+    }
     mad_use_commit(e);   /* this draw's useResource entries reached the encoder */
 #undef MAD_APPEND
     e->draws++; e->pass_draws++;   /* ml1098 */
@@ -9165,6 +9422,100 @@ static void exec_copy_aspect(struct mad_exec *e, const struct mad_cmd *c) {
 }
 
 #define MAD_FILLPAT_BYTES (256u << 10)   /* ml1151: one exact UAV-clear pattern buffer */
+/* ml1310: BC uploads on a GPU that cannot sample BC.
+ *
+ * winemetal creates every BC texture with an uncompressed format there
+ * (remap_unsupported_bc: BC1/2/3/7 -> RGBA8, BC4 -> R8, BC5 -> RG8, BC6H ->
+ * RGBA16F), and the iPad's A16 is such a GPU (supportsBCTextureCompression = NO).
+ * DXMT's D3D11 layer decodes the blocks before every upload; this runtime copied
+ * the raw blocks into the RGBA8 texture, so they were read as texels: noisy,
+ * repeated artwork (Final Fantasy Tactics - The Ivalice Chronicles' enhanced menu,
+ * 175 BC7 textures). Decoded here on the CPU at encode time -- the source is an
+ * UPLOAD buffer the application filled before ExecuteCommandLists -- into a
+ * staging buffer the command buffer keeps alive, and copied with the texel pitch.
+ * bcd.cfg / a game's config d3d12-bc-decode = 1 turns it on (BCD: default 0 until a device has shown it, Final Fantasy Tactics' list sets it);
+ * 0 is the raw copy as before. It only does anything on a GPU without BC sampling. */
+extern void mad_bcn_decode_image(const uint8_t *src, size_t src_pitch, uint8_t *dst, size_t dst_pitch,
+                                 uint32_t width, uint32_t height, int kind);
+extern uint32_t mad_bcn_texel_size(int kind);
+static int mad_bc_kind_of_pf(UINT pf) {
+    switch (pf) {
+    case WMTPixelFormatBC1_RGBA: case WMTPixelFormatBC1_RGBA_sRGB: return 1;
+    case WMTPixelFormatBC2_RGBA: case WMTPixelFormatBC2_RGBA_sRGB: return 2;
+    case WMTPixelFormatBC3_RGBA: case WMTPixelFormatBC3_RGBA_sRGB: return 3;
+    case WMTPixelFormatBC4_RUnorm: return 4;
+    case WMTPixelFormatBC4_RSnorm: return 14;
+    case WMTPixelFormatBC5_RGUnorm: return 5;
+    case WMTPixelFormatBC5_RGSnorm: return 15;
+    case WMTPixelFormatBC7_RGBAUnorm: case WMTPixelFormatBC7_RGBAUnorm_sRGB: return 7;
+    case WMTPixelFormatBC6H_RGBFloat: case WMTPixelFormatBC6H_RGBUfloat: return -1;   /* remapped, no decoder */
+    default: return 0;
+    }
+}
+static int g_bc_decode = -1;   /* 1: decode BC uploads (no native BC), 0: raw copies */
+static int mad_bc_decode_on(struct mad_device *d) {
+    if (g_bc_decode < 0) {
+        int want = mad_cfg_int_pe("d3d12-bc-decode", 0) ? 1 : 0, native = 1;
+        if (want) native = MTLDevice_supportsBCTextureCompression(d->mtl_device) ? 1 : 0;   /* BCD: switch off, no query and no line */
+        g_bc_decode = want && !native;
+        if (want)
+            d3d12_log("[madeira-d3d12] ml1310 BC sampling %s on this GPU; BC uploads are %s (bcd.cfg d3d12-bc-decode)\n",
+                      native ? "native" : "NOT available (winemetal stores BC textures uncompressed)",
+                      g_bc_decode ? "decoded on the CPU" : "copied raw");
+    }
+    return g_bc_decode;
+}
+static int mad_bc_upload_decoded(struct mad_exec *e, const struct mad_cmd *c) {
+    struct mad_resource *t = c->u.bt.tex, *b = c->u.bt.buf;
+    struct wmtcmd_blit_copy_from_buffer_to_texture k;
+    struct WMTBufferInfo bi; obj_handle_t stage;
+    UINT mw, mh, md, cw, ch, cd, z;
+    size_t dst_pitch, slice_bytes;
+    int kind = mad_bc_kind_of_pf((UINT)t->tex_pf);
+    static LONG n_ok, n_nocpu, n_bc6;
+    if (!kind) return 0;
+    if (!mad_bc_decode_on(e->q->device)) return 0;
+    if (kind < 0) {
+        if (InterlockedIncrement(&n_bc6) <= 4) d3d12_log("[madeira-d3d12] ml1310 BC6H upload: no decoder, copied raw (texture %ux%u)\n", t->width, t->height);
+        return 0;
+    }
+    if (!b->cpu) {
+        if (InterlockedIncrement(&n_nocpu) <= 8)
+            d3d12_log("[madeira-d3d12] ml1310 BC upload from a GPU-only buffer (%llu bytes) into %ux%u: cannot decode on the CPU, copied raw\n",
+                      (unsigned long long)b->size, t->width, t->height);
+        return 0;
+    }
+    mad_mip_dims(t, c->u.bt.level, &mw, &mh, &md);
+    cw = c->u.bt.x < mw ? mw - c->u.bt.x : 0; if (c->u.bt.w < cw) cw = c->u.bt.w;
+    ch = c->u.bt.y < mh ? mh - c->u.bt.y : 0; if (c->u.bt.h < ch) ch = c->u.bt.h;
+    cd = c->u.bt.d ? c->u.bt.d : 1;
+    if (!cw || !ch) return 1;   /* nothing inside the level: D3D clips it away too */
+    if (c->u.bt.off + (UINT64)c->u.bt.row * c->u.bt.rows * cd > b->size) {
+        static LONG said; if (InterlockedIncrement(&said) <= 8) d3d12_log("[madeira-d3d12] ml1310 BC upload reads past its buffer; copied raw\n");
+        return 0;
+    }
+    dst_pitch = (size_t)cw * mad_bcn_texel_size(kind);
+    slice_bytes = dst_pitch * ch;
+    memset(&bi, 0, sizeof bi); bi.length = slice_bytes * cd; bi.options = WMTResourceStorageModeShared;
+    stage = MTLDevice_newBuffer(e->q->device->mtl_device, &bi);
+    if (!stage || !bi.memory.ptr) { if (stage) NSObject_release(stage); return 0; }
+    for (z = 0; z < cd; z++)
+        mad_bcn_decode_image((const uint8_t *)b->cpu + c->u.bt.off + (UINT64)z * c->u.bt.row * c->u.bt.rows, c->u.bt.row,
+                             (uint8_t *)bi.memory.ptr + (size_t)z * slice_bytes, dst_pitch, cw, ch, kind);
+    memset(&k, 0, sizeof k);
+    k.type = WMTBlitCommandCopyFromBufferToTexture;
+    k.src = stage; k.src_offset = 0;
+    k.bytes_per_row = dst_pitch; k.bytes_per_image = slice_bytes;
+    k.size.width = cw; k.size.height = ch; k.size.depth = cd;
+    k.dst = t->texture; k.slice = c->u.bt.slice; k.level = c->u.bt.level;
+    k.origin.x = c->u.bt.x; k.origin.y = c->u.bt.y; k.origin.z = c->u.bt.z;
+    MTLBlitCommandEncoder_encodeCommands(e->benc, (const struct wmtcmd_base *)&k);
+    NSObject_release(stage);   /* the command buffer retains what it reads */
+    if (InterlockedIncrement(&n_ok) <= 4 || (n_ok % 1000) == 0)
+        d3d12_log("[madeira-d3d12] ml1310 BC%d upload decoded on the CPU: %ux%ux%u texels into %ux%u mip %u (%ld so far)\n",
+                  kind > 10 ? kind - 10 : kind, cw, ch, cd, t->width, t->height, (unsigned)c->u.bt.level, (long)n_ok);
+    return 1;
+}
 static void exec_copy(struct mad_exec *e, const struct mad_cmd *c) {
     if (!exec_begin_blit(e)) { MAD_SKIP(e); return; }
     switch (c->kind) {   /* ml1116: the destination is written */
@@ -9227,6 +9578,7 @@ static void exec_copy(struct mad_exec *e, const struct mad_cmd *c) {
         if (!c->u.bt.tex->texture || !c->u.bt.buf->buffer) { MAD_SKIP(e); return; }
         if (g_sd_state > 0 && g_upload_guard)   /* madeira-bcd: as above, the first rows of a texture upload */
             mad_ug_note(e, c->u.bt.buf, c->u.bt.off, g_ug_bytes, MAD_UG_COPY, 1, 0, "CopyTextureRegion");
+        if (mad_bc_upload_decoded(e, c)) return;   /* ml1310 (bcd.cfg d3d12-bc-decode): a BC upload on a GPU without BC sampling */
         memset(&k, 0, sizeof k);
         k.type = WMTBlitCommandCopyFromBufferToTexture;
         k.src = c->u.bt.buf->buffer; k.src_offset = c->u.bt.off;
@@ -9745,10 +10097,11 @@ static void exec_dispatch(struct mad_exec *e, const struct mad_cmd *c) {
         if (r) MAD_CUSE(r->texture ? r->texture : r->buffer, (enum WMTResourceUsage)(WMTResourceUsageRead | WMTResourceUsageWrite));
     }
     const int ml1060_cskip = dev->resset && dev->nsrv > 256;   /* same reasoning as exec_draw */
+    const int ml1302_chold = !ml1060_cskip && mad_hold_view_lists_on();   /* ml1302: the lock is released after the encode, below */
     if (!ml1060_cskip) AcquireSRWLockShared(&dev->list_lock);   /* madeira-bcd */
     for (i = 0; !ml1060_cskip && i < dev->nsrv && nur < 256; i++) { struct mad_resource *r = dev->srv_res[i]; if (r) MAD_CUSE(r->texture ? r->texture : r->buffer, WMTResourceUsageRead); }
     for (i = 0; !ml1060_cskip && i < dev->nuav && nur < 256; i++) { struct mad_resource *r = dev->uav_res[i]; if (r) MAD_CUSE(r->texture ? r->texture : r->buffer, (enum WMTResourceUsage)(WMTResourceUsageRead | WMTResourceUsageWrite)); }
-    if (!ml1060_cskip) ReleaseSRWLockShared(&dev->list_lock);
+    if (!ml1060_cskip && !ml1302_chold) ReleaseSRWLockShared(&dev->list_lock);
     InterlockedExchangeAdd(&g_es_use_n, (LONG)nur);   /* madeira-bcd: encode split */
 #undef MAD_CUSE
     if (c->kind == MC_DISPATCH_INDIRECT) {
@@ -9766,6 +10119,10 @@ static void exec_dispatch(struct mad_exec *e, const struct mad_cmd *c) {
     tail->next.ptr = NULL;
 #undef MAD_APPEND
     MTLComputeCommandEncoder_encodeCommands(e->cenc, (const struct wmtcmd_base *)&c_pso);
+    if (ml1302_chold) {   /* ml1302: held until the batch is encoded, see exec_draw */
+        mad_eb_flush_cur(EBF_OTHER);
+        ReleaseSRWLockShared(&dev->list_lock);
+    }
     mad_use_commit(e);
     e->draws++;
     if (g_capture_on && g_cap_uav) mad_capture_dispatch_outputs(e, c);   /* madeira-bcd: contact sheets */
@@ -11220,7 +11577,15 @@ mad_x64_ExecuteCommandLists(ID3D12CommandQueue *This, UINT count, ID3D12CommandL
 
 static ID3D12CommandQueueVtbl g_queue_vtbl;
 static ID3D12CommandAllocatorVtbl g_alloc_vtbl;
-static ID3D12GraphicsCommandList7Vtbl g_list_vtbl;
+/* ml1300: ID3D12GraphicsCommandList8 is List7 plus OMSetFrontAndBackStencilRef.
+ * The toolchain's d3d12.h stops at List7, so the List8 slot is appended after
+ * the List7 table; g_list_vtbl names that List7 part for every assignment below
+ * (the object's vtbl pointer is the address of the List7 part, as before). */
+static struct {
+    ID3D12GraphicsCommandList7Vtbl v7;
+    void (STDMETHODCALLTYPE *OMSetFrontAndBackStencilRef)(ID3D12GraphicsCommandList *This, UINT front, UINT back);
+} g_list_vtbl8;
+#define g_list_vtbl (g_list_vtbl8.v7)
 static ID3D12FenceVtbl g_fence_vtbl;
 
 static HRESULT STDMETHODCALLTYPE device_QI(ID3D12Device *This, REFIID riid, void **out) {
@@ -16639,6 +17004,60 @@ static void mad_scn_init(void) {
                          "keeps Wine's file calls)\n");
     else d3d12_log("[madeira-d3d12] shader cache: native file access unavailable (%s); Wine's file calls stay in use\n", why);
 }
+/* PIPELINE ARCHIVE (bcd.cfg / a game's config pso-archive = 1; default 0;
+ * upstream Madeira #516 with dxmt d8894f4, a828d75, 19ea691). Metal's own cache of
+ * compiled pipelines can be emptied by iOS between sessions (logs 2026-10-26:
+ * 6,904 of 6,986 pipelines found there in one session, 19 of the first 500 in the
+ * next, which then compiled for minutes at 420-550 ms each). With the switch on,
+ * winemetal keeps the pipelines this game compiles in Metal binary archives of
+ * its own and looks there first (MadeiraCtl op 11, winemetal in DXMT): a folder per
+ * executable and switch set in LOCALAPPDATA\BCD\PipelineArchive, outside the shader
+ * cache, so a new build does not prune it. A pipeline is found only when the
+ * converter wrote the same shader; winemetal caps each folder's size
+ * (MADEIRA_PSO_ARCHIVE_MB, 1024 by default). Env MADEIRA_PSO_ARCHIVE_PER_BUILD=1:
+ * the folder in the build directory instead. A winemetal without op 11 answers 0
+ * and nothing changes. */
+static void mad_pso_archive_init(void) {
+    typedef char *(CDECL *unix_name_fn)(LPCWSTR);
+    unix_name_fn unix_name = NULL;
+    struct mad_sc_hash h = { 0xcbf29ce484222325ull, 0x84222325cbf29ce4ull };
+    WCHAR exe[MAX_PATH], dir[MAX_PATH], base[MAX_PATH];
+    const WCHAR *rt = wcsrchr(g_sc_dir, L'\\');   /* the switch set's subdirectory */
+    char v[8];
+    struct madeira_ctl_args a;
+    HMODULE k32;
+    char *udir;
+    DWORD n, i;
+    int per_build;
+    if (mad_cfg_int_pe("pso-archive", 0) <= 0) return;   /* bcd.cfg pso-archive: compiled pipelines kept in Metal binary archives of our own (1; 0 = Metal's cache only) */
+    n = GetModuleFileNameW(NULL, exe, MAX_PATH);
+    if (!n || n >= MAX_PATH) return;
+    for (i = 0; i < n; i++) if (exe[i] >= 'A' && exe[i] <= 'Z') exe[i] += 'a' - 'A';
+    mad_sc_feed(&h, exe, n * sizeof(WCHAR));
+    n = GetEnvironmentVariableA("MADEIRA_PSO_ARCHIVE_PER_BUILD", v, sizeof v);
+    per_build = (n && n < sizeof v && v[0] == '1') || !rt;
+    n = per_build ? 0 : GetEnvironmentVariableW(L"LOCALAPPDATA", base, MAX_PATH);
+    if (n && n < MAX_PATH - 112) {
+        _snwprintf(dir, MAX_PATH, L"%ls\\BCD\\PipelineArchive", base);
+        CreateDirectoryW(dir, NULL);
+        _snwprintf(dir, MAX_PATH, L"%ls\\BCD\\PipelineArchive\\%ls-%016llx", base, rt + 1, (unsigned long long)h.a);
+    } else {
+        _snwprintf(dir, MAX_PATH, L"%ls\\pso-archive-%016llx", g_sc_dir, (unsigned long long)h.a);
+    }
+    CreateDirectoryW(dir, NULL);
+    if ((k32 = GetModuleHandleW(L"kernel32.dll")))
+        unix_name = (unix_name_fn)(void *)GetProcAddress(k32, "wine_get_unix_file_name");
+    if (!unix_name || !(udir = unix_name(dir))) {
+        d3d12_log("[madeira-d3d12] pso-archive: %ls has no unix name; Metal's cache only\n", dir);
+        return;
+    }
+    memset(&a, 0, sizeof a);
+    a.op = 11; a.ptr = (UINT64)(ULONG_PTR)udir;
+    MadeiraCtl(&a);
+    HeapFree(GetProcessHeap(), 0, udir);
+    if (a.ret) d3d12_log("[madeira-d3d12] pso-archive: compiled pipelines kept in %ls (bcd.cfg pso-archive)\n", dir);
+    else d3d12_log("[madeira-d3d12] pso-archive: winemetal took no archive directory (no op 11, or remote mode); Metal's cache only\n");
+}
 static int mad_sc_init(void) {
     static SRWLOCK lk = SRWLOCK_INIT;
     if (g_sc_on >= 0) return g_sc_on;
@@ -16709,7 +17128,7 @@ static int mad_sc_init(void) {
         }
         if (on) d3d12_log("[madeira-d3d12] shader cache ON: %ls, identity '%s' (%s; bcd.cfg shader-cache = 0 turns it off)\n", g_sc_dir, g_sc_stamp, g_sc_rt);
         else d3d12_log("[madeira-d3d12] shader cache off\n");
-        if (on) { mad_scn_init(); MemoryBarrier(); }   /* madeira-bcd shader-cache-native: g_scn before g_sc_on */
+        if (on) { mad_scn_init(); mad_pso_archive_init(); MemoryBarrier(); }   /* madeira-bcd shader-cache-native: g_scn before g_sc_on */
         g_sc_on = on;
     }
     ReleaseSRWLockExclusive(&lk);
@@ -19702,6 +20121,16 @@ static void STDMETHODCALLTYPE list_DiscardResource(ID3D12GraphicsCommandList *Th
     c->u.discard.whole = mad_discard_whole(r, region);
     if (c->u.discard.whole && mad_rp_discard_on()) mad_rp_dset_add(r);   /* its passes decide their store at the end */
 }
+static void STDMETHODCALLTYPE list_OMSetStencilRef(ID3D12GraphicsCommandList *This, UINT ref);
+/* ml1300: List8. Allowed only with OPTIONS14.IndependentFrontAndBackStencilRefMaskSupported,
+ * which is reported off, and winemetal carries one reference: the front value is used. */
+static void STDMETHODCALLTYPE list_OMSetFrontAndBackStencilRef(ID3D12GraphicsCommandList *This, UINT front, UINT back) {
+    static LONG warned;
+    if (front != back && !InterlockedExchange(&warned, 1))
+        d3d12_log("[madeira-d3d12] ml1300 OMSetFrontAndBackStencilRef(%u, %u): one reference here, the front one is used\n",
+                  front, back);
+    list_OMSetStencilRef(This, front);
+}
 static void STDMETHODCALLTYPE list_OMSetStencilRef(ID3D12GraphicsCommandList *This, UINT ref) {
     struct mad_cmd *c = mad_list_push((struct mad_list *)This, MC_STENCIL_REF);
     if (c) c->u.stencil_ref = ref;
@@ -21053,6 +21482,7 @@ static void build_vtables(void) {
     g_res_vtbl.GetDesc = (void *)res_GetDesc;
 
     madeira_fill_ID3D12GraphicsCommandList7(&g_list_vtbl);
+    g_list_vtbl8.OMSetFrontAndBackStencilRef = list_OMSetFrontAndBackStencilRef;   /* ml1300 */
     g_list_vtbl.GetDevice = (void *)list_GetDevice;
     g_list_vtbl.QueryInterface          = (void *)list_QI;
     g_list_vtbl.AddRef                  = (void *)list_AddRef;

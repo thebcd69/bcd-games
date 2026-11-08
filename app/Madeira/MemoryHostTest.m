@@ -1,3 +1,5 @@
+/* Copyright 2026 Will Faust. This file was taken from https://github.com/willfaust/Madeira (commit a15332c)
+ * under GPL-3.0-or-later and modified for BCD in September and October 2026. See THIRD-PARTY-NOTICES.md. */
 // The extension memory experiment, Madeira's side (see MemoryHostProtocol.h).
 //
 // Run 2 (2026-09-29): memory OWNED by the MadeiraMemoryHost extension is billed

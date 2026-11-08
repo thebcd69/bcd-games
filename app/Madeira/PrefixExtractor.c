@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Kesavamoorthi G: code taken from https://github.com/willfaust/Madeira (commits 39c7465 and 9344146)
+ * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 // Minimal gzip + ustar extractor. Handles the subset of tar produced by
 // /usr/bin/tar on macOS: regular files (type '0'), directories (type '5'),
 // and pax extended headers (type 'x', ignored).

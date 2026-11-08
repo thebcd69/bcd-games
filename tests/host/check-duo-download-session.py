@@ -28,6 +28,11 @@ import Foundation
 import Combine
 enum BCDDuoFeatures { static var active = true }
 enum SteamLog { static func event(_ message: String) {} }
+@MainActor final class SteamWorkshopModel {
+ static let shared = SteamWorkshopModel()
+ var stops = 0
+ func stopForSession() { stops += 1 }
+}
 var guestRunning = false
 func wine_process_is_running() -> Int32 { guestRunning ? 1 : 0 }
 func wineserver_is_running() -> Int32 { guestRunning ? 1 : 0 }
@@ -137,6 +142,7 @@ checks = r'''
   precondition(live.store.windowsRunning && !live.inGame)
   live.resume(11); live.resume(22)
   precondition(account.inSession && account.started.isEmpty)
+  precondition(SteamWorkshopModel.shared.stops > 0, "desktop session also pauses Workshop downloads")
   precondition(account.resumeAfterSession == Set([11, 22]))
   // The front end stays mounted and inGame stays false throughout this stop.
   guestRunning = false; library.current = nil; settle()

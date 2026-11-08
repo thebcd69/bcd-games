@@ -151,6 +151,7 @@ import Foundation
             if signedIn {
                 await checkSession()
                 await refreshLibrary(force: false)
+                BCDEpicCloud.shared.startupCheck()   // build 632: only the games whose cloud saves the player turned on
             }
         }
     }
@@ -222,8 +223,10 @@ import Foundation
             error = nil
             items = []
             updated = nil
+            BCDEpicCloud.shared.accountChanged()
             if let account = tokens.accountID { loadCache(account: BCDEpicCatalog.accountKey(account)) }
             await refreshLibrary(force: true)
+            BCDEpicCloud.shared.startupCheck()
         } catch BCDEpicError.corrective(let action, let step) {
             let next = step != nil
             BCDEpicLog.write("[epic-auth] failed reason=corrective-\(action) next=\(next ? 1 : 0)")
@@ -265,6 +268,7 @@ import Foundation
     }
 
     func clearAccount() {
+        BCDEpicCloud.shared.accountChanged()
         signedIn = false
         displayName = nil
         items = []

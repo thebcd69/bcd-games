@@ -38,12 +38,17 @@ check(not re.search(r"#include <(?!stddef\.h>)", header), "the header includes o
 ntdll = (R / "build/ntdll-unix/process_ios.c").read_text()
 bridge = (R / "app/Madeira/WineProcessBridge.m").read_text()
 check('#include "../bcd_epic_mask.h"' in ntdll and "bcd_epic_mask_w(" in ntdll, "process_ios.c includes the header and masks the command line it prints")
-check(re.search(r'ERR\("NtCreateUserProcess: image=%s cmdline=%s\\n",\s*debugstr_us\( &params->ImagePathName \), debugstr_us\( &shown \)\);', ntdll),
-      "...the line prints the masked copy, not params->CommandLine")
-check(ntdll.count("debugstr_us( &params->CommandLine )") == 1, "...and the only other print of the command line is the TRACE line (off unless Wine's debug channel is on)")
+# madeira-bcd (ajan62, D12): the printed copy goes through upstream's redactor (build/madeira_redact.h) after the Epic mask.
+check(re.search(r'ERR\("NtCreateUserProcess: image=%s cmdline=%s\\n",\s*debugstr_us\( &params->ImagePathName \), madeira_debugstr_cmdline_us\( &shown \)\);', ntdll),
+      "...the line prints the masked copy, not params->CommandLine (then redacted)")
+check(len(re.findall(r'(?<!madeira_)debugstr_us\(\s*&params->CommandLine\s*\)', ntdll)) == 0
+      and ntdll.count("madeira_debugstr_cmdline_us( &params->CommandLine )") == 1,
+      "...and the only other print of the command line is the TRACE line (off unless Wine's debug channel is on), redacted")
 check('#include "../../build/bcd_epic_mask.h"' in bridge and "bcd_epic_mask_a(extra_argv[i]" in bridge, "WineProcessBridge.m includes the header and masks its argv lines")
-check(re.search(r'dprintf\(STDERR_FILENO, "\[WineProc\] argv\[%d\] = %s\\n", 2 \+ i, masked_len >= 0 \? masked : extra_argv\[i\]\);', bridge)
-      and 'dprintf(STDERR_FILENO, "[WineProc] argv[%d] = %s\\n", 2 + i, extra_argv[i]);' not in bridge, "...the loop prints the masked copy")
+check('madeira_redact_arg_a(masked_len >= 0 ? masked : extra_argv[i], &credential_next, shown, sizeof(shown));' in bridge
+      and 'dprintf(STDERR_FILENO, "[WineProc] argv[%d] = %s\\n", 2 + i, shown);' in bridge
+      and 'dprintf(STDERR_FILENO, "[WineProc] argv[%d] = %s\\n", 2 + i, extra_argv[i]);' not in bridge,
+      "...the loop prints the masked copy (then redacted)")
 # No other place of the runtime or the bridge prints MADEIRA_ARGS or a whole command line at a level that is on in a build.
 for path in [R / "app/Madeira/WineProcessBridge.m", R / "build/ntdll-unix/process_ios.c", R / "build/ntdll-unix/env_ios.c"]:
     text = path.read_text()

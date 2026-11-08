@@ -254,6 +254,7 @@ ROUTED = {
     ("GameRecommendations.swift", "# Madeira's recommended settings"): "remote-recommendations (the lists' text)",
     ("ContentView.swift", '"madeira-bcd Home"'): "wave 3 (the developer interface's button to the old home screen)",
     ("SteamOwnedLibrary.swift", '"Madeira"'): "never shown: the Application Support folder's name",
+    ("EAAPI.swift", '"Madeira (EA client)"'): "never shown: the User-Agent EA's servers see, one of the EA client constants kept as Madeira sends them (check-ea.py)",
     ("AutoTune.swift", "# madeira-bcd auto-tune"): "bcd-file-names (# BCD auto-tune there)",
     ("MadeiraConfig.swift", "# madeira-bcd: the game's own file"): "bcd-file-names (# BCD: there)",
 }

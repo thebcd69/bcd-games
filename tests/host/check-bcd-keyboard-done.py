@@ -68,6 +68,7 @@ screens = {
     "BCDSettingsFeedback.swift": 1,
     "GameProfiles.swift": 1,
     "BCDSettingsAll.swift": 1,     # the lines of bcd.cfg: each option's value and "Add a line"
+    "BCDAccounts.swift": 1,        # round 632: Steam's "PC address" field (downloads from a PC on this network); a decimal pad has no Return key
 }
 for name, count in screens.items():
     text = (APP / name).read_text()
@@ -87,6 +88,9 @@ fb = (APP / "BCDSettingsFeedback.swift").read_text()
 check("the feedback message keeps the Done beside its counter and has the keyboard's", 'Text("Done")' in fb and ".bcdKeyboardDone { typing = false }" in fb)
 gp = (APP / "GameProfiles.swift").read_text()
 check("the raw game config editor has a focus state and the Done", "@FocusState private var typing: Bool" in gp and ".bcdKeyboardDone { typing = false }" in gp)
+acc = (APP / "BCDAccounts.swift").read_text()
+check("Steam's PC address field (a decimal pad, no Return key): Done ends its focus",
+      ".bcdKeyboardDone { lanFieldFocused = false }" in acc and ".focused($lanFieldFocused)" in acc)
 others = [f.name for f in APP.glob("*.swift") if ".bcdKeyboardDone" in f.read_text() and f.name not in set(screens) | {"BCDComponents.swift"}]
 check("no other file has one", not others, others)
 wf = (R / ".github/workflows/build-ipa.yml").read_text()

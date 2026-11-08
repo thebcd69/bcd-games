@@ -1,3 +1,5 @@
+/* Portions copyright 2026 meshoklv: code taken from https://github.com/willfaust/Madeira (pull request #401)
+ * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * NT threads support
  *
@@ -2369,8 +2371,19 @@ static DECLSPEC_NORETURN void exit_thread( int status )
      * window, including its TEB addresses. A raw prev_teb can then name this
      * live thread; joining self fails and the old path frees its own stack.
      * Keep this identity-checked handoff confined to the EA opt-in session. */
+    /* madeira-bcd (ajan62, X9; upstream Madeira ml2290, the 10-31 tester log): a launcher installer that ran its 32-bit VC++
+     * redistributables one after the other had the same trouble outside EA: the second got the first's window and TEB
+     * addresses, prev_teb named the exiting thread itself, the thread freed its own kernel stack (unregister_view+4, stuck
+     * on the virtual_mutex it held) and the installer waited on it forever (GTA V Legacy's Rockstar launcher setup BT9TE3,
+     * 0DHNMC; a vcredist PY5TEX). Two layers:
+     *  - for every process, the raw hand-off no longer joins or frees the TEB of the thread that is exiting right now: that
+     *    free can only ever be wrong, so no working session can depend on it (the TEB stays the next exit's prev_teb);
+     *  - env.MADEIRA_THREAD_REAP_CHECKED = 1 (default off; upstream's default) takes the identity-checked hand-off for every
+     *    process, the one the EA session has used since build 608: it also refuses a previous TEB that is gone or now belongs
+     *    to another thread, but it takes the virtual_mutex twice at every thread exit. */
     const char *ea_cef = getenv( "MADEIRA_EA_CEF" );
-    if (ea_cef && !strcmp( ea_cef, "1" ))
+    const char *checked = getenv( "MADEIRA_THREAD_REAP_CHECKED" );
+    if ((ea_cef && !strcmp( ea_cef, "1" )) || (checked && !strcmp( checked, "1" )))
     {
         extern void ios_ea_reap_exited_thread( TEB *current );
         ios_ea_reap_exited_thread( NtCurrentTeb() );
@@ -2379,7 +2392,14 @@ static DECLSPEC_NORETURN void exit_thread( int status )
     {
         struct ntdll_thread_data *thread_data = (struct ntdll_thread_data *)&teb->GdiTebBatch;
 
-        if (thread_data->pthread_id)
+        if (teb == NtCurrentTeb())
+        {
+            static int said;
+            if (said++ < 8)
+                dprintf( 2, "[thread-reap] ml2290 the previous exited thread's TEB %p is this exiting thread's own (a reused window): "
+                            "not joined, not freed\n", (void *)teb );
+        }
+        else if (thread_data->pthread_id)
         {
             pthread_join( thread_data->pthread_id, NULL );
             virtual_free_teb( teb );

@@ -43,7 +43,7 @@ step = step[:step.index("\n\n")]
 check("CI runs this check and applies the patch after the other launch.c patches, before the Dock build, without failing the step",
       "python3 tests/host/check-dock-install-dir-events.py\n" in step
       and 'python3 tools/patch-dock-install-dir-events.py madeira-dock/src/launch.c || echo "::warning::' in step
-      and step.index("patch-dock-ceg-zero-jobs.py") < step.index("patch-dock-install-dir-events.py") < step.index("bash build/madeira-dock/build.sh"))
+      and step.index("patch-dock-steam-readback.py") < step.index("patch-dock-install-dir-events.py") < step.index("bash build/madeira-dock/build.sh"))
 dk = (root / "app/Madeira/MadeiraDock.swift").read_text()
 allowed = dk[dk.index("static let reportAllowed: Set<String> = ["):]
 allowed = allowed[:allowed.index("]")]
@@ -74,8 +74,7 @@ else:
         shutil.copytree(dock / "src", t / "src")
         lc = t / "src/launch.c"
         lc.write_text(orig)
-        for patch in ("tools/patch-dock-game-scm.py", "tools/patch-dock-keep-alive.py", "tools/patch-dock-steam-readback.py",
-                      "tools/patch-dock-ceg-zero-jobs.py"):
+        for patch in ("tools/patch-dock-game-scm.py", "tools/patch-dock-keep-alive.py", "tools/patch-dock-steam-readback.py"):
             r = subprocess.run([sys.executable, str(root / patch), str(lc)], capture_output=True, text=True)
             check("the workflow's earlier patch %s applies to the copy" % patch, r.returncode == 0, r.stdout + r.stderr)
         before = lc.read_text()

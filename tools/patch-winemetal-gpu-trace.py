@@ -790,14 +790,15 @@ PAIRS = [
   return STATUS_SUCCESS;
 }
 """, 1),
-    ("""  params->ret_pso =
-      (obj_handle_t)[device newComputePipelineStateWithDescriptor:descriptor options:options reflection:nil error:&err];
-  params->ret_error = (obj_handle_t)err;
+    # The compute site is anchored on what follows the creation (dxmt d8894f4, pso-archive, rewrote the creation call itself).
+    ("""  params->ret_error = (obj_handle_t)err;
+  if (!err && info->binary_archive_for_serialization) {
+    [(id<MTLBinaryArchive>)info->binary_archive_for_serialization addComputePipelineFunctionsWithDescriptor:descriptor
 """,
-     """  params->ret_pso =
-      (obj_handle_t)[device newComputePipelineStateWithDescriptor:descriptor options:options reflection:nil error:&err];
-  params->ret_error = (obj_handle_t)err;
+     """  params->ret_error = (obj_handle_t)err;
   madeira_gt_note_pso(params->ret_pso, info->compute_function);   /* madeira-bcd: gpu trace */
+  if (!err && info->binary_archive_for_serialization) {
+    [(id<MTLBinaryArchive>)info->binary_archive_for_serialization addComputePipelineFunctionsWithDescriptor:descriptor
 """, 1),
     ("""  params->ret_error = (obj_handle_t)err;
   if (!err && info->binary_archive_for_serialization) {

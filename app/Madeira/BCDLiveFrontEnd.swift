@@ -173,6 +173,10 @@ struct BCDLiveFrontEnd: View {
         switch sheet {
         case .steamSignIn:
             BCDSteamSignInSheet()   // BCD's own sign-in (BCDAccountsLive.swift)
+        case .itchKey:
+            BCDItchKeySheet()   // itch.io's API key (BCDItch/BCDItchViews.swift)
+        case .itchFind:
+            BCDItchFindSheet()   // Find a game on itch.io (BCDItch/BCDItchViews.swift)
         case .addGame, .details:
             EmptyView()   // full screen (pageScreen)
         }

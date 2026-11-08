@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 Ash Hopkins. This file was taken from https://github.com/willfaust/Madeira (pull request #461)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """LSE atomics on aliased pages: the Mach store emulator's LD<OP> and CAS case.
 
 FEX lowers a guest LOCK ADD/SUB/XADD/INC/DEC, AND, OR, XOR and CMPXCHG to

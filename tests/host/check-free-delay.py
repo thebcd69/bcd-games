@@ -71,8 +71,13 @@ assert 'if (!ios_steered && *ret) ios_fd_reuse( *ret, *size_ptr, type );\n' \
     'only with an address, right before the generic allocation'
 ex = body('static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemoryEx(')
 assert ex.count('ios_fd_reuse(') == 1
+# round 631 (R4 S3): the generic allocation keeps the ask's address and size for the V8-table zone after it
 assert 'if (!caged && *ret) ios_fd_reuse( *ret, *size_ptr, type );\n' \
        '            if (!caged)\n' \
+       '            {\n' \
+       '                void *ask_at = *ret;\n' \
+       '                SIZE_T ask_sz = *size_ptr;\n' \
+       '\n' \
        '                st = allocate_virtual_memory( ret, size_ptr, type, protect,' in ex, \
     'only with an address, right before the generic allocation'
 assert 'ios_fd_reuse' not in body('static NTSTATUS allocate_virtual_memory('), 'internal fixed placements unchanged'

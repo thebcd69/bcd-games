@@ -399,6 +399,12 @@ struct BCDContentPlanBuilder {
 
     var fileCount: Int { files.count }
 
+    /// Whether a file of this path (letter case aside) is planned already.
+    func hasFile(_ raw: String) -> Bool {
+        guard let parts = try? BCDContentPaths.components(raw) else { return false }
+        return fileByPath[BCDContentPaths.fold(parts.joined(separator: "/"))] != nil
+    }
+
     mutating func addDirectory(_ raw: String) throws {
         _ = try folding.directory(BCDContentPaths.components(raw))
     }

@@ -15,6 +15,11 @@ allocated or registered, and every caller of create_view handles a failure statu
 placeholder path and virtual_create_builtin_view pass the status on; map_dosmem returns it). A compiled run of the production loop
 with fake views: a system view is deleted and the loop goes on; a non-system view returns the status, deletes nothing, and prints
 the line (first four, then every 256th).
+
+Ported from upstream Madeira v0.2.0 (#516): env.MADEIRA_CREATE_VIEW_REFUSE = 0 restores Wine's assert for a non-system overlap
+(kill switch, default on = the refusal above). The assert is reachable only with the switch off; with it on, the code after the
+refusal sees system views only. A compiled run of the production loop in a child process per case: switch off, a system view is
+still deleted; switch off, a non-system view aborts (SIGABRT, the assert); switch "1" or empty or "00" is not "0" and refuses.
 """
 from pathlib import Path
 import os
@@ -36,13 +41,21 @@ def check(what, cond, detail=''):
 f0 = src.index('static NTSTATUS create_view( struct file_view **view_ret, void *base, size_t size, unsigned int vprot )')
 f1 = src.index('\n}\n', f0) + 3
 fn = src[f0:f1]
-check('the assert on VPROT_SYSTEM is gone from create_view', 'assert( view->protect & VPROT_SYSTEM )' not in fn)
+cond = 'if (!(view->protect & VPROT_SYSTEM) && ios_create_view_refuse_enabled())'
+check('the refusal is taken only while env.MADEIRA_CREATE_VIEW_REFUSE is not 0; with it off Wine\'s assert stands (kill switch, #516)',
+      fn.count(cond) == 1 and fn.count('assert( view->protect & VPROT_SYSTEM );') == 1 and
+      fn.index(cond) < fn.index('assert( view->protect & VPROT_SYSTEM );') < fn.index('delete_view( view );'))
+sw0 = src.index('static int ios_create_view_refuse_enabled( void )')
+sw = src[sw0:src.index('\n}\n', sw0) + 3]
+check('the switch is read once, "0" alone turns it off (MADEIRA_CREATE_VIEW_REFUSE), default on',
+      'getenv( "MADEIRA_CREATE_VIEW_REFUSE" )' in sw and "on = !(e && e[0] == '0' && !e[1]);" in sw and 'static int on = -1;' in sw and
+      src.count('MADEIRA_CREATE_VIEW_REFUSE" )') == 1)
 check('the alignment asserts stay (they are about the caller, not about the memory)',
       'assert( !((UINT_PTR)base & host_page_mask) );' in fn and 'assert( !(size & page_mask) );' in fn)
-check('a system view is still deleted, as Wine does', 'delete_view( view );' in fn and fn.index('if (!(view->protect & VPROT_SYSTEM))') < fn.index('delete_view( view );'))
+check('a system view is still deleted, as Wine does', 'delete_view( view );' in fn and fn.index(cond) < fn.index('delete_view( view );'))
 check('the refusal returns STATUS_CONFLICTING_ADDRESSES before alloc_pages_vprot / alloc_view / register_view',
       fn.index('return STATUS_CONFLICTING_ADDRESSES;') < fn.index('alloc_pages_vprot( base, size )') < fn.index('alloc_view()') < fn.index('register_view( view );'))
-check('the refusal does not delete the old view', 'delete_view' not in fn[fn.index('if (!(view->protect & VPROT_SYSTEM))'):fn.index('return STATUS_CONFLICTING_ADDRESSES;')])
+check('the refusal does not delete the old view', 'delete_view' not in fn[fn.index(cond):fn.index('return STATUS_CONFLICTING_ADDRESSES;')])
 diag0 = src.index('static void ios_create_view_conflict')
 diag = src[diag0:src.index('\n}\n', diag0) + 3]
 check('the line names both views (base, size, protect), the thread and the guest rip, and the history of the old one',
@@ -63,8 +76,9 @@ check('virtual_create_builtin_view: only a success continues; the status is retu
 w0 = fn.index('    while ((view = find_view_range( base, size )))')
 w1 = fn.index('    if (!alloc_pages_vprot( base, size ))')
 loop = fn[w0:w1]
-helper = src[src.index('static void ios_create_view_conflict'):f0]
+helper = src[sw0:f0]   # the switch and the diagnostic, as built
 harness = r'''
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,10 +116,29 @@ static NTSTATUS loop_only(void *base, size_t size, unsigned int vprot)
 @LOOP@
     return STATUS_SUCCESS;
 }
-int main(void)
+int main(int argc, char **argv)
 {
     NTSTATUS st;
     int i, fail = 0;
+
+    if (argc > 1)   /* one scenario per process: the switch is read once */
+    {
+        if (!strcmp( argv[1], "nonsystem" ))   /* the overlapped view is not a system view */
+        {
+            views[0] = (struct file_view){ (char *)0x7c3a000000, 0x1000000, 0x1 | 0x4, 0 }; nviews = 1;
+            st = loop_only((void *)0x7c3a400000 - 0x400000, 0x1000000, 0x4);
+            printf("%s nonsystem returned status 0x%x, deleted %d\n", st == STATUS_CONFLICTING_ADDRESSES && !deleted_count ? "refused" : "went on", (unsigned)st, deleted_count);
+            return 0;
+        }
+        if (!strcmp( argv[1], "system" ))
+        {
+            views[0] = (struct file_view){ (char *)0x7c3a000000, 0x1000000, VPROT_SYSTEM | 0x1, 0 }; nviews = 1;
+            st = loop_only((void *)0x7c3a400000, 0x1000000, 0x4);
+            printf("%s system status 0x%x, deleted %d\n", st == 0 && deleted_count == 1 ? "deleted" : "wrong", (unsigned)st, deleted_count);
+            return 0;
+        }
+        return 2;
+    }
 
     /* a stale system view: deleted, the creation goes on */
     views[0] = (struct file_view){ (char *)0x7c3a000000, 0x1000000, VPROT_SYSTEM | 0x1, 0 }; nviews = 1;
@@ -155,6 +188,25 @@ with tempfile.TemporaryDirectory() as tmp:
         for line in r.stdout.splitlines():
             check(line[5:], line.startswith('ok'))
         check('every compiled scenario passes', r.returncode == 0, r.stdout[-800:])
+        # the kill switch: one process per case
+        def run(arg, value):
+            env = dict(os.environ, QUIET_LOG='1')
+            env.pop('MADEIRA_CREATE_VIEW_REFUSE', None)
+            if value is not None:
+                env['MADEIRA_CREATE_VIEW_REFUSE'] = value
+            return subprocess.run([str(exe), arg], capture_output=True, text=True, env=env)
+        r = run('nonsystem', None)
+        check('switch unset: a non-system overlap is refused (the default)', r.returncode == 0 and r.stdout.startswith('refused'), r.stdout + r.stderr[-300:])
+        for value in ('1', '', '00', 'off', '0x'):
+            r = run('nonsystem', value)
+            check('MADEIRA_CREATE_VIEW_REFUSE=%r is not "0": still refused' % value, r.returncode == 0 and r.stdout.startswith('refused'), r.stdout + r.stderr[-300:])
+        r = run('nonsystem', '0')
+        check('MADEIRA_CREATE_VIEW_REFUSE=0: the assert ends the process again (SIGABRT), as before build 591',
+              r.returncode < 0 and -r.returncode == 6 and 'VPROT_SYSTEM' in r.stderr, 'rc=%d %s' % (r.returncode, r.stderr[-300:]))
+        r = run('system', '0')
+        check('MADEIRA_CREATE_VIEW_REFUSE=0: a stale system view is still deleted and the creation goes on', r.returncode == 0 and r.stdout.startswith('deleted'), r.stdout + r.stderr[-300:])
+        r = run('system', None)
+        check('switch unset: the system view is deleted as well', r.returncode == 0 and r.stdout.startswith('deleted'), r.stdout + r.stderr[-300:])
 
 print('PASS' if ok else 'FAIL')
 raise SystemExit(0 if ok else 1)

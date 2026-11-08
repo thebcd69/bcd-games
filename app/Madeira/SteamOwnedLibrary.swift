@@ -3,12 +3,19 @@
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
 // Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `dlc`, and the DLC request a download carries
 // (`run`). A game nothing was chosen for, with no DLC installed, downloads as before.
+// Modified by BCD (thebcd69), 2026-11-05: a game's version (beta branches): the game's branches (`SteamOwnedGame.branches`), `refreshBranches`,
+// `enterBetaCode`, the branch-aware update check and the chosen branch in `run`. A game whose player picked no beta downloads as before.
+// Modified by BCD (thebcd69), 2026-11-05: Steam Workshop (BCDSteamWorkshop/): `SteamOwnedGame.workshop`, the Workshop's calls over the app's own
+// connection (`workshopCall`, `downloadWorkshopItem`), and its downloads stopping when a game session starts.
+// Portions copyright 2026 ft7t8drgwf-wq, wamei, 125hz and alantangok: code taken from https://github.com/willfaust/Madeira (pull requests #237, #381, #382, #404, #490, #491 and 2 more)
+// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // The library and download model is adapted from the account model built
 // around Jfishin's Madeira Steam client (used with the author's permission,
 // see docs/STEAM_SIGNIN.md, "Provenance"); the integration with sign-in,
 // Madeira Dock and the library is 125hz's.
 
+import Combine
 import CryptoKit
 import Foundation
 import UIKit
@@ -52,6 +59,11 @@ struct SteamOwnedGame: Codable, Identifiable, Hashable, Sendable {
     /// Steam states no size.
     var downloadBytes: UInt64?
     var installBytes: UInt64?
+    /// Steam's branches of the game, public first (SteamAppInfo.branches), for
+    /// Options › Version; nil in older caches (a library refresh fills them).
+    var branches: [SteamAppInfo.Branch]?
+    /// The game has a Steam Workshop (SteamAppInfo.workshopVisible); nil in older caches (a library refresh fills it).
+    var workshop: Bool?
 
     init(_ info: SteamAppInfo) {
         id = Int(info.appID)
@@ -73,6 +85,23 @@ struct SteamOwnedGame: Codable, Identifiable, Hashable, Sendable {
         let download = info.downloadSize(for: "windows"), install = info.installSize(for: "windows")
         downloadBytes = download > 0 ? download : nil
         installBytes = install > 0 ? install : nil
+        branches = info.branches
+        workshop = info.workshopVisible
+    }
+
+    /// The build Steam lists for a branch of the game: the branch's own, else
+    /// the public build (also for "public", nil and a branch no longer listed).
+    func buildID(branch: String?) -> Int {
+        guard let branch, branch != SteamAppInfo.publicBranch,
+              let entry = branches?.first(where: { $0.name == branch }), entry.buildID > 0 else { return buildID }
+        return Int(entry.buildID)
+    }
+
+    /// Whether Steam lists another build than the installed record's, on the branch the record names (`installedBranch`, `BetaKey`; nil:
+    /// public). The public build counts only when it is newer (a number, as before); a beta's build when it differs (betas can step back).
+    func hasUpdate(installedBuild: Int, installedBranch: String?) -> Bool {
+        let latest = buildID(branch: installedBranch)
+        return latest > 0 && latest != installedBuild && (latest > installedBuild || installedBranch != nil)
     }
 
     /// The language to offer on an installed game's page (Download in ...):
@@ -281,6 +310,7 @@ final class SteamOwnedLibrary: ObservableObject {
                                                 canConnect: { [unowned self] in Self.enabled && self.signedIn && !self.inSession },
                                                 startDownload: { [unowned self] appID in self.install(appID) })
     private var started = false
+    private var lastLibraryRefreshAttempt: Date?
     /// Which account the cached list belongs to: a SHA-256 of the account name,
     /// so the cache file holds no name.
     private var cachedAccount: String?
@@ -323,10 +353,22 @@ final class SteamOwnedLibrary: ObservableObject {
 
     private func refreshIfStale() {
         if Date().timeIntervalSince(libraryUpdated ?? .distantPast) > 6 * 3600 {
-            Task { await refreshLibrary(interactive: false) }
+            refreshAfterForeground()
         } else {
             Task { await refreshPlaytime() }   // playtime changes more often than the library
         }
+    }
+
+    /// An offline first load stays eligible when the app returns to the foreground: a library never loaded, or older than six
+    /// hours, is fetched again, at most once a minute. The attempt is reserved before it is scheduled, so repeated activation
+    /// callbacks cannot queue more requests while the first task is waiting to run.
+    func refreshAfterForeground() {
+        guard Self.enabled, signedIn, !refreshing, !inSession else { return }
+        let now = Date()
+        guard now.timeIntervalSince(libraryUpdated ?? .distantPast) > 6 * 3600,
+              now.timeIntervalSince(lastLibraryRefreshAttempt ?? .distantPast) >= 60 else { return }
+        lastLibraryRefreshAttempt = now
+        Task { await refreshLibrary(interactive: false) }
     }
 
     /// Sign-in was stored or removed (SteamSignIn.didChange).
@@ -373,6 +415,7 @@ final class SteamOwnedLibrary: ObservableObject {
     /// offline start does not raise an alert.
     func refreshLibrary(interactive: Bool = true) async {
         guard Self.enabled, signedIn, !refreshing, !inSession else { return }
+        lastLibraryRefreshAttempt = Date()
         refreshing = true
         defer { refreshing = false }
         do {
@@ -982,6 +1025,7 @@ final class SteamOwnedLibrary: ObservableObject {
             for id in queue { resumeAfterSession.insert(id); downloads[id]?.state = .paused }
             queue.removeAll()
             gate.close()
+            SteamWorkshopModel.shared.stopForSession()   // a Workshop download stops too (the account goes to the game); finished chunks stay journaled
             SteamLog.event("[steam-depot] paused for a game session count=\(resumeAfterSession.count)")
         } else {
             // Madeira Dock may still hold the account (dockEnded() releases it).
@@ -1082,10 +1126,138 @@ final class SteamOwnedLibrary: ObservableObject {
 
     // MARK: Downloads
 
-    /// Whether Steam lists a newer build than the installed record.
-    func updateAvailable(appID: Int, installedBuild: Int?) -> Bool {
-        guard let installedBuild, let latest = game(appID)?.buildID, latest > 0 else { return false }
-        return latest > installedBuild
+    /// Whether Steam lists a newer build than the installed record, on the
+    /// branch the record names (`installedBranch`, `BetaKey`; nil: public).
+    func updateAvailable(appID: Int, installedBuild: Int?, installedBranch: String? = nil) -> Bool {
+        guard let installedBuild, let game = game(appID) else { return false }
+        return game.hasUpdate(installedBuild: installedBuild, installedBranch: installedBranch)
+    }
+
+    // MARK: Steam Workshop (BCDSteamWorkshop/)
+
+    /// Off with `env.MADEIRA_STEAM_WORKSHOP = 0`: no Workshop page or area, no Workshop call. Nothing is asked of Steam before the player opens a
+    /// Workshop page.
+    static var workshopEnabled: Bool { enabled && SteamSignIn.flag("MADEIRA_STEAM_WORKSHOP", default: true) }
+    /// Workshop calls use the app's own connection: signed in, and no game session holds the account (Valve's client has it then).
+    var workshopReady: Bool { Self.workshopEnabled && signedIn && !inSession }
+    /// The logged-on account's ID (the low half of its SteamID), as Valve's client records it beside an item it keeps for that account.
+    var workshopAccountID: UInt32 { UInt32(truncatingIfNeeded: session.steamID) }
+
+    /// One PublishedFile call (SteamWorkshopModel). `body` gets the account's SteamID.
+    func workshopCall(_ method: SteamServiceMethod, timeout: TimeInterval = 20,
+                      body: (UInt64) -> Data) async throws -> (eresult: Int32, body: Data) {
+        guard workshopReady else { throw SteamError.disconnected }
+        try await session.ensureConnected()
+        return try await session.callServiceMethodWithResult(method: method, body: body(session.steamID), timeout: timeout)
+    }
+
+    /// Downloads one Workshop item's content into its folder (DepotDownloader).
+    func downloadWorkshopItem(appID: UInt32, itemID: UInt64, manifestGID: UInt64, into folder: URL, journalDir: URL,
+                              progress: @escaping (SteamDownloadProgress) -> Void) async throws -> UInt64 {
+        guard workshopReady else { throw SteamError.disconnected }
+        try await session.ensureConnected()
+        return try await downloader.installWorkshopItem(appID: appID, itemID: itemID, manifestGID: manifestGID,
+                                                        into: folder, journalDir: journalDir, progress: progress)
+    }
+
+    // MARK: Branches (BCDSteamBranches/)
+
+    /// Off with `env.MADEIRA_STEAM_BRANCHES = 0`: no version row on the game's page, no branch lookup, and a download takes the
+    /// public build whatever was chosen before.
+    static var branchesEnabled: Bool { enabled && SteamSignIn.flag("MADEIRA_STEAM_BRANCHES", default: true) }
+
+    /// The branch a download of the game takes: the one chosen on its page (public without a choice or with the feature off).
+    func branchToDownload(_ appID: Int) -> String {
+        Self.branchesEnabled ? SteamBranch.chosen(appID) : SteamAppInfo.publicBranch
+    }
+
+    /// Tells the pages that show a game's version that the choice or the kept beta code changed.
+    let branchesChanged = PassthroughSubject<Void, Never>()
+    /// What the last beta-code check of a game said, and the games Steam is checking a code for now (the page reads both).
+    private(set) var betaCodeNotes: [Int: String] = [:]
+    private(set) var betaChecking = Set<Int>()
+
+    /// Apps whose branch list was read again this run (refreshBranches).
+    private var branchesRead = Set<Int>()
+
+    /// Reads a game's branches from Steam once per run (signed in, no session
+    /// running), so the page lists a beta added since the library was cached.
+    func refreshBranches(_ appID: Int) async {
+        guard Self.branchesEnabled, signedIn, !inSession, appID > 0, appID <= Int(UInt32.max),
+              branchesRead.insert(appID).inserted else { return }
+        do {
+            guard let info = try await fetcher.fetchAppInfo(appID: UInt32(appID)),
+                  let index = owned.firstIndex(where: { $0.id == appID }) else { return }
+            if owned[index].branches != info.branches {
+                owned[index].branches = info.branches
+                writeCache()
+                branchesChanged.send()
+            }
+            SteamLog.event("[steam-branch] app=\(appID) branches=\(info.branches.count) private=\(info.branches.filter(\.passwordRequired).count)")
+        } catch {
+            branchesRead.remove(appID)
+            handleSessionError(error, context: "branch", report: false)
+        }
+    }
+
+    /// The page's Enter a beta code: checks the code with Steam and keeps what it said for the page (`betaCodeNotes`).
+    func submitBetaCode(_ code: String, appID: Int) {
+        guard !betaChecking.contains(appID) else { return }
+        betaChecking.insert(appID)
+        betaCodeNotes[appID] = nil
+        branchesChanged.send()
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let (opened, problem) = await self.enterBetaCode(code, appID: appID)
+            self.betaChecking.remove(appID)
+            if let problem {
+                self.betaCodeNotes[appID] = problem
+            } else if opened.isEmpty {
+                self.betaCodeNotes[appID] = "Steam did not accept that code for this game."
+            } else {
+                self.betaCodeNotes[appID] = "Opened: " + opened.joined(separator: ", ") + "."
+                // One version opened: it is the choice now (the code was typed for it); more than one: the player picks.
+                if opened.count == 1 { SteamBranch.choose(opened[0], for: appID) }
+            }
+            self.branchesChanged.send()
+        }
+    }
+
+    /// A line for the page under the beta-code row (a refusal that did not need Steam).
+    func noteBetaCode(_ text: String, appID: Int) {
+        betaCodeNotes[appID] = text
+        branchesChanged.send()
+    }
+
+    /// Forgets the game's beta code (a chosen protected beta goes back to public).
+    func forgetBetaCode(appID: Int) {
+        SteamBranch.setCode(nil, branches: [], for: appID)
+        betaCodeNotes[appID] = nil
+        branchesChanged.send()
+    }
+
+    /// Checks a beta code with Steam (signed in, no session running). A code
+    /// that opens a branch of the game is kept (SteamBranch). Returns the
+    /// branches it opened ([] when Steam does not accept it), or why Steam
+    /// could not be asked.
+    func enterBetaCode(_ code: String, appID: Int) async -> (branches: [String], problem: String?) {
+        let code = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !code.isEmpty, code.utf8.count <= 256, appID > 0, appID <= Int(UInt32.max) else { return ([], nil) }
+        guard Self.branchesEnabled, signedIn else { return ([], "Sign in to Steam to enter a beta code.") }
+        guard !inSession else { return ([], "Close the game first: Steam checks the code over BCD's own connection.") }
+        do {
+            let opened = try await fetcher.checkBetaCode(appID: UInt32(appID), code: code).keys.sorted()
+            if !opened.isEmpty {
+                SteamBranch.setCode(code, branches: opened, for: appID)
+                branchesRead.remove(appID)
+                await refreshBranches(appID)
+                branchesChanged.send()
+            }
+            return (opened, nil)
+        } catch {
+            handleSessionError(error, context: "branch", report: false)
+            return ([], SteamSignIn.message(error))
+        }
     }
 
     func hasPartialDownload(_ appID: Int) -> Bool {
@@ -1199,7 +1371,7 @@ final class SteamOwnedLibrary: ObservableObject {
     private func run(_ appID: Int) async {
         var outcome = SteamDownloadBackground.Outcome.paused
         do {
-            guard let info = try await fetcher.fetchInstallInfo(appID: UInt32(appID)) else {
+            guard var info = try await fetcher.fetchInstallInfo(appID: UInt32(appID)) else {
                 throw SteamError.appInfoNotFound(UInt32(appID))
             }
             try FileManager.default.createDirectory(at: SteamInstallPaths.common(drive: Self.drive), withIntermediateDirectories: true)
@@ -1209,6 +1381,9 @@ final class SteamOwnedLibrary: ObservableObject {
             // env.MADEIRA_STEAM_CDN_FALLBACK = 0: no fallback to the directory's other hosts when it gives no usable HTTPS
             // server on Valve's domains (DepotDownloader.selectContentHosts); on by default.
             downloader.directoryFallback = SteamSignIn.flag("MADEIRA_STEAM_CDN_FALLBACK", default: true)
+            // The version the player picked (SteamBranch, Options › Version): the public build unless a beta was chosen; a beta's code is
+            // checked with Steam again. Nothing is asked of Steam for the public build.
+            try await fetcher.applyBranch(&info, branch: branchToDownload(appID), code: SteamBranch.code(appID))
             let dlcRequest = await dlc.request(for: info, steamApps: Self.steamApps)
             let folder = try await downloader.install(info, steamApps: Self.steamApps,
                                                       ownedDepots: { [weak self] in try? await self?.fetcher.ownedDepotIDs() },
@@ -1234,6 +1409,9 @@ final class SteamOwnedLibrary: ObservableObject {
                 handleSessionError(error, context: "depot")
                 outcome = .failed(SteamSignIn.message(error))
             } else {
+                // Refused by the content servers: Try again asks Steam for new authorization.
+                if case SteamError.contentHTTP(let status) = error, status == 401 || status == 403 { downloader.forgetAuthorization() }
+                if case SteamError.contentRefused = error { downloader.forgetAuthorization() }
                 downloads[appID]?.state = .failed(SteamSignIn.message(error))
                 SteamLog.event("[steam-depot] failed app=\(appID) reason=\(Self.reason(error))")
                 outcome = .failed(SteamSignIn.message(error))
@@ -1255,11 +1433,18 @@ final class SteamOwnedLibrary: ObservableObject {
         case SteamError.depotKeyNotFound: return "depot-key"
         case SteamError.depotNotFound: return "no-windows-depot"
         case SteamError.insufficientDiskSpace: return "disk-space"
+        case SteamError.betaCodeNeeded: return "beta-code"
         case SteamError.checksumMismatch: return "checksum"
         case SteamError.decompressionFailed: return "decompress"
         case SteamError.chunkDecodeFailed(let format): return "decode-\(format)"
         case SteamError.manifestFetchFailed: return "manifest"
         case SteamError.chunkDownloadFailed: return "chunk"
+        case SteamError.noServersAvailable: return "no-servers"
+        case SteamError.connectionFailed: return "connection-failed"
+        case SteamError.transportFailed(let domain, let code): return "transport-\(domain == NSURLErrorDomain ? "url" : domain == NSPOSIXErrorDomain ? "posix" : "other")-\(code)"
+        case SteamError.disconnected: return "disconnected"
+        case SteamError.contentHTTP(let status): return "http-\(status)"
+        case SteamError.contentRefused(let status): return "refused-\(status)"
         case let url as URLError: return "url-\(url.code.rawValue)"
         default: return String(describing: type(of: error))
         }

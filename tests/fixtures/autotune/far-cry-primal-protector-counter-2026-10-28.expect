@@ -2,12 +2,14 @@
  "dialogs": [],
  "end": {},
  "matched": [
-  "protector-incode-counter-loop",
+  "protector-incode-counter-hot-page",
   "x64-image-smc-nocopy"
  ],
- "next": [],
- "note": "Far Cry Primal (P5GYTQ, build 622): the protector's in-code counter loop (201,052 handled inline self-modifying-code events in 40 s); round 624: known, NOCOPY is not offered any more",
+ "next": [
+  "env.MADEIRA_SMC_HOT_PAGE = 64"
+ ],
+ "note": "Far Cry Primal (P5GYTQ, build 622): the protector's in-code counter loop (201,052 handled inline self-modifying-code events in 40 s); round 632: auto-tune tries env.MADEIRA_SMC_HOT_PAGE = 64 (hot self-modifying-code pages, build 632) before anything else; not tried on a device yet",
  "outcome": "exited-early",
  "stage": 3,
- "status": "known"
+ "status": "trying"
 }

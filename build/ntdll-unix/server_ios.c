@@ -1,3 +1,5 @@
+/* Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #475)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Wine server communication
  *
@@ -215,10 +217,27 @@ static int ios_current_fd_socket(void)
 /* Per-process process_exiting flag (used by NtTerminateProcess). A global
  * flag poisons every OTHER pseudo-process's exit path once the first one
  * dies (they skip their self-terminate and the server never hears). */
+/* madeira-bcd (ajan62, L4; upstream Madeira ddf976d, Ash Hopkins, which makes this the behaviour for everyone): the session's initial
+ * process has no slot and is handed the GLOBAL process_exiting itself. That global is more than an exit-path flag: Wine's mutex_lock()
+ * and mutex_unlock() (unix_private.h) skip the pthread call while it is set, for every thread of every pseudo-process, so once a
+ * launcher stub that started the game has exited (NtTerminateProcess( 0, ... ); 109 archive logs: GTA V Legacy and Enhanced through
+ * PlayGTAV.exe, RDR2, Skyrim SE's launcher, Hogwarts Legacy, Warcraft III ...), virtual_mutex, fd_cache_mutex and every other lock taken
+ * through mutex_lock() stop excluding anything for the rest of the app run (the global is never cleared). With
+ * env.MADEIRA_FIRST_PROC_OWN_EXIT_FLAG = 1 (default off, since those are the flows that run today) the initial process gets a private
+ * flag like a child's, the global stays FALSE, and the initial process's exit path takes real locks. */
+static BOOL ios_initial_process_exiting;
+
+static int ios_first_proc_own_flag(void)
+{
+    const char *e = getenv( "MADEIRA_FIRST_PROC_OWN_EXIT_FLAG" );
+    return e && e[0] == '1' && !e[1];
+}
+
 BOOL *ios_process_exiting_ptr(void)
 {
     int i = ios_proc_socket_index();
-    return (i >= 0) ? &ios_proc_sockets[i].exiting : &process_exiting;
+    if (i >= 0) return &ios_proc_sockets[i].exiting;
+    return ios_first_proc_own_flag() ? &ios_initial_process_exiting : &process_exiting;
 }
 
 /* ─── ml586 fd-ownership trace ────────────────────────────────────────────
@@ -6345,6 +6364,13 @@ void server_init_process_done(void)
      * reissues the ids of dead processes, so drop what a dead process with this id
      * left behind. This process owns no handles yet. A no-op while fastsync is off. */
     madeira_fast_flush_pid();
+
+    /* The client half of the directory cache is kept per process id for the same reason
+     * (wine/dlls/ntdll/unix/file.c): drop a dead process's listings. */
+    {
+        extern void madeira_dir_cache_flush_pid(void);
+        madeira_dir_cache_flush_pid();
+    }
 
     if (!get_device_info( initial_cwd, &info ) && (info.Characteristics & FILE_REMOVABLE_MEDIA))
         chdir( "/" );

@@ -1,3 +1,5 @@
+// Portions copyright 2026 alantangok and NevesHenry: code taken from https://github.com/willfaust/Madeira (pull request #413; commits abca30a, 91e1e57, 9806664 and facd2cc)
+// under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 import Foundation
 import QuartzCore
 import UIKit

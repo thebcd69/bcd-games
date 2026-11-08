@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Portions copyright 2026 JMRBDev: code taken from https://github.com/willfaust/Madeira (pull request #462)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 # Fetch Microsoft's x64 Visual C++ runtime (the fourteen DLLs listed in
 # tools/fetch-vcruntime.md) from VC_redist.x64.exe into app/Madeira/x86_64-vcruntime/,
 # byte for byte as Microsoft ships them, then check them with

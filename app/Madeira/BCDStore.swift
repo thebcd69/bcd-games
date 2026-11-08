@@ -15,12 +15,14 @@ import SwiftUI
 // MARK: - What the interface shows
 
 enum BCDStoreFront: String, CaseIterable, Codable, Hashable {
-    case steam, epic, gog, local
+    case steam, epic, gog, itch, ea, local
     var title: String {
         switch self {
         case .steam: return "Steam"
         case .epic: return "Epic Games"
         case .gog: return "GOG"
+        case .itch: return "itch.io"
+        case .ea: return "EA games"
         case .local: return "Local"
         }
     }
@@ -109,6 +111,9 @@ struct BCDDownload: Identifiable, Hashable {
     var bytesPerSecond: Double
     var paused = false
     var failed: String?
+    /// Where the bytes come from while it downloads, said only when the player turned on downloads from a PC on this network ("From a PC on
+    /// this network · 2 GB so far", "From Steam's servers"); nil otherwise, and the row says nothing more.
+    var source: String? = nil
     var fraction: Double { totalBytes > 0 ? min(1, Double(doneBytes) / Double(totalBytes)) : 0 }
 }
 
@@ -160,6 +165,12 @@ struct BCDSystemStatus: Hashable {
     func signOut(_ store: BCDStoreFront)
     func addGameFromFiles()
     func refreshLibrary()
+    /// A store's own tool (itch.io's Find a game); the stores that have none do nothing.
+    func openStoreTool(_ store: BCDStoreFront)
+}
+
+extension BCDActions {
+    func openStoreTool(_ store: BCDStoreFront) {}
 }
 
 // MARK: - The store

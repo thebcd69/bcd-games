@@ -1,3 +1,5 @@
+/* Copyright 2026 Will Faust. This file was taken from https://github.com/willfaust/Madeira (commit a15332c)
+ * under GPL-3.0-or-later. See THIRD-PARTY-NOTICES.md. */
 #import <Foundation/Foundation.h>
 
 /// The extension memory experiment (MemoryHostProtocol.h): starts the

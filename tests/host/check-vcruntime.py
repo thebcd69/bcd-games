@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 byKAYRA. This file was taken from https://github.com/willfaust/Madeira (pull request #251; commits 89cc3e0 and a6acc4e)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 import os
 import struct
 import sys

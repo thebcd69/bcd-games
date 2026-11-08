@@ -346,8 +346,12 @@ func rulesPhase() {
     // round 624 (agent R S24; 7Z8VKR, TV6H06): Epic's GTA V starts Rockstar's launcher, which needs Windows' service manager
     check(BCDEpicRules.startsRockstarLauncher("gta5-enhanced") && BCDEpicRules.startsRockstarLauncher("gta5-legacy")
           && !BCDEpicRules.startsRockstarLauncher(nil) && !BCDEpicRules.startsRockstarLauncher("other")
+          && BCDEpicRules.startsRockstarLauncher(nil, program: #"C:\Program Files\Epic Games\RDR2\PlayRDR2.exe"#)
+          && BCDEpicRules.startsRockstarLauncher(nil, program: "RDR2.exe")
+          && !BCDEpicRules.startsRockstarLauncher(nil, program: #"C:\Games\Other\PlayRDR2.exe.bak"#)
+          && !BCDEpicRules.startsRockstarLauncher(nil, program: #"C:\Games\Hades\Hades.exe"#)
           && BCDEpicRules.antiCheatExceptions.allSatisfy { BCDEpicRules.startsRockstarLauncher($0.id) },
-          "the GTA V records (both editions, every anti-cheat exception today) start Windows services; a record without an exception does not")
+          "the GTA V records (both editions, every anti-cheat exception today) and Epic's RDR2 (by its launch program) start Windows services; any other record does not")
     check(BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "game\\BIN\\win64\\GAME.EXE") == nil
           && BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "./Game/Bin/Win64/Game.exe") == nil
           && BCDEpicRules.manifestRefusal(files: ["Game/Bin/Win64/Game.exe"], launchExe: "Game\\Other.exe")?.message == "The program Epic names for this game isn't among its files.",

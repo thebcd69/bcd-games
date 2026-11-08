@@ -8,6 +8,7 @@ The wineserver's poll loop (build/wineserver/fd_ios.c) synthesizes POLLOUT for e
 kept the class of a (user, fd) pair after the slot was recycled: a new TCP socket on an old pipe's slot and fd number got a connect
 completion at once, the program sent and the kernel answered ENOTCONN. With the key on, a recycled slot forgets its class and a
 POLLOUT for a TCP stream socket without a peer is withheld (synthesized or real; POLLERR/POLLHUP untouched). Off, nothing changes.
+Build 632: the recycled slot forgets its class for everyone (upstream Madeira 454276d); the key keeps only the POLLOUT withholding.
 
 Checks: the switch is read with the server's other switches (bcd.cfg / the game's lines, then the environment), exactly "1"; every new
 call is behind it; the real dispatch never touches POLLERR/POLLHUP; the cache, ios_fd_class_forget and ios_tcp_unconnected, cut from
@@ -33,8 +34,11 @@ def check(what, cond, detail=""):
 check("the switch is read with the server's others, exactly \"1\"",
       'const char *pg = ios_srv_switch( "MADEIRA_SRV_POLLOUT_GUARD", pgb, sizeof(pgb) );' in SRC
       and "ios_pollout_guard = pg && pg[0] == '1' && !pg[1];" in SRC)
-check("slot recycling forgets the class only with the switch",
-      SRC.count("if (ios_pollout_guard) ios_fd_class_forget( ret );") == 1 and SRC.count("if (ios_pollout_guard) ios_fd_class_forget( user );") == 1)
+# madeira-bcd (ajan62, L5, build 632): the forget on slot recycling no longer needs the switch (upstream Madeira 454276d); the switch keeps
+# the POLLOUT withholding. tests/host/check-inet-poll-cache.py runs the recycled-slot cases on real sockets.
+check("slot recycling forgets the class for everyone (the switch only keeps the POLLOUT withholding)",
+      "if (ios_pollout_guard) ios_fd_class_forget" not in SRC and SRC.count("    ios_fd_class_forget( user );\n") == 1
+      and SRC.count("    ios_fd_class_forget( ret );   /* a reused slot must be classified again") == 1)
 check("both real dispatch loops withhold POLLOUT only with the switch, never with POLLERR/POLLHUP",
       SRC.count("if (ios_pollout_guard && (rp[k].revents & POLLOUT) && !(rp[k].revents & (POLLERR | POLLHUP)) &&") == 2)
 check("the synthesized POLLOUT is withheld only with the switch, and the class forgotten",

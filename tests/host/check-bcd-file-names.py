@@ -334,6 +334,8 @@ KEPT = {
     "madeira-dock.txt": "C:\\madeira-dock.txt, BCD Dock's report: the Dock program (madeira-dock submodule) writes it",
     "madeira-continue.flag": "C:\\madeira-continue.flag: the prebuilt tests/net/winhttp-test.exe waits for it (developer net test)",
     "madeira-swap.bin": "the swap tier's backing file in tmp/, not in Documents",
+    "madeira-games": "SwiftItch/ItchInstall.swift's skip list: a folder name the search for an installer's new folder passes over "
+                     "(upstream Madeira's games folder in a shared prefix); BCD writes no such folder (round 632)",
 }
 SCAN = [("app/Madeira", (".swift",), False), ("app/Madeira", (".m", ".mm", ".c", ".h"), True),
         ("build", (".c", ".h", ".m", ".mm", ".cpp"), True), ("madeira-d3d12/src", (".c", ".h", ".mm", ".cpp"), True)]

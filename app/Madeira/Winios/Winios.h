@@ -1,3 +1,5 @@
+/* Portions copyright 2026 alantangok and 125hz: code taken from https://github.com/willfaust/Madeira (pull request #243; commit abca30a)
+ * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 /* Winios.h — registration entry point for the iOS user_driver.
  *
  * winios.drv is Madeira's iOS-side replacement for Wine's per-platform

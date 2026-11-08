@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (commit 8deb759)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """A placement walk that found no gap is remembered (build/ntdll-unix/virtual_ios.c); no Wine runs.
 
 Compiles the production ios_ml1027_place, its proof (ios_place_proven_full) and

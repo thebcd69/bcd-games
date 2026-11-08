@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (pull request #559)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Exercise the bounded message-constructor observer through the Win64 ABI.
 
 Assemble the production hook, compare its embedded bytes, then execute it with
@@ -16,6 +18,11 @@ root = Path(__file__).resolve().parents[2]
 native = (root / 'build/ntdll-unix/virtual_ios.c').read_text()
 
 
+def sch_table(name):
+    start = native.index(' ' + name + '[] =')
+    return native[start:native.index('\n};', start)]
+
+
 def define(name):
     return int(re.search(r'#define ' + name + r'\s+(0x[\da-fA-F]+|\d+)', native)[1], 0)
 
@@ -30,6 +37,16 @@ assert define('IOS_SCH_IPC_SPLIT') + 661 <= define('IOS_SCH_UI_TRACE')
 assert define('IOS_SCH_UI_TRACE') + len(blob) <= 0x181000
 assert define('IOS_SCH_IPC_CONTEXT') + 16 <= define('IOS_SCH_UI_COUNT')
 assert define('IOS_SCH_UI_COUNT') + 4 <= define('IOS_SCH_CACHE')
+
+
+# The trace is the first build's alone (ios_sch_builds[0]): its tables install
+# the observer and its constructor hook; 2.4.0.296's tables carry neither, so that
+# build's message constructor runs unmodified.
+first_blob, first_hook = sch_table('ios_sch_blob'), sch_table('ios_sch_hook')
+later_blob, later_hook = sch_table('ios_sch296_blob'), sch_table('ios_sch296_hook')
+assert '{ IOS_SCH_UI_TRACE, ios_sch_ui_trace, sizeof(ios_sch_ui_trace), 0, 0,' in first_blob
+assert '{ IOS_SCH_UI_CTOR, IOS_SCH_UI_TRACE, 5, 0xe9, 0 },' in first_hook
+assert 'ui_trace' not in later_blob and 'UI_' not in later_hook and not re.search(r'#define IOS_SCH296_UI', native)
 
 with tempfile.TemporaryDirectory(prefix='madeira-ui-close-') as tmp:
     folder = Path(tmp)

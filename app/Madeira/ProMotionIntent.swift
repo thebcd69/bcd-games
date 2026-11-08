@@ -1,3 +1,5 @@
+// Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (pull request #246)
+// under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 import SwiftUI
 import UIKit
 import QuartzCore

@@ -19,7 +19,7 @@ native set has an mscoree.dll, upstream's answer minus ComPlusNativeReady when i
 same either way. Part C holds the workflow, the auto-tune rule and its fixture to this fix.
 """
 from pathlib import Path
-import re, subprocess, sys, tempfile
+import os, re, subprocess, sys, tempfile
 
 root = Path(__file__).resolve().parents[2]
 ok = True
@@ -52,7 +52,8 @@ check("the IL-only block still sets ComPlusILOnly itself and the three flags com
       "mapping->image.image_flags |= ios_ilonly_image_flags( clr.Flags, native_ilonly );" in clr_block and
       "IMAGE_FLAGS_ComPlusNativeReady" not in clr_block)
 check("the probe is asked with WINEDLLPATH and the server's native machine, only for a PE32 image",
-      "int native_ilonly = ios_native_has_mscoree( getenv( \"WINEDLLPATH\" ), native_machine );" in clr_block and
+      "int native_ilonly = !ios_ilonly_wow64_enabled() ||\n"
+      "                                ios_native_has_mscoree( getenv( \"WINEDLLPATH\" ), native_machine );" in clr_block and
       clr_block.index("IMAGE_NT_OPTIONAL_HDR32_MAGIC") < clr_block.index("ios_native_has_mscoree("))
 check("the log line is printed only when the flag was withheld (an image that is 32BITREQUIRED keeps quiet)",
       "if (!native_ilonly && !(clr.Flags & COMIMAGE_FLAGS_32BITREQUIRED))" in clr_block and "ios_ilonly_say(" in clr_block)
@@ -93,6 +94,18 @@ if wine_mapping.is_file():
     check("and the same process-machine rule that reads the flag", "(view->image.image_flags & IMAGE_FLAGS_ComPlusNativeReady) ?" in up)
 else:
     print("skip the pinned upstream comparison (wine submodule not checked out)")
+
+# ---- Part A2: the kill switch (upstream Madeira v0.2.0, #516): env.MADEIRA_ILONLY_WOW64 = 0 restores the native promotion
+sw = function(mapping, "static int ios_ilonly_wow64_enabled(")
+check("the switch is read from bcd.cfg's env. line first (the server starts before the bridge exports env. lines), then the environment; "
+      "only \"0\" turns it off", 'madeira_cfg_get( "env.MADEIRA_ILONLY_WOW64", buf, sizeof(buf) )' in sw and
+      'getenv( "MADEIRA_ILONLY_WOW64" )' in sw and "enabled = !(v && !strcmp( v, \"0\" ));" in sw)
+check("the bcd.cfg reader is included before Wine's headers (winnt.h poisons strncpy) with the unused-function warning off, like "
+      "storage_device_ios.c", mapping.index('#include "../madeira_cfg.h"') < mapping.index('#include "ntstatus.h"') and
+      mapping.index('#include "config.h"') < mapping.index('#include "../madeira_cfg.h"') and
+      '#pragma GCC diagnostic ignored "-Wunused-function"' in mapping[:mapping.index('#include "ntstatus.h"')])
+check("with the switch off the flag is upstream's again, and the probe is not even asked",
+      clr_block.index("!ios_ilonly_wow64_enabled() ||") < clr_block.index("ios_native_has_mscoree("))
 
 # ---- Part B: the production functions
 code = r"""
@@ -192,6 +205,50 @@ with tempfile.TemporaryDirectory() as tmp:
           "(%s)" % (lines[-1] if lines else out.stderr[-300:]), out.returncode == 0 and "flags ok" in out.stdout)
     said = [l for l in out.stderr.splitlines() if l.startswith("[ilonly-machine]")]
     check("the diagnostic is printed %d times for 20 calls" % len(said), len(said) == 6 and "CLR flags=0x1, machine=0x14c" in said[0])
+
+# ---- Part B2: the production switch function against the production bcd.cfg reader
+swcode = r"""
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "madeira_cfg.h"
+""" + sw + r"""
+int main(void) { printf("%d\n", ios_ilonly_wow64_enabled()); return 0; }
+"""
+with tempfile.TemporaryDirectory() as tmp:
+    t = Path(tmp)
+    c = t / "sw.c"; exe = t / "sw"; c.write_text(swcode)
+    r = subprocess.run(["cc", "-std=gnu11", "-O1", "-g", "-I", str(root / "build"), "-Werror=implicit-function-declaration",
+                        str(c), "-o", str(exe)], capture_output=True, text=True)
+    check("the production switch function compiles with the production bcd.cfg reader" +
+          ("" if r.returncode == 0 else ": " + r.stderr[-400:]), r.returncode == 0)
+    if r.returncode == 0:
+        docs = t / "docs"; docs.mkdir()
+        game = t / "game.cfg"
+
+        def answer(cfg, env=None, gamecfg=None):
+            (docs / "bcd.cfg").unlink(missing_ok=True)
+            if cfg is not None:
+                (docs / "bcd.cfg").write_text(cfg)
+            if gamecfg is not None:
+                game.write_text(gamecfg)
+            e = {k: v for k, v in os.environ.items() if not k.startswith("MADEIRA_")}
+            e["MADEIRA_DOCS_DIR"] = str(docs)
+            if env is not None:
+                e["MADEIRA_ILONLY_WOW64"] = env
+            if gamecfg is not None:
+                e["MADEIRA_CFG_GAME"] = str(game)
+            return subprocess.run([str(exe)], capture_output=True, text=True, env=e).stdout.strip()
+
+        check("nothing set: on (the round 579 behaviour stays the default)", answer(None) == "1")
+        check("bcd.cfg without the key: on", answer("swap-mb = 1024\n") == "1")
+        check("env.MADEIRA_ILONLY_WOW64 = 0 in bcd.cfg: off", answer("env.MADEIRA_ILONLY_WOW64 = 0\n") == "0")
+        check("env.MADEIRA_ILONLY_WOW64 = 1 in bcd.cfg: on", answer("env.MADEIRA_ILONLY_WOW64 = 1\n") == "1")
+        check("the process environment alone: 0 is off", answer(None, env="0") == "0")
+        check("the process environment alone: anything but 0 is on", all(answer(None, env=v) == "1" for v in ("1", "", "00", "no")))
+        check("a game's own file wins over bcd.cfg (off in the game file)", answer("env.MADEIRA_ILONLY_WOW64 = 1\n", gamecfg="env.MADEIRA_ILONLY_WOW64 = 0\n") == "0")
+        check("a game's own file wins over bcd.cfg (on in the game file)", answer("env.MADEIRA_ILONLY_WOW64 = 0\n", gamecfg="env.MADEIRA_ILONLY_WOW64 = 1\n") == "1")
 
 # ---- Part C: workflow, auto-tune, fixture
 wf = (root / ".github/workflows/build-ipa.yml").read_text()

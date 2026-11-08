@@ -124,6 +124,16 @@ ZMP=""
 if [ "${MADEIRA_ZMP_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/kernelbase/process.c" ] && [ -f "$SHIP/kernelbase.dll" ]; then
     ZMP=kernelbase
 fi
+# madeira-bcd (OpenGL, gl-backend = zink or gles): opengl32-optin.dll is Wine's opengl32 built from this tree as it is pinned. The Wine fork builds
+# opengl32 with the default image base for everything but x86 (dlls/opengl32/Makefile.in; the shipped arm64ec-windows/opengl32.dll is based at
+# 0x7a800000, an emulated sub-floor window where its thunks lose the TEB). Only a game whose gl-backend key is on runs it: WineProcessBridge.m
+# adds opengl32 to MADEIRA_OPTIN_DLLS and links it as opengl32.dll for that session; every other game keeps the shipped file byte for byte. Built
+# only from a tree that has the fork's change (unix_private.h's ios_wow_host_ptr) and no uncommitted opengl32 edit; verified by
+# tools/verify-opengl32-optin.py before it ships. MADEIRA_OPENGL32_BUILD=0 skips it.
+OGL=""
+if [ "${MADEIRA_OPENGL32_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/opengl32/unix_wgl.c" ] && [ -f "$SHIP/opengl32.dll" ]; then
+    OGL=opengl32
+fi
 # madeira-bcd: a new file too. wer-optin.dll is Wine's own, unpatched wer.dll (Hello Neighbor's
 # UE4 executable imports it and exited at once with 0xc0000135, a tester's log, build 573). It is
 # NOT shipped as wer.dll: Wine's wer.dll has 68 unimplemented exports, so a program that loads
@@ -223,7 +233,7 @@ DCO=""
 if [ "${MADEIRA_DCOMP_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/dcomp/device.c" ] && [ -f "$SHIP/dcomp.dll" ]; then
     DCO=dcomp
 fi
-[ -n "$todo$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO" ] || { echo "nothing to build"; exit 0; }
+[ -n "$todo$OGL$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO" ] || { echo "nothing to build"; exit 0; }
 
 # The cached tree may have disabled winegstreamer because macOS has no
 # GStreamer headers. Only its real PE frontend is needed here; the iOS unix
@@ -381,6 +391,42 @@ if [ -n "$ZMP" ]; then
         echo "::warning::wine/dlls/kernelbase differs from the pin; kernelbase-optin.dll not built"
     fi
     rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
+fi
+# madeira-bcd (OpenGL): opengl32-optin.dll (see OGL above), from the restored tree. Only from an opengl32 the pin left as it is and that has the
+# fork's change; stripped like the kernelbase variant and padded to at least SizeOfImage + 0x10000 like the other extra DLLs; verified (the
+# shipped DLL's machine and exports, not based at 0x7a800000) before it ships. Its delay import of glu32 stays, as in the shipped file. The
+# objects are removed afterwards (wine/build-arm64ec is cached).
+if [ -n "$OGL" ]; then
+    og="$B/dlls/opengl32/arm64ec-windows/opengl32.dll"
+    og_tmp="$SHIP/opengl32-optin.dll.tmp"
+    if git -C "$R/wine" diff --quiet -- dlls/opengl32 && grep -q "ios_wow_host_ptr" "$R/wine/dlls/opengl32/unix_private.h"; then
+        rm -f "$og" "$B"/dlls/opengl32/arm64ec-windows/*.o
+        make -C "$B" -j"$JOBS" dlls/opengl32/arm64ec-windows/opengl32.dll > "$B.opengl32.log" 2>&1
+        if [ -f "$og" ] && cp "$og" "$og_tmp" && "$MINGW/arm64ec-w64-mingw32-strip" --strip-debug "$og_tmp"; then
+            python3 - "$og_tmp" <<'PY'
+import struct, sys
+p = sys.argv[1]; d = open(p, 'rb').read()
+pe = struct.unpack_from('<I', d, 0x3c)[0]
+target = struct.unpack_from('<I', d, pe + 24 + 56)[0] + 0x10000
+if len(d) < target:
+    open(p, 'ab').write(b'\0' * (target - len(d)))
+PY
+            if python3 "$R/tools/verify-opengl32-optin.py" "$og_tmp" "$SHIP/opengl32.dll"; then
+                mv "$og_tmp" "$SHIP/opengl32-optin.dll"
+                echo "::notice::opengl32-optin.dll (the tree's opengl32 with the default image base; linked as opengl32.dll only for a game whose gl-backend key is on): built next to the shipped opengl32.dll"
+            else
+                rm -f "$og_tmp"
+                echo "::warning::opengl32-optin.dll failed its check; not shipped (gl-backend = zink or gles then cannot work for a 64-bit game)"
+            fi
+        else
+            rm -f "$og_tmp"
+            echo "::warning::opengl32-optin.dll did not build; gl-backend = zink or gles cannot work for a 64-bit game"
+            grep -m 10 "error" "$B.opengl32.log"
+        fi
+    else
+        echo "::warning::wine/dlls/opengl32 differs from the pin or lacks the fork's winios change; opengl32-optin.dll not built"
+    fi
+    rm -f "$og" "$B"/dlls/opengl32/arm64ec-windows/*.o
 fi
 # madeira-bcd: setupapi-optin.dll (see SDL above), from the restored tree. Stripped the way
 # build/wine-pe/build-modules.sh strips the shipped one (--strip-debug), padded to at least SizeOfImage

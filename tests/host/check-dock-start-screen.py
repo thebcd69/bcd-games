@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2026 125hz
 # Madeira Converter Exception: see LICENSE-EXCEPTION.md
+# Portions copyright 2026 125hz and NevesHenry: code taken from https://github.com/willfaust/Madeira (pull requests #243 and #398)
+# under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 """The starting screen of a Madeira Dock start (app/Madeira/DockStartScreen.swift), on the host.
 
 1. Swift: compiles the production rules (SteamLaunchScene, SteamLaunchHold,

@@ -43,6 +43,9 @@ private enum BCDLiveKey {
     static let memoryPool = "mempool-mb"
     static let swapCoverage = "env.MADEIRA_SWAP_COVERAGE"
     static let eco = "eco"
+    static let backgroundRun = "background-run"                // BackgroundRun.swift: minutes; absent = 0 = off
+    static let backgroundDownload = "background-download"      // minutes; absent = off
+    static let backgroundSound = "background-sound"            // "1" = the game stays audible; absent = muted
     static let desktopSize = "desktop-size"
     static let frameCap = "env.MADEIRA_FPS_CAP"
     static let promote = "env.MADEIRA_PROMOTE"
@@ -63,6 +66,9 @@ private enum BCDLiveKey {
 @MainActor final class BCDMemoryLive: BCDMemoryBackend {
     @Published private(set) var status = BCDMemoryLive.measure()
     @Published private(set) var eco = false
+    @Published private(set) var backgroundGame = ""
+    @Published private(set) var backgroundDownload = ""
+    @Published private(set) var backgroundSound = false
     @Published private(set) var restartNeeded = false
     @Published private(set) var extensionTestRunning = false
     @Published private(set) var extensionTestLine: String?
@@ -122,6 +128,15 @@ private enum BCDLiveKey {
         out[.syncEngine] = SyncEngine.current.rawValue
         values = out
         eco = MadeiraConfig.bool(BCDLiveKey.eco, default: false)
+        backgroundGame = Self.minutes(MadeiraConfig.get(BCDLiveKey.backgroundRun))
+        backgroundDownload = Self.minutes(MadeiraConfig.get(BCDLiveKey.backgroundDownload))
+        backgroundSound = MadeiraConfig.get(BCDLiveKey.backgroundSound) == "1"
+    }
+
+    /// bcd.cfg's minutes as the rows show them: "" for none, 0 or something that is not a number (BackgroundRun reads those as off).
+    private static func minutes(_ raw: String?) -> String {
+        guard let raw, let m = Double(raw), m > 0 else { return "" }
+        return m == m.rounded() ? String(Int(m)) : raw
     }
 
     func choices(_ key: BCDMemoryKey) -> [String] {
@@ -162,6 +177,25 @@ private enum BCDLiveKey {
         MadeiraConfig.set(BCDLiveKey.eco, on ? "1" : nil)
         LogStore.shared.log("[runtime-settings] eco=\(on ? 1 : 0)")
         restartNeeded = true
+        read()
+    }
+
+    /// In the background (BackgroundRun.swift): BackgroundRun reads these keys each time BCD is left, so no restart. The default, off, is no line.
+    func setBackgroundGame(_ minutes: String) {
+        MadeiraConfig.set(BCDLiveKey.backgroundRun, Self.minutes(minutes).isEmpty ? nil : Self.minutes(minutes))
+        LogStore.shared.log("[runtime-settings] background-run=\(Self.minutes(minutes).isEmpty ? "off" : Self.minutes(minutes))")
+        read()
+    }
+
+    func setBackgroundDownload(_ minutes: String) {
+        MadeiraConfig.set(BCDLiveKey.backgroundDownload, Self.minutes(minutes).isEmpty ? nil : Self.minutes(minutes))
+        LogStore.shared.log("[runtime-settings] background-download=\(Self.minutes(minutes).isEmpty ? "off" : Self.minutes(minutes))")
+        read()
+    }
+
+    func setBackgroundSound(_ on: Bool) {
+        MadeiraConfig.set(BCDLiveKey.backgroundSound, on ? "1" : nil)
+        LogStore.shared.log("[runtime-settings] background-sound=\(on ? 1 : 0)")
         read()
     }
 
@@ -1160,6 +1194,11 @@ struct BCDLiveSwitch {
         "MIT-fmt.txt": "fmt · MIT license",
         "MIT-libxml2.txt": "libxml2 · MIT license",
         "MIT-libxslt.txt": "libxslt · MIT license",
+        // OpenGL (build 632): the licenses build/mesa-ios, build/moltenvk-ios and build/luajit-x64 copy into the bundle.
+        "MIT-Mesa.txt": "Mesa · MIT license", "Mesa-license.rst": "Mesa · the licenses of its parts",
+        "MoltenVK-Apache-2.0.txt": "MoltenVK · Apache 2.0 license", "SPIRV-Cross-Apache-2.0.txt": "SPIRV-Cross · Apache 2.0 license",
+        "SPIRV-Tools-Apache-2.0.txt": "SPIRV-Tools · Apache 2.0 license", "cereal-BSD-3-Clause.txt": "cereal · BSD 3-clause license",
+        "LuaJIT-MIT.txt": "LuaJIT · MIT license",
     ]
 }
 
