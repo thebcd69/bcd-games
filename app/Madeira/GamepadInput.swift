@@ -138,7 +138,9 @@ final class GamepadInput: @unchecked Sendable {
         setenv("MADEIRA_HIDPAD", kind, 1)
         if kind == "generic", let name = first?.vendorName { setenv("MADEIRA_HIDPAD_NAME", name, 1) }
         Self.sessionHIDKind = kind
-        let keepXInput = Self.optIn("MADEIRA_HIDPAD_XINPUT")
+        // The game's own file as well, as the mode above and MADEIRA_PAD_EARLY_SLOT (round 630): its env lines reach the process
+        // environment only after this runs.
+        let keepXInput = MadeiraConfig.gameValue("env.MADEIRA_HIDPAD_XINPUT") == "1" || Self.optIn("MADEIRA_HIDPAD_XINPUT")
         queue.async { [self] in hidActive = true; hidKeepsXInput = keepXInput; sample() }
         LogStore.shared.log("[hid-pad] ml2100 session mode=\(mode.value) source=\(mode.source) kind=\(kind) "
                             + "pad=\(first?.productCategory ?? "none") xinput-slot0=\(keepXInput ? "kept" : "off")")

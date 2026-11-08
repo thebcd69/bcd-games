@@ -1395,7 +1395,8 @@ OVERLAY = {
     "env.MADEIRA_HIDPAD_XINPUT": {"category": "Controllers", "title": "HID mode: keep player 1 on XInput too", "kind": "bool",
                 "default": "0",
                 "note": "1: with the HID controller on, player 1 also stays an XInput pad. Off by default, so a game "
-                        "that reads both APIs does not see the same pad twice.",
+                        "that reads both APIs does not see the same pad twice. Read from the game's own file, bcd.cfg "
+                        "or the environment when the session starts.",
                 "sources": ["app/Madeira/GamepadInput.swift"]},
     # ml2106: game output to the physical pad (app/Madeira/PadOutput.m).
     "env.MADEIRA_PAD_OUTPUT": {"category": "Controllers", "title": "Rumble, adaptive triggers and lightbar to the pad",

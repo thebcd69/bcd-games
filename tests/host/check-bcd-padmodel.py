@@ -56,6 +56,9 @@ check(project.count("/* BCDPadModel.swift in Sources */") == 2 and project.count
 begin = func(gamepad, "@MainActor func beginPadSession()")
 check('["hid", "dualsense", "generic"].contains(mode.value)' in begin, "GamepadInput accepts the modes it always did: hid, dualsense, generic (and no ds4)")
 check('"ds4"' not in code(gamepad), "... and does not name a DualShock 4")
+check('MadeiraConfig.gameValue("env.MADEIRA_HIDPAD_XINPUT") == "1" || Self.optIn("MADEIRA_HIDPAD_XINPUT")' in begin,
+      "HID mode's keep-XInput switch is also read from the game's own file, as the mode and MADEIRA_PAD_EARLY_SLOT are (the "
+      "game's env lines reach the environment only after the session's controller path is chosen)")
 served = "static let dualShockServed = true" in model
 check(served == ('"ds4"' in ids), "DualShock 4 is offered exactly when the wineserver's identity table has one (it has none: " + ("served" if served else "not served") + ")")
 check("static let dualShockServed = false" in model, "this build serves no DualShock 4")
