@@ -1363,9 +1363,12 @@ OVERLAY = {
     "env.MADEIRA_PAD_MODE": {"category": "Controllers", "title": "Controller API (player 1)", "kind": "choice",
                 "note": "XInput (default): every controller is an Xbox pad. hid: player 1 becomes a HID game controller, "
                         "a DualSense (054C:0CE6) when it is a PlayStation pad, else a generic HID gamepad, and leaves "
-                        "XInput. dualsense/generic force the identity. Read at session start; the game's own file wins.",
-                "choices": [("", "XInput (default)"), ("hid", "DirectInput / HID"), ("dualsense", "HID, always a DualSense"),
-                            ("generic", "HID, always a generic gamepad")],
+                        "XInput. dualsense/generic force the identity. xbox360: player 1 stays on XInput and is also the "
+                        "HID device Windows lists beside a wired Xbox 360 controller (045E:028E, IG_00), for games that "
+                        "look for one among the devices before they read XInput (Far Cry 4). Read at session start; the "
+                        "game's own file wins.",
+                "choices": [("", "XInput (default)"), ("xbox360", "XInput + Xbox 360 device"), ("hid", "DirectInput / HID"),
+                            ("dualsense", "HID, always a DualSense"), ("generic", "HID, always a generic gamepad")],
                 "sources": ["app/Madeira/GamepadInput.swift"]},
     # madeira-bcd (2026-10-18): hardware mouse and keyboard (app/Madeira/HardwareInput.swift,
     # docs/KEYBOARD_MOUSE.md); read through HardwareInput.sessionValue, so a game's own lines set them.
@@ -1388,7 +1391,7 @@ OVERLAY = {
                         "until it is released (a held Backspace in a game's chat). The game's own file wins.",
                 "sources": ["app/Madeira/HardwareInput.swift"]},
     "env.MADEIRA_HIDPAD": {"category": "Controllers",
-                "note": "Set by the app at session start from env.MADEIRA_PAD_MODE (dualsense or generic) for the "
+                "note": "Set by the app at session start from env.MADEIRA_PAD_MODE (dualsense, generic or xbox360) for the "
                         "wineserver and ntdll; not meant to be set by hand."},
     "env.MADEIRA_HIDPAD_NAME": {"category": "Controllers",
                 "note": "Set by the app: the product string a generic HID gamepad reports (the physical pad's name)."},

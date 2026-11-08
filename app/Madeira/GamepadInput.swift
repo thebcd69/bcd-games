@@ -70,9 +70,12 @@ final class GamepadInput: @unchecked Sendable {
     /// default). "hid": player 1 becomes a HID game controller served by the
     /// wineserver (build/wineserver/hidpad_ios.c) -- a DualSense when the pad
     /// is a PlayStation one, a generic HID gamepad otherwise -- and leaves
-    /// XInput. "dualsense" / "generic" force that identity. Read once, at
-    /// session start (beginPadSession): the device exists before the game
-    /// enumerates, so a change applies at the game's next start.
+    /// XInput. "dualsense" / "generic" force that identity. "xbox360": player 1
+    /// stays on XInput and is also the HID device Windows lists beside a wired
+    /// Xbox 360 controller (045E:028E, IG_00), for games that look for an Xbox
+    /// controller among the devices before they read XInput (Far Cry 4). Read
+    /// once, at session start (beginPadSession): the device exists before the
+    /// game enumerates, so a change applies at the game's next start.
     static let padModeKey = "env.MADEIRA_PAD_MODE"
     static func configuredPadMode() -> (value: String, source: String) {
         if let v = MadeiraConfig.gameValue(padModeKey) { return (v.lowercased(), "game") }
@@ -116,7 +119,7 @@ final class GamepadInput: @unchecked Sendable {
         // An earlier session in this app run may have taken player 1 off XInput.
         queue.async { [self] in hidActive = false; hidKeepsXInput = false }
         Self.sessionHIDKind = nil
-        guard ["hid", "dualsense", "generic"].contains(mode.value) else {
+        guard ["hid", "dualsense", "generic", "xbox360"].contains(mode.value) else {
             LogStore.shared.log("[hid-pad] ml2100 session mode=xinput source=\(mode.source)")
             beginPadOutput(xinput: output.xinput && Self.enabled, hid: false, value: output.value)
             return
@@ -131,20 +134,21 @@ final class GamepadInput: @unchecked Sendable {
         let sony = first?.extendedGamepad is GCDualSenseGamepad || first?.extendedGamepad is GCDualShockGamepad
         let kind: String
         switch mode.value {
-        case "dualsense", "generic": kind = mode.value
+        case "dualsense", "generic", "xbox360": kind = mode.value
         // No pad yet: a DualSense, the identity this mode exists for.
         default: kind = first == nil || sony ? "dualsense" : "generic"
         }
         setenv("MADEIRA_HIDPAD", kind, 1)
         if kind == "generic", let name = first?.vendorName { setenv("MADEIRA_HIDPAD_NAME", name, 1) }
         Self.sessionHIDKind = kind
-        // The game's own file as well, as the mode above and MADEIRA_PAD_EARLY_SLOT (round 630): its env lines reach the process
+        // The Xbox 360 identity is the device beside an XInput pad: player 1 stays on XInput, as on Windows. For the others the
+        // game's own file as well, as the mode above and MADEIRA_PAD_EARLY_SLOT (round 630): its env lines reach the process
         // environment only after this runs.
-        let keepXInput = MadeiraConfig.gameValue("env.MADEIRA_HIDPAD_XINPUT") == "1" || Self.optIn("MADEIRA_HIDPAD_XINPUT")
+        let keepXInput = kind == "xbox360" || MadeiraConfig.gameValue("env.MADEIRA_HIDPAD_XINPUT") == "1" || Self.optIn("MADEIRA_HIDPAD_XINPUT")
         queue.async { [self] in hidActive = true; hidKeepsXInput = keepXInput; sample() }
         LogStore.shared.log("[hid-pad] ml2100 session mode=\(mode.value) source=\(mode.source) kind=\(kind) "
                             + "pad=\(first?.productCategory ?? "none") xinput-slot0=\(keepXInput ? "kept" : "off")")
-        // Only the DualSense identity has output reports (the generic pad has none).
+        // Only the DualSense identity has output reports (the generic and Xbox 360 pads have none).
         beginPadOutput(xinput: output.xinput, hid: output.hid && kind == "dualsense", value: output.value)
     }
 
@@ -502,7 +506,8 @@ final class GamepadInput: @unchecked Sendable {
             if hid {
                 publishHID(state, live: hidLive, pad: pad)
                 // One controller, one API: player 1 is not also an XInput pad,
-                // as a DualSense on Windows is not (MADEIRA_HIDPAD_XINPUT=1 keeps both).
+                // as a DualSense on Windows is not (MADEIRA_HIDPAD_XINPUT=1 keeps both;
+                // the Xbox 360 identity always does, as a 360 pad on Windows is both).
                 if !hidKeepsXInput {
                     winios_gamepad_set_state(Int32(i), nil)
                     continue

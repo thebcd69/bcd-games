@@ -760,7 +760,7 @@ struct BCDSessionLiveLayer: View {
         let session = GamepadInput.sessionHIDKind
         switch mode {
         case "hid": return session != nil
-        case "dualsense", "generic": return session == mode
+        case "dualsense", "generic", "xbox360": return session == mode
         default: return session == nil
         }
     }
@@ -781,12 +781,15 @@ struct BCDSessionLiveLayer: View {
         switch GamepadInput.sessionHIDKind ?? "" {
         case "dualsense": session = "a DualSense (HID)"
         case "generic": session = "a HID gamepad"
+        case "xbox360": session = "an XInput pad that is also listed as an Xbox 360 controller"
         default: session = "an XInput pad"
         }
         return "This session shows player 1 as \(session). A game looks for its controllers when it starts, so a change "
             + "applies from its next start. The Xbox controller (XInput) is what almost every game knows; a 360 and an One are the same to it. "
             + "DualSense shows Sony's PC games the controller they look for, Generic gamepad is what DirectInput games list, and The controller "
             + "itself is a DualSense when the paired one is and a generic gamepad otherwise; a game that reads only XInput then sees no controller. "
+            + "Xbox 360 controller keeps the XInput pad and adds the device Windows lists for one, for a game that shows no controller under the "
+            + "Xbox choice although it supports one (Far Cry 4). "
             // Round 630 (agent T1 S7; GTA V Legacy D3QR11 on Generic gamepad: touch and buttons did nothing). Text only.
             + "If the buttons do nothing in a game, choose the Xbox controller (XInput)."
     }

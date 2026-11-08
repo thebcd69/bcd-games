@@ -103,6 +103,7 @@ extension BCDSettingsBackends {
     var nextLayoutName: String { "Custom Layout 2" }
     var restartNeeded: Bool { false }
     let controllerAPIChoices = [BCDSettingsChoice(value: "", label: "XInput (default)"),
+                                BCDSettingsChoice(value: "xbox360", label: "XInput + Xbox 360 device"),
                                 BCDSettingsChoice(value: "hid", label: "DirectInput / HID"),
                                 BCDSettingsChoice(value: "dualsense", label: "HID, always a DualSense"),
                                 BCDSettingsChoice(value: "generic", label: "HID, always a generic gamepad")]

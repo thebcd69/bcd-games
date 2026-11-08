@@ -554,8 +554,8 @@ struct BCDControlsSettings<Backend: BCDControlsBackend>: View {
     /// Settings' own words for the engine's controller choices, by value (the engine's label
     /// stays for a value Settings does not know).
     private static var apiWords: [String: String] {
-        ["": "Xbox controller (standard)", "hid": "HID: DualSense or plain pad", "dualsense": "Always a DualSense",
-         "generic": "Always a plain gamepad"]
+        ["": "Xbox controller (standard)", "xbox360": "Xbox 360, also as a device", "hid": "HID: DualSense or plain pad",
+         "dualsense": "Always a DualSense", "generic": "Always a plain gamepad"]
     }
     private static var outputWords: [String: String] {
         ["": "All of it (standard)", "hid": "DualSense effects only", "xinput": "Rumble only", "0": "Nothing"]
