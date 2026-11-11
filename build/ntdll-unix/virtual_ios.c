@@ -33423,8 +33423,9 @@ NTSTATUS virtual_uninterrupted_write_memory( void *addr, const void *buffer, SIZ
  * the instruction cache (which is what tells the emulator) and restores the protection.
  *
  * What may be written (ios_self_write_in_reach): a 32-bit program, inside its own window; a 64-bit program, inside one image
- * view (the hooked code) or inside its own hook zone (env.MADEIRA_X64_HOOK_ZONE, the trampoline). A 64-bit process's other
- * memory has no owner here (every pseudo-process shares one address space), so a write there still goes to the server.
+ * view (the hooked code), inside its own hook zone (env.MADEIRA_X64_HOOK_ZONE, the trampoline), or inside a private VirtualAlloc
+ * view tagged with its PEB. The last case is checked again under virtual_mutex before each page is written: a freed view may
+ * have been replaced by another process's allocation since the initial range check. Other memory still goes to the server.
  *
  * Page by page (4 KB, so a piece lies in one host page): the source is read first, with no lock held and without faulting;
  * then, under virtual_mutex:
@@ -33464,7 +33465,20 @@ static void ios_self_write_note_protect( const char *base, SIZE_T size, ULONG pr
     }
 }
 
-static SIZE_T ios_self_write( char *dst, const char *src, SIZE_T size, unsigned *paths )
+/* virtual_mutex held. A complete private allocation, never a section, placeholder, system or unknown-owner view. */
+static int ios_self_write_private_view( const char *addr, SIZE_T size )
+{
+    const void *owner = ios_jit_current_peb();
+    struct file_view *view;
+
+    if (!owner || !size || size > ~(ULONG_PTR)0 - (ULONG_PTR)addr) return 0;
+    view = find_view( addr, size );
+    return view && view->ios_owner == owner && is_view_valloc( view ) &&
+           !(view->protect & (SEC_IMAGE | VPROT_SYSTEM | VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER)) &&
+           !(view->ios_flags & IOS_VIEW_QUARANTINED);
+}
+
+static SIZE_T ios_self_write( char *dst, const char *src, SIZE_T size, unsigned *paths, BOOL private_view )
 {
     ULONG_PTR grant_begin = ios_self_write_grant.begin, grant_end = ios_self_write_grant.end;
     char stage[0x1000];   /* one page */
@@ -33488,8 +33502,9 @@ static SIZE_T ios_self_write( char *dst, const char *src, SIZE_T size, unsigned 
         server_enter_uninterrupted_section( &virtual_mutex, &sigset );
         vprot = get_page_vprot( at );
         writable = (get_unix_prot( vprot & ~VPROT_WRITEWATCH ) & PROT_WRITE) != 0;
-        if (writable || ((vprot & 0x7f) == (VPROT_COMMITTED | VPROT_READ | VPROT_EXEC) &&
-                         (ULONG_PTR)at >= grant_begin && (ULONG_PTR)at + len <= grant_end))
+        if ((!private_view || ios_self_write_private_view( at, len )) &&
+            (writable || ((vprot & 0x7f) == (VPROT_COMMITTED | VPROT_READ | VPROT_EXEC) &&
+                          (ULONG_PTR)at >= grant_begin && (ULONG_PTR)at + len <= grant_end)))
         {
             if (!check_write_access( at, len, &watch ))
             {
@@ -33540,8 +33555,9 @@ static void ios_self_write_log( const char *dst, SIZE_T size, SIZE_T done, unsig
              (paths & 4) ? " protect-record" : "", stop );
 }
 
-/* Whether [addr, addr + size) may be written by the calling program here (see ios_self_write). A window is 4 GB and
- * contiguous, so a range of at most that size whose two ends lie outside every window misses every window. */
+/* Whether [addr, addr + size) may be written by the calling program here (see ios_self_write). 2 means a private view whose
+ * ownership must be rechecked per page; 1 is the existing image/window/zone path. A window is 4 GB and contiguous, so a range
+ * of at most that size whose two ends lie outside every window misses every window. */
 static int ios_self_write_in_reach( const char *addr, SIZE_T size )
 {
     struct file_view *view;
@@ -33553,6 +33569,7 @@ static int ios_self_write_in_reach( const char *addr, SIZE_T size )
         return 0;
     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
     own = ios_hook_zone_holds( addr, size ) || ((view = find_view( addr, size )) && (view->protect & SEC_IMAGE));
+    if (!own && ios_self_write_private_view( addr, size )) own = 2;
     server_leave_uninterrupted_section( &virtual_mutex, &sigset );
     return own;
 }
@@ -43621,13 +43638,15 @@ NTSTATUS WINAPI NtWriteVirtualMemory( HANDLE process, void *addr, const void *bu
 {
     unsigned int status;
 #ifdef WINE_IOS
+    int reach;
+
     /* madeira-bcd: a program's write into its own memory (ios_self_write). The pseudo-handle only, like
      * NtReadVirtualMemory's branch above. A write that stops at its first page takes the server request below. */
     if (process == NtCurrentProcess() && size && ios_self_write_enabled() &&
-        (ULONG_PTR)addr + size - 1 >= (ULONG_PTR)addr && ios_self_write_in_reach( addr, size ))
+        (ULONG_PTR)addr + size - 1 >= (ULONG_PTR)addr && (reach = ios_self_write_in_reach( addr, size )))
     {
         unsigned paths;
-        SIZE_T done = ios_self_write( addr, buffer, size, &paths );
+        SIZE_T done = ios_self_write( addr, buffer, size, &paths, reach == 2 );
 
         ios_self_write_log( addr, size, done, paths );
         if (done)
