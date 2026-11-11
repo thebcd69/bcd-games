@@ -91,7 +91,9 @@ check("and it runs before the session is torn down (the entry and the start time
       finish.index("GameSaveAuto.sessionEnded") < finish.index("current = nil; activeEntry = nil"))
 check("only the hook and the section appear in the older files (no other file names GameSave*)",
       all("GameSave" not in read(f) for f in APP.glob("*.swift")
-          if f.name not in ("BCDGameSaves.swift",) and f.name not in ("Library.swift", "BCDGamePageLive.swift", "BCDGamePageLiveSaves.swift")))
+          if f.name not in ("BCDGameSaves.swift",) and f.name not in ("Library.swift", "BCDGamePageLive.swift", "BCDGamePageLiveSaves.swift",
+                                                                 # BCDGameRekey (build 635): a game that moves keeps its record
+                                                                 "LibraryBCD.swift")))
 
 # The promises.
 check("the automatic backup is off unless the player turns it on", "var automatic = false" in work and 'value: s.automatic ? "1" : "0", defaultValue: "0"' in ui)

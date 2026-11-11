@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """BCD's Settings (app/Madeira/BCDSettings*.swift, docs/BCD-UI-ARCHITECTURE.md).
 
   1. Every Settings file carries BCD's three licence lines.
@@ -179,9 +181,9 @@ func check(_ cond: Bool, _ what: String) {
 typealias N = BCDSettingsNavigator
 let all = BCDSettingsSection.allCases
 let list = BCDSettingsID.list
-check(all.count == 16 && all.last == .about && all[all.count - 2] == .updates && all.contains(.developer)
+check(all.count == 17 && all.last == .about && all[all.count - 2] == .updates && all.contains(.developer)
       && all.firstIndex(of: .gecko) == all.firstIndex(of: .vcruntime)! + 1,
-      "sixteen sections (Developer among them, the HTML engine for installers right after Visual C++), Updates then About last")
+      "seventeen sections (Appearance after Graphics, Developer among them, the HTML engine for installers right after Visual C++), Updates then About last")
 check(all.firstIndex(of: .feedback) == all.firstIndex(of: .logs)! + 1 && BCDSettingsSection.feedback.title == "Feedback"
       && BCDSettingsSection(name: "feedback") == .feedback && !BCDSettingsSection.feedback.placeholder,
       "Feedback is a section of its own, right after Logs")
@@ -250,6 +252,17 @@ for s in all {
     check(page.move(.down, from: list(s)) == .focus(first), "upright: a ring left on the list comes to the page")
     page.pushed = false
     check(page.back(from: list(s)) == .close, "upright: B on the list closes Settings")
+}
+
+// Persistent Settings has no modal Done control: no direction may lead to it.
+for mode in [N.Mode.split, .stacked] {
+    let native = N(mode: mode, selected: .accounts, hasDone: false)
+    check(native.move(.up, from: list(.accounts)) == .stay,
+          "native Settings: Up at the first section stays on a visible target")
+    var detail = native
+    detail.pushed = true
+    check(detail.move(.right, from: BCDSettingsID.back) == .stay,
+          "native Settings: Right from Back never targets removed Done")
 }
 
 // The words.
@@ -500,12 +513,18 @@ check(not [t for t in shown_text if re.search(r"page|absoluteString|html_url|htt
       "updates: no address is drawn as text; Go to update opens the page")
 check("if checker.showsChip" in chip and "var showsChip: Bool { autoCheck && state == .updateAvailable }" in updates
       and 'Text("Update available")' in chip, "updates: the chip shows only while checking automatically and a newer release exists")
-chips = block(front, "private var statusChips: some View")
-check("BCDUpdateChip { settingsSection = .updates; showSettings = true }" in chips
-      and "section: settingsSection" in front, "updates: the chip sits with the JIT chip and opens Settings at Updates")
+chips = block(front, "private func page(_ item: BCDDuoTab) -> some View")
+check("BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }" in chips
+      and "section: settingsSection" in front, "updates: the native toolbar keeps the update action and opens Settings at Updates")
 check('Label("Go to update"' in updates_view and "checker.checkNow()" in updates_view and "checker.autoCheck = $0" in updates_view
       and "model.go(to: .updates)" in views["BCDSettingsAbout.swift"],
       "updates: Go to update, Check for updates and Check automatically in Settings, reachable from About")
+# Native presentation must register the IDs that the compiled navigator returns.
+check('horizontal == .compact || geometry.size.width < 700 ? .stacked : .split' in root,
+      "native split navigation collapses by width, including compact landscape")
+check('.bcdFocusable(BCDSettingsID.back, cornerRadius: 22, action: model.leaveToList)' in root
+      and 'ToolbarItem(placement: .topBarLeading) { backButton }' in root,
+      "compact detail registers the navigator's Back target as a native toolbar action")
 # ---- 11. every classic function has a place ---------------------------------------------
 COVERED = [  # (the classic function, where it is now, the code that does it)
     ("Extended logging", "Logs", "input.diagnostics = on"),

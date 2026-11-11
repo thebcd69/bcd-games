@@ -298,7 +298,7 @@ if rule:
     sig = [s['has'] for s in rule[0]['all']]
     check('it keys on the crash PC inside the module, the missing TLS pointer and the non-TXM start-up line',
           ['[mach_exc] pc PE: libwow64fex.dll+'] in sig and ['[x86_seg]', 'TEB[0x58]=0x0'] in sig
-          and ['[jit-nodebug] debugger-less JIT pool: allowed'] in sig and 'none' not in rule[0])
+          and ['[jit-nodebug] debugger-less JIT pool: allowed'] in sig)   # night round 2026-11-11 (A5 S9): a 'none' keeps the pool-narrowing stop (KPX6DZ) out
 fixtures = sorted(p.name for p in (root / 'tests/fixtures/autotune').glob('*.expect')
                   if 'wow64-thread-map-uninitialised' in json.loads(p.read_text())['matched'])
 check('exactly one fixture, and it ends known', fixtures == ['half-life-2-2026-10-20.expect']

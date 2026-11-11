@@ -76,8 +76,8 @@ script = script[:script.index("\n    }\n")]
 check("guard usesLaunchOptions, wantsServicesBatch else { return nil }" in script
       and script.index('lines.append("start \\"\\" \\"C:\\\\windows\\\\system32\\\\services.exe\\"")') < script.index("if !setup.isEmpty { lines.append(setup) }") < script.index('lines.append(unicode ? "cd /d'),
       "the services batch: the installers go between the services.exe line and the cd line")
-check("private var wantsServicesBatch: Bool {\n        startServices == true || !(Self.gogSetup(for: id) ?? \"\").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty\n    }" in library
-      and library.count("wantsServicesBatch") == 3, "a batch is wanted by startServices as before, or by installers to run; nothing else changes")
+check("private var wantsServicesBatch: Bool {\n        startServices == true || wantsRockstarServices || !(Self.gogSetup(for: id) ?? \"\").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty\n    }" in library
+      and library.count("wantsServicesBatch") == 3, "a batch is wanted by startServices as before, by a keyed local Rockstar start (R1 S5), or by installers to run; nothing else changes")
 check("private static var gogSetup: [UUID: String] = [:]" in library and "never part of the saved entry" in library,
       "the installers are kept in memory (a static table), never in the saved entry")
 launch = (APP / "BCDGameSetup/BCDGameStartLaunch.swift").read_text()

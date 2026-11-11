@@ -4,6 +4,8 @@
 # Madeira Converter Exception: see LICENSE-EXCEPTION.md
 # Portions copyright 2026 ft7t8drgwf-wq and wamei: code taken from https://github.com/willfaust/Madeira (pull requests #381 and #490)
 # under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Host checks for the owned Steam library and downloads (docs/STEAM_LIBRARY.md).
 
 Never contacts Steam. It needs swiftc (Linux), cc, python3 with `cryptography`
@@ -124,6 +126,13 @@ for path in ['SteamOwnedLibrary.swift', 'SteamGames.swift', 'SteamInstall.swift'
         if path == 'SwiftSteam/Core/SteamSession.swift' and word == 'refreshToken':
             continue  # it logs on with the token SteamSignIn hands out
         if path == 'SteamGames.swift' and word == 'UserDefaults':
+            continue
+        if path == 'SteamOwnedLibrary.swift' and word == 'UserDefaults':
+            uses = [line.strip() for line in text.splitlines() if 'UserDefaults' in line]
+            require(uses == [
+                'private var targets: [Int: String] = (UserDefaults.standard.dictionary(forKey: "steam-install-targets") as? [String: String] ?? [:])',
+                'UserDefaults.standard.set(Dictionary(uniqueKeysWithValues: targets.map { (String($0.key), $0.value) }), forKey: Self.targetsKey)'],
+                'UserDefaults holds only install destinations, never sign-in tokens')
             continue
         require(word not in text, f'{path}: no {word} (sign-in tokens stay in SteamSignIn)')
 require('SteamSignIn.credentialsForDock()' in sources['SwiftSteam/Core/SteamSession.swift'],
@@ -630,6 +639,7 @@ size_t compression_decode_buffer(uint8_t *dst, size_t dst_size, const uint8_t *s
 DECODERS_H = '#include "{app}/SwiftSteam/lzma_shim.h"\n'
 
 STUBS = r'''
+enum ExternalDrives { static var steamLibraries: [String] { [] } }
 import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
@@ -651,6 +661,13 @@ enum MadeiraConfig {
     @discardableResult static func set(_ key: String, _ value: String?) -> Bool { configValues[key] = value; return true }
 }
 enum SteamRuntimeFiles {
+    // night round 2026-11-11 (W-DOCK M11): MadeiraDock.validate asks the client files' build; the stand-in calls every client supported
+    enum ClientStatus: Equatable { case missing, supported, unsupported(sha: String) }
+    static func clientStatus(drive: URL) -> ClientStatus {
+        FileManager.default.fileExists(atPath: drive.appendingPathComponent(relativeRoot).appendingPathComponent("steamclient64.dll").path) ? .supported : .missing
+    }
+    static let supportedClientSHA256: Set<String> = []
+    static func unsupportedClientWords(sha: String) -> String { "unsupported \(sha)" }
     static let relativeRoot = "RELATIVE_ROOT"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"
 }
@@ -1140,6 +1157,10 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     let raw = hexData(fx["rawEncrypted"] as! String)
     let decrypted = try ContentDecryptor.decryptChunk(encryptedData: raw, depotKey: key)
     require(decrypted == plainVector.prefix(1000), "AES: the IV is ECB-decrypted, the rest CBC with PKCS7")
+    for count in [0, 16, 17, raw.count - 1] {
+        do { _ = try ContentDecryptor.decryptChunk(encryptedData: Data(raw.prefix(count)), depotKey: key); require(false, "truncated AES payload rejected") }
+        catch { require(true, "truncated AES payload rejected") }
+    }
     do { _ = try ContentDecryptor.decryptChunk(encryptedData: raw, depotKey: Data(count: 16)); require(false, "a short depot key is rejected") }
     catch { require(error is SteamError, "a short depot key is rejected") }
     do { _ = try ContentDecryptor.decompressChunk(compressedData: Data("ZZZZ-not-a-container".utf8), expectedSize: 999); require(false, "an unknown container is rejected") }
@@ -1360,8 +1381,9 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
                 "a branch Steam no longer lists is compared with the public build")
     }
     if phase == "uninstall" {
-        SteamInstallFiles.delete(appID: 9000, folderName: "Fixture Game", steamApps: steamApps)
+        try SteamInstallFiles.delete(appID: 9000, folderName: "Fixture Game", steamApps: steamApps)
         require(MadeiraDock.games(drive: drive).isEmpty, "an uninstalled game is no longer found (its shared owner record went with it)")
+        require(!FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("appmanifest_9100.acf").path), "the shared owner record was removed")
         require(!FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("common/Fixture Game").path), "its folder is gone")
         require(FileManager.default.fileExists(atPath: steamApps.appendingPathComponent("common").path) , "the common folder stays")
     }
@@ -1472,11 +1494,10 @@ dock_body = (dock[dock.index('enum MadeiraDock {'):dock.index('    @MainActor pr
              dock[dock.index("    /// The host's environment for one launch."):])
 # URLSession lives in FoundationNetworking on Linux; the production file imports Foundation only.
 downloader_host = downloader.replace('import Foundation\n', 'import Foundation\n#if canImport(FoundationNetworking)\nimport FoundationNetworking\n#endif\n', 1)
-# The free-space query is Darwin's (volumeAvailableCapacityForImportantUsage); the host has none, so the check is skipped there.
-space = ('let values = try? installURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])\n'
-         '            let available = UInt64(max(0, values?.volumeAvailableCapacityForImportantUsage ?? Int64.max))')
-assert space in downloader_host
-downloader_host = downloader_host.replace(space, 'let available = UInt64.max')
+# Linux has no Darwin volume keys or statfs layout. Unknown capacity remains allowed.
+if sys.platform != 'darwin':
+    space = block(downloader_host, 'public var freeSpace: Int64?')
+    downloader_host = downloader_host.replace(space, 'public var freeSpace: Int64? { nil }\n')
 fetcher_source = sources['SwiftSteam/Library/SteamLibraryFetcher.swift']
 require('encoder.writeString(fieldNumber: 4, value: branch)' in downloader and 'branch: depot.hasOwnManifest(app.branch) ? app.branch : nil' in downloader
         and 'buildID: app.branchBuildID' in downloader and 'betaKey: app.branch' in downloader,
@@ -1529,7 +1550,7 @@ try:
                   steam / 'Core/SteamMessageCodec.swift', steam / 'Core/SteamCMSession.swift',
                   steam / 'Content/ContentDecryptor.swift', steam / 'Content/DepotManifest.swift', steam / 'Content/SteamLANPeer.swift',
                   steam / 'Library/SteamAppInfo.swift', steam / 'Library/SteamLibraryFetcher.swift',
-                  steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift',
+                  steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift', app / 'ExternalStorage.swift',
                   app / 'BCDSteamDLC/BCDSteamDLC.swift', app / 'BCDSteamDLC/BCDSteamDLCDownload.swift']   # the downloader's DLC steps (Foundation only)
     exe = work / 'check'
     build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-g', '-o', str(exe)] +

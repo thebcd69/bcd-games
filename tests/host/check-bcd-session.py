@@ -209,7 +209,7 @@ own = [w for w in ("controls.visible = ", "controls.editing = ", "presets.load("
 check(not own, "no touch-control rows of the menu's own beside BCD's touch section", ", ".join(own))
 session = block(live, "@MainActor final class BCDLiveSession: ObservableObject, BCDSessionHUDActions {")
 check("LibraryController.shared.configure(enabled: true, ownsInput: true)" in session
-      and "LibraryController.shared.configure(enabled: true, ownsInput: false)" in session
+      and "LibraryController.shared.configure(enabled: true, ownsInput: BCDDuoFeatures.active && (model.desktopHome || model.current == nil))" in session   # the pad is the game's after the menu, except at BCD Home of the native Duo interface
       and "if save { model.saveCurrentProfile() }" in session and "model.saveCurrentProfile()" in block(session, "func appeared() {"),
       "the menu takes the controller while open and saves the game's choices when it closes")
 command = block(session, "func command(_ name: String) {")

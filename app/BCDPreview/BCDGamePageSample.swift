@@ -122,6 +122,8 @@ import SwiftUI
                 choice("async-submit", "Direct3D 12 command encoding", "", [("", "On the game's thread"), ("1", "On a worker thread")]),
                 choice("fence-chain", "Direct3D 12 GPU sync", "", [("", "One pass after another"), ("6", "Where barriers allow")]),
                 choice(BCDOpenGL.key, "OpenGL", "", BCDOpenGL.choices, note: BCDOpenGL.pageNote),
+                toggle("vulkan", "Vulkan (experimental)",
+                       note: "For a 64-bit game that needs Vulkan (Detroit: Become Human): Wine's Vulkan on Metal (MoltenVK), drawn into the game's window. Off, the game finds no Vulkan driver, as before. Takes effect at the game's next start."),
                 toggle("nvidia", "Show the game an NVIDIA card", game.id == "271590",
                        note: "For games that stop with \"no graphics card\": Windows then reports an NVIDIA card and driver."),
             ]),

@@ -199,7 +199,9 @@ with tempfile.TemporaryDirectory() as tmp:
     src = Path(tmp) / "main.swift"
     src.write_text("import Foundation\nimport CryptoKit\n" + compare + "\n" + remote + "\n" + plan + "\n" + main.replace("import Foundation\n", "", 1))
     out = Path(tmp) / "remotecache"
-    build = subprocess.run([SWIFTC, "-O", str(src), "-o", str(out)], capture_output=True, text=True)
+    # SteamCloud.swift's paths check an external drive's folder (ExternalStorage.swift, which reads VDF with SteamKeyValues.swift).
+    build = subprocess.run([SWIFTC, "-O", str(src), str(APP / "ExternalStorage.swift"), str(APP / "SteamKeyValues.swift"), "-o", str(out)],
+                           capture_output=True, text=True)
     if build.returncode != 0:
         print(build.stderr[-3500:])
         require(False, "the production SteamRemoteCache and the comparison types compile on the host")

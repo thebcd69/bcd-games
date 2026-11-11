@@ -342,6 +342,11 @@ func window(_ image: String, _ w: Int, _ h: Int, visible: Bool = true, drawn: Bo
         // Steam's own waits come first.
         let update = listed.merging(["launch-client-error": "17", "launch-update-wait": "17"]) { $1 }
         require(text(update).hasPrefix("Waiting for Steam to install content"), "content wait")
+        // Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A): error 19 says the game needs an update, not that content installs
+        let needsUpdate = listed.merging(["launch-client-error": "19", "launch-update-wait": "19"]) { $1 }
+        require(text(needsUpdate).hasPrefix("Steam says this game needs an update before it can start") && !text(needsUpdate).contains("install content"),
+                "update wait with error 19: the words name the update")
+        require(text(listed.merging(["launch-client-error": "20", "launch-update-wait": "20"]) { $1 }).hasPrefix("Waiting for Steam to install content"), "error 20 keeps the content wait")
         require(text(update.merging(["launch-update-ready": "3", "launch-client-error": "0"]) { $1 }) == "Launching the game. Waiting for its window to appear…",
                 "content ready")
         let session = listed.merging(["launch-session-wait": "35", "launch-client-error": "35"]) { $1 }

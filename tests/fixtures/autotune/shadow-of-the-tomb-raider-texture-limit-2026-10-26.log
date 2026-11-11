@@ -1,0 +1,287 @@
+[23:10:05.130] [INFO] Checking entitlements...
+[23:10:05.130] [INFO] [build] v0.1.600 (600)
+[23:10:05.130] [INFO] [device] model=iPhone18,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7672MB available=6124MB cores=6
+[23:10:05.130] [INFO] [device] address-map=[0x102d7c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[23:10:05.131] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=5d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0
+[23:10:05.140] [INFO] [device] settings: low-power=0 thermal=fair screen=1206x2622@3.0x max-fps=120 utc-offset=-05:00 free-disk=106GB stikdebug-url=0
+[23:10:05.143] [INFO] [device] gpu="Apple A19 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:10:41.871] [INFO] Requesting JIT with Built-in StikJIT...
+[23:10:43.504] [INFO] [epic-launch] start app=89..ed signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[23:10:43.510] [INFO] [bcd] library launch SOTTR.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[23:10:43.531] [INFO] Running full Wine sequence...
+[23:10:43.531] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102d7c000,0x8000000000) 512GB available=6107MB low-power=0 thermal=nominal
+[23:10:43.533] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[23:10:43.537] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:10:43.537] [INFO] Allocating 896MB JIT pool via debugger...
+[23:10:43.538] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:10:43.538] [INFO] [jit-debugger] attached=1 at the pool request
+[23:10:43.540] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:10:44.238] [INFO] RX pool at 0x148000000
+[23:10:44.256] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.755s rev=ml526
+[23:10:44.292] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 4 x 512 MB registered, extension exited
+[game-cfg] <container>/Library/Application Support/GameConfigs/feb53315fa84f968.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x70a4000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[23:10:44.765] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5519 MB + phys_footprint=624 MB = 6144 MB (hw.memsize says 7672 MB)
+ml985: map_image_view size=0x456c000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=70 occupied=9729 MB of 15232 MB free=5566 MB maxhole=5565 MB@0x70a4004000 rev=ml787 (periodic)
+[jit-pool] image 0x140000000+0x456c000 (SOTTR.exe) → pool 0x148006000 used=0x4576000/0x24000000 tramp+0x0
+[copy-verify] SOTTR.exe: OK, 1046 .text pages executable (copy @0x148006000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14c574000 used=0x46ac000/0x24000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14c574000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x412000 (libarm64ecfex.dll) → pool 0x14c6ae000 used=0x4aca000/0x24000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14c6ae000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14cac8000 used=0x4bfc000/0x24000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14cac8000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14cbfc000 used=0x4cc4000/0x24000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14cbfc000)
+[window] 0x123c00000..0x7884000000 regions=73915 occupied=464116 MB of 488964 MB free=43343 MB maxhole=18496 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=778 MB (peak 778) internal=777 MB compressed=0 MB external=73 MB reusable=11 MB (cycle=1)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14ccc4000 used=0x4fc4000/0x24000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14ccc4000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module SOTTR.exe (sottr.exe-0029f241c3aeee3b): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module GDI32.dll (gdi32.dll-c5970f8a59a953f3): 71FE280000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FE060000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDFE0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDF30000
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14df7c000)
+[copy-verify] bink2w64.dll: OK, 16 .text pages executable (copy @0x14e0e0000)
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14e15c000)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14e280000)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x150b08000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fd2a0000) -> 64-bit table (0x1057633d8)
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=0 first=0000000000000000
+[jumbo#1] +0ms tid=16d56b000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0xc0000000 (3072 MB) hint=0x0 -> 0x70a5530000 st=0x0 | granted=3072 MB ok=1 fail=0
+[srv-conn-done] dport=4455 event=|HUP err=61 fd=184 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+0048:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\ShadowoftheTombRaider\\crashpad_handler.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\ShadowoftheTombRaider\\crashpad_handler.exe\" --no-rate-limit \"--attachment=attachment_Log.txt=C:\\users\\mobile\\Documents\\Shadow of the Tomb Raider\\Shadow of the Tomb Raider.log\" \"--database=C:\\users\\mobile\\AppData\\Roaming\\Eidos Montreal\\Shado"...
+[phase] spawn:L"C:\\Program Files\\Epic Games\\ShadowoftheTombRaider\\crashpad_handler.exe" t+  1.700s rev=ml526
+0048:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\ShadowoftheTombRaider\\crashpad_handler.exe\" --no-rate-limit \"--attachment=attachment_Log.txt=C:\\users\\mobile\\Documents\\Shadow of the Tomb Raider\\Shadow of the Tomb Raider.log\" \"--database=C:\\users\\mobile\\AppData\\Roaming\\Eidos Montreal\\Shado"... (fd=185, unixdir=186, dup_unixdir=190) cwd=L"C:\\Program Files\\Epic Games\\ShadowoftheTombRaider\\"
+[jit-pool] image 0x1253a0000+0xc9000 (?) → pool 0x1526a7000 used=0xa777000/0x24000000 tramp+0x0
+ml957: ? backing 0x1253a0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[free-delay] #1 release of 0x716ad80000+0x100000 held for 2000 ms (1 in flight)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x153d54000)
+[image-reload] unmapped image 0x71f7260000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x109ba4000
+[nls-getptr] type=11 id=10000 peb=0x109ba4000
+[nls-getptr] type=11 id=10000 peb=0x109ba4000
+[nls-getptr] type=11 id=10000 peb=0x109ba4000
+[win-pos] #1 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,132,38} surface=0x105221b80 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-pos] #2 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x105221b80 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-pos] #3 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x105221b80 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,132,38} surface=0x105221b80 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[xp-names] m838225 "wine-x18-exc"
+[xp] 23:10:45.470 +0.63 dt=325 cpu=366 (thr 198) P=350 E=16 run=378 pgw=0.0 GHz P=4.17 E=2.50 Minst=6646 IPC=4.43 mJ=1739 pin=70 rdKB=160 fpMB=1165
+[free-delay] #2 release of 0x7170000000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7170800000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x71717d0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x71727a0000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7173770000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7174740000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7175710000+0xfd0000 held for 2000 ms (8 in flight)
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Shadow of the Tomb Raider/Shadow of the Tomb Raider.log
+[guest-log] #1 tid=0024 04:10:45:565 (00000036) > [Render] Enumerating adapters:
+[guest-log] #2 tid=0024 04:10:45:566 (00000036) > [Render] 	Adapter 0:
+[guest-log] #3 tid=0024 04:10:45:566 (00000036) > [Monitor] 		Description             : Apple A19 GPU
+[guest-log] #4 tid=0024 04:10:45:566 (00000036) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #5 tid=0024 04:10:45:566 (00000036) > [Monitor] 		Device                  : 2544
+[guest-log] #6 tid=0024 04:10:45:566 (00000036) > [Monitor] 		Sub system              : 0
+[guest-log] #12 tid=0024 04:10:45:566 (00000036) > [Render] Loading NVAPI...
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[image-reload] unmapped image 0x71f6120000+0xded000: 1 pool copy marked
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[guest-log] #21 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[swap] ml1077 backed 0x70a5c94000+0x800000 (file off 0 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[xp] 23:10:45.764 +0.93 dt=294 cpu=309 (thr 290) P=305 E=3 run=315 pgw=0.0 GHz P=4.10 E=2.17 Minst=5482 IPC=4.36 mJ=1439 pin=66 rdKB=1280 fpMB=1311
+[xp] 23:10:46.054 +1.22 dt=290 cpu=314 (thr 281) P=309 E=5 run=323 pgw=0.0 GHz P=4.13 E=2.23 Minst=7237 IPC=5.62 mJ=1684 pin=1 rdKB=0 fpMB=1466
+[xp] 23:10:46.379 +1.54 dt=325 cpu=329 (thr 329) P=328 E=1 run=332 pgw=0.0 GHz P=3.86 E=1.58 Minst=7713 IPC=6.09 mJ=1472 pin=0 rdKB=0 fpMB=1466
+[xp] 23:10:46.639 +1.80 dt=260 cpu=255 (thr 250) P=253 E=2 run=261 pgw=0.0 GHz P=4.07 E=1.63 Minst=6125 IPC=5.94 mJ=1329 pin=64 rdKB=0 fpMB=1425
+[jit-pool] image 0x71f4e40000+0xded000 (nvngx_dlss.dll) → pool 0x155f25000 used=0xed19000/0x24000000 tramp+0x0
+D 24 Load module nvngx_dlss.dll (nvngx_dlss.dll-1758ead32c83d711): 71F4E40000
+[image-reload] unmapped image 0x71f4e40000+0xded000: 1 pool copy marked
+[madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[guest-log] #27 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[guest-log] #29 tid=0024 04:10:46:680 (00000036) > [Validate Settings] Disabling DLSS as it is not supported on this Nvidia gpu
+[guest-log] #30 tid=0024 04:10:46:680 (00000036) > [Validate Settings] Monitor #0
+[guest-log] #31 tid=0024 04:10:46:680 (00000036) > [Validate Settings] Desktop settings (Resolution: 1280 x 720, Refresh rate: 60hz, Multi-monitor: off, Bezel correction: off)
+[guest-log] #32 tid=0024 04:10:46:680 (00000036) > [NxApp] Querying GPU Driver Info...
+[win-pos] #5 hwnd=0x1003a after=0x0 flags=0000003c vis={245,138,1035,582} surface=0x105221b80 rev=ml505 style=84880000 visible=0 parent=0x10024
+[win-pos] #6 hwnd=0x10042 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x105221b80 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #7 hwnd=0x10042 class='' text="Default IME" rev=ml853
+[win-name] #8 hwnd=0x1003a class='' text="Shadow of the Tomb Raider" rev=ml853
+[win-name] #9 hwnd=0x1003a class='' text="Shadow of the Tomb Raider" rev=ml853
+[win-name] #15 hwnd=0x1003a class='' text="Shadow of the Tomb Raider" rev=ml853
+[blit] #1 rop=cc0020  SRC phys=0,0 790x444 vis={0,0,790,444}  DST phys=0,0 790x444 vis={0,0,790,444} rev=ml506
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[blit] #2 rop=cc0020  SRC phys=0,0 788x442 vis={0,0,788,442}  DST phys=0,0 788x442 vis={0,0,788,442} rev=ml506
+[footprint] rev=ml358 phys=1519 MB (peak 1519) internal=1516 MB compressed=0 MB external=136 MB reusable=11 MB (cycle=2)
+[xp] 23:10:46.910 +2.07 dt=271 cpu=96 (thr 89) P=89 E=7 run=95 pgw=0.0 GHz P=3.09 E=2.06 Minst=905 IPC=3.13 mJ=217 pin=1 rdKB=8 fpMB=1519
+[swap] ml1077 stats: 8 MB file-backed now (peak 8), 1 extents, file used 8 of 4096 MB, backs 1 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 1 guarded, 0 MB lost to a full free list
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml1060 fast phys=1519 MB compressed=0 MB
+[footprint] rev=ml358 phys=1517 MB (peak 1519) internal=1515 MB compressed=0 MB external=136 MB reusable=11 MB (cycle=3)
+[srv-input] btn msg=0x201 at (592,719) hit win=00010024 thread=0x0
+[hwinput] keyboard focus: program (program cursor)
+[srv-input] btn msg=0x201 at (1047,473) hit win=00010024 thread=0x0
+[footprint] rev=ml358 phys=1515 MB (peak 1519) internal=1513 MB compressed=0 MB external=137 MB reusable=11 MB (cycle=4)
+[footprint] rev=ml358 phys=1505 MB (peak 1519) internal=1503 MB compressed=0 MB external=137 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=1505 MB (peak 1519) internal=1504 MB compressed=0 MB external=150 MB reusable=11 MB (cycle=6)
+[srv-input] btn msg=0x201 at (301,327) hit win=0001003a thread=0x11ce44900
+[srv-input] btn msg=0x201 at (301,327) hit win=0001003a thread=0x11ce44900
+[srv-input] btn msg=0x201 at (301,327) hit win=0001003a thread=0x11ce44900
+[srv-input] btn msg=0x201 at (301,327) hit win=0001003a thread=0x11ce44900
+[win-name] #16 hwnd=0x1003a class='' text="Shadow of the Tomb Raider" rev=ml853
+[guest-log] #37 tid=0024 04:10:55:020 (00000036) > [Validate Settings] Monitor #0
+[guest-log] #38 tid=0024 04:10:55:021 (00000036) > [Validate Settings] Desktop settings (Resolution: 1280 x 720, Refresh rate: 60hz, Multi-monitor: off, Bezel correction: off)
+[jit-pool] image 0x71f5bc0000+0xa7000 (AnselSDK64.dll) → pool 0x156d1b000 used=0xedc7000/0x24000000 tramp+0x0
+D 24 Load module AnselSDK64.dll (anselsdk64.dll-00240f1cbcc5c570): 71F5BC0000
+[jit-pool] image 0x71f5b10000+0xb0000 (d3dcompiler_47.dll) → pool 0x156dc4000 used=0xee78000/0x24000000 tramp+0x4000
+D 24 Load module D3DCompiler_47.dll (d3dcompiler_47.dll-e0c838ea40199618): 71F5B10000
+[madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[guest-log] #39 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[guest-log] #41 tid=00e8 [madeira-d3d12] D3D12CreateDevice(adapter=000000716F42F5B0, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[guest-log] #44 tid=0024 04:10:55:070 (00000036) > [NxApp] Querying GPU Driver Info...
+[guest-log] #53 tid=0024 04:10:55:071 (00000036) > [Settings] Fullscreen display mode:
+[guest-log] #54 tid=0024 04:10:55:071 (00000036) > [Settings] 	Display mode: 1280x720@60
+[guest-log] #55 tid=0024 04:10:55:071 (00000036) > [Settings] 		MultiMonitor: 0
+[guest-log] #56 tid=0024 04:10:55:071 (00000036) > [Settings] Graphics Options:
+[win-name] #19 hwnd=0x1004c class='' text="Default IME" rev=ml853
+[win-name] #20 hwnd=0x2003c class='' text="Shadow of the Tomb Raider v1.0 build 492.0_64" rev=ml853
+[win-name] #21 hwnd=0x2003c class='' text="Shadow of the Tomb Raider v1.0 build 492.0_64" rev=ml853
+[win-name] #22 hwnd=0x2003c class='' text="Shadow of the Tomb Raider v1.0 build 492.0_64" rev=ml853
+[win-name] #23 hwnd=0x2003c class='' text="Shadow of the Tomb Raider v1.0 build 492.0_64" rev=ml853
+[win-pos] #28 hwnd=0x10050 after=0x2003c flags=0000181b vis={0,0,1,1} surface=0x105221b80 rev=ml505 style=84000000 visible=0 parent=0x10024
+[guest-log] #57 tid=00ec 04:10:55:080 (00000236) > [Input] ERROR: Failed to open registry key "SYSTEM\CurrentControlSet\Control\Keyboard Layouts\00000409". (Error: "畓捣獥⹳਀" code: 0x00000000)
+[jit-pool] image 0x71f59f0000+0xa0000 (windows.gaming.input.dll) → pool 0x156e78000 used=0xef1c000/0x24000000 tramp+0x4000
+D EC Load module windows.gaming.input.dll (windows.gaming.input.dll-3f9af7d1c913b561): 71F59F0000
+[jit-pool] image 0x71f5940000+0xb0000 (dinput8.dll) → pool 0x156f1c000 used=0xefd0000/0x24000000 tramp+0x4000
+D EC Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71F5940000
+[win-pos] #29 hwnd=0x10052 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-pos] #30 hwnd=0x10052 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+00f4:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00f4 status=00000001 caller=000000014CC2232C
+[jit-pool] image 0x71f5870000+0x90000 (xinput1_3.dll) → pool 0x156fd0000 used=0xf064000/0x24000000 tramp+0x4000
+D EC Load module xinput1_3.dll (xinput1_3.dll-1e6b917460bc611f): 71F5870000
+[win-pos] #31 hwnd=0x10056 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-pos] #32 hwnd=0x10056 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-pos] #33 hwnd=0x2003c after=0x0 flags=8000183f vis={0,0,1280,720} surface=0x11b652040 rev=ml505 style=96080000 visible=1 parent=0x10024
+[win-name] #33 hwnd=0x2003c class='' text="Shadow of the Tomb Raider v1.0 build 492.0_64" rev=ml853
+[guest-log] #58 tid=00e8 04:10:55:116 (00000232) > [Render] NVidia 3D Vision is not enabled.
+[winios] game window hwnd=0x2003c presents through Metal; its GDI surface is not drawn
+[footprint] rev=ml1060 fast phys=1577 MB compressed=0 MB
+[swap-diag] #1 layer 0x11b46b100: drawable 800x600 format 80 -> 1920x1080 format 70, set on the iOS main thread (dispatch_sync) ...
+-[MTLTextureDescriptorInternal validateWithDevice:]:1421: failed assertion `Texture Descriptor Validation
+MTLTextureDescriptor has height (2147484416) greater than the maximum allowed size of 32768.
+00e8:err:seh:NtRaiseException Unhandled exception code 80000101 flags 1 addr 0x2483ab1fc
+00e8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x206e6f69) syscalls=0 unix_calls=4714
+[unwind] term ml661 begin rip=1521d6d00 rsp=71707ffca8 window=[71707ffca8..7170fffca8) max=32
+[unwind] term ml661 #00 pc=1521d6d00 rsp=71707ffca8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000:   ? 1412937e0  SOTTR.exe+0x12937e0
+[term-stack] ml660 sp+100:   ? 141298d90  SOTTR.exe+0x1298d90
+[term-stack] ml660 sp+130:   ? 14128b950  SOTTR.exe+0x128b950
+[term-stack] ml660 sp+200:   ? 14129d8c8  SOTTR.exe+0x129d8c8
+[term-stack] ml660 sp+410:   ? 141287850  SOTTR.exe+0x1287850
+[term-stack] ml660 sp+6a0:   ? 141288c00  SOTTR.exe+0x1288c00
+[Wine ntdll/server] process_exit_wrapper(544108393)
+[srv-kill] kill_process pid=0020 violent=0 threads: 00e8 rev=ml586
+0050:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=4754
+[unwind] term ml661 begin rip=71f8570690 rsp=716a53fed8 window=[716a53fed8..716ad3fed8) max=32
+[unwind] term ml661 #00 pc=71f8570690 rsp=716a53fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=716a53ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   global @+0x69 -> 125426608 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=152e2d9cc rsp=716a53ffb0  <no module — STOP>
+[unwind] term ml661 end
+0050:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=4770
+[unwind] term ml661 begin rip=1527f22fc rsp=716a53fd28 window=[716a53fd28..716ad3fd28) max=32
+[unwind] term ml661 #00 pc=1527f22fc rsp=716a53fd28  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+010:   ? 71f82c0200  kernelbase.dll+0x80200
+[term-stack] ml660 sp+038:   ? 1253ff950  (exe)+0x5f950
+[term-stack] ml660 sp+1b0: call* 125412799  (exe)+0x72799
+[term-stack] ml660 sp+1e0: CALL 12541274f  (exe)+0x7274f
+[term-stack] ml660 sp+240: CALL 1253fd640  (exe)+0x5d640
+[term-stack] ml660 sp+bc8:   ? 12544fb58  (exe)+0xafb58
+0050:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=189
+[Wine ntdll/server] process_exit_wrapper(0)
+[srv-kill] kill_thread tid=0050 pid=004c violent=0 rev=ml586
+[WineProc] stopping wineserver...
+[frontend] returned to library
+0060:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0060 status=00000000 caller=00000001527E53D4
+[23:11:00.150] [INFO] [bcd-host] no report
+[footprint] rev=ml1060 fast phys=1606 MB compressed=0 MB
+[23:11:01.758] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "" teb=0x0 cpu=11% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d082230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16d452ac0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8b1050 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: elsewhere (responder)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=20 resident=1722MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8b1050 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1548 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=27)
+[footprint] rev=ml358 phys=1548 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=28)
+[footprint] rev=ml358 phys=1548 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=29)
+[window] 0x7048000000..0x7400000000 regions=1428 occupied=13465 MB of 15232 MB free=1830 MB maxhole=1753 MB@0x7187e50000 rev=ml787 (periodic)
+[window] 0x123c00000..0x7884000000 regions=75417 occupied=468046 MB of 488964 MB free=39413 MB maxhole=18496 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=1548 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=30)
+[swap] ml1077 stats: 8 MB file-backed now (peak 8), 1 extents, file used 8 of 4096 MB, backs 1 releases 0 unbacks 0 refused 0 | coverage classic: disk 8 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 1 guarded, 0 MB lost to a full free list
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=21 resident=1731MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1548 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=31)
+[xp] 23:11:47.123 +62.28 dt=297 cpu=45 (thr 45) P=0 E=45 run=51 pgw=0.0 GHz P=0.00 E=1.07 Minst=83 IPC=1.73 mJ=3 pin=0 rdKB=0 fpMB=1548
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8b1050 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x716fdb0000 cpu=0% wait pc=libsystem_kernel.dylib`__ulock_wait2+0x8 lr=libsystem_platform.dylib`os_sync_wait_on_address+0x68 sp=0x12deffa00 NATIVE (no FEX state) sp-cand=[ ntdll.dll+0x62dac ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=Madeira`$s7Madeira7LogTailC10flushLines33_021D1B84151237F59396648796200A17LLyyF+0x2f4 lr=Madeira`$s7Madeira7LogTailC10flushLines33_021D1B84151237F59396648796200A17LLyyF+0x2f4 sp=0x16dc02310 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d3c6890 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d222b30 NATIVE (no FEX state) sp-cand=[ ]
+[xp] 23:11:47.446 +62.61 dt=323 cpu=137 (thr 137) P=58 E=79 run=189 pgw=0.0 GHz P=2.06 E=1.40 Minst=462 IPC=2.01 mJ=46 pin=7 rdKB=436 fpMB=1549
+[xp] 23:11:47.704 +62.86 dt=258 cpu=31 (thr 30) P=12 E=19 run=41 pgw=0.0 GHz P=2.04 E=1.37 Minst=112 IPC=2.22 mJ=11 pin=0 rdKB=0 fpMB=1549
+[waiters]  tid=00d8 addr=0x151f91808 age=61s INF w0=00000001 w1=00000000
+[waiters]  tid=00e0 addr=0x716f437f28 age=61s INF w0=00000000 w1=00000000
+[waiters]  tid=00d4 addr=0x151f8fc88 age=61s INF w0=00000001 w1=00000000
+[waiters]  tid=00e4 addr=0x716f437f28 age=61s INF w0=00000000 w1=00000000
+[footprint] rev=ml358 phys=1549 MB (peak 1585) internal=1547 MB compressed=0 MB external=165 MB reusable=18 MB (cycle=32)
+[thread-sample] ml876 b2 "" teb=0x0 cpu=3% RUN pc=Madeira`$s7Madeira13LogUploadCoreO9endsLower33_D4009DD0BD41518EAE43148AD077544DLLySbSW_Sis12StaticStringVtFZ+0x1c4 lr=Madeira`$s7Madeira13LogUploadCoreO9endsLower33_D4009DD0BD41518EAE43148AD077544DLLySbSW_Sis12StaticStringVtFZ+0x1c4 sp=0x16d3c4ad0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d222b30 NATIVE (no FEX state) sp-cand=[ ]
+[xp] 23:11:47.978 +63.14 dt=275 cpu=196 (thr 196) P=13 E=182 run=224 pgw=0.0 GHz P=2.30 E=2.15 Minst=1491 IPC=3.53 mJ=71 pin=7 rdKB=288 fpMB=1551
+[23:11:47.978] [xp] 23:11:47.978 +63.14 dt=275 cpu=196 (thr 196) P=13 E=182 run=224 pgw=0.0 GHz P=2.30 E=2.15 Minst=1491 IPC=3.53 mJ=71 pin=7 rdKB=288 fpMB=1551
+[23:11:48.274] [xp] 23:11:48.274 +63.44 dt=296 cpu=297 (thr 298) P=10 E=288 run=309 pgw=0.0 GHz P=2.56 E=2.59 Minst=3216 IPC=4.18 mJ=151 pin=1 rdKB=80 fpMB=1554

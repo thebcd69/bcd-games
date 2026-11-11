@@ -50,19 +50,46 @@ enum BCDTouchStage { case began, moved, ended, cancelled }
 
 // MARK: - Aim mode
 
+/// Night round 2026-11-11 (A5 S13): the right stick of player 1 while an aiming finger drives it (aim-as = stick). GamepadInput.sample reads it on its own
+/// queue the way it reads BCDGyroLive's stick: one static flag while it is off.
+final class BCDAimStick: @unchecked Sendable {
+    static let shared = BCDAimStick()
+    /// The aim drives the right stick of player 1 right now (set on the main thread, read on GamepadInput's queue).
+    nonisolated(unsafe) static var active = false
+    private let lock = NSLock()
+    private var stick: (rx: Int16, ry: Int16) = (0, 0)
+
+    func set(_ value: (rx: Int16, ry: Int16)) { lock.lock(); stick = value; lock.unlock() }
+
+    /// Player 1's controller as the game is about to see it: the aim's stick goes on the right stick unless the player pushes the pad's own past its dead zone.
+    func padSample(_ state: inout winios_gamepad) {
+        lock.lock(); let aim = stick; lock.unlock()
+        guard aim.rx != 0 || aim.ry != 0 else { return }
+        let merged = BCDGyroMath.merged(physical: (state.rx, state.ry), gyro: aim)
+        state.rx = merged.rx
+        state.ry = merged.ry
+    }
+}
+
 @MainActor final class BCDAimLive {
     private(set) var settings = BCDAimSettings()
     private var touch = BCDAimTouch()
     private var lastNote = 0.0
     private var logged = ""
+    private var stickHeld = false
+    private var decayPending = false
+    private var lastStickMove = 0.0
 
     var isOn: Bool { settings.isOn }
 
     func configure(_ new: BCDAimSettings, title: String) {
-        if new != settings { touch.reset() }
+        if new != settings { touch.reset(); stickRest() }
         settings = new
+        let wasStick = BCDAimStick.active
+        BCDAimStick.active = new.isOn && new.output == .stick
+        if wasStick != BCDAimStick.active { GamepadInput.shared.aimStickChanged() }
         let note = new.isOn ? "\(title): aim mode \(new.zone.rawValue) sensitivity \(new.sensitivity) vertical \(new.vertical)%"
-            + (new.invertY ? " inverted" : "") + (new.tapClicks ? " tap clicks" : "") : ""
+            + (new.invertY ? " inverted" : "") + (new.tapClicks ? " tap clicks" : "") + (new.output == .stick ? " output stick" : "") : ""
         if note != logged {
             logged = note
             if !note.isEmpty { LogStore.shared.log("[aim] " + note) }
@@ -79,20 +106,58 @@ enum BCDTouchStage { case began, moved, ended, cancelled }
             case .began:
                 if touch.began(id: id, at: point, time: t.timestamp, bounds: view.bounds.size, settings) { taken.append(t) }
             case .moved:
-                if let counts = touch.moved(id: id, to: point, settings) {
+                if settings.output == .stick {
+                    // The finger's travel in this event is the push of the right stick (BCDAimMath.stickPush); the counts of the mouse path are not used.
+                    if let travel = touch.movedPoints(id: id, to: point) {
+                        stickPush(BCDAimMath.stickPush(dx: travel.dx, dy: travel.dy, settings), now: t.timestamp)
+                        taken.append(t)
+                    }
+                } else if let counts = touch.moved(id: id, to: point, settings) {
                     post(counts, now: t.timestamp)
                     taken.append(t)
                 }
             case .ended:
                 if let tap = touch.ended(id: id, time: t.timestamp) {
                     if tap && settings.tapClicks { BCDInputActionRunner.run(.click(.left)) }
+                    stickRest()
                     taken.append(t)
                 }
             case .cancelled:
-                if touch.cancelled(id: id) { taken.append(t) }
+                if touch.cancelled(id: id) { stickRest(); taken.append(t) }
             }
         }
         return taken.isEmpty ? touches : touches.subtracting(taken)
+    }
+
+    /// Night round 2026-11-11 (A5 S13): the push goes to the right stick; one delayed check at a time (no timer of its own) lets it go back to rest
+    /// once no move has come for BCDAimMath.stickHoldSeconds.
+    private func stickPush(_ push: (x: Double, y: Double), now: Double) {
+        BCDAimStick.shared.set((BCDGyroMath.axis(push.x), BCDGyroMath.axis(push.y)))
+        stickHeld = true
+        GamepadInput.shared.aimStickChanged()
+        lastStickMove = ProcessInfo.processInfo.systemUptime
+        scheduleStickDecay(after: BCDAimMath.stickHoldSeconds)
+    }
+
+    private func scheduleStickDecay(after delay: Double) {
+        guard !decayPending else { return }
+        decayPending = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.decayPending = false
+                let age = ProcessInfo.processInfo.systemUptime - self.lastStickMove
+                if age >= BCDAimMath.stickHoldSeconds { self.stickRest() } else { self.scheduleStickDecay(after: BCDAimMath.stickHoldSeconds - age + 0.005) }
+            }
+        }
+    }
+
+    /// The stick back to rest (the finger lifted, the touch was taken away, the settings changed, or no move came for the hold time).
+    private func stickRest() {
+        guard stickHeld else { return }
+        stickHeld = false
+        BCDAimStick.shared.set((0, 0))
+        GamepadInput.shared.aimStickChanged()
     }
 
     /// Whole counts through the exit the controller's right-stick mouse uses, only while the game view has the pointer.

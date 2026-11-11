@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 
@@ -42,7 +43,7 @@ struct BCDLibraryView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     if let launcher { BCDLauncherPanel(spec: launcher) }   // a launcher's chip (Battle.net, EA app): its Install / Open card, no games
                     notices
-                    itchTool
+                    BCDLibraryItchTool(filter: filter, query: query)
                     savesNotice
                     LazyVGrid(columns: columns, alignment: .leading, spacing: layout == .pad ? 26 : 20) {
                         ForEach(shown) { game in
@@ -244,39 +245,6 @@ struct BCDLibraryView: View {
         }
     }
 
-    /// Library › itch.io, signed in: Find a game, for a free game the account does not have yet (BCDActions.openStoreTool), and what an empty
-    /// itch.io list means. The Find a game screen itself belongs to the engine side (BCDLiveStore).
-    @ViewBuilder private var itchTool: some View {
-        let signedIn = store.accounts.contains { $0.store == .itch && $0.name != nil }
-        if filter == .store(.itch), signedIn, query.isEmpty {
-            Button { store.actions?.openStoreTool(.itch) } label: {
-                HStack(spacing: 14) {
-                    Image(systemName: "magnifyingglass.circle.fill").font(.system(size: 28, weight: .semibold))
-                        .foregroundStyle(BCDStyle.lavender)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Find a game on itch.io").font(BCDStyle.heading(17))
-                        Text("Search itch.io or paste a game's link, add a free game to this library and install it here.")
-                            .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: 8)
-                    Image(systemName: "chevron.right").font(.system(size: 13, weight: .bold)).foregroundStyle(BCDStyle.textSoft)
-                }
-                .padding(16)
-                .frame(maxWidth: 620, alignment: .leading)
-                .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(BCDStyle.glow, lineWidth: 1))
-            }
-            .buttonStyle(.plain)
-            .bcdFocusable("library.itch.find", cornerRadius: 18) { store.actions?.openStoreTool(.itch) }
-            if store.count(.itch) == 0 {
-                Text("No Windows games yet. Games you buy or claim on itch.io show here, and so do the games in your itch.io collections. Refresh reads the account's list again.")
-                    .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-
     /// Games whose Steam Cloud saves differ from this device's, one line each as the classic library's
     /// Steam section said it: nothing is replaced until the player picks the copies to keep on the game's page.
     @ViewBuilder private var savesNotice: some View {
@@ -436,4 +404,362 @@ enum BCDLibraryFilter: Identifiable, Hashable, CaseIterable {
         if case .launcher = self { return true }
         return false
     }
+}
+
+// Modified 2026-11-04: native search, toolbars and even cover grids for Duo only.
+struct BCDDuoLibraryView: View {
+    @EnvironmentObject private var store: BCDStore
+    @EnvironmentObject private var focus: BCDFocus
+    @Environment(\.bcdLayout) private var layout
+    /// Y in the shell (BCDFrontEnd): each press opens the search, or closes an open one.
+    var searchRequest = 0
+    @AppStorage("bcd.library.filter") private var filterKey = BCDLibraryFilter.all.rawValue
+    /// The order: BCDLibrarySort's key. Before the sort menu there was only a switch between recent
+    /// play and name, kept in `sortByName`; it still decides until a sort is chosen from the menu.
+    @AppStorage("bcd.library.sort") private var sortKey = ""
+    @AppStorage("bcd.library.sortByName") private var sortByName = false
+    @State private var navigationOwner = UUID()
+    @State private var searching = false
+    @State private var query = ""
+    @State private var gridWidth: CGFloat = 0
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @State private var opened: BCDGame?
+    @State private var workshop: BCDWorkshopRoute?
+    @Environment(\.bcdMenu) private var menu
+
+    private var libraryGames: [BCDGame] { store.games.filter { !$0.isWindowsDesktop } }
+    private func gameCount(_ store: BCDStoreFront) -> Int { libraryGames.filter { $0.store == store }.count }
+    private var filter: BCDLibraryFilter { BCDLibraryFilter.allCases.first { $0.rawValue == filterKey } ?? .all }
+    private var sort: BCDLibrarySort { BCDLibrarySort(rawValue: sortKey) ?? (sortByName ? .name : .played) }
+    /// The launcher whose chip is chosen (BCDLaunchers.swift); nil for every other filter.
+    private var launcher: BCDLauncherSpec? {
+        if case .launcher(let id) = filter { return BCDLauncherSpec.spec(id) }
+        return nil
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            filters
+            ScrollViewReader { reader in
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let launcher { BCDLauncherPanel(spec: launcher) }   // a launcher's chip (Battle.net, EA app): its Install / Open card, no games
+                    notices
+                    BCDLibraryItchTool(filter: filter, query: query)
+                    savesNotice
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: layout == .pad ? 26 : 20) {
+                        ForEach(shown.map { BCDDuoLibraryGame(game: $0) }) { item in
+                            let game = item.game
+                            BCDCoverCard(game: game, focusID: "library.game.\(game.id)") { opened = game }
+                                .id(item.id)
+
+                        }
+                    }
+                    .bcdGlowLayer()
+                    if !query.isEmpty && shown.isEmpty {
+                        Text("No game called \"\(query)\" here.").font(BCDStyle.body(15)).foregroundStyle(BCDStyle.textSoft)
+                    }
+                    if showsDriveHint {
+                        Label("To add a game of your own, copy its folder into BCD › wine › drive_c with the Files app, then choose Add a game.",
+                              systemImage: "folder.badge.plus")
+                            .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.horizontal, layout.gutter).padding(.top, 14).padding(.bottom, 22)
+            }
+            .modifier(BCDSoftTopEdge())
+            .refreshable { store.actions?.refreshLibrary() }
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, _ in revealGame(reader) }
+            .onChange(of: focus.controllerActive) { _, _ in revealGame(reader) }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in revealGame(reader) }
+            }
+        }
+        .padding(.top, 4)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
+        .searchable(text: $query, isPresented: $searching, prompt: "Find a game")
+        .onChange(of: searching) { _, shown in if !shown { query = "" } }
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                if workshopOffered {
+                    Button { workshop = .area } label: { Label("Steam Workshop", systemImage: "square.stack.3d.up") }
+                        .bcdFocusable("library.workshop", cornerRadius: 22) { workshop = .area }
+                }
+                Button { store.actions?.addGameFromFiles() } label: { Label("Add a game", systemImage: "plus") }
+                    .bcdFocusable("library.add", cornerRadius: 22) { store.actions?.addGameFromFiles() }
+                Button { showSortMenu() } label: { Label("Sort by: \(sort.title)", systemImage: "arrow.up.arrow.down") }
+                    .bcdFocusable("library.sort", cornerRadius: 22) { showSortMenu() }
+            }
+            ToolbarItem(placement: .secondaryAction) {
+                Button { store.actions?.refreshLibrary() } label: { Label("Refresh library", systemImage: "arrow.clockwise") }
+                    .bcdFocusable("library.refresh", cornerRadius: 22) { store.actions?.refreshLibrary() }
+            }
+        }
+        .bcdGamePage($opened, from: "Library")
+        .bcdWorkshop($workshop)
+        // The game menu's "Game page" opens the page over the Library.
+        .onAppear { menu?.openPage = { opened = $0 }; installNavigation() }
+        .onDisappear { focus.removeNavigator("library.game.", owner: navigationOwner) }
+        .onChange(of: shown.map(\.id)) { _, _ in installNavigation() }
+        .onChange(of: columns.count) { _, _ in installNavigation() }
+        .onChange(of: searchRequest) { _, _ in toggleSearch() }
+    }
+
+    private var workshopOffered: Bool {
+        filter == .store(.steam) && BCDWorkshopSource.backend?.available == true
+            && libraryGames.contains { $0.store == .steam && $0.state.isInstalled }
+    }
+
+    /// Ordered movement can reach cards the lazy grid has not created yet.
+    private func installNavigation() {
+        let ids = shown.map { "library.game." + $0.id }
+        let width = columns.count
+        focus.setNavigator("library.game.", owner: navigationOwner) { direction in
+            guard let current = focus.focused, let index = ids.firstIndex(of: current) else { return false }
+            guard let next = BCDGridNavigation.target(index: index, columns: width, count: ids.count,
+                                                       direction: direction) else { return false }
+            focus.focused = ids[next]
+            return true
+        }
+    }
+
+    private func revealGame(_ reader: ScrollViewProxy) {
+        guard focus.controllerActive, let id = focus.focused, id.hasPrefix("library.game.") else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
+        }
+    }
+
+    private func revealFilter(_ reader: ScrollViewProxy) {
+        let prefix = "library.filter."
+        guard focus.controllerActive, let id = focus.focused, id.hasPrefix(prefix) else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(String(id.dropFirst(prefix.count)), anchor: .center) }
+        }
+    }
+
+    // MARK: Filters and the row's buttons
+
+    /// Filters scroll independently; search and library actions live in the system toolbar.
+    private var filters: some View {
+        chips.padding(.trailing, layout.gutter)
+    }
+
+    private var chips: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(availableFilters) { item in
+                        Button { filterKey = item.rawValue } label: {
+                            Text(item.isLauncher ? item.title : "\(item.title) · \(count(item))")
+                                .font(BCDStyle.label(14))
+                                .padding(.horizontal, 14).frame(minHeight: 44)
+                                .foregroundStyle(filter == item ? BCDStyle.text : BCDStyle.textSoft)
+                                .bcdGlass(in: Capsule(), tint: filter == item ? BCDStyle.violet : nil, interactive: true)
+                        }
+                        .buttonStyle(.plain)
+                        .bcdFocusable("library.filter.\(item.rawValue)", cornerRadius: 18) { filterKey = item.rawValue }
+                        .id(item.rawValue)
+                    }
+                }
+                .padding(.leading, layout.gutter).padding(.trailing, 4).padding(.vertical, 6)
+            }
+            // The launchers' chips sit at the end of a row that scrolls: a chosen one is brought into view (the other chips stay where they were).
+            .onAppear { if filter.isLauncher { proxy.scrollTo(filter.rawValue, anchor: .center) } }
+            .onChange(of: filterKey) { _, _ in if filter.isLauncher { proxy.scrollTo(filter.rawValue, anchor: .center) } }
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, _ in revealFilter(proxy) }
+            .onChange(of: focus.controllerActive) { _, _ in revealFilter(proxy) }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in revealFilter(proxy) }
+        }
+    }
+
+    /// Every sort the classic library had, in BCD's own menu (the controller's A on the chip opens it too).
+    private func showSortMenu() {
+        let current = sort
+        menu?.show(BCDMenuContent(title: "Sort by", items: BCDLibrarySort.allCases.map { item in
+            BCDMenuItem(id: item.rawValue, title: item.title, symbol: item.symbol, checked: item == current, run: { sortKey = item.rawValue })
+        }))
+    }
+
+    /// The system search field supports touch, keyboard, VoiceOver, and the controller Y shortcut.
+    private func toggleSearch() {
+        searching.toggle()
+        if !searching { query = "" }
+    }
+
+    // MARK: What the library says above and below its games
+
+    @ViewBuilder private var notices: some View {
+        let steam = store.accounts.first { $0.store == .steam }
+        let steamShown = filter == .all || filter == .store(.steam)
+        if steamShown, let steam, steam.available, steam.name == nil {
+            Button { store.actions?.signIn(.steam) } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "person.crop.circle.badge.plus").font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(BCDStyle.lavender)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Sign in to Steam").font(BCDStyle.heading(17))
+                        Text("Your Steam games show up here, and BCD installs them itself.")
+                            .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right").font(.system(size: 13, weight: .bold)).foregroundStyle(BCDStyle.textSoft)
+                }
+                .padding(16)
+                .frame(maxWidth: 620, alignment: .leading)
+                .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(BCDStyle.glow, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .bcdFocusable("library.signin", cornerRadius: 18) { store.actions?.signIn(.steam) }
+        } else if steamShown, let steam, steam.name != nil, gameCount(.steam) == 0, query.isEmpty {
+            Text("There are no Windows games on this Steam account yet. Refresh reads the account's list again.")
+                .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                .fixedSize(horizontal: false, vertical: true)
+        } else if steamShown, let steam, steam.name != nil, query.isEmpty,
+                  store.games.contains(where: { $0.store == .steam }),
+                  !store.games.contains(where: { $0.store == .steam && $0.state.isInstalled }) {
+            // round 624 (agent N S10, 2FJV7P): a Steam account with games, none installed: how a Steam game starts
+            Text("None of your Steam games is installed yet. Tap one, then Install; BCD downloads it from Steam and Play starts it with Valve's own Steam client.")
+                .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// Games whose Steam Cloud saves differ from this device's, one line each as the classic library's
+    /// Steam section said it: nothing is replaced until the player picks the copies to keep on the game's page.
+    @ViewBuilder private var savesNotice: some View {
+        let steamShown = filter == .all || filter == .store(.steam)
+        let games = store.savesDiffer.compactMap { id in store.games.first { $0.id == id } }
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+        if steamShown, query.isEmpty, !games.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(games.prefix(3)) { game in
+                    Button { opened = game } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.icloud").font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(BCDGameColors.amber)
+                            Text("Steam Cloud and this device have different saves for \(game.title). Open its page and pick the copy to keep.")
+                                .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.text)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 8)
+                            Image(systemName: "chevron.right").font(.system(size: 13, weight: .bold)).foregroundStyle(BCDStyle.textSoft)
+                        }
+                        .padding(.horizontal, 16).padding(.vertical, 12)
+                        .frame(maxWidth: 620, alignment: .leading)
+                        .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(BCDGameColors.amber.opacity(0.55), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .bcdFocusable("library.saves.\(game.id)", cornerRadius: 16) { opened = game }
+                }
+                if games.count > 3 {
+                    Text("and \(games.count - 3) more").font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft)
+                }
+            }
+        }
+    }
+
+    /// No game added by hand yet (the Wine desktop is always there): say how they get in.
+    private var showsDriveHint: Bool {
+        (filter == .all || filter == .store(.local)) && query.isEmpty && gameCount(.local) == 0
+    }
+
+    private var availableFilters: [BCDLibraryFilter] {
+        BCDLibraryFilter.allCases.filter { item in
+            switch item {
+            case .all, .installed: return true
+            case .store(let s): return gameCount(s) > 0 || store.accounts.contains { $0.store == s && $0.available }
+            case .launcher: return BCDLauncherModel.shared.available
+            }
+        }
+    }
+
+    private func count(_ item: BCDLibraryFilter) -> Int {
+        switch item {
+        case .all: return libraryGames.count
+        case .installed: return libraryGames.filter { $0.state.isInstalled }.count
+        case .store(let s): return gameCount(s)
+        case .launcher: return 0
+        }
+    }
+
+    private var shown: [BCDGame] {
+        var list = store.games.filter { game in
+            guard !game.isWindowsDesktop else { return false }
+            switch filter {
+            case .all: return true
+            case .installed: return game.state.isInstalled
+            case .store(let s): return game.store == s
+            case .launcher: return false   // a launcher's chip shows its card, not games
+            }
+        }
+        let words = query.trimmingCharacters(in: .whitespaces)
+        if !words.isEmpty { list = list.filter { $0.title.localizedCaseInsensitiveContains(words) } }
+        return sort.sorted(list)
+    }
+
+    // MARK: The grid
+
+    /// Fit covers to the available content width, keeping even columns around the Duo fold.
+    private var columns: [GridItem] {
+        let gap: CGFloat = layout == .pad ? 20 : 14
+        let minimum: CGFloat = typeSize.isAccessibilitySize ? 200 : 120
+        let available = max(0, gridWidth - 2 * layout.gutter)
+        let fitting = max(2, Int((available + gap) / (minimum + gap)))
+        // Even counts keep the fold between covers rather than through one.
+        let count = max(2, fitting - fitting % 2)
+        return Array(repeating: GridItem(.flexible(), spacing: gap, alignment: .top), count: count)
+    }
+}
+
+/// The lazy grid can resolve an unrealized controller target from its data identity.
+private struct BCDDuoLibraryGame: Identifiable {
+    let game: BCDGame
+    var id: String { "library.game." + game.id }
+}
+
+/// Shared store controls so the native Duo library offers the same actions as the original layout.
+private struct BCDLibraryItchTool: View {
+    @EnvironmentObject private var store: BCDStore
+    let filter: BCDLibraryFilter
+    let query: String
+
+    var body: some View {
+        let signedIn = store.accounts.contains { $0.store == .itch && $0.name != nil }
+        if filter == .store(.itch), signedIn, query.isEmpty {
+            Button { store.actions?.openStoreTool(.itch) } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "magnifyingglass.circle.fill").font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(BCDStyle.lavender)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Find a game on itch.io").font(BCDStyle.heading(17))
+                        Text("Search itch.io or paste a game's link, add a free game to this library and install it here.")
+                            .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right").font(.system(size: 13, weight: .bold)).foregroundStyle(BCDStyle.textSoft)
+                }
+                .padding(16)
+                .frame(maxWidth: 620, alignment: .leading)
+                .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(BCDStyle.glow, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .bcdFocusable("library.itch.find", cornerRadius: 18) { store.actions?.openStoreTool(.itch) }
+            if store.count(.itch) == 0 {
+                Text("No Windows games yet. Games you buy or claim on itch.io show here, and so do the games in your itch.io collections. Refresh reads the account's list again.")
+                    .font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
 }

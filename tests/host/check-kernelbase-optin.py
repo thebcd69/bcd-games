@@ -105,7 +105,7 @@ pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the download policy of build 624 lets a list name kernelbase (else a 624 device would refuse the whole online list); older builds '
       'never check the line (minBuild 624, checkPolicy checks only the lines a build gets)',
       '|| $0 == "kernelbase" || $0 == "dcomp" || $0 == "msvproc" || $0 == "xinputuap" || $0 == "httpapi" || $0 == "dbgcore" }) else {' in pol
-      and 'or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc, xinputuap, httpapi, dbgcore")' in pol
+      and 'or glu32, tdh, gamingtcui, qwave, or kernelbase, dcomp, msvproc, xinputuap, httpapi, dbgcore, or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase")' in pol
       and 'for (j, line) in lines.enumerated() where everyLine || line.applies(build: build) {' in pol)
 rules = (root / 'build/tools/autotune_rules.py').read_text()
 r = rules[rules.index('"id": "chakracore-cfg-policy-failfast"'):]

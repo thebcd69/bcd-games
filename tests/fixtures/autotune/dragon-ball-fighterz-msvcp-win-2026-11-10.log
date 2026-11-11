@@ -1,0 +1,258 @@
+[07:56:52.336] [INFO] Checking entitlements...
+[07:56:52.337] [INFO] [build] v0.1.634 (634)
+[07:56:52.337] [INFO] [device] model=iPhone14,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=5639MB available=4074MB cores=6
+[07:56:52.338] [INFO] [device] address-map=[0x102648000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[07:56:52.338] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=4d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[07:56:52.350] [INFO] [device] settings: low-power=0 thermal=nominal screen=1284x2778@3.0x max-fps=120 utc-offset=-03:00 free-disk=31GB stikdebug-url=0
+[07:56:52.354] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[07:58:24.086] [INFO] Requesting JIT with Built-in StikJIT...
+[07:58:25.689] [INFO] [bcd] library launch DBFighterZ.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[07:58:25.731] [INFO] Running full Wine sequence...
+[07:58:25.732] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102648000,0x8000000000) 512GB available=4052MB low-power=0 thermal=nominal
+[07:58:25.734] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_OPTIN_DLLS=twinapi.appcore
+[07:58:25.743] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[07:58:25.743] [INFO] Allocating 896MB JIT pool via debugger...
+[07:58:25.743] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[07:58:25.744] [INFO] [jit-debugger] attached=1 at the pool request
+[07:58:25.747] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[07:58:26.891] [INFO] RX pool at 0x148000000
+[07:58:26.922] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.231s rev=ml526
+[07:58:26.974] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_OPTIN_DLLS: twinapi.appcore.dll -> twinapi.appcore-optin.dll (Wine's twinapi.appcore.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[07:58:27.334] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[07:58:27.334] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3450 MB + phys_footprint=645 MB = 4096 MB (hw.memsize says 5639 MB)
+ml985: preferred base 0x140000000+0x64000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x64000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x10f380000+0x64000 (?) → pool 0x148004000 used=0x68000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+ml957: ? backing 0x10f380000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148068000 used=0x1a0000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148068000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x1481a3000 used=0x5c7000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x1481a3000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x1485c4000 used=0x6f8000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485c4000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x1486f8000 used=0x7c0000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1486f8000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1487c0000 used=0xac0000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487c0000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[window] 0x12629c000..0x7805000000 regions=75958 occupied=462162 MB of 486893 MB free=41194 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=660 MB (peak 660) internal=659 MB compressed=0 MB external=97 MB reusable=12 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module DBFighterZ.exe (dbfighterz.exe-f6ca2adf0ab215b5): 10F380000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\DRAGON_BALL_FighterZ.exe" cmdline=L"\"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\DRAGON_BALL_FighterZ.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\DRAGON_BALL_FighterZ.exe" t+  1.846s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\DRAGON_BALL_FighterZ.exe\"" (fd=75, unixdir=82, dup_unixdir=86) cwd=L"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x4d6f000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=424
+[unwind] term ml661 begin rip=71fe700690 rsp=702580fed8 window=[702580fed8..702600fed8) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=702580fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=702580ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=702580ff60: d0ff8025 70000000 5420380f 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=10f385834 rsp=702580fee0  (exe)+0x5834
+[unwind] term ml662 #01 nv: rbx=0 rbp=702580ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[term-stack] ml660 sp+000: call* 10f385834  (exe)+0x5834
+[term-stack] ml660 sp+030: CALL 10f385806  (exe)+0x5806
+[term-stack] ml660 sp+090: CALL 10f382054  (exe)+0x2054
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=443
+[term-stack] ml660 sp+000: CALL 10f3865ba  (exe)+0x65ba
+[term-stack] ml660 sp+008:   ? 10f393f6c  (exe)+0x13f6c
+[term-stack] ml660 sp+038:   ? 10f3833c4  (exe)+0x33c4
+[term-stack] ml660 sp+1b0: call* 10f385834  (exe)+0x5834
+[term-stack] ml660 sp+1e0: CALL 10f385806  (exe)+0x5806
+[term-stack] ml660 sp+240: CALL 10f382054  (exe)+0x2054
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (dragon_ball_fighterz.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x14e9c8000)
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14ea6c000)
+[copy-verify] winmm.dll: OK, 5 .text pages executable (copy @0x14eb63000)
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x14eb8c000)
+[copy-verify] gdi32.dll: OK, 20 .text pages executable (copy @0x14edb4000)
+[copy-verify] dnsapi.dll: OK, 3 .text pages executable (copy @0x150214000)
+[xp-names] m929630 "wine-x18-exc"
+[xp] 07:58:28.016 +0.63 dt=325 cpu=248 (thr 248) P=247 E=1 run=253 pgw=-1.0 GHz P=3.16 E=1.58 Minst=3128 IPC=4.00 mJ=616 pin=1601 rdKB=28704 fpMB=929
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fab40000) -> 64-bit table (0x105b3db98)
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x10a768000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10024 msg_window=0x10026
+[image-reload] unmapped image 0x71f9f10000+0xb0000: 1 pool copy marked
+[jit-pool] image 0x71f9f70000+0x4e000 (CONCRT140.dll) → pool 0x151e78000 used=0x9ec8000/0x25000000 tramp+0x0
+D 2C Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71F9F70000
+[jit-pool] image 0x71f9f60000+0xc000 (VCRUNTIME140_1.dll) → pool 0x151ec8000 used=0x9ed4000/0x25000000 tramp+0x0
+D 2C Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 71F9F60000
+002c:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=0 first=0000000000000000
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"aqProf.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp] 07:58:28.304 +0.91 dt=288 cpu=235 (thr 235) P=234 E=0 run=236 pgw=-1.0 GHz P=3.18 E=1.50 Minst=3017 IPC=4.04 mJ=604 pin=797 rdKB=16756 fpMB=956
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"VtuneApi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"VtuneApi32e.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x71f9f10000 size=0x1000 type=0x3000 protect=0x40
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000074 status=00000000 native_pc=0000000239421EE8 is_ec=0 -> returned rip=0000000239421EE8 rsp=000000011E08E9D0 flags=00100001
+[swap] ml1077 backed 0x7028750000+0xdd0000 (file off 0 MB): 13 MB in 1 extents, peak 13 MB, 0 refused
+[xp] 07:58:28.612 +1.22 dt=308 cpu=308 (thr 305) P=307 E=0 run=314 pgw=-1.0 GHz P=3.21 E=1.52 Minst=3965 IPC=4.02 mJ=893 pin=643 rdKB=10460 fpMB=973
+[swap] ml1077 backed 0x702a930000+0x37c0000 (file off 13 MB): 69 MB in 2 extents, peak 69 MB, 0 refused
+[xp] 07:58:28.864 +1.47 dt=252 cpu=243 (thr 241) P=242 E=1 run=244 pgw=-1.0 GHz P=3.19 E=1.39 Minst=3821 IPC=4.94 mJ=761 pin=2594 rdKB=41572 fpMB=990
+[swap] ml1077 backed 0x702e0f0000+0x14f0000 (file off 69 MB): 90 MB in 3 extents, peak 90 MB, 0 refused
+[xp] 07:58:29.132 +1.74 dt=268 cpu=271 (thr 273) P=270 E=1 run=274 pgw=-1.0 GHz P=3.23 E=1.45 Minst=4597 IPC=5.26 mJ=895 pin=325 rdKB=0 fpMB=1002
+[xp] 07:58:29.431 +2.04 dt=298 cpu=302 (thr 302) P=301 E=1 run=299 pgw=-1.0 GHz P=3.22 E=1.43 Minst=5179 IPC=5.33 mJ=1051 pin=416 rdKB=0 fpMB=1022
+[footprint] rev=ml358 phys=1033 MB (peak 1033) internal=1031 MB compressed=0 MB external=213 MB reusable=12 MB (cycle=2)
+[swap] ml1077 stats: 90 MB file-backed now (peak 90), 3 extents, file used 90 of 3072 MB, backs 3 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 3072 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 90 MB (peak 90), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml1060 fast phys=1062 MB compressed=0 MB internal=1060 MB
+[footprint] rev=ml1060 fast phys=1186 MB compressed=0 MB internal=1184 MB
+[footprint] rev=ml1060 fast phys=1231 MB compressed=0 MB internal=1229 MB
+[free-delay] #1 release of 0x7037d10000+0x200000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7038010000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7038410000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7038c10000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7039be0000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x703abb0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x703bb80000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x703cb50000+0xfd0000 held for 2000 ms (8 in flight)
+[jit-pool] image 0x71f9a50000+0xc0000 (rsaenh.dll) → pool 0x151ed8000 used=0x9f9c000/0x25000000 tramp+0x4000
+D 2C Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71F9A50000
+[image-reload] unmapped image 0x71f9a50000+0xc0000: 1 pool copy marked
+[jit-pool] image 0x71f9a50000+0xc0000 (rsaenh.dll) → pool 0x151ed8000 used=0x9f9c000/0x25000000 tramp+0x4000
+D 2C Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71F9A50000
+[footprint] rev=ml358 phys=1278 MB (peak 1278) internal=1276 MB compressed=0 MB external=182 MB reusable=12 MB (cycle=3)
+[jit-pool] image 0x71f9830000+0x11e000 (GameChat2.dll) → pool 0x151f9e000 used=0xa0c2000/0x25000000 tramp+0x0
+D 2C Load module GameChat2.dll (gamechat2.dll-c1310a2a95987e63): 71F9830000
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"msvcp_win.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:import_dll Library msvcp_win.dll (which is needed by L"C:\\Program Files (x86)\\Dragon Ball FighterZ\\RED\\Binaries\\Win64\\GameChat2.dll") not found
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"GameChat2.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=0000003c vis={147,108,477,406} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x2002a class='#32770' text="" rev=ml853
+[win-pos] #2 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x105589c98 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x105589c98 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x2002a after=0x0 flags=00000018 vis={147,108,477,406} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x2002a class='#32770' text="" rev=ml853
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=00000014 vis={12,33,36,59} surface=0x0 rev=ml505 style=40000003 visible=0 parent=0x2002a
+[win-name] #5 hwnd=0x10036 class='Static' text="" rev=ml853
+[win-pos] #6 hwnd=0x10036 after=0x1 flags=00000010 vis={12,33,36,59} surface=0x0 rev=ml505 style=40000003 visible=0 parent=0x2002a
+[win-name] #6 hwnd=0x10036 class='Static' text="" rev=ml853
+[win-name] #53 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #59 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #60 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #61 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #62 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #63 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #68 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-name] #70 hwnd=0x1004c class='Static' text="Fatal error!????" rev=ml853
+[win-pos] #71 hwnd=0x10040 after=0x0 flags=0000001c vis={36,42,118,68} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x2002a
+[win-name] #71 hwnd=0x10040 class='Button' text="Aceptar" rev=ml853
+[win-pos] #72 hwnd=0x2002a after=0x0 flags=00001967 vis={631,277,785,378} surface=0x112ec0a80 rev=ml505 style=94c801c4 visible=1 parent=0x10024
+[win-name] #72 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x10a768000
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml1060 fast phys=1283 MB compressed=0 MB internal=1280 MB
+[footprint] rev=ml358 phys=1283 MB (peak 1283) internal=1279 MB compressed=0 MB external=182 MB reusable=12 MB (cycle=4)
+[footprint] rev=ml358 phys=1282 MB (peak 1283) internal=1279 MB compressed=1 MB external=182 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=1282 MB (peak 1283) internal=1279 MB compressed=1 MB external=182 MB reusable=9 MB (cycle=6)
+[srv-input] btn msg=0x201 at (722,366) hit win=0002002a thread=0x119e44000
+[srv-input] btn msg=0x201 at (722,366) hit win=0002002a thread=0x119e44000
+[srv-input] btn msg=0x201 at (722,366) hit win=0002002a thread=0x119e44000
+[hwinput] keyboard focus: program (program cursor)
+[srv-input] btn msg=0x201 at (722,366) hit win=0002002a thread=0x119e44000
+[srv-input] btn msg=0x201 at (722,366) hit win=0002002a thread=0x119e44000
+[win-pos] #73 hwnd=0x2002a after=0x0 flags=000018bf vis={631,277,785,378} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #73 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-pos] #74 hwnd=0x2002a after=0x0 flags=0000181f vis={631,277,785,378} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #74 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-pos] #75 hwnd=0x2002a after=0x0 flags=0000181f vis={631,277,785,378} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #75 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[win-pos] #76 hwnd=0x2002a after=0x0 flags=0000181f vis={631,277,785,378} surface=0x105589c98 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #76 hwnd=0x2002a class='#32770' text="The UE4-RED Game has crashed and will close" rev=ml853
+[file-census] r624 11s: case-sensitive=1 full-path-tries=1414 full-path-hits=219 component-lookups=6190 shortcut-hits=3853 misses=2272 scans=2337 entries-scanned=48856 us-in-lookup=663730 (5% of the window) slowest=0.451 ms ...0-F771895EA825/Documents/wine/dosdevices/c:/windows/system32
+[jit-pool] image 0x71f97a0000+0x90000 (psapi.dll) → pool 0x1520c0000 used=0xa154000/0x25000000 tramp+0x4000
+D 30 Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 71F97A0000
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=6021
+[unwind] term ml662   global @+0x2b -> 144a723b8 = 0x00000002 (2)
+[unwind] term ml662   global @+0x48 -> 142fe21e0 = 0x00000000 (0)
+[unwind] term ml662   global @+0x4f -> 142fe21b8 = 0x00000000 (0)
+[unwind] term ml662   global @+0x69 -> 142fe21b0 = 0x00000000 (0)
+[unwind] term ml661 #03 pc=14e62d9cc rsp=7026caffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: CALL 14024b3b7  RED.exe+0x24b3b7
+[term-stack] ml660 sp+040: call* 140ada962  RED.exe+0xada962
+[term-stack] ml660 sp+860: CALL 142e0e182  RED.exe+0x2e0e182
+[srv-kill] kill_thread tid=0070 pid=0028 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0074 pid=0028 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0078 pid=0028 violent=1 rev=ml586
+[srv-kill] kill_thread tid=007c pid=0028 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0080 pid=0028 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(3): closing child fd_socket=85
+[srv-kill] kill_thread tid=002c pid=0028 violent=0 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(3)
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e0a7000 NO pool/anon alias | region 0x102648000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[WineProc] stopping wineserver...
+[07:58:39.235] [INFO] [session] length=13s play=0s frames=0 stalls=0/0s peak=1291MB limit=4095MB thermal=nominal lpm=0 res=1416x656 cap=60 game=DBFighterZ
+[frontend] returned to library
+[07:58:41.116] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1286 MB (peak 1286) internal=1283 MB compressed=0 MB external=183 MB reusable=9 MB (cycle=9)
+[footprint] rev=ml358 phys=1286 MB (peak 1286) internal=1283 MB compressed=0 MB external=183 MB reusable=9 MB (cycle=10)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=9% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d7b6220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16dfe4d70 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16decd030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=0x0 lr=0x0 sp=0x0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=99% RUN pc=libswiftCore.dylib`swift_getAssociatedTypeWitness+0x30 lr=libswiftCore.dylib`<redacted>+0x4c sp=0x16d83b510 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e102b30 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1286 MB (peak 1286) internal=1283 MB compressed=0 MB external=183 MB reusable=9 MB (cycle=11)
+[thread-sample] ml876 b2 "" teb=0x0 cpu=100% RUN pc=libswiftCore.dylib`$sSayxSicig+0x70 lr=libswiftCore.dylib`$sSayxSicig+0x58 sp=0x16d83b6e0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e102b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[footprint] rev=ml358 phys=1287 MB (peak 1287) internal=1284 MB compressed=0 MB external=187 MB reusable=9 MB (cycle=12)
+[footprint] rev=ml358 phys=1287 MB (peak 1287) internal=1285 MB compressed=0 MB external=187 MB reusable=9 MB (cycle=13)
+[hwinput] keyboard focus: elsewhere (responder)
+[xp] 07:58:52.974 +25.58 dt=310 cpu=36 (thr 37) P=10 E=26 run=39 pgw=-1.0 GHz P=2.08 E=1.25 Minst=110 IPC=2.05 mJ=10 pin=0 rdKB=4 fpMB=1294
+[xp] 07:58:53.253 +25.86 dt=280 cpu=84 (thr 83) P=12 E=72 run=97 pgw=-1.0 GHz P=3.18 E=1.15 Minst=218 IPC=1.80 mJ=30 pin=100 rdKB=1936 fpMB=1292
+[xp] 07:58:53.505 +26.12 dt=252 cpu=15 (thr 16) P=10 E=5 run=16 pgw=-1.0 GHz P=3.08 E=1.93 Minst=88 IPC=2.13 mJ=21 pin=14 rdKB=16 fpMB=1293
+[xp] 07:58:53.806 +26.42 dt=301 cpu=139 (thr 139) P=47 E=92 run=163 pgw=-1.0 GHz P=1.87 E=1.39 Minst=337 IPC=1.56 mJ=36 pin=9 rdKB=240 fpMB=1293
+[footprint] rev=ml358 phys=1293 MB (peak 1293) internal=1191 MB compressed=100 MB external=197 MB reusable=9 MB (cycle=14)
+[xp] 07:58:54.105 +26.72 dt=299 cpu=22 (thr 22) P=12 E=10 run=25 pgw=-1.0 GHz P=1.75 E=1.42 Minst=64 IPC=1.83 mJ=8 pin=3 rdKB=16 fpMB=1293
+.87 E=1.39 Minst=337 IPC=1.56 mJ=36 pin=9 rdKB=240 fpMB=1293
+[07:58:54.106] [xp] 07:58:54.105 +26.72 dt=299 cpu=22 (thr 22) P=12 E=10 run=25 pgw=-1.0 GHz P=1.75 E=1.42 Minst=64 IPC=1.83 mJ=8 pin=3 rdKB=16 fpMB=1293
+P=2.94 E=2.02 Minst=1966 IPC=3.13 mJ=85 pin=0 rdKB=0 fpMB=1296

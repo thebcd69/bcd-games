@@ -113,7 +113,13 @@ enum BCDReadiness {
                     add("mono", "\(m.file) is a .NET program. Download Wine Mono in Settings › .NET Framework first.")
                 case "openal32.dll" where !provided.openAL && !files.contains(name):
                     add("openal", "\(m.file) wants OpenAL. Install it from the Start menu: BCD Runtimes › OpenAL.")
-                case "physxloader.dll" where !provided.physX && !files.contains(name):
+                // Night round 2026-11-11 (G10 S12, X-Men Origins: Wolverine EWCBZQ, feedback RPPFA5 and HZDEKS): a PhysX 2.x game ships PhysXLoader.dll
+                // but the physics core (PhysXCore.dll) comes from NVIDIA's PhysX System Software; the loader finds it through the registry. A game
+                // that ships the loader and no core stops on the empty result (a NULL fault in the 32-bit code) without the software, so the loader
+                // alone no longer silences the note. A game that ships a core, or a scan that stopped at its limit (the core may not have been
+                // reached), gets no note from the shipped loader; a game that does not ship the loader is judged as before.
+                case "physxloader.dll" where !provided.physX
+                    && (!files.contains(name) || (complete && !files.contains("physxcore.dll") && !files.contains("physxcore64.dll"))):
                     add("physx", "\(m.file) wants NVIDIA PhysX. Install it from the Start menu: BCD Runtimes › PhysX (legacy).")
                 default:
                     break

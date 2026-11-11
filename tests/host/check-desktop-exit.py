@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """The Windows desktop says why a program ended at once (round 624, agent D2 S3 and S7).
 
 Geometry Dash (Steam 322170, Send Log VDFZHN, build 623) was started six times from the Windows desktop: each time it loaded
@@ -70,8 +72,11 @@ c_stubs = r'''
 #include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 typedef int NTSTATUS;
+typedef struct { int WowTebOffset; } TEB;
+static TEB *NtCurrentTeb(void) { static TEB teb; return &teb; }
 typedef NTSTATUS (*unixlib_entry_t)(void *);
 #define STATUS_SUCCESS ((NTSTATUS)0)
 #define STATUS_NOT_SUPPORTED ((NTSTATUS)0xC00000BB)
@@ -347,6 +352,16 @@ let gd = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Geometry Dash\\Geom
         require(D.poolWords == "The Windows desktop is out of room for programs: what runs on it now is too big for this device. Close a program, or start the game from BCD's library.",
                 "the pool's words")
 
+        // ---- night round 2026-11-11 (A4 S2): a program with a list row that failed on the desktop
+        let rec = "BCD has recommended settings for Red Dead Redemption 2. The Windows desktop does not use them. Close the desktop, choose Add a game (the + button) and pick this program, then start it from the library."
+        require(D.recommendedWords("Red Dead Redemption 2 (Steam)") == rec && D.recommendedWords("Red Dead Redemption 2 (not Steam)") == rec
+                && D.recommendedWords("Red Dead Redemption 2") == rec, "BPR8JP: the row's title without its (Steam) / (not Steam) tail names the game")
+        require(D.recommendedWords("(Steam)").hasPrefix("BCD has recommended settings for (Steam).") && D.recommendedWords("").hasPrefix("BCD has recommended settings for ."),
+                "a title that is only a bracket or empty is used as it is")
+        require(D.logLine(end("C:\\Games\\RDR2\\RDR2.exe", 0x80000003, lived: 14, gl: false)) != nil && D.logLine(end("C:\\Games\\RDR2\\RDR2.exe", 0, lived: 14, gl: false)) == nil
+                && D.logLine(end("C:\\Games\\RDR2\\RDR2.exe", 0x80000003, lived: 300, gl: false)) == nil,
+                "the notice's gate is the [desktop-exit] line's: a nonzero status within 60 s")
+
         // ---- the C table's own text, end to end
         if CommandLine.arguments.count > 1, let text = try? String(contentsOfFile: CommandLine.arguments[1], encoding: .utf8) {
             let all = D.parse(text)
@@ -428,8 +443,15 @@ require(watch.startswith('private func watchDesktopExits() {\n        guard let 
 require('desktopExitLines < DesktopExitRules.maxLines, let line = DesktopExitRules.logLine(end)' in watch
         and 'if DesktopExitRules.needsOpenGL(end), desktopNamed.insert(end.fileName.lowercased()).inserted' in watch,
         'a line for each end worth one (32 at most), the OpenGL notice once per program')
-require('if !desktopPoolNoticed, refusals > desktopPoolBase {' in watch and watch.count('desktopNotices.append(') == 2,
-        'the pool notice once a session, at the first refusal after the start')
+require('if !desktopPoolNoticed, refusals > desktopPoolBase {' in watch and watch.count('desktopNotices.append(') == 3,
+        'the pool notice once a session, at the first refusal after the start (and the two other notices: OpenGL, a list row)')
+require('if !end.helper, DesktopExitRules.logLine(end) != nil,\n                   let rec = GameRecommendations.match(windowsPath: end.path, steamAppID: nil, fileExists: GameRecommendations.driveFileExists),\n'
+        '                   rec.id != GameRecommendations.standardID, desktopRecsNamed.insert(rec.id).inserted {' in watch
+        and 'desktopNotices.append(DesktopExitRules.recommendedWords(rec.title))' in watch
+        and '[desktop-exit] exe=\\(end.fileName) recs=\\(rec.id) v\\(rec.version) notice=library' in watch,
+        'A4 S2: a failed program with a list row (not the standard one) gets the notice once per rule, and one log line')
+require('desktopNamed = []; desktopExitLines = 0; desktopNotices = []; desktopRecsNamed = []' in begin, 'A4 S2: a session begins with no rule named')
+
 require('guard !desktopNotices.isEmpty, sessionMessage.isEmpty else { return }' in watch
         and 'if self?.sessionMessage == words { self?.sessionMessage = "" }' in watch,
         'the session line only when it is empty, cleared only if it still says the notice')
@@ -453,6 +475,10 @@ def swift_words(src, marker):
 
 
 gl_words = swift_words(rules, 'static func openGLWords(_ exe: String) -> String {\n        ').replace('\\(exe)', 'GeometryDash.exe')
+require(swift_words(preview, 'static let desktopRecommendedWords = ') == "BCD has recommended settings for Red Dead Redemption 2. The Windows desktop does not use them. "
+        "Close the desktop, choose Add a game (the + button) and pick this program, then start it from the library."
+        and 'case "message-recommended": hud.message = BCDPreviewSessionSamples.desktopRecommendedWords' in preview,
+        "the preview app's copy of the list-row notice (message-recommended) says what DesktopExitRules.recommendedWords says")
 require(swift_words(preview, 'static let desktopOpenGLWords = ') == gl_words
         and swift_words(preview, 'static let desktopPoolWords = ') == swift_words(rules, 'static let poolWords = ')
         and 'tab.hasPrefix("message-")' in preview,

@@ -223,8 +223,19 @@ func dateChecks() {
               && p.notes.contains { $0.text.contains("It needs") && $0.warning }, p)
         var external = system
         external.freeExternalBytes = 400_000_000_000
+        external.externalDriveName = "SSD"
         p = plan(big, nil, external)
-        check("not installed, an external drive: the drive beside Install", p.others.contains { $0.action == .install(.externalDrive) }, p)
+        check("not installed, an external drive: the drive beside Install", p.main?.action == .install(.device)
+              && p.others.contains { $0.action == .install(.externalDrive) }, p)
+        external.installsToExternal = true
+        p = plan(big, nil, external)
+        check("the drive chosen for Steam installs: Install goes there, this device beside it, the line names the drive",
+              p.main?.action == .install(.externalDrive) && p.others.contains { $0.action == .install(.device) }
+              && p.installLine == "\(BCDFormat.bytes(98_000_000_000)) on SSD, \(BCDFormat.bytes(400_000_000_000)) free"
+              && !p.notes.contains { $0.text.contains("It needs") }, p)
+        p = plan(BCDGame(id: "g", title: "G", store: .gog, state: .notInstalled, size: 1_000), nil, external)
+        check("a GOG game installs on this device only", p.main?.action == .install(.device)
+              && !p.others.contains { $0.action == .install(.externalDrive) }, p)
         p = plan(big, accounts: [BCDAccount(store: .steam, name: nil, available: true)])
         check("not installed, signed out: the line says so first and offers the sign-in",
               p.notes.first?.fix?.action == .signIn(.steam), p)

@@ -1,0 +1,335 @@
+[01:10:50.153] [INFO] Checking entitlements...
+[01:10:50.153] [INFO] [build] v0.1.634 (634)
+[01:10:50.154] [INFO] [device] model=iPad16,2 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=7908MB available=6124MB cores=6
+[01:10:50.154] [INFO] [device] address-map=[0x1040dc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[01:10:50.154] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[01:10:50.166] [INFO] [device] settings: low-power=0 thermal=nominal screen=1488x2266@2.0x max-fps=60 utc-offset=+09:00 free-disk=37GB stikdebug-url=0
+[01:10:50.169] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:10:52.585] [INFO] Requesting JIT with Built-in StikJIT...
+[01:10:53.972] [INFO] [bcd] library launch GhostOfTsushima.exe: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off lc=0
+[01:10:53.974] [INFO] Session log: logs/GhostOfTsushima.exe-2026-11-10_01-10-53.txt
+[01:10:54.008] [INFO] Running full Wine sequence...
+[01:10:54.008] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1040dc000,0x8000000000) 512GB available=6107MB low-power=0 thermal=nominal
+[01:10:54.010] [INFO] [game-cfg] dxil-tess=0 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_PAD_MODE=hid env.MADEIRA_THREAD_STACK_SPILL=1 ind-count=6000 low-graphics-tip=1 sampler-reduction=3 swap-mb=1024 swap-min-mb=8 swap-mode=2 typed-view-align=16 typed-view-shadow=1 view-census=1
+[01:10:54.017] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:10:54.017] [INFO] Allocating 896MB JIT pool via debugger...
+[01:10:54.018] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:10:54.018] [INFO] [jit-debugger] attached=1 at the pool request
+[01:10:54.021] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[01:10:54.884] [INFO] RX pool at 0x148000000
+[01:10:54.903] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.927s rev=ml526
+[01:10:54.944] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/481b1bd7fb918df5.cfg (read)
+[game-cfg]   dxil-tess = 0
+[game-cfg]   sampler-reduction = 3
+[game-cfg]   ind-count = 6000
+[game-cfg]   typed-view-align = 16
+[game-cfg]   typed-view-shadow = 1
+[game-cfg]   view-census = 1
+[game-cfg]   swap-mode = 2
+[game-cfg]   swap-min-mb = 8
+[game-cfg]   swap-mb = 1024
+[game-cfg]   low-graphics-tip = 1
+[WineProc] Target exe: C:\External\Games\Ghost of Tsushima DIRECTORS CUT\GhostOfTsushima.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[01:10:55.269] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5531 MB + phys_footprint=612 MB = 6144 MB (hw.memsize says 7908 MB)
+ml985: preferred base 0x140000000+0x3793000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x3794000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x129c90000+0x3793000 (ship_steam.exe) → pool 0x148004000 used=0x3798000/0x23000000 tramp+0x0
+[copy-verify] ship_steam.exe: OK, 1083 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14b798000 used=0x38d0000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14b798000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[window] 0x129c8c000..0x7803000000 regions=71837 occupied=462142 MB of 486803 MB free=41092 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=725 MB (peak 725) internal=724 MB compressed=0 MB external=73 MB reusable=1 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x14b8d3000 used=0x3cf7000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x14b8d3000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14bcf4000 used=0x3e28000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14bcf4000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14be28000 used=0x3ef0000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14be28000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14bef0000 used=0x41f0000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14bef0000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module GhostOfTsushima.exe (ghostoftsushima.exe-72e8af940734b466): 129C90000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module HID.DLL (hid.dll-c3a5177fc021edec): 71FE2E0000
+D 24 Load module WINMM.dll (winmm.dll-1158d7513552255a): 71FE1D0000
+D 24 Load module SHELL32.dll (shell32.dll-a220962968ad1278): 71FD850000
+D 24 Load module shlwapi.dll (shlwapi.dll-ce1cdcc1d59e3a45): 71FD7A0000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x14d81c000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x14d940000)
+ml985: map_image_view size=0x46b6000 base=0x6ffff9250000 info_base=0x180000000 map_addr=0x6ffff9250000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[xp] 01:10:55.994 +0.54 dt=254 cpu=59 (thr 59) P=58 E=0 run=62 pgw=-1.0 GHz P=3.55 E=2.11 Minst=773 IPC=3.73 mJ=183 pin=527 rdKB=8960 fpMB=846
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x153104000)
+[xp] 01:10:56.296 +0.84 dt=302 cpu=173 (thr 173) P=172 E=0 run=176 pgw=-1.0 GHz P=3.28 E=2.08 Minst=2024 IPC=3.57 mJ=421 pin=566 rdKB=12536 fpMB=983
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x71f6160000 size=0x10000 type=0x3000 protect=0x40
+[xp] 01:10:56.617 +1.16 dt=321 cpu=285 (thr 285) P=285 E=0 run=287 pgw=-1.0 GHz P=3.76 E=2.09 Minst=5300 IPC=4.95 mJ=1183 pin=380 rdKB=6872 fpMB=975
+[swap] ml1077 backed 0x75d0000000+0x40000000 (whole reservation, ml1257) (file off 0 MB): 1024 MB in 1 extents, peak 1024 MB, 0 refused
+[jumbo#1] +0ms tid=16bfdb000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0x40000000 (1024 MB) hint=0x56dd0000000 -> 0x75d0000000 st=0x0 | granted=1024 MB ok=1 fail=0
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[xp-names] m394902 "wine-x18-exc"
+[xp] 01:10:56.926 +1.47 dt=309 cpu=295 (thr 294) P=295 E=0 run=297 pgw=-1.0 GHz P=3.75 E=2.09 Minst=4216 IPC=3.81 mJ=1126 pin=1025 rdKB=392 fpMB=1118
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-handler.exe" cmdline=L"\"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\GhostOfTsushima.exe\" --capture-image --"...
+[phase] spawn:L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-handler.exe" t+  2.971s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\GhostOfTsushima.exe\" --capture-image --"... (fd=50, unixdir=60, dup_unixdir=160) cwd=L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\"
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x155b4c000)
+[xp] 01:10:57.241 +1.79 dt=315 cpu=204 (thr 74) P=203 E=0 run=207 pgw=-1.0 GHz P=3.73 E=2.10 Minst=3164 IPC=4.17 mJ=733 pin=47 rdKB=644 fpMB=1232
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x71f2db0000 size=0x10000 type=0x3000 protect=0x40
+[image-reload] unmapped image 0x71f2cc0000+0xb0000: 1 pool copy marked
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,132,38} surface=0x10701dc98 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10030 class='crashpad_SessionEndWatcher' text="" rev=ml853
+[win-pos] #4 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x10701dc98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x10701dc98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,132,38} surface=0x10701dc98 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x10030 class='crashpad_SessionEndWatcher' text="" rev=ml853
+003c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe" cmdline=L"\"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe\" --pid=32 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Sucker Punch Productions\\Ghost of Tsushima DIRECTOR'S CUT\\crs\\temp\\<uuid>\\crash-report\""...
+[phase] spawn:L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe" t+  3.426s rev=ml526
+003c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe\" --pid=32 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Sucker Punch Productions\\Ghost of Tsushima DIRECTOR'S CUT\\crs\\temp\\<uuid>\\crash-report\""... (fd=208, unixdir=209, dup_unixdir=214) cwd=L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x128450000+0x176000 (?) → pool 0x157ad6000 used=0xfc52000/0x23000000 tramp+0x0
+ml957: ? backing 0x128450000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000010 status=00000000 native_pc=00000071FFD32DAC is_ec=1 -> returned rip=00000071FFD32DAC rsp=000000702E920000 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=0000000000000010 status=00000000 native_pc=00000071F71F1130 is_ec=0 -> returned rip=00000071F71F1130 rsp=000000702E920000 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[footprint] rev=ml358 phys=1378 MB (peak 1378) internal=1377 MB compressed=0 MB external=173 MB reusable=1 MB (cycle=2)
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #9 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=0000000000000010 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[nls-getptr] type=11 id=437 peb=0x10c150000
+[xp] 01:10:57.525 +2.06 dt=272 cpu=318 (thr 220) P=270 E=48 run=348 pgw=-1.0 GHz P=3.72 E=2.11 Minst=3707 IPC=3.35 mJ=924 pin=630 rdKB=10276 fpMB=1419
+[nls-getptr] type=11 id=20127 peb=0x10c150000
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[swap] ml1077 stats: 1024 MB file-backed now (peak 1024), 1 extents, file used 1024 of 131072 MB, backs 1 releases 0 unbacks 0 refused 0 | coverage broad: disk 0 MB of 1024 cap, reservations 1, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 99 MB (peak 99), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10c150000
+[nls-getptr] type=11 id=437 peb=0x10c150000
+0044:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0044:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x1592bc000)
+[swap] ml1077 backed 0x7031450000+0x800000 (whole reservation, ml1257) (file off 1024 MB): 1032 MB in 2 extents, peak 1032 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemory #6 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0054:err:module:load_dll [dll-missing] rev=ml336 #1 L"EVR.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0054:err:module:import_dll Library EVR.dll (which is needed by L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe") not found
+0054:err:module:loader_init Importing dlls for L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\crs-video.exe" failed, status c0000135
+0054:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=3583
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=213
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[bigres] tid=0024 #1 size=0x22400000 (548 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=548 MB
+[swap] ml1077 backed 0x7038010000+0x22400000 (whole reservation, ml1257) (file off 1032 MB): 1580 MB in 3 extents, peak 1580 MB, 0 refused
+[swap] ml1077 backed 0x7032060000+0xe00000 (whole reservation, ml1257) (file off 1580 MB): 1594 MB in 4 extents, peak 1594 MB, 0 refused
+[swap] ml1077 backed 0x7032e60000+0x4a00000 (whole reservation, ml1257) (file off 1594 MB): 1668 MB in 5 extents, peak 1668 MB, 0 refused
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[image-reload] unmapped image 0x71ef470000+0x6c000: 1 pool copy marked
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #1 release of 0x7028ff0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7028ef0000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7037b60000+0x100000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7037a60000+0x100000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x705bc10000+0x100000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7037e60000+0x100000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7037d60000+0x100000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7037c60000+0x100000 held for 2000 ms (8 in flight)
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x7061f10000+0xfd0000 (whole reservation, ml1257) (file off 1668 MB): 1683 MB in 6 extents, peak 1683 MB, 0 refused
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Ghost of Tsushima DIRECTOR'S CUT/Ghost of Tsushima DIRECTOR'S CUT.log
+[guest-log] #1 tid=0024 16:10:59:032 (00000036) > [Render] Enumerating adapters:
+[guest-log] #2 tid=0024 16:10:59:032 (00000036) > [Render] 	Adapter 0:
+[guest-log] #3 tid=0024 16:10:59:032 (00000036) > [Monitor] 		Description             : Apple A17 Pro GPU
+[guest-log] #4 tid=0024 16:10:59:032 (00000036) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #5 tid=0024 16:10:59:032 (00000036) > [Monitor] 		Device                  : 2544
+[guest-log] #6 tid=0024 16:10:59:032 (00000036) > [Monitor] 		Sub system              : 0
+[guest-log] #12 tid=0024 16:10:59:032 (00000036) > [Render] Loading NVAPI...
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000702479BB10, feature level 0xb000, create)
+[guest-log] #21 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=000000702479BB10, feature level 0xb000, create)
+[guest-log] #25 tid=0024 16:10:59:050 (00000036) > [NxApp] Querying GPU Driver Info...
+[madeira-d3d12] D3D12CreateDevice(adapter=000000702479BB10, feature level 0xb000, create)
+[guest-log] #30 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=000000702479BB10, feature level 0xb000, create)
+[image-reload] unmapped image 0x71f2d30000+0x3b000: 1 pool copy marked
+[image-reload] unmapped image 0x71ef050000+0x6c000: 1 pool copy marked
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[guest-log] #35 tid=0024 16:10:59:081 (00000036) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[guest-log] #39 tid=0024 16:10:59:084 (00000036) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 3
+00c0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00c0 status=00000001 caller=000000014BE4E32C
+[winios] game window hwnd=0x1003a presents through Metal; its GDI surface is not drawn
+[swap-diag] #1 layer 0x110fe7a40: drawable 800x600 format 80 -> 1280x720 format 70, set on the iOS main thread (dispatch_sync) ...
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[steer] #1 size=0x2010000 reserved_total=548MB armed=va-pressure -> above ceiling 0x7c50010000
+[madeira-d3d12] command queue: type 3
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014BF08110 flags=1 nparams=4 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014BF08110 flags=1 nparams=4 tid=0024 hit=2
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014BF08110 flags=1 nparams=4 tid=0024 hit=3
+[swap] ml1077 backed 0x7078500000+0xc00000 (whole reservation, ml1257) (file off 1767 MB): 1779 MB in 12 extents, peak 1779 MB, 0 refused
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=132MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=60MB/14 (peak 60) buf-shared=61MB/13 (peak 61)
+[guest-log] #50 tid=0024 [madeira-d3d12] ml1057 live GPU backing (estimated) total=132MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=60MB/14 (peak 60) buf-shared=61MB/13 (peak 61)
+[madeira-d3d12] ml1060 shader libraries created: 6, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 164 MB = standalone textures 3 (11 MB as Metal sizes them, 10 MB estimated) + texture heaps 0 MB + application heaps 8 MB + buffers 121 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 1
+[guest-log] #52 tid=0024 [madeira-d3d12] metal-gap: Metal 164 MB = standalone textures 3 (11 MB as Metal sizes them, 10 MB estimated) + texture heaps 0 MB + application heaps 8 MB + buffers 121 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 1
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:err:module:import_dll Library NTDSAPI.dll (which is needed by L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll") not found
+0024:err:module:import_dll Library tbs.dll (which is needed by L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #10 L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #11 L"NTDSAPI.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library NTDSAPI.dll (which is needed by L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #12 L"tbs.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library tbs.dll (which is needed by L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #13 L"C:\\External\\Games\\Ghost of Tsushima DIRECTORS CUT\\PsPcSdk.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #74 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #75 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #76 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #77 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #78 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #79 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #80 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #81 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[win-name] #83 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-name] #84 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-pos] #90 hwnd=0x10064 after=0x0 flags=0000001c vis={143,55,195,81} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x10052
+[win-name] #90 hwnd=0x10064 class='Button' text="??" rev=ml853
+[win-pos] #91 hwnd=0x10052 after=0x0 flags=00001967 vis={471,299,809,420} surface=0x114114fc0 rev=ml505 style=94c801c4 visible=1 parent=0x10020
+[win-name] #91 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[footprint] rev=ml358 phys=2055 MB (peak 2055) internal=1935 MB compressed=3 MB external=344 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml1060 fast phys=2067 MB compressed=3 MB internal=1946 MB
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=2046 MB (peak 2055) internal=1946 MB compressed=3 MB external=344 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=2045 MB (peak 2055) internal=1946 MB compressed=3 MB external=344 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=2044 MB (peak 2055) internal=1945 MB compressed=3 MB external=343 MB reusable=0 MB (cycle=6)
+[srv-input] btn msg=0x201 at (642,397) hit win=00010052 thread=0x11d292100
+[srv-input] btn msg=0x201 at (642,397) hit win=00010052 thread=0x11d292100
+[srv-input] btn msg=0x201 at (642,397) hit win=00010052 thread=0x11d292100
+[srv-input] btn msg=0x201 at (642,397) hit win=00010052 thread=0x11d292100
+[srv-input] btn msg=0x201 at (642,397) hit win=00010052 thread=0x11d292100
+[win-pos] #92 hwnd=0x10052 after=0x0 flags=000018bf vis={471,299,809,420} surface=0x10701dc98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #92 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-pos] #93 hwnd=0x10052 after=0x0 flags=0000181f vis={471,299,809,420} surface=0x10701dc98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #93 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-pos] #94 hwnd=0x10052 after=0x0 flags=0000181f vis={471,299,809,420} surface=0x10701dc98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #94 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[win-pos] #95 hwnd=0x10052 after=0x0 flags=0000181f vis={471,299,809,420} surface=0x10701dc98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #95 hwnd=0x10052 class='#32770' text="GhostOfTsushima.exe - System Error" rev=ml853
+[swap] ml1077 backed 0x7080a80000+0x100000000 (whole reservation, ml1257) (file off 1779 MB): 5859 MB in 12 extents, peak 5859 MB, 0 refused
+[jumbo#2] +9926ms tid=16bfdb000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x71eeaffcc6 size=0x100000000 (4096 MB) hint=0x0 -> 0x7080a80000 st=0x0 | granted=5120 MB ok=2 fail=0
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=132MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=60MB/14 (peak 60) buf-shared=61MB/14 (peak 61)
+[guest-log] #54 tid=0024 [madeira-d3d12] ml1057 live GPU backing (estimated) total=132MB: tex-RT=10MB/3 (peak 10) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=60MB/14 (peak 60) buf-shared=61MB/14 (peak 61)
+[madeira-d3d12] ml1060 shader libraries created: 6, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 207 MB = standalone textures 3 (11 MB as Metal sizes them, 10 MB estimated) + texture heaps 0 MB + application heaps 50 MB + buffers 121 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 1
+[guest-log] #56 tid=0024 [madeira-d3d12] metal-gap: Metal 207 MB = standalone textures 3 (11 MB as Metal sizes them, 10 MB estimated) + texture heaps 0 MB + application heaps 50 MB + buffers 121 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 1
+[swap] ml1077 backed 0x705ac10000+0x800000 (whole reservation, ml1257) (file off 1668 MB): 5867 MB in 13 extents, peak 5867 MB, 0 refused
+[swap] ml1077 backed 0x705b410000+0xae0000 (whole reservation, ml1257) (file off 5875 MB): 5878 MB in 14 extents, peak 5878 MB, 0 refused
+[file-census] r624 11s: case-sensitive=1 full-path-tries=1008 full-path-hits=321 component-lookups=3172 shortcut-hits=1454 misses=1113 scans=1718 entries-scanned=267976 us-in-lookup=1751324 (15% of the window) slowest=7.426 ms ...6-96DE22566EEA/Documents/wine/dosdevices/c:/windows/system32
+[swap] ml1077 backed 0x7060b10000+0x800000 (whole reservation, ml1257) (file off 5886 MB): 5886 MB in 15 extents, peak 5886 MB, 0 refused
+[mem-burst] rev=624 +712 MB in 252 ms phys=2768 internal=1576 compressed=279 other=913 | guest commits since the last sample: n=511, 190 MB, biggest 10 MB tid=0024 | swap backed=956 MB | pool head=330 MB tail=176 MB
+[footprint] rev=ml1060 fast phys=2768 MB compressed=279 MB internal=1576 MB
+[guest-log] #59 tid=0024 16:11:07:028 (00000036) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[madeira-d3d12] ml1308 DXBC texture2d bindings get 2D views of the array textures (bcd.cfg sm5-flat-views=2, automatic: GPU older than Apple10)
+[guest-log] #60 tid=00b4 [madeira-d3d12] ml1308 DXBC texture2d bindings get 2D views of the array textures (bcd.cfg sm5-flat-views=2, automatic: GPU older than Apple10)
+[guest-log] #61 tid=00b0 [madeira-d3d12] ml1103 occlusion-visible = 0 (real GPU results)
+[mem-burst] rev=624 +665 MB in 255 ms phys=3433 internal=1462 compressed=384 other=1587 | guest commits since the last sample: n=1292, 494 MB, biggest 32 MB tid=0024 | swap backed=1056 MB | pool head=330 MB tail=176 MB
+[footprint] rev=ml1060 fast phys=3433 MB compressed=384 MB internal=1462 MB
+[guest-log] #62 tid=00b0 [madeira-d3d12] ml1070 present #1 waited for the GPU to finish frame N-1 (serial 9; 1 such waits so far)
+015c:err:module:load_dll [dll-missing] rev=ml336 #14 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+015c:err:module:load_dll [dll-missing] rev=ml336 #15 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71ed1a0000+0x90000 (schannel.dll) → pool 0x158ee4000 used=0x10f78000/0x23000000 tramp+0x4000
+D 15C Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71ED1A0000
+[01:11:07.317] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[jit-pool] image 0x71ed0e0000+0xc0000 (xaudio2_9.dll) → pool 0x1595f0000 used=0x116b4000/0x23000000 tramp+0x4000
+D 154 Load module XAudio2_9.dll (xaudio2_9.dll-b31aa379071159e6): 71ED0E0000
+[jit-pool] image 0x71ed010000+0xd0000 (mfplat.dll) → pool 0x15a190000 used=0x12264000/0x23000000 tramp+0x4000
+[copy-verify] mfplat.dll: OK, 14 .text pages executable (copy @0x15a190000)
+D 154 Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 71ED010000
+[jit-pool] image 0x71ecf70000+0xa0000 (propsys.dll) → pool 0x159040000 used=0x110e4000/0x23000000 tramp+0x4000
+D 154 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71ECF70000
+[jit-pool] image 0x71ecef0000+0x80000 (rtworkq.dll) → pool 0x159564000 used=0x115e8000/0x23000000 tramp+0x4000
+D 154 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71ECEF0000
+[jit-pool] image 0x71ece50000+0xa0000 (mfreadwrite.dll) → pool 0x158b04000 used=0x10ba8000/0x23000000 tramp+0x4000
+D 154 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71ECE50000
+[bigres] tid=0024 #2 size=0x39a00000 (922 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=1470 MB
+[swap] ml1077 backed 0x7186280000+0x39a00000 (whole reservation, ml1257) (file off 5894 MB): 6776 MB in 15 extents, peak 6776 MB, 0 refused
+[srv-own] receive_fd tid=0188 pid=0020 client_fd=753 server_dup=755 kind=fifo rev=ml586
+[srv-own] init_thread tid=0188 pid=0020 reply=751->srv754 wait=753->srv755 rev=ml586
+E 188 [cpu-area] ThreadInit-done tid=0x188 teb=0x70614a0000 tsd275=0x70614a0000 x18teb=0x70614a0000 area=0x707ff00000 StateFrame(ED0)=0x7caa801140 ThreadState(ED1)=0x7caa801000 EnterEC=0x16affc108
+0188:err:thread:set_native_thread_name [thr-name] ml810 tid=0188 teb=0x70614a0000 name="audio_client_timer"
+[footprint] rev=ml358 phys=3350 MB (peak 3350) internal=1426 MB compressed=408 MB external=468 MB reusable=0 MB (cycle=7)
+[guest-log] #63 tid=0164 16:11:07:983 (00000356) > [PSNLNK] ERROR reqk 1001 400
+[guest-log] #64 tid=0024 16:11:07:997 (00000036) > [Validate Settings] Disabled AMD anti-lag as it is not supported
+[xp] 01:11:08.106 +12.65 dt=256 cpu=135 (thr 135) P=115 E=20 run=161 pgw=-1.0 GHz P=2.96 E=1.97 Minst=669 IPC=1.76 mJ=150 pin=5677 rdKB=32 fpMB=3340 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 259.9 cmt 0.5) pool=0.0 caller-ecl 24/3.4
+[xp] 01:11:08.393 +12.94 dt=287 cpu=157 (thr 156) P=133 E=23 run=194 pgw=-1.0 GHz P=2.29 E=1.95 Minst=626 IPC=1.79 mJ=106 pin=6154 rdKB=4 fpMB=3339 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.2 lat 0/0.0 draw 259.3 cmt 0.5) pool=0.0 caller-ecl 24/3.9
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 01:11:08.668 +13.21 dt=275 cpu=152 (thr 151) P=101 E=51 run=259 pgw=-1.0 GHz P=2.96 E=2.07 Minst=600 IPC=1.49 mJ=156 pin=6041 rdKB=736 fpMB=3321 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.2 lat 0/0.0 draw 265.9 cmt 0.8) pool=0.0 caller-ecl 24/3.4
+[xp] 01:11:08.921 +13.47 dt=253 cpu=206 (thr 207) P=172 E=35 run=239 pgw=-1.0 GHz P=3.03 E=2.01 Minst=940 IPC=1.60 mJ=235 pin=3344 rdKB=120 fpMB=3315 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 259.5 cmt 0.5) pool=0.0 caller-ecl 24/3.8
+[xp] 01:11:09.204 +13.75 dt=283 cpu=314 (thr 314) P=297 E=17 run=333 pgw=-1.0 GHz P=3.73 E=1.94 Minst=1758 IPC=1.54 mJ=588 pin=1 rdKB=0 fpMB=3315 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 261.5 cmt 0.1) pool=0.0 caller-ecl 24/2.0
+[xp] 01:11:09.471 +14.02 dt=267 cpu=323 (thr 323) P=292 E=31 run=346 pgw=-1.0 GHz P=3.73 E=2.00 Minst=2040 IPC=1.77 mJ=612 pin=1 rdKB=0 fpMB=3315 | pres 16/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 262.1 cmt 0.2) pool=0.0 caller-ecl 24/1.9
+[01:11:09.542] [INFO] [session] length=15s partial=1 play=2s frames=70 avg=29.9 worst=73ms stalls=0/0s peak=3439MB limit=6143MB thermal=nominal lpm=0 api=D3D11/D3D12/Vulkan/64 res=1280x720 cap=30 game=Ghost of Tsushima DIRECTOR'S CUT

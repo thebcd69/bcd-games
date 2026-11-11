@@ -198,6 +198,15 @@ func before(_ options: [SteamLaunchOption]?, _ root: URL) -> (UInt32, String) {
         require(odd.count == 2 && odd[1] == "[bat-start] 1: echo ab c " + String(repeating: "z", count: 160 - "echo ab c ".count), "control characters out, a tab is a space, a line is cut at 160: \(odd.map { $0.count })")
         require(D.batchPreview(options: batOptions, key: 4, installFolder: scripts) == ["[bat-start] launch option 4: binary.bat (not a text file, 5 bytes read)"], "a file with a zero byte is only named")
         require(D.batchPreview(options: batOptions, key: 5, installFolder: scripts).isEmpty, "a program that is not on disk logs nothing")
+        // Night round 2026-11-11 (G5 S5; GeoGuessr PX27QG, Valve's launch error 45): the launch entry's fields in one log line, no path outside the install folder
+        let entryOptions = [opt(1, "bin\\Game.exe", type: "option1", os: "windows", arch: "64", dlc: "", beta: "", args: String(repeating: "a", count: 100) + "\t-x"),
+                            opt(2, "../outside.exe", dlc: "123", beta: "beta", dir: "x"), opt(3, "x.exe")]
+        let entryLine = D.launchEntryLine(options: entryOptions, key: 1)
+        require(entryLine == ["[madeira-dock] launch option 1 entry: program=bin/Game.exe arguments=\"" + String(repeating: "a", count: 80) + "\" oslist=windows osarch=64 type=option1 dlc=0 beta=0 workingDir=0"],
+                "the launch entry's fields: program, arguments cut at 80, platform, type, and whether a DLC, beta key or working directory is set: \(entryLine)")
+        require(D.launchEntryLine(options: entryOptions, key: 2) == ["[madeira-dock] launch option 2 entry: program=(outside the install folder) arguments=\"\" oslist= osarch= type= dlc=1 beta=1 workingDir=1"],
+                "a program outside the install folder is not printed")
+        require(D.launchEntryLine(options: entryOptions, key: 9).isEmpty && D.launchEntryLine(options: nil, key: 1).isEmpty, "an unknown key or no options: no line")
         require(D.batchPreview(options: batOptions, key: 6, installFolder: scripts).isEmpty, "a path that leaves the install folder logs nothing")
         require(D.batchPreview(options: batOptions, key: 7, installFolder: scripts) == ["[bat-start] launch option 7: empty.bat (0 lines follow)"], "an empty script is named with zero lines")
         require(D.batchPreview(options: batOptions, key: 99, installFolder: scripts).isEmpty && D.batchPreview(options: nil, key: 0, installFolder: scripts).isEmpty,

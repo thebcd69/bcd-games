@@ -117,8 +117,12 @@ enum GameSaveBackups {
     /// `dir`'s path below `drive`, in the disk's spelling ("users/user/AppData/Roaming").
     private static func diskSpelling(of dir: URL, below drive: URL) -> String {
         let d = drive.resolvingSymlinksInPath().pathComponents, p = dir.resolvingSymlinksInPath().pathComponents
-        guard p.count >= d.count, Array(p[..<d.count]) == d else { return dir.lastPathComponent }
-        return p[d.count...].joined(separator: "/")
+        if p.count >= d.count, Array(p[..<d.count]) == d { return p[d.count...].joined(separator: "/") }
+        // A folder reached through an external drive's link (drive_c/External/<name>, ExternalDrives.swift) resolves outside
+        // drive_c: its path as it was built, below the drive.
+        let dl = drive.standardizedFileURL.pathComponents, pl = dir.standardizedFileURL.pathComponents
+        guard pl.count > dl.count, Array(pl[..<dl.count]) == dl else { return dir.lastPathComponent }
+        return pl[dl.count...].joined(separator: "/")
     }
 
     /// Every file under the roots that a backup would hold, with sizes. Caches and logs inside a root are left out, as in a

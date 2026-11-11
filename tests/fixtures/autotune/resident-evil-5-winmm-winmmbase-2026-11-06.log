@@ -1,0 +1,165 @@
+[10:57:07.117] [INFO] Checking entitlements...
+[10:57:07.117] [INFO] [build] v0.1.634 (634)
+[10:57:07.118] [INFO] [device] model=iPad16,5 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=15416MB available=16361MB cores=10
+[10:57:07.118] [INFO] [device] address-map=[0x104adc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[10:57:07.118] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[10:57:07.135] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+08:00 free-disk=733GB stikdebug-url=1
+[10:57:07.138] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:57:15.343] [INFO] [bcd] library launch re5dx9.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[10:57:15.359] [INFO] Running full Wine sequence...
+[10:57:15.359] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104adc000,0x8000000000) 512GB available=16349MB low-power=0 thermal=nominal
+[10:57:15.360] [INFO] [game-cfg] env.FEX_MULTIBLOCK=0 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[10:57:15.364] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:57:15.364] [INFO] Allocating 896MB JIT pool via debugger...
+[10:57:15.364] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:57:15.364] [INFO] [jit-debugger] attached=1 at the pool request
+[10:57:15.366] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:57:17.225] [INFO] RX pool at 0x148000000
+[10:57:17.254] [INFO] Detaching debugger...
+[10:57:17.267] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.934s rev=ml526
+[10:57:17.298] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/97028a7da84d0ff9.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[10:57:17.573] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[10:57:17.574] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=15772 MB + phys_footprint=611 MB = 16384 MB (hw.memsize says 15416 MB)
+ml993: REJECTED 16384 MB -- larger than hw.memsize (15416 MB), so it is a sentinel, not a limit
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x23000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x3000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bf000 (libwow64fex.dll) → pool 0x148193000 used=0x55b000/0x23000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148193000)
+[window] 0x7048000000..0x7400000000 regions=136 occupied=12293 MB of 15232 MB free=2938 MB maxhole=2938 MB@0x7048000000 rev=ml787 (periodic)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148558000 used=0x67c000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148558000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x14867c000 used=0x724000/0x23000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x14867c000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148724000 used=0x8a4000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148724000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[jit-pool] image 0x70ff710000+0x80000 (wow64win.dll) → pool 0x1488a4000 used=0x928000/0x23000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1488a4000)
+[jit-pool] image 0x70ff680000+0x90000 (win32u.dll) → pool 0x148928000 used=0x9bc000/0x23000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148928000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+[free-delay] #1 release of 0x7023120000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7023220000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7023420000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7023820000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7024020000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7024ff0000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7025fc0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7026f90000+0xfd0000 held for 2000 ms (8 in flight)
+[window] 0x128000000..0x7803000000 regions=71962 occupied=466286 MB of 486832 MB free=36977 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=633 MB (peak 633) internal=632 MB compressed=0 MB external=121 MB reusable=8 MB (cycle=1)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x114a91b98)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module re5dx9.exe (re5dx9.exe-003a38c97ae953e3): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c6b191): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1db4596): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa35747): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module user32.dll (user32.dll-7d7be97280d77cb6): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5ab7396a): 717B9F0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"WINMMBASE.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library WINMMBASE.dll (which is needed by L"C:\\Games\\Resident Evil 5\\WINMM.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"WINMM.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library WINMM.dll (which is needed by L"C:\\Games\\Resident Evil 5\\re5dx9.exe") not found
+[map-view] r630 #60 NtMapViewOfSection section=0x48 size=0x34000 req=0x0 got=0x7fda0000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module WINMM.dll (winmm.dll-114ba751efe01756): 717FDA0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"WINMMBASE.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library WINMMBASE.dll (which is needed by L"C:\\Games\\Resident Evil 5\\winmm.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"winmm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library winmm.dll (which is needed by L"C:\\windows\\system32\\msacm32.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"msacm32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library msacm32.dll (which is needed by L"C:\\windows\\system32\\AVIFIL32.dll") not found
+[map-view] r630 #61 NtMapViewOfSection section=0x44 size=0x1d000 req=0x0 got=0x7a360000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module msvfw32.dll (msvfw32.dll-a54072a4166a0d04): 717A360000
+[map-view] r630 #62 NtMapViewOfSection section=0x48 size=0x34000 req=0x0 got=0x7fd60000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module WINMM.dll (winmm.dll-114ba751efe01756): 717FD60000
+0024:err:module:import_dll Library WINMMBASE.dll (which is needed by L"C:\\Games\\Resident Evil 5\\winmm.dll") not found
+[map-view] r630 #63 NtMapViewOfSection section=0x44 size=0x34000 req=0x0 got=0x7fd20000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module WINMM.dll (winmm.dll-114ba751efe01756): 717FD20000
+0024:err:module:load_dll [dll-missing] rev=ml336 #9 L"WINMMBASE.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library WINMMBASE.dll (which is needed by L"C:\\Games\\Resident Evil 5\\winmm.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #10 L"winmm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library winmm.dll (which is needed by L"C:\\windows\\system32\\AVIFIL32.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #11 L"AVIFIL32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library AVIFIL32.dll (which is needed by L"C:\\Games\\Resident Evil 5\\re5dx9.exe") not found
+[map-view] r630 #64 NtMapViewOfSection section=0x40 size=0x1d000 req=0x0 got=0x7fd00000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module msvfw32.dll (msvfw32.dll-a54072a4166a0d04): 717FD00000
+[map-view] r630 #65 NtMapViewOfSection section=0x44 size=0x34000 req=0x0 got=0x7fcc0000 off=0x0 prot=0x20 status=40000003 tid=0024
+D 24 Load module WINMM.dll (winmm.dll-114ba751efe01756): 717FCC0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #12 L"WINMMBASE.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library WINMMBASE.dll (which is needed by L"C:\\Games\\Resident Evil 5\\winmm.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #13 L"winmm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library winmm.dll (which is needed by L"C:\\windows\\system32\\MSVFW32.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #14 L"MSVFW32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library MSVFW32.dll (which is needed by L"C:\\Games\\Resident Evil 5\\re5dx9.exe") not found
+0024:err:module:loader_init Importing dlls for L"C:\\Games\\Resident Evil 5\\re5dx9.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=295
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[10:57:17.858] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=676MB limit=16383MB thermal=nominal lpm=0 api=D3D10/D3D11/D3D12/D3D9/OpenGL/Vulkan/32 res=1112x832 cap=60 game=Resident Evil 5
+[10:57:17.861] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[xp] 10:57:18.260 +0.64 dt=325 cpu=527 (thr 518) P=157 E=369 run=548 pgw=-1.0 GHz P=3.99 E=2.81 Minst=6489 IPC=3.89 mJ=966 pin=5 rdKB=172 fpMB=692
+[xp] 10:57:18.586 +0.97 dt=327 cpu=328 (thr 329) P=5 E=323 run=335 pgw=-1.0 GHz P=3.61 E=2.83 Minst=3679 IPC=3.94 mJ=238 pin=0 rdKB=0 fpMB=692
+[xp] 10:57:18.912 +1.30 dt=326 cpu=20 (thr 20) P=4 E=15 run=21 pgw=-1.0 GHz P=2.83 E=2.76 Minst=162 IPC=2.97 mJ=16 pin=0 rdKB=0 fpMB=692
+[xp] 10:57:19.184 +1.57 dt=273 cpu=17 (thr 17) P=0 E=17 run=18 pgw=-1.0 GHz P=0.00 E=1.36 Minst=39 IPC=1.66 mJ=2 pin=0 rdKB=0 fpMB=692
+[xp] 10:57:19.509 +1.89 dt=325 cpu=16 (thr 15) P=0 E=16 run=17 pgw=-1.0 GHz P=0.00 E=1.63 Minst=38 IPC=1.48 mJ=2 pin=0 rdKB=0 fpMB=692
+[footprint] rev=ml358 phys=694 MB (peak 694) internal=694 MB compressed=0 MB external=125 MB reusable=8 MB (cycle=2)
+[xp] 10:57:19.768 +2.15 dt=259 cpu=117 (thr 117) P=93 E=24 run=114 pgw=-1.0 GHz P=3.13 E=1.94 Minst=857 IPC=2.54 mJ=203 pin=0 rdKB=0 fpMB=694
+[10:57:20.065] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=687 MB (peak 694) internal=686 MB compressed=0 MB external=125 MB reusable=11 MB (cycle=3)
+[footprint] rev=ml358 phys=692 MB (peak 694) internal=691 MB compressed=0 MB external=137 MB reusable=11 MB (cycle=4)
+[footprint] rev=ml358 phys=693 MB (peak 694) internal=692 MB compressed=0 MB external=138 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=693 MB (peak 694) internal=693 MB compressed=0 MB external=139 MB reusable=11 MB (cycle=6)
+[xp] 10:57:28.557 +10.94 dt=288 cpu=73 (thr 73) P=0 E=73 run=79 pgw=-1.0 GHz P=0.00 E=2.07 Minst=182 IPC=1.20 mJ=14 pin=0 rdKB=0 fpMB=693
+[xp] 10:57:28.809 +11.19 dt=251 cpu=40 (thr 40) P=4 E=36 run=43 pgw=-1.0 GHz P=1.68 E=2.01 Minst=107 IPC=1.35 mJ=9 pin=0 rdKB=0 fpMB=693
+[xp] 10:57:29.135 +11.52 dt=327 cpu=62 (thr 62) P=4 E=58 run=66 pgw=-1.0 GHz P=1.53 E=2.15 Minst=154 IPC=1.18 mJ=14 pin=0 rdKB=0 fpMB=693
+[xp] 10:57:29.440 +11.83 dt=304 cpu=30 (thr 29) P=0 E=30 run=31 pgw=-1.0 GHz P=0.00 E=2.00 Minst=75 IPC=1.28 mJ=5 pin=0 rdKB=0 fpMB=693
+[xp] 10:57:29.695 +12.08 dt=255 cpu=72 (thr 72) P=32 E=39 run=77 pgw=-1.0 GHz P=2.01 E=1.65 Minst=244 IPC=1.87 mJ=36 pin=0 rdKB=0 fpMB=693
+[footprint] rev=ml358 phys=693 MB (peak 694) internal=692 MB compressed=0 MB external=140 MB reusable=12 MB (cycle=7)
+[xp] 10:57:30.010 +12.40 dt=315 cpu=23 (thr 23) P=2 E=21 run=29 pgw=-1.0 GHz P=1.76 E=1.83 Minst=57 IPC=1.34 mJ=5 pin=0 rdKB=0 fpMB=693
+=21 run=29 pgw=-1.0 GHz P=1.76 E=1.83 Minst=57 IPC=1.34 mJ=5 pin=0 rdKB=0 fpMB=693

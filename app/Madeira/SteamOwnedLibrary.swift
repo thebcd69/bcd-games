@@ -9,6 +9,9 @@
 // connection (`workshopCall`, `downloadWorkshopItem`), and its downloads stopping when a game session starts.
 // Portions copyright 2026 ft7t8drgwf-wq, wamei, 125hz and alantangok: code taken from https://github.com/willfaust/Madeira (pull requests #237, #381, #382, #404, #490, #491 and 2 more)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Connor Gow, intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
+// under GPL-3.0-or-later and modified for BCD in November 2026 (a download's library keeps BCD's DLC, version and resume steps;
+// paused downloads come back from every library; a drive plugged in since the start is opened before a download). See THIRD-PARTY-NOTICES.md.
 //
 // The library and download model is adapted from the account model built
 // around Jfishin's Madeira Steam client (used with the author's permission,
@@ -325,7 +328,23 @@ final class SteamOwnedLibrary: ObservableObject {
     // MARK: Files
 
     static var drive: URL { MadeiraDock.drive }
-    static var steamApps: URL { SteamInstallPaths.steamApps(drive: drive) }
+    /// The library downloads go to: drive_c's own, or the external drive picked
+    /// in Settings › External drives.
+    static var installLibrary: String { ExternalDrives.steamInstallLibrary ?? SteamInstallPaths.libraryRelative }
+    static var steamApps: URL { drive.appendingPathComponent(installLibrary, isDirectory: true) }
+    /// Library chosen for one download (the install sheet's Install on), kept
+    /// through completion, so offline repairs and resumes use the same place.
+    private static let targetsKey = "steam-install-targets"
+    private var targets: [Int: String] = (UserDefaults.standard.dictionary(forKey: "steam-install-targets") as? [String: String] ?? [:])
+        .reduce(into: [:]) { if let id = Int($1.key) { $0[id] = $1.value } }
+    private func setTarget(_ appID: Int, _ library: String?) {
+        targets[appID] = library
+        UserDefaults.standard.set(Dictionary(uniqueKeysWithValues: targets.map { (String($0.key), $0.value) }), forKey: Self.targetsKey)
+    }
+    /// The library a download of `appID` goes to.
+    func library(for appID: Int) -> String { targets[appID] ?? Self.installLibrary }
+    func installMoved(_ appID: Int, to library: String) { setTarget(appID, library) }
+    func steamApps(for appID: Int) -> URL { Self.drive.appendingPathComponent(library(for: appID), isDirectory: true) }
     private static var supportFolder: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return base.appendingPathComponent("Madeira", isDirectory: true)
@@ -623,11 +642,13 @@ final class SteamOwnedLibrary: ObservableObject {
         let steamID = session.steamID
         guard let info = try await fetcher.fetchAppInfo(appID: UInt32(appID)) else { return nil }
         let drive = Self.drive
+        let external = try ExternalDrives.externalRoot(for: game.library)
+        let install = try ExternalDrives.nativeURL(game.library + "/common/" + game.installDir)
         let paths = SteamCloudPaths(
             drive: drive, userFolder: user.url,
-            installFolder: drive.appendingPathComponent(game.library + "/common/" + game.installDir, isDirectory: true),
+            installFolder: install,
             remoteFolder: MadeiraDock.clientRoot.appendingPathComponent("userdata/\(steamID & 0xFFFF_FFFF)/\(appID)/remote", isDirectory: true),
-            steamID: steamID, overrides: info.rootOverrides)
+            steamID: steamID, overrides: info.rootOverrides, externalLibraryRoot: external?.root, externalLibraryID: external?.identity)
         return (info, paths)
     }
 
@@ -640,12 +661,33 @@ final class SteamOwnedLibrary: ObservableObject {
     }
 
     private var cloudBusy: Set<Int> = []
+    private var deleting: Set<Int> = []
+    var hasStorageWork: Bool {
+        hasActiveDownload || !cloudBusy.isEmpty || !deleting.isEmpty || cloud.values.contains { $0.phase == .checking }
+            || !SteamWorkshopModel.shared.jobs.isEmpty   // BCD: a Workshop item downloading or being removed
+    }
+    /// BCD: a drive was removed in Settings: the downloads that were to go there forget it (their partial files stay on the drive),
+    /// and a paused one that can no longer resume is dropped from the list.
+    func forgetTargets(onDrive name: String) {
+        for (id, library) in targets where ExternalDrives.driveName(library: library) == name {
+            setTarget(id, nil)
+            if downloads[id]?.state == .paused { downloads[id] = nil }
+        }
+    }
+    func externalStorageReconnected() {
+        for (id, var state) in cloud where SteamGamesModel.shared.games.contains(where: { $0.id == id && ExternalDrives.driveName(library: $0.library) != nil }) {
+            state.retryFailedCheck(); cloud[id] = state
+        }
+        // BCD: a paused download on a drive comes back once the drive is open (start() may have run before it was).
+        if started, signedIn { restorePartialDownloads() }
+    }
 
     /// Compares the game's cloud saves with the prefix and returns what to do
     /// about the differences. Reads only (it records files found identical).
     @discardableResult
     func checkCloud(_ appID: Int) async -> SteamCloudPlan? {
         guard Self.cloudEnabled, signedIn, !cloudBlocked else { return nil }
+        guard !deleting.contains(appID), GameMover.shared.moving == nil else { return nil }
         var state = cloud[appID] ?? SteamCloudState()
         state.phase = .checking
         cloud[appID] = state
@@ -655,8 +697,8 @@ final class SteamOwnedLibrary: ObservableObject {
             }
             let listing = try await cloudListing(appID)
             let saveFiles = context.info.saveFiles, paths = context.paths, drive = Self.drive
-            let result = await Task.detached(priority: .utility) { () -> (SteamCloudAudit, String?) in
-                let audit = SteamCloudAudit.run(listing: listing, saveFiles: saveFiles, paths: paths)
+            let result = try await Task.detached(priority: .utility) { () -> (SteamCloudAudit, String?) in
+                let audit = try SteamCloudAudit.run(listing: listing, saveFiles: saveFiles, paths: paths)
                 // Every cloud file missing and nothing local: the game may keep its saves elsewhere.
                 var elsewhere: String?
                 if audit.cloudFiles > 0, audit.count(.cloudOnly) == audit.cloudFiles, audit.count(.localOnly) == 0,
@@ -665,6 +707,7 @@ final class SteamOwnedLibrary: ObservableObject {
                 }
                 return (audit, elsewhere)
             }.value
+            _ = try paths.validateInstallURL(paths.installFolder)
             let audit = result.0
             // Valve's client in a session shows the game only the files its list
             // names (SteamRemoteCache); not while that client runs.
@@ -704,6 +747,7 @@ final class SteamOwnedLibrary: ObservableObject {
     /// device's (which are backed up first), or the device's replace the cloud's.
     func resolveCloud(_ appID: Int, useCloud: Bool) async {
         guard Self.cloudEnabled, !cloudBusy.contains(appID), let state = cloud[appID], state.phase == .ready, !state.conflicts.isEmpty else { return }
+        guard !deleting.contains(appID), GameMover.shared.moving == nil else { return }
         cloudBusy.insert(appID)
         defer { cloudBusy.remove(appID) }
         SteamLog.event("[steam-cloud] app=\(appID) choice=\(useCloud ? "cloud" : "device") files=\(state.conflicts.count)")
@@ -735,7 +779,7 @@ final class SteamOwnedLibrary: ObservableObject {
                 guard !inSession, Self.cloudEnabled else { throw CancellationError() }
                 guard let place = context.paths.location(cloudPath: entry.path) else { continue }
                 let file = try await cloudFile(appID, entry)
-                let url = SteamCloudPaths.resolve(base: place.base, parts: place.parts)
+                let url = try context.paths.resolve(base: place.base, parts: place.parts)
                 let existed = FileManager.default.fileExists(atPath: url.path)
                 let label = SteamCloudPaths.split(entry.path).root ?? "remote"
                 try SteamCloudTransfer.place(file, at: url, backupTo: backup, relative: [label] + place.parts, time: entry.cloudTime)
@@ -823,7 +867,7 @@ final class SteamOwnedLibrary: ObservableObject {
             for entry in wanted {
                 guard !cloudBlocked, Self.cloudEnabled else { throw CancellationError() }
                 guard let place = context.paths.location(cloudPath: entry.path) else { continue }
-                let url = SteamCloudPaths.resolve(base: place.base, parts: place.parts)
+                let url = try context.paths.resolve(base: place.base, parts: place.parts)
                 let file = try Data(contentsOf: url)
                 guard file.count <= SteamCloudTransfer.maxFileBytes else { throw SteamFileError.invalid("One save file exceeds the upload size limit.") }
                 let sha = Data(Insecure.SHA1.hash(data: file))
@@ -1261,7 +1305,7 @@ final class SteamOwnedLibrary: ObservableObject {
     }
 
     func hasPartialDownload(_ appID: Int) -> Bool {
-        DepotDownloader.hasPartialDownload(appID: UInt32(appID), steamApps: Self.steamApps)
+        DepotDownloader.hasPartialDownload(appID: UInt32(appID), steamApps: steamApps(for: appID))
     }
 
     /// The download list lives in memory, so a first-time install paused (or
@@ -1273,24 +1317,40 @@ final class SteamOwnedLibrary: ObservableObject {
     /// Off with `env.MADEIRA_STEAM_RESTORE_PAUSED = 0` (the list starts empty, as before).
     private func restorePartialDownloads() {
         guard SteamSignIn.flag("MADEIRA_STEAM_RESTORE_PAUSED", default: true) else { return }
-        let apps = Self.steamApps
+        // Every library a download can go to (BCD, with external drives): the default one and each download's own choice.
+        var libraries: [String] = []
+        for library in [Self.installLibrary] + targets.values.sorted()
+            where !libraries.contains(where: { $0.caseInsensitiveCompare(library) == .orderedSame }) { libraries.append(library) }
         var restored = 0
-        for (appID, progress) in DepotDownloader.partialDownloads(steamApps: apps) {
-            let id = Int(appID)
-            guard downloads[id] == nil,
-                  !FileManager.default.fileExists(atPath: apps.appendingPathComponent("appmanifest_\(id).acf").path)
-            else { continue }
-            downloads[id] = Download(state: .paused, progress: progress)
-            restored += 1
+        for library in libraries {
+            guard let apps = try? ExternalDrives.nativeURL(library) else { continue }
+            for (appID, progress) in DepotDownloader.partialDownloads(steamApps: apps) {
+                let id = Int(appID)
+                guard downloads[id] == nil, self.library(for: id).caseInsensitiveCompare(library) == .orderedSame,
+                      !FileManager.default.fileExists(atPath: apps.appendingPathComponent("appmanifest_\(id).acf").path)
+                else { continue }
+                downloads[id] = Download(state: .paused, progress: progress)
+                restored += 1
+            }
         }
         if restored > 0 { SteamLog.event("[steam-depot] restored paused downloads count=\(restored)") }
     }
 
     /// Installs or updates a game: queues it and starts when nothing else downloads.
-    func install(_ appID: Int) {
+    /// `library` picks where a new download goes; nil keeps the earlier choice
+    /// (or the default from Settings › External drives).
+    func install(_ appID: Int, library: String? = nil) {
         guard Self.enabled else { return }
+        guard !deleting.contains(appID), GameMover.shared.moving == nil else { error = "Wait for the file operation to finish."; return }
         guard signedIn else { error = "Downloading games needs a Steam sign-in."; return }
         if active?.id == appID || queue.contains(appID) { return }
+        let installed = SteamGamesModel.shared.games.first(where: { $0.id == appID })?.library
+        // BCD: a place on a drive that was removed in Settings is forgotten (it can never come back under that registration).
+        if let earlier = targets[appID], let name = ExternalDrives.driveName(library: earlier),
+           !ExternalDrives.shared.folders.contains(where: { $0.name == name }) { setTarget(appID, nil) }
+        let target = ExternalInstallTarget.select(existing: targets[appID], installed: installed, requested: library, fallback: Self.installLibrary)
+        guard SteamInstallPaths.isManaged(library: target) else { error = "The install library is invalid."; return }
+        setTarget(appID, target)
         if inSession {
             resumeAfterSession.insert(appID); downloads[appID] = Download(state: .paused); return
         }
@@ -1315,6 +1375,8 @@ final class SteamOwnedLibrary: ObservableObject {
     /// Stops a download. A first-time install also loses its partial files;
     /// an update of an installed game is only paused, never deleted.
     func cancelInstall(_ appID: Int, installed: Bool) {
+        guard !deleting.contains(appID), !cloudBusy.contains(appID), cloud[appID]?.phase != .checking,
+              GameMover.shared.moving == nil else { error = "Wait for the file operation to finish."; return }
         let running = active?.id == appID ? active?.task : nil
         pause(appID)
         downloads[appID] = nil
@@ -1322,11 +1384,21 @@ final class SteamOwnedLibrary: ObservableObject {
         // BCD DLC (owner, 2026-10-22: never remember the DLC answer, ask every time): a cancelled first install keeps no
         // DLC answer; the next Install asks again.
         dlc.choices.forget(appID)
-        let apps = Self.steamApps
+        let library = library(for: appID)
+        deleting.insert(appID)
         Task { @MainActor in
+            defer { deleting.remove(appID) }
             await running?.value
-            SteamInstallFiles.delete(appID: appID, folderName: game.folderName, steamApps: apps)
-            SteamLog.event("[steam-depot] cancelled app=\(appID) partial-files-removed=1")
+            do {
+                let apps = try ExternalDrives.nativeURL(library, write: true)
+                try SteamInstallFiles.delete(appID: appID, folderName: game.folderName, steamApps: apps)
+                setTarget(appID, nil)
+                SteamLog.event("[steam-depot] cancelled app=\(appID) partial-files-removed=1")
+            } catch ExternalStorageError.unavailable {
+                // BCD: the drive is not connected: its partial files stay there, and the next Install may choose another place.
+                setTarget(appID, nil)
+                SteamLog.event("[steam-depot] cancelled app=\(appID) partial-files-removed=0 reason=drive-missing")
+            } catch { self.error = "The partial install was kept: " + error.localizedDescription }
         }
     }
 
@@ -1342,18 +1414,29 @@ final class SteamOwnedLibrary: ObservableObject {
     /// Madeira Dock's own), with its library entry (its per-game settings).
     func uninstall(_ game: DockGame) {
         guard SteamInstallPaths.isManaged(library: game.library), !inSession else { return }
+        guard !deleting.contains(game.id), !cloudBusy.contains(game.id), cloud[game.id]?.phase != .checking,
+              GameMover.shared.moving == nil else { error = "Wait for the file operation to finish."; return }
+        let running = active?.id == game.id ? active?.task : nil
         pause(game.id); downloads[game.id] = nil
-        LibraryModel.shared.removeSteam(appID: game.id)
-        // A reinstall evaluates the game's one-time installs again.
-        DockInstallers.setRunsNext(game.id, true, prefix: MadeiraDock.prefix)
         // BCD DLC (owner, 2026-10-22): an uninstalled game keeps no DLC answer; a reinstall asks again.
         dlc.choices.forget(game.id)
-        let apps = Self.steamApps, id = game.id, folder = game.installDir
-        Task.detached(priority: .utility) {
-            SteamInstallFiles.delete(appID: id, folderName: folder, steamApps: apps)
-            await MainActor.run { SteamGamesModel.shared.refresh() }
+        deleting.insert(game.id)
+        Task { @MainActor in
+            defer { deleting.remove(game.id) }
+            await running?.value
+            do {
+                let apps = try ExternalDrives.nativeURL(game.library, write: true)
+                try await Task.detached(priority: .utility) {
+                    try SteamInstallFiles.delete(appID: game.id, folderName: game.installDir, steamApps: apps)
+                }.value
+                LibraryModel.shared.removeSteam(appID: game.id)
+                // A reinstall evaluates the game's one-time installs again.
+                DockInstallers.setRunsNext(game.id, true, prefix: MadeiraDock.prefix)
+                setTarget(game.id, nil)
+                SteamGamesModel.shared.refresh()
+                SteamLog.event("[steam-depot] uninstalled app=\(game.id)")
+            } catch { self.error = "The install could not be removed: " + error.localizedDescription }
         }
-        SteamLog.event("[steam-depot] uninstalled app=\(id)")
     }
 
     private func pump() {
@@ -1371,10 +1454,22 @@ final class SteamOwnedLibrary: ObservableObject {
     private func run(_ appID: Int) async {
         var outcome = SteamDownloadBackground.Outcome.paused
         do {
+            // The chosen drive is unplugged: fail rather than fill this device.
+            let library = library(for: appID)
+            // BCD: a drive plugged in since BCD started is opened first (ExternalDrives.mountAll, nothing while a game runs).
+            if let name = ExternalDrives.driveName(library: library) ?? (targets[appID] == nil ? ExternalDrives.steamInstallMissing : nil),
+               !ExternalDrives.isConnected(name) {
+                ExternalDrives.shared.mountAll()
+            }
+            if targets[appID] == nil, let missing = ExternalDrives.steamInstallMissing {
+                throw SteamDriveMissing(name: missing)
+            }
+            if let name = ExternalDrives.driveName(library: library), !ExternalDrives.isConnected(name) {
+                throw SteamDriveMissing(name: name)
+            }
             guard var info = try await fetcher.fetchInstallInfo(appID: UInt32(appID)) else {
                 throw SteamError.appInfoNotFound(UInt32(appID))
             }
-            try FileManager.default.createDirectory(at: SteamInstallPaths.common(drive: Self.drive), withIntermediateDirectories: true)
             // madeira-bcd (2026-10-22): env.MADEIRA_STEAM_CHUNK_SHA1 = 1 refuses a chunk whose SHA-1 differs from the manifest's;
             // off (the default), such a chunk is only logged (ChunkDigestCheck in DepotDownloader.swift).
             ChunkDigestCheck.shared.enforce = SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false)
@@ -1384,18 +1479,26 @@ final class SteamOwnedLibrary: ObservableObject {
             // The version the player picked (SteamBranch, Options › Version): the public build unless a beta was chosen; a beta's code is
             // checked with Steam again. Nothing is asked of Steam for the public build.
             try await fetcher.applyBranch(&info, branch: branchToDownload(appID), code: SteamBranch.code(appID))
-            let dlcRequest = await dlc.request(for: info, steamApps: Self.steamApps)
-            let folder = try await downloader.install(info, steamApps: Self.steamApps,
+            let steamApps = try ExternalDrives.nativeURL(library, write: true)
+            let common = try ExternalDrives.nativeURL(library + "/common", write: true)
+            _ = try ExternalDrives.nativeURL(library + "/common/" + SteamInstallFiles.safeFolderName(info.installDir.isEmpty ? "app_\(appID)" : info.installDir), write: true)
+            _ = try ExternalDrives.nativeURL(library + "/downloading/\(appID)", write: true)
+            try FileManager.default.createDirectory(at: common, withIntermediateDirectories: true)
+            SteamLog.event("[steam-depot] install app=\(appID) library=\(library)")
+            let dlcRequest = await dlc.request(for: info, steamApps: steamApps)
+            let folder = try await downloader.install(info, steamApps: steamApps,
                                                       ownedDepots: { [weak self] in try? await self?.fetcher.ownedDepotIDs() },
                                                       dlc: dlcRequest) { [weak self] progress in
                 self?.downloads[appID]?.progress = progress
                 SteamDownloadBackground.shared.progress(progress)
             }
             downloads[appID] = nil
+            // A new library on a drive is listed for Dock and Valve's client.
+            if library.hasPrefix("External/") { ExternalDrives.shared.refreshSteam() }
             // The install record is written last: the game is now "installed" for Dock, and it
             // gets its library entry (its Game details page and settings; an existing one is kept).
             LibraryModel.shared.upsertSteam(DockGame(id: appID, name: info.name, installDir: folder.lastPathComponent,
-                                                     library: SteamInstallPaths.libraryRelative, installed: true,
+                                                     library: library, installed: true,
                                                      customExecutables: false), title: info.name)
             SteamLog.event("[steam-depot] library entry app=\(appID)")
             SteamGamesModel.shared.refresh()
@@ -1408,6 +1511,11 @@ final class SteamOwnedLibrary: ObservableObject {
                 downloads[appID]?.state = .failed(SteamSignIn.message(error))
                 handleSessionError(error, context: "depot")
                 outcome = .failed(SteamSignIn.message(error))
+            } else if let missing = error as? SteamDriveMissing {
+                let message = "\(missing.name) is not connected. Plug it in and tap Try again, or stop the download and install the game on this device."
+                downloads[appID]?.state = .failed(message)
+                SteamLog.event("[steam-depot] failed app=\(appID) reason=drive-missing")
+                outcome = .failed(message)
             } else {
                 // Refused by the content servers: Try again asks Steam for new authorization.
                 if case SteamError.contentHTTP(let status) = error, status == 401 || status == 403 { downloader.forgetAuthorization() }
@@ -1450,3 +1558,6 @@ final class SteamOwnedLibrary: ObservableObject {
         }
     }
 }
+
+/// The external drive Steam downloads go to is not connected.
+struct SteamDriveMissing: Error { let name: String }

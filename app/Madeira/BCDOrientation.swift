@@ -64,6 +64,19 @@ enum BCDOrientationRules {
         return BCDOrientationChoice(setting: global)
     }
 
+    /// Night round 2026-11-11 (A5 S15; Q4XKJ6 and VW8QG1: "when the app is exited and then opened a second time to enter the game, if landscape mode is
+    /// locked, only half the screen shows"): whether an interface orientation is one the lock allows. `mask` is a UIInterfaceOrientationMask's raw
+    /// value, `interfaceRaw` a UIInterfaceOrientation's (portrait 1, upside down 2, right 3, left 4; the mask has the bit of that number).
+    static func allows(mask: UInt, interfaceRaw: Int) -> Bool {
+        interfaceRaw > 0 && interfaceRaw < 8 && mask & (1 << UInt(interfaceRaw)) != 0
+    }
+
+    /// The `[orientation] check:` line (log only): what the lock is, what the scene is, and whether the lock turns it again.
+    static func checkLine(lock: String, reason: String, sceneW: Double, sceneH: Double, interfaceRaw: Int, fits: Bool) -> String {
+        String(format: "[orientation] check: lock=%@ reason=%@ scene=%.0fx%.0f interface=%d %@", lock, reason, sceneW, sceneH, interfaceRaw,
+               fits ? "matches" : "turns again")
+    }
+
     /// The game page's choices: "" follows Settings (and says what that is now), the others are the game's own.
     static func gameChoices(global: String?) -> [(value: String, label: String)] {
         let now = BCDOrientationChoice(setting: global)
@@ -173,11 +186,17 @@ final class BCDOrientationLock {
     /// scenes are asked to turn to the locked ones now. When a lock ends, the interface turns to the way the device
     /// is held now (UIKit leaves it where it is until the device moves).
     func apply(_ new: BCDOrientationChoice) {
-        guard new != choice else { return }
+        guard new != choice else {
+            // Night round 2026-11-11 (A5 S15): the lock is in force already (the app was left and opened again with a session, or a session did not
+            // end cleanly): the scene may have come back in the orientation iOS chose, so look again instead of trusting the lock.
+            if new.locked { reassert(reason: "start") }
+            return
+        }
         let old = choice
         choice = new
         let device = UIDevice.current
         if new.locked && !old.locked { device.beginGeneratingDeviceOrientationNotifications() }
+        if new.locked { watchActivation() } else { unwatchActivation() }
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         for scene in scenes {
             for window in scene.windows { window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations() }
@@ -189,6 +208,41 @@ final class BCDOrientationLock {
         }
         if !new.locked && old.locked { device.endGeneratingDeviceOrientationNotifications() }
         onLog?("[orientation] \(old.rawValue) -> \(new.rawValue)")
+    }
+
+    /// Night round 2026-11-11 (A5 S15): while a lock is on, the app coming back to the front looks at the scenes once more.
+    private var activeObserver: NSObjectProtocol?
+
+    private func watchActivation() {
+        guard activeObserver == nil else { return }
+        activeObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reassert(reason: "activate") }
+        }
+    }
+
+    private func unwatchActivation() {
+        if let observer = activeObserver { NotificationCenter.default.removeObserver(observer) }
+        activeObserver = nil
+    }
+
+    /// One look at every scene while a lock is on: one `[orientation] check:` line each, and a scene whose interface orientation the lock does not
+    /// allow is asked again to turn (the windows are asked which orientations they may take, then the geometry update). A scene that already
+    /// matches is left alone, so a lock that works stays as it is. Nothing happens without a lock.
+    func reassert(reason: String) {
+        guard choice.locked, let mask = choice.mask else { return }
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        for scene in scenes {
+            let raw = scene.interfaceOrientation.rawValue
+            let fits = BCDOrientationRules.allows(mask: mask.rawValue, interfaceRaw: raw)
+            let size = scene.coordinateSpace.bounds.size
+            onLog?(BCDOrientationRules.checkLine(lock: choice.rawValue, reason: reason, sceneW: Double(size.width), sceneH: Double(size.height),
+                                                 interfaceRaw: raw, fits: fits))
+            guard !fits else { continue }
+            for window in scene.windows { window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations() }
+            scene.requestGeometryUpdate(.iOS(interfaceOrientations: mask)) { [weak self] error in
+                self?.onLog?("[orientation] the screen could not turn to \(mask.rawValue): \(error.localizedDescription)")
+            }
+        }
     }
 }
 

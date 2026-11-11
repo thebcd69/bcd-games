@@ -203,7 +203,7 @@ cr = body('static HRESULT mad_create_resource_at(struct mad_device *d, D3D12_HEA
 check('mip0-full: layouts, sizes and creation all see the resolved count (GetDesc answers what creation stored)',
       fp.index('desc = mad_desc_mips(desc, &dfix);') < fp.index('mips = desc->MipLevels ? desc->MipLevels : 1;') and
       'const D3D12_RESOURCE_DESC *d = mad_desc_mips(&descs[i], &dfix);' in ai and
-      cr.index('desc = mad_desc_mips(desc, &dfix); }') < cr.index('r->desc = *desc;') < cr.index('mad_texinfo_from_desc(desc, &ti, &pf, &is_depth)') and
+      cr.index('desc = mad_desc_mips(desc, &dfix); }') < cr.index('r->desc = *desc;') < cr.index('mad_texinfo_from_desc(d, desc, &ti, &pf, &is_depth)') and
       '*ret = ((struct mad_resource *)This)->desc;' in body('static D3D12_RESOURCE_DESC * STDMETHODCALLTYPE res_GetDesc(ID3D12Resource *This, D3D12_RESOURCE_DESC *ret)'))
 check('mip0-full: every texture created with MipLevels 0 is named (capped), with what it got',
       '[mip0] r#%u' in cr and 'if (InterlockedIncrement(&said) <= 24)' in cr and 'mad_full_mips(desc), (unsigned)r->tex_mips' in cr)

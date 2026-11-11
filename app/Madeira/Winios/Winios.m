@@ -1,5 +1,6 @@
-/* Portions copyright 2026 alantangok and 125hz: code taken from https://github.com/willfaust/Madeira (pull request #243; commits abca30a and 9806664)
- * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+/* Portions copyright 2026 alantangok, 125hz and Jelly-RayTian: code taken from https://github.com/willfaust/Madeira (pull requests #243 and #400; commits abca30a and 9806664)
+ * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Winios.m — iOS user_driver implementation for Wine.
  *
  * The Wine win32u-unix side declares weak externs `winios_pCreateWindow`,
@@ -37,6 +38,7 @@
 /* The window census struct is shared with Swift through this header;
  * including it here keeps both sides' definitions the same. */
 #include "Winios.h"
+#include "VulkanLayerGeometry.h"   /* madeira-bcd (Windows Vulkan) */
 #include "WiniosCursor.h"
 #include "winios_windowed.h"
 
@@ -1033,7 +1035,43 @@ static int winios_drain_text(const winios_input_event_t *e) {
     return 1;
 }
 
+/* madeira-bcd (build 646): [ptr-map] a windowed game's picture fills the game view, so a point on it goes into the window's client
+ * rect, not onto the whole guest screen (winios_ptr_map.h has the why). winios_ptr_map_update (main thread, below) keeps the rect of the
+ * window the game's swapchain presents into; 0 = off: no window known, a full-screen window, a launcher or dialog window drawn over the
+ * game (those are drawn at their place on the whole screen), or a desktop session. Any thread reads it. */
+#include "winios_ptr_map.h"
+static _Atomic(unsigned long long) g_ptr_map_client;   /* winios_ptr_map_pack(cx, cy, cw, ch), 0 = off */
+static _Atomic(unsigned long long) g_ptr_map_screen;   /* winios_ptr_map_pack(0, 0, sw, sh), written before the client rect */
+
+static int winios_ptr_map_load(int *sw, int *sh, int *cx, int *cy, int *cw, int *ch) {
+    unsigned long long c = atomic_load_explicit(&g_ptr_map_client, memory_order_acquire), sc;
+    int zx, zy;
+    if (!c) return 0;
+    sc = atomic_load_explicit(&g_ptr_map_screen, memory_order_acquire);
+    winios_ptr_map_unpack(c, cx, cy, cw, ch);
+    winios_ptr_map_unpack(sc, &zx, &zy, sw, sh);
+    return winios_ptr_map_wanted(*sw, *sh, *cx, *cy, *cw, *ch);
+}
+
+/* Swift (HardwareInput.renderCursor): a cursor position Windows reported, in screen pixels, to the picture's space; 1 when moved. */
+int winios_pointer_map_invert(int *x, int *y) {
+    int sw, sh, cx, cy, cw, ch;
+    if (!x || !y || !winios_ptr_map_load(&sw, &sh, &cx, &cy, &cw, &ch)) return 0;
+    winios_ptr_map_invert(x, y, sw, sh, cx, cy, cw, ch);
+    return 1;
+}
+
+/* Swift: a point in the picture's space to screen pixels inside the window, as an absolute move is posted; 1 when moved. */
+int winios_pointer_map_apply(int *x, int *y) {
+    int sw, sh, cx, cy, cw, ch;
+    if (!x || !y || !winios_ptr_map_load(&sw, &sh, &cx, &cy, &cw, &ch)) return 0;
+    winios_ptr_map_apply(x, y, sw, sh, cx, cy, cw, ch);
+    return 1;
+}
+
 static void winios_q_push_ev(unsigned int type, int x, int y, unsigned int flags, unsigned int data) {
+    /* [ptr-map]: every absolute move, press or release (finger, pointer, Pencil, touch trackpad) passes here */
+    if (type == WINIOS_EV_MOUSE && (flags & MOUSEEVENTF_ABSOLUTE)) (void)winios_pointer_map_apply(&x, &y);
     pthread_mutex_lock(&g_input_q.lock);
     unsigned int next = (g_input_q.head + 1) % WINIOS_RING_SIZE;
     if (next != g_input_q.tail) {
@@ -1217,7 +1255,8 @@ BOOL winios_pProcessEvents(DWORD mask) {
 static NSMutableDictionary<NSNumber *, CALayer *> *g_layers;
 static NSMutableDictionary<NSNumber *, NSValue *> *g_px_rects;  /* hwnd → last px rect */
 static NSMutableDictionary<NSNumber *, NSValue *> *g_surf_sizes; /* hwnd → surface px size */
-static NSMutableDictionary<NSNumber *, CAMetalLayer *> *g_metal_layers; /* hwnd → DXMT layer */
+static NSMutableDictionary<NSNumber *, CAMetalLayer *> *g_metal_layers; /* hwnd → Metal layer (DXMT's or Vulkan's) */
+static NSHashTable<CAMetalLayer *> *g_vulkan_layers; /* madeira-bcd (Windows Vulkan): weak identities; main thread only */
 static NSMutableDictionary<NSNumber *, NSValue *> *g_client_rects;      /* hwnd → client px rect */
 static NSMutableDictionary<NSNumber *, NSNumber *> *g_root_hwnd;        /* child hwnd → top-level ancestor hwnd */
 static NSMutableDictionary<NSNumber *, NSNumber *> *g_win_depth;        /* child hwnd → ancestor depth >= 1 */
@@ -1378,6 +1417,21 @@ void winios_set_compositor_frame(double x, double y, double w, double h) {
  * on the app window above the library and keeps showing the last frame after
  * the session ended, so the library hides it then and shows it again for the
  * next session. Returns 1 when there was a view to change. */
+static int g_compositor_backgrounded;
+void winios_compositor_set_backgrounded(int backgrounded) {
+    __atomic_store_n(&g_compositor_backgrounded, backgrounded != 0, __ATOMIC_RELEASE);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (g_compositor_view) {
+            BOOL hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
+            g_compositor_view.hidden = hidden;
+            // A background-started desktop precedes the Metal host's first
+            // attachment. Restore the desktop above that opaque host on Open.
+            if (!hidden && !g_comp_game)
+                [g_compositor_view.superview bringSubviewToFront:g_compositor_view];
+        }
+    });
+}
+
 int winios_compositor_set_hidden(int hidden) {
     if (!g_compositor_view) return 0;
     if (g_comp_game) {   /* an ended game session's windows go away */
@@ -1449,6 +1503,60 @@ int winios_desktop_point_from_window(double wx, double wy, int *px, int *py) {
  * desktop)"). Unset or 1: unchanged. */
 static NSMutableSet<NSNumber *> *g_game_metal;  /* game mode: hwnds presenting through Metal */
 
+/* madeira-bcd (build 646): [ptr-map], main thread only. The window the picture comes from: in a game session (the game-mode overlay),
+ * the swapchain window shown last when it presents through Metal, else the only such window whose client rect is known; none while a
+ * window of the overlay (a launcher, a dialog) is shown over the game. Called whenever a window's frame, a layer's visibility or the
+ * set of Metal windows changes. One log line per change, the first 32. */
+static void winios_ptr_map_update(const char *why) {
+    unsigned long long client = 0, screen = 0, old;
+    NSNumber *pick = nil;
+    int sw = 0, sh = 0;
+
+    if (g_comp_game && g_game_metal.count) {
+        BOOL overlay = NO;
+        for (NSNumber *k in g_layers) {
+            CALayer *l = g_layers[k];
+            if (![g_game_metal containsObject:k] && !l.hidden && !CGRectIsEmpty(l.bounds)) { overlay = YES; break; }
+        }
+        if (!overlay) {
+            int last = atomic_load_explicit(&g_swap_last_shown, memory_order_relaxed);
+            void *lh = last ? winios_swapchain_hwnd_at(last - 1) : NULL;
+            NSNumber *lk = lh ? @((uintptr_t)lh) : nil;
+            if (lk && [g_game_metal containsObject:lk] && g_client_rects[lk]) pick = lk;
+            else {
+                NSUInteger n = 0;
+                for (NSNumber *k in g_game_metal) if (g_client_rects[k]) { pick = k; n++; }
+                if (n != 1) pick = nil;
+            }
+        }
+    }
+    if (pick) {
+        CGRect c = g_client_rects[pick].CGRectValue;
+        int cx = (int)c.origin.x, cy = (int)c.origin.y, cw = (int)c.size.width, ch = (int)c.size.height;
+        winios_screen_size(&sw, &sh);
+        if (winios_ptr_map_wanted(sw, sh, cx, cy, cw, ch)) {
+            screen = winios_ptr_map_pack(0, 0, sw, sh);
+            client = winios_ptr_map_pack(cx, cy, cw, ch);
+        }
+    }
+    old = atomic_load_explicit(&g_ptr_map_client, memory_order_relaxed);
+    if (client) atomic_store_explicit(&g_ptr_map_screen, screen, memory_order_release);
+    atomic_store_explicit(&g_ptr_map_client, client, memory_order_release);
+    if (old != client) {
+        static unsigned n;
+        if (++n <= 32) {
+            if (client) {
+                int cx, cy, cw, ch;
+                winios_ptr_map_unpack(client, &cx, &cy, &cw, &ch);
+                fprintf(stderr, "[ptr-map] the picture is window hwnd=0x%llx's client (%d,%d %dx%d) on a %dx%d screen: points on it go "
+                                "there (%s)\n", pick.unsignedLongLongValue, cx, cy, cw, ch, sw, sh, why);
+            } else
+                fprintf(stderr, "[ptr-map] off: points map to the whole screen (%s)\n", why);
+            fflush(stderr);
+        }
+    }
+}
+
 static int winios_desktop_session(void) {
     /* read every time: one app run can hold desktop and game sessions */
     const char *dm = getenv("MADEIRA_DESKTOP");
@@ -1497,6 +1605,7 @@ static void winios_drop_compositor(const char *why) {
     fprintf(stderr, "[winios] %s compositor removed (%s)\n", g_comp_game ? "game-mode" : "desktop", why);
     fflush(stderr);
     g_comp_game = NO;
+    winios_ptr_map_update(why);   /* build 646, [ptr-map]: no game overlay, no map */
 }
 
 /* main thread only. Is this window drawn by the game overlay? Removes its
@@ -1529,6 +1638,7 @@ void winios_note_game_metal_hwnd(void *hwnd) {
         fprintf(stderr, "[winios] game window hwnd=%p presents through Metal; its GDI surface is not drawn\n", hwnd);
         fflush(stderr);
         if (g_comp_game) (void)winios_game_window_shown(key);
+        winios_ptr_map_update("a swapchain window");   /* build 646, [ptr-map] */
     });
 }
 
@@ -1539,6 +1649,7 @@ void winios_session_reset(void) {
     dispatch_async(dispatch_get_main_queue(), ^{
         [g_game_metal removeAllObjects];
         if (g_comp_game) winios_drop_compositor("new session");
+        winios_ptr_map_update("new session");   /* build 646, [ptr-map]: off until the new game's window is known */
         winios_metal_hud_pick();   /* the window-level layer's HUD follows the session kind */
     });
 }
@@ -1566,6 +1677,7 @@ static void winios_ensure_compositor(void) {
         if (!g_px_rects) g_px_rects = [NSMutableDictionary new];
         if (!g_surf_sizes) g_surf_sizes = [NSMutableDictionary new];
         g_compositor_view = [[UIView alloc] initWithFrame:win.bounds];
+        g_compositor_view.hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
         g_compositor_view.userInteractionEnabled = NO;  /* touches fall through */
         g_compositor_view.clipsToBounds = YES;
         g_compositor_view.backgroundColor = UIColor.clearColor;
@@ -1594,6 +1706,7 @@ static void winios_ensure_compositor(void) {
     g_px_rects = [NSMutableDictionary new];
     g_surf_sizes = [NSMutableDictionary new];
     g_compositor_view = [[UIView alloc] initWithFrame:win.bounds];
+        g_compositor_view.hidden = __atomic_load_n(&g_compositor_backgrounded, __ATOMIC_ACQUIRE);
     g_compositor_view.userInteractionEnabled = NO;  /* touches fall through */
     g_compositor_view.clipsToBounds = YES;
     /* letterbox area: black, like the rest of a session's screen (the game
@@ -1765,6 +1878,10 @@ static void winios_remove_layer(HWND hwnd) {
             [g_px_rects removeObjectForKey:key];
             winios_game_cursor_refresh();
         }
+        if (g_comp_game) {   /* build 646, [ptr-map]: a gone window's client rect means nothing */
+            [g_client_rects removeObjectForKey:key];
+            winios_ptr_map_update("a window removed");
+        }
         CAMetalLayer *ml = g_metal_layers[key];
         if (ml) {
             [ml removeFromSuperlayer];
@@ -1850,10 +1967,13 @@ static void winios_place_metal_layer(NSNumber *key) {
     if (!wv || !cv) return;
     CGRect w = wv.CGRectValue, c = cv.CGRectValue;
     CGFloat s = g_px_to_pt;
+    BOOL vulkan = [g_vulkan_layers containsObject:ml];
+    if (vulkan) ml.affineTransform = CGAffineTransformIdentity;
     ml.frame = CGRectMake((c.origin.x - w.origin.x) * s,
                           (c.origin.y - w.origin.y) * WINIOS_PX_TO_PT_Y,
                           c.size.width * s, c.size.height * WINIOS_PX_TO_PT_Y);
     winios_desktop_fit(key, ml, c);
+    if (vulkan) madeira_vulkan_layer_geometry(ml, ml.frame, c.size);
 }
 
 /* madeira-bcd: A HIDDEN WINDOW PRESENTS SLOWLY. A desktop window's swapchain
@@ -2083,6 +2203,29 @@ CAMetalLayer *winios_metal_layer_for_hwnd(void *hwnd) {
     return result;
 }
 
+/* madeira-bcd (Windows Vulkan; Madeira #400/#462): Vulkan preserves the Wine client-pixel extent independently of the compositor's point
+ * placement. Do not change the DXMT-only layer path. Weak layer identities avoid carrying the Vulkan flag across HWND reuse. */
+CAMetalLayer *winios_vulkan_layer_for_hwnd(void *hwnd) {
+    __block CAMetalLayer *result = nil;
+    void (^make)(void) = ^{
+        CAMetalLayer *ml = winios_metal_layer_for_hwnd(hwnd);
+        if (!ml) return;
+        if (!g_vulkan_layers) g_vulkan_layers = [NSHashTable weakObjectsHashTable];
+        [g_vulkan_layers addObject:ml];
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        winios_place_metal_layer(@((uintptr_t)hwnd));
+        [CATransaction commit];
+        fprintf(stderr, "[vk-layer] hwnd=%p client=%.0fx%.0f point-frame=%.1fx%.1f scale=%.1f\n",
+                hwnd, ml.bounds.size.width, ml.bounds.size.height,
+                ml.frame.size.width, ml.frame.size.height, (double)ml.contentsScale);
+        result = ml;
+    };
+    if ([NSThread isMainThread]) make();
+    else dispatch_sync(dispatch_get_main_queue(), make);
+    return result;
+}
+
 /* Parent show/hide: update existing child layers on the same queue as frames.
  * A hidden child retains its surface and Metal layer for a later parent show. */
 void winios_window_visibility(HWND hwnd, int visible) {
@@ -2098,6 +2241,7 @@ void winios_window_visibility(HWND hwnd, int visible) {
         winios_sync_metal_hidden(@((uintptr_t)hwnd), l);
         winios_swap_layer_note(@((uintptr_t)hwnd), "parent shown or hidden");
         winios_game_cursor_refresh();
+        if (g_comp_game) winios_ptr_map_update("a window shown or hidden");   /* build 646, [ptr-map] */
         static unsigned n;
         if (++n <= 64 || (n % 128) == 0) {
             fprintf(stderr, "[winios] inherited visibility hwnd=%p visible=%d\n", hwnd, !hidden);
@@ -2144,7 +2288,10 @@ void winios_window_frame(HWND hwnd, int x, int y, int w, int h, int visible,
         NSNumber *key = @((uintptr_t)hwnd);
         if (g_comp_game) {   /* game-mode windows, see winios_game_window_shown */
             g_px_rects[key] = [NSValue valueWithCGRect:CGRectMake(x, y, w, h)];
-            if (!winios_game_window_shown(key)) return;
+            /* build 646, [ptr-map]: a Metal window keeps its client rect too (it has no layer) */
+            if (!g_client_rects) g_client_rects = [NSMutableDictionary new];
+            g_client_rects[key] = [NSValue valueWithCGRect:CGRectMake(cx, cy, cw, ch)];
+            if (!winios_game_window_shown(key)) { winios_ptr_map_update("window frame"); return; }
         }
         CALayer *l = winios_layer_for(hwnd, true);
         g_px_rects[key] = [NSValue valueWithCGRect:CGRectMake(x, y, w, h)];
@@ -2164,6 +2311,7 @@ void winios_window_frame(HWND hwnd, int x, int y, int w, int h, int visible,
         winios_sync_metal_hidden(key, l);
         winios_swap_layer_note(key, "window frame");
         winios_game_cursor_refresh();
+        if (g_comp_game) winios_ptr_map_update("window frame");   /* build 646, [ptr-map]: an overlay window shown or moved */
     });
 }
 

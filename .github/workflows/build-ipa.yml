@@ -1,5 +1,7 @@
 # Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #462)
 # under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 name: Build Madeira IPA (unsigned)
 
 on:
@@ -77,6 +79,10 @@ jobs:
       # The preview still compiles every distinct input; identical checks share its successful result.
       - name: Check preview build cache correctness
         run: python3 tests/host/check-ui-preview-cache.py
+
+      # Settings › Appearance (thebcd69/bcd-games#27 by creeper4004): the colour profile store and its file format on the host.
+      - name: Check the colour profiles
+        run: python3 tests/host/check-bcd-themes.py
 
       # madeira-bcd: the games' built-in recommended settings and where the app
       # applies them (GameRecommendations.swift; owner's decision 2026-10-09).
@@ -156,6 +162,16 @@ jobs:
       # follow only (no orientation or geometry request, nothing paused or restarted). Nothing else in the app changes.
       - name: Check the foldable iPhone support
         run: python3 tests/host/check-bcd-foldable.py
+
+      # The native Duo interface (thebcd69/bcd-games#43; BCDDuoFeatures: the foldable model AND its own switch, off by default) and the
+      # tabletop pose (#31): the controller's navigation core and the focus layers, the Steam download hold that is released when the
+      # background Windows desktop closes (and Resume's question), the desktop quit's server shutdown and its native-thread
+      # acknowledgement with real pthreads, and the tabletop geometry. Host runs; nothing else in the app changes.
+      - name: Check the native Duo interface
+        run: |
+          python3 tests/host/check-duo-controller-navigation.py
+          python3 tests/host/check-duo-download-session.py
+          python3 tests/host/check-desktop-quit.py
 
       # A Done button on the keyboard where config lines and long text are typed (BCDKeyboardDone): every editor has one.
       - name: Check the keyboard's Done button
@@ -432,6 +448,15 @@ jobs:
           python3 tests/host/check-fex-inval-null-thread.py
           python3 tests/host/check-fex-processorid.py
           python3 tests/host/check-fex-moffs-rip.py
+          python3 tests/host/check-ntdll-rtcs-null-area.py
+          python3 tests/host/check-fex-allocwatch-clear.py
+          python3 tests/host/check-fex-threadterm-clear-area.py
+          python3 tests/host/check-fex-repne-bit-ops.py
+          python3 tests/host/check-fex-dep-promote-stale.py
+          python3 tests/host/check-fex-pool-alloc-null.py
+          python3 tests/host/check-fex-process-term.py
+          python3 tests/host/check-fex-wow-recursive-tcm.py
+          python3 tests/host/check-fex-notify-nocpuarea.py
           python3 tests/host/check-thread-sample-syscall.py
           python3 tests/host/check-usd-osversion.py
           python3 tests/host/check-thread-fault-isolate.py
@@ -780,6 +805,28 @@ jobs:
       # Round 626 (P S8): the Mach exception thread's diagnostics read through mach_vm_read_overwrite, never a plain load.
       - name: Check the Mach exception thread's checked reads
         run: python3 tests/host/check-mach-exc-safe-reads.py
+      # Night round 2026-11-11 (W-SIG; G6 S8, Maneater): the SIGBUS and SIGSEGV handlers' diagnostics read through a register of the
+      # interrupted thread (LR - 4, PC, x11, x17) with a checked read, never a plain load: a wild LR killed the thread inside the handler.
+      - name: Check the fault handlers' register-derived reads
+        run: python3 tests/host/check-bus-handler-safe-reads.py
+      # Night round 2026-11-11 (W-SIG; G9 S11 and S3): the store emulator's [store-undecoded] line is for real store gaps only (a fetch fault or a
+      # word outside the load/store group gets a short line of its own); the pre-index STR/STRB/STRH masks stay as they are (the BSD handler heals).
+      - name: Check the store emulator's undecoded report
+        run: python3 tests/host/check-store-undecoded-report.py
+      # Night round 2026-11-11 (W-SIG; G1 S3, Assassin's Creed IV Y7XADV): a 32-bit thread's stack guard page is a stack guard (STATUS_STACK_OVERFLOW,
+      # StackLimit lowered as a guest value), and the [stack-ovf] fingerprint has a 32-bit sibling that names the recursion. The real helpers and the
+      # real fingerprint compiled and run on the host.
+      - name: Check the 32-bit thread stack guard
+        run: python3 tests/host/check-wow-stack-guard.py
+      # Night round 2026-11-11 (W-SIG; T1 S3, Alan Wake D6F62Q and 22 archive logs): MADEIRA_EXIT_POOL_DIAG / MADEIRA_EXIT_POOL_SKIP, both off by default: a Wine thread
+      # that exits with a freed object in its autorelease pool killed BCD in libobjc's thread-exit destructor. The real helpers run on this Mac against the bug.
+      - name: Check the exit-time autorelease pool switches
+        run: python3 tests/host/check-exit-pool.py
+      # Night round 2026-11-11 (W-SIG; G3 S4, T1 S10, G3 S10, G1 S10, D S13, G8 S4, D S16, G2 S17, G2 S10, A4 S6 and the source shape of G11 S5, G9 S7, G6 S13, T1 S9, G2 S16):
+      # the log-only diagnostics compiled from the real sources on the host against memory the check builds (a constructed 32-bit window with an import table, a 64-bit
+      # module with a PE header, three views of a JIT page, a ring of thread frees), plus the auto-tune rules and fixtures that name them.
+      - name: Check the night round's log-only diagnostics
+        run: python3 tests/host/check-w-sig-diagnostics.py
       # Round 626 (U2 S10, Sable PVTSYM): every CoreHaptics call of the controller rumble is guarded; a stopped engine is rebuilt.
       - name: Check the rumble's CoreHaptics guard
         run: python3 tests/host/check-pad-output-haptics-guard.py
@@ -951,6 +998,44 @@ jobs:
       - name: Check Wine's zeroed mitigation policy (Glyphica, ChakraCore)
         run: python3 tests/host/check-zero-mitigation-policy.py
 
+      # madeira-bcd (night round 2026-11-11, Surviving Mars 34BEY6, G6 S9): [winios-tree] prints the text of a Static or Button child (a message
+      # box's body), which a 64-bit program's box never had in the log. Log only.
+      - name: Check the window tree's child text (message boxes of 64-bit programs)
+        run: python3 tests/host/check-winios-tree-child-text.py
+
+      # madeira-bcd (night round 2026-11-11, Dying Light T92QFA, T2 S-DL1): env.MADEIRA_DISPLAY_FOLLOW_BORDERLESS = 1 (default off) makes the virtual
+      # monitor follow a borderless window smaller than it (a game whose resolution menu resizes its window instead of switching the display mode).
+      - name: Check the opt-in monitor that follows a borderless window
+        run: python3 tests/host/check-display-follow-borderless.py
+
+      # madeira-bcd (night round 2026-11-11, Fear & Hunger 2 6Z8SV4, G5 S4b): [winios-tree] surface says whether anything was flushed into a window's
+      # recreated surface (Chromium stopped drawing, or BCD stopped showing what it draws). Log only.
+      - name: Check the recreated-surface census in the window tree
+        run: python3 tests/host/check-winios-surface-recreated.py
+
+      # madeira-bcd (night round 2026-11-11, Akka Arrh 8BBTB3 / Soldier of Fortune JHANDP, T3 S11): the 120th presented frame of a GL window is
+      # probed (non-black share, mean colour) so a black picture and a wrongly drawn one read differently in the log. Log only.
+      - name: Check the OpenGL frame probe
+        run: python3 tests/host/check-gl-probe.py
+
+      # madeira-bcd (night round 2026-11-11, Resonance A82ECP / Devil May Cry 5 7VHWKC, T3 S12 / T1 S17): the HID controller's wineserver half logs once a
+      # minute what the game read and what the app fed (HID mode only). Log only.
+      - name: Check the HID controller's one-minute line
+        run: python3 tests/host/check-hidpad-minute.py
+
+      # madeira-bcd (night round 2026-11-11, G8 S9 and A4 S5): two Wine source patches that no step applies, because the binaries they would change are
+      # committed (the 64-bit ntdll.dll and shell32.dll): these checks keep their anchors true to the pinned sources until someone rebuilds those
+      # modules (see the notes in the scripts).
+      - name: Check the PE ntdll's MSVC C++ throw diagnostic patch (applied by no step)
+        run: python3 tests/host/check-ntdll-cxx-diag.py
+      - name: Check the shell32 navigation-pane guard patch (applied by no step)
+        run: python3 tests/host/check-shell32-navpane-null.py
+
+      # madeira-bcd (night round 2026-11-11, Glyphica 8YHNJ0, G5 S7): kernelbase-optin.dll names what GetProcessMitigationPolicy did and exports
+      # SetProcessValidCallTargets; tools/patch-wine-zero-mitigation-diag.py is applied by tools/build-wine-extra-dlls.sh around that DLL's build only.
+      - name: Check the opt-in kernelbase's mitigation diagnostic (Glyphica, ChakraCore)
+        run: python3 tests/host/check-zero-mitigation-diag.py
+
       # PC launchers in the Library (Battle.net, EA app: BCDLaunchers.swift, BCDLauncherDownload.swift, BCDLaunchersLive.swift) and
       # Wine Gecko for their installers (BCDGecko.swift): the installer addresses and hosts, the "installed" detection, the start
       # on its own (no explorer), the download served from a URLProtocol, Gecko's SHA-256 values against addons.c.
@@ -968,6 +1053,11 @@ jobs:
       # the soft-grant loop against the original (switch off = the old grants), the spawn gate and the command line.
       - name: Check the EA app's Chromium
         run: python3 tests/host/check-ea-cef.py
+
+      # madeira-bcd: env.MADEIRA_UBI_CEF (on unless 0): Ubisoft Connect's browser (upc.exe) gets Chromium's process-count switches,
+      # and a checked libcef.dll build keeps them (two bytes changed in memory); the command line, the locator and the rewrite.
+      - name: Check Ubisoft Connect's Chromium
+        run: python3 tests/host/check-ubi-cef.py
 
       # BCD's menus (BCDMenu.swift): a game's menu on a long press or X (Play or Install, Game
       # page, Uninstall or Remove after a question), the Library's sort menu, the controller layer.
@@ -1048,13 +1138,17 @@ jobs:
       - name: Check BCD's Settings
         run: python3 tests/host/check-bcd-settings.py
 
-      # Games on a USB-C SSD (Settings > Storage > External SSD, C:\External; docs/EXTERNAL-STORAGE.md; based on
-      # thebcd69/bcd-games#12 by Pardoxum). Opt-in by use: until a folder is chosen restore() is one UserDefaults read
-      # and every hook in the library keeps its original test first (compiled against the original scanner on real
-      # folders); then the reconnect without the picker, stale and damaged bookmarks, containment, and that no user
-      # file is deleted or overwritten. Needs macOS Foundation and swift (bookmarks, links, real folders).
-      - name: Check games on an external SSD (opt-in by use, reconnect, safety)
+      # External drives (Settings > Storage > External drives, C:\External\<name> and a drive letter; ExternalDrives.swift and
+      # ExternalStorage.swift from Madeira #464; docs/EXTERNAL-STORAGE.md): the sources' rules, Madeira's guards (registrations,
+      # mappings, identity files, paths, libraryfolders.vdf, install targets, uninstall) and the move of BCD's earlier External SSD
+      # folder against real temporary folders under AddressSanitizer. Needs macOS and swift.
+      - name: Check external drives (registrations, safety, the earlier SSD folder)
         run: python3 tests/host/check-external-storage.py --require-swift
+
+      # The library's path mapping (LibraryModel.relativeToDrive, Madeira #536): a drive's own folder and what is on it map to
+      # C:\External\<name>, links that leave drive_c or a drive do not.
+      - name: Check the program browser's paths on external drives
+        run: python3 tests/host/check-executable-browser-paths.py
 
       # The in-place External SSD folder-picker fix (app/Madeira/ExternalGamesPicker.swift): on an install
       # whose signed App ID differs from the bundle id, correct the picker's host identity (only, never the
@@ -1511,6 +1605,14 @@ jobs:
           python3 tests/host/check-hide-host-version-plist.py
           python3 tools/patch-wine-hide-host-version-plist.py wine/dlls/ntdll/unix/file.c
 
+      # madeira-bcd (night round 2026-11-11, Spec Ops: The Line 0TF6NN, A2 S4): [dir-slow] / [dir-storm] say which directory a process spends its time
+      # listing (the Steam Client Service of a CEG Dock start sat at 95 % CPU in NtQueryDirectoryFile for 95 s and no log named the directory).
+      # Log only; env MADEIRA_DIR_STORM = 0 turns it off.
+      - name: Patch wine with the directory-listing census
+        run: |
+          python3 tests/host/check-wine-dir-storm.py
+          python3 tools/patch-wine-dir-storm.py wine/dlls/ntdll/unix/file.c
+
       # madeira-bcd (build 632, upstream Madeira 0.2.0 / Wine fork commits 9a64361cc + 3e1dcdfda; Terraria "Failed to load asset: PixelShader",
       # six logs, builds 576-592): NtQueryDirectoryFile reads a directory by its absolute path instead of through the cwd every pseudo-process
       # shares, and each process id has its own directory cache array. Fork commits (no script); this proves BCD's file.c scripts above still
@@ -1650,6 +1752,14 @@ jobs:
       - name: Patch wine with the DNS trace
         run: python3 tools/patch-wine-dns-trace.py wine/dlls/ws2_32/unixlib.c
 
+      # madeira-bcd (night round 2026-11-11, Garry's Mod GYG6SG, T2 S-GM1): env.MADEIRA_DNS_REFUSE_CRASH = 1 makes the wrapper above answer
+      # crash.steampowered.com with EAI_NONAME at once (Valve's crash upload blocked a Dock start for 150 s on a network that drops the host).
+      # Opt-in (the policy default is in the script); every other name is looked up as before.
+      - name: Patch wine so the DNS wrapper can refuse Valve's crash upload host (opt-in)
+        run: |
+          python3 tests/host/check-wine-dns-refuse-crash.py
+          python3 tools/patch-wine-dns-refuse-crash.py wine/dlls/ws2_32/unixlib.c
+
       # madeira-bcd: D3DXCreateVolumeTextureFromResourceExA/W were stubs that aborted the program
       # (GTA IV, build 574); implemented like D3DXCreateTextureFromResourceExW.
       - name: Patch wine d3dx9 volume textures from resources
@@ -1670,6 +1780,47 @@ jobs:
         run: |
           python3 tests/host/check-vkd3d-point-ident.py
           python3 tools/patch-wine-vkd3d-point-ident.py wine
+
+      # madeira-bcd (night round 2026-11-11, S.T.A.L.K.E.R. Clear Sky N8E3WW): a register reservation that names a shader target,
+      # register(ps, c0), applies only when compiling for that type and is ignored for the others (Direct3D's compiler does so); it was
+      # a compile error ("Reservation shader target ps"). Sources that compile today are unchanged.
+      - name: Patch wine vkd3d-shader to honour register(ps, c0)
+        run: |
+          python3 tests/host/check-vkd3d-register-target.py
+          python3 tools/patch-wine-vkd3d-register-target.py wine
+
+      # madeira-bcd (night round 2026-11-11, S.T.A.L.K.E.R. Clear Sky, G11 S2): `line`, `lineadj`, `triangle`, `triangleadj`, `linear` and
+      # `centroid` are names unless white space and a type or a modifier follow them (the way `point` already is above): Direct3D 9 shaders may
+      # use them as names and each was a syntax error. Sources that compile today tokenise the same. The i386 farm builds the lexer.
+      - name: Patch wine vkd3d-shader to read more HLSL keywords as names
+        run: |
+          python3 tests/host/check-vkd3d-keyword-names.py
+          python3 tools/patch-wine-vkd3d-keyword-names.py wine
+
+      # madeira-bcd (night round 2026-11-11, BioShock 01NGQE / FDVGYM, G2 S1): D3DX10CompileFromMemory, D3DX11CompileFromMemory and
+      # D3DX10CreateEffectFromMemory / FromFile / FromResource write the caller's documented HRESULT *pHResult (Wine returned the result
+      # but never wrote it; the tree's texture loaders do). A NULL pointer, or a caller that ignores the variable, sees no change.
+      # The i386 farm (and the arm64ec d3dx10_43 / d3dx11_43 the extra-DLL step builds) get it.
+      - name: Patch wine d3dx10/d3dx11 compile functions to write pHResult
+        run: |
+          python3 tests/host/check-wine-d3dx-hresult.py
+          python3 tools/patch-wine-d3dx-hresult.py wine
+
+      # madeira-bcd (night round 2026-11-11, BioShock 01NGQE / FDVGYM, G2 S1 (d)): D3DCompile2 names a failed run-time HLSL compile in the
+      # log (target, entry, flags, source head and the compiler's text; 24 a process) and the first line of a compile that only warned
+      # (3 a process). Log only; the caller's blobs and results are untouched. The i386 farm builds it.
+      - name: Patch wine d3dcompile with a failed-compile diagnostic
+        run: |
+          python3 tests/host/check-wine-d3dcompile-diag.py
+          python3 tools/patch-wine-d3dcompile-diag.py wine
+
+      # madeira-bcd (night round 2026-11-11, S.T.A.L.K.E.R. Clear Sky, G11 S3): env.MADEIRA_HLSL_FAIL_DUMP = 1 (a game's row sets it) writes the
+      # compiler's text and the preprocessed source of a shader Wine's HLSL compiler refused ([hlsl-fail], 3 a process), so the next
+      # unsupported construct is found in one device round instead of one per round. Off by default; the i386 farm builds it.
+      - name: Patch wine vkd3d-utils to dump a refused shader (opt-in)
+        run: |
+          python3 tests/host/check-vkd3d-hlsl-fail-dump.py
+          python3 tools/patch-wine-vkd3d-hlsl-fail-dump.py wine
 
       # madeira-bcd: [rpc-np] names the status of a failed RPC named-pipe read (Steam's CEG service
       # install and RockstarService failed their svcctl bind with 1726, build 574). Logging only.
@@ -1715,6 +1866,19 @@ jobs:
       # swtch_pri). Unset, nothing changes. Checked by "Check yield-mode".
       - name: Patch wine with the opt-in yield mode
         run: python3 tools/patch-wine-yield-mode.py wine/dlls/ntdll/unix/sync.c
+
+      # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC = 1 (default off): a non-alertable sleep waits in the server with
+      # SELECT_INTERRUPTIBLE, so an I/O completion queued for the sleeping thread runs during the sleep, as on Windows.
+      # Checked by "Check sleep-kernel-apc".
+      - name: Patch wine so non-alertable sleeps can run I/O completions
+        run: python3 tools/patch-wine-sleep-kernel-apc.py wine/dlls/ntdll/unix/sync.c
+
+      # madeira-bcd: env.MADEIRA_WOA_RECHECK = 1 (default off): an infinite RtlWaitOnAddress in the 32-bit ntdll (the i386 farm's)
+      # waits in one-second slices and returns when a waker removed its entry but the alert never came; the unix side keeps the
+      # [waiters] registry's park across the slices, and without the switch waits a slice out as the infinite wait it stands for.
+      # Checked by "Check woa-recheck".
+      - name: Patch wine so an infinite wait on an address can re-check every second
+        run: python3 tools/patch-wine-woa-recheck.py wine/dlls/ntdll/sync.c wine/dlls/ntdll/unix/sync.c
 
       # bcd.cfg avail-phys = 1 (opt-in): GlobalMemoryStatusEx's available
       # physical memory is what remains before this app's memory limit, so
@@ -1763,7 +1927,7 @@ jobs:
           MISSING=""
           for s in bcrypt_unix_call_funcs secur32_unix_call_funcs crypt32_unix_call_funcs \
                    ws2_32_unix_call_funcs dwrite_unix_call_funcs winedmo_unix_call_funcs \
-                   opengl32_unix_call_funcs opengl32_unix_call_wow64_funcs; do
+                   opengl32_unix_call_funcs opengl32_unix_call_wow64_funcs winevulkan_unix_call_funcs; do
             if grep -qx "_$s" defined-syms.txt; then
               echo "  OK   $s (defined)"
             else
@@ -1771,7 +1935,7 @@ jobs:
             fi
           done
           echo "-- object sizes (an empty object means its #ifdef guard was off) --"
-          for o in ws2_32_unixlib bcrypt_unixlib secur32_unixlib crypt32_unixlib dwrite_unixlib winedmo_unixlib opengl32_wgl opengl32_thunks; do
+          for o in ws2_32_unixlib bcrypt_unixlib secur32_unixlib crypt32_unixlib dwrite_unixlib winedmo_unixlib opengl32_wgl opengl32_thunks winevulkan_vulkan winevulkan_thunks; do
             if [ -f "$OBJ/$o.o" ]; then
               printf '  %-18s %8s bytes, %s external defs\n' "$o" \
                 "$(wc -c < "$OBJ/$o.o" | tr -d ' ')" \
@@ -1828,6 +1992,13 @@ jobs:
           python3 tests/host/check-wineserver-proc-log.py
           python3 tools/patch-wineserver-proc-log.py wine
 
+      # madeira-bcd (night round 2026-11-11, Horizon Zero Dawn ASEXZ5, A1 S4): env.MADEIRA_OBJ_TRACE = 1 makes the wineserver name every named object a
+      # process failed to open ([obj-open-fail], 200 a session): "SteamAPI_Init() failed; create pipe failed." names no object. Log only, off by default.
+      - name: Patch the wineserver's failed named-object opens (log)
+        run: |
+          python3 tests/host/check-wineserver-object-open-trace.py
+          python3 tools/patch-wineserver-object-open-trace.py wine
+
       # madeira-bcd: a WM_PAINT that never ends no longer starves WM_TIMER
       # (build/wineserver/queue_ios.c; the Rockstar Games Launcher installer
       # stayed at "Preparing to Install..."; 2026-10-12).
@@ -1857,6 +2028,18 @@ jobs:
       # (BCDGameSound.swift): unchanged unless 10..200, exact scaling, read once, one comparison in the render callback when it is off.
       - name: Check the audio volume
         run: python3 tests/host/check-audio-gain.py
+
+      # Night round 2026-11-11 (T3 S5): a stream whose queue stays shorter than one RemoteIO pass (Quake II, Counter-Strike 2, Deadlock, Resonance, ...: the
+      # sound runs slow with a gap in every pass) makes the driver ask the audio session for a 5 ms IO buffer once, after two 10 s windows
+      # (audio_null_ios.c, WineProcessBridge.m). The driver's window code runs on the host with the numbers of real pacing lines.
+      - name: Check the automatic audio IO buffer request
+        run: python3 tests/host/check-audio-io-auto.py
+
+      # Night round 2026-11-11 (G2 S2, T2 S-AUD1): env.MADEIRA_AUDIO_CAPTURE = 1 (OFF unless set) offers a game one silent recording device (BioShock's
+      # "no audio after the intro" experiment); and the first audible buffer of a stream is logged with the endpoint's state. The driver's real
+      # endpoint, stream and render-buffer code runs on the host.
+      - name: Check the audio capture endpoint and the first audible buffer
+        run: python3 tests/host/check-audio-capture.py
 
       # BCD (round 603): MIDI music. A game's MIDI output plays through Apple's synthesizer and a General MIDI SoundFont
       # (build/ntdll-unix/bcd_midi_ios.c, bcd_midi_synth_ios.m; env.MADEIRA_MIDI = 0 turns it off). The driver check runs
@@ -1983,6 +2166,22 @@ jobs:
         continue-on-error: true
         run: bash build/wineserver/build.sh 2>&1 | tee "$GITHUB_WORKSPACE/wineserver.log"; exit ${PIPESTATUS[0]}
 
+      # madeira-bcd (Windows Vulkan): Madeira's Wine commit df1c5ea5 (125hz), written into the checked-out tree so the Wine pin and its caches stay
+      # as they are: a host VK_SUBOPTIMAL_KHR for a swapchain that matches its client rect counts as success (MADEIRA_VK_HOST_SUBOPTIMAL=1 undoes it).
+      - name: Patch Wine's win32u Vulkan present (Windows Vulkan)
+        run: |
+          python3 tools/patch-wine-vulkan-suboptimal.py
+          grep -q MADEIRA_VK_HOST_SUBOPTIMAL wine/dlls/win32u/vulkan.c
+
+      # madeira-bcd (night round 2026-11-11, FINAL FANTASY VII (2013) 9J06NQ, G4 S13): NtGdiEnumFonts cut a face name longer than the 32-WCHAR
+      # field of its LOGFONTW (Qt 4 hands gdi32 a 32-character name without a terminator, length 33); the iOS SDK's fortified memcpy aborted
+      # the host and the launcher ended with c0000026. A name of 32 characters or fewer is copied as before.
+      - name: Patch Wine's win32u NtGdiEnumFonts (a face name that does not fit)
+        run: |
+          python3 tests/host/check-wine-enumfonts-facename.py
+          python3 tools/patch-wine-enumfonts-facename.py wine
+          grep -q "madeira-bcd: NtGdiEnumFonts face name" wine/dlls/win32u/font.c
+
       - name: Build win32u-unix
         # Keep going so one run reports every broken stage (and caches FEX and
         # LLVM). "Verify all linked archives exist" still fails the job before
@@ -2074,6 +2273,14 @@ jobs:
         env:
           MINGW: ${{ github.workspace }}/toolchains/llvm-mingw-20260421-ucrt-macos-universal/bin
         run: python3 tests/host/check-dxgi-budget-events.py
+
+      # env.DXMT_MODE_LIST_ANY_BPP = 1 (opt-in; night round 2026-11-11, Crash Bandicoot N. Sane Trilogy: the game takes the last element of an
+      # empty display mode vector): tools/patch-dxgi-modes-any-bpp.py lists modes for a format whose bits per pixel differ from the monitor's;
+      # checked before the build below applies it to a copy of dxgi_output.cpp (a failed patch only warns).
+      - name: Check opt-in DXGI any-bpp mode lists
+        env:
+          MINGW: ${{ github.workspace }}/toolchains/llvm-mingw-20260421-ucrt-macos-universal/bin
+        run: python3 tests/host/check-dxgi-modes-any-bpp.py
 
       # madeira-bcd: DXMT's 64-bit dxgi.dll compiled from the dxmt submodule
       # with IDXGIFactory7 + EnumAdapterByLuid (tools/patch-dxgi-factory7.py, on
@@ -2427,6 +2634,14 @@ jobs:
               || echo "::warning::-downloadComponent unsupported on this Xcode"
           fi
 
+      # Xcode 27's Metal compiler rejects the private atomic intrinsic of DXMT's tessellation shader (thebcd69/bcd-games#43 by
+      # Paulo Eduardo Correa; #22 by creeper4004 has the same one-line patch). --if-needed patches only when this machine's compiler
+      # rejects it: Xcode 26, the one BCD builds with today, keeps the shader byte for byte as it has run on devices.
+      - name: Use public Metal atomics when the compiler needs them (Xcode 27)
+        run: |
+          python3 tools/patch-dxmt-metal-atomics.py --if-needed
+          python3 tests/host/check-dxmt-metal-atomics.py --require-metal
+
       # build/dxmt-ios/shader-headers/ is gitignored and nothing generated it,
       # so airconv_context.cpp could not find air_msad.h / air_samplepos.h.
       # Mirrors the metalir + hexdump generators in dxmt/meson.build.
@@ -2474,8 +2689,15 @@ jobs:
           python3 tools/patch-dock-game-scm.py madeira-dock/src/launch.c || echo "::warning::Dock game-session service manager patch not applied"
           # env.MADEIRA_DOCK_KEEP_ALIVE = <exe>;<exe>: hold the session while a self-updating launcher restarts
           python3 tools/patch-dock-keep-alive.py madeira-dock/src/launch.c || echo "::warning::Dock keep-alive patch not applied"
+          # night round 2026-11-11 (X2 S2; Control G2CRAR): env.MADEIRA_DOCK_KEEP_ALIVE = * holds the session while a program of the game's install folder runs
+          python3 tests/host/check-dock-keep-alive-tree.py
+          python3 tools/patch-dock-keep-alive-tree.py madeira-dock/src/launch.c || echo "::warning::Dock keep-alive tree patch not applied"
           # round 624 (Steam 113): the published values read back while the game starts; env.MADEIRA_DOCK_PUMP_MS / _REASSERT experiments
           python3 tools/patch-dock-steam-readback.py madeira-dock/src/launch.c || echo "::warning::Dock Steam readback patch not applied"
+          # night round 2026-11-11 (X2 S1 + S4b; K7QKB6, 25C9NT, 9HEY99, NR2WGS, KQMTVT): the discovery entries are mirrored into the 32-bit registry view (HKCU
+          # Software\Wow6432Node when the prefix has it) and steam_api's five calls are replayed and reported; env.MADEIRA_DOCK_STEAM_VIEWS = 0 skips the mirror
+          python3 tests/host/check-dock-steam-views.py
+          python3 tools/patch-dock-steam-views.py madeira-dock/src/launch.c || echo "::warning::Dock steam views patch not applied"
           # round 630 (444TS8): a late sign-in gets 45 s for the licence list (at most 180 s); env.MADEIRA_DOCK_LICENCE_WAIT = 0: 90 s as before
           python3 tests/host/check-dock-licence-wait.py
           python3 tools/patch-dock-licence-wait.py madeira-dock/src/session.c || echo "::warning::Dock licence-wait patch not applied"
@@ -2489,11 +2711,18 @@ jobs:
           # round 630 (BN3SXW): the Steam client entries step (42) says which part failed; a failed open is tried once more after 1 s
           python3 tests/host/check-dock-registry-events.py
           python3 tools/patch-dock-registry-events.py madeira-dock/src/launch.c || echo "::warning::Dock registry events patch not applied"
+          # night round 2026-11-11 (ZB8E97, RAC3KD, GNWWRT, GWX5H2, DP9TVR: launch-registry-step=2, error 2 after the retry): a missing Steam client key is
+          # created instead of ending the start in 42, and a start that still fails says which keys the host sees; env.MADEIRA_DOCK_REGISTRY_CREATE = 0 keeps the failure
+          python3 tests/host/check-dock-registry-create.py
+          python3 tools/patch-dock-registry-create.py madeira-dock/src/launch.c || echo "::warning::Dock registry create patch not applied"
           # round 632 (Madeira #519; BCD logs: 24 sessions of 12 Steam games, ceg-result=55, and FRKBN1, ceg-request=0): Valve's CEG step in a
           # Dock session. The registered Steam Client Service is started before the request (env.MADEIRA_DOCK_CEG_SERVICE_START = 0 skips it), a request that
           # failed with 55 is asked again (3 times), and an OK with no job on a first request is "already prepared" (replaces round 630's keyed zero-jobs experiment)
           python3 tests/host/check-dock-ceg-prepare.py
           python3 tools/patch-dock-ceg-service-start.py madeira-dock/src/scm.c || echo "::warning::Dock CEG service start patch not applied"
+          # night round 2026-11-11 (G2 S3; R0GHX7, HJZJ1P, 7XG9VK, WFRZ8A): the service is looked at once more after its settle and started again when it died
+          python3 tests/host/check-dock-ceg-service-restart.py
+          python3 tools/patch-dock-ceg-service-restart.py madeira-dock/src/scm.c || echo "::warning::Dock CEG service restart patch not applied"
           python3 tools/patch-dock-ceg-retry.py madeira-dock/src/launch.c || echo "::warning::Dock CEG retry patch not applied"
           python3 tools/patch-dock-ceg-already-prepared.py madeira-dock/src/launch.c madeira-dock/src/validation.c || echo "::warning::Dock CEG already-prepared patch not applied"
           bash build/madeira-dock/build.sh
@@ -2655,6 +2884,12 @@ jobs:
       - name: Patch DXMT D3D9 SM3 vertex interface
         run: python3 tools/patch-dxmt-d9-sm3-vs-interface.py
 
+      # Requiem: Avenging Angel (night round 2026-11-11, G1 S2; K21Z9Y, H3RW0Y): black rectangles where UI sprites should be. With
+      # DXMT_DUMP_D9_SHADER set, UnlockRect logs pixel statistics of the first 400 writes of an A8R8G8B8 rect ([d9-stat]: does the Glide
+      # wrapper write black data, or does the draw turn good data black?). Log only. The i386 d3d9-emulated.dll and d3d9-dxmt.dll.
+      - name: Patch DXMT D3D9 lock statistics
+        run: python3 tools/patch-dxmt-d9-lock-stats.py
+
       # Batman: Arkham City (round 626, agent T S2, 9AGR39/AE9TXK): a tessellation mesh pipeline that did not compile ("Total mesh size
       # (33792) exceeds the maximum mesh size allowed (32768)") left no pipeline bound and its draws made the driver fault; they are now
       # dropped until a pipeline of that kind compiles ([mesh-skip] ml870; geometry the same). The i386 d3d11.dll and d3d11-src.dll.
@@ -2664,6 +2899,31 @@ jobs:
 
       - name: Patch DXMT mesh pipeline failures
         run: python3 tools/patch-dxmt-tess-pso-failed.py
+
+      # FIFA 23 (night round 2026-11-11, G4 S12; HPM5D7, KAXT96): UpdateSubresource(1) on a STAGING buffer, which has no Metal buffer, made
+      # the encode thread dereference an empty Rc (d3d11.dll+0x98818, c0000005 22 s in). Direct3D 11 drops such a call and so does the
+      # patch ([update-subresource-staging]). The i386 d3d11.dll and d3d11-src.dll (BCD_PATCHES in tools/build-d3d11-dll.sh). Before the
+      # farm key, which hashes it.
+      - name: Patch DXMT UpdateSubresource on a staging buffer
+        run: python3 tools/patch-dxmt-update-subresource-staging.py
+
+      # The Battle for Wesnoth (night round 2026-11-11, G1 S13; CF2N9T): SDL2's Direct3D 11 renderer calls IDXGISwapChain1::SetRotation right
+      # after CreateSwapChain and DXMT's IMPLEMENT_ME aborted the process (exit code 3); the identity rotation is answered now
+      # ([swapchain-rotation]). Same two DLLs as above.
+      - name: Patch DXMT swap chain rotation
+        run: python3 tools/patch-dxmt-d11-swapchain-rotation.py
+
+      # The Witness, Rise/Shadow of the Tomb Raider, Transformers, Danganronpa (night round 2026-11-11, G10 S9): a texture over Direct3D 11's
+      # limits (16384 / 2048 slices; 3D 2048) reached Metal, whose validation aborts the process; it gets E_INVALIDARG as on Windows
+      # ([dxmt-tex-limit]). Same two DLLs as above.
+      - name: Patch DXMT texture size limits
+        run: python3 tools/patch-dxmt-texture-limit.py
+
+      # Hatred (night round 2026-11-11, G5 S15; PKJ7ZW): env.MADEIRA_VIEW_PRIVATE_REF = 1 (off by default) makes a view hold its resource
+      # with a private reference, as Windows' views do (Unreal Engine 4.10 checks its back buffer's reference count; [view-ref]). Same
+      # two DLLs as above.
+      - name: Patch DXMT view private references (opt-in)
+        run: python3 tools/patch-dxmt-view-private-ref.py
 
       # env.MADEIRA_DXMT_FAULT_INFO = 1 (off by default): command buffers with
       # encoder execution status, labelled encoders and a [fault-enc] line after
@@ -2796,6 +3056,20 @@ jobs:
       - name: Patch winemetal empty fragment function
         run: python3 tools/patch-winemetal-null-fragment.py
 
+      # The Witness, Tomb Raider, Transformers, Danganronpa (night round 2026-11-11, G10 S9): Metal's descriptor validation aborts the
+      # process (SIGABRT) on a texture beyond the device's limit (height 3221225536); newTexture now returns no texture for a size above
+      # every Apple GPU's limit (32768; 3D depth and array length 2048) and logs it ([mtl-tex-fail]). Native only, so the i386 farm key is
+      # not touched (the script is not a tools/patch-dxmt-*.py); the Direct3D 11 guard that answers E_INVALIDARG is a DXMT patch above.
+      - name: Patch winemetal impossible texture sizes
+        run: python3 tools/patch-winemetal-mtl-tex-fail.py
+
+      # Sekiro (night round 2026-11-11, T3 S14; FB6729, ZA4PSP): GPU recovery stalls of 10-33 s in which every command buffer failed as
+      # an InnocentVictim and the buffer that caused it is in no log. _MTLCommandBuffer_error now also logs, for the first 8 failed
+      # buffers (then every 64th), whether the error is a victim, its codes, the buffer's label and GPU/kernel times, the thermal state and
+      # how long ago the first error was ([gpu-error]). Log only; native, so every game and the i386 farm key is not touched.
+      - name: Patch winemetal GPU error description
+        run: python3 tools/patch-winemetal-gpu-error-info.py
+
       # Is God of War at 1080p GPU-bound? The logs had no GPU timing. The
       # [frame] instrument (server_ios.c, MADEIRA_FRAME_STATS=1, off by
       # default) gets each command buffer's GPU start/end, so it can print the
@@ -2825,6 +3099,27 @@ jobs:
 
       - name: Patch airconv geometry shader input system values
         run: python3 tools/patch-airconv-gs-input-siv.py
+
+      # Direct3D 9 vertex formats DEC3N (Int1010102Normalized) and UDEC3 (dxmt's 0x1000) aborted the game in airconv
+      # (assert in unpack_fvec4_from_addr / pull_vec4_from_addr_checked, exit 0x80000101): Battlefield 2 about 40 s in,
+      # Cold Fear at its first 3D scene. Now unpacked as Direct3D 9 expands them; only shaders that aborted before change.
+      # Native only.
+      - name: Check airconv DEC3N and UDEC3 vertex formats
+        run: python3 tests/host/check-airconv-dec3n.py
+
+      - name: Patch airconv DEC3N and UDEC3 vertex formats
+        run: python3 tools/patch-airconv-dec3n.py
+
+      # Alan Wake (night round 2026-11-11, G1 S6; 778A58, A6232G: 67 pipelines a run): a Direct3D 9 vertex shader that writes the point size
+      # got its [[point_size]] output in triangle pipelines too, which AGX refuses ("Vertex shader writes point size but
+      # inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle"): the draws of those pipelines were skipped. The output is defined for
+      # the point-draw variant only now; only pipelines that could not be built change. Native only (airconv), so the i386 farm key is not
+      # touched (the script is not a tools/patch-dxmt-*.py).
+      - name: Check airconv D3D9 point size in triangle pipelines
+        run: python3 tests/host/check-airconv-d9-psize-topology.py
+
+      - name: Patch airconv D3D9 point size in triangle pipelines
+        run: python3 tools/patch-airconv-d9-psize-topology.py
 
       # A geometry shader that declares its instance id (dcl_input vGSInstanceID, a Shader Model 5 [instance(N)] shader) aborted the game
       # (assert in handle_signature_gs, exit 0x80000101): ROBOBEAT, about 8 s into its start. The converter already does the rest of
@@ -3156,6 +3451,58 @@ jobs:
       - name: Check the refused-shader retry, memo and placeholder
         run: python3 tests/host/check-msc-unbounded-retry.py
 
+      # madeira-bcd (build 647): a pixel shader that reads a 64-bit texture atomic's result (The Last of Us Part I's
+      # transparency layers), which the converter refuses, is rewritten into ordered loads and stores on ROV textures.
+      - name: Check the 64-bit texture atomic rewrite
+        run: python3 tests/host/check-a64rov.py
+
+      # madeira-bcd (build 648): a UAV texture clear to zero through a view of another texel size fills the texture in its own size.
+      - name: Check the UAV texture clear to zero
+        run: python3 tests/host/check-uav-zero-clear.py
+
+      # madeira-bcd (build 648): dxil-loop-guard caps the loops of listed shaders, so a loop that never ends stops instead of
+      # hanging the GPU (The Last of Us Part I's light-probe tree walk).
+      - name: Check dxil-loop-guard
+        run: python3 tests/host/check-loop-guard.py
+
+      # madeira-bcd (build 649): trace-buffer-size / trace-dispatch, diagnostics (log only, off unless set).
+      - name: Check the readback and dispatch traces
+        run: python3 tests/host/check-rb-trace.py
+
+      # madeira-bcd (build 650): a UAV clear value past the 32-value pattern cache is written exactly from a pattern of its own
+      # (The Last of Us Part I's ray-cast guards; it fell back to the value's low byte).
+      - name: Check UAV clears past the pattern cache
+        run: python3 tests/host/check-uav-clear-oneoff.py
+
+      # madeira-bcd (build 651): env.MADEIRA_CAGE_RELEASE = 2 never holds the 8 GB V8 cage holdback, so Wine's band and the host share
+      # it (The Last of Us Part I ran out of both while loading its first level).
+      - name: Check the cage holdback skip
+        run: python3 tests/host/check-cage-boot-skip.py
+
+      # madeira-bcd (build 652): heap-backing = 2 backs buffer and render-target/depth heaps, leaves texture heaps descriptions
+      # (The Last of Us Part I read zeros through aliased placed buffers with 0, and ran out of memory).
+      - name: Check heap-backing mode 2
+        run: python3 tests/host/check-heap-backing-mode2.py
+
+      # madeira-bcd (build 652): D3D12 bundles (Kingdom Hearts HD 1.5+2.5 ReMIX stopped on the E_NOTIMPL bundle allocator).
+      - name: Check D3D12 bundles
+        run: python3 tests/host/check-d3d12-bundles.py
+
+      # madeira-bcd (build 652), night round 2026-11-11, madeira-d3d12: block-compressed footprints in whole blocks (Satisfactory's assertion), a view of
+      # the other sample count (Age of Wonders 4's Metal abort), RG32Uint texture atomics only on Apple9+ (REANIMAL, Oar'some Adventures, RDR2), fence flags (skate2),
+      # a texture beyond Metal's size limits refused with E_INVALIDARG (Shadow of the Tomb Raider's Metal abort).
+      - name: Check D3D12 fixes of the 2026-11-11 round
+        run: |
+          python3 tests/host/check-d3d12-footprint-block-align.py
+          python3 tests/host/check-d3d12-view-sample-count.py
+          python3 tests/host/check-d3d12-texinfo-atomics.py
+          python3 tests/host/check-d3d12-fence-flags.py
+          python3 tests/host/check-d3d12-texture-limits.py
+
+      # madeira-bcd (build 652): Capcom's codec notice (InstallerMessage.exe) is provided by BCD at the first Dock start.
+      - name: Check Capcom's codec notice is provided
+        run: python3 tests/host/check-dock-capcom-notice.py
+
       # madeira-bcd: Horizon Zero Dawn on build 480 (20:28): 23,045 shader
       # libraries kept for 52,570 pipelines (iOS closed it at 8,189 MB), and
       # clears with rectangles cleared whole targets. Both opt-in.
@@ -3265,6 +3612,37 @@ jobs:
       - name: Check jumbo half
         run: python3 tests/host/check-jumbo-half.py
 
+      # madeira-bcd (night round 2026-11-11, G8 S7 / G10 S5: Roommate 4EN8TR, The Edge Of V88DKA): the three walks over a program's
+      # relocation directory in its JIT pool copy (first copy, IAT sync, child copy) stay inside the copy; a malformed directory ends
+      # the walk with a [reloc-bad] line instead of a store through a wild address or a hang. Compiled run on the host (ios_reloc_walk.h).
+      - name: Check relocation walks
+        run: python3 tests/host/check-reloc-walk.py
+
+      # madeira-bcd (night round 2026-11-11, R1 S1: GTA IV R5A0JP / KCY3C5): what a pseudo-process that ended leaves in the emulator's arena is counted
+      # ([fex-arena] r652, log only) and, with env.MADEIRA_FEX_ARENA_REAP = 1, released after a 3 s grace; compiled against a model view tree.
+      - name: Check FEX arena reap
+        run: python3 tests/host/check-fex-arena-reap.py
+
+      # madeira-bcd (night round 2026-11-11, G6 S1 / G10 S11: Jetboard Joust, Wolfpack): env.MADEIRA_X64_RWX_PLAIN (a 64-bit program's anonymous RWX memory is plain, default
+      # off), MADEIRA_GUEST_RWX_DATA = 2 (4 MB+ views of a 64-bit program, default unchanged) and the [rwx-view] line; compiled against a model view list.
+      - name: Check 64-bit plain RWX memory
+        run: python3 tests/host/check-x64-rwx-plain.py
+
+      # madeira-bcd (night round 2026-11-11, G9 S1: Slay the Spire 2 .NET stubs across a pool seam): env.MADEIRA_SEAM_TRACE ([seam] lines) and
+      # env.MADEIRA_ANON_POOL_ADJACENT (guest-adjacent anonymous RWX blocks get adjacent pool slots), both off by default; compiled against a model pool.
+      - name: Check anonymous RWX pool adjacency
+        run: python3 tests/host/check-anon-adjacent.py
+
+      # madeira-bcd (night round 2026-11-11, G5 S9: Half-Life 2 with CEF, a committed page that reads back unreadable): [commit-noaccess] names the four guest-page bytes of the host
+      # page and the last guard event, and env.MADEIRA_COMMIT_GUARD_CLEAR (default off) clears a stale guard bit on an uncommitted neighbour; compiled against a model page table.
+      - name: Check guard history and commit guard clear
+        run: python3 tests/host/check-guard-hist.py
+
+      # madeira-bcd (night round 2026-11-11, G6 S7: The Binding of Isaac, a 32-bit program's 1 GB reservation placed outside its window): [jumbo-wow] says where it went (log only) and
+      # env.MADEIRA_WOW_JUMBO_INSIDE (default off) refuses a placement outside the window; the two helpers compiled on the host.
+      - name: Check 32-bit jumbo reservations
+        run: python3 tests/host/check-wow-jumbo-inside.py
+
       # madeira-bcd: env.MADEIRA_ALIAS_RELEASE (off by default): anonymous JIT aliases follow
       # MEM_RELEASE and MEM_DECOMMIT (Ratchet & Clank: Rift Apart froze loading a save).
       - name: Check alias release
@@ -3359,6 +3737,33 @@ jobs:
       - name: Check the Windows desktop's exit watch
         run: ASAN_OPTIONS=symbolize=0 python3 tests/host/check-desktop-exit.py
 
+      # madeira-bcd gl-empty-extensions: with env.MADEIRA_GL_EMPTY_EXTENSIONS = 1 the OpenGL stub table answers a 64-bit
+      # glGetString(GL_EXTENSIONS) with "" (Far Cry 4's hardware detection); the tables per value, and code 130 from the shipped DLL.
+      - name: Check the OpenGL stub's empty extension list
+        run: python3 tests/host/check-gl-empty-extensions.py
+
+      # madeira-bcd (night round 2026-11-11, A4 S1; 1MQV99, DR1MW9 and 10 more Windows desktop logs): the Windows desktop session ends when the
+      # player closes it. BCD's Close posted Alt+F4 into a desktop with no window to close and Start > Shut Down ran wineboot --end-session
+      # --shutdown, which ends with 0 and kills nothing, so nothing ended the session (explorer and services never exit). The library's watch
+      # (DesktopExitRules.closeVerdict) ends it as BCD Dock's quit does (wine_session_desktop_closed: exit code 0, no error box); the in-game
+      # menu's row says Close the Windows desktop. env.MADEIRA_DESKTOP_CLOSE = 0 brings back the old behaviour.
+      - name: Check closing the Windows desktop
+        run: python3 tests/host/check-desktop-close.py
+
+      # madeira-bcd (night round 2026-11-11, M7: A2 S1, A4 S3, G10 S10, A5 S8): the JIT memory request that the external debugger never answers (25 of
+      # 769 starts; the whole process stops inside the BRK). The starting screen says it BEFORE the request on the risky path (StikDebug attached
+      # long ago, or a hot phone), a line is logged before and after each request, a main-queue watch says it after 30 s, and the trail record carries
+      # the method, the attach age, LiveContainer and iOS. G9 S2a: the retry after a guest-window placement asks for less.
+      - name: Check the JIT memory request's words and log lines
+        run: |
+          python3 tests/host/check-jit-pool-wait.py
+          python3 tests/host/check-pool-retry.py
+
+      # madeira-bcd (night round 2026-11-11, W-APP): small text and log changes (game config notes, Low Power Mode on the starting screen, the game page's
+      # Start over row, the iPad Resolution note, the long-session log line, DOOM 3's language chooser out of the folder scan).
+      - name: Check the night round's app text
+        run: python3 tests/host/check-night-app-text.py
+
       # madeira-bcd (round 579, Tomb Raider: Underworld ZWAA2K): a 32-bit main program that cannot get its 4 GB window ended the boot
       # thread with pthread_exit (fatal_error), so the session never ended and the app showed "running" for three minutes. The failure
       # now reports its status and leaves by exit(): the shim long-jumps back to wine_process_thread on the boot thread.
@@ -3383,6 +3788,7 @@ jobs:
         run: |
           python3 tests/host/check-wow-null-diag.py
           python3 tests/host/check-tls-clear-process.py
+          python3 tests/host/check-tls-diag-util.py
 
       # ajan11-wow64stack: a dead 32-bit thread's stack is released in ITS window (virtual_free_teb handed it to the next exiting
       # thread, of another process, and the release landed on that process's live stack: Battle.net's network-service helper), and a
@@ -3412,6 +3818,16 @@ jobs:
       - name: Check opt-in DLLs
         run: python3 tests/host/check-optin-dlls.py
 
+      # madeira-bcd: env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw: Wine's DxDiag provider for a 64-bit program, with the patch that lets
+      # IDxDiagProvider::Initialize finish without DirectShow's device enumerator.
+      - name: Check the DxDiag provider opt-in DLL
+        run: python3 tests/host/check-dxdiagn-optin.py
+
+      # madeira-bcd (round 2026-11-11, G7 S1): combase-optin.dll (env.MADEIRA_OPTIN_DLLS = combase): a thread that never started COM
+      # uses a process MTA that is created on first need (Unreal Engine 5's FAsyncLoadingThread: Meccha Chameleon, Hubert).
+      - name: Check the combase implicit MTA
+        run: python3 tests/host/check-combase-implicit-mta.py
+
       # madeira-bcd (round 620): NtMapViewOfSection judges a 32-bit program's explicit base by its guest address inside
       # its WoW64 window (DirectPlay's static data at 0x50000000: Requiem, Hotline Miami); the real block runs on the host.
       - name: Check WoW64 explicit section base
@@ -3429,6 +3845,26 @@ jobs:
       # madeira-bcd (round 624): Dark Souls III's SRV mip count from GetDesc (the DXMT patch, opt-in; d3d11-src.dll for the 64-bit game).
       - name: Check DXMT SRV GetDesc mip count
         run: python3 tests/host/check-dxmt-srv-getdesc.py
+
+      # madeira-bcd (night round 2026-11-11): FIFA 23's UpdateSubresource on a staging buffer is dropped (G4 S12), Wesnoth's SetRotation is
+      # answered (G1 S13), textures over Direct3D 11's limits get E_INVALIDARG (G10 S9), Hatred's opt-in private view references (G5 S15).
+      - name: Check DXMT UpdateSubresource on a staging buffer
+        run: python3 tests/host/check-dxmt-update-subresource-staging.py
+
+      - name: Check DXMT swap chain rotation
+        run: python3 tests/host/check-dxmt-d11-swapchain-rotation.py
+
+      - name: Check DXMT texture size limits
+        run: python3 tests/host/check-dxmt-texture-limit.py
+
+      - name: Check DXMT view private references
+        run: python3 tests/host/check-dxmt-view-private-ref.py
+
+      - name: Check DXMT D3D9 lock statistics
+        run: python3 tests/host/check-dxmt-d9-lock-stats.py
+
+      - name: Check winemetal GPU error description
+        run: python3 tests/host/check-winemetal-gpu-error-info.py
 
       # madeira-bcd (round 620, thebcd69/bcd-games#17): Add a game names why a file is not a Windows program (words only).
       - name: Check the not-a-Windows-program words
@@ -3617,6 +4053,14 @@ jobs:
       - name: Check yield-mode
         run: python3 tests/host/check-yield-mode.py
 
+      # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC (tools/patch-wine-sleep-kernel-apc.py).
+      - name: Check sleep-kernel-apc
+        run: python3 tests/host/check-sleep-kernel-apc.py
+
+      # madeira-bcd: env.MADEIRA_WOA_RECHECK (tools/patch-wine-woa-recheck.py).
+      - name: Check woa-recheck
+        run: python3 tests/host/check-woa-recheck.py
+
       # madeira-bcd: render-pass traffic (gpu-traffic counters, clear-defer;
       # opt-in rp-carry, rp-discard and its winemetal op 24, f6-rar).
       - name: Check render-pass traffic
@@ -3756,6 +4200,30 @@ jobs:
       # (MADEIRA_JUMBO_CODE_DUMP) and the exact-hint experiment (MADEIRA_BIG_HINT_EXACT, build/ntdll-unix/ios_big_hint.h), both default off.
       - name: Check the big hint reservations
         run: python3 tests/host/check-big-hint.py
+
+      # madeira-bcd (build 641, The Last of Us Part I): the log-only dump of the code that showed a message box (MADEIRA_DIALOG_CODE_DUMP,
+      # default off; build/ntdll-unix/ios_dlg_code.h, virtual_ios.c, win32u's driver_ios.c).
+      - name: Check the dialog code dump
+        run: python3 tests/host/check-dlg-code.py
+
+      # madeira-bcd (build 646, Slime Rancher 2): points on a windowed game's picture go into its window, not onto the whole screen
+      # (app/Madeira/Winios/winios_ptr_map.h, Winios.m, HardwareInput.swift).
+      - name: Check the pointer map for windowed games
+        run: python3 tests/host/check-ptr-map.py
+
+      # madeira-bcd (build 646): vector registers in cross-thread thread contexts (Madeira #556, Henry Morin; build/wineserver/mach_ios.c).
+      - name: Check vector registers in thread contexts
+        run: python3 tests/host/check-ctx-fp.py
+
+      # madeira-bcd (build 646, Windows Vulkan; Madeira #353, #400, #462): the opt-in, the surface adapter, the extension query, the layer geometry
+      # (the unix binder: check-unixlib-binder.py, above); check-vulkan-bcd.py holds BCD's own parts (list policy, catalog, CI, the frame counter, the Wine patch).
+      - name: Check Windows Vulkan
+        run: |
+          python3 tests/host/check-vulkan-opt-in.py
+          python3 tests/host/check-vulkan-surface.py
+          python3 tests/host/check-vk-surface-query.py
+          python3 tests/host/check-vulkan-layer-geometry.py
+          python3 tests/host/check-vulkan-bcd.py
 
       # madeira-bcd (round 626, Splatterhouse YWX9P5): a fixed section view beyond the address limit is refused (Wine answered a
       # success-class status with no view behind it), and big refused fixed views name the kernel's regions ([map-block]).
@@ -3946,6 +4414,12 @@ jobs:
         continue-on-error: true
         run: bash tools/build-wine-extra-dlls.sh "$GITHUB_WORKSPACE/wine/build-native"
 
+      # madeira-bcd (Windows Vulkan): Wine's winevulkan.dll and vulkan-1.dll for the bundle's vulkan folder, not the farm (tools/build-vulkan-dlls.sh);
+      # "Verify the Windows Vulkan pieces" refuses a package without them.
+      - name: Build winevulkan.dll and vulkan-1.dll (Windows Vulkan)
+        continue-on-error: true
+        run: bash tools/build-vulkan-dlls.sh
+
       # Launcher error117 in406: WMVCORE.DLL was never packaged. Its genuine
       # Wine reader imports winegstreamer; both must build despite the optional
       # handling of unrelated extra DLLs above. Do not ship another missing farm.
@@ -4032,8 +4506,9 @@ jobs:
           # (F1 2020), so an IPA in which no 64-bit d3d11.dll carries them is refused.
           NEED=""
           # Round 624: Dark Souls III's [srv-getdesc] and WRC 9's [query-stuck] too (build 624's first IPA shipped a
-          # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it).
-          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 "; do
+          # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it). Night round 2026-11-11: FIFA 23's
+          # [update-subresource-staging], Wesnoth's [swapchain-rotation], [dxmt-tex-limit] and Hatred's [view-ref] too.
+          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 " "[update-subresource-staging] skipped #" "[swapchain-rotation] madeira-bcd: SetRotation(" "[dxmt-tex-limit] CreateTexture2D refused " "[view-ref] madeira-bcd #"; do
             LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11.dll && continue
             [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ] && LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11-src.dll && continue
             NEED="$NEED \"$m\""
@@ -4083,6 +4558,21 @@ jobs:
           for d in winedmo.dll wmvdecod-optin.dll wmadmod-optin.dll; do
             [ -f "app/Madeira/arm64ec-windows/$d" ] || echo "::warning::$d missing: Resident Evil 2's cutscenes still end the game in this IPA"
           done
+          # And the DxDiag provider of env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw (Far Cry 4): never ship one without the DirectShow
+          # patch (an unpatched one fails IDxDiagProvider::Initialize without devenum.dll, which a program treats as no provider).
+          if [ -f app/Madeira/arm64ec-windows/dxdiagn-optin.dll ]; then
+            python3 tools/patch-wine-dxdiagn-directshow.py --verify app/Madeira/arm64ec-windows/dxdiagn-optin.dll
+          else
+            echo "::warning::dxdiagn-optin.dll missing: env.MADEIRA_OPTIN_DLLS = dxdiagn does nothing in this IPA"
+          fi
+          # And the combase-optin.dll of env.MADEIRA_OPTIN_DLLS = combase (Unreal Engine 5's loading thread): never ship one without the
+          # implicit MTA, of another machine type, or with other exports than the shipped combase.dll.
+          if [ -f app/Madeira/arm64ec-windows/combase-optin.dll ]; then
+            python3 tools/patch-wine-combase-implicit-mta.py --verify app/Madeira/arm64ec-windows/combase-optin.dll \
+              app/Madeira/arm64ec-windows/combase.dll
+          else
+            echo "::warning::combase-optin.dll missing: env.MADEIRA_OPTIN_DLLS = combase does nothing in this IPA"
+          fi
           # And its ntdll-sync.dll, which the unix loader maps by default: never
           # ship one whose SRW and critical-section exports are not the x64 bodies
           # or whose exports are not the shipped ntdll.dll's plus madeira_sync_x64_off.
@@ -4401,6 +4891,43 @@ jobs:
       - name: Check thin reservations
         run: python3 tests/host/check-thin-reserve.py
 
+      # madeira-bcd tls-index-sync: the loader's TLS slot for a module reaches the pool copy it runs from; the parse and the copy on a
+      # synthetic image, and where the protect-time sync calls it.
+      - name: Check the TLS slot in pool copies
+        run: python3 tests/host/check-tls-index-sync.py
+
+      # madeira-bcd: a generic reserved area never swallows a FEX or thin area that follows it (mmap_add_reserved_area).
+      - name: Check reserved-area merges keep special areas
+        run: python3 tests/host/check-reserved-area-merge.py
+
+      # madeira-bcd: env.MADEIRA_X64_HOOK_ZONE = 1 (default off): 16 MB free above each 64-bit process's ntdll for hook code (a FIXED_ONLY
+      # reserved area); the kind, the placement, the release and FC64's probe on a fake map.
+      - name: Check the 64-bit hook zone
+        run: python3 tests/host/check-x64-hook-zone.py
+
+      # madeira-bcd: env.MADEIRA_SELF_WRITE = 1 (default off): a program's WriteProcessMemory into itself is done in ntdll, page by page
+      # as on Windows; the page rules, the reach (a 32-bit window; a 64-bit image view or hook zone) and the wiring.
+      - name: Check a program's writes into its own memory
+        run: python3 tests/host/check-self-write.py
+
+      # madeira-bcd: env.MADEIRA_KILL_REAP = 1 (default off): a process ended by another one releases its code buffers, window and
+      # handles as an exit does (process_ios.c NtTerminateProcess); the switch and the order around the server request.
+      - name: Check kill-reap
+        run: python3 tests/host/check-kill-reap.py
+
+      # madeira-bcd: env.MADEIRA_POOL_CARVE_MERGE = 1 (free code buffers merge and are cut to the size asked) and
+      # env.MADEIRA_POOL_CODE_FOREGROUND = 1 (the session's other programs get code buffers of at most 16 MB; the program being played's
+      # freed or exited buffer is held for it); both default off. The production allocator and release paths on a model of the pool.
+      - name: Check the code-buffer merge and the policy for the program being played
+        run: |
+          python3 tests/host/check-pool-carve-merge.py
+          python3 tests/host/check-pool-code-policy.py
+
+      # madeira-bcd split-lock: a guest atomic whose operand crosses a 16-byte boundary is done inline under a lock instead of
+      # trapping (tools/patch-fex-ios-split-lock.py, both FEX builds); the patch, and the emitted code on the host (unicorn when present).
+      - name: Check the FEX split-lock fast path
+        run: python3 tests/host/check-fex-split-lock.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure
       # parts run on the host.
@@ -4495,6 +5022,10 @@ jobs:
       # the two dylibs (arm64 Mach-O, @rpath names), opengl32-optin.dll, the licence texts, and the driver and the unix tables in the archives.
       - name: Verify the OpenGL pieces
         run: python3 tools/check-opengl-shipped.py
+
+      # madeira-bcd (Windows Vulkan): the two DLLs, the unix tables in the archives, MoltenVK and the farm's stand-in vulkan-1.dll.
+      - name: Verify the Windows Vulkan pieces
+        run: python3 tools/check-vulkan-shipped.py
 
       # Fail here with a clear list rather than deep inside a linker error.
       - name: Verify all linked archives exist

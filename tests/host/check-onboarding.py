@@ -90,16 +90,26 @@ require(not re.search(r'\b(SwiftUI|UIKit|View|UIDevice)\b', rules.replace('// MA
 
 # ------------------------------------------------------------------ static: when setup opens
 present = block(model, 'func presentIfNeeded()')
-require('guard !considered' in present and 'OnboardingRules.shouldShow(seen: Self.seen, enabled: Self.enabled, steps: steps(since: Self.seen))' in present
+require('guard !considered' in present and 'OnboardingRules.shouldShow(seen: Self.seen, enabled: Self.enabled, steps: steps(since: Self.seen), debuggable: Self.debuggable)' in present
         and 'open(reason: "revision \\(Self.seen)->\\(OnboardingRules.revision)", since: Self.seen)' in present,
         'setup is considered once per run, opens only by the rules, and after an update shows only the new pages')
+require('static var debuggable: Bool { SigningStatus.current.debuggable }' in model
+        and 'var available: Bool { Self.enabled && OnboardingRules.hasSetup(steps(since: 0), debuggable: Self.debuggable) }' in model
+        and '+ (Self.debuggable ? "" : " signing=no-get-task-allow")' in block(model, 'private func open(reason: String, since: Int)'),
+        'A1 S8: the model reads the copy\'s signing, opens for the message, and logs signing=no-get-task-allow once')
+welcome_page = block(setup, 'private var welcome: some View')
+require('if !OnboardingModel.debuggable {' in welcome_page and 'Text(SigningStatus.notDebuggableMessage)' in welcome_page
+        and 'primary("OK", symbol: "checkmark") { model.finish() }' in welcome_page
+        and welcome_page.index('Text("This copy can\'t run games yet")') < welcome_page.index('if OnboardingModel.debuggable {')
+        and welcome_page.index('if OnboardingModel.debuggable {') < welcome_page.index('primary("Let\'s go"'),
+        'A1 S8: the welcome page of a copy without get-task-allow says so and offers OK; the list of pages, Let\'s go and Skip stay for every other copy')
 require('func rerun() { open(reason: "settings", since: 0) }' in model,
         'Run setup again shows every page')
 opener = block(model, 'private func open(reason: String, since: Int)')
 require('LibraryModel.shared.current == nil' in opener and 'wine_process_is_running() == 0' in opener and 'guard available' in opener,
         'setup never opens over a running session, or with nothing to set up')
 require('OnboardingRules.steps(signIn: SteamSignIn.isEnabled, dock: MadeiraDock.enabled, localDevVPN: offerLocalDevVPN,\n'
-        '                              wineMono: offerWineMono, vcRuntime: offerVCRuntime, since: since)' in model,
+        '                              wineMono: offerWineMono, vcRuntime: offerVCRuntime, debuggable: Self.debuggable, since: since)' in model,
         'the pages follow the sign-in and Dock switches, whether LocalDevVPN, Wine Mono and the VC++ runtime are here, and the revision seen')
 require('private var offerVCRuntime = !VCRuntime.shared.isAvailable' in model
         and 'offerVCRuntime = !VCRuntime.shared.isAvailable' in opener,
@@ -188,7 +198,7 @@ require('.exe' not in rules, 'rules key nothing on program names')
 
 # ------------------------------------------------------------------ static: Dock from the library
 start = block(content, 'private func startDock(_ game: DockGame, compactPool: Bool')
-require('BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,\n                                    startDock: { startDock($0, compactPool: $1) })' in content,
+require('BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,\n                                startDock: { startDock($0, compactPool: $1) }, waitForCloud: cloudWait)' in content,
         "ContentView hands Dock's start to BCD's interface")
 held = start.index('LibraryModel.sessionsThisRun > 0, MadeiraConfig.flag("MADEIRA_ONE_SESSION_PER_RUN")')
 require(held < start.index('MadeiraDock.writeHandoff('), 'a held Dock start writes no sign-in transfer')
@@ -268,6 +278,20 @@ import Foundation
                "an update shows setup only when a new page applies (Wine Mono missing)")
         expect(R.hasSetup(full) && R.hasSetup([.welcome, .jit, .done])
                && !R.hasSetup([.welcome, .done]), "hasSetup")
+
+        // Night round 2026-11-11 (A1 S8; HZCYB2, C4X44R, WMCY7N): a copy signed without get-task-allow has the welcome page (with its message) and done.
+        expect(R.steps(signIn: true, dock: true, localDevVPN: true, wineMono: true, vcRuntime: true, debuggable: false) == [.welcome, .done]
+               && R.steps(signIn: true, dock: true, debuggable: false, since: 2) == [.welcome, .done]
+               && R.steps(signIn: true, dock: true, debuggable: true) == full && R.steps(signIn: true, dock: true) == full,
+               "no get-task-allow: only welcome and done (no LocalDevVPN, JIT, sign-in, Dock client, Wine Mono or VC++ page); a debuggable copy keeps its pages")
+        expect(R.hasSetup([.welcome, .done], debuggable: false) && !R.hasSetup([.welcome, .done], debuggable: true) && !R.hasSetup([.welcome, .done])
+               && R.hasSetup(full, debuggable: true), "hasSetup: a copy that cannot use JIT has a message to show")
+        expect(R.shouldShow(seen: 0, enabled: true, steps: [.welcome, .done], debuggable: false)
+               && R.shouldShow(seen: R.revision - 1, enabled: true, steps: [.welcome, .done], debuggable: false)
+               && !R.shouldShow(seen: R.revision, enabled: true, steps: [.welcome, .done], debuggable: false)
+               && !R.shouldShow(seen: 0, enabled: false, steps: [.welcome, .done], debuggable: false)
+               && !R.shouldShow(seen: 0, enabled: true, steps: [.welcome, .done]),
+               "no get-task-allow: setup opens once for the message (and MADEIRA_ONBOARDING = 0, or a finished revision, still keep it closed)")
 
         // First-run decision.
         expect(R.shouldShow(seen: 0, enabled: true, steps: full), "new install shows setup")

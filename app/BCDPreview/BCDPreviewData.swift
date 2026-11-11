@@ -87,7 +87,8 @@ extension BCDStore {
         store.system = BCDSystemStatus(jit: .on, memoryLimitBytes: 6_442_450_944, increasedMemoryLimit: true,
                                        controllerName: "DualSense", controllerBattery: 82,
                                        freeDeviceBytes: 58_600_000_000, totalDeviceBytes: 256_000_000_000,
-                                       freeExternalBytes: empty ? nil : 412_000_000_000)
+                                       freeExternalBytes: empty ? nil : 412_000_000_000,
+                                       externalDriveName: empty ? nil : "Kingston SSD")
         return store
     }
 }

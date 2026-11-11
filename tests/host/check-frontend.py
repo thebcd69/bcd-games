@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Library front end: launch profiles, controller navigation and the session
 exit report.
 
@@ -94,6 +96,7 @@ enum MadeiraConfig {
     static var values: [String: String] = [:]   // stands in for bcd.cfg
     static func flag(_ name: String, fallback: Bool = true) -> Bool { fallback }
     static func get(_ key: String) -> String? { values[key] }
+    static func gameValue(_ key: String) -> String? { nil }   // the game's own file (Library.wantsRockstarServices, night round 2026-11-11)
     static func bool(_ key: String, default dflt: Bool = false) -> Bool { values[key].map { ["1", "on", "true", "yes"].contains($0) } ?? dflt }
     @discardableResult static func set(_ key: String, _ value: String?) -> Bool { values[key] = value; return true }
     static var game: String?   // stands in for the file MADEIRA_CFG_GAME names
@@ -126,7 +129,8 @@ swift += block(lib, 'struct LibraryEntry: Codable, Identifiable') + '\n'
 swift += block(lib, 'enum SyncEngine: String, CaseIterable, Identifiable') + '\n'
 swift += '\n'.join(l for l in display.splitlines() if not l.startswith('import ')) + '\n'
 swift += block(lib, 'final class LibraryController: ObservableObject, @unchecked Sendable') + '\n'
-swift += block(lib, 'enum LaunchArgumentText {') + '\n'   # round 632: configureLaunch exports MADEIRA_ARGS through it (check-launch-argument-text.py)
+swift += block(lib, 'enum LaunchArgumentText {') + '\n'
+swift += block(lib, 'enum GameConfigNotes {') + '\n'   # night round 2026-11-11 (A5 S1): configureLaunch logs a note per pasted line without a key   # round 632: configureLaunch exports MADEIRA_ARGS through it (check-launch-argument-text.py)
 swift += r'''
 var failed = 0
 func expect(_ cond: Bool, _ what: String) { print((cond ? "PASS: " : "FAIL: ") + what); if !cond { failed += 1 } }
@@ -137,6 +141,7 @@ desk.resolution = "1280x720"
 expect(desk.launchArguments == "/desktop=shell,1280x720 C:\\windows\\system32\\services.exe", "desktop arguments")
 desk.configureLaunch()
 expect(env("MADEIRA_EXE") == "explorer.exe" && env("MADEIRA_DESKTOP") == "1", "desktop starts explorer in desktop mode")
+expect(env("BCD_GAME_FOLDER") == nil, "pool-fg: the Desktop entry publishes no game folder")
 expect(env("MADEIRA_SCREEN_W") == "1280" && env("MADEIRA_SCREEN_H") == "720", "desktop size exported")
 expect(published == (1280, 720), "desktop size published to the display shim")
 
@@ -147,6 +152,7 @@ game.configureLaunch()
 expect(env("MADEIRA_EXE") == "C:\\Games\\Some Game\\bin\\game.exe", "direct executable path")
 expect(env("MADEIRA_ARGS") == "-windowed \"-name=a b\"", "direct arguments verbatim")
 expect(env("MADEIRA_DESKTOP") == nil, "desktop state cleared")
+expect(env("BCD_GAME_FOLDER") == "C:\\Games\\Some Game\\bin", "pool-fg: the program's own folder is the game's")
 // Every entry's Resolution becomes the session's virtual monitor.
 expect(game.resolution == "1152x800", "ml1172: new entries default to the screen's shape at 720p's pixels (1152x800 on an 11-inch iPad)")
 expect(env("MADEIRA_SCREEN_W") == "1152" && env("MADEIRA_SCREEN_H") == "800" && env("MADEIRA_SCREEN_SRC") == "knob",
@@ -160,8 +166,9 @@ game.resolution = "1280x720"; game.configureLaunch()
 // A Steam game: Madeira Dock sets what starts, so its profile leaves MADEIRA_EXE alone...
 var steamGame = LibraryEntry(title: "Steam game", relativePath: "Program Files (x86)/Steam/steamapps/common/Some Game", bits: 0)
 steamGame.steamAppID = 4242
-setenv("MADEIRA_EXE", "set-by-dock", 1); setenv("MADEIRA_STEAM_APPID", "1", 1)
+setenv("MADEIRA_EXE", "set-by-dock", 1); setenv("MADEIRA_STEAM_APPID", "1", 1); setenv("BCD_GAME_FOLDER", "set-by-dock", 1)
 steamGame.configureLaunch()
+expect(env("BCD_GAME_FOLDER") == "set-by-dock", "pool-fg: a Dock start's folder is MadeiraDock.configure's")
 expect(env("MADEIRA_EXE") == "set-by-dock" && env("MADEIRA_STEAM_APPID") == nil, "Madeira Dock (the default): the profile sets nothing that starts")
 // ...and "Start with: The game" starts the game's own program, with the game's own Steam identity.
 steamGame.steamStart = "game"; steamGame.steamProgram = "bin/game.exe"; steamGame.steamProgramArguments = "-dx11 \"-name=a b\""
@@ -174,6 +181,7 @@ expect(env("MADEIRA_ARGS") == "-dx11 \"-name=a b\"", "The game: Steam's argument
 expect(env("MADEIRA_STEAM_APPID") == "4242" && env("MADEIRA_STEAM_APPPATH") == steamFolder,
        "The game: its own App ID and install folder for the bridge")
 expect(env("MADEIRA_WORKDIR") == steamFolder + "\\data", "The game: Steam's working folder")
+expect(env("BCD_GAME_FOLDER") == steamFolder, "pool-fg: The game's folder is its install folder, not its program's")
 steamGame.steamProgramFolder = ""; steamGame.configureLaunch()
 expect(env("MADEIRA_WORKDIR") == steamFolder, "working folder \"\": the install folder")
 steamGame.steamProgramFolder = nil; steamGame.configureLaunch()

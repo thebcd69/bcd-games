@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import SwiftUI
@@ -37,6 +38,13 @@ struct BCDStartNote: Identifiable, Equatable {
     var id: String
     var text: String
     var tone: BCDSessionTone = .soft
+}
+
+/// The words of the starting screen's hints that need no engine type (the live layer picks when to show them; the preview app shows them as they are).
+enum BCDStartHints {
+    /// Night round 2026-11-11 (A5 S12; Borderlands GOTY Enhanced WK5EAC, and 5 of 289 logs of 11-07 and 11-08 with low-power=1): Low Power Mode slows
+    /// the processor, and a game or its launcher starts and runs much slower; nothing in BCD can change that.
+    static let lowPower = "Low Power Mode is on, so this device slows its processor and games and launchers start and run much slower. Turn it off for play."
 }
 
 /// Everything the starting screen shows.
@@ -103,6 +111,11 @@ enum BCDDockStart {
         if fields["launch-option-missing"] != nil || fields["launch-option-invalid"] != nil {
             return (.launching, note("launch-option", "Steam doesn't accept this game's launch option.", .warm))
         }
+        // Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A): error 19 is "the game needs an update", and nothing may be installing it.
+        if fields["launch-update-wait"] != nil && fields["launch-update-ready"] == nil && fields["launch-client-error"] == "19" {
+            return (.waiting, note("update", "Steam says this game needs an update before it can start. If nothing is downloading, open the game's page, "
+                                   + "check for an update and install it, then play again.", .warm))
+        }
         if fields["launch-update-wait"] != nil && fields["launch-update-ready"] == nil {
             return (.waiting, note("update", "Steam is installing content this game needs. The game starts right after."))
         }
@@ -119,6 +132,11 @@ enum BCDDockStart {
             return (.launching, note("window", "Steam started the game. Waiting for its window."))
         }
         if ["ceg-scm", "ceg-request-busy", "ceg-request"].contains(where: { fields[$0] != nil }) && fields["ceg-result"] == nil {
+            // Night round 2026-11-11 (A2 S4; Spec Ops: The Line 0TF6NN, XCOM: Enemy Unknown 82Y3VH, 7NVV4P): the host waits up to 5 minutes for the job and the three
+            // players left after 32 to 98 s. A minute into the wait the note says it can take several minutes.
+            if waited >= 60, fields["ceg-request"] != nil {
+                return (.preparing, note("ceg", "Steam is still preparing this game's program. This can take several minutes the first time: keep BCD open.", .warm))
+            }
             return (.preparing, note("ceg", "Steam is preparing this game's program."))
         }
         if fields["session-offline-listed"] == "1" {
@@ -268,7 +286,7 @@ struct BCDStartingScreen: View {
                 Image(systemName: symbol).font(.system(size: 13, weight: .bold))
                 Text(title).font(BCDStyle.label(13)).lineLimit(1)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(primary || on ? BCDStyle.onAccent : .white)
             .padding(.horizontal, 13).frame(minHeight: 36)
             .background {
                 if primary || on { Capsule().fill(BCDStyle.glow) } else { Capsule().fill(Color.white.opacity(0.14)) }

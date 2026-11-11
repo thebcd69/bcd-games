@@ -281,12 +281,17 @@ check("a downloaded list may set them, with the one value each and nothing else"
 recs = json.loads((root / "recommended/recommendations.json").read_text())
 with_d8 = [r["id"] for r in recs["rules"] if "MADEIRA_D3D8" in json.dumps(r["config"])]
 # round 624 (agent D2): Red Faction's launcher (8R8V3Z) is the fifth.
-check("only the five Direct3D 8 games of the logs carry env.MADEIRA_D3D8 = d3d9, each from build 602 only, after the standard line",
-      with_d8 == ["grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2", "red-faction"]
+# night round 2026-11-11 (agents R1 S6, G2 S4, G5 S13, G6 S2): Vice City, Battlefield 1942, Mafia and Hitman: Contracts (the last after its msvcrt line of build 630)
+five = ["grand-theft-auto-iii", "postal-2", "hotline-miami", "max-payne-2", "red-faction"]
+check("the five Direct3D 8 games of the first logs and the four of the night carry env.MADEIRA_D3D8 = d3d9, each from build 602 only",
+      with_d8 == five + ["hitman-contracts", "grand-theft-auto-vice-city", "battlefield-1942", "mafia-classic"]
+      and next(r for r in recs["rules"] if r["id"] == "hitman-contracts")["config"][3:] == [{"line": "env.MADEIRA_APP_DLL_SHADOW = msvcrt.dll", "minBuild": 630}, {"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602}]
+      and all({"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602} in next(r for r in recs["rules"] if r["id"] == i)["config"]
+              for i in ("grand-theft-auto-vice-city", "battlefield-1942", "mafia-classic"))
       # round 630 (agent A2 S15): Hotline Miami v2 also carries the 32-bit fault report, from build 624
       and all(next(r for r in recs["rules"] if r["id"] == i)["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D8 = d3d9", "minBuild": 602}]
-              + ([{"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 624}] if i == "hotline-miami" else []) for i in with_d8))
-matches = {r["id"]: r["match"] for r in recs["rules"] if r["id"] in with_d8}
+              + ([{"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 624}] if i == "hotline-miami" else []) for i in five))
+matches = {r["id"]: r["match"] for r in recs["rules"] if r["id"] in five}
 check("their matches are the games' Steam App IDs (12100, 223470, 219150, 12150, 20530), install folders and programs",
       matches == {"grand-theft-auto-iii": {"steamAppIDs": [12100], "steamFolders": ["grand theft auto 3"], "programs": [{"name": "gta3.exe"}]},
                   "postal-2": {"steamAppIDs": [223470], "steamFolders": ["postal2complete"], "programs": [{"name": "postal2.exe"}]},
@@ -304,8 +309,9 @@ mod = __import__("importlib.util").util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 rule = next(r for r in mod.RULES if r["id"] == "d3d8-to-d3d9")
 # round 624 (agent D2): Red Faction's launcher (8R8V3Z) joins with its three lines, 16 in all.
+# night round 2026-11-11 (agents R1 S6, G2 S4, G5 S13): Vice City, Battlefield 1942 and Hitman: Contracts join with three signals each (9 more, 25 in all).
 check("auto-tune's rule adds the one line, needs the GL failure and a loaded d3d8.dll, is the five games' alone and stops once the bridge linked (or lacked) the DLL",
-      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 16
+      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 25
       and {"has": ["(d3d8.dll-", "Load module"]} in rule["all"] and {"has": ["wined3d_adapter_gl_init Failed to get a GL context"]} in rule["all"]
       and {"has": ["MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll"]} in rule["none"] and "noFix" not in rule and "fixedIn" not in rule)
 fx = root / "tests/fixtures/autotune"
@@ -322,23 +328,26 @@ def rule_matches(r, text):
 
 
 for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-miami-d3d8-2026-10-21", "exited-early"), ("gta-iii-d3d8-2026-10-24", "exited-early"),
-                           ("red-faction-d3d8-2026-10-29", "exited-early")):
+                           ("red-faction-d3d8-2026-10-29", "exited-early"), ("gta-vice-city-d3d8-2026-11-10", "exited-early"),
+                           ("battlefield-1942-d3d8-2026-11-05", "exited-early"), ("hitman-contracts-d3d8-2026-11-07", "crashed")):
     expect = json.loads((fx / (name + ".expect")).read_text())
     log = (fx / (name + ".log")).read_text()
     check(f"{name}: the fixture proposes the line ({expect['outcome']}, stage {expect['stage']})",
-          expect["matched"] == ["d3d8-to-d3d9"] and expect["next"] == ["env.MADEIRA_D3D8 = d3d9"] and expect["outcome"] == want_outcome and expect["status"] == "trying")
+          expect["matched"][:1] == ["d3d8-to-d3d9"] and expect["next"] == ["env.MADEIRA_D3D8 = d3d9"] and expect["outcome"] == want_outcome and expect["status"] == "trying")
     check(f"{name}: not once the bridge logged the link, not when the DLL was missing, not without the GL failure or the d3d8.dll load, not for another game",
           rule_matches(rule, log)
           and not rule_matches(rule, log + "\n[WineProc] MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll (x; syswow64)\n")
           and not rule_matches(rule, log + "\n[WineProc] MADEIRA_D3D8=d3d9 but this build has no d3d8to9.dll -- Wine's d3d8.dll stays\n")
           and not rule_matches(rule, log.replace("wined3d_adapter_gl_init Failed to get a GL context", "ok"))
           and not rule_matches(rule, log.replace("(d3d8.dll-", "(d3d9.dll-"))
-          and not rule_matches(rule, re.sub(r"library launch [^:\n]*:|\[session-log\] Steam game [^:\n]*:|Session log: logs/[^ \n]*", "library launch Some Other Game:", log)))
+          and not rule_matches(rule, re.sub(r"library launch [^:\n]*:|\[session-log\] Steam game [^:\n]*:|Session log: logs/[^ \n]*", "library launch Some Other Game:",
+                                            log.replace("Failed to init Direct3D", "ok"))))   # Battlefield 1942's own line is one of its three signals
     check(f"{name}: scrubbed (no container path, user name, e-mail, address)",
           not re.search(r"/var/mobile/Containers|/Users/(?!<user>)|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}|\b(?:\d{1,3}\.){3}\d{1,3}\b", log))
 others = [p.name[:-7] for p in fx.glob("*.expect") if "d3d8-to-d3d9" in json.loads(p.read_text()).get("matched", [])]
-check("no other fixture matches it (Vice City, Hitman, Peggle, the D3D9 and D3D11 games): %s" % others,
-      sorted(others) == ["gta-iii-d3d8-2026-10-24", "hotline-miami-d3d8-2026-10-21", "postal-2-d3d8-2026-10-24", "red-faction-d3d8-2026-10-29"])
+check("no other fixture matches it (Peggle, the D3D9 and D3D11 games; Mafia's NULL-adapter crash is d3d8-null-adapter-crash's): %s" % others,
+      sorted(others) == ["battlefield-1942-d3d8-2026-11-05", "gta-iii-d3d8-2026-10-24", "gta-vice-city-d3d8-2026-11-10", "hitman-contracts-d3d8-2026-11-07",
+                         "hotline-miami-d3d8-2026-10-21", "postal-2-d3d8-2026-10-24", "red-faction-d3d8-2026-10-29"])
 catalog_ok = '"env.MADEIRA_D3D8"' in (root / "build/tools/gen-config-catalog.py").read_text()
 check("the rule's key is in the settings catalog's overlay", catalog_ok)
 

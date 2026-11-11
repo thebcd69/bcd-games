@@ -5,7 +5,7 @@
 // app/Madeira/AutoTuneCore.swift and AutoTuneRules.generated.swift by
 // tests/host/check-autotune.py and tools/autotune-fixture.py.
 //
-//   replay [--chunk N] [--end JSON] [--rules FILE] LOG...
+//   replay [--chunk N] [--end JSON] [--rules FILE] [--user-keys a,b] LOG...
 //
 // For each log: one JSON line with the scan's facts, the report (outcome, stage,
 // matched rules, the game's error boxes, whether a .NET program found no Wine Mono) and the
@@ -22,6 +22,7 @@ struct AutoTuneReplay {
         var chunk = 0
         var endJSON = "{}"
         var overrideFile: URL?
+        var userKeys: Set<String> = []
         while let a = args.first, a.hasPrefix("--") {
             args.removeFirst()
             guard let v = args.first else { break }
@@ -30,6 +31,8 @@ struct AutoTuneReplay {
             case "--chunk": chunk = Int(v) ?? 0
             case "--end": endJSON = v
             case "--rules": overrideFile = URL(fileURLWithPath: v)
+            // Night round 2026-11-11 (agent T3 S1): keys the player set (the game's own file, the entry's lines, bcd.cfg): "swap-mb,pool".
+            case "--user-keys": userKeys = Set(v.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty })
             default: FileHandle.standardError.write(Data("unknown option \(a)\n".utf8)); exit(2)
             }
         }
@@ -61,11 +64,11 @@ struct AutoTuneReplay {
                 scanner = s
             }
             let report = AutoTuneEngine.report(end, scanner, rules: rules, signals: signals)
-            var state = AutoTuneEngine.advance(AutoTuneState(), report: report, rules: rules, userKeys: [],
+            var state = AutoTuneEngine.advance(AutoTuneState(), report: report, rules: rules, userKeys: userKeys,
                                                fingerprint: "replay", log: nil)
             // The second start: after the unchanged retry, which a noRetry rule skips.
             if state.candidateRule == "retry" {
-                state = AutoTuneEngine.advance(state, report: report, rules: rules, userKeys: [],
+                state = AutoTuneEngine.advance(state, report: report, rules: rules, userKeys: userKeys,
                                                fingerprint: "replay", log: nil)
             }
             let enc = JSONEncoder()

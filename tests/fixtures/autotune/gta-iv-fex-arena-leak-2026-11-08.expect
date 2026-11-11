@@ -1,0 +1,23 @@
+{
+ "dialogs": [
+  "Error",
+  "Unable to launch game, please try reinstalling the game."
+ ],
+ "end": {},
+ "matched": [
+  "fex-arena-dead-process-leak",
+  "socialclub-helper-table-zone-conflict",
+  "socialclub-helper-v8-tables-no-room",
+  "fex-runtime-fault",
+  "fex-arena-exhausted-thread-start",
+  "fex-irlist-fault-window-stays",
+  "lock-orphan-stamped"
+ ],
+ "next": [
+  "env.MADEIRA_FEX_ARENA_REAP = 1"
+ ],
+ "note": "GTA IV (Steam 12210, BCD Dock), build 634, iPhone19,4: Rockstar Launcher's sign-in page restarts its Social Club helper; the helper dies out of memory each time (chromium-oom) and the emulator memory of the dead helper is never given back (the arena went from 49 to 94 percent in four restarts), then FEXAlloc stops (alloc-fail ml798) and the Launcher dies (fex-fault fault-addr=0x800010). The first held V8 table slot is refused (0xc0000018) and the zone ends the helper there. UNPROVEN: env.MADEIRA_FEX_ARENA_REAP = 1 and the next-slot retry (build 652).",
+ "outcome": "crashed",
+ "stage": 4,
+ "status": "trying"
+}

@@ -43,6 +43,8 @@ def function(sig):
 
 # ---------------------------------------------------------------- Part A: sources
 real_mb = function('static long long ios_oversize_real_mb( void )')
+min_fn = function('static unsigned long long ios_oversize_min( void )')
+eager_fn = function('static int ios_oversize_eager( void )')
 reserve = function('static NTSTATUS ios_oversize_reserve( void **ret, SIZE_T *size_ptr, ULONG type, ULONG protect )')
 failed = function('static void ios_oversize_commit_failed( const void *addr, SIZE_T size, NTSTATUS status )')
 image_is = function('static int ios_image_file_is( const UNICODE_STRING *nt_name, const char *want )')
@@ -56,8 +58,18 @@ check('the allocator pattern is 96 bytes, ten of them wildcards (the two rel32 o
       pat[0x33:0x3b] == [0, 0, 0, 0, 0x10, 0, 0, 0] and '#define IOS_FFT_ARENA_IMM 0x33' in src, 'len=%d wild=%d' % (len(pat), pat.count(-1)))
 check('the two keys are plain bcd.cfg keys read once; the real part is 0 unless oversize-reserve is on',
       'madeira_cfg_bool( "oversize-reserve", 0 )' in real_mb and 'madeira_cfg_int( "oversize-reserve-mb", 16384 )' in real_mb and ': 0;' in real_mb)
+check('night round 2026-11-11 (G3 S3): the 64 GB floor is ios_oversize_min() (bcd.cfg oversize-reserve-min-mb, default 65536, at least 1024) and the guard of '
+      'ios_oversize_reserve uses it; the constant is no longer in the guard',
+      'madeira_cfg_int( "oversize-reserve-min-mb", 65536 )' in min_fn and 'if (mb < 1024) mb = 1024;' in min_fn and
+      'want < ios_oversize_min()' in reserve and 'want < IOS_OVERSIZE_MIN' not in reserve)
+big = src[src.index('if (!*ret && *size_ptr >= 0x40000000 && (type & MEM_RESERVE) && !limit)'):]
+big = big[:big.index('st = allocate_virtual_memory( ret, size_ptr, type, protect, 0, limit, 0, 0 );') + 100]
+check('oversize-reserve-eager: the hook is the first thing of the big-reserve branch, before the window is asked for the full size, and needs oversize-reserve on',
+      'if (ios_oversize_eager() && !ios_oversize_reserve( ret, size_ptr, type, protect )) return STATUS_SUCCESS;' in big and
+      big.index('ios_oversize_eager()') < big.index('st = allocate_virtual_memory( ret, size_ptr, type, protect, 0, limit, 0, 0 );') and
+      'ios_oversize_real_mb() > 0 && madeira_cfg_bool( "oversize-reserve-eager", 0 )' in eager_fn)
 check('the unhinted reserve hooks: NtAllocateVirtualMemory after the jumbo failure census, NtAllocateVirtualMemoryEx for an unconstrained request',
-      src.count('ios_oversize_reserve( ret, size_ptr, type, protect )') == 2 and
+      src.count('ios_oversize_reserve( ret, size_ptr, type, protect )') == 3 and
       src.index('ios_band_census( "jumbo reserve failed" );') < src.index('if (!ios_oversize_reserve( ret, size_ptr, type, protect )) return STATUS_SUCCESS;') and
       'if (st && !jumbo_hint && !limit_low && !limit_high && !align && !attributes\n            && !ios_oversize_reserve( ret, size_ptr, type, protect ))\n            st = STATUS_SUCCESS;' in src)
 check('the commit-failure log is called from both entry points, only for a failed commit with a hint', src.count('ios_oversize_commit_failed( jumbo_hint, jumbo_size, st );') == 2 and
@@ -125,6 +137,8 @@ static int fake_mprotect(void *a, size_t l, int p) { (void)a; (void)l; (void)p; 
 #define munmap fake_munmap
 #define mprotect fake_mprotect
 @REALMB@
+@MINFN@
+@EAGERFN@
 #define IOS_OVERSIZE_MIN   0x1000000000ULL
 #define IOS_OVERSIZE_ALIGN 0x4000000UL
 #define IOS_FFT_RESERVE   0x4004000000ULL
@@ -138,6 +152,7 @@ static pthread_mutex_t ios_oversize_lock = PTHREAD_MUTEX_INITIALIZER;
 /* a model allocator: one hole of `hole` bytes at `hole_base`; refuses a size above it, an alignment it cannot give, or a hint */
 static ULONG_PTR hole_base = 0x7100000000ULL; static SIZE_T hole;
 static ULONG_PTR last_align; static int alloc_calls;
+static int consume;     /* 1: a success uses its part of the hole up (the REDengine sequence below) */
 static NTSTATUS allocate_virtual_memory(void **ret, SIZE_T *size_ptr, ULONG type, ULONG protect, ULONG_PTR limit_low, ULONG_PTR limit_high, ULONG_PTR align, ULONG attributes)
 {
     (void)type; (void)protect; (void)limit_low; (void)limit_high; (void)attributes;
@@ -145,12 +160,29 @@ static NTSTATUS allocate_virtual_memory(void **ret, SIZE_T *size_ptr, ULONG type
     if (*size_ptr > hole) return STATUS_NO_MEMORY;
     *ret = (void *)((hole_base + align - 1) & ~(align - 1));
     *size_ptr = ROUND_SIZE(0, *size_ptr, page_mask);
+    if (consume) { hole -= (SIZE_T)(((ULONG_PTR)*ret - hole_base) + *size_ptr); hole_base = (ULONG_PTR)*ret + *size_ptr; }
     return STATUS_SUCCESS;
 }
 @REALLOC@
 @FAILED@
 @IMAGEIS@
 @PATCH@
+static void run_redengine(void)
+{
+    /* Cyberpunk 2077 (A488SG): reserves 16, 64 and 32 GB; the three can only be served in part. 15 + 10 + 4 GB of holes: one 15 GB hole, here as ONE
+     * model hole of 15 GB that each success uses up, 4 GB real each (oversize-reserve-mb = 4096) */
+    static const unsigned long long ask[] = { 16, 64, 32, 8, 1 };
+    int i, served = 0;
+    consume = 1; hole = 15ULL << 30; hole_base = 0x7100000000ULL; ios_oversize_n = 0; memset(ios_oversize, 0, sizeof(ios_oversize));
+    for (i = 0; i < 5; i++)
+    {
+        void *ret = NULL; SIZE_T sz = (SIZE_T)(ask[i] << 30); NTSTATUS st = ios_oversize_reserve(&ret, &sz, MEM_RESERVE, PAGE_NOACCESS);
+        printf("ask%d st=%x\n", i, st);
+        if (!st) served++;
+    }
+    printf("served=%d min=%llu eager=%d\n", served, (unsigned long long)(ios_oversize_min() >> 20), ios_oversize_eager());
+    consume = 0;
+}
 static void run_reserve(void)
 {
     void *ret; SIZE_T sz; NTSTATUS st;
@@ -263,6 +295,9 @@ int main(int argc, char **argv)
 {
     if (!strcmp(argv[1], "reserve")) { run_reserve(); return 0; }
     if (!strcmp(argv[1], "realmb")) { printf("%lld\n", ios_oversize_real_mb()); return 0; }
+    if (!strcmp(argv[1], "minmb")) { printf("%llu\n", (unsigned long long)(ios_oversize_min() >> 20)); return 0; }
+    if (!strcmp(argv[1], "eager")) { printf("%d\n", ios_oversize_eager()); return 0; }
+    if (!strcmp(argv[1], "redengine")) { run_redengine(); return 0; }
     if (!strcmp(argv[1], "failed"))
     {
         ios_oversize_n = 1; ios_oversize[0].base = 0x7100000000ULL; ios_oversize[0].real = 16ULL << 30; ios_oversize[0].size = 0x4004000000ULL;
@@ -279,7 +314,7 @@ int main(int argc, char **argv)
     return 2;
 }
 '''
-harness = (harness.replace('@REALMB@', real_mb).replace('@PAT@', 'static const short ios_fft_arena_pat[] =\n{' + pat_src + '\n};')
+harness = (harness.replace('@REALMB@', real_mb).replace('@MINFN@', min_fn).replace('@EAGERFN@', eager_fn).replace('@PAT@', 'static const short ios_fft_arena_pat[] =\n{' + pat_src + '\n};')
            .replace('@REALLOC@', reserve).replace('@FAILED@', failed).replace('@IMAGEIS@', image_is).replace('@PATCH@', patch))
 with tempfile.TemporaryDirectory() as tmp:
     t = Path(tmp)
@@ -310,6 +345,24 @@ with tempfile.TemporaryDirectory() as tmp:
                           ('oversize-mb = 3\noversize-reserve-mb = 8192\n', '0')):
             r = run(['realmb'], cfg)
             check('bcd.cfg %r: the real part is %s MB' % (cfg, want), r.stdout.strip() == want, r.stdout + r.stderr[-300:])
+        # night round 2026-11-11 (G3 S3): the floor and the eager switch
+        for cfg, want in ((None, '65536'), ('oversize-reserve-min-mb = 16384\n', '16384'), ('oversize-reserve-min-mb = 100\n', '1024'),
+                          ('oversize-reserve-min-mb = 0\n', '1024'), ('oversize-reserve-min-mb = 131072\n', '131072')):
+            r = run(['minmb'], cfg)
+            check('bcd.cfg %r: the floor is %s MB' % (cfg, want), r.stdout.strip() == want, r.stdout + r.stderr[-300:])
+        for cfg, want in ((None, '0'), ('oversize-reserve-eager = 1\n', '0'), ('oversize-reserve = 1\n', '0'), ('oversize-reserve = 1\noversize-reserve-eager = 0\n', '0'),
+                          ('oversize-reserve = 1\noversize-reserve-eager = 1\n', '1')):
+            r = run(['eager'], cfg)
+            check('bcd.cfg %r: eager is %s (it needs oversize-reserve = 1)' % (cfg, want), r.stdout.strip() == want, r.stdout + r.stderr[-300:])
+        red = 'oversize-reserve = 1\noversize-reserve-min-mb = 16384\noversize-reserve-eager = 1\noversize-reserve-mb = 4096\n'
+        r = run(['redengine'], red)
+        check('Cyberpunk shape (15 GB of hole; 16, 64, 32 GB asks; 4 GB real each): the three big asks are served in part (12 GB of the hole), the 8 GB and 1 GB asks are not '
+              '(below the floor of 16 GB), min 16384, eager on',
+              'ask0 st=0' in r.stdout and 'ask1 st=0' in r.stdout and 'ask2 st=0' in r.stdout and 'ask3 st=c0000017' in r.stdout and 'ask4 st=c0000017' in r.stdout and
+              'served=3 min=16384 eager=1' in r.stdout, r.stdout + r.stderr[-300:])
+        r = run(['redengine'], 'oversize-reserve = 1\noversize-reserve-mb = 4096\n')
+        check('with the default floor (64 GB) only the 64 GB ask is served: the 16 and 32 GB asks keep the old path, so nothing changes for a game whose list does not lower it',
+              'ask0 st=c0000017' in r.stdout and 'ask1 st=0' in r.stdout and 'ask2 st=c0000017' in r.stdout and 'served=1 min=65536 eager=0' in r.stdout, r.stdout + r.stderr[-300:])
         # reserve
         on = 'oversize-reserve = 1\n'
         r = run(['reserve'], on)

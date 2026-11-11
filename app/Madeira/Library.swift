@@ -1,5 +1,8 @@
-// Portions copyright 2026 alantangok and ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #551; commits abca30a and facd2cc)
-// under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 alantangok, ft7t8drgwf-wq and Connor Gow: code taken from https://github.com/willfaust/Madeira (pull requests #464, #536 and #551;
+// commits abca30a and facd2cc) under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 import SwiftUI
 import UniformTypeIdentifiers
 import UIKit
@@ -99,6 +102,11 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
     private var owns = false
     private var last: UInt16 = 0
     private var announced = false
+    private var heldNavigation: UInt16 = 0
+    private var nextNavigationRepeat: TimeInterval = 0
+    /// Repeating directions at BCD Home of the native Duo interface (thebcd69/bcd-games#43). A plain flag, off: MadeiraApp sets it from
+    /// `BCDDuoFeatures.active` once at launch, so this class names no other type (the host checks compile it on its own).
+    static var duoNavigation = false
     private let allowed = MadeiraConfig.flag("MADEIRA_FRONTEND_CONTROLLER")
     /// BCD (2026-10-18): holding the Home button opens and closes the in-game menu (BCDSessionLive.swift).
     static let homeHold = MadeiraConfig.flag("MADEIRA_MENU_HOME_HOLD", fallback: false)   // 1: holding a controller's Home (PS) button for half a second opens and closes BCD's in-game menu; iOS hands Home over at once only with env.MADEIRA_PAD_SYSTEM_GESTURES = 1. Off (default): Back + Start and the menu button only
@@ -108,7 +116,12 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
     private var chord = BCDChordTracker()   // madeira-bcd (round 604): hold Start opens the menu, when the player chose it in the menu (BCDSessionFeel.swift)
     var ownsInput: Bool { lock.lock(); defer { lock.unlock() }; return enabled && owns }
     func configure(enabled: Bool, ownsInput: Bool) {
-        lock.lock(); self.enabled = enabled && allowed; owns = ownsInput; lock.unlock()
+        lock.lock()
+        if self.enabled != (enabled && allowed) || owns != ownsInput {
+            heldNavigation = 0; nextNavigationRepeat = 0
+        }
+        self.enabled = enabled && allowed; owns = ownsInput
+        lock.unlock()
     }
     /// One sample of player 1's pad, in XInput button bits and stick units.
     func sample(buttons raw: UInt16, lx: Int16, ly: Int16) {
@@ -119,7 +132,20 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
             if lx < -16000 { buttons |= 4 }; if lx > 16000 { buttons |= 8 }
             if ly > 16000 { buttons |= 1 }; if ly < -16000 { buttons |= 2 }
         }
-        let pressed = buttons & ~last; last = buttons
+        var pressed = buttons & ~last; last = buttons
+        // The live frontend uses this sampler, not BCDFocus's preview polling loop.
+        // Repeat only directions; never repeat A/B, tab changes, or a destructive action.
+        if Self.duoNavigation {
+            let direction = owns ? buttons & 0x0f : 0
+            let now = ProcessInfo.processInfo.systemUptime
+            if direction != heldNavigation {
+                heldNavigation = direction
+                nextNavigationRepeat = now + 0.35
+            } else if direction != 0 && now >= nextNavigationRepeat {
+                if pressed & ~UInt16(0x0f) == 0 { pressed |= direction }
+                nextNavigationRepeat = now + 0.12
+            }
+        }
         let own = owns, announce = !announced; announced = true
         var homeHeld = false
         if holdHome || BCDChordSetting.mode == .holdGuide { homeHeld = holdingHome(buttons) }   // BCD: env.MADEIRA_MENU_HOME_HOLD (opt-in), or the menu's "Hold Home"; off, nothing is timed
@@ -375,9 +401,24 @@ struct LibraryEntry: Codable, Identifiable {
         gogSetupLock.lock(); defer { gogSetupLock.unlock() }
         return gogSetup[id]
     }
-    /// The services batch is wanted: the entry asks for it (startServices), or installers of its GOG game are still to run.
+    /// The services batch is wanted: the entry asks for it (startServices), or installers of its GOG game are still to run, or (night round
+    /// 2026-11-11) it is a local Rockstar launcher entry whose settings turn the services batch on (wantsRockstarServices).
     private var wantsServicesBatch: Bool {
-        startServices == true || !(Self.gogSetup(for: id) ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        startServices == true || wantsRockstarServices || !(Self.gogSetup(for: id) ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    /// Night round 2026-11-11 (R1 S5; HXPE5R, XTZBDN, MRX800 and 8 more archive starts): a LOCAL entry of a Rockstar title (the game's folder added
+    /// by hand, not an Epic or Steam library entry) starts no Windows services, and Rockstar's Launcher needs the service manager: every one of
+    /// the 11 logged local starts ends at "Unable to open SC manager! (1722)". The services batch (services.exe first, then the program) is what
+    /// the entry's own "Start Windows services first" switch and the Epic path already use. env.MADEIRA_ROCKSTAR_LOCAL_SERVICES = 1 (the game's
+    /// own settings or bcd.cfg; off unless set, and auto-tune offers it after this failure) turns it on for the programs named here when the
+    /// entry itself says nothing (startServices unset).
+    static let rockstarLauncherPrograms: Set<String> = ["playgtav.exe", "playrdr2.exe", "rdr2.exe", "rdr2launcher.exe", "playgtaiv.exe",
+                                                       "rockstar-games-launcher.exe"]
+    var wantsRockstarServices: Bool {
+        guard startServices == nil, steamAppID == nil, desktop != true,
+              Self.rockstarLauncherPrograms.contains(launchWindowsPath.split(whereSeparator: { $0 == "\\" || $0 == "/" }).last.map { $0.lowercased() } ?? "")
+        else { return false }
+        return (MadeiraConfig.gameValue("env.MADEIRA_ROCKSTAR_LOCAL_SERVICES") ?? MadeiraConfig.get("env.MADEIRA_ROCKSTAR_LOCAL_SERVICES")) == "1"
     }
     /// ml1163: where startServices writes its batch file, one per entry.
     var servicesScriptPath: String { "C:\\bcd-games\\\(id.uuidString).bat" }
@@ -497,6 +538,13 @@ struct LibraryEntry: Codable, Identifiable {
     }
 
     var windowsPath: String { "C:\\" + relativePath.replacingOccurrences(of: "/", with: "\\") }
+    /// madeira-bcd: the folder of the program the player plays (BCD_GAME_FOLDER): a Steam game's install folder, else the folder of the
+    /// entry's program. With env.MADEIRA_POOL_CODE_FOREGROUND = 1 the session's other programs get smaller FEX code buffers than
+    /// its processes (virtual_ios.c ios_pool_fg_class); nil for the Desktop entry.
+    var gameFolder: String? {
+        if desktop == true { return nil }
+        return steamAppID != nil ? windowsPath : Self.folder(of: launchWindowsPath)
+    }
 
     /// The vsync mode to apply: a saved 30 or 40 FPS limit runs as 60 when it is
     /// not offered (DXMT without that cap would present uncapped).
@@ -648,6 +696,7 @@ struct LibraryEntry: Codable, Identifiable {
             let pairs = try MadeiraConfig.applyGame(gameConfigText)
             if !pairs.isEmpty {
                 LogStore.shared.log("[game-cfg] " + pairs.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " "))
+                for note in GameConfigNotes.notes(pairs) { LogStore.shared.log("[game-cfg] note: " + note) }   // night round 2026-11-11 (A5 S1)
                 // Round 630 (agent T1 S26; The Amazing Spider-Man VTX0DG): which FEX memory-order preset the game's file amounts to, in one word.
                 let preset = BCDFEXPresets.current(pairs)
                 if !preset.isEmpty {
@@ -686,6 +735,9 @@ struct LibraryEntry: Codable, Identifiable {
         setenv("MADEIRA_EXE", command.exe, 1)
         setenv("MADEIRA_ARGS", LaunchArgumentText.plain(command.args), 1)   // round 632: Smart Punctuation's dashes and quotes put back (ASCII is unchanged)
         if desktop == true || runsInDesktop { setenv("MADEIRA_DESKTOP", "1", 1) } else { unsetenv("MADEIRA_DESKTOP") }
+        // madeira-bcd: the folder of the program the player plays, for the session's code-buffer budget (virtual_ios.c
+        // ios_pool_fg_class); a Dock start publishes its game's in MadeiraDock.configure.
+        if let gameFolder { setenv("BCD_GAME_FOLDER", gameFolder, 1) } else { unsetenv("BCD_GAME_FOLDER") }
         if startsSteamGameDirectly, let steamAppID {
             // The game's own Steam identity (SteamAppId, SteamGameId, SteamAppPath = its install
             // folder) instead of the bridge's fixed one.
@@ -738,6 +790,31 @@ final class LibraryModel: ObservableObject {
     }
     @Published var error: String?
     @Published var sessionMessage = ""
+    @Published var desktopHome = false
+    @Published var desktopCloseError: String?
+    var desktopClosing: Bool { activeEntry?.desktop == true && quitRequested }
+
+    func showDesktopHome() {
+        guard BCDDuoFeatures.active, activeEntry?.desktop == true, !launching else { return }
+        LibraryKeyboard.hide()
+        if HardwareInput.shared.pointerHeldByProgram { HardwareInput.shared.togglePointerLock(why: "BCD Home") }
+        menu = false
+        desktopHome = true
+        MetalHostView.shared.isHidden = true
+        winios_compositor_set_backgrounded(1)
+        GamepadInput.shared.setKeyboardMouse(nil)
+        LibraryController.shared.configure(enabled: true, ownsInput: true)
+        NotificationCenter.default.post(name: Notification.Name("BCDDesktopDidQuit"), object: nil)
+    }
+
+    func showWindowsDesktop() {
+        guard current != nil, activeEntry?.desktop == true, !quitRequested else { return }
+        desktopHome = false
+        winios_compositor_set_backgrounded(0)
+        MetalHostView.shared.isHidden = false
+        applyControllerMode()
+        LibraryController.shared.configure(enabled: true, ownsInput: false)
+    }
     @Published var launching = false
     @Published var overlayFields = ["FPS", "Frame time", "RAM", "Battery"]
     private var launchPresent: UInt64 = 0
@@ -778,6 +855,15 @@ final class LibraryModel: ObservableObject {
     private var desktopNamed: Set<String> = []
     private var desktopExitLines = 0
     private var desktopNotices: [String] = []
+    /// Night round 2026-11-11 (A4 S2): the list rules already named by a notice this session (once each).
+    private var desktopRecsNamed: Set<String> = []
+    /// Night round 2026-11-11 (A4 S1): the player closed the Windows desktop. Close presses this session and when the last one was, when Start >
+    /// Shut Down's wineboot ended, that the session is being ended, and that the "a program is still open" line was shown (env.MADEIRA_DESKTOP_CLOSE).
+    private var desktopAsks = 0
+    private var desktopAskedAt: Date?
+    private var desktopShutdownAt: Date?
+    private var desktopCloseRunning = false
+    private var desktopProgramNoted = false
     /// madeira-bcd (round 580, BCD Dock: the launch failed and no game ran): when watchDockFailedLaunch first saw the host's failed
     /// launch with nothing of the game running; nil while that does not hold.
     private var dockFailedAt: Date?
@@ -836,8 +922,10 @@ final class LibraryModel: ObservableObject {
         }
         // madeira-bcd (round 624, agent E1 S1, VMJ4WV): 0xC0000135 is a DLL the program imports that was not found (Aliens: Colonial Marines
         // without its steam_api.dll); the game's page names the file when the readiness check finds it missing.
+        // Night round 2026-11-11 (G7 S2, Meccha Chameleon F4WD9B): 3 is the exit code of abort() and of Unreal's crash handler.
         let kind = status == 0xC0000005 ? " (access violation)" : status == 0xC0000017 ? " (not enough memory)"
-            : status == 0xC0000135 ? " (a file the game needs was not found)" : ""
+            : status == 0xC0000135 ? " (a file the game needs was not found)"
+            : status == DockGameEndRules.abortStatus ? " (the game stopped itself: a crash or an abort)" : ""
         return "The game quit with Windows error 0x\(String(status, radix: 16, uppercase: true))\(kind). To report the problem, export the diagnostic log."
     }
     /// madeira-bcd (round 624): the last 512 KB of the session's log (bcd-log.txt), complete when the exit report is built.
@@ -976,6 +1064,37 @@ final class LibraryModel: ObservableObject {
         guard entries.contains(where: { $0.steamAppID == appID }) else { return }
         persist(entries.filter { $0.steamAppID != appID })
     }
+    /// BCD (2026-11-07): the games of the External SSD folder of builds 600 to 634, which was linked as C:\External itself,
+    /// move to the drive it now is (ExternalDrives.migrateLegacyFolder). `legacyExternalEntries` lists them (entry id -> path)
+    /// before anything changes; `rebaseExternal` moves exactly those whose path is still the listed one, External/<path> to
+    /// External/<name>/<path>, with a working folder there and the settings BCD keeps under the game's path (BCDGameRekey), so a
+    /// second run after an interruption changes nothing twice. Returns how many entries moved, nil when the library could not be
+    /// written (the moves are then tried again).
+    func legacyExternalEntries() -> [String: String] {
+        var moves: [String: String] = [:]
+        for entry in entries where entry.desktop != true && entry.relativePath.lowercased().hasPrefix("external/") {
+            moves[entry.id.uuidString] = entry.relativePath
+        }
+        return moves
+    }
+    func rebaseExternal(_ moves: [String: String], to name: String) -> Int? {
+        guard !readOnly, !name.isEmpty else { return nil }
+        var next = entries, moved: [(String, String)] = []
+        for i in next.indices where next[i].desktop != true {
+            let path = next[i].relativePath
+            guard let listed = moves[next[i].id.uuidString], listed == path, path.lowercased().hasPrefix("external/") else { continue }
+            let old = next[i].windowsPath
+            next[i].relativePath = "External/\(name)/" + path.dropFirst("External/".count)
+            if let folder = next[i].workingDirectory, folder.lowercased().hasPrefix("c:\\external\\") {
+                next[i].workingDirectory = "C:\\External\\\(name)\\" + folder.dropFirst("C:\\External\\".count)
+            }
+            moved.append((old, next[i].windowsPath))
+        }
+        guard !moved.isEmpty else { return 0 }
+        guard persist(next) else { return nil }
+        for (old, new) in moved { BCDGameRekey.carry(from: old, to: new) }   // its settings follow it (LibraryBCD.swift)
+        return moved.count
+    }
     @discardableResult
     private func persist(_ next: [LibraryEntry]) -> Bool {
         guard !readOnly else { return false }
@@ -1055,11 +1174,24 @@ final class LibraryModel: ObservableObject {
 
     /// What an entry can start: an executable, or (ml1163) a batch file run through cmd.exe.
     static let programExtensions: Set<String> = ["exe", "bat", "cmd"]
+    /// The path relative to drive_c that reaches `url`, or nil when it is
+    /// outside drive_c. Files on an external drive are reached through
+    /// drive_c/External/<name> (ExternalDrives.swift). BCD reads the opened drives
+    /// through `ExternalDrives.openedRoots`, so this answers on any thread.
+    static func relativeToDrive(_ url: URL) -> String? {
+        let path = url.resolvingSymlinksInPath().standardizedFileURL.path
+        if path.hasPrefix(drive.path + "/") { return String(path.dropFirst(drive.path.count + 1)) }
+        for root in ExternalDrives.openedRoots {
+            if path == root.path { return "External/" + root.name }
+            if path.hasPrefix(root.path + "/") {
+                return "External/" + root.name + "/" + path.dropFirst(root.path.count + 1)
+            }
+        }
+        return nil
+    }
     static func executable(_ relative: String) throws -> URL {
         let url = drive.appendingPathComponent(relative).resolvingSymlinksInPath().standardizedFileURL
-        // The original test first; the SSD folder chosen in Settings > Storage (C:\External) is asked only about what it refuses.
-        guard url.path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits(url),
-              programExtensions.contains(url.pathExtension.lowercased()),
+        guard relativeToDrive(url) != nil, programExtensions.contains(url.pathExtension.lowercased()),
               FileManager.default.fileExists(atPath: url.path) else {
             throw LibraryError.message("Pick a program in drive_c: an .exe, .bat or .cmd file.")
         }
@@ -1084,9 +1216,8 @@ final class LibraryModel: ObservableObject {
     }
 
     static func inspect(_ url: URL) throws -> LibraryEntry {
-        // drive_c's relative path as it always was; C:\External (the SSD folder) only where that refuses (ExternalGameStorage).
-        guard let relative = ExternalGameStorage.shared.relativePath(for: url, drive: drive) else {
-            throw LibraryError.message("Only programs inside drive_c can be added.")
+        guard let relative = relativeToDrive(url) else {
+            throw LibraryError.message("Only programs inside drive_c or on an external drive can be added.")
         }
         if ["bat", "cmd"].contains(url.pathExtension.lowercased()) {
             // ml1163: a batch file has no PE header. Like every entry it starts
@@ -1220,6 +1351,10 @@ final class LibraryModel: ObservableObject {
     /// Play is enabling JIT before starting this entry (ContentView.jitReadyForLaunch):
     /// its Play button reads Starting JIT, with a spinner, until JIT is on or fails.
     @Published var startingJIT: UUID?
+    /// Night round 2026-11-11 (M7, A2 S1 / G10 S10 / A5 S8): a line the starting screen shows while BCD waits for the debugger's answer to the JIT
+    /// memory request: before the request on the risky path (StikDebug attached long ago, or a hot phone), and after 30 s without an answer.
+    /// StikJITHelper sets and clears it (poolWait, JIT pool request watch); nil shows nothing.
+    @Published var poolWait: String?
     /// A Steam game's saves may not be the latest (SteamOwnedLibrary.cloudHold):
     /// the alert Play shows before starting it.
     struct CloudNotice: Equatable {
@@ -1242,13 +1377,18 @@ final class LibraryModel: ObservableObject {
     /// `dock`: the game a Madeira Dock start launches (DockStartScreen).
     func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil) {
         wine_exit_status_reset()
+        desktopHome = BCDDuoFeatures.active && entry.desktop == true
+        desktopCloseError = nil
+        if BCDDuoFeatures.active { winios_compositor_set_backgrounded(desktopHome ? 1 : 0) }   // native Duo interface: the desktop may run behind BCD Home
         quitRequested = false
         endedByWatch = nil; endWatchNote = ""
         endedByDockGame = false; dockEndNote = ""; dockFailedAt = nil; endedByDockFailure = nil; endedByDockShortExit = nil
         // round 624 (agent D2 S3/S7): only what ends after this moment, only on the Windows desktop
         desktopEndsAfter = entry.desktop == true ? madeira_child_ends_since(UInt32.max, nil, 0) : nil
         desktopPoolBase = madeira_jit_pool_refusals(); desktopPoolNoticed = false
-        desktopNamed = []; desktopExitLines = 0; desktopNotices = []
+        desktopNamed = []; desktopExitLines = 0; desktopNotices = []; desktopRecsNamed = []
+        desktopAsks = 0; desktopAskedAt = nil; desktopShutdownAt = nil; desktopCloseRunning = false; desktopProgramNoted = false
+        poolWait = nil   // night round 2026-11-11 (M7): the JIT memory request's line belongs to one start
         // madeira-bcd: auto-tune's session marker (AutoTune.swift); off, nothing.
         if AutoTune.enabled { AutoTune.sessionBegan(entry, remember: remember, dockWithoutEntry: dock != nil && !remember) }
         LibraryController.shared.configure(enabled: true, ownsInput: false)
@@ -1286,7 +1426,11 @@ final class LibraryModel: ObservableObject {
         padMouseVertical = GamepadInput.keyboardMouseAvailable ? (entry.padMouseVertical ?? 1) : 1
         controllerMode = GamepadInput.keyboardMouseAvailable ? entry.controllerMode : nil
         applyControllerMode()
-        MetalHostView.shared.isHidden = false
+        if desktopHome {
+            GamepadInput.shared.setKeyboardMouse(nil)
+            LibraryController.shared.configure(enabled: true, ownsInput: true)
+        }
+        MetalHostView.shared.isHidden = desktopHome
         ProMotionIntent.apply(mode: entry.effectiveFPSMode)
         // madeira-bcd (round 626, agent H S1): the display rate this session holds and the one Windows programs are told (log only)
         LogStore.shared.log("[display-rate] session start: limit=mode \(entry.effectiveFPSMode) panel_max=\(ProMotionIntent.panelMaxFPS) Hz "
@@ -1334,6 +1478,7 @@ final class LibraryModel: ObservableObject {
             watchWindowedHint()
             watchOpenURL()
             watchDesktopExits()
+            watchDesktopClose()
         } else if sawProcess && wineserver_is_running() == 0 { finish() }
         // The first frame gives Aspect and Fill height the drawable's shape.
         if current != nil, !laidOutAfterFirstPresent, madeira_get_present_count() != MetalBackedView.presentCountAtLaunch {
@@ -1492,6 +1637,20 @@ final class LibraryModel: ObservableObject {
                 if DesktopExitRules.needsOpenGL(end), desktopNamed.insert(end.fileName.lowercased()).inserted {
                     desktopNotices.append(DesktopExitRules.openGLWords(end.fileName))
                 }
+                // night round 2026-11-11 (A4 S2; BPR8JP, BWGQE7, N1455G, YMDKBS: RDR2 started from the desktop failed with the 28 GB reserve): the
+                // desktop does not read a program's list row (only a library game or a Dock start does), so a program with a row that ended
+                // at once with an error is told how to get its settings. Text and one log line; the program and the desktop are untouched.
+                if !end.helper, DesktopExitRules.logLine(end) != nil,
+                   let rec = GameRecommendations.match(windowsPath: end.path, steamAppID: nil, fileExists: GameRecommendations.driveFileExists),
+                   rec.id != GameRecommendations.standardID, desktopRecsNamed.insert(rec.id).inserted {
+                    LogStore.shared.log("[desktop-exit] exe=\(end.fileName) recs=\(rec.id) v\(rec.version) notice=library")
+                    desktopNotices.append(DesktopExitRules.recommendedWords(rec.title))
+                }
+                // night round 2026-11-11 (A4 S1): Start > Shut Down's wineboot ended (the watch below ends the session)
+                if DesktopExitRules.isShutdown(end), desktopShutdownAt == nil, MadeiraConfig.flag("MADEIRA_DESKTOP_CLOSE") {
+                    desktopShutdownAt = Date()
+                    LogStore.shared.log("[desktop-close] Start > Shut Down: wineboot ended with 0")
+                }
             }
         }
         let refusals = madeira_jit_pool_refusals()
@@ -1506,6 +1665,42 @@ final class LibraryModel: ObservableObject {
         sessionMessage = words
         DispatchQueue.main.asyncAfter(deadline: .now() + DesktopExitRules.noticeSeconds) { [weak self] in
             if self?.sessionMessage == words { self?.sessionMessage = "" }
+        }
+    }
+
+    /// Night round 2026-11-11 (A4 S1; 1MQV99, DR1MW9, C7DQPR and 9 more Windows desktop logs; 19 of the 85 desktop logs of the archive have a
+    /// Shut Down): a Windows desktop session cannot be left from inside. BCD's Close posts Alt+F4 into a desktop that has no window to close,
+    /// and Start > Shut Down runs wineboot --end-session --shutdown, which ends with 0 and kills nothing; the desktop's explorer and services
+    /// never exit, so nothing ended the session and the player swiped BCD away. Once the player has pressed Close or wineboot has ended,
+    /// DesktopExitRules.closeVerdict decides (nothing of the player's runs, or a second Close, or 8 s after Shut Down) and the session ends
+    /// as BCD Dock's quit does (wine_session_desktop_closed: status 0, no error box). A desktop session only (a library or Dock session never
+    /// gets here); env.MADEIRA_DESKTOP_CLOSE = 0 brings back the old behaviour (nothing ends it).
+    private func watchDesktopClose() {
+        guard activeEntry?.desktop == true, !desktopCloseRunning, desktopAskedAt != nil || desktopShutdownAt != nil, !BCDDuoFeatures.active,
+              MadeiraConfig.flag("MADEIRA_DESKTOP_CLOSE") else { return }
+        var names = [CChar](repeating: 0, count: 160)
+        let programs = Int(madeira_live_user_processes(&names, Int32(names.count)))
+        let listed = String(decoding: names.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
+        let sinceAsk = desktopAskedAt.map { -$0.timeIntervalSinceNow }
+        let sinceShutdown = desktopShutdownAt.map { -$0.timeIntervalSinceNow }
+        switch DesktopExitRules.closeVerdict(asks: desktopAsks, sinceAsk: sinceAsk, sinceShutdown: sinceShutdown, programs: programs) {
+        case .end:
+            desktopCloseRunning = true
+            LogStore.shared.log("[desktop-close] ending the session: closes=\(desktopAsks) shutdown=\(desktopShutdownAt != nil ? 1 : 0) programs=\(programs)"
+                                + (programs > 0 ? " (\(listed))" : ""))
+            sessionMessage = DesktopExitRules.closingWords
+            DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_desktop_closed() }
+        case .wait:
+            // the first Close found a program of the player's still running (Alt+F4 went to it first)
+            guard !desktopProgramNoted, desktopShutdownAt == nil, desktopAsks == 1, programs > 0,
+                  let since = sinceAsk, since >= DesktopExitRules.closeSeconds else { return }
+            desktopProgramNoted = true
+            LogStore.shared.log("[desktop-close] a program is still open (\(listed)); Close again ends the desktop")
+            let words = DesktopExitRules.programOpenWords
+            sessionMessage = words
+            DispatchQueue.main.asyncAfter(deadline: .now() + DesktopExitRules.noticeSeconds) { [weak self] in
+                if self?.sessionMessage == words { self?.sessionMessage = "" }
+            }
         }
     }
 
@@ -1578,8 +1773,10 @@ final class LibraryModel: ObservableObject {
             if !asked && !DockGameEndRules.isCrash(status) {
                 // Round 625 (N-S18): it closed by itself with 0 before any picture (its own error box, then exit): the session ends
                 // with the reason in words; the status is not made a crash status, and auto-tune reads the start as failed (exited early).
+                // Night round 2026-11-11 (G2 S11, T2 S-IS1): the same for any other status that is not an error status (exit code 1 after a crash
+                // handler's dump, Black Mesa 8V90T6; an odd code of the game's own, Isaac CMXRG6).
                 LogStore.shared.log("[dock-game-end] \(file) ended with status 0x\(String(status, radix: 16)) after \(Int(lived)) s, no picture was drawn, the host finished and nothing of the game runs: ending the session")
-                endedByDockShortExit = "\(file) closed by itself \(Int(lived)) seconds after it started, before it showed a picture. If it showed a message, that is the reason."
+                endedByDockShortExit = DockGameEndRules.shortExitWords(file: file, lived: lived, status: status)   // night round 2026-11-11: any status, not only 0
                 DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock_game_left(Int32(bitPattern: status)) }
                 return
             }
@@ -1686,11 +1883,38 @@ final class LibraryModel: ObservableObject {
         saveCurrentProfile()
     }
     func showMenu() {
+        if BCDDuoFeatures.active { LogStore.shared.log("[session-menu] requested home=\(desktopHome) current=\(current != nil)") }
         LibraryKeyboard.hide()
         LibraryController.shared.configure(enabled: true, ownsInput: true)
         menu = true
     }
     func requestQuit() {
+        if BCDDuoFeatures.active { guard current != nil else { return } }
+        if BCDDuoFeatures.active, activeEntry?.desktop == true {
+            guard !quitRequested, !launching else { return }
+            quitRequested = true
+            BCDPauseLive.resume()
+            LibraryKeyboard.hide()
+            sessionMessage = "Closing Windows…"
+            menu = false
+            let session = current
+            DispatchQueue.global(qos: .userInitiated).async {
+                let result = wine_session_quit_desktop()
+                if result <= 0 {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self, self.current == session else { return }
+                        if result == 0 {
+                            self.quitRequested = false
+                            self.sessionMessage = "Windows is not ready to close. Try again once startup finishes."
+                            return
+                        }
+                        self.desktopCloseError = "Windows could not finish closing. Restart BCD to recover."
+                        self.sessionMessage = self.desktopCloseError ?? ""
+                    }
+                }
+            }
+            return
+        }
         BCDPauseLive.resume()   // madeira-bcd (round 604): a paused game could not answer Alt+F4; nothing when it is not paused
         LibraryKeyboard.hide()
         quitRequested = true
@@ -1700,7 +1924,14 @@ final class LibraryModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
             winios_post_key(0x73, 0); winios_post_key(0x12, 0)
         }
-        sessionMessage = "The game was asked to close. Confirm in the game if it asks."
+        // night round 2026-11-11 (A4 S1): on the Windows desktop Close ends the session (watchDesktopClose); the words say so
+        if activeEntry?.desktop == true, MadeiraConfig.flag("MADEIRA_DESKTOP_CLOSE") {
+            desktopAsks += 1; desktopAskedAt = Date()
+            LogStore.shared.log("[desktop-close] Close pressed (\(desktopAsks))")
+            sessionMessage = DesktopExitRules.closingWords
+        } else {
+            sessionMessage = "The game was asked to close. Confirm in the game if it asks."
+        }
         menu = false
         fputs("[frontend] graceful close requested\n", stderr)
     }
@@ -1743,12 +1974,22 @@ final class LibraryModel: ObservableObject {
         }
     }
     private func finish() {
+        let returnHome = BCDDuoFeatures.active && quitRequested && activeEntry?.desktop == true
         BCDSessionRecorder.sessionEnded()   // madeira-bcd: the [session] summary line, and the open-session marker goes (BCDSessionRecorderLive.swift)
         // madeira-bcd: auto-tune reads this session's log afterwards (AutoTune.swift); off, nothing.
         if AutoTune.enabled { autoTuneSessionEnded() }
         // madeira-bcd (round 603): the session's times for "Find where it saves", and, with the game's switch on, its saves backed up (BCDSaveBackups/GameSaveAuto.swift).
         GameSaveAuto.sessionEnded(activeEntry, started: launchStarted)
-        let report = sawProcess ? exitReport() : nil
+        var report = sawProcess ? exitReport() : nil
+        // Night round 2026-11-11 (G3 S11): a library entry that is a setup or language tool and closed at once with 0 and no picture says so.
+        if report == nil, sawProcess, !quitRequested, let entry = activeEntry, entry.desktop != true, !DockStartScreen.shared.active {
+            let program = entry.windowsPath.split(whereSeparator: { $0 == "\\" || $0 == "/" }).last.map(String.init) ?? ""
+            if let words = SessionEndRules.setupToolWords(fileName: program, exitCode: Int32(wine_process_exit_code()),
+                                                          seconds: Date().timeIntervalSince(launchStarted), presented: madeira_get_present_count() > launchPresent) {
+                LogStore.shared.log("[session-end] \(program) is a setup or language tool that closed at once with 0; the player is told")
+                report = words
+            }
+        }
         if let report { error = report }
         // madeira-bcd (round 579): a Steam game started without Dock that said it found no Steam: text only, read once from
         // the log after a short session that ended by itself (SteamStartHint). Every other session is not touched.
@@ -1770,7 +2011,8 @@ final class LibraryModel: ObservableObject {
         controls.controls = savedControls; controls.visible = savedVisible; controls.sizeScale = savedSize
         if ControlPresetsModel.enabled { controls.layoutID = savedLayout }
         current = nil; activeEntry = nil; menu = false; sessionMessage = ""
-        desktopEndsAfter = nil; desktopNotices = []
+        desktopHome = false
+        desktopEndsAfter = nil; desktopNotices = []; poolWait = nil
         displayMode = .fit
         LogStore.shared.setDisplayActive(true)
         launching = false; launchLogs = false; LibraryKeyboard.hide()
@@ -1782,6 +2024,9 @@ final class LibraryModel: ObservableObject {
         BCDOrientationLive.sessionEnded()   // madeira-bcd: the interface follows the device again; with no lock on, nothing to undo
         BCDFeelLive.sessionEnded()   // madeira-bcd (round 604): the menu's session settings are put back; the gate of Pause opens
         ThermalPacing.shared.end()
+        if returnHome {
+            NotificationCenter.default.post(name: Notification.Name("BCDDesktopDidQuit"), object: nil)
+        }
         fputs("[frontend] returned to library\n", stderr)
     }
     /// madeira-bcd: what auto-tune needs from a session that ended (AutoTune.swift).
@@ -1824,11 +2069,49 @@ enum SessionEndRules {
         return userProcesses > 0 ? .keep(userProcesses) : .leave
     }
 
+    /// Night round 2026-11-11 (G3 S11; DOOM 3: BFG Edition DVXP0H and RATRZ0): a library entry whose program is a language chooser or a settings tool
+    /// (DOOM 3's Qt language_setup.exe) closes by itself with 0 a few seconds after it starts and never draws a frame: the game was never started, and
+    /// the session ended without a word. A program whose file name says language, config or settings, that ended with 0 within this many seconds with no
+    /// picture, is named as such. (A plain setup.exe is not guessed at: the player may have started an installer on purpose.)
+    static let setupToolSeconds = 15.0
+
+    static func looksLikeSetupTool(_ fileName: String) -> Bool {
+        let name = fileName.lowercased()
+        return name.hasSuffix(".exe") && (name.contains("language") || name.contains("config") || name.contains("settings"))
+    }
+
+    static func setupToolWords(fileName: String, exitCode: Int32, seconds: Double, presented: Bool) -> String? {
+        guard exitCode == 0, !presented, seconds >= 0, seconds <= setupToolSeconds, looksLikeSetupTool(fileName) else { return nil }
+        return "\(fileName) closed by itself \(Int(seconds)) seconds after it started. It looks like a setup or language tool, not the game. "
+            + "Add the game's own program from the same folder (Add a game) and start that one."
+    }
+
     /// What the user reads: a plain exit code, in a few words (an NTSTATUS error has its own report). Nil for 0.
     static func message(exitCode: Int32) -> String? {
         guard exitCode != 0 else { return nil }
         let shown = exitCode > 0 && exitCode < 65536 ? String(exitCode) : "0x" + String(UInt32(bitPattern: exitCode), radix: 16, uppercase: true)
         return "The game closed (exit code \(shown)). If it keeps happening, open its page and send its log."
+    }
+}
+
+/// Night round 2026-11-11 (A5 S1; Fallout 3 GOTY K2J61G and YBZ3HX: a player's config held `FalloutLauncher.exe=Fallout3.exe` as a line of its own, with no key,
+/// and an `env.MADEIRA_SPAWN_SWAP` with nothing after it): a line that is not a setting is read as one by the config parser (the key is the program's name)
+/// and does nothing, and the log never said so. Log only: one sentence for each such line; the config is exported exactly as before.
+enum GameConfigNotes {
+    /// `pairs`: the game's config as the parser read it. A key that ends in .exe is a program pair written without its key; an empty program swap is a
+    /// key with no value.
+    static func notes(_ pairs: [String: String]) -> [String] {
+        var out: [String] = []
+        for key in pairs.keys.sorted() {
+            let value = pairs[key] ?? ""
+            if key.lowercased().hasSuffix(".exe") {
+                out.append("\"\(key)=\(value)\" is a line without a key; a program swap is written env.MADEIRA_SPAWN_SWAP = \(key)=\(value) "
+                           + "(and it only changes a program that another program starts, not the one BCD starts first)")
+            } else if key == "env.MADEIRA_SPAWN_SWAP", value.trimmingCharacters(in: .whitespaces).isEmpty {
+                out.append("env.MADEIRA_SPAWN_SWAP has no value; write it as env.MADEIRA_SPAWN_SWAP = launcher.exe=game.exe")
+            }
+        }
+        return out
     }
 }
 
@@ -1884,6 +2167,8 @@ enum DesktopExitRules {
 
     /// A crash or hard failure status, read as BCD Dock's game-end watch reads one (DockGameEndRules.isCrash, the same test, kept
     /// here so these rules stay Foundation only): an NTSTATUS error or exception code, the breakpoint exit, a negative exit code.
+    /// Not exit code 3 (the Dock watch's abort status, night round 2026-11-11): a program that asks for OpenGL and aborts with 3 keeps
+    /// the notice below.
     static func isCrash(_ status: UInt32) -> Bool {
         status & 0xC000_0000 == 0xC000_0000 || status == 0x8000_0003
     }
@@ -1902,6 +2187,55 @@ enum DesktopExitRules {
     /// What the session line says the first time the JIT pool refuses an image in a desktop session.
     static let poolWords = "The Windows desktop is out of room for programs: what runs on it now is too big for this device. "
         + "Close a program, or start the game from BCD's library."
+
+    /// Night round 2026-11-11 (A4 S2): what the session line says when a program that has a list row ended at once with an error on the desktop,
+    /// which does not use list rows. The game's name is the row's title without a trailing "(Steam)" or "(not Steam)".
+    static func recommendedWords(_ title: String) -> String {
+        var name = title
+        if name.hasSuffix(")"), let open = name.lastIndex(of: "("), open > name.startIndex {
+            name = String(name[..<open]).trimmingCharacters(in: .whitespaces)
+        }
+        if name.isEmpty { name = title }
+        return "BCD has recommended settings for \(name). The Windows desktop does not use them. "
+            + "Close the desktop, choose Add a game (the + button) and pick this program, then start it from the library."
+    }
+
+    // MARK: Closing the desktop (night round 2026-11-11, A4 S1)
+
+    /// Start > Shut Down: Wine's wineboot ends with 0 after `--end-session --shutdown` (user32's ExitWindowsEx), and BCD, which runs Wine's
+    /// processes as threads of one app, has nothing else that ends a desktop session. 85 desktop logs started wineboot.exe only for that.
+    static func isShutdown(_ e: End) -> Bool { e.fileName.lowercased() == "wineboot.exe" && e.status == 0 }
+
+    enum CloseVerdict: Equatable { case wait, end }
+
+    /// Seconds after BCD's Close (Alt+F4 into the desktop) before the desktop's session ends when no program of the player's runs.
+    static let closeSeconds = 1.5
+    /// Seconds after Shut Down's wineboot ended before the session ends when no program of the player's runs, and the seconds after which
+    /// it ends although a program still runs (the programs were told by wineboot; a service of the prefix never ends by itself).
+    static let shutdownSeconds = 2.0
+    static let shutdownForceSeconds = 8.0
+
+    /// When the Windows desktop's session ends because the player closed it. `asks`: how many times Close was pressed this session;
+    /// `sinceAsk` / `sinceShutdown`: seconds since the last Close / since wineboot ended with 0 (nil: never); `programs`: the engine's count
+    /// of programs that are not Wine's own and not helpers (madeira_live_user_processes). The first Close ends the desktop only when
+    /// nothing of the player's runs (Alt+F4 went to that program first); a second Close ends it anyway (a service started by a program's
+    /// installer, PunkBuster's PnkBstrA.exe, never ends by itself and would hold the desktop for good).
+    static func closeVerdict(asks: Int, sinceAsk: Double?, sinceShutdown: Double?, programs: Int) -> CloseVerdict {
+        if let s = sinceShutdown, s >= shutdownSeconds, programs == 0 || s >= shutdownForceSeconds { return .end }
+        if let a = sinceAsk, a >= closeSeconds, programs == 0 || asks >= 2 { return .end }
+        return .wait
+    }
+
+    /// The session line while the desktop closes (the first Close).
+    static let closingWords = "The Windows desktop is closing."
+    /// The session line when the first Close found a program of the player's still running.
+    static let programOpenWords = "A program is still open on the desktop. Close it, or choose Close again to end the desktop."
+    /// The in-game menu's Close row for a Windows desktop session (BCDSessionLive.swift; the preview app keeps copies).
+    static let menuTitle = "Close the Windows desktop"
+    static let menuDetail = "Programs on it are closed; what they haven't saved is lost."
+    static let menuConfirmTitle = "Close the Windows desktop?"
+    static let menuConfirmMessage = "BCD asks the programs on the desktop to close and ends this session. What you haven't saved is lost."
+    static let menuAnswer = "Close desktop"
 }
 
 /// madeira-bcd (round 624, agent E1 S12-b and S13-d): an NTSTATUS exit in words that name what the log already knows. GRID 2 (26MVCW)
@@ -2128,7 +2462,7 @@ private actor LibraryMetadataScanner {
     /// `countBytes: false` skips the size walk (a Steam game's size is its install record's).
     func scan(_ executable: URL, drive: URL, countBytes: Bool = true) -> (bytes: Int64?, api: String?) {
         let folder = executable.deletingLastPathComponent()
-        guard folder.path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits(folder), !Task.isCancelled else { return (nil, nil) }
+        guard folder.path.hasPrefix(drive.path + "/") || LibraryModel.relativeToDrive(folder) != nil, !Task.isCancelled else { return (nil, nil) }
         let manager = FileManager.default
         // Executables commonly live below the installation root. Only ascend
         // conventional binary directories, never an arbitrary library parent.
@@ -2137,16 +2471,16 @@ private actor LibraryMetadataScanner {
         for _ in 0..<4 {
             guard binaryFolders.contains(installation.lastPathComponent.lowercased()) else { break }
             let parent = installation.deletingLastPathComponent()
-            // The SSD folder itself (C:\External) is never an installation: a game's size is not the drive's.
-            guard parent.path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits(parent),
-                  !ExternalGameStorage.shared.isMountRoot(parent),
+            // An external drive itself (C:\External\<name>) is never an installation: a game's size is not the drive's.
+            guard parent.path.hasPrefix(drive.path + "/") || LibraryModel.relativeToDrive(parent) != nil,
+                  !ExternalDrives.isDriveRoot(LibraryModel.relativeToDrive(parent)),
                   !["program files", "program files (x86)", "games", "common", "steamapps"].contains(parent.lastPathComponent.lowercased()) else { break }
             installation = parent
         }
         var complete = true
         let keys: Set<URLResourceKey> = [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey]
-        // A game whose program sits directly in the SSD folder has the whole folder as its installation: not counted.
-        let walker = countBytes && !ExternalGameStorage.shared.isMountRoot(installation) ? manager.enumerator(at: installation, includingPropertiesForKeys: Array(keys), options: [], errorHandler: { _, _ in complete = false; return true }) : nil
+        // A game whose program sits directly on an external drive has the whole drive as its installation: not counted.
+        let walker = countBytes && !ExternalDrives.isDriveRoot(LibraryModel.relativeToDrive(installation)) ? manager.enumerator(at: installation, includingPropertiesForKeys: Array(keys), options: [], errorHandler: { _, _ in complete = false; return true }) : nil
         var bytes: Int64 = 0
         var files = 0
         while let file = walker?.nextObject() as? URL {
@@ -2162,7 +2496,7 @@ private actor LibraryMetadataScanner {
         let siblings = (try? manager.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
         var local: [String: URL] = [:]
         for file in siblings where file.pathExtension.lowercased() == "dll" {
-            if file.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits(file) { local[file.lastPathComponent.lowercased()] = file }
+            if file.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") || LibraryModel.relativeToDrive(file) != nil { local[file.lastPathComponent.lowercased()] = file }
         }
         var budget = 32 * 1024 * 1024
         var pending = [executable], visited = Set<String>(), apis = Set<String>()
@@ -2171,7 +2505,7 @@ private actor LibraryMetadataScanner {
         if LibraryModel.graphicsImports(executable) == nil {
             pending.insert(contentsOf: siblings.filter {
                 $0.pathExtension.lowercased() == "exe" && $0 != executable &&
-                ($0.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits($0))
+                ($0.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") || LibraryModel.relativeToDrive($0) != nil)
             }.sorted { $0.path < $1.path }.prefix(8), at: 0)
         }
         while let file = pending.popLast(), visited.count < 64, !Task.isCancelled {

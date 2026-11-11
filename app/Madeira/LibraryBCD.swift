@@ -123,3 +123,52 @@ enum BCDLibraryImport {
         }
     }
 }
+
+/// BCD (2026-11-07): a game whose Windows path changes keeps what BCD stores under that path. A Move between this device and an
+/// external drive (GameMover) and the earlier External SSD folder becoming a drive (LibraryModel.rebaseExternal) change a game's
+/// path; without this the game's own config file, Auto-tune's state and switch, the recommended-settings mark (without which the
+/// next Play counts as the first and puts the recommended FPS, resolution and display back), the LibraryPrefs switches, the gyro
+/// choices, the save-backup record and the graphics tip's mark would stay under the old path. Each moves only where the new path
+/// holds nothing yet; nothing is overwritten. The literal UserDefaults keys are their owners' (tests/host/check-external-storage.py
+/// checks that they still are).
+enum BCDGameRekey {
+    static func carry(from old: String, to new: String) {
+        guard old.lowercased() != new.lowercased() else { return }
+        let fm = FileManager.default
+        // The game's own config file and Auto-tune's state file, named from the path (GameProfiles.swift, AutoTune.swift).
+        for (from, to) in [(GameProfile(windowsPath: old).url, GameProfile(windowsPath: new).url),
+                           (AutoTune.stateURL(old), AutoTune.stateURL(new))] {
+            guard let from, let to, fm.fileExists(atPath: from.path), !fm.fileExists(atPath: to.path) else { continue }
+            try? fm.moveItem(at: from, to: to)
+        }
+        // Dictionaries in UserDefaults: lower-case keys, then exact ones.
+        for key in [AutoTune.gamesKey, "madeira.recommended.applied", "bcd.saves.lastSession"] {
+            moveEntry(key, from: old.lowercased(), to: new.lowercased())
+        }
+        for key in ["madeira.library.inDesktop", "madeira.library.avx", "madeira.library.wineVCRT", "madeira.library.nvidia",
+                    "madeira.library.safeSync", "madeira.library.screen", "bcd.gyro"] {
+            moveEntry(key, from: old, to: new)
+        }
+        // The low-graphics tip's list of games it was shown for (GameRecommendationsApply.swift).
+        let tipKey = "bcd.lowGraphicsTip.shown"
+        if var shown = UserDefaults.standard.stringArray(forKey: tipKey), let at = shown.firstIndex(of: old.lowercased()) {
+            shown[at] = new.lowercased()
+            UserDefaults.standard.set(shown, forKey: tipKey)
+        }
+        // The save-backup record (BCDSaveBackups/GameSaveWork.swift).
+        let record = GameSaveStore.record(old.lowercased())
+        if record != GameSaveRecord(), GameSaveStore.record(new.lowercased()) == GameSaveRecord() {
+            GameSaveStore.update(new.lowercased()) { $0 = record }
+            GameSaveStore.update(old.lowercased()) { $0 = GameSaveRecord() }
+        }
+        LogStore.shared.log("[external] a game's settings followed it to its new place")
+    }
+
+    private static func moveEntry(_ key: String, from old: String, to new: String) {
+        let defaults = UserDefaults.standard
+        guard var all = defaults.dictionary(forKey: key), let value = all[old], all[new] == nil else { return }
+        all[new] = value
+        all[old] = nil
+        defaults.set(all, forKey: key)
+    }
+}

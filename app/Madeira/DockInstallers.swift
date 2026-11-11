@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -380,7 +382,7 @@ enum DockInstallScripts {
         var parts: [String] = []
         if !names(.pending).isEmpty { parts.append("To run: " + names(.pending)) }
         if !names(.done).isEmpty { parts.append("Done earlier: " + names(.done)) }
-        for by in ["Wine Mono", "BCD"] {
+        for by in ["Wine Mono", "BCD", "BCD (Capcom's codec notice)", launcherProvider] {
             var seen: [String] = []
             for item in items where item.status == .provided && provider(item.process) == by {
                 let text = label(item.process.run)
@@ -460,8 +462,68 @@ enum DockInstallScripts {
     }
 
     /// madeira-bcd: who provides what a plan's provided program would have installed: "BCD" for DirectX's runtime libraries,
-    /// "Wine Mono" for a .NET Framework.
-    static func provider(_ process: SteamInstallProcess) -> String { isDirectXSetup(process.executable) ? "BCD" : "Wine Mono" }
+    /// "Wine Mono" for a .NET Framework, "the installed launcher" for a shared launcher's installer, "BCD (Capcom's codec notice)" for Capcom's notice.
+    static func provider(_ process: SteamInstallProcess) -> String {
+        if sharedLauncherInstallers[fileName(process.executable)] != nil { return launcherProvider }
+        return isDirectXSetup(process.executable) ? "BCD" : isCapcomCodecNotice(process.executable) ? "BCD (Capcom's codec notice)" : "Wine Mono"
+    }
+    static let launcherProvider = "the installed launcher"
+
+    /// madeira-bcd: the installers of launchers that every game of their company carries in its install script, by file name (lower
+    /// case), and the programs (Windows paths) any one of which says that launcher is already installed. The prefix is one for every
+    /// Dock game and the library (MadeiraDock.prefix, Documents/wine), so the launcher is installed once: a run of its installer for
+    /// the next game only repeats it. Ubisoft Connect, whose ~250 MB installer every Ubisoft game's script runs (Far Cry 3:
+    /// `ubisoft connect pc client`, file=UbisoftConnectInstaller.exe, in tests/fixtures/autotune/far-cry-3-registry-2026-10-27.log).
+    static let sharedLauncherInstallers: [String: [String]] = [
+        "ubisoftconnectinstaller.exe": ["C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+                                        "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe"],
+    ]
+
+    /// madeira-bcd: whether `executable` is such an installer and one of its launcher's programs exists (`exists`: a Windows path is a file).
+    static func installsPresentLauncher(_ executable: String, exists: (String) -> Bool) -> Bool {
+        (sharedLauncherInstallers[fileName(executable)] ?? []).contains(where: exists)
+    }
+
+    /// madeira-bcd: the lines a shared launcher needs in the session of a game that runs it, by its installer's file name (lower case),
+    /// as environment variables the app sets for that session only (DockInstallers.launcherSessionEnv, ContentView.startDock); the
+    /// game's own bcd.cfg lines are exported later and win. Ubisoft Connect: env.MADEIRA_APC_BUSY_QUEUE = 1, the line the EA app's
+    /// launcher entry has (BCDLaunchers.swift). Without it Ubisoft's game starter never started the play session ("Gamestarter must
+    /// be initialized before game can be launched"): an I/O completion for a busy thread was handed to another waiting thread or
+    /// dropped ("[apc-requeue]"); with it every Far Cry 3 and Far Cry 4 start reached the play session. The same launcher needs the
+    /// program's own writes into itself (env.MADEIRA_SELF_WRITE = 1: its hook installer ended it with 0xdeadc0de when they were
+    /// refused) and does about 200,000 atomics across a 16-byte boundary at its start (env.MADEIRA_FEX_SPLIT_LOCK = 1: done inline,
+    /// not trapped); both are off for every other program.
+    static let sharedLauncherSessionEnv: [String: [String: String]] = [
+        "ubisoftconnectinstaller.exe": ["MADEIRA_APC_BUSY_QUEUE": "1", "MADEIRA_FEX_SPLIT_LOCK": "1", "MADEIRA_SELF_WRITE": "1"],
+    ]
+
+    /// madeira-bcd: every name sharedLauncherSessionEnv sets (a start without such a launcher clears them).
+    static var sharedLauncherSessionNames: [String] {
+        Array(Set(sharedLauncherSessionEnv.values.flatMap { $0.keys })).sorted()
+    }
+
+    /// madeira-bcd: the session lines of the shared launchers among `processes` (a game's install-script programs, whether they run
+    /// at this start or the launcher is already installed).
+    static func launcherSessionEnv(_ processes: [SteamInstallProcess]) -> [String: String] {
+        var env: [String: String] = [:]
+        for process in processes {
+            for (name, value) in sharedLauncherSessionEnv[fileName(process.executable)] ?? [:] where env[name] == nil { env[name] = value }
+        }
+        return env
+    }
+
+    static func fileName(_ executable: String) -> String {
+        (executable.split(separator: "\\").last.map(String.init) ?? executable).lowercased()
+    }
+
+    /// madeira-bcd (night round 2026-11-11, agent A2 S5; Resident Evil 4 D8RPHE, Monster Hunter Rise Q6WDVC, Mega Man Zero/ZX Legacy
+    /// Collection Z3F8AX; 42 logs since 2026-10-17): Capcom's `InstallerMessage.exe` is a .NET WinForms notice about video codecs that
+    /// cannot run under Wine Mono (TypeLoadException ... Windows.Foundation.UniversalApiContract) and installs nothing; every run failed,
+    /// and the first Dock start of every Capcom game became an installs-only session. It is provided (MADEIRA_DOCK_INSTALLERMESSAGE_PROVIDED,
+    /// default on; 0 runs it as before).
+    static func isCapcomCodecNotice(_ executable: String) -> Bool {
+        (executable.split(separator: "\\").last.map(String.init) ?? executable).lowercased() == "installermessage.exe"
+    }
 
     /// madeira-bcd: the entries whose provided programs are recorded as done at this start (every
     /// program of the entry is provided or done), and those held back: another program of the same
@@ -838,6 +900,10 @@ enum DockInstallers {
     private(set) static var runsEAAppInstaller = false
     /// This start runs installers and turns madsync off for its session.
     private(set) static var serverSync = false
+    /// madeira-bcd: the environment lines this start's session gets for a shared launcher its game's install script runs (Ubisoft
+    /// Connect), whether its installer runs now or the launcher is installed (DockInstallScripts.sharedLauncherSessionEnv). Empty
+    /// for other games, and when MADEIRA_DOCK_INSTALLERS=0.
+    private(set) static var launcherSessionEnv: [String: String] = [:]
     /// This start's plan in words (the Dock sheet's status), nil when there is nothing to say.
     private(set) static var note: String?
     /// When poll first read the batch's end: the host starts next. nil before, and
@@ -924,6 +990,13 @@ enum DockInstallers {
             guard inside(current, drive: drive) else { return nil }
         }
         return current
+    }
+
+    /// madeira-bcd: a Windows path on drive C that is a file (not a folder), any case of its names.
+    nonisolated static func isFile(_ windowsPath: String, drive: URL) -> Bool {
+        var folder: ObjCBool = false
+        guard let url = resolve(windowsPath, drive: drive) else { return false }
+        return FileManager.default.fileExists(atPath: url.path, isDirectory: &folder) && !folder.boolValue
     }
 
     /// The PE machine of an executable (0x14c: 32-bit x86, 0x8664: x64), nil when unreadable.
@@ -1114,7 +1187,7 @@ enum DockInstallers {
                         hasWineMono: Bool = WineMonoModel.available,
                         hasGecko: Bool = true,   // round 630 (A1 S20): the caller passes BCDGeckoFiles.ready; true holds nothing back
                         fusionSource: URL? = Bundle.main.resourceURL?.appendingPathComponent("i386-windows/fusion.dll")) {
-        script = nil; serverSync = false; note = nil; finishedAt = nil; logged = []; runningSince = nil; installsOnly = false
+        script = nil; serverSync = false; note = nil; finishedAt = nil; logged = []; runningSince = nil; installsOnly = false; launcherSessionEnv = [:]
         allSucceeded = false; sessionPrograms = []; skipsNextStart = false; failedDirectX = false; sessionAppID = 0; runsEAAppInstaller = false
         let app = game.id
         sessionAppID = app
@@ -1138,6 +1211,7 @@ enum DockInstallers {
         }
         let defaultKey = flag("MADEIRA_INSTALL_DEFAULT_KEY")
         let (found, scripts) = Self.found(game, drive: drive, defaultKey: defaultKey)
+        launcherSessionEnv = DockInstallScripts.launcherSessionEnv(found)
         // A Record as done / Reset request saved since the last start, before the plan reads
         // the registry.
         applyRequest(game, found: found, prefix: prefix, drive: drive, others: others)
@@ -1168,6 +1242,7 @@ enum DockInstallers {
         // own download prompt. MADEIRA_DOCK_EA_GECKO=0 runs it as before.
         let eaGecko = flag("MADEIRA_DOCK_EA_GECKO")
         let skip = DockInstallScripts.installSkipNames()   // madeira-bcd (round 626, A1 S7): the game's own list of provided installs; empty by default
+        let capcomNotice = flag("MADEIRA_DOCK_INSTALLERMESSAGE_PROVIDED")   // madeira-bcd (night round 2026-11-11, A2 S5): 0 runs Capcom's notice as before
         let items = DockInstallScripts.plan(found,
                                             done: { DockInstallScripts.marked($0, in: registry[$0.hive] ?? "") },
                                             exists: { resolve($0, drive: drive) != nil },
@@ -1181,6 +1256,8 @@ enum DockInstallers {
                                                     || (directXProvided && DockInstallScripts.isDirectXSetup($0.executable)
                                                         && (directXFirst || failedBefore.contains($0.run.name)))
                                                     || skip.contains(DockInstallScripts.label($0.run).lowercased())
+                                                    || (capcomNotice && DockInstallScripts.isCapcomCodecNotice($0.executable))
+                                                    || DockInstallScripts.installsPresentLauncher($0.executable, exists: { path in isFile(path, drive: drive) })
                                             })
         let providedRuns = DockInstallScripts.providedRuns(items)
         var providedWritten = 0
@@ -1269,6 +1346,13 @@ enum DockInstallers {
                 if skip.contains(DockInstallScripts.label(run).lowercased()) {
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the game's settings list it in " +
                                         "env.MADEIRA_DOCK_INSTALL_SKIP (BCD provides what it installs); file=\(file); record: \(recorded)")
+                } else if DockInstallScripts.provider(item.process) == DockInstallScripts.launcherProvider {
+                    LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: the launcher it installs is already in the prefix " +
+                                        "(file=\(file) is a shared launcher's installer, and every Dock game shares the prefix); record: \(recorded)")
+                } else if DockInstallScripts.isCapcomCodecNotice(item.process.executable) {
+                    LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by BCD; " +
+                                        "file=\(file) is Capcom's codec notice, a .NET program that cannot run under Wine Mono and installs nothing " +
+                                        "(MADEIRA_DOCK_INSTALLERMESSAGE_PROVIDED=0 runs it); record: \(recorded)")
                 } else if DockInstallScripts.provider(item.process) == "BCD" {
                     let why = failedBefore.contains(run.name) ? "it failed in this game before" : "env.MADEIRA_DOCK_DIRECTX_FIRST = 1 skips it at the first start"
                     LogStore.shared.log("[dock-installers] app=\(app) program=\(DockInstallScripts.label(run)) skipped: provided by BCD; " +
@@ -1693,7 +1777,8 @@ enum DockCEGService {
     /// the folder's file names and sizes, so the next log says which files exist. 22 -> 55
     /// (ceg-server-result 22, ceg-job-result 55) is what all three logged CEG sessions with a
     /// registered service ended with (the service ran in two), and nothing in the session log says why.
-    private nonisolated static let logFiles = ["content_log.txt", "service_log.txt"]
+    // Night round 2026-11-11 (G6 S4; Mafia II 7XG9VK, WFRZ8A: ceg-result=3 after 60 s): appinfo_log.txt too.
+    private nonisolated static let logFiles = ["content_log.txt", "service_log.txt", "appinfo_log.txt"]
     private nonisolated static let logWords = ["ceg", "drm", "custom", "binar", "service", "remote", "fail", "error", "timeout", "denied"]
 
     nonisolated static func steamLogLines(drive: URL, maxLines: Int = 40, maxBytes: Int = 96 * 1024) -> [String] {
@@ -1737,14 +1822,24 @@ enum DockCEGService {
     /// Writes `steamLogLines` to the log, once per failed CEG start.
     static func logSteamLogs(drive: URL) {
         guard SteamSignIn.flag("MADEIRA_DOCK_CEG_SERVICE", default: true) else { return }
+        // Night round 2026-11-11 (G6 S4, G2 S3): Valve's service_log.txt is written in UTC and content_log.txt in local time; the moment of this reading in UTC,
+        // so that a line older than the session can be told from this session's lines (in WFRZ8A the newest lines of the three files predate the session).
+        // The lead: no ICU date formatter in BCD (bcd-date-formatter-crash, build 580: udat_open); gmtime_r and plain digits instead.
+        var now = time(nil), parts = tm()
+        gmtime_r(&now, &parts)
+        func two(_ v: Int32) -> String { v < 10 ? "0\(v)" : "\(v)" }
+        LogStore.shared.log("[ceg-log] now-utc=\(parts.tm_year + 1900)-\(two(parts.tm_mon + 1))-\(two(parts.tm_mday))T"
+                            + "\(two(parts.tm_hour)):\(two(parts.tm_min)):\(two(parts.tm_sec))Z")
         for line in steamLogLines(drive: drive) { LogStore.shared.log("[ceg-log] " + line) }
+        // Night round 2026-11-11 (G6 S4, G2 S3): the client's connection state during the job's wait (connection_log.txt, the lines about the service included).
+        for line in connectionLogLines(drive: drive, maxLines: 24) { LogStore.shared.log("[steam-connection] " + line) }
     }
 
     /// madeira-bcd (round 630, agent U S3; 444TS8 and seven older starts that ended with code 34): the sign-in and connection part of
     /// Valve's client's own log (logs/connection_log.txt) after a Dock start whose licence list never came (34) or whose sign-in failed
     /// (15). Only lines about the logon, the connection and the licence list; a line that names an account or a person is dropped, and
     /// every run of five or more digits is replaced. At most 40 lines.
-    private nonisolated static let connectionWords = ["logon", "logged on", "logged off", "licens", "connect", "timeout", "fail", "error", "retry"]
+    private nonisolated static let connectionWords = ["logon", "logged on", "logged off", "licens", "connect", "timeout", "fail", "error", "retry", "service"]
     private nonisolated static let connectionDrop = ["steamid", "[u:", "[a:", "account", "user", "persona", "@", "token", "password", "name"]
 
     nonisolated static func connectionLogLines(drive: URL, maxLines: Int = 40, maxBytes: Int = 64 * 1024) -> [String] {

@@ -73,6 +73,10 @@ static int MTLDevice_supportsFamily(int dev, int f)
 { (void)dev; return gpu_family == 2002 ? f == 2002 : (f < 2000 && f <= gpu_family); }
 static DWORD GetEnvironmentVariableA(const char *n, char *buf, DWORD size)
 { const char *v = getenv(n); if (!v) return 0; snprintf(buf, size, "%s", v); return (DWORD)strlen(v); }
+/* build 646: the runtime's config reader, answered here by the harness (dxil-target-latest only) */
+static int cfg_latest;
+static long long mad_cfg_int_pe(const char *k, long long d)
+{ return (k && !strcmp(k, "dxil-target-latest")) ? cfg_latest : d; }
 """ + switch + families + r"""
 int main(int argc, char **argv)
 {
@@ -91,6 +95,23 @@ int main(int argc, char **argv)
             printf("FAIL %s: wave %d atomics %d\n", table[i].gpu, mad_family_wave_ops(&d), mad_family_atomics64(&d));
             fails++;
         }
+    }
+    /* build 646, dxil-target-latest: off keeps Apple9 / iOS 18.0 on an Apple10 phone; on gives Apple10 / iOS 26.0, and an Apple9 phone
+     * keeps its family with iOS 26.0 */
+    {
+        static const struct { int latest, gpu; unsigned want; const char *ver; } t2[] = {
+            { 0, 1010, 1009, "18.0" }, { 1, 1010, 1010, "26.0" }, { 1, 1009, 1009, "26.0" }, { 1, 2002, 5001, "15.0" },
+        };
+        for (i = 0; i < sizeof(t2) / sizeof(t2[0]); i++) {
+            memset(&g_target, 0, sizeof(g_target));
+            cfg_latest = t2[i].latest; gpu_family = t2[i].gpu;
+            mad_resolve_target(&d);
+            if (g_target.family != t2[i].want || strcmp(g_target.os_version, t2[i].ver)) {
+                printf("FAIL dxil-target-latest=%d on %d: family %u iOS %s\n", t2[i].latest, t2[i].gpu, g_target.family, g_target.os_version);
+                fails++;
+            }
+        }
+        cfg_latest = 0;
     }
     puts(fails ? "FAILED" : "ok");
     return fails != 0;

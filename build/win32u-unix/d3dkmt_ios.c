@@ -1,3 +1,5 @@
+/* Portions copyright 2026 125hz: code taken from https://github.com/willfaust/Madeira (pull request #353)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * D3DKMT entry points, iOS override (madeira-bcd)
  *
@@ -66,6 +68,19 @@
 #include <strings.h>
 #include "../madeira_cfg.h"   /* before Wine's headers, which poison strncpy */
 
+#include <pthread.h>
+
+/* madeira-bcd (Windows Vulkan): D3DKMT's Vulkan instance (get_d3dkmt_vulkan_instance, the file's only pthread_once) is NULL on a
+ * thread that is inside Vulkan's own set-up: that set-up loads the display driver, which lists Vulkan's GPUs through this instance,
+ * which would enter Vulkan's set-up again inside its pthread_once (vulkan_ios.c); Apple's pthread_once traps on that re-entry.
+ * Vulkan is off unless a game's file asks for it, and then madeira_vulkan_init_on_this_thread() is never true. */
+extern int madeira_vulkan_init_on_this_thread( void );
+static int madeira_d3dkmt_pthread_once( pthread_once_t *once, void (*init)(void) )
+{
+    if (madeira_vulkan_init_on_this_thread()) return 0;
+    return pthread_once( once, init );
+}
+
 #define NtGdiDdDDIOpenAdapterFromLuid          upstream_NtGdiDdDDIOpenAdapterFromLuid
 #define NtGdiDdDDIOpenAdapterFromHdc            upstream_NtGdiDdDDIOpenAdapterFromHdc
 #define NtGdiDdDDICloseAdapter                  upstream_NtGdiDdDDICloseAdapter
@@ -79,6 +94,7 @@
 #define NtGdiDdDDICheckOcclusion                upstream_NtGdiDdDDICheckOcclusion
 #define NtGdiDdDDICheckVidPnExclusiveOwnership  upstream_NtGdiDdDDICheckVidPnExclusiveOwnership
 #define NtGdiDdDDIEscape                        upstream_NtGdiDdDDIEscape
+#define pthread_once( once, init )              madeira_d3dkmt_pthread_once( once, init )
 #include "../../wine/dlls/win32u/d3dkmt.c"
 #undef NtGdiDdDDIOpenAdapterFromLuid
 #undef NtGdiDdDDIOpenAdapterFromHdc
@@ -93,6 +109,7 @@
 #undef NtGdiDdDDICheckOcclusion
 #undef NtGdiDdDDICheckVidPnExclusiveOwnership
 #undef NtGdiDdDDIEscape
+#undef pthread_once
 
 #include "madeira_kmt.h"
 

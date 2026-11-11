@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """env.MADEIRA_ZERO_MITIGATION_POLICY: Wine's GetProcessMitigationPolicy zeroes the caller's buffer; opt-in; no Wine runs.
 
 Glyphica: Typing Survival (Steam 2400160, neosphere.exe: the Sphere engine neoSphere with ChakraCore.dll; 777YHV and JAHWGD, one start, build
@@ -239,7 +241,10 @@ check('the rule stands before "standard" (the last rule), after it only the roun
       + ['the-wolf-among-us-remastered', 'sable', 'the-darkside-detective-2', 'payday-2', 'halo-the-master-chief-collection',   # round 630 (T2, G2, D)
          'football-manager-26', 'the-binding-of-isaac-rebirth', 'mewgenics', 'doom-3-bfg-edition', 'darkest-dungeon', 'battle-brothers', 'balatro',   # build 632: gl-backend (OpenGL)
          'borderlands-2', 'the-escapists-2', 'dark-souls-remastered',   # round 632 (the Steam CEG fix; D1.8, D1.9, D1.5)
-         'the-last-of-us-part-1'] + ['standard'])   # round 634 (The Last of Us Part I)
+         'the-last-of-us-part-1',   # round 634 (The Last of Us Part I)
+         'slime-rancher-2',   # list v44 (2026-11-08, Slime Rancher 2)
+         'far-cry-4']   # build 652 (Far Cry 4)
+      + ['dying-light-the-beast', 'eslabong', 'find-the-needle-demo', 'fifa-23', 'grand-theft-auto-vice-city', 'la-noire-steam', 'call-of-duty-world-at-war', 'dishonored', 'buckshot-roulette', 'arctic-drive-demo', 'brotato', 'quake-ii', 'resonance', 'replaced', 'need-for-speed-shift', 'bulletstorm', 'doom-64', 'deponia-the-complete-journey', 'sc-jogos-barro-gt', 'angry-birds', 'into-the-breach', 'freshwomen-season-1', 'gp-bikes', 'polybius', 'noita', 'battlefield-1942', 'mafia-classic', 'killer-instinct', 'the-witcher-2', 'the-elder-scrolls-iv-oblivion', 'astro-tripper', 'baba-is-you', 'fear-and-hunger-2-termina', 'hearts-of-iron-iv', 'inscryption', 'half-sword-demo', 'sonic-generations', 'yakuza-kiwami-3-dark-ties', 'call-of-duty-infinite-warfare', 'call-of-duty-modern-warfare-4', 'bluefield', 'assassins-creed-brotherhood', 'metaphor-refantazio', 'prince-of-persia-the-lost-crown', 'football-manager-other', 'mirrors-edge', 'need-for-speed-most-wanted-2012', 'crash-bandicoot-n-sane-trilogy', 'dark-deception-chapter-1', 'far-cry-3-folder', 'far-cry-4-folder', 'kof-xiv-steam', 'dmc-devil-may-cry', 'football-manager-2020', 'momo-game', 'watch-dogs', 'assassins-creed-black-flag-resynced', 'dragon-ball-fighterz'] + ['standard'])   # night round 2026-11-11: the new rows, in the list's order
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)
 case = re.search(r'case "MADEIRA_WINTYPES"[^\n]*"%s":(.*?)guard value == "0" \|\| value == "1"' % NAME, pol, re.S)
@@ -292,7 +297,9 @@ allowed = {'app/Madeira/GameRecommendationsList.swift', 'app/Madeira/ConfigCatal
            # round 624 (agent E2 S3): the build of kernelbase-optin.dll and its check name the switch they ship
            'tools/build-wine-extra-dlls.sh', 'tools/verify-kernelbase-optin.py',
            # round 630 (agent U S2): the bridge adds the opt-in kernelbase when the key is 1
-           'app/Madeira/WineProcessBridge.m'}
+           'app/Madeira/WineProcessBridge.m',
+           # night round 2026-11-11 (G5 S7): the script that makes the opt-in kernelbase log what the policy function did
+           'tools/patch-wine-zero-mitigation-diag.py'}
 check('only the policy, the catalog and auto-tune name it in the app and build sources', set(users) <= allowed, str(sorted(set(users) - allowed)))
 cat = (root / 'app/Madeira/ConfigCatalog.generated.swift').read_text()
 check('the settings catalog knows the key, off by default', re.search(r'key: "env\.%s".*kind: \.bool, defaultValue: "0"' % NAME, cat) is not None)

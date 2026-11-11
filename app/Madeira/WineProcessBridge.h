@@ -1,3 +1,4 @@
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 /* Portions copyright 2026 SirDank: code taken from https://github.com/willfaust/Madeira (pull request #360; commits ba617bb and 4e568c1)
  * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 #pragma once
@@ -54,6 +55,9 @@ void wine_exit_status_reset(void);
 // the wineserver stopped). Blocks until the wineserver thread is joined: call it off the main queue.
 int wine_launched_exit_stuck(int32_t *code, double *seconds);
 void wine_session_abandon(void);
+// Confirmed Windows desktop Quit; terminates the whole guest, keeps BCD alive.
+// Blocks for server shutdown: call off the main queue.
+int wine_session_quit_desktop(void);
 // Processes the program started that still run, not counting Wine's own (explorer, services, winedevice,
 // conhost, plugplay, rpcss, svchost, the Dock host) or crash reporters and helpers (process_ios.c). Their
 // file names go to names. A child that could not be tracked counts as running.
@@ -73,6 +77,9 @@ int wine_session_dock_game_quit(int32_t status);
 // wine_session_dock_game_left (round 625, N-S18): the same end for a game whose last program closed by itself with a status that is
 // not a crash before it drew a picture (the library's watch decides); not a crash status, not the player's quit.
 int wine_session_dock_game_left(int32_t status);
+// wine_session_desktop_closed (night round 2026-11-11, A4 S1): the Windows desktop session ends because the player closed it (BCD's
+// Close, or Start > Shut Down); status 0, not a crash status. Off the main queue. 1 when it ended the session.
+int wine_session_desktop_closed(void);
 
 // madeira-bcd (round 624, agent D2 S3 and S7; process_ios.c, virtual_ios.c): the Windows desktop's exit watch
 // (LibraryModel.watchDesktopExits, DesktopExitRules). madeira_child_ends_since: the processes that ended after the first `after`

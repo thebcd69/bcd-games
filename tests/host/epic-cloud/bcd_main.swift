@@ -112,6 +112,7 @@ let http = BCDEpicCloudHTTP(api: api, accountID: account)
 
         // what is remembered
         let work = FileManager.default.temporaryDirectory.appendingPathComponent("epic-cloud-bcd-\(getpid())")
+        try? FileManager.default.removeItem(at: work)   // start empty: exit() skips defer, so a folder with a reused process id may be left
         try? FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: work) }
         let store = work.appendingPathComponent("cloud-sync.json")

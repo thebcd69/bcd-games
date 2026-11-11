@@ -12,6 +12,8 @@ final class MadeiraDockModel: ObservableObject {
 
     @Published private(set) var games: [DockGame] = []
     @Published private(set) var clientInstalled = false
+    /// Night round 2026-11-11 (A1 S7): the first 12 hex digits of the SHA-256 of a client the Dock host does not support, else nil.
+    @Published private(set) var clientUnsupportedBuild: String?
     @Published private(set) var preparing = false
     @Published private(set) var progress = ""
     @Published var error: String?
@@ -32,6 +34,11 @@ final class MadeiraDockModel: ObservableObject {
         clientInstalled = MadeiraDock.clientInstalled
         let drive = MadeiraDock.drive, prefix = MadeiraDock.prefix
         Task.detached(priority: .userInitiated) {
+            // The client file's fingerprint (15 MB, read in pieces) off the main thread.
+            var unsupported: String?
+            if case .unsupported(let sha) = SteamRuntimeFiles.clientStatus(drive: drive) { unsupported = String(sha.prefix(12)) }
+            let build = unsupported
+            await MainActor.run { self.clientUnsupportedBuild = build }
             let found = MadeiraDock.games(drive: drive)
             var programs: [Int: Int] = [:], runNext: [Int: Bool] = [:], requests: [Int: DockInstallRequest] = [:]
             if DockInstallers.choiceEnabled {
@@ -63,16 +70,23 @@ final class MadeiraDockModel: ObservableObject {
         installRequest[appID] = request
     }
 
-    /// Downloads and unpacks Valve's client components (no Wine session).
-    func prepareClient() {
+    /// Downloads and unpacks Valve's client components (no Wine session). `replacing` (night round 2026-11-11, A1 S7): Settings' "Replace client
+    /// components" for a client build the Dock host does not support: the old folder is renamed aside, nothing is deleted.
+    func prepareClient(replacing: Bool = false) {
         guard !preparing else { return }
         preparing = true; error = nil; progress = "Starting…"
         Task { @MainActor in
             do {
-                try await SteamRuntimeInstaller.shared.prepare(prefix: MadeiraDock.prefix) { text in
+                try await SteamRuntimeInstaller.shared.prepare(prefix: MadeiraDock.prefix, replacing: replacing) { text in
                     await MainActor.run { self.progress = text }
                 }
-                SteamLog.event("[dock-setup] client components ready")
+                SteamLog.event(replacing ? "[dock-setup] client components replaced" : "[dock-setup] client components ready")
+                // Night round 2026-11-11 (A2 S2; 1Z6JQQ): Play right after a long components download starts the session on an attach that is older than the
+                // JIT pool request tolerates. Text only, and only when a debugger is attached and was attached 25 s or more ago in this run.
+                if !replacing, jit_check_debugged(), let age = StikJITHelper.attachAge(), age.source == "enable-jit", age.seconds >= 25 {
+                    status = "The components are ready. JIT was turned on \(age.seconds) seconds ago: tap Enable JIT again, then Play."
+                    SteamLog.event("[dock-setup] jit-stale age=\(age.seconds)s")
+                }
             } catch {
                 self.error = error.localizedDescription
                 SteamLog.event("[dock-setup] client components failed: \(error.localizedDescription)"
@@ -93,11 +107,17 @@ final class MadeiraDockModel: ObservableObject {
         status = plan.map { $0 + "\n" + starting } ?? starting
         if let plan { LogStore.shared.log("[dock-installers] " + plan) }
         watch = Task { @MainActor in
-            var idle = 0, started = false, offered = false
+            var idle = 0, started = false, offered = false, appStateLogged = false
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 let report = MadeiraDock.pollReport()
                 DockOffline.observe(report.fields)
+                // Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A): Valve's client refused the launch with an update error (17, 19, 20): the numbers of the
+                // game's install record go to the log once, so a log says whether the installed build is behind (buildid / TargetBuildID) and whether anything downloads.
+                if !appStateLogged, ["17", "19", "20"].contains(report.fields["launch-client-error"] ?? ""), let game = MadeiraDock.launchedGame {
+                    appStateLogged = true
+                    LogStore.shared.log(MadeiraDock.appStateLine(game: game, drive: MadeiraDock.drive) ?? "[dock-app-state] the install record could not be read")
+                }
                 // The game's one-time installs run before the host writes its first field.
                 if DockInstallers.script != nil {
                     let progress = DockInstallers.poll(drive: MadeiraDock.drive)

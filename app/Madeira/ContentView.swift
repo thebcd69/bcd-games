@@ -1,10 +1,17 @@
 // Portions copyright 2026 alantangok, 125hz and wamei: code taken from https://github.com/willfaust/Madeira (pull request #244; commits abca30a, facd2cc and bbe0b12)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #464)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Henrique Rocha (iqui27): the iPhone Duo tabletop pose, from thebcd69/bcd-games pull request #31; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 import SwiftUI
 import UIKit
 import QuartzCore
 import Metal
 import os.log
+
 
 // 2026-07-03 window-hosted Metal layer.
 //
@@ -122,6 +129,70 @@ final class MetalHostView: UIView {
     }
 }
 
+/// iPhone Duo's tabletop pose (thebcd69/bcd-games#31 by Henrique Rocha / iqui27): while the device is partially folded with
+/// the fold across the screen (an active division region wider than tall), the game is laid out in
+/// the region above the fold and the touch controls in the region below it, the way a laptop splits
+/// screen and keyboard. Flat, closed, folded like a book, or on any other iPhone, both are nil and
+/// the game and the controls use the whole screen as before. Logged as [fold] when it changes.
+///
+/// Part of the foldable iPhone support (BCDFoldable.swift): nothing here reads the fold or changes a layout unless
+/// `BCDFoldable.active` (the foldable model AND its experimental switch, off by default). The hinge itself is read with
+/// UIKit's iOS 27.1 hinge API, which only an SDK of that version has: the reading is compiled when the build setting
+/// `SWIFT_ACTIVE_COMPILATION_CONDITIONS` names BCD_SDK_IOS27_1 (project.pbxproj: set for the iphoneos27.1 SDK), and
+/// the rest (the regions, the layout, the touch mapping) is always compiled and inert while both regions are nil.
+@MainActor final class FoldTabletop: ObservableObject {
+    static let shared = FoldTabletop()
+    /// The regions above and below the fold, in window (screen) points.
+    @Published private(set) var top: CGRect?
+    @Published private(set) var bottom: CGRect?
+    private var hinge: (any UIInteraction)?
+    private weak var host: UIView?
+
+    /// Follows the hinge from `view` (the game surface) from now on.
+    func attach(to view: UIView) {
+        guard BCDFoldable.active else { return }
+        host = view
+#if BCD_SDK_IOS27_1
+        if #available(iOS 27.1, *), hinge?.view !== view {   // a new game view (the old one is gone or another) gets its own
+            if let old = hinge, let oldView = old.view { oldView.removeInteraction(old) }
+            let interaction = UIHingeInteraction { [weak self] _, _ in
+                self?.update()
+                // The fold's region settles a moment after the hinge reports.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    MainActor.assumeIsolated { self?.update() }
+                }
+            }
+            view.addInteraction(interaction)
+            hinge = interaction
+        }
+#endif
+        update()
+    }
+
+    /// Reads the fold again; the game surface re-lays-out when it moved, and the controls follow
+    /// `bottom`.
+    func update() {
+        guard BCDFoldable.active else { return }
+        var above: CGRect?, below: CGRect?
+#if BCD_SDK_IOS27_1
+        if #available(iOS 27.1, *), let w = host?.window {
+            for region in w.reservedRegions(kind: .division) where region.isActive {
+                if let split = BCDTabletop.regions(bounds: w.bounds, division: region.frame) {
+                    above = split.top; below = split.bottom
+                    break
+                }
+            }
+        }
+#endif
+        guard above != top || below != bottom else { return }
+        top = above
+        bottom = below
+        fputs("[fold] tabletop=\(above != nil ? 1 : 0) top=\(above ?? .zero) bottom=\(below ?? .zero)\n", stderr)
+        host?.setNeedsLayout()
+        MetalBackedView.refreshDisplayMode(reason: "fold")
+    }
+}
+
 // SwiftUI-hosted placeholder: geometry + touch input only.
 final class MetalBackedView: UIView {
     private static var layerRegistered = false
@@ -234,9 +305,17 @@ final class MetalBackedView: UIView {
     /// never skew input.
     private func gameRect() -> CGRect {
         let r = GameSurfaceLayout.rect(guest: guestSize(), aspect: drawableAspect(),
-                                       bounds: bounds, mode: effectiveDisplayMode())
+                                       bounds: surfaceArea, mode: effectiveDisplayMode())
         let base = CGRect(x: r.minX, y: r.minY, width: max(r.width, 1), height: max(r.height, 1))
         return BCDMagnifierCurrent.state.rect(base: base)   // madeira-bcd (round 604): the magnifier; at 1x (the default) this is `base` itself
+    }
+
+    /// Where the game may be laid out (view-local points): the whole view, or in iPhone Duo's
+    /// tabletop pose only the region above the fold (FoldTabletop).
+    private var surfaceArea: CGRect {
+        guard let top = FoldTabletop.shared.top, let w = window else { return bounds }
+        let r = convert(top, from: w).intersection(bounds)
+        return r.isEmpty ? bounds : r
     }
 
     private static var drawableObservation: NSKeyValueObservation?
@@ -307,12 +386,18 @@ final class MetalBackedView: UIView {
             host.removeFromSuperview()
             w.addSubview(host)
         }
+        FoldTabletop.shared.attach(to: self)
         applyDisplayMode(reason: "attach")
         // S2 desktop mode: the winios compositor renders the wine virtual
         // desktop aspect-fit inside THIS placeholder's area, exactly like
         // the games' Metal layer — never over the whole phone screen.
-        let full = convert(bounds, to: w)
+        let full = convert(surfaceArea, to: w)
         winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
+        if BCDDuoFeatures.active, LibraryModel.shared.activeEntry?.desktop == true,
+           !LibraryModel.shared.desktopHome {
+            // The desktop can already exist when Open first mounts this host.
+            winios_compositor_set_backgrounded(0)
+        }
         if !Self.layerRegistered {
             Self.layerRegistered = true
             madeira_display_set_layer(host.metalLayer)
@@ -328,8 +413,9 @@ final class MetalBackedView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         if let w = window {
+            FoldTabletop.shared.update()
             applyDisplayMode(reason: "layout")
-            let full = convert(bounds, to: w)
+            let full = convert(surfaceArea, to: w)
             winios_set_compositor_frame(full.minX, full.minY, full.width, full.height)
             if BCDFoldable.active { BCDFoldableLive.layoutPass(self, in: w) }   // madeira-bcd foldable (experimental, BCDFoldableLive.swift): only on the foldable iPhone with its switch on; re-frames the control window when the scene's size changes without a rotation
         }
@@ -357,10 +443,10 @@ final class MetalBackedView: UIView {
         var p = p
         if BCDMagnifierCurrent.state.isOn {   // madeira-bcd (round 604): the finger is over the enlarged picture; map it as the picture at 1x would be
             p = BCDMagnifierCurrent.state.unzoom(point: p, base: GameSurfaceLayout.rect(guest: guestSize(), aspect: drawableAspect(),
-                                                                                       bounds: bounds, mode: effectiveDisplayMode()))
+                                                                                       bounds: surfaceArea, mode: effectiveDisplayMode()))
         }
         let g = GameSurfaceLayout.map(point: p, guest: guestSize(), aspect: drawableAspect(),
-                                      bounds: bounds, mode: effectiveDisplayMode())
+                                      bounds: surfaceArea, mode: effectiveDisplayMode())
         return (Int32(g.x), Int32(g.y))
     }
 
@@ -1020,37 +1106,51 @@ struct ContentView: View {
         case unavailable
     }
 
-    var body: some View {
-        /* ml658: was NavigationView, which is deprecated and — the reason this
-         * matters — defaults to a SPLIT VIEW on iPad. TARGETED_DEVICE_FAMILY is
-         * "1,2", so iPad is a shipping target, and the whole UI was being forced
-         * into a sidebar/detail arrangement it was never laid out for.
-         * NavigationStack is single-column on every device. Safe here: there are
-         * no NavigationLinks anywhere in the app, so nothing depended on the
-         * two-column selection behaviour. */
-        NavigationStack {
-            Group {
-                if library.current != nil {
-                    sessionBody
-                        .navigationBarHidden(true)
-                } else {
-                    // BCD's own interface (BCDLiveFrontEnd.swift), with Play, Enable JIT and the
-                    // Dock start (BCD, 2026-10-18; the only interface since wave 3, 2026-10-19).
-                    BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,
-                                    startDock: { startDock($0, compactPool: $1) })
-                }
+    @ViewBuilder var body: some View {
+        // Modified 2026-11-04: only the Duo path owns per-tab navigation stacks.
+        // All other devices retain the original navigation container and styling, and for them the modifiers are applied in
+        // the original order: the root, the navigation title and bar, then the alerts and observers of appChrome.
+        if BCDDuoFeatures.active {
+            appChrome(rootContent)
+        } else {
+            /* ml658: was NavigationView, which is deprecated and — the reason this
+             * matters — defaults to a SPLIT VIEW on iPad. TARGETED_DEVICE_FAMILY is
+             * "1,2", so iPad is a shipping target, and the whole UI was being forced
+             * into a sidebar/detail arrangement it was never laid out for.
+             * NavigationStack is single-column on every device. Safe here: there are
+             * no NavigationLinks anywhere in the app, so nothing depended on the
+             * two-column selection behaviour. */
+            NavigationStack {
+                appChrome(rootContent
+                    .navigationTitle("BCD")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(.regularMaterial, for: .navigationBar)
+                    .toolbarBackground(!Self.systemScrollEdge ? .visible : .automatic, for: .navigationBar))
             }
-            .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): adds nothing off the foldable iPhone with its switch on; there, a window under 700 pt reads as compact so the iPad layout is not drawn in it
-            .navigationTitle("BCD")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.regularMaterial, for: .navigationBar)
-            // The library keeps a material bar only before iOS 26. From iOS 26 the
-            // system draws its soft scroll edge effect instead: content scrolls
-            // under the title, the buttons and the search field behind a
-            // progressive blur (as in the App Store), with no hard edge.
-            .toolbarBackground(!Self.systemScrollEdge ? .visible : .automatic, for: .navigationBar)
+        }
+    }
+
+    /// A session, or BCD's own interface, with the foldable follower.
+    private var rootContent: some View {
+        Group {
+            if library.current != nil && !library.desktopHome {
+                sessionBody
+                    .navigationBarHidden(true)
+            } else {
+                // BCD's own interface (BCDLiveFrontEnd.swift), with Play, Enable JIT and the
+                // Dock start (BCD, 2026-10-18; the only interface since wave 3, 2026-10-19).
+                BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,
+                                startDock: { startDock($0, compactPool: $1) }, waitForCloud: cloudWait)
+            }
+        }
+        .modifier(BCDFoldableWatch())   // madeira-bcd foldable (experimental, BCDFoldableUI.swift): on the foldable iPhone, a window under 700 pt reads as compact, independently of the experimental game-support switch
+    }
+
+    /// The app's alerts, sheets and observers, applied to the root (on the original path: after its navigation title and bar).
+    private func appChrome<Root: View>(_ root: Root) -> some View {
+        root
             // A second session cannot start in this process; offer to close Madeira.
-            .alert("BCD needs a restart", isPresented: Binding(get: { library.restartNotice != nil },
+            .alert("BCD needs a restart", isPresented: Binding(get: { !BCDDuoFeatures.active && library.restartNotice != nil },
                                                                set: { if !$0 { library.restartNotice = nil } })) {
                 Button("Close BCD") {
                     LogStore.shared.log("[session-once] closed by the user for a restart")
@@ -1061,14 +1161,14 @@ struct ContentView: View {
             } message: { Text(library.restartNotice ?? "") }
             .modifier(AutoTuneAlert())   // madeira-bcd: auto-tune's result (AutoTuneViews.swift); never shown while it is off
             // CS_DEBUGGED without a debugger (JIT enabled outside Madeira): offer Madeira's own request.
-            .alert("Enable JIT", isPresented: Binding(get: { library.jitNotice != nil },
+            .alert("Enable JIT", isPresented: Binding(get: { !BCDDuoFeatures.active && library.jitNotice != nil },
                                                       set: { if !$0 { library.jitNotice = nil } })) {
                 Button("Enable JIT") { library.jitNotice = nil; enableJIT() }
                 Button("Later", role: .cancel) { library.jitNotice = nil }
             } message: { Text(library.jitNotice ?? "") }
             .sheet(isPresented: $jitCoordinator.showSetup) { BCDJITSetupSheet(enableJIT: { enableJIT() }) }   // madeira-bcd 2026-10-18: BCD's JIT setup (BCDJITLive.swift)
             // A Steam game's saves may not be the latest (cloudClear).
-            .alert(library.cloudNotice?.title ?? "Steam Cloud", isPresented: Binding(get: { library.cloudNotice != nil },
+            .alert(library.cloudNotice?.title ?? "Steam Cloud", isPresented: Binding(get: { !BCDDuoFeatures.active && library.cloudNotice != nil },
                                                                                      set: { if !$0 { library.cloudNotice = nil } })) {
                 if let notice = library.cloudNotice {
                     switch notice.kind {
@@ -1113,7 +1213,6 @@ struct ContentView: View {
             // A Home Screen shortcut (madeira://play?exe=...) starts its library entry,
             // now or, from a cold start, once the library is up.
             .onReceive(ShortcutRouter.shared.$pendingExe) { _ in launchPendingShortcut() }
-        }
     }
 
     /// A library session: the game full screen in either orientation, with the
@@ -1311,14 +1410,15 @@ struct ContentView: View {
     /// applies the entry's launch profile and runs the same full sequence as the
     /// developer interface's buttons.
     private func launchLibraryEntry(_ entry: LibraryEntry) {
-        // A game on the SSD chosen in Settings > Storage (C:\External): when its folder is not connected, the saved one is
+        // A game on an external drive (Settings › Storage › External drives): when the drive is not open, its saved folder is
         // opened again without the picker; if the program is still out of reach, say so. Nothing here for any other game.
-        if entry.relativePath.hasPrefix("External/"), ExternalGameStorage.shared.hasSavedFolder {
-            if (try? LibraryModel.executable(entry.launchRelativePath)) == nil {
-                _ = ExternalGameStorage.shared.reconnect(verifyWrite: false)
-            }
-            if (try? LibraryModel.executable(entry.launchRelativePath)) == nil {
-                library.error = "This game is on the external SSD, and BCD can't reach it. Plug the SSD in, then tap Reconnect in Settings › Storage (or choose its games folder again)."
+        if let drive = ExternalDrives.driveName(library: entry.relativePath) {
+            if !ExternalDrives.reachable(entry) { ExternalDrives.shared.mountAll() }
+            if !ExternalDrives.reachable(entry) {
+                LogStore.shared.log("[external] play refused: the game's drive is not reachable (connected=\(ExternalDrives.isConnected(drive) ? 1 : 0))")
+                library.error = ExternalDrives.shared.folders.contains(where: { $0.name == drive })
+                    ? "This game is on \(drive), and BCD can't reach it. Plug the drive in and try again. If it still fails, open Settings › Storage › External drives, tap \(drive) and choose Reconnect: its games stay in the library."
+                    : "This game is on \(drive), and BCD can't reach it. Plug the drive in and try again. If it still fails, add it in Settings › Storage › External drives (choose the same folder): its games stay in the library."
                 return
             }
         }
@@ -1529,6 +1629,9 @@ struct ContentView: View {
             os_log("[HEARTBEAT] main thread alive #%d", heartbeatCount)
         }
 
+        // Night round 2026-11-11 (M7): the JIT method as the main thread reads it (the pool request's log fields and its caption rule use it).
+        StikJITHelper.noteRequestMethod(jitCoordinator.resolvedMethod)
+
         // Pause UI flushing — prevents ALL SwiftUI re-renders during Wine execution,
         // so zero main thread hang time accumulates while debugger is attached
         logStore.uiPaused = true
@@ -1539,8 +1642,12 @@ struct ContentView: View {
 
         let epicSession = profile.map { BCDEpic.shared.owns(entryID: $0.id) } ?? false   // madeira-bcd (2026-10-22): read here, on the main thread (BCDEpic is main-actor); used for the msiexec line below
         let eaInstallerSession = DockInstallers.runsEAAppInstaller && DockInstallers.flag("MADEIRA_DOCK_EA_MSISERVICE")   // round 626 (A1 S12)
+        let paradoxLauncherSession = MadeiraDock.paradoxLauncherSession   // night round 2026-11-11 (D S2): read here, on the main thread
         let eaInstallLines = DockInstallers.eaInstallSession ? BCDLauncherSpec.eaInstallerSessionLines : []   // round 630 (A1 S12): read here, on the main thread
         let windowsDesktopEntry = profile?.desktop == true   // madeira-bcd (2026-10-23): the library's "Windows desktop" entry (no game), for the msiexec line below
+        // Link external drives before the server lists dosdevices (Madeira #464 does it in startWineserver; here it runs on the main
+        // thread, where ExternalDrives and the Steam models it refreshes live, before the sequence below starts the server).
+        ExternalDrives.shared.mountAll()
         DispatchQueue.global(qos: .userInitiated).async {
             // A library entry's launch profile (executable, arguments, x87
             // precision, frame limit).
@@ -1692,6 +1799,15 @@ struct ContentView: View {
                 // system32\msiexec.exe. env.MADEIRA_DOCK_EA_MSISERVICE = 0 leaves it out.
                 setenv("MADEIRA_MSIEXEC_SYSTEM32", "1", 1)
                 logStore.log("[msiexec64] Dock install of the EA app: msiexec in system32 for this session")
+            } else if paradoxLauncherSession && SteamSignIn.flag("MADEIRA_PARADOX_LAUNCHER_MSI", default: true) {
+                // madeira-bcd (night round 2026-11-11, agents D S2, G3 S8, G5 S11; Prison Architect KQ3E87, Hearts of Iron IV QZB4QB): a Dock start whose launch option
+                // is Paradox's launcher stub (Launcher\dowser.exe) installs the Paradox Launcher by running "msiexec" from PATH and a WiX bundle that loads msi.dll
+                // ("exec: msiexec: executable file not found", "Error 0x8007007e: Failed to initialize Wiutil"); only the 32-bit msiexec and msi.dll are bundled, so
+                // every such start ended there. msiexec goes into the 64-bit system32 and the session gets the opt-in 64-bit msi DLLs (the EA app's set); a
+                // MADEIRA_OPTIN_DLLS line of the game's own wins. env.MADEIRA_PARADOX_LAUNCHER_MSI = 0 leaves the session as it was.
+                setenv("MADEIRA_MSIEXEC_SYSTEM32", "1", 1)
+                if getenv("MADEIRA_OPTIN_DLLS") == nil { setenv("MADEIRA_OPTIN_DLLS", "msi,mspatcha,odbccp32,sxs,rstrtmgr", 1) }
+                logStore.log("[msiexec64] Paradox launcher stub: msiexec in system32 and the msi DLLs for this session")
             } else {
                 unsetenv("MADEIRA_MSIEXEC_SYSTEM32")
             }
@@ -1927,8 +2043,12 @@ struct ContentView: View {
 
             winiosPhase("pool-alloc-begin")
             logStore.log("Allocating \(poolSizeMB)MB JIT pool (BRK will suspend process)...")
+            // Night round 2026-11-11 (M7, A2 S1): on the risky path (StikDebug attached long ago, or a hot phone) the starting screen says what BCD
+            // waits for before the request stops the process; nothing is shown for the built-in helper or a fresh attach.
+            let requestCaption = StikJITHelper.announceRiskyRequest()
             let t0 = CFAbsoluteTimeGetCurrent()
             let pool = StikJITHelper.allocatePool(poolSize: poolSizeMB * 1024 * 1024)
+            if requestCaption { StikJITHelper.clearRequestCaption() }
             let elapsed = CFAbsoluteTimeGetCurrent() - t0
             winiosPhase("pool-ready")
             logStore.log("BRK suspension lasted \(String(format: "%.2f", elapsed))s")
@@ -2284,12 +2404,13 @@ struct ContentView: View {
                     }
                 }
                 if now - pollStart > maxWait {
-                    logStore.log("Wine still running after \(Int(maxWait))s, proceeding with detach", level: .error)
+                    // Night round 2026-11-11 (T2 S-LOG1; Fallout: New Vegas 2FMXYN): a game that is simply still playing after the wait is no error.
+                    logStore.log("The session is still running after \(Int(maxWait)) s; the detach wait ends here")
                     break
                 }
             }
             let wineElapsed = CFAbsoluteTimeGetCurrent() - pollStart
-            logStore.log("Wine finished after \(String(format: "%.1f", wineElapsed))s")
+            if wine_process_is_running() == 0 { logStore.log("Wine finished after \(String(format: "%.1f", wineElapsed))s") }   // not while the game still runs
 
             // Step 5: Resume UI + os_log, give main thread time to recover before detach
             DispatchQueue.main.async {
@@ -2380,7 +2501,9 @@ struct ContentView: View {
             }
             let dockLaunch = SteamDirectStart.dockLaunch(chosen: profile?.steamLaunchOption, options: options, installFolder: installFolder)
             let launchOption = dockLaunch.index
+            MadeiraDock.paradoxLauncherSession = options?.first(where: { $0.index == launchOption }).map { MadeiraDock.isParadoxLauncher(executable: $0.executable) } ?? false   // night round 2026-11-11 (D S2)
             for line in dockLaunch.lines { LogStore.shared.log(line) }
+            for line in SteamDirectStart.launchEntryLine(options: options, key: launchOption) { LogStore.shared.log(line) }   // night round 2026-11-11 (G5 S5)
             // madeira-bcd (round 623): a launch entry that is a .bat or .cmd shows its first lines in the log (SteamDirectStart.batchPreview).
             for line in SteamDirectStart.batchPreview(options: options, key: launchOption, installFolder: installFolder) { LogStore.shared.log(line) }
             await SteamOwnedLibrary.shared.prepareDock()
@@ -2406,6 +2529,12 @@ struct ContentView: View {
             // madeira-bcd (round 578): a start that has Valve's client prepare per-user executables (CEG)
             // finds Valve's own client service installed, as on Windows; the Dock host's own installer
             // step failed in 3 of 5 logged sessions (DockCEGService). No session runs yet.
+            // madeira-bcd (night round 2026-11-11; GNWWRT, RAC3KD, GWX5H2, DP9TVR): the host ends a start with 42 when HKLM Software\Valve\Steam
+            // (32-bit view) or HKCU ...\ActiveProcess is missing; the sections BCD seeded at the client download are put back here
+            // when a prefix lost them (nothing is written when they are there). env.MADEIRA_DOCK_REGISTRY_REPAIR = 0 leaves the hives alone.
+            if !DockInstallers.installsOnly, SteamSignIn.flag("MADEIRA_DOCK_REGISTRY_REPAIR", default: true) {
+                SteamRuntimeFiles.repairRegistry(prefix: MadeiraDock.prefix, log: { logStore.log($0) })
+            }
             if !DockInstallers.installsOnly {
                 DockCEGService.prepare(game, drive: MadeiraDock.drive, prefix: MadeiraDock.prefix)
                 // madeira-bcd (2026-10-21): Valve's client added Counter-Strike 2's dependency on the
@@ -2433,6 +2562,14 @@ struct ContentView: View {
                 logStore.log("[dock-installers] this session runs one-time installs: madsync off for this session only (MADEIRA_MADSYNC_SESSION=0)")
             } else {
                 unsetenv("MADEIRA_MADSYNC_SESSION")
+            }
+            // madeira-bcd: a game whose install script runs a shared launcher's installer (Ubisoft Connect) runs that launcher in its
+            // session, so the session gets the launcher's own lines (DockInstallScripts.sharedLauncherSessionEnv); a start without one
+            // clears them. bcd.cfg's lines, exported after this, win.
+            for name in DockInstallScripts.sharedLauncherSessionNames where DockInstallers.launcherSessionEnv[name] == nil { unsetenv(name) }
+            for (name, value) in DockInstallers.launcherSessionEnv.sorted(by: { $0.key < $1.key }) {
+                setenv(name, value, 1)
+                logStore.log("[dock-installers] the game's install script runs a shared launcher: \(name)=\(value) for this session")
             }
             // A Dock session starts 64-bit (explorer, then the host), but the programs it starts
             // later are often 32-bit: one-time installers and the 32-bit games Valve's client
@@ -2802,7 +2939,9 @@ final class TouchControlsModel: ObservableObject {
     /// touch in the window. Nothing responded, and edit mode — whose branch
     /// captured everything — could never be entered to mask it.
     /// `topBar: false` in a library session, where BCD's in-game layer replaces the bar.
-    func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true) -> Bool {
+    /// `controlsArea`: where the controls are laid out when not the whole screen (FoldTabletop's
+    /// region below the fold); the editor always uses the whole screen.
+    func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true, controlsArea: CGRect? = nil) -> Bool {
         // Top bar: three 44pt buttons 10pt apart in play mode (controls, edit,
         // session: madeira-bcd), centred, 10pt down, plus the layout menu while
         // touch controls are on (ml1970), plus the keyboard button.
@@ -2813,10 +2952,11 @@ final class TouchControlsModel: ObservableObject {
         if topBar, CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
                           width: barW + 20, height: 68).contains(p) { return true }
         guard visible, !BCDTouchFeel.controlsHidden else { return false }   // madeira-bcd (round 604): hidden for want of a touch, every touch is the game's
+        let area = editing ? bounds : (controlsArea ?? bounds)
         for c in controls {
             let r = Self.diameter(c) / 2
-            let cx = CGFloat(c.nx) * bounds.width
-            let cy = CGFloat(c.ny) * bounds.height
+            let cx = area.minX + CGFloat(c.nx) * area.width
+            let cy = area.minY + CGFloat(c.ny) * area.height
             // madeira-bcd (2026-11-03): a control the player gave a shape of its own takes touches in that shape
             // (BCDTouchGeometry.windowTakes); every other control as always.
             if c.face != nil, let own = c.bcdOwnShape {
@@ -2845,6 +2985,8 @@ final class ControlsWindow: UIWindow {
     }
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let sessionModel = LibraryModel.shared
+        if sessionModel.desktopHome || (BCDDuoFeatures.active && sessionModel.current == nil) { return nil }
         let m = TouchControlsModel.shared
         // Edit mode owns the whole screen: drags and the scale pinch must not
         // leak through and swing the camera while you are arranging buttons.
@@ -2872,12 +3014,13 @@ final class ControlsWindow: UIWindow {
                 library.performanceRect.contains(point) {   // the HUD's frame is zero except while the player moves it (BCDHUDHost)
                 return super.hitTest(point, with: event)
             }
-            guard m.hitsInteractive(point, in: bounds, topBar: false) else { return nil }
+            guard m.hitsInteractive(point, in: bounds, topBar: false,
+                                    controlsArea: FoldTabletop.shared.bottom) else { return nil }
             return super.hitTest(point, with: event)
         }
         // Portrait draws nothing here, so it must consume nothing.
         guard bounds.width > bounds.height else { return nil }
-        guard m.hitsInteractive(point, in: bounds) else { return nil }
+        guard m.hitsInteractive(point, in: bounds, controlsArea: FoldTabletop.shared.bottom) else { return nil }
         return super.hitTest(point, with: event)
     }
 }
@@ -2895,6 +3038,7 @@ enum TouchControlsHost {
             // keep a portrait-sized frame after the first rotation.
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
             let w = ControlsWindow(windowScene: scene)
+            if BCDDuoFeatures.active { MainActor.assumeIsolated { GamepadEventClaim.install(on: w) } }
             // Above the joystick pad's +100. A higher windowLevel is the only
             // ordering nothing inside the app window can undo.
             w.windowLevel = .normal + 101
@@ -2915,6 +3059,7 @@ struct TouchControlsOverlay: View {
     @ObservedObject private var m = TouchControlsModel.shared
     @ObservedObject private var library = LibraryModel.shared
     @ObservedObject private var feel = BCDTouchFeelModel.shared   // madeira-bcd (round 604): the controls hide when no finger has been on them for the time the player chose
+    @ObservedObject private var fold = FoldTabletop.shared
     @State private var pinchBase: Double?
 
     var body: some View {
@@ -2926,7 +3071,7 @@ struct TouchControlsOverlay: View {
             let session = library.current != nil
             let landscape = geo.size.width > geo.size.height || session
             ZStack(alignment: .top) {
-                if landscape {
+                if landscape && !library.desktopHome && (!BCDDuoFeatures.active || session) {
                     if (m.visible || m.editing) && !library.blocksGameplayTouch {
                         if !feel.hidden {   // madeira-bcd (round 604): hidden for want of a touch, the controls have no view at all
                             controls(geo.size, session: session)
@@ -2956,8 +3101,19 @@ struct TouchControlsOverlay: View {
         .persistentSystemOverlays(library.current != nil ? .hidden : .automatic)
     }
 
-    /// BCD's controls (BCDTouchLive.swift).
-    private func controls(_ screen: CGSize, session: Bool) -> some View { BCDTouchControlsLive(screen: screen, session: session) }
+    /// BCD's controls (BCDTouchLive.swift). In iPhone Duo's tabletop pose they are laid out in the
+    /// region below the fold (FoldTabletop), the game above it; the editor keeps the whole screen.
+    @ViewBuilder
+    private func controls(_ screen: CGSize, session: Bool) -> some View {
+        if let area = fold.bottom, !m.editing {
+            BCDTouchControlsLive(screen: area.size, session: session)
+                .frame(width: area.width, height: area.height)
+                .offset(x: area.minX, y: area.minY)
+                .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+        } else {
+            BCDTouchControlsLive(screen: screen, session: session)
+        }
+    }
 
     private func configureGamepad(landscape: Bool) {
         let ids = landscape && m.visible

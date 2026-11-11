@@ -58,10 +58,13 @@ enum MemoryRights {
     /// Round 630 (agent A1 S8 and S19; Cult of the Lamb 4CTGPT, GTA V Legacy RT7HMV): over 1,057 archive starts with a JIT memory request, a
     /// request more than 30 s after JIT turned on stopped 20 to 25 times as often, and the games that ask several times (the Rockstar shape:
     /// three requests) 9.4 % against 1.4 %; the built-in way answers the first request in 0.74 s, StikDebug in 1.8 s. Text only.
+    /// Night round 2026-11-11 (A2 S1): the heat sentence (with StikDebug 5 of 22 starts stalled while the phone reported a serious heat state, none of
+    /// 28 with the built-in way); the starting screen says the same before the request on that path (StikJITHelper.announceRiskyRequest).
     static let poolStopWords = "Last time BCD stopped while JIT was being set up for the game: its JIT memory request did not come back. "
         + "Check in Settings › JIT that JIT turns on, that LocalDevVPN is connected and that the pairing file is set, then press Play again. "
         + "It happens more often when JIT turned on long before Play, and with games that ask for JIT memory several times (GTA V): press "
-        + "Play soon after JIT turns on. The built-in way answers these requests faster than StikDebug."
+        + "Play soon after JIT turns on. StikDebug stops answering far more often when the phone is hot: let it cool down first. "
+        + "The built-in way answers these requests faster than StikDebug."
     func lastStartStoppedInPoolRequest() {
         if started {
             if message == nil { title = Self.poolStopTitle; message = Self.poolStopWords }

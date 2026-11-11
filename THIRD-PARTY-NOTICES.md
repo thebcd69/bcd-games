@@ -470,6 +470,67 @@ the table counts their lines), which the build applies with `patch`.
 
 Taken after this count: Madeira's commit `755a893` (ABTOPEMOHT, Madeira #566 and #574; taken 2026-11-06): the Mesa patch `build/mesa-ios/patches/0009-osmesa-allow-compressed-fallback.patch` and the check program `tests/x64/gls3tc-x64.c`, both credited in their headers and in `build/mesa-ios/patches/README.md`.
 
+Taken after this count (2026-11-07, build 635): Madeira's external drive support, pull requests #464 ("Add external drive support": Connor
+Gow's feature commit `41fa0ad`, and intraducine's `cb578f1` with David Brookes, whose safety checks it adapts from Madeira #235), #501
+(Jelly-RayTian) and #536 (alantangok), under GPL-3.0-or-later with the Madeira Converter Exception; BCD's section 7 terms do not apply to these
+lines. Counted as above (833 lines in 13 files: Connor Gow 334, intraducine with David Brookes 437, alantangok 56, Jelly-RayTian 6):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/Madeira/ExternalDrives.swift` | whole file | 317 | #464 Connor Gow 221; #464 intraducine (with David Brookes) 90; #501 Jelly-RayTian 6 |
+| `app/Madeira/ExternalStorage.swift` | whole file | 91 | #464 intraducine (with David Brookes) 91 |
+| `app/Madeira/Library.swift` | portions | 6 | #464 Connor Gow 3; #536 alantangok 3 |
+| `app/Madeira/MadeiraDock.swift` | portions | 5 | #464 Connor Gow 5 |
+| `app/Madeira/SteamCloud.swift` | portions | 20 | #464 intraducine (with David Brookes) 20 |
+| `app/Madeira/SteamInstall.swift` | portions | 32 | #464 intraducine (with David Brookes) 32 |
+| `app/Madeira/SteamOwnedLibrary.swift` | portions | 40 | #464 Connor Gow 17; #464 intraducine (with David Brookes) 23 |
+| `app/Madeira/SwiftSteam/Content/ContentDecryptor.swift` | portions | 4 | #464 intraducine (with David Brookes) 4 |
+| `app/Madeira/SwiftSteam/Content/DepotDownloader.swift` | portions | 88 | #464 Connor Gow 88 |
+| `tests/host/check-executable-browser-paths.py` | whole file | 53 | #536 alantangok 53 |
+| `tests/host/check-external-storage.py` | portions | 106 | #464 intraducine (with David Brookes) 106 |
+| `tests/host/check-steam-cloud.py` | portions | 58 | #464 intraducine (with David Brookes) 58 |
+| `tests/host/check-steam-library.py` | portions | 13 | #464 intraducine (with David Brookes) 13 |
+
+Single lines of #464 below the count's threshold are credited in their files' headers too (`ContentView.swift`, `MadeiraApp.swift`,
+`SteamGames.swift`). `docs/EXTERNAL-STORAGE.md` names the pull requests and their authors.
+
+Taken after this count (2026-11-08, build 646): Madeira pull request #556 by Henry Morin ("Vector registers in thread contexts; stop JIT
+pool code-buffer leaks (Persona 5 Royal reaches gameplay)", commit `10df6a1` of 2026-11-05), under GPL-3.0-or-later with the Madeira
+Converter Exception (the lines in `virtual_ios.c` and `mach_ios.c`: LGPL-2.1-or-later, as those Wine files); BCD's section 7 terms do
+not apply to these lines. Counted as above (194 lines in 5 files, all Henry Morin):
+
+| `build/ntdll-unix/virtual_ios.c` | portions | 38 | #556 Henry Morin 38 |
+| `build/wineserver/mach_ios.c` | portions | 45 | #556 Henry Morin 45 |
+| `tests/host/check-ctx-fp.py` | whole file | 83 | #556 Henry Morin 83 |
+| `tests/host/check-pool-code-exit.py` | portions | 15 | #556 Henry Morin 15 |
+| `tests/host/check-pool-startup-budget.py` | portions | 13 | #556 Henry Morin 13 |
+
+Taken after this count (2026-11-08, build 646): Madeira's Windows Vulkan for x64 programs, pull requests #353 (125hz, commit `b74cb82`), #400
+(Jelly-RayTian, commit `ac746ed`) and #462 (intraducine, who merged both, commit `7ed32a9`), and Madeira's Wine commit `df1c5ea5` (125hz, signed off by
+intraducine), which BCD writes into the Wine tree at build time (`tools/patch-wine-vulkan-suboptimal.py`). The Wine unix side (`vulkan_ios.c`,
+`vulkan_surface_ios.c`, the `d3dkmt_ios.c`, `driver_ios.c` and `virtual_ios.c` lines and the Wine change) is LGPL-2.1-or-later, the rest GPL-3.0-or-later with the
+Madeira Converter Exception; BCD's section 7 terms do not apply to these lines. `WineProcessBridge.m`'s session set-up is BCD's adaptation of 125hz's. The idea in
+`vulkan_ios.c`'s re-entrancy guard is NutsEmu's Wine patch 0083 (no code taken). Counted as above (641 lines in 18 files):
+
+| `app/Madeira.xcodeproj/project.pbxproj` | portions | 4 | #353 125hz 4 |
+| `app/Madeira/IOSDisplayShim.m` | portions | 13 | #400 Jelly-RayTian 13 |
+| `app/Madeira/WineProcessBridge.m` | portions (adapted) | 20 | #353 125hz 20 |
+| `app/Madeira/Winios/VulkanLayerGeometry.h` | whole file | 26 | #400 Jelly-RayTian 26 |
+| `app/Madeira/Winios/Winios.m` | portions | 21 | #400 Jelly-RayTian 21 |
+| `build/ntdll-unix/build.sh` | portions | 5 | #353 125hz 5 |
+| `build/ntdll-unix/virtual_ios.c` | portions | 5 | #353 125hz 5 |
+| `build/win32u-unix/build.sh` | portions | 3 | #353 125hz 3 |
+| `build/win32u-unix/d3dkmt_ios.c` | portions | 7 | #353 125hz 7 |
+| `build/win32u-unix/driver_ios.c` | portions | 8 | #353 125hz and #462 intraducine 8 |
+| `build/win32u-unix/vulkan_ios.c` | whole file | 81 | #353 125hz, #400 Jelly-RayTian and #462 intraducine 81 |
+| `build/win32u-unix/vulkan_surface_ios.c` | whole file | 87 | #400 Jelly-RayTian and #462 intraducine 87 |
+| `tests/host/check-unixlib-binder.py` | portions | 2 | #400 Jelly-RayTian 2 |
+| `tests/host/check-vk-surface-query.py` | whole file | 124 | #462 intraducine and #353 125hz 124 |
+| `tests/host/check-vulkan-layer-geometry.py` | whole file | 62 | #400 Jelly-RayTian 62 |
+| `tests/host/check-vulkan-opt-in.py` | portions | 61 | #400 Jelly-RayTian and #462 intraducine 61 |
+| `tests/host/check-vulkan-surface.py` | portions | 89 | #400 Jelly-RayTian and #462 intraducine 89 |
+| `tools/patch-wine-vulkan-suboptimal.py` | portions | 23 | Madeira's Wine commit df1c5ea5 (#353) 125hz 23 |
+
 ### Game lists
 
 These entries of BCD's recommended settings follow tested lists of Madeira, and the notes of each entry say so: Fallout: New Vegas and
@@ -486,9 +547,101 @@ the file `LICENSE-MADEIRA.md` of each fork lists them, with the Madeira commit e
 
 ### Other people's work in BCD
 
-Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by le0-VV, #11 by vancez, #12 by Pardoxum) and work from rtmtree's
+Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by le0-VV, #11 by vancez, #12 by Pardoxum, #27 by creeper4004, #31 by iqui27 (Henrique Rocha), #33 by Taala2, #43 by pauloec (Paulo Eduardo Correa),
+#46 by rbarton124) and work from rtmtree's
 Persona 3 Reload fork of BCD (helper memory, root certificate enumeration, the bytes at the instruction pointer in the guest log) are credited
 in the files that hold them and in `README-BCD.md`.
+
+Pull request #46 of `thebcd69/bcd-games` by rbarton124 (Russell Barton), "Ubisoft Connect and its
+games now run on BCD" (taken 2026-11-11, build 652): twenty commits written against 0.1.634 and signed off under the Developer Certificate of Origin (the author says the
+changes were written with an AI assistant and tested by him on a device), submitted under GPL-3.0-or-later with the Madeira Converter Exception,
+his changes inside BCD Material files on the terms of `LICENSE-BCD.md`, so those files stay BCD Material (the lines in `build/ntdll-unix/`:
+LGPL-2.1-or-later, as those Wine files, the way Madeira's contributors' lines there are treated above). What came in: the TLS slot of an ARM64EC
+module reaches its pool copy; reserved areas keep FEX and thin areas apart from a generic merge; a 64-bit hook zone above each ntdll
+(`env.MADEIRA_X64_HOOK_ZONE`); a program's WriteProcessMemory into itself (`env.MADEIRA_SELF_WRITE`); I/O completions in a non-alertable
+sleep and a one-second re-check of an infinite wait on an address, both as Wine patch scripts; the release of what a killed process held;
+Ubisoft Connect's Chromium switches and the in-memory libcef.dll change for one checked build; the Dock's handling of Ubisoft Connect's
+installer, session lines and resident client; merging and cutting of free code buffers and a code-buffer policy for the program being played;
+Wine's DxDiag provider as an opt-in DLL with its DirectShow patch; an empty OpenGL extension list; the FEX split-lock patch
+(`tools/patch-fex-ios-split-lock.py`); the game's own file for `env.MADEIRA_HIDPAD_XINPUT`; the Xbox 360 controller identity; and the lists of
+Far Cry 3, Far Cry 4 and Ubisoft Connect. Counted from the pull request's own diff, before BCD's changes (6028 added lines in
+59 files, all rbarton124; generated files are not counted):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `tests/host/check-dxdiagn-optin.py` | whole file | 122 | #46 rbarton124 122 |
+| `tests/host/check-fex-split-lock.py` | whole file | 364 | #46 rbarton124 364 |
+| `tests/host/check-gl-empty-extensions.py` | whole file | 199 | #46 rbarton124 199 |
+| `tests/host/check-kill-reap.py` | whole file | 85 | #46 rbarton124 85 |
+| `tests/host/check-pool-carve-merge.py` | whole file | 402 | #46 rbarton124 402 |
+| `tests/host/check-pool-code-policy.py` | whole file | 476 | #46 rbarton124 476 |
+| `tests/host/check-reserved-area-merge.py` | whole file | 126 | #46 rbarton124 126 |
+| `tests/host/check-self-write.py` | whole file | 385 | #46 rbarton124 385 |
+| `tests/host/check-sleep-kernel-apc.py` | whole file | 178 | #46 rbarton124 178 |
+| `tests/host/check-tls-index-sync.py` | whole file | 182 | #46 rbarton124 182 |
+| `tests/host/check-ubi-cef.py` | whole file | 235 | #46 rbarton124 235 |
+| `tests/host/check-woa-recheck.py` | whole file | 313 | #46 rbarton124 313 |
+| `tests/host/check-x64-hook-zone.py` | whole file | 370 | #46 rbarton124 370 |
+| `tools/patch-fex-ios-split-lock.py` | whole file | 194 | #46 rbarton124 194 |
+| `tools/patch-wine-dxdiagn-directshow.py` | whole file | 133 | #46 rbarton124 133 |
+| `tools/patch-wine-sleep-kernel-apc.py` | whole file | 106 | #46 rbarton124 106 |
+| `tools/patch-wine-woa-recheck.py` | whole file | 232 | #46 rbarton124 232 |
+| `.github/workflows/build-ipa.yml` | portions | 80 | #46 rbarton124 80 |
+| `app/BCDPreview/BCDSettingsPreviewData.swift` | portions | 1 | #46 rbarton124 1 |
+| `app/Madeira/BCDPadModel.swift` | portions | 9 | #46 rbarton124 9 |
+| `app/Madeira/BCDSessionLive.swift` | portions | 4 | #46 rbarton124 4 |
+| `app/Madeira/BCDSettingsSections.swift` | portions | 2 | #46 rbarton124 2 |
+| `app/Madeira/ContentView.swift` | portions | 8 | #46 rbarton124 8 |
+| `app/Madeira/DockGameEnd.swift` | portions | 8 | #46 rbarton124 8 |
+| `app/Madeira/DockInstallers.swift` | portions | 68 | #46 rbarton124 68 |
+| `app/Madeira/GameRecommendationsList.swift` | portions | 52 | #46 rbarton124 52 |
+| `app/Madeira/GamepadInput.swift` | portions | 15 | #46 rbarton124 15 |
+| `app/Madeira/Library.swift` | portions | 10 | #46 rbarton124 10 |
+| `app/Madeira/MadeiraDock.swift` | portions | 2 | #46 rbarton124 2 |
+| `app/Madeira/WineProcessBridge.m` | portions | 12 | #46 rbarton124 12 |
+| `build/hidpad/hidpad_ids.h` | portions | 25 | #46 rbarton124 25 |
+| `build/hidpad/hidpad_reports.h` | portions | 66 | #46 rbarton124 66 |
+| `build/ntdll-unix/loader_ios.c` | portions | 13 | #46 rbarton124 13 |
+| `build/ntdll-unix/process_ios.c` | portions | 142 | #46 rbarton124 142 |
+| `build/ntdll-unix/virtual_ios.c` | portions | 878 | #46 rbarton124 878 |
+| `build/tools/autotune_rules.py` | portions | 10 | #46 rbarton124 10 |
+| `build/tools/gen-config-catalog.py` | portions | 103 | #46 rbarton124 103 |
+| `recommended/recommendations.json` | portions | 77 | #46 rbarton124 77 |
+| `tests/host/bcd_padmodel_checks.swift` | portions | 8 | #46 rbarton124 8 |
+| `tests/host/check-bcd-padmodel.py` | portions | 18 | #46 rbarton124 18 |
+| `tests/host/check-d3d9-x64.py` | portions | 5 | #46 rbarton124 5 |
+| `tests/host/check-desktop-exit.py` | portions | 3 | #46 rbarton124 3 |
+| `tests/host/check-dock-contract.py` | portions | 5 | #46 rbarton124 5 |
+| `tests/host/check-dock-game-end.py` | portions | 21 | #46 rbarton124 21 |
+| `tests/host/check-dock-installers.py` | portions | 79 | #46 rbarton124 79 |
+| `tests/host/check-farm-imports.py` | portions | 2 | #46 rbarton124 2 |
+| `tests/host/check-frontend.py` | portions | 5 | #46 rbarton124 5 |
+| `tests/host/check-game-recommendations.py` | portions | 26 | #46 rbarton124 26 |
+| `tests/host/check-hidpad.py` | portions | 93 | #46 rbarton124 93 |
+| `tests/host/check-log-redaction.py` | portions | 2 | #46 rbarton124 2 |
+| `tests/host/check-pool-code-exit.py` | portions | 10 | #46 rbarton124 10 |
+| `tests/host/check-pool-startup-budget.py` | portions | 8 | #46 rbarton124 8 |
+| `tests/host/check-session-switches.py` | portions | 12 | #46 rbarton124 12 |
+| `tests/host/check-thin-reserve.py` | portions | 2 | #46 rbarton124 2 |
+| `tests/host/check-zero-mitigation-policy.py` | portions | 2 | #46 rbarton124 2 |
+| `tools/build-wine-extra-dlls.sh` | portions | 29 | #46 rbarton124 29 |
+| `tools/build-xtajit-wow64.sh` | portions | 4 | #46 rbarton124 4 |
+| `tools/build-xtajit64.sh` | portions | 4 | #46 rbarton124 4 |
+| `tools/farm-baseline.json` | portions | 3 | #46 rbarton124 3 |
+| `app/Madeira/arm64ec-windows/windowscodecs.dll`, `wininet.dll`, `cryptnet.dll` | not taken | 0 | #46 rbarton124's commit 16 strips their debug sections; BCD did the same to its own copies with `llvm-strip --strip-debug` and took no binary from the pull request |
+
+### Pull requests sent to BCD, file by file
+
+Each file below also carries the author's "Portions copyright" line in its header. All of it is under GPL-3.0-only (the files of the Wine unix side,
+`build/ntdll-unix/`, under LGPL-2.1-or-later like Wine); a file that was BCD's before keeps BCD's lines, and BCD's changes to the received code are marked
+"modified for BCD" in the header or at the lines.
+
+| Pull request | Author | Files and what |
+|---|---|---|
+| #43, 2026-11-04 | pauloec (Paulo Eduardo Correa) | The native iPhone Duo interface: `app/Madeira/BCDFrontEnd.swift` (`BCDDuoFrontEnd`), `BCDLibraryView.swift` (`BCDDuoLibraryView`), `BCDSettings.swift` (`BCDDuoSettingsRoot`), `BCDHomeView.swift` (Windows desktop card, controller navigation), `BCDDownloadsView.swift`, `BCDFocus.swift` (navigators, layer ownership), `BCDFoldable.swift` (`BCDDuoFeatures`, `BCDDuoPageOwner`), `BCDFoldableSettings.swift`, `BCDFoldableUI.swift`, `BCDGamePage.swift` (embedded page), `BCDLiveFrontEnd.swift` (system prompts as menus), `BCDLiveStore.swift`, `BCDMenu.swift`, `BCDSessionLive.swift`, `BCDStyle.swift` (Liquid Glass), `BCDArt.swift`, `BCDSectionKit.swift`, `BCDSettingsCore.swift`, `BCDSettingsSections.swift`, `BCDStore.swift`, `BCDGyroLive.swift`, `BCDInputLive.swift`, `ContentView.swift`, `GamepadInput.swift`, `HardwareInput.swift`, `Library.swift`; the Windows desktop's quit and background compositor: `WineProcessBridge.m/.h`, `WineServerBridge.m/.h`, `Winios/Winios.m/.h`, `build/wineserver/fd_ios.c`, `mach_ios.c`; `tools/patch-dxmt-metal-atomics.py`; host checks `check-duo-controller-navigation.py`, `check-duo-download-session.py`, `check-desktop-quit.py`, `check-dxmt-metal-atomics.py` and edits to six existing checks |
+| #31, 2026-10-27 | iqui27 (Henrique Rocha) | The tabletop pose: `app/Madeira/ContentView.swift` (`FoldTabletop`, the game surface, touch mapping and touch controls below the fold), `BCDFoldable.swift` (`BCDTabletop`), `tests/host/check-bcd-touch.py` |
+| #27, 2026-10-27 | creeper4004 | Colour profiles: `app/Madeira/BCDThemeCore.swift`, `BCDTheme.swift`, `BCDThemes.json`, `BCDSettingsAppearance.swift`, `docs/color-profiles.md`, `tests/host/check-bcd-themes.py`; one-line colour changes in `BCDStyle.swift`, `BCDSettings.swift`, `BCDSettingsCore.swift`, `BCDAccounts.swift`, `BCDComponents.swift`, `BCDControllerScreen.swift`, `BCDFrontEnd.swift`, `BCDGamePage.swift`, `BCDHomeView.swift`, `BCDInGameMenu.swift`, `BCDSectionKit.swift`, `BCDSession.swift`, `BCDSetupView.swift`, `BCDStartingScreen.swift`, `BCDTouchControls.swift`, `BCDTouchEditor.swift`, `MadeiraApp.swift`, `tools/ui-preview.py` |
+| #33, 2026-10-30 | Taala2 | Cross-process TlsFree diagnostics: `build/ntdll-unix/ios_tls_diag_util.h`, `ios_nw_tls_diag.h`, parts of `ios_tls_clear.h`, `virtual_ios.c`, `signal_arm64_ios.c`; `tests/host/check-tls-clear-process.py` |
 
 ## Microsoft Visual C++ runtime redistributables — NOT DISTRIBUTED
 

@@ -28,6 +28,8 @@ python3 "$R/tools/patch-fex-ios-wow-threads-ctor.py" "$R/FEX"
 python3 "$R/tools/patch-fex-ios-thread-init-nomem.py" "$R/FEX" || echo "warning: the thread-init guard was not applied (FEX anchor changed)"
 # round 630 (O2 S7): the code-invalidation walk skips a thread state without its caches; optional
 python3 "$R/tools/patch-fex-ios-inval-null-thread.py" "$R/FEX" || echo "warning: the invalidation-walk guard was not applied (FEX anchor changed)"
+# night round 2026-11-11 (G5 S3 / G7 S13): the thread-creation lock can be taken again by its owner (tools/patch-fex-ios-wow-recursive-tcm.py); optional
+python3 "$R/tools/patch-fex-ios-wow-recursive-tcm.py" "$R/FEX" || echo "warning: the re-enterable thread-creation lock was not applied (FEX anchor changed)"
 trap 'git -C "$R/FEX" checkout -- Source/Windows/WOW64/Module.cpp FEXCore/Source/Interface/Core/Core.cpp' EXIT
 cmake --build "$B" --target wow64fex
 cp "$B/Bin/libwow64fex.dll" "$R/app/Madeira/aarch64-windows/xtajit.dll" && ls -l "$R/app/Madeira/aarch64-windows/xtajit.dll"

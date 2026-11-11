@@ -1,0 +1,21 @@
+[00:45:22.815] [INFO] Checking entitlements...
+[00:45:22.815] [INFO] [build] v0.1.630 (630)
+[00:45:22.816] [INFO] [device] model=iPad16,5 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=15416MB available=16360MB cores=10
+[00:45:22.816] [INFO] [device] address-map=[0x102988000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[00:45:22.816] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[00:45:22.833] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+08:00 free-disk=441GB stikdebug-url=1
+[00:45:22.837] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:46:26.847] [INFO] [bcd] library launch BlueField.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off lc=1
+[00:46:26.870] [INFO] Running full Wine sequence...
+[00:46:26.870] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102988000,0x8000000000) 512GB available=16332MB low-power=0 thermal=nominal
+[00:46:26.871] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_GDI_SHARED_SECTION=1 env.MADEIRA_VCRT_ARM64_KEY=1
+[00:46:26.876] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[00:46:26.876] [INFO] Allocating 1152MB JIT pool via debugger...
+[00:46:26.876] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:46:26.876] [INFO] [jit-debugger] attached=1 at the pool request
+[00:46:26.877] [ERR] ml1034: could NOT reserve the executable window (kr=3) BEFORE RX - something else already holds 0x140000000; a non-relocatable image will be displaced and its absolute pointers will be stale
+[00:46:26.878] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[00:46:52.512] [ERR] Debugger failed to allocate RX memory (attempt 0)
+[00:46:52.515] [ERR] [jit-debugger] the pool request was not answered: no debugger is attached. Enable JIT with BCD's Enable JIT button, so that StikDebug attaches with BCD's script and stays attached until the game starts.
+[00:46:52.522] [ERR] JIT pool allocation FAILED — not starting Wine.
+[00:46:52.552] [INFO] [session] length=25s play=0s frames=0 stalls=0/0s peak=56MB limit=16383MB thermal=nominal lpm=0 res=1112x832 cap=60 game=BlueField

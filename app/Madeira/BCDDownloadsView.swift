@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 
@@ -12,10 +13,13 @@ struct BCDDownloadsView: View {
     @EnvironmentObject private var store: BCDStore
     @EnvironmentObject private var focus: BCDFocus
     @Environment(\.bcdLayout) private var layout
+    @Environment(\.bcdMenu) private var menu
+    var nativeControllerNavigation = false
     /// The download whose Cancel waits for an answer.
     @State private var stopping: String?
 
     var body: some View {
+        ScrollViewReader { reader in
         ScrollView(.vertical, showsIndicators: false) {
             if layout == .phonePortrait {
                 VStack(spacing: 14) { queue; roomCard; finishedCard }
@@ -27,6 +31,19 @@ struct BCDDownloadsView: View {
                 }
                 .padding(.horizontal, layout.gutter).padding(.vertical, 8)
             }
+        }
+        .onScrollPhaseChange { _, phase in if nativeControllerNavigation && phase == .interacting { focus.touched() } }
+        .onChange(of: focus.focused) { _, _ in reveal(reader) }
+        .onChange(of: focus.controllerActive) { _, _ in reveal(reader) }
+        .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in reveal(reader) }
+        }
+    }
+
+    private func reveal(_ reader: ScrollViewProxy) {
+        guard nativeControllerNavigation, focus.controllerActive, let id = focus.focused, id.hasPrefix("downloads.") else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
         }
     }
 
@@ -63,7 +80,7 @@ struct BCDDownloadsView: View {
                 HStack(spacing: 8) {
                     Text("\(BCDFormat.bytes(download.doneBytes)) of \(BCDFormat.bytes(download.totalBytes))")
                     Spacer(minLength: 4)
-                    Text(download.paused ? "Paused" : progressDetail(download))
+                    Text(download.paused ? (waitingForWindows ? "Waiting for Windows" : "Paused") : progressDetail(download))
                 }
                 .font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft).monospacedDigit().lineLimit(1)
                 if let source = download.source, !download.paused {
@@ -103,6 +120,7 @@ struct BCDDownloadsView: View {
             pair {
                 // The row's main control keeps the row's focus id (A: "Pause or resume").
                 chip(main.title, symbol: main.symbol, id: "downloads.\(download.id)") { primary(download) }
+                    .disabled(waitingForWindows && (store.windowsStarting || store.windowsClosing))
                 chip("Cancel", symbol: "xmark", id: "downloads.\(download.id).cancel") { ask(download) }
             }
         }
@@ -121,11 +139,25 @@ struct BCDDownloadsView: View {
     /// downloaded is lost); a running or waiting one pauses.
     private func primary(_ download: BCDDownload) {
         if BCDDownloadButton(paused: download.paused, failed: download.failed != nil).resumes {
-            store.actions?.resumeDownload(download.id)
+            if waitingForWindows {
+                guard !store.windowsStarting, !store.windowsClosing else { return }
+                menu?.confirm(BCDGameQuestion(title: "Stop Windows and resume?",
+                    message: "Downloads are paused while Windows is running. All Windows programs will close and unsaved changes will be lost.",
+                    confirm: "Stop Windows", destructive: true, defaultCancel: true)) {
+                    // Queue first: the session hold releases only after Windows
+                    // actually exits. A failed shutdown leaves the job waiting.
+                    store.actions?.resumeDownload(download.id)
+                    store.stopWindows?()
+                }
+            } else {
+                store.actions?.resumeDownload(download.id)
+            }
         } else {
             store.actions?.pauseDownload(download.id)
         }
     }
+
+    private var waitingForWindows: Bool { nativeControllerNavigation && store.windowsRunning }
 
     private func ask(_ download: BCDDownload) {
         withAnimation(.easeOut(duration: 0.15)) { stopping = download.id }
@@ -150,6 +182,7 @@ struct BCDDownloadsView: View {
         }
         .buttonStyle(.plain)
         .bcdFocusable(id, cornerRadius: 22, action: action)
+        .bcdScrollTarget(id, if: nativeControllerNavigation)
     }
 
     /// Speed and time left on one line, the time first when the row is narrow.

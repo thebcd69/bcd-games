@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -41,11 +42,11 @@ import UIKit
 /// BCD's palette for drawing over a game: the night-violet ground, kept see-through, with the
 /// logo's violet-to-fuchsia light for a pressed control.
 enum BCDTouchPalette {
-    static let fill = BCDStyle.ground
+    static var fill: Color { BCDStyle.ground }
     /// The player's colour for the rims and labels (BCDTouchFeel.tint, set from the in-game menu), else BCD's own.
     static var rim: Color { BCDTouchFeel.tint.map { Color(red: $0.r, green: $0.g, blue: $0.b) } ?? BCDStyle.lavender }
     static var label: Color { BCDTouchFeel.tint.map { Color(red: $0.r, green: $0.g, blue: $0.b) } ?? BCDStyle.text }
-    static let selected = BCDStyle.fuchsia
+    static var selected: Color { BCDStyle.fuchsia }
     static func pressed(_ opacity: Double) -> LinearGradient {
         LinearGradient(colors: [BCDStyle.violet.opacity(0.92 * opacity), BCDStyle.fuchsia.opacity(0.92 * opacity)],
                        startPoint: .topLeading, endPoint: .bottomTrailing)

@@ -52,6 +52,17 @@
  *
  * 64-bit processes never get here (their calls are not in_wow64_call()). MADEIRA_IOSB_DEAD_TARGET=0 stores anyway, as before.
  *
+ * NIGHT ROUND 2026-11-11 (agent G8 S1; Resident Evil 5 BF3644, build 630, an iPhone on a 7-day free profile: 63 GB address map): the same
+ * garbage pointer, this time not 0x10000 but a RETURN ADDRESS that an earlier call of the same thread had left on the stack where FEX's
+ * IOSB lives: 0x30a6f1354, inside kernelbase.dll's copy in the JIT pool (the call that returned there was the failed first band
+ * allocation: "[nt-fail] NtAllocateVirtualMemoryEx status=c000000d ... low=0x7c00000000"). That address is above the floor and
+ * mapped (prot r-x), so "mapped" was no reason to skip, the store was done through the pool's RW alias by the store emulator, and the
+ * program then executed `00000043` (Status 0 at +0, Information 0x43 at +4 over two instruction words): "ill_handler ILL at pc=0x30a6f1358,
+ * kernelbase.dll+0x51358" and the process ended. The same site is in the Portal logs CQEQJX, Q3SG8T, V7F39B and MX074P and in the earlier
+ * Battle.net Agent, Batman: Arkham Asylum and LEGO Batman 2 ones. An IO_STATUS_BLOCK32 never lives in the executable code of a DLL
+ * the pool copies: a store target inside it is a store into nothing as well. ios_iosb32_target_in_code asks the pool (the `.text`
+ * of every image copy) after the cheap cases; the data sections of the copies, the host stack and the host heap stay as they are.
+ *
  * The probes are passed in so tests/host/check-iosb-dead-target.py can compile this file on the host and run every case.
  */
 #ifndef IOS_IOSB_DEAD_H
@@ -84,6 +95,17 @@ static inline int ios_iosb32_target_dead( unsigned long long p, unsigned long lo
     if (guest_base && p >= guest_base && p - guest_base < IOS_IOSB_WINDOW_SIZE) return 0;
     if (p < IOS_IOSB_FLOOR) return !served_low( p, IOS_IOSB32_SIZE );
     return !mapped( p, IOS_IOSB32_SIZE );
+}
+
+/* 1: the 8-byte store at p would land in the executable code of an image the JIT pool copied (night round 2026-11-11, see above) and must be
+ * skipped as well. Only a pointer at or above the floor and outside the process's own guest window is asked about.
+ *   exec_pool   1 when [addr, addr + len) touches the `.text` of a JIT pool image copy */
+static inline int ios_iosb32_target_in_code( unsigned long long p, unsigned long long guest_base, ios_iosb_probe_fn exec_pool )
+{
+    if (!p || p < IOS_IOSB_FLOOR) return 0;
+    if (p + IOS_IOSB32_SIZE < p) return 0;
+    if (guest_base && p >= guest_base && p - guest_base < IOS_IOSB_WINDOW_SIZE) return 0;
+    return exec_pool( p, IOS_IOSB32_SIZE ) != 0;
 }
 
 #endif

@@ -1,0 +1,199 @@
+[16:15:57.916] [INFO] Checking entitlements...
+[16:15:57.917] [INFO] [build] v0.1.634 (634)
+[16:15:57.918] [INFO] [device] model=iPhone17,4 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7655MB available=6120MB cores=6
+[16:15:57.918] [INFO] [device] address-map=[0x102d14000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[16:15:57.919] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[16:15:57.929] [INFO] [device] settings: low-power=0 thermal=serious screen=1290x2796@3.0x max-fps=60 utc-offset=-05:00 free-disk=14GB stikdebug-url=0
+[16:15:57.933] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:16:01.070] [INFO] Requesting JIT with Built-in StikJIT...
+[16:16:02.495] [INFO] [bcd] library launch Baba Is You.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[16:16:02.531] [INFO] Running full Wine sequence...
+[16:16:02.531] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102d14000,0x8000000000) 512GB available=6105MB low-power=0 thermal=serious
+[16:16:02.533] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[16:16:02.752] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[16:16:02.755] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[16:16:02.755] [INFO] Allocating 896MB JIT pool via debugger...
+[16:16:02.755] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:16:02.755] [INFO] [jit-debugger] attached=1 at the pool request
+[16:16:02.757] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[16:16:03.524] [INFO] RX pool at 0x148000000
+[16:16:03.543] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.823s rev=ml526
+[16:16:03.578] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/ed3b3a727be806df.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[WineProc] MADEIRA_MFC32=1: mfc140.dll mfc140u.dll mfcm140.dll mfcm140u.dll linked into syswow64 (the downloaded 32-bit MFC)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[16:16:03.875] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[16:16:03.875] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5499 MB + phys_footprint=644 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: preferred base 0x140000000+0xaad000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xab0000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x124400000+0xaad000 (Chowdren.exe) → pool 0x148007000 used=0xabb000/0x24000000 tramp+0x0
+[copy-verify] Chowdren.exe: OK, 327 .text pages executable (copy @0x148007000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148ab8000 used=0xbf0000/0x24000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148ab8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[window] 0x7048000000..0x7400000000 regions=77 occupied=8211 MB of 15232 MB free=7020 MB maxhole=7020 MB@0x7048000000 rev=ml787 (periodic)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x148bf3000 used=0x1017000/0x24000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x148bf3000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x149014000 used=0x1148000/0x24000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x149014000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x149148000 used=0x1210000/0x24000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x149148000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x149210000 used=0x1510000/0x24000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x149210000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[window] 0x124400000..0x7804000000 regions=73921 occupied=462147 MB of 486908 MB free=41209 MB maxhole=16448 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=677 MB compressed=0 MB external=75 MB reusable=5 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Baba Is You.exe (baba is you.exe-e0e4bcb756f099bc): 124400000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71FE250000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FE030000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FDF40000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDE90000
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x14a164000)
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x14a298000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14a32c000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a410000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14a494000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"sentry.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"steam_api64.dll" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"steam_api64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0x71fc840000+0xb0000: 1 pool copy marked
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg-mismatch] QueryDisplayConfig flags=0x2 answered success with 0 paths 0 modes (room for 1 paths 2 modes offered; 1 monitor(s) without a source skipped) after GetDisplayConfigBufferSizes said 1 paths 2 modes: a program that trusts the sizes call and reads the result finds no monitor; env.MADEIRA_VDCFG_PATH = 1 lists the virtual monitor's path
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x2002c after=0x0 flags=00000014 vis={0,0,1068,492} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #1 hwnd=0x2002c class='SDLHelperWindowInputCatcher' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002c after=0x0 flags=00000010 vis={0,0,1068,492} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #2 hwnd=0x2002c class='SDLHelperWindowInputCatcher' text="SDLHelperWindowInputMsgWindow" rev=ml853
+[win-pos] #3 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #3 hwnd=0x10032 class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[win-pos] #4 hwnd=0x10032 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #4 hwnd=0x10032 class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+0028:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0028 status=00000001 caller=000000014916E32C
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #5 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #6 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #7 hwnd=0x10036 class='__wine_xinput_devnotify' text="" rev=ml853
+[jit-pool] image 0x71fc0b0000+0xa0000 (mmdevapi.dll) → pool 0x14b76c000 used=0x3810000/0x24000000 tramp+0x4000
+D 38 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71FC0B0000
+[xp] 16:16:04.563 +0.60 dt=275 cpu=284 (thr 281) P=278 E=6 run=286 pgw=-1.0 GHz P=3.56 E=2.34 Minst=4714 IPC=4.70 mJ=931 pin=0 rdKB=0 fpMB=844
+[win-name] #11 hwnd=0x1003c class='SDL_app' text="" rev=ml853
+[win-name] #14 hwnd=0x1003c class='SDL_app' text="" rev=ml853
+[win-name] #15 hwnd=0x1003c class='SDL_app' text="" rev=ml853
+[win-name] #16 hwnd=0x1003c class='SDL_app' text="Baba Is You" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[xp] 16:16:04.863 +0.90 dt=300 cpu=305 (thr 306) P=303 E=2 run=309 pgw=-1.0 GHz P=3.59 E=2.04 Minst=5378 IPC=4.92 mJ=1057 pin=0 rdKB=0 fpMB=872
+[win-name] #17 hwnd=0x20046 class='Wine IME' text="" rev=ml853
+[win-pos] #18 hwnd=0x20046 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x105c55c98 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #18 hwnd=0x20046 class='Wine IME' text="" rev=ml853
+[win-pos] #19 hwnd=0x20046 after=0x1003c flags=0000181b vis={0,0,1,1} surface=0x105c55c98 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #19 hwnd=0x20046 class='Wine IME' text="" rev=ml853
+[jit-pool] image 0x71fbf80000+0xb0000 (d3d9.dll) → pool 0x14b810000 used=0x38c4000/0x24000000 tramp+0x4000
+[copy-verify] d3d9.dll: OK, 8 .text pages executable (copy @0x14b810000)
+D 24 Load module d3d9.dll (d3d9.dll-23c2a01a8eade245): 71FBF80000
+[jit-pool] image 0x71fbc10000+0x370000 (wined3d.dll) → pool 0x14b8c4000 used=0x3c38000/0x24000000 tramp+0x4000
+D 24 Load module wined3d.dll (wined3d.dll-e53ebe6d434bb891): 71FBC10000
+[jit-pool] image 0x71fbab0000+0x160000 (opengl32.dll) → pool 0x14bc38000 used=0x3d9c000/0x24000000 tramp+0x4000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71FBAB0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fbab0000) -> 64-bit table (0x106209b98)
+[win-pos] #20 hwnd=0x2004c after=0x0 flags=4000003c vis={10,10,142,48} surface=0x105c55c98 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #20 hwnd=0x2004c class='WineD3D_OpenGL' text="" rev=ml853
+[win-pos] #21 hwnd=0x2004c after=0x0 flags=40000018 vis={10,10,142,48} surface=0x105c55c98 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #21 hwnd=0x2004c class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 000000702C680050.
+[win-pos] #22 hwnd=0x3004c after=0x0 flags=4000003c vis={10,10,142,48} surface=0x105c55c98 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #22 hwnd=0x3004c class='WineD3D_OpenGL' text="" rev=ml853
+[win-pos] #23 hwnd=0x3004c after=0x0 flags=40000018 vis={10,10,142,48} surface=0x105c55c98 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #23 hwnd=0x3004c class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 000000702C680050.
+0024:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+[jit-pool] image 0x71fb7d0000+0x2df000 (D3D9.DLL) → pool 0x14bd9f000 used=0x4083000/0x24000000 tramp+0x0
+D 24 Load module dxvk.dll (dxvk.dll-6794b36e60f4104d): 71FB7D0000
+[jit-pool] image 0x71fb7a0000+0x23000 (vulkan-1.dll) → pool 0x14c082000 used=0x40ae000/0x24000000 tramp+0x4000
+D 24 Load module vulkan-1.dll (vulkan-1.dll-2c1a3868f8133737): 71FB7A0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"openvr_api_dxvk.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] file <container>/Documents/wine/drive_c/Games/Baba Is You/Baba Is You/Baba Is You_d3d9.log
+[guest-log] #1 tid=0024 info:  OpenVR: Failed to locate module
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"wineopenxr.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  Required Vulkan extension VK_KHR_surface not supported
+[guest-log] #2 tid=0024 info:  Required Vulkan extension VK_KHR_surface not supported
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7024810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled exception 0x20474343 in thread 24 at address 0000000149228110 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x20474343) syscalls=0 unix_calls=1110
+[unwind] term ml661 begin rip=1492881fc rsp=702480d898 window=[702480d898..702500d898) max=32
+[unwind] term ml661 #00 pc=1492881fc rsp=702480d898  kernelbase.dll+0x781fc
+[unwind] term ml662 #00 nv: rbx=702480ee50 rbp=702480d8c0 rsi=702480e970 rdi=7024810000 r12=702480db60 r13=0 r14=c0000005 r15=702480ee50
+[unwind] term ml662   rbx=702480ee50: 43434720 00000000 00000000 00000000 10812249 01000000 01000000 00000000
+[unwind] term ml662   rbp=702480d8c0: 648b2249 01000000 648b2249 01000000 f331feff 71000000 02000000 70000000
+[unwind] term ml661 stop: ret pc 0 repeats or is null
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? 71ffcf5388  ntdll.dll+0x25388
+[term-stack] ml660 sp+068: CALL 71fb99eb49  D3D9.DLL+0x1ceb49
+[term-stack] ml660 sp+088: CALL 71fb9a11fd  D3D9.DLL+0x1d11fd
+[term-stack] ml660 sp+0f0: call* 12442fa3f  Chowdren.exe+0x2fa3f
+[term-stack] ml660 sp+0f8: CALL 124435092  Chowdren.exe+0x35092
+[term-stack] ml660 sp+100: CALL 12445adff  Chowdren.exe+0x5adff
+[term-stack] ml660 sp+108: CALL 124908b30  Chowdren.exe+0x508b30
+[term-stack] ml660 sp+110: CALL 1248dafea  Chowdren.exe+0x4dafea
+[term-stack] ml660 sp+bd8: CALL 71fb854f24  D3D9.DLL+0x84f24
+[srv-kill] kill_thread tid=002c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0030 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0034 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0038 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0040 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0044 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(541541187)
+[WineProc] Wine exited with code 541541187 (caught by longjmp)
+[WineProc] stopping wineserver...
+[16:16:05.029] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=886MB limit=6143MB thermal=serious lpm=0 api=D3D9/OpenGL/64 res=1424x656 cap=60 game=Baba Is You
+[frontend] returned to library
+[xp] 16:16:05.120 +1.16 dt=256 cpu=270 (thr 166) P=195 E=75 run=271 pgw=-1.0 GHz P=3.53 E=2.16 Minst=3965 IPC=4.67 mJ=671 pin=0 rdKB=0 fpMB=888
+[hwinput] keyboard focus: elsewhere (poll)
+[xp] 16:16:05.463 +1.50 dt=344 cpu=566 (thr 550) P=367 E=199 run=598 pgw=-1.0 GHz P=3.38 E=2.22 Minst=7979 IPC=4.74 mJ=1184 pin=0 rdKB=0 fpMB=896
+[xp] 16:16:05.789 +1.82 dt=326 cpu=240 (thr 244) P=40 E=200 run=250 pgw=-1.0 GHz P=3.03 E=2.12 Minst=2184 IPC=4.01 mJ=175 pin=0 rdKB=0 fpMB=893
+[footprint] rev=ml358 phys=898 MB (peak 898) internal=896 MB compressed=0 MB external=129 MB reusable=4 MB (cycle=2)
+[xp] 16:16:06.079 +2.11 dt=290 cpu=264 (thr 264) P=97 E=167 run=267 pgw=-1.0 GHz P=3.90 E=2.10 Minst=2444 IPC=3.35 mJ=365 pin=0 rdKB=0 fpMB=898
+[16:16:07.101] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=890 MB (peak 898) internal=888 MB compressed=0 MB external=129 MB reusable=8 MB (cycle=3)
+[footprint] rev=ml358 phys=880 MB (peak 898) internal=877 MB compressed=0 MB external=131 MB reusable=11 MB (cycle=4)
+[footprint] rev=ml358 phys=880 MB (peak 898) internal=878 MB compressed=0 MB external=131 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=880 MB (peak 898) internal=878 MB compressed=0 MB external=131 MB reusable=11 MB (cycle=6)
+[xp] 16:16:15.483 +11.52 dt=296 cpu=27 (thr 27) P=0 E=27 run=32 pgw=-1.0 GHz P=0.00 E=2.09 Minst=67 IPC=1.19 mJ=4 pin=1 rdKB=32 fpMB=885
+[xp] 16:16:15.786 +11.82 dt=303 cpu=20 (thr 20) P=0 E=20 run=24 pgw=-1.0 GHz P=0.00 E=2.09 Minst=58 IPC=1.40 mJ=3 pin=0 rdKB=0 fpMB=885
+[xp] 16:16:16.074 +12.11 dt=287 cpu=20 (thr 19) P=0 E=20 run=23 pgw=-1.0 GHz P=0.00 E=2.10 Minst=59 IPC=1.41 mJ=3 pin=0 rdKB=0 fpMB=885
+[footprint] rev=ml358 phys=885 MB (peak 898) internal=883 MB compressed=0 MB external=138 MB reusable=11 MB (cycle=7)
+[xp] 16:16:16.364 +12.40 dt=290 cpu=27 (thr 27) P=0 E=27 run=33 pgw=-1.0 GHz P=0.00 E=2.10 Minst=94 IPC=1.66 mJ=5 pin=0 rdKB=0 fpMB=885
+[xp] 16:16:16.684 +12.72 dt=321 cpu=104 (thr 105) P=39 E=65 run=188 pgw=-1.0 GHz P=1.90 E=2.10 Minst=317 IPC=1.51 mJ=37 pin=15 rdKB=356 fpMB=885
+[xp] 16:16:16.998 +13.03 dt=314 cpu=24 (thr 24) P=9 E=15 run=29 pgw=-1.0 GHz P=2.07 E=2.09 Minst=72 IPC=1.46 mJ=9 pin=0 rdKB=0 fpMB=885
+314 cpu=24 (thr 24) P=9 E=15 run=29 pgw=-1.0 GHz P=2.07 E=2.09 Minst=72 IPC=1.46 mJ=9 pin=0 rdKB=0 fpMB=885

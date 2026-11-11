@@ -1,0 +1,242 @@
+[11:19:28.825] [INFO] Checking entitlements...
+[11:19:28.826] [INFO] [build] v0.1.634 (634)
+[11:19:28.826] [INFO] [device] model=iPad14,8 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7643MB available=8170MB cores=8
+[11:19:28.827] [INFO] [device] address-map=[0x104ea4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[11:19:28.827] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=4d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[11:19:28.839] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+02:00 free-disk=49GB stikdebug-url=0
+[11:19:28.843] [INFO] [device] gpu="Apple M2 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:19:29.855] [INFO] Requesting JIT with Built-in StikJIT...
+[11:19:31.856] [INFO] [epic-launch] start app=da..f8 signed-in=1 ovt=1 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[11:19:31.866] [INFO] [bcd] library launch fm.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[11:19:31.890] [INFO] Running full Wine sequence...
+[11:19:31.890] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104ea4000,0x8000000000) 512GB available=8151MB low-power=0 thermal=nominal
+[11:19:31.892] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 exe-window-mb=512
+[11:19:31.898] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:19:31.898] [INFO] Allocating 896MB JIT pool via debugger...
+[11:19:31.898] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:19:31.899] [INFO] [jit-debugger] attached=1 at the pool request
+[11:19:31.900] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[11:19:31.901] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 432MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:19:31.901] [ERR] ⚠️ SMALL JIT POOL (432MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[11:19:32.569] [INFO] RX pool at 0x12429c000
+[11:19:32.586] [INFO] Detaching debugger...
+[11:19:32.611] [INFO] [session] length=0s partial=1 play=0s frames=0 stalls=0/0s peak=472MB limit=8191MB thermal=nominal lpm=0 api=D3D11/D3D12/64 res=1152x800 cap=60 game=Football Manager 2024
+[phase] wine-start             t+  0.748s rev=ml526
+[11:19:32.646] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   exe-window-mb = 512
+[WineProc] Target exe: C:\Program Files\Epic Games\FootballManager24\fm.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[11:19:32.998] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[11:19:32.998] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7716 MB + phys_footprint=475 MB = 8192 MB (hw.memsize says 7643 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7643 MB), so it is a sentinel, not a limit
+ml985: map_image_view size=0x1d5eb000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x100010000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\FootballManager24\\fm.exe" 0x140000000+0x1d5eb000: the JIT pool of 432 MB cannot hold the 469 MB copy: running it from the loaded image (NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x140000000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x140000000+0x557c000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x14557c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x14557c000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x14643c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #19 0x15cd34000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #20 0x15d3fc000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #21 0x15d3fc000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #22 0x140001000+0x557e000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #23 0x1466f4000+0x16632000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #24 0x15cd27000+0x1000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[freeze] GAP #1  9.1s (wall 9.1s) — started t+0.3s, ended t+9.3s; threads=22 resident=848MB dbg=DEBUGGED gen=1 cause=unexplained-FREEZE rev=ml525
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1242a0000 used=0x13c000/0x1b000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1242a0000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x1243db000 used=0x563000/0x1b000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x1243db000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x1247fc000 used=0x694000/0x1b000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1247fc000)
+[window] 0x16ba4c000..0x780b000000 regions=27786 occupied=461265 MB of 485877 MB free=41172 MB maxhole=16560 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=955 MB (peak 955) internal=782 MB compressed=169 MB external=72 MB reusable=7 MB (cycle=1)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x124930000 used=0x75c000/0x1b000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x124930000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1249f8000 used=0xa5c000/0x1b000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1249f8000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module fm.exe (fm.exe-69ad7bb1d5234fae): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe2e0000+0x8e000 (MSVCP140.dll) → pool 0x124cfc000 used=0xaf0000/0x1b000000 tramp+0x0
+[copy-verify] MSVCP140.dll: OK, 22 .text pages executable (copy @0x124cfc000)
+D 24 Load module MSVCP140.dll (msvcp140.dll-fd95c6e973864e3c): 71FE2E0000
+D 24 Load module VCRUNTIME140.dll (vcruntime140.dll-3d833f46d38b6ea9): 71FE2C0000
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd85f329d9): 71FE2B0000
+D 24 Load module icuuc65.dll (icuuc65.dll-3cbb42187a8b8780): 71FE0D0000
+[file-fail] ml665 #38 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\Program Files\Epic Games\FootballManager24\WININET.dll
+E 24 [iOS-xins] tracker=0x1247a5f18 WININET.dll sec=0x71fd650000-0x71fd68b029
+E 24 [iOS-xins] tracker=0x1247a5f18 WININET.dll sec=0x71fd690000-0x71fd690f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FD640000
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x125c10000)
+[hwinput] keyboard focus: program (app active)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x126594000)
+E 24 [iOS-xins] tracker=0x1247a5f18 WININET.dll sec=0x71fd650000-0x71fd68b029
+E 24 [iOS-xins] tracker=0x1247a5f18 WININET.dll sec=0x71fd690000-0x71fd690f90
+E 24 [img-map] ml710 #18 intervals-only WININET.dll base=0x71fd640000
+[copy-verify] steam_api64.dll: OK, 10 .text pages executable (copy @0x126638000)
+[copy-verify] bidstack-cpp-sdk.dll: OK, 56 .text pages executable (copy @0x12668b000)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x1267c8000)
+[copy-verify] xinput9_1_0.dll: OK, 1 .text pages executable (copy @0x127358000)
+[jit-pool] image 0x71fa170000+0xa0000 (jsproxy.dll) → pool 0x128ee0000 used=0x4ce8000/0x1b000000 tramp+0x4000
+D 24 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): 71FA170000
+[jit-pool] image 0x71f9f30000+0x235000 (vpxmt.dll) → pool 0x128f84000 used=0x4f20000/0x1b000000 tramp+0x0
+D 24 Load module vpxmt.dll (vpxmt.dll-4d2f29f3990bcf25): 71F9F30000
+[jit-pool] image 0x71f9e90000+0xa0000 (imm32.dll) → pool 0x1291bc000 used=0x4fc4000/0x1b000000 tramp+0x4000
+D 24 Load module IMM32.dll (imm32.dll-d32ec4d784d2a68d): 71F9E90000
+[jit-pool] image 0x71f9d30000+0x160000 (comdlg32.dll) → pool 0x129260000 used=0x5128000/0x1b000000 tramp+0x4000
+D 24 Load module COMDLG32.dll (comdlg32.dll-bb3453125056fbd5): 71F9D30000
+[jit-pool] image 0x71f9bb0000+0x180000 (comctl32.dll) → pool 0x1293c4000 used=0x52ac000/0x1b000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71F9BB0000
+[jit-pool] image 0x71f9b30000+0x80000 (powrprof.dll) → pool 0x129548000 used=0x5330000/0x1b000000 tramp+0x4000
+D 24 Load module POWRPROF.dll (powrprof.dll-147faff017e7494a): 71F9B30000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> secur32.dll: resolved=10 failed=0
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> crypt32.dll: resolved=7 failed=0
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+[xp-names] m1488992 "wine-x18-exc"
+[xp] 11:19:42.603 +0.54 dt=289 cpu=227 (thr 227) P=225 E=2 run=243 pgw=-1.0 GHz P=3.27 E=2.14 Minst=2816 IPC=3.80 mJ=755 pin=1219 rdKB=43880 fpMB=1095
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............."
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=2 first=00000001454E8DD0
+[subfloor] ml956 serviced 4097 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe026c -> real 0x703800026c insn=0x994000c6
+[xp] 11:19:42.901 +0.84 dt=298 cpu=293 (thr 293) P=292 E=1 run=331 pgw=-1.0 GHz P=3.12 E=2.28 Minst=2683 IPC=2.94 mJ=870 pin=0 rdKB=0 fpMB=1101
+[subfloor] ml956 serviced 8193 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0262 -> real 0x7038000262 insn=0x994002c7
+[subfloor] ml956 serviced 12289 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0281 -> real 0x7038000281 insn=0xd94000c7
+[subfloor] ml956 serviced 16385 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe026f -> real 0x703800026f insn=0xd94000e7
+[xp] 11:19:43.156 +1.09 dt=255 cpu=265 (thr 265) P=264 E=1 run=293 pgw=-1.0 GHz P=2.95 E=1.80 Minst=2412 IPC=3.09 mJ=794 pin=0 rdKB=0 fpMB=1101
+[hwinput] keyboard focus: elsewhere (app inactive)
+[subfloor] ml956 serviced 20481 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0014 -> real 0x7038000014 insn=0xd94000c6
+[subfloor] ml956 serviced 24577 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe026d -> real 0x703800026d insn=0xd94000fa
+[subfloor] ml956 serviced 28673 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0271 -> real 0x7038000271 insn=0xd94000e8
+[subfloor] ml956 serviced 32769 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0270 -> real 0x7038000270 insn=0xd9400116
+[xp] 11:19:43.413 +1.35 dt=257 cpu=273 (thr 273) P=270 E=3 run=313 pgw=-1.0 GHz P=2.90 E=2.04 Minst=2457 IPC=3.11 mJ=788 pin=0 rdKB=0 fpMB=1102
+[xp] 11:19:43.699 +1.64 dt=286 cpu=299 (thr 299) P=296 E=2 run=346 pgw=-1.0 GHz P=2.71 E=2.19 Minst=2732 IPC=3.38 mJ=847 pin=0 rdKB=0 fpMB=1102
+[xp] 11:19:43.997 +1.94 dt=299 cpu=303 (thr 303) P=303 E=1 run=349 pgw=-1.0 GHz P=2.56 E=2.37 Minst=2812 IPC=3.62 mJ=852 pin=0 rdKB=0 fpMB=1102
+[footprint] rev=ml358 phys=1106 MB (peak 1106) internal=932 MB compressed=171 MB external=114 MB reusable=7 MB (cycle=2)
+[subfloor] ml956 serviced 143361 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0270 -> real 0x7038000270 insn=0xd94001ce
+[subfloor] ml956 serviced 147457 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe026e -> real 0x703800026e insn=0x994000d9
+[subfloor] ml956 serviced 151553 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe02d0 -> real 0x70380002d0 insn=0xd94000c6
+[subfloor] ml956 serviced 155649 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe026f -> real 0x703800026f insn=0xd94001cf
+[subfloor] ml956 serviced 159745 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0260 -> real 0x7038000260 insn=0xd94003ae
+[subfloor] ml956 serviced 163841 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0284 -> real 0x7038000284 insn=0xd94000c7
+[subfloor] ml956 serviced 167937 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0283 -> real 0x7038000283 insn=0xd94000ee
+[vfree] ml842 # base=0x7c01921000 size=0xf000 type=0x4000 tid=0024
+[valloc] ml959 # base=0x7c01921000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c01921000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c01a51000 size=0xf000 type=0x4000 tid=0024
+[store-noalias] #1 rev=ml348 addr=0x38000008 insn=0x994000c6 pc=0x13e9eb9b8 NO pool/anon alias | region 0x104ea4000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3b0000 (pc=0x13e9eb9b8 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x38000008 hostpc=0x13e9eb9b8 hinsn=0x994000c6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13e298000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x157be5c1d pc=0x13e9eb9b8 addr=0x38000008 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104ea4000+0x2da0000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x13e9eb9b8 addr=0x38000008 x18=0x0 type=1 lr=0x13f298354 sp=0x71fe3b0000 x16=0xfffffffffffff0b0 x17=0x71fe3acbf0
+[guest-code] rev=ml333 pool_rip=0x157be5c1d (PE 0x157be5c1d) -- NO pool copy for this address (identity translate)
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x157be5cf7 (block entry 0x157be5c1d) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x15446c000+0x3b94000 prot=rw- max=rwx | Wine vprot of the 4 KB pages of host page 0x157be4000: 2d 25 25 2d (this page 25) | trap: OFF: Wine's table says this page is read-only, its host page is writable, and a neighbouring 4 KB page of it is WRITECOPY | pool copy: none | 32 bytes at rip, loaded image: 44 2b 04 10 41 f7 d8 45 01 c8 44 89 c2 44 31 d2 44 33 14 25 73 02 fe 7f 44 31 d2 44 31 ca 44 33 | pool copy: - | image and pool copy not compared
+[fault-host] 13e9eb8b8: 0a160063 910022f7 9b087c84 aa0403e8 f84086f6 f81f8ee8 d10022f7 d2c00028
+[fault-host] 13e9eb8d8: f90002e1 9bc87c61 9b087c68 f94002e1 aa0803e3 910022f7 b240bfe4 8a040021
+[fault-host] 13e9eb8f8: f84086e8 93c1c021 f81f8ee2 92800002 f94002e6 ca0200c6 f90002e6 aa0203e6
+[fault-host] 13e9eb918: cb010042 aa0203e7 aa0103e2 aa2703e1 f94002e7 f81f8ee7 f94002e7 ca0600e6
+[fault-host] 13e9eb938: f90002e6 f94002e6 aa060021 d28c7726 f2aaa466 f2c00026 f84000c4 d5033dbf
+[fault-host] 13e9eb958: 529e0306 72a78ba6 8b060084 ca040021 aa2103e1 910022f7 910022f7 aa0103e2
+[mach_exc] insn_stream PC-12..PC+8: d500401f 1a030042 8b010106 [994000c6] d503201f 4b060042 4b0203e2
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x701b88c360 *(gs_cached+0x58)=0x701b88c360
+[store-noalias] #2 rev=ml348 addr=0x38000008 insn=0x994000c6 pc=0x13e9eb9b8 NO pool/anon alias | region 0x104ea4000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3b0000 (pc=0x13e9eb9b8 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x38000008 hostpc=0x13e9eb9b8 hinsn=0x994000c6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13e298000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x157be5c1d pc=0x13e9eb9b8 addr=0x38000008 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104ea4000+0x2da0000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x13e9eb9b8 addr=0x38000008 x18=0x0 type=1 lr=0x13f298354 sp=0x71fe3b0000 x16=0xfffffffffffff0b0 x17=0x71fe3acbf0
+[guest-code] rev=ml333 pool_rip=0x157be5c1d (PE 0x157be5c1d) -- NO pool copy for this address (identity translate)
+[fault-host] 13e9eb918: cb010042 aa0203e7 aa0103e2 aa2703e1 f94002e7 f81f8ee7 f94002e7 ca0600e6
+[fault-host] 13e9eb938: f90002e6 f94002e6 aa060021 d28c7726 f2aaa466 f2c00026 f84000c4 d5033dbf
+[fault-host] 13e9eb958: 529e0306 72a78ba6 8b060084 ca040021 aa2103e1 910022f7 910022f7 aa0103e2
+[fault-host] 13e9eb978: aa0103e4 aa030021 ca030042 8a030084 52800026 d37ff821 cb020021 cb040021
+[fault-host] 13e9eb998: 9280bf67 b867eae7 4a070063 4b020042 ba1f84c2 d500401f 1a030042 8b010106
+[fault-host] 13e9eb9b8: 994000c6 d503201f 4b060042 4b0203e2 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d500401f 1a030042 8b010106 [994000c6] d503201f 4b060042 4b0203e2
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x701b88c360 *(gs_cached+0x58)=0x701b88c360
+0024:err:seh:segv_handler   x8=0x0 x9=0x57be5c1d x10=0x13e9eb850 x16=0xfffffffffffff0b0 x17=0x71fe3acbf0 x18=0x0 x19=0x707ffe0270 x20=0x703881f5a0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x13e9eb850 rip=0x157be5cf7 x86=44 2b 04 10 41 f7 d8 45 01 c8 44 89 c2 44 31 d2
+[fault-rgn] addr=0x38000008 page=0x38000000 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x13e9eb9b8 pc=13e9eb9b8 nparams=2 p0=0 p1=38000008
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x13e9eb9b8 RX from -32, 64 of 64 bytes: 67 bf 80 92 e7 ea 67 b8 63 00 07 4a 42 00 02 4b c2 84 1f ba 1f 40 00 d5 42 00 03 1a 06 01 01 8b c6 00 40 99 1f 20 03 d5 42 00 06 4b e2 03 02 4b 42 00 03 0b 41 00 04 4a 66 4e 80 52 c6 ff af 72 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x13e9eb9b8 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 13E9EB9B8 AV READ of 38000008
+[set-ctx] ml946 distinct#4 tid=0024 req pc=0x71ffd315d0 sp=0x7038816b20 flags=00400007 status=00000000 | frame pc=0x71ffd315d0 sp=0x7038816b20 | is_ec(frame.pc)=1 ec_cur=1
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x157be5cf7 RX from -32, 64 of 64 bytes: 09 ca 4d 31 c8 4d 21 ca 48 d1 e2 4c 29 c2 4c 29 d2 44 33 8c 24 04 fa ff ff 45 29 c0 f8 45 11 c8 44 2b 04 10 41 f7 d8 45 01 c8 44 89 c2 44 31 d2 44 33 14 25 73 02 fe 7f 44 31 d2 44 31 ca 44 33 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x157be5cf7 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 157BE5CF7 AV READ of 38000008
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=0000000157BE5CF7 flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x157be5cf7
+[unhandled] madeira-bcd code=c0000005 nparams=2 p0=0 p1=38000008 p2=0 p3=0
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1255
+[unwind] term ml661 begin rip=157be5cf7 rsp=7038816fa8 window=[7038816fa8..7039016fa8) max=32
+[unwind] term ml661 #00 pc=157be5cf7 rsp=7038816fa8  fm.exe+0x17be5cf7
+[unwind] term ml662 #00 nv: rbx=73f4 rbp=703881ffd0 rsi=4e1d rdi=4e1d r12=707ffe0270 r13=703881f5a0 r14=ba837766 r15=703881f4f0
+[unwind] term ml662   rbp=703881ffd0: 00000000 00000000 20639524 01000000 d82d3024 01000000 00000000 00000000
+[unwind] term ml661 #01 pc=14dbe5eb4 rsp=7038816fb0  fm.exe+0xdbe5eb4
+[unwind] term ml662 #01 nv: rbx=73f4 rbp=703881ffd0 rsi=4e1d rdi=4e1d r12=707ffe0270 r13=703881f5a0 r14=ba837766 r15=703881f4f0
+[unwind] term ml662   rbp=703881ffd0: 00000000 00000000 20639524 01000000 d82d3024 01000000 00000000 00000000
+[unwind] term ml661 stop: ret pc 0 repeats or is null
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[11:19:45.391] [INFO] [session] length=13s play=0s frames=0 stalls=0/0s peak=1111MB limit=8191MB thermal=nominal lpm=0 api=D3D11/D3D12/64 res=1152x800 cap=60 game=Football Manager 2024
+[11:19:45.399] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[11:19:45.633] [INFO] [bcd-host] no report
+[footprint] rev=ml358 phys=1155 MB (peak 1155) internal=983 MB compressed=170 MB external=117 MB reusable=7 MB (cycle=3)
+[11:19:47.291] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1140 MB (peak 1155) internal=968 MB compressed=170 MB external=117 MB reusable=7 MB (cycle=4)
+[footprint] rev=ml358 phys=1129 MB (peak 1155) internal=798 MB compressed=329 MB external=119 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=1117 MB (peak 1155) internal=783 MB compressed=333 MB external=120 MB reusable=20 MB (cycle=6)
+[footprint] rev=ml358 phys=1124 MB (peak 1155) internal=790 MB compressed=333 MB external=129 MB reusable=20 MB (cycle=7)
+[xp] 11:19:55.752 +13.69 dt=290 cpu=44 (thr 44) P=1 E=43 run=48 pgw=-1.0 GHz P=1.17 E=1.22 Minst=60 IPC=1.12 mJ=4 pin=0 rdKB=0 fpMB=1124
+[xp] 11:19:56.020 +13.96 dt=268 cpu=63 (thr 63) P=4 E=59 run=74 pgw=-1.0 GHz P=1.16 E=1.21 Minst=91 IPC=1.19 mJ=6 pin=0 rdKB=0 fpMB=1124
+[footprint] rev=ml358 phys=1124 MB (peak 1155) internal=790 MB compressed=333 MB external=129 MB reusable=20 MB (cycle=8)
+[xp] 11:19:56.276 +14.21 dt=256 cpu=59 (thr 59) P=5 E=54 run=70 pgw=-1.0 GHz P=1.06 E=1.19 Minst=81 IPC=1.17 mJ=6 pin=0 rdKB=0 fpMB=1124
+[xp] 11:19:56.536 +14.48 dt=261 cpu=133 (thr 132) P=73 E=60 run=148 pgw=-1.0 GHz P=2.16 E=1.56 Minst=510 IPC=2.03 mJ=79 pin=64 rdKB=1024 fpMB=1124
+[xp] 11:19:56.830 +14.77 dt=293 cpu=39 (thr 40) P=16 E=23 run=50 pgw=-1.0 GHz P=2.75 E=0.92 Minst=132 IPC=2.01 mJ=54 pin=0 rdKB=0 fpMB=1124
+[11:19:57.091] [xp] 11:19:57.091 +15.03 dt=261 cpu=217 (thr 217) P=43 E=174 run=226 pgw=-1.0 GHz P=1.83 E=2.21 Minst=1222 IPC=2.64 mJ=112 pin=1 rdKB=80 fpMB=1125

@@ -1,0 +1,49 @@
+[01:25:15.586] [INFO] Checking entitlements...
+[01:25:15.587] [INFO] [build] v0.1.634 (634)
+[01:25:15.588] [INFO] [device] model=iPhone17,5 idiom=phone os=iOS Version 26.6.1 (Build 23G83) ram=7718MB available=6126MB cores=6
+[01:25:15.588] [INFO] [device] address-map=[0x102fe8000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[01:25:15.589] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[01:25:15.598] [INFO] [device] settings: low-power=0 thermal=nominal screen=1170x2532@3.0x max-fps=60 utc-offset=-07:00 free-disk=2GB stikdebug-url=1
+[01:25:15.601] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:25:39.183] [INFO] Requesting JIT with StikDebug...
+[01:25:39.212] [INFO] Opening StikDebug to enable JIT...
+[01:25:44.467] [INFO] [bcd] library launch Roommate.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[01:25:44.482] [INFO] Running full Wine sequence...
+[01:25:44.482] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102fe8000,0xfc0000000) 63GB available=6100MB low-power=0 thermal=nominal
+[01:25:44.484] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[01:25:44.524] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:25:44.524] [INFO] Allocating 896MB JIT pool via debugger...
+[01:25:44.524] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:25:44.525] [INFO] [jit-debugger] attached=1 at the pool request
+[01:25:47.341] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  2.917s rev=ml526
+[01:25:47.441] [wineserver] send_client_fd: fd=39 handle=0x3a2 msg_fd_unix=36 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/3794827777ef710c.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x10fbb0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[Wine connect] fd_socket=37, receiving version fd...
+[01:25:47.807] [Wine connect] fd_socket=37, receiving version fd...
+[Wine init_process] waiting for request_fd from wineserver...
+[01:25:47.807] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[01:25:47.807] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[Wine init_process] reply_pipe=43, sending init_first_thread...
+[01:25:47.807] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[srv-own] init_thread tid=0024 pid=0020 reply=43->srv46 wait=45->srv47 rev=ml586
+[thread-prio] madeira-bcd tid=0024 base=0 effective=9 -> kept at pthread QoS
+[Wine init_process] init_first_thread ret=0, pid=32, tid=36
+[01:25:47.808] [Wine init_process] init_first_thread ret=0, pid=32, tid=36
+[01:25:47.808] [map-name] #1 open "\KernelObjects\__wine_user_shared_data" err=00000000 pid=0020 tid=0024 handle=0004 hits=1
+[iOS env] INCLUDED: SteamAppId=356400
+[01:25:47.811] [map-name] #2 open "\KernelObjects\__wine_user_shared_data" err=00000000 pid=0020 tid=0024 handle=0004 hits=2
+ml992: os_proc_available_memory=5194 MB + phys_footprint=949 MB = 6144 MB (hw.memsize says 7718 MB)
+[exe-window] 0x140000000+0x2c000 is under the 64MB floor but its relocations are stripped: it can only run at this base, so it gets the window (MADEIRA_EXE_WINDOW_SMALL_FIXED=0 refuses it as before)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x140000000+0x2c000 (?) → pool 0x300006000 used=0x36000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300006000)
+[early-fault] sig=11 code=2 addr=0x437ff6eae pc=0x104a42a64 lr=0x104a427b4 sp=0x16d5b1a30 fp=0x16d5b1ff0 thread=0x10f0b phase=relocations rev=r624
+[early-fault] frames: 0x104a157f8 0x104a206ac 0x104a20fd4 0x10498c0e4 0x10497191c 0x1049905fc 0x103011b80 0x1e78be438 0x1e78ba8cc

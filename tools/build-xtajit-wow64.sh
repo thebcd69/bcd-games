@@ -1,4 +1,6 @@
 #!/bin/bash
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # Build FEX's aarch64 WOW64 module (libwow64fex.dll, shipped as
 # app/Madeira/aarch64-windows/xtajit.dll -- the CPU backend wow64.dll loads for
 # 32-bit x86 programs) from the FEX submodule with madeira-bcd's patches that
@@ -54,7 +56,20 @@ python3 "$R/tools/patch-fex-ios-processorid.py" "$R/FEX/FEXCore/Source/Interface
 python3 "$R/tools/patch-fex-ios-moffs-rip.py" "$R/FEX/FEXCore/Source/Interface/Core/Core.cpp" || echo "::warning::the MOV moffs RIP opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
 # opt-in (round 626, Burnout Paradise 7MSNGW): MADEIRA_FEX_CPUID_CLASSIC=1 reports CPUID.1:EDX DE and PSE; EDX unchanged without it
 python3 "$R/tools/patch-fex-ios-cpuid-classic.py" "$R/FEX/$CPUIDF" || echo "::warning::the CPUID DE/PSE opt-in was not applied (FEX anchor changed); xtajit.dll is built without it"
-restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF" FEXCore/Source/Interface/Core/Core.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp; }
+# a guest atomic whose operand crosses a 16-byte boundary is done inline under a lock instead of trapping (Ubisoft Connect's
+# upc.exe: about 200,000 per start); only with MADEIRA_FEX_SPLIT_LOCK=1 (default off)
+python3 "$R/tools/patch-fex-ios-split-lock.py" "$R/FEX" || echo "::warning::the split-lock fast path was not applied (FEX anchor changed); xtajit.dll is built without it"
+# night round 2026-11-11 (G5 S3 / G7 S13; FTL PHE15B, Peggle Deluxe SF5ZDS, METSK8): the thread-creation lock the thunk holds across NtProtectVirtualMemory can be taken again by
+# its owner, so the fault handler a BASS.dll OldProtect store into an armed page raises no longer waits for itself
+python3 "$R/tools/patch-fex-ios-wow-recursive-tcm.py" "$R/FEX" || echo "::warning::the re-enterable thread-creation lock was not applied (FEX anchor changed); xtajit.dll is built without it"
+# night round 2026-11-11 (X1 S2; the 32-bit modules share FEXCore's pooled buffers): a pooled IR / decoder / JIT-temp buffer that cannot be allocated is reclaimed from idle buffers and
+# retried, then refused, instead of being handed out as NULL
+python3 "$R/tools/patch-fex-ios-pool-alloc-null.py" "$R/FEX" || echo "::warning::the pooled-buffer NULL guard was not applied (FEX anchor changed); xtajit.dll is built without it"
+# night round 2026-11-11 (A4 S4; Need for Speed: Underground C86TQF): a page promoted under DEP-off, freed and allocated again is promoted again (it stayed "not executable": NoExec)
+python3 "$R/tools/patch-fex-ios-dep-promote-stale.py" "$R/FEX" || echo "::warning::the stale DEP-promotion fix was not applied (FEX anchor changed); xtajit.dll is built without it"
+# night round 2026-11-11 (G2 S9; Blur 43HNJX): REPNE/REP-prefixed BSF/BSR/BTC/MOVSX/CMOVcc decode like the unprefixed forms (a protector's junk prefix was "invalid instruction")
+python3 "$R/tools/patch-fex-ios-repne-bit-ops.py" "$R/FEX" || echo "::warning::the REP/REPNE bit-op decode entries were not applied (FEX anchor changed); xtajit.dll is built without them"
+restore() { git -C "$R/FEX" checkout -- "$CPUIDF" Source/Windows/Common/Priv.h Source/Windows/WOW64/Module.cpp "$OPDISPF" FEXCore/Source/Interface/Core/Core.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp FEXCore/Source/Interface/Core/JIT/AtomicOps.cpp FEXCore/include/FEXCore/Utils/ThreadPoolAllocator.h FEXCore/Source/Interface/IR/IntrusiveIRList.h FEXCore/Source/Interface/IR/IREmitter.h FEXCore/Source/Interface/Core/OpcodeDispatcher.h FEXCore/Source/Interface/Core/OpcodeDispatcher.cpp FEXCore/Source/Interface/Core/Frontend.h FEXCore/Source/Interface/Core/Frontend.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/Core/X86Tables/SecondaryTables.cpp; }
 trap restore EXIT
 
 cmake -S "$R/FEX" -B "$B" -G Ninja -DCMAKE_BUILD_TYPE=Release \

@@ -94,6 +94,8 @@ static void virtual_free_teb(TEB *t) {
     sigset_t s; server_enter_uninterrupted_section(&virtual_mutex,&s);
     server_leave_uninterrupted_section(&virtual_mutex,&s);
 }
+/* night round 2026-11-11 (A4 S6): the production raw hand-off records the TEB it is about to free in a log-only ring; the check runs the hand-off without it. */
+static void ios_teb_free_note(TEB *t) { (void)t; }
 static int test_join(pthread_t id, void **value) {
     assert(!vm_depth); assert(id != pthread_self()); joins++;
     if (force_join_error) return force_join_error;

@@ -35,6 +35,7 @@
 
 #define IR_PRIVATE_IMPLEMENTATION 0   /* the canary owns the one definition */
 #include <metal_irconverter/metal_irconverter.h>
+#include <mach/mach.h>   /* madeira-bcd: vm_read_overwrite for the converter's message (ir_log_error_text) */
 
 /* Resolved by name, so a converter that is present but incomplete is reported
  * as a missing symbol instead of crashing on a null call. */
@@ -82,7 +83,8 @@
     X(IRShaderReflectionCopyHullInfo) \
     X(IRShaderReflectionReleaseHullInfo) \
     X(IRShaderReflectionCopyDomainInfo) \
-    X(IRShaderReflectionReleaseDomainInfo)
+    X(IRShaderReflectionReleaseDomainInfo) \
+    X(IRErrorGetPayload)
 
 struct IRFns {
     void *handle;
@@ -97,6 +99,41 @@ struct IRFns {
 };
 static IRFns g_ir;
 static pthread_once_t g_ir_once = PTHREAD_ONCE_INIT;
+
+/* madeira-bcd (build 646, The Last of Us Part I): the converter's own sentence for a shader it refuses. On a phone only the error
+ * code reached the log ("compile/link failed (dxil backend, code 7)"); the sentence, the one that named ml1140's fix ("... requires
+ * targeting macOS 15, iOS 18, or later"), came only from a Mac. The payload of a compile error is a C string; it is copied with
+ * vm_read_overwrite (a payload that is not readable gives "unreadable" instead of a fault) and only its printable prefix is
+ * printed, at most 400 characters and 32 shaders. Log only, on the failure path: nothing changes for a shader that converts. */
+static void ir_log_error_text(const IRError *err, uint32_t code, size_t dxil_len) {
+    static int said;
+    const void *payload;
+    char text[401];
+    vm_size_t got = 0;
+    size_t n = 0;
+
+    if (!err || !g_ir.IRErrorGetPayload || said >= 32) return;
+    said++;
+    payload = g_ir.IRErrorGetPayload(err);
+    if (!payload) { fprintf(stderr, "[madeira-ir] converter error %u (%zu bytes of DXIL): no message\n", code, dxil_len); return; }
+    memset(text, 0, sizeof text);
+    if (vm_read_overwrite(mach_task_self(), (vm_address_t)(uintptr_t)payload, sizeof text - 1,
+                          (vm_address_t)(uintptr_t)text, &got) != KERN_SUCCESS) {
+        /* the payload may end before 400 bytes: try a smaller read */
+        if (vm_read_overwrite(mach_task_self(), (vm_address_t)(uintptr_t)payload, 64,
+                              (vm_address_t)(uintptr_t)text, &got) != KERN_SUCCESS) {
+            fprintf(stderr, "[madeira-ir] converter error %u (%zu bytes of DXIL): message unreadable\n", code, dxil_len);
+            return;
+        }
+    }
+    while (n < got && n < sizeof text - 1 && text[n] && ((unsigned char)text[n] >= 0x20 || text[n] == '\n' || text[n] == '\t')) {
+        if (text[n] == '\n' || text[n] == '\t') text[n] = ' ';
+        n++;
+    }
+    text[n] = 0;
+    if (n >= 4) fprintf(stderr, "[madeira-ir] converter error %u (%zu bytes of DXIL): %s\n", code, dxil_len, text);
+    else fprintf(stderr, "[madeira-ir] converter error %u (%zu bytes of DXIL): the message is not text\n", code, dxil_len);
+}
 
 /* The dylib ships inside the app bundle, so the service finds it itself rather
  * than having the guest pass a path across. A path chosen by the guest would be
@@ -315,6 +352,9 @@ static void mad_air_entry_name(const unsigned char *b, size_t len, char *out, si
 /* ml1149: madeira_ags.cpp (LLVM 15, plain C++ like the IA resolver). */
 extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_t *out_len,
                                    char *note, size_t note_cap);
+/* madeira-bcd (build 648): dxil-loop-guard, madeira_ags.cpp. */
+extern "C" int madeira_loop_guard_rewrite(const void *bc, size_t len, uint32_t cap, void **out, size_t *out_len,
+                                          char *note, size_t note_cap);
 
 extern "C" int madeira_sm5_resolve_ia(const void *bc, size_t bclen,
                                       const struct madeira_ir_input_layout *L,
@@ -1581,6 +1621,46 @@ static void mad_dxc_slot_put(uint64_t key, uint64_t check, void *blob, size_t le
     free(old);
 }
 
+/* madeira-bcd (build 648): bcd.cfg or the game's file dxil-loop-guard = <hash>[,<hash>...], the bytecode hashes (FNV-1a 64)
+ * [dxil-dump] and the GPU fault report print. The loops of those shaders stop after MAD_LOOP_GUARD_CAP iterations instead of
+ * hanging the GPU (madeira_ags.cpp, rewrite_loop_guard_module). Unset (the default): nothing changes. The PE runtime keys its
+ * shader cache on the same list (madeira_d3d12.c, mad_loop_guard_listed). */
+#define MAD_LOOP_GUARD_CAP 65536u
+static uint64_t g_lg_want[32];
+static unsigned g_lg_n;
+static pthread_once_t g_lg_once = PTHREAD_ONCE_INIT;
+static void mad_lg_load(void)
+{
+    char v[1024], *p;
+    if (!madeira_cfg_get("dxil-loop-guard", v, sizeof v)) return;
+    for (p = v; *p && g_lg_n < 32; ) {
+        char *e;
+        unsigned long long h;
+        while (*p == ',' || *p == ';' || *p == ' ' || *p == '\t') p++;
+        if (!*p) break;
+        h = strtoull(p, &e, 16);
+        if (e != p && e - p == 16) g_lg_want[g_lg_n++] = h;
+        while (*e && *e != ',' && *e != ';' && *e != ' ' && *e != '\t') e++;
+        p = e;
+    }
+    if (g_lg_n) dprintf(2, "[madeira-ir] dxil-loop-guard: %u shader hash(es) get their loops capped at %u iterations\n", g_lg_n, MAD_LOOP_GUARD_CAP);
+}
+static uint64_t mad_lg_hash(const void *dxil, size_t len)
+{
+    const unsigned char *b = (const unsigned char *)dxil;
+    uint64_t h = 0xcbf29ce484222325ull;
+    for (size_t i = 0; i < len; i++) { h ^= b[i]; h *= 0x100000001b3ull; }
+    return h;
+}
+static int mad_loop_guard_wanted(const void *dxil, size_t len, uint64_t *hash)
+{
+    pthread_once(&g_lg_once, mad_lg_load);
+    if (!g_lg_n || !dxil || !len) return 0;
+    *hash = mad_lg_hash(dxil, len);
+    for (unsigned i = 0; i < g_lg_n; i++) if (g_lg_want[i] == *hash) return 1;
+    return 0;
+}
+
 /* ml1149: read once; bcd.cfg ags-rewrite = 0 turns the rewrite off. */
 static int mad_ags_enabled(void)
 {
@@ -1723,6 +1803,9 @@ extern "C" int madeira_ir_convert_impl(struct madeira_ir_convert_args *a) {
     IRMetalLibBinary *lib = NULL;
     IRShaderReflection *refl = NULL;
     void *ags_buf = NULL;   /* ml1149: rewritten container, borrowed by `input` */
+    void *lg_buf = NULL;    /* madeira-bcd (build 648): dxil-loop-guard's container, borrowed by `input` */
+    uint64_t lg_hash = 0;
+    int lg_want = mad_loop_guard_wanted((const void *)(uintptr_t)a->dxil, (size_t)a->dxil_len, &lg_hash);
     int status = MADEIRA_IR_COMPILE_FAILED;
     const char *entry = (const char *)(uintptr_t)a->entry_point;
     IRShaderStage stage = IRShaderStageInvalid;
@@ -1753,7 +1836,7 @@ extern "C" int madeira_ir_convert_impl(struct madeira_ir_convert_args *a) {
         size_t hit_len = 0;
         env.converter_ident = g_ir.ident;
         env.build_stamp = MAD_SC_BUILD;
-        env.ags_rewrite = (uint32_t)mad_ags_enabled();
+        env.ags_rewrite = (uint32_t)mad_ags_enabled() | (lg_want ? 2u : 0u);   /* madeira-bcd: a capped shader is another conversion */
         env.compat_flags = mad_ir_compat_flags();
         mad_dxc_key(a, &env, &dxc_key, &dxc_check);
         if (dxc_slot) hit = mad_dxc_slot_take(dxc_key, dxc_check, &hit_len);
@@ -1859,7 +1942,11 @@ extern "C" int madeira_ir_convert_impl(struct madeira_ir_convert_args *a) {
 
     /* ml1149: AMD AGS 64-bit atomics (magic UAV in space 0x7FFF0ADE) become
      * native SM6.6 64-bit atomics before the converter sees the module; it
-     * refuses the magic space outright. bcd.cfg ags-rewrite = 0 turns it off. */
+     * refuses the magic space outright. bcd.cfg ags-rewrite = 0 turns it off.
+     * madeira-bcd (build 647): a pixel shader that reads the result of a 64-bit
+     * texture atomic, which the converter refuses on every target (The Last of
+     * Us Part I's transparency layers), gets ordered loads and stores on
+     * rasterizer-ordered textures instead (madeira_ags.cpp, same switch). */
     {
         const uint8_t *src = (const uint8_t *)(uintptr_t)a->dxil;
         size_t src_len = (size_t)a->dxil_len, ags_len = 0;
@@ -1870,11 +1957,24 @@ extern "C" int madeira_ir_convert_impl(struct madeira_ir_convert_args *a) {
         if (rc != 0 && (a->out_buf || dxc_slot)) {
             char nm[MADEIRA_IR_ENTRY_MAX];
             mad_air_entry_name(src, src_len, nm, sizeof nm);
-            dprintf(2, "[madeira-ir] ml1149 AGS %s: %s%s\n", nm + 4, note,
+            /* madeira-bcd (build 647): the same pass also rewrites a pixel shader's 64-bit texture atomics whose result is
+             * read (madeira_ags.cpp, rewrite_a64rov_module); its note says which. */
+            dprintf(2, "[madeira-ir] ml1149 %s %s: %s%s\n", strstr(note, "64-bit texture atomic") ? "DXIL" : "AGS", nm + 4, note,
                     rc < 0 ? " -- converting the original, which the converter will refuse" : "");
         }
-        input = rc == 1 ? g_ir.IRObjectCreateFromDXIL((const uint8_t *)ags_buf, ags_len, IRBytecodeOwnershipNone)
-                        : g_ir.IRObjectCreateFromDXIL(src, src_len, IRBytecodeOwnershipNone);
+        /* madeira-bcd (build 648): dxil-loop-guard, on what the converter would take (the AGS rewrite's output when there is one). */
+        if (lg_want) {
+            const void *cur = rc == 1 ? (const void *)ags_buf : (const void *)src;
+            size_t cur_len = rc == 1 ? ags_len : src_len, lg_len = 0;
+            char lnote[192];
+            int lrc = madeira_loop_guard_rewrite(cur, cur_len, MAD_LOOP_GUARD_CAP, &lg_buf, &lg_len, lnote, sizeof lnote);
+            if (a->out_buf || dxc_slot)
+                dprintf(2, "[madeira-ir] dxil-loop-guard %016llx: %s\n", (unsigned long long)lg_hash, lnote);
+            if (lrc == 1) input = g_ir.IRObjectCreateFromDXIL((const uint8_t *)lg_buf, lg_len, IRBytecodeOwnershipNone);
+        }
+        if (!input)
+            input = rc == 1 ? g_ir.IRObjectCreateFromDXIL((const uint8_t *)ags_buf, ags_len, IRBytecodeOwnershipNone)
+                            : g_ir.IRObjectCreateFromDXIL(src, src_len, IRBytecodeOwnershipNone);
     }
     if (!input) { status = MADEIRA_IR_BAD_DXIL; goto done; }
 
@@ -1923,6 +2023,7 @@ extern "C" int madeira_ir_convert_impl(struct madeira_ir_convert_args *a) {
     if (!output) {
         a->ret_error_code = err ? g_ir.IRErrorGetCode(err) : 0;
         status = MADEIRA_IR_COMPILE_FAILED;
+        ir_log_error_text(err, a->ret_error_code, (size_t)a->dxil_len);   /* madeira-bcd: the converter's sentence, log only */
         /* ml863: keep the bytecode the converter refused, so the failure can
          * be reproduced on a Mac with the same converter and the real
          * diagnostics, instead of a code number on a phone. */
@@ -2150,6 +2251,7 @@ done:
     free(irr);
     free(irp);
     free(ags_buf);
+    free(lg_buf);   /* madeira-bcd: dxil-loop-guard */
     free(dxc_blob);
     free(lib_bytes);
     free(lib2_bytes);

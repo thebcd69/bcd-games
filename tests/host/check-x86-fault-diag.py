@@ -207,6 +207,9 @@ allowed = {
     # round 630: checks that pin whole list rows or launcher lines, this switch among them: Hotline Miami's row (agent A2 S15) and
     # Battle.net's session lines (agent A2 S5)
     'tests/host/check-d3d8-to-d3d9.py', 'tests/host/check-wc-old-prot.py',
+    # night round 2026-11-11 (agents G8 S4, D S16, G1 S10, D S13, G3 S4): process_ios.c ([term-code]) and server_ios.c ([spin-code]) name the key in a comment where they call the
+    # header's exported switch / spin dump (neither reads the environment: getenv stays in the header, pinned above), and the checks that run those functions
+    'build/ntdll-unix/process_ios.c', 'build/ntdll-unix/server_ios.c', 'tests/host/check-w-sig-diagnostics.py', 'tests/host/check-term-stack-32.py',
 }
 # The launcher lines: the EA app's entry (round 624, 7NKYWT) and Battle.net's (round 630, agent A2 S5, 6KW9QM), one source line each.
 launch_src = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
@@ -253,7 +256,9 @@ check('the bundled lists that carry the switch are exactly Most Wanted, Undergro
                            ('fallout-3', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('hitman-blood-money', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598),
                            ('hotline-miami', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624), ('resident-evil-5', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630),
                            ('stalker-xray-engine', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('tales-of-zestiria', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630),
-                           ('vampire-bloodlines', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]),
+                           ('vampire-bloodlines', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]
+                          # night round 2026-11-11 (agents G1, G3, G4, G6, G8, T1, D): the new diagnostic rows and Isaac's v2
+                          + [('assassins-creed-brotherhood', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('astro-tripper', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('bulletstorm', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('call-of-duty-world-at-war', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('far-cry-3-folder', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('mafia-classic', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624), ('need-for-speed-shift', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('the-binding-of-isaac-rebirth', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]),
       str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs

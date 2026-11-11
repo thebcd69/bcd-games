@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Combine
 import SwiftUI
@@ -49,8 +50,8 @@ enum BCDSessionTone: Equatable {
 }
 
 enum BCDSessionStyle {
-    static let amber = Color(red: 1.0, green: 0.76, blue: 0.29)      // #FFC24A
-    static let panel = Color(red: 0.063, green: 0.047, blue: 0.122)   // #100C1F
+    static var amber: Color { BCDStyle.amber }
+    static var panel: Color { BCDStyle.panel }
     /// The game under the menu is dimmed, never blurred.
     static let dim = Color.black.opacity(0.55)
 }

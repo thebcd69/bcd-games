@@ -161,7 +161,7 @@ def cut(log, wanted):
     return lines
 
 
-def replay(paths, end):
+def replay(paths, end, user_keys=""):
     swiftc = shutil.which("swiftc")
     if not swiftc:
         sys.exit("autotune-fixture: swiftc is needed to check the cut")
@@ -171,7 +171,8 @@ def replay(paths, end):
                             str(CORE), str(RULES_SWIFT), str(REPLAY)], capture_output=True, text=True)
         if b.returncode:
             sys.exit(b.stderr[-3000:])
-        r = subprocess.run([exe, "--end", json.dumps(end)] + [str(p) for p in paths], capture_output=True, text=True)
+        r = subprocess.run([exe, "--end", json.dumps(end)] + (["--user-keys", user_keys] if user_keys else []) + [str(p) for p in paths],
+                           capture_output=True, text=True)
         if r.returncode:
             sys.exit(r.stderr[-3000:])
         return [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
@@ -186,19 +187,23 @@ def main():
     ap.add_argument("name")
     ap.add_argument("--end", default="{}", help='AutoTuneSessionEnd fields, e.g. {"killed": true}')
     ap.add_argument("--note", default="")
+    # Night round 2026-11-11 (agent T3 S1): keys the player set (swap-mb in bcd.cfg); the .expect records them as "userKeys".
+    ap.add_argument("--user-keys", default="", help="comma-separated keys the player set, which auto-tune never proposes")
     a = ap.parse_args()
     end = json.loads(a.end)
     OUT.mkdir(parents=True, exist_ok=True)
     fixture = OUT / (a.name + ".log")
     lines = cut(a.log, needles())
     fixture.write_text("\n".join(lines) + "\n")
-    full, cutr = replay([a.log, fixture], end)
+    full, cutr = replay([a.log, fixture], end, a.user_keys)
     diff = [k for k in KEYS + ("monoMissing",) if full[k] != cutr[k]]
     if diff:
         fixture.unlink()
         sys.exit("the cut lost something (%s):\n full: %s\n cut:  %s" % (", ".join(diff),
                  {k: full[k] for k in diff}, {k: cutr[k] for k in diff}))
     expect = {"end": end, "note": a.note}
+    if a.user_keys:
+        expect["userKeys"] = [k for k in a.user_keys.split(",") if k]
     expect.update({k: cutr[k] for k in KEYS})
     if cutr["monoMissing"]:
         expect["monoMissing"] = True   # the game page's Wine Mono hint (only a fixture that shows it says so)

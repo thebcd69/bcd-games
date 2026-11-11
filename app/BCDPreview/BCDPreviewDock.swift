@@ -48,6 +48,7 @@ import SwiftUI
         state.components.stepIndex = 1
         state.components.steps = 4
     }
+    func replaceComponents() { downloadComponents() }
     func start(_ appID: Int) {
         let name = state.games.first { $0.id == appID }?.name ?? "the game"
         state.lastResult = "Sample: starting \(name) through BCD Dock."

@@ -1,4 +1,4 @@
-/* Portions copyright 2026 alantangok: code taken from https://github.com/willfaust/Madeira (commit abca30a)
+/* Portions copyright 2026 alantangok, 125hz and intraducine: code taken from https://github.com/willfaust/Madeira (commit abca30a; pull requests #353 and #462)
  * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Graphics driver management functions
@@ -65,6 +65,16 @@ extern void winios_pWindowPosChanged( HWND hwnd, HWND insert_after, HWND owner_h
 /* opengl_ios.c: the winios WGL driver. Installed only for a session whose gl-backend key is on (see load_display_driver). */
 extern UINT winios_OpenGLInit( UINT version, const struct opengl_funcs *opengl_funcs,
                                const struct opengl_driver_funcs **driver_funcs );
+/* vulkan_surface_ios.c (included by vulkan_ios.c): VK_KHR_win32_surface on the window's CAMetalLayer. Only reached once a session
+ * loaded a Vulkan library (MADEIRA_VULKAN_LIBRARY, set by WineProcessBridge.m for a game whose file has vulkan = moltenvk). */
+extern UINT madeira_ios_VulkanInit( UINT version, void *vulkan_handle,
+                                    const struct vulkan_driver_funcs **driver_funcs );
+
+/* sysparams_ios.c (madeira-bcd, night round 2026-11-11, T2 S-DL1): env.MADEIRA_DISPLAY_FOLLOW_BORDERLESS = 1 (default off) makes the virtual monitor
+ * follow a borderless window smaller than it. */
+extern int ios_display_follow_enabled(void);
+extern void ios_display_follow_window( HWND hwnd, UINT swp_flags, const RECT *visible );
+extern void ios_display_follow_window_gone( HWND hwnd );
 
 static struct user_driver_funcs winios_user_driver;
 
@@ -76,6 +86,8 @@ static struct user_driver_funcs winios_user_driver;
  * nothing the program sees, and does nothing until the app has asked for the
  * reports (MADEIRA_DIRECT_CURSOR=0 or MADEIRA_HWINPUT=0 in the app: never). */
 extern int winios_direct_cursor_wanted( void ) __attribute__((weak));
+/* madeira-bcd (build 641): ntdll's [dlg-code] dump (virtual_ios.c; env.MADEIRA_DIALOG_CODE_DUMP = 1, log only). */
+extern void madeira_dialog_code_dump( const char *text ) __attribute__((weak));
 extern void winios_direct_cursor_set( unsigned int id, int w, int h, int hot_x, int hot_y,
                                       const void *bgra ) __attribute__((weak));
 extern void winios_direct_cursor_show( int show ) __attribute__((weak));
@@ -258,6 +270,84 @@ void winios_drv_post_key(unsigned short vk, unsigned int flags)
     }
 }
 
+/* madeira-bcd (night round 2026-11-11, G5 S4b; Fear & Hunger 2 6Z8SV4, an NW.js game): after five clicks on Maximize the window got ONE new surface
+ * ("[surf-create] ... RECREATED - old content dropped") and then nothing was presented for 40 s, while Chromium's processes were alive and idle. The log
+ * cannot say whether Chromium stopped drawing or BCD stopped showing what it draws. For every window whose surface was recreated (32 at most) this keeps
+ * how often it was recreated, how many surface flushes came since the last recreate and when, and the window-tree dump prints it:
+ *   [winios-tree] surface hwnd=0x10086 recreated=1 flushes-since=0 last-flush=never recreated-ago=40012 ms vis=1
+ * flushes-since=0 with a visible window: nothing was drawn into the new surface (Chromium's side, or the child windows' repaint never came);
+ * flushes-since > 0 and a frozen picture: BCD's side. Log only; a session whose windows are never recreated does nothing (one relaxed load per flush). */
+#define WINIOS_RECREATED_MAX 32
+static struct winios_recreated
+{
+    HWND hwnd;
+    unsigned recreates, flushes;
+    double recreated_ms, flush_ms;
+} winios_recreated[WINIOS_RECREATED_MAX];
+static unsigned winios_recreated_count;
+static pthread_mutex_t winios_recreated_lock = PTHREAD_MUTEX_INITIALIZER;
+
+static double winios_recreated_now_ms(void)
+{
+    struct timespec ts;
+
+    clock_gettime( CLOCK_MONOTONIC, &ts );
+    return ts.tv_sec * 1000.0 + ts.tv_nsec / 1e6;
+}
+
+static void winios_note_recreated( HWND hwnd )
+{
+    unsigned i;
+
+    pthread_mutex_lock( &winios_recreated_lock );
+    for (i = 0; i < winios_recreated_count && winios_recreated[i].hwnd != hwnd; i++) ;
+    if (i == winios_recreated_count)   /* a window not seen before */
+    {
+        if (i == WINIOS_RECREATED_MAX) i = WINIOS_RECREATED_MAX - 1;   /* full: the last slot is reused */
+        memset( &winios_recreated[i], 0, sizeof(winios_recreated[i]) );
+        winios_recreated[i].hwnd = hwnd;
+        if (i + 1 > winios_recreated_count) __atomic_store_n( &winios_recreated_count, i + 1, __ATOMIC_RELAXED );
+    }
+    winios_recreated[i].recreates++;
+    winios_recreated[i].flushes = 0;
+    winios_recreated[i].flush_ms = 0;
+    winios_recreated[i].recreated_ms = winios_recreated_now_ms();
+    pthread_mutex_unlock( &winios_recreated_lock );
+}
+
+static void winios_note_flushed( HWND hwnd )
+{
+    unsigned i, n = __atomic_load_n( &winios_recreated_count, __ATOMIC_RELAXED );
+
+    if (!n) return;
+    pthread_mutex_lock( &winios_recreated_lock );
+    for (i = 0; i < winios_recreated_count; i++)
+    {
+        if (winios_recreated[i].hwnd != hwnd) continue;
+        winios_recreated[i].flushes++;
+        winios_recreated[i].flush_ms = winios_recreated_now_ms();
+        break;
+    }
+    pthread_mutex_unlock( &winios_recreated_lock );
+}
+
+/* madeira-bcd (night round 2026-11-11, G6 S9; Surviving Mars 34BEY6, a 64-bit "Error" box): the text of a Static or Button child (a message
+ * box's body and its button labels), read when the tree is dumped. [win-name] reads a window's text when the window is positioned, which for a
+ * dialog is before it sets its controls' text (the Static's line is empty), and a 64-bit program has no [msgbox-origin] (the 64-bit user32.dll is
+ * a committed binary). Only these two classes: nothing a player types into. Printable ASCII, 99 characters at most. */
+static void winios_tree_child_text( HWND hwnd, const char *cls, char *out, size_t size )
+{
+    WCHAR textW[100];
+    int n, j;
+
+    out[0] = 0;
+    if (strcmp( cls, "Static" ) && strcmp( cls, "Button" )) return;
+    n = NtUserInternalGetWindowText( hwnd, textW, ARRAY_SIZE(textW) );
+    for (j = 0; j < n && j < (int)size - 1 && j < (int)ARRAY_SIZE(textW) - 1; j++)
+        out[j] = (textW[j] >= 32 && textW[j] < 127) ? (char)textW[j] : '?';
+    out[j] = 0;
+}
+
 /* Same key input as the hardware bridge, without logging pasted text. */
 static void winios_text_key(unsigned short vk, unsigned int flags)
 {
@@ -377,7 +467,7 @@ void winios_dump_window_tree(void)
                 for (k = 0; k + 1 < ksize && k < ARRAY_SIZE(kids); k++)
                 {
                     WCHAR kclsW[32];
-                    char kcls[32];
+                    char kcls[32], ktxt[100];
                     UNICODE_STRING kus = { .Buffer = kclsW, .MaximumLength = sizeof(kclsW) };
                     struct window_rects krects = {0};
                     DWORD kstyle;
@@ -392,12 +482,36 @@ void winios_dump_window_tree(void)
                     }
                     kstyle = get_window_long( kids[k], GWL_STYLE );
                     get_window_rects( kids[k], COORDS_SCREEN, &krects, get_thread_dpi() );
-                    dprintf( 2, "[winios-tree]    +child %p '%s' style=%08x vis=%d win={%d,%d,%d,%d}\n",
-                             kids[k], kcls, (unsigned)kstyle, (kstyle & WS_VISIBLE) ? 1 : 0,
+                    winios_tree_child_text( kids[k], kcls, ktxt, sizeof(ktxt) );   /* madeira-bcd (night round 2026-11-11, G6 S9) */
+                    dprintf( 2, "[winios-tree]    +child %p '%s' \"%s\" style=%08x vis=%d win={%d,%d,%d,%d}\n",
+                             kids[k], kcls, ktxt, (unsigned)kstyle, (kstyle & WS_VISIBLE) ? 1 : 0,
                              (int)krects.window.left, (int)krects.window.top,
                              (int)krects.window.right, (int)krects.window.bottom );
                 }
             }
+        }
+    }
+    /* madeira-bcd (night round 2026-11-11, G5 S4b): the windows whose surface was recreated, and whether anything was flushed into the new one */
+    if (__atomic_load_n( &winios_recreated_count, __ATOMIC_RELAXED ))
+    {
+        struct winios_recreated snap[WINIOS_RECREATED_MAX];
+        unsigned count, r;
+        double now = winios_recreated_now_ms();
+
+        pthread_mutex_lock( &winios_recreated_lock );
+        count = winios_recreated_count;
+        memcpy( snap, winios_recreated, count * sizeof(snap[0]) );
+        pthread_mutex_unlock( &winios_recreated_lock );
+        for (r = 0; r < count; r++)
+        {
+            char last[32];
+
+            if (!is_window( snap[r].hwnd )) continue;
+            if (snap[r].flush_ms) snprintf( last, sizeof(last), "%.0f ms ago", now - snap[r].flush_ms );
+            else snprintf( last, sizeof(last), "never" );
+            dprintf( 2, "[winios-tree] surface hwnd=%p recreated=%u flushes-since=%u last-flush=%s recreated-ago=%.0f ms vis=%d\n",
+                     snap[r].hwnd, snap[r].recreates, snap[r].flushes, last, now - snap[r].recreated_ms,
+                     is_window_visible( snap[r].hwnd ) ? 1 : 0 );
         }
     }
 }
@@ -1082,6 +1196,7 @@ static BOOL winios_surface_flush( struct window_surface *surface, const RECT *re
                                   const BITMAPINFO *color_info, const void *color_bits, BOOL shape_changed,
                                   const BITMAPINFO *shape_info, const void *shape_bits )
 {
+    if (surface) winios_note_flushed( surface->hwnd );   /* madeira-bcd: G5 S4b, see winios_recreated */
     /* ml505: attribute the paint. All three children share this ONE surface,
      * so if they paint on different threads the mach thread id separates
      * them — and a single thread painting alternating content rules the
@@ -1163,6 +1278,7 @@ static BOOL winios_CreateWindowSurface( HWND hwnd, BOOL layered, const RECT *sur
     *window_surface = window_surface_create( sizeof(struct window_surface), &winios_surface_funcs,
                                              hwnd, surface_rect, info, 0 );
     if (previous) window_surface_release( previous );
+    if (previous) winios_note_recreated( hwnd );   /* madeira-bcd: G5 S4b */
 
     {
         /* ml505: was capped at 16 GLOBALLY, so a window created late (the
@@ -1417,6 +1533,7 @@ static void winios_drv_window_pos_changed( HWND hwnd, HWND insert_after, HWND ow
                                            const struct window_rects *new_rects, struct window_surface *surface )
 {
     ios_note_fullscreen_show( hwnd, swp_flags, &new_rects->visible );
+    if (ios_display_follow_enabled()) ios_display_follow_window( hwnd, swp_flags, &new_rects->visible );   /* madeira-bcd: T2 S-DL1, keyed */
 
     /* desktop mode, or a top-level window in game mode (Winios.m draws it
      * in its transparent game-mode overlay, never the desktop backdrop that
@@ -1502,6 +1619,20 @@ static void winios_drv_window_pos_changed( HWND hwnd, HWND insert_after, HWND ow
                 txt[j] = 0;
                 if (cls[0] || txt[0])
                     dprintf( 2, "[win-name] #%u hwnd=%p class='%s' text=\"%s\" rev=ml853\n", n, hwnd, cls, txt );
+                /* madeira-bcd (build 641, The Last of Us Part I): a message box's text (a Static child of a #32770 dialog) is being shown on
+                 * the thread that called MessageBox: ntdll prints the game's stack and the code before its return addresses when
+                 * env.MADEIRA_DIALOG_CODE_DUMP = 1 ([dlg-code]; it checks the key itself and stops after two boxes). */
+                if (madeira_dialog_code_dump && txt[0] && !strcmp( cls, "Static" ))
+                {
+                    HWND parent = NtUserGetAncestor( hwnd, GA_PARENT );
+                    WCHAR pclsW[16];
+                    UNICODE_STRING pus = { 0, sizeof(pclsW), pclsW };
+                    static const WCHAR dialogW[] = {'#','3','2','7','7','0'};
+
+                    if (parent && NtUserGetClassName( parent, FALSE, &pus ) == ARRAY_SIZE(dialogW)
+                        && !memcmp( pclsW, dialogW, sizeof(dialogW) ))
+                        madeira_dialog_code_dump( txt );
+                }
                 /* madeira-bcd (round 624, agent B S6; FINAL FANTASY VII's launcher MMJZ8K): an error box keeps its details (a WinForms
                  * ThreadExceptionDialog's exception and stack, an MFC or crash-reporter box) in a read-only multi-line Edit control, whose text is
                  * not the window's own: the log never showed the exception. With env MADEIRA_WIN_TEXT = 1 (default off: it asks the control for its
@@ -2487,9 +2618,16 @@ static LRESULT nulldrv_WintabProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
     return 0;
 }
 
+#ifdef MADEIRA_MOLTENVK
+extern UINT madeira_ios_VulkanInit( UINT version, void *handle, const struct vulkan_driver_funcs **funcs );
+#endif
 static UINT nulldrv_VulkanInit( UINT version, void *vulkan_handle, const struct vulkan_driver_funcs **driver_funcs )
 {
+#ifdef MADEIRA_MOLTENVK
+    return madeira_ios_VulkanInit( version, vulkan_handle, driver_funcs );
+#else
     return STATUS_NOT_IMPLEMENTED;
+#endif
 }
 
 static UINT nulldrv_OpenGLInit( UINT version, const struct opengl_funcs *opengl_funcs, const struct opengl_driver_funcs **driver_funcs )
@@ -2587,6 +2725,14 @@ static BOOL load_desktop_driver( HWND hwnd )
  * Each entry point simply loads the real driver and chains to it.
  */
 
+/* pDestroyWindow wrapper, installed only with env.MADEIRA_DISPLAY_FOLLOW_BORDERLESS = 1: a followed window that is destroyed gives the monitor its
+ * session default back, then Winios.m's own pDestroyWindow runs as it always did. */
+static void winios_drv_destroy_window( HWND hwnd )
+{
+    ios_display_follow_window_gone( hwnd );
+    if (winios_pDestroyWindow) winios_pDestroyWindow( hwnd );
+}
+
 static void load_display_driver(void)
 {
     USEROBJECTFLAGS flags;
@@ -2615,7 +2761,8 @@ static void load_display_driver(void)
          * and SET_USER_FUNC falls back to nulldrv_*. Real impls live
          * in app/Madeira/Winios/Winios.m and link in via Madeira.app. */
         if (winios_pCreateWindow)        winios_user_driver.pCreateWindow        = winios_drv_create_window;   /* [win-create] */
-        if (winios_pDestroyWindow)       winios_user_driver.pDestroyWindow       = winios_pDestroyWindow;
+        if (winios_pDestroyWindow)       winios_user_driver.pDestroyWindow       = ios_display_follow_enabled() ? winios_drv_destroy_window
+                                                                                                          : winios_pDestroyWindow;   /* T2 S-DL1: the wrapper only with the key */
         if (winios_pProcessEvents)       winios_user_driver.pProcessEvents       = winios_drv_process_events;
         if (winios_desktop_mode())       winios_user_driver.pSetCursor           = winios_drv_set_cursor;
         /* direct mode: inert (like winios_pSetCursor) until the app enables it */
@@ -2656,6 +2803,9 @@ static void load_display_driver(void)
          * WineProcessBridge.m then exports MADEIRA_GL_BACKEND. Without it pOpenGLInit stays unset and takes nulldrv_OpenGLInit
          * (STATUS_NOT_IMPLEMENTED: no context can be made), exactly as before. */
         if (getenv( "MADEIRA_GL_BACKEND" )) winios_user_driver.pOpenGLInit = winios_OpenGLInit;
+        /* madeira-bcd: Vulkan surfaces on Metal (vulkan_surface_ios.c). win32u calls pVulkanInit only after a Vulkan library was loaded,
+         * which needs MADEIRA_VULKAN_LIBRARY; without it nothing ever reaches this entry (vulkan_ios.c: Vulkan stays off, as before). */
+        winios_user_driver.pVulkanInit = madeira_ios_VulkanInit;
         __wine_set_user_driver( &winios_user_driver, WINE_GDI_DRIVER_VERSION );
 #else
         __wine_set_user_driver( &null_user_driver, WINE_GDI_DRIVER_VERSION );

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import SwiftUI
@@ -50,6 +51,8 @@ enum BCDGameState: Hashable {
 }
 
 struct BCDGame: Identifiable, Hashable {
+    /// The built-in Windows environment is a utility, not a game.
+    var isWindowsDesktop = false
     var id: String
     var title: String
     var store: BCDStoreFront
@@ -145,6 +148,10 @@ struct BCDSystemStatus: Hashable {
     var freeDeviceBytes: Int64?
     var totalDeviceBytes: Int64?
     var freeExternalBytes: Int64?
+    /// The external drive a Steam game's "External drive" install goes to (Settings › Storage › External drives); nil: none is connected.
+    var externalDriveName: String?
+    /// That drive is the one Settings chose for Steam installs: a game page's Install goes there, "This device" is the other choice.
+    var installsToExternal = false
 }
 
 // MARK: - What the interface asks for
@@ -181,6 +188,16 @@ extension BCDActions {
     @Published var system = BCDSystemStatus()
     /// A game is running: the interface is torn down and draws nothing until it ends.
     @Published var inGame = false
+    @Published var windowsRunning = false
+    @Published var windowsStarting = false
+    @Published var windowsClosing = false
+    @Published var windowsError: String?
+    @Published var restartMessage: String?
+    var closeForRestart: (() -> Void)?
+    @Published var windowsNeedsRestart = false
+    var showWindows: (() -> Void)?
+    var stopWindows: (() -> Void)?
+    var restartWindows: (() -> Void)?
     /// The game whose Play is turning JIT on before it starts (its Play reads so); nil otherwise.
     @Published var startingJIT: String?
     /// The games whose Steam Cloud saves differ from this device's: they wait for a choice on each

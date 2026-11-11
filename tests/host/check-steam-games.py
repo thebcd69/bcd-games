@@ -152,6 +152,7 @@ head = dock[dock.index('enum DockPerformancePolicy {'):dock.index('enum MadeiraD
 body = (dock[dock.index('enum MadeiraDock {'):dock.index('    @MainActor private static var lastReport =')] +
         dock[dock.index("    /// The host's environment for one launch."):])
 stubs = r'''
+enum ExternalDrives { static var steamLibraries: [String] { [] } }
 import Foundation
 #if canImport(Glibc)
 import Glibc
@@ -165,6 +166,13 @@ enum SteamLog { static func event(_ m: String) {}; static func trace(_ m: @autoc
 enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): MadeiraDock's result-46 words read it; the install has the limit here
 enum MadeiraConfig { static func get(_ key: String) -> String? { nil }; static func set(_ key: String, _ value: String?) {} }   // SteamLanguage (SteamAppInfo.swift)
 enum SteamRuntimeFiles {
+    // night round 2026-11-11 (W-DOCK M11): MadeiraDock.validate asks the client files' build; the stand-in calls every client supported
+    enum ClientStatus: Equatable { case missing, supported, unsupported(sha: String) }
+    static func clientStatus(drive: URL) -> ClientStatus {
+        FileManager.default.fileExists(atPath: drive.appendingPathComponent(relativeRoot).appendingPathComponent("steamclient64.dll").path) ? .supported : .missing
+    }
+    static let supportedClientSHA256: Set<String> = []
+    static func unsupportedClientWords(sha: String) -> String { "unsupported \(sha)" }
     static let relativeRoot = "Program Files (x86)/Steam"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"
 }
@@ -499,7 +507,7 @@ with tempfile.TemporaryDirectory(prefix='madeira-steam-games-') as tmp:
     build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-o', str(exe),
                             str(tmp / 'stubs.swift'), str(tmp / 'dock.swift'), str(tmp / 'rules.swift'),
                             str(tmp / 'checks.swift'), str(tmp / 'owned.swift'), str(app / 'SteamKeyValues.swift'),
-                            str(app / 'SteamInstall.swift'), str(app / 'SwiftSteam/Library/SteamAppInfo.swift')],
+                            str(app / 'SteamInstall.swift'), str(app / 'ExternalStorage.swift'), str(app / 'SwiftSteam/Library/SteamAppInfo.swift')],
                            capture_output=True, text=True)
     require(build.returncode == 0, 'production Steam games rules and Dock discovery compile on the host')
     if build.returncode:

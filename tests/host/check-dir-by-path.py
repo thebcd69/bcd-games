@@ -30,6 +30,7 @@ BCD's twelve file.c patch scripts still apply after the fork's commits, in the w
 """
 from pathlib import Path
 import os
+import importlib.util
 import re
 import subprocess
 import sys
@@ -512,12 +513,12 @@ with tempfile.TemporaryDirectory() as tmp:
               'steps agree with the model; nothing leaks (AddressSanitizer)',
               run.returncode == 0 and 'RESULT OK' in run.stdout, run.stdout[-300:] + run.stderr[-1500:])
 
-# ---- (d) BCD's twelve file.c patch scripts after the fork's commits, in the workflow's order
+# ---- (d) BCD's thirteen file.c patch scripts after the fork's commits, in the workflow's order
 order = ['guest-log', 'guest-log-tag', 'guest-log-service', 'guest-log-renpy', 'guest-log-trace', 'guest-log-redact', 'file-trace',
-         'file-census', 'globalroot', 'app-local-dll', 'file-info-fstat', 'hide-host-version-plist']
+         'file-census', 'globalroot', 'app-local-dll', 'file-info-fstat', 'hide-host-version-plist', 'dir-storm']
 wf_order = [m.group(1) for m in re.finditer(r'python3 tools/patch-wine-([a-z-]+)\.py wine/dlls/ntdll/unix/file\.c', wf)]
 # tools/patch-wine-guest-log-secrets.py (W07) may sit after the account-name script; nothing else may be added or moved
-check('the workflow applies exactly these twelve scripts to file.c, in this order (and the sign-in-value script after the account names, when present)',
+check('the workflow applies exactly these thirteen scripts to file.c, in this order (and the sign-in-value script after the account names, when present)',
       [s_ for s_ in wf_order if s_ != 'guest-log-secrets'] == order and (('guest-log-secrets' not in wf_order) or
                                                                        wf_order.index('guest-log-secrets') == wf_order.index('guest-log-redact') + 1), str(wf_order))
 order = wf_order
@@ -531,8 +532,19 @@ with tempfile.TemporaryDirectory() as t:
             bad.append(s_ + ': ' + (r.stdout + r.stderr).strip()[-160:])
     check('all the workflow\'s file.c scripts apply on the Wine fork\'s file.c with the directory-read commits (none fails)', not bad, '\n     '.join(bad))
     patched = f.read_text()
+    # night round 2026-11-11 (A2 S4): tools/patch-wine-dir-storm.py adds log-only timing to NtQueryDirectoryFile; take exactly its
+    # additions out again before comparing, so every other line of the reads must still be the fork's.
+    spec = importlib.util.spec_from_file_location('dir_storm', root / 'tools/patch-wine-dir-storm.py')
+    ds = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ds)
+    # (In a build the Wine checkout may already carry it when this runs, so the fork's blocks above are compared the same way.)
+    def without_dir_storm(text):
+        for new, old in ((ds.HELPER, ''), (ds.LOCALS_NEW, ds.LOCALS_OLD), (ds.START_NEW, ds.START_OLD), (ds.END_NEW, ds.END_OLD)):
+            text = text.replace(new, old)
+        return text
+    patched = without_dir_storm(patched)
     check('and the patched file still holds the new reads and the cache block (the scripts touched neither)',
-          reader in patched and cache in patched and query in patched)
+          all(without_dir_storm(b) in patched for b in (reader, cache, query)))
 
 # ---- (e) the workflow
 check('the workflow runs this check', 'python3 tests/host/check-dir-by-path.py' in wf)

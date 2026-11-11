@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -13,7 +15,7 @@ import UIKit
 /// acts (docs/BCD-UI-ARCHITECTURE.md, "Performance").
 enum BCDSectionKit {
     /// The warm amber BCD uses for "needs a look" (the status chips use the same).
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 
     enum Tone {
         case good, warn, bad, info, soft
@@ -107,12 +109,26 @@ extension BCDSectionKit {
                             guard focus.controllerActive, let id, id.hasPrefix(focusPrefix) else { return }
                             withAnimation(.easeOut(duration: 0.2)) { reader.scrollTo(id, anchor: .center) }
                         }
+                        .onChange(of: focus.controllerActive) { _, active in
+                            if BCDDuoFeatures.active && active { reveal(reader) }
+                        }
+                        .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in
+                            if BCDDuoFeatures.active { reveal(reader) }
+                        }
                     }
                 } else {
                     stack
                 }
             }
             .environment(\.bcdSectionScale, pad ? 1.12 : 1)
+        }
+
+        private func reveal(_ reader: ScrollViewProxy) {
+            guard focus.controllerActive, let id = focus.focused, id.hasPrefix(focusPrefix) else { return }
+            DispatchQueue.main.async {
+                guard focus.focused == id else { return }
+                withAnimation(.easeOut(duration: 0.18)) { reader.scrollTo(id, anchor: .center) }
+            }
         }
 
         private var stack: some View {
@@ -338,7 +354,7 @@ extension BCDSectionKit {
                                 Image(systemName: "checkmark").font(.system(size: 11, weight: .heavy)).foregroundStyle(BCDStyle.mint)
                             } else {
                                 Circle().fill(BCDStyle.glow)
-                                Text("\(index + 1)").font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                                Text("\(index + 1)").font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
                             }
                         }
                         .frame(width: 24, height: 24)

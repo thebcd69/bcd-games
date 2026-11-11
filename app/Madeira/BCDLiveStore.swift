@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Combine
 import Foundation
@@ -78,6 +79,10 @@ import os
             epicChanges,
             itchChanges,   // BCDItch/BCDLiveStoreItch.swift: says something only once itch.io is in use
             eaChanges,     // BCDEA/BCDLiveStoreEA.swift: only while the experimental EA store is switched on
+            // External drives (ExternalDrives.swift): a drive connected or removed moves games between "on this device" and
+            // "on the external drive"; a game being moved (GameMover) shows on its page.
+            ExternalDrives.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
+            GameMover.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
         ]
         // @Published sends before the value is stored: the rebuild runs a moment later, and at
         // most a few times a second while a download reports its progress.
@@ -101,13 +106,49 @@ import os
             NotificationCenter.default.publisher(for: .GCControllerDidConnect).map { _ in () }.eraseToAnyPublisher(),
             NotificationCenter.default.publisher(for: .GCControllerDidDisconnect).map { _ in () }.eraseToAnyPublisher(),
             NotificationCenter.default.publisher(for: .GCControllerDidBecomeCurrent).map { _ in () }.eraseToAnyPublisher(),
+            ExternalDrives.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
         ]
         Publishers.MergeMany(device)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.refreshSystem() }
             .store(in: &watchers)
         // A game runs from LibraryModel.begin until its session ends (finish, or a failed launch).
-        library.$current.sink { [weak self] current in self?.session(running: current != nil) }.store(in: &watchers)
+        if BCDDuoFeatures.active {
+            // The native Duo interface (thebcd69/bcd-games#43): the Windows desktop can run in the background while BCD Home is shown, so
+            // the interface is torn down for a session that is not the desktop at home, and the desktop's state is published.
+            Publishers.CombineLatest4(library.$current, library.$desktopHome, library.$sessionMessage, library.$launching)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] current, home, _, launching in
+                    guard let self else { return }
+                    self.store.windowsRunning = current != nil && library.activeEntry?.desktop == true
+                    self.store.windowsStarting = self.store.windowsRunning && launching
+                    self.store.windowsClosing = library.desktopClosing
+                    self.store.windowsError = library.desktopCloseError
+                    self.store.windowsNeedsRestart = current == nil && LibraryModel.sessionsThisRun > 0
+                    // Returning from a background desktop does not remount the
+                    // front end. Release Steam's session hold on the state change,
+                    // rather than waiting for another app foreground transition.
+                    if BCDDuoFeatures.active { account.reconcileSession() }
+                    self.session(running: current != nil && !home)
+                }.store(in: &watchers)
+        } else {
+            library.$current.sink { [weak self] current in self?.session(running: current != nil) }.store(in: &watchers)
+        }
+        store.showWindows = { library.showWindowsDesktop() }
+        store.stopWindows = {
+            guard library.current != nil, library.activeEntry?.desktop == true else { return }
+            library.requestQuit()
+        }
+        store.restartWindows = { library.restartNotice = LibraryModel.restartMessage }
+        store.closeForRestart = {
+            BCDSessionRecorder.closingOnPurpose()
+            exit(0)
+        }
+        library.$restartNotice.compactMap { $0 }.receive(on: DispatchQueue.main).sink { [weak self] message in
+            guard BCDDuoFeatures.active else { return }
+            library.restartNotice = nil
+            self?.store.restartMessage = message
+        }.store(in: &watchers)
         rebuild()
         refreshSystem()
     }
@@ -244,10 +285,11 @@ import os
         let isDesktop = entry.desktop == true
         var game = BCDGame(id: BCDLiveID.local(entry.id), title: isDesktop ? "Windows desktop" : entry.title,
                            store: .local, state: .ready, size: entry.folderBytes)
+        game.isWindowsDesktop = isDesktop
         game.lastPlayed = entry.lastPlayed
         game.thirtyTwoBit = entry.bits == 32
-        // A game on the SSD folder chosen in Settings > Storage (C:\External).
-        if entry.relativePath.hasPrefix("External/"), ExternalGameStorage.shared.hasSavedFolder { game.place = .externalDrive }
+        // A game on an external drive (C:\External\<name>, Settings › Storage › External drives).
+        if ExternalDrives.driveName(library: entry.relativePath) != nil { game.place = .externalDrive }
         if !isDesktop {
             game.recommended = GameRecommendations.match(windowsPath: entry.windowsPath, steamAppID: nil,
                                                          fileExists: GameRecommendations.driveFileExists) != nil
@@ -302,6 +344,8 @@ import os
             state = .notInstalled
         }
         var game = BCDGame(id: BCDLiveID.steam(item.id), title: item.name, store: .steam, state: state, size: size)
+        // Installed in a Steam library on an external drive (ExternalDrives.steamLibraries).
+        if let installed, ExternalDrives.driveName(library: installed.library) != nil { game.place = .externalDrive }
         let playtime = account.playtime[item.id]
         let steamPlayed = playtime.flatMap { $0.lastPlayed > 0 ? Date(timeIntervalSince1970: TimeInterval($0.lastPlayed)) : nil }
         game.lastPlayed = [entry?.lastPlayed, steamPlayed].compactMap { $0 }.max()
@@ -367,6 +411,11 @@ import os
             var item = BCDDownload(id: BCDLiveID.steam(appID), title: names[appID] ?? "Steam game", store: .steam,
                                    doneBytes: Int64(clamping: progress.doneBytes), totalBytes: Int64(clamping: progress.totalBytes),
                                    bytesPerSecond: download.state == .active ? progress.bytesPerSecond : 0)
+            // A repair, an update or a moved game first reads the files already there (DepotDownloader.checkExisting, from Madeira #464).
+            if download.state == .active, progress.phase == .checking {
+                let done = progress.checkTotal > 0 ? Int(Double(progress.checkDone) / Double(progress.checkTotal) * 100) : 0
+                item.source = "Checking the files already there · \(done)%"
+            }
             // Downloads from a PC on this network (off by default): while it is on, where the bytes come from now.
             if SteamLANSetting.enabled, download.state == .active, progress.phase == .downloading {
                 if let pc = progress.pcName {
@@ -478,7 +527,13 @@ import os
         storageAsked = Date()
         system.freeDeviceBytes = space.free
         system.totalDeviceBytes = space.total
-        system.freeExternalBytes = nil   // the engine has no external drive yet (docs/HARICI-SSD.md)
+        // The drive a Steam game's "External drive" install goes to (ExternalDrives.externalInstallTarget), and its free room.
+        // Its free room is measured off the main thread (a sleeping drive can take a while to answer) and shown when it is known.
+        let target = ExternalDrives.shared.externalInstallTarget
+        system.externalDriveName = target?.name
+        system.freeExternalBytes = target.flatMap { externalFree[$0.name] }
+        system.installsToExternal = target != nil && ExternalDrives.shared.steamInstallFolder?.name == target?.name
+        if let target { measureExternal(target.name, MadeiraDock.drive.appendingPathComponent(target.library)) }
         if store.system != system { store.system = system }
     }
 
@@ -507,6 +562,23 @@ import os
         store.system.totalDeviceBytes = space.total
     }
     private var storageAsked = Date.distantPast
+    /// The external drives' free room as last measured (refreshSystem), by drive name.
+    private var externalFree: [String: Int64] = [:]
+    private var measuringExternal = false
+
+    private func measureExternal(_ name: String, _ url: URL) {
+        guard !measuringExternal else { return }
+        measuringExternal = true
+        DispatchQueue.global(qos: .utility).async {
+            let free = url.freeSpace
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                measuringExternal = false
+                externalFree[name] = free
+                if store.system.externalDriveName == name, store.system.freeExternalBytes != free { store.system.freeExternalBytes = free }
+            }
+        }
+    }
     private var storageKey = ""
 
     private static func deviceSpace() -> (free: Int64?, total: Int64?) {
@@ -539,7 +611,12 @@ import os
     // MARK: - BCDActions
 
     func play(_ game: BCDGame) {
-        guard !starting, LibraryModel.shared.current == nil else { return }
+        let library = LibraryModel.shared
+        if library.desktopHome, library.current != nil {
+            library.error = "Windows is still running. On Home, choose Show Windows to return to it, or Stop before starting a game."
+            return
+        }
+        guard !starting, library.current == nil else { return }
         starting = true
         settled { [weak self] in
             self?.starting = false
@@ -627,8 +704,18 @@ import os
         if ea(.install, game.id) { return }
         // A game from Files is added, not installed.
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
-        if place == .externalDrive { LogStore.shared.log("[bcd-ui] no external drive in this build: app=\(appID) goes to the device") }
-        download(appID)
+        // Where the download goes (from Madeira #464, the install sheet's Install on): this device's Steam library, or the
+        // SteamLibrary folder on the external drive. A paused earlier download keeps its own place (SteamOwnedLibrary.install).
+        if place == .externalDrive {
+            guard let target = ExternalDrives.shared.externalInstallTarget else {
+                LibraryModel.shared.error = "The external drive is not connected. Plug it in, then try again."
+                return
+            }
+            LogStore.shared.log("[bcd-ui] install app=\(appID) on the external drive")
+            download(appID, library: target.library)
+        } else {
+            download(appID, library: SteamInstallPaths.libraryRelative)
+        }
     }
 
     func update(_ game: BCDGame) {
@@ -645,12 +732,13 @@ import os
     /// continued-processing task) while BCD is in front: a player who leaves BCD right after
     /// tapping keeps the download running. Only a start that can only fail (no Steam library, no
     /// sign-in) waits for the page to close, so the Steam message shows over BCD's interface.
-    private func download(_ appID: Int) {
+    private func download(_ appID: Int, library: String? = nil) {
         let account = SteamOwnedLibrary.shared
+        if BCDDuoFeatures.active { account.reconcileSession() }
         if SteamOwnedLibrary.enabled && account.signedIn {
-            account.install(appID)
+            account.install(appID, library: library)
         } else {
-            settled { account.install(appID) }
+            settled { account.install(appID, library: library) }
         }
     }
 

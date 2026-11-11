@@ -42,6 +42,7 @@
 
 #include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
+#include "llvm/IR/CFG.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Dominators.h"
@@ -606,7 +607,452 @@ static int rewrite_t2r_module(Module &m, const t2r_target &tgt, note_t &note,
     return 1;
 }
 
+/* madeira-bcd (build 647): a 64-bit texture atomic whose old value is read, in a pixel shader.
+ *
+ * The Last of Us Part I's transparency pass (MainPsOitAppend, the owner's logs of 2026-11-08/09, four shaders of 6833 to
+ * 6845 bytes) keeps the four nearest layers of every pixel in four RWTexture2D<uint64_t> (R32G32_UINT, u2-u5): each
+ * InterlockedMax hands the value it replaced to the next layer (old = max(L0, v); v = min(old, v); ...). Metal's 64-bit
+ * texture atomics return nothing, so the converter refuses the shader ("IR contains unsupported instruction:
+ * dx.op.atomicBinOp.i64"), on every target (Apple9/iOS 18 and Apple10/iOS 26 both), and the pass was skipped: the menu's
+ * curtain and windows were drawn wrong. A pixel shader can do the same without an atomic: with the textures made
+ * rasterizer-ordered views (ROV, Metal's raster order groups, which the converter emits), the accesses of fragments on
+ * the same pixel run in primitive order, so "load, combine, store, return the loaded value" is exactly the atomic.
+ * The pass rewrites every atomicBinOp.i64 on such a texture into textureLoad.i32 + textureStore.i32 of its two 32-bit
+ * halves (R = low, G = high, as D3D lays a uint64 out in R32G32_UINT), retypes the resource as a ROV of uint2 (element
+ * U32, no Atomic64Use tag, its handles' properties likewise) and sets the shader flags that say so (ROVs, typed UAV
+ * loads of additional formats). Only a pixel shader with at least one read result, only plain bindings; anything
+ * else leaves the shader as it was (the converter then refuses it as before). Returns 1 rewritten, 0 nothing to do,
+ * -1 could not (note says why). */
+constexpr unsigned kOpTextureLoad = 66;
+constexpr uint64_t kFlagUAVLoadAdditional = 1ull << 13, kFlagROVs = 1ull << 18;   /* DXIL module flags */
+constexpr uint64_t kSfi0TypedUAVLoadAdditional = 0x800, kSfi0ROVs = 0x1000;        /* SFI0 feature bits */
+
+struct a64_res { uint32_t space, lo; bool read = false; };
+
+static bool a64_binding(Module &m, Value *h, uint32_t *space, uint32_t *lo)
+{
+    auto *ci = dyn_cast<CallInst>(h);
+    if (!ci) return false;
+    if (is_dx_op(ci, kOpAnnotateHandle) && ci->arg_size() >= 2) return a64_binding(m, ci->getArgOperand(1), space, lo);
+    if (is_dx_op(ci, kOpCreateHandleFromBinding) && ci->arg_size() >= 3) {
+        auto *cs = dyn_cast<ConstantStruct>(ci->getArgOperand(1));
+        if (!cs || cs->getNumOperands() != 4) return false;
+        bool ok = true;
+        uint64_t l = cint(cs->getOperand(0), &ok), hi = cint(cs->getOperand(1), &ok), sp = cint(cs->getOperand(2), &ok),
+                 cl = cint(cs->getOperand(3), &ok), idx = cint(ci->getArgOperand(2), &ok);
+        if (!ok || cl != kClassUAV || l != hi || idx != l) return false;   /* one register, a constant index */
+        *space = (uint32_t)sp; *lo = (uint32_t)l;
+        return true;
+    }
+    if (is_dx_op(ci, kOpCreateHandle) && ci->arg_size() >= 4) {
+        bool ok = true;
+        uint64_t cl = cint(ci->getArgOperand(1), &ok), rid = cint(ci->getArgOperand(2), &ok);
+        if (!ok || cl != kClassUAV) return false;
+        MDTuple *uavs = uav_list(m);
+        if (!uavs) return false;
+        for (const MDOperand &op : uavs->operands()) {
+            auto *e = dyn_cast_or_null<MDTuple>(op.get());
+            if (!e || e->getNumOperands() < 7) continue;
+            bool ok2 = true;
+            if (md_int(e->getOperand(0), &ok2) != rid || !ok2) continue;
+            uint64_t sp = md_int(e->getOperand(3), &ok2), l = md_int(e->getOperand(4), &ok2), cnt = md_int(e->getOperand(5), &ok2);
+            uint64_t idx = cint(ci->getArgOperand(3), &ok2);
+            if (!ok2 || cnt != 1 || idx != l) return false;
+            *space = (uint32_t)sp; *lo = (uint32_t)l;
+            return true;
+        }
+    }
+    return false;
+}
+
+static int rewrite_a64rov_module(Module &m, note_t &note, unsigned *n_atomics, unsigned *n_res, bool *any_left)
+{
+    LLVMContext &ctx = m.getContext();
+    NamedMDNode *sm = m.getNamedMetadata("dx.shaderModel");
+    auto *smt = sm && sm->getNumOperands() == 1 ? dyn_cast<MDTuple>(sm->getOperand(0)) : nullptr;
+    auto *kind = smt && smt->getNumOperands() >= 1 ? dyn_cast_or_null<MDString>(smt->getOperand(0).get()) : nullptr;
+    if (!kind || kind->getString() != "ps") return 0;   /* ROVs exist in pixel shaders only */
+    MDTuple *uavs = uav_list(m);
+    if (!uavs) return 0;
+
+    /* The 64-bit atomics, by binding; which bindings have one whose result is read. */
+    std::vector<CallInst *> atomics;
+    std::vector<a64_res> res;
+    auto find = [&](uint32_t sp, uint32_t lo) -> a64_res * {
+        for (a64_res &r : res) if (r.space == sp && r.lo == lo) return &r;
+        return nullptr;
+    };
+    for (Function &f : m) for (BasicBlock &bb : f) for (Instruction &in : bb) {
+        auto *ci = dyn_cast<CallInst>(&in);
+        if (!ci || !is_dx_op(ci, kOpAtomicBinOp) || !ci->getType()->isIntegerTy(64) || ci->arg_size() < 7) continue;
+        uint32_t sp = 0, lo = 0;
+        if (!a64_binding(m, ci->getArgOperand(1), &sp, &lo)) {
+            if (!ci->use_empty()) { say(note, "a 64-bit atomic whose result is read goes through a handle %sthat is not a plain binding", ""); return -1; }
+            continue;
+        }
+        a64_res *r = find(sp, lo);
+        if (!r) { res.push_back({sp, lo}); r = &res.back(); }
+        r->read |= !ci->use_empty();
+        atomics.push_back(ci);
+    }
+    /* Nothing read: the converter takes the shader as it is. Something read: every 64-bit atomic of the shader on a plain
+     * binding goes the ordered way (one mechanism for the whole pass: the layer nobody reads back, The Last of Us Part I's
+     * fourth, would otherwise stay a native atomic beside three ordered textures). */
+    bool any_read = false;
+    for (a64_res &r : res) any_read |= r.read;
+    if (!any_read) return 0;
+    std::vector<a64_res> want = res;
+    auto wanted = [&](uint32_t sp, uint32_t lo) {
+        for (a64_res &r : want) if (r.space == sp && r.lo == lo) return true;
+        return false;
+    };
+
+    /* The resources: plain 2D textures (shape 2) in the UAV list. */
+    for (a64_res &r : want) {
+        bool found = false;
+        for (const MDOperand &op : uavs->operands()) {
+            auto *e = dyn_cast_or_null<MDTuple>(op.get());
+            if (!e || e->getNumOperands() < 11) continue;
+            bool ok = true;
+            uint64_t sp = md_int(e->getOperand(3), &ok), lo = md_int(e->getOperand(4), &ok), cnt = md_int(e->getOperand(5), &ok),
+                     shape = md_int(e->getOperand(6), &ok);
+            if (!ok || sp != r.space || lo != r.lo) continue;
+            if (cnt != 1 || shape != 2) { say(note, "the 64-bit atomic's texture at register %su%u is not one plain 2D texture", "", r.lo); return -1; }
+            found = true;
+        }
+        if (!found) { say(note, "the 64-bit atomic's texture at register %su%u is not in the resource list", "", r.lo); return -1; }
+    }
+
+    /* Every other use of those handles must be an annotateHandle or a 64-bit atomic (the shaders seen use nothing else). */
+    for (Function &f : m) for (BasicBlock &bb : f) for (Instruction &in : bb) {
+        auto *ci = dyn_cast<CallInst>(&in);
+        if (!ci || !(is_dx_op(ci, kOpAnnotateHandle) || is_dx_op(ci, kOpCreateHandleFromBinding) || is_dx_op(ci, kOpCreateHandle))) continue;
+        uint32_t sp = 0, lo = 0;
+        if (!a64_binding(m, ci, &sp, &lo) || !wanted(sp, lo)) continue;
+        for (User *u : ci->users()) {
+            auto *uc = dyn_cast<CallInst>(u);
+            bool fine = uc && (is_dx_op(uc, kOpAnnotateHandle) ||
+                               (is_dx_op(uc, kOpAtomicBinOp) && uc->getType()->isIntegerTy(64) && uc->getArgOperand(1) == ci));
+            if (!fine) { say(note, "the texture at register %su%u is also used another way", "", lo); return -1; }
+        }
+    }
+
+    Type *i8 = Type::getInt8Ty(ctx), *i32 = Type::getInt32Ty(ctx), *i64 = Type::getInt64Ty(ctx);
+    Type *handle_ty = atomics[0]->getArgOperand(1)->getType();
+    StructType *ret_ty = StructType::getTypeByName(ctx, "dx.types.ResRet.i32");
+    if (!ret_ty) ret_ty = StructType::create(ctx, {i32, i32, i32, i32, i32}, "dx.types.ResRet.i32");
+    FunctionCallee load = m.getOrInsertFunction("dx.op.textureLoad.i32",
+        FunctionType::get(ret_ty, {i32, handle_ty, i32, i32, i32, i32, i32, i32, i32}, false));
+    if (auto *lf = dyn_cast<Function>(load.getCallee())) { lf->addFnAttr(Attribute::NoUnwind); lf->addFnAttr(Attribute::ReadOnly); }
+    FunctionCallee store = m.getOrInsertFunction("dx.op.textureStore.i32",
+        FunctionType::get(Type::getVoidTy(ctx), {i32, handle_ty, i32, i32, i32, i32, i32, i32, i32, i8}, false));
+    if (auto *sf = dyn_cast<Function>(store.getCallee())) sf->addFnAttr(Attribute::NoUnwind);
+
+    unsigned done = 0;
+    for (CallInst *ci : atomics) {
+        uint32_t sp = 0, lo = 0;
+        if (!a64_binding(m, ci->getArgOperand(1), &sp, &lo) || !wanted(sp, lo)) continue;
+        bool ok = true;
+        unsigned op = (unsigned)cint(ci->getArgOperand(2), &ok);
+        if (!ok || op > 8) { say(note, "a 64-bit atomic with an unknown or non-constant operation %s(%u)", "", op); return -1; }
+        Value *h = ci->getArgOperand(1), *x = ci->getArgOperand(3), *y = ci->getArgOperand(4), *z = ci->getArgOperand(5);
+        Value *v = ci->getArgOperand(6), *u32 = UndefValue::get(i32);
+        IRBuilder<> b(ci);
+        Value *ld = b.CreateCall(load, {ConstantInt::get(i32, kOpTextureLoad), h, u32, x, y, z, u32, u32, u32});
+        Value *olo = b.CreateExtractValue(ld, 0), *ohi = b.CreateExtractValue(ld, 1);
+        Value *old = b.CreateOr(b.CreateShl(b.CreateZExt(ohi, i64), 32), b.CreateZExt(olo, i64));
+        Value *nv = nullptr;
+        switch (op) {   /* DXIL AtomicBinOpCode */
+        case 0: nv = b.CreateAdd(old, v); break;
+        case 1: nv = b.CreateAnd(old, v); break;
+        case 2: nv = b.CreateOr(old, v); break;
+        case 3: nv = b.CreateXor(old, v); break;
+        case 4: nv = b.CreateSelect(b.CreateICmpSLT(v, old), v, old); break;   /* IMin */
+        case 5: nv = b.CreateSelect(b.CreateICmpSGT(v, old), v, old); break;   /* IMax */
+        case 6: nv = b.CreateSelect(b.CreateICmpULT(v, old), v, old); break;   /* UMin */
+        case 7: nv = b.CreateSelect(b.CreateICmpUGT(v, old), v, old); break;   /* UMax */
+        default: nv = v; break;                                                 /* Exchange */
+        }
+        Value *nlo = b.CreateTrunc(nv, i32), *nhi = b.CreateTrunc(b.CreateLShr(nv, 32), i32);
+        b.CreateCall(store, {ConstantInt::get(i32, kOpTextureStore), h, x, y, z, nlo, nhi, nlo, nlo, ConstantInt::get(i8, 3)});
+        ci->replaceAllUsesWith(old);
+        ci->eraseFromParent();
+        done++;
+    }
+
+    /* Handle properties (SM 6.6): {Texture2D | UAV, U32 x1} -> {Texture2D | UAV | ROV, U32 x2}. */
+    for (Function &f : m) for (BasicBlock &bb : f) for (Instruction &in : bb) {
+        auto *ci = dyn_cast<CallInst>(&in);
+        if (!ci || !is_dx_op(ci, kOpAnnotateHandle) || ci->arg_size() < 3) continue;
+        uint32_t sp = 0, lo = 0;
+        if (!a64_binding(m, ci, &sp, &lo) || !wanted(sp, lo)) continue;
+        auto *cs = dyn_cast<ConstantStruct>(ci->getArgOperand(2));
+        if (!cs || cs->getNumOperands() != 2) { say(note, "the texture at register %su%u has handle properties BCD cannot read", "", lo); return -1; }
+        bool ok = true;
+        uint64_t w0 = cint(cs->getOperand(0), &ok), w1 = cint(cs->getOperand(1), &ok);
+        if (!ok || (w0 & 0xff) != 2 || !(w0 & 0x1000) || (w1 & 0xff) != 5) { say(note, "the texture at register %su%u is not a typed U32 2D UAV", "", lo); return -1; }
+        ci->setArgOperand(2, ConstantStruct::get(cs->getType(),
+            {ConstantInt::get(i32, w0 | 0x2000), ConstantInt::get(i32, (w1 & ~0xff00ull) | (2u << 8))}));
+    }
+
+    /* The resource list: ROV of uint2, element U32, no Atomic64Use tag. */
+    const char *rov_name = "class.RasterizerOrderedTexture2D<vector<unsigned int, 2> >";
+    StructType *rov_ty = StructType::getTypeByName(ctx, rov_name);
+    if (!rov_ty) rov_ty = StructType::create(ctx, {FixedVectorType::get(i32, 2)}, rov_name);
+    std::vector<Metadata *> kept;
+    for (const MDOperand &op : uavs->operands()) {
+        auto *e = dyn_cast_or_null<MDTuple>(op.get());
+        if (!e) continue;
+        bool ok = true;
+        uint64_t sp = e->getNumOperands() >= 11 ? md_int(e->getOperand(3), &ok) : ~0ull, lo = e->getNumOperands() >= 11 ? md_int(e->getOperand(4), &ok) : ~0ull;
+        if (!ok || !wanted((uint32_t)sp, (uint32_t)lo)) { kept.push_back(e); continue; }
+        std::vector<Metadata *> f(e->op_begin(), e->op_end());
+        f[1] = ConstantAsMetadata::get(UndefValue::get(PointerType::get(rov_ty, 0)));
+        f[9] = ConstantAsMetadata::get(ConstantInt::getTrue(ctx));
+        std::vector<Metadata *> props;
+        bool have_elem = false;
+        if (f[10]) {
+            auto *p = cast<MDTuple>(f[10]);
+            for (unsigned i = 0; i + 1 < p->getNumOperands(); i += 2) {
+                bool ok2 = true;
+                uint64_t tag = md_int(p->getOperand(i), &ok2);
+                if (ok2 && tag == 3) continue;   /* Atomic64Use */
+                if (ok2 && tag == 0) {
+                    have_elem = true;
+                    props.push_back(p->getOperand(i));
+                    props.push_back(ConstantAsMetadata::get(ConstantInt::get(i32, 5)));   /* U32 */
+                    continue;
+                }
+                props.push_back(p->getOperand(i)); props.push_back(p->getOperand(i + 1));
+            }
+        }
+        if (!have_elem) {
+            props.insert(props.begin(), ConstantAsMetadata::get(ConstantInt::get(i32, 5)));
+            props.insert(props.begin(), ConstantAsMetadata::get(ConstantInt::get(i32, 0)));
+        }
+        f[10] = MDTuple::get(ctx, props);
+        kept.push_back(MDTuple::get(ctx, f));
+        (*n_res)++;
+    }
+
+    /* Any 64-bit atomic left (on other textures, its result unread) keeps the module's 64-bit atomic flag. */
+    bool left = false;
+    for (Function &f : m) for (BasicBlock &bb : f) for (Instruction &in : bb) {
+        auto *ci = dyn_cast<CallInst>(&in);
+        left |= ci && is_dx_op(ci, kOpAtomicBinOp) && ci->getType()->isIntegerTy(64);
+    }
+    *any_left = left;
+    {
+        NamedMDNode *resn = m.getNamedMetadata("dx.resources");
+        auto *top = cast<MDTuple>(resn->getOperand(0));
+        std::vector<Metadata *> t(top->op_begin(), top->op_end());
+        t[1] = MDTuple::get(ctx, kept);
+        MDTuple *ntop = MDTuple::get(ctx, t);
+        resn->setOperand(0, ntop);
+        if (NamedMDNode *eps = m.getNamedMetadata("dx.entryPoints")) {
+            for (unsigned i = 0; i < eps->getNumOperands(); i++) {
+                auto *ep = cast<MDTuple>(eps->getOperand(i));
+                std::vector<Metadata *> e(ep->op_begin(), ep->op_end());
+                if (e.size() < 5) e.resize(5, nullptr);
+                if (e[3]) e[3] = ntop;
+                std::vector<Metadata *> props;
+                bool have_flags = false;
+                uint64_t add = kFlagROVs | kFlagUAVLoadAdditional;
+                if (e[4]) {
+                    auto *p = cast<MDTuple>(e[4]);
+                    for (unsigned k = 0; k + 1 < p->getNumOperands(); k += 2) {
+                        bool ok = true;
+                        uint64_t tag = md_int(p->getOperand(k), &ok);
+                        Metadata *val = p->getOperand(k + 1);
+                        if (ok && tag == 0) {
+                            bool ok2 = true;
+                            uint64_t fl = md_int(p->getOperand(k + 1), &ok2) | add;
+                            if (!left) fl &= ~kFlagAtomicInt64Typed;
+                            val = ConstantAsMetadata::get(ConstantInt::get(i64, fl));
+                            have_flags = true;
+                        }
+                        props.push_back(p->getOperand(k)); props.push_back(val);
+                    }
+                }
+                if (!have_flags) {
+                    props.insert(props.begin(), ConstantAsMetadata::get(ConstantInt::get(i64, add)));
+                    props.insert(props.begin(), ConstantAsMetadata::get(ConstantInt::get(i32, 0)));
+                }
+                e[4] = MDTuple::get(ctx, props);
+                eps->setOperand(i, MDTuple::get(ctx, e));
+            }
+        }
+    }
+    {
+        std::vector<Function *> unused;
+        for (Function &f : m) if (f.isDeclaration() && f.use_empty() && f.getName().startswith("dx.op.")) unused.push_back(&f);
+        for (Function *f : unused) f->eraseFromParent();
+    }
+    *n_atomics = done;
+    return done ? 1 : 0;
+}
+
+/* madeira-bcd (build 648): dxil-loop-guard. A loop that never ends hangs the GPU: Metal ends the command buffer with "Caused GPU
+ * Hang Error", the command buffers queued behind it are discarded, and whatever they were to compute never comes. The Last of Us
+ * Part I (the owner's starts of 2026-11-09 11:25, 13:15 and 13:39; the last two with heap-backing 0 and 1) hangs every time a new
+ * game loads in CS_ComputeVolProbeBufferWriteCache, which walks a k-d tree of light probes with a stack: one node popped, at most
+ * two children pushed (left = node + 1, right = the node's own index, 0x1FFFFFFF for none). A sound tree visits each node once,
+ * and the node indices are 16-bit, so no loop of it runs 65536 times; a tree whose data reads wrong (a child pointing back) never
+ * ends. For the shaders named by their bytecode hash (the FNV-1a 64 [dxil-dump] prints), every loop whose back edges are
+ * conditional branches that otherwise leave the loop gets a counter: past `cap` iterations the back edge leaves instead. A loop
+ * that ends on its own never sees the difference; one that does not end stops instead of hanging the GPU. Loops of any other
+ * shape are left as they were (counted in the note). */
+static int rewrite_loop_guard_module(Module &m, uint32_t cap, unsigned *n_loops, unsigned *n_left)
+{
+    LLVMContext &ctx = m.getContext();
+    Type *i32 = Type::getInt32Ty(ctx);
+    for (Function &f : m) {
+        if (f.isDeclaration()) continue;
+        DominatorTree dt(f);
+        std::vector<BasicBlock *> heads;
+        std::vector<std::vector<BasicBlock *>> latches;
+        for (BasicBlock &b : f)
+            for (BasicBlock *s : successors(&b)) {
+                if (!dt.dominates(s, &b)) continue;   /* a back edge: its target dominates its source */
+                size_t k = 0;
+                while (k < heads.size() && heads[k] != s) k++;
+                if (k == heads.size()) { heads.push_back(s); latches.emplace_back(); }
+                bool have = false;
+                for (BasicBlock *l : latches[k]) have |= l == &b;
+                if (!have) latches[k].push_back(&b);
+            }
+        for (size_t k = 0; k < heads.size(); k++) {
+            BasicBlock *h = heads[k];
+            /* the loop's body: what reaches a latch without passing the header */
+            std::vector<BasicBlock *> body{h}, work(latches[k].begin(), latches[k].end());
+            auto in_body = [&](BasicBlock *x) { for (BasicBlock *y : body) if (y == x) return true; return false; };
+            while (!work.empty()) {
+                BasicBlock *x = work.back(); work.pop_back();
+                if (in_body(x)) continue;
+                body.push_back(x);
+                for (BasicBlock *p : predecessors(x)) work.push_back(p);
+            }
+            bool fit = true;
+            for (BasicBlock *l : latches[k]) {
+                auto *br = dyn_cast<BranchInst>(l->getTerminator());
+                if (!br || !br->isConditional() || br->getSuccessor(0) == br->getSuccessor(1)) { fit = false; break; }
+                BasicBlock *other = br->getSuccessor(0) == h ? br->getSuccessor(1) : br->getSuccessor(0);
+                if (in_body(other)) { fit = false; break; }   /* the other way stays in the loop: no exit to take */
+            }
+            if (!fit) { (*n_left)++; continue; }
+            PHINode *cnt = PHINode::Create(i32, 2, "bcd.lg", &h->front());
+            std::vector<std::pair<BasicBlock *, Value *>> next;
+            for (BasicBlock *l : latches[k]) {
+                auto *br = cast<BranchInst>(l->getTerminator());
+                IRBuilder<> b(br);
+                Value *nx = b.CreateAdd(cnt, ConstantInt::get(i32, 1), "bcd.lg.next");
+                Value *more = b.CreateICmpULT(nx, ConstantInt::get(i32, cap), "bcd.lg.more");
+                Value *c = br->getCondition();
+                br->setCondition(br->getSuccessor(0) == h ? b.CreateAnd(c, more) : b.CreateOr(c, b.CreateNot(more)));
+                next.push_back({l, nx});
+            }
+            for (BasicBlock *p : predecessors(h)) {
+                Value *v = ConstantInt::get(i32, 0);
+                for (auto &e : next) if (e.first == p) v = e.second;
+                cnt->addIncoming(v, p);
+            }
+            (*n_loops)++;
+        }
+    }
+    return *n_loops ? 1 : 0;
+}
+
+/* A container with its DXIL part's bitcode replaced; the hash and the debug and statistics copies of the old bitcode dropped. */
+static uint8_t *container_with_bitcode(const uint8_t *d, size_t len, const SmallVector<char, 0> &nb, size_t *out_len)
+{
+    uint32_t nparts = rd32(d + 28);
+    std::vector<std::pair<uint32_t, std::vector<uint8_t>>> parts;
+    for (uint32_t i = 0; i < nparts; i++) {
+        uint32_t off = rd32(d + 32 + 4 * i), sz = rd32(d + off + 4);
+        uint32_t cc; memcpy(&cc, d + off, 4);
+        if (!memcmp(&cc, "HASH", 4) || !memcmp(&cc, "ILDB", 4) || !memcmp(&cc, "STAT", 4)) continue;
+        std::vector<uint8_t> p(d + off + 8, d + off + 8 + sz);
+        if (!memcmp(&cc, "DXIL", 4)) {
+            std::vector<uint8_t> q(24 + nb.size());
+            memcpy(q.data(), p.data(), 16);
+            wr32(q.data() + 4, (uint32_t)(q.size() / 4));
+            wr32(q.data() + 16, 16);
+            wr32(q.data() + 20, (uint32_t)nb.size());
+            memcpy(q.data() + 24, nb.data(), nb.size());
+            p.swap(q);
+        }
+        parts.push_back({cc, std::move(p)});
+    }
+    size_t total = 32 + 4 * parts.size();
+    for (auto &p : parts) total += 8 + p.second.size();
+    uint8_t *o = (uint8_t *)malloc(total);
+    if (!o) return nullptr;
+    memcpy(o, d, 24);
+    memset(o + 4, 0, 16);
+    wr32(o + 24, (uint32_t)total);
+    wr32(o + 28, (uint32_t)parts.size());
+    size_t w = 32 + 4 * parts.size();
+    for (size_t i = 0; i < parts.size(); i++) {
+        wr32(o + 32 + 4 * i, (uint32_t)w);
+        memcpy(o + w, &parts[i].first, 4);
+        wr32(o + w + 4, (uint32_t)parts[i].second.size());
+        memcpy(o + w + 8, parts[i].second.data(), parts[i].second.size());
+        w += 8 + parts[i].second.size();
+    }
+    (void)len;
+    *out_len = total;
+    return o;
+}
+
 }  // namespace
+
+/* madeira-bcd (build 648): see rewrite_loop_guard_module. 1 and a malloc'd container when a loop got its counter, 0 when none fits,
+ * -1 when the container or its bitcode cannot be read (note says why; the caller keeps what it had). */
+extern "C" int madeira_loop_guard_rewrite(const void *bc, size_t len, uint32_t cap, void **out, size_t *out_len,
+                                          char *note_buf, size_t note_cap)
+{
+    note_t note{note_buf, note_cap};
+    const uint8_t *d = (const uint8_t *)bc;
+    *out = nullptr; *out_len = 0;
+    if (note_buf && note_cap) note_buf[0] = 0;
+    if (len < 32 || memcmp(d, "DXBC", 4)) { say(note, "not a DXBC container%s", ""); return -1; }
+    uint32_t nparts = rd32(d + 28);
+    if (32 + 4ull * nparts > len) { say(note, "container part table runs past its end%s", ""); return -1; }
+    const uint8_t *dxil = nullptr; uint32_t dxil_size = 0;
+    for (uint32_t i = 0; i < nparts; i++) {
+        uint32_t off = rd32(d + 32 + 4 * i);
+        if (off + 8ull > len) return -1;
+        uint32_t sz = rd32(d + off + 4);
+        if (off + 8ull + sz > len) return -1;
+        if (!memcmp(d + off, "DXIL", 4)) { dxil = d + off + 8; dxil_size = sz; }
+    }
+    if (!dxil || dxil_size < 24) { say(note, "no DXIL part%s", ""); return -1; }
+    uint32_t bc_off = rd32(dxil + 16), bc_size = rd32(dxil + 20);
+    if (8ull + bc_off + bc_size > dxil_size) { say(note, "DXIL part's bitcode runs past its end%s", ""); return -1; }
+    LLVMContext ctx;
+    ctx.setOpaquePointers(false);
+    auto mb = MemoryBuffer::getMemBuffer(StringRef((const char *)dxil + 8 + bc_off, bc_size), "dxil", false);
+    auto mod = parseBitcodeFile(mb->getMemBufferRef(), ctx);
+    if (!mod) {
+        std::string err = toString(mod.takeError());
+        say(note, "bitcode reader: %s", err.c_str());
+        return -1;
+    }
+    unsigned n = 0, left = 0;
+    if (!rewrite_loop_guard_module(**mod, cap, &n, &left)) {
+        if (note_buf && note_cap) snprintf(note_buf, note_cap, "no loop of a shape that can be capped (%u left as they were)", left);
+        return 0;
+    }
+    SmallVector<char, 0> nb;
+    { raw_svector_ostream os(nb); WriteBitcodeToFile(**mod, os); }
+    while (nb.size() & 3) nb.push_back(0);
+    uint8_t *o = container_with_bitcode(d, len, nb, out_len);
+    if (!o) return -1;
+    *out = o;
+    if (note_buf && note_cap)
+        snprintf(note_buf, note_cap, "%u loop(s) capped at %u iterations, %u left as they were", n, cap, left);
+    return 1;
+}
 
 extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_t *out_len,
                                    char *note_buf, size_t note_cap)
@@ -623,20 +1069,34 @@ extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_
      * does not declare it (the bitcode stores it as a plain 32-bit literal in a
      * VBR, so scan PSV0's resource table instead: space is a raw uint32 there). */
     const uint8_t *dxil = nullptr; uint32_t dxil_size = 0;
-    bool magic = false;
+    bool magic = false, a64 = false;
     for (uint32_t i = 0; i < nparts; i++) {
         uint32_t off = rd32(d + 32 + 4 * i);
         if (off + 8 > len) return 0;
         uint32_t sz = rd32(d + off + 4);
         if (off + 8ull + sz > len) return 0;
         if (!memcmp(d + off, "DXIL", 4)) { dxil = d + off + 8; dxil_size = sz; }
-        if (!memcmp(d + off, "PSV0", 4))
+        if (!memcmp(d + off, "PSV0", 4)) {
             for (uint32_t k = 0; k + 4 <= sz; k += 4) magic |= rd32(d + off + 8 + k) == kAgsSpace;
+            /* madeira-bcd (build 647): a pixel shader (runtime info 1's stage byte, 0) with a typed UAV marked
+             * UsedByAtomic64 (bind info flag 1) is a candidate for rewrite_a64rov_module. */
+            const uint8_t *q = d + off + 8;
+            uint32_t ri = sz >= 4 ? rd32(q) : 0;
+            if (ri >= 25 && 4ull + ri + 8 <= sz && q[4 + 24] == 0) {
+                uint32_t cnt = rd32(q + 4 + ri), bsz = rd32(q + 4 + ri + 4);
+                if (bsz >= 24 && 4ull + ri + 8 + (uint64_t)cnt * bsz <= sz)
+                    for (uint32_t k = 0; k < cnt; k++) {
+                        const uint8_t *b = q + 4 + ri + 8 + (size_t)k * bsz;
+                        a64 |= rd32(b) == 6u && (rd32(b + 20) & 1u);   /* UAVTyped, UsedByAtomic64 */
+                    }
+            }
+        }
     }
     t2r_target t2r{};
     bool want_t2r = !magic && match_t2r_target(d, len, &t2r);
+    bool want_a64 = !magic && !want_t2r && a64;   /* bcd.cfg ags-rewrite = 0 turns this off with the rest */
     if (getenv("MADEIRA_AGS_ROUNDTRIP_ONLY")) magic = true;
-    if (!dxil || (!magic && !want_t2r) || dxil_size < 24) return 0;
+    if (!dxil || (!magic && !want_t2r && !want_a64) || dxil_size < 24) return 0;
     uint32_t bc_off = rd32(dxil + 16), bc_size = rd32(dxil + 20);
     if (8ull + bc_off + bc_size > dxil_size) return 0;
 
@@ -649,9 +1109,11 @@ extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_
         say(note, "bitcode reader: %s", err.c_str());
         return -1;
     }
-    unsigned n = 0, n_used = 0, t2r_h = 0, t2r_l = 0, t2r_s = 0;
+    unsigned n = 0, n_used = 0, t2r_h = 0, t2r_l = 0, t2r_s = 0, a64_n = 0, a64_r = 0;
+    bool a64_left = false;
     int rc = getenv("MADEIRA_AGS_ROUNDTRIP_ONLY") ? 1
            : want_t2r ? rewrite_t2r_module(**mod, t2r, note, &t2r_h, &t2r_l, &t2r_s)
+           : want_a64 ? rewrite_a64rov_module(**mod, note, &a64_n, &a64_r, &a64_left)
                       : rewrite_module(**mod, note, &n, &n_used);   /* offline control */
     if (rc <= 0) return rc;
 
@@ -679,7 +1141,10 @@ extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_
             p.swap(q);
         } else if (!memcmp(&cc, "SFI0", 4) && p.size() >= 8) {
             uint64_t fl; memcpy(&fl, p.data(), 8);
-            fl |= want_t2r ? kSfi0RawBuffers : (kSfi0Int64Ops | kSfi0AtomicInt64Typed);
+            if (want_a64) {
+                fl |= kSfi0ROVs | kSfi0TypedUAVLoadAdditional;
+                if (!a64_left) fl &= ~kSfi0AtomicInt64Typed;
+            } else fl |= want_t2r ? kSfi0RawBuffers : (kSfi0Int64Ops | kSfi0AtomicInt64Typed);
             memcpy(p.data(), &fl, 8);
         } else if (!memcmp(&cc, "PSV0", 4) && p.size() >= 4) {
             /* PSV0: u32 runtime-info size, runtime info, u32 resource count,
@@ -694,6 +1159,12 @@ extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_
                     if (bsz >= 16 && base + (size_t)cnt * bsz <= p.size()) {
                         for (uint32_t k = 0; k < cnt; k++) {
                             uint8_t *b = p.data() + base + (size_t)k * bsz;
+                            if (want_a64) {
+                                /* the rewritten textures (all of them when no 64-bit atomic is left) no longer
+                                 * take a 64-bit atomic: drop UsedByAtomic64 */
+                                if (!a64_left && bsz >= 24 && rd32(b) == 6u) wr32(b + 20, rd32(b + 20) & ~1u);
+                                continue;
+                            }
                             if (want_t2r) {
                                 if (rd32(b + 4) == t2r.space && rd32(b + 8) == t2r.reg && rd32(b + 12) == t2r.reg &&
                                     rd32(b + 0) == (t2r.uav ? 6u : 3u)) {
@@ -730,7 +1201,11 @@ extern "C" int madeira_ags_rewrite(const void *bc, size_t len, void **out, size_
         w += 8 + parts[i].second.size();
     }
     *out = o; *out_len = total;
-    if (want_t2r)
+    if (want_a64)
+        snprintf(note_buf, note_cap, "rewrote %u 64-bit texture atomic(s) whose result is read into ordered load/store on %u "
+                 "rasterizer-ordered texture(s) (Metal's raster order groups)%s", a64_n, a64_r,
+                 a64_left ? "; other 64-bit atomics stay" : "");
+    else if (want_t2r)
         snprintf(note_buf, note_cap, "rewrote TypedBuffer<U32> %s space %u reg %u -> RawBuffer (%u handle(s), %u load(s), %u store(s))",
                  t2r.uav ? "UAV" : "SRV", t2r.space, t2r.reg, t2r_h, t2r_l, t2r_s);
     else if (n_used)

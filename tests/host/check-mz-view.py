@@ -13,7 +13,7 @@ Checks:
   - build/ntdll-unix/ios_mz_view.h compiled on the host against the geometries of the logs and of a genuine image;
   - virtual_ios.c: the check sits after the backward MZ scan and before the ml348 range check, only for a request inside the
     header's SizeOfImage, looks the view up with find_view( image_base, 0 ), logs "[mz-view] r624" at most 24 times, and drops
-    the image only with MADEIRA_MZ_VIEW_CHECK=1 (default off);
+    the image only with MADEIRA_MZ_VIEW_CHECK=1 (default on since the night round of 2026-11-11; 0 turns it off);
   - the key is in the settings catalog and in the list policy's allowedEnvNames;
   - virtual_ios.c still compiles for iOS (syntax only, pinned Wine headers) when the Wine tree is there.
 """
@@ -96,8 +96,8 @@ check("the image is dropped only when the key is on",
       re.search(r"if \(on\)\s*\{\s*image_base = NULL;\s*image_size = 0;\s*\}", block) is not None)
 fn = text[text.find("static int ios_mz_view_check_enabled(void)"):]
 fn = fn[:fn.find("\n}\n") + 3]
-check("MADEIRA_MZ_VIEW_CHECK is read once and is off unless it is 1",
-      'getenv( "MADEIRA_MZ_VIEW_CHECK" )' in fn and "cached = (s && *s == '1') ? 1 : 0;" in fn, fn)
+check("MADEIRA_MZ_VIEW_CHECK is read once and is on unless it is 0 (default on since the night round of 2026-11-11)",
+      'getenv( "MADEIRA_MZ_VIEW_CHECK" )' in fn and "cached = (s && *s == '0') ? 0 : 1;" in fn, fn)
 check("ios_mz_view.h is included by virtual_ios.c", '#include "ios_mz_view.h"' in text)
 vi = text[text.find("void virtual_init(void)"):]
 vi = vi[:vi.find("ios_log_running_image_identity();")]

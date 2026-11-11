@@ -238,7 +238,15 @@ struct AutoTuneEngineChecks {
         var v = AutoTuneState(retried: true)
         v = AutoTuneEngine.advance(v, report: report("killed", stage: 4, matched: ["swap-12gb-memory-kill", "swap-12gb-more"]),
                                    rules: rules, userKeys: ["swap-mb"], fingerprint: "n", log: nil)
-        expect(v.status == "stuck" && v.candidate == nil, "the user's own swap-mb is neither added to nor raised")
+        // Night round 2026-11-11 (agent T3 S1): the player's own swap-mb is still neither added to nor raised; the memory-kill rule now runs
+        // without it (swap-mode and swap-min-mb are the attempt) and the "more" step, which raises swap-mb itself, stays out.
+        expect(v.candidate == ["swap-mode = 2", "swap-min-mb = 1"] && v.candidateRule == "swap-12gb-memory-kill"
+               && !v.layerLines.contains { AutoTuneRules.key($0) == "swap-mb" },
+               "the user's own swap-mb is neither added to nor raised (\(v.candidate ?? []))")
+        var vm = AutoTuneState(retried: true)
+        vm = AutoTuneEngine.advance(vm, report: report("killed", stage: 4, matched: ["swap-12gb-more"]), rules: rules,
+                                    userKeys: ["swap-mb"], fingerprint: "n2", log: nil)
+        expect(vm.status == "stuck" && vm.candidate == nil, "the user's own swap-mb still keeps the swap step that raises it out")
         var x = AutoTuneState(retried: true)
         x = AutoTuneEngine.advance(x, report: report("killed", stage: 4, matched: ["swap-12gb-more"]), rules: rules,
                                    userKeys: [], fingerprint: "o", log: nil)
@@ -759,7 +767,8 @@ struct AutoTuneEngineChecks {
             expect(l.candidate == ["swap-mb = 6144", "swap-mode = 2", "swap-min-mb = 1"], "the same number in the list: the other two lines are new")
             l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: kill12, rules: rules, userKeys: ["swap-mb"], fingerprint: "l5", log: nil,
                                        listValues: ["swap-mb": "3072"])
-            expect(l.status == "stuck", "the user's own swap-mb still keeps the rule out")
+            expect(l.candidate == ["swap-mode = 2", "swap-min-mb = 1"],
+                   "the user's own swap-mb stays and keeps the number out; the tier's other two lines are the attempt (night round 2026-11-11, T3 S1)")
             l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: report("crashed", stage: 4, matched: ["swap-12gb-memory-dialog"]), rules: rules,
                                        userKeys: [], fingerprint: "l6", log: nil, listValues: ["swap-mb": "3072"])
             expect(l.status == "stuck", "a crash with the memory dialog (not a kill) leaves the list's swap-mb alone")
@@ -1190,6 +1199,144 @@ struct AutoTuneEngineChecks {
             let trying = AutoTuneEngine.advance(stuck, report: report("crashed", stage: 3, matched: [jumbo]), rules: rules, userKeys: [],
                                                 fingerprint: "w", log: nil)
             expect(trying.skippedNote == nil, "the next session's verdict does not carry the note of the one before")
+        }
+
+        // 14c. Night round 2026-11-11 (agents T3, G5, G2, T1, T2, G10): scoring facts, the partial swap rules, the BC census share,
+        // the known stop's own words, the trial note and the line numbers. The first half of every pair is the case that must still hold.
+        do {
+            func scanned(_ text: String) -> AutoTuneLogScanner {
+                let sc = AutoTuneLogScanner(signals: AutoTuneEngine.signals(rules))
+                sc.feed(Data(text.utf8)); sc.finish()
+                return sc
+            }
+            // (a) T3 S1: a player's own swap-mb keeps the swap tier out no longer; swap-mode and swap-min-mb are the attempt.
+            let kill = report("killed", stage: 3, matched: ["swap-8gb-memory-kill-sure", "swap-8gb-memory-kill"])
+            func next(_ keys: Set<String>) -> AutoTuneState {
+                AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "p"), report: kill, rules: rules, userKeys: keys, fingerprint: "p", log: nil)
+            }
+            let plain = next([]), partial = next(["swap-mb"]), other = next(["swap-mode"]), both = next(["swap-mb", "swap-mode"])
+            expect(plain.candidate == ["swap-mb = 3072", "swap-mode = 2", "swap-min-mb = 1"] && plain.candidateRule == "swap-8gb-memory-kill-sure",
+                   "no user key: the whole swap tier (\(plain.candidate ?? []))")
+            expect(partial.candidate == ["swap-mode = 2", "swap-min-mb = 1"] && partial.candidateRule == "swap-8gb-memory-kill-sure"
+                   && partial.layerLines == ["swap-mode = 2", "swap-min-mb = 1"],
+                   "the player's own swap-mb stays and the other two lines are the attempt (\(partial.candidate ?? []))")
+            expect(other.status == "stuck" && other.candidate == nil && both.status == "stuck" && both.candidate == nil,
+                   "any other key of the rule that the player set still keeps it out")
+            let withRoom = AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "p"),
+                                                  report: { var r = kill; r.freeDiskGB = 1; return r }(), rules: rules, userKeys: ["swap-mb"],
+                                                  fingerprint: "p", log: nil)
+            expect(withRoom.candidate == ["swap-mode = 2", "swap-min-mb = 1"],
+                   "the storage test is about the swap file's size, which the player's own number settles: no 'no room' answer")
+            // (b) T3 S2: the block-compressed textures as a share of the limit.
+            func census(_ kb: Int) -> String {
+                "[device] model=iPhone19,4 idiom=phone os=iOS ram=11570MB available=8172MB cores=6\n"
+                    + "ml992: os_proc_available_memory=7537 MB + phys_footprint=654 MB = 8192 MB (hw.memsize says 11570 MB)\n"
+                    + "err:   [bc-census] ml653   TOTAL logical BC bytes = \(kb / 2)KB\n[bc-census] ml653   TOTAL logical BC bytes = \(kb)KB\n"
+                    + "[footprint] rev=ml358 phys=8141 MB (peak 8141) internal\n"
+            }
+            let big = scanned(census(1_966_080)), small = scanned(census(409_600))
+            let bigReport = AutoTuneEngine.report(AutoTuneSessionEnd(killed: true), big, rules: rules, signals: AutoTuneEngine.signals(rules))
+            let smallReport = AutoTuneEngine.report(AutoTuneSessionEnd(killed: true), small, rules: rules, signals: AutoTuneEngine.signals(rules))
+            expect(big.facts.bcCensusKB == 1_966_080 && bigReport.bcCensusPct == 23 && bigReport.outcome == "killed"
+                   && bigReport.matched.contains("bc-census-share-memory-kill"),
+                   "1.9 GB of BC textures on an 8191 MB limit (23 %) and killed at the limit: the clamp rule matches (\(bigReport.bcCensusPct ?? -1) %)")
+            expect(smallReport.bcCensusPct == 4 && !smallReport.matched.contains("bc-census-share-memory-kill"),
+                   "400 MB (4 %): it does not (the swap tier answers)")
+            expect(AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "p"), report: bigReport, rules: rules, userKeys: [],
+                                          fingerprint: "p", log: nil).candidate == ["dxmt = d3d11.mipClampBC=1"],
+                   "and the attempt is the clamp, before the swap tier")
+            // (c) G5 S3, G5 S14: a game that never drew while the census says a thread waited 30 s for a lock, or a million emulated stores went by.
+            var sw = AutoTuneLogFacts(); sw.stage = 2; sw.aliveSeconds = 240; sw.presentsCounted = true; sw.presentsLogged = 0; sw.srwHangs = 5
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 240), sw) == "hung"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), sw) == "hung",
+                   "the SRW-lock census with no frame: hung, also when the player says they closed it (FTL PHE15B)")
+            var swf = sw; swf.frameSeen = true; swf.stage = 3
+            var swc = sw; swc.unhandled = 1
+            expect(AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 240), swf) == "ran"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 240), swc) == "crashed",
+                   "...not once a frame was printed, and a crash keeps its own verdict (Spec Ops HN2342)")
+            var ms = AutoTuneLogFacts(); ms.stage = 3; ms.aliveSeconds = 120; ms.presentsCounted = true; ms.presentsLogged = 0
+            ms.emulatedStoreFaults = 5_000_000; ms.wowRwxPlainUnset = true; ms.unityCrashHandler32 = true
+            expect(ms.monoStoreStorm && AutoTuneEngine.outcome(AutoTuneSessionEnd(killed: true, userSaid: "i-closed"), ms) == "hung"
+                   && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 120), ms) == "hung",
+                   "5 million emulated stores of a 32-bit Unity game that never drew: hung (Inscryption 4HZY1P)")
+            var ms2 = ms; ms2.emulatedStoreFaults = 900_000
+            var ms3 = ms; ms3.wowRwxPlainUnset = false
+            var ms4 = ms; ms4.frameSeen = true
+            expect(![ms2, ms3, ms4].contains { $0.monoStoreStorm }, "...not below a million, with the key on, or with a frame (A Short Hike)")
+            // (d) G2 S8: no debugger answered the pool request and the start ended: not a session of the game; a BAD POOL placement is.
+            let stale = scanned("[ERR] [jit-debugger] the pool request was not answered: no debugger is attached. Enable JIT\n"
+                                + "[ERR] JIT pool allocation FAILED \u{2014} not starting Wine.\n")
+            let badPool = scanned("[ERR] BAD POOL: no valid placement after retries.\n[ERR] JIT pool allocation FAILED \u{2014} not starting Wine.\n")
+            expect(stale.facts.wineNeverStarted && AutoTuneEngine.outcome(AutoTuneSessionEnd(sawProcess: true, seconds: 25), stale.facts) == "inconclusive"
+                   && !badPool.facts.wineNeverStarted,
+                   "the stale-debugger stop is not scored; the BAD POOL stop keeps its rules")
+            // (e) G10 S2: the sender's own words are no evidence.
+            let comment = scanned("[user-comment] it says Unhandled exception code c0000005 and [exit-report] status=0xC0000005\nplain line\n")
+            let noComment = scanned("it says Unhandled exception code c0000005\n")
+            expect(comment.facts.unhandled == 0 && comment.facts.exitStatus == nil && noComment.facts.unhandled == 1,
+                   "a [user-comment] line counts nowhere; the same words in the game's log do")
+            // (f) G10 S4: a known stop that carries its own words.
+            let gles = AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "p"),
+                                              report: report("crashed", stage: 3, matched: ["opengl-es-for-desktop-game"]), rules: rules, userKeys: [],
+                                              fingerprint: "p", log: nil)
+            expect(gles.status == "known" && gles.knownLeadText == "Choose another OpenGL backend" && gles.knownAdvice.hasPrefix("Choose another OpenGL backend: "),
+                   "a rule's own lead replaces 'No setting changes this' in the advice (the headline is checked with the app side)")
+            let plainKnown = AutoTuneEngine.advance(AutoTuneState(retried: true, fingerprint: "p"),
+                                                    report: report("crashed", stage: 3, matched: ["steam-stub-exit-8000dead-no-client"]), rules: rules,
+                                                    userKeys: [], fingerprint: "p", log: nil)
+            expect(plainKnown.status == "known" && plainKnown.knownLeadText == nil && plainKnown.knownAdvice.hasPrefix("No setting changes this: "),
+                   "a rule without a lead speaks as before")
+            // (g) T1 S1: why a trial was kept or reverted.
+            var trial = AutoTuneState(); trial.retried = true; trial.fingerprint = "t"
+            trial = AutoTuneEngine.advance(trial, report: report("killed", stage: 3, seconds: 301, matched: ["bc-decode-memory-kill"]), rules: rules, userKeys: [], fingerprint: "t", log: nil)
+            trial = AutoTuneEngine.advance(trial, report: report("killed", stage: 3, seconds: 40, matched: ["bc-decode-memory-kill"]), rules: rules, userKeys: [], fingerprint: "t", log: nil)
+            expect((trial.trialNote ?? "").contains("trial bc-decode-memory-kill") && (trial.trialNote ?? "").hasSuffix("reverted"),
+                   "a decided trial leaves a note with both runs' numbers (\(trial.trialNote ?? "nil"))")
+            let after = AutoTuneEngine.advance(trial, report: report("killed", stage: 3, seconds: 40), rules: rules, userKeys: [], fingerprint: "t", log: nil)
+            expect(after.trialNote == nil, "...and the next verdict does not carry it")
+            // (h) T2 S-DL3: line numbers of what the rules read.
+            let nums = scanned("line one\n\nsecond\n[device] gpu=A bc=0\n[bc-decode] ml679 x\n")
+            expect(nums.lineCount == 5, "the scanner counts the physical lines, empty ones too (\(nums.lineCount))")
+        }
+
+        // 14c. Round 2026-11-11 (G3 S5/S6; DRAGON BALL FighterZ EWFEK0: twinapi.appcore, then msvcp_win; Dolphin 5ZT354: qwave, then bluetoothapis):
+        // env.MADEIRA_OPTIN_DLLS is a list a later rule adds to; every other key is still replaced, and a line with nothing kept before it is as it was.
+        do {
+            let o = AutoTuneState.optinKey
+            expect(AutoTuneState.merge(["\(o) = twinapi.appcore"], ["\(o) = msvcp_win"]) == ["\(o) = twinapi.appcore,msvcp_win"],
+                   "a second opt-in DLL rule adds its name to the kept one (DRAGON BALL FighterZ)")
+            expect(AutoTuneState.merge(["x = 1", "\(o) = qwave"], ["\(o) = bluetoothapis", "y = 2"]) == ["x = 1", "\(o) = qwave,bluetoothapis", "y = 2"],
+                   "the other kept lines stay and the other candidate lines follow (Dolphin)")
+            expect(AutoTuneState.merge(["\(o) = tbs"], ["\(o) = TBS, ntdsapi;evr"]) == ["\(o) = tbs,ntdsapi,evr"],
+                   "a name that is kept already is not added again (without case), and commas, semicolons and spaces all separate names")
+            expect(AutoTuneState.merge(["x = 1"], ["\(o) = a, b"]) == ["x = 1", "\(o) = a, b"],
+                   "a candidate opt-in line with no kept one before it goes in as it is")
+            expect(AutoTuneState.merge(["swap-mb = 2048", "\(o) = a"], ["swap-mb = 3072"]) == ["\(o) = a", "swap-mb = 3072"],
+                   "any other key is replaced, and a kept opt-in line survives a candidate without one")
+            var ost = AutoTuneState(); ost.retried = true; ost.fingerprint = "o"
+            ost.kept = ["\(o) = twinapi.appcore"]; ost.candidate = ["\(o) = msvcp_win"]; ost.candidateRule = "test-msvcp"
+            ost.best = report("crashed", stage: 3)
+            expect(ost.layerLines == ["\(o) = twinapi.appcore,msvcp_win"], "the layer file of the second attempt carries both names")
+            let oadv = AutoTuneEngine.advance(ost, report: report("crashed", stage: 4, seconds: 60), rules: rules, userKeys: [], fingerprint: "o", log: nil)
+            expect(oadv.kept == ["\(o) = twinapi.appcore,msvcp_win"] && oadv.attempts.last?.kept == true,
+                   "an attempt that got further keeps both names (\(oadv.kept))")
+            // the rule that brings the second name is a new try, not "a key auto-tune kept" (before the change: stuck)
+            let second = AutoTuneRule(id: "test-optin-second", lines: ["\(o) = msvcp_win"], priority: 10,
+                                      all: [AutoTuneSignal(has: ["only in the opt-in test"])], noRetry: true, reason: "test")
+            var kst = AutoTuneState(); kst.retried = true; kst.fingerprint = "q"; kst.kept = ["\(o) = twinapi.appcore"]
+            let q1 = AutoTuneEngine.advance(kst, report: report("crashed", stage: 3, matched: [second.id]), rules: rules + [second], userKeys: [],
+                                            fingerprint: "q", log: nil)
+            expect(q1.status == "trying" && q1.candidate == ["\(o) = msvcp_win"] && q1.layerLines == ["\(o) = twinapi.appcore,msvcp_win"],
+                   "a second opt-in DLL rule is tried on top of the kept name, and the layer carries both (\(q1.status) \(q1.layerLines))")
+            kst.kept = ["\(o) = twinapi.appcore,MSVCP_WIN"]
+            let q2 = AutoTuneEngine.advance(kst, report: report("crashed", stage: 3, matched: [second.id]), rules: rules + [second], userKeys: [],
+                                            fingerprint: "q", log: nil)
+            expect(q2.status == "stuck" && q2.skippedNote == "test-optin-second (a key auto-tune kept)",
+                   "a rule whose DLL is kept already is no new try (\(q2.skippedNote ?? "nil"))")
+            let q3 = AutoTuneEngine.advance(kst, report: report("crashed", stage: 3, matched: [second.id]), rules: rules + [second],
+                                            userKeys: ["\(o)"], fingerprint: "q", log: nil)
+            expect(q3.status == "stuck" && q3.skippedNote == "test-optin-second (a key you set)", "the user's own opt-in line is never added to")
         }
 
         // 15. State survives JSON (the app saves it between sessions).

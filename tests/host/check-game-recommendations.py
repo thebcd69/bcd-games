@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """BCD's built-in recommended settings per game (owner's decision 2026-10-09).
 
 Source checks (every host): the lists in recommended/recommendations.json (the
@@ -126,9 +128,10 @@ for _id, _want in R634.items():
     assert _got == [(l, (b, 1000000000)) for l, b in _want], (_id, _got)
     del presets[_id]['lines'][-len(_want):]
     del presets[_id]['line_builds'][-len(_want):]
-for _key in ('mempool-mb', 'MADEIRA_DONOR_BROWSERS'):
+# The Last of Us Part I v13 (build 646) carries mempool-mb = 4096 too: the owner's line of 2026-11-08 19:59, checked with its list below.
+for _key, _want in (('mempool-mb', ['rdr2-other', 'rdr2-steam', 'the-last-of-us-part-1']), ('MADEIRA_DONOR_BROWSERS', ['rdr2-other', 'rdr2-steam'])):
     _rows = sorted(r['id'] for r in recs['rules'] if _key in json.dumps(r['config']))
-    assert _rows == ['rdr2-other', 'rdr2-steam'], (_key, _rows)
+    assert _rows == _want, (_key, _rows)
 # Round 631 (Rockstar after the 2026-11-03 Launcher/Social Club update; agents R1, R3, round 630 R S1/S8 and the owner's decisions of
 # 2026-11-04): these rows end with the round's lines, after the launcher's tbs and before the tip. Checked here and taken off, so
 # the pins below are the lists before round 631.
@@ -148,7 +151,9 @@ for _id, _want in R631.items():
     del presets[_id]['line_builds'][-len(_want):]
 for _key in ('MADEIRA_POOL_LAZY_WINDOWS', 'MADEIRA_FEX_CALLRET_RESERVE_KB', 'MADEIRA_SC_ALIGN1G', 'totalphys-cap'):
     _rows = sorted(r['id'] for r in recs['rules'] if _key in json.dumps(r['config']))
-    assert _rows == sorted(i for i, w in R631.items() if any(_key in l for l, _ in w)), (_key, _rows)
+    # night round 2026-11-11: L.A. Noire (new) and Max Payne 3 (v3) carry the helper-memory window line too (agent R1 S9, S13)
+    _NIGHT = {'MADEIRA_POOL_LAZY_WINDOWS': ['la-noire-steam', 'max-payne-3']}.get(_key, [])
+    assert _rows == sorted([i for i, w in R631.items() if any(_key in l for l, _ in w)] + _NIGHT), (_key, _rows)
 assert 'ConfigOption(key: "low-graphics-tip"' in catalog and '"Windows, display & input"' in catalog.split('ConfigOption(key: "low-graphics-tip"')[1].split('\n')[0]
 assert 'static let key = "low-graphics-tip"' in apply_src and 'enum BCDGraphicsTip' in apply_src
 # The tip comes before the start: every start of BCD's interface goes through begin(), the front end shows it, OK starts the game.
@@ -181,6 +186,18 @@ assert list(presets) == ['rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other
                          'the-binding-of-isaac-rebirth', 'mewgenics', 'doom-3-bfg-edition', 'darkest-dungeon', 'battle-brothers', 'balatro',   # build 632: gl-backend (OpenGL)
                          'borderlands-2', 'the-escapists-2', 'dark-souls-remastered',   # round 632 (the Steam CEG fix; D1.8, D1.9, D1.5)
                          'the-last-of-us-part-1',   # round 634 (the sixteen 512 GB reservations; tlou1-2026-11-06)
+                         'slime-rancher-2',   # 2026-11-08 (a tester's wintypes.dll copy; Discord)
+                         'far-cry-4',   # build 652 (Ubisoft Connect's games)
+                         'dying-light-the-beast', 'eslabong', 'find-the-needle-demo', 'fifa-23', 'grand-theft-auto-vice-city', 'la-noire-steam',
+                         'call-of-duty-world-at-war', 'dishonored', 'buckshot-roulette', 'arctic-drive-demo', 'brotato', 'quake-ii', 'resonance', 'replaced',
+                         'need-for-speed-shift', 'bulletstorm', 'doom-64', 'deponia-the-complete-journey', 'sc-jogos-barro-gt', 'angry-birds', 'into-the-breach',
+                         'freshwomen-season-1', 'gp-bikes', 'polybius', 'noita', 'battlefield-1942', 'mafia-classic', 'killer-instinct', 'the-witcher-2',
+                         'the-elder-scrolls-iv-oblivion', 'astro-tripper', 'baba-is-you', 'fear-and-hunger-2-termina', 'hearts-of-iron-iv', 'inscryption',
+                         'half-sword-demo', 'sonic-generations', 'yakuza-kiwami-3-dark-ties', 'call-of-duty-infinite-warfare', 'call-of-duty-modern-warfare-4',
+                         'bluefield', 'assassins-creed-brotherhood', 'metaphor-refantazio', 'prince-of-persia-the-lost-crown', 'football-manager-other', 'mirrors-edge',
+                         'need-for-speed-most-wanted-2012', 'crash-bandicoot-n-sane-trilogy', 'dark-deception-chapter-1', 'far-cry-3-folder', 'far-cry-4-folder',
+                         'kof-xiv-steam', 'dmc-devil-may-cry',   # night round 2026-11-11 (the new rows, in the list's order)
+                         'football-manager-2020', 'momo-game', 'watch-dogs', 'assassins-creed-black-flag-resynced', 'dragon-ball-fighterz',   # night round 2026-11-11, second part (rows that name an opt-in DLL W-OPTIN adds)
                          'standard'], list(presets)
 
 catalog_keys = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog))
@@ -221,6 +238,143 @@ header = block(profiles, '        if lines.isEmpty { lines = [', ']')
 assert 'Madeira' not in header and '# BCD settings for' in header, header
 print('PASS: forty-six lists in order, each starting "# BCD\'s recommended settings for", no key twice, every non-env key in '
       'the settings catalog, no Social Club DLL lines, "Madeira" in no line, title or GameProfile header')
+
+# Night round 2026-11-11 (the lead's list v56): the new rows are pinned here (with their match), then taken out of `presets` and `recs`; the lines and
+# versions added to rows that already existed are checked and taken off too, so every pin below reads the lists as they were before the night (the
+# way round 631's and build 634's lines are). NIGHT: row -> (the new version, the lines added as (text, first build, last build), the old lines that now
+# end at build 651 because a newer line replaces them from 652, as (text, first build)).
+NIGHT = {
+    'dragon-ball-sparking-zero': (2, [('typed-view-shadow = 1', 0, 1000000000), ('typed-view-align = 4', 0, 1000000000)], []),
+    'dying-light': (3, [('env.MADEIRA_GUEST_LOG = all', 652, 1000000000), ('env.MADEIRA_GUEST_LOG_LIMIT = 800', 652, 1000000000)], []),
+    '1000xresist': (2, [('env.MADEIRA_REAL_SUSPEND = 1', 620, 1000000000)], []),
+    'dark-souls-iii': (3, [], []),
+    'nfs-underground-2': (3, [('env.MADEIRA_WOW_RWX_PLAIN = 1', 598, 1000000000)], []),
+    'just-cause-3': (3, [('env.MADEIRA_GPU_TRACE = slow=150,30,1', 652, 1000000000)], [('env.MADEIRA_GPU_TRACE = slow=150,30,3', 624)]),
+    'slay-the-spire-2': (6, [('pool-window-cut = 1', 624, 1000000000)], []),
+    'max-payne-3': (3, [('env.MADEIRA_GUEST_LOG = all', 626, 1000000000), ('env.MADEIRA_GUEST_LOG_LIMIT = 800', 626, 1000000000), ('env.MADEIRA_POOL_LAZY_WINDOWS = 1', 630, 1000000000)], []),
+    'control': (2, [('env.MADEIRA_DOCK_KEEP_ALIVE = Control_DX11.exe;Control_DX12.exe', 652, 1000000000), ('env.MADEIRA_SPIN_DUMP_REGS = 1', 652, 1000000000)], []),
+    'no-more-room-in-hell': (3, [('env.MADEIRA_X64_IMAGE_NOCOPY = 1', 652, 1000000000)], []),
+    'fallout-3': (3, [('env.MADEIRA_WIN_TEXT = 1', 624, 1000000000), ('env.MADEIRA_REG_TRACE = 1', 624, 1000000000)], []),
+    'the-witcher-3': (3, [('env.MADEIRA_JUMBO_HALF = 2', 652, 1000000000), ('oversize-reserve = 1', 632, 1000000000), ('oversize-reserve-mb = 6144', 632, 1000000000)], [('env.MADEIRA_JUMBO_HALF = 1', 624)]),
+    'requiem-avenging-angel': (3, [('env.MADEIRA_GPU_TRACE = 14,2,1', 652, 1000000000)], [('env.MADEIRA_GPU_TRACE = 20,2,1', 630)]),
+    'reanimal': (2, [('env.MADEIRA_D3D12_CAPS_BY_FAMILY = 1', 652, 1000000000)], []),
+    'pragmata': (2, [('env.MADEIRA_KUSER_KEEP_REGS = 1', 602, 1000000000)], []),
+    'crosscode': (2, [('env.MADEIRA_OPTIN_DLLS = dxva2', 652, 1000000000)], []),
+    'football-manager-27': (3, [('env.MADEIRA_KUSER_KEEP_REGS = 1', 652, 1000000000)], []),
+    'bioshock': (2, [('env.MADEIRA_FILE_TRACE_LIMIT = 20000', 652, 1000000000)], [('env.MADEIRA_FILE_TRACE_LIMIT = 6000', 630)]),
+    'hitman-contracts': (2, [('env.MADEIRA_D3D8 = d3d9', 602, 1000000000)], []),
+    'resident-evil-5': (2, [('env.MADEIRA_APP_DLL_SHADOW = winmm.dll', 630, 1000000000)], []),
+    'burnout-paradise': (2, [('env.MADEIRA_DOCK_INSTALL_SKIP = directx', 626, 1000000000), ('env.MADEIRA_PAD_EARLY_SLOT = 1', 630, 1000000000)], []),
+    'halo-the-master-chief-collection': (2, [('env.MADEIRA_OPTIN_DLLS = dxva2', 575, 1000000000)], []),
+    'the-binding-of-isaac-rebirth': (2, [('env.MADEIRA_X86_FAULT_DUMP = 1', 624, 1000000000)], []),
+    'mewgenics': (2, [('env.MADEIRA_THIN_RESERVE = 1', 652, 1000000000), ('env.MADEIRA_THIN_RESERVE_MB = 16', 652, 1000000000)], []),
+    'balatro': (2, [('env.MADEIRA_GUEST_LOG = all', 598, 1000000000), ('env.MADEIRA_GUEST_LOG_LIMIT = 400', 598, 1000000000), ('env.MADEIRA_FRAME_STATS = 1', 598, 1000000000), ('env.MADEIRA_FILE_TRACE = 1', 630, 1000000000), ('env.MADEIRA_FILE_TRACE_LIMIT = 4000', 630, 1000000000)], []),
+    'ghost-of-tsushima': (6, [('env.MADEIRA_OPTIN_DLLS = tbs,ntdsapi,evr', 652, 1000000000)], []),
+}
+# The new rows: version, lines after the two header lines, their builds, smallRAMConfig, and the match.
+NIGHT_NEW = {
+    'dying-light-the-beast': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.LC_ALL = en_US.UTF-8', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 800'], [(0, 1000000000), (0, 1000000000), (576, 1000000000), (598, 1000000000), (598, 1000000000)], [], {'steamAppIDs': [3008130], 'steamFolders': ['dying light the beast'], 'programs': [{'name': 'dyinglightgame_thebeast_x64_rwdi.exe'}]}),
+    'eslabong': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_LOCK_ORPHAN = stamped'], [(0, 1000000000), (480, 1000000000)], [], {'steamAppIDs': [4560660], 'steamFolders': ['eslabong'], 'programs': [{'name': 'eslabong.exe'}]}),
+    'find-the-needle-demo': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_CHILD_ARGS = FindTheNeedle.exe --rendering-driver d3d12', 'd3d12-typed-uav-load = 1', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 1500'], [(0, 1000000000), (630, 1000000000), (0, 1000000000), (630, 1000000000), (630, 1000000000)], [], {'steamAppIDs': [5165210], 'steamFolders': ['find the needle demo'], 'programs': [{'name': 'findtheneedle.exe'}]}),
+    'fifa-23': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_D3D11_SRC = 1'], [(0, 1000000000), (652, 1000000000)], [], {'programs': [{'name': 'fifa23.exe'}]}),
+    'grand-theft-auto-vice-city': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_D3D8 = d3d9'], [(0, 1000000000), (602, 1000000000)], [], {'steamAppIDs': [12110], 'steamFolders': ['grand theft auto vice city'], 'programs': [{'name': 'gta-vc.exe'}]}),
+    'la-noire-steam': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_DOCK_GAME_SCM = 1', 'env.MADEIRA_FEX_AVX = 0', 'env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'pool-split = 1', 'env.MADEIRA_OPTIN_DLLS = tbs', 'env.MADEIRA_POOL_LAZY_WINDOWS = 1', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 800'], [(0, 1000000000), (576, 1000000000), (576, 1000000000), (576, 1000000000), (576, 1000000000), (576, 1000000000), (579, 1000000000), (630, 1000000000), (626, 1000000000), (626, 1000000000)], [], {'steamAppIDs': [110800], 'steamFolders': ['l.a.noire'], 'programs': [{'name': 'playlan.exe', 'steam': True}, {'name': 'lan.exe', 'steam': True}]}),
+    'call-of-duty-world-at-war': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1', 'env.MADEIRA_FRAME_STATS = 1', 'env.MADEIRA_PAUSE_IN_BACKGROUND = 1', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 6000'], [(0, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000)], [], {'steamAppIDs': [10090], 'steamFolders': ['call of duty world at war'], 'programs': [{'name': 'codwaw.exe'}]}),
+    'dishonored': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_PAUSE_IN_BACKGROUND = 1'], [(0, 1000000000), (630, 1000000000)], [], {'steamAppIDs': [205100], 'steamFolders': ['dishonored'], 'programs': [{'name': 'dishonored.exe'}]}),
+    'buckshot-roulette': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamFolders': ['buckshot roulette'], 'programs': [{'name': 'buckshot roulette.exe'}]}),
+    'arctic-drive-demo': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1'], [(0, 1000000000), (624, 1000000000)], [], {'steamAppIDs': [4601500], 'steamFolders': ['arctic drive demo'], 'programs': [{'name': 'arctic drive.exe'}]}),
+    'brotato': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_PAD_EARLY_SLOT = 1', 'gl-backend = zink'], [(0, 1000000000), (630, 1000000000), (632, 1000000000)], [], {'steamFolders': ['brotato'], 'programs': [{'name': 'brotato.exe'}]}),
+    'quake-ii': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_AUDIO_IO_MS = 5', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 60000', 'env.MADEIRA_REG_TRACE = 1', 'env.MADEIRA_GUEST_LOG = all'], [(0, 1000000000), (625, 1000000000), (630, 1000000000), (630, 1000000000), (624, 1000000000), (598, 1000000000)], [], {'steamAppIDs': [2320], 'steamFolders': ['quake 2'], 'programs': [{'name': 'quake2ex_steam.exe'}]}),
+    'resonance': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_AUDIO_IO_MS = 5'], [(0, 1000000000), (625, 1000000000)], [], {'programs': [{'name': 'resonance.exe'}]}),
+    'replaced': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_VDCFG_PATH = 1', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 800'], [(0, 1000000000), (580, 1000000000), (626, 1000000000), (626, 1000000000)], [], {'steamAppIDs': [4261860], 'steamFolders': ['replaced demo'], 'programs': [{'name': 'replaced.exe'}]}),
+    'need-for-speed-shift': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1', 'env.MADEIRA_D3D9_LAST = 1'], [(0, 1000000000), (630, 1000000000), (598, 1000000000)], [], {'programs': [{'name': 'shift.exe'}]}),
+    'bulletstorm': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1', 'env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1'], [(0, 1000000000), (630, 1000000000), (600, 1000000000)], [], {'steamAppIDs': [99810], 'steamFolders': ['bulletstorm'], 'programs': [{'name': 'shippingpc-stormgame.exe'}]}),
+    'doom-64': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [1148590], 'steamFolders': ['doom 64'], 'programs': [{'name': 'doom64_x64.exe'}]}),
+    'deponia-the-complete-journey': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [292910], 'steamFolders': ['deponia the complete journey'], 'programs': [{'name': 'deponia.exe'}]}),
+    'sc-jogos-barro-gt': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [1990740], 'steamFolders': ['sc jogos'], 'programs': [{'name': 'sc jogos launcher.exe'}, {'name': 'barro gt.exe'}]}),
+    'angry-birds': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'programs': [{'name': 'angrybirds.exe'}]}),
+    'into-the-breach': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [590380], 'steamFolders': ['into the breach'], 'programs': [{'name': 'breach.exe'}]}),
+    'freshwomen-season-1': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink', 'env.MADEIRA_GUEST_LOG = all'], [(0, 1000000000), (632, 1000000000), (598, 1000000000)], [], {'steamAppIDs': [1350650], 'steamFolders': ['freshwomen']}),
+    'gp-bikes': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [848050], 'steamFolders': ['gp bikes'], 'programs': [{'name': 'gpbikes.exe'}]}),
+    'polybius': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [906120], 'steamFolders': ['polybius'], 'programs': [{'name': 'polybius.exe'}]}),
+    'noita': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [881100], 'steamFolders': ['noita'], 'programs': [{'name': 'noita.exe'}]}),
+    'battlefield-1942': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_D3D8 = d3d9'], [(0, 1000000000), (602, 1000000000)], [], {'programs': [{'name': 'bf1942.exe'}]}),
+    'mafia-classic': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_D3D8 = d3d9', 'env.MADEIRA_X86_FAULT_DUMP = 1'], [(0, 1000000000), (602, 1000000000), (624, 1000000000)], [], {'steamFolders': ['mafia'], 'programs': [{'name': 'game.exe', 'beside': 'ls3df.dll'}, {'name': 'setup.exe', 'beside': 'ls3df.dll'}, {'name': 'mafiasetup.exe', 'beside': 'ls3df.dll'}]}),
+    'killer-instinct': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0'], [(0, 1000000000)], [('env.MADEIRA_MIP_CLAMP_AUTO = 1', 625, 1000000000)], {'steamAppIDs': [577940], 'steamFolders': ['killer instinct'], 'programs': [{'name': 'killerinstinctx64_r.exe'}]}),
+    'the-witcher-2': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 40000', 'env.MADEIRA_REG_TRACE = 1'], [(0, 1000000000), (597, 1000000000), (597, 1000000000), (624, 1000000000)], [], {'steamAppIDs': [20920], 'steamFolders': ['the witcher 2'], 'programs': [{'name': 'witcher2.exe'}]}),
+    'the-elder-scrolls-iv-oblivion': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1', 'env.MADEIRA_REG_TRACE = 1', 'env.MADEIRA_WIN_TEXT = 1'], [(0, 1000000000), (591, 1000000000), (624, 1000000000), (624, 1000000000)], [], {'steamAppIDs': [22330], 'steamFolders': ['oblivion'], 'programs': [{'name': 'oblivion.exe'}, {'name': 'oblivionlauncher.exe'}]}),
+    'astro-tripper': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1', 'env.MADEIRA_X86_FAULT_DUMP = 1', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 4000', 'env.MADEIRA_GUEST_LOG = all'], [(0, 1000000000), (580, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000)], [], {'steamAppIDs': [110600], 'steamFolders': ['astrotripper', 'astro tripper'], 'programs': [{'name': 'astrotripper.exe'}]}),
+    'baba-is-you': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_D3D9_X64 = dxmt'], [(0, 1000000000), (595, 1000000000)], [], {'steamFolders': ['baba is you'], 'programs': [{'name': 'baba is you.exe'}]}),
+    'fear-and-hunger-2-termina': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_CHILD_ARGS = Game.exe --disable-accelerated-video-decode --disable-accelerated-video-encode', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 400'], [(0, 1000000000), (630, 1000000000), (598, 1000000000), (598, 1000000000)], [], {'steamAppIDs': [2171440], 'steamFolders': ['fear & hunger 2 termina'], 'programs': [{'name': 'game.exe', 'beside': 'nw_elf.dll'}, {'name': 'game.exe', 'beside': 'nw.dll'}]}),
+    'hearts-of-iron-iv': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [394360], 'steamFolders': ['hearts of iron iv'], 'programs': [{'name': 'hoi4.exe'}, {'name': 'dowser.exe'}]}),
+    'inscryption': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WOW_RWX_PLAIN = 1'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [1092790], 'steamFolders': ['inscryption'], 'programs': [{'name': 'inscryption.exe'}]}),
+    'half-sword-demo': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_MIP_CLAMP_AUTO = 1'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [2642680], 'steamFolders': ['half sword demo'], 'programs': [{'name': 'halfswordue5.exe'}]}),
+    'sonic-generations': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [71340], 'steamFolders': ['sonic generations'], 'programs': [{'name': 'sonicgenerations.exe'}]}),
+    'yakuza-kiwami-3-dark-ties': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'exe-window-mb = 512', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'env.MADEIRA_KUSER_KEEP_REGS = 1'], [(0, 1000000000), (575, 1000000000), (576, 1000000000), (602, 1000000000)], [], {'steamAppIDs': [3937550], 'steamFolders': ['yakuzakiwami3'], 'programs': [{'name': 'yakuzakiwami3.exe'}]}),
+    'call-of-duty-infinite-warfare': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'oversize-reserve = 1'], [(0, 1000000000), (632, 1000000000)], [], {'steamAppIDs': [292730], 'steamFolders': ['call of duty - infinite warfare'], 'programs': [{'name': 'iw7_ship.exe'}]}),
+    'call-of-duty-modern-warfare-4': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_FEX_AVX = 1', 'env.MADEIRA_OPTIN_DLLS = tbs'], [(0, 1000000000), (576, 1000000000), (579, 1000000000)], [], {'steamFolders': ['cod-mw4'], 'programs': [{'name': 'sp26-cod.exe'}]}),
+    'bluefield': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = tbs'], [(0, 1000000000), (579, 1000000000)], [], {'programs': [{'name': 'bluefield-win64-shipping.exe'}, {'name': 'bluefield.exe'}]}),
+    'assassins-creed-brotherhood': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 4000'], [(0, 1000000000), (630, 1000000000), (630, 1000000000), (630, 1000000000)], [], {'programs': [{'name': 'acbsp.exe'}, {'name': 'assassinscreedbrotherhood.exe'}]}),
+    'metaphor-refantazio': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'exe-window-mb = 352', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'env.MADEIRA_KUSER_KEEP_REGS = 1'], [(0, 1000000000), (575, 1000000000), (576, 1000000000), (602, 1000000000)], [], {'steamAppIDs': [2679460], 'steamFolders': ['metaphor'], 'programs': [{'name': 'metaphor.exe'}]}),
+    'prince-of-persia-the-lost-crown': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_KUSER_KEEP_REGS = 1', 'env.MADEIRA_USD_OSVERSION = 1'], [(0, 1000000000), (602, 1000000000), (630, 1000000000)], [], {'steamAppIDs': [2751000], 'steamFolders': ['prince of persia the lost crown'], 'programs': [{'name': 'thelostcrown.exe'}]}),
+    'football-manager-other': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_KUSER_KEEP_REGS = 1'], [(0, 1000000000), (652, 1000000000)], [], {'programs': [{'name': 'fm.exe', 'steam': False}]}),
+    'mirrors-edge': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_NLS_EXTRA = 1'], [(0, 1000000000), (652, 1000000000)], [], {'programs': [{'name': 'mirrorsedge.exe'}]}),
+    'need-for-speed-most-wanted-2012': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = rstrtmgr'], [(0, 1000000000), (579, 1000000000)], [], {'steamAppIDs': [1262560]}),
+    'crash-bandicoot-n-sane-trilogy': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.DXMT_WSI_MONITOR_IDENTITY = 1', 'env.DXMT_WSI_MODE_TABLE = 1', 'env.DXMT_DISPLAY_MODE_STATS = 1'], [(0, 1000000000), (630, 1000000000), (630, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [731490], 'steamFolders': ['crash bandicoot - n sane trilogy'], 'programs': [{'name': 'crashbandicootnsanetrilogy.exe'}]}),
+    'dark-deception-chapter-1': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_GUEST_LOG = all', 'env.MADEIRA_GUEST_LOG_LIMIT = 400'], [(0, 1000000000), (598, 1000000000), (598, 1000000000)], [], {'programs': [{'name': 'ddeception.exe'}, {'name': 'ddeception-win64-shipping.exe'}]}),
+    'far-cry-3-folder': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 8000', 'env.MADEIRA_REG_TRACE = 1', 'env.MADEIRA_X86_FAULT_DUMP = 1'], [(0, 1000000000), (576, 1000000000), (576, 1000000000), (624, 1000000000), (630, 1000000000)], [], {'programs': [{'name': 'farcry3.exe', 'beside': 'fc3.dll'}, {'name': 'farcry3_d3d11.exe', 'beside': 'fc3.dll'}]}),
+    'far-cry-4-folder': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_FILE_TRACE = 1', 'env.MADEIRA_FILE_TRACE_LIMIT = 8000', 'env.MADEIRA_REG_TRACE = 1'], [(0, 1000000000), (576, 1000000000), (576, 1000000000), (624, 1000000000)], [], {'programs': [{'name': 'farcry4.exe', 'beside': 'fc64.dll'}]}),
+    'kof-xiv-steam': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'gl-backend = zink', 'env.MESA_GL_VERSION_OVERRIDE = 4.3', 'env.MESA_GLSL_VERSION_OVERRIDE = 430'], [(0, 1000000000), (652, 1000000000), (652, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [571260], 'steamFolders': ['the king of fighters xiv'], 'programs': [{'name': 'kofxiv.exe'}]}),
+    'dmc-devil-may-cry': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_GUEST_LOG = all'], [(0, 1000000000), (598, 1000000000)], [], {'steamAppIDs': [220440], 'steamFolders': ['dmc devil may cry'], 'programs': [{'name': 'dmc-devilmaycry.exe'}]}),
+    'football-manager-2020': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'exe-window-mb = 512', 'env.MADEIRA_OPTIN_DLLS = avicap32'], [(0, 1000000000), (575, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [1100600], 'steamFolders': ['football manager 2020'], 'programs': [{'name': 'fm.exe', 'steam': True}]}),
+    'momo-game': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = coremessaging'], [(0, 1000000000), (652, 1000000000)], [], {'programs': [{'name': 'momo game.exe'}]}),
+    'watch-dogs': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [243470], 'programs': [{'name': 'watch_dogs.exe'}]}),
+    'assassins-creed-black-flag-resynced': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'env.MADEIRA_OPTIN_DLLS = gameinput'], [(0, 1000000000), (0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [3751950], 'steamFolders': ["assassin's creed black flag resynced"], 'programs': [{'name': 'acblackflag.exe'}]}),
+    'dragon-ball-fighterz': (1, ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_OPTIN_DLLS = twinapi.appcore,msvcp_win'], [(0, 1000000000), (652, 1000000000)], [], {'steamAppIDs': [678950], 'programs': [{'name': 'dbfighterz.exe'}, {'name': 'red-win64-shipping.exe'}]}),
+}
+def _tup(item):
+    return (item, 0, 10 ** 9) if isinstance(item, str) else (item['line'], item.get('minBuild', 0), item.get('maxBuild', 10 ** 9))
+for _id, (_ver, _lines, _builds, _small, _match) in NIGHT_NEW.items():
+    _p = presets[_id]
+    assert _p['version'] == _ver and _p['lines'][2:] == _lines and _p['line_builds'][2:] == _builds and \
+        list(zip(_p['small'], [b[0] for b in _p['small_builds']], [b[1] for b in _p['small_builds']])) == _small, (_id, _p)
+    assert _p['match'] == _match and _p['switches'] == '' and 'minBuild' not in next(r for r in recs['rules'] if r['id'] == _id), (_id, _p['match'])
+    del presets[_id]
+import copy
+recs = copy.deepcopy(recs)
+recs['rules'] = [r for r in recs['rules'] if r['id'] not in NIGHT_NEW]
+for _id, (_ver, _add, _lim) in NIGHT.items():
+    _p = presets[_id]
+    _r = next(r for r in recs['rules'] if r['id'] == _id)
+    assert _p['version'] == _ver and _r['version'] == _ver, (_id, _p['version'])
+    for _line, _lo, _hi in _add:
+        _at = [i for i, (l, b) in enumerate(zip(_p['lines'], _p['line_builds'])) if l == _line and b == (_lo, _hi)]
+        assert len(_at) == 1, (_id, _line)
+        del _p['lines'][_at[0]], _p['line_builds'][_at[0]]
+        _ri = [i for i, c in enumerate(_r['config']) if _tup(c) == (_line, _lo, _hi)]
+        assert len(_ri) == 1
+        del _r['config'][_ri[0]]
+    for _line, _lo in _lim:
+        _at = [i for i, (l, b) in enumerate(zip(_p['lines'], _p['line_builds'])) if l == _line and b == (_lo, 651)]
+        assert len(_at) == 1, (_id, _line)
+        _p['line_builds'][_at[0]] = (_lo, 10 ** 9)
+        _ri = [i for i, c in enumerate(_r['config']) if isinstance(c, dict) and _tup(c) == (_line, _lo, 651)]
+        assert len(_ri) == 1
+        del _r['config'][_ri[0]]['maxBuild']
+    _p['version'] = _r['version'] = _ver - 1
+# Dark Souls III v3: a smallRAMConfig (devices under 10 GB) that the row did not have
+_ds3 = presets['dark-souls-iii']
+_ds3_r = next(r for r in recs['rules'] if r['id'] == 'dark-souls-iii')
+assert _ds3['small'] == ['env.MADEIRA_MIP_CLAMP_AUTO = 1'] and _ds3['small_builds'] == [(625, 1000000000)]
+_ds3['small'], _ds3['small_builds'] = [], []   # the version was taken back by NIGHT above
+del _ds3_r['smallRAMConfig']
+# Oxygen Not Included v2: the clamp line moved from smallRAMConfig into config, for every device (it acts only within 1536 MB of the limit; Send Log 445G5W)
+_oni = presets['oxygen-not-included']
+_oni_r = next(r for r in recs['rules'] if r['id'] == 'oxygen-not-included')
+assert _oni['version'] == 2 and _oni['small'] == [] and _oni['lines'][-1] == 'env.MADEIRA_MIP_CLAMP_AUTO = 1' and _oni['line_builds'][-1] == (625, 1000000000)
+del _oni['lines'][-1], _oni['line_builds'][-1], _oni_r['config'][-1]
+_oni['small'], _oni['small_builds'], _oni['version'] = ['env.MADEIRA_MIP_CLAMP_AUTO = 1'], [(625, 1000000000)], 1
+_oni_r['smallRAMConfig'], _oni_r['version'] = [{'line': 'env.MADEIRA_MIP_CLAMP_AUTO = 1', 'minBuild': 625}], 1
 
 # Red Dead Redemption 2 from Steam: the owner's list of 2026-10-09 (build 463), line for line,
 # plus the lines of build 466's test (version 2), build 467's (version 3), build 470's (version 4) and
@@ -566,8 +720,11 @@ assert not any(line.startswith(('env.MADEIRA_JUMBO_HALF', 'env.MADEIRA_CAGE_RELE
                # round 626 (agent G1 S11): Cyberpunk 2077, the same 32/64 GB reserve experiment
                and not (p is presets['cyberpunk-2077'] and line == 'env.MADEIRA_JUMBO_HALF = 1')
                # round 630 (agent T1 S31, Q335M7): PEAK started from its own folder; auto-tune found and kept cage-release, "Runs good"
-               and not (p is presets['peak'] and line == 'env.MADEIRA_CAGE_RELEASE = 1')), \
-    'jumbo-half, cage-release, alias-release, LC_ALL, fence-early and va-pressure-gap are Rift Apart\'s and Spider-Man 2\'s only (LC_ALL: Dying Light\'s and Dead Island DE\'s too; jumbo-half: The Witcher 3\'s and Cyberpunk 2077\'s too; cage-release: PEAK\'s too)'
+               and not (p is presets['peak'] and line == 'env.MADEIRA_CAGE_RELEASE = 1')
+               # 2026-11-10 (build 650, the owner's start of 08:11): The Last of Us Part I ran out of Wine's band (an 8 MB thread stack)
+               # with the unclaimed cage holdback holding half of it
+               and not (p is presets['the-last-of-us-part-1'] and line in ('env.MADEIRA_CAGE_RELEASE = 1', 'env.MADEIRA_CAGE_RELEASE = 2'))), \
+    'jumbo-half, cage-release, alias-release, LC_ALL, fence-early and va-pressure-gap are Rift Apart\'s and Spider-Man 2\'s only (LC_ALL: Dying Light\'s and Dead Island DE\'s too; jumbo-half: The Witcher 3\'s and Cyberpunk 2077\'s too; cage-release: PEAK\'s and The Last of Us Part I\'s too)'
 # 2026-10-23 (owner: the list carries the latest Spider-Man settings, not running yet)
 # v3 (owner, 2026-10-28): pso-warm = 2 (the 621 stutter in a new area was pipelines built at their first draw; the owner found it
 # smooth with it), 30 FPS and the tip.
@@ -736,6 +893,12 @@ _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_X64_IMAGE_
 # Round 624 (agent E1 S9, Far Cry 3's updater): v2 logs the failed registry requests (MADEIRA_REG_TRACE, build 624). Marvel Cosmic Invasion v2
 # (Discord W6): the program match no longer needs a Steam copy (the ParisEngine.dll check beside it stays); its lines are unchanged.
 _r620['far-cry-3'] = _r620['far-cry-3'] + ['env.MADEIRA_REG_TRACE = 1']
+# Build 652: v3 shows DXMT's DXGI an AMD adapter (the clear-value assumption), splits the pool with its retry, plays the plain 10 ms audio beat, and
+# turns on the four Ubisoft Connect switches of build 652 the game was played with.
+_r620['far-cry-3'] = _r620['far-cry-3'] + ['dxmt = dxgi.customVendorId=1002;dxgi.customDeviceId=7340', 'pool-split = 1', 'pool-split-retry = 1',
+                                           'env.MADEIRA_AUDIO_LEAD_MS = 0', 'env.MADEIRA_POOL_CODE_FOREGROUND = 1', 'env.MADEIRA_SLEEP_KERNEL_APC = 1',
+                                           'env.MADEIRA_WOA_RECHECK = 1', 'env.MADEIRA_KILL_REAP = 1', 'env.MADEIRA_SELF_WRITE = 1',
+                                           'env.MADEIRA_FEX_SPLIT_LOCK = 1']
 # Round 624 (agent E2, S2b: BMVD7C): v3 serves Godot 4.5's composition swap chain on the game's window (build 624).
 _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_DXGI_SRC = 1', 'env.MADEIRA_DXGI_COMPOSITION = 1', 'env.MADEIRA_OPTIN_DLLS = dcomp']
 # Round 625 (agent L4 S1-a: ZXCXT5, BMVD7C): v4 switches the .NET runtime's write-xor-execute code memory off (the fail-fast at its write
@@ -744,12 +907,13 @@ _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.DOTNET_EnableWrite
 # 2026-11-01 (58D8SD build 626, 1R1NCG build 625): v5 gives the game its own keyed event (RtlRunOnceComplete, Control's line) from build 624,
 # the build whose list policy takes the key.
 _r620['slay-the-spire-2'] = _r620['slay-the-spire-2'] + ['env.MADEIRA_KEYED_EVENT_PER_PROCESS = 1']
-_r620_v = {'slay-the-spire-2': 5, 'far-cry-3': 2, 'marvel-cosmic-invasion': 2}
+_r620_v = {'slay-the-spire-2': 5, 'far-cry-3': 3, 'marvel-cosmic-invasion': 2}
 for _id, _lines in _r620.items():
     assert presets[_id]['version'] == _r620_v.get(_id, 1) and presets[_id]['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0'] + _lines, (_id, presets[_id])
 assert presets['slay-the-spire-2']['line_builds'][-7:] == [(576, 1000000000), (624, 1000000000), (624, 1000000000), (624, 1000000000),
                                                           (576, 1000000000), (608, 1000000000), (624, 1000000000)], presets['slay-the-spire-2']['line_builds']
-assert presets['far-cry-3']['line_builds'][-1] == (624, 1000000000), presets['far-cry-3']['line_builds']
+assert presets['far-cry-3']['line_builds'][-11:] == [(624, 1000000000), (577, 1000000000), (0, 1000000000), (598, 1000000000)] + [(652, 1000000000)] * 7, \
+    presets['far-cry-3']['line_builds']
 for _id, _line in (('forza-horizon-4', 'env.MADEIRA_OPTIN_DLLS = dxva2,gamingtcui'), ('big-walk', 'env.MADEIRA_REAL_SUSPEND = 1'),
                    ('ball-x-pit', 'env.MADEIRA_REAL_SUSPEND = 1')):
     _i = presets[_id]['lines'].index(_line)
@@ -932,7 +1096,7 @@ assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_FILE_TRACE' in json.dum
 for _id, _line in (('mudrunner', 'env.MADEIRA_D3D9_X64 = dxmt'), ('indivisible', 'env.MADEIRA_D3D9_X64 = dxmt'), ('sekiro-shadows-die-twice', 'env.MADEIRA_NLS_EXTRA = 1')):
     assert presets[_id]['lines'][2:] == [_std, _line] and presets[_id]['version'] == 1 and presets[_id]['switches'] == '', (_id, presets[_id])
     assert {'line': _line, 'minBuild': 598} in _cfg(_id), _id
-assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_X64' in json.dumps(r['config'])) == ['a-hat-in-time', 'counter-strike-source', 'darksiders-ii-deathinitive', 'dont-starve-together', 'indivisible', 'mudrunner', 'no-more-room-in-hell', 'outlast', 'pico-park'], 'only Darksiders II, MudRunner, Indivisible, Counter-Strike: Source (round 2026-10-24), PICO PARK, Don\'t Starve Together, A Hat in Time (round 602) and No More Room in Hell, Outlast (round 624) carry the 64-bit D3D9 line'
+assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_D3D9_X64' in json.dumps(r['config'])) == ['a-hat-in-time', 'counter-strike-source', 'darksiders-ii-deathinitive', 'dont-starve-together', 'far-cry-4', 'indivisible', 'mudrunner', 'no-more-room-in-hell', 'outlast', 'pico-park'], 'only Darksiders II, MudRunner, Indivisible, Counter-Strike: Source (round 2026-10-24), PICO PARK, Don\'t Starve Together, A Hat in Time (round 602), No More Room in Hell, Outlast (round 624) and Far Cry 4 (build 652) carry the 64-bit D3D9 line'
 assert sorted(r['id'] for r in recs['rules'] if 'MADEIRA_NLS_EXTRA' in json.dumps(r['config'])) == ['sekiro-shadows-die-twice', 'sword-and-fairy-3'], 'only Sword and Fairy 3 and Sekiro carry the extra code pages'
 assert presets['counter-strike-source']['lines'][2:] == [_std, 'env.MADEIRA_D3D9_X64 = dxmt', 'env.MADEIRA_DIRCACHE = 1'] and {'line': 'env.MADEIRA_D3D9_X64 = dxmt', 'minBuild': 598} in _cfg('counter-strike-source') and presets['counter-strike-source']['version'] == 2
 # build 632 (ajan63, Wine fork commit 11f6aa3a9): the two Source-engine rows turn the opt-in directory listing cache on, from build 632 only; lists may set the key to 0 or 1.
@@ -1355,6 +1519,8 @@ MATCH = {
     'the-last-of-us-part-1': {'steamAppIDs': [1888930], 'steamFolders': ['the last of us part i'],
                               'programs': [{'name': 'tlou-i.exe'}, {'name': 'tlou-i-l.exe'},
                                            {'name': 'launcher.exe', 'beside': 'tlou-i.exe'}]},   # round 634 (24TC8Y, W5M7YN, S0M36P, 8GRXB9, the four of 633)
+    'slime-rancher-2': {'steamAppIDs': [1657630], 'steamFolders': ['slime rancher 2'], 'programs': [{'name': 'slimerancher2.exe'}]},
+    'far-cry-4': {'steamAppIDs': [298110], 'steamFolders': ['far cry 4'], 'programs': [{'name': 'farcry4.exe', 'steam': True}]},   # build 652
 }
 # Round 632 (the Steam CEG fix of build 632, upstream Madeira #519 and the recipes that ride on it; agent ajan68). Every new line is for build 632 on or an
 # older key that is already allowed; the three new rules start with build 632, so no older build gets them (they keep the standard rule).
@@ -1372,9 +1538,85 @@ assert presets['dark-souls-remastered']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TR
 # Round 634 (The Last of Us Part I): the AVX switch the game needs to get as far as its own stop, and the two keyed diagnostics of build 634 (log only /
 # an experiment, ios_big_hint.h); the rule starts with build 634, so no older build gets the keys it does not read.
 _tlou = _rules632['the-last-of-us-part-1']
-assert _tlou['version'] == 1 and _tlou['minBuild'] == 634 and _tlou['switches'] == {'avx': True}, _tlou
-assert presets['the-last-of-us-part-1']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_JUMBO_CODE_DUMP = 1', 'env.MADEIRA_BIG_HINT_EXACT = 1'] \
-    and presets['the-last-of-us-part-1']['line_builds'][3:] == [(634, 1000000000), (634, 1000000000)], presets['the-last-of-us-part-1']
+# v2 (build 635, the owner's build-634 logs): the experiment's mode 2 from build 635 (the game's area base moved); build 634 keeps mode 1.
+# v3 (build 639, the owner's build-638 logs): the NVIDIA switch (the game refuses another vendor) and d3d12-device9 = 1 from build 639
+# (the game asks its 12_0 device for ID3D12Device9 and refuses every level without it).
+# v4 (build 640, the owner's build-639 logs): env.MADEIRA_NVAPI_DEVICE_ID = 2544 from build 640 (NVAPI's PCI device id as DXGI's).
+# v5 (build 641, the owner's build-640 log): env.MADEIRA_DIALOG_CODE_DUMP = 1 from build 641 (log only: the code that showed the box).
+# v6 (build 641, the exe read on 2026-11-07): d3d12-binding-tier = 3 and d3d12-typed-uav-load = 1 from build 641 (the game requires both).
+# v7 (build 643, the owner's build-642 logs): d3d12-pipeline-library = 1 from build 643 (SHADER_CACHE then reports LIBRARY).
+# v8 (build 643, the owner's build-643 logs of 12:13 and 12:17): d3d12-pso-cached-blob = 1 and heap-backing = 0 (both proven by hand).
+# v9 (build 645): a note only (build 644 ended the game at its start; 645 fixes that).
+# v10 (build 646, the owner's build-645 logs of 18:09): dxil-target-latest = 1 and pso-placeholder = 1 (a pixel shader the converter refused, code 7).
+# v11 (build 646, the owner's build-645 log of 18:21: pso-placeholder by hand, main menu, picture wrong): msc-unbounded-retry = 1 from
+#     build 646 (two compute shaders refused with code 4 on table ranges "t1-unbounded" / "t10-unbounded").
+# v12 (build 646, the owner's build-645 log of 18:37: the game started loading the world and asked for slot 32 of its 32 GB, "[big-hint] r644
+#     OUT OF ROOM"): env.MADEIRA_BIG_HINT_EXACT = 3 from build 646; mode 2 ends with build 645.
+# v13 (build 646, the owner's start of 19:59 with 256 MB slots: slot 128 was the end): mode 3 is 64 MB slots from build 646 (code), and the
+#     owner's own lines of that start from build 646: swap-mb = 8192, swap-mode = 2, swap-min-mb = 1, mempool-mb = 4096, vram-mb = 2304.
+# v14 (build 647, the owner's build-646 start of 2026-11-09 07:29: a GPU hang, then MeshRayCaster's result guards read 0xfefefefe):
+#     encoder-labels = 1 and dxil-dump of the ray-casting and transparency-resolve compute shaders from build 647 (log only).
+# v15 (the owner's build-647 start of 11:25: the hang is CS_ComputeVolProbeBufferWriteCache; the ray shaders came): dxil-dump names the
+#     volumetric probe shaders instead (log only).
+# v16 (build 648, the owner's starts of 13:15 and 13:39: the probe shaders' k-d tree walk never ends): dxil-loop-guard caps the loops
+#     of CS_ComputeVolProbeBufferWriteCache and CS_ComputeVolProbeBuffer (two hashes each) from build 648.
+# v17 (build 649, the owner's starts of 19:51 to 20:10 on 648: the hang gone, the ray-cast guards still wrong): the dxil-dump line ends with
+#     build 648; trace-buffer-size, trace-dispatch and trace-dispatch-cb-offset from build 649 (log only).
+# v18 (build 651, the owner's build-650 start of 2026-11-10 08:11: the ray-cast assertion gone, the first level loading, then "threadHandle != 0":
+#     no 8 MB gap for a thread stack while the unclaimed 8 GB cage holdback held half of Wine's band): env.MADEIRA_CAGE_RELEASE = 1 from build 650;
+#     trace-buffer-size ends with build 650; dxil-dump of the exposure shaders from build 650 (the menu's room far too bright; log only).
+# v19 (build 651, the owner's build-650 start of 09:05 with the line by hand: the host's allocator ran dry three seconds after the
+#     hand-over): env.MADEIRA_CAGE_RELEASE = 1 for build 650 only, = 2 (no holdback at all) from build 651; the ray-cast traces and the
+#     exposure dxil-dump end with build 650; trace-dispatch of CS_ExposureControl and CS_DoHistogramMerge (every 301st, 24 in all)
+#     from build 651 (log only: their GPU-only exposure state before they run).
+# v20 (build 652, the owner's build-651 start of 10:42: Ellie in the first scene, faces black, walls missing, killed at 8187 MB):
+#     heap-backing = 0 ends with build 651, heap-backing = 2 (buffer and render-target/depth heaps backed) from build 652; the exposure
+#     traces end with build 651 (the menu's exposure is the game's own fixed EV).
+assert _tlou['version'] == 20 and _tlou['minBuild'] == 634 and _tlou['switches'] == {'avx': True, 'nvidia': True}, _tlou
+assert presets['the-last-of-us-part-1']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_JUMBO_CODE_DUMP = 1', 'env.MADEIRA_BIG_HINT_EXACT = 1',
+                                                         'env.MADEIRA_BIG_HINT_EXACT = 2', 'env.MADEIRA_BIG_HINT_EXACT = 3', 'd3d12-device9 = 1', 'env.MADEIRA_NVAPI_DEVICE_ID = 2544',
+                                                         'env.MADEIRA_DIALOG_CODE_DUMP = 1', 'd3d12-binding-tier = 3', 'd3d12-typed-uav-load = 1',
+                                                         'd3d12-pipeline-library = 1', 'd3d12-pso-cached-blob = 1', 'heap-backing = 0', 'heap-backing = 2',
+                                                         'dxil-target-latest = 1', 'pso-placeholder = 1', 'msc-unbounded-retry = 1',
+                                                         'swap-mb = 8192', 'swap-mode = 2', 'swap-min-mb = 1', 'mempool-mb = 4096', 'vram-mb = 2304',
+                                                         'encoder-labels = 1', 'dxil-dump = CS_ComputeVolProbeBufferWriteCache,CS_ComputeVolProbeBufferReadCache,'
+                                                         'CS_ComputeVolProbeBuffer,CS_VolumetricsProbeCacheReset,CS_ApplyVolProbeBuffer',
+                                                         'dxil-loop-guard = 0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c',
+                                                         'trace-buffer-size = 56832,272,454656',
+                                                         'trace-dispatch = Cs_GenerateRayHitPolygonInfo,CS_ComputeVolProbeBufferWriteCache',
+                                                         'trace-dispatch-cb-offset = 8704', 'env.MADEIRA_CAGE_RELEASE = 1', 'env.MADEIRA_CAGE_RELEASE = 2',
+                                                         'dxil-dump = CS_ExposureControl,CS_DoHistogramFast,CS_DoHistogramMerge,CS_DoHistogramCollect,Cs_ComputeAiExposureMap',
+                                                         'trace-dispatch = CS_ExposureControl,CS_DoHistogramMerge', 'trace-dispatch-every = 301',
+                                                         'trace-dispatch-max = 24'] \
+    and presets['the-last-of-us-part-1']['line_builds'][3:] == [(634, 1000000000), (634, 634), (635, 645), (646, 1000000000), (639, 1000000000), (640, 1000000000), (641, 1000000000),
+                                                                 (641, 1000000000), (641, 1000000000), (643, 1000000000), (643, 1000000000),
+                                                                 (643, 651), (652, 1000000000), (646, 1000000000), (646, 1000000000), (646, 1000000000),
+                                                                 (646, 1000000000), (646, 1000000000), (646, 1000000000), (646, 1000000000),
+                                                                 (646, 1000000000), (647, 1000000000), (647, 648), (648, 1000000000),
+                                                                 (649, 650), (649, 650), (649, 650), (650, 650), (651, 1000000000), (650, 650),
+                                                                 (651, 651), (651, 651), (651, 651)], \
+    presets['the-last-of-us-part-1']
+# Slime Rancher 2 (2026-11-08, a tester's "Failed to load il2cpp" fixed with a wintypes.dll copy): Megabonk's two Unity IL2CPP lines.
+assert presets['slime-rancher-2']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1', 'env.MADEIRA_WGI_HOST_PADS = 1'] \
+    and presets['slime-rancher-2']['version'] == 1 and presets['slime-rancher-2']['line_builds'][3:] == [(575, 1000000000), (0, 1000000000)], \
+    presets['slime-rancher-2']
+# Build 652 (Ubisoft Connect's games): Far Cry 4 starts with build 652, whose switches it needs (the DxDiag provider, the OpenGL extension list,
+# the hook zone, the code-buffer policy, the three Ubisoft Connect lines, the Xbox 360 controller identity and the plain audio beat), so no older build gets the rule; Ubisoft Connect v2 re-checks its
+# infinite waits on an address from build 635.
+_fc4 = _rules632['far-cry-4']
+assert _fc4['version'] == 1 and _fc4['minBuild'] == 652 and 'switches' not in _fc4, _fc4
+assert presets['far-cry-4']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X64_IMAGE_NOCOPY = 1', 'pool-split = 1', 'pool-split-retry = 1',
+                                             'env.MADEIRA_D3D9_X64 = dxmt', 'env.MADEIRA_OPTIN_DLLS = dxdiagn,ddraw', 'env.MADEIRA_GL_EMPTY_EXTENSIONS = 1',
+                                             'env.MADEIRA_X64_HOOK_ZONE = 1', 'env.MADEIRA_POOL_CODE_FOREGROUND = 1', 'env.MADEIRA_SLEEP_KERNEL_APC = 1',
+                                             'env.MADEIRA_WOA_RECHECK = 1', 'env.MADEIRA_KILL_REAP = 1', 'env.MADEIRA_SELF_WRITE = 1',
+                                             'env.MADEIRA_FEX_SPLIT_LOCK = 1', 'env.MADEIRA_PAD_MODE = xbox360',
+                                             'env.MADEIRA_AUDIO_LEAD_MS = 0'] \
+    and presets['far-cry-4']['line_builds'][2:] == [(0, 1000000000)] * 5 + [(652, 1000000000)] * 11, presets['far-cry-4']
+_uc = _rules632['ubisoft-connect']
+assert _uc['version'] == 2 and presets['ubisoft-connect']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_X86_FAULT_DUMP = 1',
+                                                                           'env.MADEIRA_WOA_RECHECK = 1', 'env.MADEIRA_SELF_WRITE = 1',
+                                                                           'env.MADEIRA_FEX_SPLIT_LOCK = 1'] \
+    and presets['ubisoft-connect']['line_builds'][3:] == [(598, 1000000000)] + [(652, 1000000000)] * 3, presets['ubisoft-connect']
 assert 'MADEIRA_CONTROLS_XBOX_DEFAULT' not in json.dumps(recs) and 'IMAGE_LOW_ALIAS' not in json.dumps(recs), 'names the list policy does not know yet'
 for ident, p in presets.items():
     assert p['match'] == MATCH.get(ident), (ident, p['match'])
@@ -1536,6 +1778,10 @@ check(RecommendationsStore.builtInFile()?.list(build: 601, origin: .builtIn).rul
       && RecommendationsStore.builtInFile()?.list(build: 602, origin: .builtIn).rules.contains { $0.recommendation.id == "the-adventures-of-elliot" } == true
       && RecommendationsStore.builtInFile()?.list(build: 601, origin: .builtIn).rules.count == @RULE_COUNT@ - 1,
       "the Elliot rule is dropped by build 601 and kept from 602")
+// Night round 2026-11-11 (T1, "[build] v0.1.634 (634.4)"): a re-signed copy's CFBundleVersion "634.4" reads as build 634, not "unknown".
+check(RecommendationsStore.buildNumber("634") == 634 && RecommendationsStore.buildNumber("634.4") == 634
+      && RecommendationsStore.buildNumber("x") == nil && RecommendationsStore.buildNumber("") == nil,
+      "CFBundleVersion 634 and 634.4 are build 634; text is no build")
 
 extension GameRecommendations {
     static func rule(_ id: String) -> GameRecommendation { all.first { $0.id == id }! }
@@ -2069,8 +2315,9 @@ assert presets['resident-evil-requiem-demo']['lines'][2:] == [_std, _nocopy, 'd3
                                                          'env.MADEIRA_FILE_TRACE_LIMIT = 30000'] and presets['resident-evil-requiem-demo']['version'] == 3 \
     and presets['resident-evil-requiem-demo']['switches'] == '', presets['resident-evil-requiem-demo']
 assert {'line': _nocopy, 'minBuild': 576} in _cfg('resident-evil-requiem-demo')
-assert sorted(r['id'] for r in recs['rules'] if 'd3d12-pso-cached-blob' in json.dumps(r['config'])) == ['resident-evil-requiem', 'resident-evil-requiem-demo'], \
-    'only the two Resident Evil Requiem lists carry the cached-blob line'
+assert sorted(r['id'] for r in recs['rules'] if 'd3d12-pso-cached-blob' in json.dumps(r['config'])) == ['resident-evil-requiem', 'resident-evil-requiem-demo',
+                                                                                                 'the-last-of-us-part-1'], \
+    'only the two Resident Evil Requiem lists and The Last of Us Part I (v8, build 643: proven by hand) carry the cached-blob line'
 _d3d9emu = {'line': 'env.MADEIRA_D3D9 = emulated', 'minBuild': 598}
 for _id in ('resident-evil-6', 'resident-evil-revelations-2'):
     # v2 (round 624, agent D2: 93WQEN, a copy from outside Steam at 60 FPS): the same lines, the program match without the Steam condition.
@@ -2145,7 +2392,7 @@ with tempfile.TemporaryDirectory(prefix='madeira-recommended-') as directory:
                                 if line.strip() and not line.strip().startswith('#'))
         rdr2_config_lines += sum(1 for _l, _b in R631['rdr2-steam'] if _b <= 602)   # round 631's lines the harness's build 602 gets
         (temporary / 'main.swift').write_text(main.replace('@RDR2_CONFIG_LINES@', str(rdr2_config_lines))
-                                              .replace('@RULE_COUNT@', str(sum(1 for r in recs['rules'] if r.get('minBuild', 0) <= 602))))   # the rules build 602 knows (round 632: three rules start with build 632)
+                                              .replace('@RULE_COUNT@', str(sum(1 for r in recs['rules'] if r.get('minBuild', 0) <= 602) + len(NIGHT_NEW))))   # the rules build 602 knows (round 632: three rules start with build 632)
         (temporary / 'drive').mkdir()
         (temporary / 'configs').mkdir()
         (temporary / 'recs').mkdir()

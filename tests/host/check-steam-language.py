@@ -90,7 +90,7 @@ else:
         (t / "VDF.swift").write_text(vdf_parser)
         shutil.copy(R / "tests/host/steam_language_checks.swift", t / "main.swift")
         sources = [t / "VDF.swift", APP / "SwiftSteam/Library/SteamAppInfo.swift", APP / "SteamKeyValues.swift", APP / "SteamInstall.swift",
-                   APP / "SwiftSteam/Install/AppManifestWriter.swift", APP / "BCDSteamDLC/BCDSteamDLC.swift"]
+                   APP / "ExternalStorage.swift", APP / "SwiftSteam/Install/AppManifestWriter.swift", APP / "BCDSteamDLC/BCDSteamDLC.swift"]
         r = subprocess.run(["xcrun", "swiftc", "-swift-version", "5", "-o", str(t / "lang"), str(t / "main.swift")] + [str(s) for s in sources],
                            capture_output=True, text=True)
         check("the language rules compile on their own with the production app info, record writer and DLC rules", r.returncode == 0,

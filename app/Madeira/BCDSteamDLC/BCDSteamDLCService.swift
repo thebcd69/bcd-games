@@ -53,9 +53,14 @@ import Foundation
         choices = SteamDLCChoices(file: choicesFile)
     }
 
-    /// The library `appmanifest_<appid>.acf` records live in: BCD's own folder in BCD Dock's Steam library.
-    /// (madeira-bcd: with a second library on an external drive, the one the game is installed in.)
-    private func steamApps(_ appID: Int) -> URL { SteamOwnedLibrary.steamApps }
+    /// The library `appmanifest_<appid>.acf` records live in: the one the game is installed in (BCD's own folder in BCD Dock's
+    /// Steam library, or a SteamLibrary on an external drive, ExternalDrives.swift), else the one its download goes to.
+    private func steamApps(_ appID: Int) -> URL {
+        if let library = SteamGamesModel.shared.games.first(where: { $0.id == appID })?.library {
+            return SteamOwnedLibrary.drive.appendingPathComponent(library, isDirectory: true)
+        }
+        return SteamOwnedLibrary.shared.steamApps(for: appID)
+    }
 
     // MARK: What is installed and wanted
 

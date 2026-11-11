@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """env.MADEIRA_THIN_RESERVE: thin reservations for 1-2 GB read-write MEM_RESERVE (virtual_ios.c, tests/x64/thinreserve-x64.c).
 
 Some programs reserve address space in 1 GB blocks (MEM_RESERVE, PAGE_READWRITE, no address) and commit a few MB of each. A
@@ -101,13 +103,21 @@ check("the commit, decommit, release and query hooks run only with a thin reserv
       and "if (ios_thin_live_n && type == MEM_DECOMMIT && base && ios_thin_decommit_fixup( base, &size ))" in src
       and "if ((type & MEM_RELEASE) && ios_thin_live_n) ios_thin_released( base );" in src
       and "if (ios_thin_live_n) ios_thin_fix_query( addr, info );" in src)
-check("every reserved area is made with thin_only set (0 for generic and FEX areas)",
-      len(re.findall(r"area->thin_only = 0;", src)) == 2 and "new_area->thin_only = area->thin_only;" in src
+check("every reserved area is made with thin_only set (0 for generic, FEX and x64 hook-zone areas)",
+      len(re.findall(r"area->thin_only = 0;", src)) == 3 and "new_area->thin_only = area->thin_only;" in src
       and src.count("area->thin_only = 1;") == 1)
 check("generic placement never searches a thin arena", src.count("if (area->thin_only) continue;") == 2)
 check("the device program is there", (R / "tests/x64/thinreserve-x64.c").is_file())
-check("no recommended list and no auto-tune rule sets it", "MADEIRA_THIN_RESERVE" not in (R / "recommended/recommendations.json").read_text()
-      and "MADEIRA_THIN_RESERVE" not in (R / "build/tools/autotune_rules.py").read_text())
+# Night round 2026-11-11 (agent G7 S4, Mewgenics 15JZMN/GBQWP3/ZQX5PG): the game's list carries the two lines from build 652 and two auto-tune rules offer them
+# after the crash that game shows (the 42nd 1 GB reservation fails); no other list and no other rule does.
+import json as _json
+_recs = _json.loads((R / "recommended/recommendations.json").read_text())
+_rules = (R / "build/tools/autotune_rules.py").read_text()
+check("only Mewgenics' list (from build 652) and the two reserve-1gb-refused rules set it",
+      [r["id"] for r in _recs["rules"] if "MADEIRA_THIN_RESERVE" in _json.dumps(r["config"])] == ["mewgenics"]
+      and {"line": "env.MADEIRA_THIN_RESERVE = 1", "minBuild": 652} in next(r for r in _recs["rules"] if r["id"] == "mewgenics")["config"]
+      and _rules.count('"env.MADEIRA_THIN_RESERVE_MB = 16"') == 2 and _rules.count('"env.MADEIRA_THIN_RESERVE = 1"') == 1
+      and 'reserve-1gb-refused-then-null-write' in _rules and 'reserve-1gb-refused-thin-slots-full' in _rules)
 
 print("PASS: thin reserve" if ok else "FAIL: thin reserve")
 sys.exit(0 if ok else 1)

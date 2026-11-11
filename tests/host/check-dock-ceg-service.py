@@ -279,7 +279,9 @@ let wineHead = "WINE REGISTRY Version 2\n;; All keys relative to REGISTRY\\\\Mac
                 "only lines with the words, only the two files")
         require(DockCEGService.scrub(String(repeating: "x", count: 500)).count == 220 && DockCEGService.scrub("id 76561198000000000.") == "id <n>.", "a line is cut to 220 characters")
         DockCEGService.logSteamLogs(drive: drive)
-        require(LogStore.shared.lines.count - logBase == lines.count && logged("[ceg-log] files="), "logged with the [ceg-log] tag")
+        // Night round 2026-11-11 (G6 S4, G2 S3): the printer adds the UTC stamp (one line) and the connection log's lines (the [steam-connection] tag)
+        let extraLines = 1 + DockCEGService.connectionLogLines(drive: drive, maxLines: 24).count
+        require(LogStore.shared.lines.count - logBase == lines.count + extraLines && logged("[ceg-log] files=") && logged("[ceg-log] now-utc="), "logged with the [ceg-log] tag, with the UTC stamp")
         try FileManager.default.removeItem(at: logs)
         try FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
         require(DockCEGService.steamLogLines(drive: drive) == ["files="], "an empty logs folder: no file names, nothing else")

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Henrique Rocha (iqui27): the iPhone Duo tabletop pose, from thebcd69/bcd-games pull request #31; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import CoreGraphics
@@ -8,12 +10,13 @@ import CoreGraphics
 // Experimental support for the foldable iPhone (iPhone Duo, 2026-10-25): the gate, the display shape BCD
 // assumes for its inner screen and the pure part of the scene-size follower (docs/HANDOFF.md, 2026-10-25).
 //
-// EVERYTHING NEW HERE RUNS ONLY WHEN BOTH ARE TRUE:
+// THE EXPERIMENTAL GAME AND RESOLUTION HOOKS RUN ONLY WHEN BOTH ARE TRUE:
 //   1. this device's model identifier is the foldable iPhone's (`BCDFoldableDevice.identifiers`), and
 //   2. the experimental switch is on (Settings › Graphics › "Foldable iPhone support (experimental)", shown on
 //      that model only; off unless a person turns it on).
 // `BCDFoldable.active` is that gate. It is read once per app run (a change of the switch applies from the next
-// start), and every hook elsewhere in the app is one line that tests it first. On any other iPhone or iPad the
+// start), and every engine hook elsewhere in the app is one line that tests it first. Interface sizing in
+// BCDFoldableUI.swift runs independently on the Duo, so its toolbar fits even with this switch off. On any other iPhone or iPad the
 // gate is false whatever the switch holds: no new layout, no new call, no new log line, and Settings has no new
 // row. tests/host/check-bcd-foldable.py runs the gate over the identifiers of other devices and lists the hooks.
 //
@@ -45,6 +48,53 @@ enum BCDFoldableDevice {
     }()
 
     static var isThisDevice: Bool { isFoldable(machine: machine) }
+}
+
+/// Native Duo interface (thebcd69/bcd-games#43 by Paulo Eduardo Correa / pauloec): Liquid Glass, system tabs and a sidebar, the library's
+/// toolbar search, controller navigation that keeps the ring in view, and the Windows desktop's controls on Home.
+///
+/// Gate: the foldable model AND the switch in Settings › Graphics › Foldable iPhone › "Duo enhancements", which is OFF until a
+/// person turns it on (UserDefaults "bcd.duo.enhancements" = "1"; read once per run, so a change applies from the next start).
+/// The pull request had it on by default for the foldable model; BCD keeps the interface that runs there today until the switch is
+/// on. On every other iPhone and iPad the gate is false whatever the stored answer is.
+enum BCDDuoFeatures {
+    static let key = "bcd.duo.enhancements"
+    static func enabled(machine: String, stored: String?) -> Bool {
+        BCDFoldableDevice.isFoldable(machine: machine) && stored?.trimmingCharacters(in: .whitespacesAndNewlines) == "1"
+    }
+#if BCD_PREVIEW
+    /// The preview app (tools/ui-preview.py) runs on no foldable iPhone: `-BCDDuo 1` stands in for the model and the switch there.
+    static let active = UserDefaults.standard.bool(forKey: "BCDDuo")
+#else
+    static let active = enabled(machine: BCDFoldableDevice.machine, stored: UserDefaults.standard.string(forKey: key))
+#endif
+    static func store(_ on: Bool) { UserDefaults.standard.set(on ? "1" : "0", forKey: key) }
+}
+
+/// A native tab hands shared controller/backend resources over before another page activates.
+@MainActor enum BCDDuoPageOwner {
+    private static var owner: UUID?
+    private static var cleanup: (() -> Void)?
+
+    static func claim(_ id: UUID, cleanup next: @escaping () -> Void) {
+        end()
+        owner = id
+        cleanup = next
+    }
+
+    static func end() {
+        let previous = cleanup
+        owner = nil
+        cleanup = nil
+        previous?()
+    }
+
+    static func owns(_ id: UUID) -> Bool { owner == id }
+
+    static func release(_ id: UUID) {
+        guard owner == id else { return }
+        end()
+    }
 }
 
 /// The experimental switch: one string in UserDefaults, "1" on and "0" off.
@@ -89,6 +139,24 @@ enum BCDFoldable {
         active ? (innerPoints, innerPixels) : nil
     }
     static var innerScreen: (points: CGSize, pixels: CGSize)? { screen(active: active) }
+}
+
+/// The tabletop pose's geometry (thebcd69/bcd-games#31 by Henrique Rocha / iqui27; FoldTabletop in ContentView.swift reads the fold,
+/// this decides what counts as one): the screen above and the screen below a fold that runs across the window. A fold across the
+/// window is wider than tall and at least half the window's width (a fold like a book's spine is tall and narrow and does not
+/// count), and both parts keep at least `minimumPart` points, so a nearly flat or nearly closed phone keeps the whole screen.
+enum BCDTabletop {
+    static let minimumPart: CGFloat = 120
+
+    static func regions(bounds b: CGRect, division f: CGRect) -> (top: CGRect, bottom: CGRect)? {
+        guard f.width > f.height, f.width >= b.width / 2 else { return nil }
+        // The two heights are compared as plain numbers: a CGRect's `height` is its absolute value, so a fold outside the window
+        // (below its bottom edge) would otherwise make a part with a negative height count as a big one.
+        let aboveHeight = f.minY - b.minY, belowHeight = b.maxY - f.maxY
+        guard aboveHeight >= minimumPart, belowHeight >= minimumPart else { return nil }
+        return (CGRect(x: b.minX, y: b.minY, width: b.width, height: aboveHeight),
+                CGRect(x: b.minX, y: f.maxY, width: b.width, height: belowHeight))
+    }
 }
 
 /// When the iPad layout does not fit. BCD's library draws its iPad layout (a top bar of tabs and chips, a game page with a 320 pt side

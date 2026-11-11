@@ -61,7 +61,7 @@ check('FINAL FANTASY VII\'s launcher row carries the switch from build 624',
       and ff7[0]['match']['programs'] == [{'name': 'ffvii_launcher.exe'}], ff7)
 # Round 626 (agents U1 S2, A2 S9): Caravan SandWitch's and Dragon Age: Origins' diagnostic rows name the windows' text too.
 check('no other list row sets it', sorted(r['id'] for r in recs['rules'] if 'MADEIRA_WIN_TEXT' in json.dumps(r['config']))
-      == ['caravan-sandwitch', 'dragon-age-origins', 'final-fantasy-vii-steam'])
+      == ['caravan-sandwitch', 'dragon-age-origins', 'fallout-3', 'final-fantasy-vii-steam', 'the-elder-scrolls-iv-oblivion'])   # night round 2026-11-11 (agent D S9): the Bethesda launchers' box text
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'python3 tests/host/check-win-text.py' in wf)
 print('PASS: win-text' if ok else 'FAIL: win-text')

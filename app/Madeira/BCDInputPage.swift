@@ -73,6 +73,9 @@ enum BCDInputPage {
         ]
         if aim.isOn {
             settings += [
+                BCDGameSetting(id: "aim-as", title: "The finger moves", kind: .choice(BCDAimSettings.Output.allCases.map { BCDGameChoice(value: $0.rawValue, label: $0.title) }),
+                               value: aim.output.rawValue, defaultValue: "",
+                               note: "The mouse is what a finger always did. For a game that plays with a controller layout and ignores the mouse for the camera (NieR: Automata), choose the right stick: the finger turns the camera like the right stick of a pad and stops when it stops. It reaches the game as player 1's controller. Speed, the up and down setting and the invert row keep their meaning."),
                 BCDGameSetting(id: "aim-sens", title: "Speed", kind: .choice(BCDAimSettings.sensitivityChoices.map { BCDGameChoice(value: number($0), label: number($0) + "×") }),
                                value: number(aim.sensitivity), defaultValue: "1",
                                note: "1× is two mouse counts for every point the finger travels. What that means for the camera depends on the game's own mouse sensitivity."),

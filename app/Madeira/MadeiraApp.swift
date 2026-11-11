@@ -1,3 +1,6 @@
+// Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #464)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 import Foundation
 import SwiftUI
 import UIKit
@@ -9,7 +12,6 @@ struct MadeiraApp: App {
     @UIApplicationDelegateAdaptor(BCDOrientationDelegate.self) private var orientationDelegate
 
     init() {
-        ExternalGameStorage.shared.restore()
         // madeira-bcd: the Metal Performance HUD's performance insights (the
         // notes that stack up left of its panel: shader compiles, similar render
         // passes, blit encoders) cover the game. Off unless bcd.cfg says
@@ -29,14 +31,19 @@ struct MadeiraApp: App {
         // Memory & performance > In the background says so (BackgroundRun.swift). Off: it only halts the audio
         // endpoint when BCD enters the background, which the "audio" background mode would otherwise keep alive.
         BackgroundRun.shared.start()
+        LibraryController.duoNavigation = BCDDuoFeatures.active   // the native Duo interface's direction repeat; false everywhere else
     }
 
     var body: some Scene {
         WindowGroup {
             // BCD's interface (BCDLiveFrontEnd, shown by ContentView) is the app's only interface.
             ContentView()
+                .modifier(BCDThemeTint())   // BCD Violet (the default) leaves the app's tint as it was; another profile tints the app
                 .modifier(ClaimGamepadEvents())
                 .onAppear {
+                    // External drives (ExternalDrives.swift, from Madeira #464): each saved drive is opened again and linked
+                    // as C:\External\<name> and its letter before Wine starts.
+                    ExternalDrives.shared.mountAll()
                     GamepadInput.shared.start()
                     // BCD (2026-10-18): controllers, their tester and the key mapping (BCDControllerHub.swift).
                     BCDControllerHub.shared.start(.live)

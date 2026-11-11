@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Taala2 (thebcd69/bcd-games pull request #33): the fake PEBs, Mach read and clock of the harness and the [TLS_CLEAR_DONE] checks;
+# modified by BCD (thebcd69), 2026-11-11: they now run under MADEIRA_TLS_DIAG=1, and the default is checked to be the line of builds 579 to 651.
 """TlsFree across pseudo-processes: the [tls-cross-clear] line and the opt-in MADEIRA_TLS_CLEAR_OWN_PROCESS switch (ios_tls_clear.h,
 virtual_clear_tls_index in virtual_ios.c); no Wine runs.
 
@@ -12,10 +14,10 @@ function does exactly what it did.
 
 Compiled runs (macOS): the production header and the production function (extracted from virtual_ios.c) are compiled against fake
 TEBs, next to the function as it was before (ORIGINAL below, from the base commit), and run on the same lists of threads:
-  - switch off (default): the cells end up exactly as the original leaves them, for every shape (64-bit and 32-bit TEBs of the caller's
+  - switch off ("0" exactly; the default until build 651): the cells end up exactly as the original leaves them, for every shape (64-bit and 32-bit TEBs of the caller's
     process and of two other processes, the 64 inline cells and the expansion cells, no caller PEB), and the foreign live cells are logged
     as CLEARED, the caller's own and the zero ones are not;
-  - switch on ("1" exactly): the other processes' cells are kept and logged as SPARED; the caller's process is cleared as before;
+  - switch on (unset or anything but "0": the default from build 652): the other processes' cells are kept and logged as SPARED; the caller's process is cleared as before;
   - the index range check and the return values are unchanged; the line count is capped.
 """
 from pathlib import Path
@@ -116,7 +118,7 @@ check('the caller is NtCurrentTeb() and the switch is read through the header on
       'TEB *caller_teb = NtCurrentTeb();' in fn and 'int own_only = ios_tls_clear_own_process_only();' in fn)
 forbidden = ('mmap(', 'mprotect', 'memset(', 'memcpy(', 'free(', 'malloc(', 'abort(', 'exit(', 'fopen(', 'open(', 'mach_vm_')
 check('the header only reads the environment and prints', not [f for f in forbidden if f in header], str([f for f in forbidden if f in header]))
-check('the switch is exactly "1"', 'e && e[0] == \'1\' && !e[1]' in header and '"MADEIRA_TLS_CLEAR_OWN_PROCESS"' in header)
+check('the switch is on unless it is exactly "0" (night round 2026-11-11, G1 S4)', 'mode = !(e && e[0] == \'0\' && !e[1]);' in header and '"MADEIRA_TLS_CLEAR_OWN_PROCESS"' in header)
 check('an unknown PEB on either side is never foreign', 'return caller_peb && victim_peb && victim_peb != caller_peb;' in header)
 check('capped at 40 lines then one closing line', '#define IOS_TLS_CROSS_LINES 40' in header and 'n > IOS_TLS_CROSS_LINES + 1' in header)
 
@@ -141,6 +143,22 @@ typedef int NTSTATUS;
 #define TLS_MINIMUM_AVAILABLE 64
 #define HandleToULong(h) ((ULONG)(ULONG_PTR)(h))
 #define WINAPI
+#include <time.h>
+/* ios_tls_diag_util.h (included by the header): the PEB fields it reads, and fakes for the Mach read and the clock. The fake read is a
+ * plain copy: every address the production code reads in this harness (the fake PEBs, the TEB cells) is a real object here, and a PEB's
+ * LdrData is NULL, so the module walk ends at once ("nw.dll not found"). */
+typedef struct { void *LdrData; ULONG TlsBitmapBits[2]; ULONG TlsExpansionBitmapBits[32]; } PEB;
+typedef unsigned long mach_vm_size_t;
+typedef unsigned long long mach_vm_address_t;
+#define KERN_SUCCESS 0
+#define mach_task_self() 0
+#define mach_vm_read_overwrite(task, addr, len, buf, got) \
+    ((void)(task), memcpy( (void *)(uintptr_t)(buf), (const void *)(uintptr_t)(addr), (len) ), *(got) = (len), 0)
+#ifndef CLOCK_UPTIME_RAW
+#define CLOCK_UPTIME_RAW 8
+#endif
+#define clock_gettime_nsec_np(clock) ((unsigned long long)(clock) * 0 + 1000000000ULL)
+unsigned long long ios_tls_diag_seq_counter;   /* defined in virtual_ios.c, just above the function; the harness has only the function */
 struct list { struct list *next, *prev; };
 #define LIST_ENTRY(elem, type, field) ((type *)((char *)(elem) - offsetof(type, field)))
 #define LIST_FOR_EACH_ENTRY(elem, list, type, field) \
@@ -163,7 +181,7 @@ static struct list teb_list = { &teb_list, &teb_list };
 static int virtual_mutex;
 #define server_enter_uninterrupted_section(m, s) ((void)(m), (void)(s))
 #define server_leave_uninterrupted_section(m, s) ((void)(m), (void)(s))
-static struct { ULONG TlsExpansionBitmapBits[32]; } fake_peb, *peb = &fake_peb;
+static PEB fake_peb, *peb = &fake_peb;
 static TEB *cur_teb;
 #define NtCurrentTeb() (cur_teb)
 
@@ -176,7 +194,7 @@ static WOW_TEB wows[NT];
 #define NEXP 1024
 static void *exp64[NT][NEXP];
 static ULONG exp32[NT][NEXP];
-static int PA = 1, PB = 2, PC = 3;   /* three processes: A (the caller's), B (32-bit), C (64-bit) */
+static PEB PA, PB, PC;   /* three processes: A (the caller's), B (32-bit), C (64-bit); real PEB objects, so the diagnostic reads of them are valid */
 
 static void build(int caller_peb_null)
 {
@@ -248,6 +266,7 @@ int main(int argc, char **argv)
 def run(binary, *args, env=None):
     e = dict(os.environ)
     e.pop('MADEIRA_TLS_CLEAR_OWN_PROCESS', None)
+    e.pop('MADEIRA_TLS_DIAG', None)
     e.update(env or {})
     return subprocess.run([str(binary), *args], capture_output=True, text=True, env=e)
 
@@ -264,10 +283,14 @@ else:
         if c.returncode == 0:
             h = d / 'h'
             orig = run(h, 'orig')
-            default = run(h, 'new')
+            # night round 2026-11-11 (G1 S4): the switch is ON by default; only "0" gives the original behaviour
+            default = run(h, 'new', env={'MADEIRA_TLS_CLEAR_OWN_PROCESS': '0'})   # `default` below is the old behaviour (the key says 0)
             on = run(h, 'new', env={'MADEIRA_TLS_CLEAR_OWN_PROCESS': '1'})
+            unset = run(h, 'new')
             ostate = [l for l in orig.stdout.splitlines() if l.startswith('state=')]
-            check('the harness runs', orig.returncode == 0 and default.returncode == 0 and on.returncode == 0, orig.stderr + default.stderr + on.stderr)
+            check('the harness runs', orig.returncode == 0 and default.returncode == 0 and on.returncode == 0 and unset.returncode == 0, orig.stderr + default.stderr + on.stderr)
+            check('key unset: the same cells and the same lines as "1" (own-process clearing is the default from build 652)', unset.stdout == on.stdout and
+                  re.sub(r'0x[0-9a-f]{6,}', 'P', unset.stderr) == re.sub(r'0x[0-9a-f]{6,}', 'P', on.stderr) and 'SPARED' in unset.stderr and 'CLEARED' not in unset.stderr, unset.stdout + unset.stderr)
             check('switch off: every cell of every thread ends exactly as the original function leaves it, and the same return values',
                   orig.stdout == default.stdout and 'rets=0,0,0,0,c000000d,0,' in default.stdout, orig.stdout + '\n' + default.stdout)
             check('the original run prints no line (it has none)', orig.stderr == '', orig.stderr)
@@ -282,6 +305,28 @@ else:
             check('switch off: the expansion cells are logged under their full index (64 + n)', any('TlsFree(67)' in l for l in lines) and any('TlsFree(73)' in l for l in lines), default.stderr)
             lines_on = [l for l in on.stderr.splitlines() if l.startswith('[tls-cross-clear] rev=ajan7-arkham')]
             check('switch on: the same events are logged as SPARED, none as CLEARED', lines_on and all('SPARED' in l for l in lines_on) and len(lines_on) == len(lines), on.stderr)
+            # MADEIRA_TLS_DIAG off (the default): the line of builds 579 to 651 and nothing else (no sequence, no read-back, no walk of a PEB)
+            check('default: no [TLS_CLEAR_DONE], and the line carries no seq=, t=, prio= or alloc-bit',
+                  '[TLS_CLEAR_DONE]' not in default.stderr and not any(w in default.stderr for w in (' seq=', ' t=', 'prio=', 'alloc-bit')), default.stderr)
+            # MADEIRA_TLS_DIAG=1: the extended line, [TLS_CLEAR_DONE] after the store (it reads the cell back); a SPARED cell is never written
+            diag = run(h, 'new', env={'MADEIRA_TLS_DIAG': '1', 'MADEIRA_TLS_CLEAR_OWN_PROCESS': '0'})
+            diag_on = run(h, 'new', env={'MADEIRA_TLS_DIAG': '1', 'MADEIRA_TLS_CLEAR_OWN_PROCESS': '1'})
+            check('MADEIRA_TLS_DIAG=1: every cell of every thread still ends exactly as the original function leaves it, and the same return values',
+                  diag.returncode == 0 and diag.stdout == orig.stdout, orig.stdout + '\n' + diag.stdout)
+            dlines = [l for l in diag.stderr.splitlines() if l.startswith('[tls-cross-clear] seq=') and ' rev=ajan7-arkham ' in l]
+            check('MADEIRA_TLS_DIAG=1: the same events are logged as with the switch off, with seq=, t=, prio= and the allocation bits',
+                  len(dlines) == len(lines) and all(w in l for l in dlines for w in (' seq=', ' t=', ' prio=0 ', 'alloc-bit[caller peb]=', 'alloc-bit[victim peb]=')), diag.stderr)
+            done = [l for l in diag.stderr.splitlines() if l.startswith('[TLS_CLEAR_DONE] seq=')]
+            cleared = [l for l in dlines if ' CLEARED ' in l]
+            check('MADEIRA_TLS_DIAG=1: each CLEARED line is followed by one [TLS_CLEAR_DONE] (note_seq = its seq) that reads the cell back as zero',
+                  cleared and len(done) == len(cleared) and all(('note_seq=%s ' % c.split()[1].split('=')[1]) in d and '(zero)' in d
+                                                                for c, d in zip(cleared, done)), diag.stderr)
+            dlines_on = [l for l in diag_on.stderr.splitlines() if l.startswith('[tls-cross-clear] seq=') and ' rev=ajan7-arkham ' in l]
+            check('MADEIRA_TLS_DIAG=1 and the other switch on: SPARED, never written, so no [TLS_CLEAR_DONE]',
+                  dlines_on and all('SPARED' in l for l in dlines_on) and '[TLS_CLEAR_DONE]' not in diag_on.stderr and diag_on.stdout == on.stdout, diag_on.stderr)
+            for val in ('0', '11', 'true', '', 'yes'):
+                r = run(h, 'new', env={'MADEIRA_TLS_DIAG': val, 'MADEIRA_TLS_CLEAR_OWN_PROCESS': '0'})
+                check('MADEIRA_TLS_DIAG=%r is not the switch: the line of builds 579 to 651' % val, r.stdout == orig.stdout and re.sub(r'0x[0-9a-f]{6,}', 'P', r.stderr) == re.sub(r'0x[0-9a-f]{6,}', 'P', default.stderr), r.stderr)
             c5 = {l.split()[0]: l for l in on.stdout.splitlines() if l.startswith('t')}
             # tebs: t0, t1 = process A; t2, t3 = B; t4 = C. cells for index 5 / 7 and expansion 3 / 9 after the five calls
             check('switch on: the caller\'s process (both threads) is cleared as before',
@@ -289,9 +334,10 @@ else:
             check('switch on: the other two processes keep every cell (the 32-bit one and the 64-bit one)',
                   'cell5=0 ' not in c5['t2'] and 'cell5=0 ' not in c5['t3'] and 'cell5=0 ' not in c5['t4'] and 'exp9=0' not in c5['t2'] and 'exp9=0' not in c5['t4'], on.stdout)
             check('switch on: the return values are the same', 'rets=0,0,0,0,c000000d,0,' in on.stdout, on.stdout)
-            for val in ('0', '11', 'true', '', 'yes'):
+            check('MADEIRA_TLS_CLEAR_OWN_PROCESS="0" is the original behaviour', default.stdout == orig.stdout and 'SPARED' not in default.stderr, default.stdout)
+            for val in ('11', 'true', '', 'yes', '2'):
                 r = run(h, 'new', env={'MADEIRA_TLS_CLEAR_OWN_PROCESS': val})
-                check('MADEIRA_TLS_CLEAR_OWN_PROCESS=%r is not the switch: the original behaviour' % val, r.stdout == orig.stdout and 'SPARED' not in r.stderr, r.stdout)
+                check('MADEIRA_TLS_CLEAR_OWN_PROCESS=%r is not "0": own-process clearing, like "1"' % val, r.stdout == on.stdout and 'CLEARED' not in r.stderr, r.stdout)
             nopeb = run(h, 'new', 'nopeb', env={'MADEIRA_TLS_CLEAR_OWN_PROCESS': '1'})
             nopeb_orig = run(h, 'orig', 'nopeb')
             check('a caller whose PEB is unknown clears everything as before, even with the switch on, and logs nothing',
@@ -307,6 +353,10 @@ else:
                 cl = [l for l in r.stderr.splitlines() if l.startswith('[tls-cross-clear]')]
                 check('capped: 40 event lines, then exactly one closing line, then silence', len(cl) == 41 and 'the rest of this run' in cl[-1]
                       and len([l for l in cl if 'rev=ajan7-arkham' in l]) == 40, '%d lines: %s' % (len(cl), cl[-2:]))
+                r = run(d / 'cap', 'new', env={'MADEIRA_TLS_DIAG': '1'})
+                cl = [l for l in r.stderr.splitlines() if l.startswith('[tls-cross-clear]')]
+                check('MADEIRA_TLS_DIAG=1, victims without nw.dll: the same 40 lines and one closing line (the priority budget is for nw.dll victims only)',
+                      len(cl) == 41 and 'the rest of this run' in cl[-1] and len([l for l in cl if 'rev=ajan7-arkham' in l and ' prio=0 ' in l]) == 40, '%d lines: %s' % (len(cl), cl[-2:]))
 
 # ---------------------------------------------------------------- the real file still compiles for iOS (when the wine headers exist)
 wine = Path(os.environ.get('WINE_SRC', root / 'wine'))

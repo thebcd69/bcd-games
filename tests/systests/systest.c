@@ -1428,11 +1428,27 @@ static int test_disk(u64 size_mb)
     }
     if (!dir_exists(c_dir)) snprintf(c_dir, sizeof c_dir, "C:");
     measured += disk_target("C: (the game folder's drive)", c_dir, size_mb, &verdict, 1);
+    /* External drives (Settings > Storage > External drives): each connected drive is C:\\External\\<name>. */
     a = GetFileAttributesA("C:\\External");
-    if (a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY))
-        measured += disk_target("External drive", "C:\\External", size_mb, &verdict, 0);
-    else
-        say("External drive: C:\\External is not there (no external drive connected in BCD)");
+    if (a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY)) {
+        WIN32_FIND_DATAA fd;
+        HANDLE h = FindFirstFileA("C:\\External\\*", &fd);
+        int drives = 0;
+        if (h != INVALID_HANDLE_VALUE) {
+            do {
+                char dir[MAX_PATH], label[MAX_PATH + 32];
+                if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || fd.cFileName[0] == '.') continue;
+                if (drives >= 4) break;
+                snprintf(dir, sizeof dir, "C:\\External\\%s", fd.cFileName);
+                snprintf(label, sizeof label, "External drive %s", fd.cFileName);
+                measured += disk_target(label, dir, size_mb, &verdict, 0);
+                drives++;
+            } while (FindNextFileA(h, &fd));
+            FindClose(h);
+        }
+        if (!drives) say("External drive: none connected in BCD (C:\\External has no drive)");
+    } else
+        say("External drive: none connected in BCD (no C:\\External)");
     if (!measured) return finish("disk", V_FAIL, "nothing could be measured");
     if (verdict == V_FAIL) return finish("disk", V_FAIL, "a drive is very slow or failed (see above)");
     if (verdict == V_WARN) return finish("disk", V_WARN, "a drive is slow (under 20 MB/s) or could not be measured (see above)");

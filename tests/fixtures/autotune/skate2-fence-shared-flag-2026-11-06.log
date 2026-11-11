@@ -1,0 +1,278 @@
+[02:53:12.626] [INFO] Checking entitlements...
+[02:53:12.627] [INFO] [build] v0.1.632 (632)
+[02:53:12.627] [INFO] [device] model=iPhone14,7 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=5709MB available=4075MB cores=6
+[02:53:12.628] [INFO] [device] address-map=[0x10218c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[02:53:12.628] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[02:53:12.652] [INFO] [device] settings: low-power=0 thermal=nominal screen=1170x2532@3.0x max-fps=60 utc-offset=+02:00 free-disk=116GB stikdebug-url=0
+[02:53:12.656] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[02:53:13.826] [INFO] Requesting JIT with Built-in StikJIT...
+[02:53:15.317] [INFO] [bcd] library launch skate2-pc.exe: avx=1 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[02:53:15.352] [INFO] Running full Wine sequence...
+[02:53:15.353] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10218c000,0x8000000000) 512GB available=4060MB low-power=0 thermal=nominal
+[02:53:15.355] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 gl-backend=zink
+[02:53:15.363] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[02:53:15.363] [INFO] Allocating 896MB JIT pool via debugger...
+[02:53:15.364] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[02:53:15.364] [INFO] [jit-debugger] attached=1 at the pool request
+[02:53:15.368] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[02:53:16.470] [INFO] RX pool at 0x148000000
+[02:53:16.494] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.189s rev=ml526
+[02:53:16.553] [wineserver] send_client_fd: fd=36 handle=0x3a2 msg_fd_unix=33 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/31d20a70e2c2c222.cfg (read)
+[game-cfg]   gl-backend = zink
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[02:53:16.943] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[02:53:16.943] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[Wine init_process] reply_pipe=40, sending init_first_thread...
+[02:53:16.943] [Wine init_process] reply_pipe=40, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3454 MB + phys_footprint=641 MB = 4096 MB (hw.memsize says 5709 MB)
+ml985: preferred base 0x140000000+0x308c000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x308c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x121000000+0x308c000 (?) → pool 0x148007000 used=0x3097000/0x25000000 tramp+0x0
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[copy-verify] ?: OK, 2399 .text pages executable (copy @0x148007000)
+ml957: ? backing 0x121000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14b094000 used=0x31cc000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14b094000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[window] 0x121000000..0x7805000000 regions=75943 occupied=462209 MB of 486976 MB free=41231 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=739 MB (peak 739) internal=738 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x14b1cf000 used=0x35f3000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x14b1cf000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14b5f0000 used=0x3724000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14b5f0000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14b724000 used=0x37ec000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14b724000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14b7ec000 used=0x3aec000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14b7ec000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module skate2-pc.exe (skate2-pc.exe-e89b899bc06e3ec5): 121000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14cfc0000)
+[copy-verify] mmdevapi.dll: OK, 6 .text pages executable (copy @0x14d044000)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x14d0e8000)
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x14d21c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14d2b0000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[free-delay] #1 release of 0x70276d0000+0x140000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7028410000+0x560000 held for 2000 ms (2 in flight)
+[xp-names] m321097 "wine-x18-exc"
+[xp] 02:53:17.601 +0.57 dt=299 cpu=609 (thr 604) P=313 E=296 run=618 pgw=-1.0 GHz P=3.16 E=1.87 Minst=5985 IPC=3.88 mJ=998 pin=67 rdKB=0 fpMB=876
+[free-delay] #3 release of 0x702a910000+0x450000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702bd30000+0x4e0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x702d1e0000+0x3c0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x702f9e0000+0x110000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x702e570000+0x4a0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7031230000+0x110000 held for 2000 ms (8 in flight)
+[xp] 02:53:17.851 +0.82 dt=250 cpu=503 (thr 503) P=251 E=252 run=501 pgw=-1.0 GHz P=3.18 E=1.59 Minst=4605 IPC=3.84 mJ=768 pin=0 rdKB=0 fpMB=967
+[xp] 02:53:18.169 +1.13 dt=317 cpu=631 (thr 631) P=318 E=313 run=633 pgw=-1.0 GHz P=3.14 E=1.59 Minst=5609 IPC=3.75 mJ=948 pin=0 rdKB=0 fpMB=1090
+[xp] 02:53:18.441 +1.41 dt=273 cpu=537 (thr 536) P=274 E=263 run=551 pgw=-1.0 GHz P=3.15 E=1.58 Minst=4641 IPC=3.63 mJ=811 pin=0 rdKB=4096 fpMB=1205
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,1062,492} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='SDLHelperWindowInputCatcher' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,1062,492} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='SDLHelperWindowInputCatcher' text="SDLHelperWindowInputMsgWindow" rev=ml853
+[win-pos] #3 hwnd=0x1002c after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #3 hwnd=0x1002c class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[win-pos] #4 hwnd=0x1002c after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #4 hwnd=0x1002c class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[win-pos] #5 hwnd=0x1002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #5 hwnd=0x1002e class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #6 hwnd=0x1002e after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #6 hwnd=0x1002e class='__wine_xinput_devnotify' text="" rev=ml853
+0034:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0034 status=00000001 caller=000000014B74A32C
+[jit-pool] image 0x71fc060000+0xb0000 (dinput8.dll) → pool 0x14dd70000 used=0x5e24000/0x25000000 tramp+0x4000
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x14dd70000)
+D 2C Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71FC060000
+[jit-pool] image 0x71fbee0000+0x180000 (comctl32.dll) → pool 0x14de24000 used=0x5fa8000/0x25000000 tramp+0x4000
+D 2C Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71FBEE0000
+[xp] 02:53:18.696 +1.66 dt=255 cpu=560 (thr 491) P=301 E=259 run=579 pgw=-1.0 GHz P=3.11 E=1.71 Minst=4960 IPC=3.60 mJ=895 pin=1 rdKB=1104 fpMB=1282
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[jit-pool] image 0x71fbbb0000+0x23000 (vulkan-1.dll) → pool 0x14dfaa000 used=0x5fd6000/0x25000000 tramp+0x4000
+D 24 Load module vulkan-1.dll (vulkan-1.dll-2c1a3868f8133737): 71FBBB0000
+[image-reload] unmapped image 0x71fbbb0000+0x23000: 1 pool copy marked
+[jit-pool] image 0x71fb780000+0x45d000 (madeira_d3d12.dll) → pool 0x14dfd5000 used=0x643d000/0x25000000 tramp+0x4000
+D 24 Load module d3d12.dll (d3d12.dll-d66018a141d9ee53): 71FB780000
+[jit-pool] image 0x71fb6d0000+0xb0000 (d3dcompiler_47.dll) → pool 0x14e43c000 used=0x64f0000/0x25000000 tramp+0x4000
+D 24 Load module d3dcompiler_47.dll (d3dcompiler_47.dll-e0c838ea40199618): 71FB6D0000
+[jit-pool] image 0x71fb360000+0x370000 (wined3d.dll) → pool 0x14e4f0000 used=0x6864000/0x25000000 tramp+0x4000
+D 24 Load module wined3d.dll (wined3d.dll-e53ebe6d434bb891): 71FB360000
+[launch-view] dismissed reason=surface logs=0
+[winios] game window hwnd=0x20052 presents through Metal; its GDI surface is not drawn
+[winios] game window hwnd=0x20052 not drawn (presents through Metal)
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=0000007045F0E8C0, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007045F0E8C0, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007045F0E8C0, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] FAILED CreateFence flags -> 0x80004001 (1, 0) [call #1 here, #1 in all]
+[madeira-d3d12] FAILED CreateFence flags -> 0x80004001 (1, 0) [call #1 here, #1 in all]
+[image-reload] unmapped image 0x71fb780000+0x45d000: 1 pool copy marked
+[image-reload] unmapped image 0x71fb6d0000+0xb0000: 1 pool copy marked
+[image-reload] unmapped image 0x71fb360000+0x370000: 1 pool copy marked
+controlled skating test failed: Parent device is lost
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #97 hwnd=0x10060 class='Static' text="Skate 2 stopped because of an error:??Parent device is lost??GPU: Apple A15 GPU (Dx12, driver 65535.65535.65535.65535 )" rev=ml853
+[xp] 02:53:18.990 +1.95 dt=293 cpu=679 (thr 481) P=358 E=321 run=744 pgw=-1.0 GHz P=3.08 E=1.88 Minst=4825 IPC=2.83 mJ=888 pin=269 rdKB=5152 fpMB=1339
+[win-pos] #99 hwnd=0x2002a after=0x0 flags=00001967 vis={575,248,841,408} surface=0x112b17e40 rev=ml505 style=94c801c4 visible=1 parent=0x10020
+[win-name] #99 hwnd=0x2002a class='#32770' text="Skate 2" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[win-pos] #100 hwnd=0x10044 after=0x0 flags=400018bf vis={0,0,1288,754} surface=0x1050c9c50 rev=ml505 style=06cf0000 visible=0 parent=0x10020
+[win-name] #100 hwnd=0x10044 class='Window Class' text="sk82" rev=ml853
+[footprint] rev=ml358 phys=1348 MB (peak 1348) internal=1209 MB compressed=127 MB external=112 MB reusable=0 MB (cycle=2)
+[srv-input] btn msg=0x201 at (714,385) hit win=0002002a thread=0x1194be700
+[srv-input] btn msg=0x201 at (714,385) hit win=0002002a thread=0x1194be700
+[srv-input] btn msg=0x201 at (714,385) hit win=0002002a thread=0x1194be700
+[win-pos] #101 hwnd=0x2002a after=0x0 flags=000018bf vis={575,248,841,408} surface=0x1050c9c50 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #101 hwnd=0x2002a class='#32770' text="Skate 2" rev=ml853
+[win-pos] #102 hwnd=0x2002a after=0x0 flags=0000181f vis={575,248,841,408} surface=0x1050c9c50 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #102 hwnd=0x2002a class='#32770' text="Skate 2" rev=ml853
+[win-pos] #103 hwnd=0x2002a after=0x0 flags=0000181f vis={575,248,841,408} surface=0x1050c9c50 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #103 hwnd=0x2002a class='#32770' text="Skate 2" rev=ml853
+[win-pos] #104 hwnd=0x2002a after=0x0 flags=0000181f vis={575,248,841,408} surface=0x1050c9c50 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #104 hwnd=0x2002a class='#32770' text="Skate 2" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=1505
+[unwind] term ml661 begin rip=14b6811d4 rsp=702600fe28 window=[702600fe28..702680fe28) max=32
+[unwind] term ml661 #00 pc=14b6811d4 rsp=702600fe28  ucrtbase.dll+0x911d4
+[unwind] term ml662 #00 nv: rbx=1 rbp=702600fe50 rsi=0 rdi=702604aa70 r12=7026885ae0 r13=14b6811bc r14=7026885ae0 r15=14b6d1000
+[unwind] term ml662   rbp=702600fe50: 00000000 00000000 00000000 00000000 b05c0c4b 01000000 a45c0c4b 01000000
+[unwind] term ml662   rdi=702604aa70: 70ad0426 70000000 82ad0426 70000000 95ad0426 70000000 fdad0426 70000000
+[unwind] term ml661 #01 pc=14b6d0000 rsp=702600fe30  ucrtbase.dll+0xe0000
+[unwind] term ml662   rdi=702604aa70: 70ad0426 70000000 82ad0426 70000000 95ad0426 70000000 fdad0426 70000000
+[unwind] term ml661 #02 pc=1 rsp=702600fe38  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+140: CALL 123514413  (exe)+0x2514413
+[term-stack] ml660 sp+150: CALL 123514425  (exe)+0x2514425
+E 24 [iOS-bogusrip] band=host-heap(0x7c-0x7f) GuestRIP=0x7c05cfb380 State.rip=0x7c05cfb380 host_ret=0x16cffc354 callret_sp=0x7c01001000
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x14b0ea35c fault_addr=0x0 insn=f9400170 rn=11 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffe0000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf9400170 pc=0x14b0ea35c NO pool/anon alias | region 0x10218c000+0x2d9c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3af860 (pc=0x14b0ea35c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x14b0ea35c hinsn=0xf9400170 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x7c05cfb380 pc=0x14b0ea35c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x14b0ea35c addr=0x0 x18=0x0 type=1 lr=0x14b1f021c sp=0x71fe3af860 x16=0x0 x17=0x0
+[guest-code] rev=ml333 pool_rip=0x7c05cfb380 (PE 0x7c05cfb380) -- NO pool copy for this address (identity translate)
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x14b0ea35c; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R9=R15=0x7c05cfb380 [R9]=(exe)+0xdca000
+[fault-host] 14b0ea25c: a90023e9 1400000f d00003c8 395ec108 360801a8 2a0003e8 d00003c1 911ec021
+[fault-host] 14b0ea27c: 900002c2 912fc042 b00002c3 910b0063 52800020 910003e4 52800105 b90003e8
+[fault-host] 14b0ea29c: 94000065 2a1f03e0 a9477bfb a9466bf9 a9455bf5 a94453f3 910203ff d65f03c0
+[fault-host] 14b0ea2bc: f2403d3f 54000080 900002ca 913c214a 17fffe8e d35efd4a b400026a f90002c8
+[fault-host] 14b0ea2dc: d1000528 d00003c9 f9000328 395ec129 360fd2e9 f94002c9 910003e4 d00003c1
+[fault-host] 14b0ea2fc: 911ec021 900002c2 912fc042 900002c3 913f0063 52800020 52800205 a90023e9
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0xaa00a900a800a7  (x16=0x0 pe=0x71ffcd0000 rva_pc=0xea35c)
+[mach_exc] insn_stream PC-12..PC+8: 370005b0 f2400d7f 540003e1 [f9400170] 58000551 eb11021f 54000141
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702604fe50 *(gs_cached+0x58)=0x702604fe50
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf9400170 pc=0x14b0ea35c NO pool/anon alias | region 0x10218c000+0x2d9c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3af860 (pc=0x14b0ea35c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x14b0ea35c hinsn=0xf9400170 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x7c05cfb380 pc=0x14b0ea35c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x14b0ea35c addr=0x0 x18=0x0 type=1 lr=0x14b1f021c sp=0x71fe3af860 x16=0x0 x17=0x0
+[guest-code] rev=ml333 pool_rip=0x7c05cfb380 (PE 0x7c05cfb380) -- NO pool copy for this address (identity translate)
+[fault-host] 14b0ea2bc: f2403d3f 54000080 900002ca 913c214a 17fffe8e d35efd4a b400026a f90002c8
+[fault-host] 14b0ea2dc: d1000528 d00003c9 f9000328 395ec129 360fd2e9 f94002c9 910003e4 d00003c1
+[fault-host] 14b0ea2fc: 911ec021 900002c2 912fc042 900002c3 913f0063 52800020 52800205 a90023e9
+[fault-host] 14b0ea31c: 17fffe8a 900002ca 913c814a 17fffe77 00027b99 d367fd70 b5000650 140370f5
+[fault-host] 14b0ea33c: d352fd71 f941b610 d34cfd69 f8717a10 9ac92610 370005b0 f2400d7f 540003e1
+[fault-host] 14b0ea35c: f9400170 58000551 eb11021f 54000141 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0xaa00a900a800a7  (x16=0x0 pe=0x71ffcd0000 rva_pc=0xea35c)
+[mach_exc] insn_stream PC-12..PC+8: 370005b0 f2400d7f 540003e1 [f9400170] 58000551 eb11021f 54000141
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702604fe50 *(gs_cached+0x58)=0x702604fe50
+0024:err:seh:segv_handler [x18-decline] #1 pc=0x14b0ea35c fault_addr=0x0 insn=f9400170 rn=11 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffe0000
+0024:err:seh:segv_handler   x8=0x14b0ea330 x9=0x0 x10=0x14b3ca730 x16=0x0 x17=0x0 x18=0x0 x19=0x7c00530080 x20=0x1
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x16c054d50 unresolved: hostPC outside block
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x71ffd2635c RX from -32, 64 of 64 bytes: 71 fd 52 d3 10 b6 41 f9 69 fd 4c d3 10 7a 71 f8 10 26 c9 9a b0 05 00 37 7f 0d 40 f2 e1 03 00 54 70 01 40 f9 51 05 00 58 1f 02 11 eb 41 01 00 54 70 05 40 f9 11 05 00 58 11 02 11 ca 3f 3e 40 f2 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x71ffd2635c (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 71FFD2635C AV READ of 0
+0024:err:seh:NtRaiseException Exception frame is not in stack limits => unable to dispatch exception.
+[unhandled] madeira-bcd code=c0000005 nparams=2 p0=0 p1=0 p2=0 p3=0
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1567
+[unwind] term ml661 begin rip=14b11220c rsp=702600fa58 window=[702600fa58..702680fa58) max=32
+[unwind] term ml661 #00 pc=14b11220c rsp=702600fa58  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+470:   ? 71ffd63ab0  ntdll.dll+0x93ab0
+[term-stack] ml660 sp+600:   ? 1231b6af0  (exe)+0x21b6af0
+[term-stack] ml660 sp+608: call* 1231b6b6e  (exe)+0x21b6b6e
+[term-stack] ml660 sp+610: call* 1231b6b7f  (exe)+0x21b6b7f
+[term-stack] ml660 sp+690: CALL 1231b706a  (exe)+0x21b706a
+[term-stack] ml660 sp+698: CALL 1231b7085  (exe)+0x21b7085
+[term-stack] ml660 sp+6a8: CALL 1231b588e  (exe)+0x21b588e
+[term-stack] ml660 sp+6b0: CALL 1231b5a2f  (exe)+0x21b5a2f
+[term-stack] ml660 sp+6b8: CALL 1231b5a51  (exe)+0x21b5a51
+[term-stack] ml660 sp+6c0: CALL 1231b5b5d  (exe)+0x21b5b5d
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741819)
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[footprint] rev=ml358 phys=1249 MB (peak 1348) internal=1117 MB compressed=126 MB external=116 MB reusable=0 MB (cycle=3)
+[02:53:21.350] [INFO] [session] length=6s play=0s frames=0 stalls=0/0s peak=1473MB limit=4095MB thermal=nominal lpm=0 api=D3D11/D3D12/D3D9/OpenGL/Vulkan/64 res=1416x656 cap=60 game=skate2-pc
+[02:53:21.353] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[02:53:23.096] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1247 MB (peak 1348) internal=1116 MB compressed=126 MB external=119 MB reusable=6 MB (cycle=4)
+[footprint] rev=ml358 phys=1264 MB (peak 1348) internal=1132 MB compressed=126 MB external=125 MB reusable=6 MB (cycle=5)
+[footprint] rev=ml358 phys=1251 MB (peak 1348) internal=1119 MB compressed=126 MB external=125 MB reusable=8 MB (cycle=6)
+[hwinput] keyboard focus: elsewhere (responder)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=19% RUN pc=libswiftCore.dylib`$ss6HasherV7combine5bytesySW_tF+0x1b8 lr=libswiftCore.dylib`$sSS4hash4intoys6HasherVz_tF+0xf8 sp=0x16dc70f40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16dcfab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e7e9030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=23 resident=1278MB dbg=DEBUGGED rev=ml525
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1262 MB (peak 1348) internal=1131 MB compressed=125 MB external=138 MB reusable=8 MB (cycle=16)
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1262 MB (peak 1348) internal=1132 MB compressed=125 MB external=139 MB reusable=8 MB (cycle=17)
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1262 MB (peak 1348) internal=1132 MB compressed=125 MB external=139 MB reusable=8 MB (cycle=18)
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1263 MB (peak 1348) internal=1132 MB compressed=125 MB external=139 MB reusable=8 MB (cycle=19)
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1264 MB (peak 1348) internal=1133 MB compressed=125 MB external=142 MB reusable=8 MB (cycle=20)
+[census-hold] idx=0 port=0xefc3 teb=0x71fffe0000 tid=0024 HOLDS fexlock @0x7c004f0108 run_state=0 susp=0 pc=0x0 lr=0x0 sp=0x0 bt: 0 0 0 0 0 0 0 0
+[footprint] rev=ml358 phys=1263 MB (peak 1348) internal=1133 MB compressed=125 MB external=143 MB reusable=8 MB (cycle=21)
+[xp] 02:53:57.817 +40.78 dt=315 cpu=50 (thr 50) P=1 E=49 run=50 pgw=-1.0 GHz P=1.11 E=0.95 Minst=77 IPC=1.63 mJ=3 pin=0 rdKB=0 fpMB=1264
+[xp] 02:53:58.092 +41.06 dt=276 cpu=115 (thr 115) P=54 E=61 run=129 pgw=-1.0 GHz P=1.99 E=1.31 Minst=268 IPC=1.43 mJ=39 pin=0 rdKB=0 fpMB=1264
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e7e9030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=0x0 lr=0x0 sp=0x0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "AudioSession - RootQueue" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x58 sp=0x16e38af20 NATIVE (no FEX state) sp-cand=[ ]
+[xp] 02:53:58.418 +41.38 dt=325 cpu=78 (thr 77) P=3 E=75 run=81 pgw=-1.0 GHz P=1.21 E=1.52 Minst=192 IPC=1.64 mJ=9 pin=3 rdKB=164 fpMB=1264
+[02:53:58.335] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=0x0 lr=0x0 sp=0x0 NATIVE (no FEX state) sp-cand=[ ]
+[02:53:58.336] [thread-sample] ml876 b0 "AudioSession - RootQueue" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x58 sp=0x16e38af20 NATIVE (no FEX state) sp-cand=[ ]
+[02:53:58.419] [xp] 02:53:58.418 +41.38 dt=325 cpu=78 (thr 77) P=3 E=75 run=81 pgw=-1.0 GHz P=1.21 E=1.52 Minst=192 IPC=1.64 mJ=9 pin=3 rdKB=164 fpMB=1264
+[thread-sample] ml876 b2 "" teb=0x0 cpu=79% RUN pc=libswiftCore.dylib`<redacted>+0xa8 lr=libswiftCore.dylib`<redacted>+0xa8 sp=0x16e07c7c0 NATIVE (no FEX state) sp-cand=[ ]
+[xp] 02:53:59.036 +42.00 dt=300 cpu=307 (thr 307) P=6 E=301 run=311 pgw=-1.0 GHz P=3.03 E=2.02 Minst=1865 IPC=2.98 mJ=87 pin=0 rdKB=0 fpMB=1267
+[02:53:58.920] [thread-sample] ml876 b2 "" teb=0x0 cpu=79% RUN pc=libswiftCore.dylib`<redacted>+0xa8 lr=libswiftCore.dylib`<redacted>+0xa8 sp=0x16e07c7c0 NATIVE (no FEX state) sp-cand=[ ]
+[02:53:59.037] [xp] 02:53:59.036 +42.00 dt=300 cpu=307 (thr 307) P=6 E=301 run=311 pgw=-1.0 GHz P=3.03 E=2.02 Minst=1865 IPC=2.98 mJ=87 pin=0 rdKB=0 fpMB=1267

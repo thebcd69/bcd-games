@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Preview reuse must preserve invalidation, failure and parallel-check isolation.
 
 Run the production cache with small stand-in compiler outputs. Real compilation
@@ -31,6 +32,7 @@ with tempfile.TemporaryDirectory(prefix="bcd-preview-cache-check-") as tmp:
     art = base / "art"
     for folder in (app, samples, sdk, art / "620", base / "bin"):
         folder.mkdir(parents=True)
+    (app / "BCDThemes.json").write_text("[]")
     source = app / "BCDCacheCheck.swift"
     source.write_text("let value = 1\n")
     (samples / "Sample.swift").write_text("let sample = 1\n")
@@ -110,6 +112,7 @@ with tempfile.TemporaryDirectory(prefix="bcd-preview-cache-check-") as tmp:
         assert len(attempts) == 3
 
         mutations = [
+            lambda: (app / "BCDThemes.json").write_text('[ {"version":1} ]'),
             lambda: (samples / "Sample.swift").write_text("let sample = 2"),
             lambda: (app / "Assets.xcassets/BCDLogo.imageset/Contents.json").write_text('{"new":1}'),
             lambda: (sdk / "SDKSettings.json").write_text('{"Version":"2"}'),

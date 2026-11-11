@@ -67,8 +67,13 @@ enum OnboardingRules {
     /// Wine Mono only when this device has none (`wineMono`), the Visual C++ runtime only
     /// when neither the build nor a download provides it (`vcRuntime`). With `since` (the
     /// revision this device last saw, after an update) only the pages added after it are offered.
+    ///
+    /// Night round 2026-11-11 (A1 S8; HZCYB2, C4X44R, WMCY7N: a fresh install signed without get-task-allow walked through LocalDevVPN, JIT, sign-in, the
+    /// Dock client, Wine Mono and the VC++ runtime and then said at the first Play that JIT can never turn on): a copy that is not `debuggable` has
+    /// only the welcome page, which says so, and the done page; every other page needs JIT or a prefix that cannot exist without it.
     static func steps(signIn: Bool, dock: Bool, localDevVPN: Bool = false, wineMono: Bool = false,
-                      vcRuntime: Bool = false, since: Int = 0) -> [Step] {
+                      vcRuntime: Bool = false, debuggable: Bool = true, since: Int = 0) -> [Step] {
+        guard debuggable else { return [.welcome, .done] }
         var list: [Step] = [.welcome]
         if localDevVPN { list.append(.localDevVPN) }
         list.append(.jit)
@@ -81,14 +86,15 @@ enum OnboardingRules {
     }
 
     /// Whether there is anything to set up between the welcome and done pages.
-    static func hasSetup(_ steps: [Step]) -> Bool {
-        steps.contains(.jit) || steps.contains(.signIn) || steps.contains(.dockClient) || steps.contains(.wineMono)
+    /// A copy that cannot use JIT (`debuggable` false) has the welcome page's message to give, so it counts as having something to show.
+    static func hasSetup(_ steps: [Step], debuggable: Bool = true) -> Bool {
+        !debuggable || steps.contains(.jit) || steps.contains(.signIn) || steps.contains(.dockClient) || steps.contains(.wineMono)
             || steps.contains(.vcRuntime)
     }
 
     /// Whether setup opens by itself when the library appears.
-    static func shouldShow(seen: Int, enabled: Bool, steps: [Step]) -> Bool {
-        enabled && seen < revision && hasSetup(steps)
+    static func shouldShow(seen: Int, enabled: Bool, steps: [Step], debuggable: Bool = true) -> Bool {
+        enabled && seen < revision && hasSetup(steps, debuggable: debuggable)
     }
 
     /// The page after `step`, or nil when setup is finished.
@@ -133,10 +139,12 @@ enum OnboardingRules {
     var steps: [Step] { steps(since: since) }
     private func steps(since: Int) -> [Step] {
         OnboardingRules.steps(signIn: SteamSignIn.isEnabled, dock: MadeiraDock.enabled, localDevVPN: offerLocalDevVPN,
-                              wineMono: offerWineMono, vcRuntime: offerVCRuntime, since: since)
+                              wineMono: offerWineMono, vcRuntime: offerVCRuntime, debuggable: Self.debuggable, since: since)
     }
-    /// Setup can be opened: enabled, and something to set up.
-    var available: Bool { Self.enabled && OnboardingRules.hasSetup(steps(since: 0)) }
+    /// Night round 2026-11-11 (A1 S8): this copy can take a debugger (get-task-allow); unknown signing flags count as debuggable (as MemoryRights does).
+    static var debuggable: Bool { SigningStatus.current.debuggable }
+    /// Setup can be opened: enabled, and something to set up (or, for a copy that cannot use JIT, something to say).
+    var available: Bool { Self.enabled && OnboardingRules.hasSetup(steps(since: 0), debuggable: Self.debuggable) }
 
     private init() {}
 
@@ -147,7 +155,7 @@ enum OnboardingRules {
         considered = true
         offerWineMono = !WineMonoModel.available
         offerVCRuntime = !VCRuntime.shared.isAvailable
-        guard OnboardingRules.shouldShow(seen: Self.seen, enabled: Self.enabled, steps: steps(since: Self.seen)) else { return }
+        guard OnboardingRules.shouldShow(seen: Self.seen, enabled: Self.enabled, steps: steps(since: Self.seen), debuggable: Self.debuggable) else { return }
         open(reason: "revision \(Self.seen)->\(OnboardingRules.revision)", since: Self.seen)
     }
 
@@ -161,7 +169,8 @@ enum OnboardingRules {
         offerWineMono = !WineMonoModel.available
         offerVCRuntime = !VCRuntime.shared.isAvailable
         self.since = since
-        LogStore.shared.log("[onboarding] shown reason=\(reason) steps=\(steps.map(\.rawValue).joined(separator: ","))")
+        LogStore.shared.log("[onboarding] shown reason=\(reason) steps=\(steps.map(\.rawValue).joined(separator: ","))"
+                            + (Self.debuggable ? "" : " signing=no-get-task-allow"))
         go(.welcome)
         presented = true
     }

@@ -88,6 +88,10 @@ HOOKS = {
     ],
     "LibraryBCD.swift": [
         "if AutoTune.enabled { AutoTune.exportLayer(for: entry) }",
+        # BCDGameRekey (build 635): a game whose path changes (a move to or from an external drive) keeps its Auto-tune state file
+        # and switch; files and keys are moved, nothing of Auto-tune runs.
+        "(AutoTune.stateURL(old), AutoTune.stateURL(new))] {",
+        'for key in [AutoTune.gamesKey, "madeira.recommended.applied", "bcd.saves.lastSession"] {',
     ],
     "Library.swift": [
         "if AutoTune.enabled { AutoTune.sessionBegan(entry, remember: remember, dockWithoutEntry: dock != nil && !remember) }",
@@ -168,8 +172,10 @@ check("BCDPresentation.didClose looks again a moment after a close, only when so
 hooks = {"BCDGamePage.swift": ["content.fullScreenCover(item: $game, onDismiss: BCDPresentation.didClose)"],
          "BCDFrontEnd.swift": ["onDismiss: { installButtons(); BCDPresentation.didClose() }"],
          "BCDLiveFrontEnd.swift": [".fullScreenCover(isPresented: $onboarding.presented, onDismiss: BCDPresentation.didClose)",
-                                   ".sheet(item: sheetShown, onDismiss: BCDPresentation.didClose)",
-                                   ".fullScreenCover(item: pageShown, onDismiss: BCDPresentation.didClose)"]}
+                                   ".sheet(item: sheetShown, onDismiss: appSheetClosed)",
+                                   ".fullScreenCover(item: pageShown, onDismiss: appSheetClosed)",
+                                   # Pull request #43: the sheet's close also asks for a pending system prompt.
+                                   "private func appSheetClosed() {\n        appSheetPresented = false\n        BCDPresentation.didClose()"]}
 for name, wants in hooks.items():
     text = (APP / name).read_text()
     check(f"{name}: its pages and sheets call BCDPresentation.didClose when they close", all(w in text for w in wants))
@@ -257,7 +263,7 @@ NOT_FROM_LAYER = {"metalfx-upscale", "fps-limit", "env.MADEIRA_PAD_MODE", "pool"
 LINE = re.compile(r"^([A-Za-z0-9._-]+) = (\S.*)$")
 FIELDS = {"id", "lines", "priority", "all", "any", "none", "outcomes", "session", "api", "ramMinMB", "ramMaxMB",
           "minStage", "maxStage", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "listUpgradeFailure", "noRetry", "reason",
-          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "swapCapHit"}
+          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "swapCapHit", "partialUserKeys", "bcCensusMinPct", "lead"}
 ids = [r["id"] for r in rules]
 check("rule ids are unique", len(ids) == len(set(ids)))
 for r in rules:
@@ -286,9 +292,16 @@ for r in rules:
         bad.append("swapCapHit is true when present")
     if r.get("exeMinMB") is not None and r.get("exeMaxMB") is not None and r["exeMinMB"] > r["exeMaxMB"]:
         bad.append("exeMinMB above exeMaxMB")
-    for k in ("memoryMinPct",):
+    for k in ("memoryMinPct", "bcCensusMinPct"):
         if r.get(k) is not None and not (isinstance(r[k], int) and 1 <= r[k] <= 100):
             bad.append("%s is a percentage" % k)
+    if "partialUserKeys" in r and (r["partialUserKeys"] is not True or not any(l.startswith("swap-mb = ") for l in r.get("lines", []))
+                                   or len(r["lines"]) < 2):
+        # Night round 2026-11-11 (agent T3 S1): the rule may run without the player's own swap-mb, so it names swap-mb and more lines.
+        bad.append("partialUserKeys is true and only on a rule with swap-mb and other lines")
+    if "lead" in r and (not isinstance(r["lead"], str) or not r["lead"].strip() or not (r.get("noFix") or r.get("fixedIn"))):
+        # Night round 2026-11-11 (agent G10 S4): the words that start a known stop's advice; only a noFix or fixedIn rule has one.
+        bad.append("lead is a non-empty string and only on a noFix or fixedIn rule")
     for line in r.get("lines", []):
         m = LINE.match(line)
         if not m:
@@ -359,6 +372,13 @@ def build(tmp, name, sources):
 
 
 KEYS = ("outcome", "stage", "matched", "dialogs", "status", "next")
+
+
+def uk(exp):
+    """Night round 2026-11-11 (agent T3 S1): the keys the player had set when the fixture's session ended (the .expect's "userKeys")."""
+    return ["--user-keys", ",".join(exp["userKeys"])] if exp.get("userKeys") else []
+
+
 with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
     replay = build(tmp, "replay", [CORE, RULES_SWIFT, R / "tests/host/autotune_replay.swift"])
     if replay:
@@ -366,7 +386,7 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
             for name in args.bless:
                 exp_path = FIX / (name + ".expect")
                 prior = json.loads(exp_path.read_text()) if exp_path.exists() else {"end": {}, "note": ""}
-                out = json.loads(subprocess.run([str(replay), "--end", json.dumps(prior["end"]), str(FIX / (name + ".log"))],
+                out = json.loads(subprocess.run([str(replay), "--end", json.dumps(prior["end"])] + uk(prior) + [str(FIX / (name + ".log"))],
                                                 capture_output=True, text=True).stdout)
                 prior.update({k: out[k] for k in KEYS})
                 exp_path.write_text(json.dumps(prior, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
@@ -375,7 +395,7 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
             exp = json.loads((FIX / (p.stem + ".expect")).read_text())
             runs = {}
             for chunk in (0, 4093, 7):
-                r = subprocess.run([str(replay), "--chunk", str(chunk), "--end", json.dumps(exp["end"]), str(p)],
+                r = subprocess.run([str(replay), "--chunk", str(chunk), "--end", json.dumps(exp["end"])] + uk(exp) + [str(p)],
                                    capture_output=True, text=True)
                 runs[chunk] = json.loads(r.stdout) if r.returncode == 0 else {"error": r.stderr}
             got = runs[0]
@@ -389,7 +409,7 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
             # A crash read from the log alone (the app never came back) reads the same when the
             # session ended normally. A memory kill or a hang exists only on the first path.
             if exp.get("end", {}).get("killed") and exp["outcome"] in ("crashed", "exited-early") and exp["matched"]:
-                r = subprocess.run([str(replay), "--end", "{}", str(p)], capture_output=True, text=True)
+                r = subprocess.run([str(replay), "--end", "{}"] + uk(exp) + [str(p)], capture_output=True, text=True)
                 alt = json.loads(r.stdout)
                 check(f"{p.stem}: a normal end gives the same rules ({alt['outcome']})",
                       alt["outcome"] in ("crashed", "hung", "exited-early") and alt["matched"] == exp["matched"])

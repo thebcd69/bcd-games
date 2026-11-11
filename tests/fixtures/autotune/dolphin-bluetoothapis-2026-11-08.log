@@ -1,0 +1,135 @@
+[16:07:12.685] [INFO] Checking entitlements...
+[16:07:12.685] [INFO] [build] v0.1.634 (634)
+[16:07:12.686] [INFO] [device] model=iPad16,1 idiom=pad os=iPadOS Version 26.6.2 (Build 23G90) ram=7908MB available=6123MB cores=6
+[16:07:12.686] [INFO] [device] address-map=[0x100404000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[16:07:12.687] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[16:07:12.700] [INFO] [device] settings: low-power=0 thermal=nominal screen=1488x2266@2.0x max-fps=60 utc-offset=-05:00 free-disk=14GB stikdebug-url=1
+[16:07:12.704] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:07:24.427] [INFO] [bcd] library launch Dolphin.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[16:07:24.452] [INFO] Running full Wine sequence...
+[16:07:24.452] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100404000,0xfc0000000) 63GB available=6101MB low-power=0 thermal=nominal
+[16:07:24.453] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_OPTIN_DLLS=qwave
+[16:07:24.457] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[16:07:24.461] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[16:07:24.461] [INFO] Allocating 896MB JIT pool via debugger...
+[16:07:24.461] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:07:24.462] [INFO] [jit-debugger] attached=1 at the pool request
+[16:07:27.712] [INFO] RX pool at 0x300000000
+[16:07:27.781] [INFO] Detaching debugger...
+[16:07:27.789] [INFO] Starting wineserver...
+[phase] wine-start             t+  3.381s rev=ml526
+[16:07:27.842] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_OPTIN_DLLS: qwave.dll -> qwave-optin.dll (Wine's qwave.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x111500000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[16:07:28.282] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[16:07:28.282] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[16:07:28.282] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5195 MB + phys_footprint=948 MB = 6144 MB (hw.memsize says 7908 MB)
+ml985: preferred base 0x140000000+0x2ad7000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x2ad8000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x123d00000+0x2ad7000 (Dolphin.exe) → pool 0x300006000 used=0x2ae2000/0x38000000 tramp+0x0
+[copy-verify] Dolphin.exe: OK, 996 .text pages executable (copy @0x300006000)
+[fex-arena] ml793 PUBLISHED [0xb80000000,0xd80000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x302ae0000 used=0x2c18000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x302ae0000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[window] 0x123c00000..0xb40000000 regions=100001 occupied=7885 MB of 41412 MB free=33526 MB maxhole=32230 MB@0x36197c000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=1035 MB (peak 1035) internal=1033 MB compressed=0 MB external=76 MB reusable=11 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf6b0000+0x41c000 (libarm64ecfex.dll) → pool 0x302c1b000 used=0x303f000/0x38000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x302c1b000)
+[jit-pool] image 0xfbf580000+0x130000 (ucrtbase.dll) → pool 0x30303c000 used=0x3170000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x30303c000)
+[jit-pool] image 0xfbf4c0000+0xc0000 (kernel32.dll) → pool 0x303170000 used=0x3238000/0x38000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x303170000)
+[jit-pool] image 0xfbf1d0000+0x2f0000 (kernelbase.dll) → pool 0x303238000 used=0x3538000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x303238000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Dolphin.exe (dolphin.exe-7d32e840bb8a569a): 123D00000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+D 24 Load module Qt6Widgets.dll (qt6widgets.dll-7911892962159eb4): FBEAF0000
+D 24 Load module dwmapi.dll (dwmapi.dll-760d02687737907f): FBEA60000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): FBE840000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): FBE750000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x305684000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x3057a8000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x30585c000)
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x305950000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x3059d4000)
+[valloc] ml959 # base=0xb807d0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb807d0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xb807e0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb807e0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xb807f0000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb807f0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xb81800000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb81800000 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xb81810000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb81810000 zero_bits=0x0 limit=0x0
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x30719c000)
+[jit-pool] image 0xfba900000+0x130000 (crypt32.dll) → pool 0x307d28000 used=0x7e60000/0x38000000 tramp+0x8000
+D 24 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): FBA900000
+[jit-pool] image 0xfba870000+0x90000 (secur32.dll) → pool 0x307e60000 used=0x7ef4000/0x38000000 tramp+0x4000
+D 24 Load module Secur32.dll (secur32.dll-f6ff7e0cf92170a6): FBA870000
+[jit-pool] image 0xfba850000+0x14000 (MSVCP140_ATOMIC_WAIT.dll) → pool 0x307ef4000 used=0x7f08000/0x38000000 tramp+0x0
+D 24 Load module MSVCP140_ATOMIC_WAIT.dll (msvcp140_atomic_wait.dll-204ef95959e7b7e2): FBA850000
+[valloc] ml959 # base=0xb81820000 size=0x10000 type=0x1000 prot=0x4 tid=0024 | req_hint=0xb81820000 zero_bits=0x0 limit=0x0
+[jit-pool] image 0xfba780000+0xd0000 (bthprops.cpl) → pool 0x307f08000 used=0x7fdc000/0x38000000 tramp+0x4000
+D 24 Load module bthprops.cpl (bthprops.cpl-0a895d2e97aeec62): FBA780000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"bluetoothapis.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\system32\\bthprops.cpl") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"bthprops.cpl" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library bthprops.cpl (which is needed by L"C:\\Dolphin-x64\\Dolphin.exe") not found
+[jit-pool] image 0xfba700000+0x80000 (qwave.dll) → pool 0x307fdc000 used=0x8060000/0x38000000 tramp+0x4000
+D 24 Load module qwave.dll (qwave.dll-b297ddb8d41d53ee): FBA700000
+[jit-pool] image 0xfba5a0000+0x160000 (opengl32.dll) → pool 0x308060000 used=0x81c4000/0x38000000 tramp+0x4000
+D 24 Load module OPENGL32.dll (opengl32.dll-9fddefc254677b75): FBA5A0000
+0024:err:module:loader_init Importing dlls for L"C:\\Dolphin-x64\\Dolphin.exe" failed, status c0000135
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=729
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[xp] 16:07:29.014 +0.60 dt=300 cpu=162 (thr 15) P=161 E=0 run=165 pgw=-1.0 GHz P=3.38 E=1.37 Minst=2221 IPC=4.08 mJ=443 pin=1364 rdKB=29992 fpMB=1190
+[xp] 16:07:29.333 +0.92 dt=319 cpu=2 (thr 2) P=0 E=1 run=2 pgw=-1.0 GHz P=1.19 E=0.84 Minst=2 IPC=1.60 mJ=0 pin=0 rdKB=0 fpMB=1190
+[16:07:29.454] [INFO] [session] length=5s play=0s frames=0 stalls=0/0s peak=1190MB limit=6143MB thermal=nominal lpm=0 api=D3D11/D3D12/OpenGL/64 res=1920x1080 cap=60 game=Dolphin
+[16:07:29.471] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[xp] 16:07:29.637 +1.23 dt=304 cpu=401 (thr 369) P=171 E=230 run=416 pgw=-1.0 GHz P=3.04 E=2.03 Minst=3559 IPC=3.61 mJ=490 pin=55 rdKB=980 fpMB=1203
+[xp] 16:07:29.893 +1.48 dt=255 cpu=281 (thr 281) P=27 E=254 run=291 pgw=-1.0 GHz P=3.39 E=2.11 Minst=2155 IPC=3.44 mJ=170 pin=0 rdKB=28 fpMB=1198
+[xp] 16:07:30.147 +1.74 dt=254 cpu=260 (thr 259) P=5 E=255 run=263 pgw=-1.0 GHz P=3.20 E=2.11 Minst=1892 IPC=3.42 mJ=99 pin=0 rdKB=0 fpMB=1198
+[footprint] rev=ml358 phys=1200 MB (peak 1200) internal=1199 MB compressed=0 MB external=123 MB reusable=9 MB (cycle=2)
+[xp] 16:07:30.472 +2.06 dt=325 cpu=367 (thr 368) P=42 E=325 run=367 pgw=-1.0 GHz P=3.76 E=2.11 Minst=2794 IPC=3.31 mJ=231 pin=0 rdKB=0 fpMB=1200
+[footprint] rev=ml1060 fast phys=1200 MB compressed=0 MB internal=1199 MB
+[16:07:31.111] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1200 MB compressed=0 MB external=124 MB reusable=9 MB (cycle=3)
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1200 MB compressed=0 MB external=124 MB reusable=9 MB (cycle=4)
+[footprint] rev=ml358 phys=1200 MB (peak 1201) internal=1200 MB compressed=0 MB external=124 MB reusable=9 MB (cycle=5)
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1200 MB compressed=0 MB external=124 MB reusable=9 MB (cycle=6)
+[footprint] rev=ml358 phys=1200 MB (peak 1201) internal=1199 MB compressed=0 MB external=124 MB reusable=9 MB (cycle=7)
+[xp] 16:07:41.005 +12.60 dt=270 cpu=21 (thr 21) P=0 E=21 run=23 pgw=-1.0 GHz P=1.03 E=1.28 Minst=49 IPC=1.81 mJ=2 pin=0 rdKB=0 fpMB=1204
+[xp] 16:07:41.322 +12.91 dt=317 cpu=95 (thr 95) P=16 E=79 run=97 pgw=-1.0 GHz P=2.92 E=1.08 Minst=244 IPC=1.84 mJ=39 pin=101 rdKB=4220 fpMB=1204
+[xp] 16:07:41.615 +13.21 dt=293 cpu=12 (thr 12) P=10 E=2 run=13 pgw=-1.0 GHz P=2.01 E=2.03 Minst=62 IPC=2.47 mJ=9 pin=0 rdKB=0 fpMB=1204
+[xp] 16:07:41.888 +13.48 dt=273 cpu=38 (thr 38) P=0 E=38 run=38 pgw=-1.0 GHz P=1.82 E=1.12 Minst=64 IPC=1.51 mJ=3 pin=0 rdKB=0 fpMB=1204
+[xp] 16:07:42.208 +13.80 dt=320 cpu=72 (thr 72) P=41 E=31 run=78 pgw=-1.0 GHz P=1.93 E=1.45 Minst=241 IPC=1.94 mJ=32 pin=6 rdKB=176 fpMB=1204
+[16:07:42.209] [xp] 16:07:42.208 +13.80 dt=320 cpu=72 (thr 72) P=41 E=31 run=78 pgw=-1.0 GHz P=1.93 E=1.45 Minst=241 IPC=1.94 mJ=32 pin=6 rdKB=176 fpMB=1204
+=287 cpu=175 (thr 175) P=19 E=156 run=184 pgw=-1.0 GHz P=1.68 E=1.87 Minst=896 IPC=2.76 mJ=52 pin=7 rdKB=320 fpMB=1206
+n=7 rdKB=320 fpMB=1206

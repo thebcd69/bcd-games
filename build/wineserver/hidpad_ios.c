@@ -92,6 +92,10 @@ struct hidpad_device
     struct winios_hidpad_output   output;
     char                          product[64];
     unsigned int                  opens, reads, outputs, features, refused;
+    /* night round 2026-11-11 (T3 S12 Resonance A82ECP, T1 S17 Devil May Cry 5 7VHWKC/C6MW97): what the game reads, for the one-minute line. */
+    unsigned int                  read_requests, stats_lines, stats_requests, stats_reads, stats_packet;
+    timeout_t                     last_read_request;   /* monotonic_time of the game's last ReadFile, 0 = none */
+    struct timeout_user          *stats_timer;
     /* ml2106: what the game's output reports asked for, for the log. */
     unsigned int                  out_rumble, out_audio, out_triggers, out_lightbar, out_leds, out_next;
 };
@@ -319,6 +323,34 @@ static void hidpad_file_deliver( struct hidpad_file *file )
     release_object( async );
 }
 
+/* night round 2026-11-11 (T3 S12: Resonance A82ECP, HID DualSense mode with no controller and a pointer on a letterboxed picture; T1 S17: Devil May Cry 5
+ * 7VHWKC/C6MW97, "freeze" comments with a healthy log): once a minute, 30 lines at most, and only after the game opened the device, one line says
+ * what the game did with it and what the app fed it:
+ *   [hid-pad] ml2101 minute #1: opens=1 read-requests=14976 (+14976) reports-delivered=14975 (+14975) last-read-request=3 ms ago pad=connected packet=5120 (+5120)
+ * read-requests = the game's ReadFile calls, reports-delivered = reports completed from the app's newest snapshot, last-read-request = how long ago the game
+ * last asked (a game that stopped reading is "freezing" from the pad's side), pad = whether the app has a controller connected in the snapshot (none: the
+ * game sees a device at rest) and its packet counter, which moves when the app publishes a changed sample (the touch controls or a physical pad). Log only. */
+static void hidpad_stats( void *private )
+{
+    struct hidpad_device *device = private;
+    struct winios_hidpad pad;
+    int connected;
+
+    device->stats_timer = add_timeout_user( -60 * TICKS_PER_SEC, hidpad_stats, device );
+    if (!device->opens || device->stats_lines >= 30) return;
+    connected = winios_hidpad_get_state( &pad );
+    device->stats_lines++;
+    fprintf( stderr, "[hid-pad] ml2101 minute #%u: opens=%u read-requests=%u (+%u) reports-delivered=%u (+%u) last-read-request=",
+             device->stats_lines, device->opens, device->read_requests, device->read_requests - device->stats_requests, device->reads,
+             device->reads - device->stats_reads );
+    if (device->last_read_request) fprintf( stderr, "%u ms ago", (unsigned int)((monotonic_time - device->last_read_request) / 10000) );
+    else fprintf( stderr, "never" );
+    fprintf( stderr, " pad=%s packet=%u (+%u)\n", connected ? "connected" : "none", pad.packet, pad.packet - device->stats_packet );
+    device->stats_requests = device->read_requests;
+    device->stats_reads = device->reads;
+    device->stats_packet = pad.packet;
+}
+
 static void hidpad_clock( void *private );
 
 static void hidpad_start_clock( struct hidpad_device *device )
@@ -353,6 +385,8 @@ static void hidpad_file_read( struct fd *fd, struct async *async, file_pos_t pos
         set_error( STATUS_INVALID_BUFFER_SIZE );
         return;
     }
+    device->read_requests++;                   /* night round 2026-11-11: counted for the one-minute line */
+    device->last_read_request = monotonic_time;
     queue_async( &file->read_q, async );
     hidpad_file_deliver( file );
     if (hidpad_file_pending( file )) hidpad_start_clock( device );
@@ -684,6 +718,9 @@ void madeira_hidpad_init( void )
     device->opens = device->reads = device->outputs = device->features = device->refused = 0;
     device->out_rumble = device->out_audio = device->out_triggers = device->out_lightbar = 0;
     device->out_leds = device->out_next = 0;
+    device->read_requests = device->stats_lines = device->stats_requests = device->stats_reads = device->stats_packet = 0;
+    device->last_read_request = 0;
+    device->stats_timer = NULL;
     hidpad_product_name( device );
 
     hidpad_interface_link( id, link, sizeof(link) );
@@ -702,4 +739,5 @@ void madeira_hidpad_init( void )
     fprintf( stderr, "[hid-pad] ml2101 device %s %04x:%04x \"%s\" input %u output %u feature %u bytes, "
              "preparsed %u bytes, \\??\\%s\n", id->env, id->vid, id->pid, device->product,
              input[1], output[id->kind == HIDPAD_KIND_DUALSENSE ? 2 : 0], feature[0x20], size, link );
+    device->stats_timer = add_timeout_user( -60 * TICKS_PER_SEC, hidpad_stats, device );   /* night round 2026-11-11: the one-minute line */
 }

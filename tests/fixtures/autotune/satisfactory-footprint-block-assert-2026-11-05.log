@@ -1,0 +1,365 @@
+[01:03:52.698] [INFO] Checking entitlements...
+[01:03:52.698] [INFO] [build] v0.1.630 (630)
+[01:03:52.698] [INFO] [device] model=iPad17,1 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11524MB available=12264MB cores=9
+[01:03:52.698] [INFO] [device] address-map=[0x104b88000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[01:03:52.699] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=321d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=0 wildcard=0 lc=0
+[01:03:52.707] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@1.7195876288659795x max-fps=120 utc-offset=+01:00 free-disk=142GB stikdebug-url=1
+[01:03:52.711] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[01:04:07.892] [INFO] Requesting JIT with StikDebug...
+[01:04:07.907] [INFO] Opening StikDebug to enable JIT...
+[01:04:12.413] [INFO] [epic-launch] start app=CrabEA signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=yours
+[01:04:12.421] [INFO] [bcd] library launch FactoryGameEGS.exe: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off lc=0
+[01:04:12.440] [INFO] Running full Wine sequence...
+[01:04:12.440] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104b88000,0x8000000000) 512GB available=12232MB low-power=0 thermal=nominal
+[01:04:12.441] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_OPTIN_DLLS=dbgcore env.MADEIRA_VCRT_ARM64_KEY=1 env.MADEIRA_X64_IMAGE_NOCOPY=1
+[01:04:12.443] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[01:04:12.445] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[01:04:12.445] [INFO] Allocating 896MB JIT pool via debugger...
+[01:04:12.445] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[01:04:12.446] [INFO] [jit-debugger] attached=1 at the pool request
+[01:04:12.447] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[01:04:14.249] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  1.868s rev=ml526
+[01:04:14.313] [wineserver] send_client_fd: fd=40 handle=0x3a2 msg_fd_unix=36 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_OPTIN_DLLS: dbgcore.dll -> dbghelp.dll (the shipped dbghelp answers the forwards of a game's own dbghelp)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[01:04:14.559] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[01:04:14.562] [vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11659 MB + phys_footprint=628 MB = 12288 MB (hw.memsize says 11524 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11524 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x37000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x38000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\FactoryGameEGS.exe" 0x11b5b0000+0x37000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x11b5b0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11b5b0000+0x14000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11b5c4000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11b5c4000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11b5d0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148004000 used=0x13c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41a000 (libarm64ecfex.dll) → pool 0x14813c000 used=0x55c000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14813c000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14855c000 used=0x690000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14855c000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148690000 used=0x758000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148690000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x148758000 used=0xa58000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148758000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[window] 0x127a80000..0x7803000000 regions=71872 occupied=462111 MB of 486837 MB free=41158 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=642 MB (peak 642) internal=628 MB compressed=0 MB external=93 MB reusable=21 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module FactoryGameEGS.exe (factorygameegs.exe-8210b0a14006e4e6): 11B5B0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe150000+0x220000 (user32.dll) → pool 0x148a5c000 used=0xc84000/0x23000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a5c000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[free-delay] #1 release of 0x70238b0000+0x100000 held for 2000 ms (1 in flight)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[free-delay] #2 release of 0x7023ca0000+0x200000 held for 2000 ms (2 in flight)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv157\\Win64\\steam_api64.dll" 0x71fd0d0000+0x4c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[steam-api] steam_api found no running Steam; process 0020 sees:
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71fb810000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] winmm.dll: OK, 9 .text pages executable (copy @0x14a21c000)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14a340000)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71fa9c0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71fa8f0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0024 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=factorygameegs.exe tid=0024 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05000000
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[S_API] SteamAPI_Init(): Loaded 'C:\Program Files (x86)\Steam\steamclient64.dll' OK.."
+[image-reload] unmapped image 0x71fa720000+0xb0000: 1 pool copy marked
+[image-reload] unmapped image 0x71fa860000+0x90000: 1 pool copy marked
+[image-reload] unmapped image 0x71fabe0000+0xe0000: 1 pool copy marked
+[image-reload] unmapped image 0x71fab60000+0x80000: 1 pool copy marked
+[image-reload] unmapped image 0x71fad50000+0x80000: 1 pool copy marked
+[image-reload] unmapped image 0x71fd040000+0x90000: 1 pool copy marked
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x14ace0000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Win64-Shipping.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Win64-Shipping.exe\" FactoryGame -epicapp=CrabEA -epicenv=Prod -EpicPortal -epiclocale=de -d3x11"
+[phase] spawn:L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Win64-Shipping.exe" t+  2.538s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Win64-Shipping.exe\" FactoryGame -epicapp=CrabEA -epicenv=Prod -EpicPortal -epiclocale=de -d3x11" (fd=88, unixdir=89, dup_unixdir=107) cwd=L"C:\\Program Files\\Epic Games\\Satisfactory\\"
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Win64-Shipping.exe" 0x11e710000+0x46000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14da6d000)
+[xp-names] m1066850 "wine-x18-exc"
+[xp] 01:04:15.192 +0.58 dt=323 cpu=298 (thr 152) P=298 E=0 run=306 pgw=-1.0 GHz P=4.28 E=2.33 Minst=5901 IPC=4.63 mJ=1732 pin=432 rdKB=66152 fpMB=842
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-UELibSampleRate-Win64-Shipping.dll" 0x71f0c40000+0x180000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-SoundFieldRendering-Win64-Shipping.dll" 0x71f0c10000+0x22000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-AudioExtensions-Win64-Shipping.dll" 0x71f0bd0000+0x37000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-AudioLinkCore-Win64-Shipping.dll" 0x71f0bb0000+0x19000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-AudioLinkEngine-Win64-Shipping.dll" 0x71f0b80000+0x21000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\FactoryGameEGS-Icmp-Win64-Shipping.dll" 0x71f0b50000+0x2c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[bigres] tid=002c #1 size=0x20010000 (512 MB) type=0x102000 prot=0x1 hint=0x0 peb=0x10c2f8000 total=512 MB
+[xp] 01:04:15.467 +0.85 dt=276 cpu=234 (thr 234) P=234 E=0 run=240 pgw=-1.0 GHz P=4.30 E=2.00 Minst=4483 IPC=4.46 mJ=1343 pin=112 rdKB=87812 fpMB=943
+[xp] 01:04:15.723 +1.11 dt=256 cpu=253 (thr 251) P=253 E=0 run=256 pgw=-1.0 GHz P=4.28 E=2.30 Minst=4727 IPC=4.37 mJ=1472 pin=10 rdKB=4216 fpMB=987
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/FactoryGame/Saved/Logs/FactoryGame-backup-2026.11.05-00.02.54.log
+[guest-log] #1 tid=002c LogInit: Display: Running engine for game: FactoryGame
+[guest-log] #2 tid=002c LogInit: Display: Project file not found: C:/Program Files/Epic Games/Satisfactory/FactoryGame/FactoryGame.uproject
+[guest-log] #3 tid=002c LogInit: Display: 	Attempting to find via project info helper.
+[guest-log] #4 tid=002c LogIoDispatcher: Display: Reading toc: ../../../FactoryGame/Content/Paks/global.utoc
+[guest-log] #5 tid=002c LogIoDispatcher: Display: Toc loaded : ../../../FactoryGame/Content/Paks/global.utoc, Id=ffffffffffffffff, Order=0, EntryCount=1, SignatureHash=FFADF1F6FBECC2E35539D2EF85FBF91C0CBC9067
+[guest-log] #6 tid=002c LogIoDispatcher: Display: Mounting container '../../../FactoryGame/Content/Paks/global.utoc' in location slot 0
+[xp] 01:04:16.042 +1.43 dt=319 cpu=468 (thr 304) P=454 E=14 run=477 pgw=-1.0 GHz P=4.20 E=2.92 Minst=7844 IPC=4.03 mJ=2376 pin=3 rdKB=8336 fpMB=1170
+[xp] 01:04:16.301 +1.69 dt=259 cpu=262 (thr 261) P=261 E=0 run=260 pgw=-1.0 GHz P=4.30 E=2.02 Minst=7328 IPC=6.52 mJ=1810 pin=0 rdKB=0 fpMB=1172
+[guest-log] #59 tid=0058 LogAudio: Display: AudioInfo: 'PCM' Registered
+[guest-log] #60 tid=0058 LogAudio: Display: AudioInfo: 'BINKA' Registered
+[guest-log] #61 tid=0058 LogAudio: Display: AudioInfo: 'RADA' Registered
+[guest-log] #62 tid=0058 LogAudio: Display: Audio Device Manager Pre-Initialized
+[xp] 01:04:16.624 +2.01 dt=323 cpu=428 (thr 381) P=425 E=3 run=444 pgw=-1.0 GHz P=4.18 E=2.34 Minst=10276 IPC=5.76 mJ=2715 pin=6 rdKB=2672 fpMB=1211
+[footprint] rev=ml358 phys=1221 MB (peak 1221) internal=1206 MB compressed=0 MB external=161 MB reusable=21 MB (cycle=2)
+[guest-log] #63 tid=0058 LogPluginManager: Mounting Engine plugin OnlineServicesOSSAdapter
+[footprint] rev=ml358 phys=1226 MB (peak 1226) internal=1210 MB compressed=0 MB external=161 MB reusable=21 MB (cycle=3)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] #64 tid=0058 LogWmfMedia: Failed to load mfplay.dll
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007035AFA800, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007035AFA800, feature level 0xb000, create)
+[footprint] rev=ml358 phys=1423 MB (peak 1423) internal=1408 MB compressed=0 MB external=166 MB reusable=21 MB (cycle=4)
+[nls-getptr] type=11 id=10000 peb=0x10c2f8000
+[win-pos] #1 hwnd=0x1002c after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x1002c class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x1002c after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x1002c class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+[win-pos] #3 hwnd=0x2002c after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #3 hwnd=0x2002c class='Static' text="" rev=ml853
+[win-pos] #4 hwnd=0x2002c after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #4 hwnd=0x2002c class='Static' text="SplashScreenGuard" rev=ml853
+[win-pos] #5 hwnd=0x2002c after=0x0 flags=0000181f vis={0,0,132,38} surface=0x0 rev=ml505 style=14c00000 visible=0 parent=0x10022
+[win-name] #5 hwnd=0x2002c class='Static' text="SplashScreenGuard" rev=ml853
+[win-pos] #6 hwnd=0x20042 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #6 hwnd=0x20042 class='OleMainThreadWndClass' text="" rev=ml853
+[blit] #1 rop=cc0020  SRC phys=0,0 1024x201 vis={0,0,1024,201}  DST phys=0,0 1024x201 vis={0,0,1024,201} rev=ml506
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[launch-view] dismissed reason=surface logs=0
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007035AFAB70, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007035AFAB70, feature level 0xc000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=49MB: tex-RT=1MB/2 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/1 (peak 0) tex-sampled=0MB/30 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/1 (peak 32) buf-shared=16MB/4 (peak 16)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=49MB: tex-RT=1MB/2 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/1 (peak 0) tex-sampled=0MB/30 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/1 (peak 32) buf-shared=16MB/4 (peak 16)
+[madeira-d3d12] ml1060 shader libraries created: 0, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 0, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 168 MB = standalone textures 3 (1 MB as Metal sizes them, 1 MB estimated) + texture heaps 64 MB + application heaps 32 MB + buffers 48 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 168 MB = standalone textures 3 (1 MB as Metal sizes them, 1 MB estimated) + texture heaps 64 MB + application heaps 32 MB + buffers 48 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 0
+[footprint] rev=ml358 phys=1987 MB (peak 1987) internal=1796 MB compressed=0 MB external=175 MB reusable=22 MB (cycle=5)
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0x71dd5a0000+0xfb000: 1 pool copy marked
+[image-reload] unmapped image 0x71dd5a0000+0xfb000: 1 pool copy marked
+[image-reload] unmapped image 0x71dd5a0000+0xfb000: 1 pool copy marked
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[free-delay] #3 release of 0x7053320000+0x110000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x7053210000+0x110000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x7053100000+0x110000 held for 2000 ms (3 in flight)
+[image-reload] unmapped image 0x71dd5e0000+0xb7000: 1 pool copy marked
+[image-reload] unmapped image 0x71dd5b0000+0x2d000: 1 pool copy marked
+[image-reload] unmapped image 0x71dd540000+0x6e000: 1 pool copy marked
+ml985: map_image_view size=0x4a36000 base=0x6fffdb1c0000 info_base=0x180000000 map_addr=0x6fffdb1c0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[free-delay] #6 release of 0x705f7d0000+0xfd0000 held for 2000 ms (4 in flight)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[win-pos] #24 hwnd=0x10064 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1074e3580 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #24 hwnd=0x10064 class='Wine IME' text="" rev=ml853
+[win-pos] #25 hwnd=0x10064 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1074e3580 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #25 hwnd=0x10064 class='Wine IME' text="" rev=ml853
+[win-pos] #26 hwnd=0x10064 after=0x10058 flags=0000181b vis={0,0,1,1} surface=0x1074e3580 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #26 hwnd=0x10064 class='Wine IME' text="" rev=ml853
+[win-pos] #27 hwnd=0x10058 after=0x0 flags=80001967 vis={-4,-23,1164,804} surface=0x11fdaa940 rev=ml505 style=94000000 visible=1 parent=0x10020
+[win-name] #27 hwnd=0x10058 class='UnrealWindow' text="Satisfactory  " rev=ml853
+[win-pos] #28 hwnd=0x10058 after=0x0 flags=80000014 vis={0,0,1160,800} surface=0x11fdaa940 rev=ml505 style=94000000 visible=1 parent=0x10020
+[win-name] #28 hwnd=0x10058 class='UnrealWindow' text="Satisfactory  " rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[winios] game window hwnd=0x10058 presents through Metal; its GDI surface is not drawn
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[01:04:23.914] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[free-delay] #7 release of 0x7027e10000+0x241000 held for 2000 ms (5 in flight)
+[free-delay] #8 release of 0x702fbd0000+0x2cb000 held for 2000 ms (6 in flight)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=9713 full-path-hits=3252 component-lookups=50988 shortcut-hits=38130 misses=12778 scans=12858 entries-scanned=245821 us-in-lookup=2972260 (29% of the window) slowest=0.420 ms .../Program Files/Epic Games/Satisfactory/Engine/Binaries/Win64
+[footprint] rev=ml358 phys=2865 MB (peak 2865) internal=2575 MB compressed=0 MB external=181 MB reusable=21 MB (cycle=6)
+[footprint] rev=ml1060 fast phys=2867 MB compressed=0 MB internal=2578 MB
+002c:err:module:load_dll [dll-missing] rev=ml336 #8 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=2955 MB compressed=0 MB internal=2666 MB
+005c:err:module:load_dll [dll-missing] rev=ml336 #9 L"GameInput.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-pos] #29 hwnd=0x1004a after=0x0 flags=000018bf vis={68,299,1092,500} surface=0x1074e3580 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #29 hwnd=0x1004a class='SplashScreenClass' text="" rev=ml853
+[footprint] rev=ml1060 fast phys=3064 MB compressed=0 MB internal=2774 MB
+LogWindows: Error: appError called: Assertion failed: (Footprint.Width % Format.BlockSizeX) == 0 [File:D:\BuildAgent\work\SM_BG\Engine\Source\Runtime\D3D12RHI\Private\D3D12Texture.cpp] [Line: 1201] 
+009c:err:seh:ios_exc_dump_str [exc] ml812   FATAL report message: "Assertion failed: (Footprint.Width % Format.BlockSizeX) == 0 [File:D:\BuildAgent\work\SM_BG\Engine\Source\Runt"
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000428 status=00000000 native_pc=000000016760140C is_ec=0 -> returned rip=000000016760140C rsp=00000071FC7B0000 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=000000012899E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=0000000128B9E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=0000000128D9E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=0000000128F9E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=000000012919E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=000000012939E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=000000012959E9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #34 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=0000000134EBE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #35 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001350BE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #36 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001352BE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #37 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001354BE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #38 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001356BE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #39 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=0000000135EBE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #40 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001362BE9D0 flags=00100001
+0030:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=0000000000000428 status=00000000 native_pc=000000023E563EE8 is_ec=0 -> returned rip=000000023E563EE8 rsp=00000001332FE9D0 flags=00100001
+0030:err:module:load_dll [dll-missing] rev=ml336 #10 L"tbs.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0030:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\CrashReportClient.exe" cmdline=L"\"../../../Engine/Binaries/Win64/CrashReportClient.exe\" \"C:/users/mobile/AppData/Local/FactoryGame/Saved/Crashes/UECC-Windows-8B604AA9483458679AAA988C6875F25C_0000\" -AppName=UE-FactoryGame -CrashGUID=UECC-Windows-8B604AA9483458679AAA988C6875F25C_0000 -DebugSymbols=..\\..\\..\\Engine\\I"...
+[phase] spawn:L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\CrashReportClient.exe" t+ 13.208s rev=ml526
+0030:err:process:spawn_process spawn_process: creating child thread for L"\"../../../Engine/Binaries/Win64/CrashReportClient.exe\" \"C:/users/mobile/AppData/Local/FactoryGame/Saved/Crashes/UECC-Windows-8B604AA9483458679AAA988C6875F25C_0000\" -AppName=UE-FactoryGame -CrashGUID=UECC-Windows-8B604AA9483458679AAA988C6875F25C_0000 -DebugSymbols=..\\..\\..\\Engine\\I"... (fd=1107, unixdir=1130, dup_unixdir=1134) cwd=L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\"
+[Wine child thread] calling wine_ios_child_main...
+[nls-getptr] type=11 id=1252 peb=0x110f40000
+[nls-getptr] type=11 id=437 peb=0x110f40000
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x14f990000)
+LogWindows: Error: Assertion failed: (Footprint.Width % Format.BlockSizeX) == 0 [File:D:\BuildAgent\work\SM_BG\Engine\Source\Runtime\D3D12RHI\Private\D3D12Texture.cpp] [Line: 1201] 
+009c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=17755
+[unwind] term ml661 begin rip=71fc854ba0 rsp=704941ff28 window=[704941ff28..7049c1ff28) max=32
+[unwind] term ml661 #00 pc=71fc854ba0 rsp=704941ff28  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=71fc4014b0 rbp=1 rsi=3 rdi=71fc4014b0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbx=71fc4014b0: 46005200 75006e00 6e006100 62006c00 65005400 68007200 65006100 64005700
+[unwind] term ml662   rdi=71fc4014b0: 46005200 75006e00 6e006100 62006c00 65005400 68007200 65006100 64005700
+[unwind] term ml661 #01 pc=71fc16d73b rsp=704941ff30  FactoryGameEGS-Core-Win64-Shipping.dll+0x38d73b
+[Wine ntdll/server] process_exit_wrapper(3): closing child fd_socket=106
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14ae9c000 NO pool/anon alias | region 0x104b88000+0x27f0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[Wine ntdll/server] process_exit_wrapper(3)
+[nls-getptr] type=11 id=20127 peb=0x110f40000
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x3) syscalls=0 unix_calls=17887
+[term-stack] ml660 sp+078:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+1c8:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+1d0:   ? 71fe481757  kernelbase.dll+0xb1757
+[term-stack] ml660 sp+210:   ? 71fe482d9f  kernelbase.dll+0xb2d9f
+[term-stack] ml660 sp+220:   ? 71fe4800d8  kernelbase.dll+0xb00d8
+[term-stack] ml660 sp+2a0:   ? 71fe450200  kernelbase.dll+0x80200
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=17905
+[unwind] term ml661 begin rip=14808216c rsp=7038b9fc20 window=[7038b9fc20..703939fc20) max=32
+[unwind] term ml661 #00 pc=14808216c rsp=7038b9fc20  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+050:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0c8:   ? 71fe3d0000  kernelbase.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(3)
+[Wine ntdll/server] process_exit_wrapper(3)
+[WineProc] Wine exited with code 3 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (factorygameegs-win64-shipping.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x110f40000
+[nls-getptr] type=11 id=437 peb=0x110f40000
+[footprint] rev=ml1060 fast phys=3115 MB compressed=0 MB internal=2861 MB
+[jit-pool] image 0x71d2030000+0x160000 (opengl32.dll) → pool 0x152948000 used=0xaaac000/0x23000000 tramp+0x4000
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x152948000)
+D 160 Load module OPENGL32.dll (opengl32.dll-9fddefc254677b75): 71D2030000
+[jit-pool] image 0x71d1f00000+0x130000 (msvcp140.dll) → pool 0x152aac000 used=0xabe0000/0x23000000 tramp+0x4000
+D 160 Load module MSVCP140.dll (msvcp140.dll-fd8e26e91ed9d4a2): 71D1F00000
+[jit-pool] image 0x71d1e80000+0x80000 (vcruntime140.dll) → pool 0x152be0000 used=0xac64000/0x23000000 tramp+0x4000
+D 160 Load module vcruntime140.dll (vcruntime140.dll-3d8a8f46733c0f4e): 71D1E80000
+[jit-pool] image 0x71d1df0000+0x90000 (version.dll) → pool 0x152c64000 used=0xacf8000/0x23000000 tramp+0x4000
+D 160 Load module VERSION.dll (version.dll-f3f7d5759bd2c065): 71D1DF0000
+[jit-pool] image 0x71d1d40000+0xb0000 (uxtheme.dll) → pool 0x152cf8000 used=0xadac000/0x23000000 tramp+0x4000
+D 160 Load module UxTheme.dll (uxtheme.dll-4e1d696344b97035): 71D1D40000
+0160:err:module:load_dll [dll-missing] rev=ml336 #1 L"dbgeng.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0160:err:module:import_dll Library dbgeng.dll (which is needed by L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\CrashReportClient.exe") not found
+[jit-pool] image 0x71d1cb0000+0x90000 (vcruntime140_1.dll) → pool 0x152dac000 used=0xae40000/0x23000000 tramp+0x4000
+D 160 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9099dd3d46b520): 71D1CB0000
+0160:err:module:loader_init Importing dlls for L"C:\\Program Files\\Epic Games\\Satisfactory\\Engine\\Binaries\\Win64\\CrashReportClient.exe" failed, status c0000135
+0160:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=18386
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=1133
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[footprint] rev=ml1060 fast phys=3152 MB compressed=0 MB internal=2899 MB
+[WineProc] stopping wineserver...
+[01:04:27.943] [INFO] [session] length=15s play=0s frames=0 stalls=0/0s peak=3155MB limit=12287MB thermal=nominal lpm=0 res=1160x800 cap=60 game=Satisfactory
+[frontend] returned to library
+[01:04:27.957] [INFO] [bcd-host] no report
+[footprint] rev=ml1060 fast phys=3203 MB compressed=0 MB internal=2947 MB
+[footprint] rev=ml358 phys=3249 MB (peak 3249) internal=2994 MB compressed=0 MB external=231 MB reusable=19 MB (cycle=8)
+[01:04:29.971] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=3441 MB (peak 3441) internal=3187 MB compressed=0 MB external=231 MB reusable=17 MB (cycle=9)
+[store-noalias] #2 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14ae9c000 NO pool/anon alias | region 0x104b88000+0x27f0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[footprint] rev=ml358 phys=3612 MB (peak 3612) internal=3142 MB compressed=215 MB external=232 MB reusable=11 MB (cycle=10)
+[hwinput] keyboard focus: elsewhere (responder)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=12% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b276230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16b4a2ac0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16b5bab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[census-hold] idx=11 port=0x1054f teb=0x71fff30000 tid=0054 HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71f005f830 bt: 14b416320 0 0 0 0 0 0 0
+[census-hold] idx=1 port=0xb20b teb=0x71fffd0000 tid=002c HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71fc7af9c0 bt: 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c
+[footprint] rev=ml358 phys=3717 MB (peak 3717) internal=2982 MB compressed=480 MB external=242 MB reusable=11 MB (cycle=11)
+[thread-sample] ml876 b3 "" teb=0x0 cpu=99% RUN pc=libswiftCore.dylib`<redacted>+0x0 lr=libswiftCore.dylib`<redacted>+0x344 sp=0x16b2fb570 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=99% RUN pc=libsystem_c.dylib`memmem+0xa0 lr=libsystem_c.dylib`memmem+0x9c sp=0x16b389470 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x10c2f8000 modules=160 first=FactoryGameEGS-Win64-Shipping.exe@0x11e710000
+[thread-sample] ml876 b3 "GameThread" teb=0x71fffd0000 cpu=0% wait pc=0x14ae9c000 lr=0x14afb413c sp=0x71fc7af9c0 NATIVE (unresolved: hostPC outside block) sp-cand=[ FactoryGameEGS-Core-Win64-Shipping.dll+0x13aaa0 ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16c04ab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[footprint] rev=ml1060 fast phys=3888 MB compressed=480 MB internal=3092 MB
+[footprint] rev=ml1060 fast phys=3908 MB compressed=480 MB internal=3113 MB
+[footprint] rev=ml1060 fast phys=3928 MB compressed=480 MB internal=3133 MB
+[census-hold] idx=11 port=0x1054f teb=0x71fff30000 tid=0054 HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71f005f830 bt: 14b416320 0 0 0 0 0 0 0
+[census-hold] idx=1 port=0xb20b teb=0x71fffd0000 tid=002c HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71fc7af9c0 bt: 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c
+[footprint] rev=ml358 phys=3947 MB (peak 3947) internal=3152 MB compressed=480 MB external=247 MB reusable=12 MB (cycle=12)
+[footprint] rev=ml1060 fast phys=3971 MB compressed=480 MB internal=3175 MB
+[footprint] rev=ml1060 fast phys=4006 MB compressed=480 MB internal=3215 MB
+[xp] 01:04:37.798 +23.18 dt=271 cpu=283 (thr 283) P=14 E=269 run=287 pgw=-1.0 GHz P=3.63 E=3.01 Minst=2312 IPC=2.68 mJ=190 pin=0 rdKB=22792 fpMB=4014 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[footprint] rev=ml1060 fast phys=4027 MB compressed=480 MB internal=3236 MB
+[xp] 01:04:38.065 +23.45 dt=267 cpu=307 (thr 307) P=51 E=256 run=330 pgw=-1.0 GHz P=4.10 E=2.99 Minst=2570 IPC=2.64 mJ=351 pin=2 rdKB=22836 fpMB=3990 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 01:04:38.346 +23.73 dt=281 cpu=378 (thr 375) P=25 E=353 run=383 pgw=-1.0 GHz P=3.81 E=3.00 Minst=3326 IPC=2.87 mJ=288 pin=5 rdKB=25020 fpMB=4016 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 01:04:38.597 +23.98 dt=252 cpu=523 (thr 524) P=17 E=506 run=529 pgw=-1.0 GHz P=3.91 E=3.00 Minst=5529 IPC=3.49 mJ=438 pin=0 rdKB=20784 fpMB=4044 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[01:04:38.598] [xp] 01:04:38.597 +23.98 dt=252 cpu=523 (thr 524) P=17 E=506 run=529 pgw=-1.0 GHz P=3.91 E=3.00 Minst=5529 IPC=3.49 mJ=438 pin=0 rdKB=20784 fpMB=4044 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+] idx=11 port=0x1054f teb=0x71fff30000 tid=0054 HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71f005f830 bt: 14b416320 0 0 0 0 0 0 0
+[census-hold] idx=1 port=0xb20b teb=0x71fffd0000 tid=002c HOLDS fexlock @0x7c050e0108 run_state=3 susp=1 pc=0x14ae9c000 lr=0x14afb413c sp=0x71fc7af9c0 bt: 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c 14afb413c
+[footprint] rev=ml358 phys=4085 MB (peak 4085) internal=3341 MB compressed=480 MB external=247 MB reusable=12 MB (cycle=13)
+[xp] 01:04:39.146 +24.53 dt=259 cpu=570 (thr 569) P=59 E=511 run=581 pgw=-1.0 GHz P=4.16 E=2.99 Minst=6061 IPC=3.42 mJ=642 pin=0 rdKB=23968 fpMB=4076 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0

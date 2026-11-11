@@ -26,6 +26,10 @@ assert(missingOption.fields["launch-option-index"] == "7" && missingOption.failu
 assert(parse("[steam-host] ml1830 launch-option-invalid=1\n[steam-host] ml1830 probe-result=45\n").failure!.contains("launch option"))
 assert(parse("[steam-host] ml1830 probe-result=30\n").failure!.contains("set up the Steam session"))
 assert(parse("[steam-host] ml1830 probe-result=35\n").failure!.contains("license"))
+// Night round 2026-11-11 (G8 S5, G5 S5): Valve's launch refusals 33 (R.E.P.O. A272J4) and 45 (GeoGuessr PX27QG) in words; the host's result 45 or 48 carries them
+assert(parse("[steam-host] ml1970 launch-client-error=33\n[steam-host] ml1830 probe-result=45\n").failure!.contains("Family Sharing"))
+assert(parse("[steam-host] ml1970 launch-client-error=45\n[steam-host] ml1830 probe-result=45\n").failure!.contains("launch option"))
+assert(MadeiraDock.Report.launchRefusal(33, waited: false)!.contains("reason 33") && MadeiraDock.Report.launchRefusal(45, waited: false)!.contains("code 45"))
 assert(parse("[steam-host] ml1830 probe-result=0\n").failure == nil)
 assert(parse("[steam-host] ml1830 probe-result=30").result == nil)
 assert(parse("[steam-host] ml1830 probe-result=30\n[steam-host] ml1830 probe-result=0\n").result == 0)

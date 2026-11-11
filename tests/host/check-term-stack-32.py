@@ -72,6 +72,9 @@ static TEB *the_teb; static I386_CONTEXT *the_ctx; static uint64_t the_win;
 static TEB *NtCurrentTeb(void) { return the_teb; }
 void *get_cpu_area(USHORT m) { return m == IMAGE_FILE_MACHINE_I386 ? the_ctx : NULL; }
 static uint64_t ios_wow_base_for_peb(void *peb) { (void)peb; return the_win; }
+/* night round 2026-11-11 (G8 S4, D S16): the dump also prints the code at the exit with env.MADEIRA_X86_FAULT_DUMP = 1 ([term-code]; tests/host/check-w-sig-diagnostics.py runs those rows);
+ * here the key is off, which also shows that the default output is unchanged */
+int ios_x86_fault_switch(void) { return 0; }
 ''' + fn + r'''
 #define G(a) (mem + 0x1000 + ((a) - 0x400000))
 static void p32(uint32_t a, uint32_t v) { memcpy(G(a), &v, 4); }

@@ -106,7 +106,7 @@ start = func(live, "private func startIfNeeded(")
 check("CMMotionManager()" in start and "guard motion == nil else { return }" in start, "... which is the start, once")
 refresh = func(live, "@MainActor func refresh()")
 check("let on = wanted.isOn && playing && entry != nil" in refresh, "it starts only for a game whose gyro is on, while it is played")
-check("let playing = library.current != nil && !library.launching && !library.menu && appActive" in refresh
+check("let playing = library.current != nil && !library.desktopHome && !library.launching && !library.menu && appActive" in refresh
       and "applicationState == .active" in refresh and "willResignActiveNotification" in live and "didBecomeActiveNotification" in live,
       "... with the game running, no menu over it and the app in front (its own notifications keep that)")
 check(re.search(r"if on \{\s*startIfNeeded\(wanted, title: entry\?\.title \?\? \"\"\)\s*\} else \{\s*stopIfNeeded\(\)\s*\}", refresh) is not None,
@@ -116,7 +116,7 @@ check("stopDeviceMotionUpdates()" in func(live, "private func stopIfNeeded()") a
 check("static var stickActive = false" in live and "static var padNeeded = false" in live, "the two flags GamepadInput reads start false")
 check("Self.stickActive = on && wanted.target == .stick" in refresh and "Self.padNeeded = on && (wanted.target == .stick || !wanted.hold.isEmpty)" in refresh,
       "... and are true only while the gyro is on")
-check("let gyroConnected = i == 0 && BCDGyroLive.stickActive" in gamepad and "guard pad != nil || touchConnected || gyroConnected else {" in gamepad,
+check("let gyroConnected = i == 0 && BCDGyroLive.stickActive" in gamepad and "guard pad != nil || touchConnected || gyroConnected || aimConnected else {" in gamepad,
       "GamepadInput connects player 1 for the gyro stick only while it drives it")
 check("if i == 0, BCDGyroLive.padNeeded, active, keyboardMouse == nil, !LibraryController.shared.ownsInput {\n                BCDGyroLive.shared.padSample(&state)\n            }" in gamepad,
       "... and looks at the controller only then (not in keyboard-and-mouse mode, nor under the library's menu)")

@@ -144,8 +144,11 @@ struct BCDCrashOffer: Equatable {
                 + "folder paths, user names, e-mail and IP addresses."
         }
         let played = minutes < 1 ? "" : " after about \(minutes) minute\(minutes == 1 ? "" : "s")"
+        // Night round 2026-11-11 (T2 S-BG1; Dying Light C1EWZY, WF4EHP, QKR2WP, J7AK88, T92QFA: about 40 of 49 logs end with the partial [session] line of
+        // a game that was left): a game that has run for a while and then goes to the background is the case iOS closes most, so the words say what to do.
+        let stay = (seconds ?? minutes * 60) >= BCDCrashRules.shortStart ? " Stay in BCD while the game runs: iOS closes a large app that goes to the background." : ""
         let what = background
-            ? "BCD was closed while it was in the background and \(title) was running\(played). iOS does this when the device runs short of memory; closing BCD from the app switcher looks the same."
+            ? "BCD was closed while it was in the background and \(title) was running\(played). iOS does this when the device runs short of memory; closing BCD from the app switcher looks the same.\(stay)"
             : "BCD closed while \(title) was running\(played)."
         return what + "\n\nSending the log helps find out why. You can add a comment first. Before it leaves the device BCD takes out folder paths, user names, e-mail and IP addresses."
     }
@@ -257,17 +260,36 @@ enum BCDScreenshotRules {
 /// this keeps whole lines only (a first line cut by the read is dropped), the last 60, each at most 400 characters. The live side scrubs every
 /// line with the upload scrubber before it is logged.
 enum BCDPrevTail {
-    static let maxBytes = 65536
+    /// Night round 2026-11-11 (A1 S9): 256 KB, so that a session that idled for a long time before it was closed still reaches its last real events
+    /// (the tail shown is at most `maxLines` lines of `maxLineLength` characters whatever is read).
+    static let maxBytes = 262144
     static let maxLines = 60
     static let maxLineLength = 400
 
+    /// Night round 2026-11-11 (A1 S9; 1WYNY2, 5WC97M, C2VRHJ, CT4ND5, TFTCJ5: the previous run's tail was only performance samples): the lines the engine prints
+    /// by the thousand while a game idles. They are dropped before the last lines are taken. A line that starts with one of these is noise.
+    static let noisePrefixes = ["[xp]", "[xp-t]", "[xp-api]", "[thread-stacks]", "[thread-sample]", "[alert-ring]", "[footprint]", "[sync-census]",
+                                "[rip-profile]", "[srv-doorbell]", "[cb-sample]", "[vfree]", "[valloc]", "[fdtrace]", "[srv-own]", "[srv-kill]", "[winios-tree]"]
+
+    /// Whether a line is idle noise. Kept whatever its tag: `[waiters]`, `[srv-stuck]`, `[freeze]`, the Wine process list of `[thread-sample] ml876 modmap`
+    /// (it shows a game process that is missing), `[session]`, `[exit-report]`, `[exc]`, `err:` and `wine:` lines (none of them starts with a noise tag
+    /// but the modmap, which is named here), and every line that is not a sample.
+    static func isNoise(_ line: String) -> Bool {
+        if line.contains("[thread-sample] ml876 modmap") { return false }
+        if line.contains("[TI-IC]") { return true }
+        return noisePrefixes.contains { line.hasPrefix($0 + " ") || line == $0 }
+    }
+
     /// `data` is the file from `offset` to its end. Split on the bytes (Swift's "\r\n" is one Character, which no "\n" split would cut).
+    /// Samples are dropped first; a tail that is nothing but samples keeps them (as before).
     static func lines(_ data: Data, offset: UInt64) -> [String] {
         var parts = data.split(separator: UInt8(ascii: "\n"), omittingEmptySubsequences: true)
         if offset > 0, !parts.isEmpty, data.first != UInt8(ascii: "\n") { parts.removeFirst() }
-        return parts.suffix(maxLines).compactMap { bytes in
+        let all: [String] = parts.compactMap { bytes in
             let text = bytes.last == UInt8(ascii: "\r") ? bytes.dropLast() : bytes
             return text.isEmpty ? nil : String(String(decoding: text, as: UTF8.self).prefix(maxLineLength))
         }
+        let real = all.filter { !isNoise($0) }
+        return Array((real.isEmpty ? all : real).suffix(maxLines))
     }
 }

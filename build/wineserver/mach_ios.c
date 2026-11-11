@@ -1,4 +1,5 @@
-/* Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #469)
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+/* Portions copyright 2026 ft7t8drgwf-wq and Henry Morin: code taken from https://github.com/willfaust/Madeira (pull requests #469 and #556)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Server-side debugger support using Mach primitives
@@ -380,6 +381,15 @@ int send_thread_signal( struct thread *thread, int sig )
 {
     int ret = -1;
     mach_port_t process_port = get_process_port( thread->process );
+#ifdef WINE_IOS
+    // Confirmed desktop shutdown only: all Wine pseudo-processes live in this
+    // task, and unix_tid is their registered Mach thread port. The regular path
+    // deliberately lacks a task port on iOS; keep it unchanged for other signals.
+    extern int g_wineserver_desktop_shutdown;
+    if (!process_port && sig == SIGQUIT &&
+        __atomic_load_n(&g_wineserver_desktop_shutdown, __ATOMIC_ACQUIRE) == 2)
+        process_port = mach_task_self();
+#endif
 
     if (thread->unix_pid != -1 && process_port)
     {
@@ -445,6 +455,9 @@ int send_thread_signal( struct thread *thread, int sig )
 #define IOS_SCF_SP    0x0f8
 #define IOS_SCF_PC    0x100
 #define IOS_SCF_CPSR  0x108
+#define IOS_SCF_FPCR  0x128
+#define IOS_SCF_FPSR  0x12c
+#define IOS_SCF_V     0x130                    /* NEON128 v[32] */
 #define IOS_SCF_SIZE  0x330
 #define IOS_SCF_RESTORE_FLAGS 0x10c           /* syscall_frame.restore_flags */
 #define IOS_CTX_ARM64_CONTROL 0x00400001u     /* CONTEXT_ARM64 | CONTEXT_ARM64_CONTROL */
@@ -880,6 +893,17 @@ done:
  * resuming in between. Snapshot-only callers leave it NULL. */
 struct thread *ios_pending_persistent_hold;
 
+/* MADEIRA_CTX_FP=0: a cross-thread GetThreadContext returns zeroed vector registers, as
+ * before. Read on every capture, madeira.cfg (and the game's own lines) first: this server
+ * starts before the app exports env.* lines (ml1236) and runs again for the next session. */
+static int ios_ctx_fp_enabled(void)
+{
+    char buf[16];
+    const char *e = madeira_cfg_get( "env.MADEIRA_CTX_FP", buf, sizeof(buf) ) ? buf
+                  : getenv( "MADEIRA_CTX_FP" );
+    return !(e && e[0] == '0');
+}
+
 int ios_fill_thread_context( struct thread *thread,
                              struct context_data *native,
                              struct context_data *wow )
@@ -911,6 +935,55 @@ int ios_fill_thread_context( struct thread *thread,
         native->integer.arm64_regs.x[29] = arm.__fp;
         native->integer.arm64_regs.x[30] = arm.__lr;
         have_native = 1;
+    }
+
+    /* The vector registers too: without them every cross-thread floating-point context
+     * came back zeroed. FEX keeps guest XMM0-15 in V0-V15 under ARM64EC, the same mapping
+     * the ARM64EC ABI uses, so these are the guest's XMM registers. Persona 5 Royal moves
+     * code between threads this way: a thread loads it into XMM13, and the main thread
+     * reads its floating-point context into a CONTEXT in the image and jumps to the
+     * XMM13 slot. A thread blocked in a syscall is overridden below from the saved frame.
+     * MADEIRA_CTX_FP=0 restores the zeroed vector registers. */
+    if (have_native && ios_ctx_fp_enabled())
+    {
+        arm_neon_state64_t neon;
+        mach_msg_type_number_t ncount = ARM_NEON_STATE64_COUNT;
+
+        if (!thread_get_state( port, ARM_NEON_STATE64, (thread_state_t)&neon, &ncount ))
+        {
+            unsigned int i;
+            for (i = 0; i < 32; i++)
+            {
+                native->fp.arm64_regs.q[i].low  = (uint64_t)neon.__v[i];
+                native->fp.arm64_regs.q[i].high = (uint64_t)(neon.__v[i] >> 64);
+            }
+            native->fp.arm64_regs.fpcr = neon.__fpcr;
+            native->fp.arm64_regs.fpsr = neon.__fpsr;
+            native->flags |= SERVER_CTX_FLOATING_POINT;
+        }
+    }
+
+    /* Inside a syscall the live vector registers belong to Unix code, which may have
+     * clobbered them; the dispatcher saved the guest's at entry. Same validation as the
+     * ml716 frame substitution below, but not behind its opt-in: only FP is replaced.
+     * A Unix call saves only q8-q15 in that frame, so inside one, q0-q7 are the values of
+     * the thread's last syscall. */
+    if (have_native && thread->teb && (native->flags & SERVER_CTX_FLOATING_POINT))
+    {
+        uint64_t frame = 0, kstack = 0;
+        uint64_t sp = native->ctl.arm64_regs.sp;
+        if (ios_safe_read( (uint64_t)thread->teb + IOS_TEB_SYSCALL_FRAME_OFF, &frame, 8 ) &&
+            ios_safe_read( (uint64_t)thread->teb + IOS_TEB_KERNEL_STACK_OFF, &kstack, 8 ) &&
+            frame && kstack && !(frame & 7) && kstack < frame && sp >= kstack && sp <= frame)
+        {
+            unsigned char f[IOS_SCF_SIZE];
+            if (ios_safe_read( frame, f, sizeof(f) ))
+            {
+                memcpy( native->fp.arm64_regs.q, f + IOS_SCF_V, sizeof(native->fp.arm64_regs.q) );
+                native->fp.arm64_regs.fpcr = *(uint32_t *)(f + IOS_SCF_FPCR);
+                native->fp.arm64_regs.fpsr = *(uint32_t *)(f + IOS_SCF_FPSR);
+            }
+        }
     }
 
     /* ml716: A THREAD PARKED INSIDE A SYSCALL MUST REPORT ITS SYSCALL FRAME.

@@ -1,0 +1,184 @@
+[10:12:38.725] [INFO] Checking entitlements...
+[10:12:38.726] [INFO] [build] v0.1.634 (634)
+[10:12:38.726] [INFO] [device] model=iPhone19,7 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11600MB available=8169MB cores=6
+[10:12:38.726] [INFO] [device] address-map=[0x104e00000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[10:12:38.726] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[10:12:38.734] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=+09:00 free-disk=161GB stikdebug-url=0
+[10:12:38.736] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:12:40.684] [INFO] Requesting JIT with Built-in StikJIT...
+[10:12:42.015] [INFO] [bcd] library launch sp26-cod.exe: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off lc=0
+[10:12:42.043] [INFO] Running full Wine sequence...
+[10:12:42.044] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104e00000,0x8000000000) 512GB available=8154MB low-power=0 thermal=nominal
+[10:12:42.045] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=1
+[10:12:42.048] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[10:12:42.050] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:12:42.051] [INFO] Allocating 896MB JIT pool via debugger...
+[10:12:42.051] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:12:42.051] [INFO] [jit-debugger] attached=1 at the pool request
+[10:12:42.053] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:12:42.576] [INFO] RX pool at 0x148000000
+[10:12:42.591] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.581s rev=ml526
+[10:12:42.631] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[10:12:42.809] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[10:12:42.809] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[10:12:42.809] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7594 MB + phys_footprint=597 MB = 8192 MB (hw.memsize says 11600 MB)
+ml985: map_image_view size=0x15948000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0x15948000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x15948000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[window] 0x12c800000..0x7802000000 regions=69782 occupied=462375 MB of 486744 MB free=24368 MB maxhole=16416 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=1238 MB (peak 1238) internal=1237 MB compressed=0 MB external=90 MB reusable=6 MB (cycle=1)
+[jit-pool] image 0x7022000000+0x15948000 (game_steam_ship.exe) → pool 0x148004000 used=0x1594c000/0x22000000 tramp+0x0
+[copy-verify] game_steam_ship.exe: OK, 12941 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x15d94c000 used=0x15a84000/0x22000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x15d94c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x15da87000 used=0x15eab000/0x22000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x15da87000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x15dea8000 used=0x15fdc000/0x22000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x15dea8000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x15dfdc000 used=0x160a4000/0x22000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x15dfdc000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x15e0a4000 used=0x163a4000/0x22000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x15e0a4000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module sp26-cod.exe (sp26-cod.exe-0bfa5e65b3afa610): 7022000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[xp-names] m3933495 "wine-x18-exc"
+[xp] 10:12:43.599 +0.57 dt=319 cpu=335 (thr 335) P=335 E=0 run=337 pgw=-1.0 GHz P=4.87 E=1.85 Minst=8464 IPC=5.19 mJ=2198 pin=0 rdKB=0 fpMB=1328
+D 24 Load module azure-attest-manager.dll (azure-attest-manager.dll-561067eb61f0ee17): 71FE360000
+D 24 Load module AzureAttestManager.dll (azureattestmanager.dll-04782490261234c2): 71FE310000
+D 24 Load module bcrypt.dll (bcrypt.dll-5a6e36eeb1a98b0b): 71FE280000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE1D0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"tbs.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library tbs.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\CoD-MW4\\sp26\\AzureAttestManager.dll") not found
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[jit-pool] anon RWX 0x7037f90000 size=0x10000 → used=0x16778000/0x22000000 NEW off=0x16768000 tid=0024 peb=0x71ffff0000 rev=ml625
+[valloc] ml959 # base=0x7037f90000 size=0x10000 type=0x3000 prot=0x40 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[jit-pool] image 0x71fdd90000+0xc000 (VCRUNTIME140_1.dll) → pool 0x15e9a4000 used=0x169b0000/0x22000000 tramp+0x0
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x15e9a4000)
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd81234494): 71FDD90000
+[jit-pool] image 0x71fdc60000+0x130000 (crypt32.dll) → pool 0x15e9b0000 used=0x16ae8000/0x22000000 tramp+0x8000
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x15e9b0000)
+D 24 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): 71FDC60000
+[jit-pool] image 0x71fda40000+0x220000 (user32.dll) → pool 0x15eae8000 used=0x16d10000/0x22000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x15eae8000)
+[xp] 10:12:43.905 +0.88 dt=306 cpu=307 (thr 306) P=307 E=0 run=308 pgw=-1.0 GHz P=4.88 E=1.95 Minst=7477 IPC=4.99 mJ=1945 pin=3 rdKB=0 fpMB=1339
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FDA40000
+[jit-pool] image 0x71fd950000+0xf0000 (gdi32.dll) → pool 0x15ed10000 used=0x16e08000/0x22000000 tramp+0x8000
+[copy-verify] gdi32.dll: OK, 20 .text pages executable (copy @0x15ed10000)
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FD950000
+[jit-pool] image 0x71fd8b0000+0xa0000 (win32u.dll) → pool 0x15ee08000 used=0x16eac000/0x22000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x15ee08000)
+D 24 Load module win32u.dll (win32u.dll-e45aa71e43175410): 71FD8B0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"AzureAttestManager.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library AzureAttestManager.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\CoD-MW4\\sp26\\azure-attest-manager.dll") not found
+[jit-pool] image 0x71fd840000+0x65000 (AzureAttestNormal.dll) → pool 0x15eeaf000 used=0x16f1b000/0x22000000 tramp+0x0
+[copy-verify] AzureAttestNormal.dll: OK, 16 .text pages executable (copy @0x15eeaf000)
+D 24 Load module AzureAttestNormal.dll (azureattestnormal.dll-37bc826f1c0e28f5): 71FD840000
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"azure-attest-manager.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x169ffc574 NO pool/anon alias | region 0x104e00000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[entry-fail] rev=ajan2-tani #1 NoExec block (null-read thunk): guest RIP=0x70378c960d game_steam_ship.exe+0x158c960d (base 0x7022000000) RSP=0x703880f490 host pc=0x169ffc574 lr=0x169ffc354
+[entry-fail]   guest bytes -32..-1: 24 28 48 8b 4c 24 30 e8 27 7a 00 00 84 c0 75 12 b8 05 00 00 00 87 05 68 fc 00 00 b9 07 00 00 00 | +0..+15: cd 29 8b 0d 47 fc 00 00 57 48 bf 8b 05 1a fc 00 
+[entry-fail]   [RSP] not readable (RSP=0x703880f490)
+[entry-fail]   session LdrSystemDllInitBlock: ntdll_handle=0x0 KiUserExceptionDispatcher=0x0 KiUserApcDispatcher=0x0 KiUserCallbackDispatcher=0x0 LdrInitializeThunk=0x0; RIP equals none of its dispatcher fields
+[noexec-who] rev=624 rip=0x70378c960d tid=0024 last-unmap {none in the history} last-map {view 0x7022000000+0x15948000 protect=0x180002d by tid 0024 1078 ms ago} now: a view 0x7022000000+0x15948000 protect=0x180002d (image)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x169ffc574 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x169ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x70378c960d pc=0x169ffc574 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x169ffc574 addr=0x0 x18=0x71fffe0000 type=1 lr=0x169ffc354 sp=0x71fe3b0000 x16=0x70378d117d x17=0x70378d117d
+[guest-code] rev=ml333 pool_rip=0x15d8cd60d (PE 0x70378c960d): cd 29 8b 0d 47 fc 00 00 57 48 bf 8b 05 1a fc 00
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x169ffc574; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R13=0x15d9f6ad8 "call_tls_callbacks"
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x70378c960d (block entry 0x70378c960d) rva 0x158c960d, section #8 '.text' rva 0x158c9000+0x7e590 chars 0xe0000020 (RWX CODE) | host region 0x70378c8000+0x10000 prot=r-- max=rw- | Wine vprot of the 4 KB pages of host page 0x70378c8000: 21 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: 0x15d8cd60d | 32 bytes at rip, loaded image: cd 29 8b 0d 47 fc 00 00 57 48 bf 8b 05 1a fc 00 00 eb 13 e8 02 00 00 00 de f7 5f 48 8d bf f3 ff | pool copy: cd 29 8b 0d 47 fc 00 00 57 48 bf 8b 05 1a fc 00 00 eb 13 e8 02 00 00 00 de f7 5f 48 8d bf f3 ff | image and pool copy equal
+[fault-host] 169ffc474: a9460f82 a9471784 a9485393 a9495b95 29426389 d53bd06b 927df16b f9448d6b
+[fault-host] 169ffc494: f94bc56b 3900057f d61f0140 d4400000 d4400000 d53b420a b9040b8a a9020388
+[fault-host] 169ffc4b4: a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95 29026389
+[fault-host] 169ffc4d4: 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000 d53b420a b9040b8a
+[fault-host] 169ffc4f4: a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95
+[fault-host] 169ffc514: 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4200000 d53b420a
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d48 4c9f2d4c 52800001 [f9400021] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x703799a340 *(gs_cached+0x58)=0x703799a340
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x169ffc574 NO pool/anon alias | region 0x104e00000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[noexec-who] rev=624 rip=0x70378c960d tid=0024 last-unmap {none in the history} last-map {view 0x7022000000+0x15948000 protect=0x180002d by tid 0024 1078 ms ago} now: a view 0x7022000000+0x15948000 protect=0x180002d (image)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x169ffc574 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x169ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x70378c960d pc=0x169ffc574 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x169ffc574 addr=0x0 x18=0x71fffe0000 type=1 lr=0x169ffc354 sp=0x71fe3b0000 x16=0x70378d117d x17=0x70378d117d
+[guest-code] rev=ml333 pool_rip=0x15d8cd60d (PE 0x70378c960d): cd 29 8b 0d 47 fc 00 00 57 48 bf 8b 05 1a fc 00
+[fault-host] 169ffc4d4: 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000 d53b420a b9040b8a
+[fault-host] 169ffc4f4: a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95
+[fault-host] 169ffc514: 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4200000 d53b420a
+[fault-host] 169ffc534: b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393
+[fault-host] 169ffc554: a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c 52800001
+[fault-host] 169ffc574: f9400021 d53b420a b9040b8a a9020388 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d48 4c9f2d4c 52800001 [f9400021] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x703799a340 *(gs_cached+0x58)=0x703799a340
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x70378c960d in image 0x7022000000: rva 0x158c960d, section #8 '.text' rva 0x158c9000+0x7e590 chars 0xe0000020 (RWX CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x168ffc000 unresolved: hostPC outside block
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x169ffc574 pc=169ffc574 nparams=2 p0=0 p1=0
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x169ffc574 RX from -32, 64 of 64 bytes: 95 5b 09 a9 89 63 02 29 8a 03 07 91 40 2d 9f 4c 44 2d 9f 4c 48 2d 9f 4c 4c 2d 9f 4c 01 00 80 52 21 00 40 f9 0a 42 3b d5 8a 0b 04 b9 88 03 02 a9 81 6f 03 a9 97 77 04 a9 99 6b 05 a9 82 0f 06 a9 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x169ffc574 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 169FFC574 AV READ of 0
+[set-ctx] ml946 distinct#2 tid=0024 req pc=0x71ffd315d0 sp=0x703880f020 flags=00400007 status=00000000 | frame pc=0x71ffd315d0 sp=0x703880f020 | is_ec(frame.pc)=1 ec_cur=1
+0024:err:seh:dispatch_exception [fast-fail] ml604 code=7 addr=00000070378C960D — terminating this pseudo-process (fast-fail bypasses VEH/SEH on Windows; unwinding it stranded fls_section in ml603)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000409) syscalls=0 unix_calls=1726
+[unwind] term ml661 begin rip=70378c960d rsp=703880f490 window=[703880f490..703900f490) max=32
+[unwind] term ml661 #00 pc=70378c960d rsp=703880f490  game_steam_ship.exe+0x158c960d
+[unwind] term ml662 #00 nv: rbx=7037993dc0 rbp=703880f500 rsi=15d9f4c28 rdi=15da1c000 r12=15da1c360 r13=15d9f6ad8 r14=15d9f6b80 r15=15d9f6af0
+[unwind] term ml662   rbx=7037993dc0: b03f9937 70000000 203c9937 70000000 c03f9937 70000000 303c9937 70000000
+[unwind] term ml662   rbp=703880f500: 78f58038 70000000 e0e7975d 01000000 00000022 70000000 01000000 00000000
+[unwind] term ml661 #01 pc=8 rsp=703880f498  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? 71fe8b0000  libarm64ecfex.dll+0x0
+[term-stack] ml660 sp+220:   ? 71fe780000  ucrtbase.dll+0x0
+[term-stack] ml660 sp+4b0:   ? 71fe6c0000  kernel32.dll+0x0
+[term-stack] ml660 sp+740:   ? 71fe3d0000  kernelbase.dll+0x0
+[Wine ntdll/server] process_exit_wrapper(-1073740791)
+[WineProc] Wine exited with code -1073740791 (caught by longjmp)
+[WineProc] stopping wineserver...
+[10:12:44.042] [INFO] [session] length=2s play=0s frames=0 stalls=0/0s peak=1342MB limit=8191MB thermal=nominal lpm=0 api=D3D12/64 res=1408x648 cap=30 game=Call of Duty®: Modern Warfare® 4
+[10:12:44.046] [INFO] [exit-report] status=0xc0000409
+[frontend] returned to library
+[xp] 10:12:44.166 +1.14 dt=259 cpu=306 (thr 276) P=148 E=159 run=319 pgw=-1.0 GHz P=4.38 E=2.56 Minst=4639 IPC=4.40 mJ=671 pin=0 rdKB=0 fpMB=1367
+[xp] 10:12:44.440 +1.41 dt=275 cpu=303 (thr 306) P=22 E=281 run=325 pgw=-1.0 GHz P=4.71 E=2.63 Minst=3922 IPC=4.65 mJ=299 pin=0 rdKB=0 fpMB=1351
+[xp] 10:12:44.761 +1.73 dt=321 cpu=326 (thr 326) P=4 E=322 run=328 pgw=-1.0 GHz P=3.96 E=2.63 Minst=4154 IPC=4.81 mJ=157 pin=0 rdKB=0 fpMB=1351
+[footprint] rev=ml358 phys=1354 MB (peak 1354) internal=1352 MB compressed=0 MB external=109 MB reusable=5 MB (cycle=2)
+[xp] 10:12:45.042 +2.01 dt=280 cpu=360 (thr 360) P=76 E=284 run=361 pgw=-1.0 GHz P=4.91 E=2.63 Minst=4791 IPC=4.27 mJ=421 pin=0 rdKB=0 fpMB=1354
+[10:12:46.148] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1354 MB (peak 1354) internal=1352 MB compressed=0 MB external=111 MB reusable=5 MB (cycle=3)
+[footprint] rev=ml358 phys=1353 MB (peak 1354) internal=1352 MB compressed=0 MB external=111 MB reusable=5 MB (cycle=4)
+[xp] 10:12:49.584 +6.56 dt=313 cpu=32 (thr 33) P=11 E=21 run=39 pgw=-1.0 GHz P=3.66 E=1.38 Minst=145 IPC=2.06 mJ=30 pin=4 rdKB=68 fpMB=1358
+[xp] 10:12:49.869 +6.84 dt=285 cpu=61 (thr 60) P=0 E=61 run=68 pgw=-1.0 GHz P=0.00 E=1.32 Minst=161 IPC=2.01 mJ=6 pin=0 rdKB=0 fpMB=1358
+[xp] 10:12:50.184 +7.16 dt=315 cpu=24 (thr 24) P=0 E=24 run=26 pgw=-1.0 GHz P=0.00 E=1.42 Minst=50 IPC=1.46 mJ=2 pin=0 rdKB=16 fpMB=1358
+[xp] 10:12:50.515 +7.49 dt=331 cpu=59 (thr 59) P=0 E=59 run=92 pgw=-1.0 GHz P=1.75 E=1.41 Minst=130 IPC=1.55 mJ=6 pin=0 rdKB=0 fpMB=1358
+[xp] 10:12:50.775 +7.75 dt=260 cpu=28 (thr 26) P=12 E=16 run=35 pgw=-1.0 GHz P=1.73 E=1.82 Minst=83 IPC=1.67 mJ=9 pin=0 rdKB=0 fpMB=1358
+[10:12:50.776] [xp] 10:12:50.775 +7.75 dt=260 cpu=28 (thr 26) P=12 E=16 run=35 pgw=-1.0 GHz P=1.73 E=1.82 Minst=83 IPC=1.67 mJ=9 pin=0 rdKB=0 fpMB=1358
+[footprint] rev=ml358 phys=1360 MB (peak 1360) internal=1359 MB compressed=0 MB external=119 MB reusable=5 MB (cycle=5)

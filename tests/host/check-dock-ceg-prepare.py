@@ -93,6 +93,22 @@ for rid in ("dock-ceg-result-55", "dock-ceg-no-job"):
 # -------------------------------------------------------------------------------------------------------- 3. the CEG gate (text)
 dock_launch = None
 dock = next((d for d in (root / "madeira-dock", Path.home() / "madeira-bcd/madeira-dock") if (d / "src/launch.c").is_file()), None)
+
+
+def pinned_src(d):
+    """The Dock's src/ as the pinned commit has it. In a build the working copy already carries the workflow's earlier Dock patches,
+    including the night round's registry-create on top of registry-events, which the earlier scripts here cannot re-apply (night round
+    2026-11-11); without git the working copy is used, as before."""
+    try:
+        data = subprocess.run(["git", "-C", str(d), "archive", "HEAD", "src"], capture_output=True, check=True).stdout
+        out = Path(tempfile.mkdtemp(prefix="dock-pinned-"))
+        subprocess.run(["tar", "-x", "-C", str(out)], input=data, check=True)
+        return out / "src"
+    except (OSError, subprocess.CalledProcessError):
+        return d / "src"
+
+
+src_dir = pinned_src(dock) if dock is not None else None
 mp = (root / "app/Madeira/MadeiraDock.swift").read_text()
 check("the app exports MADEIRA_STEAM_HOST_CEG=1 only for a game with custom executables (and unsets it otherwise)",
       re.search(r'if game\.customExecutables && SteamSignIn\.flag\("MADEIRA_DOCK_CEG", default: true\) \{\s*setenv\("MADEIRA_STEAM_HOST_CEG", "1", 1\)\s*\} else \{\s*unsetenv\("MADEIRA_STEAM_HOST_CEG"\)', mp)
@@ -101,7 +117,7 @@ check("the app exports MADEIRA_STEAM_HOST_CEG=1 only for a game with custom exec
 if dock is None:
     print("skip: the Dock source is not at hand (madeira-dock submodule)")
 else:
-    orig = {f: (dock / "src" / f).read_text() for f in ("launch.c", "scm.c", "validation.c", "session.c")}
+    orig = {f: (src_dir / f).read_text() for f in ("launch.c", "scm.c", "validation.c", "session.c")}
     if "madeira-bcd: ceg-" in orig["launch.c"] + orig["scm.c"] + orig["validation.c"]:
         print("note: the Dock tree is already patched; the checks below need the pristine pin, so they are skipped")
     else:
@@ -112,7 +128,7 @@ else:
 
             def fresh(name):
                 d = t / name
-                shutil.copytree(dock / "src", d)
+                shutil.copytree(src_dir, d)
                 return d
 
             def run(script, *files):
@@ -244,7 +260,7 @@ else:
             outside_no_fn = outside.replace(fn_text, "")
             check("sh_ceg_scm_prepare and prepare_custom_binaries are called only inside the MADEIRA_STEAM_HOST_CEG=1 block",
                   "sh_ceg_scm_prepare(" not in outside_no_fn and "prepare_custom_binaries(" not in outside_no_fn)
-            others = "".join((dock / "src" / f).read_text() for f in ("main.c", "session.c", "probe.c", "auth.c"))
+            others = "".join((src_dir / f).read_text() for f in ("main.c", "session.c", "probe.c", "auth.c"))
             check("sh_ceg_request_step, sh_ceg_scm_prepare and start_client_service have no other caller in the Dock",
                   "sh_ceg_request_step(" not in others and "sh_ceg_scm_prepare(" not in others and "start_client_service" not in others)
 

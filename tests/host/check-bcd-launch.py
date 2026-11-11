@@ -118,9 +118,9 @@ check(content.count("play: launchLibraryEntry, enableJIT: enableJIT,") == 1
       and "BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT," in content
       and "LibraryView(" not in content,
       "ContentView hands BCD's interface the Play (launchLibraryEntry), Enable JIT and the Dock start; no other interface is left")
-check("if library.current != nil {\n                    sessionBody" in content and "FrontendChoice" not in content + lib
+check("if library.current != nil && !library.desktopHome {\n                sessionBody" in content and "FrontendChoice" not in content + lib
       and "LibraryController.shared.configure(enabled: true, ownsInput: true)" in block(lib, "func refreshFlag()"),
-      "BCD's interface runs with the library engine always on: its Play, JIT prompt and alerts are the library's")
+      "BCD's interface runs with the library engine always on: its Play, JIT prompt and alerts are the library's (a session shows unless the Windows desktop runs behind BCD Home: desktopHome, native Duo interface only)")
 start = code(block(store, "private func start(_ game: BCDGame)"))
 # Build 622: every start goes through begin(), which shows a heavy game's one-time graphics tip first (BCDGraphicsTip) and
 # otherwise hands the entry to the connected Play; the tip's OK hands it over too.
@@ -274,13 +274,14 @@ check('guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }'
       "Install and sign-in: GOG's and Epic's hooks first (Epic's Install only says it comes later), then Steam")
 
 # ---- downloads: the classic calls, at once; the background task untouched ----------------------
-download = code(block(store, "private func download(_ appID: Int)"))
-check("if SteamOwnedLibrary.enabled && account.signedIn {\n            account.install(appID)\n        } else {\n"
-      "            settled { account.install(appID) }" in download,
+download = code(block(store, "private func download(_ appID: Int, library: String? = nil)"))
+check("if SteamOwnedLibrary.enabled && account.signedIn {\n            account.install(appID, library: library)\n        } else {\n"
+      "            settled { account.install(appID, library: library) }" in download,
       "a download starts at once (SteamOwnedLibrary.install), while BCD is in front; only a start that can only fail waits for the page")
 for fn in ("func install(_ game: BCDGame, place: BCDInstallPlace)", "func update(_ game: BCDGame)", "func resumeDownload(_ id: String)"):
     body = code(block(store, fn))
-    check("download(appID)" in body and "settled" not in body and ".install(" not in body, f"{fn.split('(')[0]}: the download path above")
+    # Install names the library: this device's, or the external drive's (ExternalDrives.externalInstallTarget, build 635).
+    check("download(appID" in body and "settled" not in body and ".install(" not in body, f"{fn.split('(')[0]}: the download path above")
 verify = code(block(store, "func verify(_ game: BCDGame)"))
 check(verify.strip().endswith("SteamOwnedLibrary.shared.repair(appID)\n    }") and "SteamInstallPaths.isManaged(library: installed.library)" in verify
       and "install(appID)" in code(block(owned, "func repair(_ appID: Int)")),
@@ -291,7 +292,7 @@ check("SteamOwnedLibrary.shared.pause(appID)" in block(store, "func pauseDownloa
       "Pause and Stop: the calls the classic download sheet made (the sheet is deleted, wave 3)")
 # Wave 3: the classic download sheet's buttons (Install, Resume, Try again, Download the update, Check files) are
 # deleted; BCDLiveStore's install, update, resume and verify (checked below) call the same SteamOwnedLibrary functions.
-install = code(block(owned, "func install(_ appID: Int)"))
+install = code(block(owned, "func install(_ appID: Int, library: String? = nil)"))
 pump = code(block(owned, "private func pump()"))
 run = code(block(owned, "private func run(_ appID: Int) async"))
 check(ordered(install, "guard Self.enabled else { return }", "guard signedIn else {", "queue.append(appID)", "pump()")

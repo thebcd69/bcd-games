@@ -248,6 +248,10 @@ enum DockStartStatus {
         if fields["launch-option-missing"] != nil || fields["launch-option-invalid"] != nil {
             return "Steam won't accept this game's launch option."
         }
+        // Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A): error 19 is "the game needs an update", and nothing may be installing it.
+        if fields["launch-update-wait"] != nil && fields["launch-update-ready"] == nil && fields["launch-client-error"] == "19" {
+            return "Steam says this game needs an update before it can start. If nothing is downloading, open the game's page, check for an update and install it, then play again."
+        }
         if fields["launch-update-wait"] != nil && fields["launch-update-ready"] == nil {
             return "Waiting for Steam to install content this game needs. The game will start after that…"
         }

@@ -153,6 +153,7 @@ import UniformTypeIdentifiers
             if !desktop { d.groups.append(libraryGroup(entry, gog: game.store == .gog || game.store == .epic)) }
             // An itch.io or EA game's name and pictures are the store's too: its Library group is GOG's and Epic's (no Name or Find on Steam row).
             if !desktop, game.store == .itch || game.store == .ea, let at = d.groups.lastIndex(where: { $0.id == "library" }) { d.groups[at] = libraryGroup(entry, gog: true) }
+            if !desktop, let location = locationGroup(game, entry) { d.groups.append(location) }   // external drives: where the game is, Move to
         }
         if let id {
             let installed = SteamGamesModel.shared.games.first { $0.id == id }
@@ -226,6 +227,14 @@ import UniformTypeIdentifiers
                        note: note, locked: locked)
     }
 
+    /// Night round 2026-11-11 (T2 S-PERF1; Fallout 4 NGBJF4, LEGO Skywalker Saga BNE0RT and MQDKS7, Dying Light C1EWZY and WF4EHP: the GPU 70 to 100 % busy at
+    /// the iPad's own resolution): an iPad's screen has the most pixels, and a lower Resolution is the first thing to try. Text only, iPad only.
+    private static var iPadResolutionHint: String {
+        UIDevice.current.userInterfaceIdiom == .pad
+            ? " An iPad's screen has many pixels, so a lower Resolution (with MetalFX upscaling below) is the first thing to try when a game stutters."
+            : ""
+    }
+
     /// A choice kept in the game's own file; a value typed into the file by hand is listed too.
     private static func line(_ key: String, _ title: String, _ profile: GameProfile, _ labels: [(String, String)],
                              note: String) -> BCDGameSetting {
@@ -273,7 +282,8 @@ import UniformTypeIdentifiers
         var settings = [
             BCDGameSetting(id: "resolution", title: "Resolution", kind: .choice(sizes), value: entry.resolution,
                            defaultValue: ResolutionChoices.defaultValue,
-                           note: "The screen size Windows reports to the game, and the Wine desktop's size. Fewer pixels run faster; Scaling decides how the picture fills this screen."),
+                           note: "The screen size Windows reports to the game, and the Wine desktop's size. Fewer pixels run faster; Scaling decides how the picture fills this screen."
+                               + Self.iPadResolutionHint),
             BCDGameSetting(id: "scaling", title: "Scaling",
                            kind: .choice(DisplayMode.allCases.map { BCDGameChoice(value: $0.rawValue, label: Self.scaling[$0.rawValue] ?? $0.label) }),
                            value: entry.displayMode.rawValue, defaultValue: DisplayMode.fit.rawValue,
@@ -334,6 +344,10 @@ import UniformTypeIdentifiers
             // OpenGL (docs/OPENGL.md): BCD's own OpenGL driver, per game and off until it is chosen here (or a recommended list or auto-tune turns it on).
             Self.line(BCDOpenGL.key, "OpenGL", profile, BCDOpenGL.choices,
                       note: BCDOpenGL.pageNote),
+            // Windows Vulkan (docs/VULKAN.md; owner 2026-11-09: a switch on the game's page, not a typed line): on writes
+            // `vulkan = moltenvk` into the game's own file, off takes the line out; the bridge reads it at the next start.
+            Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk",
+                        note: "For a 64-bit game that needs Vulkan (Detroit: Become Human): Wine's Vulkan on Metal (MoltenVK), drawn into the game's window. Off, the game finds no Vulkan driver, as before. Takes effect at the game's next start."),
             Self.toggle("nvidia", "Show the game an NVIDIA card", LibraryPrefs.nvidia(entry.windowsPath),
                         note: "For games that stop with \"no graphics card\" or \"failed to get GPU driver info\": Windows then reports an NVIDIA card and driver."),
             // madeira-bcd (2026-10-25, round 603): the same, for any maker (BCDGPUCards.swift), and the video memory a game is told it has.
@@ -755,6 +769,47 @@ import UniformTypeIdentifiers
         return BCDGameSettingGroup(id: "library", title: "Library", symbol: "books.vertical", settings: settings, headline: entry.title)
     }
 
+    // MARK: Location
+
+    /// Where the game is installed and Move to (Madeira #464's Install Location, ExternalDrives.swift's GameMover): a Steam game
+    /// moves between this device's Steam library and the SteamLibrary of each connected drive, a game added from Files between
+    /// C:\Games and each drive's Games folder. A move copies the game, checks the copy, then deletes the original. A GOG, Epic,
+    /// itch.io or EA game keeps the place its store installed it in (its store's records name that folder). Nil: nothing to show
+    /// (no drive was ever added and the game is on this device).
+    private func locationGroup(_ game: BCDGame, _ entry: LibraryEntry) -> BCDGameSettingGroup? {
+        let drives = ExternalDrives.shared
+        let steam = entry.steamAppID != nil
+        guard game.store == .local || (steam && game.store == .steam) else { return nil }
+        let here = GameMover.place(entry.relativePath)
+        guard !drives.folders.isEmpty || here != "This device" else { return nil }
+        var settings = [BCDGameSetting(id: "location", title: "Installed on", kind: .info, value: here)]
+        let mover = GameMover.shared
+        if mover.moving == entry.id {
+            settings.append(BCDGameSetting(id: "moving", title: "Moving", kind: .info, value: "\(Int(mover.progress * 100))%",
+                                           note: "Keep BCD open and the drive connected until it finishes."))
+        } else {
+            let installed = steam ? SteamGamesModel.shared.games.first { $0.id == entry.steamAppID } : nil
+            let targets: [(name: String, value: String)] = steam ? drives.steamTargets.map { ($0.name, $0.library) }
+                : drives.gameTargets.map { ($0.name, $0.root) }
+            let locked: String? = mover.moving != nil ? "Another game is being moved."
+                : steam && installed == nil ? "Steam does not list this game as installed."
+                : steam && SteamOwnedLibrary.shared.downloads[entry.steamAppID ?? 0] != nil ? "Wait for the download to finish or stop it first."
+                : nil
+            for target in targets where target.name != here {
+                settings.append(BCDGameSetting(id: "moveto:" + target.value, title: "Move to \(target.name)", kind: .action,
+                                               note: target.name == "This device" ? "Copies the game to this device, checks the copy, then deletes it from the drive."
+                                                   : "Copies the game to \(target.name), checks the copy, then deletes it from \(here == "This device" ? "this device" : here).",
+                                               locked: locked,
+                                               question: BCDGameQuestion(title: "Move \(entry.title) to \(target.name)?",
+                                                                         message: "BCD copies the game, checks every file of the copy, then deletes the original. It can take a while: keep BCD open and the drive connected until it finishes. No game, download or cloud sync can run meanwhile.",
+                                                                         confirm: "Move", destructive: false)))
+            }
+        }
+        return BCDGameSettingGroup(id: "location", title: "Location", symbol: "externaldrive", settings: settings,
+                                   note: drives.folders.isEmpty ? nil : "Drives are added in Settings › Storage › External drives.",
+                                   headline: here)
+    }
+
     // MARK: Steam Cloud
 
     /// Steam Cloud's state for the game (SteamOwnedLibrary.cloud): where a sync stands, the saves
@@ -969,6 +1024,9 @@ import UniformTypeIdentifiers
         case BCDOpenGL.key:
             // OpenGL (docs/OPENGL.md): a plain line in the game's own file, like the Direct3D choices above.
             setLine(game, setting, value)
+        case "vulkan":
+            // Windows Vulkan (docs/VULKAN.md): the switch is the line `vulkan = moltenvk` in the game's own file.
+            setLine(game, "vulkan", on ? "moltenvk" : "")
         case "framegen":
             if #available(iOS 26.0, *) {
                 setLine(game, "env.MADEIRA_FRAMEGEN", on ? "1" : "")
@@ -1056,6 +1114,16 @@ import UniformTypeIdentifiers
             guard !name.isEmpty else { return }
             change(game) { $0.title = name }
         case "storeart": change(game) { $0.coverFile = nil }
+        case let move where move.hasPrefix("moveto:"):
+            // Location › Move to (locationGroup): GameMover copies, checks, then deletes the original.
+            let target = String(move.dropFirst("moveto:".count))
+            guard let entry = entry(for: game), !target.isEmpty else { return }
+            let steam = entry.steamAppID != nil
+            Task { @MainActor [weak self] in
+                do { _ = try await GameMover.shared.move(entry, toSteamLibrary: steam ? target : nil, toRoot: steam ? nil : target) }
+                catch { LibraryModel.shared.error = error.localizedDescription }
+                self?.onChange?()
+            }
         default:
             break
         }
@@ -1359,10 +1427,17 @@ import UniformTypeIdentifiers
             storeCloudChanges,   // build 632: a sync of another store's cloud saves moved on
             BCDLiveStore.shared.itchDetailChanges,
             BCDLiveStore.shared.eaDetailChanges,
+            GameMover.shared.$moving.dropFirst().map { _ in () }.eraseToAnyPublisher(),   // Location › Move to
+            ExternalDrives.shared.$mounted.dropFirst().map { _ in () }.eraseToAnyPublisher(),
         ]
         Publishers.MergeMany(changes)
             .debounce(for: .milliseconds(250), scheduler: RunLoop.main)
             .sink { [weak self] in self?.onChange?() }
+            .store(in: &watching)
+        // A move's percentage, once a second (the debounce above would wait for the move to end).
+        GameMover.shared.$progress.dropFirst()
+            .throttle(for: .seconds(1), scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] _ in self?.onChange?() }
             .store(in: &watching)
         let notices: [AnyPublisher<Bool, Never>] = [
             library.$current.dropFirst().map { $0 != nil }.eraseToAnyPublisher(),

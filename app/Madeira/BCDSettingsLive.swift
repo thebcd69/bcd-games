@@ -505,56 +505,93 @@ struct BCDTouchEditorHost: View {
 // MARK: - Storage
 
 @MainActor final class BCDStorageLive: BCDStorageBackend {
-    // External SSD (thebcd69/bcd-games#12 by Pardoxum; ExternalGameStorage in StorageModel.swift). Nothing here touches
-    // the disk until the player taps one of its buttons; the folder work runs off the main thread.
+    // External drives (ExternalDrives.swift, from Madeira #464). Nothing here touches the disk on the main thread until the player
+    // taps one of its rows; the rows wait for a running game and a move, and removing a drive also for downloads, cloud syncs and
+    // Workshop jobs (ExternalDrives.remove).
     let supportsExternalGames = true
-    @Published private(set) var externalGamesMessage: String? = ExternalGameStorage.shared.message
-    @Published private(set) var externalGamesFree: Int64?
+    @Published private(set) var externalGamesMessage: String?
     @Published private var externalGamesBusy = false
     private var pickerOpenedAt: Date?
     private var pickerAnswered = false
 
-    var externalGamesSavedFolder: String? { ExternalGameStorage.shared.savedFolderName }
+    var externalDrives: [BCDExternalDrive] {
+        let drives = ExternalDrives.shared
+        return drives.folders.map { folder in
+            let connected = drives.mounted[folder.id] != nil   // opened this run; no disk read on the main thread
+            return BCDExternalDrive(id: folder.id.uuidString, letter: folder.letter.uppercased(), name: folder.name, connected: connected,
+                                    free: connected ? externalSpace[folder.id]?.free ?? nil : nil,
+                                    total: connected ? externalSpace[folder.id]?.total ?? nil : nil)
+        }
+    }
+    /// The drives' free and total room, measured off the main thread by refresh().
+    @Published private var externalSpace: [UUID: (free: Int64?, total: Int64?)] = [:]
+
+    var steamInstallDrive: String { ExternalDrives.shared.steamInstallFolder?.id.uuidString ?? "" }
     var prefixToolsView: AnyView? { AnyView(BCDPrefixToolsGroup(backend: BCDPrefixToolsLive.shared)) }   // round 604: BCDGameSetup/BCDPrefixToolsLive.swift
 
-    var canConnectExternalGames: Bool {
-        !externalGamesBusy && wine_process_is_running() == 0 && LibraryModel.shared.current == nil && !savesBusy && !addingGames && !model.busy
+    var canChangeExternalDrives: Bool {
+        // A download, a cloud sync or a Workshop job only keeps a drive from being removed (ExternalDrives.remove says so).
+        !externalGamesBusy && wine_process_is_running() == 0 && LibraryModel.shared.current == nil && GameMover.shared.moving == nil
+            && !savesBusy && !addingGames && !model.busy
     }
 
-    func connectExternalGames(_ url: URL) {
+    func addExternalDrive(_ url: URL) {
         guard beginExternalWork() else { return }
-        DispatchQueue.global(qos: .userInitiated).async {
-            let result = Swift.Result { try ExternalGameStorage.shared.connect(url) }
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                externalGamesBusy = false
-                switch result {
-                case .success: externalGamesMessage = ExternalGameStorage.shared.message
-                case .failure(let error):
-                    externalGamesMessage = error.localizedDescription
-                    LogStore.shared.log("[ext-storage] folder refused: \((error as NSError).domain) \((error as NSError).code)")
-                }
-                refresh()
-            }
+        let result = Swift.Result { try ExternalDrives.shared.add(url) }
+        externalGamesBusy = false
+        switch result {
+        case .success(let added):
+            externalGamesMessage = added.reopened ? "\(added.folder.name) is connected." : nil
+            SteamGamesModel.shared.refresh()
+            // Madeira offers the games already on a drive it adds; BCD adds them at once (Find games).
+            if !added.reopened { findGames(onDrive: added.folder.id.uuidString) }
+        case .failure(let error):
+            externalGamesMessage = error.localizedDescription
+            LogStore.shared.log("[external] folder refused: \((error as NSError).domain) \((error as NSError).code)")
+        }
+        refresh()
+    }
+
+    func reconnectExternalDrive(_ id: String, chooseAgain: @escaping () -> Void) {
+        guard let folder = folder(id), beginExternalWork() else { return }
+        ExternalDrives.shared.mountAll()
+        externalGamesBusy = false
+        if ExternalDrives.shared.mounted[folder.id] != nil {
+            externalGamesMessage = "\(folder.name) is connected."
+            SteamGamesModel.shared.refresh()
+        } else {
+            // iOS no longer opens the saved folder: the picker, to choose it again (ExternalDrives.add opens the same registration).
+            externalGamesMessage = "Choose \(folder.name) again in Files: the same folder, or the whole drive if you added the whole drive."
+            chooseAgain()
+        }
+        refresh()
+    }
+
+    func findGames(onDrive id: String) {
+        guard let folder = folder(id), beginExternalWork() else { return }
+        Task { [weak self] in
+            let added = await ExternalDrives.shared.addGames(on: folder)
+            self?.externalGamesBusy = false
+            self?.externalGamesMessage = added == 0 ? "No new games were found on \(folder.name). Steam games there are in your library already."
+                : "\(added) \(added == 1 ? "game" : "games") from \(folder.name) added to your library."
         }
     }
 
-    func reconnectExternalGames(chooseAgain: @escaping () -> Void) {
-        guard beginExternalWork() else { return }
-        DispatchQueue.global(qos: .userInitiated).async {
-            let outcome = ExternalGameStorage.shared.reconnect()
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                externalGamesBusy = false
-                externalGamesMessage = ExternalGameStorage.shared.message
-                refresh()
-                // The saved bookmark did not open (or none is saved): the picker, with the message above in the row.
-                switch outcome {
-                case .chooseAgain, .noSavedFolder: chooseAgain()
-                case .connected, .refused: break
-                }
-            }
-        }
+    func removeExternalDrive(_ id: String) {
+        guard let folder = folder(id), canChangeExternalDrives else { return }
+        ExternalDrives.shared.remove(folder.id)
+        externalGamesMessage = ExternalDrives.shared.folders.contains { $0.id == folder.id }
+            ? "\(folder.name) was kept: a download, a cloud sync or a Workshop item is using storage. Try again when it has finished." : nil
+        refresh()
+    }
+
+    func setSteamInstallDrive(_ id: String) {
+        ExternalDrives.shared.setSteamInstalls(id.isEmpty ? nil : UUID(uuidString: id))
+        objectWillChange.send()
+    }
+
+    private func folder(_ id: String) -> ExternalFolder? {
+        ExternalDrives.shared.folders.first { $0.id.uuidString == id }
     }
 
     func noteExternalPicker(_ what: String) {
@@ -580,8 +617,8 @@ struct BCDTouchEditorHost: View {
     }
 
     private func beginExternalWork() -> Bool {
-        guard canConnectExternalGames else {
-            externalGamesMessage = "Quit the game and wait for storage tasks to finish before connecting a folder."
+        guard canChangeExternalDrives else {
+            externalGamesMessage = "Quit the game and wait for a move to finish before changing drives."
             return false
         }
         externalGamesBusy = true
@@ -600,6 +637,8 @@ struct BCDTouchEditorHost: View {
 
     init() {
         model.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        ExternalDrives.shared.objectWillChange.receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
 
     var items: [BCDStorageItem] {
@@ -614,10 +653,12 @@ struct BCDTouchEditorHost: View {
 
     func refresh() {
         model.refresh()
-        if ExternalGameStorage.shared.isConnected {
+        let open = ExternalDrives.shared.folders.compactMap { folder in ExternalDrives.shared.mounted[folder.id].map { (folder.id, $0) } }
+        if !open.isEmpty {
             DispatchQueue.global(qos: .utility).async {
-                let free = ExternalGameStorage.shared.freeBytes
-                DispatchQueue.main.async { [weak self] in self?.externalGamesFree = free }
+                var space: [UUID: (free: Int64?, total: Int64?)] = [:]
+                for (id, root) in open { space[id] = (root.freeSpace, root.volumeTotal) }
+                DispatchQueue.main.async { [weak self] in self?.externalSpace = space }
             }
         }
         let keys: Set<URLResourceKey> = [.volumeAvailableCapacityForImportantUsageKey, .volumeTotalCapacityKey]

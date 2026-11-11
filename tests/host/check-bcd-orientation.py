@@ -87,13 +87,21 @@ check("the delegate answers with the lock's `supported`, which is the declared s
       "BCDOrientationLock.shared.supported" in src and "choice.mask ?? bcdDeclaredOrientations" in src)
 check("Info.plist has no UIRequiresFullScreen and no iPad orientation key of its own (nothing is declared differently)",
       "UIRequiresFullScreen" not in plist and "UISupportedInterfaceOrientations~ipad" not in plist)
-check("apply() does nothing for the choice already in force",
-      "guard new != choice else { return }" in src)
-check("the lock reaches UIKit only when it turns on or off (the first call of apply with .free returns before any UIKit call)",
-      src.index("guard new != choice else { return }") < src.index("UIDevice.current") < src.index("requestGeometryUpdate"))
+check("apply() does nothing for the choice already in force, except that a lock in force looks at the scenes again (night round 2026-11-11, A5 S15)",
+      "guard new != choice else {" in src and 'if new.locked { reassert(reason: "start") }' in src)
+check("the lock reaches UIKit only when it turns on or off or looks again while locked (the first call of apply with .free returns before any UIKit call)",
+      src.index("guard new != choice else {") < src.index("UIDevice.current") < src.index("requestGeometryUpdate")
+      and "guard choice.locked, let mask = choice.mask else { return }" in src)
+check("A5 S15: a scene that already has an orientation the lock allows is left alone (only the log line); a scene that does not is asked again",
+      "guard !fits else { continue }" in src and "BCDOrientationRules.allows(mask: mask.rawValue, interfaceRaw: raw)" in src
+      and src.index("guard !fits else { continue }") < src.index("scene.requestGeometryUpdate", src.index("func reassert(")))
+check("A5 S15: the activation observer exists only while a lock is on (added when it turns on, removed when it ends)",
+      "if new.locked { watchActivation() } else { unwatchActivation() }" in src and "UIApplication.didBecomeActiveNotification" in src
+      and src.count("NotificationCenter.default.addObserver") == 1)
 check("the engine side does nothing when the choice is the device's and no lock is on",
       "guard chosen.locked || lock.choice.locked else { return }" in live and "guard lock.choice.locked else { return }" in live)
-check("the lock logs only when it changes", src.count("onLog?(") == 2 and "[orientation]" in src)
+check("the lock logs when it changes, and one `[orientation] check:` line per scene when a lock in force is looked at again (never without a lock)",
+      src.count("onLog?(") == 4 and "[orientation]" in src and "[orientation] check: lock=" in src)
 check("a lock that ends turns the interface to the way the device is held (UIKit leaves it where it is)",
       "device.orientation.interfaceMask" in src and "case .landscapeLeft: return .landscapeRight" in src)
 check("the two sides: camera on the left is the interface's landscapeRight, camera on the right its landscapeLeft (proved in the simulator)",

@@ -118,6 +118,16 @@ func sample() -> BCDSessionSummary {
               left20?.seconds == 20 && left20?.message.hasPrefix("BCD went to the background 20 seconds") == true
               && left90?.seconds == 90 && left90?.message.hasPrefix("BCD was closed while it was in the background and Hollow Knight was running after about 1 minute.") == true,
               "\(left20?.message ?? "nil") | \(left90?.message ?? "nil")")
+        // Night round 2026-11-11 (T2 S-BG1; Dying Light C1EWZY, WF4EHP, QKR2WP, J7AK88, T92QFA): a game that ran 90 s or more and was left says to stay in BCD.
+        let stay = " Stay in BCD while the game runs: iOS closes a large app that goes to the background."
+        check("a game that ran 90 s or more and went to the background: the words it had, then the advice; a game left earlier or in front gets none",
+              left90?.message.contains("closes a large app that goes to the background") == true
+              && left90?.message.contains("looks the same." + stay) == true
+              && BCDCrashOffer(title: "Dying Light", minutes: 18, background: true, seconds: 1100).message.contains("looks the same." + stay)
+              && BCDCrashOffer(title: "Dying Light", minutes: 18, background: false, seconds: 1100).message.contains("Stay in BCD while the game runs") == false
+              && left20?.message.contains("Stay in BCD while the game runs") == false
+              && BCDCrashOffer(title: "X", minutes: 0, background: true).message.contains("Stay in BCD while the game runs") == false,
+              left90?.message ?? "nil")
         check("an offer made without its seconds keeps the words it had",
               BCDCrashOffer(title: "X", minutes: 0, background: true).message.hasPrefix("BCD was closed while it was in the background and X was running."))
         check("the [session] line says why nothing is asked: a start left within 20 s, turned off, too old",
@@ -177,7 +187,23 @@ func sample() -> BCDSessionSummary {
         let long = BCDPrevTail.lines(Data((String(repeating: "x", count: 1000) + "\n").utf8), offset: 0)
         check("a line is cut to 400 characters", long.count == 1 && long[0].count == 400)
         check("an empty file gives nothing", BCDPrevTail.lines(Data(), offset: 0).isEmpty)
-        check("the read is the last 64 KB", BCDPrevTail.maxBytes == 65536 && BCDPrevTail.maxLines == 60)
+        check("the read is the last 256 KB (night round 2026-11-11, A1 S9), 60 lines at most", BCDPrevTail.maxBytes == 262144 && BCDPrevTail.maxLines == 60)
+        // Night round 2026-11-11 (A1 S9; 1WYNY2, 5WC97M, C2VRHJ, CT4ND5, TFTCJ5): the idle samples go, the real lines stay.
+        let real = ["wine: a real line 1", "err:module:load_dll one", "[srv-stuck] tid=0084 age=30590ms op=1", "[session] length=3s partial=1", "[thread-sample] ml876 modmap pid=0024 explorer.exe"]
+        let samples = (1...80).map { n -> String in
+            ["[xp] 12:34:02.\(n) +49.14 dt=257", "[xp-t] 12:34:03.017 m382270:0/10", "[xp-api] 12:34:02.703 x64->EC 0/s", "[thread-stacks] tid=0042 x",
+             "[thread-sample] tid=0042 pc=0x1", "[alert-ring] a", "[footprint] 100MB", "[sync-census] c", "[rip-profile] r", "[srv-doorbell] d", "[cb-sample] c",
+             "[vfree] v", "[valloc] v", "E 24 [TI-IC] t", "[fdtrace] f", "[srv-own] o", "[srv-kill] k", "[winios-tree] w"][n % 18]
+        }
+        let idle = BCDPrevTail.lines(Data((real + samples).joined(separator: "\n").utf8), offset: 0)
+        check("a tail of 80 samples after five real lines: the five real lines (the modmap and [srv-stuck] among them)", idle == real, "\(idle.count) lines, first \(idle.first ?? "")")
+        let mixed = BCDPrevTail.lines(Data(((1...70).map { "real \($0)" } + samples).joined(separator: "\n").utf8), offset: 0)
+        check("more than 60 real lines with samples after them: the last 60 real ones", mixed.count == 60 && mixed.first == "real 11" && mixed.last == "real 70", "\(mixed.first ?? "") .. \(mixed.last ?? "")")
+        let onlySamples = BCDPrevTail.lines(Data(samples.joined(separator: "\n").utf8), offset: 0)
+        check("a tail that is nothing but samples keeps them (60, as before)", onlySamples.count == 60 && onlySamples.last == samples.last, "\(onlySamples.count)")
+        check("a line that merely mentions a tag is not noise; the tag at its start is", !BCDPrevTail.isNoise("wine: see [xp] below") && BCDPrevTail.isNoise("[xp] 1")
+              && !BCDPrevTail.isNoise("[xpx] 1") && !BCDPrevTail.isNoise("[thread-sample] ml876 modmap pid=1") && BCDPrevTail.isNoise("[thread-sample] tid=1")
+              && !BCDPrevTail.isNoise("[waiters] w") && !BCDPrevTail.isNoise("[freeze] f"))
 
         print(failures == 0 ? "bcd_session_checks: PASS" : "bcd_session_checks: \(failures) FAILED")
         exit(failures == 0 ? 0 : 1)

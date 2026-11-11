@@ -107,6 +107,8 @@ static NTSTATUS NtUserBuildHwndList(uintptr_t desk, HWND hwnd, BOOL children,
     memcpy(out, found, n * sizeof(*out)); out[n] = DESKTOP; /* HWND_BOTTOM */
     return 0;
 }
+static int ios_display_follow_enabled(void) { return 0; }   /* sysparams_ios.c (T2 S-DL1): the key is off in these cases */
+static void ios_display_follow_window(HWND hwnd, UINT swp_flags, const RECT *visible) { (void)hwnd; (void)swp_flags; (void)visible; }
 static int winios_desktop_mode(void) { return desktop_mode; }
 static int winios_game_windows(void) { return game_windows; }
 static void capture(HWND hwnd, int x, int y, int w, int h, int visible,

@@ -78,8 +78,9 @@ carriers = {r["id"]: next((c for c in r["config"] if isinstance(c, dict) and "MA
 want = {"dark-souls-ptde": "directx", "saints-row-the-third": "directx", "sleeping-dogs-definitive-edition": "directx",
         "call-of-duty-black-ops": "directx", "fallout-new-vegas": "directx", "batman-arkham-city-goty": "directx,amd",
         "batman-arkham-asylum-goty": "directx", "mafia-2": "directx",   # round 630 (A2 S14)
-        "dont-starve-together": "directx", "the-witcher-enhanced-edition": "directx"}   # round 630 (A1 S9, O3 S6)
-check("exactly the ten rows carry it, from build 626", set(carriers) == set(want) and all(
+        "dont-starve-together": "directx", "the-witcher-enhanced-edition": "directx",   # round 630 (A1 S9, O3 S6)
+        "burnout-paradise": "directx"}   # night round 2026-11-11 (agent A2 S6, C3566G): the first start's DirectX setup exits -9
+check("exactly the eleven rows carry it, from build 626", set(carriers) == set(want) and all(
       carriers[k] == {"line": "env.MADEIRA_DOCK_INSTALL_SKIP = " + v, "minBuild": 626} for k, v in want.items()), carriers)
 # round 630 (agent A2 S14): env.MADEIRA_DOCK_DIRECTX_FIRST (off unless set) provides DirectX's setup at the first start too.
 check("DIRECTX_FIRST is read off by default and only widens the DirectX case to the first start",

@@ -2,7 +2,8 @@
  "dialogs": [],
  "end": {},
  "matched": [
-  "syscall-protection-fault-uncaught"
+  "syscall-protection-fault-uncaught",
+  "x86-bus-fault-diag"
  ],
  "next": [],
  "note": "EA app installer through the Wine desktop (build 592, iPhone18,2): the 32-bit installer probes the lowest, never-committed page of its own thread stack with ReadProcessMemory and expects it to fail; the protection fault arrived as SIGBUS, bus_handler did not hand it to NtReadVirtualMemory's __TRY, the exception was dispatched on the kernel stack and the installer process ended. Fixed in code in 593 (bus_handler returns to the __EXCEPT block); no setting changes it",

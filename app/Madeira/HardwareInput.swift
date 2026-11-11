@@ -1,5 +1,6 @@
 // Portions copyright 2026 alantangok and NevesHenry: code taken from https://github.com/willfaust/Madeira (pull request #413; commits abca30a, 91e1e57, 9806664 and facd2cc)
 // under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 import Foundation
 import QuartzCore
 import UIKit
@@ -1348,6 +1349,7 @@ final class HardwareInput: ObservableObject {
     /// and no sheet, alert, picker or menu controller is presented over any of
     /// the scene's windows.
     private func computeBaseFocus() -> Bool {
+        guard !LibraryModel.shared.desktopHome else { return false }
         guard appActive, UIApplication.shared.applicationState == .active else { return false }
         guard Self.focusEnabled else { return true }
         guard let v = MetalBackedView.keyboardTarget, let w = v.window,
@@ -1992,7 +1994,9 @@ final class HardwareInput: ObservableObject {
             minuteWarps += warps
             if let last = lastAbsolute {
                 let w = Double(max(Self.screenSize().w, 1))
-                let dx = Double(cursorState.x) - Double(last.x), dy = Double(cursorState.y) - Double(last.y)
+                var wx = cursorState.x, wy = cursorState.y
+                _ = winios_pointer_map_invert(&wx, &wy)   // build 646, [ptr-map]: in the picture's space, as lastAbsolute is
+                let dx = Double(wx) - Double(last.x), dy = Double(wy) - Double(last.y)
                 warpDistance = (dx * dx + dy * dy).squareRoot() / w
                 lastAbsolute = nil
                 updateTracking()
@@ -2030,13 +2034,19 @@ final class HardwareInput: ObservableObject {
         guard directCursorLive else { return }
         let shown = cursorState.shown != 0 || (touchCursorActive && cursorState.reports == 0)
         let visible = (mouseInUse || touchCursorActive) && mouseFocused && shown && !InputSettings.shared.relative
-        var pos = (x: cursorState.x, y: cursorState.y)
+        var pos = (x: cursorState.x, y: cursorState.y)   // screen pixels, where Windows has its cursor
         if let last = lastAbsolute {
-            pos = ScreenMap.clamp(x: last.x, y: last.y, clipLeft: cursorState.clip_left, top: cursorState.clip_top,
+            // madeira-bcd (build 646, [ptr-map]): lastAbsolute is in the picture's space; Wine clips in screen pixels. Unchanged
+            // (both calls do nothing) unless a windowed game's picture fills the view (Winios.h, winios_pointer_map_apply).
+            var sx = last.x, sy = last.y
+            _ = winios_pointer_map_apply(&sx, &sy)
+            pos = ScreenMap.clamp(x: sx, y: sy, clipLeft: cursorState.clip_left, top: cursorState.clip_top,
                                   right: cursorState.clip_right, bottom: cursorState.clip_bottom)
         }
+        var px = pos.x, py = pos.y
+        _ = winios_pointer_map_invert(&px, &py)   // build 646: back to the picture's space, where the overlay draws
         let g = Self.screenSize()
-        DirectCursorOverlay.shared.render(visible: visible, x: pos.x, y: pos.y, guestW: g.w, guestH: g.h)
+        DirectCursorOverlay.shared.render(visible: visible, x: px, y: py, guestW: g.w, guestH: g.h)
     }
 
     private func updateAutoLock() {

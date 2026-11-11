@@ -109,6 +109,8 @@ static void ios_ajan2_fault_diag( const arm_thread_state64_t *st, uintptr_t teb,
 { printf( "entry-fail exc=%d fa=%lx\n", exc, (unsigned long)fa ); }
 void ios_noexec_who( uint64_t addr, uint64_t guest_rip, unsigned int tid )
 { printf( "who addr=%llx rip=%llx tid=%04x\n", (unsigned long long)addr, (unsigned long long)guest_rip, tid ); }
+/* night round 2026-11-11 (G2 S10): the note also prints the three views of the RIP's JIT page; tests/host/check-w-sig-diagnostics.py runs that function */
+static void ios_noexec_alias_views( uint64_t addr ) { (void)addr; }
 @NOTE@
 static void deliver( uintptr_t teb, uint64_t rip, uint64_t pc, uint64_t frame )
 {

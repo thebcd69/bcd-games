@@ -79,6 +79,7 @@ struct BCDDockLiveSection: View {
         let parts = SteamRuntimeFiles.packages.count
         var components = BCDDockComponents()
         components.installed = dock.clientInstalled
+        components.unsupportedBuild = dock.clientUnsupportedBuild
         components.downloadBytes = Int64(SteamRuntimeFiles.packages.reduce(0) { $0 + $1.bytes })
         components.working = dock.preparing
         components.error = dock.error
@@ -133,6 +134,7 @@ struct BCDDockLiveSection: View {
     }
 
     func downloadComponents() { MadeiraDockModel.shared.prepareClient() }
+    func replaceComponents() { MadeiraDockModel.shared.prepareClient(replacing: true) }
 
     /// As the old Dock sheet started a game: the interface's start with the pool choice.
     func start(_ appID: Int) {

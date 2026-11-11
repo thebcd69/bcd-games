@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -300,7 +303,10 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                 }
             }
             if BCDFoldableDevice.isThisDevice {   // madeira-bcd foldable (experimental, BCDFoldable.swift): the foldable iPhone's Settings only; every other device's Graphics page is unchanged
-                BCDSettingsGroup(title: "Foldable iPhone") { BCDFoldableSettingsRow() }
+                BCDSettingsGroup(title: "Foldable iPhone") {
+                    BCDDuoEnhancementsSettingsRow()
+                    BCDFoldableSettingsRow()
+                }
             }
             if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
             // OpenGL is a game's choice (its page, Options, Direct3D): this says so, once, where graphics are chosen for every game.
@@ -554,8 +560,8 @@ struct BCDControlsSettings<Backend: BCDControlsBackend>: View {
     /// Settings' own words for the engine's controller choices, by value (the engine's label
     /// stays for a value Settings does not know).
     private static var apiWords: [String: String] {
-        ["": "Xbox controller (standard)", "hid": "HID: DualSense or plain pad", "dualsense": "Always a DualSense",
-         "generic": "Always a plain gamepad"]
+        ["": "Xbox controller (standard)", "xbox360": "Xbox 360, also as a device", "hid": "HID: DualSense or plain pad",
+         "dualsense": "Always a DualSense", "generic": "Always a plain gamepad"]
     }
     private static var outputWords: [String: String] {
         ["": "All of it (standard)", "hid": "DualSense effects only", "xinput": "Rumble only", "0": "Nothing"]
@@ -674,31 +680,51 @@ struct BCDStorageItem: Identifiable, Hashable {
     var addingGames: Bool { get }
     var addGamesMessage: String? { get }
     func addEveryGame()
-    /// Games kept on an SSD (USB-C): the folder chosen in Files appears as C:\External. Only the live backend has it.
+    /// External drives (USB-C SSDs and drives; ExternalDrives.swift, from Madeira #464): each folder chosen in Files is a drive
+    /// letter and C:\External\<name>. Only the live backend has them.
     var supportsExternalGames: Bool { get }
+    var externalDrives: [BCDExternalDrive] { get }
+    /// What the last drive action said (a refusal, how many games were added); nil: nothing to say.
     var externalGamesMessage: String? { get }
-    var externalGamesFree: Int64? { get }
-    /// The name of the folder chosen last, once one was (the Reconnect button); nil before.
-    var externalGamesSavedFolder: String? { get }
-    var canConnectExternalGames: Bool { get }
-    func connectExternalGames(_ url: URL)
-    /// The saved folder again, without the picker. `chooseAgain` runs when iOS no longer lets BCD open it.
-    func reconnectExternalGames(chooseAgain: @escaping () -> Void)
+    /// No game runs and no game is being moved: drives can be added, reopened and removed (a removal also waits for downloads).
+    var canChangeExternalDrives: Bool { get }
+    /// The drive Steam installs go to by default (its id), or "" for this device.
+    var steamInstallDrive: String { get }
+    func addExternalDrive(_ url: URL)
+    /// Opens a drive again without the picker; `chooseAgain` runs when iOS no longer opens it (the picker, to pick it again).
+    func reconnectExternalDrive(_ id: String, chooseAgain: @escaping () -> Void)
+    func findGames(onDrive id: String)
+    func removeExternalDrive(_ id: String)
+    func setSteamInstallDrive(_ id: String)
     /// What the folder picker did ("opened", "answered", "failed: ...", "closed"), for the log.
     func noteExternalPicker(_ what: String)
     var prefixToolsView: AnyView? { get }
+}
+
+/// One external drive of Settings › Storage › External drives.
+struct BCDExternalDrive: Identifiable, Hashable {
+    var id: String
+    /// Its Windows drive letter, upper case ("E").
+    var letter: String
+    var name: String
+    var connected: Bool
+    var free: Int64?
+    var total: Int64?
 }
 
 extension BCDStorageBackend {
     /// Round 604: copies, export, import and a fresh registry for the Windows prefix (BCDPrefixTools.swift); nil: the group is left out.
     var prefixToolsView: AnyView? { nil }
     var supportsExternalGames: Bool { false }
+    var externalDrives: [BCDExternalDrive] { [] }
     var externalGamesMessage: String? { nil }
-    var externalGamesFree: Int64? { nil }
-    var externalGamesSavedFolder: String? { nil }
-    var canConnectExternalGames: Bool { false }
-    func connectExternalGames(_ url: URL) {}
-    func reconnectExternalGames(chooseAgain: @escaping () -> Void) {}
+    var canChangeExternalDrives: Bool { false }
+    var steamInstallDrive: String { "" }
+    func addExternalDrive(_ url: URL) {}
+    func reconnectExternalDrive(_ id: String, chooseAgain: @escaping () -> Void) {}
+    func findGames(onDrive id: String) {}
+    func removeExternalDrive(_ id: String) {}
+    func setSteamInstallDrive(_ id: String) {}
     func noteExternalPicker(_ what: String) {}
 }
 
@@ -776,44 +802,81 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
         .bcdCard(padding: 16)
     }
 
-    /// Settings > Storage > External SSD (thebcd69/bcd-games#12 by Pardoxum, with Reconnect). The folder picker is attached
-    /// here, on the group, not on the page: the page already carries the saves backup's importer, and two importers
-    /// on one view can displace each other.
+    /// Settings › Storage › External drives (from Madeira #464, Settings › External drives): every drive or folder added from
+    /// Files, its letter, whether it is connected and its free room; a tap offers Find games, Reconnect and Remove; Steam
+    /// installs picks where a Steam game's Install goes by default. The folder picker is attached here, on the group, not on the
+    /// page: the page already carries the saves backup's importer, and two importers on one view can displace each other.
     private var externalGames: some View {
-        let saved = backend.externalGamesSavedFolder
-        return BCDSettingsGroup(title: "External SSD",
-                                footer: "Connect a USB-C SSD and choose its games folder in Files. Open Add a game → External to add its programs. Windows and existing saves stay on this device. Store downloads still install on this device. After you unplug the SSD or restart the phone, tap Reconnect; if iOS has forgotten the folder, BCD opens Files for you to choose it again. Quit games before changing the connection, and keep the SSD connected while playing.") {
-            if let saved {
-                BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "external-reconnect"),
-                                     title: "Reconnect \(saved)", note: backend.externalGamesMessage,
-                                     symbol: "externaldrive.badge.checkmark", enabled: backend.canConnectExternalGames) {
-                    backend.reconnectExternalGames {
-                        backend.noteExternalPicker("opened (after reconnect)")
-                        choosingExternalGames = true
-                    }
-                }
-            }
-            BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "external-games"),
-                                 title: saved == nil ? "Choose an SSD folder" : "Choose another SSD folder",
-                                 note: saved == nil ? backend.externalGamesMessage : nil, symbol: "externaldrive",
-                                 enabled: backend.canConnectExternalGames) {
+        let drives = backend.externalDrives
+        return BCDSettingsGroup(title: "External drives",
+                                footer: "Choose a folder on a USB-C SSD or drive in Files, or the whole drive. Windows sees it as its own drive letter and as C:\\External\\<name>. Steam libraries on it (steamapps or SteamLibrary) appear in your library and start through BCD Dock; Find games adds its other games. A Steam game's page can install it on the drive (in <name>\\SteamLibrary), and Options › Location moves a game between this device and a drive. Use an exFAT or APFS drive; NTFS is read-only on iPhone and iPad. Keep the drive connected while playing. After you plug it in again BCD opens it by itself; if it does not, tap the drive and choose Reconnect.") {
+            ForEach(drives) { drive in driveRow(drive) }
+            BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "external-add"),
+                                 title: drives.isEmpty ? "Add a drive or folder" : "Add another drive or folder",
+                                 note: drives.isEmpty ? backend.externalGamesMessage : nil, symbol: "externaldrive.badge.plus",
+                                 enabled: backend.canChangeExternalDrives) {
                 backend.noteExternalPicker("opened")
                 choosingExternalGames = true
             }
-            if let free = backend.externalGamesFree {
-                BCDSettingsInfoRow(title: "Free on external drive", value: BCDFormat.bytes(free))
+            if !drives.isEmpty {
+                BCDSettingsValueRow(id: BCDSettingsID.control(.storage, "external-steam"), title: "Steam installs",
+                                    note: "Where a Steam game's Install goes first; the other place is the choice beside it.",
+                                    choices: [BCDSettingsChoice(value: "", label: "This device")]
+                                        + drives.map { BCDSettingsChoice(value: $0.id, label: $0.name) },
+                                    value: backend.steamInstallDrive, enabled: backend.canChangeExternalDrives) {
+                    backend.setSteamInstallDrive($0)
+                }
+                if let message = backend.externalGamesMessage {
+                    BCDSettingsInfoRow(title: message, value: "")
+                }
             }
         }
         .fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder]) { result in
             switch result {
             case .success(let url):
                 backend.noteExternalPicker("answered")
-                backend.connectExternalGames(url)
+                backend.addExternalDrive(url)
             case .failure(let error):
                 backend.noteExternalPicker("failed: \(error.localizedDescription)")
             }
         }
         .onChange(of: choosingExternalGames) { _, open in if !open { backend.noteExternalPicker("closed") } }
+    }
+
+    private func driveRow(_ drive: BCDExternalDrive) -> some View {
+        var note = drive.connected ? "Connected" : "Not connected"
+        if drive.connected, let free = drive.free {
+            note += " · \(BCDFormat.bytes(free)) free" + (drive.total.map { " of \(BCDFormat.bytes($0))" } ?? "")
+        }
+        return BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "external-drive.\(drive.id)"),
+                                    title: "\(drive.letter): \(drive.name)", note: note,
+                                    symbol: drive.connected ? "externaldrive.fill.badge.checkmark" : "externaldrive.badge.xmark",
+                                    enabled: backend.canChangeExternalDrives) {
+            var choices: [BCDSettingsConfirm.Choice] = []
+            if drive.connected {
+                choices.append(.init(title: "Find games") { backend.findGames(onDrive: drive.id) })
+            } else {
+                choices.append(.init(title: "Reconnect") {
+                    backend.reconnectExternalDrive(drive.id) {
+                        backend.noteExternalPicker("opened (after reconnect)")
+                        choosingExternalGames = true
+                    }
+                })
+            }
+            choices.append(.init(title: "Remove", destructive: true) {
+                // A second question, after the first has closed and given the focus back to the drive's row.
+                DispatchQueue.main.async {
+                    model.ask(BCDSettingsConfirm(title: "Remove \(drive.name)?",
+                                                 message: "BCD forgets this drive and removes its games from the library. The files on the drive are kept.",
+                                                 choices: [.init(title: "Remove", destructive: true) { backend.removeExternalDrive(drive.id) }]))
+                }
+            })
+            model.ask(BCDSettingsConfirm(title: "\(drive.letter): \(drive.name)",
+                                         message: drive.connected
+                                            ? "Find games adds the games on it to your library (its Steam libraries are already there)."
+                                            : "Plug the drive in, then tap Reconnect. If iOS no longer opens it, Files opens: choose the same folder again, and its games stay in your library.",
+                                         choices: choices))
+        }
     }
 
     private var games: [BCDGame] {

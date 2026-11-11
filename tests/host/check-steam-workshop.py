@@ -186,7 +186,8 @@ else:
         shutil.copy(R / "tests/host/steam_workshop_files_checks.swift", t / "checks.swift")
         build = subprocess.run(swiftc + ["-sanitize=address", "-o", str(t / "check"), str(t / "checks.swift"), str(SHOP / "SteamWorkshopFiles.swift"),
                                          str(APP / "SwiftSteam/Proto/SteamProtoMessages.swift"), str(APP / "SwiftSteam/Core/SteamError.swift"),
-                                         str(APP / "SteamKeyValues.swift"), str(APP / "SteamInstall.swift")], capture_output=True, text=True)
+                                         str(APP / "SteamKeyValues.swift"), str(APP / "SteamInstall.swift"), str(APP / "ExternalStorage.swift")],
+                               capture_output=True, text=True)
         check("SteamWorkshopFiles.swift compiles on the host with the protobuf helpers", build.returncode == 0, (build.stderr or build.stdout)[-3000:])
         if build.returncode == 0:
             run = subprocess.run([str(t / "check")], env=dict(os.environ, ASAN_OPTIONS="detect_leaks=0"), capture_output=True, text=True, timeout=300)

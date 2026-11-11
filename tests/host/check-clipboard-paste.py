@@ -69,6 +69,7 @@ c = r'''
 #include <stddef.h>
 #define INPUT_KEYBOARD 1
 #define KEYEVENTF_KEYUP 0x0002
+#define MOUSEEVENTF_ABSOLUTE 0x8000   /* build 646: winios_q_push_ev maps absolute mouse events ([ptr-map]) */
 #define KEYEVENTF_UNICODE 4
 #define VK_SHIFT 0x10
 #define VK_CAPITAL 0x14
@@ -163,7 +164,9 @@ with tempfile.TemporaryDirectory(prefix='madeira-paste-') as temp:
     subprocess.run([os.environ.get('SWIFTC', 'swiftc'), str(temp/'main.swift'), '-o', str(temp/'swift-test')], check=True)
     subprocess.run([str(temp/'swift-test')], check=True)
     (temp/'test.c').write_text(c)
-    subprocess.run([os.environ.get('CC', 'cc'), '-std=c11', '-pthread', str(temp/'test.c'), '-o', str(temp/'c-test')], check=True)
+    # build 646: the queue's mouse events pass the pointer map (winios_ptr_map.h, beside Winios.m)
+    subprocess.run([os.environ.get('CC', 'cc'), '-std=c11', '-pthread', '-I', str(root / 'app/Madeira/Winios'), str(temp/'test.c'), '-o', str(temp/'c-test')],
+                   check=True)
     subprocess.run([str(temp/'c-test')], check=True)
 
 # Modified by BCD (2026-10-25): what BCD changed in the port. The key bar's Paste button is always there; Command-V is opt-in

@@ -2,6 +2,7 @@
 // Copyright 2026 125hz
 // Copyright 2026 thebcd69 (BCD)
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // Derived from Onboarding.swift (125hz) by BCD (thebcd69), 2026-10-18: the same setup steps with BCD's
 // own look and wording. Not BCD Material: LICENSE-BCD.md's terms cover files BCD wrote from scratch.
 
@@ -164,7 +165,7 @@ struct OnboardingView: View {
                     Image(systemName: "checkmark").font(.system(size: 12, weight: .heavy)).foregroundStyle(BCDStyle.mint)
                 } else {
                     Circle().fill(BCDStyle.glow)
-                    Text("\(number)").font(.system(size: 13, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                    Text("\(number)").font(.system(size: 13, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
                 }
             }
             .frame(width: 26, height: 26).alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 5 }
@@ -181,7 +182,12 @@ struct OnboardingView: View {
     private var welcome: some View {
         VStack(alignment: .leading, spacing: 22) {
             BCDLogoMark(size: 84)
-            if model.since > 0 {
+            if !OnboardingModel.debuggable {
+                // Night round 2026-11-11 (A1 S8): a copy signed without get-task-allow can never turn JIT on; none of the setup pages could help it.
+                Text("This copy can't run games yet").font(BCDStyle.title(34)).accessibilityAddTraits(.isHeader)
+                Text(SigningStatus.notDebuggableMessage).font(BCDStyle.body(17)).fixedSize(horizontal: false, vertical: true)
+                primary("OK", symbol: "checkmark") { model.finish() }.padding(.top, 6)
+            } else if model.since > 0 {
                 // After an update: only the pages added since this device last ran setup.
                 Text("Something new to set up").font(BCDStyle.title(34)).accessibilityAddTraits(.isHeader)
                 Text("BCD gained a few things since your last setup:").font(BCDStyle.body(18)).foregroundStyle(BCDStyle.textSoft)
@@ -191,20 +197,22 @@ struct OnboardingView: View {
                 Text("Here is what we'll set up. Every step is optional, and you can come back to any of them later.")
                     .font(BCDStyle.body(15)).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true)
             }
-            let pages = model.steps
-            let offered: [LocalizedStringKey] =
-                (pages.contains(.localDevVPN) ? ["Get LocalDevVPN, the free app BCD uses to turn on JIT"] : [])
-                + (pages.contains(.jit) ? ["Pick how this device turns on JIT"] : [])
-                + (pages.contains(.signIn) ? ["Connect your Steam account"] : [])
-                + (pages.contains(.dockClient) ? ["Fetch the Steam client files that BCD Dock needs"] : [])
-                + (pages.contains(.wineMono) ? ["Add Wine Mono for games made with .NET"] : [])
-                + (pages.contains(.vcRuntime) ? ["Get Microsoft's Visual C++ runtime, which most games need"] : [])
-            VStack(alignment: .leading, spacing: 14) {
-                ForEach(offered.indices, id: \.self) { index in point(index + 1, offered[index]) }
+            if OnboardingModel.debuggable {
+                let pages = model.steps
+                let offered: [LocalizedStringKey] =
+                    (pages.contains(.localDevVPN) ? ["Get LocalDevVPN, the free app BCD uses to turn on JIT"] : [])
+                    + (pages.contains(.jit) ? ["Pick how this device turns on JIT"] : [])
+                    + (pages.contains(.signIn) ? ["Connect your Steam account"] : [])
+                    + (pages.contains(.dockClient) ? ["Fetch the Steam client files that BCD Dock needs"] : [])
+                    + (pages.contains(.wineMono) ? ["Add Wine Mono for games made with .NET"] : [])
+                    + (pages.contains(.vcRuntime) ? ["Get Microsoft's Visual C++ runtime, which most games need"] : [])
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(offered.indices, id: \.self) { index in point(index + 1, offered[index]) }
+                }
+                .bcdCard(padding: 18)
+                primary("Let's go", symbol: "arrow.right") { model.next() }.padding(.top, 6)
+                secondary("Skip for now") { model.skip() }
             }
-            .bcdCard(padding: 18)
-            primary("Let's go", symbol: "arrow.right") { model.next() }.padding(.top, 6)
-            secondary("Skip for now") { model.skip() }
         }
     }
 

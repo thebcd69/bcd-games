@@ -1,4 +1,6 @@
 #!/bin/bash
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # Build the ARM64EC FEX module (libarm64ecfex.dll) from the FEX submodule with
 # tools/patch-fex-ios-mapview-selfshared.py and tools/patch-fex-ios-avx.py
 # applied, and ship it as xtajit64.dll (and a copy as xtajit64-avx.dll, which
@@ -231,8 +233,27 @@ python3 "$R/tools/patch-fex-ios-alias-capacity.py" "$R/FEX"
 # Opt-in, whichever pin (round 631; round 630 agent R S8: GTA V Legacy J5DGX2, BGGECJ, SXEV6S, the FEX arena full of 8 MiB call-ret
 # regions nothing touches since the stack is elided): MADEIRA_FEX_CALLRET_RESERVE_KB sizes each thread's region (unset keeps 8 MiB).
 python3 "$R/tools/patch-fex-ios-callret-small.py" "$R/FEX"
+# Whichever pin: a guest atomic whose operand crosses a 16-byte boundary is done inline under a lock instead of trapping into
+# BCD's exception thread (Far Cry 4's FC64.dll: about 450,000 per start); only with MADEIRA_FEX_SPLIT_LOCK=1 (default off).
+python3 "$R/tools/patch-fex-ios-split-lock.py" "$R/FEX" || echo "::warning::the split-lock fast path was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (night round 2026-11-11, R1 S3 / X1 S1c; Epic GTA V Enhanced QG7MT4, KT9K9S, SCHZWC, DABCAC, The Escapists 4TXJW2, Psych Engine 3012R0):
+# a native ARM64 program of an ARM64EC session (services.exe, cmd.exe) has no CPU area; the emulator's hooks no longer read the thread state through it.
+python3 "$R/tools/patch-fex-ios-notify-nocpuarea.py" "$R/FEX" || echo "::warning::the no-CPU-area guards were not applied (FEX anchor changed); xtajit64.dll is built without them"
+# Whichever pin (night round 2026-11-11, X1 S3; TSGVTP, 06A8JF, 66HYF7, BS6583, JCW9Q0, Z40K5X, QTDFHP, RBCWQH, A3ZNFE): after NtTerminateProcess(0) the memory hooks no
+# longer use the emulator's tracker (its context object was already gone in 3 % of the exits: a fault at 0xf0 that turned a normal quit into a crash).
+python3 "$R/tools/patch-fex-ios-process-term.py" "$R/FEX" || echo "::warning::the process-terminating gate was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (night round 2026-11-11, X1 S5; Splinter Cell Conviction 2QWXFW): ThreadTerm clears the CPU area's thread-state slots once the state is destroyed (an exception on the
+# exiting thread read the freed state through the stale slot)
+python3 "$R/tools/patch-fex-ios-threadterm-clear-area.py" "$R/FEX" || echo "::warning::the ThreadTerm slot clearing was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (night round 2026-11-11, X1 S6; GTA V Legacy's child GTA5.exe ZDWTFF): AllocWatch::Clear returns at once when nothing is watched (its implicit TLS read faulted on a thread without a TLS pointer)
+python3 "$R/tools/patch-fex-ios-allocwatch-clear.py" "$R/FEX" || echo "::warning::the AllocWatch::Clear early return was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (night round 2026-11-11, X1 S2; GTA V Enhanced 8HCFEP, Arctic Drive KNQGPQ, NTE EQWQ67, Dominus Gladiatus Q7XZ5F, RDR2 N1MBVQ): a pooled IR / decoder / JIT-temp
+# buffer that cannot be allocated (the FEX address band is full) is reclaimed from idle buffers and retried, then refused, instead of being handed out as NULL.
+python3 "$R/tools/patch-fex-ios-pool-alloc-null.py" "$R/FEX" || echo "::warning::the pooled-buffer NULL guard was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Whichever pin (night round 2026-11-11, G2 S9; Blur 43HNJX): REPNE/REP-prefixed BSF/BSR/BTC/MOVSX/CMOVcc decode like the unprefixed forms (a protector's junk prefix was "invalid instruction")
+python3 "$R/tools/patch-fex-ios-repne-bit-ops.py" "$R/FEX" || echo "::warning::the REP/REPNE bit-op decode entries were not applied (FEX anchor changed); xtajit64.dll is built without them"
 build
-git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp
+git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp FEXCore/Source/Interface/Core/JIT/AtomicOps.cpp FEXCore/include/FEXCore/Utils/ThreadPoolAllocator.h FEXCore/Source/Interface/IR/IntrusiveIRList.h FEXCore/Source/Interface/IR/IREmitter.h FEXCore/Source/Interface/Core/OpcodeDispatcher.h FEXCore/Source/Interface/Core/OpcodeDispatcher.cpp FEXCore/Source/Interface/Core/Frontend.h FEXCore/Source/Interface/Core/Frontend.cpp FEXCore/Source/Interface/Core/X86Tables/SecondaryTables.cpp FEXCore/Source/Utils/AllocWatch.cpp
 git -C FEX/External/rpmalloc checkout -- rpmalloc/rpmalloc.c
 cp "$B/Bin/libarm64ecfex.dll" "$SHIP"
 cp "$B/Bin/libarm64ecfex.dll" "$AVX"

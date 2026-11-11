@@ -113,11 +113,19 @@ done
 #   tools/patch-dxmt-srv-getdesc-mips.py      Dark Souls III (an SRV's GetDesc reports the real mip count, [srv-getdesc]; round 624)
 #   tools/patch-dxmt-d11-query-stuck.py       WRC 9 ([query-stuck], DXMT_QUERY_TS_WATCHDOG; round 624: build 624's first IPA lacked it here)
 #   tools/patch-dxmt-tess-pso-failed.py       Batman: Arkham City (a mesh pipeline that did not compile: its draws dropped, [mesh-skip] ml870; round 626)
+#   tools/patch-dxmt-update-subresource-staging.py  FIFA 23 (UpdateSubresource on a STAGING buffer is dropped, [update-subresource-staging]; night round 2026-11-11)
+#   tools/patch-dxmt-d11-swapchain-rotation.py      The Battle for Wesnoth / SDL2 (IDXGISwapChain1::SetRotation/GetRotation answer the identity rotation, [swapchain-rotation])
+#   tools/patch-dxmt-texture-limit.py         The Witness, Tomb Raider, Transformers, Danganronpa (a texture over Direct3D 11's limits gets E_INVALIDARG, [dxmt-tex-limit])
+#   tools/patch-dxmt-view-private-ref.py      Hatred (opt-in, env.MADEIRA_VIEW_PRIVATE_REF = 1: a view holds its resource with a private reference, [view-ref])
 BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skipped #"
              "patch-dxmt-buffer-rtv.py" "[rtv-fail] #"
              "patch-dxmt-srv-getdesc-mips.py" "[srv-getdesc] madeira-bcd #"
              "patch-dxmt-d11-query-stuck.py" "[query-stuck] madeira-bcd query="
-             "patch-dxmt-tess-pso-failed.py" "[mesh-skip] ml870 ")
+             "patch-dxmt-tess-pso-failed.py" "[mesh-skip] ml870 "
+             "patch-dxmt-update-subresource-staging.py" "[update-subresource-staging] skipped #"
+             "patch-dxmt-d11-swapchain-rotation.py" "[swapchain-rotation] madeira-bcd: SetRotation("
+             "patch-dxmt-texture-limit.py" "[dxmt-tex-limit] CreateTexture2D refused "
+             "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #")
 SHIP_HAS_BCD=1
 for ((i = 1; i < ${#BCD_PATCHES[@]}; i += 2)); do
     LC_ALL=C grep -aqF "${BCD_PATCHES[$i]}" "$SHIP/d3d11.dll" || SHIP_HAS_BCD=0

@@ -90,7 +90,7 @@ rules = (root / 'build/tools/autotune_rules.py').read_text()
 r = rules[rules.index('"id": "fex-runtime-fault"'):]
 r = r[:r.index('\n    },\n')]
 check('auto-tune\'s fex-runtime-fault leaves the 624-625 teardown fault to the session\'s own verdict',
-      '"none": [s("[fex-fault] pc=libarm64ecfex.dll+0x1123c4")]' in r, r[:600])
+      '"none": [s("[fex-fault] pc=libarm64ecfex.dll+0x1123c4")' in r, r[:600])
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'python3 tests/host/check-fex-ec-teardown-ctx.py' in wf)
 print('PASS: FEX torn-down context' if ok else 'FAILED: FEX torn-down context')

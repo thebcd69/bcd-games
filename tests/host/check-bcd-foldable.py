@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Experimental support for the foldable iPhone, iPhone Duo (BCDFoldable.swift, BCDFoldableLive.swift, BCDFoldableSettings.swift).
 
 Owner's rule (2026-10-25): nothing that works today may change. Every new behaviour runs only on the foldable model (its
@@ -80,21 +81,34 @@ for path in sorted(APP.rglob("*")):
     if path.suffix not in (".swift", ".m", ".mm", ".c", ".h") or path.name in ("BCDFoldable.swift", "BCDFoldableLive.swift", "BCDFoldableSettings.swift", "BCDFoldableUI.swift"):
         continue
     for n, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
-        if names.search(line):
+        if names.search(line) and not line.strip().startswith("//"):   # code lines only: comments may name it
             where.setdefault(path.name, []).append(line.strip())
-check("only three files outside the new ones mention it: ContentView (two lines), GuestDisplay and BCDSettingsSections, one hook each",
-      {k: len(v) for k, v in where.items()} == {"ContentView.swift": 2, "GuestDisplay.swift": 1, "BCDSettingsSections.swift": 2}, where)
+check("only three files outside the new ones mention it: ContentView (the two hooks and the two gates of the tabletop pose), GuestDisplay and BCDSettingsSections, one hook each",
+      {k: len(v) for k, v in where.items()} == {"ContentView.swift": 4, "GuestDisplay.swift": 1, "BCDSettingsSections.swift": 2}, where)
 content = (APP / "ContentView.swift").read_text()
 check("the game view's hook tests the gate first and sits at the end of the layout pass's window branch",
       re.search(r"winios_set_compositor_frame\(full\.minX, full\.minY, full\.width, full\.height\)\n"
                 r"            if BCDFoldable\.active \{ BCDFoldableLive\.layoutPass\(self, in: w\) \}", content) is not None
       and content.count("BCDFoldableLive.layoutPass") == 1)
-check("... and the rest of that layout pass is as it was",
-      "    override func layoutSubviews() {\n        super.layoutSubviews()\n        if let w = window {\n            applyDisplayMode(reason: \"layout\")\n"
-      "            let full = convert(bounds, to: w)\n" in content)
-check("the root hook is one modifier on the root Group, before the navigation title; the lines around it are as they were",
-      re.search(r"startDock: \{ startDock\(\$0, compactPool: \$1\) \}\)\n                \}\n            \}\n            \.modifier\(BCDFoldableWatch\(\)\)[^\n]*\n            \.navigationTitle\(\"BCD\"\)", content) is not None
-      and content.count("BCDFoldableWatch()") == 1)
+check("... and the rest of that layout pass is as it was, but for the tabletop pose (the fold read first, the compositor frame from the game's region)",
+      "    override func layoutSubviews() {\n        super.layoutSubviews()\n        if let w = window {\n            FoldTabletop.shared.update()\n            applyDisplayMode(reason: \"layout\")\n"
+      "            let full = convert(surfaceArea, to: w)\n" in content)
+# the tabletop pose (iPhone Duo; thebcd69/bcd-games#31): gated like the rest, the hinge API only where the SDK has it
+fold_class = content[content.index("@MainActor final class FoldTabletop"):content.index("// SwiftUI-hosted placeholder: geometry + touch input only.")]
+outside = re.sub(r"#if BCD_SDK_IOS27_1.*?#endif", "", fold_class, flags=re.S)
+check("the tabletop pose reads the fold only behind the gate (model and experimental switch) and only where the SDK has the hinge API",
+      fold_class.count("guard BCDFoldable.active else { return }") == 2
+      and fold_class.count("#if BCD_SDK_IOS27_1") == 2 and fold_class.count("#endif") == 2
+      and "UIHingeInteraction" in fold_class and "reservedRegions" in fold_class
+      and "UIHingeInteraction" not in outside and "reservedRegions" not in outside
+      and fold_class.count("@available(iOS 27.1, *)") == 0 and fold_class.count("#available(iOS 27.1, *)") == 2)
+pbx = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
+check("the build setting turns BCD_SDK_IOS27_1 on only for an iPhone OS 27 SDK (Debug and Release)",
+      pbx.count('"SWIFT_ACTIVE_COMPILATION_CONDITIONS[sdk=iphoneos27.*]" = "$(inherited)') == 2 and pbx.count("BCD_SDK_IOS27_1") == 2)
+check("the scene follower stays on the shared session content and native navigation is Duo-only",
+      content.count(".modifier(BCDFoldableWatch())") == 1
+      and "if BCDDuoFeatures.active {\n            appChrome(rootContent)" in content
+      and 'NavigationStack {\n                appChrome(rootContent\n                    .navigationTitle("BCD")' in content)
 display = (APP / "GuestDisplay.swift").read_text()
 check("the Resolution screen's hook is the first line of its UIKit branch, nil off the gate, and the old reading follows it untouched",
       re.search(r"#if canImport\(UIKit\)\n        if let inner = BCDFoldable\.innerScreen \{ return Screen\(points: inner\.points, pixels: inner\.pixels\) \}[^\n]*\n"
@@ -102,10 +116,10 @@ check("the Resolution screen's hook is the first line of its UIKit branch, nil o
                 r"        return Screen\(points: CGSize\(width: max\(b\.width, b\.height\), height: min\(b\.width, b\.height\)\),\n", display) is not None
       and "static func screen(active: Bool) -> (points: CGSize, pixels: CGSize)? {\n        active ? (innerPoints, innerPixels) : nil" in pure)
 sections = (APP / "BCDSettingsSections.swift").read_text()
-check("Settings › Graphics adds its group only on the foldable model, after the Display group and before the restart note",
-      re.search(r"\n            if BCDFoldableDevice\.isThisDevice \{[^\n]*\n                BCDSettingsGroup\(title: \"Foldable iPhone\"\) \{ BCDFoldableSettingsRow\(\) \}\n            \}\n"
-                r"            if backend\.restartNeeded \{ BCDSettingsNotice\(text: bcdSettingsRestartNote\) \}\n", sections) is not None
-      and "var displaySwitchesShown: Bool { get }" in sections)
+check("Settings exposes the Duo-only interface and gameplay switches inside the model gate",
+      'if BCDFoldableDevice.isThisDevice {' in sections
+      and 'BCDSettingsGroup(title: "Foldable iPhone")' in sections
+      and "BCDDuoEnhancementsSettingsRow()" in sections and "BCDFoldableSettingsRow()" in sections)
 check("the gate is read once per run and holds the model and the switch", "static let active: Bool = BCDFoldableSwitch.gate(machine: BCDFoldableDevice.machine, stored: BCDFoldableSwitch.stored)" in pure)
 check("the switch is off by default", "static let defaultOn = false" in pure)
 check("the model table has the one identifier", 'static let identifiers: [String] = ["iPhone19,4"]' in pure)
@@ -132,8 +146,8 @@ check("it decides from the width alone, through the pure rule, and does nothing 
       "BCDFoldableLayout.compact(forWidth: width)" in ui and "guard want != window.traitOverrides.contains(UITraitHorizontalSizeClass.self) else { return false }" in ui)
 check("a window that appears later gets what the others have, when it becomes visible",
       "UIWindow.didBecomeVisibleNotification" in ui and "apply(wanted, to: window)" in ui)
-check("the root modifier adds the probe only when the gate is open and gives the content as it is otherwise",
-      re.search(r"if BCDFoldable\.active \{\n            content\.background\(BCDFoldableProbe\(\)\)\n        \} else \{\n            content\n        \}", ui) is not None)
+check("the Duo interface flag and existing experimental gate can adapt Duo; other devices keep their content",
+      re.search(r"if !BCDDuoFeatures\.active && BCDFoldable\.active \{\n            content\.background\(BCDFoldableProbe\(\)\)\n        \} else \{\n            content\n        \}", ui) is not None)
 check("the probe is clear, untouchable and reads the window's width",
       "isUserInteractionEnabled = false" in ui and "backgroundColor = .clear" in ui and "Double(window.bounds.width)" in ui)
 check("the follower reads no UIScreen.main and asks for no orientation or geometry",

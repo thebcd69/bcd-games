@@ -88,6 +88,21 @@ func require(_ condition: @autoclosure () -> Bool, _ label: String) {
         require(R.message(exitCode: 3) == "The game closed (exit code 3). If it keeps happening, open its page and send its log.",
                 "exit code 3: short, factual, points at the game page's Send Log")
         require(R.message(exitCode: 1)?.contains("exit code 1") == true, "exit code 1")
+        // Night round 2026-11-11 (G3 S11; DOOM 3: BFG Edition DVXP0H, RATRZ0): a setup or language tool that closes at once with 0 and no picture
+        require(R.setupToolWords(fileName: "language_setup.exe", exitCode: 0, seconds: 5.8, presented: false)
+                == "language_setup.exe closed by itself 5 seconds after it started. It looks like a setup or language tool, not the game. Add the game's own program from the same folder (Add a game) and start that one.",
+                "DVXP0H: DOOM 3's language chooser, 5.8 s, exit 0, no frame: named")
+        require(R.setupToolWords(fileName: "GameConfig.EXE", exitCode: 0, seconds: 15, presented: false) != nil
+                && R.setupToolWords(fileName: "Settings.exe", exitCode: 0, seconds: 0, presented: false) != nil, "config and settings tools, the case ignored, up to 15 s")
+        require(R.setupToolWords(fileName: "language_setup.exe", exitCode: 0, seconds: 15.1, presented: false) == nil
+                && R.setupToolWords(fileName: "language_setup.exe", exitCode: 1, seconds: 5, presented: false) == nil
+                && R.setupToolWords(fileName: "language_setup.exe", exitCode: 0, seconds: 5, presented: true) == nil,
+                "not after 15 s, not with an error code (it has its own words), not when a picture was drawn")
+        require(R.setupToolWords(fileName: "setup.exe", exitCode: 0, seconds: 5, presented: false) == nil
+                && R.setupToolWords(fileName: "Doom3BFG.exe", exitCode: 0, seconds: 5, presented: false) == nil
+                && R.setupToolWords(fileName: "languages.dll", exitCode: 0, seconds: 5, presented: false) == nil
+                && R.setupToolWords(fileName: "", exitCode: 0, seconds: 5, presented: false) == nil,
+                "a plain setup.exe (an installer started on purpose), the game, a file that is no program, an empty name: nothing")
         require(R.message(exitCode: 70000)?.contains("0x11170") == true, "a large code reads in hex")
         require(R.message(exitCode: -2)?.contains("0xFFFFFFFE") == true, "a negative code reads as the 32-bit value")
         require(!(R.message(exitCode: 3) ?? "").contains("GTA"), "no game names")
@@ -370,6 +385,7 @@ static int g_wine_exit_code = 0;   /* wine_process_exit_code()'s plain global (t
 _Thread_local volatile int wine_ios_exit_code = 0;
 static uint64_t g_launch_exit = 0;   /* the status word defined above the section (wine_session_dock_game_ended, round 579, records into it) */
 static int g_gl_love_hint_set;   /* round 632 (OpenGL): bcd_gl_session_setup's LOVE hint, defined above the section; the session end drops it */
+int g_wineserver_desktop_shutdown;   /* the desktop Stop flag (WineServerBridge.m; native Duo interface): idle, so the session end runs as always */
 void wineserver_stop(void) { g_stops++; }
 void wine_session_note_launch_exit(int status);
 int wine_launched_exit_stuck(int32_t *code, double *seconds);
@@ -560,6 +576,14 @@ require('longjmp(wine_ios_exit_jmpbuf, 1);' in shim and 'pthread_exit(NULL);' in
 require(env.count('setprogname( name );') == 1, 'Wine\'s set_process_name is untouched (the name is given back when the program ends)')
 # the diagnostic for the next log
 require('[native-bt] progname ptr=0x%llx == x%d' in signal and 'getprogname()' in signal, 'a native fault logs whether the faulting string is the program name')
+
+# G3 S11: the setup-tool words are said only for a library entry that ended with no report of its own, not for a quit, the desktop or a Dock session
+fin_start = library.index('private func finish() {')
+fin = library[fin_start:fin_start + 3500]
+require('if report == nil, sawProcess, !quitRequested, let entry = activeEntry, entry.desktop != true, !DockStartScreen.shared.active {' in fin
+        and 'SessionEndRules.setupToolWords(fileName: program, exitCode: Int32(wine_process_exit_code())' in fin
+        and 'presented: madeira_get_present_count() > launchPresent' in fin and fin.index('setupToolWords') < fin.index('if let report { error = report }'),
+        'G3 S11: finish() names a setup or language tool that closed at once, only without a report of its own, never after a quit, on the desktop or in a Dock session')
 
 print('check-session-end: ' + ('PASS' if failures == 0 else 'FAIL (%d)' % failures))
 sys.exit(1 if failures else 0)

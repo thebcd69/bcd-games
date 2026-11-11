@@ -26,6 +26,7 @@ enum BCDSessionRecorder {
     /// LibraryModel.init: a marker from the run before says that session never came back; Send Log's comment box learns to offer a screenshot.
     static func appStarted() {
         onMain {
+            BCDBrkTrail.context = { StikJITHelper.brkTrailContext() }   // night round 2026-11-11 (M7): the JIT method, attach age, LiveContainer and iOS in every record
             BCDScreenshotLive.install()
             BCDPerfTraceSend.install()   // round 604: the comment box tells that a performance trace goes with a log
             BCDDebugRunLive.shared.appStarted()   // round 604: a guided debug run that was open when BCD closed (before the crash question below)
@@ -75,6 +76,9 @@ enum BCDBrkTrail {
     static var url: URL? = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("jit-brk-last.txt")
     private static let lock = NSLock()
     private static var began = 0.0   // systemUptime of the open request
+    /// Night round 2026-11-11 (M7, A2 S1 / G10 S10 / A4 S3): more fields for the record (method, attach age and source, LiveContainer, iOS, footprint), set by the
+    /// app at start (appStarted); they come last, after `avail=`, so a reader of the older format is unharmed. Empty adds nothing.
+    static var context: () -> String = { "" }
 
     /// `site`: the caller's line in StikJITHelper.swift; `attempt`: the pool loop's try (nil elsewhere); `region`: which of the pool's
     /// regions the request is for (round 630, agent A1 S19: A the pool, A-single its split's replacement, B the second region and B-mid
@@ -86,8 +90,9 @@ enum BCDBrkTrail {
         began = info.systemUptime
         let line = "begin site=L\(site) region=\(region) size=\(size >> 20)MB attempt=\(attempt.map(String.init) ?? "-") uptime=\(String(format: "%.1f", began)) "
             + "wall=\(Int(Date().timeIntervalSince1970)) thermal=\(info.thermalState.rawValue) lpm=\(info.isLowPowerModeEnabled ? 1 : 0) "
-            + "avail=\(os_proc_available_memory() >> 20)MB\n"
-        write(line, to: url, fresh: true)   // the file holds the last request only
+            + "avail=\(os_proc_available_memory() >> 20)MB"
+        let extra = context()
+        write(line + (extra.isEmpty ? "" : " " + extra) + "\n", to: url, fresh: true)   // the file holds the last request only
     }
 
     static func end() {

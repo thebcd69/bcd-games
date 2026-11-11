@@ -1,0 +1,379 @@
+[09:15:18.199] [INFO] Checking entitlements...
+[09:15:18.200] [INFO] [build] v0.1.626 (626)
+[09:15:18.200] [INFO] [device] model=iPad17,3 idiom=pad os=iPadOS Version 26.6.1 (Build 23G83) ram=11441MB available=12266MB cores=9
+[09:15:18.201] [INFO] [device] address-map=[0x104b00000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[09:15:18.201] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[09:15:18.211] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+01:00 free-disk=411GB stikdebug-url=0
+[09:15:18.214] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[09:15:27.874] [INFO] Requesting JIT with Built-in StikJIT...
+[09:15:43.136] [INFO] [bcd] library launch Oblivion.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[09:15:43.153] [INFO] Running full Wine sequence...
+[09:15:43.153] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104b00000,0xfc0000000) 63GB available=12245MB low-power=0 thermal=nominal
+[09:15:43.154] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[09:15:43.501] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[09:15:43.501] [INFO] Allocating 896MB JIT pool via debugger...
+[09:15:43.501] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[09:15:43.501] [INFO] [jit-debugger] attached=1 at the pool request
+[09:15:44.450] [INFO] RX pool at 0x300000000
+[09:15:44.482] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.015s rev=ml526
+[09:15:44.516] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x113cd0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x47ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x47ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x47fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x47ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x47ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[fdtrace] pipes tid=0000 peb=0x47ffd0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[09:15:44.770] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11314 MB + phys_footprint=973 MB = 12288 MB (hw.memsize says 11441 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11441 MB), so it is a sentinel, not a limit
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x400400000+0x7af000 (?) → pool 0x300006000 used=0x7ba000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 394 .text pages executable (copy @0x300006000)
+ml957: ? backing 0x400bac000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x3ffef0000+0x110000 (ntdll.dll) → pool 0x3007b8000 used=0x8d0000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x3007b8000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+[jit-pool] image 0x3ffe80000+0x70000 (wow64.dll) → pool 0x3008d0000 used=0x944000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x3008d0000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x300945000 used=0xd09000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x300945000)
+ml957: libwow64fex.dll backing 0x3ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x3ff9a0000+0x120000 (ucrtbase.dll) → pool 0x300d08000 used=0xe2c000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300d08000)
+[jit-pool] image 0x3ff900000+0xa0000 (KERNEL32.dll) → pool 0x300e2c000 used=0xed4000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300e2c000)
+[window] 0x12a000000..0xb30000000 regions=100001 occupied=7844 MB of 41056 MB free=33211 MB maxhole=31974 MB@0x361960000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=1002 MB (peak 1002) internal=1000 MB compressed=0 MB external=78 MB reusable=15 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=oblivion.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300cc4df0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ffac0000) -> 64-bit table (0x107988828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Oblivion.exe (oblivion.exe-e0b32232111659db): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+D 24 Load module COMCTL32.dll (comctl32.dll-8c41fd137b4902d7): 47BB30000
+D 24 Load module user32.dll (user32.dll-7d7be97280dde402): 47B970000
+[jit-pool] image 0x47b860000+0x1b000 (?) → pool 0x30116e000 used=0x118e000/0x38000000 tramp+0x0
+ml957: ? backing 0x47b878000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x47b380000+0x1a000 (?) → pool 0x30118f000 used=0x11af000/0x38000000 tramp+0x0
+ml957: ? backing 0x47b398000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x47b2d0000+0x1b000 (?) → pool 0x3011af000 used=0x11cf000/0x38000000 tramp+0x0
+ml957: ? backing 0x47b2e8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x47a920000+0x13000 (?) → pool 0x3011cd000 used=0x11e5000/0x38000000 tramp+0x0
+ml957: ? backing 0x47a930000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x47a2f0000+0x12000 (?) → pool 0x3011e7000 used=0x11ff000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x3011e7000)
+ml957: ? backing 0x47a300000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x12ad50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[jit-pool] image 0x47a2a0000+0x1b000 (?) → pool 0x3011ff000 used=0x121f000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x3011ff000)
+ml957: ? backing 0x47a2b8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[unixlib] opengl32 (GL-absent stub table) (module 0x47a3f0000) -> wow64 table (0x107990828)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x47ffd0000 total=256 MB
+[alloc-fail] ml814 #1 status=c0000018 hint=0x401000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0xc00000 type=0x2000 prot=0x4 hint=0x401000000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #2 status=c0000018 hint=0x402000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0xc00000 type=0x2000 prot=0x4 hint=0x402000000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #3 status=c0000018 hint=0x403000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0xc00000 type=0x2000 prot=0x4 hint=0x403000000 zb=0xffffffff hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x404000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0xc00000 type=0x2000 prot=0x4 hint=0x404000000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x405000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #6 status=c0000018 hint=0x406000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #7 status=c0000018 hint=0x407000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x408000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0xc00000 type=0x2000 prot=0x4 hint=0x408000000 zb=0xffffffff hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #9 status=c0000018 hint=0x409000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x40a000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x40b000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x40c000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x40d000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x40e000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x40f000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x410000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x411000000 size=0xc00000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x401000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x402000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x403000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x404000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x405000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x406000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x407000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x408000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x409000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x40a000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x40b000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x40c000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x40d000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x40e000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x40f000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x410000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x411000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x412000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x401000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x402000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x403000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x404000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x405000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x406000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x407000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x408000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x409000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x40a000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x40b000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x40c000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x40d000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x40e000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x40f000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x410000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x411000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x412000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x413000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x401000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x402000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x403000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x404000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x405000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x406000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x407000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x408000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x409000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x40a000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #128 status=c0000018 hint=0x40b000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #192 status=c0000018 hint=0x41a000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #24 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x401000000 zb=0xffffffff hits=1 rev=ajan5-rockstar
+[nt-fail] #25 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x402000000 zb=0xffffffff hits=2 rev=ajan5-rockstar
+[nt-fail] #26 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x403000000 zb=0xffffffff hits=3 rev=ajan5-rockstar
+[nt-fail] #27 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x404000000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+[nt-fail] #28 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x408000000 zb=0xffffffff hits=8 rev=ajan5-rockstar
+[nt-fail] #29 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x2000000 type=0x2000 prot=0x4 hint=0x410000000 zb=0xffffffff hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #256 status=c0000018 hint=0x409000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #320 status=c0000018 hint=0x40c000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #35 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x200000 type=0x2000 prot=0x4 hint=0x404000000 zb=0xffffffff hits=4 rev=ajan5-rockstar
+[nt-fail] #36 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x200000 type=0x2000 prot=0x4 hint=0x408000000 zb=0xffffffff hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #384 status=c0000018 hint=0x40b000000 size=0x200000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #37 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x200000 type=0x2000 prot=0x4 hint=0x410000000 zb=0xffffffff hits=16 rev=ajan5-rockstar
+[nt-fail] #38 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x200000 type=0x2000 prot=0x4 hint=0x420000000 zb=0xffffffff hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #448 status=c0000018 hint=0x406000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #39 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x400000 type=0x2000 prot=0x4 hint=0x410000000 zb=0xffffffff hits=256 rev=ajan5-rockstar
+[alloc-fail] ml814 #512 status=c0000018 hint=0x422000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #576 status=c0000018 hint=0x417000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #640 status=c0000018 hint=0x406000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #704 status=c0000018 hint=0x41c000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #768 status=c0000018 hint=0x405000000 size=0x800000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[alloc-fail] ml814 #832 status=c0000018 hint=0x418000000 size=0x400000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0xc00000000+0x60000
+[nt-fail] #40 NtAllocateVirtualMemory status=c0000018 proc=oblivion.exe tid=0024 size=0x400000 type=0x2000 prot=0x4 hint=0x41d000000 zb=0xffffffff hits=512 rev=ajan5-rockstar
+[xp] 09:15:45.405 +0.57 dt=319 cpu=321 (thr 320) P=320 E=0 run=326 pgw=-1.0 GHz P=4.19 E=1.88 Minst=7757 IPC=5.77 mJ=2153 pin=1 rdKB=36 fpMB=1058
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-pos] #1 hwnd=0x2002e after=0x0 flags=0000003c vis={0,0,326,272} surface=0x1073f6968 rev=ml505 style=04ca0000 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x2002e class='Oblivion' text="" rev=ml853
+[win-pos] #2 hwnd=0x10038 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1073f6968 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10038 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10038 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1073f6968 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10038 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x2002e after=0x0 flags=00000018 vis={0,0,326,272} surface=0x1073f6968 rev=ml505 style=04ca0000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x2002e class='Oblivion' text="Oblivion" rev=ml853
+[win-pos] #5 hwnd=0x2002e after=0x0 flags=00001967 vis={0,0,326,272} surface=0x11ede1080 rev=ml505 style=14ca0000 visible=1 parent=0x10024
+[win-name] #5 hwnd=0x2002e class='Oblivion' text="Oblivion" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-pos] #6 hwnd=0x1003a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #6 hwnd=0x1003a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #7 hwnd=0x1003a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #7 hwnd=0x1003a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #8 hwnd=0x2003e after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1073f6968 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #8 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[win-pos] #9 hwnd=0x2003e after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1073f6968 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #9 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[win-pos] #10 hwnd=0x2003e after=0x2002e flags=0000181b vis={0,0,1,1} surface=0x1073f6968 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #10 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[exc-disp] dispatch tid=0024 code=406d1388 flags=0 addr=0x47bc52f79 pc=3008e9be8 nparams=4 p0=1000 p1=400a2fc44
+[jit-pool] image 0x47a210000+0xe000 (?) → pool 0x30121f000 used=0x1233000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x30121f000)
+ml957: ? backing 0x47a21c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x47a1f0000+0x7000 (?) → pool 0x301230000 used=0x1238000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x301230000)
+ml957: ? backing 0x47a1f4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module winusb.dll (winusb.dll-9f0900f23410a74f): 47A1F0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"sdl2.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x47a1b0000+0x23000 (?) → pool 0x30123a000 used=0x1262000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 5 .text pages executable (copy @0x30123a000)
+ml957: ? backing 0x47a1d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbf8a769): 47A1B0000
+D 24 Load module oleaut32.dll (oleaut32.dll-ed26e11610c95a15): 47A0F0000
+[xp] 09:15:45.676 +0.84 dt=271 cpu=243 (thr 236) P=242 E=0 run=249 pgw=-1.0 GHz P=4.15 E=1.99 Minst=5475 IPC=5.44 mJ=1562 pin=80 rdKB=11200 fpMB=1080
+D 24 Load module D3D9.DLL (d3d9.dll-23c8601a8ecac108): 47A0C0000
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=3008e9be8 nparams=2 p0=83 p1=47a0d129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=3008e9be8 nparams=2 p0=2 p1=47a0d10a0
+D 24 Load module d3d9-emulated.dll (d3d9-emulated.dll-cd2cf2331278a201): 479D60000
+[jit-pool] image 0x479d40000+0xe000 (?) → pool 0x301261000 used=0x1275000/0x38000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x301261000)
+ml957: ? backing 0x479d4c000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module winemetal.dll (winemetal.dll-5ddc5096148f101a): 479D40000
+info:  [d3d9-caps] ... capped at 256 lines; further distinct queries are not printed
+[store-noalias] #1 rev=ml348 addr=0x400000000 insn=0xb8bfc307 pc=0x3375bfaa4 NO pool/anon alias | region 0x400000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x400000000 hostpc=0x3375bfaa4 hinsn=0xb8bfc307 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x3375bfaa4 addr=0x400000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x400000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x3375bfaa4 addr=0x400000000 x18=0x47ffc0000 type=1 lr=0x337650b4c sp=0x12a7ff350 x16=0xd31441080 x17=0x401999
+[x86-fault] #1 a 32-bit guest faulted at guest 0x00000000 at EIP 0x00498749 (Oblivion.exe+0x98749) [exact: the block table of FEX for host pc 0x3375bfaa4; State.rip=0x00401999 is only the last block entry], window 0x400000000, 48 modules in the PEB32 list; EAX=0x0 ECX=0x3001 EDX=0x12001401 EBX=0x20c6488 ESI=0x200 EDI=0x20c6688 EBP=0x1eff110 ESP=0x13af490
+[x86-fault]   modules (name=base/size): Oblivion.exe=0x400000/0x7af000 ntdll.dll=0xfff40000/0xaa000 kernel32.dll=0x7bed0000/0x58000 kernelbase.dll=0x7bc40000/0x27f000 COMCTL32.dll=0x7bb30000/0xfb000 user32.dll=0x7b970000/0x1aa000
+[x86-fault]   modules (name=base/size): gdi32.dll=0x7b8e0000/0x74000 advapi32.dll=0x7b890000/0x33000 sechost.dll=0x7b860000/0x1b000 ucrtbase.dll=0x7b770000/0xd9000 msvcrt.dll=0x7b6c0000/0x9f000 win32u.dll=0x7b670000/0x33000
+[x86-fault]   modules (name=base/size): DINPUT8.dll=0x28000000/0x11e000 WINMM.dll=0x7b5a0000/0xb9000 ole32.dll=0x7b4f0000/0x9c000 combase.dll=0x7b490000/0x46000 rpcrt4.dll=0x7b400000/0x76000 cryptbase.dll=0x7b3e0000/0x8000
+[x86-fault]   modules (name=base/size): coml2.dll=0x7b3b0000/0x14000 msacm32.dll=0x7b380000/0x1a000 SETUPAPI.dll=0x7b300000/0x68000 cfgmgr32.dll=0x7b2d0000/0x1b000 SHELL32.dll=0x7a9b0000/0x904000 shlwapi.dll=0x7a950000/0x42000
+[x86-fault]   modules (name=base/size): shcore.dll=0x7a920000/0x13000 DSOUND.dll=0x7a8d0000/0x3e000 binkw32.dll=0x18000000/0x68000 VERSION.dll=0x7a8b0000/0x8000 d3dx9_27.dll=0x7a810000/0x8c000 d3dcompiler_47.dll=0x7a7d0000/0x2e000
+[x86-fault]   modules (name=base/size): wined3d.dll=0x7a500000/0x2b3000 opengl32.dll=0x7a3f0000/0xfc000 d3dxof.dll=0x7a3c0000/0x20000 WSOCK32.dll=0x7a3a0000/0xc000 ws2_32.dll=0x7a360000/0x21000 iphlpapi.dll=0x7a320000/0x25000
+[x86-fault]   modules (name=base/size): dnsapi.dll=0x7a2f0000/0x12000 nsi.dll=0x7a2d0000/0x8000 imm32.dll=0x7a2a0000/0x1b000 dinput8.dll=0x7a250000/0x3c000 hid.dll=0x7a230000/0xc000 xinput1_4.dll=0x7a210000/0xe000
+[x86-fault]   modules (name=base/size): winusb.dll=0x7a1f0000/0x7000 mmdevapi.dll=0x7a1b0000/0x23000 oleaut32.dll=0x7a0f0000/0xa6000 D3D9.DLL=0x7a0c0000/0x1c000 d3d9-emulated.dll=0x79d60000/0x346000 winemetal.dll=0x79d40000/0xe000
+[fault-rgn] addr=0x401eff110 page=0x401efc000 vprot prev/this/next=23/23/23 region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x401e40000 size=0x10000000 protect=0x23 off=0xbf110 end=0x411e40000
+[fault-rgn] addr=0x4020c6688 page=0x4020c4000 vprot prev/this/next=23/23/23 region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x401e40000 size=0x10000000 protect=0x23 off=0x286688 end=0x411e40000
+[fault-rgn] addr=0x412001401 page=0x412000000 vprot prev/this/next=00/23/03 region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x412000000 size=0xc00000 protect=0x3 off=0x1401 end=0x412c00000
+[guest-code] rev=ml333 pool_rip=0x401999 (PE 0x401999) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x13af490 x9=0x1eff110 x10=0x200 x11=0x20c6688 x0=0x1000000 x2=0x300b224f9 | teb=0x47ffc0000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[wow-null32] rev=ajan7-arkham #1 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x3375bfaa4; EAX=0x0 ECX=0x3001 EDX=0x12001401 EBX=0x20c6488 ESI=0x200 EDI=0x20c6688 EBP=0x1eff110 ESP=0x13af490 (48 modules in the PEB32 list)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:1 +04:16 +08:80000 +0c:3 +10:71 +14:2cae1daf +18:13af9ed +1c:2002e +20:0 +24:400000(Oblivion.exe+0x0) +28:0 +2c:1eff4e4 +30:7a1ce158(mmdevapi.dll+0x1e158) +34:13af4d4 +38:fff8de4c(ntdll.dll+0x4de4c) +3c:7bca06bd(kernelbase.dll+0x606bd)
+[wow-null32]   TEB32=0x7ffc2000 PEB32=0x7ffd1000 TlsBitmapBits=0x0000000001ffffff TlsExpansionSlots=0x0; 3 cell(s) hold a value: [19]=0x2ba4d8 [20]=0x2bbe90 [23]=0x7bedcabc(kernel32.dll+0xcabc)
+[wow-null32]   22 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 21 22 24
+[fault-host] 3375bf9a4: 14000783 52800014 528d8e95 72a01615 8b354278 38bfc31b 53081f60 6b14601f
+[fault-host] 3375bf9c4: 5100037a 540001e0 11003134 8b344278 b8bfc307 d503201f 53117ce7 121860fa
+[fault-host] 3375bf9e4: 2b1a63ff aa1a03e7 5289f4b4 72a01674 8b344278 089fff07 d500401f 14000005
+[fault-host] 3375bfa04: 5289f4b4 72a01674 8b344278 089fff1f 528db494 72a01614 8b344278 38bfc314
+[fault-host] 3375bfa24: b3401e85 11046134 8b344278 78bfc30a d503201f 52800e34 51001108 b8284a74
+[fault-host] 3375bfa44: 52800074 51001108 b8284a74 52a00114 51001108 b8284a74 528002d4 51001108
+[mach_exc] insn_stream PC-12..PC+8: 8b344278 089fff05 8b244278 [b8bfc307] d503201f 1100a0f4 8b344278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x300a48768 = libwow64fex.dll+0x103768 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x300a486ec = libwow64fex.dll+0x1036ec copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x300a486e4 = libwow64fex.dll+0x1036e4 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x47ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x400000000 insn=0xb8bfc307 pc=0x3375bfaa4 NO pool/anon alias | region 0x400000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x400000000 hostpc=0x3375bfaa4 hinsn=0xb8bfc307 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x3375bfaa4 addr=0x400000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x400000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x3375bfaa4 addr=0x400000000 x18=0x47ffc0000 type=1 lr=0x337650b4c sp=0x12a7ff350 x16=0xd31441080 x17=0x401999
+[guest-code] rev=ml333 pool_rip=0x401999 (PE 0x401999) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x13af490 x9=0x1eff110 x10=0x200 x11=0x20c6688 x0=0x1000000 x2=0x300b224f9 | teb=0x47ffc0000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 3375bfa04: 5289f4b4 72a01674 8b344278 089fff1f 528db494 72a01614 8b344278 38bfc314
+[fault-host] 3375bfa24: b3401e85 11046134 8b344278 78bfc30a d503201f 52800e34 51001108 b8284a74
+[fault-host] 3375bfa44: 52800074 51001108 b8284a74 52a00114 51001108 b8284a74 528002d4 51001108
+[fault-host] 3375bfa64: b8284a74 1108108b 11001086 52842a94 72a01694 8b344278 b8bfc304 d503201f
+[fault-host] 3375bfa84: 52800034 51001108 b8284a74 5285e654 72a01694 8b344278 089fff05 8b244278
+[fault-host] 3375bfaa4: b8bfc307 d503201f 1100a0f4 8b344278 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 8b344278 089fff05 8b244278 [b8bfc307] d503201f 1100a0f4 8b344278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x300a48768 = libwow64fex.dll+0x103768 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x300a486ec = libwow64fex.dll+0x1036ec copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x300a486e4 = libwow64fex.dll+0x1036e4 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x47ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler [bus-rgn] si_code=1 addr=0x400000000 pc=0x3375bfaa4 pc_in_pool=1 readable=0
+0024:err:seh:bus_handler [bus-rgn]   region=0x400000000+0x110000 prot=0 max=7 share_mode=2 user_tag=0
+0024:err:seh:bus_handler [bus-rgn]   OWNER extpager=0 resident=0 swapped=0 dirtied=0 reusable=0 refcnt=1 shadow=0  purgeable=not-purgeable(0x0) rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   VERDICT <== ANONYMOUS, NEVER RESIDENT — never materialised rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   PROVENANCE NO file mapping covers this address (anonymous — EOF/backing story does NOT apply) rev=ml561
+0024:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x400000000: [XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]  ('.'=materialises 'X'=fails; fault is at +0x0) rev=ml561
+[fault-rgn] addr=0x400000000 page=0x400000000 vprot prev/this/next=21/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: base=0x3ffef0000 size=0x110000 end=0x400000000 protect=0x180002d (image) -- the fault is exactly one past its end
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x400000000 pc=0x3375bfaa4 rw=0 rev=ml420
+wine: Unhandled page fault on read access to 00000000 at address 00498749 (thread 0024), starting debugger...
+[stale-heal]   3 slot(s) in the copy of 0x3ffac0000 (libwow64fex.dll) -> 0x300827294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000005) syscalls=0 unix_calls=487
+info:  [d3d9-last] dump (process detach): ring disabled -- set MADEIRA_D3D9_LAST=1 in Documents/madeira-env.txt to record the last 64 D3D9 calls (it costs one emulated locked RMW per call, which is why it is off by default)
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=3008e9be8 nparams=2 p0=3a p1=4013afc10
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=3008e9be8 nparams=2 p0=2 p1=47a0d10a0
+0028:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0028 status=00000000 caller=7BEF40C8
+[prot-img] #9 tid=0024 0x400a28000+0xda000 (rva 0x628000) new_prot=0x40 old=0x2 status=0 | rva 0x628000, section #1 '.rdata' rva 0x628000+0xda000 chars 0x40000040 (R--)
+[prot-img] #10 tid=0024 0x400a28000+0xda000 (rva 0x628000) new_prot=0x2 old=0x80 status=0 | rva 0x628000, section #1 '.rdata' rva 0x628000+0xda000 chars 0x40000040 (R--)
+[prot-img] #11 tid=0024 0x400a28000+0xda000 (rva 0x628000) new_prot=0x40 old=0x2 status=0 | rva 0x628000, section #1 '.rdata' rva 0x628000+0xda000 chars 0x40000040 (R--)
+[prot-img] #12 tid=0024 0x400a28000+0xda000 (rva 0x628000) new_prot=0x2 old=0x80 status=0 | rva 0x628000, section #1 '.rdata' rva 0x628000+0xda000 chars 0x40000040 (R--)
+[vfree] ml842 # base=0xd31631000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=498
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741819)
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[xp-names] m6994993 "wine-x18-exc"
+[xp] 09:15:45.989 +1.15 dt=312 cpu=106 (thr 12) P=105 E=1 run=112 pgw=-1.0 GHz P=3.67 E=2.31 Minst=1882 IPC=4.85 mJ=458 pin=10 rdKB=2436 fpMB=1105
+[09:15:46.157] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=1105MB limit=12287MB thermal=nominal lpm=0 api=D3D9/DirectDraw/OpenGL/32 res=1112x832 cap=60 game=The Elder Scrolls IV: Oblivion - Game of the Year Edition Deluxe
+[09:15:46.167] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[xp] 09:15:46.259 +1.42 dt=270 cpu=196 (thr 195) P=87 E=109 run=196 pgw=-1.0 GHz P=3.22 E=2.89 Minst=2768 IPC=4.66 mJ=345 pin=46 rdKB=664 fpMB=1107
+[hwinput] keyboard focus: elsewhere (poll)
+[xp] 09:15:46.530 +1.70 dt=271 cpu=475 (thr 455) P=181 E=293 run=485 pgw=-1.0 GHz P=4.28 E=3.00 Minst=7580 IPC=4.57 mJ=1359 pin=155 rdKB=2484 fpMB=1118
+[xp] 09:15:46.786 +1.95 dt=256 cpu=266 (thr 267) P=9 E=257 run=270 pgw=-1.0 GHz P=3.41 E=3.02 Minst=3760 IPC=4.66 mJ=274 pin=0 rdKB=0 fpMB=1118
+[footprint] rev=ml358 phys=1121 MB (peak 1121) internal=1117 MB compressed=0 MB external=86 MB reusable=14 MB (cycle=2)
+[09:15:48.047] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1119 MB (peak 1121) internal=1117 MB compressed=0 MB external=86 MB reusable=14 MB (cycle=3)
+[footprint] rev=ml358 phys=1093 MB (peak 1121) internal=1090 MB compressed=0 MB external=87 MB reusable=19 MB (cycle=4)
+[footprint] rev=ml358 phys=1092 MB (peak 1121) internal=1090 MB compressed=0 MB external=87 MB reusable=19 MB (cycle=5)
+[footprint] rev=ml358 phys=1092 MB (peak 1121) internal=1090 MB compressed=0 MB external=87 MB reusable=19 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b2fe1d0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.uikit.eventfetch-thread" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b529ca0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd5d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=19 resident=1196MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd5d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[window] 0x12a000000..0xb30000000 regions=100001 occupied=7925 MB of 41056 MB free=33130 MB maxhole=31975 MB@0x3618c0000 rev=ml787 (layerkit-span)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=19 resident=1196MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd5d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1096 MB (peak 1121) internal=1093 MB compressed=0 MB external=99 MB reusable=19 MB (cycle=38)
+[freeze] alive t+92s beats=3 gaps=1 iter=302 gen=1 threads=19 resident=1211MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1110 MB (peak 1121) internal=1094 MB compressed=1 MB external=102 MB reusable=15 MB (cycle=39)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd5d020 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x1c sp=0x16bc46c40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=libsystem_pthread.dylib`start_wqthread+0x0 lr=0x0 sp=0x16b386b70 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__proc_info+0x8 lr=libsystem_kernel.dylib`proc_pidinfo+0x28 sp=0x16b410db0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libswiftCore.dylib`<redacted>+0x9c lr=libswiftCore.dylib`<redacted>+0xac sp=0x16c2d64f0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% RUN pc=0x192bbb0a0 lr=Foundation`<redacted>+0xdc sp=0x16bc46c40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[footprint] rev=ml358 phys=1099 MB (peak 1121) internal=1095 MB compressed=1 MB external=110 MB reusable=15 MB (cycle=40)
+[footprint] rev=ml358 phys=1099 MB (peak 1121) internal=1095 MB compressed=1 MB external=110 MB reusable=15 MB (cycle=41)
+[footprint] rev=ml358 phys=1099 MB (peak 1121) internal=1095 MB compressed=1 MB external=110 MB reusable=15 MB (cycle=42)
+[footprint] rev=ml358 phys=1099 MB (peak 1121) internal=1095 MB compressed=1 MB external=109 MB reusable=15 MB (cycle=43)
+[xp] 09:17:24.176 +99.34 dt=314 cpu=15 (thr 15) P=0 E=15 run=16 pgw=-1.0 GHz P=0.00 E=2.91 Minst=79 IPC=1.79 mJ=8 pin=0 rdKB=0 fpMB=1099
+[xp] 09:17:24.502 +99.67 dt=326 cpu=14 (thr 14) P=0 E=14 run=14 pgw=-1.0 GHz P=0.00 E=2.89 Minst=77 IPC=1.90 mJ=7 pin=0 rdKB=0 fpMB=1099
+[xp] 09:17:24.826 +99.99 dt=324 cpu=20 (thr 20) P=0 E=20 run=21 pgw=-1.0 GHz P=0.00 E=2.91 Minst=96 IPC=1.61 mJ=10 pin=0 rdKB=0 fpMB=1099
+[xp] 09:17:25.083 +100.25 dt=256 cpu=119 (thr 98) P=59 E=60 run=132 pgw=-1.0 GHz P=2.92 E=2.89 Minst=828 IPC=2.40 mJ=154 pin=159 rdKB=2632 fpMB=1112
+[xp] 09:17:25.376 +100.54 dt=294 cpu=49 (thr 49) P=0 E=48 run=50 pgw=-1.0 GHz P=1.43 E=2.88 Minst=161 IPC=1.15 mJ=20 pin=34 rdKB=792 fpMB=1113
+GHz P=2.92 E=2.89 Minst=828 IPC=2.40 mJ=154 pin=159 rdKB=2632 fpMB=1112
+[09:17:25.376] [xp] 09:17:25.376 +100.54 dt=294 cpu=49 (thr 49) P=0 E=48 run=50 pgw=-1.0 GHz P=1.43 E=2.88 Minst=161 IPC=1.15 mJ=20 pin=34 rdKB=792 fpMB=1113

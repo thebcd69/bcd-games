@@ -138,6 +138,7 @@ typedef unsigned char BOOLEAN;
 #define REG_DWORD 4
 #define SYNCHRONIZE 0x100000
 #define PROCESS_QUERY_LIMITED_INFORMATION 0x1000
+#define FIELD_OFFSET(t, f) ((ULONG)(ULONG_PTR)&(((t *)0)->f))
 #define DBG_PRINTEXCEPTION_C 0x40010006
 #define KeyValuePartialInformation 2
 #define ProcessBasicInformation 0
@@ -156,11 +157,14 @@ static void dbg_err(const char *fmt, ...) { va_list ap; va_start(ap, fmt); vfpri
 /* A registry of strings: "path|value" -> type + bytes. Scenario "full" has everything, "empty" nothing. */
 static int scenario_full;
 static const char *last_path;
+static int seen_20219, seen_20019, seen_0x400;   /* night round 2026-11-11 (R1 S7): the access masks steam_api64's own calls use */
+__attribute__((destructor)) static void print_masks(void) { if (seen_20219 || seen_20019 || seen_0x400) printf("masks key20219=%d key20019=%d openproc0x400=%d\n", seen_20219, seen_20019, seen_0x400); }
 static NTSTATUS NtOpenKey(HANDLE *key, ACCESS_MASK access, const OBJECT_ATTRIBUTES *attr)
 {
     static char path[160]; size_t i, n = attr->ObjectName->Length / 2;
     for (i = 0; i < n; i++) path[i] = (char)attr->ObjectName->Buffer[i];
     path[n] = 0;
+    if (strstr(path, "ActiveProcess")) { if (access == 0x20219) seen_20219++; if (access == 0x20019) seen_20019++; }
     if (!scenario_full) return 0xc0000034;
     if (!strstr(path, "\\Valve\\Steam")) return 0xc0000034;
     /* round 624: what a 64-bit process gets. The wineserver turns KEY_WOW64_32KEY into the 64-bit view for a process that is not WoW64,
@@ -201,7 +205,7 @@ static NTSTATUS NtQueryValueKey(HANDLE key, const UNICODE_STRING *name, int cls,
     return 0xc0000034;
 }
 static NTSTATUS NtOpenProcess(HANDLE *h, ACCESS_MASK a, const OBJECT_ATTRIBUTES *attr, const CLIENT_ID *id)
-{ (void)attr; (void)a; if (!scenario_full || HandleToULong(id->UniqueProcess) != 52) return 0xc0000008; *h = (HANDLE)1; return 0; }
+{ (void)attr; if (a == 0x0400) seen_0x400++; if (!scenario_full || HandleToULong(id->UniqueProcess) != 52) return 0xc0000008; *h = (HANDLE)1; return 0; }
 static WCHAR image_name[64];
 static NTSTATUS NtQueryInformationProcess(HANDLE h, int cls, void *out, ULONG len, ULONG *got)
 {
@@ -401,6 +405,11 @@ with tempfile.TemporaryDirectory() as t:
         lines = [l for l in out.splitlines() if l.startswith("[steam-api]")]
         check("two reports, not three", sum(1 for l in lines if "found no running Steam" in l) == 2)
         one = out.split("found no running Steam", 2)[1]
+        check("night round 2026-11-11 (R1 S7): the replica line does steam_api64's four calls with ITS access masks (key 0x20219, the pid read into room for 4 bytes, "
+              "OpenProcess 0x400, the exit status) and prints each status, plus the key without the WOW flag (0x20019), in every report (2 of 2)",
+              one.count("[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=0 RegQueryValueExW(pid, cb=4)=0 type=4 cb=4 pid=52 | OpenProcess(0x400)=0 "
+                        "GetExitCodeProcess=0 exit=259 (259 = running) | open without the WOW flag (0x20019)=0") == 1
+              and "masks key20219=2 key20019=2 openproc0x400=2" in out)
         check("the pid, the client DLL, the paths and the process are reported",
               "HKCU ActiveProcess pid: DWORD 52" in one and "steamclient64.dll" in one and
               'HKCU Steam SteamPath: SZ "c:/program files (x86)/steam"' in one and
@@ -448,8 +457,19 @@ with tempfile.TemporaryDirectory() as t:
         one = out.split("found no running Steam", 2)[1]
         check("an empty registry: every key says it is not opened (11 values, 4 key ages), no process line, objects not found, an empty "
               "object directory, no file lines (no SteamPath)",
-              one.count("key not opened, status 0xc0000034") == 15 and "OpenProcess" not in one and
-              one.count("not opened, status 0xc0000034") == 17 and "\\BaseNamedObjects: 0 objects, 0 with steam in the name" in one
+              one.count("key not opened, status 0xc0000034") == 15 and "OpenProcess(52)" not in one and
+              "[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=0xc0000034 RegQueryValueExW(pid, cb=4)=(not asked) 0 type=0 cb=4 pid=0 | OpenProcess(0x400)=(not asked) 0 "
+              "GetExitCodeProcess=(not asked) 0 exit=0 (259 = running) | open without the WOW flag (0x20019)=0xc0000034" in one and
+              one.count("not opened, status 0xc0000034") == 18 and "HKCU Software\\Wow6432Node: not opened, status 0xc0000034" in one and   # night round 2026-11-11 (X2 S4): the node's line
+              "\\BaseNamedObjects: 0 objects, 0 with steam in the name" in one
               and "file <SteamPath>" not in one)
+# night round 2026-11-11 (R1 S7): the auto-tune rule that names the replica line, and its (synthetic) fixture
+rules_py = (root / "build/tools/autotune_rules.py").read_text()
+check("auto-tune: rule rockstar-launcher-steam-113-replica (noFix, Dock sessions, ahead of the two experiment rules) needs the 113 error and the replica line",
+      '"id": "rockstar-launcher-steam-113-replica"' in rules_py and re.search(r'"id": "rockstar-launcher-steam-113-replica",\s+"lines": \[\],\s+"noFix": True,\s+"priority": 5,', rules_py)
+      and 's("[steam-api] replica:")' in rules_py)
+fx = root / "tests/fixtures/autotune/synthetic-rockstar-launcher-steam-113-replica.expect"
+check("auto-tune: the synthetic fixture (the BFWFM3 log plus the replica line) is known, the replica rule first, no line",
+      fx.exists() and '"rockstar-launcher-steam-113-replica"' in fx.read_text() and '"status": "known"' in fx.read_text() and '"next": []' in fx.read_text())
 print("PASS: steam api diag" if ok else "FAILED: steam api diag")
 sys.exit(0 if ok else 1)

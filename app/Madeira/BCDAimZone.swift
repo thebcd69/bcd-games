@@ -25,7 +25,16 @@ struct BCDAimSettings: Equatable {
         }
     }
 
+    /// Night round 2026-11-11 (A5 S13; NieR: Automata 83B2RX: "the swipe to aim doesn't work with controller config since it's trying to use the mouse cursor"):
+    /// what the aiming finger drives. The mouse is what it always did; the right stick is for a game that plays with a controller layout and ignores the mouse
+    /// for the camera (the way gyro aim can drive the stick).
+    enum Output: String, CaseIterable {
+        case mouse = "", stick
+        var title: String { self == .mouse ? "The mouse" : "The right stick" }
+    }
+
     var zone = Zone.off
+    var output = Output.mouse
     /// A multiple: 1 is two mouse counts for every point the finger travels (the speed the pointer settings' mouse-look starts at).
     var sensitivity = 1.0
     /// How fast the camera turns up and down against left and right, in percent.
@@ -41,12 +50,13 @@ struct BCDAimSettings: Equatable {
     static let verticalChoices = [50, 75, 100, 125, 150]
     static let verticalRange = 25...200
     /// The lines of a game this feature keeps.
-    static let lineNames = ["aim-zone", "aim-sens", "aim-vertical", "aim-invert", "aim-tap"]
+    static let lineNames = ["aim-zone", "aim-sens", "aim-vertical", "aim-invert", "aim-tap", "aim-as"]
 
     static func parse(_ get: (String) -> String?) -> BCDAimSettings {
         func word(_ line: String) -> String { (get(line) ?? "").trimmingCharacters(in: .whitespaces).lowercased() }
         var s = BCDAimSettings()
         s.zone = Zone(rawValue: word("aim-zone")) ?? .off
+        s.output = Output(rawValue: word("aim-as")) ?? .mouse
         if let v = Double(word("aim-sens")), v.isFinite { s.sensitivity = min(max(v, sensitivityRange.lowerBound), sensitivityRange.upperBound) }
         if let v = Int(word("aim-vertical")) { s.vertical = min(max(v, verticalRange.lowerBound), verticalRange.upperBound) }
         s.invertY = word("aim-invert") == "1"
@@ -92,6 +102,24 @@ enum BCDAimMath {
     }
 }
 
+extension BCDAimMath {
+    /// Night round 2026-11-11 (A5 S13): the stick for a finger's travel in one touch event: a drag of this many points in one event is a full push of the
+    /// stick (1 point an event, the pace of a slow drag at 60 events a second, is 40 %).
+    static let pointsPerFullPush = 2.5
+    /// A stick that gets no new move for this long goes back to rest: a finger that stops stops the camera (a stick, unlike a mouse, is a rate).
+    static let stickHoldSeconds = 0.05
+
+    /// The right stick (x right, y up, each -1...1, the vector at most 1) for a travel of (`dx`, `dy`) points, y growing downwards: dragging right turns right
+    /// and dragging down looks down (stick down is negative). `sensitivity`, `vertical` and `invertY` keep their meaning.
+    static func stickPush(dx: Double, dy: Double, _ s: BCDAimSettings) -> (x: Double, y: Double) {
+        guard dx.isFinite, dy.isFinite else { return (0, 0) }
+        let x = dx * s.sensitivity / pointsPerFullPush
+        let y = -dy * s.sensitivity / pointsPerFullPush * Double(s.vertical) / 100 * (s.invertY ? -1 : 1)
+        let length = (x * x + y * y).squareRoot()
+        return length > 1 ? (x / length, y / length) : (x, y)
+    }
+}
+
 /// The one finger that aims, from touch-down to lift.
 struct BCDAimTouch {
     private(set) var finger: Int?
@@ -122,6 +150,15 @@ struct BCDAimTouch {
         last = point
         travelled = max(travelled, hypot(Double(point.x - start.x), Double(point.y - start.y)))
         return BCDAimMath.counts(dx: dx, dy: dy, s, carry: &carry)
+    }
+
+    /// Night round 2026-11-11 (A5 S13): the aiming finger moved: its travel since the last event, in points, for the stick; nil for any other finger.
+    mutating func movedPoints(id: Int, to point: CGPoint) -> (dx: Double, dy: Double)? {
+        guard finger == id else { return nil }
+        let dx = Double(point.x - last.x), dy = Double(point.y - last.y)
+        last = point
+        travelled = max(travelled, hypot(Double(point.x - start.x), Double(point.y - start.y)))
+        return (dx, dy)
     }
 
     /// The aiming finger lifted: true when it was a tap; nil for any other finger.

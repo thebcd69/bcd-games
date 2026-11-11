@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """BCD's interface as the app's real interface (app/Madeira/BCDLiveStore.swift and
 BCDLiveFrontEnd.swift; docs/BCD-UI-ARCHITECTURE.md).
 
@@ -118,13 +119,13 @@ unbuilt = [f.name for f in sorted(APP.glob("BCD*.swift"))
 check(not unbuilt, "the Xcode project builds every app/Madeira/BCD*.swift", str(unbuilt))
 
 # ---- ContentView: BCD's interface in the library's place -----------------------------------
-session_at = content.index("if library.current != nil {")
+session_at = content.index("if library.current != nil && !library.desktopHome {")
 bcd_at = content.index("} else {", session_at)
 bcd_branch = content[bcd_at:content.index("BCDLiveFrontEnd(", bcd_at) + 400]
 check(session_at < bcd_at and "LibraryView" not in content and "FrontendChoice" not in content and "developerBody" not in content,
       "ContentView: a session first, otherwise BCD's interface; no classic library, interface choice or developer interface is left")
 check("BCDLiveFrontEnd(play: launchLibraryEntry, enableJIT: enableJIT,\n"
-      "                                    startDock: { startDock($0, compactPool: $1) })" in bcd_branch,
+      "                                startDock: { startDock($0, compactPool: $1) }, waitForCloud: cloudWait)" in bcd_branch,
       "ContentView: BCD's interface gets Play, Enable JIT and the Dock start")
 check("sessionBody" in content[session_at:bcd_at], "a game's session replaces BCD's interface")
 check("BCDFrontEnd(store: live.store, focus: focus)" in front and "settingsOverride" not in front
@@ -176,8 +177,10 @@ check(not any(starts.values()), "the live files start nothing themselves", str(s
 
 # ---- in game -------------------------------------------------------------------------------
 session = block(store, "private func session(running: Bool)")
-check("library.$current.sink { [weak self] current in self?.session(running: current != nil) }" in store,
-      "inGame follows LibraryModel.current: set by begin, cleared when the session ends or the launch fails")
+check("Publishers.CombineLatest4(library.$current, library.$desktopHome, library.$sessionMessage, library.$launching)" in store and "self.session(running: current != nil && !home)" in store
+      and "} else {\n            library.$current.sink { [weak self] current in self?.session(running: current != nil) }.store(in: &watchers)\n        }" in store
+      and "if BCDDuoFeatures.active {\n            // The native Duo interface" in store,
+      "inGame follows LibraryModel.current: set by begin, cleared when the session ends or the launch fails (the original sink off the native Duo interface; the desktop's state and the hop to the main queue only on it)")
 check("store.inGame = running" in session and "BCDArt.shared.purge()" in session and "metadata?.cancel()" in session,
       "a game starting drops the pictures and stops the metadata reads")
 check(all(s in session for s in ("art.removeAll()", "store.games = []", "store.downloads = []", "store.finishedToday = []"))
@@ -212,14 +215,14 @@ check("settingsOverride" not in shell and "showSettings = true" in block(shell, 
 check("LibrarySettingsForm" not in lib and "BCDInterfacePicker" not in lib,
       "the classic Settings form and its interface picker are gone")
 check("if let jitProblem { jitConnectionActions(jitProblem, retry: enableJIT) { library.error = nil } }" in front
-      and ('isPresented: Binding(get: { steam.error != nil }' in front or 'isPresented: Binding<Bool>(get: { steam.error != nil }' in front),
+      and ('isPresented: Binding(get: { !BCDDuoFeatures.active && steam.error != nil }' in front or 'isPresented: Binding<Bool>(get: { !BCDDuoFeatures.active && steam.error != nil }' in front),
       "the library's and Steam's errors show over BCD's interface")
 check("LogUploadSettingsSection" not in front and "sendLog" not in front and "BCDSteamSignInSheet()" in front
       and "SteamSignInView()" not in front,
       "no old Send Log sheet (Send Log lives in Settings › Logs and on the game page); Steam sign-in is BCD's own page")
 # Add a game and a game's page (after Add a game, and the Play question's Choose saves) are BCD's
 # own screens, full screen (ui-game-page, 2026-10-18): the classic browser and page never open.
-check("BCDAddGame(close:" in front and "BCDGamePage(gameID:" in front and ".fullScreenCover(item: pageShown, onDismiss: BCDPresentation.didClose)" in front
+check("BCDAddGame(close:" in front and "BCDGamePage(gameID:" in front and ".fullScreenCover(item: pageShown, onDismiss: appSheetClosed)" in front
       and "ExecutableBrowser" not in front and "LibraryDetail" not in front,
       "Add a game and a game's page are BCD's own screens, never the classic ones")
 check("@StateObject private var focus = BCDFocus(watchControllers: false)" in front

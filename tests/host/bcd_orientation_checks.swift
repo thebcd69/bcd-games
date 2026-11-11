@@ -79,6 +79,23 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
         check("the line has no name, path or identifier: digits, flags and the idiom only",
               BCDWindowReport.line(facts()).range(of: "^\\[device\\] window: [a-z0-9=\\- ().]+$", options: .regularExpression) != nil)
 
+        // Night round 2026-11-11 (A5 S15; Q4XKJ6, VW8QG1): the lock looks at a scene again; UIKit's raw values: mask portrait 2, upside down 4,
+        // right 8, left 16 (landscape 24); interface orientation portrait 1, upside down 2, right 3, left 4.
+        let landscapeRightMask: UInt = 8, landscapeMask: UInt = 24
+        check("camera on the left (the interface's landscapeRight): landscapeRight (3) fits, portrait (1) and landscapeLeft (4) do not",
+              BCDOrientationRules.allows(mask: landscapeRightMask, interfaceRaw: 3) && !BCDOrientationRules.allows(mask: landscapeRightMask, interfaceRaw: 1)
+              && !BCDOrientationRules.allows(mask: landscapeRightMask, interfaceRaw: 4))
+        check("landscape on either side: both landscapes fit, portrait and upside down do not",
+              BCDOrientationRules.allows(mask: landscapeMask, interfaceRaw: 3) && BCDOrientationRules.allows(mask: landscapeMask, interfaceRaw: 4)
+              && !BCDOrientationRules.allows(mask: landscapeMask, interfaceRaw: 1) && !BCDOrientationRules.allows(mask: landscapeMask, interfaceRaw: 2))
+        check("an unknown orientation (0, a number past the four) fits nothing", !BCDOrientationRules.allows(mask: 30, interfaceRaw: 0)
+              && !BCDOrientationRules.allows(mask: 30, interfaceRaw: 9) && !BCDOrientationRules.allows(mask: UInt.max, interfaceRaw: -1))
+        check("the check line: a matching scene, and a portrait scene under a landscape lock (402x874)",
+              BCDOrientationRules.checkLine(lock: "landscape-camera-left", reason: "start", sceneW: 874, sceneH: 402, interfaceRaw: 3, fits: true)
+                == "[orientation] check: lock=landscape-camera-left reason=start scene=874x402 interface=3 matches"
+              && BCDOrientationRules.checkLine(lock: "landscape-camera-left", reason: "activate", sceneW: 402, sceneH: 874, interfaceRaw: 1, fits: false)
+                == "[orientation] check: lock=landscape-camera-left reason=activate scene=402x874 interface=1 turns again")
+
         if failures > 0 { exit(1) }
     }
 }

@@ -41,6 +41,9 @@ enum BCDInputMenu {
                                detail: "For first- and third-person games. A finger on a touch control never turns it.",
                                kind: .choice(BCDAimSettings.Zone.allCases.map { BCDChoice(id: $0.rawValue, title: $0.title) }, selected: aim.zone.rawValue))]
         if aim.isOn {
+            rows.append(BCDMenuRow(id: "in.aim-as", title: "The finger moves",
+                                   detail: "The right stick is for a game that plays with a controller layout and ignores the mouse for the camera.",
+                                   kind: .choice(BCDAimSettings.Output.allCases.map { BCDChoice(id: $0.rawValue, title: $0.title) }, selected: aim.output.rawValue)))
             rows.append(BCDMenuRow(id: "in.aim-sens", title: "Speed",
                                    kind: .choice(BCDAimSettings.sensitivityChoices.map { BCDChoice(id: number($0), title: number($0) + "×") }, selected: number(aim.sensitivity))))
             rows.append(BCDMenuRow(id: "in.aim-vertical", title: "Up and down against left and right",

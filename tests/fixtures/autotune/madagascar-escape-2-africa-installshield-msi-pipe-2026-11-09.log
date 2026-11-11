@@ -1,0 +1,237 @@
+[04:55:40.721] [INFO] Checking entitlements...
+[04:55:40.722] [INFO] [build] v0.1.634 (634)
+[04:55:40.722] [INFO] [device] model=iPad16,3 idiom=pad os=iPadOS Version 26.4.2 (Build 23E261) ram=7461MB available=8168MB cores=9
+[04:55:40.723] [INFO] [device] address-map=[0x1003f8000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[04:55:40.723] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[04:55:40.731] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@1.7195876288659795x max-fps=120 utc-offset=+03:00 free-disk=18GB stikdebug-url=1
+[04:55:40.735] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[04:55:42.367] [INFO] [bcd] library launch setup.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[04:55:42.391] [INFO] Running full Wine sequence...
+[04:55:42.391] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1003f8000,0xfc0000000) 63GB available=8158MB low-power=0 thermal=nominal
+[04:55:42.392] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[04:55:42.396] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[04:55:42.398] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[04:55:42.398] [INFO] Allocating 896MB JIT pool via debugger...
+[04:55:42.398] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[04:55:42.399] [INFO] [jit-debugger] attached=1 at the pool request
+[04:55:44.516] [INFO] RX pool at 0x300000000
+[04:55:44.559] [INFO] Detaching debugger...
+[04:55:44.566] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.207s rev=ml526
+[04:55:44.606] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/4a930b5524f3e8cd.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x10a1e0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x47ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x47ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x47fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x47ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x47ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[fdtrace] pipes tid=0000 peb=0x47ffd0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[04:55:45.711] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7245 MB + phys_footprint=946 MB = 8192 MB (hw.memsize says 7461 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7461 MB), so it is a sentinel, not a limit
+[fex-arena] ml793 PUBLISHED [0xb40000000,0xd40000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x126af0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+[jit-pool] image 0x126a80000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x3000 so .data lands on a 16KB page
+[jit-pool] image 0x11b940000+0x3bf000 (libwow64fex.dll) → pool 0x300193000 used=0x55b000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x300193000)
+ml957: libwow64fex.dll backing 0x11b940000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x126960000+0x120000 (ucrtbase.dll) → pool 0x300558000 used=0x67c000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300558000)
+[jit-pool] image 0x1268c0000+0xa0000 (KERNEL32.dll) → pool 0x30067c000 used=0x724000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x30067c000)
+[jit-pool] image 0x11be90000+0x170000 (kernelbase.dll) → pool 0x300724000 used=0x8a4000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300724000)
+[window] 0x128000000..0xb40000000 regions=100001 occupied=7843 MB of 41344 MB free=33500 MB maxhole=32230 MB@0x361948000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=960 MB (peak 960) internal=957 MB compressed=0 MB external=108 MB reusable=0 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=setup.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300515e60 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x11b940000) -> 64-bit table (0x10f885b98)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module setup.exe (setup.exe-743509948e21a728): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c6b191): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1db4596): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa35747): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+D 24 Load module VERSION.dll (version.dll-f3fe55759b3db05e): 47BC20000
+D 24 Load module ucrtbase.dll (ucrtbase.dll-c2fc888ed01c1a72): 47BB30000
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x11b5d0000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #3 hwnd=0x1002e after=0x0 flags=0000003c vis={114,34,498,185} surface=0x10f2d9c98 rev=ml505 style=84c800c4 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x1002e class='#32770' text="" rev=ml853
+[win-pos] #4 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x10f2d9c98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x10f2d9c98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x1002e after=0x0 flags=00000018 vis={114,34,498,185} surface=0x10f2d9c98 rev=ml505 style=84c800c4 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x1002e class='#32770' text="Dialog" rev=ml853
+[win-name] #7 hwnd=0x10036 class='ComboBox' text="" rev=ml853
+[xp-names] m1311368 "wine-x18-exc"
+[xp] 04:55:46.306 +0.54 dt=270 cpu=100 (thr 100) P=100 E=0 run=103 pgw=-1.0 GHz P=3.87 E=2.68 Minst=1876 IPC=4.83 mJ=512 pin=10 rdKB=204 fpMB=1003
+[launch-view] dismissed reason=surface logs=0
+[xp] 04:55:46.567 +0.80 dt=261 cpu=17 (thr 17) P=0 E=16 run=17 pgw=-1.0 GHz P=1.09 E=2.71 Minst=39 IPC=0.88 mJ=4 pin=0 rdKB=0 fpMB=1003
+[xp] 04:55:46.884 +1.12 dt=318 cpu=7 (thr 7) P=0 E=7 run=8 pgw=-1.0 GHz P=0.00 E=2.64 Minst=14 IPC=0.76 mJ=2 pin=0 rdKB=0 fpMB=1003
+[xp] 04:55:47.146 +1.38 dt=261 cpu=3 (thr 3) P=0 E=3 run=3 pgw=-1.0 GHz P=0.00 E=2.58 Minst=9 IPC=1.31 mJ=1 pin=0 rdKB=0 fpMB=1003
+[xp] 04:55:47.470 +1.70 dt=325 cpu=3 (thr 3) P=0 E=3 run=4 pgw=-1.0 GHz P=0.00 E=2.60 Minst=10 IPC=1.41 mJ=1 pin=0 rdKB=0 fpMB=1003
+[xp] 04:55:47.738 +1.97 dt=268 cpu=2 (thr 2) P=0 E=2 run=2 pgw=-1.0 GHz P=0.00 E=2.58 Minst=7 IPC=1.36 mJ=1 pin=0 rdKB=0 fpMB=1003
+[guest-stk] sp+0x78 0x3002994f8 = libwow64fex.dll+0x1064f8
+[footprint] rev=ml358 phys=1006 MB (peak 1006) internal=1001 MB compressed=0 MB external=111 MB reusable=0 MB (cycle=2)
+[srv-input] btn msg=0x201 at (541,454) hit win=0001002e thread=0x127bc5e00
+[srv-input] btn msg=0x201 at (541,454) hit win=0001002e thread=0x127bc5e00
+[srv-input] btn msg=0x201 at (541,454) hit win=0001002e thread=0x127bc5e00
+[hwinput] keyboard focus: program (program cursor)
+[srv-input] btn msg=0x201 at (541,454) hit win=0001002e thread=0x127bc5e00
+[srv-input] btn msg=0x201 at (541,454) hit win=0001002e thread=0x127bc5e00
+[blit] #1 rop=cc0020  SRC phys=0,0 219x373 vis={0,0,164,301}  DST phys=0,0 219x373 vis={0,0,164,301} rev=ml506
+[footprint] rev=ml358 phys=1009 MB (peak 1009) internal=1008 MB compressed=0 MB external=111 MB reusable=0 MB (cycle=3)
+[stale-heal]   3 slot(s) in the copy of 0x11b940000 (libwow64fex.dll) -> 0x300073294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\msiexec.exe" cmdline=L"C:\\windows\\syswow64\\msiexec.exe -Embedding 32"
+[phase] spawn:L"C:\\windows\\syswow64\\msiexec.exe" t+  8.771s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\syswow64\\msiexec.exe -Embedding 32" (fd=131, unixdir=132, dup_unixdir=136) cwd=L"C:\\Madagascar_Escape_2_Africa_Win_Setup_EN\\Game Files\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x400000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x500000000: window body after failed reservations (OCCUPIED 0x500000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x500000000 REJECTED: 4GB+guard unavailable and the page at 0x600000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x600000000 are free, next region 0xb40000000 (+0x53fffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x600000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x600000000..0x700000000 (slot 1) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x600000000 reserve=0
+[wow-window] slot 1 B=0x600000000 bound to peb=0x600310000
+0030:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x600400000 transfer=0x600404670 window=0x600000000 guest_base=0x400000
+[nls-getptr] type=11 id=1252 peb=0x600310000
+[nls-getptr] type=11 id=437 peb=0x600310000
+0030:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0030:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x3000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffbd0000+0x3bf000 (libwow64fex.dll) → pool 0x300b4b000 used=0xf13000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x300b4b000)
+ml957: libwow64fex.dll backing 0x3ffbd0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x3ffab0000+0x120000 (ucrtbase.dll) → pool 0x300f10000 used=0x1034000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300f10000)
+[jit-pool] image 0x3ffa10000+0xa0000 (KERNEL32.dll) → pool 0x301034000 used=0x10dc000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x301034000)
+[jit-pool] image 0x3ff8a0000+0x170000 (kernelbase.dll) → pool 0x3010dc000 used=0x125c000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x3010dc000)
+[nls-getptr] type=11 id=20127 peb=0x600310000
+[jit-pool] image 0x3ff820000+0x80000 (wow64win.dll) → pool 0x30125c000 used=0x12e0000/0x38000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x30125c000)
+[jit-pool] image 0x3ff790000+0x90000 (win32u.dll) → pool 0x3012e0000 used=0x1374000/0x38000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x3012e0000)
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c000000d proc=msiexec.exe tid=0030 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0030 #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x600310000 total=512 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300ecde60 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ffbd0000) -> 64-bit table (0x10f885b98)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x600310000
+[nls-getptr] type=11 id=437 peb=0x600310000
+D 30 Load module imagehlp.dll (imagehlp.dll-8b1026ce1ea57bf4): 67A650000
+D 30 Load module mspatcha.dll (mspatcha.dll-975702169a466f5c): 67A630000
+D 30 Load module odbccp32.dll (odbccp32.dll-7ed95aa590c775d1): 67A610000
+D 30 Load module wintrust.dll (wintrust.dll-f4cd6b53ba3ba48a): 67A5D0000
+D 30 Load module crypt32.dll (crypt32.dll-6b71bb9bfc774e8a): 67A500000
+D 30 Load module bcrypt.dll (bcrypt.dll-5a6646eeb10850ce): 67A4D0000
+[nls-getptr] type=11 id=20127 peb=0x600310000
+[apc-requeue] on (MADEIRA_APC_REQUEUE=0 restores dropping async I/O APCs for busy threads)
+[apc-requeue] #1 async I/O APC status=00000000 for busy thread 0028 -> dropped, no waiting thread 0000
+[apc-requeue] #2 async I/O APC status=00000101 for busy thread 0038 -> waiting thread 0030
+[apc-requeue] #3 async I/O APC status=00000101 for busy thread 003c -> dropped, no waiting thread 0000
+[apc-requeue] #4 async I/O APC status=c000014b for busy thread 0038 -> waiting thread 0030
+[exc-disp] dispatch tid=0038 code=000006be flags=0 addr=0x67bc52f79 pc=300aedbe8 nparams=0 p0=0 p1=0
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x6be) syscalls=0 unix_calls=755
+[Wine ntdll/server] process_exit_wrapper(1726): closing child fd_socket=135
+[pool-freechk] POISONED AT FREE off=0x9bc000 size=0x118000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x12e0000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x125c000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x10dc000 size=0x180000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x1034000 size=0xa8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xf10000 size=0x124000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xb48000 size=0x3c8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xad4000 size=0x74000 cur=0x3 max=0x3  <== narrowed during the module's life
+[wow-window] slot 1 B=0x600000000 released (owner peb=0x600310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1726)
+0024:err:msi:custom_get_thread_return invalid Return Code 1726
+[vfree] ml842 # base=0xd40221000 size=0x800000 type=0x4000 tid=0024
+[win-name] #107 hwnd=0x2002e class='#32770' text="InstallShield Wizard" rev=ml853
+[win-pos] #108 hwnd=0x2002e after=0x0 flags=0000181f vis={328,207,832,593} surface=0x10f2d9c98 rev=ml505 style=84c008c4 visible=0 parent=0x10020
+[win-name] #108 hwnd=0x2002e class='#32770' text="InstallShield Wizard" rev=ml853
+[win-pos] #109 hwnd=0x2002e after=0x0 flags=0000181f vis={328,207,832,593} surface=0x10f2d9c98 rev=ml505 style=84c008c4 visible=0 parent=0x10020
+[win-name] #109 hwnd=0x2002e class='#32770' text="InstallShield Wizard" rev=ml853
+[win-pos] #110 hwnd=0x2002e after=0x0 flags=0000181f vis={328,207,832,593} surface=0x10f2d9c98 rev=ml505 style=84c008c4 visible=0 parent=0x10020
+[win-name] #110 hwnd=0x2002e class='#32770' text="InstallShield Wizard" rev=ml853
+[win-pos] #111 hwnd=0x2002e after=0x0 flags=0000181f vis={328,207,832,593} surface=0x10f2d9c98 rev=ml505 style=84c008c4 visible=0 parent=0x10020
+[win-name] #111 hwnd=0x2002e class='#32770' text="InstallShield Wizard" rev=ml853
+[win-pos] #112 hwnd=0x2004a after=0x0 flags=0000003c vis={0,0,1,1} surface=0x10f2d9c98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #112 hwnd=0x2004a class='IME' text="" rev=ml853
+[win-pos] #113 hwnd=0x2004a after=0x0 flags=00000018 vis={0,0,1,1} surface=0x10f2d9c98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #113 hwnd=0x2004a class='IME' text="Default IME" rev=ml853
+[footprint] rev=ml358 phys=1109 MB (peak 1109) internal=1108 MB compressed=0 MB external=117 MB reusable=0 MB (cycle=4)
+[vfree] ml842 # base=0xd41501000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=762
+[srv-kill] kill_thread tid=0028 pid=0020 violent=1 rev=ml586
+[vfree] ml842 # base=0xd41561000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=763
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (msiexec.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[vfree] ml842 # base=0xd49251000 size=0xf000 type=0x4000 tid=0028
+[WineProc] stopping wineserver...
+[04:55:53.891] [INFO] [session] length=11s play=0s frames=0 stalls=0/0s peak=1128MB limit=8191MB thermal=nominal lpm=0 res=1160x800 cap=60 game=setup
+[frontend] returned to library
+[footprint] rev=ml358 phys=1112 MB (peak 1112) internal=1111 MB compressed=0 MB external=119 MB reusable=0 MB (cycle=5)
+[04:55:55.439] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1116 MB (peak 1116) internal=1114 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=6)
+[footprint] rev=ml358 phys=1116 MB (peak 1116) internal=1115 MB compressed=0 MB external=120 MB reusable=0 MB (cycle=7)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1126 MB (peak 1126) internal=1125 MB compressed=0 MB external=131 MB reusable=0 MB (cycle=8)
+[footprint] rev=ml358 phys=1127 MB (peak 1127) internal=1126 MB compressed=0 MB external=133 MB reusable=0 MB (cycle=9)
+[footprint] rev=ml358 phys=1119 MB (peak 1127) internal=1118 MB compressed=0 MB external=133 MB reusable=8 MB (cycle=10)
+[xp] 04:56:04.083 +18.31 dt=255 cpu=59 (thr 59) P=24 E=36 run=62 pgw=-1.0 GHz P=2.05 E=2.78 Minst=223 IPC=1.51 mJ=33 pin=16 rdKB=440 fpMB=1119
+[xp] 04:56:04.349 +18.58 dt=266 cpu=36 (thr 36) P=0 E=36 run=36 pgw=-1.0 GHz P=0.00 E=2.77 Minst=102 IPC=1.02 mJ=11 pin=3 rdKB=52 fpMB=1119
+[xp] 04:56:04.601 +18.83 dt=252 cpu=54 (thr 54) P=0 E=54 run=54 pgw=-1.0 GHz P=0.00 E=2.78 Minst=177 IPC=1.18 mJ=18 pin=0 rdKB=0 fpMB=1119
+[xp] 04:56:04.863 +19.09 dt=262 cpu=12 (thr 12) P=0 E=12 run=12 pgw=-1.0 GHz P=0.00 E=2.80 Minst=38 IPC=1.12 mJ=4 pin=0 rdKB=0 fpMB=1119
+[xp] 04:56:05.114 +19.35 dt=251 cpu=18 (thr 18) P=0 E=18 run=18 pgw=-1.0 GHz P=0.00 E=2.76 Minst=50 IPC=0.99 mJ=5 pin=0 rdKB=0 fpMB=1119
+[xp] 04:56:05.438 +19.67 dt=324 cpu=60 (thr 59) P=37 E=22 run=61 pgw=-1.0 GHz P=2.18 E=2.77 Minst=255 IPC=1.78 mJ=45 pin=0 rdKB=0 fpMB=1120
+55 IPC=1.78 mJ=45 pin=0 rdKB=0 fpMB=1120
+16 E=128 run=148 pgw=-1.0 GHz P=2.24 E=2.81 Minst=1148 IPC=2.90 mJ=82 pin=8 rdKB=112 fpMB=1122
+[04:56:05.770] [thread-sample] ml876 b0 "" teb=0x0 cpu=14% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fa05d70 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[04:56:05.770] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=libdispatch.dylib`<redacted>+0x0 lr=libdispatch.dylib`<redacted>+0x94 sp=0x16fa8e9f0 NATIVE (no FEX state) sp-cand=[ ]

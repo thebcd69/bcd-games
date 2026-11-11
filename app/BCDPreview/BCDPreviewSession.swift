@@ -7,8 +7,8 @@ import UIKit
 
 /// The in-game layer on sample values, for the preview app's photographs (tools/ui-preview.py):
 ///   -BCDTab ingame-menu[-display|-controls|-tools|-binds|-quit|-cloud|-desk]
-///   -BCDTab starting[-dock|-installs|-failed|-log|-home|-desktop]   (-desktop: the Windows desktop's first start on an empty library)
-///   -BCDTab message-opengl|message-pool   (the session line over the running Windows desktop: Library.swift DesktopExitRules)
+///   -BCDTab starting[-dock|-installs|-failed|-log|-home|-desktop|-poolwait|-poolstalled|-lowpower]   (-desktop: the Windows desktop's first start on an empty library)
+///   -BCDTab message-opengl|message-pool|message-closing|message-program|message-recommended   (the session line over the running Windows desktop: Library.swift DesktopExitRules)
 ///   -BCDTab overlay[-1|-2|-3|-4|-custom|-legacy|-edit|-warn|-desk|-keyboard]   (the performance HUD's layouts; -legacy is an old overlay carried over)
 ///   -BCDTab ingame-menu-hud[-custom]   (the Display tab with the HUD's rows, or the Custom HUD's page)
 /// A picture of a game stands in for the running game. Only the preview app compiles this file.
@@ -141,6 +141,13 @@ private struct BCDPreviewSessionStage: View {
             case "starting-desktop":
                 info.step = .loading
                 info.notes = [BCDStartNote(id: "desktop-empty", text: BCDPreviewSessionSamples.desktopHint)]
+            case "starting-lowpower":   // night round 2026-11-11 (A5 S12): BCDStartHints.lowPower
+                info.step = .loading
+                info.notes = [BCDStartNote(id: "low-power", text: BCDStartHints.lowPower, tone: .warm)]
+            case "starting-poolwait", "starting-poolstalled":   // night round 2026-11-11 (M7): the JIT memory request's line (StikJITHelper)
+                info.step = .loading
+                info.notes = [BCDStartNote(id: "pool-wait", text: spec == "starting-poolwait" ? BCDPreviewSessionSamples.poolWaitWords
+                                           : BCDPreviewSessionSamples.poolStalledWords, tone: .warm)]
             default:
                 info.step = .loading
             }
@@ -149,7 +156,13 @@ private struct BCDPreviewSessionStage: View {
         }
         if spec.hasPrefix("message-") {
             // The session line over the running Windows desktop (LibraryModel.sessionMessage, set by watchDesktopExits).
-            hud.message = spec == "message-pool" ? BCDPreviewSessionSamples.desktopPoolWords : BCDPreviewSessionSamples.desktopOpenGLWords
+            switch spec {
+            case "message-pool": hud.message = BCDPreviewSessionSamples.desktopPoolWords
+            case "message-closing": hud.message = BCDPreviewSessionSamples.desktopClosingWords   // night round 2026-11-11 (A4 S1)
+            case "message-program": hud.message = BCDPreviewSessionSamples.desktopProgramOpenWords
+            case "message-recommended": hud.message = BCDPreviewSessionSamples.desktopRecommendedWords   // night round 2026-11-11 (A4 S2)
+            default: hud.message = BCDPreviewSessionSamples.desktopOpenGLWords
+            }
             actions.hud = hud
             return
         }
@@ -256,6 +269,21 @@ enum BCDPreviewSessionSamples {
     static let desktopOpenGLWords = "GeometryDash.exe needs OpenGL, which BCD does not have yet, so it closes. This is not a setting."
     static let desktopPoolWords = "The Windows desktop is out of room for programs: what runs on it now is too big for this device. "
         + "Close a program, or start the game from BCD's library."
+    /// Night round 2026-11-11 (M7): StikJITHelper.poolWaitWords and .poolStalledWords (check-jit-pool-wait.py keeps them the same).
+    static let poolWaitWords = "Waiting for StikDebug to hand over JIT memory. The screen can freeze for up to 30 seconds. Don't close BCD."
+    static let poolStalledWords = "BCD has waited 30 seconds for JIT memory and StikDebug has not answered. Close BCD (swipe it away in the app "
+        + "switcher), make sure LocalDevVPN is connected, tap Enable JIT and press Play again straight away."
+    /// Night round 2026-11-11 (A4 S1): the Close row of a Windows desktop session (DesktopExitRules.menu*; check-desktop-close.py keeps them the same).
+    /// Night round 2026-11-11 (A4 S2): DesktopExitRules.recommendedWords for the row "Red Dead Redemption 2 (Steam)".
+    static let desktopRecommendedWords = "BCD has recommended settings for Red Dead Redemption 2. The Windows desktop does not use them. "
+        + "Close the desktop, choose Add a game (the + button) and pick this program, then start it from the library."
+    static let desktopClosingWords = "The Windows desktop is closing."
+    static let desktopProgramOpenWords = "A program is still open on the desktop. Close it, or choose Close again to end the desktop."
+    static let desktopCloseTitle = "Close the Windows desktop"
+    static let desktopCloseDetail = "Programs on it are closed; what they haven't saved is lost."
+    static let desktopCloseConfirmTitle = "Close the Windows desktop?"
+    static let desktopCloseConfirmMessage = "BCD asks the programs on the desktop to close and ends this session. What you haven't saved is lost."
+    static let desktopCloseAnswer = "Close desktop"
 
     static let deskReading = BCDPerformanceReading(readings: [
         BCDReading(id: "fps", text: "59.8 FPS", tone: .good), BCDReading(id: "mem", text: "2310/6144 MB", tone: .good),
@@ -319,6 +347,15 @@ enum BCDPreviewSessionSamples {
                                confirm: BCDConfirm(title: "Quit the game?",
                                                    message: "BCD asks the game to close, as Alt+F4 does. What you haven't saved is lost, and the game may ask you to confirm.",
                                                    answers: [.init(id: "quit", title: "Quit game", destructive: true)])),
+                ]))
+            } else {
+                // night round 2026-11-11 (A4 S1): the Windows desktop has no game to quit (BCDSessionLive.gameSections, DesktopExitRules)
+                out.append(BCDMenuSection(id: "quit", rows: [
+                    BCDMenuRow(id: "quit", title: BCDPreviewSessionSamples.desktopCloseTitle, detail: BCDPreviewSessionSamples.desktopCloseDetail,
+                               symbol: "stop.circle", kind: .action(destructive: true),
+                               confirm: BCDConfirm(title: BCDPreviewSessionSamples.desktopCloseConfirmTitle,
+                                                   message: BCDPreviewSessionSamples.desktopCloseConfirmMessage,
+                                                   answers: [.init(id: "quit", title: BCDPreviewSessionSamples.desktopCloseAnswer, destructive: true)])),
                 ]))
             }
             return out

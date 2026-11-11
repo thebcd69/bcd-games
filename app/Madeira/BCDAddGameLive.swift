@@ -21,18 +21,21 @@ import Foundation
         path.isEmpty ? drive : drive.appendingPathComponent(path)
     }
 
-    /// Only what lies inside drive_c, links followed: a link out of it is not listed. The one link that leads out
-    /// and is listed is C:\External, the SSD folder the player chose in Settings > Storage (while it is connected).
-    private func inside(_ url: URL) -> Bool {
-        url.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/") || ExternalGameStorage.shared.admits(url)
-    }
+    /// Only what lies inside drive_c, links followed: a link out of it is not listed. The links that lead out and are
+    /// listed are the external drives added in Settings › Storage (C:\External\<name>, while connected; ExternalDrives.swift).
+    private func inside(_ url: URL) -> Bool { LibraryModel.relativeToDrive(url) != nil }
 
     func list(_ folder: String) throws -> [BCDDriveItem] {
         let base = url(folder)
         guard folder.isEmpty || inside(base) else { throw BCDGameError("This folder is outside drive_c.") }
         let names: [URL]
-        if let linked = ExternalGameStorage.shared.linkedChildren(of: base) {
-            names = linked       // the SSD folder, listed by path: the URL listing does not follow the C:\External link
+        if folder.lowercased() == "external" || folder.lowercased().hasPrefix("external/") {
+            // C:\External and the drives in it, listed by path: the path-based call follows a drive's link, and the names
+            // keep `base` as their parent, so they stay under drive_c (the URL listing fails on a link as the last component).
+            guard let found = try? FileManager.default.contentsOfDirectory(atPath: base.path) else {
+                throw BCDGameError("BCD couldn't open this folder. If it is on an external drive, check that the drive is connected.")
+            }
+            names = found.filter { !$0.hasPrefix(".") }.map { base.appendingPathComponent($0) }
         } else {
             do {
                 names = try FileManager.default.contentsOfDirectory(at: base, includingPropertiesForKeys: [.isDirectoryKey],

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -11,7 +13,7 @@ import Foundation
 
 /// Settings' sections, in the order the list shows them.
 enum BCDSettingsSection: String, CaseIterable, Identifiable {
-    case accounts, jit, dock, memory, graphics, controls, storage, dotnet, vcruntime, gecko, logs, feedback, all, developer, updates, about
+    case accounts, jit, dock, memory, graphics, appearance, controls, storage, dotnet, vcruntime, gecko, logs, feedback, all, developer, updates, about
 
     var id: String { rawValue }
 
@@ -22,6 +24,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "BCD Dock"
         case .memory: return "Memory & performance"
         case .graphics: return "Graphics"
+        case .appearance: return "Appearance"
         case .controls: return "Controls"
         case .storage: return "Storage"
         case .dotnet: return ".NET Framework"
@@ -44,6 +47,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "Valve's client for your Steam games"
         case .memory: return "Limits, the swap file, sync, eco mode and the background"
         case .graphics: return "Resolution, frame cap and the display"
+        case .appearance: return "App colors and saved profiles"
         case .controls: return "Touch controls, pointer and controllers"
         case .storage: return "What BCD keeps on this device"
         case .dotnet: return "Wine Mono for games made with .NET"
@@ -65,6 +69,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .dock: return "shippingbox.fill"
         case .memory: return "memorychip"
         case .graphics: return "display"
+        case .appearance: return "paintpalette.fill"
         case .controls: return "gamecontroller.fill"
         case .storage: return "internaldrive.fill"
         case .dotnet: return "cube.fill"
@@ -156,6 +161,8 @@ struct BCDSettingsNavigator {
     var order: [String] = []
     /// The value rows among them: left and right step these.
     var adjustable: Set<String> = []
+    /// Persistent-tab Settings has no modal Done action.
+    var hasDone = true
 
     /// The list is what the ring is on, or what B returns to.
     private var onList: Bool { mode == .split || !pushed }
@@ -179,7 +186,7 @@ struct BCDSettingsNavigator {
         if id == BCDSettingsID.back {
             switch move {
             case .down: return order.first.map { .focus($0) } ?? .stay
-            case .right: return .focus(BCDSettingsID.done)
+            case .right: return hasDone ? .focus(BCDSettingsID.done) : .stay
             case .left: return .leave(selected)
             case .up: return .stay
             }
@@ -188,7 +195,7 @@ struct BCDSettingsNavigator {
             guard let index = sections.firstIndex(of: section) else { return .pass }
             switch move {
             case .up:
-                guard index > 0 else { return .focus(BCDSettingsID.done) }
+                guard index > 0 else { return hasDone ? .focus(BCDSettingsID.done) : .stay }
                 return mode == .split ? .select(sections[index - 1]) : .focus(BCDSettingsID.list(sections[index - 1]))
             case .down:
                 guard index + 1 < sections.count else { return .stay }

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -90,6 +92,7 @@ struct BCDSettingsReading: Identifiable {
     @Published private(set) var developerShown = UserDefaults.standard.bool(forKey: BCDSettingsModel.developerKey)
     static let developerKey = "bcd.settings.developer"
 
+    var tabCycle: ((Int) -> Void)?
     var mode: BCDSettingsNavigator.Mode = .split
     /// The shown section's controls, top to bottom, and what left/right and Y do on them.
     private(set) var order: [String] = []
@@ -110,7 +113,10 @@ struct BCDSettingsReading: Identifiable {
     private weak var focus: BCDFocus?
     private var close: () -> Void = {}
 
-    init(section: BCDSettingsSection?) {
+    private let retainsDetail: Bool
+
+    init(section: BCDSettingsSection?, retainsDetail: Bool = false) {
+        self.retainsDetail = retainsDetail
         backends = .make()
         selected = section ?? BCDSettingsSection.allCases[0]
         pushed = section != nil
@@ -120,7 +126,7 @@ struct BCDSettingsReading: Identifiable {
 
     var navigator: BCDSettingsNavigator {
         BCDSettingsNavigator(mode: mode, sections: visibleSections, selected: selected, pushed: pushed, order: order,
-                             adjustable: Set(steppers.keys))
+                             adjustable: Set(steppers.keys), hasDone: !retainsDetail)
     }
 
     /// The list: Developer only while About's "Developer options" is on.
@@ -141,11 +147,11 @@ struct BCDSettingsReading: Identifiable {
         self.focus = focus
         self.close = close
         focus.steer = { [weak self] move in self?.steer(move) ?? false }
-        if let id = focus.focused, id.hasPrefix("settings."), let section = BCDSettingsID.section(id) {
+        if !retainsDetail, let id = focus.focused, id.hasPrefix("settings."), let section = BCDSettingsID.section(id) {
             selected = section          // the preview app's -BCDFocus on a section's control
         } else if mode == .stacked && pushed {
-            focus.focused = nil
-            focusFirst = true
+            if retainsDetail, let first = order.first { focus.focused = first; focusFirst = false }
+            else { focus.focused = nil; focusFirst = true }
         } else {
             focus.focused = BCDSettingsID.list(selected)
         }
@@ -159,6 +165,12 @@ struct BCDSettingsReading: Identifiable {
         focus.steer = nil
         focus.setHandlers([])
         if focus.focused?.hasPrefix("settings.") == true { focus.focused = nil }
+        if retainsDetail {
+            // Transient overlays must not outlive their controller focus ownership.
+            confirm = nil; reading = nil; controllersShown = false
+            covered = nil
+            self.focus = nil
+        }
     }
 
     // MARK: Rows
@@ -232,14 +244,21 @@ struct BCDSettingsReading: Identifiable {
     /// Shows a section beside the list; its rows report their order once drawn.
     private func show(_ section: BCDSettingsSection) {
         guard section != selected else { return }
-        selected = section
-        order = []
-        focusFirst = false
+        if retainsDetail {
+            order = []
+            focusFirst = false
+            selected = section
+        } else {
+            selected = section
+            order = []
+            focusFirst = false
+        }
     }
 
     /// The ring reached a row of the list some other way (the nearest-control rule from a
     /// section wired in later, a tap): beside the list, that section shows.
     func focusMoved(to id: String?) {
+        guard !retainsDetail || focus?.controllerActive == true else { return }
         if let id, id.hasPrefix("settings.") { lastFocus = id }
         guard mode == .split, let id, let section = BCDSettingsID.listSection(id) else { return }
         show(section)
@@ -249,6 +268,16 @@ struct BCDSettingsReading: Identifiable {
     /// back to the same place (a section's row upright only while its page is open).
     func layoutChanged(to new: BCDSettingsNavigator.Mode) {
         mode = new
+        if retainsDetail {
+            // Touch intent owns the destination. Rotation must not replay a previous
+            // section from the controller's hidden focus or change the navigation depth.
+            if focus?.controllerActive == true {
+                let valid = lastFocus.flatMap { order.contains($0) ? $0 : nil }
+                focus?.focused = (pushed ? valid ?? order.first : nil) ?? BCDSettingsID.list(selected)
+            }
+            installButtons()
+            return
+        }
         if new == .stacked, let last = lastFocus {
             // Upright, the page the ring was on: the section for one of its rows, else the list.
             if BCDSettingsID.listSection(last) != nil {
@@ -266,19 +295,39 @@ struct BCDSettingsReading: Identifiable {
     }
 
     private func enter(_ section: BCDSettingsSection, first: String?) {
-        let fresh = section != selected || (mode == .stacked && !pushed)
-        selected = section
-        if mode == .stacked && !pushed { withAnimation(.easeOut(duration: 0.22)) { pushed = true } }
-        if !fresh, let first {
-            setFocus(first)
-        } else {
-            order = []
-            focusFirst = true
+        if !retainsDetail {   // the original Settings, as it was
+            let fresh = section != selected || (mode == .stacked && !pushed)
+            selected = section
+            if mode == .stacked && !pushed { withAnimation(.easeOut(duration: 0.22)) { pushed = true } }
+            if !fresh, let first {
+                setFocus(first)
+            } else {
+                order = []
+                focusFirst = true
+            }
+            return
         }
+        // The native Duo Settings (thebcd69/bcd-games#43): the detail stays alive in the split view.
+        let sameSection = section == selected
+        let fresh = !sameSection || (mode == .stacked && !pushed)
+        let immediate: String?
+        if sameSection { immediate = first ?? order.first }
+        else if !fresh { immediate = first }
+        else { immediate = nil }
+        // Publishing selection can synchronously deliver the new page's row preferences.
+        // Establish entry intent first; never clear those fresh rows after publishing it.
+        if immediate != nil { focusFirst = false }
+        else { order = []; focusFirst = true }
+        selected = section
+        if !pushed { withAnimation(.easeOut(duration: 0.22)) { pushed = true } }
+        if let immediate { setFocus(immediate) }
     }
 
     private func leave(_ section: BCDSettingsSection) {
-        if mode == .stacked {
+        if retainsDetail {
+            focusFirst = false
+            withAnimation(.easeOut(duration: 0.22)) { pushed = false }
+        } else if mode == .stacked {
             withAnimation(.easeOut(duration: 0.22)) { pushed = false }
             order = []
             focusFirst = false
@@ -405,7 +454,7 @@ struct BCDSettingsReading: Identifiable {
 
     /// The buttons and their hints for where the ring is.
     func installButtons() {
-        guard let focus else { return }
+        guard let focus, !retainsDetail || !focus.layerOpen || coveredLayer.map(focus.ownsLayer) == true else { return }
         let id = focus.focused
         var list: [(BCDHint, () -> Void)] = []
         if let covered {
@@ -418,13 +467,22 @@ struct BCDSettingsReading: Identifiable {
             list = [(BCDHint(button: .b, title: "Close"), { [weak self] in self?.back() })]
         } else {
             let onList = id.flatMap(BCDSettingsID.listSection) != nil
-            list.append((BCDHint(button: .a, title: onList ? "Open" : steps(id) ? "Next" : "Choose"), {}))
+            list.append((BCDHint(button: .a, title: onList ? "Open" : steps(id) ? "Next" : "Choose"), { [weak self] in
+                // A native List may not have materialized the newly selected sidebar row yet.
+                guard let self, self.retainsDetail, let id = self.focus?.focused,
+                      let section = BCDSettingsID.listSection(id) else { return }
+                self.open(section)
+            }))
             if let id, resetters[id] != nil {
                 list.append((BCDHint(button: .y, title: "Default"), { [weak self] in self?.resetFocused() }))
             }
             list.append((BCDHint(button: .b, title: navigator.back(from: id) == .close ? "Close" : "Back"),
                          { [weak self] in self?.back() }))
             list.append((BCDHint(button: .menu, title: "Close"), { [weak self] in self?.close() }))
+        }
+        if covered == nil && confirm == nil && reading == nil, let tabCycle {
+            list.append((BCDHint(button: .leftShoulder, title: "Previous tab"), { tabCycle(-1) }))
+            list.append((BCDHint(button: .rightShoulder, title: "Next tab"), { tabCycle(1) }))
         }
         focus.setHandlers(list)
     }
@@ -785,6 +843,7 @@ struct BCDSettingsDetail: View {
         case .gecko: Self.gecko(model.backends.gecko)
         case .memory: Self.memory(model.backends.memory)
         case .graphics: Self.graphics(model.backends.graphics)
+        case .appearance: BCDAppearanceSettings()
         case .controls: Self.controls(model.backends.controls)
         case .storage: Self.storage(model.backends.storage)
         case .dotnet: Self.dotNet(model.backends.dotNet)
@@ -1103,7 +1162,7 @@ struct BCDSettingsNotice: View {
 
 enum BCDSettingsColor {
     /// Warnings: a change that needs a restart, an entitlement that is missing.
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 }
 
 /// What Settings says about a change that applies from BCD's next start.
@@ -1201,5 +1260,189 @@ struct BCDSettingsReaderView: View {
             }
         }
         .background(BCDStyle.ground.ignoresSafeArea())
+    }
+}
+
+// Modified 2026-11-04: native split navigation is exclusive to the Duo enhancements path.
+struct BCDDuoSettingsRoot: View {
+    @ObservedObject var store: BCDStore
+    let close: () -> Void
+    let section: BCDSettingsSection?
+    let requestID: Int
+    let active: Bool
+    let cycleTabs: (Int) -> Void
+    @EnvironmentObject private var focus: BCDFocus
+    @State private var owner = UUID()
+    @StateObject private var model: BCDSettingsModel
+    @Environment(\.horizontalSizeClass) private var horizontal
+    @Environment(\.verticalSizeClass) private var vertical
+
+    init(store: BCDStore, close: @escaping () -> Void, section: BCDSettingsSection? = nil, requestID: Int = 0, active: Bool = true, cycleTabs: @escaping (Int) -> Void = { _ in }) {
+        self.store = store
+        self.close = close
+        self.section = section
+        self.requestID = requestID
+        self.active = active
+        self.cycleTabs = cycleTabs
+        _model = StateObject(wrappedValue: BCDSettingsModel(section: section, retainsDetail: true))
+    }
+
+    private var layout: BCDLayout { BCDLayout.of(horizontal: horizontal, vertical: vertical) }
+    private func selection(mode: BCDSettingsNavigator.Mode) -> Binding<BCDSettingsSection?> {
+        // Selection is presentation only: adapting the split view can replay stale values.
+        // Explicit row actions and the controller navigator own the selected section.
+        Binding(get: { mode == .stacked && !model.pushed ? nil : model.selected }, set: { _ in })
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            // Keep UIKit's real traits for native bars. One model owns presentation for both
+            // touch and controller Back, including regular-width portrait on the inner screen.
+            let mode: BCDSettingsNavigator.Mode = horizontal == .compact || geometry.size.width < 700 ? .stacked : .split
+            let contentLayout: BCDLayout = geometry.size.width < 700 ? .phonePortrait : layout
+            settings(mode: mode)
+                .environment(\.bcdLayout, contentLayout)
+                .onAppear { model.mode = mode; if active { start() } }
+                .onChange(of: mode) { _, new in if active { model.layoutChanged(to: new) } else { model.mode = new } }
+        }
+        .coordinateSpace(name: BCDFocus.space)
+        .environmentObject(store)
+        .environmentObject(model)
+        .foregroundStyle(BCDStyle.text)
+        .tint(BCDStyle.lavender)
+        .preferredColorScheme(.dark)
+        .onDisappear { if active { BCDDuoPageOwner.release(owner) } }
+        .onChange(of: active) { _, value in if value { start() } else { BCDDuoPageOwner.release(owner) } }
+        .onChange(of: requestID) { _, _ in if let section { model.go(to: section) } }
+        .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, id in
+            guard active else { return }
+            model.focusMoved(to: id); model.installButtons()
+        }
+    }
+
+    private func visibility(mode: BCDSettingsNavigator.Mode) -> Binding<NavigationSplitViewVisibility> {
+        Binding(get: { mode == .stacked && model.pushed ? .detailOnly : .all }, set: { _ in })
+    }
+
+    private func compactColumn(mode: BCDSettingsNavigator.Mode) -> Binding<NavigationSplitViewColumn> {
+        Binding(get: { model.pushed ? .detail : .sidebar }, set: { _ in })
+    }
+
+    private func settings(mode: BCDSettingsNavigator.Mode) -> some View {
+        ZStack {
+            // Keep the detail subtree alive across width changes (including an active sign-in).
+            NavigationSplitView(columnVisibility: visibility(mode: mode), preferredCompactColumn: compactColumn(mode: mode)) {
+                sidebar(mode: mode)
+            } detail: {
+                NavigationStack { detail(mode: mode) }
+            }
+            .navigationSplitViewStyle(.balanced)
+            // Collapse this Settings container locally; never override the app window or tab bar.
+            .environment(\.horizontalSizeClass, mode == .stacked ? .compact : horizontal)
+            .toolbar(removing: .sidebarToggle)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if focus.controllerActive && !focus.hints.isEmpty { hintBar }
+            }
+            if let question = model.confirm { BCDSettingsConfirmView(question: question) }
+            if let reading = model.reading { BCDSettingsReaderView(reading: reading) }
+            if model.controllersShown {
+                BCDControllerScreen(focus: focus, close: { model.hideControllers() })
+                    .contentShape(Rectangle()).accessibilityAddTraits(.isModal)
+            }
+        }
+    }
+
+    private func sidebar(mode: BCDSettingsNavigator.Mode) -> some View {
+        ScrollViewReader { proxy in
+            List(selection: selection(mode: mode)) {
+                ForEach(model.visibleSections) { section in
+                    // Route touch through the same model action as controller selection.
+                    Button { model.open(section) } label: {
+                        Label(section.title, systemImage: section.symbol)
+                            .font(.body).frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .tag(section)
+                    .id(BCDSettingsID.list(section))
+                    .bcdFocusable(BCDSettingsID.list(section), cornerRadius: 12) { model.open(section) }
+                }
+            }
+            .listStyle(.sidebar)
+            .scrollContentBackground(.hidden)
+            .background { BCDBackdrop() }
+            .navigationTitle("Settings")
+            .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
+            .onScrollPhaseChange { _, phase in if phase == .interacting { focus.touched() } }
+            .onChange(of: focus.focused) { _, id in
+                guard focus.controllerActive, let id, BCDSettingsID.listSection(id) != nil else { return }
+                revealSidebar(id, proxy)
+            }
+            .onChange(of: focus.controllerActive) { _, active in
+                if active, let id = focus.focused { revealSidebar(id, proxy) }
+            }
+            .onGeometryChange(for: CGSize.self) { $0.size } action: { _ in
+                if focus.controllerActive, let id = focus.focused { revealSidebar(id, proxy) }
+            }
+            .onAppear { proxy.scrollTo(BCDSettingsID.list(model.selected), anchor: .center) }
+        }
+    }
+
+    private func revealSidebar(_ id: String, _ proxy: ScrollViewProxy) {
+        guard BCDSettingsID.listSection(id) != nil else { return }
+        DispatchQueue.main.async {
+            guard focus.controllerActive, focus.focused == id else { return }
+            withAnimation(.easeOut(duration: 0.18)) { proxy.scrollTo(id, anchor: .center) }
+        }
+    }
+
+    private func detail(mode: BCDSettingsNavigator.Mode) -> some View {
+        BCDSettingsDetail(section: model.selected)
+            .background { BCDBackdrop() }
+            .navigationTitle(model.selected.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(mode == .stacked)
+            .toolbar {
+                if mode == .stacked { ToolbarItem(placement: .topBarLeading) { backButton } }
+            }
+    }
+
+    private func start() {
+        BCDDuoPageOwner.claim(owner) { model.stop() }
+        model.tabCycle = cycleTabs
+        model.start(focus: focus, close: close)
+    }
+
+    /// Native toolbar action shared by touch, VoiceOver and the controller's Back target.
+    private var backButton: some View {
+        Button(action: model.leaveToList) { Label("Back", systemImage: "chevron.left") }
+            .bcdFocusable(BCDSettingsID.back, cornerRadius: 22, action: model.leaveToList)
+            .accessibilityLabel("Back to Settings")
+    }
+
+    private var hintBar: some View {
+        HStack(spacing: layout == .phonePortrait ? 14 : 20) {
+            Spacer(minLength: 0)
+            if model.steps(focus.focused) {
+                HStack(spacing: 7) {
+                    Text("◀ ▶")
+                        .font(.system(size: 10, weight: .heavy, design: .rounded))
+                        .foregroundStyle(BCDStyle.ground)
+                        .padding(.horizontal, 6).frame(minHeight: 24)
+                        .background(BCDStyle.text, in: Capsule())
+                    Text("Change").font(BCDStyle.label(14)).lineLimit(1)
+                }
+                .fixedSize()
+                .accessibilityElement(children: .combine)
+            }
+            // Upright there is room for three: Menu's Close goes (B closes from the list too).
+            ForEach(focus.hints.filter { layout != .phonePortrait || $0.button != .menu }) {
+                BCDHintView(hint: $0).fixedSize()
+            }
+        }
+        .padding(.horizontal, layout == .phonePortrait ? 16 : layout.gutter).frame(height: 40)
+        .background(BCDStyle.ground.ignoresSafeArea(edges: .bottom))
+        .overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke.opacity(0.7)).frame(height: 1) }
     }
 }

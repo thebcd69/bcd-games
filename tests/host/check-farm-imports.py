@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """tools/check-farm-imports.py: the farm completeness guard (round 632, D17).
 
 Synthetic farms of small PE files built here (PE32+ and PE32, static imports, delay imports by RVA and by VA, an api-set contract): the
@@ -148,8 +150,8 @@ baseline = json.loads((root / "tools/farm-baseline.json").read_text())
 check("the committed baseline knows the three farms, each with required files, a minimum and gap lists",
       set(baseline["farms"]) == {"arm64ec-windows", "aarch64-windows", "i386-windows"}
       and all(f["required"] and f["minFiles"] > 50 and "staticGaps" in f and "delayGaps" in f for f in baseline["farms"].values()))
-check("its accepted static gaps are the opt-in modules' (evr-optin, msi-optin) and the Bluetooth control panel's",
-      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "evr-optin.dll", "msi-optin.dll"}
+check("its accepted static gaps are the opt-in modules' (dxdiagn-optin, evr-optin, msi-optin) and the Bluetooth control panel's",
+      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "dxdiagn-optin.dll", "evr-optin.dll", "msi-optin.dll"}
       and baseline["farms"]["aarch64-windows"]["staticGaps"] == {} and baseline["farms"]["i386-windows"]["staticGaps"] == {})
 wf = (root / ".github/workflows/build-ipa.yml").read_text()
 step_at = wf.index("      - name: Verify the Windows farms are complete")

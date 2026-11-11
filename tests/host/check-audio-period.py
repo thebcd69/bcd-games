@@ -111,14 +111,22 @@ check("madeira_audio_io_slice asks for nothing without MADEIRA_AUDIO_IO_MS",
 check("  and publishes the granted slice only after asking", fn.index("setPreferredIOBufferDuration") < fn.index('setenv("MADEIRA_AUDIO_IO_US"'))
 check("it is called once, after the observers (the env.* lines are exported by then)",
       bridge.count("madeira_audio_io_slice();") == 1 and bridge.index("madeira_engine_observers_install();   /* madeira-bcd") < bridge.index("madeira_audio_io_slice();"))
-check("the session setup is as it was: no preferred buffer duration there", bridge.count("setPreferredIOBufferDuration") == 2)
+# Night round 2026-11-11 (T3 S5): a second caller exists, madeira_audio_request_io_slice (the driver found a stream whose queue is shorter than one pass;
+# tests/host/check-audio-io-auto.py holds it). The session's own setup (wine_process_thread) still sets no preferred buffer duration.
+_boot = bridge[bridge.index("static void *wine_process_thread(void *arg) {"):]
+_auto = bridge[bridge.index("int madeira_audio_request_io_slice(double ms)"):]
+_auto = _auto[:_auto.index("\n}\n")]
+check("the session setup is as it was: no preferred buffer duration there; only the two requests (the key's and the driver's) call it",
+      "setPreferredIOBufferDuration" not in _boot.replace(fn, "") and bridge.count("setPreferredIOBufferDuration:") == 2
+      and fn.count("setPreferredIOBufferDuration:") == 1 and _auto.count("setPreferredIOBufferDuration:") == 1)
 text = (R / "recommended/recommendations.json").read_text() + (R / "build/tools/autotune_rules.py").read_text()
 # Round 625 (owner's item 13, agent D1 S3-b): Dead Rising's list asks for a 5 ms IO buffer from build 625; no other list and no auto-tune rule.
 _recs = json.loads((R / "recommended/recommendations.json").read_text())
 _io = sorted(r["id"] for r in _recs["rules"] if "MADEIRA_AUDIO_IO_MS" in json.dumps(r))
 # Round 626 (agent T S8): Murder Miners' row asks for the same 5 ms buffer.
-check("only Dead Rising's and Murder Miners' lists set the IO buffer (5 ms, build 625); no list sets the period and no auto-tune rule sets either",
-      _io == ["dead-rising", "murder-miners"] and all({"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == i)["config"] for i in _io)
+# Night round 2026-11-11 (agent T3 S5): Quake II's and Resonance's rows ask for the same 5 ms buffer (XAudio2 clients that queue 960 frames under iOS's 1024).
+check("only Dead Rising's, Murder Miners', Quake II's and Resonance's lists set the IO buffer (5 ms, build 625); no list sets the period and no auto-tune rule sets either",
+      _io == ["dead-rising", "murder-miners", "quake-ii", "resonance"] and all({"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == i)["config"] for i in _io)
       and "MADEIRA_AUDIO_PERIOD_MS" not in text and "MADEIRA_AUDIO_IO_MS" not in (R / "build/tools/autotune_rules.py").read_text())
 
 print("PASS: audio period" if ok else "FAIL: audio period")

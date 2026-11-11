@@ -138,17 +138,22 @@ autotune = (APP / "AutoTune.swift").read_text()
 info = plistlib.loads((APP / "Info.plist").read_bytes())
 
 # ---- 1. ContentView's alerts reach every interface -----------------------------------------
-body = block(content, "    var body: some View {\n        /* ml658")
-group_end = body.index('.navigationTitle("BCD")')
-fronts = body[:group_end]
+# The root (a session or BCD's interface) and the app's alerts and observers (appChrome) are two members now: the original
+# path still applies them in the original order (root, navigation title and bar, alerts), the native Duo path without the stack.
+fronts = block(content, "    private var rootContent: some View {")
+body_chrome = block(content, "    private func appChrome<Root: View>(_ root: Root) -> some View {")
 # Wave 3 (2026-10-19): the classic library and the developer interface are deleted; the Group holds a session or BCD's interface.
 check("BCDLiveFrontEnd(play: launchLibraryEntry" in fronts and "LibraryView(" not in fronts
       and "developerBody" not in fronts, "ContentView: one Group holds a session or BCD's interface, the app's only interface")
-after = body[group_end:]
+after = body_chrome
+check("if BCDDuoFeatures.active {\n            appChrome(rootContent)" in content
+      and 'NavigationStack {\n                appChrome(rootContent\n                    .navigationTitle("BCD")' in content
+      and content.count("appChrome(rootContent") == 2,
+      "ContentView: both paths apply the alerts and observers to the root; the original path keeps the order root, navigation title, bar, alerts")
 for what, needle in [
-        ("the restart notice (one game per run)", '.alert("BCD needs a restart", isPresented: Binding(get: { library.restartNotice != nil }'),
+        ("the restart notice (one game per run)", '.alert("BCD needs a restart", isPresented: Binding(get: { !BCDDuoFeatures.active && library.restartNotice != nil }'),
         ("auto-tune's result and \"Close BCD\" for the next attempt", ".modifier(AutoTuneAlert())"),
-        ("the Enable JIT notice (JIT on without a debugger)", '.alert("Enable JIT", isPresented: Binding(get: { library.jitNotice != nil }'),
+        ("the Enable JIT notice (JIT on without a debugger)", '.alert("Enable JIT", isPresented: Binding(get: { !BCDDuoFeatures.active && library.jitNotice != nil }'),
         ("the JIT setup sheet", ".sheet(isPresented: $jitCoordinator.showSetup) { BCDJITSetupSheet(enableJIT: { enableJIT() }) }"),
         ("the Steam Cloud question before a start", '.alert(library.cloudNotice?.title ?? "Steam Cloud"'),
         ("Home Screen links once the library is up", ".onReceive(ShortcutRouter.shared.$pendingExe) { _ in launchPendingShortcut() }")]:
@@ -158,9 +163,11 @@ for button in ('Button("Sync first")', 'Button("Try again")', 'Button("Choose sa
 
 # ---- 2. BCDLiveFrontEnd: what LibraryView does around the library --------------------------
 check("if let jitProblem { jitConnectionActions(jitProblem, retry: enableJIT) { library.error = nil } }" in front
-      and ('isPresented: Binding(get: { library.error != nil }' in front or 'isPresented: Binding<Bool>(get: { library.error != nil }' in front),
+      and ('isPresented: Binding(get: { library.error != nil }' in front or 'isPresented: Binding<Bool>(get: { library.error != nil }' in front
+           or 'isPresented: Binding<Bool>(get: { !BCDDuoFeatures.active && library.error != nil }' in front),
       "BCD's interface shows the library's error, with the JIT connection fixes")
-check(('.alert("Steam", isPresented: Binding(get: { steam.error != nil }' in front or '.alert("Steam", isPresented: Binding<Bool>(get: { steam.error != nil }' in front), "BCD's interface shows Steam's error")
+check(('.alert("Steam", isPresented: Binding(get: { steam.error != nil }' in front or '.alert("Steam", isPresented: Binding<Bool>(get: { steam.error != nil }' in front
+           or '.alert("Steam", isPresented: Binding<Bool>(get: { !BCDDuoFeatures.active && steam.error != nil }' in front), "BCD's interface shows Steam's error")
 check(".fullScreenCover(isPresented: $onboarding.presented, onDismiss: BCDPresentation.didClose) { OnboardingView() }" in front
       and "onboarding.presentIfNeeded()" in front, "first-run setup opens over BCD's interface")
 check("EndedSessionSurface.install()" in front and 'EndedSessionSurface.hide(reason: "library-appeared")' in front,
@@ -213,8 +220,8 @@ check(".resumes" in primary and "store.actions?.resumeDownload(download.id)" in 
 # Resume and Try again go through the live store's download(), which calls SteamOwnedLibrary.install
 # at once (tests/host/check-bcd-launch.py pins it; ui-memory-launch, 2026-10-18).
 check("download(appID)" in block(store, "func resumeDownload(_ id: String)")
-      and "let account = SteamOwnedLibrary.shared" in block(store, "private func download(_ appID: Int)")
-      and "account.install(appID)" in block(store, "private func download(_ appID: Int)")
+      and "let account = SteamOwnedLibrary.shared" in block(store, "private func download(_ appID: Int, library: String? = nil)")
+      and "account.install(appID, library: library)" in block(store, "private func download(_ appID: Int, library: String? = nil)")
       and "SteamOwnedLibrary.shared.cancelInstall(appID, installed:" in block(store, "func cancelDownload(_ id: String)"),
       "the live store resumes, retries and cancels through the classic download sheet's functions")
 check("if #available(iOS 26.0, *) { return BCDDownloadNotes.background(continues: true) }" in downloads

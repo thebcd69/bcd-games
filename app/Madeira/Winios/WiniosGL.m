@@ -38,6 +38,7 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "../IOSDisplayShim.h"
 
@@ -286,8 +287,19 @@ static BOOL pipeline_ensure(MadeiraGLPresenter *p, MTLPixelFormat format) {
 static _Atomic uint64_t gl_present_count;
 extern void bcd_frame_ring_push(void);
 
+// madeira-bcd (Windows Vulkan): a Vulkan game's presents count like a GL game's, through the same getter, so the HUD, the launch checks that
+// wait for a first frame (Library.swift, the Dock's starting screen) and the session summary see them. build/win32u-unix/vulkan_surface_ios.c
+// calls this after each vkQueuePresentKHR, from client_surface_present(), which holds win32u's surfaces_lock: COUNT ONLY, nothing that can wait.
+// No frame-ring push here: bcd_frame_ring_push() ends in the Pause gate (BCDPauseGate), which would block that lock; the HUD's frame-time graph
+// and the in-game Pause therefore do not cover Vulkan games yet (docs/VULKAN.md).
+static _Atomic uint64_t vulkan_present_count;
+void madeira_vulkan_present_note(void) {
+    atomic_fetch_add_explicit(&vulkan_present_count, 1, memory_order_relaxed);
+}
+
 uint64_t madeira_gl_present_count(void) {
-    return atomic_load_explicit(&gl_present_count, memory_order_relaxed);
+    return atomic_load_explicit(&gl_present_count, memory_order_relaxed) +
+           atomic_load_explicit(&vulkan_present_count, memory_order_relaxed);
 }
 
 // The presenter behind *state, created on first use for hwnd's layer.
@@ -324,6 +336,45 @@ static double gl_cap_frame_time(void) {
     }
 }
 
+// madeira-bcd (night round 2026-11-11, T3 S11; Akka Arrh 8BBTB3 and Soldier of Fortune JHANDP, the first Zink device logs): the players say "No visuals" and
+// "texture / graphical problems" and the log cannot tell a black picture from a wrongly drawn one. At the 120th presented frame of each presenter one
+// probe line says how much of the slot's IOSurface is not black and its mean colour, from a grid of at most 64x64 samples. Plain C so the host check can run
+// it: `base` is the BGRA surface, `stride` its bytes per row. Returns the sample count (0: nothing to look at).
+static int madeira_gl_probe_pixels(const uint8_t *base, size_t stride, int width, int height,
+                                   int *nonblack_pct, int *mean_r, int *mean_g, int *mean_b, int *varied) {
+    *nonblack_pct = *mean_r = *mean_g = *mean_b = *varied = 0;
+    if (!base || width <= 0 || height <= 0 || stride < (size_t)width * 4) return 0;
+    int step_x = width > 64 ? width / 64 : 1, step_y = height > 64 ? height / 64 : 1;
+    long samples = 0, nonblack = 0, sum_r = 0, sum_g = 0, sum_b = 0;
+    int first_b = -1, first_g = -1, first_r = -1;
+    for (int y = 0; y < height; y += step_y) {
+        const uint8_t *row = base + (size_t)y * stride;
+        for (int x = 0; x < width; x += step_x) {
+            int b = row[x * 4], g = row[x * 4 + 1], r = row[x * 4 + 2];
+            samples++;
+            sum_r += r; sum_g += g; sum_b += b;
+            if (r > 8 || g > 8 || b > 8) nonblack++;
+            if (first_b < 0) { first_b = b; first_g = g; first_r = r; }
+            else if (abs(r - first_r) > 8 || abs(g - first_g) > 8 || abs(b - first_b) > 8) *varied = 1;
+        }
+    }
+    *nonblack_pct = (int)(nonblack * 100 / samples);
+    *mean_r = (int)(sum_r / samples); *mean_g = (int)(sum_g / samples); *mean_b = (int)(sum_b / samples);
+    return (int)samples;
+}
+
+// The probe of slot `s` (just presented, its content final: GL finished the blit, OSMesa copied the frame), read-only; once per presenter.
+static void gl_probe_slot(MadeiraGLPresenter *p, GLSlot *s, void *hwnd) {
+    if (!s->surface || s->locked) return;
+    int nonblack, r, g, b, varied;
+    if (IOSurfaceLock(s->surface, kIOSurfaceLockReadOnly, NULL) != 0) return;   // 0 = kIOReturnSuccess
+    int samples = madeira_gl_probe_pixels((const uint8_t *)IOSurfaceGetBaseAddress(s->surface), IOSurfaceGetBytesPerRow(s->surface),
+                                          p->width, p->height, &nonblack, &r, &g, &b, &varied);
+    IOSurfaceUnlock(s->surface, kIOSurfaceLockReadOnly, NULL);
+    GLLOG("hwnd %p: probe at frame %lu (%dx%d, %d samples): non-black %d%%, mean rgb %d,%d,%d, %s", hwnd, p->frames, p->width, p->height,
+          samples, nonblack, r, g, b, varied ? "varied" : "flat");
+}
+
 // Draw slot `s` (its IOSurface, rows bottom-up) onto the presenter's layer.
 static BOOL present_slot(MadeiraGLPresenter *p, GLSlot *s, void *hwnd) {
     CAMetalLayer *layer = p->layer;
@@ -358,6 +409,7 @@ static BOOL present_slot(MadeiraGLPresenter *p, GLSlot *s, void *hwnd) {
 
     if (++p->frames == 1 || p->frames % 600 == 0)
         GLLOG("hwnd %p: %lu frames presented (%dx%d)", hwnd, p->frames, p->width, p->height);
+    if (p->frames == 120) gl_probe_slot(p, s, hwnd);   // madeira-bcd: T3 S11, once
     return YES;
 }
 

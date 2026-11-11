@@ -1,3 +1,4 @@
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 /* Portions copyright 2026 alantangok and 125hz: code taken from https://github.com/willfaust/Madeira (pull request #243; commit abca30a)
  * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 /* Winios.h — registration entry point for the iOS user_driver.
@@ -67,6 +68,13 @@ void winios_set_desktop_rect(double x, double y, double w, double h, int set);
  * uses. A MOVE event also repositions the compositor's cursor layer. */
 void winios_pointer(int x, int y, unsigned int flags, unsigned int data);
 
+/* madeira-bcd (build 646, [ptr-map], winios_ptr_map.h): in a library session whose game draws into a window smaller than the guest
+ * screen, absolute points (the picture's space, the guest screen's size) are moved into that window's client rect where they are posted.
+ * apply: the picture's space to screen pixels; invert: screen pixels (a cursor Windows placed) back to the picture's space. Both return 1
+ * when they moved the point, 0 (point untouched) when no such window is shown. Any thread. */
+int winios_pointer_map_apply(int *x, int *y);
+int winios_pointer_map_invert(int *x, int *y);
+
 /* Reposition the rendered cursor arrow (desktop px). Usually implied
  * by winios_pointer(MOVE); exposed for initial placement. */
 void winios_cursor_move(int x, int y);
@@ -78,6 +86,8 @@ void winios_cursor_move(int x, int y);
  * mapping (0 when there is no desktop). */
 unsigned long long winios_surface_present_count(void);
 int winios_compositor_set_hidden(int hidden);
+// Duo Home can keep the desktop running before its compositor view exists.
+void winios_compositor_set_backgrounded(int backgrounded);
 
 /* Game-mode windows (Winios.m). The window a game session's swapchain
  * presents from (IOSDisplayShim) is never drawn as a GDI window; a Wine

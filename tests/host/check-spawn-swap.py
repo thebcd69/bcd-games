@@ -329,7 +329,7 @@ for path in list((root / 'build').rglob('*.[ch]')) + list((root / 'app/Madeira')
     if path.name in ('ConfigCatalog.generated.swift', 'AutoTuneRules.generated.swift'):
         continue
     t = path.read_text(errors='ignore')
-    if 'MADEIRA_SPAWN_SWAP' in t and path.name not in ('process_ios.c', 'ios_spawn_swap.h', 'GameRecommendationsList.swift', 'BCDGameStart.swift'):   # round 604: the game page's row writes the game's own line
+    if 'MADEIRA_SPAWN_SWAP' in t and path.name not in ('process_ios.c', 'ios_spawn_swap.h', 'GameRecommendationsList.swift', 'BCDGameStart.swift', 'Library.swift'):   # round 604: the game page's row writes the game's own line; night round 2026-11-11 (W-APP A5-S1): Library's [game-cfg] note only reads it
         other_readers.append(path.name)
 check('no other source reads or sets the variable', not other_readers, str(other_readers))
 

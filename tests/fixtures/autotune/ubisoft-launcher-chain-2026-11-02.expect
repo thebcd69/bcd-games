@@ -4,9 +4,11 @@
  "matched": [
   "ubisoft-launcher-protection-exit"
  ],
- "next": [],
- "note": "Ubisoft Connect (MSFM7W, build 626): no Unknown ALU Op line, the same bad-close 0xdeadc0de, trap and exit: known, no fix yet",
+ "next": [
+  "env.MADEIRA_SELF_WRITE = 1"
+ ],
+ "note": "Ubisoft Connect (MSFM7W, build 626): no Unknown ALU Op line, the same bad-close 0xdeadc0de, trap and exit; its hook installer's WriteProcessMemory into itself was refused: env.MADEIRA_SELF_WRITE = 1 lets a program write into its own memory (build 652)",
  "outcome": "crashed",
  "stage": 3,
- "status": "known"
+ "status": "trying"
 }

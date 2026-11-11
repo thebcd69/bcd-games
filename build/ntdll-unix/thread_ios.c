@@ -36,6 +36,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <pthread/qos.h>
+#include <dlfcn.h>
 volatile long long ios_affinity_sets;   /* ml1117 */
 #include <signal.h>
 #include <sys/types.h>
@@ -1117,6 +1118,126 @@ static void contexts_from_server( CONTEXT *context, struct context_data server_c
 }
 
 
+/* Night round 2026-11-11 (agent T1 S3; Alan Wake D6F62Q, build 634, and 22 archive logs of 18 games): BCD itself dies when a Wine thread exits.
+ *
+ *   objc_release+0x10 <- objc_autoreleasePoolPop+0xf4 <- libobjc +0x9c (the pool page's TSD destructor, AutoreleasePoolPage::tls_dealloc)
+ *     <- libsystem_pthread +0x25c <- pthread_exit+0x58 <- Madeira exit_thread
+ *
+ * The thread's autorelease pool still held an object that had been freed and whose memory was reused (D6F62Q L47883: x0 = 0x131523b40, the
+ * object's class word x2 = 0xce1d760df8 is garbage); libobjc's destructor pops the pool at thread exit and releases it. Nothing in the log
+ * names the object. Two opt-in switches, both default off (nothing changes without them):
+ *   MADEIRA_EXIT_POOL_DIAG = 1   the first three Wine-thread exits of the process print "[exit-pool] ..." and libobjc's own pool dump
+ *                                (_objc_autoreleasePoolPrint, every page and entry: a garbage entry is the last line before a crash);
+ *   MADEIRA_EXIT_POOL_SKIP = 1   a Wine thread clears libobjc's autorelease-pool TSD slot just before pthread_exit, so the destructor finds NULL
+ *                                (the pthread cleanup skips NULL values) and never walks the pool; the pool's pages and what they retain leak,
+ *                                at thread exit only.
+ * The slot is found, not assumed: on the first Wine thread(s) (a fresh pthread has none) one objc_autoreleasePoolPush / Pop is run and the direct
+ * TSD slot (40..49, libobjc's __PTK_FRAMEWORK_OBJC_KEYn range) that went from NULL to non-NULL is the key; exactly one such slot or the
+ * mitigation stays off ("[exit-pool] key not found"). libobjc's functions are looked up with dlsym (they are not in the SDK headers). */
+static volatile int ios_exit_pool_key = -1;   /* >= 40: the TSD slot of libobjc's autorelease pool; -1: not looked for yet; -2: not found */
+
+static int ios_exit_pool_diag_on( void )
+{
+    static volatile int on = -1;
+
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_EXIT_POOL_DIAG" );   /* 1: the first three Wine-thread exits of a process print the thread's stack bounds and libobjc's autorelease-pool dump to the log (the crash of BCD itself at a game's exit, objc_release in the thread-exit destructor). unset/0: nothing. */
+        on = e && *e && strcmp( e, "0" ) != 0;
+    }
+    return on;
+}
+
+static int ios_exit_pool_skip_on( void )
+{
+    static volatile int on = -1;
+
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_EXIT_POOL_SKIP" );   /* 1: a Wine thread clears libobjc's autorelease-pool slot just before it exits, so libobjc does not release a freed object of that pool at the thread's exit (the pool's pages leak): for a game whose exit ends BCD itself in objc_release. unset/0: off. */
+        on = e && *e && strcmp( e, "0" ) != 0;
+    }
+    return on;
+}
+
+/* Called by start_thread, before the thread runs anything of libobjc's own. Only with one of the two switches; at most 8 tries per process. */
+static void ios_exit_pool_find_key( void )
+{
+    static volatile int tries;
+    void *(*push)( void );
+    void (*pop)( void * );
+    void **tsd;
+    uintptr_t tsd_base;
+    void *before[10], *token;
+    int k, found = -1, n = 0;
+
+    if (ios_exit_pool_key != -1 || (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on())) return;
+    if (__sync_add_and_fetch( &tries, 1 ) > 8) { ios_exit_pool_key = -2; return; }
+    push = (void *(*)( void ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPush" );
+    pop = (void (*)( void * ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPop" );
+    if (!push || !pop)
+    {
+        ios_exit_pool_key = -2;
+        dprintf( 2, "[exit-pool] key not found: libobjc's autorelease pool functions are not there (MADEIRA_EXIT_POOL_*)\n" );
+        return;
+    }
+    __asm__ volatile("mrs %0, TPIDRRO_EL0" : "=r"(tsd_base));
+    tsd = (void **)(tsd_base & ~7ULL);
+    for (k = 0; k < 10; k++) before[k] = tsd[40 + k];
+    token = push();
+    for (k = 0; k < 10; k++)
+        if (!before[k] && tsd[40 + k]) { found = 40 + k; n++; }
+    pop( token );
+    if (n == 1 && !tsd[found])
+    {
+        ios_exit_pool_key = found;
+        dprintf( 2, "[exit-pool] key=%d: libobjc's autorelease pool lives in direct TSD slot %d (MADEIRA_EXIT_POOL_*)\n", found, found );
+    }
+    else if (n == 0 && tries < 8) { /* the thread already had a pool: try the next one */ }
+    else
+    {
+        ios_exit_pool_key = -2;
+        dprintf( 2, "[exit-pool] key not found (%d slot(s) of 40..49 changed after a pool push%s); the mitigation stays off (MADEIRA_EXIT_POOL_*)\n", n,
+                 n == 1 && tsd[found] ? " and the pushed pool did not clear its slot again" : "" );
+    }
+}
+
+/* Called by pthread_exit_wrapper for a Wine thread, last thing before pthread_exit. */
+static void ios_exit_pool_at_exit( void )
+{
+    static volatile unsigned diag_n, skip_n;
+    uintptr_t tsd_base;
+    void **tsd;
+    unsigned tid = (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread;
+    int key = ios_exit_pool_key;
+
+    if (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on()) return;
+    __asm__ volatile("mrs %0, TPIDRRO_EL0" : "=r"(tsd_base));
+    tsd = (void **)(tsd_base & ~7ULL);
+    if (ios_exit_pool_diag_on() && __sync_add_and_fetch( &diag_n, 1 ) <= 3)
+    {
+        pthread_t self = pthread_self();
+        void *stack_top = pthread_get_stackaddr_np( self );
+        size_t stack_size = pthread_get_stacksize_np( self );
+        void (*print)( void ) = (void (*)( void ))dlsym( RTLD_DEFAULT, "_objc_autoreleasePoolPrint" );
+
+        dprintf( 2, "[exit-pool] tid=%04x exiting: stack=[%p,%p) teb=%p pool key=%d slot=%p (MADEIRA_EXIT_POOL_DIAG)\n",
+                 tid, (char *)stack_top - stack_size, stack_top, NtCurrentTeb(), key, key >= 40 ? tsd[key] : NULL );
+        if (print) print();   /* libobjc writes every page and entry to stderr */
+        else dprintf( 2, "[exit-pool] _objc_autoreleasePoolPrint is not available\n" );
+    }
+    if (ios_exit_pool_skip_on() && key >= 40 && tsd[key])
+    {
+        unsigned n = __sync_add_and_fetch( &skip_n, 1 );
+
+        if (n <= 8 || !(n & (n - 1)))
+            dprintf( 2, "[exit-pool] tid=%04x clears libobjc's autorelease-pool slot %d (%p) so its thread-exit destructor does not walk the pool; "
+                        "the pool's pages leak (#%u, MADEIRA_EXIT_POOL_SKIP)\n", tid, key, tsd[key], n );
+        tsd[key] = NULL;
+    }
+}
+
+
 /***********************************************************************
  *           pthread_exit_wrapper
  */
@@ -1256,6 +1377,7 @@ static DECLSPEC_NORETURN void pthread_exit_wrapper( int status )
             ios_thread_qos_exit( (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread );
         }
     }
+    ios_exit_pool_at_exit();   /* T1 S3: MADEIRA_EXIT_POOL_DIAG / MADEIRA_EXIT_POOL_SKIP, both off unless set */
     pthread_exit( UIntToPtr(status) );
 }
 
@@ -1634,6 +1756,7 @@ static void start_thread( TEB *teb )
                 raw == teb ? "MATCH" : "MISMATCH");
     }
     ios_thread_qos_start( (unsigned)(ULONG_PTR)teb->ClientId.UniqueThread );   /* MADEIRA_THREAD_QOS */
+    ios_exit_pool_find_key();   /* T1 S3: only with MADEIRA_EXIT_POOL_DIAG / MADEIRA_EXIT_POOL_SKIP */
     server_init_thread( thread_data->start, &suspend );
     signal_start_thread( thread_data->start, thread_data->param, suspend, teb );
 }
@@ -2355,6 +2478,63 @@ void abort_process( int status )
 }
 
 
+/* Night round 2026-11-11 (agent A4 S6; Ryse 70HE81, build 634: "[vfree] ml842 # base=0x12c100000 size=0x0 type=0x8000 tid=00f0", then the APP crashed in
+ * libsystem_pthread pthread_exit+0x58 on a READ at 0x12c1ff944, inside the range just released): a use-after-free in the thread-reap protocol is likely
+ * (exit_thread frees the PREVIOUS exited thread's TEB, kernel stack and stack while another exiting thread's pthread bookkeeping may still point into
+ * them), one log in 3,600, and nothing in the log said whose memory 0x12c1ff944 was. This ring remembers the ranges of the last 16 frees made by the
+ * raw hand-off (the TEB block, the kernel stack the pthread_t lives at the top of, the thread's stack) with the exiting and the freed thread ids and
+ * the time; ios_teb_free_lookup() names the entry an address lies in, for the fault reports of signal_arm64_ios.c ("[teb-uaf]"). Log only; the
+ * identity-checked hand-off (MADEIRA_EA_CEF / MADEIRA_THREAD_REAP_CHECKED) frees through virtual_ios.c and is not recorded. */
+struct ios_teb_free_rec { uintptr_t ks, ks_end, st_lo, st_hi, teb; unsigned tid, by_tid; uint64_t ms; };
+static struct ios_teb_free_rec ios_teb_free_ring[16];
+static volatile unsigned ios_teb_free_n;
+
+static uint64_t ios_teb_free_now_ms( void )
+{
+    struct timespec ts;
+
+    clock_gettime( CLOCK_MONOTONIC, &ts );
+    return (uint64_t)ts.tv_sec * 1000ull + (uint64_t)(ts.tv_nsec / 1000000);
+}
+
+static void ios_teb_free_note( TEB *teb )
+{
+    struct ntdll_thread_data *td = (struct ntdll_thread_data *)&teb->GdiTebBatch;
+    struct ios_teb_free_rec *r = &ios_teb_free_ring[__sync_fetch_and_add( &ios_teb_free_n, 1 ) & 15];
+
+    r->ks = (uintptr_t)td->kernel_stack;
+    r->ks_end = r->ks ? r->ks + kernel_stack_size : 0;
+    r->st_lo = (uintptr_t)teb->DeallocationStack;
+    r->st_hi = (uintptr_t)teb->Tib.StackBase;
+    r->teb = (uintptr_t)teb;
+    r->tid = (unsigned)(ULONG_PTR)teb->ClientId.UniqueThread;
+    r->by_tid = NtCurrentTeb() ? (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread : 0;
+    r->ms = ios_teb_free_now_ms();
+}
+
+/* 1 and a text when addr lies in the TEB block, kernel stack or stack of a thread whose memory the raw hand-off released recently (newest first). */
+int ios_teb_free_lookup( uintptr_t addr, char *out, size_t outsz );
+int ios_teb_free_lookup( uintptr_t addr, char *out, size_t outsz )
+{
+    unsigned n = ios_teb_free_n, i;
+
+    for (i = 0; i < 16 && i < n; i++)
+    {
+        const struct ios_teb_free_rec *r = &ios_teb_free_ring[(n - 1 - i) & 15];
+        const char *what = NULL;
+
+        if (!r->teb) continue;
+        if (r->ks && addr >= r->ks && addr < r->ks_end) what = "kernel stack (the pthread_t is at its top)";
+        else if (r->st_lo && addr >= r->st_lo && addr < r->st_hi) what = "stack";
+        else if (addr >= r->teb && addr < r->teb + 0x2000) what = "TEB block";
+        if (!what) continue;
+        snprintf( out, outsz, "%s of tid=%04x, freed %llu ms ago by the exit of tid=%04x (TEB %p, kernel stack %p..%p, stack %p..%p; entry %u of the last 16)", what, r->tid,
+                  (unsigned long long)(ios_teb_free_now_ms() - r->ms), r->by_tid, (void *)r->teb, (void *)r->ks, (void *)r->ks_end, (void *)r->st_lo, (void *)r->st_hi, i );
+        return 1;
+    }
+    return 0;
+}
+
 /***********************************************************************
  *           exit_thread
  */
@@ -2402,6 +2582,7 @@ static DECLSPEC_NORETURN void exit_thread( int status )
         else if (thread_data->pthread_id)
         {
             pthread_join( thread_data->pthread_id, NULL );
+            ios_teb_free_note( teb );   /* A4 S6: log only */
             virtual_free_teb( teb );
         }
     }
@@ -2764,6 +2945,64 @@ static void ios_sd_steam_objects( void )
             (unsigned int)hits, hits > 24 ? " (the first 24 shown)" : "" );
 }
 
+/* Night round 2026-11-11 (agent R1 S7; Rockstar launcher Dock sessions 7HBJC2, MAAJKX, B8QSK5, BWWZQ7 and about 70 archive logs end in Steam 113 against 52 that find Steam
+ * on the same devices, builds, games and timings): the report above replays none of the calls steam_api64.dll's SteamAPI_IsSteamRunning really makes (the disassembly of
+ * Rockstar's ThirdParty\Steam\steam_api64.dll, RVA 0x7960): RegOpenKeyExW( HKCU, "Software\Valve\Steam\ActiveProcess", 0, 0x20219 = KEY_READ | KEY_WOW64_32KEY ), RegQueryValueExW( "pid",
+ * &type, &pid, cb = 4 ), OpenProcess( 0x400 = PROCESS_QUERY_INFORMATION ) and GetExitCodeProcess == 259. The report read the keys with access 0 and opened the process with 0x1000, so it
+ * showed every value fine after a failure and could not say which step failed. This line does exactly those four calls (NtOpenKey with 0x20219, NtQueryValueKey into room for 4 bytes,
+ * NtOpenProcess with 0x400, NtQueryInformationProcess for the exit status) and prints each status, plus the key opened without the WOW flag (0x20019) to separate the view.
+ * Reads only. It is part of the report, so it is printed where the report is: at the failure and, in a Dock session, once when steam_api DID find Steam, for comparison. */
+static void ios_sd_replica( const char *active )
+{
+    union { KEY_VALUE_PARTIAL_INFORMATION info; char raw[sizeof(KEY_VALUE_PARTIAL_INFORMATION) + 8]; } buf;
+    WCHAR wide[8];
+    UNICODE_STRING name;
+    HANDLE key = 0, key2 = 0, process = 0;
+    ULONG len = 0, pid = 0, type = 0, cb = 4;
+    NTSTATUS open_s, open2_s = 0, query_s = 0, proc_s = 0, exit_s = 0;
+    ULONG exit_code = 0;
+    int have_pid = 0;
+
+    open_s = ios_sd_key( active, 0x20219, &key );
+    if (!open_s)
+    {
+        ios_sd_wide( "pid", wide, 8, &name );
+        memset( &buf, 0, sizeof(buf) );
+        /* RegQueryValueExW with cb = 4 hands the server room for 4 bytes of data: a longer value is STATUS_BUFFER_OVERFLOW, as for steam_api */
+        query_s = NtQueryValueKey( key, &name, KeyValuePartialInformation, &buf, (ULONG)(FIELD_OFFSET( KEY_VALUE_PARTIAL_INFORMATION, Data ) + 4), &len );
+        type = buf.info.Type;
+        cb = buf.info.DataLength;
+        if (!query_s && cb >= sizeof(ULONG)) { memcpy( &pid, buf.info.Data, sizeof(pid) ); have_pid = 1; }
+        NtClose( key );
+    }
+    open2_s = ios_sd_key( active, 0x20019, &key2 );
+    if (!open2_s) NtClose( key2 );
+    if (have_pid && pid)
+    {
+        OBJECT_ATTRIBUTES attr;
+        CLIENT_ID id;
+
+        InitializeObjectAttributes( &attr, NULL, 0, NULL, NULL );
+        id.UniqueProcess = ULongToHandle( pid );
+        id.UniqueThread = 0;
+        proc_s = NtOpenProcess( &process, 0x0400 /* PROCESS_QUERY_INFORMATION */, &attr, &id );
+        if (!proc_s)
+        {
+            PROCESS_BASIC_INFORMATION pbi;
+
+            memset( &pbi, 0, sizeof(pbi) );
+            exit_s = NtQueryInformationProcess( process, ProcessBasicInformation, &pbi, sizeof(pbi), NULL );
+            exit_code = (ULONG)pbi.ExitStatus;
+            NtClose( process );
+        }
+    }
+    SD_ERR( "[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=%#x RegQueryValueExW(pid, cb=4)=%s%#x type=%u cb=%u pid=%u | OpenProcess(0x400)=%s%#x "
+            "GetExitCodeProcess=%s%#x exit=%u (259 = running) | open without the WOW flag (0x20019)=%#x\n",
+            (unsigned int)open_s, open_s ? "(not asked) " : "", (unsigned int)query_s, (unsigned int)type, (unsigned int)cb, (unsigned int)pid,
+            have_pid && pid ? "" : "(not asked) ", (unsigned int)proc_s, have_pid && pid && !proc_s ? "" : "(not asked) ", (unsigned int)exit_s,
+            (unsigned int)exit_code, (unsigned int)open2_s );
+}
+
 static void ios_sd_report_body( void )
 {
     static const char active[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Valve\\Steam\\ActiveProcess";
@@ -2789,6 +3028,30 @@ static void ios_sd_report_body( void )
     ios_sd_key_age( machine_steam, "HKLM 64-bit view Valve\\Steam" );
     ios_sd_key_age( user_steam, "HKCU Valve\\Steam" );
     ios_sd_key_age( active, "HKCU Valve\\Steam\\ActiveProcess" );
+    ios_sd_replica( active );   /* R1 S7: steam_api64's own four calls, with its own access masks */
+    {
+        /* night round 2026-11-11 (X2 S4; K7QKB6, 25C9NT, NR2WGS, KQMTVT, the Rockstar Launcher logs): steam_api64 reads HKCU with the 32-bit view flag (0x20219) and a 32-bit game with
+         * its default view; when the prefix has HKCU Software\Wow6432Node both reach a tree the Dock may not have written. The node and that tree by their literal
+         * paths (KEY_WOW64_64KEY stops any redirect), the same helpers as above; log only. */
+        static const char wow_node[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Wow6432Node";
+        static const char active_32[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Wow6432Node\\Valve\\Steam\\ActiveProcess";
+        static const char steam_32[] = "\\Registry\\User\\S-1-5-21-0-0-0-1000\\Software\\Wow6432Node\\Valve\\Steam";
+        HANDLE node = 0;
+        NTSTATUS node_status = ios_sd_key( wow_node, KEY_WOW64_64KEY, &node );
+
+        if (node_status)
+            SD_ERR( "[steam-api]   HKCU Software\\Wow6432Node: not opened, status %#x\n", (unsigned int)node_status );
+        else
+        {
+            SD_ERR( "[steam-api]   HKCU Software\\Wow6432Node: exists\n" );
+            NtClose( node );
+            ios_sd_value( active_32, KEY_WOW64_64KEY, "pid", "HKCU 32-bit tree ActiveProcess pid", 0, NULL );
+            ios_sd_value( active_32, KEY_WOW64_64KEY, "ActiveUser", "HKCU 32-bit tree ActiveProcess ActiveUser", 1, NULL );
+            ios_sd_value( active_32, KEY_WOW64_64KEY, "SteamClientDll64", "HKCU 32-bit tree ActiveProcess SteamClientDll64", 0, NULL );
+            ios_sd_value( steam_32, KEY_WOW64_64KEY, "SteamPath", "HKCU 32-bit tree Steam SteamPath", 0, NULL );
+            ios_sd_key_age( active_32, "HKCU 32-bit tree Valve\\Steam\\ActiveProcess" );
+        }
+    }
     if (pid)
     {
         OBJECT_ATTRIBUTES attr;

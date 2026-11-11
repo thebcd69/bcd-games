@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """A BCD Dock session whose game died ends (round 579).
 
 Dying Light 32FEAT (Dock, build 578, c0000005) and The Binding of Isaac VV5NHZ (Dock, build 576, c0000005): the game's
@@ -109,8 +111,10 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(R.isCrash(0xC0000135) && R.isCrash(0xC0000018) && R.isCrash(0xC0000017), "a missing DLL, conflicting addresses, no memory are failures")
         require(R.isCrash(0xE06D7363) && R.isCrash(0xE000BEEF), "a C++ exception code and a game's own 0xE... exit are failures")
         require(R.isCrash(0x80000003) && R.isCrash(0xFFFFFFFF) && R.isCrash(0xFFFFFC8F), "the breakpoint exit and negative exit codes are failures")
-        require(!R.isCrash(0) && !R.isCrash(1) && !R.isCrash(3) && !R.isCrash(0xFF) && !R.isCrash(0x2329) && !R.isCrash(0xEAC9),
+        require(!R.isCrash(0) && !R.isCrash(1) && !R.isCrash(0xFF) && !R.isCrash(0x2329) && !R.isCrash(0xEAC9),
                 "exit code 0 and small plain codes are not crashes (a game may end with 1 after a quit)")
+        // Night round 2026-11-11 (G7 S2; Meccha Chameleon F4WD9B): 3 is abort()'s and Unreal's crash handler's exit code.
+        require(R.isCrash(3) && R.abortStatus == 3 && !R.isCrash(2) && !R.isCrash(4), "exit code 3 (abort, Unreal's crash handler) is a failure; its neighbours are not")
         require(!R.isCrash(0x8007054F), "an installer's HRESULT-like exit code is not a crash")
         // Round 630 (agent G3 S19; RVW5FD): Wine's stub end ("unimplemented function ... aborting") is a crash; its neighbours are not.
         require(R.isCrash(0x80000100) && !R.isCrash(0x80000101) && !R.isCrash(0x100), "Wine's stub status 0x80000100 is a crash")
@@ -177,7 +181,14 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
 
         // ---- exit code 0 and plain codes keep today's behaviour
         require(verdict([dockhost, ended(dying, 0, ago: 60)]) == .none, "the game ended with 0: nothing")
-        require(verdict([dockhost, ended(dying, 1, ago: 60)]) == .none && verdict([dockhost, ended(dying, 3, ago: 60)]) == .none, "plain codes 1 and 3: nothing")
+        require(verdict([dockhost, ended(dying, 1, ago: 60)]) == .none && verdict([dockhost, ended(dying, 2, ago: 60)]) == .none, "plain codes 1 and 2 after a long run: nothing")
+        // Night round 2026-11-11 (G7 S2, F4WD9B): the game ended with 3 after playing: end, as an error status
+        require(verdict([dockhost, ended(dying, 3, ago: 60, lived: 600)]) == .end(status: 3, file: "dyinglightgame.exe", lived: 600),
+                "exit code 3 (Unreal's crash handler) after a long run: the session ends")
+        require(verdict([dockhost, ended(dying, 3, ago: 60, lived: 600)], host: DockHostState(gameRan: true, gameOver: false, finished: false))
+                == .wait(status: 3, file: "dyinglightgame.exe", why: "host-still-counts-the-game"), "with 3, the host's conditions still hold")
+        require(verdict([dockhost, ended(dying, 3, ago: 60, lived: 600), runs(game)]) == .wait(status: 3, file: "dyinglightgame.exe", why: "game-still-runs"),
+                "with 3, a program of the game that runs keeps the session")
         require(verdict([dockhost, ended(dying, 0xC0000005, ago: 300), ended(game, 0, ago: 50)]) == .none,
                 "an early crash of one program, the game's own last end is 0: nothing (the LAST program decides)")
 
@@ -189,7 +200,26 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(verdict([dockhost, ended(brotato, 0, ago: 60, lived: 5)]) == .none, "the same after frames were drawn: nothing (today's rule)")
         require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 40)]) == .none
                 && verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 30)]) == .none, "it lived 30 s or more: nothing")
-        require(verdictNoPicture([dockhost, ended(brotato, 1, ago: 60, lived: 5)]) == .none, "a plain code 1 is not a short clean exit: nothing")
+        // Night round 2026-11-11 (G2 S11, T2 S-IS1; Black Mesa 8V90T6: Valve's crash handler ends the game with exit code 1, 17 s, 2 frames; Isaac
+        // CMXRG6: 0x58203a6e after 14 s with no frame): any status of a program that closed within 30 s without a picture ends the session.
+        let blackMesa = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Black Mesa\\bms.exe"
+        let isaac = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\isaac-ng.exe"
+        require(verdictNoPicture([dockhost, ended(blackMesa, 1, ago: 60, lived: 17)]) == .end(status: 1, file: "bms.exe", lived: 17),
+                "Black Mesa: exit code 1 after 17 s, no picture, the host finished, nothing runs: end")
+        require(verdictNoPicture([dockhost, ended(isaac, 0x58203a6e, ago: 60, lived: 14)]) == .end(status: 0x58203a6e, file: "isaac-ng.exe", lived: 14),
+                "Isaac: an odd status after 14 s, no picture: end")
+        require(verdict([dockhost, ended(blackMesa, 1, ago: 60, lived: 17)]) == .none, "the same after frames were drawn: nothing (the game played)")
+        require(verdictNoPicture([dockhost, ended(blackMesa, 2, ago: 60, lived: 40)]) == .none, "code 2 after 40 s: nothing")
+        require(verdictNoPicture([dockhost, ended(blackMesa, 1, ago: 4, lived: 17)]) == .wait(status: 1, file: "bms.exe", why: "grace"), "code 1 within the grace: wait")
+        require(verdictNoPicture([dockhost, ended(blackMesa, 1, ago: 60, lived: 17)], host: DockHostState(gameRan: true, gameOver: false, finished: false))
+                == .wait(status: 1, file: "bms.exe", why: "host-still-counts-the-game"), "code 1 while Valve's client still counts the game: wait")
+        require(verdictNoPicture([dockhost, ended(game, 1, ago: 60, lived: 5), runs(blackMesa)]) == .wait(status: 1, file: "game.exe", why: "game-still-runs"),
+                "a launcher that left with 1 while the game runs: wait")
+        require(R.shortExitWords(file: "brotato.exe", lived: 5, status: 0)
+                == "brotato.exe closed by itself 5 seconds after it started, before it showed a picture. If it showed a message, that is the reason.",
+                "exit code 0 keeps its round 625 words")
+        require(R.shortExitWords(file: "bms.exe", lived: 17.6, status: 1).contains("exit code 0x1") && R.shortExitWords(file: "bms.exe", lived: 17.6, status: 1).contains("crash reporter"),
+                "another code names itself and the crash reporter")
         require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 4, lived: 5)]) == .wait(status: 0, file: "brotato.exe", why: "grace"),
                 "within the grace: wait")
         require(verdictNoPicture([dockhost, ended(brotato, 0, ago: 60, lived: 5)], host: DockHostState(gameRan: true, gameOver: false, finished: false))
@@ -245,6 +275,27 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(R.isResidentLauncher("C:\\Program Files (x86)\\Rockstar Games\\Social Club\\SocialClubHelper.exe")
                 && !R.isResidentLauncher(rdr2) && !R.isResidentLauncher(cuphead),
                 "the resident launcher is Rockstar's folder only")
+        // ---- madeira-bcd: Ubisoft Connect's client is resident after Close too, but a game the client installed below it is a game
+        let fc3 = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Far Cry 3\\bin\\farcry3_d3d11.exe"
+        let uFolder = "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\"
+        require(verdictAsked([dockhost, ended(fc3, 0, ago: 6, lived: 900), runs(uFolder + "upc.exe"), runs(uFolder + "UplayService.exe"),
+                              runs(uFolder + "UplayWebCore.exe"), runs(uFolder + "UplayWebCore.exe"), runs(uFolder + "UbisoftGameLauncher.exe")])
+                    == .end(status: 0, file: "farcry3_d3d11.exe", lived: 900),
+                "Close, Far Cry 3 ended 0, the host finished, only Ubisoft Connect's client runs: end with the game's status")
+        require(verdict([dockhost, ended(fc3, 0, ago: 60), runs(uFolder + "upc.exe")]) == .none,
+                "without the Close the client still counts (today's behaviour)")
+        require(verdictAsked([dockhost, ended(fc3, 0, ago: 6, lived: 900), runs(uFolder + "upc.exe"), runs(uFolder + "games\\Far Cry 3\\bin\\farcry3.exe")])
+                    == .wait(status: 0, file: "farcry3_d3d11.exe", why: "game-still-runs"),
+                "a game below the client's folder that still runs keeps the session open")
+        require(verdictAsked([dockhost, ended(fc3, 0, ago: 6, lived: 900), runs(uFolder + "shareplay\\SharePlayClient.exe")])
+                    == .wait(status: 0, file: "farcry3_d3d11.exe", why: "game-still-runs"),
+                "a program in a folder below the client's own is not taken for the client")
+        require(R.isResidentLauncher(uFolder + "upc.exe") && R.isResidentLauncher("C:\\Program Files\\Ubisoft\\Ubisoft Game Launcher\\UPLAYWEBCORE.EXE")
+                && R.isResidentLauncher("c:/program files (x86)/ubisoft/ubisoft game launcher/UbisoftConnect.exe")
+                && !R.isResidentLauncher(uFolder + "games\\Far Cry 3\\bin\\farcry3.exe") && !R.isResidentLauncher(uFolder + "shareplay\\SharePlayClient.exe")
+                && !R.isResidentLauncher("C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher2\\upc.exe") && !R.isResidentLauncher("C:\\Program Files (x86)\\Ubisoft\\upc.exe")
+                && !R.isResidentLauncher(fc3),
+                "the resident client is the programs directly in Ubisoft Game Launcher's folder, any case, either slash; nothing below it, no look-alike folder, no game")
         require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: true, gameOver: true, finished: false))
                 == .wait(status: 0, file: "cuphead.exe", why: "host-not-finished"), "the host has not finished: wait")
         require(verdictAsked([dockhost, ended(cuphead, 0, ago: 60)], host: DockHostState(gameRan: false, gameOver: false, finished: false))
@@ -603,6 +654,7 @@ volatile int g_madeira_srv_fgetpath = 0, g_madeira_srv_eco_follow = 0, g_madeira
 static int g_stops;
 static int g_wine_exit_code = 0;   /* wine_process_exit_code()'s plain global (the boot thread copies the thread-local status into it) */
 static int g_gl_love_hint_set;   /* round 632 (OpenGL): bcd_gl_session_setup's LOVE hint, defined elsewhere in the bridge; the session end drops it */
+int g_wineserver_desktop_shutdown;   /* the desktop Stop flag (WineServerBridge.m; native Duo interface): idle, so the session end runs as always */
 _Thread_local volatile int wine_ios_exit_code = 0;
 void wineserver_stop(void) { g_stops++; }
 void wine_session_note_launch_exit(int status);
@@ -806,7 +858,7 @@ require('let rendered = !MadeiraConfig.flag("MADEIRA_DOCK_SHORT_EXIT_END") || ma
         'the watch passes whether frames reached the screen (the starting screen\'s own test); the key off passes rendered = true')
 short_branch = watch[watch.index('if !asked && !DockGameEndRules.isCrash(status) {'):]
 short_branch = short_branch[:short_branch.index('                return\n')]
-require('endedByDockShortExit = ' in short_branch and 'before it showed a picture. If it showed a message, that is the reason.' in short_branch
+require('endedByDockShortExit = DockGameEndRules.shortExitWords(file: file, lived: lived, status: status)' in short_branch   # words: DockGameEndRules.shortExitWords
         and 'wine_session_dock_game_left(Int32(bitPattern: status))' in short_branch and 'wine_session_dock_game_ended' not in short_branch
         and 'no picture was drawn' in short_branch,
         'a short clean exit ends the session with the reason in words, through the left call (not a crash status), and logs it')

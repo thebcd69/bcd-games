@@ -93,6 +93,9 @@ static void *cur_peb;
 void *ios_jit_current_peb(void) { return cur_peb; }
 const char *ios_pe_module_name( const void *image_base, size_t image_size )
 { (void)image_base; (void)image_size; return "test.dll"; }
+/* night round 2026-11-11 (R1 S8): the mapping lines name the image through the checked reader */
+static const char *ios_pe_module_name_safe( const void *image_base, size_t image_size, char *out, size_t out_size )
+{ (void)image_base; (void)image_size; snprintf( out, out_size, "test.dll" ); return out; }
 int ios_subfloor_enum( int idx, unsigned long long *low, unsigned long long *real, unsigned long long *size,
                        void **owner )
 { (void)idx; (void)low; (void)real; (void)size; (void)owner; return 0; }

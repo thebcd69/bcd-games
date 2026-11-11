@@ -107,6 +107,19 @@ struct AutoTuneRule: Codable {
     /// madeira-bcd (round 624, Fallout 4 voices, WRSNC8): an evaluateWhenRan rule that speaks ONLY for a session that played: its signals are
     /// the game's own side effect (a missing audio decoder), never the reason a failed session failed, so a crash keeps its own verdict.
     var ranOnly: Bool?
+    /// Night round 2026-11-11 (agent T3 S1; PEAK XVABPA, N0F74Y, W8T71S): the rule may run although the player's own bcd.cfg or game file sets
+    /// swap-mb: the attempt then carries the rule's other lines and leaves that key out (the player's number and cap stay). Only when swap-mb is
+    /// the ONLY key of the rule the player set; any other user key still keeps the rule out. The swap tiers carry it (a global swap-mb = 4096
+    /// with the default coverage backs nothing, [swap] ml1077 stats 0 MB; swap-mode = 2 is what makes the file take Unity-sized allocations).
+    var partialUserKeys: Bool?
+    /// Night round 2026-11-11 (agent T3 S2; Oxygen Not Included S1P30G, Poppy Playtime RBCWQH, Thief Simulator 3 S02ESM, WolfQuest 9W3TW7): the
+    /// game's block-compressed textures (the last "[bc-census] ml653   TOTAL logical BC bytes" line) were at least this percent of the memory
+    /// limit; the log has to have the census and the limit. Sibling of memoryMinPct.
+    var bcCensusMinPct: Int?
+    /// Night round 2026-11-11 (agent G10 S4; Binding of Isaac on gl-backend = gles, KJYCYC): the words that start the advice of a "known" stop
+    /// instead of "No setting changes this" / "A crash in BCD itself, not a setting": a noFix rule whose answer IS a setting that auto-tune may
+    /// not change by itself (the player's own key) says what to choose. Optional: a rule without it speaks as before.
+    var lead: String?
 }
 
 enum AutoTuneRules {
@@ -265,6 +278,44 @@ struct AutoTuneLogFacts: Codable, Equatable {
     /// stage came from the clock or from the cover going to the desktop did not play (Call of Duty HQ waited 331 s with presents=0; the
     /// Rockstar launcher sessions of GTA V Legacy and GTA IV; Doom 3, which draws through OpenGL).
     var noFrames: Bool { presentsCounted == true && presentsLogged == 0 && !frameSeen }
+    /// Night round 2026-11-11 (agent T1 S5; CrossCode J787P4, CS2 G7B80A, Poppy Playtime YWCX20): the Dock's launch report. Steam saw the
+    /// game running ("[dock-report] launch-game-running=1"), saw it end ("launch-game-ended=1"), and the last launch result Valve's client
+    /// gave ("launch-client-error=N"; 0 = it started, 19 = update required, 35 = the account plays elsewhere).
+    var dockGameRunning = false
+    var dockGameEnded = false
+    var dockLaunchError: Int?
+    /// A Dock session that never drew while Steam said the game ended, or refused the start and never ran it: it did not run, whatever the
+    /// clock says (J787P4 422 s, G7B80A 301 s, YWCX20 151 s with presents=0 were "ran, ok", so no rule was evaluated), and whether or not
+    /// the player then quit it (G7B80A and YWCX20 waited, then quit: "quit" counted as played).
+    var dockNeverDrew: Bool {
+        dock && noFrames && aliveSeconds >= 20
+            && (dockGameEnded || (!dockGameRunning && (dockLaunchError ?? 0) > 0))
+    }
+    /// Night round 2026-11-11 (agent G5 S3; FTL PHE15B, Peggle Deluxe SF5ZDS and METSK8): "[srw-hang] ml2250 tid=... waits 30s for an SRW lock"
+    /// reports, the census BCD prints when a guest thread has waited 30 s for a slim reader/writer lock. With the Dock's frame counter at 0 the
+    /// game never started: a hang, like a FEX lock that is never released (fexlockStuck). 3 archive logs have the line; Spec Ops: The Line
+    /// HN2342 (an SRW wait in another place) is scored a crash already and keeps that verdict.
+    var srwHangs = 0
+    /// Night round 2026-11-11 (agent G5 S14; Inscryption 4HZY1P): the last "[fault-cost] ml685 emulated-store faults=N" count (every 200,000 or
+    /// so), the Mono-store marker "[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset)" and Unity's crash-handler program in the session: a 32-bit
+    /// Unity game whose own code patching goes through BCD's slow store path millions of times and never draws.
+    var emulatedStoreFaults = 0
+    var wowRwxPlainUnset = false
+    var unityCrashHandler32 = false
+    var monoStoreStorm: Bool {
+        emulatedStoreFaults >= 1_000_000 && wowRwxPlainUnset && unityCrashHandler32 && noFrames
+    }
+    /// Night round 2026-11-11 (agent T3 S2; Oxygen Not Included S1P30G, Poppy Playtime RBCWQH and QTDFHP, Thief Simulator 3 S02ESM, WolfQuest
+    /// 9W3TW7): the newest "[bc-census] ml653   TOTAL logical BC bytes = NKB" (the census lines are running totals), in KB: how much of the
+    /// memory limit the game's block-compressed textures take before any clamp.
+    var bcCensusKB: Int?
+    /// Night round 2026-11-11 (agent G2 S8; BlueField SM3JHE and VW6TV2): BCD asked the debugger for the JIT pool and none answered
+    /// ("[jit-debugger] the pool request was not answered: no debugger is attached") and the app ended the start ("JIT pool allocation FAILED -
+    /// not starting Wine"): Wine never started, so nothing in the session is the game's. The BAD POOL variant of that last line (a placement
+    /// problem the game's rules speak for) does not count.
+    var jitDebuggerUnanswered = false
+    var jitPoolFailed = false
+    var wineNeverStarted: Bool { jitDebuggerUnanswered && jitPoolFailed }
 
     /// The session summary line BCD writes when a session ends, or when the app goes to the background ("[session] length=1234s play=1180s
     /// frames=71234 avg=58.7 low1=41.2 ..." in BCDSessionCore.swift): the whole numbers of the newest one in the log. A replay and the log
@@ -323,6 +374,11 @@ final class AutoTuneLogScanner {
     private(set) var counts: [Int]
     /// The first line that matched each signal (at most 24 lines, 240 bytes each).
     private(set) var evidence: [String] = []
+    /// Night round 2026-11-11 (agent T2 S-DL3; Dying Light WF4EHP: "matched x64-image-nocopy,pool-split-exhausted" that no log shows): the
+    /// physical lines read so far (a file's line numbers, as grep -n counts them) and, in the order of `signals`, the line number of the
+    /// first line that matched each signal (0: none). Text for the verdict line only; nothing decides by them.
+    private(set) var lineCount = 0
+    private(set) var firstLine: [Int]
     private let needles: [[[UInt8]]]
     /// madeira-bcd (round 630): the signals marked sinceLaunch, whose counts start again at each game launch.
     private let sinceLaunch: [Int]
@@ -335,6 +391,7 @@ final class AutoTuneLogScanner {
         counts = Array(repeating: 0, count: signals.count)
         sinceLaunch = signals.indices.filter { signals[$0].sinceLaunch == true }
         evidenced = Array(repeating: false, count: signals.count)
+        firstLine = Array(repeating: 0, count: signals.count)
     }
 
     /// Streams the whole file. bcd-log.txt holds one app run, which runs one Wine
@@ -390,6 +447,7 @@ final class AutoTuneLogScanner {
     }
 
     private func line(_ whole: UnsafeRawBufferPointer) {
+        lineCount += 1
         // The same cut whether the line came whole from one chunk or through `carry`.
         let l = whole.count > Self.maxLine ? UnsafeRawBufferPointer(rebasing: whole[0..<Self.maxLine]) : whole
         guard l.count > 4 else { return }
@@ -398,11 +456,16 @@ final class AutoTuneLogScanner {
         // 177 archive logs with such a block were scored by it (Cult of the Lamb 4DR32H "hung" from the previous run's GPU errors; Mina
         // the Hollower W6PACT matched metal-texture-double-release through it).
         if Self.find(l, Self.mPrevTail) != nil { return }
+        // Night round 2026-11-11 (agents G10 S2, G1 note on 778A58): the sender's own words ("[user-comment] ..." lines at the top of a sent log,
+        // LogUploadCore.commentLines) are a person's text, never the game's: Alan Wake 778A58's comment quoted a shader message and matched
+        // dxmt-d3d9-vs-ps-interface ("FIX-FAILED") although the log has no such failure. The app's own live log never has these lines.
+        if l.count >= Self.mUserComment.count, Self.mUserComment.indices.allSatisfy({ l[$0] == Self.mUserComment[$0] }) { return }
         if !sinceLaunch.isEmpty, Self.find(l, Self.mLibraryLaunch) != nil {
             for i in sinceLaunch { counts[i] = 0 }
         }
         for i in needles.indices where Self.hasAll(l, needles[i]) {
             counts[i] += 1
+            if firstLine[i] == 0 { firstLine[i] = lineCount }
             if !evidenced[i] && evidence.count < 24 {
                 evidenced[i] = true
                 evidence.append(String(decoding: l.prefix(240), as: UTF8.self))
@@ -496,6 +559,9 @@ final class AutoTuneLogScanner {
     private static let mXpLine = Array("[xp] ".utf8)
     private static let mFpMB = Array(" fpMB=".utf8)
     private static let mPrevTail = Array("[prev-tail]".utf8)
+    /// "[user-comment] " as bytes, not as an Array("...".utf8) literal: tools/autotune-fixture.py keeps every line a literal matches, and a
+    /// sender's comment must never reach a fixture because of this marker.
+    private static let mUserComment: [UInt8] = [0x5B, 0x75, 0x73, 0x65, 0x72, 0x2D, 0x63, 0x6F, 0x6D, 0x6D, 0x65, 0x6E, 0x74, 0x5D, 0x20]
     private static let mLibraryLaunch = Array("[bcd] library launch ".utf8)
     /// madeira-bcd (round 630, agent T2 S7): the owner of a stuck FEX lock ("| owner teb=... tid=0024").
     private static let mOwnerTid = Array("| owner teb=".utf8)
@@ -530,6 +596,17 @@ final class AutoTuneLogScanner {
     private static let mMachUnhandled1 = Array("[mach_exc] UNHANDLED #1 pc=".utf8)   // "#1 pc=": not #12400 (Watch Dogs 2's SMC traps)
     private static let mX18Zero = Array(" x18=0x0 ".utf8)
     private static let mDetachWait = Array("detach-wait: presents=".utf8)
+    private static let mDockRunning = Array("[dock-report] launch-game-running=1".utf8)
+    private static let mDockEnded = Array("[dock-report] launch-game-ended=1".utf8)
+    private static let mDockClientError = Array("[dock-report] launch-client-error=".utf8)
+    /// Night round 2026-11-11 (agents G5 S3, G5 S14, T3 S2, G2 S8): see the facts of the same names.
+    private static let mSrwHang = Array("[srw-hang] ml2250 tid=".utf8)
+    private static let mStoreFaults = Array("[fault-cost] ml685 emulated-store faults=".utf8)
+    private static let mWowRwxPlainUnset = Array("[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset)".utf8)
+    private static let mUnityCrashHandler32 = Array("UnityCrashHandler32.exe".utf8)
+    private static let mBcCensusTotal = Array("[bc-census] ml653   TOTAL logical BC bytes = ".utf8)
+    private static let mJitDebuggerUnanswered = Array("[jit-debugger] the pool request was not answered".utf8)
+    private static let mJitPoolFailed = Array("JIT pool allocation FAILED".utf8)
     private static let mLaunchView = Array("[launch-view] dismissed reason=".utf8)
     private static let mLaunchViewGameWindow = Array("[launch-view] dismissed reason=game-window".utf8)
     private static let mSteamErrorReporterGate = Array("(steamerrorreporter gate)".utf8)
@@ -711,6 +788,17 @@ final class AutoTuneLogScanner {
             if v >= 600 { facts.stage = max(facts.stage, 4) }   // about 20 s of frames
         }
         if facts.stage < 3, S.find(l, S.mLaunchView) != nil { facts.stage = 3 }
+        if !facts.dockGameRunning, S.find(l, S.mDockRunning) != nil { facts.dockGameRunning = true }
+        if !facts.dockGameEnded, S.find(l, S.mDockEnded) != nil { facts.dockGameEnded = true }
+        if let v = S.number(l, after: S.mDockClientError), v < 1_000_000 { facts.dockLaunchError = Int(v) }
+        // Night round 2026-11-11 (agents G5 S3, G5 S14, T3 S2, G2 S8).
+        if S.find(l, S.mSrwHang) != nil { facts.srwHangs += 1 }
+        if let v = S.number(l, after: S.mStoreFaults) { facts.emulatedStoreFaults = Int(min(v, 1 << 40)) }
+        if !facts.wowRwxPlainUnset, S.find(l, S.mWowRwxPlainUnset) != nil { facts.wowRwxPlainUnset = true }
+        if !facts.unityCrashHandler32, S.find(l, S.mUnityCrashHandler32) != nil { facts.unityCrashHandler32 = true }
+        if let v = S.number(l, after: S.mBcCensusTotal), v > 0 { facts.bcCensusKB = Int(min(v, 1 << 40)) }
+        if !facts.jitDebuggerUnanswered, S.find(l, S.mJitDebuggerUnanswered) != nil { facts.jitDebuggerUnanswered = true }
+        if !facts.jitPoolFailed, S.find(l, S.mJitPoolFailed) != nil { facts.jitPoolFailed = true }
         if !facts.steamClientCrashSeen, S.find(l, S.mSteamErrorReporterGate) != nil { facts.steamClientCrashSeen = true }
         if !facts.gameWindowSeen, facts.dock, S.find(l, S.mLaunchViewGameWindow) != nil {
             facts.gameWindowSeen = true
@@ -795,6 +883,9 @@ struct AutoTuneReport: Codable, Equatable {
     /// madeira-bcd (round 630, agent T2 S12): whether the swap file reached its cap (AutoTuneRule.swapCapHit); nil when the log has no
     /// stats line with the cap. Optional, so that a saved state without it still loads.
     var swapCapHit: Bool?
+    /// Night round 2026-11-11 (agent T3 S2): the game's block-compressed textures (AutoTuneLogFacts.bcCensusKB) as a percentage of the memory
+    /// limit (AutoTuneRule.bcCensusMinPct); nil when the log has no census line or no limit. Optional, so that a saved state without it still loads.
+    var bcCensusPct: Int?
 
     var failed: Bool { ["crashed", "killed", "hung", "exited-early"].contains(outcome) }
     var played: Bool { outcome == "ran" || outcome == "quit" }
@@ -810,6 +901,9 @@ enum AutoTuneEngine {
         // failed (Saints Row: The Third's DirectX setup, T3P8HK, scored "crashed" and given exe-window-mb = 512 for the game).
         // Nothing to learn about the game's settings.
         if f.installsOver { return "inconclusive" }
+        // Night round 2026-11-11 (agent G2 S8; BlueField SM3JHE, VW6TV2): BCD asked the debugger for the JIT pool, none answered and the start
+        // ended before Wine did: nothing in this run is the game's (it was scored "inconclusive at stage 0" and the line said "kept ...").
+        if f.wineNeverStarted { return "inconclusive" }
         // madeira-bcd (round 624, E1): in a Dock session an error box after the game's steam_api found no running Steam is a failure at any
         // stage (Portal 2 HZE5E9: "Engine Error: Steam is not running", a black window presenting behind it, scored "ran"). Dock only: the
         // Rockstar launcher's own probe of an Epic start prints the same line and an "Error" box and is left as it was (VX8ZZ0, YZZFYA, PA6PEB).
@@ -837,7 +931,11 @@ enum AutoTuneEngine {
             // for a BCD lock it owns itself ("[fexlock] STUCK write-wait") and no frame ever drawn, is not a player leaving a game that
             // works: keep the evidence (the Dock's frame counter is there, it stayed at 0, nothing crashed or was quit).
             // Round 630 (agent T1 S25): a spin with no frame in two minutes is the same freeze.
-            let frozenWithoutFrames = (f.fexlockStuck > 0 || f.spinNoFrames) && f.presentsCounted == true && f.presentsLogged == 0 && !crashedInLog
+            // Night round 2026-11-11 (agents G5 S3, G5 S14; FTL PHE15B, Peggle Deluxe SF5ZDS, Inscryption 4HZY1P): a 32-bit program whose
+            // lock census says a thread waited 30 s for an SRW lock, or whose own code patching went through BCD's slow store path a
+            // million times, with no frame in the whole session, is frozen as well.
+            let neverDrewStuck = f.fexlockStuck > 0 || f.spinNoFrames || (f.srwHangs > 0 && f.noFrames) || f.monoStoreStorm
+            let frozenWithoutFrames = neverDrewStuck && f.presentsCounted == true && f.presentsLogged == 0 && !crashedInLog
                 && !f.quitRequested
             if end.userSaid == "i-closed" { return frozenWithoutFrames || (frozeLocked && !crashedInLog) ? "hung" : "inconclusive" }
             // madeira-bcd (round 591): the user asked a game that was playing to close ("graceful close requested" after the Dock counted frames
@@ -864,6 +962,13 @@ enum AutoTuneEngine {
                let last = f.lastFootprintMB, let slow = f.lastSlowFootprintMB, f.lastFootprintFast,
                let limit = end.limitMB ?? f.limitMB, limit >= 2048,
                last * 100 >= limit * 75, last * 10 >= slow * 14 { return "killed" }
+            // madeira-bcd (night round 2026-11-11, agent T1 S4; Arctic Drive Demo TJ15HX, build 634, iPad M5): one GPU error the app
+            // recovered from 10 % into a 36-minute session, 67,607 frames presented, and the last footprint line at 99.4 % of the limit:
+            // iOS closed the app for memory. The GPU error did not end the session (a death by a GPU error does not sit at the limit), but
+            // it scored "hung" below and no memory rule ever ran. Only with at most three GPU errors and a long run of frames.
+            if end.userSaid != "froze", f.freezeGaps == 0, !frozeLocked, !(f.quitRequested && !f.returnedToLibrary), !crashedInLog,
+               f.gpuErrors > 0, f.gpuErrors <= 3, f.presentsLogged >= 3000,
+               let last = f.lastFootprintMB, let limit = end.limitMB ?? f.limitMB, last >= limit - max(150, limit / 50) { return "killed" }
             if end.userSaid == "froze" || f.freezeGaps > 0 || f.gpuErrors > 0 || frozeLocked
                 || (f.quitRequested && !f.returnedToLibrary) { return "hung" }
             // madeira-bcd 578 (lead, from ajan6-mm): a session killed at the memory limit whose only crash evidence is
@@ -902,6 +1007,8 @@ enum AutoTuneEngine {
             let playedThenLeft = f.sessionPartial && f.frameSeen && f.stage >= 4 && (f.sessionPlaySeconds ?? 0) >= 20
                 && f.freezeGaps == 0 && f.gpuErrors == 0 && !crashedInLog
             if playedThenLeft, let last = f.lastFootprintMB, let limit = end.limitMB ?? f.limitMB, last < limit * 9 / 10 { return "ran" }
+            // Night round 2026-11-11 (T1 S5): the app was gone after a Dock session that never drew (the player left it): not run.
+            if f.dockNeverDrew && !crashedInLog { return "exited-early" }
             if end.userSaid == "closed-by-itself" { return "killed" }
             return "inconclusive"
         }
@@ -912,7 +1019,10 @@ enum AutoTuneEngine {
         // counter stayed at 0 for 6.5 minutes, yet the stage the clock raises (5 after five minutes) scored the session "ran, ok" and auto-tune
         // tried nothing. Only with the Dock's counter (a game that draws without it keeps the old rule, round 580) and no crash evidence.
         // Round 630 (agent T1 S25; C2698Z, YZ6WCQ): or a spin with no frame in two minutes.
-        if (f.fexlockStuck > 0 || f.spinNoFrames) && f.presentsCounted == true && f.presentsLogged == 0 && crashStatus == nil && !crashedInLog {
+        // Night round 2026-11-11 (agents G5 S3, G5 S14): the same for the SRW-lock census (FTL PHE15B, Peggle Deluxe SF5ZDS) and the million
+        // emulated stores of a 32-bit Unity game that never drew (Inscryption 4HZY1P); both need the Dock's counter at 0 and no frame line.
+        if (f.fexlockStuck > 0 || f.spinNoFrames || (f.srwHangs > 0 && f.noFrames) || f.monoStoreStorm)
+            && f.presentsCounted == true && f.presentsLogged == 0 && crashStatus == nil && !crashedInLog {
             return "hung"
         }
         // madeira-bcd (round 624, Farming Simulator 22 on Discord): a host fault in a thread with no TEB that nothing handled, and the Dock's frame
@@ -924,6 +1034,9 @@ enum AutoTuneEngine {
         }
         // madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): frames, then a counter that stood still for 90 s or more with a FEX lock held.
         if frozeLocked && crashStatus == nil && !crashedInLog { return "hung" }
+        // Night round 2026-11-11 (T1 S5): a Dock session that never drew while Steam ended or refused the game did not run; neither the 300 s
+        // clock nor the player's quit after waiting turns it into "ran" or "quit". A crash keeps "crashed".
+        if f.dockNeverDrew && crashStatus == nil && !crashedInLog { return "exited-early" }
         // The user quit a game that was on screen: whatever it logged on the way out, it played,
         // unless it had crashed before the user asked (the quit line's moment, when it is logged).
         if end.quitRequested && f.stage >= 3 && (f.crashEvidenceAtQuit ?? 0) == 0 && !(launcherFailed && f.launcherErrorBeforeQuit) { return "quit" }
@@ -966,11 +1079,15 @@ enum AutoTuneEngine {
         // use of 90 % of the cap or more; nil without a stats line that names the cap.
         var swapCapHit: Bool?
         if let cap = f.swapCapMB, cap > 0, let disk = f.swapDiskMB { swapCapHit = (f.swapDiskRefusals ?? 0) > 0 || disk * 10 >= cap * 9 }
+        // Night round 2026-11-11 (agent T3 S2): the compressed textures against the limit the marker or the log names (not the guess from the
+        // free memory at launch: the census share is a ratio of the real limit).
+        var bcCensusPct: Int?
+        if let kb = f.bcCensusKB, let limit = end.limitMB ?? f.limitMB, limit > 0 { bcCensusPct = Int(min(Int64(kb) * 100 / (Int64(limit) * 1024), 1000)) }
         let r = AutoTuneReport(outcome: out, stage: stage, seconds: max(end.seconds, Double(f.aliveSeconds)),
                                presents: presents, peakMB: f.peakFootprintMB, dock: f.dock,
                                d3d12: f.d3d12, ramMB: f.ramMB, matched: [], evidence: scanner.evidence,
                                dialogs: f.dialogs, build: f.build, jitImageFailMB: f.jitImageFailMB, fixedExeMB: f.fixedExeMB,
-                               memoryPct: memoryPct, freeDiskGB: f.freeDiskGB, swapCapHit: swapCapHit)
+                               memoryPct: memoryPct, freeDiskGB: f.freeDiskGB, swapCapHit: swapCapHit, bcCensusPct: bcCensusPct)
         var report = r
         if f.monoMissing && report.failed { report.monoMissing = true }
         report.matched = rules.filter { matches($0, report: r, counts: scanner.counts, signals: signals) }
@@ -985,6 +1102,17 @@ enum AutoTuneEngine {
             report.outcome = "inconclusive"
         }
         return report
+    }
+
+    /// Night round 2026-11-11 (agent T2 S-DL3): "rule line N" for up to three matched rules: the first line of the log that showed the rule's
+    /// first required signal, so that a verdict that no log reproduces can be checked against the file it read.
+    static func matchedLines(_ matched: [String], rules: [AutoTuneRule], signals: [AutoTuneSignal], scanner: AutoTuneLogScanner) -> [String] {
+        matched.prefix(3).compactMap { id in
+            guard let rule = rules.first(where: { $0.id == id }), let sig = rule.all.first,
+                  let i = signals.firstIndex(of: AutoTuneSignal(has: sig.has, sinceLaunch: sig.sinceLaunch)), i < scanner.firstLine.count,
+                  scanner.firstLine[i] > 0 else { return nil }
+            return "\(id) from line \(scanner.firstLine[i])"
+        }
     }
 
     /// Every signal a rule set needs, deduplicated, in a stable order.
@@ -1023,6 +1151,7 @@ enum AutoTuneEngine {
         if let lo = rule.exeMinMB, (report.fixedExeMB ?? 0) < lo { return false }
         if let lo = rule.memoryMinPct, let pct = report.memoryPct, pct < lo { return false }
         if rule.swapCapHit == true, report.swapCapHit == false { return false }
+        if let lo = rule.bcCensusMinPct, (report.bcCensusPct ?? 0) < lo { return false }
         guard !rule.all.isEmpty, rule.all.allSatisfy(seen) else { return false }
         if let any = rule.any, !any.isEmpty, !any.contains(where: seen) { return false }
         if let none = rule.none, none.contains(where: seen) { return false }
@@ -1100,6 +1229,13 @@ struct AutoTuneState: Codable, Equatable {
     /// madeira-bcd (round 624, agent E1 S5b): with the status "stuck", each matched rule that was passed over and why ("rule (tried)"),
     /// for the log. Optional: a state saved before it existed still loads.
     var skippedNote: String?
+    /// Night round 2026-11-11 (agent G10 S4): the words that start the advice for a "known" stop when its rule carries `lead`
+    /// (AutoTuneRule.lead). Optional: a state saved before it existed still loads.
+    var knownLeadText: String?
+    /// Night round 2026-11-11 (agent T1 S1; Dark Souls III on a 4 GB phone): why the line tried in the session that just ended was kept or
+    /// reverted, for the log ("trial <rule>: 301 s vs best 993 s, stage 4 vs 4 -> reverted"). Set only by the advance that decided a trial,
+    /// text only. Optional: a state saved before it existed still loads.
+    var trialNote: String?
 
     /// Why no swap file was tried, for "stuck" (nil unless an attempt was left out for lack of room).
     var lowDiskNote: String? {
@@ -1116,7 +1252,7 @@ struct AutoTuneState: Codable, Equatable {
 
     /// The words that start the advice for a "known" failure: a crash BCD fixed in a build, or one no setting and no known build changes
     /// (Valve's copy protection refusing the game's program, an open bug of BCD's).
-    var knownLead: String { knownNoFix == true ? "No setting changes this" : "A crash in BCD itself, not a setting" }
+    var knownLead: String { knownLeadText ?? (knownNoFix == true ? "No setting changes this" : "A crash in BCD itself, not a setting") }
     /// What to tell the user about a "known" failure.
     var knownAdvice: String {
         var text = "\(knownLead): \(knownReason ?? known ?? "")"
@@ -1132,9 +1268,37 @@ struct AutoTuneState: Codable, Equatable {
 
     /// The layer file's lines for the next session: a candidate's key replaces a kept one.
     var layerLines: [String] { AutoTuneState.merge(kept, candidate ?? []) }
+    /// madeira-bcd (round 2026-11-11, G3 S5/S6): the one key whose values add up. env.MADEIRA_OPTIN_DLLS is a list of DLL names, and a game
+    /// can fail on one missing library after another (DRAGON BALL FighterZ: twinapi.appcore, then msvcp_win; Dolphin: qwave, then
+    /// bluetoothapis): the second rule's line must not drop the first one's name.
+    static let optinKey = "env.MADEIRA_OPTIN_DLLS"
+    /// The DLL names of an env.MADEIRA_OPTIN_DLLS line (commas, semicolons and spaces separate them, as WineProcessBridge.m reads them).
+    static func optinNames(_ line: String) -> [String] {
+        AutoTuneRules.value(line).split(whereSeparator: { ",; ".contains($0) }).map(String.init)
+    }
+    /// Whether `lines` name an env.MADEIRA_OPTIN_DLLS DLL that the kept lines do not have yet (a second wall of the same kind: a try that
+    /// adds something, where "a key auto-tune kept" would end the search).
+    static func addsOptinNames(_ lines: [String], to kept: [String]) -> Bool {
+        let have = Set(kept.filter { AutoTuneRules.key($0) == optinKey }.flatMap(optinNames).map { $0.lowercased() })
+        return lines.filter { AutoTuneRules.key($0) == optinKey }.flatMap(optinNames).contains { !have.contains($0.lowercased()) }
+    }
     static func merge(_ kept: [String], _ add: [String]) -> [String] {
         let keys = Set(add.map(AutoTuneRules.key))
-        return kept.filter { !keys.contains(AutoTuneRules.key($0)) } + add
+        var out = kept.filter { !keys.contains(AutoTuneRules.key($0)) }
+        // The names of env.MADEIRA_OPTIN_DLLS: the kept ones first, then the candidate's that are not there yet (compared without case, as the
+        // bridge lowercases them). A candidate line with no kept line before it goes in as it is.
+        var names = kept.filter { AutoTuneRules.key($0) == optinKey }.flatMap(optinNames)
+        for line in add {
+            guard AutoTuneRules.key(line) == optinKey, !names.isEmpty else {
+                out.append(line)
+                if AutoTuneRules.key(line) == optinKey { names = optinNames(line) }
+                continue
+            }
+            for name in optinNames(line) where !names.contains(where: { $0.lowercased() == name.lowercased() }) { names.append(name) }
+            out.removeAll { AutoTuneRules.key($0) == optinKey }
+            out.append("\(optinKey) = " + names.joined(separator: ","))
+        }
+        return out
     }
     var decided: Int { attempts.filter { $0.kept != nil && $0.rule != nil }.count }
 }
@@ -1174,6 +1338,7 @@ extension AutoTuneEngine {
                         listValues: [String: String] = [:]) -> AutoTuneState {
         var s = state
         s.skippedNote = nil   // madeira-bcd (round 624, E1 S5b): this session's own, set below only for a "stuck" verdict
+        s.trialNote = nil     // night round 2026-11-11 (T1 S1): this session's own, set below only when a trial was decided
         if s.fingerprint != fingerprint {
             // The user changed the game's settings: what follows is compared with a new baseline.
             s.fingerprint = fingerprint
@@ -1193,6 +1358,10 @@ extension AutoTuneEngine {
         if let best = s.best, s.candidateRule != nil {
             let keep = better(report, than: best, tried: s.candidateRule)
             attempt.kept = keep
+            if let rule = s.candidateRule {
+                s.trialNote = "trial \(rule): \(Int(report.seconds)) s at stage \(report.stage) (\(report.outcome)) vs best \(Int(best.seconds)) s at stage "
+                    + "\(best.stage) (\(best.outcome)) -> \(keep ? "kept" : "reverted")"
+            }
             if keep {
                 s.kept = AutoTuneState.merge(s.kept, s.candidate ?? [])
                 s.best = report
@@ -1212,6 +1381,7 @@ extension AutoTuneEngine {
             s.status = "known"
             s.known = rule.id
             s.knownReason = rule.reason
+            s.knownLeadText = rule.lead
             s.knownFixedIn = rule.noFix == true ? nil : rule.fixedIn   // 2026-11-01: a fixedIn rule names its build
             s.knownNoFix = rule.noFix == true ? true : nil
             s.knownBuild = report.build
@@ -1230,6 +1400,7 @@ extension AutoTuneEngine {
             s.status = "known"
             s.known = rule.id
             s.knownReason = rule.reason
+            s.knownLeadText = rule.lead
             s.knownFixedIn = rule.fixedIn
             s.knownNoFix = rule.noFix == true ? true : nil
             s.knownBuild = report.build
@@ -1262,12 +1433,16 @@ extension AutoTuneEngine {
         // madeira-bcd (round 624, agent E1 S5b; Supermarket Together 45T9YP, Hogwarts Legacy GBQRKH): why each matched rule was passed
         // over, for the [autotune] line of a "stuck" verdict (text only: the choice below is the same).
         var skipped: [String] = []
+        // Night round 2026-11-11 (agent T3 S1): the lines of a rule that may run without the one key the player set (partialUserKeys); nil
+        // for every other rule and when the player set none of its keys.
+        var partialLines: [String]?
         let next = report.matched.compactMap { id in rules.first { $0.id == id } }.first { rule in
             func skip(_ why: String) -> Bool { skipped.append("\(rule.id) (\(why))"); return false }
             if rule.fixedIn != nil || rule.noFix == true { return skip("no line fixes it") }
             // madeira-bcd (round 624, agent D3 S5-3): a swap attempt the device has no room for is no attempt (swapRoomMB); one that would not
-            // raise the swap file auto-tune already kept is none either.
-            if let free = report.freeDiskGB,
+            // raise the swap file auto-tune already kept is none either. Not when the player's own swap-mb stays (T3 S1): the rule then adds no
+            // file size, and the player's number is the player's.
+            if let free = report.freeDiskGB, !(rule.partialUserKeys == true && userKeys.contains("swap-mb")),
                let swap = rule.lines.first(where: { AutoTuneRules.key($0) == "swap-mb" }).flatMap({ Int(AutoTuneRules.value($0)) }) {
                 let room = swapRoomMB(freeGB: free)
                 let have = s.kept.first(where: { AutoTuneRules.key($0) == "swap-mb" }).flatMap { Int(AutoTuneRules.value($0)) } ?? 0
@@ -1276,10 +1451,21 @@ extension AutoTuneEngine {
                     return skip(room == 0 ? "no storage for a swap file" : "no larger swap file fits")
                 }
             }
-            let keys = rule.lines.map(AutoTuneRules.key)
+            var keys = rule.lines.map(AutoTuneRules.key)
             if s.tried.contains(rule.id) { return skip("tried") }
             if triedLines.contains(rule.lines) { return skip("its lines were tried") }
-            if keys.contains(where: userKeys.contains) { return skip("a key you set") }
+            partialLines = nil
+            let blocked = Set(keys).intersection(userKeys)
+            if !blocked.isEmpty {
+                // Night round 2026-11-11 (agent T3 S1; PEAK XVABPA: "skipped swap-8gb-memory-kill-sure (a key you set)"): the player's swap-mb
+                // (a global bcd.cfg line) stays and keeps its cap; the rule's other lines (swap-mode = 2, swap-min-mb = 1: what makes the
+                // file back Unity-sized allocations) still are an attempt. Any other key the player set keeps the rule out, as before.
+                guard rule.partialUserKeys == true, blocked == ["swap-mb"] else { return skip("a key you set") }
+                let rest = rule.lines.filter { !userKeys.contains(AutoTuneRules.key($0)) }
+                guard !rest.isEmpty else { return skip("a key you set") }
+                partialLines = rest
+                keys = rest.map(AutoTuneRules.key)
+            }
             // madeira-bcd (round 591): the recommended list's own lines in the game's file are as good as the user's, except for a rule that is
             // marked as an upgrade of them, after a memory kill, and only with a larger number (GTA V Enhanced's list swap-mb = 3072 kept the
             // 12 GB tier's swap-mb = 6144 out, A24ES3). A line equal to the list's is already in force; a rule with nothing new is no attempt.
@@ -1287,7 +1473,7 @@ extension AutoTuneEngine {
                 if rule.listUpgrade == true && (report.outcome == "killed"
                     || (rule.listUpgradeFailure == true && (report.outcome == "crashed" || report.outcome == "exited-early"))) {
                     var changes = false
-                    for line in resolve(rule.lines, report: report) {   // round 625: "{exeWindowMB}" as the attempt would write it
+                    for line in resolve(partialLines ?? rule.lines, report: report) {   // round 625: "{exeWindowMB}" as the attempt would write it
                         guard let had = listValues[AutoTuneRules.key(line)] else { changes = true; continue }
                         let value = AutoTuneRules.value(line)
                         if value == had { continue }
@@ -1303,7 +1489,13 @@ extension AutoTuneEngine {
             if rule.upgrade == true {
                 return keys.contains(where: keptKeys.contains) ? true : skip("nothing kept to raise")
             }
-            return !keys.contains(where: keptKeys.contains) ? true : skip("a key auto-tune kept")
+            // madeira-bcd (round 2026-11-11, G3 S5/S6/G7 S1: DRAGON BALL FighterZ twinapi.appcore then msvcp_win, Dolphin qwave then bluetoothapis,
+            // Meccha Chameleon dbgcore then combase): env.MADEIRA_OPTIN_DLLS is a list. A rule that names a DLL auto-tune did not keep yet is a new
+            // try (AutoTuneState.merge adds the names up), not "a key auto-tune kept". Every other key is as before.
+            let held = keys.filter { key in
+                keptKeys.contains(key) && !(key == AutoTuneState.optinKey && AutoTuneState.addsOptinNames(rule.lines, to: s.kept))
+            }
+            return held.isEmpty ? true : skip("a key auto-tune kept")
         }
         guard let rule = next else {
             s.status = "stuck"
@@ -1313,7 +1505,7 @@ extension AutoTuneEngine {
         }
         s.lowDiskGB = nil
         s.tried.append(rule.id)
-        s.candidate = resolve(rule.lines, report: report)
+        s.candidate = resolve(partialLines ?? rule.lines, report: report)
         s.candidateRule = rule.id
         s.status = "trying"
         return s

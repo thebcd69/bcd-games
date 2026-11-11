@@ -57,7 +57,12 @@ dock = next((d for d in (root / "madeira-dock", Path.home() / "madeira-bcd/madei
 if dock is None:
     print("skip: the Dock source is not at hand (madeira-dock submodule)")
 else:
-    orig = (dock / "src/launch.c").read_text()
+    # The pinned launch.c (night round 2026-11-11: a build tree may also carry patch-dock-registry-create.py on top of this patch, which the
+    # rebuild below cannot undo); without git the working copy, as before.
+    try:
+        orig = subprocess.run(["git", "-C", str(dock), "show", "HEAD:src/launch.c"], capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        orig = (dock / "src/launch.c").read_text()
     if P.MARKER in orig:
         print("note: the Dock tree is already patched; the original is rebuilt from it")
         orig = orig.replace(P.NEW_OPEN, P.OLD_OPEN, 1).replace(P.NEW_PUBLISH, P.OLD_PUBLISH, 1)

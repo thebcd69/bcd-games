@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -37,6 +38,8 @@ struct BCDMenuContent: Identifiable {
     /// A game's menu shows its state under the title.
     var game: BCDGame? = nil
     var items: [BCDMenuItem]
+    var message: String? = nil
+    var cancel: (() -> Void)? = nil
 }
 
 struct BCDMenuAsk {
@@ -65,6 +68,11 @@ struct BCDMenuAsk {
         self.content = content
     }
 
+    func confirm(_ question: BCDGameQuestion, run: @escaping () -> Void) {
+        guard !isOpen else { return }
+        ask = BCDMenuAsk(question: question, yes: run)
+    }
+
     func pick(_ item: BCDMenuItem) {
         guard content != nil else { return }
         content = nil
@@ -82,6 +90,7 @@ struct BCDMenuAsk {
     }
 
     func dismiss() {
+        afterClose = content?.cancel
         content = nil
         ask = nil
     }
@@ -95,7 +104,7 @@ struct BCDMenuAsk {
     // MARK: A game's menu
 
     /// The focus ids of a game's card, and the game each names (the shell's X reads the ring).
-    static let cardPrefixes = ["library.game.", "home.recent."]
+    static let cardPrefixes = ["library.game.", "home.recent.", "home.continue."]
     static let continueID = "home.continue"
 
     static func gameID(focused id: String?, store: BCDStore) -> String? {
@@ -229,6 +238,7 @@ struct BCDMenuHost: ViewModifier {
     @EnvironmentObject private var focus: BCDFocus
     @Environment(\.bcdLayout) private var layout
     static let layer = "menu."
+    var prefix = BCDMenuHost.layer
 
     func body(content: Content) -> some View {
         content
@@ -236,10 +246,10 @@ struct BCDMenuHost: ViewModifier {
             .animation(.easeOut(duration: 0.18), value: model.isOpen)
             .onChange(of: model.isOpen) { _, open in
                 if open {
-                    focus.openLayer(Self.layer)
+                    focus.openLayer(prefix)
                     placeFocus()
                 } else {
-                    focus.closeLayer(Self.layer)
+                    focus.closeLayer(prefix)
                     // What the choice does comes after the controller is back under the menu.
                     model.closed()?()
                 }
@@ -249,7 +259,7 @@ struct BCDMenuHost: ViewModifier {
             .onDisappear {
                 guard model.isOpen else { return }
                 model.dismiss()
-                focus.closeLayer(Self.layer)
+                focus.closeLayer(prefix)
             }
     }
 
@@ -257,9 +267,9 @@ struct BCDMenuHost: ViewModifier {
         ZStack {
             if let content = model.content {
                 Color.black.opacity(0.55).ignoresSafeArea().onTapGesture { model.dismiss() }
-                BCDMenuCard(content: content) { model.pick($0) }
+                BCDMenuCard(content: content, prefix: prefix) { model.pick($0) }
             } else if let asked = model.ask {
-                BCDGameQuestionView(question: asked.question, prefix: Self.layer + "ask.") { model.answer($0) }
+                BCDGameQuestionView(question: asked.question, prefix: prefix + "ask.") { model.answer($0) }
             }
         }
         .overlay(alignment: .bottom) {
@@ -279,12 +289,12 @@ struct BCDMenuHost: ViewModifier {
     /// question deletes something; the buttons follow what is up.
     private func placeFocus() {
         if let asked = model.ask {
-            focus.focused = asked.question.destructive ? Self.layer + "ask.no" : Self.layer + "ask.yes"
+            focus.focused = (asked.question.destructive || asked.question.defaultCancel) ? prefix + "ask.no" : prefix + "ask.yes"
             focus.setHandlers([(BCDHint(button: .a, title: "Select"), {}),
                                (BCDHint(button: .b, title: "Cancel"), { model.answer(false) })])
         } else if let content = model.content {
             let first = content.items.first(where: \.checked) ?? content.items.first
-            focus.focused = first.map { Self.layer + "item." + $0.id }
+            focus.focused = first.map { prefix + "item." + $0.id }
             focus.setHandlers([(BCDHint(button: .a, title: "Choose"), {}),
                                (BCDHint(button: .b, title: "Close"), { model.dismiss() })])
         }
@@ -293,6 +303,7 @@ struct BCDMenuHost: ViewModifier {
 
 private struct BCDMenuCard: View {
     let content: BCDMenuContent
+    var prefix = BCDMenuHost.layer
     let pick: (BCDMenuItem) -> Void
 
     var body: some View {
@@ -300,6 +311,7 @@ private struct BCDMenuCard: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text(content.title).font(BCDStyle.heading(19)).lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
+                if let message = content.message { Text(message).font(BCDStyle.body(14)).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true) }
                 if let game = content.game { BCDGameStatusLine(game: game) }
             }
             .padding(.horizontal, 20).padding(.top, 18).padding(.bottom, 12)
@@ -340,7 +352,7 @@ private struct BCDMenuCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .bcdFocusable(BCDMenuHost.layer + "item." + item.id, cornerRadius: 14) { pick(item) }
+        .bcdFocusable(prefix + "item." + item.id, cornerRadius: 14) { pick(item) }
         .accessibilityAddTraits(item.checked ? .isSelected : [])
     }
 }

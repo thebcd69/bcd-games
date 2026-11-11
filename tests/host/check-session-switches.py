@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """A game's own switches end with its session (WineProcessBridge.m's unsetenv list).
 
 The bridge setenv()s every env. line of the game's file at the start; a switch missing from the
@@ -17,7 +19,18 @@ unset = set(re.findall(r'unsetenv\("(MADEIRA_[A-Z0-9_]+)"\);', bridge))
 want = ["MADEIRA_WER", "MADEIRA_WINTYPES", "MADEIRA_OPTIN_DLLS", "MADEIRA_VCRT_ARM64_KEY",
         "MADEIRA_TAIL_CARVE_EXEC_CHECK", "MADEIRA_LUM_PROBE", "MADEIRA_FEX_BAND_KEEP_MB", "MADEIRA_X64_MACHINE",
         "MADEIRA_POOL_CLAMP_SECTIONS", "MADEIRA_TINY_WINDOW_FIX", "MADEIRA_WG_64BIT", "MADEIRA_NLS_EXTRA",
-        "MADEIRA_REAL_SUSPEND", "MADEIRA_FIRST_PROC_OWN_EXIT_FLAG"]
+        "MADEIRA_REAL_SUSPEND", "MADEIRA_FIRST_PROC_OWN_EXIT_FLAG",
+        "MADEIRA_FEX_SPLIT_LOCK",
+        "MADEIRA_GL_EMPTY_EXTENSIONS",
+        "MADEIRA_POOL_CODE_FOREGROUND",
+        "MADEIRA_POOL_CARVE_MERGE",
+        "MADEIRA_UBI_CEF",
+        "MADEIRA_KILL_REAP",
+        "MADEIRA_WOA_RECHECK",
+        "MADEIRA_SLEEP_KERNEL_APC",
+        "MADEIRA_SELF_WRITE",
+        "MADEIRA_X64_HOOK_ZONE",
+        "MADEIRA_APC_BUSY_QUEUE"]
 missing = [n for n in want if n not in unset]
 for n in want:
     print(("ok   " if n in unset else "FAIL ") + n + " is cleared at the end of a session")

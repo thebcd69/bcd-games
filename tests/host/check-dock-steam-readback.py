@@ -23,6 +23,7 @@ Checks:
      four new fields; the settings catalog knows both keys.
 """
 from pathlib import Path
+import importlib.util
 import os, re, shutil, subprocess, sys, tempfile
 
 root = Path(__file__).resolve().parents[2]
@@ -82,6 +83,12 @@ else:
               in r.stderr and bad.read_text() == before), r.stdout + r.stderr)
         # ---------------------------------------------------------------- 3. the helpers on the host
         helpers = p[p.index('/* madeira-bcd: launch-discovery-readback (round 624'):p.index('static volatile LONG interrupted;')]
+        # Night round 2026-11-11: in a build the Dock tree already carries tools/patch-dock-steam-views.py, whose helpers sit in the same
+        # place and need more of Windows than this harness gives; they have their own check (check-dock-steam-views.py).
+        _sv = importlib.util.spec_from_file_location('steam_views', root / 'tools/patch-dock-steam-views.py')
+        _svm = importlib.util.module_from_spec(_sv)
+        _sv.loader.exec_module(_svm)
+        helpers = helpers.replace(_svm.HELPERS, '')
         harness = r'''
 #include <stdbool.h>
 #include <stdint.h>

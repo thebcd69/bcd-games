@@ -210,7 +210,20 @@ func readiness() {
     check("OpenAL, PhysX and the 2010 DirectX files each point at their Start menu runtime",
           ids([module("g.exe", false, ["openal32.dll"])]) == ["openal"] && ids([module("g.exe", false, ["physxloader.dll"])]) == ["physx"]
           && ids([module("g.exe", false, ["xactengine2_1.dll"])]) == ["dx2010"] && ids([module("g.exe", true, ["xactengine3_7.dll"])]) == ["dx2010"])
-    check("... a DLL the game carries itself is not missing", ids([module("g.exe", false, ["openal32.dll", "physxloader.dll"])], files: ["openal32.dll", "physxloader.dll"]).isEmpty)
+    check("... a DLL the game carries itself is not missing (OpenAL; PhysX only when the core comes with its loader, below)",
+          ids([module("g.exe", false, ["openal32.dll", "physxloader.dll"])], files: ["openal32.dll", "physxloader.dll", "physxcore.dll"]).isEmpty
+          && ids([module("g.exe", false, ["openal32.dll"])], files: ["openal32.dll"]).isEmpty)
+    // Night round 2026-11-11 (G10 S12, X-Men Origins: Wolverine EWCBZQ): the game ships PhysXLoader.dll and no core: the loader needs NVIDIA's System Software.
+    let wolverine = ["physxloader.dll", "physxextensions.dll", "nxcooking.dll"]
+    check("PhysX: a shipped PhysXLoader.dll without a PhysXCore.dll still needs the System Software (EWCBZQ)",
+          ids([module("XMenOriginsWolverine.exe", false, ["physxloader.dll"])], files: wolverine) == ["physx"])
+    check("... a shipped core (physxcore.dll, or physxcore64.dll for a 64-bit game) needs nothing",
+          ids([module("g.exe", false, ["physxloader.dll"])], files: wolverine + ["physxcore.dll"]).isEmpty
+          && ids([module("g.exe", true, ["physxloader.dll"])], files: wolverine + ["physxcore64.dll"]).isEmpty)
+    check("... installed (BCD Runtimes), it is not missing", { var p = none; p.physX = true; return ids([module("g.exe", false, ["physxloader.dll"])], files: wolverine, p).isEmpty }())
+    check("... a scan that stopped at its limit says nothing about a shipped loader (the core may not have been reached), and judges a missing loader as before",
+          BCDReadiness.evaluate(modules: [module("g.exe", false, ["physxloader.dll"])], files: Set(wolverine), provided: none, complete: false).isEmpty
+          && BCDReadiness.evaluate(modules: [module("g.exe", false, ["physxloader.dll"])], files: [], provided: none, complete: false).map(\.id) == ["physx"])
     check("... installed, they are not missing", { var p = none; p.openAL = true; p.physX = true; p.directX2010 = true; return ids([module("g.exe", false, ["openal32.dll", "physxloader.dll", "xactengine2_1.dll"])], p).isEmpty }())
     check("a 32-bit DirectX file BCD already has (xactengine2_0, d3dx9_43) is not flagged", ids([module("g.exe", false, ["xactengine2_0.dll", "d3dx9_43.dll", "xinput1_3.dll"])]).isEmpty)
     check("XNA: the game's folder names the framework and the runtime is missing", ids([], files: ["microsoft.xna.framework.dll"]) == ["xna"]

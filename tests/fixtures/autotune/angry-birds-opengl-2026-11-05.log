@@ -1,0 +1,211 @@
+[02:18:52.428] [INFO] Checking entitlements...
+[02:18:52.429] [INFO] [build] v0.1.626 (626)
+[02:18:52.430] [INFO] [device] model=iPhone12,1 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=3851MB available=2324MB cores=6
+[02:18:52.431] [INFO] [device] address-map=[0x100968000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[02:18:52.432] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[02:18:52.449] [INFO] [device] settings: low-power=0 thermal=fair screen=828x1792@2.0x max-fps=60 utc-offset=-03:00 free-disk=41GB stikdebug-url=1
+[02:18:52.457] [INFO] [device] gpu="Apple A13 GPU" family=apple6 argument-buffers=tier2 mesh=0 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=no-mesh x64=ok
+[02:18:55.424] [INFO] Requesting JIT with StikDebug...
+[02:18:55.471] [INFO] Opening StikDebug to enable JIT...
+[02:19:01.778] [INFO] [bcd] library launch AngryBirds.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[02:19:01.799] [INFO] Running full Wine sequence...
+[02:19:01.799] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100968000,0x8000000000) 512GB available=2328MB low-power=0 thermal=fair
+[02:19:01.801] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[02:19:02.024] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[02:19:02.024] [INFO] Allocating 896MB JIT pool via debugger...
+[02:19:02.024] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[02:19:02.025] [INFO] [jit-debugger] attached=1 at the pool request
+[02:19:02.029] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[02:19:08.644] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  6.749s rev=ml526
+[02:19:08.774] [wineserver] send_client_fd: fd=28 handle=0x3a2 msg_fd_unix=15 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/2758e10e177d1a02.cfg (read)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=26 reply=31/32 wait=33/34 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=1682 MB + phys_footprint=665 MB = 2348 MB (hw.memsize says 3851 MB)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 288)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 288)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 288)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x27000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[window] 0x7048000000..0x7400000000 regions=135 occupied=12293 MB of 15232 MB free=2938 MB maxhole=2938 MB@0x7048000000 rev=ml787 (periodic)
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x148191000 used=0x555000/0x27000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148554000 used=0x678000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x148678000 used=0x720000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x148720000 used=0x8a0000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[window] 0x119c00000..0x77f7000000 regions=80126 occupied=466306 MB of 486868 MB free=36801 MB maxhole=16240 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=678 MB (peak 678) internal=477 MB compressed=199 MB external=68 MB reusable=3 MB (cycle=1)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x148510df0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x1037f0828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module AngryBirds.exe (angrybirds.exe-941357c5dfd03a37): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280dde402): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5abda131): 717B9F0000
+[jit-pool] image 0x717b970000+0x1b000 (?) → pool 0x1489ba000 used=0x9da000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x1489ba000)
+ml957: ? backing 0x717b988000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717b700000+0x16000 (?) → pool 0x1489db000 used=0x9f7000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x1489db000)
+ml957: ? backing 0x717b714000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717b0c0000+0x13000 (?) → pool 0x1489f5000 used=0xa0d000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x1489f5000)
+ml957: ? backing 0x717b0d0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717b050000+0x12000 (?) → pool 0x148a0f000 used=0xa27000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x148a0f000)
+ml957: ? backing 0x717b060000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x717a610000+0x1a000 (?) → pool 0x148a27000 used=0xa47000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148a27000)
+ml957: ? backing 0x717a628000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7027370000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[jit-pool] image 0x717a5e0000+0x1b000 (?) → pool 0x148a47000 used=0xa67000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148a47000)
+ml957: ? backing 0x717a5f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[free-delay] #1 release of 0x71016d0000+0x100000 held for 2000 ms (1 in flight)
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445f3c30): 717A5A0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=4000003c vis={0,0,1032,634} surface=0x10325e968 rev=ml505 style=04cf0000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='C:\Program Files\Angry Birds Portable\AngryBirds.exe' text="" rev=ml853
+[win-pos] #2 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x10325e968 rev=ml505 style=8c000000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10030 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x10325e968 rev=ml505 style=8c000000 visible=0 parent=0x10022
+[win-name] #3 hwnd=0x10030 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x10028 after=0x0 flags=40000018 vis={0,0,1032,634} surface=0x10325e968 rev=ml505 style=04cf0000 visible=0 parent=0x10022
+[win-name] #4 hwnd=0x10028 class='C:\Program Files\Angry Birds Portable\AngryBirds.exe' text="Loading..." rev=ml853
+[win-pos] #5 hwnd=0x10028 after=0x0 flags=40001967 vis={0,0,1032,634} surface=0x1138f5140 rev=ml505 style=14cf0000 visible=1 parent=0x10022
+[win-name] #5 hwnd=0x10028 class='C:\Program Files\Angry Birds Portable\AngryBirds.exe' text="Loading..." rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[win-pos] #6 hwnd=0x10036 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x10036 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #7 hwnd=0x10036 class='OleMainThreadWndClass' text="" rev=ml853
+D 24 Load module grgl2.dll (grgl2.dll-0bf2356da74416f6): 717A4F0000
+D 24 Load module OPENGL32.dll (opengl32.dll-9fc42fc254d16021): 717A3E0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x717a3e0000) -> wow64 table (0x1037f8828)
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x717bc52f79 pc=148135be8 nparams=3 p0=19930520 p1=ddda28
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x717bc52f79 pc=148135be8 nparams=3 p0=19930520 p1=dddec4
+D 24 Load module grgl1.dll (grgl1.dll-4b051ed872120526): 717A300000
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x717bc52f79 pc=148135be8 nparams=3 p0=19930520 p1=ddda44
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x717bc52f79 pc=148135be8 nparams=3 p0=19930520 p1=dddec4
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x717bc52f79 pc=148135be8 nparams=3 p0=19930520 p1=dde324
+0024:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Error!" / L"OpenGL 2.0 renderer not supported!\nOpenGL 1.4 renderer not supported!\n": main exe base 00400000 size 0x1dc000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+D 24 Load module comctl32.dll (comctl32.dll-8c5c2d137b4902d7): 717A1C0000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445f3c30): 717A180000
+[xp-names] m1465796 "wine-x18-exc"
+[xp] 02:19:09.925 +0.53 dt=251 cpu=226 (thr 226) P=225 E=1 run=235 pgw=-1.0 GHz P=2.61 E=1.22 Minst=1955 IPC=3.33 mJ=703 pin=57 rdKB=10296 fpMB=732
+[win-name] #61 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #62 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #63 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #64 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #65 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #66 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #67 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #68 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #70 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #71 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-name] #73 hwnd=0x1005a class='Static' text="OpenGL 2.0 renderer not supported!?OpenGL 1.4 renderer not supported!?" rev=ml853
+[win-name] #74 hwnd=0x1004e class='Button' text="Aceptar" rev=ml853
+[win-pos] #75 hwnd=0x1003e after=0x0 flags=00001967 vis={577,271,838,385} surface=0x10c04d380 rev=ml505 style=94c801c4 visible=1 parent=0x10022
+[win-name] #75 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[xp] 02:19:10.179 +0.78 dt=254 cpu=34 (thr 34) P=31 E=3 run=42 pgw=-1.0 GHz P=2.34 E=1.22 Minst=141 IPC=1.86 mJ=64 pin=0 rdKB=0 fpMB=738
+[launch-view] dismissed reason=surface logs=0
+[xp] 02:19:10.476 +1.08 dt=296 cpu=53 (thr 53) P=0 E=53 run=68 pgw=-1.0 GHz P=0.00 E=0.89 Minst=34 IPC=0.71 mJ=3 pin=0 rdKB=0 fpMB=738
+[xp] 02:19:10.801 +1.41 dt=326 cpu=32 (thr 32) P=0 E=32 run=48 pgw=-1.0 GHz P=0.00 E=0.74 Minst=16 IPC=0.67 mJ=1 pin=0 rdKB=0 fpMB=737
+[xp] 02:19:11.066 +1.67 dt=265 cpu=38 (thr 38) P=18 E=20 run=51 pgw=-1.0 GHz P=1.54 E=1.11 Minst=62 IPC=1.25 mJ=14 pin=0 rdKB=0 fpMB=737
+[xp] 02:19:11.381 +1.99 dt=315 cpu=26 (thr 26) P=0 E=26 run=39 pgw=-1.0 GHz P=0.00 E=0.67 Minst=14 IPC=0.79 mJ=1 pin=0 rdKB=0 fpMB=737
+[guest-stk] sp+0x78 0x148296bec = libwow64fex.dll+0x105bec
+[guest-stk] sp+0x188 0x1481a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x1b0 0x14836e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x1c0 0x1481a7a0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x3c8 0x148294768 = libwow64fex.dll+0x103768
+[guest-stk] sp+0x428 0x1482946ec = libwow64fex.dll+0x1036ec
+[guest-stk] sp+0x548 0x1482946e4 = libwow64fex.dll+0x1036e4
+[footprint] rev=ml358 phys=742 MB (peak 742) internal=478 MB compressed=262 MB external=71 MB reusable=3 MB (cycle=2)
+[footprint] rev=ml358 phys=741 MB (peak 742) internal=478 MB compressed=262 MB external=71 MB reusable=3 MB (cycle=3)
+[srv-input] btn msg=0x201 at (711,362) hit win=0001003e thread=0x108d78300
+[srv-input] btn msg=0x201 at (711,362) hit win=0001003e thread=0x108d78300
+[srv-input] btn msg=0x201 at (711,362) hit win=0001003e thread=0x108d78300
+[win-pos] #76 hwnd=0x1003e after=0x0 flags=000018bf vis={577,271,838,385} surface=0x10325e968 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #76 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-pos] #77 hwnd=0x1003e after=0x0 flags=0000181f vis={577,271,838,385} surface=0x10325e968 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #77 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-pos] #78 hwnd=0x1003e after=0x0 flags=0000181f vis={577,271,838,385} surface=0x10325e968 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #78 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-pos] #79 hwnd=0x1003e after=0x0 flags=0000181f vis={577,271,838,385} surface=0x10325e968 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #79 hwnd=0x1003e class='#32770' text="Error!" rev=ml853
+[win-pos] #80 hwnd=0x10028 after=0x0 flags=400018bf vis={0,0,1032,634} surface=0x10325e968 rev=ml505 style=04cf0000 visible=0 parent=0x10022
+[win-name] #80 hwnd=0x10028 class='C:\Program Files\Angry Birds Portable\AngryBirds.exe' text="Loading..." rev=ml853
+[vfree] ml842 # base=0x7101a30000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x71016d0000 size=0x0 type=0x8000 tid=0024
+[free-delay] #2 release of 0x7101a30000+0x2d0000 held for 2000 ms (1 in flight)
+[vfree] ml842 # base=0x7c01081000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=243
+[vfree] ml842 # base=0x7c01371000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0x7c01251000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0x7c01251000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=244
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[02:19:15.304] [INFO] [session] length=13s play=0s frames=0 stalls=0/0s peak=742MB limit=2347MB thermal=fair lpm=0 res=1416x656 cap=60 game=AngryBirds
+[frontend] returned to library
+[footprint] rev=ml358 phys=736 MB (peak 742) internal=473 MB compressed=262 MB external=71 MB reusable=6 MB (cycle=4)
+[02:19:16.859] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=734 MB (peak 742) internal=474 MB compressed=259 MB external=75 MB reusable=6 MB (cycle=5)
+[footprint] rev=ml358 phys=734 MB (peak 742) internal=474 MB compressed=259 MB external=75 MB reusable=7 MB (cycle=6)
+[footprint] rev=ml358 phys=734 MB (peak 742) internal=474 MB compressed=259 MB external=76 MB reusable=7 MB (cycle=7)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=738 MB (peak 742) internal=440 MB compressed=296 MB external=86 MB reusable=8 MB (cycle=8)
+[xp] 02:19:25.216 +15.82 dt=309 cpu=50 (thr 50) P=25 E=25 run=52 pgw=-1.0 GHz P=1.57 E=1.31 Minst=125 IPC=1.75 mJ=18 pin=0 rdKB=0 fpMB=739
+[xp] 02:19:25.515 +16.12 dt=299 cpu=112 (thr 112) P=37 E=75 run=122 pgw=-1.0 GHz P=0.91 E=1.16 Minst=128 IPC=1.06 mJ=14 pin=3 rdKB=0 fpMB=739
+[footprint] rev=ml358 phys=739 MB (peak 742) internal=427 MB compressed=310 MB external=89 MB reusable=9 MB (cycle=9)
+[xp] 02:19:25.811 +16.42 dt=296 cpu=55 (thr 55) P=30 E=25 run=60 pgw=-1.0 GHz P=1.00 E=1.39 Minst=78 IPC=1.21 mJ=10 pin=0 rdKB=0 fpMB=739
+[xp] 02:19:26.115 +16.72 dt=304 cpu=114 (thr 114) P=52 E=61 run=149 pgw=-1.0 GHz P=1.84 E=1.31 Minst=184 IPC=1.04 mJ=41 pin=4 rdKB=64 fpMB=739
+[02:19:26.116] [xp] 02:19:26.115 +16.72 dt=304 cpu=114 (thr 114) P=52 E=61 run=149 pgw=-1.0 GHz P=1.84 E=1.31 Minst=184 IPC=1.04 mJ=41 pin=4 rdKB=64 fpMB=739
+[02:19:26.384] [xp] 02:19:26.383 +16.99 dt=268 cpu=83 (thr 83) P=22 E=61 run=107 pgw=-1.0 GHz P=2.13 E=1.51 Minst=168 IPC=1.21 mJ=30 pin=5 rdKB=196 fpMB=739

@@ -94,12 +94,14 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
 - **.NET games** through Wine Mono, downloaded in the app.
 - **Feedback from the app:** Settings › Feedback to tell us what is broken or what to improve,
   and Send Log after a crash.
-- **iPhone Duo (experimental):** on the foldable iPhone, turn on Settings › Graphics › Foldable
-  iPhone support (experimental). A game you add then starts at a resolution shaped like the inner
-  display, the touch controls follow the screen when you fold or unfold the phone, and BCD uses its
-  phone layout in a window narrower than 700 points. Installed directly, iOS shows BCD in a small
-  window on the inner display; inside LiveContainer it fills the screen. The switch is off by
-  default and changes nothing on other iPhones and iPads.
+- **iPhone Duo (experimental):** on the foldable iPhone, Settings › Graphics › Foldable iPhone has two
+  switches, both off by default and both changing nothing on other iPhones and iPads. *Duo
+  enhancements* gives BCD a native interface with Liquid Glass, system tabs and a sidebar, search in
+  the Library and controller navigation; the Windows desktop's Start, Open and Stop sit on Home, and
+  downloads resume when the desktop runs in the background. *Foldable iPhone support* starts a game
+  you add at a resolution shaped like the inner display, and the touch controls follow the screen when
+  you fold or unfold the phone. Installed directly, iOS shows BCD in a small window on the inner
+  display; inside LiveContainer it fills the screen. Both switches apply from the next start of BCD.
 
 ## Games
 
@@ -275,7 +277,9 @@ code from Madeira and from the people who contribute to it; every file, author a
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 **Contributors to BCD:** [mckenna654](https://github.com/mckenna654), [Pardoxum](https://github.com/Pardoxum),
-[le0-VV](https://github.com/le0-VV) and [rtmtree](https://github.com/rtmtree).
+[le0-VV](https://github.com/le0-VV), [rtmtree](https://github.com/rtmtree), [vancez](https://github.com/vancez),
+[creeper4004](https://github.com/creeper4004), [iqui27](https://github.com/iqui27), [Taala2](https://github.com/Taala2),
+[pauloec](https://github.com/pauloec) and [rbarton124](https://github.com/rbarton124).
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by
@@ -284,3 +288,5 @@ FreeType, and every library listed in THIRD-PARTY-NOTICES.md. Thank you to every
 works on them.
 
 **BCD** by thebcd69, with the AltStore and SideStore source by **le0-VV** ([le0-VV](https://github.com/le0-VV)).
+
+**The app icon** by **Mila** (mudcatpot on Discord). Thank you!

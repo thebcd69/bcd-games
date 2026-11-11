@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Henry Morin: code taken from https://github.com/willfaust/Madeira (pull request #556)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Exercise production EC_CODE reuse and page-fit arithmetic; no Wine/game runs.
 
 The C fixture compiles the real allocation prefix, including its best-fit loop,
@@ -35,14 +39,18 @@ assert ec.count('ios_tail_carve_ready( &ios_tail_carves[') == 2, 'cap lift and r
 assert 'if (kept_large_carve && !reuse_all_carves)' in ec
 assert 'reuse_all_carves = 1;\n                low_fits = 0;' in ec
 assert ec.count('(low_ok || !ios_tail_carve_in_low( ios_tail_carves[') == 2
-helpers = ''.join(function(native, signature) for signature in (
+fg_policy = '\n'.join(line for line in native.splitlines() if line.startswith(('#define IOS_POOL_OTHER_MAX ', '#define IOS_POOL_FG_HOLD_SEC '))) + '\n' + function(native, 'static int ios_pool_fg_held(')
+helpers = next(line for line in native.splitlines() if line.startswith('#define IOS_POOL_CUT_MIN ')) + '\n' + ''.join(function(native, signature) for signature in (
     'static size_t ios_pool_hole_between(',
     'static size_t ios_pool_code_cap(',
     'int ios_jit_low_contains(',
     'static int ios_pool_low_take(',
     'static int ios_tail_carve_in_low(',
     'static int ios_pool_preserve_code_carve(',
+    'static int ios_pool_preserve_big_carve(',
     'static int ios_tail_carve_ready(',
+    'static unsigned ios_tail_carve_cut(',
+    'static int ios_pool_carve_merge_enabled(',
 ))
 carve_start = native.index('#define IOS_TAIL_CARVE_MAX ')
 carve_table = native[carve_start:native.index('\n\n', carve_start)]
@@ -51,6 +59,7 @@ c_fixture = r'''
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
@@ -74,6 +83,10 @@ static pthread_mutex_t ios_tail_carve_lock = PTHREAD_MUTEX_INITIALIZER;
 ''' + carve_table + r'''
 static uintptr_t ios_wow_base(void) { return wow; }
 static void *ios_jit_current_peb(void) { return (void *)(uintptr_t)1; }
+/* madeira-bcd pool-fg: the policy is off in this fixture (tests/host/check-pool-code-policy.py covers it) */
+enum { IOS_POOL_FG_OFF = 0, IOS_POOL_FG_OTHER = 1, IOS_POOL_FG_GAME = 2 };
+static int ios_pool_fg_class(void) { return IOS_POOL_FG_OFF; }
+''' + fg_policy + r'''
 static int ios_tail_carve_scan(const void *base, size_t size, int strict)
 { (void)base; (void)size; (void)strict; return 0; }
 ''' + helpers + r'''
@@ -89,6 +102,7 @@ static int racing_low_take(volatile size_t *used, size_t total, size_t want, siz
 static int allocate(size_t *size_ptr, void **ret)
 {
 ''' + ec.replace('ios_pool_low_take(', 'racing_low_take(') + r'''
+    (void)kept_big_carve;  /* read by the production tail path after this prefix */
     return FALLBACK_TAIL;  /* The production tail path starts after this prefix. */
 }
 static const size_t used = 272 * MB + 0x14000;
@@ -145,7 +159,10 @@ int main(void)
     reset(memory);
     ios_jit_low_reserved = ios_jit_low_size_global;
     request = 0x4000;
-    CHECK(allocate(&request, &ret) == STATUS_SUCCESS && request == 16 * MB);
+    CHECK(allocate(&request, &ret) == FALLBACK_TAIL && ios_tail_carves[0].free);
+    setenv("MADEIRA_POOL_CODE_KEEP_BIG", "0", 1);   /* the old policy: the 16MB carve, whatever the ask */
+    CHECK(allocate(&request, &ret) == STATUS_SUCCESS && request == 16 * MB && !ios_tail_carves[0].free);
+    unsetenv("MADEIRA_POOL_CODE_KEEP_BIG");
     reset(memory);
     ios_tail_carves[1] = ios_tail_carves[0];
     ios_tail_carves[1].off += 20 * MB;
@@ -156,9 +173,13 @@ int main(void)
     CHECK(ios_tail_carves[0].free && !ios_tail_carves[1].free && ios_jit_low_reserved == used);
     reset(memory);
     request = MB;
+    CHECK(allocate(&request, &ret) == STATUS_SUCCESS && request == MB && ios_tail_carves[0].free);
+    CHECK(ios_jit_low_reserved == used + MB);
+    reset(memory);
+    request = 4 * MB + 0x4000;
     CHECK(allocate(&request, &ret) == STATUS_SUCCESS && request == 16 * MB);
-    CHECK(ios_jit_low_reserved == used);
-    puts("PASS: full C, an exact-size retired carve and normal code-buffer requests retain the existing behavior");
+    CHECK(!ios_tail_carves[0].free && ios_jit_low_reserved == used);
+    puts("PASS: a request under a quarter of the free 16MB carve leaves it free (fresh tail carve with C full, region C otherwise; MADEIRA_POOL_CODE_KEEP_BIG=0 takes it); an exact-size carve and a larger request still reuse");
 
     /* A 440MB low run less the unchanged 128MB margin leaves 312MB. With
      * 16MB rounding C has only 304MB: the helper's 32MB request misses by

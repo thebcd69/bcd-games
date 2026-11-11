@@ -85,7 +85,7 @@ harness = r'''
 typedef uint64_t UINT64; typedef int32_t LONG; typedef int64_t LONG64, LONGLONG; typedef uint32_t DWORD, ULONG;
 typedef int BOOL; typedef void *HANDLE, *HMODULE; typedef struct { int dummy; } IID, ID3D12FenceVtbl;
 typedef union { LONGLONG QuadPart; } LARGE_INTEGER;
-typedef struct ID3D12Fence ID3D12Fence;
+typedef struct ID3D12Fence ID3D12Fence; typedef unsigned D3D12_FENCE_FLAGS;   /* the flags field of struct mad_fence (build 652, CreateFence flags) */
 typedef pthread_mutex_t CRITICAL_SECTION; typedef pthread_cond_t CONDITION_VARIABLE;
 #define WINAPI
 #define STDMETHODCALLTYPE

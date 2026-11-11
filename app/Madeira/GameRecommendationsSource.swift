@@ -96,7 +96,12 @@ enum RecommendationsStore {
     static var directory: URL? = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
         .appendingPathComponent("Recommendations", isDirectory: true)
     /// This build's number (CFBundleVersion): a rule's or a line's minBuild / maxBuild compare with it.
-    static var build: Int? = (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String).flatMap { Int($0) }
+    static var build: Int? = (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String).flatMap(buildNumber)
+    /// The build number in a CFBundleVersion: "634", or the part before the first dot of a re-signed copy's "634.4" (night round 2026-11-11,
+    /// T1: "634.4" gave "build unknown", so every line with a minBuild was dropped).
+    static func buildNumber(_ text: String) -> Int? {
+        Int(text) ?? text.split(separator: ".", maxSplits: 1).first.flatMap { Int($0) }
+    }
     static var publicKey = RecommendationsSignature.publicKey
 
     /// What a download may set: the settings catalog's game settings and the allowed environment lines.

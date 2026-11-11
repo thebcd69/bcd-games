@@ -1,0 +1,401 @@
+[21:47:08.324] [INFO] Checking entitlements...
+[21:47:08.324] [INFO] [build] v0.1.634 (634)
+[21:47:08.325] [INFO] [device] model=iPhone18,4 idiom=phone os=iOS Version 27.3 (Build 24C5037i) ram=11734MB available=6634MB cores=6
+[21:47:08.325] [INFO] [device] address-map=[0x104d48000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[21:47:08.326] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=316d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=0 wildcard=0 lc=0
+[21:47:08.354] [INFO] [device] settings: low-power=0 thermal=nominal screen=1260x2736@3.0x max-fps=120 utc-offset=-03:00 free-disk=256GB stikdebug-url=1
+[21:47:08.357] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[21:47:09.677] [INFO] Requesting JIT with Built-in StikJIT...
+[21:47:13.433] [INFO] [epic-launch] start app=Heron signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[21:47:13.437] [INFO] [bcd] library launch alanwake.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[21:47:13.456] [INFO] Running full Wine sequence...
+[21:47:13.456] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104d48000,0x8000000000) 512GB available=8156MB low-power=0 thermal=nominal
+[21:47:13.457] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[21:47:13.487] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[21:47:13.488] [INFO] Allocating 896MB JIT pool via debugger...
+[21:47:13.488] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[21:47:13.488] [INFO] [jit-debugger] attached=1 at the pool request
+[21:47:13.490] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[21:47:14.540] [INFO] RX pool at 0x148000000
+[21:47:14.562] [INFO] Detaching debugger...
+[21:47:15.394] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=580MB limit=6655MB thermal=nominal lpm=0 api=D3D9/DirectDraw/32 res=1408x648 cap=60 game=Alan Wake
+[phase] wine-start             t+  2.055s rev=ml526
+[21:47:15.543] [wineserver] send_client_fd: fd=39 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 8 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/c9852b99c595bbf1.cfg (read)
+[hwinput] keyboard focus: program (app active)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x70e2000000+0x20000000 prot=3/3 shared=0 (and the range continues past this region))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x70e2000000+0x20000000 prot=3/3 shared=0 (and the range continues past this region))
+[wow-window] B=0x7200000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7200000000+0x8000000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7a00000000: window body after failed reservations (no-region-above (free to end of VA))
+[wow-window] B=0x7a00000000 REJECTED: 4GB+guard unavailable and the page at 0x7b00000000 is not an inaccessible neighbour (no-region-above (free to end of VA))
+[wow-window] B=0x7900000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] band full: spilled into the Chromium pool range B=0x7900000000..0x7a00000000 (MADEIRA_WOW_SPILL_CEF=0 disables)
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[swap] ml1150 pool: 8 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 3842 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x7122000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x797ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x797ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x797fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x797ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x797ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7900000000 bound to peb=0x797ffd0000
+[fdtrace] pipes tid=0000 peb=0x797ffd0000 master=35 reply=42/43 wait=44/45 rev=ml586
+[21:47:16.412] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7600 MB + phys_footprint=591 MB = 8192 MB (hw.memsize says 11734 MB)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffef0000+0x110000 (ntdll.dll) → pool 0x148004000 used=0x11c000/0x22000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x797ffd0000
+[nls-getptr] type=11 id=437 peb=0x797ffd0000
+[jit-pool] image 0x71ffe80000+0x70000 (wow64.dll) → pool 0x14811c000 used=0x190000/0x22000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x3000 so .data lands on a 16KB page
+[window] 0x7048000000..0x7400000000 regions=91 occupied=11790 MB of 15232 MB free=3537 MB maxhole=3537 MB@0x712293c000 rev=ml787 (periodic)
+[jit-pool] image 0x71ffac0000+0x3bf000 (libwow64fex.dll) → pool 0x148193000 used=0x55b000/0x22000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148193000)
+ml957: libwow64fex.dll backing 0x71ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x71ff9a0000+0x120000 (ucrtbase.dll) → pool 0x148558000 used=0x67c000/0x22000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148558000)
+[jit-pool] image 0x71ff900000+0xa0000 (KERNEL32.dll) → pool 0x14867c000 used=0x724000/0x22000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x14867c000)
+[jit-pool] image 0x71ff790000+0x170000 (kernelbase.dll) → pool 0x148724000 used=0x8a4000/0x22000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148724000)
+[nls-getptr] type=11 id=20127 peb=0x797ffd0000
+[jit-pool] image 0x71ff710000+0x80000 (wow64win.dll) → pool 0x1488a4000 used=0x928000/0x22000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1488a4000)
+[jit-pool] image 0x71ff680000+0x90000 (win32u.dll) → pool 0x148928000 used=0x9bc000/0x22000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148928000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x797ffd0000 total=256 MB
+[free-delay] #1 release of 0x7122a40000+0x100000 held for 2000 ms (1 in flight)
+[window] 0x1260d4000..0x7902000000 regions=69850 occupied=466175 MB of 490943 MB free=24767 MB maxhole=20480 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=608 MB (peak 608) internal=608 MB compressed=0 MB external=68 MB reusable=10 MB (cycle=1)
+[free-delay] #2 release of 0x7122b40000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7122d40000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7123140000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7123940000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7124910000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x71258e0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x71268b0000+0xfd0000 held for 2000 ms (8 in flight)
+[unixlib] libwow64fex.dll (module 0x71ffac0000) -> 64-bit table (0x108235b98)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module alanwake.exe (alanwake.exe-202252ecc7cf1763): 7900400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83c6b191): 79FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1db4596): 797BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa35747): 797BC40000
+[nls-getptr] type=11 id=1252 peb=0x797ffd0000
+[nls-getptr] type=11 id=437 peb=0x797ffd0000
+D 24 Load module d3dx9_43.dll (d3dx9_43.dll-e0e149f712904470): 797BBA0000
+D 24 Load module d3dcompiler_43.dll (d3dcompiler_43.dll-bbc7a17ad1e439f7): 797BB60000
+[nls-getptr] type=11 id=20127 peb=0x797ffd0000
+[gdi-shared] session table 0x712a940000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x797b780000) -> wow64 table (0x10823db98)
+[stale-heal]   3 slot(s) in the copy of 0x71ffac0000 (libwow64fex.dll) -> 0x148073294 for peb=0x797ffd0000 (owner=0x0 mapper=0x797ffd0000)
+[exc-disp] dispatch tid=0024 code=406d1388 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=4 p0=1000 p1=7900632644
+[xp] 21:47:16.987 +0.52 dt=267 cpu=259 (thr 259) P=254 E=4 run=266 pgw=-1.0 GHz P=3.32 E=2.19 Minst=3769 IPC=4.41 mJ=709 pin=126 rdKB=4828 fpMB=675
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=29 p1=7900fac4e8
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=29 p1=7900fac4e8
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=29 p1=7900fac4e8
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=29 p1=7900fac4e8
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=29 p1=7900fac4e8
+[xp] 21:47:17.307 +0.84 dt=321 cpu=322 (thr 321) P=321 E=2 run=358 pgw=-1.0 GHz P=3.16 E=1.36 Minst=5299 IPC=5.22 mJ=782 pin=0 rdKB=2616 fpMB=678
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=3a p1=7900fada9c
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=2 p1=7979f510a0
+[win-pos] #1 hwnd=0x2002e after=0x0 flags=8000003c vis={0,0,1408,648} surface=0x107c89c98 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x2002e class='AppWindowClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x107c89c98 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10034 class='IME' text="" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[nls-getptr] type=11 id=10000 peb=0x797ffd0000
+[win-pos] #3 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x107c89c98 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x2002e after=0x0 flags=80000018 vis={0,0,1408,648} surface=0x107c89c98 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x2002e class='AppWindowClass' text="Alan Wake - v1.07.33.72514 EGS" rev=ml853
+[win-pos] #5 hwnd=0x2002e after=0x0 flags=80001967 vis={0,0,1408,648} surface=0x114b8b840 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #5 hwnd=0x2002e class='AppWindowClass' text="Alan Wake - v1.07.33.72514 EGS" rev=ml853
+[win-pos] #6 hwnd=0x10036 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #6 hwnd=0x10036 class='OleMainThreadWndClass' text="" rev=ml853
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=83 p1=7979f5129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=2 p1=7979f510a0
+[xp-names] m3482857 "wine-x18-exc"
+[xp] 21:47:17.627 +1.16 dt=320 cpu=272 (thr 247) P=265 E=7 run=285 pgw=-1.0 GHz P=3.19 E=2.35 Minst=4519 IPC=5.24 mJ=706 pin=15 rdKB=28764 fpMB=772
+[swap] ml1077 backed 0x790b810000+0x810000 (file off 8796093022208 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[swap] ml1077 backed 0x790c020000+0x810000 (file off 8796093022216 MB): 16 MB in 2 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x790c830000+0x810000 (file off 8796093022224 MB): 24 MB in 3 extents, peak 24 MB, 0 refused
+[swap] ml1077 backed 0x790d040000+0x810000 (file off 8796093022232 MB): 32 MB in 4 extents, peak 32 MB, 0 refused
+[swap] ml1077 backed 0x790d850000+0x810000 (file off 8796093022240 MB): 40 MB in 5 extents, peak 40 MB, 0 refused
+[swap] ml1077 backed 0x790e060000+0x810000 (file off 8796093022248 MB): 48 MB in 6 extents, peak 48 MB, 0 refused
+[winios] game window hwnd=0x2002e presents through Metal; its GDI surface is not drawn
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"nvapi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp] 21:47:17.914 +1.45 dt=287 cpu=244 (thr 240) P=241 E=3 run=250 pgw=-1.0 GHz P=3.40 E=1.64 Minst=3844 IPC=4.66 mJ=718 pin=7 rdKB=52 fpMB=800
+[xp] 21:47:18.214 +1.75 dt=300 cpu=304 (thr 304) P=302 E=2 run=308 pgw=-1.0 GHz P=3.47 E=1.03 Minst=5843 IPC=5.56 mJ=1019 pin=0 rdKB=0 fpMB=804
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=26 p1=7900faca30
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x797bc52f79 pc=148135be8 nparams=2 p0=2a p1=7900facb58
+D 24 Load module oleaut32.dll (oleaut32.dll-ed26e11610c3c264): 7979A10000
+D 24 Load module rtworkq.dll (rtworkq.dll-2285c19464108ee6): 79799F0000
+D 24 Load module mfreadwrite.dll (mfreadwrite.dll-ba29d9fb7cb1fb3f): 79799B0000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbf23f06): 7979970000
+D 24 Load module version.dll (version.dll-f3fe55759b3db05e): 7979950000
+[win-pos] #19 hwnd=0x50036 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #19 hwnd=0x50036 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #20 hwnd=0x50036 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #20 hwnd=0x50036 class='OleMainThreadWndClass' text="" rev=ml853
+D 5C Load module avrt.dll (avrt.dll-cbfea88ff1787343): 7979930000
+[rb-tex] madeira-bcd new readback #1: fmt 1 1280x720 level 0 (texture 1280x720, 1 mips)
+[win-pos] #21 hwnd=0x10040 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #21 hwnd=0x10040 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #22 hwnd=0x10040 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #22 hwnd=0x10040 class='__wine_xinput_devnotify' text="" rev=ml853
+007c:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=007c status=00000001 caller=7BEF40C8
+[xp] 21:47:18.540 +2.07 dt=325 cpu=487 (thr 383) P=284 E=204 run=828 pgw=-1.0 GHz P=3.15 E=2.51 Minst=4026 IPC=2.87 mJ=705 pin=222 rdKB=6028 fpMB=1143
+[footprint] rev=ml358 phys=1143 MB (peak 1143) internal=1040 MB compressed=0 MB external=74 MB reusable=10 MB (cycle=2)
+[21:47:18.586] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[swap] ml1077 stats: 143 MB file-backed now (peak 143), 17 extents, file used 0 of 4096 MB, backs 17 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 143 MB in use (peak 143), 17 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3843 MB available
+[launch-view] dismissed reason=present logs=0
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[footprint] rev=ml358 phys=1270 MB (peak 1270) internal=1173 MB compressed=2 MB external=73 MB reusable=5 MB (cycle=3)
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1188 MB compressed=1 MB external=76 MB reusable=5 MB (cycle=4)
+[footprint] rev=ml358 phys=1289 MB (peak 1289) internal=1196 MB compressed=1 MB external=76 MB reusable=5 MB (cycle=5)
+0064:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0064 status=00000001 caller=7BEF40C8
+[win-pos] #23 hwnd=0x2002e after=0xffffffffffffffff flags=80001837 vis={0,0,1408,648} surface=0x114b8b840 rev=ml505 style=94080000 visible=1 parent=0x10024
+[win-name] #23 hwnd=0x2002e class='AppWindowClass' text="Alan Wake - v1.07.33.72514 EGS" rev=ml853
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle" UserInfo={NSLocalizedDescription=Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle}
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle" UserInfo={NSLocalizedDescription=Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle}
+[footprint] rev=ml358 phys=1279 MB (peak 1289) internal=1243 MB compressed=1 MB external=78 MB reusable=6 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 890 samples
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b0b6230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16b139c10 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16b256b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[21:47:38.829] [OK] Early detach: game presenting and settled
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (704,324) hit win=0002002e thread=0x120a48c00
+[21:47:40.831] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=38 resident=1403MB dbg=DEBUGGED rev=ml525
+0080:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0080 status=00000001 caller=7BEF40C8
+0084:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0084 status=00000001 caller=7BEF40C8
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 233 wakes; device short 14.7 ms in 1 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[srv-input] btn msg=0x201 at (683,476) hit win=0002002e thread=0x120a48c00
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[window] 0x7048000000..0x7400000000 regions=200 occupied=12046 MB of 15232 MB free=3281 MB maxhole=3206 MB@0x7136fc0000 rev=ml787 (periodic)
+[window] 0x1260d4000..0x7902000000 regions=70106 occupied=466504 MB of 490943 MB free=24438 MB maxhole=20480 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 251 MB file-backed now (peak 291), 29 extents, file used 0 of 4096 MB, backs 36 releases 7 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 251 MB in use (peak 291), 36 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3880 MB available
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=38 resident=1349MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=38 resident=1349MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+0088:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0088 status=00000001 caller=7BEF40C8
+008c:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=008c status=00000001 caller=7BEF40C8
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 251 MB file-backed now (peak 291), 29 extents, file used 0 of 4096 MB, backs 36 releases 7 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=38 resident=1349MB dbg=DEBUGGED rev=ml525
+0090:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0090 status=00000001 caller=7BEF40C8
+0094:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0094 status=00000001 caller=7BEF40C8
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=39 resident=1108MB dbg=DEBUGGED rev=ml525
+0098:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0098 status=00000001 caller=7BEF40C8
+009c:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=009c status=00000001 caller=7BEF40C8
+[swap] ml1077 stats: 251 MB file-backed now (peak 291), 29 extents, file used 0 of 4096 MB, backs 36 releases 7 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[freeze] alive t+181s beats=6 gaps=0 iter=714 gen=1 threads=39 resident=1115MB dbg=DEBUGGED rev=ml525
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+00a0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00a0 status=00000001 caller=7BEF40C8
+00a4:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00a4 status=00000001 caller=7BEF40C8
+[file-census] r624 181s: case-sensitive=1 full-path-tries=1382 full-path-hits=459 component-lookups=5646 shortcut-hits=3751 misses=1708 scans=1895 entries-scanned=34390 us-in-lookup=488084 (0% of the window) slowest=0.783 ms .../Documents/wine/dosdevices/c:/windows/syswow64/xinput1_3.dll
+00b0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b0 status=00000001 caller=7BEF40C8
+[rb-tex] madeira-bcd new readback #71: fmt 43 2432x2432 level 0 (texture 2432x2432, 1 mips)
+[swap] ml1077 backed 0x7942650000+0xb50000 (file off 8796093022693 MB): 496 MB in 57 extents, peak 496 MB, 0 refused
+[rb-tex] madeira-bcd new readback #73: fmt 134 512x512 level 0 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #74: fmt 134 256x256 level 1 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #75: fmt 134 128x128 level 2 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #76: fmt 134 64x64 level 3 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #77: fmt 134 32x32 level 4 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #78: fmt 134 16x16 level 5 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #79: fmt 134 8x8 level 6 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #80: fmt 134 4x4 level 7 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #81: fmt 134 2x2 level 8 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #82: fmt 134 1x1 level 9 (texture 512x512, 10 mips)
+[rb-tex] madeira-bcd new readback #243: fmt 80 352x162 level 0 (texture 352x162, 1 mips)
+[swap] ml1077 stats: 451 MB file-backed now (peak 514), 53 extents, file used 0 of 4096 MB, backs 105 releases 52 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1077 backed 0x7932d10000+0x810000 (file off 8796093022386 MB): 459 MB in 54 extents, peak 514 MB, 0 refused
+[rb-tex] madeira-bcd new readback #477: fmt 130 32x32 level 6 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #478: fmt 130 16x16 level 7 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #479: fmt 130 8x8 level 8 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #480: fmt 130 4x4 level 9 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #481: fmt 130 2x2 level 10 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #482: fmt 130 1x1 level 11 (texture 2048x2048, 12 mips)
+[rb-tex] madeira-bcd new readback #504: fmt 130 2048x1024 level 0 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #505: fmt 130 1024x512 level 1 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #506: fmt 130 512x256 level 2 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #507: fmt 130 256x128 level 3 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #508: fmt 130 128x64 level 4 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #509: fmt 130 64x32 level 5 (texture 2048x1024, 12 mips)
+[rb-tex] madeira-bcd new readback #510: fmt 130 32x16 level 6 (texture 2048x1024, 12 mips)
+[file-census] r624 107s: case-sensitive=1 full-path-tries=212 full-path-hits=9 component-lookups=1216 shortcut-hits=815 misses=398 scans=401 entries-scanned=55735 us-in-lookup=109017 (0% of the window) slowest=0.912 ms ...ts/wine/dosdevices/c:/Program Files/Epic Games/AlanWake/data
+[swap] ml1077 stats: 467 MB file-backed now (peak 514), 55 extents, file used 0 of 4096 MB, backs 174 releases 119 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+00b4:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b4 status=00000001 caller=7BEF40C8
+00b8:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b8 status=00000001 caller=7BEF40C8
+[win-pos] #24 hwnd=0x2002e after=0xffffffffffffffff flags=80001837 vis={0,0,1408,648} surface=0x114b8b840 rev=ml505 style=94080000 visible=1 parent=0x10024
+[win-name] #24 hwnd=0x2002e class='AppWindowClass' text="Alan Wake - v1.07.33.72514 EGS" rev=ml853
+[swap] ml1077 backed 0x7928c20000+0x810000 (file off 8796093022319 MB): 314 MB in 36 extents, peak 531 MB, 0 refused
+[swap] ml1077 backed 0x7935d60000+0x810000 (file off 8796093022672 MB): 531 MB in 63 extents, peak 612 MB, 0 refused
+[swap] ml1077 stats: 556 MB file-backed now (peak 612), 66 extents, file used 0 of 4096 MB, backs 263 releases 197 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 556 MB in use (peak 612), 263 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3750 MB available
+[swap] ml1077 stats: 467 MB file-backed now (peak 612), 55 extents, file used 0 of 4096 MB, backs 315 releases 260 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 467 MB in use (peak 612), 315 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3784 MB available
+err:   d3d9: failed to create pipeline state: Error Domain=AGXMetalG18P Code=3 "Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle" UserInfo={NSLocalizedDescription=Vertex shader writes point size but inputPrimitiveTopology is MTLPrimitiveTopologyClassTriangle}
+[swap] ml1077 backed 0x794f080000+0x810000 (file off 8796093022343 MB): 483 MB in 57 extents, peak 612 MB, 0 refused
+[free-delay] #1024 release of 0x790ba20000+0x100000 held for 2000 ms (83 in flight)
+[swap] ml1077 stats: 588 MB file-backed now (peak 612), 70 extents, file used 0 of 4096 MB, backs 375 releases 305 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 588 MB in use (peak 612), 375 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3789 MB available
+[free-delay] #2048 release of 0x793fa10000+0x100000 held for 2000 ms (69 in flight)
+[swap] ml1077 backed 0x79365f0000+0x810000 (file off 8796093022343 MB): 572 MB in 68 extents, peak 612 MB, 0 refused
+[swap] ml1077 stats: 572 MB file-backed now (peak 612), 68 extents, file used 0 of 4096 MB, backs 403 releases 335 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 572 MB in use (peak 612), 403 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3745 MB available
+[free-delay] #3072 release of 0x7942b00000+0x200000 held for 2000 ms (55 in flight)
+[freeze] alive t+602s beats=20 gaps=0 iter=2380 gen=1 threads=39 resident=1478MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=203 occupied=12076 MB of 15232 MB free=3251 MB maxhole=3215 MB@0x71366c0000 rev=ml787 (periodic)
+[window] 0x1260d4000..0x7902000000 regions=70389 occupied=466571 MB of 490943 MB free=24371 MB maxhole=20480 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 564 MB file-backed now (peak 612), 67 extents, file used 0 of 4096 MB, backs 406 releases 339 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 564 MB in use (peak 612), 406 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3879 MB available
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+632s beats=21 gaps=0 iter=2499 gen=1 threads=39 resident=1471MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[free-delay] #4096 release of 0x7921e40000+0x100000 held for 2000 ms (76 in flight)
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+662s beats=22 gaps=0 iter=2618 gen=1 threads=39 resident=1510MB dbg=DEBUGGED rev=ml525
+[window] 0x7048000000..0x7400000000 regions=203 occupied=12076 MB of 15232 MB free=3251 MB maxhole=3215 MB@0x71366c0000 rev=ml787 (periodic)
+[window] 0x1260d4000..0x7902000000 regions=70390 occupied=466572 MB of 490943 MB free=24371 MB maxhole=20480 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.3%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 stats: 580 MB file-backed now (peak 612), 69 extents, file used 0 of 4096 MB, backs 431 releases 362 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 580 MB in use (peak 612), 431 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3855 MB available
+[ios_audio] ml1230 pacing stream=0x120750e00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[frontend] graceful close requested
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=86581
+[store-noalias] #1 rev=ml348 addr=0x7902d5c9fa insn=0x38bfc304 pc=0x161237358 NO pool/anon alias | region 0x7902d50000+0xb0000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x7902d5c9fa hostpc=0x161237358 hinsn=0x38bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x160ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x161237358 addr=0x7902d5c9fa kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7902d50000+0xb0000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x161237358 addr=0x7902d5c9fa x18=0x797ffc0000 type=1 lr=0x1624ab170 sp=0x712291f350 x16=0x148069e94 x17=0x712291f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d79c (PE 0xfff8d79c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xfad270 x9=0x7a130b20 x10=0xbc09390 x11=0x2d5c9fa x0=0x161237310 x2=0x13 | teb=0x797ffc0000 peb=0x797ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 161237258: 14000002 d61f0000 58000240 d63f0000 00000000 00000000 01349ad0 00000000
+[fault-host] 161237278: fffffe68 ffffffff 14000002 d61f0000 58000100 d63f0000 00000000 00000000
+[fault-host] 161237298: 01349ad0 00000000 fffffefc ffffffff 69ffc108 00000001 00000338 00000000
+[fault-host] 1612372b8: 013591c0 00000000 00000078 00000000 0000002a 00000028 00000000 00000000
+[fault-host] 1612372d8: 03800180 00810223 01105723 45231231 23101013 10134523 35104410 10361035
+[fault-host] 1612372f8: 66452323 12312310 02013136 00000081 d503201f d503201f 00000178 10ffffe0
+[mach_exc] insn_stream PC-12..PC+8: aa0503e6 aa0703eb 8b2b4278 [38bfc304] 51001108 b8284a64 52935cd4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x148297034 = libwow64fex.dll+0x104034 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x148296fb8 = libwow64fex.dll+0x103fb8 copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x148296fb0 = libwow64fex.dll+0x103fb0 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x797ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x7902d5c9fa insn=0x38bfc304 pc=0x161237358 NO pool/anon alias | region 0x7902d50000+0xb0000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x7902d5c9fa hostpc=0x161237358 hinsn=0x38bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x160ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x161237358 addr=0x7902d5c9fa kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7902d50000+0xb0000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x161237358 addr=0x7902d5c9fa x18=0x797ffc0000 type=1 lr=0x1624ab170 sp=0x712291f350 x16=0x148069e94 x17=0x712291f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d79c (PE 0xfff8d79c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0xfad270 x9=0x7a130b20 x10=0xbc09390 x11=0x2d5c9fa x0=0x161237310 x2=0x13 | teb=0x797ffc0000 peb=0x797ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 1612372b8: 013591c0 00000000 00000078 00000000 0000002a 00000028 00000000 00000000
+[fault-host] 1612372d8: 03800180 00810223 01105723 45231231 23101013 10134523 35104410 10361035
+[fault-host] 1612372f8: 66452323 12312310 02013136 00000081 d503201f d503201f 00000178 10ffffe0
+[fault-host] 161237318: f9000380 f90f639f 51002108 8b284278 29001b09 52823614 72a026f4 8b344278
+[fault-host] 161237338: b8bfc309 d503201f 51002108 8b284278 29002b0b aa0503e6 aa0703eb 8b2b4278
+[fault-host] 161237358: 38bfc304 51001108 b8284a64 52935cd4 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: aa0503e6 aa0703eb 8b2b4278 [38bfc304] 51001108 b8284a64 52935cd4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x148297034 = libwow64fex.dll+0x104034 copy_owner=0x0
+[exit-stk] sp+0xa8: 0x148296fb8 = libwow64fex.dll+0x103fb8 copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x148296fb0 = libwow64fex.dll+0x103fb0 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x797ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[fault-rgn]   small-view history: view 0x7902d50000+0xb0000 (ends 0x7902e00000) protect=0x3 DELETED by tid 0024 1517 ms ago
+[fault-rgn]   small-view history: view 0x7902d50000+0xb0000 (ends 0x7902e00000) protect=0x3 CREATED by tid 0024 2129 ms ago
+[fault-rgn]   small-view history: view 0x7902d50000+0xf0000 (ends 0x7902e40000) protect=0x3 DELETED by tid 0024 2809 ms ago
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x7902d5c9fa pc=0x161237358 rw=0 rev=ml420
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=86603
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[21:58:34.957] [INFO] [session] length=681s play=673s frames=26425 avg=39.3 low1=15.0 low01=13.3 worst=1568ms stalls=0/0s peak=1898MB limit=8191MB thermal=serious lpm=0 api=D3D9/DirectDraw/32 res=1408x648 game=Alan Wake
+[frontend] returned to library
+[21:58:34.982] [INFO] [bcd-host] no report
+[hwinput] keyboard focus: elsewhere (poll)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+693s beats=23 gaps=0 iter=2737 gen=1 threads=24 resident=1511MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+1013s beats=24 gaps=1 iter=2794 gen=1 threads=28 resident=838MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=1723 MB (peak 2142) internal=770 MB compressed=1066 MB external=84 MB reusable=6 MB (cycle=353)
+[footprint] rev=ml358 phys=1722 MB (peak 2142) internal=770 MB compressed=1066 MB external=84 MB reusable=6 MB (cycle=354)
+[footprint] rev=ml358 phys=1725 MB (peak 2142) internal=773 MB compressed=1066 MB external=84 MB reusable=6 MB (cycle=355)
+[footprint] rev=ml358 phys=1724 MB (peak 2142) internal=774 MB compressed=1065 MB external=84 MB reusable=6 MB (cycle=356)
+[freeze] alive t+1098s beats=25 gaps=2 iter=2827 gen=1 threads=28 resident=864MB dbg=DEBUGGED rev=ml525
+[waiters]  tid=0078 addr=0x7901e895d4 age=434s INF w0=000004ca w1=01e93848
+[footprint] rev=ml358 phys=1715 MB (peak 2142) internal=764 MB compressed=1065 MB external=84 MB reusable=16 MB (cycle=357)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b859030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x7906120000 cpu=0% RUN pc=libsystem_kernel.dylib`swtch_pri+0x8 lr=libsystem_pthread.dylib`cthread_yield+0x24 sp=0x71355bfa50 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=1% RUN pc=libswiftCore.dylib`<redacted>+0x98 lr=libswiftCore.dylib`<redacted>+0xac sp=0x16b262500 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x797ffd0000 modules=9 first=alanwake.exe@0x7900400000
+[thread-sample] ml876 b3 "RMD - Tessellator Thread" teb=0x79061e0000 cpu=0% RUN pc=libsystem_kernel.dylib`swtch_pri+0x8 lr=libsystem_pthread.dylib`cthread_yield+0x24 sp=0x7122b3fa50 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=2% RUN pc=libswiftCore.dylib`swift_getCanonicalPrespecializedGenericMetadata+0x2a8 lr=libswiftCore.dylib`<redacted>+0x28 sp=0x16b2620d0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[xp] 22:05:35.042 +1098.57 dt=261 cpu=52 (thr 52) P=0 E=52 run=51 pgw=-1.0 GHz P=0.00 E=1.26 Minst=150 IPC=2.28 mJ=5 pin=0 rdKB=0 fpMB=1716
+[xp] 22:05:35.321 +1098.85 dt=279 cpu=54 (thr 54) P=0 E=54 run=69 pgw=-1.0 GHz P=0.00 E=1.47 Minst=155 IPC=1.95 mJ=8 pin=0 rdKB=0 fpMB=1716
+[xp] 22:05:35.606 +1099.14 dt=286 cpu=30 (thr 30) P=0 E=30 run=38 pgw=-1.0 GHz P=0.00 E=1.91 Minst=102 IPC=1.77 mJ=5 pin=0 rdKB=0 fpMB=1716
+[waiters]  tid=0034 addr=0x7901e89710 age=424s INF w0=0000682c w1=00000000
+[waiters]  tid=0030 addr=0x7901e89708 age=424s INF w0=0000682c w1=00000000
+[waiters]  tid=0040 addr=0x7901e895d4 age=436s INF w0=000004ca w1=01e93848
+[waiters]  tid=003c addr=0x7901e895d4 age=436s INF w0=000004ca w1=01e93848
+[waiters]  tid=0078 addr=0x7901e895d4 age=436s INF w0=000004ca w1=01e93848
+[footprint] rev=ml358 phys=1716 MB (peak 2142) internal=765 MB compressed=1065 MB external=84 MB reusable=16 MB (cycle=358)
+[xp] 22:05:35.932 +1099.46 dt=326 cpu=71 (thr 71) P=0 E=71 run=84 pgw=-1.0 GHz P=3.17 E=1.79 Minst=235 IPC=1.85 mJ=12 pin=0 rdKB=0 fpMB=1716
+[xp] 22:05:36.256 +1099.79 dt=324 cpu=26 (thr 26) P=6 E=19 run=47 pgw=-1.0 GHz P=2.98 E=1.77 Minst=116 IPC=2.18 mJ=14 pin=0 rdKB=0 fpMB=1717
+:36.257] [xp] 22:05:36.256 +1099.79 dt=324 cpu=26 (thr 26) P=6 E=19 run=47 pgw=-1.0 GHz P=2.98 E=1.77 Minst=116 IPC=2.18 mJ=14 pin=0 rdKB=0 fpMB=1717

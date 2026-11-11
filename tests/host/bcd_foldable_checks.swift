@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Henrique Rocha (iqui27): the iPhone Duo tabletop pose, from thebcd69/bcd-games pull request #31; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // The foldable-iPhone gate, the inner display's shape and the scene-size tracker, compiled on the host by
 // tests/host/check-bcd-foldable.py with app/Madeira/BCDFoldable.swift and app/Madeira/GuestDisplay.swift.
 
@@ -17,7 +19,7 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
 }
 
 @main enum Run {
-    static func main() {
+    @MainActor static func main() {
         // ---------------------------------------------------------------- the gate: model AND switch
         check("the foldable model's identifier is iPhone19,4 and no other", BCDFoldableDevice.identifiers == ["iPhone19,4"])
         check("the model is recognised", BCDFoldableDevice.isFoldable(machine: "iPhone19,4"))
@@ -28,6 +30,11 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
         check("the foldable model with its switch on opens the gate", BCDFoldableSwitch.gate(machine: "iPhone19,4", stored: "1"))
         check("the foldable model with its switch off, stored 0, unset or garbled keeps it shut",
               ["0", nil, "", "maybe", "true"].allSatisfy { !BCDFoldableSwitch.gate(machine: "iPhone19,4", stored: $0) })
+
+        check("native Duo enhancements are OFF on the Duo until a person turns them on (unset, garbled or 0 keep the interface BCD had)",
+              [nil, "", "0", " 0\n", "true", "yes", "maybe"].allSatisfy { !BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: $0) })
+        check("the Duo interface is on when its switch is \"1\" (white space around it ignored)",
+              BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: "1") && BCDDuoFeatures.enabled(machine: "iPhone19,4", stored: " 1\n"))
 
         // A different model identifier: nothing new runs, whatever the switch holds.
         var others: [String] = []
@@ -43,8 +50,48 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
             if BCDFoldableDevice.isFoldable(machine: m) { leaked.append("\(m)/model") }
         }
         check("with any other model identifier the gate is shut for every switch value (\(others.count) identifiers, five values each)", leaked.isEmpty, leaked.joined(separator: ", "))
+        check("no other model can enable native Duo enhancements, even with an override", others.allSatisfy { model in
+            [nil, "0", "1", "true", ""] .allSatisfy { !BCDDuoFeatures.enabled(machine: model, stored: $0) }
+        })
         check("the identifier list holds exactly one entry, so nothing but iPhone19,4 can ever match", BCDFoldableDevice.identifiers.count == 1)
         check("this host is not the foldable model, so its gate is shut", !BCDFoldableDevice.isThisDevice && !BCDFoldable.active)
+
+        // A late disappearance from the previous tab cannot release the new page's resources.
+        let firstOwner = UUID(), nextOwner = UUID()
+        var handoff: [String] = []
+        BCDDuoPageOwner.claim(firstOwner) { handoff.append("first closed") }
+        BCDDuoPageOwner.claim(nextOwner) { handoff.append("next closed") }
+        check("claiming another native page first cleans up the outgoing page", handoff == ["first closed"])
+        BCDDuoPageOwner.release(firstOwner)
+        check("late outgoing cleanup cannot release the incoming page", handoff == ["first closed"])
+        BCDDuoPageOwner.release(nextOwner)
+        BCDDuoPageOwner.end()
+        check("the active page cleans up exactly once", handoff == ["first closed", "next closed"])
+
+        // ---------------------------------------------------------------- the tabletop pose (thebcd69/bcd-games#31)
+        let screenBounds = CGRect(x: 0, y: 0, width: 440, height: 956)
+        let fold = CGRect(x: 0, y: 470, width: 440, height: 16)
+        let split = BCDTabletop.regions(bounds: screenBounds, division: fold)
+        check("a fold across the window splits it into the part above and the part below, each at its full width",
+              split?.top == CGRect(x: 0, y: 0, width: 440, height: 470) && split?.bottom == CGRect(x: 0, y: 486, width: 440, height: 470))
+        check("a fold like a book's spine (taller than wide) is not a tabletop",
+              BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 214, y: 0, width: 12, height: 956)) == nil)
+        check("a fold narrower than half the window is not a tabletop",
+              BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 470, width: 219, height: 16)) == nil
+              && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 470, width: 220, height: 16)) != nil)
+        check("a part under 120 points on either side keeps the whole screen (nearly flat, nearly closed); 120 points is enough",
+              BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 119, width: 440, height: 16)) == nil
+              && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 120, width: 440, height: 16)) != nil
+              && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 821, width: 440, height: 16)) == nil
+              && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 820, width: 440, height: 16)) != nil)
+        check("a fold outside the window (above its top edge or below its bottom edge) is no tabletop: a negative part is not a big one",
+              BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 1300, width: 440, height: 16)) == nil
+              && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: -400, width: 440, height: 16)) == nil
+              && BCDTabletop.regions(bounds: CGRect(x: 0, y: 0, width: 375, height: 667), division: CGRect(x: 0, y: 900, width: 375, height: 16)) == nil)
+        check("the regions follow a window that does not start at the origin",
+              BCDTabletop.regions(bounds: CGRect(x: 10, y: 20, width: 440, height: 956), division: CGRect(x: 10, y: 490, width: 440, height: 16))?.top == CGRect(x: 10, y: 20, width: 440, height: 470))
+        check("an empty division or an empty window gives nothing",
+              BCDTabletop.regions(bounds: screenBounds, division: .zero) == nil && BCDTabletop.regions(bounds: .zero, division: fold) == nil)
 
         // ---------------------------------------------------------------- the display shape
         check("a shut gate returns no screen, so the existing reading of the screen stays", BCDFoldable.screen(active: false) == nil && BCDFoldable.innerScreen == nil)

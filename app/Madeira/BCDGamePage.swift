@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Combine
 import Foundation
@@ -545,6 +547,7 @@ struct BCDGameQuestion: Equatable {
     var destructive: Bool
     /// A second way to say yes, shown between Cancel and the confirm button (the DLC question's "Game only").
     var alternative: String? = nil
+    var defaultCancel: Bool = false
 }
 
 extension BCDGameAction {
@@ -897,25 +900,31 @@ struct BCDGamePagePlan: Equatable {
                 notes.append(Note(text: blocker, warning: true))
                 break
             }
-            main = Choice(action: .install(.device), title: "Install", symbol: "arrow.down.circle.fill")
-            if system.freeExternalBytes != nil {
-                others.append(Choice(action: .install(.externalDrive), title: "External drive", symbol: "externaldrive"))
+            // A Steam game can also go to the external drive (Settings › Storage › External drives); the drive Settings chose
+            // for Steam installs comes first, this device second. Other stores install on this device.
+            let drive = game.store == .steam ? system.externalDriveName : nil
+            let external = drive != nil && system.installsToExternal
+            main = Choice(action: .install(external ? .externalDrive : .device), title: "Install", symbol: "arrow.down.circle.fill")
+            if drive != nil {
+                others.append(external ? Choice(action: .install(.device), title: "This device", symbol: "internaldrive")
+                                       : Choice(action: .install(.externalDrive), title: "External drive", symbol: "externaldrive"))
             }
             // A game whose size is not known yet (Epic's, until its first plan) starts the line with the place, capitalised.
             // A Steam game's size comes from Steam's product info before the download starts: about this much (shared
             // depots whose owner was not read count nothing).
             let size = game.size ?? details.installBytes
             let estimate = game.size == nil && details.installBytes != nil
-            var line = [size.map { (estimate ? "About " : "") + BCDFormat.bytes($0) }, size == nil ? "On this device" : "on this device"]
+            let place = external ? "on \(drive ?? "the external drive")" : "on this device"
+            var line = [size.map { (estimate ? "About " : "") + BCDFormat.bytes($0) }, size == nil ? place.prefix(1).uppercased() + place.dropFirst() : place]
                 .compactMap { $0 }.joined(separator: " ")
-            if let free = system.freeDeviceBytes { line += ", \(BCDFormat.bytes(free)) free" }
+            if let free = external ? system.freeExternalBytes : system.freeDeviceBytes { line += ", \(BCDFormat.bytes(free)) free" }
             installLine = line
             if game.store != .local, let account = accounts.first(where: { $0.store == game.store }), account.name == nil {
                 notes.append(Note(text: "Downloading needs your \(game.store.title) sign-in.", warning: true,
                                   fix: Choice(action: .signIn(game.store), title: "Sign in", symbol: "person.crop.circle")))
             }
-            if let size, let free = system.freeDeviceBytes, size > free {
-                notes.append(Note(text: "It needs \(estimate ? "about " : "")\(BCDFormat.bytes(size)); this device has \(BCDFormat.bytes(free)) free.", warning: true))
+            if let size, let free = external ? system.freeExternalBytes : system.freeDeviceBytes, size > free {
+                notes.append(Note(text: "It needs \(estimate ? "about " : "")\(BCDFormat.bytes(size)); \(external ? drive ?? "the external drive" : "this device") has \(BCDFormat.bytes(free)) free.", warning: true))
             }
             if let warning = details.installWarning { notes.append(Note(text: warning, warning: false)) }
         case .queued, .downloading, .installing:
@@ -1389,11 +1398,31 @@ private struct BCDGamePagePresenter: ViewModifier {
     @Binding var game: BCDGame?
     let from: String
 
-    func body(content: Content) -> some View {
-        content.fullScreenCover(item: $game, onDismiss: BCDPresentation.didClose) { opened in
-            BCDGamePage(gameID: opened.id, from: from) { game = nil }
-                .environmentObject(store)
-                .environmentObject(focus)
+    @ViewBuilder func body(content: Content) -> some View {
+        if BCDDuoFeatures.active {
+            content.navigationDestination(isPresented: Binding(get: { game != nil }, set: { if !$0 { game = nil } })) {
+                if let opened = game {
+                    BCDGamePage(gameID: opened.id, from: from, embeddedInNavigation: true) { game = nil }
+                        .environmentObject(store)
+                        .environmentObject(focus)
+                        .navigationTitle(opened.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationBarBackButtonHidden()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button { game = nil } label: { Label(from, systemImage: "chevron.left") }
+                                    .bcdFocusable("game.back", cornerRadius: 22) { game = nil }
+                            }
+                        }
+                }
+            }
+            .onChange(of: game?.id) { old, new in if old != nil && new == nil { BCDPresentation.didClose() } }
+        } else {
+            content.fullScreenCover(item: $game, onDismiss: BCDPresentation.didClose) { opened in
+                BCDGamePage(gameID: opened.id, from: from) { game = nil }
+                    .environmentObject(store)
+                    .environmentObject(focus)
+            }
         }
     }
 }
@@ -1444,12 +1473,16 @@ struct BCDGamePage: View {
     @StateObject private var model: BCDGamePageModel
     /// Options: nil while closed. A panel from the right, a sheet from the bottom on an upright
     /// phone; turning the phone moves it from one to the other.
+    @State private var pageWidth: CGFloat = 0
+    @State private var visible = false
+    @State private var owner = UUID()
     @State private var options: BCDGameOptionsPage?
     /// The Steam Workshop page, full screen over this one while it is up (it holds the controller's buttons).
     @State private var workshop: BCDWorkshopRoute?
     /// The layout as the size classes last said. Closures handed to the focus outlive the render
     /// that made them, so they read this, never the environment they captured.
     @State private var phoneUpright = false
+    let embeddedInNavigation: Bool
     let from: String
     let close: () -> Void
     private let preview: (panel: BCDGameOptionsPage?, ask: BCDGameAction?, after: Double)
@@ -1459,14 +1492,18 @@ struct BCDGamePage: View {
     /// saves, the Library section for a game just added, the preview app's screenshots (which
     /// turn the screen first).
     init(gameID: String, from: String, backend: BCDGameDetailBackend? = nil,
-         panel: BCDGameOptionsPage? = nil, ask: BCDGameAction? = nil, after: Double = 1, close: @escaping () -> Void) {
+         panel: BCDGameOptionsPage? = nil, ask: BCDGameAction? = nil, after: Double = 1, embeddedInNavigation: Bool = false, close: @escaping () -> Void) {
+        self.embeddedInNavigation = embeddedInNavigation
         self.from = from
         self.close = close
         preview = (panel, ask, after)
         _model = StateObject(wrappedValue: BCDGamePageModel(gameID: gameID, backend: backend ?? BCDGameDetailSource.backend))
     }
 
-    private var layout: BCDLayout { BCDLayout.of(horizontal: horizontal, vertical: vertical) }
+    private var layout: BCDLayout {
+        if embeddedInNavigation && pageWidth > 0 && pageWidth < 700 { return .phonePortrait }
+        return BCDLayout.of(horizontal: horizontal, vertical: vertical)
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -1506,16 +1543,20 @@ struct BCDGamePage: View {
                 hintBar(m, beside: options != nil && !phoneUpright && model.pending == nil)
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { if embeddedInNavigation { pageWidth = $0 } }
         .coordinateSpace(name: BCDFocus.space)
         .environment(\.bcdLayout, layout)
         .foregroundStyle(BCDStyle.text)
         .preferredColorScheme(.dark)
         .onAppear(perform: appeared)
         .onDisappear {
-            model.leave()
-            focus.closeLayer(Self.layer)
+            if embeddedInNavigation {
+                // Our full-screen Workshop cover keeps this page and its Options panel underneath it.
+                if workshop == nil { BCDDuoPageOwner.release(owner) }
+            } else { model.leave(); focus.closeLayer(Self.layer) }
         }
         .onChange(of: model.pending) { old, new in
+            guard !embeddedInNavigation || visible else { return }
             if old == nil, new != nil {
                 focus.openLayer(Self.askLayer)
                 focus.focused = new?.question.destructive == true ? "game.ask.no" : "game.ask.yes"
@@ -1526,6 +1567,7 @@ struct BCDGamePage: View {
         }
         // The DLC chooser: it holds the controller (layer "game.dlc.") and starts with the ring on its first row.
         .onChange(of: model.chooser != nil) { _, open in
+            guard !embeddedInNavigation || visible else { return }
             if open {
                 focus.openLayer(Self.dlcLayer)
                 focus.focused = model.chooser?.rows.first.map { BCDDLCChooserView.rowID($0.id) } ?? "game.dlc.install"
@@ -1546,14 +1588,24 @@ struct BCDGamePage: View {
         .onChange(of: workshop) { old, new in
             // Back from the Workshop page: this page's buttons are back, with the ring on the row that opened it.
             if old != nil, new == nil {
-                installButtons()
-                focus.focused = "game.panel.row.workshop"
+                if embeddedInNavigation {
+                    // The native Duo interface: later, and only while this page is the visible owner of the panel's layer.
+                    DispatchQueue.main.async {
+                        guard visible, BCDDuoPageOwner.owns(owner), options != nil, focus.ownsLayer(Self.panelLayer) else { return }
+                        installButtons()
+                        focus.focused = "game.panel.row.workshop"
+                    }
+                } else {
+                    installButtons()
+                    focus.focused = "game.panel.row.workshop"
+                }
             }
         }
         .bcdWorkshop($workshop)
         .onChange(of: model.details) { _, _ in installButtons() }
         // A game BCD finds it cannot install (a store's look at its files) loses Install while the page is open: the focus goes to Back.
         .onChange(of: model.plan.main == nil) { _, none in
+            guard !embeddedInNavigation || visible else { return }
             if none, focus.focused == "game.main" { focus.focused = "game.back" }
         }
         .onChange(of: layout) { _, now in phoneUpright = now == .phonePortrait }
@@ -1566,7 +1618,23 @@ struct BCDGamePage: View {
     static let askLayer = "game.ask."
     static let dlcLayer = BCDDLCChooserView.layer
 
+    private func deactivateEmbeddedPage() {
+        guard visible else { return }
+        visible = false
+        if model.pending != nil { model.answer(false) }
+        closeOptions()
+        model.leave()
+        focus.closeLayer(Self.layer)
+    }
+
     private func appeared() {
+        if embeddedInNavigation && visible && BCDDuoPageOwner.owns(owner) {
+            // Returning from our own cover must not reset the panel or replace its focus layer.
+            installButtons()
+            return
+        }
+        if embeddedInNavigation { BCDDuoPageOwner.claim(owner, cleanup: deactivateEmbeddedPage) }
+        visible = true
         phoneUpright = layout == .phonePortrait
         model.close = close
         model.open(store)
@@ -1575,6 +1643,7 @@ struct BCDGamePage: View {
         installButtons()
         if preview.panel != nil || preview.ask != nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + preview.after) {
+                guard !embeddedInNavigation || visible else { return }
                 if let first = preview.panel { openOptions(first) }
                 if let ask = preview.ask { model.request(ask) }
             }
@@ -1587,6 +1656,7 @@ struct BCDGamePage: View {
     /// there is one, B back; in Options A chooses, Y puts a setting back to its default, B goes
     /// back or closes.
     private func installButtons() {
+        if embeddedInNavigation { guard visible, !focus.layerOpen || focus.ownsLayerTree(Self.layer) else { return } }   // native Duo interface only
         // The Steam Workshop page is up over this one: its buttons are in force.
         guard workshop == nil else { return }
         // The DLC chooser: A switches a row or presses a button, X selects all, Y none, B goes back to the question (short words: four hints must fit an upright phone).
@@ -1761,6 +1831,7 @@ struct BCDGamePage: View {
     private func landscape(_ game: BCDGame, _ m: BCDGamePageMetrics) -> some View {
         let plan = model.plan
         return ZStack(alignment: .topLeading) {
+            ScrollViewReader { scroller in
             ScrollView(.vertical, showsIndicators: false) {
                 HStack(alignment: .bottom, spacing: m.columnGap) {
                     mainColumn(game, plan, m)
@@ -1774,7 +1845,13 @@ struct BCDGamePage: View {
                 .frame(minHeight: m.size.height, alignment: .bottom)
             }
             .scrollBounceBehavior(.basedOnSize)
-            backButton.padding(.leading, m.gutter).padding(.top, m.pad ? 18 : 10)
+            .onChange(of: focus.focused) { _, id in
+                guard embeddedInNavigation, focus.controllerActive, let id, id.hasPrefix(Self.layer),
+                      !id.hasPrefix(Self.panelLayer), !id.hasPrefix(Self.askLayer), !id.hasPrefix(Self.dlcLayer) else { return }
+                withAnimation(.easeOut(duration: 0.18)) { scroller.scrollTo(id, anchor: .center) }
+            }
+            }
+            if !embeddedInNavigation { backButton.padding(.leading, m.gutter).padding(.top, m.pad ? 18 : 10) }
         }
     }
 
@@ -1806,7 +1883,7 @@ struct BCDGamePage: View {
                     withAnimation(.easeOut(duration: 0.2)) { scroller.scrollTo(id, anchor: .center) }
                 }
             }
-            backButton.padding(.leading, m.gutter).padding(.top, 8)
+            if !embeddedInNavigation { backButton.padding(.leading, m.gutter).padding(.top, 8) }
         }
     }
 
@@ -2005,7 +2082,9 @@ struct BCDGamePage: View {
                     .padding(.leading, m.gutter)
                     .padding(.trailing, panel ? m.panelWidth + m.gutter : m.gutter)
                     .background {
-                        if !panel {
+                        if embeddedInNavigation {
+                            BCDStyle.ground.ignoresSafeArea(edges: .bottom)
+                        } else if !panel {
                             LinearGradient(colors: [BCDStyle.ground.opacity(0), BCDStyle.ground.opacity(0.92)],
                                            startPoint: .top, endPoint: .bottom)
                                 .ignoresSafeArea(edges: .bottom)
@@ -2044,7 +2123,7 @@ private struct BCDGamePageMetrics {
 
 /// The warm amber of the warnings, as the shell's JIT and memory chips use it.
 enum BCDGameColors {
-    static let amber = Color(red: 1, green: 0.76, blue: 0.29)
+    static var amber: Color { BCDStyle.amber }
 }
 
 /// The hints along the bottom: each button's glyph and what it does here.
@@ -2406,6 +2485,11 @@ private struct BCDGameOptionsList: View {
             rows.append(BCDGameRow(id: "recommended", title: "Recommended settings", symbol: "checkmark.seal",
                                    detail: message("recommended") ?? what ?? "No tested list for this game yet", chevron: true,
                                    run: { commands?.show(.recommended, nil) }))
+            // Night round 2026-11-11 (A5 S14; MHG2T1: "a click that deletes the setting and resets ... the game, ... without need to delete and install
+            // again"): the same confirmed reset as Recommended settings > Reset to Recommended, one page up and in the player's words.
+            rows.append(BCDGameRow(id: "startover", title: "Start over with BCD's settings", symbol: "arrow.counterclockwise",
+                                   detail: "Removes the lines and switches you or auto-tune changed and puts BCD's recommended ones back. Your saves and the game's own files stay.",
+                                   tone: .destructive, run: request(.resetToRecommended)))
         }
         if let tuning = d.tuning {
             rows.append(BCDGameRow(id: "tuning", title: "Auto-tune", symbol: "wand.and.stars", value: tuning.on ? "On" : "Off",
@@ -2740,7 +2824,7 @@ private struct BCDGameOptionsList: View {
                     .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4).padding(.bottom, 4)
             }
             ForEach(rows) { BCDGameRowView(row: $0) }
-            Text("Recommended settings are the config lines and switches this game ran with in BCD's tests. A game gets them the first time BCD sees it; after that, your own changes stay until you reset.")
+            Text("Recommended settings are the config lines and switches this game ran with in BCD's tests. A game gets them the first time BCD sees it; after that, your own changes stay until you reset. A reset does not touch the game's own files: its saves and its in-game options.")
                 .font(BCDStyle.body(12)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4).padding(.top, 4)
         }

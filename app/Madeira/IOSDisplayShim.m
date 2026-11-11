@@ -1,3 +1,5 @@
+// Portions copyright 2026 Jelly-RayTian: code taken from https://github.com/willfaust/Madeira (pull request #400)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // IOSDisplayShim.m — iOS stand-in for Wine's mac driver, used by DXMT.
 //
 // DXMT (src/winemetal/unix/winemetal_unix.c) looks up this API via
@@ -169,6 +171,7 @@ static int madeira_desktop_mode(void) {
 // Winios.m compositor: per-window CAMetalLayer inside the window's
 // compositor layer (desktop mode only).
 extern CAMetalLayer *winios_metal_layer_for_hwnd(void *hwnd);
+extern CAMetalLayer *winios_vulkan_layer_for_hwnd(void *hwnd);
 // Game sessions: the window a swapchain presents from is the game's own;
 // Winios.m's game-mode window overlay must not draw its GDI bits.
 extern void winios_note_game_metal_hwnd(void *hwnd);
@@ -244,6 +247,25 @@ static macdrv_metal_layer my_view_get_metal_layer(macdrv_metal_view v) {
 
 static void my_view_release_metal_view(macdrv_metal_view v) {
     if (v) CFBridgingRelease((CFTypeRef)v);
+}
+
+/* madeira-bcd (Windows Vulkan; Madeira #400/#462): winevulkan's window surfaces (build/win32u-unix/vulkan_surface_ios.c). Vulkan uses
+ * the same retain contract as DXMT, with client-pixel geometry for desktop compositor layers. NULL HWND is only a native
+ * presentation-support probe, not a window. */
+void *madeira_vulkan_layer_acquire(void *hwnd) {
+    if (hwnd && madeira_desktop_mode()) {
+        winios_note_swapchain_hwnd(hwnd);
+        CAMetalLayer *layer = winios_vulkan_layer_for_hwnd(hwnd);
+        return layer ? (void *)CFBridgingRetain(layer) : NULL;
+    }
+    if (hwnd) return (void *)my_view_create_metal_view((macdrv_view)hwnd, NULL);
+    pthread_mutex_lock(&g_lock);
+    void *retained = g_layer ? (void *)CFBridgingRetain(g_layer) : NULL;
+    pthread_mutex_unlock(&g_lock);
+    return retained;
+}
+void madeira_vulkan_layer_release(void *layer) {
+    my_view_release_metal_view((macdrv_metal_view)layer);
 }
 
 static void my_on_main_thread(dispatch_block_t b) {

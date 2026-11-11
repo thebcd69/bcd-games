@@ -1,0 +1,453 @@
+[11:50:46.320] [INFO] Checking entitlements...
+[11:50:46.320] [INFO] [build] v0.1.630 (630)
+[11:50:46.320] [INFO] [device] model=iPad16,3 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=7455MB available=8169MB cores=9
+[11:50:46.321] [INFO] [device] address-map=[0x100ca0000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[11:50:46.321] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[11:50:46.338] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@1.7195876288659795x max-fps=120 utc-offset=-08:00 free-disk=115GB stikdebug-url=0
+[11:50:46.342] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:50:53.055] [INFO] Requesting JIT with Built-in StikJIT...
+[11:50:57.341] [INFO] [bcd] library launch Hades II: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[11:50:57.348] [INFO] [dock-launch] image-retire=1
+[11:50:57.348] [INFO] [dock-launch] image-map-guard=1
+[11:50:57.348] [INFO] [dock-offline] enabled=1 network=up request=0 account-saved=1 game-started-online=0
+[11:50:57.354] [INFO] [dock-installers] app=1145350 scripts=0 programs=0
+[11:50:57.355] [INFO] [madeira-dock] starting the host for app 1145350; Valve's client authenticates and authorizes the launch
+[11:50:57.365] [INFO] Running full Wine sequence...
+[11:50:57.365] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100ca0000,0x8000000000) 512GB available=8159MB low-power=0 thermal=nominal
+[11:50:57.366] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[11:50:57.368] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[11:50:57.370] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:50:57.370] [INFO] Allocating 896MB JIT pool via debugger...
+[11:50:57.370] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:50:57.371] [INFO] [jit-debugger] attached=1 at the pool request
+[11:50:57.372] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:50:58.084] [INFO] RX pool at 0x148000000
+[11:50:58.100] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.778s rev=ml526
+[11:50:58.148] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/7c0f219a001fcd5c.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[11:50:58.378] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+ml992: os_proc_available_memory=7517 MB + phys_footprint=674 MB = 8192 MB (hw.memsize says 7455 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7455 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11a220000+0x70000 (?) → pool 0x148004000 used=0x78000/0x27000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[window] 0x7048000000..0x7400000000 regions=82 occupied=8197 MB of 15232 MB free=7035 MB maxhole=7034 MB@0x7048000000 rev=ml787 (periodic)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71ffa10000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x27000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0x71ff980000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x27000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[window] 0x121cf0000..0x7807000000 regions=80088 occupied=462213 MB of 486995 MB free=41277 MB maxhole=16496 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=686 MB (peak 686) internal=686 MB compressed=0 MB external=81 MB reusable=9 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1160x800, winstation visible, input desktop set
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={0,0,100,100} surface=0x1035fb580 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000018 vis={0,0,100,100} surface=0x1035fb580 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #3 hwnd=0x10020 after=0x0 flags=8000116a vis={0,0,1160,800} surface=0x11746fd80 rev=ml505 style=96000000 visible=1 parent=0x0
+[win-name] #3 hwnd=0x10020 class='#32769' text="madeira - Wine Desktop" rev=ml853
+[win-pos] #4 hwnd=0x1002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #4 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+[win-pos] #5 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #5 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #6 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-name] #7 hwnd=0x10032 class='WineAppBar' text="WineAppBar" rev=ml853
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.196s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[jit-pool] image 0x11f360000+0x99000 (?) → pool 0x149837000 used=0x18d7000/0x27000000 tramp+0x0
+ml957: ? backing 0x11f360000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a0c000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149e2c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.261s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=128, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[jit-pool] image 0x11a550000+0x80000 (?) → pool 0x14a4d0000 used=0x2554000/0x27000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae74000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11F360000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c650000+0x100000 held for 2000 ms (1 in flight)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp-names] m3047551 "wine-x18-exc"
+[xp] 11:50:59.047 +0.63 dt=315 cpu=277 (thr 277) P=276 E=0 run=281 pgw=-1.0 GHz P=4.15 E=2.07 Minst=4796 IPC=4.18 mJ=1573 pin=1577 rdKB=52748 fpMB=852
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee91000)
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=000000014A12E32C
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dd4c48 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dd4c48 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dd4c48 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dd4c48 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+E 4C [img-map] ml710 #42 intervals-only WININET.dll base=0x71f8170000
+[apc-requeue] on (MADEIRA_APC_REQUEUE=0 restores dropping async I/O APCs for busy threads)
+[apc-requeue] #1 async I/O APC status=00000000 for busy thread 0050 -> waiting thread 0038
+[apc-requeue] #2 async I/O APC status=00000000 for busy thread 0058 -> waiting thread 0038
+[apc-requeue] #3 async I/O APC status=00000000 for busy thread 0058 -> waiting thread 0038
+[apc-requeue] #4 async I/O APC status=00000000 for busy thread 005c -> waiting thread 0038
+[apc-requeue] #5 async I/O APC status=00000000 for busy thread 005c -> waiting thread 0038
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 11:50:59.370 +0.95 dt=323 cpu=494 (thr 208) P=484 E=9 run=529 pgw=-1.0 GHz P=3.90 E=2.65 Minst=8772 IPC=4.58 mJ=2542 pin=453 rdKB=11284 fpMB=947
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000104 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[apc-requeue] #11 async I/O APC status=00000000 for busy thread 0074 -> waiting thread 0038
+[apc-requeue] #12 async I/O APC status=00000000 for busy thread 0074 -> waiting thread 0038
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=000000014A12E32C
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[xp] 11:50:59.684 +1.27 dt=314 cpu=281 (thr 193) P=279 E=1 run=287 pgw=-1.0 GHz P=3.97 E=2.49 Minst=5399 IPC=4.86 mJ=1466 pin=282 rdKB=10264 fpMB=1021
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[file-wfail] ml669 #11 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[xp] 11:50:59.984 +1.57 dt=300 cpu=84 (thr 73) P=77 E=7 run=90 pgw=-1.0 GHz P=2.87 E=2.49 Minst=1153 IPC=4.83 mJ=257 pin=83 rdKB=1504 fpMB=1023
+[apc-requeue] #13 async I/O APC status=00000101 for busy thread 0038 -> waiting thread 004c
+[apc-requeue] #14 async I/O APC status=00000101 for busy thread 0038 -> waiting thread 004c
+[apc-requeue] #15 async I/O APC status=00000000 for busy thread 0038 -> waiting thread 004c
+[apc-requeue] #16 async I/O APC status=00000000 for busy thread 0038 -> waiting thread 004c
+[xp] 11:51:00.251 +1.83 dt=267 cpu=213 (thr 159) P=210 E=4 run=230 pgw=-1.0 GHz P=3.76 E=2.39 Minst=3022 IPC=3.79 mJ=910 pin=109 rdKB=2076 fpMB=1107
+[footprint] rev=ml358 phys=1121 MB (peak 1121) internal=1120 MB compressed=0 MB external=156 MB reusable=9 MB (cycle=2)
+[xp] 11:51:00.546 +2.13 dt=295 cpu=145 (thr 145) P=145 E=1 run=144 pgw=-1.0 GHz P=3.22 E=2.16 Minst=1504 IPC=3.22 mJ=396 pin=53 rdKB=960 fpMB=1122
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery.exe" cmdline=L".\\bin\\vulkandriverquery.exe"
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f51f0000) -> 64-bit table (0x103b9b2d0)
+0050:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 000000703A1AD780.
+0050:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+[footprint] rev=ml358 phys=1156 MB (peak 1156) internal=1154 MB compressed=0 MB external=157 MB reusable=9 MB (cycle=3)
+[file-wfail] ml669 #69 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #70 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #71 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1160 MB (peak 1160) internal=1159 MB compressed=0 MB external=157 MB reusable=9 MB (cycle=4)
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[footprint] rev=ml358 phys=1150 MB (peak 1160) internal=1149 MB compressed=0 MB external=157 MB reusable=9 MB (cycle=5)
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hades II\\Release\\Hades2.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hades II\\Release\\Hades2.exe\" /c ../ /steampowered /VerboseScriptLogging=false /DebugKeysEnabled=false /UnsafeDebugKeysEnabled=false /LiveCreateTextures=false /CheckNonExistingTextures=false /DirectLoadShell=true /SaveCollectionRateFl"...
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hades II\\Release\\Hades2.exe" t+  9.433s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hades II\\Release\\Hades2.exe\" /c ../ /steampowered /VerboseScriptLogging=false /DebugKeysEnabled=false /UnsafeDebugKeysEnabled=false /LiveCreateTextures=false /CheckNonExistingTextures=false /DirectLoadShell=true /SaveCollectionRateFl"... (fd=365, unixdir=366, dup_unixdir=445) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hades II"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0xcbc4000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0xcbc4000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xcbc4000 rev=ajan5-motor
+[11:51:06.865] [INFO] [dock-report] launch-client-discovery-published=1
+[nls-getptr] type=11 id=1252 peb=0x10fed4000
+[nls-getptr] type=11 id=437 peb=0x10fed4000
+[nls-getptr] type=11 id=20127 peb=0x10fed4000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10fed4000
+[nls-getptr] type=11 id=437 peb=0x10fed4000
+[free-delay] #2 release of 0x7037c00000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7037d00000+0x200000 held for 2000 ms (2 in flight)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x1605ec000)
+D A8 Load module SDL2.dll (sdl2.dll-7bd8a3bb07b7d4dc): 71F3960000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71ef530000) -> 64-bit table (0x103b9b2d0)
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[alloc-fail] ml814 #2 status=c0000018 hint=0x180000000 size=0x39000 type=0x2000 protect=0x4 tid=00a8 | STAGE=fixed-map err=3 at 0x180000000+0x3c000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=hades2.exe tid=00a8 size=0x39000 type=0x2000 prot=0x4 hint=0x180000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #4 release of 0x703cc10000+0x100000 held for 2000 ms (3 in flight)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x166768000)
+[alloc-fail] ml814 #3 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a8 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #3 NtAllocateVirtualMemory status=c000000d proc=hades2.exe tid=00a8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+00a8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[S_API] SteamAPI_Init(): Loaded 'C:\Program Files (x86)\Steam\steamclient64.dll' OK.."
+[11:51:08.384] [INFO] [dock-offline] Valve's client can log this account on offline: saved
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2857 full-path-hits=1391 component-lookups=6464 shortcut-hits=3670 misses=2652 scans=2794 entries-scanned=301893 us-in-lookup=524193 (5% of the window) slowest=0.457 ms ...B-70A43DBF0533/Documents/wine/dosdevices/c:/windows/system32
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #76 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #5 release of 0x703f510000+0x120000 held for 2000 ms (4 in flight)
+[footprint] rev=ml358 phys=1895 MB (peak 1895) internal=1893 MB compressed=0 MB external=199 MB reusable=9 MB (cycle=6)
+[11:51:08.865] [INFO] [dock-report] launch-client-error=0
+[11:51:08.865] [INFO] [dock-report] launch-game-running=1
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Saved Games/Hades II/Hades II.log
+[guest-log] #1 tid=00a8 2026-11-04 11:51:12 [MainThread      ]     ProfileManager.cpp:222    ERR| Load profile Profile1.sjson failed! Load status: 1
+[guest-log] #2 tid=00a8 2026-11-04 11:51:12 [MainThread      ]     ProfileManager.cpp:222    ERR| Load profile GlobalSettingsWin.sjson failed! Load status: 1
+[guest-log] #3 tid=00a8 2026-11-04 11:51:12 [MainThread      ]        WindowsBase.cpp:379   INFO| ----Begin printing all displays available on the system----
+[guest-log] #4 tid=00a8 2026-11-04 11:51:12 [MainThread      ]        WindowsBase.cpp:383   INFO| Number of detected displays: 1
+[guest-log] #5 tid=00a8 2026-11-04 11:51:12 [MainThread      ]        WindowsBase.cpp:548   INFO| ----Finish printing all displays available on the system----
+[guest-log] #6 tid=00a8 2026-11-04 11:51:12 [MainThread      ]         Resolution.cpp:165   INFO| Monitor modes:
+[win-pos] #37 hwnd=0x2007e after=0x0 flags=80001967 vis={-3,-29,1163,803} surface=0x110130300 rev=ml505 style=14ca0000 visible=1 parent=0x10020
+[nls-getptr] type=11 id=10000 peb=0x10fed4000
+[free-delay] #6 release of 0x7037d00000+0x120000 held for 2000 ms (1 in flight)
+[guest-log] #10 tid=00a8 2026-11-04 11:51:13 [MainThread      ]       SteamWrapper.cpp:76     ERR| SteamAPI failed to initialize: No SteamUtils011
+00e0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00e0 status=00000001 caller=000000015F1FE32C
+[win-name] #43 hwnd=0x1008a class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #44 hwnd=0x1008e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #44 hwnd=0x1008e class='Message' text="" rev=ml853
+[win-pos] #45 hwnd=0x1008e after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #45 hwnd=0x1008e class='Message' text="" rev=ml853
+[win-pos] #46 hwnd=0x10090 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #46 hwnd=0x10090 class='__wine_gaming_input_devnotify' text="" rev=ml853
+[win-pos] #47 hwnd=0x10090 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #47 hwnd=0x10090 class='__wine_gaming_input_devnotify' text="" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[free-delay] #7 release of 0x703cc10000+0x100000 held for 2000 ms (2 in flight)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #4 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #5 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71ec970000+0xfb000 (nvapi64.dll) → pool 0x1674b2000 used=0x1f5b6000/0x27000000 tramp+0x4000
+D A8 Load module nvapi64.dll (nvapi64.dll-2214fbd4b321d835): 71EC970000
+00a8:err:module:load_dll [dll-missing] rev=ml336 #6 L"nvldumdx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #7 L"atiadlxx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a8:err:module:load_dll [dll-missing] rev=ml336 #8 L"atiadlxy.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71ec970000+0xfb000 (nvapi64.dll) → pool 0x1675b6000 used=0x1f6ba000/0x27000000 tramp+0x4000
+D A8 Load module nvapi64.dll (nvapi64.dll-2214fbd4b321d835): 71EC970000
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703CA11D60, feature level 0xc100, create)
+[madeira-d3d12] feature level 0xc100 refused; 12_0 is the ceiling claimed (d3d12-fl-12-1 = 1 claims 12_1)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000703CA11D60, feature level 0xc000, create)
+[jit-pool] image 0x71ec970000+0xfb000 (nvapi64.dll) → pool 0x1676ba000 used=0x1f7be000/0x27000000 tramp+0x4000
+D A8 Load module nvapi64.dll (nvapi64.dll-2214fbd4b321d835): 71EC970000
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=29 argTable=-1 qwords=0 ranges=1, 3 input element(s)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] ml1060 shader libraries created: 2, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 283 MB = standalone textures 1 (128 MB as Metal sizes them, 128 MB estimated) + texture heaps 0 MB + application heaps 0 MB + buffers 152 MB + argument ring chunks 0 (0 MB) + the rest 3 MB; frees waiting for the GPU: 0
+[swap-diag] #1 layer 0x10d04f780: drawable 0x0 format 80 -> 1160x800 format 80, set on the iOS main thread (dispatch_sync) ...
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=29 argTable=-1 qwords=0 ranges=1, 3 input element(s)
+[madeira-d3d12] command queue: type 0
+[guest-log] #25 tid=00a8 2026-11-04 11:51:14 [MainThread      ]      ConfigOptions.cpp:233   INFO| Total Display Memory Megabytes: 1024
+[guest-log] #26 tid=00a8 2026-11-04 11:51:14 [MainThread      ]      ConfigOptions.cpp:293   INFO| Set GraphicsQualityPreset: GraphicsQualityPreset_Low
+[guest-log] #27 tid=00a8 2026-11-04 11:51:14 [MainThread      ]                App.cpp:169   INFO| Initializing graphics device: 1160x800
+[jit-pool] image 0x71ec9f0000+0x3c000 (rad_tm_win64.dll) → pool 0x1677bd000 used=0x1f7fd000/0x27000000 tramp+0x0
+D A8 Load module rad_tm_win64.dll (rad_tm_win64.dll-838fcf12acd1e8ce): 71EC9F0000
+[footprint] rev=ml1060 fast phys=2719 MB compressed=347 MB internal=2180 MB
+[footprint] rev=ml1060 fast phys=2746 MB compressed=347 MB internal=2208 MB
+[jit-pool] image 0x71ec950000+0xa0000 (mmdevapi.dll) → pool 0x1677fc000 used=0x1f8a0000/0x27000000 tramp+0x4000
+D B8 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71EC950000
+[guest-log] #28 tid=00b8 2026-11-04 11:51:15 [LoadTaskScheduler]       AudioManager.cpp:862   INFO| FMOD driver: Speakers (iOS Null)
+[footprint] rev=ml1060 fast phys=2992 MB compressed=536 MB internal=1889 MB
+[mem-burst] rev=624 +403 MB in 250 ms phys=3395 internal=2004 compressed=535 other=856 | guest commits since the last sample: n=391, 299 MB, biggest 8 MB tid=0120 | swap backed=0 MB | pool head=504 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=3395 MB compressed=535 MB internal=2004 MB
+[mem-burst] rev=624 +563 MB in 250 ms phys=3958 internal=2369 compressed=589 other=1000 | guest commits since the last sample: n=215, 90 MB, biggest 3 MB tid=00b8 | swap backed=0 MB | pool head=504 MB tail=32 MB
+[footprint] rev=ml1060 fast phys=3958 MB compressed=589 MB internal=2369 MB
+[free-delay] #8 release of 0x706fcc0000+0xfd0000 held for 2000 ms (1 in flight)
+[footprint] rev=ml1060 fast phys=4099 MB compressed=587 MB internal=1971 MB
+[footprint] rev=ml1060 fast phys=4419 MB compressed=732 MB internal=2148 MB
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f15e230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f2feb30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16f15e230
+[thread-stacks] port=0x2603 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1100bf901 x18=0x0 sp=0x16f2feb30
+[thread-stacks] port=0x5303 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1f149f0dc x18=0x0 sp=0x16f5b5c10
+[thread-stacks] port=0xb113 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x1f149f0dc x18=0x0 sp=0x16f6d0d70
+[thread-stacks] port=0x9d27 "" pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 run=3 susp=0 cpu=163 x8=0x0 x18=0x0 sp=0x16f38aa60
+[thread-stacks] port=0x8e13 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x120e26b81 x18=0x0 sp=0x16f416b30
+[thread-stacks] port=0xc51b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16fb31030
+[file-census] r624 10s: case-sensitive=1 full-path-tries=3106 full-path-hits=2962 component-lookups=751 shortcut-hits=468 misses=278 scans=283 entries-scanned=25387 us-in-lookup=64347 (0% of the window) slowest=0.712 ms ...8CB-70A43DBF0533/Documents/wine/dosdevices/c:/windows/sysx64
+[footprint] rev=ml1060 fast phys=4466 MB compressed=742 MB internal=2182 MB
+[jit-pool] image 0x71ec600000+0x90000 (schannel.dll) → pool 0x1678a0000 used=0x1f934000/0x27000000 tramp+0x4000
+D B8 Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 71EC600000
+[madeira-d3d12] ml1060 shader libraries created: 13, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1765 MB = standalone textures 235 (988 MB as Metal sizes them, 973 MB estimated) + texture heaps 64 MB + application heaps 336 MB + buffers 360 MB + argument ring chunks 3 (0 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[footprint] rev=ml1060 fast phys=4522 MB compressed=736 MB internal=2217 MB
+[srv-input] btn msg=0x201 at (316,490) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (316,490) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (316,490) hit win=0002007e thread=0x12160ad00
+[madeira-d3d12] ml1060 shader libraries created: 16, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1742 MB = standalone textures 235 (988 MB as Metal sizes them, 973 MB estimated) + texture heaps 64 MB + application heaps 336 MB + buffers 337 MB + argument ring chunks 6 (0 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (288,386) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (288,386) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (288,386) hit win=0002007e thread=0x12160ad00
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007058FF5450, feature level 0xc100, probe)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007058FF5450, feature level 0xc000, probe)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007058FF5450, feature level 0xc100, probe)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007058FF5450, feature level 0xc000, probe)
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[sock-big] send ERROR fd=414 errno=65 rev=ml464
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=69 resident=2302MB dbg=DEBUGGED rev=ml525
+[11:51:28.219] [INFO] detach-wait: presents=715 running=1 elapsed=30s
+[srv-input] btn msg=0x201 at (937,444) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (937,444) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (937,444) hit win=0002007e thread=0x12160ad00
+[guest-log] #29 tid=00a8 2026-11-04 11:51:28 [MainThread      ]         Resolution.cpp:165   INFO| Monitor modes:
+[subfloor] ml956 serviced 4097 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[madeira-d3d12] metal-gap: Metal 1745 MB = standalone textures 235 (988 MB as Metal sizes them, 973 MB estimated) + texture heaps 64 MB + application heaps 336 MB + buffers 340 MB + argument ring chunks 6 (0 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[srv-input] btn msg=0x201 at (845,491) hit win=0002007e thread=0x12160ad00
+[win-pos] #48 hwnd=0x2007e after=0xfffffffffffffffe flags=00000234 vis={65,-13,1095,787} surface=0x1100b9740 rev=ml505 style=14ca0000 visible=1 parent=0x10020
+[win-name] #48 hwnd=0x2007e class='The Forge' text="Hades II" rev=ml853
+[swap-diag] #1 layer 0x10d04f780: drawable 1160x800 format 80 -> 1024x768 format 80, set on the iOS main thread (dispatch_sync) ...
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=29 argTable=-1 qwords=0 ranges=1, 3 input element(s)
+[madeira-d3d12] command queue: type 0
+[win-pos] #49 hwnd=0x2007e after=0xfffffffffffffffe flags=80000234 vis={-3,-29,1163,803} surface=0x1100bae80 rev=ml505 style=14ca0000 visible=1 parent=0x10020
+[win-name] #49 hwnd=0x2007e class='The Forge' text="Hades II" rev=ml853
+[swap-diag] #2 layer 0x10d04f780: drawable 1024x768 format 80 -> 1160x800 format 80, set on the iOS main thread (dispatch_sync) ...
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=29 argTable=-1 qwords=0 ranges=1, 3 input element(s)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] metal-gap: Metal 1742 MB = standalone textures 235 (988 MB as Metal sizes them, 973 MB estimated) + texture heaps 64 MB + application heaps 336 MB + buffers 337 MB + argument ring chunks 6 (0 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xc51b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=21 x8=0x0 x18=0x0 sp=0x16fb31030
+[madeira-d3d12] metal-gap: Metal 1748 MB = standalone textures 235 (988 MB as Metal sizes them, 973 MB estimated) + texture heaps 64 MB + application heaps 336 MB + buffers 343 MB + argument ring chunks 6 (0 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[subfloor] ml956 serviced 8193 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[nt-fail] #4 NtAllocateVirtualMemoryEx status=c0000017 proc=hades2.exe tid=00b4 size=0x8000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000000 type=0x103000 protect=0x40
+[nt-fail] #5 NtAllocateVirtualMemoryEx status=c0000017 proc=hades2.exe tid=00b4 size=0x4000000 type=0x103000 prot=0x40 hint=0x0 zb=0x0 ext={attrs=0x40} hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x2000000 type=0x103000 protect=0x40
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=1% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb2fcc0 NATIVE (no FEX state) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 236 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1728..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[guest-log] #30 tid=00a8 2026-11-04 11:51:46 [MainThread      ]      ConfigOptions.cpp:293   INFO| Set GraphicsQualityPreset: GraphicsQualityPreset_Low
+[footprint] rev=ml1060 fast phys=4580 MB compressed=689 MB internal=2121 MB
+[subfloor] ml956 serviced 12289 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[footprint] rev=ml1060 fast phys=4599 MB compressed=773 MB internal=2057 MB
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=71 resident=2133MB dbg=DEBUGGED rev=ml525
+[11:51:58.301] [INFO] detach-wait: presents=2427 running=1 elapsed=60s
+[subfloor] ml956 serviced 16385 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (124,722) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (124,722) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (124,722) hit win=0002007e thread=0x12160ad00
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (727,278) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (727,278) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (727,278) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (727,278) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (871,326) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (871,326) hit win=0002007e thread=0x12160ad00
+[srv-input] btn msg=0x201 at (871,326) hit win=0002007e thread=0x12160ad00
+[footprint] rev=ml1060 fast phys=4618 MB compressed=744 MB internal=2101 MB
+[subfloor] ml956 serviced 20481 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[11:52:28.352] [INFO] detach-wait: presents=4224 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=69 resident=2155MB dbg=DEBUGGED rev=ml525
+[11:52:58.423] [INFO] detach-wait: presents=6028 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=68 resident=2160MB dbg=DEBUGGED rev=ml525
+[subfloor] ml956 serviced 24577 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[subfloor] ml956 serviced 28673 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[11:53:28.503] [INFO] detach-wait: presents=7832 running=1 elapsed=150s
+[freeze] alive t+150s beats=5 gaps=0 iter=595 gen=1 threads=69 resident=2170MB dbg=DEBUGGED rev=ml525
+[subfloor] ml956 serviced 32769 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[fault-cost] ml685 emulated-store faults=8 total=0 ms avg=6114 ns dropped=0 (one handler thread serves all threads)
+[thread-stacks] port=0xc51b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=31 x8=0x0 x18=0x0 sp=0x16fb31030
+[subfloor] ml956 serviced 36865 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[fault-cost] ml685 emulated-store faults=8 total=0 ms avg=6114 ns dropped=0 (one handler thread serves all threads)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[subfloor] ml956 serviced 40961 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[11:53:58.584] [INFO] detach-wait: presents=9521 running=1 elapsed=180s
+[freeze] alive t+180s beats=6 gaps=0 iter=714 gen=1 threads=69 resident=2170MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc51b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=25 x8=0x0 x18=0x0 sp=0x16fb31030
+[subfloor] ml956 serviced 45057 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9400100
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1937 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 328 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1937 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 328 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-stacks] port=0xc51b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=4 x8=0x0 x18=0x0 sp=0x16fb31030
+[thread-stacks] port=0x1f1c3 "FMOD nonblocking thread (0)" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16f2680e0 x18=0x0 sp=0x13fd5e9d0
+[thread-stacks] port=0x971b "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16f26c0e0 x18=0x0 sp=0x13eafe9d0
+[thread-stacks] port=0x15f73 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=18 x8=0x1100bf701 x18=0x0 sp=0x16fe42b30
+[thread-stacks] port=0x8e7b "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=7 x8=0x10d3ab181 x18=0x0 sp=0x16f7eab30
+[thread-stacks] port=0x10e3f "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=18 x8=0x1100bf701 x18=0x0 sp=0x16f22eb30
+[thread-stacks] port=0x136df "" pc=?`?+0x0 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x0
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1937 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 328 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1943 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 334 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[footprint] rev=ml358 phys=4602 MB (peak 4616) internal=2093 MB compressed=736 MB external=73 MB reusable=1 MB (cycle=103)
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=4602 MB (peak 4616) internal=2094 MB compressed=736 MB external=73 MB reusable=1 MB (cycle=104)
+[11:54:28.672] [INFO] detach-wait: presents=11325 running=1 elapsed=210s
+[freeze] alive t+211s beats=7 gaps=0 iter=833 gen=1 threads=69 resident=2162MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=4596 MB (peak 4616) internal=2088 MB compressed=736 MB external=73 MB reusable=1 MB (cycle=105)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1516MB: tex-RT=57MB/51 (peak 57) tex-DS=7MB/3 (peak 7) tex-UAV=0MB/0 (peak 0) tex-sampled=1027MB/451 (peak 1027) tex-MSAA=94MB/7 (peak 94) buf-private=0MB/0 (peak 0) buf-shared=328MB/38 (peak 877)
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1937 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 328 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[footprint] rev=ml358 phys=4591 MB (peak 4616) internal=2083 MB compressed=736 MB external=73 MB reusable=1 MB (cycle=106)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fb31030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "Bink IO" teb=0x704fc00000 cpu=0% wait pc=libsystem_kernel.dylib`__ulock_wait2+0x8 lr=libsystem_platform.dylib`os_sync_wait_on_address+0x68 sp=0x13e2bfa00 NATIVE (no FEX state) sp-cand=[ bink2w64.dll+0x33b00 bink2w64.dll+0x5c310 ] last-syscall id=0xff pc=0x15eba7634 user-sp=0x7071bffd20 user-cand=[ bink2w64.dll+0x5c0a8 bink2w64.dll+0x5c0a8 bink2w64.dll+0x5c080 bink2w64.dll+0x5c080 bink2w64.dll+0x34255 ]
+[thread-sample] ml876 b0 "FMOD nonblocking thread (0)" teb=0x704fbf0000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x13fd5e9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x15eba71c8 user-sp=0x70723ffbb0 user-cand=[ fmod.dll+0xb85e0 fmod.dll+0xc0e57 fmod.dll+0xc16af fmod.dll+0xb85e0 fmod.dll+0xb8651 fmod.dll+0xb85e0 fmod.dll+0xc0999 ]
+[thread-sample] ml876 b0 "CNet Encrypt:0" teb=0x704fbe0000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x13eafe9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14992f1c8 user-sp=0x7033eefc20 user-cand=[ tier0_s64.dll+0x1645d steamclient64.dll+0xd44f59 ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__proc_info+0x8 lr=libsystem_kernel.dylib`proc_pidinfo+0x28 sp=0x16f6d0dc0 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=4594 MB (peak 4616) internal=2086 MB compressed=735 MB external=73 MB reusable=1 MB (cycle=107)
+[thread-sample] ml876 b3 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16f6d0d70 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[winios-tree] 0x1004a 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10048 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10046 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x20040 'WineDdeEventClass' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x40030 'Shell_TrayWnd' "" style=04c80000 ex=00000100 vis=0 tid=0024 win={0,0,166,52} client={3,29,163,49}
+[winios-tree] 0x1003e 'IME' "Default IME" style=8c000000 ex=00000000 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=1516MB: tex-RT=57MB/51 (peak 57) tex-DS=7MB/3 (peak 7) tex-UAV=0MB/0 (peak 0) tex-sampled=1027MB/451 (peak 1027) tex-MSAA=94MB/7 (peak 94) buf-private=0MB/0 (peak 0) buf-shared=328MB/38 (peak 877)
+[madeira-d3d12] ml1060 shader libraries created: 36, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1937 MB = standalone textures 270 (1125 MB as Metal sizes them, 1110 MB estimated) + texture heaps 128 MB + application heaps 336 MB + buffers 328 MB + argument ring chunks 57 (3 MB) + the rest 15 MB; frees waiting for the GPU: 0
+[footprint] rev=ml358 phys=4595 MB (peak 4616) internal=2087 MB compressed=735 MB external=73 MB reusable=1 MB (cycle=108)
+[hwinput] keyboard focus: elsewhere (pointer left the game view)
+[hwinput] mouse focus: elsewhere (pointer left the game view)
+[xp] 11:54:35.160 +216.75 dt=271 cpu=187 (thr 184) P=138 E=49 run=243 pgw=-1.0 GHz P=2.67 E=2.71 Minst=926 IPC=1.84 mJ=195 pin=120 rdKB=4176 fpMB=4599 | pres 15/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 1/3.9 draw 211.8 cmt 0.8) pool=0.0 caller-ecl 15/28.2
+[xp] 11:54:35.412 +217.00 dt=252 cpu=156 (thr 160) P=97 E=59 run=218 pgw=-1.0 GHz P=3.76 E=2.73 Minst=833 IPC=1.58 mJ=248 pin=0 rdKB=0 fpMB=4598 | pres 13/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 1/1.0 draw 215.0 cmt 0.8) pool=0.0 caller-ecl 13/9.8
+[xp] 11:54:35.672 +217.26 dt=260 cpu=186 (thr 185) P=141 E=45 run=233 pgw=-1.0 GHz P=2.36 E=2.64 Minst=822 IPC=1.82 mJ=151 pin=0 rdKB=0 fpMB=4598 | pres 15/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 203.6 cmt 0.8) pool=0.0 caller-ecl 15/12.9
+[ios_audio] ml1230 pacing stream=0x1178cee00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[xp] 11:54:35.924 +217.51 dt=251 cpu=226 (thr 225) P=167 E=59 run=281 pgw=-1.0 GHz P=1.94 E=2.70 Minst=900 IPC=1.86 mJ=134 pin=0 rdKB=0 fpMB=4598 | pres 15/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 209.8 cmt 0.8) pool=0.0 caller-ecl 15/14.3
+[xp] 11:54:36.187 +217.77 dt=264 cpu=229 (thr 230) P=164 E=65 run=282 pgw=-1.0 GHz P=2.18 E=2.72 Minst=948 IPC=1.77 mJ=175 pin=35 rdKB=1448 fpMB=4598 | pres 15/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 200.1 cmt 0.7) pool=0.0 caller-ecl 15/14.7
+[11:54:36.217] [INFO] [session] length=218s partial=1 play=201s frames=11772 avg=58.7 low1=50.6 low01=16.2 worst=892ms stalls=0/0s peak=4767MB limit=8191MB thermal=nominal lpm=0 res=1160x800 cap=60 game=Hades II
+ [xp] 11:54:36.187 +217.77 dt=264 cpu=229 (thr 230) P=164 E=65 run=282 pgw=-1.0 GHz P=2.18 E=2.72 Minst=948 IPC=1.77 mJ=175 pin=35 rdKB=1448 fpMB=4598 | pres 15/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 200.1 cmt 0.7) pool=0.0 caller-ecl 15/14.7

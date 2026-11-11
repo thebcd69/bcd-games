@@ -426,7 +426,8 @@ enum StikJITHelper {
         LogStore.shared.log("[jit-debugger] attached=\(debuggerAttached ? 1 : 0) at the pool request")
         // Round 630 (agent G3 S1): how old the attach is when the request goes out (log only).
         let attachAgeAtRequest = debuggerAttached ? attachAge() : nil
-        if let age = attachAgeAtRequest { LogStore.shared.log("[jit-age] attach age=\(age.seconds)s source=\(age.source)") }
+        // Night round 2026-11-11 (M7, A2 S1): the method and the heat state ride on the same line, so the next archive scan needs no joins.
+        if let age = attachAgeAtRequest { LogStore.shared.log("[jit-age] attach age=\(age.seconds)s source=\(age.source)" + JITRequestRules.ageLineTail(method: requestMethod, thermal: ProcessInfo.processInfo.thermalState.rawValue)) }
         // With no debugger attached, a JIT request fails the launch with a message; 0 lets it crash the app as before.
         // CS_DEBUGGED stays set after a debugger detaches (JIT enabled by a tool
         // that attaches and leaves, or without Madeira's script), and the pool
@@ -701,6 +702,7 @@ enum StikJITHelper {
                     + "A game whose program needs more than that stops with c0000018: quit BCD and open it again for a new memory layout", level: .error)
             }
         }
+        var censusLargest: vm_address_t = 0   // night round 2026-11-11 (G9 S2a): the census's largest hole, for the BAD POOL step-down below
         if reservePlan == nil {   // madeira-bcd pool-reserve: no census or plugs for a pool placed in the reservation
             var holes: [(base: vm_address_t, size: vm_address_t)] = []
             var addr = vm_address_t(goodLow)
@@ -745,6 +747,7 @@ enum StikJITHelper {
                 }
             }
             let largest = holes.map { $0.size }.max() ?? 0
+            censusLargest = largest
             // madeira-bcd pool-pair (pool-split only): two runs ABOVE the window, split
             // only by the main thread's stack, can beat the largest single run when that
             // one lies BELOW the window, where the pool cannot split ("the gap would
@@ -892,20 +895,24 @@ enum StikJITHelper {
         if let plan = reservePlan { poolSize = PoolReserve.releaseSlice(plan) }
         var rxPtrOpt: UnsafeMutableRawPointer? = nil
         var requestUnanswered = false
+        // Night round 2026-11-11 (G9 S2a, 78BPN7 and the archive's guest-window BAD POOL logs): the size of each try; a try after a placement in the
+        // guest window asks for 16 MB less each time when the pool was sized to the census's hole with no slack (PoolRetryRules.stepDown).
+        var attemptSize = poolSize
         for attempt in 0..<3 {
-            guard let p = requestRegion(poolSize, attempt: attempt, region: "A"), p != UnsafeMutableRawPointer(bitPattern: 0) else {
+            guard let p = requestRegion(attemptSize, attempt: attempt, region: "A"), p != UnsafeMutableRawPointer(bitPattern: 0) else {
                 LogStore.shared.log(noDebugger ? "BCD could not map \(poolSize >> 20)MB of JIT memory without a debugger (attempt \(attempt))"
                                                : "Debugger failed to allocate RX memory (attempt \(attempt))", level: .error)
                 requestUnanswered = true
                 break
             }
             let a = Int(bitPattern: p)
-            let inGuestWindow = a + poolSize > guestLo && a < guestHi
+            let inGuestWindow = a + attemptSize > guestLo && a < guestHi
             // ml1034: a pool covering 0x140000000 displaces a non-relocatable
             // main image, which is fatal later and unrecoverable.
-            let hitsExeWindow = overlapsExeWindow(vm_address_t(a), vm_address_t(poolSize))
+            let hitsExeWindow = overlapsExeWindow(vm_address_t(a), vm_address_t(attemptSize))
             if a >= goodLow && !inGuestWindow && !hitsExeWindow {
                 rxPtrOpt = p
+                poolSize = attemptSize   // night round 2026-11-11 (G9 S2a): the size that was placed (unchanged unless a step-down ran)
                 break
             }
             LogStore.shared.log(String(format: "BAD POOL placement 0x%lx (%@) — re-rolling (attempt %d)",
@@ -914,8 +921,18 @@ enum StikJITHelper {
                                          : (hitsExeWindow ? "swallows the 0x140000000 executable window"
                                                           : "guest 64G window"),
                                        attempt), level: .error)
-            plugs.append((vm_address_t(a), vm_size_t(poolSize)))
+            plugs.append((vm_address_t(a), vm_size_t(attemptSize)))
             LogStore.shared.log("  bad region kept as pin until loop end")
+            // Night round 2026-11-11 (G9 S2a; 78BPN7, Slay the Spire 2 on an iPad16,3: the census hole was exactly the 560 MB pool, a stray mapping
+            // of a few pages took part of it between the census and the request 0.4 s later, first-fit then fell to the guest window three times
+            // with the same size). The archive has no start that a same-size retry recovered (21 logs with an in-run BAD POOL, none played), so
+            // the retry after a guest-window placement asks for 16 MB less each time; only where the pool was sized to the hole.
+            if inGuestWindow, windowHeld, pairA == nil, reservePlan == nil, attempt < 2,
+               let next = PoolRetryRules.stepDown(requested: poolSize, tried: attemptSize, largestHole: Int(censusLargest), attempt: attempt) {
+                LogStore.shared.log("[pool-retry] ml1036: the pool was sized to the \(Int(censusLargest) >> 20)MB hole and landed in the guest window; "
+                    + "the next try asks for \(next >> 20)MB (was \(attemptSize >> 20)MB)", level: .error)
+                attemptSize = next
+            }
         }
         // ml1040: the plugs existed only to steer first-fit; give the VA back.
         for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
@@ -1880,6 +1897,8 @@ enum StikJITHelper {
         guard noDebugger else {
             // madeira-bcd (round 624, agent R S2): the process stops inside this BRK until the debugger answers and may be killed there;
             // the record is on disk first (BCDBrkTrail, BCDSessionRecorderLive.swift). `site` is the caller's line (#line as a default).
+            let watch = StikJITHelper.requestWatchBegin(region: region, size: size, attempt: attempt)   // night round 2026-11-11 (M7): a line before, one after, a 30 s note
+            defer { StikJITHelper.requestWatchEnd(watch) }
             BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)
             defer { BCDBrkTrail.end() }
             return jit26_prepare_region(nil, size)
@@ -2238,5 +2257,158 @@ enum JITNoDebuggerPool {
         "The debugger attached to BCD and left again without running BCD's JIT script, so BCD can't set up its JIT "
             + "memory. In StikDebug, turn on Settings › Always Run Scripts, then tap Enable JIT again."
             + (osMajor >= 26 ? builtInAdvice : "")
+    }
+}
+
+/// Night round 2026-11-11 (G9 S2a): the pool request's retry after a placement in the guest window (tests/host/check-pool-retry.py compiles it alone).
+enum PoolRetryRules {
+    /// A pool within this much of the census's largest hole was sized to that hole: there is no slack for a stray mapping.
+    static let exactFitSlack = 32 << 20
+    /// The step a retry takes off the size that was requested at first (16 MB, the pool's own granule).
+    static let step = 16 << 20
+    /// The smallest pool a retry may ask for (the census's own minimum, PoolReserve.minPool).
+    static let minimum = 256 << 20
+
+    /// The size of the next try after the try number `attempt` landed in the guest window, or nil to ask for the same size as before.
+    /// `requested`: the pool's size before the loop, `tried`: the size just tried, `largestHole`: the census's largest free hole.
+    static func stepDown(requested: Int, tried: Int, largestHole: Int, attempt: Int) -> Int? {
+        guard largestHole >= minimum, largestHole - requested < exactFitSlack else { return nil }
+        let next = requested - step * (attempt + 1)
+        guard next >= minimum, next < tried else { return nil }
+        return next
+    }
+}
+
+// MARK: - Night round 2026-11-11 (M7: the JIT memory request that never returns)
+
+/// Pure rules of the JIT memory request's words and log fields (tests/host/check-jit-pool-wait.py compiles this enum on its own).
+///
+/// Over the archive (769 starts with a `[jit-age]` line, builds 630 to 634; A2 S1, A4 S3) 25 starts ended inside a `BRK #0xf00d` that the external
+/// debugger never answered: the whole process stays stopped, so nothing can be drawn or logged from inside the request. StikDebug failed 5.8 % of
+/// the starts against 1.3 % for the built-in helper; an attach older than 30 s stalled 15 % against 2 %; with StikDebug a phone in a serious heat
+/// state stalled 22.7 % (5 of 22). So the words go up BEFORE the request on that risky path, and a request that has not come back after 30 s puts
+/// the way out on the screen when the app's main thread is still running (G10 S10: a UI line was logged 20 s into a stalled request).
+enum JITRequestRules {
+    /// A start whose request is likelier to stop: `ageSeconds` is the attach's age (nil unknown), `hot` the phone's heat state is serious or worse.
+    struct Risk: Equatable {
+        var ageSeconds: Int?
+        var hot: Bool
+    }
+
+    /// Seconds of attach age from which a request counts as risky (the stalls start at 30 s; 25 keeps a margin for the seconds the start takes).
+    static let riskAgeSeconds = 25
+    /// Seconds a request may take before the starting screen says it did not come back (925 answered requests: median 1.1 s, p99 6.7 s, max 25.6 s).
+    static let stallSeconds = 30.0
+
+    /// The risky path: only an external debugger (StikDebug, or a debugger attached before BCD started) and only an old attach or a hot phone.
+    static func risk(external: Bool, attachAgeSeconds: Int?, thermalSerious: Bool) -> Risk? {
+        guard external else { return nil }
+        let old = (attachAgeSeconds ?? 0) >= riskAgeSeconds
+        guard old || thermalSerious else { return nil }
+        return Risk(ageSeconds: attachAgeSeconds, hot: thermalSerious)
+    }
+
+    /// The starting screen's line while the request waits (before it, on the risky path).
+    static let waitWords = "Waiting for StikDebug to hand over JIT memory. The screen can freeze for up to 30 seconds. Don't close BCD."
+    /// The starting screen's line when the request has not come back after `stallSeconds`.
+    static let stalledWords = "BCD has waited 30 seconds for JIT memory and StikDebug has not answered. Close BCD (swipe it away in the app "
+        + "switcher), make sure LocalDevVPN is connected, tap Enable JIT and press Play again straight away."
+
+    /// What `[jit-age]` gets after the age and the source.
+    static func ageLineTail(method: String, thermal: Int) -> String { " method=\(method) thermal=\(thermal)" }
+
+    /// The one line before a debugger region request: what is asked and the state it is asked in (the process stops inside the request).
+    static func requestLine(region: String, sizeMB: Int, attempt: Int?, ageSeconds: Int?, source: String?, method: String) -> String {
+        "[jit-pool] request \(region): size=\(sizeMB)MB attempt=\(attempt.map(String.init) ?? "-") attach-age=\(ageSeconds.map(String.init) ?? "?")s "
+            + "source=\(source ?? "?") method=\(method)"
+    }
+
+    /// The trail record's extra fields (the trail's context): the next start's `[jit-brk-prev]` line carries them even when the dead run's log is lost.
+    static func trailContext(method: String, ageSeconds: Int?, source: String?, liveContainer: Bool, os: String, footprintMB: Int) -> String {
+        "method=\(method) attach-age=\(ageSeconds.map(String.init) ?? "?")s source=\(source ?? "?") lc=\(liveContainer ? 1 : 0) ios=\(os) foot=\(footprintMB)MB"
+    }
+}
+
+extension StikJITHelper {
+    /// The JIT method of this start as the library's main thread read it (JITCoordinator.resolvedMethod): "builtin" or "stikdebug"; "?" before.
+    /// Set on the main thread by ContentView before the pool request goes out (reading it here would touch UIKit off the main thread).
+    private(set) static var requestMethod = "?"
+
+    static func noteRequestMethod(_ method: JITMethod) {
+        requestMethod = method == .builtIn ? "builtin" : "stikdebug"
+    }
+
+    /// The caption of the risky path is up (so a stalled-request note that clears does not remove it).
+    private static var captionUp = false
+
+    /// Night round 2026-11-11 (A2 S1, A5 S8): on the risky path the starting screen says what BCD waits for BEFORE the request goes out (the request
+    /// stops the whole process; nothing can be drawn from inside it). Call on the thread that makes the request, right before allocatePool; true when
+    /// the line was put up (then `clearRequestCaption()` after allocatePool). Nothing happens, and nothing is shown, for the built-in helper, a
+    /// fresh attach on a cool phone, or no debugger (93 % of the starts).
+    @discardableResult
+    static func announceRiskyRequest() -> Bool {
+        guard isDebuggerTraced() else { return false }
+        let age = attachAge()
+        let thermal = ProcessInfo.processInfo.thermalState
+        guard let risk = JITRequestRules.risk(external: requestMethod != "builtin" || age?.source == "at-start",
+                                              attachAgeSeconds: age?.seconds, thermalSerious: thermal == .serious || thermal == .critical) else { return false }
+        LogStore.shared.log("[jit-risk] method=\(requestMethod) attach-age=\(risk.ageSeconds.map(String.init) ?? "?")s source=\(age?.source ?? "?") "
+                            + "thermal=\(thermal.rawValue) caption=1")
+        captionUp = true
+        DispatchQueue.main.async { LibraryModel.shared.poolWait = JITRequestRules.waitWords }
+        Thread.sleep(forTimeInterval: 0.4)   // SwiftUI draws the line before the request stops the process
+        return true
+    }
+
+    static func clearRequestCaption() {
+        captionUp = false
+        DispatchQueue.main.async { LibraryModel.shared.poolWait = nil }
+    }
+
+    /// One debugger region request in progress: when it began and the main-queue watch that says it did not come back.
+    final class RequestWatch {
+        let region: String
+        let began = ProcessInfo.processInfo.systemUptime
+        var item: DispatchWorkItem?
+        /// The 30 s note went up (set on the main queue by the watch itself).
+        var fired = false
+        init(region: String) { self.region = region }
+    }
+
+    /// Night round 2026-11-11 (G10 S10, A5 S8): the line before the request (it is in the file before the process stops; a log that ends at it proves a
+    /// request that never came back, with the state it began in) and, 30 s after it began, a note on the starting screen and a `[jit-brk-wait]` line IF
+    /// the app's main thread still runs (the trail's own record, BCDBrkTrail, is the one that survives a stopped process).
+    static func requestWatchBegin(region: String, size: Int, attempt: Int?) -> RequestWatch {
+        let age = attachAge()
+        LogStore.shared.log(JITRequestRules.requestLine(region: region, sizeMB: size >> 20, attempt: attempt, ageSeconds: age?.seconds, source: age?.source,
+                                                        method: requestMethod))
+        let watch = RequestWatch(region: region)
+        let item = DispatchWorkItem { [weak watch] in
+            guard let watch else { return }
+            LogStore.shared.log("[jit-brk-wait] the JIT memory request has not come back for \(Int(JITRequestRules.stallSeconds)) s: region=\(watch.region) "
+                                + "size=\(size >> 20)MB footprint=\(jit_phys_footprint() >> 20)MB")
+            watch.fired = true
+            LibraryModel.shared.poolWait = JITRequestRules.stalledWords
+        }
+        watch.item = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + JITRequestRules.stallSeconds, execute: item)
+        return watch
+    }
+
+    static func requestWatchEnd(_ watch: RequestWatch) {
+        let wasStalled = watch.fired
+        watch.item?.cancel()
+        let ms = Int((ProcessInfo.processInfo.systemUptime - watch.began) * 1000)
+        LogStore.shared.log("[jit-pool] request \(watch.region) answered after \(ms) ms")
+        if wasStalled { DispatchQueue.main.async { LibraryModel.shared.poolWait = captionUp ? JITRequestRules.waitWords : nil } }
+    }
+
+    /// The trail's context closure (set in BCDSessionRecorderLive.appStarted): the fields a trail record gets (see JITRequestRules.trailContext).
+    static func brkTrailContext() -> String {
+        let age = attachAge()
+        let v = ProcessInfo.processInfo.operatingSystemVersion
+        return JITRequestRules.trailContext(method: requestMethod, ageSeconds: age?.seconds, source: age?.source,
+                                            liveContainer: getenv("LC_HOME_PATH") != nil,
+                                            os: "\(v.majorVersion).\(v.minorVersion).\(v.patchVersion)", footprintMB: Int(jit_phys_footprint() >> 20))
     }
 }

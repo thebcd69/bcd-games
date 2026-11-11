@@ -119,6 +119,35 @@ if cc and sys.platform == "darwin":
 else:
     print("note: not on macOS or no C compiler; the reader was not run")
 
+# Night round 2026-11-11 (agent R1 S8; GTA V VKV5ZW, build 634): the same fault in the stale-pointer healer. Its escalation pass named a pool copy
+# with ios_pe_module_name( ios_jit_mappings[i].pe_base, ... ); the image had been unmapped ("[image-reload] unmapped image 0xfb8000000+0x28000: 1 pool copy
+# marked") and the plain read of its header faulted in the native "wine-stale-heal" thread: "[mach-deliver] rev=ml540 NATIVE-THREAD DECLINE ...
+# ios_jit_patch_stale_pointer ... addr=0xfb8000000 -> kernel default handler", the app ended. The four diagnostics that name a mapping ENTRY now use the
+# safe reader as well (the pool describer, the pool-owner cluster report, the alias-push line, the stale-heal line), and so does the alias-push
+# "went to the emulator of" line.
+import re
+for what, anchor in (("the pool describer", '"%s pool off=0x%lx -> LIVE mapping[%d] %s pe=%p jit=%p+0x%lx owner=%p"'),
+                     ("the pool-owner cluster report", '"[pool-owner] CLUSTER in %s: 0x%llx at +0x%lx and 0x%llx at +0x%lx\\n"'),
+                     ("the alias-push own-copy line", '"[alias-push] madeira-bcd peb=%p: emulator maps %s %p+0x%lx to this process\'s "'),
+                     ("the alias-push cross-emulator line", '"emulator of peb=%p -- its own emulator does not learn this alias (#%d)\\n"'),
+                     ("the stale-heal line", '"[stale-heal]   %d slot(s) in the copy of %p (%s) -> %p for peb=%p (owner=%p mapper=%p)\\n"')):
+    at = SRC.find(anchor)
+    seg = SRC[at:at + 700] if at >= 0 else ""
+    check("R1 S8: %s names the image with ios_pe_module_name_safe and a local buffer" % what,
+          at >= 0 and "ios_pe_module_name_safe(" in seg and "ios_pe_module_name(" not in seg.replace("ios_pe_module_name_safe(", ""), seg[:400])
+check("R1 S8: ios_pe_module_name_safe is declared before the first of them (the describer)",
+      SRC.index("static const char *ios_pe_module_name_safe( const void *image_base, size_t image_size, char *out, size_t out_size );")
+      < SRC.index("void ios_jit_describe_pool_addr( const void *addr, char *buf, size_t buflen )"))
+plain = [m.group(0) for m in re.finditer(r"ios_pe_module_name\(\s*(?:ios_jit_mappings\[\w+\]\.pe_base|m->pe_base)", SRC)]
+check("R1 S8: the only plain-load names left for a pe_base are the ones of an image in use this very moment: the child-ntdll copy (two) and the ec-hook scan (one, "
+      "which reads the same view just before); a new one fails this check", len(plain) == 3, "\n".join(plain))
+
+rules = (root / "build/tools/autotune_rules.py").read_text()
+r = rules[rules.index('"id": "stale-heal-unmapped-image-crash"'):] if '"id": "stale-heal-unmapped-image-crash"' in rules else ""
+r = r[:r.index("\n    },")] if r else ""
+check("auto-tune knows the stale-heal crash of builds 634 and before (fixedIn 652)", '"fixedIn": 652' in r and "ios_jit_patch_stale_pointer" in r and "[image-reload] unmapped image" in r, r[:300])
+exp2 = root / "tests/fixtures/autotune/gta-v-stale-heal-unmapped-image-2026-11-07.expect"
+check("its fixture (VKV5ZW) is there and expects the known verdict", exp2.is_file() and "stale-heal-unmapped-image-crash" in json.loads(exp2.read_text()).get("matched", []))
 rules = (root / "build/tools/autotune_rules.py").read_text()
 r = rules[rules.index('"id": "fex-exports-stale-image-read"'):] if '"id": "fex-exports-stale-image-read"' in rules else ""
 r = r[:r.index("\n    },")] if r else ""

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -29,6 +31,10 @@ import Foundation
 // screen (Brotato, Until Then, Darksiders II, Shadow of Mordor ... showed their own error box and left: QQ0BEX and about
 // 40 Dock logs), ends the session under all the other conditions above. `rendered` says whether frames were drawn;
 // env.MADEIRA_DOCK_SHORT_EXIT_END = 0 turns the exception off (the library then passes rendered = true).
+// Night round 2026-11-11 (G2 S11 / T2 S-IS1, Black Mesa 8V90T6 and The Binding of Isaac CMXRG6): the same exception for ANY status
+// that is not an error status already: Valve's crash handler ends a Source game with exit code 1 after its dump (17 s, 2 frames),
+// and Isaac left with 0x58203a6e after 14 s without a frame; both sat on a dead picture until the player quit. Exit code 3, what the C
+// runtime's abort() and Unreal's crash handler end with (Meccha Chameleon F4WD9B, 13 archive logs), is an error status now (isCrash).
 // A launch the host reported as failed, with no game process, is the second rule below (round 580).
 
 /// One process of the session, as the engine's process table reports it.
@@ -88,9 +94,12 @@ enum DockGameEndRules {
     /// negative exit code (-1). Exit code 0 and plain small codes are not: a game may end with 1 after a quit.
     /// Round 630 (agent G3 S19; RVW5FD and four older logs): Wine's EXCEPTION_WINE_STUB, the end after "wine: Call from ... to
     /// unimplemented function X, aborting".
+    /// Night round 2026-11-11 (G7 S2; Meccha Chameleon F4WD9B, 13 archive Dock logs end a process with 3 and have launch-game-ended=1
+    /// but no [dock-game-end]): 3 is the exit code of the C runtime's abort() and of Unreal's crash handler, a failure and not a quit.
     static let wineStubStatus: UInt32 = 0x8000_0100
+    static let abortStatus: UInt32 = 3
     static func isCrash(_ status: UInt32) -> Bool {
-        status & 0xC000_0000 == 0xC000_0000 || status == 0x8000_0003 || status == wineStubStatus
+        status & 0xC000_0000 == 0xC000_0000 || status == 0x8000_0003 || status == wineStubStatus || status == abortStatus
     }
 
     enum Verdict: Equatable {
@@ -141,7 +150,9 @@ enum DockGameEndRules {
         }
         guard let last else { return .none }
         // Round 625 (N-S18): it closed by itself with 0, soon, having drawn nothing (its own error box, then exit).
-        let shortCleanExit = !rendered && last.status == 0 && last.lived < shortExitSeconds
+        // Night round 2026-11-11 (G2 S11, T2 S-IS1): with any status, not only 0: a crash handler's exit code 1 (Black Mesa), an odd code of
+        // the game's own (Isaac, 0x58203a6e). The other conditions below are unchanged: nothing of the game runs, the host finished.
+        let shortCleanExit = !rendered && last.lived < shortExitSeconds
         guard anyStatus || isCrash(last.status) || shortCleanExit else { return .none }
         func wait(_ why: String) -> Verdict { .wait(status: last.status, file: last.fileName, why: why) }
         if !table.complete { return wait("table-incomplete") }
@@ -155,11 +166,28 @@ enum DockGameEndRules {
         return .end(status: last.status, file: last.fileName, lived: last.lived)
     }
 
+    /// The words the player sees when a program ended the session by closing within `shortExitSeconds` without a picture (not an error
+    /// status). Exit code 0 keeps its round 625 words; another code names itself and the crash reporter that may have ended it.
+    static func shortExitWords(file: String, lived: Double, status: UInt32) -> String {
+        if status == 0 {
+            return "\(file) closed by itself \(Int(lived)) seconds after it started, before it showed a picture. If it showed a message, that is the reason."
+        }
+        return "\(file) closed \(Int(lived)) seconds after it started, before it showed a picture (exit code 0x\(String(status, radix: 16))). "
+            + "It may have stopped itself, or its own crash reporter closed it. If it showed a message, that is the reason."
+    }
+
     /// Round 626 (agent P S11): Rockstar's Games Launcher, its service and Social Club live under C:\Program Files\Rockstar Games\
     /// (or the x86 folder) and stay resident after the game closes. Consulted only after the player's Close (`anyStatus`).
+    /// madeira-bcd: so does Ubisoft Connect's client (upc.exe, UplayService.exe, UplayWebCore.exe, UbisoftGameLauncher.exe), but only the
+    /// programs directly in its folder: the games the client installs itself live below it (...\Ubisoft Game Launcher\games\<game>\).
     static func isResidentLauncher(_ image: String) -> Bool {
         let p = SteamLaunchScene.path(image)
-        return p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\")
+        if p.hasPrefix("c:\\program files\\rockstar games\\") || p.hasPrefix("c:\\program files (x86)\\rockstar games\\") { return true }
+        for folder in ["c:\\program files (x86)\\ubisoft\\ubisoft game launcher\\", "c:\\program files\\ubisoft\\ubisoft game launcher\\"]
+        where p.hasPrefix(folder) {
+            return !p.dropFirst(folder.count).contains("\\")
+        }
+        return false
     }
 
     /// Round 631 (round 630 agent R S2; GTA V Legacy GJDXG6: the Launcher crashed at the game's exit, PlayGTAV.exe waited on its box, and

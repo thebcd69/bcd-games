@@ -157,17 +157,20 @@ want = {  # id: (app id, folder, program, word)
 }
 for rid, (app, folder, prog, word) in want.items():
     r = by.get(rid)
-    lines = [c for c in (r or {}).get("config", []) if isinstance(c, dict)]
+    lines = [c for c in (r or {}).get("config", []) if isinstance(c, dict) and c["line"].startswith("gl-backend")]   # night round 2026-11-11: Isaac v2 and Mewgenics v2 carry more lines
     check(f"list rule {rid}: Steam {app}, folder {folder!r}, program {prog}, `gl-backend = {word}` from build 632 only",
           r is not None and r["match"] == {"steamAppIDs": [app], "steamFolders": [folder], "programs": [{"name": prog}]}
-          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] == 1 and any("Not tried on a device yet" in n for n in r["notes"]), r)
+          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] in (1, 2) and any("Not tried on a device yet" in n for n in r["notes"]), r)
 for rid in ("jetboard-joust", "stardew-valley"):
     lines = [c for c in by[rid]["config"] if isinstance(c, dict) and c["line"].startswith("gl-backend")]
     check(f"list rule {rid}: carries `gl-backend = zink` from build 632 only, its version raised", lines == [{"line": "gl-backend = zink", "minBuild": 632}], by[rid]["config"])
-check("no other list rule turns OpenGL on, and none turns it on without minBuild 632",
+# night round 2026-11-11: the new OpenGL-only rows (log-proved stops; each carries the line from build 632, KOF XIV from 652 with the two version overrides)
+night_gl = ["angry-birds", "brotato", "buckshot-roulette", "deponia-the-complete-journey", "doom-64", "freshwomen-season-1", "gp-bikes",
+            "into-the-breach", "kof-xiv-steam", "noita", "polybius", "sc-jogos-barro-gt"]
+check("no other list rule turns OpenGL on, and none turns it on without minBuild 632 (KOF XIV's experiment: 652)",
       sorted(r["id"] for r in lst["rules"] if any("gl-backend" in (c["line"] if isinstance(c, dict) else c) for c in r["config"]))
-      == sorted(list(want) + ["jetboard-joust", "stardew-valley"])
-      and all(c.get("minBuild") == 632 for r in lst["rules"] for c in r["config"] if isinstance(c, dict) and c["line"].startswith("gl-backend")))
+      == sorted(list(want) + ["jetboard-joust", "stardew-valley"] + night_gl)
+      and all(c.get("minBuild") == (652 if r["id"] == "kof-xiv-steam" else 632) for r in lst["rules"] for c in r["config"] if isinstance(c, dict) and c["line"].startswith("gl-backend")))
 check("the standard rule is still last, and the list is v32 or later (the lead raised and signed it for round 632)",
       lst["rules"][-1]["id"] == "standard" and lst["version"] >= 32)
 ids = [r["id"] for r in lst["rules"]]

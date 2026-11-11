@@ -62,8 +62,11 @@ require('static var enabled: Bool {\n        get { UserDefaults.standard.bool(fo
 require('static let deviceName = "BCD"' in peer_src and 'hostname: SteamLANSetting.deviceName' in dd and 'name: SteamLANSetting.deviceName' in dd
         and 'Madeira' not in dd.split('lanPeerSource')[1].split('private nonisolated static func dotted')[0],
         "this device is called BCD in the account's device list")
-require('if SteamLANSetting.enabled, !prepared.pending.allSatisfy(\\.isEmpty) {' in dd and '} else {\n            peer = nil\n        }' in dd,
-        'a download asks no PC unless the setting is on and there is something left to fetch')
+# Build 635 (Madeira #464): what is left to fetch is what the check of the files already on disk left (`work`), as Madeira's own LAN code has it.
+require('if SteamLANSetting.enabled, !work.allSatisfy(\\.isEmpty) {' in dd and '} else {\n            peer = nil\n        }' in dd
+        and dd.index('try await checkExisting(plans: plans, prepared: prepared, work: &work, state: &state, report: report)')
+        < dd.index('if SteamLANSetting.enabled, !work.allSatisfy(\\.isEmpty) {'),
+        'a download asks no PC unless the setting is on and there is something left to fetch after the check of the files on disk')
 require(dd.count('SteamLANSetting.enabled') == 1 and 'off (Settings' not in dd, 'with the setting off the downloader writes no [steam-lan] line and makes no network call')
 require('fetchChunk(chunk, plan: plan, peer: peer, path: path' in dd and 'peer: SteamPeerChunkSource? = nil' in dd and 'if let peer, peer.serves(plan.depotID) {' in dd,
         'a chunk goes to the PC only when there is a peer; every other chunk is fetched exactly as before')

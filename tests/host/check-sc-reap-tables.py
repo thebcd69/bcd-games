@@ -185,6 +185,14 @@ static struct file_view *view_at( uint64_t base )
     return NULL;
 }
 static int has_view( uint64_t base ) { return view_at( base ) != NULL; }
+static void remove_view( uint64_t base )
+{
+    int i;
+    for (i = 0; i < nviews && (uint64_t)(ULONG_PTR)views[i].base != base; i++) ;
+    assert( i < nviews );
+    for (; i + 1 < nviews; i++) views[i] = views[i + 1];
+    nviews--;
+}
 static int virtual_mutex, mutex_depth;
 static void server_enter_uninterrupted_section( int *m, sigset_t *s ) { (void)m; (void)s; mutex_depth++; }
 static void server_leave_uninterrupted_section( int *m, sigset_t *s ) { (void)m; (void)s; mutex_depth--; }
@@ -232,11 +240,12 @@ static kern_return_t mach_vm_deallocate( int task, mach_vm_address_t lo, mach_vm
 static int mach_task_self( void ) { return 0; }
 static void ios_va_release_note( void ) {}
 static int blocked;   /* something else took a zone slot between the release of its hold and the reserve */
+static uint64_t blocked_at;   /* the same for ONE slot (night round 2026-11-11, R1 S2) */
 static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size, ULONG type, ULONG protect, int a, int b, int c, int d )
 {
     uint64_t lo = (uint64_t)(ULONG_PTR)*ret;
     (void)protect; (void)a; (void)b; (void)c; (void)d;
-    if (blocked) add_view( lo, 0x10000, 0, (void *)0xb10c );
+    if (blocked || (blocked_at && lo == blocked_at)) add_view( lo, 0x10000, 0, (void *)0xb10c );
     if (native_busy( lo, lo + *size )) return STATUS_CONFLICTING_ADDRESSES;
     add_view( lo, *size, (type & MEM_RESERVE_PLACEHOLDER) ? VPROT_PLACEHOLDER : 0, current_peb );
     return STATUS_SUCCESS;
@@ -459,6 +468,35 @@ int main( int argc, char **argv )
         p = NULL; s = 512 * MB;
         assert( ios_sc2_table_zone( &p, &s, PH, PAGE_NOACCESS ) == STATUS_NO_MEMORY && !p );
         blocked = 0;
+        /* night round 2026-11-11 (R1 S2; GTA IV R5A0JP and KCY3C5: the first held slot was refused because a view stood in it and the function
+         * ended the helper with five slots left): a slot that is refused is passed over, its hold is not put back while the other view stands
+         * there, and the next free slot serves the ask; three lines (the old one, the busy one, the served one) */
+        {
+            int l0 = lines;
+            remove_view( IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT );          /* the view the blocked ask left in slot 1 goes */
+            ios_sc2_tbl_rehold_empty();
+            assert( !ios_sc2_tbl_given[1] && held( IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT, IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT ) );
+            release( IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT );          /* slot 2's table is released: held again */
+            assert( !ios_sc2_tbl_given[2] && ios_sc2_tbl_given[0] );
+            l0 = lines;
+            blocked_at = IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT;           /* a view appears in slot 1 when its hold is let go */
+            p = NULL; s = 512 * MB;
+            assert( !ios_sc2_table_zone( &p, &s, PH, PAGE_NOACCESS ) && (uint64_t)(ULONG_PTR)p == IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT );
+            assert( lines - l0 == 3 && ios_sc2_tbl_given[1] && has_view( IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT ) && ios_sc2_tbl_given[2] );
+            assert( !held( IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT, IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT ) );   /* not put back under the view */
+            blocked_at = 0;
+            /* all the free slots refused: the ask fails as before */
+            remove_view( IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT );
+            ios_sc2_tbl_rehold_empty();
+            blocked_at = IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT;
+            p = NULL; s = 512 * MB;
+            assert( ios_sc2_table_zone( &p, &s, PH, PAGE_NOACCESS ) == STATUS_NO_MEMORY && !p );
+            blocked_at = 0;
+            remove_view( IOS_SC2_TBL_BASE + IOS_SC2_TBL_SLOT );
+            remove_view( IOS_SC2_TBL_BASE + 2 * IOS_SC2_TBL_SLOT );
+            ios_sc2_tbl_rehold_empty();
+            assert( !ios_sc2_tbl_given[1] && !ios_sc2_tbl_given[2] );
+        }
         /* the helper with the first slot's table ends out of memory: the reap empties the slot and holds it again */
         split_head( IOS_SC2_TBL_BASE, 512 * MB, 0x20000 );
         ios_sc_note_oom_exit();

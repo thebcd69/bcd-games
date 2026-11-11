@@ -24,7 +24,7 @@ require(aim(["aim-sens": "2"]).sensitivity == 2 && aim(["aim-sens": "99"]).sensi
         && aim(["aim-sens": "nan"]).sensitivity == 1 && aim(["aim-sens": "inf"]).sensitivity == 1, "the sensitivity is kept in range, a bad one is the default")
 require(aim(["aim-vertical": "150"]).vertical == 150 && aim(["aim-vertical": "5"]).vertical == 25 && aim(["aim-vertical": "900"]).vertical == 200 && aim(["aim-vertical": "?"]).vertical == 100, "the vertical share too")
 require(aim(["aim-invert": "1"]).invertY && !aim(["aim-invert": "0"]).invertY && aim(["aim-tap": "1"]).tapClicks && !aim(["aim-tap": ""]).tapClicks, "invert and tap")
-require(BCDAimSettings.lineNames.count == 5 && Set(BCDAimSettings.lineNames).count == 5, "five lines")
+require(BCDAimSettings.lineNames.count == 6 && Set(BCDAimSettings.lineNames).count == 6 && BCDAimSettings.lineNames.contains("aim-as"), "six lines (aim-as: night round 2026-11-11)")
 require(BCDAimSettings.sensitivityChoices.allSatisfy { BCDAimSettings.sensitivityRange.contains($0) } && BCDAimSettings.verticalChoices.allSatisfy { BCDAimSettings.verticalRange.contains($0) }, "every offered value is in range")
 require(BCDAimSettings.Zone.allCases.allSatisfy { !$0.title.isEmpty } && BCDAimSettings.Zone.allCases.count == 4, "four zones with words")
 
@@ -97,4 +97,32 @@ let leftover = touch.moved(id: 10, to: CGPoint(x: 6, y: 5), off)
 require(leftover?.dx == 2, "(sanity: with the zone on anywhere a corner aims)")
 
 if failures > 0 { print("\(failures) FAILED"); exit(1) }
+
+// ---- the output (night round 2026-11-11, A5 S13: NieR: Automata 83B2RX) ------------------------------------------------------
+require(aim([:]).output == .mouse && aim(["aim-as": ""]).output == .mouse && aim(["aim-as": "mouse"]).output == .mouse && aim(["aim-as": "x"]).output == .mouse,
+        "no line, an empty one or a word it does not know: the mouse, as always")
+require(aim(["aim-as": "stick"]).output == .stick && aim(["aim-as": " Stick "]).output == .stick, "aim-as = stick, any case")
+require(aim(["aim-zone": "right", "aim-as": "stick"]).isOn && !aim(["aim-as": "stick"]).isOn, "the stick output needs a zone like the mouse (the zone decides whether aim mode is on)")
+require(BCDAimSettings.Output.allCases.count == 2 && BCDAimSettings.Output.allCases.allSatisfy { !$0.title.isEmpty } && BCDAimSettings.Output.mouse.rawValue == "",
+        "two outputs with words; the mouse is the default value, no line")
+var st = BCDAimSettings(); st.zone = .all; st.output = .stick
+let slow = BCDAimMath.stickPush(dx: 1, dy: 0, st)
+require(abs(slow.x - 0.4) < 1e-9 && slow.y == 0, "a drag of 1 point an event is 40 % of the stick to the right")
+let down = BCDAimMath.stickPush(dx: 0, dy: 1, st)
+require(down.x == 0 && abs(down.y + 0.4) < 1e-9, "dragging down looks down: the stick goes down (negative)")
+var inv = st; inv.invertY = true
+require(abs(BCDAimMath.stickPush(dx: 0, dy: 1, inv).y - 0.4) < 1e-9, "inverted: dragging down looks up")
+var fast = st; fast.sensitivity = 2; fast.vertical = 50
+let both = BCDAimMath.stickPush(dx: 0.5, dy: 0.5, fast)
+require(abs(both.x - 0.4) < 1e-9 && abs(both.y + 0.2) < 1e-9, "sensitivity 2 and 50 % up and down: 0.4 across, 0.2 down")
+let big = BCDAimMath.stickPush(dx: 30, dy: 40, st)
+require(abs(big.x * big.x + big.y * big.y - 1) < 1e-9 && big.x > 0 && big.y < 0 && abs(big.x / big.y + 0.75) < 1e-9, "a long swipe is a full push in its direction, never more")
+require(BCDAimMath.stickPush(dx: .nan, dy: 1, st) == (0, 0) && BCDAimMath.stickPush(dx: 1, dy: .infinity, st) == (0, 0), "a bad number is no push")
+require(BCDAimMath.stickHoldSeconds == 0.05 && BCDAimMath.pointsPerFullPush == 2.5, "50 ms hold, 2.5 points for a full push")
+var touch2 = BCDAimTouch()
+require(touch2.movedPoints(id: 1, to: CGPoint(x: 5, y: 5)) == nil, "movedPoints: a finger that does not aim gives nothing")
+_ = touch2.began(id: 1, at: CGPoint(x: 600, y: 100), time: 0, bounds: screen, st)
+let travel = touch2.movedPoints(id: 1, to: CGPoint(x: 603, y: 98))
+require(travel?.dx == 3 && travel?.dy == -2 && touch2.movedPoints(id: 2, to: CGPoint(x: 0, y: 0)) == nil, "movedPoints: the travel since the last event for the aiming finger only")
+
 print("ALL PASS")

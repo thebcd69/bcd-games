@@ -51,6 +51,7 @@ func isWholeJPEG(_ d: Data) -> Bool { d.count > 4 && d[0] == 0xFF && d[1] == 0xD
     static func main() throws {
         let target = BCDScreenshotRules.uploadTargetBytes
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("bcd-shrink-\(getpid())")
+        try? FileManager.default.removeItem(at: dir)   // start empty: exit() skips defer, so a folder with a reused process id may be left
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
 

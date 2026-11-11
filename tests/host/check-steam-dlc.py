@@ -106,7 +106,7 @@ check("the downloader's default request is none; install() is the same call with
 check("no DLC is looked up for a game nothing was chosen for and no DLC is installed in",
       "if wanted == nil, installed.isEmpty { return .none }" in service and "if wanted == nil, installed.isEmpty { return .none }" in rules)
 check("SteamOwnedLibrary asks the service for the request in run() and passes it to the downloader",
-      "let dlcRequest = await dlc.request(for: info, steamApps: Self.steamApps)" in owned and "dlc: dlcRequest)" in owned)
+      "let dlcRequest = await dlc.request(for: info, steamApps: steamApps)" in owned and "dlc: dlcRequest)" in owned)
 check("the installDepots() rules themselves are untouched (no DLC depot without a DLC choice)",
       "d.supports(os: os) && d.dlcAppID == nil && !d.isSharedInstall &&" in read(APP / "SwiftSteam/Library/SteamAppInfo.swift"))
 
@@ -158,7 +158,7 @@ check("the page's live backend calls the DLC hooks (offer, section, set, opened,
       all(h in page_live for h in ["dlcOffer(game, into: &d)", "if let dlc = dlcGroup(game) { d.groups.append(dlc) }",
                                    "if dlcSet(setting, to: value, for: game) { return }", "dlcOpened(game)", "dlcChanges,"]))
 check("Install, Update, Repair and Resume read the stored choice; the card menu keeps today's Install (no question)",
-      "choices.wanted(appID)" in service and ".installChoosingDLC" in page and "BCDGameQuestionView(question: asked.question, prefix: Self.layer" in read(APP / "BCDMenu.swift"))
+      "choices.wanted(appID)" in service and ".installChoosingDLC" in page and "BCDGameQuestionView(question: asked.question, prefix: prefix + \"ask.\"" in read(APP / "BCDMenu.swift"))
 
 # Device round 1 (2026-10-22): the question waits for the lookup; DLC that declare their own depots.
 check("the page's Install waits for the DLC lookup (a card, a timeout, the game alone on failure) and logs why it skipped",
@@ -308,7 +308,7 @@ else:
         (t / "stubs.swift").write_text("import Foundation\nenum SteamLog { static func event(_ m: String) {}; static func trace(_ m: @autoclosure () -> String) {} }\n"
                                        "enum MadeiraConfig { static func get(_ key: String) -> String? { nil }\n"
                                        "    @discardableResult static func set(_ key: String, _ value: String?) -> Bool { true } }\n")
-        sources = [t / "VDF.swift", t / "stubs.swift", APP / "SwiftSteam/Library/SteamAppInfo.swift", APP / "SteamKeyValues.swift", APP / "SteamInstall.swift",
+        sources = [t / "VDF.swift", t / "stubs.swift", APP / "SwiftSteam/Library/SteamAppInfo.swift", APP / "SteamKeyValues.swift", APP / "SteamInstall.swift", APP / "ExternalStorage.swift",
                    APP / "SwiftSteam/Install/AppManifestWriter.swift", DLC / "BCDSteamDLC.swift"]
         shutil.copy(R / "tests/host/steam_dlc_checks.swift", t / "main.swift")
         r = subprocess.run(["xcrun", "swiftc", "-swift-version", "5", "-o", str(t / "rules"), str(t / "main.swift")] + [str(s) for s in sources],

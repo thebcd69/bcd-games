@@ -56,8 +56,14 @@ typedef unsigned int ULONG, NTSTATUS;
 #define MEM_RESERVE 0x2000
 #define STATUS_SUCCESS 0
 #define STATUS_CONFLICTING_ADDRESSES 0xc0000018
+#define MEM_TOP_DOWN 0x100000
+#define IOS_OVERSIZE_MIN 0x1000000000ULL
 #define OLD_PATH 0xdead
 #define G 0x40000000ul
+/* night round 2026-11-11 (A1 S3): the real part bcd.cfg oversize-reserve-mb gives (0 = oversize-reserve off) */
+static long long oversize_mb;
+static long long ios_oversize_real_mb( void ) { return oversize_mb; }
+static unsigned long long ios_oversize_min( void ) { return IOS_OVERSIZE_MIN; }
 static ULONG_PTR ios_usable_va_floor = 0x7038000000ul;
 static struct { ULONG_PTR lo, hi; } used[64];
 static int nused, calls;
@@ -157,6 +163,47 @@ int main( void )
     expect( "no hole for the half: the old path", "1", 32 * G, MEM_RESERVE, OLD_PATH, 0, 32 * G, -1 );
     expect( "a commit is never served", "1", 32 * G, MEM_RESERVE | MEM_COMMIT, OLD_PATH, 0, 32 * G, 0 );
     nholes = 0;
+    /* night round 2026-11-11 (A1 S3, The Witcher 3 DirectX 12: 16 + 64 + 32 GB): value 2 keeps halving, down to 4 GB. The window holds one free 8 GB
+     * slot (0x7400000000) and nothing else below 0x7c00000000 */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7600000000ul, 0x7c00000000ul );
+    expect( "value 1: 32 GB finds no 16 GB half: the old path", "1", 32 * G, MEM_RESERVE, OLD_PATH, 0, 32 * G, -1 );
+    expect( "value 2: 32 GB -> the 8 GB slot", "2", 32 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 8 * G, -1 );
+    expect( "value 2: the slot is taken now, the old path", "2", 32 * G, MEM_RESERVE, OLD_PATH, 0, 32 * G, -1 );
+    /* a request below 16 GB has no size between its half and 4 GB: value 2 = value 1 */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7600000000ul, 0x7c00000000ul );
+    expect( "value 2: 8 GB -> its 4 GB half, as value 1", "2", 8 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 4 * G, -1 );
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7500000000ul, 0x7c00000000ul );
+    expect( "value 2: 8 GB with only a 4 GB slot free: its half, as value 1", "2", 8 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 4 * G, -1 );
+    /* 16 GB: the half (8 GB) has no slot, the quarter (4 GB) has */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7500000000ul, 0x7c00000000ul );
+    expect( "value 1: 16 GB with only a 4 GB slot: the old path", "1", 16 * G, MEM_RESERVE, OLD_PATH, 0, 16 * G, -1 );
+    expect( "value 2: 16 GB with only a 4 GB slot: 4 GB", "2", 16 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 4 * G, -1 );
+    /* nothing of 4 GB or more is free: the old path */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7c00000000ul );
+    expect( "value 2: no slot of 4 GB: the old path", "2", 64 * G, MEM_RESERVE, OLD_PATH, 0, 64 * G, -1 );
+    /* the 64 GB request with oversize-reserve = 1 skips the loop: oversize's smaller real part (below) must serve it */
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7600000000ul, 0x7c00000000ul );
+    oversize_mb = 6144;
+    expect( "value 2 + oversize-reserve: 64 GB is left to the oversize serving (no grant here)", "2", 64 * G, MEM_RESERVE, OLD_PATH, 0, 64 * G, -1 );
+    expect( "value 2 + oversize-reserve: a 32 GB request is still halved down", "2", 32 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 8 * G, -1 );
+    oversize_mb = 0;
+    nused = 0;
+    occupy( 0x7000000000ul, 0x7400000000ul );
+    occupy( 0x7600000000ul, 0x7c00000000ul );
+    expect( "value 2 without oversize-reserve: 64 GB -> the 8 GB slot", "2", 64 * G, MEM_RESERVE, STATUS_SUCCESS, 0x7400000000ul, 8 * G, -1 );
+    expect( "value 2: a commit is never served", "2", 32 * G, MEM_RESERVE | MEM_COMMIT, OLD_PATH, 0, 32 * G, 0 );
+    nused = 0;
     printf( "%s\n", fails ? "HARNESS FAILED" : "harness ok" );
     return fails != 0;
 }
@@ -184,7 +231,13 @@ check("the block runs after the holdback was tried and before the band census",
       fail.index('ios_jumbo_holdback_take( *size_ptr );') < fail.index('getenv( "MADEIRA_JUMBO_HALF" )') <
       fail.index('ios_band_census( "jumbo reserve failed" );'))
 check("it logs [jumbo-half] at most 32 times",
-      block.count("if (half_logs++ < 32)") == 3 and block.count('"[jumbo-half] madeira-bcd') == 3)
+      block.count("if (half_logs++ < 32)") == 5 and block.count('"[jumbo-half] madeira-bcd') == 5)
+value2 = block[block.index("[jumbo-half] value 2"):block.index("no free %lu MB slot below")]
+check("value 2 (night round 2026-11-11, A1 S3) runs after step 2, only for value '2', halves from the half's half down to 4 GB with the same two "
+      "attempts per size, and leaves a 64 GB-or-more request to oversize-reserve",
+      block.index("[jumbo-half] step 2") < block.index("[jumbo-half] value 2") and "if (jh[0] == '2' && !(want >= ios_oversize_min() && ios_oversize_real_mb() > 0" in value2
+      and "for (f = half / 2; f >= 0x100000000ull; f /= 2)" in value2 and value2.count("allocate_virtual_memory(") == 2
+      and "jumbo_half_nested = 1;" in value2 and "(jh[0] == '1' || jh[0] == '2')" in block)
 step2 = block[block.index("[jumbo-half] step 2"):]
 check("step 2 (round 624) runs after the aligned scan, once: its own request is not halved again (a thread-local guard)",
       block.index("for (; a + half <= 0x7c00000000ull; a += half)") < block.index("[jumbo-half] step 2")
@@ -194,9 +247,9 @@ check("step 2 (round 624) runs after the aligned scan, once: its own request is 
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "run: python3 tests/host/check-jumbo-half.py" in wf)
 cat = (R / "app/Madeira/ConfigCatalog.generated.swift").read_text()
-check("the catalog documents env.MADEIRA_JUMBO_HALF (default 0)",
+check("the catalog documents env.MADEIRA_JUMBO_HALF (default 0; values 0, 1, 2)",
       'ConfigOption(key: "env.MADEIRA_JUMBO_HALF", title: "Give a too-large probe reservation half its size", '
-      'kind: .bool, defaultValue: "0"' in cat)
+      'kind: .int, defaultValue: "0"' in cat and '2 (build 652)' in cat)
 
 print("PASS: jumbo half" if ok else "FAILED: jumbo half")
 sys.exit(0 if ok else 1)

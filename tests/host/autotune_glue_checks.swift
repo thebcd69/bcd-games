@@ -174,6 +174,21 @@ struct AutoTuneGlueChecks {
         } else {
             expect(false, "an offer to check the Wine Mono sentence on")
         }
+        // Night round 2026-11-11 (T3 S3, T1 S2): the memory limit in the memory-kill advice is the device's own, and a 6 GB phone is named.
+        expect(AutoTuneOffer.limitWords(peakMB: 2244, memoryPct: 95) == "2.3 GB" && AutoTuneOffer.limitWords(peakMB: 2122, memoryPct: 90) == "2.3 GB",
+               "WE9D10, 2P7QQY: a 4 GB phone (limit 2347 MB) reads 2.3 GB, not 4 GB")
+        expect(AutoTuneOffer.limitWords(peakMB: 4000, memoryPct: 98) == "4 GB" && AutoTuneOffer.limitWords(peakMB: 4096, memoryPct: 100) == "4 GB",
+               "a limit of 4 GB still reads 4 GB")
+        expect(AutoTuneOffer.limitWords(peakMB: 4000, memoryPct: nil) == "4 GB" && AutoTuneOffer.limitWords(peakMB: 4000, memoryPct: 20) == "4 GB"
+               && AutoTuneOffer.limitWords(peakMB: 0, memoryPct: 99) == "4 GB", "no usable percentage: the words it had")
+        expect(AutoTuneOffer.sixGBClassWords(title: "Spider-Man", peakMB: 6062, memoryPct: 98, ramMB: 7500)
+                == "This device lets apps use about 6 GB, and Spider-Man needed more (its memory reached 6062 MB). A game this size needs a phone that gives apps more than 6 GB: an iPad or a 12 GB iPhone has the room.",
+               "C0S8PX: a 6 GB-limit phone is named, with the way out")
+        expect(AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 8097, memoryPct: 99, ramMB: 11500) == nil
+               && AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 2244, memoryPct: 95, ramMB: 3800) == nil
+               && AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 6062, memoryPct: nil, ramMB: 7500) == nil
+               && AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 6062, memoryPct: 98, ramMB: nil) == nil,
+               "a 12 GB phone (limit 8191), a 4 GB phone, an unknown percentage or an unknown RAM: no 6 GB sentence")
         AutoTuneOffers.shared.offer = nil
 
         // The retry: the same crash -> the first rule.
@@ -295,8 +310,10 @@ struct AutoTuneGlueChecks {
         expect(settle(until: { AutoTune.state(game.windowsPath).attempts.count == attemptsBefore + 1 }),
                "a killed run is analysed at the next start from its logs/ hard link")
         expect(AutoTune.state(game.windowsPath).attempts.last?.outcome == "crashed", "its crash is recognised from the log alone")
-        expect(!FileManager.default.fileExists(atPath: AutoTune.markerURL!.path)
-               && !FileManager.default.fileExists(atPath: configs.appendingPathComponent("autotune-session.pending.json").path),
+        // The recovery removes its pending copy on the utility queue AFTER analyse() records the attempt (AutoTune.recoverUnfinishedSession),
+        // so on a busy Mac the copy can still be there when the attempt count above already moved (2026-11-08: two of five full runs).
+        expect(settle(until: { !FileManager.default.fileExists(atPath: AutoTune.markerURL!.path)
+                               && !FileManager.default.fileExists(atPath: configs.appendingPathComponent("autotune-session.pending.json").path) }),
                "the marker and its pending copy are gone")
         AutoTuneOffers.shared.offer = nil
 
@@ -319,6 +336,42 @@ struct AutoTuneGlueChecks {
         AutoTune.answer("froze")
         _ = settle(until: { false }, seconds: 0.5)
         expect(AutoTune.state(game.windowsPath).attempts.count == before + 1, "a second answer does nothing")
+
+        // Night round 2026-11-11 (agent T3 S7; 2FR906, 9W3TW7, BZQMTZ, XVABPA, P1433Z): a launch of the same game that starts while the verdict
+        // about its last session is still being written does NOT wait for it (the lead: exportLayer runs on the main thread; a wait of up to
+        // 20 s there would freeze the interface): it starts at once and says so, and the verdict still lands for the start after it.
+        do {
+            AutoTuneOffers.shared.offer = nil
+            copy(env["AUTOTUNE_TEST_CRASH"]!, to: log)
+            echoCandidate()
+            AutoTune.sessionBegan(game, remember: true, dockWithoutEntry: false)
+            try? FileManager.default.removeItem(at: prev)
+            try? FileManager.default.moveItem(at: log, to: prev)
+            let attemptsNow = AutoTune.state(game.windowsPath).attempts.count
+            AutoTune.recoverUnfinishedSession()
+            let began = Date()
+            AutoTune.exportLayer(for: game)   // the next start, at once: no settle() before it
+            expect(Date().timeIntervalSince(began) < 1.0, "a launch right after the recovery does not wait for the verdict (main thread)")
+            _ = settle(until: { !FileManager.default.fileExists(atPath: AutoTune.markerURL!.path)
+                                && !FileManager.default.fileExists(atPath: configs.appendingPathComponent("autotune-session.pending.json").path) })
+            expect(AutoTune.state(game.windowsPath).attempts.count == attemptsNow + 1, "the verdict about the session before it still lands")
+            // The analysis posts its result on the main queue after it saved: let that happen here, not inside the next case.
+            _ = settle(until: { AutoTuneOffers.shared.offer != nil }, seconds: 3)
+            AutoTuneOffers.shared.offer = nil
+        }
+
+        // Night round 2026-11-11 (agent G10 S4): a known stop's own words lead the headline and the advice ("Choose another OpenGL backend").
+        do {
+            let rep = AutoTuneReport(outcome: "crashed", stage: 3, seconds: 30, presents: 0, peakMB: nil, dock: false, d3d12: false, ramMB: 11695,
+                                     matched: ["opengl-es-for-desktop-game"], evidence: [])
+            var st = AutoTuneState(); st.status = "known"; st.known = "opengl-es-for-desktop-game"; st.knownReason = "Choose Desktop OpenGL."; st.knownNoFix = true
+            expect(AutoTuneOffer(title: "Isaac", windowsPath: "C:\\x.exe", report: rep, state: st, reason: nil).headline == "Isaac: no setting changes this failure",
+                   "a known stop without its own words keeps the old headline")
+            st.knownLeadText = "Choose another OpenGL backend"
+            let offer = AutoTuneOffer(title: "Isaac", windowsPath: "C:\\x.exe", report: rep, state: st, reason: nil)
+            expect(offer.headline == "Isaac: choose another OpenGL backend" && offer.message.hasSuffix("Choose another OpenGL backend: Choose Desktop OpenGL."),
+                   "with its own words the headline and the advice use them")
+        }
 
         // A session that only ran the one-time installs and whose batch ended is no session of the game (round 579): BCD closes
         // itself for a restart, the leftover marker would read as a kill and the user would be asked about it (NM88NQ).

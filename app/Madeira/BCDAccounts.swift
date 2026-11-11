@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -357,7 +358,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                 Image(uiImage: image).resizable().scaledToFill()
             } else if let initial = name?.first {
                 Circle().fill(BCDStyle.glow)
-                Text(String(initial).uppercased()).font(.system(size: 22, weight: .heavy, design: .rounded)).foregroundStyle(.white)
+                Text(String(initial).uppercased()).font(.system(size: 22, weight: .heavy, design: .rounded)).foregroundStyle(BCDStyle.onAccent)
             } else {
                 Circle().fill(BCDStyle.surfaceRaised)
                 Image(systemName: "person.fill").font(.system(size: 22, weight: .semibold)).foregroundStyle(BCDStyle.textSoft)

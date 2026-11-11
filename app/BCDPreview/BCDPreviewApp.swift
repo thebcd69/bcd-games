@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 creeper4004: colour profiles and Settings > Appearance, from thebcd69/bcd-games pull request #27; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -40,6 +42,7 @@ struct BCDPreviewApp: App {
 
     init() {
         let defaults = UserDefaults.standard
+        if let theme = defaults.string(forKey: "BCDTheme") { BCDThemeStore.shared.select(theme) }
         let actions = BCDPreviewActions()
         BCDUpdateChecker.shared.usePreviewSample()
         // -BCDLook graphite,green,playstation,ring: the touch controls' look (round 604; body, colour when pressed, symbols, how a press shows).
@@ -86,6 +89,7 @@ struct BCDPreviewApp: App {
                 }
                 .modifier(BCDPreviewSessionScreens(store: store, focus: focus))   // -BCDTab ingame-menu|starting|overlay (BCDPreviewSession.swift)
                 .modifier(BCDPreviewStage())   // -BCDStage WxH[:regular|compact,regular|compact] (BCDPreviewStage.swift): a window of that size, centred; outermost, so the in-game screens are inside it
+                .modifier(BCDFoldableWatch())
         }
     }
 
@@ -94,7 +98,11 @@ struct BCDPreviewApp: App {
         if tab == "settings" {
             let section = UserDefaults.standard.string(forKey: "BCDSection")
                 .flatMap { BCDSettingsSection(name: String($0.split(separator: "+").first ?? "")) }
-            BCDSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            if BCDDuoFeatures.active {
+                BCDDuoSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            } else {
+                BCDSettingsRoot(store: store, close: {}, section: section).environmentObject(focus)
+            }
         } else if tab == "controllers" {
             BCDControllerPreview(focus: focus)
         } else if tab.hasPrefix("game") {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Accelerate
 import ImageIO
@@ -371,8 +372,14 @@ struct BCDArtRequest: Equatable {
     let pixels: CGSize
 }
 
+/// Decoration identities must not collide with the String IDs of scroll/focus targets.
+struct BCDGlowRenderID: Hashable {
+    let source: String
+}
+
 struct BCDGlowItem {
     let id: String
+    var renderID: BCDGlowRenderID { BCDGlowRenderID(source: id) }
     let glow: BCDGlow
     let bounds: Anchor<CGRect>
     let strength: Double
@@ -392,7 +399,7 @@ extension View {
     func bcdGlowLayer() -> some View {
         backgroundPreferenceValue(BCDGlowKey.self) { items in
             GeometryReader { proxy in
-                ForEach(items, id: \.id) { item in
+                ForEach(items, id: \.renderID) { item in
                     let frame = proxy[item.bounds]
                     Image(uiImage: item.glow.image)
                         .resizable()

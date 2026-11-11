@@ -157,6 +157,8 @@ static BOOL get_window_rects(HWND hwnd, enum coords_relative relative, struct wi
     if (hwnd == fail_hwnd && (int)relative == fail_relative) return FALSE;
     return wine_get_window_rects(hwnd, relative, out, dpi);
 }
+static int ios_display_follow_enabled(void) { return 0; }   /* sysparams_ios.c (T2 S-DL1): the key is off in these cases */
+static void ios_display_follow_window(HWND hwnd, UINT swp_flags, const RECT *visible) { (void)hwnd; (void)swp_flags; (void)visible; }
 static int winios_desktop_mode(void) { return desktop_mode; }
 static int winios_game_windows(void) { return game_windows; }
 static void capture(HWND hwnd, int x, int y, int w, int h, int visible,

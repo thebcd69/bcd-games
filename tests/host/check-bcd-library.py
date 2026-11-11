@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """BCD's Library tab and Add a game (app/Madeira/BCDLibraryView.swift, BCDAddGame.swift;
 docs/BCD-UI-ARCHITECTURE.md, docs/research/parity-2026-10-18.md B2, B6, B9, B12, B15, B17, B18,
 A13, C20).
@@ -28,6 +29,7 @@ Checks:
   - the preview build compiles (tools/ui-preview.py --build-only; --no-preview leaves it out);
   - CI runs this check.
 """
+# Modified 2026-11-04: assert native search and toolbar presentation.
 import argparse
 import re
 import shutil
@@ -104,18 +106,19 @@ for name in ("BCDAddGame.swift", "BCDAddGameLive.swift"):
 
 # ---- the library ---------------------------------------------------------------------------------
 check("Library: a search field that filters the games by name",
-      'TextField("Find a game", text: $query)' in library
+      '.searchable(text: $query, isPresented: $searching, prompt: "Find a game")' in library
       and "list = list.filter { $0.title.localizedCaseInsensitiveContains(words) }" in library)
-check("Library: Add a game, Search and Refresh stay in sight at the end of the filter row",
-      'round("library.search", searching ? "xmark" : "magnifyingglass"' in library
-      and 'rowButton("library.add", "Add a game", "plus") { store.actions?.addGameFromFiles() }' in library
-      and "so turning the phone does not replace it" in library)
+check("Library: native search and toolbar actions adapt to the device's reserved bars",
+      '.searchable(text: $query, isPresented: $searching' in library
+      and 'ToolbarItemGroup(placement: .primaryAction)' in library
+      and 'Label("Add a game", systemImage: "plus")' in library
+      and 'Label("Refresh library", systemImage: "arrow.clockwise")' in library)
 check("Library: Y on the library tab opens the search (and closes it again)",
       'if tab == .library { list.append((BCDHint(button: .y, title: "Search"), { librarySearch += 1 })) }' in shell
       and "case .library: BCDLibraryView(searchRequest: librarySearch)" in shell
-      and ".onChange(of: searchRequest) { _, _ in toggleSearch() }" in library and "typing = searching" in library)
+      and ".onChange(of: searchRequest) { _, _ in toggleSearch() }" in library and "searching.toggle()" in library)
 check("Library: Refresh, a button and pull to refresh, calls the store's refreshLibrary",
-      'round("library.refresh", "arrow.clockwise", "Refresh the library") { store.actions?.refreshLibrary() }' in library
+      'Button { store.actions?.refreshLibrary() } label:' in library
       and ".refreshable { store.actions?.refreshLibrary() }" in library)
 check("Library: signed out of Steam, a card offers the sign-in",
       "if steamShown, let steam, steam.available, steam.name == nil {" in library
@@ -142,7 +145,7 @@ check("Library: the filter and the order are kept across games and launches (the
 check("Library: BCD's own sort menu offers every sort the classic library had (Library.swift's Sort by: played, name, added, size)",
       'case played, name, added, size' in library and 'return "Last played"' in library and 'return "Recently added"' in library
       and 'return "Folder size"' in library and 'case .name: return "Name"' in library
-      and 'rowButton("library.sort", sort.title, "arrow.up.arrow.down", label: "Sort by: \\(sort.title)") { showSortMenu() }' in library
+      and 'Button { showSortMenu() } label:' in library and 'Label("Sort by: \\(sort.title)", systemImage: "arrow.up.arrow.down")' in library
       and 'BCDMenuContent(title: "Sort by", items: BCDLibrarySort.allCases.map' in library
       and "return sort.sorted(list)" in library)
 # Wave 3 (2026-10-19): the classic library's Sort by picker (played, name, added, size) is deleted; the four sorts
@@ -173,8 +176,8 @@ check("Add a game finds its live backend by its Objective-C name",
       and "BCDAddGameSource.backend = BCDAddGameSample()" in (R / "app/BCDPreview/BCDPreviewApp.swift").read_text())
 for what, needle in [
     ("drive_c's folders and programs (.exe, .bat, .cmd)", "LibraryModel.programExtensions.contains(file.pathExtension.lowercased())"),
-    ("... only what lies inside drive_c, links followed", 'url.resolvingSymlinksInPath().path.hasPrefix(drive.path + "/")'),
-    ("... and, while the SSD folder is connected, that folder (C:\\External; check-external-storage.py)", ' || ExternalGameStorage.shared.admits(url)'),
+    ("... only what lies inside drive_c or on an opened external drive, links followed (check-external-storage.py)",
+     "private func inside(_ url: URL) -> Bool { LibraryModel.relativeToDrive(url) != nil }"),
     ("... folders first, then by name", "$0.folder != $1.folder ? $0.folder : $0.name.localizedStandardCompare($1.name) == .orderedAscending"),
     ("the program is read as the library reads one", "let entry = try LibraryModel.inspect(url(path))"),
     ("it is saved to the library with its name", "if !name.isEmpty { entry.title = name }\n        library.save(entry)"),
@@ -201,7 +204,8 @@ for focus_id in ('"add.close"', '"add.back"', '"add.every"', '"add.item." + item
 
 # ---- the app shows BCD's screens -----------------------------------------------------------------
 check("the app shows Add a game and the game page full screen, never the classic browser or Game details",
-      ".fullScreenCover(item: pageShown, onDismiss: BCDPresentation.didClose) { page in pageScreen(page) }" in front and "BCDAddGame(close:" in front
+      ".fullScreenCover(item: pageShown, onDismiss: appSheetClosed) { page in pageScreen(page) }" in front
+      and "private func appSheetClosed()" in front and "BCDPresentation.didClose()" in front and "BCDAddGame(close:" in front
       and "BCDGamePage(gameID:" in front and "ExecutableBrowser" not in code(front) and "LibraryDetail" not in code(front))
 check("a game just added opens on its Library section; Choose saves opens on Cloud saves",
       'opening = .group("library")' in front

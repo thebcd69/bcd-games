@@ -123,7 +123,7 @@ check("the pool request asks P_TRACED, and only asks JITNoDebuggerPool with CS_D
       and "defer { releaseNoDebuggerEntries() }" in pool)
 check("it arms the trap fallback whenever nothing is traced and the pool is the debugger's",
       'if !debuggerAttached && !noDebugger && MadeiraConfig.flag("MADEIRA_JIT_TRAP_FALLBACK") {' in pool
-      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(poolSize, attempt: attempt, region: \"A\")"))
+      and pool.index("jit_arm_trap_fallback()") < pool.index("requestRegion(attemptSize, attempt: attempt, region: \"A\")"))
 check("no exit() in the pool request: a failure refuses the launch and keeps BCD up",
       "exit(" not in code(pool) and "Killing in 10s" not in pool and "exiting now" not in pool)
 check("an unanswered request reads P_TRACED again before calling it 'no debugger'",
@@ -137,7 +137,7 @@ check("the attach's age: set when Enable JIT sees the debugger attach, else coun
       "if traced { debuggerAttachedAt = ProcessInfo.processInfo.systemUptime }" in wait
       and "let attachAgeAtRequest = debuggerAttached ? attachAge() : nil" in pool
       and '"[jit-age] attach age=\\(age.seconds)s source=\\(age.source)"' in pool
-      and pool.index("let attachAgeAtRequest") < pool.index("requestRegion(poolSize, attempt: attempt, region: \"A\")")
+      and pool.index("let attachAgeAtRequest") < pool.index("requestRegion(attemptSize, attempt: attempt, region: \"A\")")
       and "info.kp_proc.p_un.__p_starttime" in braced(stik, "static func attachAge()"))
 check("an unanswered request from a debugger that was attached at it gets the stale-attach words and one log line",
       "if debuggerAttached, let age = attachAgeAtRequest {" in unanswered

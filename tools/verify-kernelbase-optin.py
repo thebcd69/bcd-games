@@ -12,13 +12,17 @@ a game that lists kernelbase in env.MADEIRA_OPTIN_DLLS gets it for its session (
 
   verify-kernelbase-optin.py BUILT SHIPPED
       BUILT carries the switch's UTF-16 name (the tree's process.c is in it), is for the shipped file's machine, and exports
-      exactly the shipped kernelbase.dll's names (a game sees the same entry points). Exit 1 with the reasons otherwise.
+      exactly the shipped kernelbase.dll's names (a game sees the same entry points), plus at most SetProcessValidCallTargets
+      (tools/patch-wine-zero-mitigation-diag.py, night round 2026-11-11, G5 S7: the opt-in kernelbase answers ChakraCore's lookup).
+      Exit 1 with the reasons otherwise.
 """
 import importlib.util
 import sys
 from pathlib import Path
 
 MARKER = "MADEIRA_ZERO_MITIGATION_POLICY"
+# exports the opt-in kernelbase may have beyond the shipped one
+EXTRA_EXPORTS = {"SetProcessValidCallTargets"}
 
 _spec = importlib.util.spec_from_file_location("kb_fibertrace", Path(__file__).resolve().parent / "patch-wine-kernelbase-fibertrace.py")
 _kb = importlib.util.module_from_spec(_spec)
@@ -33,9 +37,9 @@ def problems(built, shipped):
         bad.append("no UTF-16 '%s': not built from the tree that has the switch (dlls/kernelbase/process.c)" % MARKER)
     if machine != smachine:
         bad.append("machine %#x, the shipped kernelbase.dll's is %#x" % (machine, smachine))
-    if names != snames:
+    if (names - snames) - EXTRA_EXPORTS or snames - names:
         bad.append("exports differ from the shipped kernelbase.dll: only here %s, only there %s"
-                   % (sorted(names - snames)[:8], sorted(snames - names)[:8]))
+                   % (sorted((names - snames) - EXTRA_EXPORTS)[:8], sorted(snames - names)[:8]))
     return bad, len(names)
 
 

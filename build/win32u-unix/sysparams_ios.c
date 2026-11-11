@@ -4545,6 +4545,72 @@ static void ios_publish_screen_size_once(void)
     ios_publish_screen_size( FALSE );
 }
 
+/* madeira-bcd (night round 2026-11-11, T2 S-DL1; Dying Light T92QFA, iPhone 17 Pro, build 634): a game whose "resolution" menu resizes its window
+ * instead of switching the display mode (it never calls ChangeDisplaySettings) ends up with a borderless 800x600 window (style 14000000, at 0,0) in
+ * the 1408x648 virtual monitor: BCD's display modes (stretch, aspect, fill, fit) scale the whole monitor, so the picture stays small and the rest is
+ * black. env.MADEIRA_DISPLAY_FOLLOW_BORDERLESS = 1 (default off; read once) makes the virtual monitor follow such a window: a visible top-level
+ * window with no caption or border, at 0,0, at least 320x200 and smaller than the session default (and not larger in either direction) sets the
+ * monitor to its size, without WM_DISPLAYCHANGE (the program chose that size itself); the session default comes back when that window is hidden,
+ * destroyed, moved, given a caption or grown to the default. Driven from the window-position callback (driver_ios.c); off, nothing here runs. */
+static HWND ios_follow_hwnd;
+
+int ios_display_follow_enabled(void)
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_DISPLAY_FOLLOW_BORDERLESS" );
+        on = e && e[0] == '1' && !e[1];
+    }
+    return on;
+}
+
+static void ios_display_follow_set_size( HWND hwnd, int w, int h, const char *why )
+{
+    int sw, sh;
+
+    ios_screen_size( &sw, &sh );
+    if (sw == w && sh == h) return;
+    ios_screen_cur_w = w;
+    ios_screen_cur_h = h;
+    ios_publish_screen_size( FALSE );
+    dprintf( STDERR_FILENO, "[display] borderless window follows: virtual monitor %dx%d -> %dx%d (%s, hwnd %p, session default %dx%d) rev=r652\n",
+             sw, sh, w, h, why, (void *)hwnd, ios_screen_def_w, ios_screen_def_h );
+}
+
+void ios_display_follow_window( HWND hwnd, UINT swp_flags, const RECT *visible )
+{
+    int w = visible->right - visible->left, h = visible->bottom - visible->top, sw, sh;
+    DWORD style, ex_style;
+    BOOL follow;
+
+    if (NtUserGetAncestor( hwnd, GA_PARENT ) != get_desktop_window()) return;
+    if (get_window_thread( hwnd, NULL ) != GetCurrentThreadId()) return;
+    ios_screen_size( &sw, &sh );   /* the session default is known from here */
+    style = get_window_long( hwnd, GWL_STYLE );
+    ex_style = get_window_long( hwnd, GWL_EXSTYLE );
+    follow = !(swp_flags & SWP_HIDEWINDOW) && (style & WS_VISIBLE) && !(style & (WS_CHILD | WS_MINIMIZE | WS_CAPTION)) &&
+             !(ex_style & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)) && visible->left == 0 && visible->top == 0 &&
+             w >= 320 && h >= 200 && w <= ios_screen_def_w && h <= ios_screen_def_h && (w < ios_screen_def_w || h < ios_screen_def_h);
+    if (follow)
+    {
+        ios_follow_hwnd = hwnd;
+        ios_display_follow_set_size( hwnd, w, h, "a borderless window smaller than the monitor" );
+    }
+    else if (ios_follow_hwnd == hwnd)
+    {
+        ios_follow_hwnd = 0;
+        ios_display_follow_set_size( hwnd, ios_screen_def_w, ios_screen_def_h, "that window changed" );
+    }
+}
+
+void ios_display_follow_window_gone( HWND hwnd )
+{
+    if (ios_follow_hwnd != hwnd) return;
+    ios_follow_hwnd = 0;
+    ios_display_follow_set_size( hwnd, ios_screen_def_w, ios_screen_def_h, "that window was destroyed" );
+}
+
 /* MADEIRA_VIRTUAL_MODE_SET=0: accept a listed mode without programming it --
  * the monitor keeps the session default size, as before this change. */
 static int ios_virtual_mode_set_enabled(void)

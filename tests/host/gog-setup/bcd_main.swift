@@ -39,6 +39,7 @@ func syncChecks() {
     check(plan.notes.allSatisfy { !$0.note.contains("Madeira") }, "the notes say BCD")
 
     let drive = FileManager.default.temporaryDirectory.appendingPathComponent("gog-setup-bcd-\(getpid())/drive_c")
+    try? FileManager.default.removeItem(at: drive.deletingLastPathComponent())   // start empty: exit() skips defer, so a folder with a reused process id may be left
     defer { try? FileManager.default.removeItem(at: drive.deletingLastPathComponent()) }
     check(GOGSetup.resultFolder == "C:\\bcd-games\\gog-setup" && GOGSetup.resultPath("MSVC2017_x64") == "C:\\bcd-games\\gog-setup\\msvc2017_x64.result", "the results go in C:\\bcd-games\\gog-setup")
     check(GOGSetup.safeID("a b/c..d") == "a_b_c..d", "a result file name is made of safe characters")
@@ -192,6 +193,7 @@ func runPlan(_ net: Net, redist: Bool, msiexec: Bool = false) async throws -> (p
 
         // 8. the install record
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("gog-setup-bcd-install-\(getpid())")
+        try? FileManager.default.removeItem(at: root)   // start empty: exit() skips defer, so a folder with a reused process id may be left
         defer { try? FileManager.default.removeItem(at: root) }
         BCDInstallRoot.hostDrive = { _ in root }
         do {

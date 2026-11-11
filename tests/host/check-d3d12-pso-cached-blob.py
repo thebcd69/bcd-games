@@ -86,8 +86,13 @@ check("the generated catalog carries the key (regenerate it in the full tree; th
       re.search(r'ConfigOption\(key: "d3d12-pso-cached-blob", [^\n]*kind: \.bool, defaultValue: "0"', swift) is not None)
 lists = json.loads((R / "recommended/recommendations.json").read_text())
 carriers = sorted(r["id"] for r in lists["rules"] if any((c["line"] if isinstance(c, dict) else c) == "d3d12-pso-cached-blob = 1" for c in r["config"]))
-check("only the two Resident Evil Requiem lists set it, each with minBuild 598", carriers == ["resident-evil-requiem", "resident-evil-requiem-demo"]
-      and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 598} in r["config"] for r in lists["rules"] if r["id"] in carriers))
+# List v42 (build 644): The Last of Us Part I v8 sets it from build 643 (proven by hand on 2026-11-08 12:17, build 643: its
+# "HALT: Failed to GetCachedBlob" is gone and the game reaches the loading screen).
+_re = ["resident-evil-requiem", "resident-evil-requiem-demo"]
+check("only the two Resident Evil Requiem lists (minBuild 598) and The Last of Us Part I (minBuild 643) set it",
+      carriers == _re + ["the-last-of-us-part-1"]
+      and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 598} in r["config"] for r in lists["rules"] if r["id"] in _re)
+      and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 643} in r["config"] for r in lists["rules"] if r["id"] == "the-last-of-us-part-1"))
 rules = (R / "build/tools/autotune_rules.py").read_text()
 check("auto-tune's rule adds the line after the GetCachedBlob stub line and the comctl32 stub line, never twice",
       '"id": "d3d12-pso-cached-blob-fatal"' in rules and '"lines": ["d3d12-pso-cached-blob = 1"]' in rules

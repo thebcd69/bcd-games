@@ -5,6 +5,8 @@
 // Modified by BCD (thebcd69), 2026-11-05: `SteamGamesModel.branches`, the beta branch each install record names (version selection).
 // Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (pull request #381)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #464)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 
@@ -384,6 +386,20 @@ enum SteamDirectStart {
             standard])
     }
 
+    /// Night round 2026-11-11 (G5 S5; GeoGuessr PX27QG, Hollow Knight 2KHWEG and 5RHVB9: Valve's launch error 45 before any process): the launch entry the
+    /// start asks for, field by field, so a log with a refusal names what the client may have disliked. The program's path inside the install folder (never
+    /// a path outside it), the arguments cut at 80 characters, the platform fields, and whether a required DLC, a beta key or a working directory is set.
+    static func launchEntryLine(options: [SteamLaunchOption]?, key: UInt32) -> [String] {
+        guard let option = options?.first(where: { $0.index == key }) else { return [] }
+        func clean(_ text: String, limit: Int) -> String {
+            String(String(String.UnicodeScalarView(text.unicodeScalars.map { $0.value == 9 ? " " : $0 }.filter { $0.value >= 0x20 && $0.value != 0x7f })).prefix(limit))
+        }
+        let program = relativePath(option.executable).map { clean($0, limit: 120) } ?? "(outside the install folder)"
+        return ["[madeira-dock] launch option \(key) entry: program=\(program) arguments=\"\(clean(option.arguments, limit: 80))\" oslist=\(clean(option.oslist, limit: 40)) "
+                + "osarch=\(clean(option.osarch, limit: 16)) type=\(clean(option.type, limit: 24)) dlc=\((option.requiredDLC ?? "").isEmpty ? 0 : 1) "
+                + "beta=\(option.betaKey.isEmpty ? 0 : 1) workingDir=\(option.workingDir.isEmpty ? 0 : 1)"]
+    }
+
     /// madeira-bcd (round 623): the log lines that say what a Dock start's .bat or .cmd launch entry will run. Valve's client starts the
     /// entry's program as it is, and when that is a script the log shows only "cmd.exe /s/c" and an exit code: Messiah's "Launch Messiah.bat"
     /// ends with exit code 255 at once without starting a program (MZYTWC, build 622; ANV0TK, 2D4QK1 and 53W6G9, build 614) and nothing in
@@ -489,7 +505,7 @@ enum SteamDirectStart {
             var builds: [Int: Int] = [:], languages: [Int: String] = [:], depots: [Int: Set<Int>] = [:]
             var branches: [Int: String] = [:]
             for game in found where SteamInstallPaths.isManaged(library: game.library) && game.installed {
-                let steamApps = SteamInstallPaths.steamApps(drive: drive)
+                let steamApps = drive.appendingPathComponent(game.library, isDirectory: true)
                 if let build = SteamInstallFiles.buildID(appID: game.id, steamApps: steamApps) {
                     builds[game.id] = build
                 }

@@ -4,9 +4,11 @@
  "matched": [
   "ubisoft-launcher-protection-exit"
  ],
- "next": [],
- "note": "Ubisoft Connect (upc.exe, build 623, P4KC3V): the 0x82 alias trap, then exit 0xdeadc0de; build 624 translates 0x82 but the launcher's self-check still ends it (MSFM7W): known, no fix yet",
+ "next": [
+  "env.MADEIRA_SELF_WRITE = 1"
+ ],
+ "note": "Ubisoft Connect (upc.exe, build 623, P4KC3V): the 0x82 alias trap, then exit 0xdeadc0de; build 624 translates 0x82 but the launcher's hook installer is still refused its WriteProcessMemory into itself (MSFM7W): env.MADEIRA_SELF_WRITE = 1 (build 652)",
  "outcome": "crashed",
  "stage": 2,
- "status": "known"
+ "status": "trying"
 }

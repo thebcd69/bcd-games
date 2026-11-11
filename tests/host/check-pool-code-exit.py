@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Henry Morin: code taken from https://github.com/willfaust/Madeira (pull request #556)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """An exited pseudo-process's FEX code buffers go back to the pool (production code).
 
 FEX releases a code buffer when it rotates to a new one, never when its process
@@ -31,7 +35,8 @@ def function(signature):
     return source[start:source.index('\n}', start) + 2] + '\n'
 
 
-helpers = ''.join(function(signature) for signature in (
+fg_policy = '\n'.join(line for line in source.splitlines() if line.startswith(('#define IOS_POOL_OTHER_MAX ', '#define IOS_POOL_FG_HOLD_SEC '))) + '\n' + function('static int ios_pool_fg_held(')
+helpers = next(line for line in source.splitlines() if line.startswith('#define IOS_POOL_CUT_MIN ')) + '\n' + ''.join(function(signature) for signature in (
     'static size_t ios_pool_hole_tail_start(',
     'static size_t ios_pool_hole_between(',
     'static size_t ios_pool_code_cap(',
@@ -41,7 +46,12 @@ helpers = ''.join(function(signature) for signature in (
     'static int ios_pool_low_take(',
     'static int ios_tail_carve_in_low(',
     'static int ios_pool_preserve_code_carve(',
+    'static int ios_pool_preserve_big_carve(',
     'static int ios_tail_carve_ready(',
+    'static int ios_tail_carve_mergeable(',
+    'static unsigned ios_tail_carves_merge(',
+    'static unsigned ios_tail_carve_cut(',
+    'static int ios_pool_carve_merge_enabled(',
     'static unsigned ios_tail_carves_retire_owner(',
     'static int ios_tail_carve_foreign_release(',
     'static void ios_tail_carves_owner_died(',
@@ -59,7 +69,7 @@ reclaim = function('void ios_jit_reclaim_process( void *peb )')
 assert reclaim.count('ios_tail_carves_owner_died( peb );') == 1
 assert reclaim.index('ios_tail_carves_owner_died( peb );') > reclaim.rindex('pthread_mutex_unlock( &ios_pool_lock );'), \
     'the carve lock is never taken under the pool lock'
-assert source.count('.retired = 1;') == 1, 'only an exit retires a carve'
+assert source.count('.retired = 1;') == 2, 'an exit, or a release while a thread still runs in the carve, retires it'
 assert source.count('ios_tail_carves[ios_tail_carve_n].retired = 0;') == 4, 'every new carve starts unretired'
 assert source.count('ios_tail_carves[ios_tail_carve_n].peb = carve_peb;') == 3, 'region C, ml1039 and tail carves'
 assert source.count('ios_tail_carves[ios_tail_carve_n].peb = NULL;') == 1, 'a skipped piece has no owner'
@@ -102,6 +112,10 @@ static pthread_mutex_t ios_tail_carve_lock = PTHREAD_MUTEX_INITIALIZER;
 static uintptr_t owner;
 static int scan_busy, scans, occupied;
 static void *ios_jit_current_peb(void) { return (void *)owner; }
+/* madeira-bcd pool-fg: the policy is off in this fixture (tests/host/check-pool-code-policy.py covers it) */
+enum { IOS_POOL_FG_OFF = 0, IOS_POOL_FG_OTHER = 1, IOS_POOL_FG_GAME = 2 };
+static int ios_pool_fg_class(void) { return IOS_POOL_FG_OFF; }
+''' + fg_policy + r'''
 static uintptr_t ios_wow_base(void) { return 0; }
 static int ios_tail_carve_scan(const void *base, size_t size, int strict)
 { (void)base; (void)size; CHECK(strict == 1); CHECK(++scans < 64); return scan_busy; }   /* < 64: no retry loop */
@@ -111,6 +125,7 @@ static int ios_tail_carve_occupied(const void *base, size_t size)
 static int allocate(size_t *size_ptr, void **ret)
 {
 ''' + ec + r'''
+    (void)kept_big_carve;  /* read by the production tail path after this prefix */
     return FALLBACK_TAIL;  /* the production tail path starts after this prefix */
 }
 static int release(void *base, unsigned type, void **addr_ptr, size_t *size_ptr)
@@ -361,15 +376,26 @@ static void unit(void)
     owner = 8;
     CHECK(release(rx, MEM_RELEASE, &addr, &size) == FALL_THROUGH && !ios_tail_carves[0].free);
     owner = 0;                                                    /* a thread without a TEB: as before */
+    /* MADEIRA_POOL_CODE_DEFER_FREE=0: refused and left live, as before. */
     occupied = 1;
+    setenv("MADEIRA_POOL_CODE_DEFER_FREE", "0", 1);
     CHECK(release(rx, MEM_RELEASE, &addr, &size) == FALL_THROUGH && !ios_tail_carves[0].free);
+    unsetenv("MADEIRA_POOL_CODE_DEFER_FREE");
+    /* A release while a thread still runs in the buffer frees it as retired: no
+     * owner, and reuse waits out the grace and a strict scan, as for an exit. */
+    CHECK(release(rx, MEM_RELEASE, &addr, &size) == STATUS_SUCCESS && addr == rx && size == 64 * MB);
+    CHECK(ios_tail_carves[0].free && ios_tail_carves[0].retired && !ios_tail_carves[0].peb);
+    CHECK(ios_tail_carves[0].freed_at == fake_now && !ios_tail_carve_ready( &ios_tail_carves[0], fake_now ));
+    CHECK(ios_tail_carve_ready( &ios_tail_carves[0], fake_now + 3 ));
     occupied = 0;
+    ios_tail_carves[0].free = ios_tail_carves[0].retired = 0;   /* live again, owned by 9 */
+    ios_tail_carves[0].peb = (void *)9;
     owner = 9;
     CHECK(release(rx, MEM_RELEASE, &addr, &size) == STATUS_SUCCESS && addr == rx && size == 64 * MB);
     CHECK(ios_tail_carves[0].free && !ios_tail_carves[0].retired);
     owner = 8;
     CHECK(release(rx, MEM_RELEASE, &addr, &size) == FALL_THROUGH);  /* already free */
-    puts("PASS: a release from another process is refused; the owner's (or a TEB-less thread's) works as before");
+    puts("PASS: a release from another process is refused; an occupied one is retired until its thread leaves (refused with MADEIRA_POOL_CODE_DEFER_FREE=0); the owner's (or a TEB-less thread's) works as before");
 }
 
 int main(void)

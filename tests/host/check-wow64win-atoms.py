@@ -241,7 +241,7 @@ check('auto-tune: the rule wow64-atom-class-rebased says fixed in 598, with no l
       and 's("Exception frame is not in stack limits => unable to dispatch exception")' in rules)
 expect = root / 'tests/fixtures/autotune/bioshock-remastered-createwindow-atom-2026-10-23.expect'
 check('the fixture is there and expects "known"', expect.is_file() and json.loads(expect.read_text())['status'] == 'known'
-      and json.loads(expect.read_text())['matched'] == ['wow64-atom-class-rebased'])
+      and json.loads(expect.read_text())['matched'][:1] == ['wow64-atom-class-rebased'])   # night round 2026-11-11: a diagnostic rule may follow
 workflow = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'run: python3 tests/host/check-wow64win-atoms.py' in workflow)
 sys.exit(0 if ok else 1)

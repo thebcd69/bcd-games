@@ -37,7 +37,8 @@ with tempfile.TemporaryDirectory(prefix='madeira-runtime-') as tmp:
                                         if Path('/usr/include/zlib.h').exists() else '')
     # The two Wine session checks and the prefix seeder SteamRuntime.swift calls are the app's, not this host's (Modified by BCD, 2026-10-25).
     (tmp/'stubs.swift').write_text('func wine_process_is_running() -> Int32 { 0 }\nfunc wineserver_is_running() -> Int32 { 0 }\n'
-                                   'func madeira_seed_prefix_if_needed(_ path: UnsafePointer<CChar>?) {}\n')
+                                   'func madeira_seed_prefix_if_needed(_ path: UnsafePointer<CChar>?) {}\n'
+                                   'enum SteamLog { static func event(_ m: String) {} }\n')   # night round 2026-11-11: the client replacement logs through it
     main = r'''
 import Foundation
 let fm = FileManager.default
@@ -82,6 +83,57 @@ if mode == "registry" {
     do { _ = try SteamRuntimeFiles.destination("link/new.dll", under: folder); fatalError("symlink accepted") }
     catch SteamRuntimeFiles.Failure.conflict { }
     print("PASS: discovery keys, idempotence, unrelated settings, conflicts, stale leftovers and path rules")
+    // Night round 2026-11-11 (G10 S1; GNWWRT, RAC3KD, GWX5H2, DP9TVR): repairRegistry puts the Steam discovery sections back before a Dock start.
+    do {
+        let prefix = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? fm.removeItem(at: prefix) }
+        let clientFolder = prefix.appendingPathComponent("drive_c/" + SteamRuntimeFiles.relativeRoot)
+        let system = prefix.appendingPathComponent("system.reg"), user = prefix.appendingPathComponent("user.reg")
+        try fm.createDirectory(at: clientFolder, withIntermediateDirectories: true)
+        var lines: [String] = []
+        func repair() -> [String] { SteamRuntimeFiles.repairRegistry(prefix: prefix, log: { lines.append($0) }) }
+        func text(_ url: URL) -> String { (try? String(contentsOf: url, encoding: .utf8)) ?? "" }
+        func bytes(_ url: URL) -> Data { (try? Data(contentsOf: url)) ?? Data() }
+        // No client files: nothing is read or written (a prefix without Valve's client is not a Dock prefix).
+        try Data("WINE REGISTRY Version 2\n\n[Software\\\\Keep] 1\n\"Unrelated\"=\"preserved\"\n".utf8).write(to: system)
+        try Data("WINE REGISTRY Version 2\n".utf8).write(to: user)
+        assert(repair().isEmpty && lines.isEmpty)
+        assert(!fm.fileExists(atPath: system.appendingPathExtension("dock-setup-bak").path))
+        try Data("client".utf8).write(to: clientFolder.appendingPathComponent("steamclient64.dll"))
+        // Both hives lack the sections: put back, a backup of the originals is kept, unrelated entries stay.
+        let before = bytes(system)
+        var state = repair()
+        assert(state.count == 2 && state.allSatisfy { $0.contains("=put-back(") }, "\(state)")
+        assert(lines.last?.hasPrefix("[dock-registry] system.reg=put-back(sections 2, values 2) user.reg=put-back(sections 2, values 4)") == true, "\(lines)")
+        let machine = text(system), userText = text(user)
+        assert(machine.contains("[Software\\\\Wow6432Node\\\\Valve\\\\Steam]") && machine.contains("[Software\\\\Valve\\\\Steam]"))
+        assert(machine.contains("\"Unrelated\"=\"preserved\"") && userText.contains("[Software\\\\Valve\\\\Steam\\\\ActiveProcess]"))
+        assert(bytes(system.appendingPathExtension("dock-setup-bak")) == before)
+        // A second run changes nothing: the files keep their bytes and the backup is not renewed.
+        let written = bytes(system)
+        state = repair()
+        assert(state == ["system.reg=ok", "user.reg=ok"], "\(state)")
+        assert(bytes(system) == written && bytes(system.appendingPathExtension("dock-setup-bak")) == before)
+        // The hive's header with Wine's timestamp (the form Wine writes) counts as there; a missing VALUE of a present section is added.
+        let stamped = "WINE REGISTRY Version 2\n\n[Software\\\\Wow6432Node\\\\Valve\\\\Steam] 1700000000\n#time=1d9\n\"Other\"=\"kept\"\n\n" +
+            "[Software\\\\Valve\\\\Steam] 1700000000\n\"InstallPath\"=\"C:\\\\Program Files (x86)\\\\Steam\"\n"
+        try Data(stamped.utf8).write(to: system)
+        state = repair()
+        let patched = text(system)
+        assert(state[0] == "system.reg=put-back(sections 0, values 1)" && patched.contains("\"Other\"=\"kept\"") && patched.contains("#time=1d9"), "\(state)")
+        assert(patched.components(separatedBy: "[Software\\\\Wow6432Node\\\\Valve\\\\Steam]").count == 2, "no second section header")
+        // A value that differs is left alone: the hive keeps its bytes, the log names the value.
+        let differing = "WINE REGISTRY Version 2\n\n[Software\\\\Valve\\\\Steam]\n\"InstallPath\"=\"D:\\\\Other\"\n"
+        try Data(differing.utf8).write(to: system)
+        state = repair()
+        assert(state[0] == "system.reg=left-alone(Software\\\\Valve\\\\Steam\\InstallPath)", "\(state)")
+        assert(text(system) == differing)
+        // A file that is not a Wine registry is left as it is.
+        try Data("garbage".utf8).write(to: system)
+        state = repair()
+        assert(state[0] == "system.reg=not-a-registry-file" && text(system) == "garbage", "\(state)")
+        print("PASS: repairRegistry puts missing Steam discovery sections back, writes nothing when they are there, leaves a differing value alone")
+    }
 } else {
     let data = try Data(contentsOf: URL(fileURLWithPath: CommandLine.arguments[2]))
     do {
@@ -144,3 +196,9 @@ model = (root / 'app/Madeira/MadeiraDockModel.swift').read_text()
 assert 'SteamLog.event("[dock-setup] client components failed: \\(error.localizedDescription)"' in model and \
     '(SteamRuntimeFiles.lastConflict.map { " (at \\($0))" } ?? "")' in model
 print('PASS: the failure line names the error and the value or file that stopped the setup')
+# Night round 2026-11-11 (G10 S1): the Dock start puts the Steam sections back after the installs plan, before the service preparation and the session.
+content = (root / 'app/Madeira/ContentView.swift').read_text()
+repair = content.index('SteamRuntimeFiles.repairRegistry(prefix: MadeiraDock.prefix')
+assert content.index('DockInstallers.prepare(game, drive: MadeiraDock.drive') < repair < content.index('DockCEGService.prepare(game, drive: MadeiraDock.drive') < content.index('runWineFullSequence(profile: profile)', repair)
+assert 'if !DockInstallers.installsOnly, SteamSignIn.flag("MADEIRA_DOCK_REGISTRY_REPAIR", default: true)' in content
+print('PASS: startDock repairs the Steam registry sections after the installs plan and before the CEG service preparation')

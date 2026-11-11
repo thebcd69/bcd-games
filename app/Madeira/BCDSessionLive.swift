@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Combine
 import Foundation
@@ -52,12 +55,14 @@ struct BCDSessionLiveLayer: View {
     init() {
         // @Published announces a change before it is stored: read the model a moment later.
         let changes: [AnyPublisher<Void, Never>] = [
+            model.$desktopHome.map { _ in () }.eraseToAnyPublisher(),
             model.$launching.map { _ in () }.eraseToAnyPublisher(),
             model.$menu.map { _ in () }.eraseToAnyPublisher(),
             model.$performance.map { _ in () }.eraseToAnyPublisher(),
             BCDHUDState.shared.$setup.map { _ in () }.eraseToAnyPublisher(),
             BCDHUDState.shared.$moving.map { _ in () }.eraseToAnyPublisher(),
             model.$sessionMessage.map { _ in () }.eraseToAnyPublisher(),
+            model.$poolWait.map { _ in () }.eraseToAnyPublisher(),   // night round 2026-11-11 (M7): the pool request's line on the starting screen
             model.$liveLogs.map { _ in () }.eraseToAnyPublisher(),
             model.$launchLogs.map { _ in () }.eraseToAnyPublisher(),
             model.$launchSlow.map { _ in () }.eraseToAnyPublisher(),
@@ -88,7 +93,7 @@ struct BCDSessionLiveLayer: View {
     // MARK: What is on screen
 
     private func refresh() {
-        let running = model.current != nil
+        let running = model.current != nil && !model.desktopHome
         hud.message = running ? model.sessionMessage : ""
         hud.showsMenuButton = running && !model.launching
         if running && model.launching { startStarting() } else { stopStarting() }
@@ -102,6 +107,7 @@ struct BCDSessionLiveLayer: View {
 
     private func startStarting() {
         guard hud.starting == nil else { return }
+        if ProcessInfo.processInfo.isLowPowerModeEnabled { LogStore.shared.log("[hint] low-power-mode: the starting screen says so") }   // night round 2026-11-11 (A5 S12)
         startingGame = BCDLiveSessionArt.game(for: model.activeEntry, dockAppID: dock.appID)
         hud.starting = BCDStartingFeed(startingInfo())
         let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
@@ -163,10 +169,19 @@ struct BCDSessionLiveLayer: View {
                                                tone: .warm))
             }
         }
+        // Night round 2026-11-11 (M7; StikJITHelper.announceRiskyRequest and the request watch): while BCD waits for the debugger's answer to the
+        // JIT memory request, on the risky path before the request and after 30 s without an answer, the starting screen says what it waits for.
+        if let words = model.poolWait {
+            info.notes.append(BCDStartNote(id: "pool-wait", text: words, tone: .warm))
+        }
         // madeira-bcd (round 624, agent D2 S2; YX66TX): the first start of a Windows desktop that is the library's only entry says, once, how a
         // game gets there (BCDDesktopHint, armed by the library's start).
         if BCDDesktopHint.armed, model.activeEntry?.desktop == true {
             info.notes.append(BCDStartNote(id: "desktop-empty", text: BCDDesktopHint.text))
+        }
+        // Night round 2026-11-11 (A5 S12): Low Power Mode is on (the one-time log line is in startStarting).
+        if ProcessInfo.processInfo.isLowPowerModeEnabled, dock.failure == nil {
+            info.notes.append(BCDStartNote(id: "low-power", text: BCDStartHints.lowPower, tone: .warm))
         }
         // madeira-bcd (round 624, agent N S14; FWXFQ1): a start left for another app within seconds is paused by iOS and may be closed.
         if dock.failure == nil && info.seconds < BCDCrashRules.shortStart {
@@ -220,7 +235,7 @@ struct BCDSessionLiveLayer: View {
         menuSource?.dispose()
         menuSource = nil
         hud.menu = nil
-        LibraryController.shared.configure(enabled: true, ownsInput: false)
+        LibraryController.shared.configure(enabled: true, ownsInput: BCDDuoFeatures.active && (model.desktopHome || model.current == nil))   // the native Duo interface owns the pad at BCD Home; otherwise as before (the game's)
         if save { model.saveCurrentProfile() }
     }
 
@@ -230,7 +245,7 @@ struct BCDSessionLiveLayer: View {
     /// LibraryController's commands: Back + Start (and, opted in, a held Home button) open and
     /// close the menu; while it is open the D-pad, A, B and the shoulders drive it.
     func command(_ name: String) {
-        guard model.current != nil else { return }
+        guard model.current != nil, !model.desktopHome else { return }
         if name == "menu" || name == "home" {
             if model.menu { model.menu = false } else { model.showMenu() }
             return
@@ -243,7 +258,12 @@ struct BCDSessionLiveLayer: View {
 
     // MARK: Touch regions (ControlsWindow lets these through to the layer)
 
-    func menuButtonFrame(_ frame: CGRect) { model.menuButtonRect = frame }
+    func menuButtonFrame(_ frame: CGRect) {
+        // A retiring SwiftUI layer must not erase its replacement's live hit region.
+        if BCDDuoFeatures.active && frame.isEmpty { return }
+        model.menuButtonRect = frame
+        if BCDDuoFeatures.active { LogStore.shared.log("[session-menu] hit region \(frame)") }
+    }
     func overlayFrame(_ frame: CGRect) { model.performanceRect = frame }
 
     // MARK: Overlay and log
@@ -417,13 +437,28 @@ struct BCDSessionLiveLayer: View {
                        symbol: "keyboard", kind: .action()),
             BCDExtraKeysMenu.row(),   // madeira-bcd (2026-10-25, round 603): the key bar over the game
         ]))
+        if BCDDuoFeatures.active, model.activeEntry?.desktop == true {
+            out.append(BCDMenuSection(id: "home", rows: [BCDMenuRow(id: "desktop.home", title: "BCD Home", detail: "Keep Windows running in the background.", symbol: "house", kind: .action())]))
+        }
         if let cloud = cloudSection { out.append(cloud) }
+        if model.activeEntry?.desktop == true, !BCDDuoFeatures.active, MadeiraConfig.flag("MADEIRA_DESKTOP_CLOSE") {
+            // night round 2026-11-11 (A4 S1): the Windows desktop has no game to quit; Close asks its programs to close and ends the session
+            // (LibraryModel.watchDesktopClose). The words are DesktopExitRules' (Library.swift); the preview app keeps copies. The native Duo interface
+            // (default off) keeps its own "Close Windows" row and quit path.
+            out.append(BCDMenuSection(id: "quit", rows: [
+                BCDMenuRow(id: "quit", title: DesktopExitRules.menuTitle, detail: DesktopExitRules.menuDetail, symbol: "stop.circle",
+                           kind: .action(destructive: true),
+                           confirm: BCDConfirm(title: DesktopExitRules.menuConfirmTitle, message: DesktopExitRules.menuConfirmMessage,
+                                               answers: [.init(id: "quit", title: DesktopExitRules.menuAnswer, destructive: true)])),
+            ]))
+            return out
+        }
         out.append(BCDMenuSection(id: "quit", rows: [
-            BCDMenuRow(id: "quit", title: "Quit game", detail: "Progress you haven't saved is lost.", symbol: "stop.circle",
+            BCDMenuRow(id: "quit", title: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close Windows" : "Quit game", detail: "Progress you haven't saved is lost.", symbol: "stop.circle",
                        kind: .action(destructive: true),
                        confirm: BCDConfirm(title: "Quit the game?",
-                                           message: "BCD asks the game to close, as Alt+F4 does. What you haven't saved is lost, and the game may ask you to confirm.",
-                                           answers: [.init(id: "quit", title: "Quit game", destructive: true)])),
+                                           message: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close all Windows programs and return to BCD Home. Save your work first; unsaved changes will be lost." : "BCD asks the game to close, as Alt+F4 does. What you haven't saved is lost, and the game may ask you to confirm.",
+                                           answers: [.init(id: "quit", title: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close Windows" : "Quit game", destructive: true)])),
         ]))
         return out
     }
@@ -640,6 +675,7 @@ struct BCDSessionLiveLayer: View {
         if BCDInputMenu.handles(row), BCDInputMenuLive.act(row) { menu?.changed(); return }   // madeira-bcd (2026-10-25, round 604): choosing a controller for a player
         switch row {
         case "resume": close()
+        case "desktop.home": model.showDesktopHome()
         case "keyboard":
             model.menu = false
             LibraryKeyboard.show()
@@ -760,7 +796,7 @@ struct BCDSessionLiveLayer: View {
         let session = GamepadInput.sessionHIDKind
         switch mode {
         case "hid": return session != nil
-        case "dualsense", "generic": return session == mode
+        case "dualsense", "generic", "xbox360": return session == mode
         default: return session == nil
         }
     }
@@ -781,12 +817,15 @@ struct BCDSessionLiveLayer: View {
         switch GamepadInput.sessionHIDKind ?? "" {
         case "dualsense": session = "a DualSense (HID)"
         case "generic": session = "a HID gamepad"
+        case "xbox360": session = "an XInput pad that is also listed as an Xbox 360 controller"
         default: session = "an XInput pad"
         }
         return "This session shows player 1 as \(session). A game looks for its controllers when it starts, so a change "
             + "applies from its next start. The Xbox controller (XInput) is what almost every game knows; a 360 and an One are the same to it. "
             + "DualSense shows Sony's PC games the controller they look for, Generic gamepad is what DirectInput games list, and The controller "
             + "itself is a DualSense when the paired one is and a generic gamepad otherwise; a game that reads only XInput then sees no controller. "
+            + "Xbox 360 controller keeps the XInput pad and adds the device Windows lists for one, for a game that shows no controller under the "
+            + "Xbox choice although it supports one (Far Cry 4). "
             // Round 630 (agent T1 S7; GTA V Legacy D3QR11 on Generic gamepad: touch and buttons did nothing). Text only.
             + "If the buttons do nothing in a game, choose the Xbox controller (XInput)."
     }

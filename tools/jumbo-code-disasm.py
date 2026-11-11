@@ -23,7 +23,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROW = re.compile(r"\[jumbo-code\] r\d+ #(\d+) (rip|ret) ([0-9a-f]+): ([0-9a-f?]{32})")
+ROW = re.compile(r"\[(jumbo|dlg)-code\] r\d+ #(\d+) (rip|ret|f\d+) ([0-9a-f]+): ([0-9a-f?]{32})")
 HEAD = re.compile(r"\[jumbo-code\] r\d+ #(\d+) size=(0x[0-9a-f]+) rip=(0x[0-9a-f]+) rsp=(0x[0-9a-f]+) \[rsp\]=(0x[0-9a-f]+)")
 
 
@@ -31,7 +31,9 @@ def blobs(text):
     """{(call, place): [(address, bytes)]}, rows of one place joined while contiguous and readable."""
     found = {}
     for m in ROW.finditer(text):
-        call, place, addr, hexrow = int(m.group(1)), m.group(2), int(m.group(3), 16), m.group(4)
+        # build 641: [dlg-code] rows (env.MADEIRA_DIALOG_CODE_DUMP) are places "dlg-rip", "dlg-f1".. so they never join a [jumbo-code] blob
+        tag, call, addr, hexrow = m.group(1), int(m.group(2)), int(m.group(4), 16), m.group(5)
+        place = ("dlg-" if tag == "dlg" else "") + m.group(3)
         found.setdefault((call, place), []).append((addr, hexrow))
     out = {}
     for key, rows in found.items():
@@ -103,6 +105,8 @@ def selftest():
     ])
     found = blobs(log)
     assert list(found) == [(2, "ret")], found
+    dlg = blobs(log + "\n" + "[dlg-code] r641 #2 f1 %x: %s  <== here" % (0x1491a8ed0, code[:16].hex()))
+    assert sorted(dlg) == [(2, "dlg-f1"), (2, "ret")] and dlg[(2, "dlg-f1")] == [(0x1491a8ed0, code[:16])], dlg
     assert [(a, len(b)) for a, b in found[(2, "ret")]] == [(0x1491a8ec0, 48), (0x1491a8f00, 16)], found
     assert HEAD.search(log).group(5) == "0x1491a8ede"
     text = disassemble(found[(2, "ret")][0][1], 0x1491a8ec0)
@@ -122,7 +126,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("log", nargs="?")
     ap.add_argument("--call", type=int, help="only this reservation (the #N of the [jumbo-code] lines)")
-    ap.add_argument("--place", choices=("rip", "ret"))
+    ap.add_argument("--place", help="rip or ret ([jumbo-code]); dlg-rip, dlg-f1, dlg-f2 ... ([dlg-code], build 641)")
     ap.add_argument("--raw", help="also write each blob as a raw file in this directory")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
@@ -135,7 +139,8 @@ def main():
         print("call #%s size=%s rip=%s rsp=%s [rsp]=%s" % m.groups())
     found = blobs(text)
     if not found:
-        sys.exit("no [jumbo-code] rows in %s (env.MADEIRA_JUMBO_CODE_DUMP = 1 in the game's file, build 634 or later)" % a.log)
+        sys.exit("no [jumbo-code] or [dlg-code] rows in %s (env.MADEIRA_JUMBO_CODE_DUMP = 1, build 634 or later; "
+                 "env.MADEIRA_DIALOG_CODE_DUMP = 1, build 641 or later; in the game's file)" % a.log)
     for (call, place), parts in sorted(found.items()):
         if (a.call and call != a.call) or (a.place and place != a.place):
             continue

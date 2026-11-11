@@ -1,0 +1,15 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "unity-gc-real-suspend",
+  "il2cpp-gc-klass-object-race-lost"
+ ],
+ "next": [
+  "env.MADEIRA_REAL_SUSPEND = 1"
+ ],
+ "note": "Night round 2026-11-11 (G1 S1): 1000xRESIST (Send Log 63G9QV, build 634; the same in 0DA164, build 614): the IL2CPP collector race lost with only the object in a register; BCD repaired 14 virtual calls, the 16th fault found no register holding the table and the game died with c0000005. Rule unity-gc-real-suspend (the line that runs Megabonk, Big Walk, BALL x PIT and Lonely Mountains) comes first, il2cpp-gc-klass-object-race-lost (fixedIn 652, the fourth repair pass) is the next best match.",
+ "outcome": "crashed",
+ "stage": 4,
+ "status": "trying"
+}

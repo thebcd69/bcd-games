@@ -134,12 +134,59 @@ enum AutoTune {
         return String(format: "%016llx", LibraryPrefs.stableHash(text))
     }
 
+    // MARK: Analyses in flight
+
+    /// Night round 2026-11-11 (agent T3 S7; 2FR906, 9W3TW7, BZQMTZ, XVABPA, P1433Z): the verdict about a session lands on a utility queue, 2 to
+    /// 65 s after the app restarted, and a player who starts the same game inside that window launched with the state as it was before: the
+    /// line the verdict prepared (the swap tier after a kill) missed that start and cost one more kill. One group per game (its Windows
+    /// path); a launch of that game waits for it, at most `waitCapSeconds`, and no other game waits for anything.
+    private static let pendingLock = NSLock()
+    private static var pendingAnalyses: [String: DispatchGroup] = [:]
+    static let waitCapSeconds = 20
+
+    private static func pendingEnter(_ windowsPath: String) {
+        pendingLock.lock(); defer { pendingLock.unlock() }
+        let key = windowsPath.lowercased()
+        let group = pendingAnalyses[key] ?? DispatchGroup()
+        pendingAnalyses[key] = group
+        group.enter()
+    }
+    private static func pendingLeave(_ windowsPath: String) {
+        pendingLock.lock(); defer { pendingLock.unlock() }
+        pendingAnalyses[windowsPath.lowercased()]?.leave()
+    }
+    /// How long this launch waited for the game's own earlier analysis, in milliseconds (0: none was running). Not called on the launch path
+    /// (see exportLayer); kept for an asynchronous launch that may wait off the main thread.
+    private static func waitForAnalysis(_ windowsPath: String) -> Int {
+        pendingLock.lock()
+        let group = pendingAnalyses[windowsPath.lowercased()]
+        pendingLock.unlock()
+        guard let group else { return 0 }
+        let began = DispatchTime.now()
+        _ = group.wait(timeout: .now() + .seconds(waitCapSeconds))
+        return Int((DispatchTime.now().uptimeNanoseconds - began.uptimeNanoseconds) / 1_000_000)
+    }
+    /// Whether the game's earlier session is still being analysed (no wait).
+    static func analysisPending(_ windowsPath: String) -> Bool {
+        pendingLock.lock()
+        let group = pendingAnalyses[windowsPath.lowercased()]
+        pendingLock.unlock()
+        guard let group else { return false }
+        return group.wait(timeout: .now()) == .timedOut
+    }
+
     // MARK: Hooks
 
     /// H1, BCDLaunch.applyLibrary after applyExtras: a tuned game's lines go under its own file.
     static func exportLayer(for entry: LibraryEntry) {
         guard enabled, eligible(entry), isOn(entry.windowsPath) else { return }
         let path = entry.windowsPath
+        // Night round 2026-11-11 (agent T3 S7): the verdict about the last session of this game may still be being written. The lead did
+        // not take the agent's wait (up to 20 s on the main thread, where this runs: the interface would freeze and iOS may end the app);
+        // the start says so instead, and the line that verdict prepares reaches the next start. An asynchronous wait is an owner's decision.
+        if analysisPending(path) {
+            LogStore.shared.log("[autotune] \(entry.title): the earlier session's verdict is still being written; this start uses the game's state as it was")
+        }
         let s = state(path)
         let blocked = userKeys(entry)
         let lines = s.layerLines.filter { !blocked.contains(AutoTuneRules.key($0)) }
@@ -221,9 +268,14 @@ enum AutoTune {
         m.end = end
         if let d = try? JSONEncoder().encode(m) { try? d.write(to: url, options: .atomic) }
         let log = LogStore.shared.logFileURL
+        // Night round 2026-11-11 (T3 S7): a game that ended on its own or crashed may have a line waiting in its verdict; a game the player
+        // closed from the library (almost always a played session) does not hold the next start back.
+        let holdsNextStart = !end.quitRequested || end.crashStatus != nil
+        if holdsNextStart { pendingEnter(m.windowsPath) }
         DispatchQueue.global(qos: .utility).async {
             analyse(m, end: end, log: log)
             try? FileManager.default.removeItem(at: url)
+            if holdsNextStart { pendingLeave(m.windowsPath) }
         }
     }
 
@@ -240,10 +292,12 @@ enum AutoTune {
             try? FileManager.default.removeItem(at: pending)
             return
         }
+        pendingEnter(m.windowsPath)   // night round 2026-11-11 (T3 S7)
         DispatchQueue.global(qos: .utility).async {
             let end = m.end ?? AutoTuneSessionEnd(sawProcess: true, seconds: 0, killed: true, limitMB: m.limitMB)
             analyse(m, end: end, log: log)
             try? FileManager.default.removeItem(at: pending)
+            pendingLeave(m.windowsPath)
         }
     }
 
@@ -285,7 +339,11 @@ enum AutoTune {
         pending = nil
         var end = p.marker.end ?? AutoTuneSessionEnd(sawProcess: true, seconds: 0, killed: true, limitMB: p.marker.limitMB)
         end.userSaid = said
-        DispatchQueue.global(qos: .utility).async { analyse(p.marker, end: end, log: p.log) }
+        pendingEnter(p.marker.windowsPath)   // night round 2026-11-11 (T3 S7)
+        DispatchQueue.global(qos: .utility).async {
+            analyse(p.marker, end: end, log: p.log)
+            pendingLeave(p.marker.windowsPath)
+        }
     }
 
     // MARK: Analysis (utility queue, no game running)
@@ -311,6 +369,12 @@ enum AutoTune {
         // where it was. A batch that never ended (an installer that hangs) is scored as before.
         if scanner.facts.installsOver {
             LogStore.shared.log("[autotune] \(m.title): this session ran only the one-time installs; it is not a session of the game and is not scored")
+            return
+        }
+        // Night round 2026-11-11 (agent G2 S8; BlueField SM3JHE and VW6TV2): BCD asked the debugger for the JIT pool, none answered, and the
+        // start ended before Wine began: not a session of the game, so nothing is scored and no line is kept or dropped for it.
+        if scanner.facts.wineNeverStarted {
+            LogStore.shared.log("[autotune] \(m.title): Wine never started (no debugger answered BCD's request for the JIT pool); this is not a session of the game and is not scored")
             return
         }
         var report = AutoTuneEngine.report(end, scanner, rules: rules, signals: ruleSignals + tried)
@@ -344,9 +408,14 @@ enum AutoTune {
             verdict = "; tried \(rule): " + (last.kept == true ? "kept" : "reverted")
         }
         let keptNow = after.kept.isEmpty ? "" : "; kept \(after.kept.joined(separator: ", "))"
+        // Night round 2026-11-11 (agent T1 S1): why a trial was kept or reverted; (agent T2 S-DL3): which file was read and where the matched
+        // rules' signals first appeared in it, so that a verdict no log reproduces (Dying Light WF4EHP) can be checked.
+        let trial = after.trialNote.map { "; " + $0 } ?? ""
+        let firstSeen = AutoTuneEngine.matchedLines(report.matched, rules: rules, signals: ruleSignals + tried, scanner: scanner)
+        let readFrom = "; read \(log.lastPathComponent) (\(scanner.lineCount) lines" + (firstSeen.isEmpty ? ")" : "; " + firstSeen.joined(separator: ", ") + ")")
         LogStore.shared.log("[autotune] \(m.title): \(report.outcome) at stage \(report.stage) after \(Int(report.seconds)) s; "
                             + "matched \(report.matched.joined(separator: ",")); status \(after.status); next \(next)"
-                            + verdict + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? ""))   // round 624 (E1 S5b)
+                            + verdict + trial + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? "") + readFrom)   // round 624 (E1 S5b)
         let offer = AutoTuneOffer(title: m.title, windowsPath: m.windowsPath, report: report, state: after,
                                   reason: after.candidateRule.flatMap { id in rules.first { $0.id == id }?.reason })
         DispatchQueue.main.async {
@@ -380,7 +449,10 @@ struct AutoTuneOffer: Equatable {
         case "ok": return "\(title) played"
         case "stuck": return "\(title): no known fix fits this failure (tried: \(state.triedSummary))"
         case "gave-up": return "\(title): auto-tune stopped after \(AutoTuneEngine.maxAttempts) attempts"
-        case "known": return state.knownNoFix == true ? "\(title): no setting changes this failure" : "\(title): a crash in BCD, not a setting"
+        case "known":
+            // Night round 2026-11-11 (agent G10 S4): a rule's own lead ("Choose another OpenGL backend") says what to do instead.
+            if let lead = state.knownLeadText, let first = lead.first { return "\(title): \(first.lowercased())\(lead.dropFirst())" }
+            return state.knownNoFix == true ? "\(title): no setting changes this failure" : "\(title): a crash in BCD, not a setting"
         default: return "\(title) \(AutoTuneOffer.outcomeText(report.outcome))"
         }
     }
@@ -411,6 +483,11 @@ struct AutoTuneOffer: Equatable {
             if report.outcome == "killed" {
                 text += "iOS closed the game at its memory limit. Set the game's own graphics to the lowest preset (and any resolution or "
                     + "texture setting to Low) and play again.\n\n"
+                // Night round 2026-11-11 (T1 S2; Spider-Man Remastered and Miles Morales, DOA6, Batman: Arkham Knight on phones that give an app 6 GB: 9 logs
+                // closed at 98 to 100 % of the limit in the first minute): the phone class, so the player knows why the lowest preset may not be enough.
+                if let words = Self.sixGBClassWords(title: title, peakMB: report.peakMB, memoryPct: report.memoryPct, ramMB: report.ramMB) {
+                    text += words + "\n\n"
+                }
             }
             if let note = state.lowDiskNote { text += note + "\n\n" }   // round 624 (agent D3 S5-3): no swap file was tried for lack of storage
             text += "Export the auto-tune report on the game's page, under Auto-tune, to report it."
@@ -422,7 +499,10 @@ struct AutoTuneOffer: Equatable {
                 // 4 GB, with a swap file next: say why (the peak and the device class), once, before the lines.
                 if report.outcome == "killed", c.contains(where: { $0.hasPrefix("swap-mb") }), let peak = report.peakMB, peak <= 4600,
                    (report.ramMB ?? Int.max) <= 8000 {
-                    text += "This iPhone lets apps use about 4 GB, and \(title) needed more (its memory reached \(peak) MB). A swap file moves part "
+                    // Night round 2026-11-11 (T3 S3; Vampire: The Masquerade WE9D10, The Sims 2 2P7QQY and 6B98A9): the number is the device's own limit
+                    // (a 4 GB phone's limit is 2347 MB, not 4 GB), read from how full the memory was when iOS closed the game.
+                    let limit = Self.limitWords(peakMB: peak, memoryPct: report.memoryPct)
+                    text += "This iPhone lets apps use about \(limit), and \(title) needed more (its memory reached \(peak) MB). A swap file moves part "
                         + "of it to storage; an iPad or a newer iPhone has more room.\n\n"
                 }
                 text += c.isEmpty ? "The next start runs the same settings once more: a first failure after an update often clears on its own."
@@ -433,6 +513,24 @@ struct AutoTuneOffer: Equatable {
         }
         return text
     }
+    /// Night round 2026-11-11 (T3 S3): the device's memory limit in words, "4 GB" or "2.3 GB", from the peak and how many percent of the limit the last
+    /// footprint line was (AutoTuneReport.memoryPct; a kill is at 90 to 100 %). Without a usable percentage the old "4 GB" stays.
+    static func limitWords(peakMB: Int, memoryPct: Int?) -> String {
+        guard let pct = memoryPct, (50...110).contains(pct), peakMB > 0 else { return "4 GB" }
+        let gb = (Double(peakMB) * 100 / Double(pct) / 1024 * 10).rounded() / 10
+        return gb == gb.rounded() ? "\(Int(gb)) GB" : String(format: "%.1f GB", gb)
+    }
+
+    /// Night round 2026-11-11 (T1 S2): for a memory kill on a phone whose limit is about 6 GB (8 GB phones: 6143 MB), the class in words; nil for any
+    /// other device. The limit is estimated as in limitWords; a phone with more than 8 GB of memory, or no usable percentage, gets nothing.
+    static func sixGBClassWords(title: String, peakMB: Int?, memoryPct: Int?, ramMB: Int?) -> String? {
+        guard let peak = peakMB, let pct = memoryPct, (50...110).contains(pct), peak > 0, (ramMB ?? Int.max) <= 8000 else { return nil }
+        let gb = Double(peak) * 100 / Double(pct) / 1024
+        guard gb >= 5.5, gb < 6.8 else { return nil }
+        return "This device lets apps use about 6 GB, and \(title) needed more (its memory reached \(peak) MB). A game this size needs a phone that "
+            + "gives apps more than 6 GB: an iPad or a 12 GB iPhone has the room."
+    }
+
     static func outcomeText(_ outcome: String) -> String {
         switch outcome {
         case "crashed": return "crashed"

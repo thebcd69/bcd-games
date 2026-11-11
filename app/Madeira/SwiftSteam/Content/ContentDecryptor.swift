@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
@@ -31,8 +33,11 @@ struct ContentDecryptor {
         guard depotKey.count == 32 else {
             throw SteamError.decryptionFailed("The depot key is \(depotKey.count) bytes instead of 32.")
         }
-        guard encryptedData.count > 16 else {
-            throw SteamError.decryptionFailed("The encrypted data is too short.")
+        // CBC ciphertext must contain complete AES blocks. CommonCrypto can
+        // return decoded prefix bytes for some truncated inputs; reject them
+        // before asking the platform crypto implementation to decrypt.
+        guard encryptedData.count >= 32, (encryptedData.count - 16) % kCCBlockSizeAES128 == 0 else {
+            throw SteamError.decryptionFailed("The encrypted data is not a complete AES payload.")
         }
 
         let ivCipher = encryptedData.prefix(16)

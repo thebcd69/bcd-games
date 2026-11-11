@@ -243,6 +243,7 @@ let script = """
 
         // ---- the switch
         let base = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("dock-script-registry-\(getpid())")
+        try? FileManager.default.removeItem(at: base)   // start empty: exit() skips defer, so a folder with a reused process id may be left
         defer { try? FileManager.default.removeItem(at: base) }
         let cfg = base.appendingPathComponent("game.cfg")
         unsetenv("MADEIRA_DOCK_SCRIPT_REGISTRY")

@@ -328,6 +328,8 @@ extern NTSTATUS NtFreeVirtualMemory( HANDLE process, void **addr_ptr,
 /* The "device" Wine probes by name. mmdevapi stores it on the endpoint
  * struct and passes it back as `const char *device` in many calls. */
 static const char IOS_DEVICE_NAME[] = "ios-null";
+/* madeira-bcd (night round 2026-11-11, G2 S2): the one silent recording device of MADEIRA_AUDIO_CAPTURE = 1 (ios_get_endpoint_ids). */
+static const char IOS_CAPTURE_DEVICE_NAME[] = "ios-null-input";
 
 /* One global stream state — single render endpoint, single stream. FMOD
  * typically creates one shared-mode render stream; if a game opens a
@@ -370,6 +372,13 @@ struct ios_stream {
     /* madeira-bcd MADEIRA_AUDIO_RESUME: mach time up to which ios_stream_drain has
      * played this stream's ring by the clock while iOS held the endpoint stopped. */
     uint64_t drain_mach;
+    /* madeira-bcd (night round 2026-11-11, T2 S-AUD1): when create_stream made this stream, and whether the line for the first audible
+     * buffer (ios_audio_log_first_audible) has been printed. Touched by the stream's own client thread only. */
+    uint64_t create_mach;
+    int audible_logged;
+    /* madeira-bcd (night round 2026-11-11, G2 S2, MADEIRA_AUDIO_CAPTURE): a recording stream. It is never mixed, never starts the output
+     * endpoint and always answers "no data yet" (ios_get_capture_buffer). Only a keyed session has one. */
+    int capture;
 };
 
 /* ml739: one stream object per client, mirroring Wine's CoreAudio driver.
@@ -1441,11 +1450,43 @@ static NTSTATUS ios_main_loop(void *args) {
     return STATUS_SUCCESS;
 }
 
+/* madeira-bcd (night round 2026-11-11, G2 S2) env.MADEIRA_AUDIO_CAPTURE = 1 (OFF unless set; per game, in its own file): offer Windows one silent
+ * recording device, "iOS Null Input" (one eCapture endpoint, default). BCD's driver has always listed NO recording device: a game that enumerates
+ * them finds none (Wine's DirectSoundCaptureEnumerate then calls back zero times, IMMDeviceEnumerator::GetDefaultAudioEndpoint(eCapture) says
+ * E_NOTFOUND), which is a Windows PC with only an HDMI sound output. BioShock's Steam forum thread ("no audio after the intro": enable "Stereo Mix"
+ * in the recording devices) describes that machine. This is an EXPERIMENT for that game: the endpoint carries no sound and never touches the
+ * microphone (no AVAudioSession input, no permission prompt): a client that opens it gets a stream whose buffers are always empty
+ * (ios_get_capture_buffer: AUDCLNT_S_BUFFER_EMPTY, as winecoreaudio answers with nothing recorded yet) and which never starts the output endpoint.
+ * Unset, "0" or anything but "1": the driver behaves exactly as before (capture refused). Read once. */
+static int ios_audio_capture_on(void)
+{
+    static int cached = -1;
+    if (cached < 0) {
+        /* 1: one silent recording device is offered; unset or anything else: none, as before */
+        const char *e = getenv("MADEIRA_AUDIO_CAPTURE");
+        cached = (e && e[0] == '1' && !e[1]) ? 1 : 0;
+        if (cached)
+            fprintf(stderr, "[ios_audio] madeira-bcd MADEIRA_AUDIO_CAPTURE=1: one silent recording device 'iOS Null Input' is offered "
+                            "(never the microphone)\n");
+    }
+    return cached;
+}
+
 static NTSTATUS ios_get_endpoint_ids(void *args) {
     LOG_FN_CALL(3, "get_endpoint_ids");
     struct get_endpoint_ids_params *p = args;
-    /* Only render endpoints; refuse capture entirely. */
-    if (p->flow != eRender) {
+    /* Render endpoints only, unless MADEIRA_AUDIO_CAPTURE offers the one silent recording device; capture is refused entirely otherwise. */
+    int capture = p->flow == eCapture && ios_audio_capture_on();
+    if (p->flow != eRender && !capture) {
+        /* ml2302: mmdevapi asks for the capture list once per process when it loads this driver, so this says "the list was asked for and
+         * stayed empty", not that the game itself asked for a recording device. Counted per process; the 1st, 10th and 100th are printed. */
+        static _Atomic uint32_t refused;
+        if (p->flow == eCapture) {
+            uint32_t n = atomic_fetch_add_explicit(&refused, 1, memory_order_relaxed) + 1;
+            if (n == 1 || n == 10 || n == 100)
+                fprintf(stderr, "[ios_audio] ml2302 get_endpoint_ids flow=capture refused: no recording device is offered "
+                                "(MADEIRA_AUDIO_CAPTURE is off), call %u\n", n);
+        }
         p->num = 0;
         p->default_idx = 0;
         p->result = S_OK;
@@ -1455,8 +1496,11 @@ static NTSTATUS ios_get_endpoint_ids(void *args) {
      * and endpoint.device as char* (single-byte). Both stored as byte
      * offsets from the endpoints buffer base. */
     static const WCHAR dev_name_w[] = { 'i','O','S',' ','N','u','l','l', 0 };
-    unsigned int name_bytes = sizeof(dev_name_w);
-    unsigned int device_bytes = sizeof(IOS_DEVICE_NAME);
+    static const WCHAR cap_name_w[] = { 'i','O','S',' ','N','u','l','l',' ','I','n','p','u','t', 0 };
+    const WCHAR *name_w = capture ? cap_name_w : dev_name_w;
+    const char *device_s = capture ? IOS_CAPTURE_DEVICE_NAME : IOS_DEVICE_NAME;
+    unsigned int name_bytes = capture ? sizeof(cap_name_w) : sizeof(dev_name_w);
+    unsigned int device_bytes = capture ? sizeof(IOS_CAPTURE_DEVICE_NAME) : sizeof(IOS_DEVICE_NAME);
     unsigned int needed = sizeof(struct endpoint) + name_bytes + device_bytes;
     if (p->size < needed) {
         p->num = 1;
@@ -1468,8 +1512,8 @@ static NTSTATUS ios_get_endpoint_ids(void *args) {
     unsigned int name_off = sizeof(struct endpoint);
     unsigned int device_off = name_off + name_bytes;
     char *buf = (char *)p->endpoints;
-    memcpy(buf + name_off, dev_name_w, name_bytes);
-    memcpy(buf + device_off, IOS_DEVICE_NAME, device_bytes);
+    memcpy(buf + name_off, name_w, name_bytes);
+    memcpy(buf + device_off, device_s, device_bytes);
     p->endpoints[0].name = name_off;
     p->endpoints[0].device = device_off;
     p->num = 1;
@@ -1536,6 +1580,8 @@ static NTSTATUS ios_create_stream(void *args) {
     s->started = 0;
     s->start_mach = 0;
     s->accumulated_frames = 0;
+    s->create_mach = mach_absolute_time();   /* madeira-bcd T2 S-AUD1: the first audible buffer is counted from here */
+    s->capture = p->flow == eCapture;        /* madeira-bcd G2 S2: only exists with MADEIRA_AUDIO_CAPTURE = 1 (no recording device is offered otherwise) */
     s->sample_rate = p->fmt && p->fmt->nSamplesPerSec ? p->fmt->nSamplesPerSec : IOS_AUDIO_SAMPLE_RATE;
     s->channels = p->fmt && p->fmt->nChannels ? p->fmt->nChannels : IOS_AUDIO_CHANNELS;
     s->frame_bytes = p->fmt && p->fmt->nBlockAlign ? p->fmt->nBlockAlign
@@ -1615,7 +1661,8 @@ static NTSTATUS ios_start(void *args) {
         s->start_mach = mach_absolute_time();
         s->drain_mach = s->start_mach;   /* madeira-bcd MADEIRA_AUDIO_RESUME: a drain counts from this start */
         s->started = 1;
-        ios_dev_start();
+        if (!s->capture)   /* madeira-bcd G2 S2: a recording stream never starts the output endpoint */
+            ios_dev_start();
     }
     p->result = S_OK;
     return STATUS_SUCCESS;
@@ -1628,7 +1675,8 @@ static NTSTATUS ios_stop(void *args) {
     if (s->started) {
         s->accumulated_frames = elapsed_frames(s);
         s->started = 0;
-        ios_dev_stop_if_idle();
+        if (!s->capture)   /* madeira-bcd G2 S2: it never started the output endpoint, so it has none to stop */
+            ios_dev_stop_if_idle();
     }
     p->result = S_OK;
     return STATUS_SUCCESS;
@@ -1705,6 +1753,71 @@ static void ios_audio_timer_thread_rt(void)
             (int)kr, ios_audio_lead_ms());
 }
 
+/* madeira-bcd (night round 2026-11-11, T3 S5): a client that never has a whole render pass queued.
+ *
+ * XAudio2/FAudio-style clients (Quake II, Counter-Strike 2, Deadlock, Resonance, Dead Rising, MARVEL Cosmic Invasion, Mina the Hollower, ...: about 40
+ * logs of about 20 games) keep two 10 ms periods queued: 960 frames (882 at 44.1 kHz). RemoteIO pulls one render pass of about 21 ms, 1024 frames
+ * (941 at 44.1 kHz, 1115 on some devices), so EVERY pass finds 64 frames too few: the ring is empty after each pass, the rest of the pass plays
+ * silence and the position clock advances by the 960 frames that existed: the game's sound runs 6 % slow with a gap in every pass (a 47 Hz buzz,
+ * "scratchy"). The ml1230 pacing line shows it: "client wrote 93.8 %", "device short ... in 468 of 468 passes", "ring 0..960 frames". With the audio
+ * session's IO buffer asked for at the start (env.MADEIRA_AUDIO_IO_MS = 5: the Dead Rising and Mewgenics logs show passes of 240-256 frames and
+ * 0-14 short passes in 1875) the same kind of client plays cleanly, and in a Counter-Strike 2 log (4VVX0Z) iOS itself made the passes smaller after a
+ * 90 s gap in the background: "short 469 of 469 passes" before, "0 of 1875" after. Nobody had set the key for these games, and the failure is plain in
+ * the log, so the driver asks once.
+ *
+ * ios_audio_underrun_window says whether ONE 10 s pacing window of ONE stream is that signature:
+ *   - 100 render passes or more, and 9 in 10 of them or more were short (a client that is late now and then is not this);
+ *   - the stream's queue never reached one whole pass: its highest padding (pad_max, stream frames) is under the largest pass, converted from device
+ *     frames to the stream's rate (a 44.1 kHz client on a 48 kHz endpoint pulls 941 stream frames per 1024 device frames);
+ *   - the client kept feeding the stream: it wrote at least a quarter of the window's seconds. A paused or idle client writes next to nothing (122
+ *     windows of 0-4 % in the archive); the queue-limited clients above write 35-94 %;
+ *   - and it is not the 12-channel bed of Wine's spatial audio (Horizon: 23 %, ring 0..480): MADEIRA_AUDIO_SPATIAL = 0 is that failure's own answer,
+ *     so a stream of more than 8 channels is left alone.
+ * Two such windows in a row (20 s) trigger the request: one per run, for any stream, through madeira_audio_request_io_slice (WineProcessBridge.m: the
+ * session's IO buffer, on a background queue). Skipped when the game's own file has env.MADEIRA_AUDIO_IO_MS at all (any value, 0 included): the player's or
+ * the list's choice wins, and 0 leaves the system's slice. Declared weak: a host test or a build without the app side asks for nothing. */
+extern int madeira_audio_request_io_slice(double ms) __attribute__((weak));
+#define IOS_AUDIO_IO_AUTO_MS 5.0
+static _Atomic int g_io_auto_asked;   /* the request was made (or refused for good) in this run */
+
+static int ios_audio_underrun_window(uint64_t pad_max, uint32_t cb_max, uint32_t passes, uint32_t short_passes,
+                                     double wrote_s, double secs, uint32_t rate, uint32_t dev_rate, uint32_t channels)
+{
+    uint64_t pass;   /* the largest render pass, in this stream's frames */
+
+    if (!rate || !dev_rate || !cb_max || secs <= 0.0 || channels > 8) return 0;
+    pass = ((uint64_t)cb_max * rate + dev_rate - 1) / dev_rate;
+    if (passes < 100 || (uint64_t)short_passes * 10 < (uint64_t)passes * 9) return 0;
+    if (pad_max == 0 || pad_max >= pass) return 0;
+    return wrote_s >= secs * 0.25;
+}
+
+/* One finished 10 s pacing window of one stream (ios_timer_loop's report block, only while nothing has been asked yet in this run): count the windows
+ * in a row that are the signature and, at the second, ask for the IO buffer once (ml2300) or say why not (ml2301). `windows` is the stream's own counter.
+ * Everything but the weak app call and getenv is plain C, so tests/host/check-audio-io-auto.py runs this very code. */
+static void ios_audio_io_auto_window(const void *stream, uint32_t *windows, uint64_t pad_max, uint32_t cb_max, uint32_t passes,
+                                     uint32_t short_passes, double wrote_s, double secs, uint32_t rate, uint32_t dev_rate, uint32_t channels)
+{
+    const char *own;
+
+    if (!ios_audio_underrun_window(pad_max, cb_max, passes, short_passes, wrote_s, secs, rate, dev_rate, channels)) { *windows = 0; return; }
+    if (++*windows < 2) return;
+    own = getenv("MADEIRA_AUDIO_IO_MS");   /* the game's own value (any, 0 too) settles the IO buffer at the start of the session */
+    if (own && *own) {
+        atomic_store_explicit(&g_io_auto_asked, 1, memory_order_relaxed);
+        fprintf(stderr, "[ios_audio] ml2301 stream=%p the client's queue is shorter than one render pass (queue at most %llu frames, "
+                        "largest pass %u frames) but env.MADEIRA_AUDIO_IO_MS=%s is set: the IO buffer is left as the game's file asks\n",
+                stream, (unsigned long long)pad_max, cb_max, own);
+    }
+    else if (!atomic_exchange_explicit(&g_io_auto_asked, 1, memory_order_relaxed)) {
+        fprintf(stderr, "[ios_audio] ml2300 stream=%p underrun signature in %u windows in a row (queue at most %llu frames, "
+                        "largest pass %u frames, %u of %u passes short, client wrote %.1f%%): asking iOS for a %.0f ms IO buffer\n",
+                stream, *windows, (unsigned long long)pad_max, cb_max, short_passes, passes,
+                secs > 0 ? 100.0 * wrote_s / secs : 0.0, IOS_AUDIO_IO_AUTO_MS);
+        if (madeira_audio_request_io_slice) madeira_audio_request_io_slice(IOS_AUDIO_IO_AUTO_MS);
+    }
+}
+
 static NTSTATUS ios_timer_loop(void *args) {
     /* Runs on a dedicated Wine thread mmdevapi spawns for event-driven
      * clients. Wake the client whenever the ring needs more (ml1230); exit
@@ -1716,6 +1829,7 @@ static NTSTATUS ios_timer_loop(void *args) {
     uint64_t rep_ns = 0, rep_wr = 0, rep_short = 0, rep_clamped = 0;
     uint32_t rep_cbs = 0, rep_short_cbs = 0, wakes = 0, unanswered = 0;
     uint64_t pad_min = UINT64_MAX, pad_max = 0, late_max_ns = 0;
+    uint32_t underrun_windows = 0;   /* madeira-bcd T3 S5: pacing windows in a row that are the "queue shorter than one pass" signature */
 
     if (!s) return STATUS_SUCCESS;
     LOG_FN_CALL(9, "timer_loop");
@@ -1791,6 +1905,9 @@ static NTSTATUS ios_timer_loop(void *args) {
                     atomic_load_explicit(&s->st_cb_max, memory_order_relaxed),
                     (unsigned long long)pad_min, (unsigned long long)pad_max, late_max_ns / 1e6,
                     (unsigned long long)(clamped - rep_clamped));
+            if (!atomic_load_explicit(&g_io_auto_asked, memory_order_relaxed))   /* madeira-bcd T3 S5: see ios_audio_underrun_window */
+                ios_audio_io_auto_window((void *)s, &underrun_windows, pad_max, atomic_load_explicit(&s->st_cb_max, memory_order_relaxed),
+                                         cbs - rep_cbs, scbs - rep_short_cbs, wrote, secs, rate, g_dev.rate ? g_dev.rate : rate, s->channels);
             rep_ns = now; rep_wr = wr; rep_short = shrt; rep_cbs = cbs; rep_short_cbs = scbs;
             rep_clamped = clamped; wakes = 0; pad_min = UINT64_MAX; pad_max = 0; late_max_ns = 0;
         }
@@ -1852,6 +1969,23 @@ static NTSTATUS ios_get_render_buffer(void *args) {
     return STATUS_SUCCESS;
 }
 
+/* madeira-bcd (night round 2026-11-11, T2 S-AUD1): once per stream, the first buffer the game hands the endpoint that carries a sound (a sample of at
+ * least -60 dBFS, 0.001; every ml1065 line before it reads peak 0.000), and what the endpoint was doing at that moment. A game whose audio "comes back
+ * after minimising" (MakeRoom NF8FK6) or "has none after the intro" (BioShock) is either silent itself (this line comes late or never) or has a stopped,
+ * muted or held endpoint (the line comes, and the state says why nothing is heard). Live (mixed) streams only: the ones that reach a slot in the
+ * ml1065 sampling. Log only; runs on the client's thread, never on the render callback. */
+#define IOS_FIRST_AUDIBLE_PEAK 0.001f
+static void ios_audio_log_first_audible(struct ios_stream *s, int slot, float peak)
+{
+    s->audible_logged = 1;
+    fprintf(stderr, "[ios_audio] ml2303 slot=%d first audible buffer %.2f s after create_stream (peak %.3f; endpoint %s, mute=%d, paused=%d, "
+                    "held=%d, halt=%d)\n", slot, (double)(mach_to_ns(mach_absolute_time() - s->create_mach)) / 1e9, (double)peak,
+            g_dev.au ? (g_dev.running ? "running" : "stopped") : "none",
+            atomic_load_explicit(&g_bg_mute, memory_order_relaxed) ? 1 : 0,
+            atomic_load_explicit(&g_ios_audio_paused, memory_order_relaxed) ? 1 : 0,
+            atomic_load_explicit(&g_dev_suspended, memory_order_acquire) ? 1 : 0, g_bg_halt);
+}
+
 static NTSTATUS ios_release_render_buffer(void *args) {
     struct release_render_buffer_params *p = args;
     struct ios_stream *s = stream_from_handle(p->stream);
@@ -1883,6 +2017,7 @@ static NTSTATUS ios_release_render_buffer(void *args) {
             for (si = 0; si < IOS_MAX_STREAMS; si++) if (atomic_load_explicit(&g_mix[si], memory_order_relaxed) == s) { slot = si; break; }
             if (slot >= 0 && slot < IOS_MAX_STREAMS && s->channels) {
                 UINT32 f2, c2, step = n > 4096 ? n / 4096 : 1;
+                float bpeak = 0.0f;   /* madeira-bcd T2 S-AUD1: the loudest sample of this buffer */
                 for (f2 = 0; f2 < n; f2 += step) {
                     const BYTE *fr = s->render_scratch + (size_t)f2 * fb;
                     /* every channel the mixer reads, not just the first two:
@@ -1893,9 +2028,11 @@ static NTSTATUS ios_release_render_buffer(void *args) {
                                 : ((const int32_t *)fr)[c2] * (1.0f / 2147483648.0f);
                         float a = v < 0 ? -v : v;
                         st[slot].sum_abs += a; if (a > st[slot].peak) st[slot].peak = a; if (a >= 0.99f) st[slot].clip++;
+                        if (a > bpeak) bpeak = a;
                         st[slot].frames++;
                     }
                 }
+                if (!s->audible_logged && bpeak >= IOS_FIRST_AUDIBLE_PEAK) ios_audio_log_first_audible(s, slot, bpeak);
                 if (time(NULL) - st[slot].last >= 10 && st[slot].frames && !s->is_float) {   /* ml1067: what do the bytes look like */
                     const uint16_t *w = (const uint16_t *)s->render_scratch;
                     fprintf(stderr, "[ios_audio] ml1067 slot=%d first 12 words of the last buffer (%u frames asked): "
@@ -1919,12 +2056,17 @@ static NTSTATUS ios_release_render_buffer(void *args) {
     return STATUS_SUCCESS;
 }
 
+/* madeira-bcd (night round 2026-11-11, G2 S2): only reachable with MADEIRA_AUDIO_CAPTURE = 1 (no capture stream exists otherwise). Nothing is ever
+ * recorded, so the answer is "no data yet", AUDCLNT_S_BUFFER_EMPTY, as winecoreaudio answers before its first period. It used to be S_OK with zero
+ * frames, which Wine's dsound capture thread (dsound/capture.c DSOUND_capture_data: `while (1) { GetBuffer; if (hr == AUDCLNT_S_BUFFER_EMPTY) break; ...
+ * ReleaseBuffer }`) takes for a packet of zero frames and polls again at once: a thread spinning on a core. */
+#define IOS_AUDCLNT_S_BUFFER_EMPTY 0x08890001L
 static NTSTATUS ios_get_capture_buffer(void *args) {
     struct get_capture_buffer_params *p = args;
     if (p->frames) *p->frames = 0;
     if (p->data) *p->data = NULL;
     if (p->flags) *p->flags = 0;
-    p->result = S_OK;
+    p->result = IOS_AUDCLNT_S_BUFFER_EMPTY;
     return STATUS_SUCCESS;
 }
 
@@ -2492,7 +2634,7 @@ static NTSTATUS ios_wow64_get_capture_buffer(void *args)
     NTSTATUS status = ios_get_capture_buffer(&params);
 
     params32->result = params.result;
-    /* this driver has no capture endpoint, so `data` is always NULL and
+    /* this driver never records anything (MADEIRA_AUDIO_CAPTURE offers a silent endpoint), so `data` is always NULL and
      * ios_wow_guest_ptr32() keeps it 0; the window check is the same
      * contract get_render_buffer enforces, should that ever change */
     if (!(slot = ios_wow_host_ptr(params32->data))) return status;

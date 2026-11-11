@@ -77,8 +77,20 @@ for k in range(start, len(fn)):
             break
 block = fn[start:end + 1]
 body = block[len(GATE):]
-check("the block ends in its own closing brace before the old early return",
-      fn[end + 1:].lstrip().startswith("if (want == r->tex_type && lvl0 == 0"))
+rest = fn[end + 1:].lstrip()
+if rest.startswith("{   /* night round 2026-11-11 (G1 S8"):
+    # build 652: the view-sample-count guard (tests/host/check-d3d12-view-sample-count.py) is a block of its own between this block and the early return
+    depth = 0
+    for k, ch in enumerate(rest):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                rest = rest[k + 1:].lstrip()
+                break
+check("the block ends in its own closing brace before the old early return (the view-sample-count guard of build 652 may sit between)",
+      rest.startswith("if (want == r->tex_type && lvl0 == 0"))
 check("the block only logs: no return, no goto, no assignment to a view argument or to the resource",
       not re.search(r"\breturn\b|\bgoto\b", body)
       and not re.search(r"\b(lvl0|nlvl|sl0|nsl|pf|swz|want|id|tex)\s*(=[^=]|\+=|-=|\+\+|--)", body)

@@ -35,6 +35,7 @@ check(ids.count == 1 && ids["bin/game.exe"] == .some("chunks:\(md5(a1))"), "iden
 
 let fm = FileManager.default
 let work = fm.temporaryDirectory.appendingPathComponent("gog-update-bcd-\(getpid())")
+try? FileManager.default.removeItem(at: work)   // start empty: exit() skips defer, so a folder with a reused process id may be left
 try? fm.createDirectory(at: work, withIntermediateDirectories: true)
 defer { try? fm.removeItem(at: work) }
 let folder = work.appendingPathComponent("Game")

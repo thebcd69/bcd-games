@@ -1118,6 +1118,7 @@ static void ios_guest_rip_profile( int gen )
     unsigned total = 0, distinct = 0, dropped = 0;
     int nb = 0, pass, i;
     thread_act_t tg[ML979_MAXTHREADS];
+    uint64_t tg_teb[ML979_MAXTHREADS], run_teb = 0;   /* night round 2026-11-11 (G1 S10, D S13): the TEB of a thread sampled while RUNNING, for [spin-code] */
     int ntg = 0;
     uint64_t rp_teb = 0;   /* ml1112b: a sampled guest thread's TEB, for the module list */
 
@@ -1163,6 +1164,7 @@ static void ios_guest_rip_profile( int gen )
             {
                 if (!rp_teb) rp_teb = teb_k;
                 tg[ntg] = tl[k];
+                tg_teb[ntg] = teb_k;
                 mach_port_mod_refs( mach_task_self(), tl[k], MACH_PORT_RIGHT_SEND, 1 ); /* keep it */
                 ntg++;
             }
@@ -1257,6 +1259,7 @@ static void ios_guest_rip_profile( int gen )
                 if (running) {   /* ml1111 */
                     uint64_t k = rip & ~(ML979_GRAIN - 1), hp = st.__pc & ~(ML979_GRAIN - 1);
                     rtotal++;
+                    run_teb = tg_teb[t];
                     for (i = 0; i < nrb; i++) if (rb[i].base == k) { rb[i].n++; break; }
                     if (i == nrb && nrb < ML979_BUCKETS) { rb[nrb].base = k; rb[nrb].n = 1; nrb++; }
                     if (rip < 0x140000000ull || rip >= 0x148000000ull) {   /* not in the game image: native callee */
@@ -1410,6 +1413,16 @@ static void ios_guest_rip_profile( int gen )
             n = snprintf( line, sizeof(line), "[rip-profile] ml1110 code @%#llx (%u%%):", (unsigned long long)b[i].base, (b[i].n * 100) / total );
             for (k = 0; k < 64 && n < (int)sizeof(line) - 4; k++) n += snprintf( line + n, sizeof(line) - n, " %02x", code[k] );
             wine_log_write( "%s", line );
+        }
+        /* Night round 2026-11-11 (agents G1 S10 and D S13; Assassin's Creed: Brotherhood 8T7MA0, ZA3QRV; The Binding of Isaac: Repentance+ CMXRG6 and 4 more):
+         * a 32-bit guest (its addresses are below 4 GB: the line above takes only 64-bit images) whose RUNNING samples are 90 % at one 64-byte bucket spins in
+         * that code. [spin-code] prints the bytes there and follows the jumps through the import slots (signal_arm64_ios.c ios_x86_spin_code), with
+         * env.MADEIRA_X86_FAULT_DUMP = 1; two shots a process. */
+        if (nrb && rtotal >= 20 && rb[0].base >= 0x10000 && rb[0].base < 0x100000000ull && (unsigned long long)rb[0].n * 100 >= 90ull * rtotal)
+        {
+            extern void ios_x86_spin_code( uint64_t thread_teb, uint32_t eip );
+
+            ios_x86_spin_code( run_teb ? run_teb : rp_teb, (uint32_t)rb[0].base );
         }
     }
 }
@@ -1767,6 +1780,22 @@ static void ios_spin_where( const struct ios_xp_mod *mods, int n, uint64_t a, ch
 
 static const char *ios_spin_cpu_why;   /* madeira-bcd (round 624): the CPU-streak look's own header (ios_spin_capture_cpu) */
 
+/* Night round 2026-11-11 (agent T1 S9; Control SM7KCK, 28NE9R and G2CRAR): the Coherent GT UI loop (coherentgtjs.dll+0x57bdd1..0x57bdeb, a list walk) never exits and
+ * nothing in the log says whether the node it walks changes (a loop that waits for another thread) or stays frozen (a lost store). With env.MADEIRA_SPIN_DUMP_REGS = 1 each
+ * [spin] look also prints 0x80 bytes of guest memory at RDI, RBX and RSI (here the list owner, the node and the sentinel): two looks 20 s apart show the fields. */
+static int ios_spin_dump_regs_on( void )
+{
+    static int on = -1;
+
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_SPIN_DUMP_REGS" );   /* 1: every [spin] look also prints 0x80 bytes of guest memory at RDI, RBX and RSI of a spinning thread, so a list walk or a wait loop can be read from the log (Control's UI loop). unset/0: off. */
+
+        on = e && *e && strcmp( e, "0" ) != 0;
+    }
+    return on;
+}
+
 static void ios_spin_capture( const char *wall, int look, double rate, double share, int streak, uint64_t top, const char *top_sym )
 {
     extern int ios_jit_pool_image_pc( uintptr_t pc, uintptr_t *pe_addr_out );
@@ -1902,6 +1931,35 @@ static void ios_spin_capture( const char *wall, int look, double rate, double sh
         }
         else wine_log_write( "[spin] ml1140   no readable x86 stack (x23, sp and the frame's RSP: none readable; the TEB's stack is 0x%llx..0x%llx)",
                              (unsigned long long)stack_limit, (unsigned long long)stack_base );
+        if (ios_spin_dump_regs_on())   /* T1 S9: the objects the registers point at, 0x80 bytes each, as qwords with the module of a code pointer */
+        {
+            const struct { const char *name; uint64_t v; } objr[] = { { "RDI", st.__x[26] }, { "RBX", st.__x[27] }, { "RSI", st.__x[25] } };
+            int oi;
+
+            for (oi = 0; oi < 3; oi++)
+            {
+                uint64_t q[16];
+                int qi;
+
+                if (objr[oi].v < 0x10000 || objr[oi].v >= 0x800000000000ULL || !ios_ts_read( objr[oi].v, q, sizeof(q) ))
+                {
+                    wine_log_write( "[spin] ml1140   [%s=0x%llx]: not readable", objr[oi].name, (unsigned long long)objr[oi].v );
+                    continue;
+                }
+                for (qi = 0; qi < 16; qi += 4)
+                {
+                    char w0[96], w1[96], w2[96], w3[96];
+
+                    ios_spin_where( mods, nmods, q[qi], w0, sizeof(w0) ); ios_spin_where( mods, nmods, q[qi + 1], w1, sizeof(w1) );
+                    ios_spin_where( mods, nmods, q[qi + 2], w2, sizeof(w2) ); ios_spin_where( mods, nmods, q[qi + 3], w3, sizeof(w3) );
+                    wine_log_write( "[spin] ml1140   [%s=0x%llx]+0x%02x: %016llx%s%s%s %016llx%s%s%s %016llx%s%s%s %016llx%s%s%s", objr[oi].name, (unsigned long long)objr[oi].v, qi * 8,
+                                    (unsigned long long)q[qi], strcmp( w0, "no module" ) ? "(" : "", strcmp( w0, "no module" ) ? w0 : "", strcmp( w0, "no module" ) ? ")" : "",
+                                    (unsigned long long)q[qi + 1], strcmp( w1, "no module" ) ? "(" : "", strcmp( w1, "no module" ) ? w1 : "", strcmp( w1, "no module" ) ? ")" : "",
+                                    (unsigned long long)q[qi + 2], strcmp( w2, "no module" ) ? "(" : "", strcmp( w2, "no module" ) ? w2 : "", strcmp( w2, "no module" ) ? ")" : "",
+                                    (unsigned long long)q[qi + 3], strcmp( w3, "no module" ) ? "(" : "", strcmp( w3, "no module" ) ? w3 : "", strcmp( w3, "no module" ) ? ")" : "" );
+                }
+            }
+        }
     }
     for (k = 0; k < tc; k++) mach_port_deallocate( mach_task_self(), tl[k] );
     vm_deallocate( mach_task_self(), (vm_address_t)tl, tc * sizeof(*tl) );
@@ -2320,6 +2378,53 @@ static void ios_xp_name_native( pthread_t pt, uint64_t tid )
     named[n++] = tid;
     pthread_getname_np( pt, name, sizeof(name) );
     wine_log_write( "[xp-names] m%llu \"%s\"", (unsigned long long)tid, name[0] ? name : "(unnamed)" );
+}
+
+/* Night round 2026-11-11 (agent G6 S13; Look Outside PCND9X: the app's own Swift thread m356839 at 94 % of a core, "a loop that builds a generic tuple on every pass" in
+ * libswiftCore's generic metadata calls, and [xp-names] said only "(unnamed)"): for a NATIVE thread (no TEB) that uses more than half of a core in one sample, the first time,
+ * its name AND where it is: the frame-pointer chain of the thread (innermost first, at most 14 frames, as dylib`symbol+offset), so the thread can be named by the code it
+ * runs. The thread is held only while the frames are copied out with plain Mach reads (no lock, no dladdr); the symbols are looked up after it runs again. At most 8
+ * threads a session; no switch (the thread is already listed by [xp-t] and the log is one line). */
+static void ios_xp_native_stack( mach_port_t th, uint64_t tid, double busy_pct )
+{
+    static uint64_t done[8];
+    static int nd;
+    arm_thread_state64_t st;
+    mach_msg_type_number_t cnt = ARM_THREAD_STATE64_COUNT;
+    uint64_t pcs[14], fp;
+    int n = 0, i;
+    char line[1400], sym[200];
+    size_t l;
+
+    if (th == pthread_mach_thread_np( pthread_self() )) return;   /* never hold the sampler itself */
+    for (i = 0; i < nd; i++) if (done[i] == tid) return;
+    if (nd >= (int)(sizeof(done) / sizeof(done[0]))) return;
+    done[nd++] = tid;
+    if (thread_suspend( th ) != KERN_SUCCESS) return;
+    if (thread_get_state( th, ARM_THREAD_STATE64, (thread_state_t)&st, &cnt ) == KERN_SUCCESS)
+    {
+        pcs[n++] = arm_thread_state64_get_pc( st );
+        if (arm_thread_state64_get_lr( st )) pcs[n++] = arm_thread_state64_get_lr( st );
+        fp = arm_thread_state64_get_fp( st );
+        while (n < 14 && fp >= 0x100000000ULL && !(fp & 15))
+        {
+            uint64_t rec[2];
+
+            if (!ios_ts_read( fp, rec, sizeof(rec) ) || rec[1] < 0x100000000ULL) break;
+            pcs[n++] = rec[1];
+            if (rec[0] <= fp) break;
+            fp = rec[0];
+        }
+    }
+    thread_resume( th );
+    if (!n) return;
+    l = (size_t)snprintf( line, sizeof(line), "[xp-names] m%llu uses %.0f%% of a core; its stack, innermost first:", (unsigned long long)tid, busy_pct );
+    for (i = 0; i < n && l + 220 < sizeof(line); i++)
+    {
+        ios_ts_sym( pcs[i], sym, sizeof(sym) );
+        l += (size_t)snprintf( line + l, sizeof(line) - l, " %s%s", i ? "<- " : "", sym );
+    }
+    wine_log_write( "%s", line );
 }
 
 /* madeira-bcd: CPU power governor (opt-in: env.MADEIRA_POWER_GOV_MW = target in mW).
@@ -2957,6 +3062,7 @@ static void ios_xprobe_main( void )
                                 if (teb) ios_ts_read( teb + 0x48, &w, 4 );
                                 r->tid = idi.thread_id; r->wtid = w; r->p_ms = pt; r->e_ms = et;
                                 if (!w && pt_ && pt + et >= 2.0) ios_xp_name_native( pt_, idi.thread_id );
+                                if (!w && dt_ms > 0 && pt + et >= 0.5 * dt_ms) ios_xp_native_stack( th[k], idi.thread_id, 100.0 * (pt + et) / dt_ms );   /* G6 S13 */
                                 r->p_ghz = pt > 0 ? pcy / (pt * 1e6) : 0; r->e_ghz = et > 0 ? ecy / (et * 1e6) : 0;
                                 r->minst = (double)((cur[0].instr - pv->c[0].instr) + (cur[1].instr - pv->c[1].instr)) / 1e6;
                                 r->role = NULL;
@@ -3660,6 +3766,7 @@ static NTSTATUS invoke_user_apc( CONTEXT *context, const struct user_apc *apc, N
  * it was, and so is every 64-bit process. MADEIRA_IOSB_DEAD_TARGET=0 stores anyway. */
 extern int ios_iosb_probe_mapped( unsigned long long addr, unsigned long long len );
 extern int ios_iosb_probe_served_low( unsigned long long addr, unsigned long long len );
+extern int ios_iosb_probe_exec_pool( unsigned long long addr, unsigned long long len );   /* night round 2026-11-11 (G8 S1) */
 
 static void ios_set_async_iosb( client_ptr_t iosb, NTSTATUS status, ULONG_PTR info )
 {
@@ -3667,17 +3774,25 @@ static void ios_set_async_iosb( client_ptr_t iosb, NTSTATUS status, ULONG_PTR in
 
     if (iosb && in_wow64_call())
     {
+        int in_code = 0;
+
         if (enabled < 0) enabled = ios_iosb_dead_enabled();
-        if (enabled && ios_iosb32_target_dead( iosb, ios_wow_base(), ios_iosb_probe_mapped, ios_iosb_probe_served_low ))
+        /* Night round 2026-11-11 (G8 S1; Resident Evil 5 BF3644, Portal CQEQJX, Q3SG8T, V7F39B, MX074P): a status block pointer that is a stale
+         * return address into a pool image copy's code is "mapped" but not a status block; the store corrupted the code and the process ended
+         * with an illegal instruction (ios_iosb_dead.h). */
+        if (enabled && (ios_iosb32_target_dead( iosb, ios_wow_base(), ios_iosb_probe_mapped, ios_iosb_probe_served_low ) ||
+                        (in_code = ios_iosb32_target_in_code( iosb, ios_wow_base(), ios_iosb_probe_exec_pool ))))
         {
             static volatile unsigned count;
             unsigned n = __sync_add_and_fetch( &count, 1 );
 
             if (n <= 8 || !(n & (n - 1)))
-                dprintf( 2, "[iosb-dead] ajan16 #%u async I/O completion in a 32-bit process (window %p): the status block pointer %#llx is not "
-                         "memory; the store of status=%#x information=%#llx is skipped (a 64-bit caller's status block taken for a guest one; "
+                dprintf( 2, "[iosb-dead] ajan16 #%u async I/O completion in a 32-bit process (window %p): the status block pointer %#llx is %s; "
+                         "the store of status=%#x information=%#llx is skipped (a 64-bit caller's status block taken for a guest one; "
                          "MADEIRA_IOSB_DEAD_TARGET=0 stores anyway)\n",
-                         n, (void *)ios_wow_base(), (unsigned long long)iosb, (unsigned)status, (unsigned long long)info );
+                         n, (void *)ios_wow_base(), (unsigned long long)iosb,
+                         in_code ? "inside the executable code of a JIT pool image copy" : "not memory",
+                         (unsigned)status, (unsigned long long)info );
             return;
         }
     }

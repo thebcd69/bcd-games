@@ -174,6 +174,18 @@ check('the mapping probe asks Mach for regions (the recurse form), calls only a 
       and 'rb > (mach_vm_address_t)p) return 0;' in probe_m)
 check('the low probe asks the sub-floor windows (any owner) and the low allocation registry, as the fault path does',
       'ios_subfloor_translate( addr, NULL )' in probe_s and 'ios_lowalloc_translate( addr, len, &real, &owner )' in probe_s)
+# Night round 2026-11-11 (agent G8 S1; Resident Evil 5 BF3644, Portal CQEQJX, Q3SG8T, V7F39B, MX074P): a pointer INTO the executable code of a pool image copy
+in_code = function(header, 'static inline int ios_iosb32_target_in_code(')
+check('the code test leaves NULL, anything below the floor, a wrapping span and the process\'s own guest window alone, and asks the pool probe last',
+      in_code.index('if (!p || p < IOS_IOSB_FLOOR) return 0;') < in_code.index('if (p + IOS_IOSB32_SIZE < p) return 0;')
+      < in_code.index('p - guest_base < IOS_IOSB_WINDOW_SIZE) return 0;') < in_code.index('exec_pool( p, IOS_IOSB32_SIZE )'))
+probe_e = function(signal, 'int ios_iosb_probe_exec_pool( unsigned long long addr, unsigned long long len )\n{')
+check('the pool probe asks ios_jit_addr_is_text (the .text of the pool\'s image copies, by address only) for the first and the last byte, and a zero or wrapping span is no hit',
+      'ios_jit_addr_is_text( (uintptr_t)addr ) || ios_jit_addr_is_text( (uintptr_t)(addr + len - 1) )' in probe_e and 'if (!len || addr + len < addr) return 0;' in probe_e)
+check('the wrapper asks the code test with the same window base and the pool probe, after the first decision, and names the code in the log line; the switch turns both off',
+      'ios_iosb32_target_in_code( iosb, ios_wow_base(), ios_iosb_probe_exec_pool )' in wrapper
+      and wrapper.index('ios_iosb32_target_dead(') < wrapper.index('ios_iosb32_target_in_code(') and 'inside the executable code of a JIT pool image copy' in wrapper
+      and 'if (enabled && (ios_iosb32_target_dead(' in wrapper)
 
 # ---------------------------------------------------------------- 3. the decision and the wrapper, compiled
 DECISION = r'''
@@ -271,6 +283,45 @@ else:
                   'enabled=1' in r.stdout and 'enabled=1' in run_d(MADEIRA_IOSB_DEAD_TARGET='1').stdout and 'enabled=1' in run_d(MADEIRA_IOSB_DEAD_TARGET='').stdout
                   and 'enabled=1' in run_d(MADEIRA_IOSB_DEAD_TARGET='00').stdout and 'enabled=0' in run_d(MADEIRA_IOSB_DEAD_TARGET='0').stdout)
 
+        # the code test (night round 2026-11-11): over the pointer cases and the probe's answer
+        CODE = r'''
+#include <stdio.h>
+#include "ios_iosb_dead.h"
+static int exec_n, exec_ans;
+static int pe(unsigned long long a, unsigned long long l) { (void)a; (void)l; exec_n++; return exec_ans; }
+int main(void)
+{
+    struct { const char *name; unsigned long long p, base; } cases[] = {
+        { "null", 0, 0x7300000000ull }, { "wraps", 0xfffffffffffffffcull, 0x7300000000ull }, { "low 0x10000", 0x10000ull, 0x7300000000ull },
+        { "below the floor by 4", 0xfffffffcull, 0x7300000000ull }, { "floor", 0x100000000ull, 0x7300000000ull },
+        { "window start", 0x7300000000ull, 0x7300000000ull }, { "window last 8", 0x73fffffff8ull, 0x7300000000ull }, { "window end", 0x7400000000ull, 0x7300000000ull },
+        { "pool code 0x30a6f1354", 0x30a6f1354ull, 0x400000000ull }, { "stack", 0x16d2ffb90ull, 0x7300000000ull },
+    };
+    for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); i++)
+        for (int e = 0; e < 2; e++)
+        {
+            exec_n = 0; exec_ans = e;
+            printf( "%s|e%d|%d|%d\n", cases[i].name, e, ios_iosb32_target_in_code( cases[i].p, cases[i].base, pe ), exec_n );
+        }
+    return 0;
+}
+'''
+        (d / 'k.c').write_text(CODE)
+        c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Werror', f'-I{nt}', str(d / 'k.c'), '-o', str(d / 'k')], capture_output=True, text=True)
+        check('ios_iosb32_target_in_code compiles on the host (-Wall -Werror)', c.returncode == 0, c.stderr[-2000:])
+        if c.returncode == 0:
+            rows = [l.split('|') for l in subprocess.run([str(d / 'k')], capture_output=True, text=True).stdout.splitlines()]
+            by = {(n, e): (int(x), int(a)) for n, e, x, a in rows}
+            asked = ('pool code 0x30a6f1354', 'stack', 'floor', 'window end')
+            check('the pool probe is asked only for a pointer at or above the floor and outside the guest window (NULL, a wrapping span, 0x10000, just below the floor, '
+                  'the window\'s first and last 8 bytes: never asked, never dead)',
+                  all(by[(n, e)] == (0, 0) for n in ('null', 'wraps', 'low 0x10000', 'below the floor by 4', 'window start', 'window last 8') for e in ('e0', 'e1'))
+                  and all(by[(n, e)][1] == 1 for n in asked for e in ('e0', 'e1')))
+            check('0x30a6f1354 (BF3644: a return address in kernelbase.dll\'s pool copy) is dead when the pool says it is code and alive when it does not; the stack, the floor and '
+                  'the address just past the window follow the pool\'s answer, nothing else',
+                  by[('pool code 0x30a6f1354', 'e1')][0] == 1 and by[('pool code 0x30a6f1354', 'e0')][0] == 0 and by[('stack', 'e0')][0] == 0
+                  and by[('stack', 'e1')][0] == 1 and by[('window end', 'e0')][0] == 0)
+
         # the real wrapper, extracted, next to stand-ins; the original is an unconditional set_async_iosb
         WRAP = '''
 #include <stdio.h>
@@ -285,26 +336,30 @@ typedef int NTSTATUS;
 typedef uintptr_t ULONG_PTR;
 static int in_wow;                       /* what in_wow64_call() answers */
 static ULONG_PTR base;                   /* what ios_wow_base() answers */
-static int set_calls, mapped_n, low_n, mapped_ans, low_ans;
+static int set_calls, mapped_n, low_n, mapped_ans, low_ans, exec_n, exec_ans;
 static client_ptr_t set_iosb; static NTSTATUS set_status; static ULONG_PTR set_info;
 static int in_wow64_call(void) { return in_wow; }
 static ULONG_PTR ios_wow_base(void) { return base; }
 static void set_async_iosb( client_ptr_t iosb, NTSTATUS status, ULONG_PTR info ) { set_calls++; set_iosb = iosb; set_status = status; set_info = info; }
 int ios_iosb_probe_mapped( unsigned long long a, unsigned long long l ) { (void)a; (void)l; mapped_n++; return mapped_ans; }
 int ios_iosb_probe_served_low( unsigned long long a, unsigned long long l ) { (void)a; (void)l; low_n++; return low_ans; }
+int ios_iosb_probe_exec_pool( unsigned long long a, unsigned long long l ) { (void)a; (void)l; exec_n++; return exec_ans; }
 @WRAPPER@
 int main(int argc, char **argv)
 {
     /* args: in_wow base iosb mapped served repeat */
     in_wow = atoi( argv[1] ); base = (ULONG_PTR)strtoull( argv[2], 0, 0 ); client_ptr_t iosb = strtoull( argv[3], 0, 0 );
     mapped_ans = atoi( argv[4] ); low_ans = atoi( argv[5] ); int repeat = atoi( argv[6] );
+    if (argc > 7) exec_ans = atoi( argv[7] );
     for (int i = 0; i < repeat; i++) ios_set_async_iosb( iosb, 0x103 + i, 0x8e );
     fprintf( stdout, "set=%d iosb=%#llx status=%#x info=%#llx mapped_asked=%d low_asked=%d\\n", set_calls, (unsigned long long)set_iosb,
              (unsigned)set_status, (unsigned long long)set_info, mapped_n, low_n );
+    if (argc > 7) fprintf( stdout, "exec_asked=%d\\n", exec_n );
     return 0;
 }
 '''.replace('@WRAPPER@', 'extern int ios_iosb_probe_mapped( unsigned long long, unsigned long long );\n'
-            'extern int ios_iosb_probe_served_low( unsigned long long, unsigned long long );\n' + wrapper)
+            'extern int ios_iosb_probe_served_low( unsigned long long, unsigned long long );\n'
+            'extern int ios_iosb_probe_exec_pool( unsigned long long, unsigned long long );\n' + wrapper)
         (d / 'w.c').write_text(WRAP)
         c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Werror', '-Wno-unused-function', f'-I{nt}', str(d / 'w.c'), '-o', str(d / 'w')],
                            capture_output=True, text=True)
@@ -315,6 +370,12 @@ int main(int argc, char **argv)
                 e.update(env)
                 r = subprocess.run([str(d / 'w'), str(in_wow), b, iosb, str(mapped), str(low), str(repeat)], capture_output=True, text=True, env=e)
                 return r.stdout.strip(), r.stderr
+
+            def run_w7(in_wow, b, iosb, mapped, low, execa, repeat=1, **env):
+                e = {k: v for k, v in os.environ.items() if k != 'MADEIRA_IOSB_DEAD_TARGET'}
+                e.update(env)
+                r = subprocess.run([str(d / 'w'), str(in_wow), b, iosb, str(mapped), str(low), str(repeat), str(execa)], capture_output=True, text=True, env=e)
+                return r.stdout.strip().replace('\n', ' '), r.stderr
 
             B = '0x7300000000'
 
@@ -359,6 +420,24 @@ int main(int argc, char **argv)
             nums = [int(re.search(r'#(\d+)', l).group(1)) for l in lines]
             check('40 skipped stores are logged 8 times and then at the powers of two (16, 32); all 40 are skipped',
                   nums == [1, 2, 3, 4, 5, 6, 7, 8, 16, 32] and many[0].startswith('set=0'), str(nums))
+            # night round 2026-11-11 (G8 S1): a mapped pointer that lies in a pool image copy's code (BF3644: 0x30a6f1354, window 0x400000000)
+            B4 = '0x400000000'
+            codeskip = run_w7(1, B4, '0x30a6f1354', 1, 0, 1)
+            codekeep = run_w7(1, B4, '0x30a6f1354', 1, 0, 0)
+            check('BF3644: a 32-bit caller whose status block pointer is mapped but lies in the executable code of a pool image copy: the store is skipped, the probes were asked once '
+                  'each (mapped, then the pool), and the log names the code and how to turn it off',
+                  codeskip[0] == 'set=0 iosb=0 status=0 info=0 mapped_asked=1 low_asked=0 exec_asked=1'
+                  and '[iosb-dead] ajan16 #1 async I/O completion in a 32-bit process (window 0x400000000): the status block pointer 0x30a6f1354 is inside the executable code of a '
+                      'JIT pool image copy; the store of status=0x103 information=0x8e is skipped' in codeskip[1] and 'MADEIRA_IOSB_DEAD_TARGET=0 stores anyway' in codeskip[1], str(codeskip))
+            check('the same pointer when the pool says it is not code (a data section, the host stack or heap): set_async_iosb once with the same arguments, nothing printed',
+                  codekeep == ('set=1 iosb=0x30a6f1354 status=0x103 info=0x8e mapped_asked=1 low_asked=0 exec_asked=1', ''), str(codekeep))
+            codeoff = run_w7(1, B4, '0x30a6f1354', 1, 0, 1, MADEIRA_IOSB_DEAD_TARGET='0')
+            check('with MADEIRA_IOSB_DEAD_TARGET=0 the store into code is done as before and no probe is asked', codeoff == ('set=1 iosb=0x30a6f1354 status=0x103 info=0x8e mapped_asked=0 low_asked=0 exec_asked=0', ''), str(codeoff))
+            noask = [run_w7(1, B4, p_, m_, s_, 1) for p_, m_, s_ in (('0x400010000', 0, 0), ('0', 0, 0), ('0x10000', 1, 1))]
+            check('a status block in the process\'s own window, a NULL one and a served low one never reach the pool probe (exec_asked=0), as before',
+                  all(r_[0].endswith('exec_asked=0') and r_[0].startswith('set=1') for r_ in noask) or noask[1][0].startswith('set=1') and noask[0][0].endswith('exec_asked=0'), str(noask))
+            c64 = run_w7(0, '0', '0x30a6f1354', 1, 0, 1)
+            check('a 64-bit caller is never asked about code either', c64[0] == 'set=1 iosb=0x30a6f1354 status=0x103 info=0x8e mapped_asked=0 low_asked=0 exec_asked=0', str(c64))
 
         # the real probes: mapping probe on the Mach calls of this Mac, low probe against stand-in registries
         if sys.platform == 'darwin':
@@ -434,6 +513,37 @@ int main(void)
             check('low probe: nothing registered is not served; a sub-floor window or a low alias that covers the 8 bytes is (first or last byte), anything else is not',
                   got == {'none': '0', 'window': '1', 'window_end': '1', 'outside': '0', 'alias': '1'}, r.stdout)
 
+        EXECP = '''
+#include <stdint.h>
+#include <stdio.h>
+/* stand-in for virtual_ios.c: one image copy with .text [0x30a6b0000, 0x30a6b0000 + 0x74638) */
+int ios_jit_addr_is_text( uintptr_t addr ) { return addr >= 0x30a6b0000ull && addr < 0x30a6b0000ull + 0x74638ull; }
+@PROBE@
+int main(void)
+{
+    printf( "inside=%d\\n", ios_iosb_probe_exec_pool( 0x30a6f1354ull, 8 ) );
+    printf( "first=%d\\n", ios_iosb_probe_exec_pool( 0x30a6b0000ull, 8 ) );
+    printf( "last=%d\\n", ios_iosb_probe_exec_pool( 0x30a6b0000ull + 0x74638ull - 8, 8 ) );
+    printf( "into_end=%d\\n", ios_iosb_probe_exec_pool( 0x30a6b0000ull + 0x74638ull - 4, 8 ) );
+    printf( "from_before=%d\\n", ios_iosb_probe_exec_pool( 0x30a6b0000ull - 4, 8 ) );
+    printf( "past=%d\\n", ios_iosb_probe_exec_pool( 0x30a6b0000ull + 0x74638ull, 8 ) );
+    printf( "before=%d\\n", ios_iosb_probe_exec_pool( 0x30a6afff0ull, 8 ) );
+    printf( "stack=%d\\n", ios_iosb_probe_exec_pool( 0x16d2ffb90ull, 8 ) );
+    printf( "zero_len=%d\\n", ios_iosb_probe_exec_pool( 0x30a6f1354ull, 0 ) );
+    printf( "wrap=%d\\n", ios_iosb_probe_exec_pool( 0xfffffffffffffffcull, 8 ) );
+    return 0;
+}
+'''.replace('@PROBE@', probe_e)
+        (d / 'x.c').write_text(EXECP)
+        c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Werror', str(d / 'x.c'), '-o', str(d / 'x')], capture_output=True, text=True)
+        check('the real ios_iosb_probe_exec_pool compiles on the host against a stand-in for the pool\'s .text test (-Wall -Werror)', c.returncode == 0, c.stderr[-3000:])
+        if c.returncode == 0:
+            r = subprocess.run([str(d / 'x')], capture_output=True, text=True)
+            got = dict(l.split('=') for l in r.stdout.splitlines())
+            check('pool probe: inside, the first 8 bytes and the last 8 bytes of the .text are code; a store that starts before it or runs past its end touches it (first / last byte); '
+                  'one wholly outside, the stack, a zero length and a wrapping span are not',
+                  got == {'inside': '1', 'first': '1', 'last': '1', 'into_end': '1', 'from_before': '1', 'past': '0', 'before': '0', 'stack': '0', 'zero_len': '0', 'wrap': '0'}, r.stdout)
+
 # ---------------------------------------------------------------- 5. auto-tune and CI
 sys.path.insert(0, str(root / 'build/tools'))
 import autotune_rules  # noqa: E402
@@ -453,6 +563,12 @@ check('auto-tune: the older Portal fixture (the same fault in a cmd.exe child, b
 fxlog = fx.with_suffix('.log').read_text() if fx.with_suffix('.log').exists() else ''
 check('the fixture shows the fault (invoke_system_apc under the write) and names no user, e-mail address, address or app container',
       'invoke_system_apc+0x57c' in fxlog and 'p0=WRITE p1=0x10004' in fxlog and not re.search(r'/Users/|@[A-Za-z0-9.-]+\.[a-z]{2,}|\b(?:\d{1,3}\.){3}\d{1,3}\b|Containers/Data/Application/[0-9A-F-]{36}', fxlog))
+code_rule = next((r for r in autotune_rules.RULES if r['id'] == 'wow32-iosb-store-into-pool-code'), None)
+check('auto-tune: the build-652 rule for the old crash (fixedIn 652, no line; the ill_handler at kernelbase.dll+0x51358 after the failed band allocation) and its fixture (the rule first, known, no line)',
+      code_rule is not None and code_rule.get('fixedIn') == 652 and code_rule['lines'] == []
+      and (root / 'tests/fixtures/autotune/resident-evil-5-iosb-store-into-pool-code-2026-11-06.expect').exists()
+      and '"wow32-iosb-store-into-pool-code"' in (root / 'tests/fixtures/autotune/resident-evil-5-iosb-store-into-pool-code-2026-11-06.expect').read_text()
+      and '"status": "known"' in (root / 'tests/fixtures/autotune/resident-evil-5-iosb-store-into-pool-code-2026-11-06.expect').read_text())
 gen_cat = (root / 'build/tools/gen-config-catalog.py').read_text()
 check('the settings catalog\'s generator knows the switch (the generated Swift catalog is regenerated in the full tree)',
       '"env.MADEIRA_IOSB_DEAD_TARGET"' in gen_cat and '"sources": ["build/ntdll-unix/ios_iosb_dead.h", "build/ntdll-unix/server_ios.c"]' in gen_cat)

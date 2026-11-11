@@ -890,7 +890,9 @@ check('winios_desktop_point_from_window(Double(w.x), Double(w.y), &px, &py)' in 
       'desktop sessions use the compositor mapping, game sessions the presented rect')
 check('let kx = host.width / CGFloat(max(guestW, 1)), ky = host.height / CGFloat(max(guestH, 1))' in source,
       'the drawn cursor scales by the live monitor, x and y separately')
-check('pos = ScreenMap.clamp(x: last.x, y: last.y, clipLeft: cursorState.clip_left' in glue,
+# build 646 ([ptr-map]): the point is moved into a windowed game's window (screen pixels, as Wine clips) before the clamp
+check('var sx = last.x, sy = last.y\n            _ = winios_pointer_map_apply(&sx, &sy)\n'
+      '            pos = ScreenMap.clamp(x: sx, y: sy, clipLeft: cursorState.clip_left' in glue,
       'the drawn cursor on the absolute route honours ClipCursor')
 check('scene?.pointerLockState?.isLocked' in glue and 'UIPointerLockState.didChangeNotification' in glue,
       "the lock is read back from iPadOS, and its changes observed")

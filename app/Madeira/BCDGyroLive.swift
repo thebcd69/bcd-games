@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Combine
 import CoreMotion
@@ -92,7 +93,7 @@ final class BCDGyroLive: @unchecked Sendable {
         let entry = library.activeEntry
         let wanted = entry.map { BCDGyroStore.settings($0.windowsPath) } ?? BCDGyroSettings()
         if observers.isEmpty { appActive = UIApplication.shared.applicationState == .active }
-        let playing = library.current != nil && !library.launching && !library.menu && appActive
+        let playing = library.current != nil && !library.desktopHome && !library.launching && !library.menu && appActive
         let on = wanted.isOn && playing && entry != nil
         let wasStick = Self.stickActive
         lock.lock()
@@ -251,7 +252,7 @@ struct BCDGyroSessionHook: ViewModifier {
     /// so the change is read a moment later.
     @MainActor private static let changes: AnyPublisher<Void, Never> = {
         let library = LibraryModel.shared
-        return Publishers.Merge3(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () })
+        return Publishers.Merge4(library.$current.map { _ in () }, library.$menu.map { _ in () }, library.$launching.map { _ in () }, library.$desktopHome.map { _ in () })
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }()

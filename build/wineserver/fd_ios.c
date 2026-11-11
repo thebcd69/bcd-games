@@ -1,3 +1,4 @@
+// Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 /* Portions copyright 2026 Ixion: code taken from https://github.com/willfaust/Madeira (pull request #461)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
@@ -1651,6 +1652,19 @@ void main_loop(void)
         ios_srv_loop_enter();   /* madeira-bcd: MADEIRA_SRV_DIRECT; the lock is let go only to sleep */
         while (active_users)
         {
+            // Confirmed desktop Quit is handled here, never on UIKit's thread.
+            // Keep pumping after shutdown_master_socket: guest termination and
+            // registry flushing complete through Wine's normal shutdown timers.
+            {
+                extern int g_wineserver_desktop_shutdown;
+                int queued = 1;
+                if (__atomic_compare_exchange_n(&g_wineserver_desktop_shutdown, &queued, 2, 0,
+                                                __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+                {
+                    ws_log("[desktop-quit] terminating Windows session");
+                    shutdown_master_socket();
+                }
+            }
             /* Check stop flag */
             if (g_wineserver_should_stop)
             {
@@ -1686,14 +1700,18 @@ void main_loop(void)
             /* [srv-queues] desktop-mode diagnostic: dump every thread's
              * message-queue state every ~10s (SendMessage stall triage) */
             {
-                static int qdump_on = -1;
+                static int qdump_on = -1, stuck_on = -1;
                 static struct timespec qdump_last;
                 if (qdump_on < 0)
                 {
                     const char *d = getenv("MADEIRA_DESKTOP");
+                    /* Night round 2026-11-11 (agent G2 S16; Call of Duty: Black Ops II M9HCPW: the program's entry stub idles 29 s and exits with 0x8000dead, and the
+                     * log did not say what the thread waited on): the stuck-wait report below ran in desktop mode only. */
+                    const char *sw = getenv("MADEIRA_STUCK_WAIT_DIAG");   /* 1: in a game session too, every 10 s the server names the object behind each wait that has been outstanding for more than 5 s ([srv-stuck]: the thread, the call, the object, whether it is signalled). Log only. unset/0: off. */
                     qdump_on = (d && *d == '1');
+                    stuck_on = (sw && *sw == '1' && !sw[1]);
                 }
-                if (qdump_on)
+                if (qdump_on || stuck_on)
                 {
                     struct timespec now;
                     clock_gettime(CLOCK_MONOTONIC, &now);
@@ -1702,7 +1720,7 @@ void main_loop(void)
                         extern void ios_dump_msg_queues(void);
                         extern void ios_dump_stuck_waits(void);
                         qdump_last = now;
-                        ios_dump_msg_queues();
+                        if (qdump_on) ios_dump_msg_queues();   /* the message queues stay desktop-mode only */
                         /* ml585: name the object behind any wait that has
                          * been outstanding >5s (see queue_ios.c). Rides the
                          * existing 10s cadence — no new timer, no new thread,

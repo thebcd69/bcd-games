@@ -41,7 +41,7 @@ check('only the debugger path records (the debugger-less pool cannot stop the pr
       and debugger_path.index('BCDBrkTrail.begin(') < debugger_path.index('return jit26_prepare_region(nil, size)')
       and req.count('BCDBrkTrail.') == 2 and helper.count('BCDBrkTrail.') == 2)
 check('the pool loop passes its attempt; every call site names its region (round 630, agent A1 S19: A, A-single, B, B-mid, C)',
-      helper.count('requestRegion(poolSize, attempt: attempt, region: "A")') == 1 and helper.count('requestRegion(') == 6
+      helper.count('requestRegion(attemptSize, attempt: attempt, region: "A")') == 1 and helper.count('requestRegion(') == 6
       and all(helper.count('region: "%s")' % r) == 1 for r in ('A', 'A-single', 'B', 'B-mid', 'C')))
 facade = rec[rec.index('    static func appStarted() {'):]
 facade = facade[:facade.index('\n    }\n')]

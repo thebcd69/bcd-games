@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Henrique Rocha (iqui27): the iPhone Duo tabletop pose, from thebcd69/bcd-games pull request #31; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """BCD's on-screen touch controls and their editor (app/Madeira/BCDTouch*.swift;
 docs/BCD-UI-ARCHITECTURE.md).
 
@@ -132,8 +133,12 @@ for i in range(5):
 # ---- where the controls show -------------------------------------------------------------
 overlay = block(content, "struct TouchControlsOverlay: View {")
 body = block(overlay, "var body: some View {")
-check("private func controls(_ screen: CGSize, session: Bool) -> some View { BCDTouchControlsLive(screen: screen, session: session) }" in overlay,
+controls_fn = block(overlay, "private func controls(_ screen: CGSize, session: Bool) -> some View {")
+check("BCDTouchControlsLive(screen: screen, session: session)" in controls_fn,
       "TouchControlsOverlay draws BCD's controls")
+check("if let area = fold.bottom, !m.editing {" in controls_fn
+      and "BCDTouchControlsLive(screen: area.size, session: session)" in controls_fn,
+      "in iPhone Duo's tabletop pose the controls are laid out below the fold, and the editor keeps the whole screen")
 check("private var topBar: some View { BCDTouchChromeLive() }" in overlay,
       "TouchControlsOverlay's top bar is BCD's bar and editor (over a game outside the library, and while editing)")
 check("MappingPanel(" not in body and "classicTopBar" not in body and "classicControls" not in body,
@@ -216,7 +221,7 @@ check("actions.setLocked(item.id, !item.locked)" in inspector and "actions.bring
 
 # ---- the bar over a game outside the library -----------------------------------------------
 bar = block(src["BCDTouchControls.swift"], "struct BCDTouchPlayBar: View {")
-model_hit = block(content, "func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true) -> Bool {")
+model_hit = block(content, "func hitsInteractive(_ p: CGPoint, in bounds: CGRect, topBar: Bool = true, controlsArea: CGRect? = nil) -> Bool {")
 check("HStack(spacing: 10)" in bar and ".frame(width: 44, height: 44)" in bar and ".padding(.top, 10)" in bar
       and len(re.findall(r"(?<!func )\bround\(", code(bar))) == 5 and "if showsLayouts { round(" in bar,
       "the bar: 44-point circles 10 apart, 10 down, five with Layouts and four without")

@@ -1,0 +1,671 @@
+[12:58:31.438] [INFO] [prev-tail] the last 60 line(s) of the previous run's log (DyingLightGame_TheBeast_x64_rwdi.exe-2026-11-10_12-57-24.txt), scrubbed:
+[12:58:31.439] [INFO] [prev-tail] [srv-stuck] tid=007c teb=0x71ffee0000 age=65734ms op=1 flags=00000002 timeout=9223372036854775807 alertable=0 nhandles=1 caller=0x103d3af44
+[12:58:31.439] [INFO] [prev-tail] [srv-stuck]   tid=007c suspend=0 rev=ml714
+[12:58:31.439] [INFO] [prev-tail] [srv-stuck]   h[0]=000002dc obj=0x11223f100 type=Event raw_obj=0x11223f100 raw_waiters=0 sync_obj=0x11ec98af0 sync_waiters=1 thread_wait=0x10f0175d0 state=LINKED Event manual=0 signaled=0 cell=69
+[12:58:31.440] [INFO] [prev-tail] [evt-before]
+[12:58:31.440] [INFO] [prev-tail] [evt-entry]
+[12:58:31.440] [INFO] [prev-tail] [evt-life] obj=0x11223f100 create=1 SET=0 reset=1 pulse=0 | wait begin=0 end=0 timeout=0 success=0 | last_set tid=0000 seq=0 | last_reset tid=007c seq=5823   <-- NEVER SET BY ANYONE, for the whole life of this object
+[12:58:31.440] [INFO] [prev-tail] [evt-life]   seq=5822 tid=007c create status=00000000
+[12:58:31.440] [INFO] [prev-tail] [evt-life]   seq=5823 tid=007c reset status=00000000
+[12:58:31.441] [INFO] [prev-tail] [srv-stuck] tid=00b0 teb=0x71ffe20000 age=60349ms op=1 flags=00000003 timeout=-792257873049 alertable=1 nhandles=1 caller=0x103d3af44
+[12:58:31.442] [INFO] [prev-tail] [xp] 12:58:28.628 +68.87 dt=261 cpu=64 (thr 62) P=22 E=42 run=266 pgw=-1.0 GHz P=2.18 E=2.10 Minst=228 IPC=1.68 mJ=29 pin=5 rdKB=20 fpMB=2013
+[12:58:31.442] [INFO] [prev-tail] [12:58:28.695] [INFO] [dock-game-end] dyinglightgame_thebeast_x64_rwdi.exe ended with status 0xffff7001; the session goes on for now (grace)
+[12:58:31.442] [INFO] [prev-tail] [hwinput] keyboard focus: program (app active)
+[12:58:31.443] [INFO] [prev-tail] [xp] 12:58:28.950 +69.19 dt=322 cpu=44 (thr 43) P=7 E=36 run=563 pgw=-1.0 GHz P=2.00 E=1.87 Minst=126 IPC=1.53 mJ=12 pin=0 rdKB=0 fpMB=2013
+[12:58:31.443] [INFO] [prev-tail] [xp] 12:58:29.271 +69.51 dt=321 cpu=58 (thr 58) P=3 E=56 run=110 pgw=-1.0 GHz P=1.36 E=1.29 Minst=154 IPC=2.05 mJ=7 pin=0 rdKB=0 fpMB=2010
+[12:58:31.445] [INFO] [prev-tail] [xp] 12:58:29.584 +69.82 dt=313 cpu=40 (thr 40) P=0 E=40 run=56 pgw=-1.0 GHz P=0.00 E=0.83 Minst=62 IPC=1.86 mJ=2 pin=0 rdKB=0 fpMB=2010
+[12:58:31.445] [INFO] [prev-tail] [xp] 12:58:29.907 +70.15 dt=323 cpu=39 (thr 38) P=5 E=33 run=61 pgw=-1.0 GHz P=1.57 E=1.21 Minst=97 IPC=2.00 mJ=6 pin=0 rdKB=0 fpMB=2009
+[12:58:31.447] [INFO] [prev-tail] [hwinput] keyboard focus: elsewhere (app inactive)
+[12:58:31.447] [INFO] [prev-tail] [hwinput] mouse focus: elsewhere (app inactive)
+[12:58:31.448] [INFO] [prev-tail] [xp] 12:58:30.170 +70.41 dt=263 cpu=43 (thr 43) P=1 E=43 run=119 pgw=-1.0 GHz P=2.72 E=1.53 Minst=80 IPC=1.19 mJ=5 pin=0 rdKB=0 fpMB=2009
+[12:58:31.448] [INFO] [prev-tail] [file-wfail] ml669 #121 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[12:58:31.449] [INFO] [prev-tail] [footprint] rev=ml358 phys=2005 MB (peak 2053) internal=1963 MB compressed=40 MB external=239 MB reusable=5 MB (cycle=36)
+[12:58:31.450] [INFO] [prev-tail] [xp-api-top] 12:58:30.490 58 samples: ntdll.dll+0x71aac=1732/s ntdll.dll+0x67dcc=367/s kernelbase.dll+0x68a34=210/s kernelbase.dll+0x69424=157/s ntdll.dll+0x6784c=157/s kernelbase.dll+0x6d470=105/s ntdll.dll+0x67d10=105/s kernelbase.dll+0x69470=52/s kernelbase.dll+0x69fec=52/s kernelbase.dll+0x6a7cc=52/s ntdll.dll+0x27cc8=52/s
+[12:58:31.450] [INFO] [prev-tail] [xp-api-qpc] 12:58:30.490 QPC 1675/s gaps <1us 61% <10us 28% <100us 8% <1ms 1% >=1ms 2%; top threads: 0050=1668/s(<1us 61% <10us 28%) 006c=7/s(<1us 12% <10us 38%)
+[12:58:31.451] [INFO] [prev-tail] [ios_audio] bg keepalive=0 mute=1 halt=1 clients=0 -> endpoint stopped
+[12:58:31.451] [INFO] [prev-tail] [12:58:30.512] [INFO] [session] length=72s partial=1 play=0s frames=0 stalls=0/0s peak=2063MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Dying Light: The Beast
+[12:58:31.451] [INFO] [prev-tail] .dll+0x6a7cc=52/s ntdll.dll+0x27cc8=52/s
+[12:58:31.451] [INFO] [prev-tail] [12:58:30.491] [xp-api-qpc] 12:58:30.490 QPC 1675/s gaps <1us 61% <10us 28% <100us 8% <1ms 1% >=1ms 2%; top threads: 0050=1668/s(<1us 61% <10us 28%) 006c=7/s(<1us 12% <10us 38%)
+[12:58:31.596] [INFO] Checking entitlements...
+[12:58:31.596] [INFO] [build] v0.1.634 (634)
+[12:58:31.597] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.3 (Build 24C5037i) ram=11722MB available=8166MB cores=6
+[12:58:31.597] [INFO] [device] address-map=[0x1001cc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[12:58:31.598] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[12:58:31.607] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=+03:00 free-disk=68GB stikdebug-url=0
+[12:58:31.610] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[12:59:05.892] [INFO] Requesting JIT with Built-in StikJIT...
+[12:59:07.755] [INFO] Requesting JIT with Built-in StikJIT...
+[12:59:12.123] [INFO] [bcd] library launch Dying Light The Beast: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[12:59:12.138] [INFO] [dock-launch] image-retire=1
+[12:59:12.138] [INFO] [dock-launch] image-map-guard=1
+[12:59:12.145] [INFO] [dock-installers] app=3008130 scripts=0 programs=0
+[12:59:12.146] [INFO] [madeira-dock] starting the host for app 3008130; Valve's client authenticates and authorizes the launch
+[12:59:12.161] [INFO] Running full Wine sequence...
+[12:59:12.162] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1001cc000,0x8000000000) 512GB available=8138MB low-power=0 thermal=nominal
+[12:59:12.163] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X64_IMAGE_NOCOPY=1
+[12:59:12.168] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[12:59:12.168] [INFO] Allocating 896MB JIT pool via debugger...
+[12:59:12.168] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[12:59:12.168] [INFO] [jit-debugger] attached=1 at the pool request
+[12:59:12.170] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[12:59:12.938] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  0.826s rev=ml526
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7504 MB + phys_footprint=687 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11e590000+0x70000 (?) → pool 0x148004000 used=0x78000/0x27000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x148078000 used=0x190000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x148190000 used=0x238000/0x27000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[window] 0x7048000000..0x7400000000 regions=84 occupied=8197 MB of 15232 MB free=7035 MB maxhole=7034 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x148238000 used=0x3b8000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71ffa10000+0xd0000 (rpcrt4.dll) → pool 0x1483b8000 used=0x48c000/0x27000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[jit-pool] image 0x71ff980000+0x90000 (advapi32.dll) → pool 0x14848c000 used=0x520000/0x27000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[window] 0x12b800000..0x7817000000 regions=80070 occupied=462206 MB of 487096 MB free=41641 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=698 MB (peak 698) internal=697 MB compressed=0 MB external=103 MB reusable=34 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1408x648, winstation visible, input desktop set
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={0,0,100,100} surface=0x10310dc98 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000018 vis={0,0,100,100} surface=0x10310dc98 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #3 hwnd=0x10020 after=0x0 flags=8000116a vis={0,0,1408,648} surface=0x126e9c540 rev=ml505 style=96000000 visible=1 parent=0x0
+[win-name] #3 hwnd=0x10020 class='#32769' text="madeira - Wine Desktop" rev=ml853
+[win-pos] #4 hwnd=0x1002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #4 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+[win-pos] #5 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #6 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-name] #5 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-name] #7 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.238s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=98, unixdir=99, dup_unixdir=103) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x11fef0000+0x9a000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x11fef0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x11fef0000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x11fef8000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x11fef8000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11fefc000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x149a03000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e24000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.307s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=127, unixdir=129, dup_unixdir=134) cwd=L"C:\\windows\\"
+[jit-pool] image 0x120390000+0x80000 (?) → pool 0x14a434000 used=0x24b8000/0x27000000 tramp+0x4000
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae6c000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 38 Load module dockhost.exe (dockhost.exe-09db8efb7c42a67b): 11FEF0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c610000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702c710000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702c910000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702cd10000+0x800000 held for 2000 ms (4 in flight)
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71f9ff0000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[xp-names] m814321 "wine-x18-exc"
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71f88d0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71f8800000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=000000014A09232C
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\crashhandler64.dll" 0x71f8380000+0x1af000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x149dcdf18 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dcdf18 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8170000
+E 4C [iOS-xins] tracker=0x149dcdf18 WININET.dll sec=0x71f8180000-0x71f81bb029
+E 4C [iOS-xins] tracker=0x149dcdf18 WININET.dll sec=0x71f81c0000-0x71f81c0f90
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6ec000)
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001F4 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x71f7230000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=000000014A09232C
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=975 MB (peak 975) internal=974 MB compressed=0 MB external=176 MB reusable=34 MB (cycle=2)
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000002B8 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[win-name] #28 hwnd=0x50052 class='OleMainThreadWndClass' text="" rev=ml853
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+[footprint] rev=ml358 phys=1100 MB (peak 1100) internal=1099 MB compressed=0 MB external=180 MB reusable=34 MB (cycle=3)
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\DyingLightGame_TheBeast_x64_rwdi.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\DyingLightGame_TheBeast_x64_rwdi.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\DyingLightGame_TheBeast_x64_rwdi.exe" t+  5.490s rev=ml526
+0088:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\DyingLightGame_TheBeast_x64_rwdi.exe\"" (fd=442, unixdir=444, dup_unixdir=447) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64"
+[12:59:17.662] [INFO] [dock-report] launch-client-discovery-published=1
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery.exe" cmdline=L".\\bin\\vulkandriverquery.exe"
+[file-wfail] ml669 #72 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x14fd7c000)
+D A8 Load module engine_x64_rwdi.dll (engine_x64_rwdi.dll-4c70cc7856130ad0): 71F02A0000
+[file-wfail] ml669 #73 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+E A8 [iOS-xins] tracker=0x14e719f18 WININET.dll sec=0x71eeda0000-0x71eeddb029
+E A8 [iOS-xins] tracker=0x14e719f18 WININET.dll sec=0x71eede0000-0x71eede0f90
+D A8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71EED90000
+E A8 [iOS-xins] tracker=0x14e719f18 WININET.dll sec=0x71eeda0000-0x71eeddb029
+E A8 [iOS-xins] tracker=0x14e719f18 WININET.dll sec=0x71eede0000-0x71eede0f90
+E A8 [img-map] ml710 #49 intervals-only WININET.dll base=0x71eed90000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+00a8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "{09:59:18.115} RETL: [CPUID] > --- CPUID - DETECTING in "Filesystem"..."
+[file-wfail] ml669 #74 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[free-delay] #5 release of 0x703d830000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #6 release of 0x703e030000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #7 release of 0x703f000000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #8 release of 0x703ffd0000+0xfd0000 held for 2000 ms (4 in flight)
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[file-wfail] ml669 #75 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #77 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+00a8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\crashpad_handler.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\crashpad_handler.exe\" --no-rate-limit \"--database=c:\\program files (x86)\\steam\\steamapps\\common\\dying light the beast\\ph_ft\\work\\out\\.sentry_x64_rwdi\" \"--metrics-dir=c:\\program"...
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\crashpad_handler.exe" t+  6.413s rev=ml526
+00a8:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\crashpad_handler.exe\" --no-rate-limit \"--database=c:\\program files (x86)\\steam\\steamapps\\common\\dying light the beast\\ph_ft\\work\\out\\.sentry_x64_rwdi\" \"--metrics-dir=c:\\program"... (fd=516, unixdir=517, dup_unixdir=521) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\"
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] winhttp.dll: OK, 8 .text pages executable (copy @0x152d70000)
+[win-pos] #29 hwnd=0x1005c after=0x0 flags=0000003c vis={0,0,132,38} surface=0x10310dc98 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #29 hwnd=0x1005c class='crashpad_SessionEndWatcher' text="" rev=ml853
+[win-pos] #30 hwnd=0x10060 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x10310dc98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #30 hwnd=0x10060 class='IME' text="" rev=ml853
+[win-pos] #31 hwnd=0x10060 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x10310dc98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #31 hwnd=0x10060 class='IME' text="Default IME" rev=ml853
+[win-pos] #32 hwnd=0x1005c after=0x0 flags=00000018 vis={0,0,132,38} surface=0x10310dc98 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #32 hwnd=0x1005c class='crashpad_SessionEndWatcher' text="" rev=ml853
+00b4:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #102 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1677 MB (peak 1677) internal=1675 MB compressed=0 MB external=247 MB reusable=34 MB (cycle=4)
+[12:59:19.661] [INFO] [dock-report] launch-client-error=0
+[12:59:19.662] [INFO] [dock-report] launch-game-running=1
+[jit-pool] image 0x71e84b0000+0xc0000 (rsaenh.dll) → pool 0x1537a8000 used=0xb86c000/0x27000000 tramp+0x4000
+00e0:err:module:load_dll [dll-missing] rev=ml336 #3 L"LightFX.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\c:\\program files (x86)\\steam\\steamapps\\common\\dying light the beast\\engine\\source\\bin\\x64\\steam_api64.dll" 0x71e8220000+0x4d000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71e6960000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71e68e0000+0x80000 (imagehlp.dll) → pool 0x15386c000 used=0xb8f0000/0x27000000 tramp+0x4000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71e6740000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71e6670000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71e65e0000+0x90000 (mswsock.dll) → pool 0x1538f0000 used=0xb984000/0x27000000 tramp+0x4000
+D E4 Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 71E65E0000
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00e4 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[jit-pool] image 0x71e6530000+0xb0000 (uxtheme.dll) → pool 0x153984000 used=0xba38000/0x27000000 tramp+0x4000
+D E4 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71E6530000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\gameoverlayrenderer64.dll" 0x71e6430000+0x1ac000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D E4 Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc678e11f2): 71E6430000
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f563c000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f563c000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f563d000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f563d000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f563e000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f563e000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f563f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x71f563f000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #15 req_addr=0x71f645e000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #16 req_addr=0x71f645f000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #17 req_addr=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #18 req_addr=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #19 req_addr=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[exec-alloc] NtAllocateVirtualMemory #20 req_addr=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f78c7000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f78c8000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f78c9000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f78ca000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f78cb000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f78cc000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f78cd000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f78ce000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f78cf000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f852f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f8558000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f8559000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f855a000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f855b000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f855c000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f855d000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f855e000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f855f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f8699000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f869a000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f869b000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f869c000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f869d000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f869e000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f869f000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f88c1000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f88c2000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f88c3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f88c4000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f88c5000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f88c6000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #128 status=c0000018 hint=0x71fc297000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #192 status=c0000018 hint=0x7200033000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200030000+0x4000
+[alloc-fail] ml814 #256 status=c0000018 hint=0x7200073000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200070000+0x4000
+[nt-fail] #12 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7200075000 zb=0x0 hits=256 rev=ajan5-rockstar
+[alloc-fail] ml814 #320 status=c0000018 hint=0x72000b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72000b0000+0x4000
+[alloc-fail] ml814 #384 status=c0000018 hint=0x72000f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72000f0000+0x4000
+[alloc-fail] ml814 #448 status=c0000018 hint=0x7200133000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200130000+0x4000
+[alloc-fail] ml814 #512 status=c0000018 hint=0x7200173000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200170000+0x4000
+[nt-fail] #13 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7200175000 zb=0x0 hits=512 rev=ajan5-rockstar
+[alloc-fail] ml814 #576 status=c0000018 hint=0x72001b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72001b0000+0x4000
+[alloc-fail] ml814 #640 status=c0000018 hint=0x72001f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72001f0000+0x4000
+[alloc-fail] ml814 #704 status=c0000018 hint=0x7200233000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200230000+0x4000
+[alloc-fail] ml814 #768 status=c0000018 hint=0x7200273000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200270000+0x4000
+[alloc-fail] ml814 #832 status=c0000018 hint=0x72002b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72002b0000+0x4000
+[alloc-fail] ml814 #896 status=c0000018 hint=0x72002f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72002f0000+0x4000
+[alloc-fail] ml814 #960 status=c0000018 hint=0x7200333000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200330000+0x4000
+[alloc-fail] ml814 #1024 status=c0000018 hint=0x7200373000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200370000+0x4000
+[nt-fail] #14 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7200375000 zb=0x0 hits=1024 rev=ajan5-rockstar
+[alloc-fail] ml814 #1088 status=c0000018 hint=0x72003b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72003b0000+0x4000
+[alloc-fail] ml814 #1152 status=c0000018 hint=0x72003f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72003f0000+0x4000
+[alloc-fail] ml814 #1216 status=c0000018 hint=0x7200433000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200430000+0x4000
+[alloc-fail] ml814 #1280 status=c0000018 hint=0x7200473000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200470000+0x4000
+[alloc-fail] ml814 #1344 status=c0000018 hint=0x72004b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72004b0000+0x4000
+[alloc-fail] ml814 #1408 status=c0000018 hint=0x72004f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72004f0000+0x4000
+[alloc-fail] ml814 #1472 status=c0000018 hint=0x7200533000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200530000+0x4000
+[alloc-fail] ml814 #1536 status=c0000018 hint=0x7200573000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200570000+0x4000
+[alloc-fail] ml814 #1600 status=c0000018 hint=0x72005b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72005b0000+0x4000
+[alloc-fail] ml814 #1664 status=c0000018 hint=0x72005f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72005f0000+0x4000
+[alloc-fail] ml814 #1728 status=c0000018 hint=0x7200633000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200630000+0x4000
+[alloc-fail] ml814 #1792 status=c0000018 hint=0x7200673000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200670000+0x4000
+[alloc-fail] ml814 #1856 status=c0000018 hint=0x72006b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72006b0000+0x4000
+[alloc-fail] ml814 #1920 status=c0000018 hint=0x72006f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72006f0000+0x4000
+[alloc-fail] ml814 #1984 status=c0000018 hint=0x7200733000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200730000+0x4000
+[alloc-fail] ml814 #2048 status=c0000018 hint=0x7200773000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200770000+0x4000
+[nt-fail] #15 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7200775000 zb=0x0 hits=2048 rev=ajan5-rockstar
+[alloc-fail] ml814 #2112 status=c0000018 hint=0x72007b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72007b0000+0x4000
+[alloc-fail] ml814 #2176 status=c0000018 hint=0x72007f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72007f0000+0x4000
+[alloc-fail] ml814 #2240 status=c0000018 hint=0x7200833000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200830000+0x4000
+[alloc-fail] ml814 #2304 status=c0000018 hint=0x7200873000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200870000+0x4000
+[alloc-fail] ml814 #2368 status=c0000018 hint=0x72008b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72008b0000+0x4000
+[alloc-fail] ml814 #2432 status=c0000018 hint=0x72008f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72008f0000+0x4000
+[alloc-fail] ml814 #2496 status=c0000018 hint=0x7200933000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200930000+0x4000
+[alloc-fail] ml814 #2560 status=c0000018 hint=0x7200973000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200970000+0x4000
+[alloc-fail] ml814 #2624 status=c0000018 hint=0x72009b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72009b0000+0x4000
+[alloc-fail] ml814 #2688 status=c0000018 hint=0x72009f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72009f0000+0x4000
+[alloc-fail] ml814 #2752 status=c0000018 hint=0x7200a33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200a30000+0x4000
+[alloc-fail] ml814 #2816 status=c0000018 hint=0x7200a73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200a70000+0x4000
+[alloc-fail] ml814 #2880 status=c0000018 hint=0x7200ab3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200ab0000+0x4000
+[alloc-fail] ml814 #2944 status=c0000018 hint=0x7200af3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200af0000+0x4000
+[alloc-fail] ml814 #3008 status=c0000018 hint=0x7200b33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200b30000+0x4000
+[alloc-fail] ml814 #3072 status=c0000018 hint=0x7200b73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200b70000+0x4000
+[alloc-fail] ml814 #3136 status=c0000018 hint=0x7200bb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200bb0000+0x4000
+[alloc-fail] ml814 #3200 status=c0000018 hint=0x7200bf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200bf0000+0x4000
+[alloc-fail] ml814 #3264 status=c0000018 hint=0x7200c33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200c30000+0x4000
+[alloc-fail] ml814 #3328 status=c0000018 hint=0x7200c73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200c70000+0x4000
+[alloc-fail] ml814 #3392 status=c0000018 hint=0x7200cb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200cb0000+0x4000
+[alloc-fail] ml814 #3456 status=c0000018 hint=0x7200cf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200cf0000+0x4000
+[alloc-fail] ml814 #3520 status=c0000018 hint=0x7200d33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200d30000+0x4000
+[alloc-fail] ml814 #3584 status=c0000018 hint=0x7200d73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200d70000+0x4000
+[alloc-fail] ml814 #3648 status=c0000018 hint=0x7200db3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200db0000+0x4000
+[alloc-fail] ml814 #3712 status=c0000018 hint=0x7200df3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200df0000+0x4000
+[alloc-fail] ml814 #3776 status=c0000018 hint=0x7200e33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200e30000+0x4000
+[alloc-fail] ml814 #3840 status=c0000018 hint=0x7200e73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200e70000+0x4000
+[alloc-fail] ml814 #3904 status=c0000018 hint=0x7200eb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200eb0000+0x4000
+[alloc-fail] ml814 #3968 status=c0000018 hint=0x7200ef3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200ef0000+0x4000
+[alloc-fail] ml814 #4032 status=c0000018 hint=0x7200f33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200f30000+0x4000
+[alloc-fail] ml814 #4096 status=c0000018 hint=0x7200f73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200f70000+0x4000
+[nt-fail] #16 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7200f75000 zb=0x0 hits=4096 rev=ajan5-rockstar
+[alloc-fail] ml814 #4160 status=c0000018 hint=0x7200fb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200fb0000+0x4000
+[alloc-fail] ml814 #4224 status=c0000018 hint=0x7200ff3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7200ff0000+0x4000
+[alloc-fail] ml814 #4288 status=c0000018 hint=0x7201033000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201030000+0x4000
+[alloc-fail] ml814 #4352 status=c0000018 hint=0x7201073000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201070000+0x4000
+[alloc-fail] ml814 #4416 status=c0000018 hint=0x72010b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72010b0000+0x4000
+[alloc-fail] ml814 #4480 status=c0000018 hint=0x72010f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72010f0000+0x4000
+[alloc-fail] ml814 #4544 status=c0000018 hint=0x7201133000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201130000+0x4000
+[alloc-fail] ml814 #4608 status=c0000018 hint=0x7201173000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201170000+0x4000
+[alloc-fail] ml814 #4672 status=c0000018 hint=0x72011b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72011b0000+0x4000
+[alloc-fail] ml814 #4736 status=c0000018 hint=0x72011f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72011f0000+0x4000
+[alloc-fail] ml814 #4800 status=c0000018 hint=0x7201233000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201230000+0x4000
+[alloc-fail] ml814 #4864 status=c0000018 hint=0x7201273000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201270000+0x4000
+[alloc-fail] ml814 #4928 status=c0000018 hint=0x72012b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72012b0000+0x4000
+[alloc-fail] ml814 #4992 status=c0000018 hint=0x72012f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72012f0000+0x4000
+[alloc-fail] ml814 #5056 status=c0000018 hint=0x7201333000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201330000+0x4000
+[alloc-fail] ml814 #5120 status=c0000018 hint=0x7201373000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201370000+0x4000
+[alloc-fail] ml814 #5184 status=c0000018 hint=0x72013b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72013b0000+0x4000
+[alloc-fail] ml814 #5248 status=c0000018 hint=0x72013f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72013f0000+0x4000
+[alloc-fail] ml814 #5312 status=c0000018 hint=0x7201433000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201430000+0x4000
+[alloc-fail] ml814 #5376 status=c0000018 hint=0x7201473000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201470000+0x4000
+[alloc-fail] ml814 #5440 status=c0000018 hint=0x72014b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72014b0000+0x4000
+[alloc-fail] ml814 #5504 status=c0000018 hint=0x72014f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72014f0000+0x4000
+[alloc-fail] ml814 #5568 status=c0000018 hint=0x7201533000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201530000+0x4000
+[alloc-fail] ml814 #5632 status=c0000018 hint=0x7201573000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201570000+0x4000
+[alloc-fail] ml814 #5696 status=c0000018 hint=0x72015b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72015b0000+0x4000
+[alloc-fail] ml814 #5760 status=c0000018 hint=0x72015f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72015f0000+0x4000
+[alloc-fail] ml814 #5824 status=c0000018 hint=0x7201633000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201630000+0x4000
+[alloc-fail] ml814 #5888 status=c0000018 hint=0x7201673000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201670000+0x4000
+[alloc-fail] ml814 #5952 status=c0000018 hint=0x72016b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72016b0000+0x4000
+[alloc-fail] ml814 #6016 status=c0000018 hint=0x72016f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72016f0000+0x4000
+[alloc-fail] ml814 #6080 status=c0000018 hint=0x7201733000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201730000+0x4000
+[alloc-fail] ml814 #6144 status=c0000018 hint=0x7201773000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201770000+0x4000
+[alloc-fail] ml814 #6208 status=c0000018 hint=0x72017b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72017b0000+0x4000
+[alloc-fail] ml814 #6272 status=c0000018 hint=0x72017f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72017f0000+0x4000
+[alloc-fail] ml814 #6336 status=c0000018 hint=0x7201833000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201830000+0x4000
+[alloc-fail] ml814 #6400 status=c0000018 hint=0x7201873000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201870000+0x4000
+[alloc-fail] ml814 #6464 status=c0000018 hint=0x72018b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72018b0000+0x4000
+[alloc-fail] ml814 #6528 status=c0000018 hint=0x72018f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72018f0000+0x4000
+[alloc-fail] ml814 #6592 status=c0000018 hint=0x7201933000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201930000+0x4000
+[alloc-fail] ml814 #6656 status=c0000018 hint=0x7201973000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201970000+0x4000
+[alloc-fail] ml814 #6720 status=c0000018 hint=0x72019b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72019b0000+0x4000
+[alloc-fail] ml814 #6784 status=c0000018 hint=0x72019f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72019f0000+0x4000
+[alloc-fail] ml814 #6848 status=c0000018 hint=0x7201a33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201a30000+0x4000
+[alloc-fail] ml814 #6912 status=c0000018 hint=0x7201a73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201a70000+0x4000
+[alloc-fail] ml814 #6976 status=c0000018 hint=0x7201ab3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201ab0000+0x4000
+[alloc-fail] ml814 #7040 status=c0000018 hint=0x7201af3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201af0000+0x4000
+[alloc-fail] ml814 #7104 status=c0000018 hint=0x7201b33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201b30000+0x4000
+[alloc-fail] ml814 #7168 status=c0000018 hint=0x7201b73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201b70000+0x4000
+[alloc-fail] ml814 #7232 status=c0000018 hint=0x7201bb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201bb0000+0x4000
+[alloc-fail] ml814 #7296 status=c0000018 hint=0x7201bf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201bf0000+0x4000
+[alloc-fail] ml814 #7360 status=c0000018 hint=0x7201c33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201c30000+0x4000
+[alloc-fail] ml814 #7424 status=c0000018 hint=0x7201c73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201c70000+0x4000
+[alloc-fail] ml814 #7488 status=c0000018 hint=0x7201cb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201cb0000+0x4000
+[alloc-fail] ml814 #7552 status=c0000018 hint=0x7201cf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201cf0000+0x4000
+[alloc-fail] ml814 #7616 status=c0000018 hint=0x7201d33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201d30000+0x4000
+[alloc-fail] ml814 #7680 status=c0000018 hint=0x7201d73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201d70000+0x4000
+[alloc-fail] ml814 #7744 status=c0000018 hint=0x7201db3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201db0000+0x4000
+[alloc-fail] ml814 #7808 status=c0000018 hint=0x7201df3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201df0000+0x4000
+[alloc-fail] ml814 #7872 status=c0000018 hint=0x7201e33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201e30000+0x4000
+[alloc-fail] ml814 #7936 status=c0000018 hint=0x7201e73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201e70000+0x4000
+[alloc-fail] ml814 #8000 status=c0000018 hint=0x7201eb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201eb0000+0x4000
+[alloc-fail] ml814 #8064 status=c0000018 hint=0x7201ef3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201ef0000+0x4000
+[alloc-fail] ml814 #8128 status=c0000018 hint=0x7201f33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201f30000+0x4000
+[alloc-fail] ml814 #8192 status=c0000018 hint=0x7201f73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201f70000+0x4000
+[nt-fail] #17 NtAllocateVirtualMemory status=c0000018 proc=dyinglightgame_thebeast_x64_rwdi.exe tid=00e4 size=0x1000 type=0x3000 prot=0x40 hint=0x7201f75000 zb=0x0 hits=8192 rev=ajan5-rockstar
+[alloc-fail] ml814 #8256 status=c0000018 hint=0x7201fb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201fb0000+0x4000
+[alloc-fail] ml814 #8320 status=c0000018 hint=0x7201ff3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7201ff0000+0x4000
+[alloc-fail] ml814 #8384 status=c0000018 hint=0x7202033000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202030000+0x4000
+[alloc-fail] ml814 #8448 status=c0000018 hint=0x7202073000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202070000+0x4000
+[alloc-fail] ml814 #8512 status=c0000018 hint=0x72020b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72020b0000+0x4000
+[alloc-fail] ml814 #8576 status=c0000018 hint=0x72020f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72020f0000+0x4000
+[alloc-fail] ml814 #8640 status=c0000018 hint=0x7202133000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202130000+0x4000
+[alloc-fail] ml814 #8704 status=c0000018 hint=0x7202173000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202170000+0x4000
+[alloc-fail] ml814 #8768 status=c0000018 hint=0x72021b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72021b0000+0x4000
+[alloc-fail] ml814 #8832 status=c0000018 hint=0x72021f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72021f0000+0x4000
+[alloc-fail] ml814 #8896 status=c0000018 hint=0x7202233000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202230000+0x4000
+[alloc-fail] ml814 #8960 status=c0000018 hint=0x7202273000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202270000+0x4000
+[alloc-fail] ml814 #9024 status=c0000018 hint=0x72022b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72022b0000+0x4000
+[alloc-fail] ml814 #9088 status=c0000018 hint=0x72022f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72022f0000+0x4000
+[alloc-fail] ml814 #9152 status=c0000018 hint=0x7202333000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202330000+0x4000
+[alloc-fail] ml814 #9216 status=c0000018 hint=0x7202373000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202370000+0x4000
+[alloc-fail] ml814 #9280 status=c0000018 hint=0x72023b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72023b0000+0x4000
+[alloc-fail] ml814 #9344 status=c0000018 hint=0x72023f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72023f0000+0x4000
+[alloc-fail] ml814 #9408 status=c0000018 hint=0x7202433000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202430000+0x4000
+[alloc-fail] ml814 #9472 status=c0000018 hint=0x7202473000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202470000+0x4000
+[alloc-fail] ml814 #9536 status=c0000018 hint=0x72024b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72024b0000+0x4000
+[alloc-fail] ml814 #9600 status=c0000018 hint=0x72024f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72024f0000+0x4000
+[alloc-fail] ml814 #9664 status=c0000018 hint=0x7202533000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202530000+0x4000
+[alloc-fail] ml814 #9728 status=c0000018 hint=0x7202573000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202570000+0x4000
+[alloc-fail] ml814 #9792 status=c0000018 hint=0x72025b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72025b0000+0x4000
+[alloc-fail] ml814 #9856 status=c0000018 hint=0x72025f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72025f0000+0x4000
+[alloc-fail] ml814 #9920 status=c0000018 hint=0x7202633000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202630000+0x4000
+[alloc-fail] ml814 #9984 status=c0000018 hint=0x7202673000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202670000+0x4000
+[alloc-fail] ml814 #10048 status=c0000018 hint=0x72026b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72026b0000+0x4000
+[alloc-fail] ml814 #10112 status=c0000018 hint=0x72026f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72026f0000+0x4000
+[alloc-fail] ml814 #10176 status=c0000018 hint=0x7202733000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202730000+0x4000
+[alloc-fail] ml814 #10240 status=c0000018 hint=0x7202773000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202770000+0x4000
+[alloc-fail] ml814 #10304 status=c0000018 hint=0x72027b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72027b0000+0x4000
+[alloc-fail] ml814 #10368 status=c0000018 hint=0x72027f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72027f0000+0x4000
+[alloc-fail] ml814 #10432 status=c0000018 hint=0x7202833000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202830000+0x4000
+[alloc-fail] ml814 #10496 status=c0000018 hint=0x7202873000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202870000+0x4000
+[alloc-fail] ml814 #10560 status=c0000018 hint=0x72028b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72028b0000+0x4000
+[alloc-fail] ml814 #10624 status=c0000018 hint=0x72028f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72028f0000+0x4000
+[alloc-fail] ml814 #10688 status=c0000018 hint=0x7202933000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202930000+0x4000
+[alloc-fail] ml814 #10752 status=c0000018 hint=0x7202973000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202970000+0x4000
+[alloc-fail] ml814 #10816 status=c0000018 hint=0x72029b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72029b0000+0x4000
+[alloc-fail] ml814 #10880 status=c0000018 hint=0x72029f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72029f0000+0x4000
+[alloc-fail] ml814 #10944 status=c0000018 hint=0x7202a33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202a30000+0x4000
+[alloc-fail] ml814 #11008 status=c0000018 hint=0x7202a73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202a70000+0x4000
+[alloc-fail] ml814 #11072 status=c0000018 hint=0x7202ab3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202ab0000+0x4000
+[alloc-fail] ml814 #11136 status=c0000018 hint=0x7202af3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202af0000+0x4000
+[alloc-fail] ml814 #11200 status=c0000018 hint=0x7202b33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202b30000+0x4000
+[alloc-fail] ml814 #11264 status=c0000018 hint=0x7202b73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202b70000+0x4000
+[alloc-fail] ml814 #11328 status=c0000018 hint=0x7202bb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202bb0000+0x4000
+[alloc-fail] ml814 #11392 status=c0000018 hint=0x7202bf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202bf0000+0x4000
+[alloc-fail] ml814 #11456 status=c0000018 hint=0x7202c33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202c30000+0x4000
+[alloc-fail] ml814 #11520 status=c0000018 hint=0x7202c73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202c70000+0x4000
+[alloc-fail] ml814 #11584 status=c0000018 hint=0x7202cb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202cb0000+0x4000
+[alloc-fail] ml814 #11648 status=c0000018 hint=0x7202cf3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202cf0000+0x4000
+[alloc-fail] ml814 #11712 status=c0000018 hint=0x7202d33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202d30000+0x4000
+[alloc-fail] ml814 #11776 status=c0000018 hint=0x7202d73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202d70000+0x4000
+[alloc-fail] ml814 #11840 status=c0000018 hint=0x7202db3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202db0000+0x4000
+[alloc-fail] ml814 #11904 status=c0000018 hint=0x7202df3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202df0000+0x4000
+[alloc-fail] ml814 #11968 status=c0000018 hint=0x7202e33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202e30000+0x4000
+[alloc-fail] ml814 #12032 status=c0000018 hint=0x7202e73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202e70000+0x4000
+[alloc-fail] ml814 #12096 status=c0000018 hint=0x7202eb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202eb0000+0x4000
+[alloc-fail] ml814 #12160 status=c0000018 hint=0x7202ef3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202ef0000+0x4000
+[alloc-fail] ml814 #12224 status=c0000018 hint=0x7202f33000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202f30000+0x4000
+[alloc-fail] ml814 #12288 status=c0000018 hint=0x7202f73000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202f70000+0x4000
+[alloc-fail] ml814 #12352 status=c0000018 hint=0x7202fb3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202fb0000+0x4000
+[alloc-fail] ml814 #12416 status=c0000018 hint=0x7202ff3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7202ff0000+0x4000
+[alloc-fail] ml814 #12480 status=c0000018 hint=0x7203033000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203030000+0x4000
+[alloc-fail] ml814 #12544 status=c0000018 hint=0x7203073000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203070000+0x4000
+[alloc-fail] ml814 #12608 status=c0000018 hint=0x72030b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72030b0000+0x4000
+[alloc-fail] ml814 #12672 status=c0000018 hint=0x72030f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72030f0000+0x4000
+[alloc-fail] ml814 #12736 status=c0000018 hint=0x7203133000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203130000+0x4000
+[alloc-fail] ml814 #12800 status=c0000018 hint=0x7203173000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203170000+0x4000
+[alloc-fail] ml814 #12864 status=c0000018 hint=0x72031b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72031b0000+0x4000
+[alloc-fail] ml814 #12928 status=c0000018 hint=0x72031f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72031f0000+0x4000
+[alloc-fail] ml814 #12992 status=c0000018 hint=0x7203233000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203230000+0x4000
+[alloc-fail] ml814 #13056 status=c0000018 hint=0x7203273000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203270000+0x4000
+[alloc-fail] ml814 #13120 status=c0000018 hint=0x72032b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72032b0000+0x4000
+[alloc-fail] ml814 #13184 status=c0000018 hint=0x72032f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72032f0000+0x4000
+[alloc-fail] ml814 #13248 status=c0000018 hint=0x7203333000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203330000+0x4000
+[alloc-fail] ml814 #13312 status=c0000018 hint=0x7203373000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203370000+0x4000
+[alloc-fail] ml814 #13376 status=c0000018 hint=0x72033b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72033b0000+0x4000
+[alloc-fail] ml814 #13440 status=c0000018 hint=0x72033f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72033f0000+0x4000
+[alloc-fail] ml814 #13504 status=c0000018 hint=0x7203433000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203430000+0x4000
+[alloc-fail] ml814 #13568 status=c0000018 hint=0x7203473000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203470000+0x4000
+[alloc-fail] ml814 #13632 status=c0000018 hint=0x72034b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72034b0000+0x4000
+[alloc-fail] ml814 #13696 status=c0000018 hint=0x72034f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72034f0000+0x4000
+[alloc-fail] ml814 #13760 status=c0000018 hint=0x7203533000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203530000+0x4000
+[alloc-fail] ml814 #13824 status=c0000018 hint=0x7203573000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203570000+0x4000
+[alloc-fail] ml814 #13888 status=c0000018 hint=0x72035b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72035b0000+0x4000
+[alloc-fail] ml814 #13952 status=c0000018 hint=0x72035f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72035f0000+0x4000
+[alloc-fail] ml814 #14016 status=c0000018 hint=0x7203633000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203630000+0x4000
+[alloc-fail] ml814 #14080 status=c0000018 hint=0x7203673000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203670000+0x4000
+[alloc-fail] ml814 #14144 status=c0000018 hint=0x72036b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72036b0000+0x4000
+[alloc-fail] ml814 #14208 status=c0000018 hint=0x72036f3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72036f0000+0x4000
+[alloc-fail] ml814 #14272 status=c0000018 hint=0x7203733000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203730000+0x4000
+[alloc-fail] ml814 #14336 status=c0000018 hint=0x7203773000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x7203770000+0x4000
+[alloc-fail] ml814 #14400 status=c0000018 hint=0x72037b3000 size=0x1000 type=0x3000 protect=0x40 tid=00e4 | STAGE=fixed-map err=3 at 0x72037b0000+0x4000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light The Beast\\ph_ft\\work\\bin\\x64\\EOSSDK-Win64-Shipping.dll" 0x71e5060000+0x1335000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D E4 Load module EOSSDK-Win64-Shipping.dll (eossdk-win64-shipping.dll-d8cdeb2c689fef2f): 71E5060000
+[jit-pool] image 0x71e4fc0000+0xa0000 (wintrust.dll) → pool 0x153a44000 used=0xbae8000/0x27000000 tramp+0x4000
+D E4 Load module WINTRUST.dll (wintrust.dll-f4c54b53ba879395): 71E4FC0000
+00e4:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............."
+[footprint] rev=ml358 phys=1961 MB (peak 1961) internal=1959 MB compressed=0 MB external=267 MB reusable=34 MB (cycle=5)
+00a8:err:module:load_dll [dll-missing] rev=ml336 #4 L"ispc_texcomp.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[nls-getptr] type=11 id=1254 peb=0x1083e0000
+[win-pos] #33 hwnd=0x10066 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #33 hwnd=0x10066 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #34 hwnd=0x10066 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #34 hwnd=0x10066 class='OleMainThreadWndClass' text="" rev=ml853
+[jit-pool] image 0x71e4c60000+0xa0000 (mmdevapi.dll) → pool 0x153ae8000 used=0xbb8c000/0x27000000 tramp+0x4000
+D 128 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71E4C60000
+[file-census] r624 10s: case-sensitive=1 full-path-tries=3994 full-path-hits=1775 component-lookups=12618 shortcut-hits=7139 misses=3818 scans=5479 entries-scanned=379106 us-in-lookup=1054981 (10% of the window) slowest=0.798 ms ...BA5-A064877AAB66/Documents/wine/dosdevices/c:/windows/sysx64
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x1670f44bc fault_addr=0x0 insn=d9400008 rn=0 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71ffe40000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xd9400008 pc=0x1670f44bc NO pool/anon alias | region 0x1001cc000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71f4d30000 (pc=0x1670f44bc x18=0x0 registry=0x71ffe40000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x1670f44bc hinsn=0xd9400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=6 base=0x163ff4000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71eff52cc0 pc=0x1670f44bc addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1670f44bc addr=0x0 x18=0x0 type=1 lr=0x16dff8354 sp=0x71f4d30000 x16=0xfffffffffffff0b0 x17=0x71f4d2cbf0
+[guest-code] rev=ml333 pool_rip=0x71eff52cc0 (PE 0x71eff52cc0) -- NO pool copy for this address (identity translate)
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x71eff52cc7 (block entry 0x71eff52cc0) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x71eff50000+0x2a4000 prot=r-- max=rwx | Wine vprot of the 4 KB pages of host page 0x71eff50000: 21 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: none | 32 bytes at rip, loaded image: 48 8b 01 48 ff 60 28 cc cc 4c 8b c9 4c 8b c2 48 8b 0d 33 79 32 00 49 8b d1 48 8b 01 48 ff a0 08 | pool copy: - | image and pool copy not compared
+[fault-host] 1670f43bc: 910002ff d29ac709 f2be7389 f2c00e29 f943338b d61f0160 6dff820c 00000001
+[fault-host] 1670f43dc: 00000000 00000080 00000000 f3a01060 00000071 0000000e 00000000 00000005
+[fault-host] 1670f43fc: 00000028 00000000 00000000 31250180 00000000 00000050 10ffffea f900038a
+[fault-host] 1670f441c: b945eb8b 3400004b d4395fc0 aa1703e8 d503201f d902011b f81f8efd f84086fd
+[fault-host] 1670f443c: 910002ff d2867689 f2be7549 f2c00e29 f943338b d61f0160 6dff820c 00000001
+[fault-host] 1670f445c: 00000000 00000080 00000000 f3b31bd0 00000071 0000000e 00000000 00000005
+[mach_exc] insn_stream PC-12..PC+8: f2c00e26 d94000c0 d503201f [d9400008] d503201f d9428106 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe40000 TEB=0x71ffe40000 TEB[0x58]=0x7037e9a430 *(gs_cached+0x58)=0x7037e9a430
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xd9400008 pc=0x1670f44bc NO pool/anon alias | region 0x1001cc000+0x2da0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71f4d30000 (pc=0x1670f44bc x18=0x0 registry=0x71ffe40000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x1670f44bc hinsn=0xd9400008 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=6 base=0x163ff4000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71eff52cc0 pc=0x1670f44bc addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1670f44bc addr=0x0 x18=0x0 type=1 lr=0x16dff8354 sp=0x71f4d30000 x16=0xfffffffffffff0b0 x17=0x71f4d2cbf0
+[guest-code] rev=ml333 pool_rip=0x71eff52cc0 (PE 0x71eff52cc0) -- NO pool copy for this address (identity translate)
+[fault-host] 1670f441c: b945eb8b 3400004b d4395fc0 aa1703e8 d503201f d902011b f81f8efd f84086fd
+[fault-host] 1670f443c: 910002ff d2867689 f2be7549 f2c00e29 f943338b d61f0160 6dff820c 00000001
+[fault-host] 1670f445c: 00000000 00000080 00000000 f3b31bd0 00000071 0000000e 00000000 00000005
+[fault-host] 1670f447c: 00000028 00000000 00000000 31250180 00000000 00000068 10ffffea f900038a
+[fault-host] 1670f449c: b945eb8b 3400004b d4395fc0 d294c206 f2be04e6 f2c00e26 d94000c0 d503201f
+[fault-host] 1670f44bc: d9400008 d503201f d9428106 d503201f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: f2c00e26 d94000c0 d503201f [d9400008] d503201f d9428106 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe40000 TEB=0x71ffe40000 TEB[0x58]=0x7037e9a430 *(gs_cached+0x58)=0x7037e9a430
+00a8:err:seh:segv_handler [x18-decline] #1 pc=0x1670f44bc fault_addr=0x0 insn=d9400008 rn=0 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71ffe40000
+00a8:err:seh:segv_handler   x8=0x704e146380 x9=0xc031 x10=0x1670f4490 x16=0xfffffffffffff0b0 x17=0x71f4d2cbf0 x18=0x0 x19=0x0 x20=0x71f19a5af0
+00a8:err:seh:segv_handler   [guest-exact] ml885 block=0x1670f4490 rip=0x71eff52cc7 x86=48 8b 01 48 ff 60 28 cc cc 4c 8b c9 4c 8b c2 48
+00a8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x1670f44bc RX from -32, 64 of 64 bytes: 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 06 c2 94 d2 e6 04 be f2 26 0e c0 f2 c0 00 40 d9 1f 20 03 d5 08 00 40 d9 1f 20 03 d5 06 81 42 d9 1f 20 03 d5 8a 2f 4a a9 6b 11 06 8a 4a 01 0b 8b 4b 29 40 a9 
+00a8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x1670f44bc (not an anon-JIT page)
+D A8 Exception: Code: C0000005 Address: 1670F44BC AV READ of 0
+00a8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71eff52cc7 RX from -32, 64 of 64 bytes: 79 32 00 48 8b 01 48 ff a0 c0 04 00 00 cc cc cc cc cc cc cc cc cc cc cc cc 48 8b 0d 49 79 32 00 48 8b 01 48 ff 60 28 cc cc 4c 8b c9 4c 8b c2 48 8b 0d 33 79 32 00 49 8b d1 48 8b 01 48 ff a0 08 
+00a8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71eff52cc7 (not an anon-JIT page)
+D A8 Exception: Code: C0000005 Address: 71EFF52CC7 AV READ of 0
+00a8:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 703c810000 (== stack hi) ControlPc=71f56a2dd8 handler=00000071F5665388 — this is the unhandled-exception filter frame
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[thread-sample] ml876 b0 "" teb=0x0 cpu=4% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc32220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16ff76ac0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170461030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=32 x8=0x0 x18=0x0 sp=0x16fc32220
+[thread-stacks] port=0x1061b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x170461030
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[sock-big] send ERROR fd=401 errno=65 rev=ml464
+[12:59:43.100] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=71 resident=2451MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (responder)
+[thread-stacks] port=0x1061b "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=1 x8=0x0 x18=0x0 sp=0x170461030
+[thread-stacks] port=0x17fab "" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=2 x8=0x270f x18=0x0 sp=0x12c92fb00
+[thread-stacks] port=0x1cd67 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1707ec0e0 x18=0x0 sp=0x12cb2e9d0
+[thread-stacks] port=0x181ef "wine_mmdevapi_notification" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1707f00e0 x18=0x0 sp=0x12cd2e680
+[thread-stacks] port=0x1e733 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=1 x8=0x126158381 x18=0x0 sp=0x17087ab30
+[thread-stacks] port=0x18787 "" pc=?`?+0x0 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x0
+[thread-stacks] port=0x1cae7 "CNet Encrypt:0" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x1708800e0 x18=0x0 sp=0x12cf2e9d0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x170461030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "EOSP2PWorker" teb=0x704a010000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x125e0e9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14e26f1c8 user-sp=0x705597fc90 user-cand=[ EOSSDK-Win64-Shipping.dll+0x53df7 EOSSDK-Win64-Shipping.dll+0x53c33 EOSSDK-Win64-Shipping.dll+0x168a4 EOSSDK-Win64-Shipping.dll+0x39e590 ]
+[thread-sample] ml876 b0 "EOSP2PSignaling" teb=0x704a000000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x12c12e9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14e26f1c8 user-sp=0x705617fc90 user-cand=[ EOSSDK-Win64-Shipping.dll+0x53df7 EOSSDK-Win64-Shipping.dll+0x53c33 EOSSDK-Win64-Shipping.dll+0x168a4 EOSSDK-Win64-Shipping.dll+0x39e590 ]
+[thread-sample] ml876 b0 "" teb=0x7049ff0000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x12150e9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14e26f1c8 user-sp=0x7057c6fd30 user-cand=[ engine_x64_rwdi.dll+0xcf1a87 engine_x64_rwdi.dll+0xcf1a09 ]
+[thread-sample] ml876 b0 "" teb=0x71fff00000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x12c32e9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14e26f1c8 user-sp=0x7052a0fd50 user-cand=[ engine_x64_rwdi.dll+0xce0f23 engine_x64_rwdi.dll+0x1081f9 engine_core_x64_rwdi.dll+0x11b0b7 ]
+[thread-sample] ml876 b0 "" teb=0x7049fe0000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x12c52e840 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14e26f1c8 user-sp=0x705320fcb0 user-cand=[ engine_x64_rwdi.dll+0x1341aef engine_x64_rwdi.dll+0x146a686 engine_x64_rwdi.dll+0x146a490 engine_x64_rwdi.dll+0x146a46f ]
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=33 MB (cycle=22)
+[thread-sample] ml876 burst done
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=33 MB (cycle=23)
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=33 MB (cycle=24)
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=33 MB (cycle=25)
+[winios-tree] 0x1004a 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10048 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10046 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x20040 'WineDdeEventClass' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x40030 'Shell_TrayWnd' "" style=04c80000 ex=00000100 vis=0 tid=0024 win={0,0,166,52} client={3,29,163,49}
+[winios-tree] 0x1003e 'IME' "Default IME" style=8c000000 ex=00000000 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=33 MB (cycle=26)
+[xp] 13:00:04.200 +50.95 dt=323 cpu=38 (thr 38) P=0 E=38 run=49 pgw=-1.0 GHz P=0.00 E=0.88 Minst=91 IPC=2.68 mJ=3 pin=0 rdKB=0 fpMB=2159
+[xp] 13:00:04.464 +51.21 dt=264 cpu=31 (thr 31) P=1 E=30 run=45 pgw=-1.0 GHz P=1.33 E=0.88 Minst=48 IPC=1.74 mJ=2 pin=0 rdKB=0 fpMB=2159
+[xp] 13:00:04.788 +51.54 dt=324 cpu=41 (thr 41) P=1 E=39 run=63 pgw=-1.0 GHz P=1.32 E=0.92 Minst=90 IPC=2.38 mJ=3 pin=0 rdKB=0 fpMB=2159
+[xp] 13:00:05.045 +51.79 dt=257 cpu=27 (thr 26) P=0 E=27 run=39 pgw=-1.0 GHz P=0.00 E=0.95 Minst=52 IPC=2.06 mJ=2 pin=0 rdKB=0 fpMB=2159
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[xp] 13:00:05.369 +52.12 dt=324 cpu=53 (thr 53) P=2 E=51 run=203 pgw=-1.0 GHz P=1.97 E=1.60 Minst=139 IPC=1.62 mJ=8 pin=0 rdKB=0 fpMB=2159
+[footprint] rev=ml358 phys=2159 MB (peak 2170) internal=2156 MB compressed=0 MB external=268 MB reusable=34 MB (cycle=27)
+[xp] 13:00:05.660 +52.41 dt=291 cpu=38 (thr 38) P=1 E=38 run=55 pgw=-1.0 GHz P=1.45 E=1.69 Minst=76 IPC=1.18 mJ=4 pin=0 rdKB=0 fpMB=2159
+[13:00:05.700] [INFO] [session] length=53s partial=1 play=0s frames=0 stalls=0/0s peak=2170MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Dying Light: The Beast

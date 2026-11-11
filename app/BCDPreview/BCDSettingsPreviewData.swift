@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import SwiftUI
@@ -103,6 +105,7 @@ extension BCDSettingsBackends {
     var nextLayoutName: String { "Custom Layout 2" }
     var restartNeeded: Bool { false }
     let controllerAPIChoices = [BCDSettingsChoice(value: "", label: "XInput (default)"),
+                                BCDSettingsChoice(value: "xbox360", label: "XInput + Xbox 360 device"),
                                 BCDSettingsChoice(value: "hid", label: "DirectInput / HID"),
                                 BCDSettingsChoice(value: "dualsense", label: "HID, always a DualSense"),
                                 BCDSettingsChoice(value: "generic", label: "HID, always a generic gamepad")]
@@ -269,6 +272,15 @@ extension BCDSettingsBackends {
     func restoreSaves(from url: URL) { savesMessage = "412 files put back." }
     func addEveryGame() { addGamesMessage = "2 games added to your library." }
     var prefixToolsView: AnyView? { AnyView(BCDPrefixToolsGroup(backend: BCDPreviewPrefix.shared)) }
+    // External drives (Settings › Storage › External drives): one connected sample drive, one unplugged.
+    var supportsExternalGames: Bool { true }
+    var externalDrives: [BCDExternalDrive] {
+        [BCDExternalDrive(id: "e", letter: "E", name: "Kingston SSD", connected: true, free: 1_210_000_000_000, total: 2_000_000_000_000),
+         BCDExternalDrive(id: "f", letter: "F", name: "Games", connected: false, free: nil, total: nil)]
+    }
+    var canChangeExternalDrives: Bool { true }
+    @Published private(set) var steamInstallDrive = "e"
+    func setSteamInstallDrive(_ id: String) { steamInstallDrive = id }
 }
 
 /// Round 604: Settings › Storage › Windows prefix, with a few sample copies.

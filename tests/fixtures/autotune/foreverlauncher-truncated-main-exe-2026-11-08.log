@@ -1,0 +1,58 @@
+[23:30:54.147] [INFO] Checking entitlements...
+[23:30:54.147] [INFO] [build] v0.1.634 (634)
+[23:30:54.148] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11722MB available=8170MB cores=6
+[23:30:54.148] [INFO] [device] address-map=[0x1001f4000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[23:30:54.148] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=48d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=0 wildcard=0 lc=0
+[23:30:54.157] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=+01:00 free-disk=95GB stikdebug-url=1
+[23:30:54.160] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:31:04.332] [INFO] Requesting JIT with StikDebug...
+[23:31:04.362] [INFO] Opening StikDebug to enable JIT...
+[23:31:10.202] [INFO] [bcd] library launch ForeverLauncher.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[23:31:10.220] [INFO] Running full Wine sequence...
+[23:31:10.220] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1001f4000,0x8000000000) 512GB available=8158MB low-power=0 thermal=nominal
+[23:31:10.221] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[23:31:10.225] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:31:10.225] [INFO] Allocating 896MB JIT pool via debugger...
+[23:31:10.225] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:31:10.225] [INFO] [jit-debugger] attached=1 at the pool request
+[23:31:10.227] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:31:12.469] [INFO] RX pool at 0x148000000
+[phase] wine-start             t+  2.335s rev=ml526
+[23:31:12.560] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/e068431660942d6f.cfg (read)
+[WineProc] Target exe: C:\Program Files (x86)\ForeverLauncher.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[23:31:12.965] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[23:31:12.965] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[23:31:12.965] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[srv-own] init_thread tid=0024 pid=0020 reply=41->srv44 wait=43->srv45 rev=ml586
+[thread-prio] madeira-bcd tid=0024 base=0 effective=9 -> kept at pthread QoS
+[Wine init_process] init_first_thread ret=0, pid=32, tid=36
+[23:31:12.965] [Wine init_process] init_first_thread ret=0, pid=32, tid=36
+[23:31:12.965] [map-name] #1 open "\KernelObjects\__wine_user_shared_data" err=00000000 pid=0020 tid=0024 handle=0004 hits=1
+[iOS env] INCLUDED: SteamAppId=356400
+[23:31:12.969] [map-name] #2 open "\KernelObjects\__wine_user_shared_data" err=00000000 pid=0020 tid=0024 handle=0004 hits=2
+ml992: os_proc_available_memory=7521 MB + phys_footprint=670 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x12ca000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x12cc000 rev=ajan5-motor
+0024:err:module:map_image_into_view Could not map L"\\??\\C:\\Program Files (x86)\\ForeverLauncher.exe" section .pdata, file probably truncated
+[main-exe] load_main_exe = 0xc000007b Machine=0x8664 chars=0x22
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=0
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[23:31:12.982] [Wine ntdll/server] process_exit_wrapper(-1073741515)
+[WineProc] Wine exited with code -1073741515 (caught by longjmp)
+[WineProc] stopping wineserver...
+[23:31:12.982] [Wine] Joining wineserver thread...
+[23:31:13.222] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=688MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=ForeverLauncher
+[23:31:13.238] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[23:31:15.076] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=7 resident=759MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+60s beats=2 gaps=0 iter=237 gen=1 threads=6 resident=759MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+90s beats=3 gaps=0 iter=355 gen=1 threads=5 resident=759MB dbg=DEBUGGED rev=ml525

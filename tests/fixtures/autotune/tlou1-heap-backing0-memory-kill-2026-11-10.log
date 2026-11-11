@@ -1,0 +1,567 @@
+[10:41:46.014] [INFO] [prev-tail] the last 60 line(s) of the previous run's log (tlou-i-l.exe-2026-11-10_09-05-54.txt), scrubbed:
+[10:41:46.015] [INFO] [prev-tail] [srv-kill] kill_thread tid=00cc pid=0020 violent=1 rev=ml586
+[10:41:46.015] [INFO] [prev-tail] [srv-kill] kill_thread tid=00d0 pid=0020 violent=1 rev=ml586
+[10:41:46.015] [INFO] [prev-tail] [srv-kill] kill_thread tid=00dc pid=0020 violent=1 rev=ml586
+[10:41:46.015] [INFO] [prev-tail] [srv-kill] kill_thread tid=00e0 pid=0020 violent=1 rev=ml586
+[10:41:46.015] [INFO] [prev-tail] [srv-kill] kill_thread tid=00e4 pid=0020 violent=1 rev=ml586
+[10:41:46.016] [INFO] [prev-tail] [srv-kill] kill_thread tid=00e8 pid=0020 violent=1 rev=ml586
+[10:41:46.019] [INFO] [prev-tail] [Wine ntdll/server] process_exit_wrapper(-2147483391)
+[10:41:46.019] [INFO] [prev-tail] -[_MTLCommandEncoder dealloc]:134: failed assertion `Command encoder released without endEncoding'
+[10:41:46.019] [INFO] [prev-tail] [srv-kill] kill_process pid=0020 violent=0 threads: 00f0 rev=ml586
+[10:41:46.022] [INFO] [prev-tail] [footprint] rev=ml358 phys=6166 MB (peak 6166) internal=1631 MB compressed=2777 MB external=569 MB reusable=2 MB (cycle=37)
+[10:41:46.022] [INFO] [prev-tail] [task-exc] BREAKPOINT #1 pc=0x19bd43a30 insn=0xd4200020 imm=0x1 other rev=ml523
+[10:41:46.023] [INFO] [prev-tail] [int3-guest] guest_rip=0x0 x28=0x48760d42790a45f7 read=0 rev=ml554
+[10:41:46.023] [INFO] [prev-tail] [fault_rip] cnt=15 rip=0x152f18880 pc=0x19bd43a30 addr=0x19bd43a30 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x180000000+0x72000000 [first] rev=ml555
+[10:41:46.023] [INFO] [prev-tail] [rip-leak] guest RIP 0x152f18880 IS POOL addr = PE 0x71fbf9d880 (module base 0x71fbf50000 rva 0x4d880)
+[10:41:46.023] [INFO] [prev-tail] [rip-leak] guest RSP=0xffffffffffffffff stack: 0 0 0 0 0 0 0 0
+[10:41:46.024] [INFO] [prev-tail] [host-fault] sig=5 pc=0x19bd43a30 addr=0x19bd43a30 on a NON-guest thread — declining to adopt (would have deadlocked in our own handler) rev=ml481
+[10:41:46.024] [INFO] [prev-tail] [task-exc] BREAKPOINT #2 pc=0x19bd43a30 insn=0xd4200020 imm=0x1 other rev=ml523
+[10:41:46.024] [INFO] [prev-tail] [task-exc]   TRAP-SYM pc=/usr/lib/system/libsystem_c.dylib`<redacted>+0xb8  lr=0x19bd43a30 /usr/lib/system/libsystem_c.dylib`<redacted>+0xb8 rev=ml559
+[10:41:46.024] [INFO] [prev-tail] [int3-guest] guest_rip=0x0 x28=0x48760d42790a45f7 read=0 rev=ml554
+[10:41:46.024] [INFO] [prev-tail] [fault_rip] cnt=16 rip=0x152f18880 pc=0x19bd43a30 addr=0x19bd43a30 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x180000000+0x72000000 rev=ml555
+[10:41:46.178] [INFO] Checking entitlements...
+[10:41:46.179] [INFO] [build] v0.1.651 (651)
+[10:41:46.179] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=11695MB available=6634MB cores=6
+[10:41:46.179] [INFO] [device] address-map=[0x1045ac000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[10:41:46.180] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=337d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=0 wildcard=0 lc=0
+[10:41:46.199] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=+03:00 free-disk=81GB stikdebug-url=1
+[10:41:46.202] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:42:06.619] [INFO] Requesting JIT with Built-in StikJIT...
+[10:42:08.124] [INFO] [bcd] library launch tlou-i-l.exe: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off lc=0
+[10:42:08.147] [INFO] Running full Wine sequence...
+[10:42:08.147] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1045ac000,0x8000000000) 512GB available=8148MB low-power=0 thermal=nominal
+[10:42:08.148] [INFO] [game-cfg] d3d12-binding-tier=3 d3d12-device9=1 d3d12-pipeline-library=1 d3d12-pso-cached-blob=1 d3d12-typed-uav-load=1 dxil-loop-guard=0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c dxil-target-latest=1 encoder-labels=1 env.MADEIRA_BIG_HINT_EXACT=3 env.MADEIRA_CAGE_RELEASE=2 env.MADEIRA_DIALOG_CODE_DUMP=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=1 env.MADEIRA_JUMBO_CODE_DUMP=1 env.MADEIRA_NVAPI_DEVICE_ID=2544 heap-backing=0 mempool-mb=4096 msc-unbounded-retry=1 pso-placeholder=1 swap-mb=8192 swap-min-mb=1 swap-mode=2 trace-dispatch=CS_ExposureControl,CS_DoHistogramMerge trace-dispatch-every=301 trace-dispatch-max=24 vram-mb=2304
+[10:42:08.153] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:42:08.153] [INFO] Allocating 896MB JIT pool via debugger...
+[10:42:08.153] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:42:08.153] [INFO] [jit-debugger] attached=1 at the pool request
+[10:42:08.156] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[10:42:08.852] [INFO] RX pool at 0x148000000
+[10:42:08.869] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.774s rev=ml526
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 8 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   d3d12-device9 = 1
+[game-cfg]   d3d12-binding-tier = 3
+[game-cfg]   d3d12-typed-uav-load = 1
+[game-cfg]   d3d12-pipeline-library = 1
+[game-cfg]   vram-mb = 2304
+[game-cfg]   encoder-labels = 1
+[game-cfg]   dxil-loop-guard = 0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c
+[game-cfg]   trace-dispatch = CS_ExposureControl,CS_DoHistogramMerge
+[game-cfg]   trace-dispatch-every = 301
+[game-cfg]   trace-dispatch-max = 24
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback NOT reserved (MADEIRA_CAGE_RELEASE=2): 0x7200000000+0x1ffff0000 is free for the guest band and the host from the start; its first page stays a guard
+[swap] ml1150 pool: 8 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 4704 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[swap] ml1077 backed 0x73ffdf0000+0x200000 (whole reservation, ml1257) (file off 8796093022208 MB): 2 MB in 1 extents, peak 2 MB, 0 refused
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7576 MB + phys_footprint=615 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: map_image_view size=0x844b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0x844b000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x844c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=11 occupied=3586 MB of 15232 MB free=11725 MB maxhole=8189 MB@0x7200004000 rev=ml787 (periodic)
+[jit-pool] image 0x127000000+0x844b000 (t1x.exe) → pool 0x148006000 used=0x8456000/0x23000000 tramp+0x0
+[copy-verify] t1x.exe: OK, 2631 .text pages executable (copy @0x148006000)
+[window] 0x127000000..0x7903000000 regions=71760 occupied=458094 MB of 490944 MB free=32849 MB maxhole=20528 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=880 MB (peak 880) internal=878 MB compressed=0 MB external=78 MB reusable=13 MB (cycle=1)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x73ffcc0000+0x130000 (ntdll.dll) → pool 0x150454000 used=0x858c000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x150454000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+[jit-pool] image 0x73fe8a0000+0x41c000 (libarm64ecfex.dll) → pool 0x15058f000 used=0x89b3000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x15058f000)
+[jit-pool] image 0x73fe770000+0x130000 (ucrtbase.dll) → pool 0x1509b0000 used=0x8ae4000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1509b0000)
+[jit-pool] image 0x73fe6b0000+0xc0000 (kernel32.dll) → pool 0x150ae4000 used=0x8bac000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x150ae4000)
+[jit-pool] image 0x73fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x150bac000 used=0x8eac000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x150bac000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[swap] ml1077 backed 0x7123980000+0x100000 (whole reservation, ml1257) (file off 8796093022210 MB): 3 MB in 2 extents, peak 3 MB, 0 refused
+[nls-getptr] type=11 id=20127 peb=0x73fffe0000
+[swap] ml1077 backed 0x7123df0000+0x24c000 (whole reservation, ml1257) (file off 8796093022211 MB): 5 MB in 3 extents, peak 5 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module tlou-i-l.exe (tlou-i-l.exe-67756582a3b70272): 127000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FFCC0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x73fffe0000
+[nls-getptr] type=11 id=437 peb=0x73fffe0000
+D 24 Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 73FE240000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 73FE020000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 73FDF30000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 73FDE80000
+[swap] ml1077 backed 0x7124090000+0x100000 (whole reservation, ml1257) (file off 8796093022213 MB): 6 MB in 4 extents, peak 6 MB, 0 refused
+[file-fail] ml665 #55 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\The Last of Us\WININET.dll
+E 24 [iOS-xins] tracker=0x150959f18 WININET.dll sec=0x73fd5f0000-0x73fd62b029
+E 24 [iOS-xins] tracker=0x150959f18 WININET.dll sec=0x73fd630000-0x73fd630f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 73FD5E0000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x151d04000)
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x151db8000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x151e3c000)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x1527c0000)
+E 24 [iOS-xins] tracker=0x150959f18 WININET.dll sec=0x73fd5f0000-0x73fd62b029
+E 24 [iOS-xins] tracker=0x150959f18 WININET.dll sec=0x73fd630000-0x73fd630f90
+E 24 [img-map] ml710 #19 intervals-only WININET.dll base=0x73fd5e0000
+[copy-verify] avrt.dll: OK, 1 .text pages executable (copy @0x1536d0000)
+[swap] ml1077 backed 0x7124310000+0x180000 (whole reservation, ml1257) (file off 8796093022214 MB): 7 MB in 5 extents, peak 7 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0x73fffe0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> secur32.dll: resolved=10 failed=0
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> crypt32.dll: resolved=7 failed=0
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x73f9360000 size=0x1000 type=0x3000 protect=0x40
+[xp-names] m10278185 "wine-x18-exc"
+[xp] 10:42:10.360 +0.62 dt=319 cpu=291 (thr 290) P=290 E=0 run=294 pgw=-1.0 GHz P=4.21 E=1.89 Minst=5572 IPC=4.56 mJ=1509 pin=462 rdKB=29648 fpMB=1046
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000000D8 status=00000000 native_pc=00000073FFD22DAC is_ec=1 -> returned rip=00000073FFD22DAC rsp=0000007124D20000 flags=00100003
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[big-hint] r646 SLOTS of 64 MB: the game's six slot-size instructions patched (image 0x127000000); its 512 slots are 32 GB
+[jumbo#1] +0ms tid=16bb97000 wtid=0024 peb=0x73fffe0000 nrip=0x73fe444f00 grip=0x0 size=0x8000000000 (524288 MB) hint=0x1000000000 -> 0x0 st=0xc0000018 | granted=0 MB ok=0 fail=1
+[alloc-fail] ml814 #1 status=c0000018 hint=0x1000000000 size=0x8000000000 type=0x2000 protect=0x4 tid=0024 | STAGE=none err=3 at 0x7023000000+0x800000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=tlou-i-l.exe tid=0024 size=0x8000000000 type=0x2000 prot=0x4 hint=0x1000000000 zb=0x0 hits=1 rev=ajan5-rockstar
+[big-hint] r635 GRANTED 0x7400000000 +524288 MB prot=0x4 at the moved base: the first 32768 MB are real, the rest on paper
+[jumbo#2] +1ms tid=16bb97000 wtid=0024 peb=0x73fffe0000 nrip=0x1273b3d89 grip=0x0 size=0x8000000000 (524288 MB) hint=0x7400000000 -> 0x7400000000 st=0x0 | granted=524288 MB ok=1 fail=1
+[swap] ml1077 backed 0x7400000000+0x142400000 (file off 0 MB): 5163 MB in 6 extents, peak 5163 MB, 0 refused
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\The Last of Us\\crs-handler.exe" cmdline=L".\\crs-handler.exe --no-identify-client-via-url --no-upload-annotations --kill-timeout=30 --locale=en \"--app-name=The Last of Us Part I\" --app-logo=./crs-prompt-logo.png --database=./.crashdata --metrics-dir=./.crashdata --url=https://upload.studiocrs.playstation.com/crashrecorder/rest/"...
+[phase] spawn:L"C:\\The Last of Us\\crs-handler.exe" t+  2.366s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L".\\crs-handler.exe --no-identify-client-via-url --no-upload-annotations --kill-timeout=30 --locale=en \"--app-name=The Last of Us Part I\" --app-logo=./crs-prompt-logo.png --database=./.crashdata --metrics-dir=./.crashdata --url=https://upload.studiocrs.playstation.com/crashrecorder/rest/"... (fd=146, unixdir=148, dup_unixdir=152) cwd=L"C:\\The Last of Us\\"
+[jit-pool] image 0x12fa50000+0x116000 (?) → pool 0x155fc6000 used=0xe0e2000/0x23000000 tramp+0x0
+ml957: ? backing 0x12fa50000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x156323244 fault_addr=0x0 insn=f8697949 rn=10 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x73fffb0000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf8697949 pc=0x156323244 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89cf5e0 (pc=0x156323244 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x156323244 hinsn=0xf8697949 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x73ffd45660 pc=0x156323244 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x156323244 addr=0x0 x18=0x0 type=1 lr=0x156318854 sp=0x73f89cf5e0 x16=0x28 x17=0x7c07cd0334
+[guest-code] rev=ml333 pool_rip=0x1504d9660 (PE 0x73ffd45660): 4c 8b d1 b8 33 00 00 00 f6 04 25 08 03 fe 7f 01
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x73ffd45660 (block entry 0x73ffd45660) rva 0x85660, section #0 '.text' rva 0x10000+0x770a5 chars 0x60000020 (R-X CODE) | host region 0x73ffd44000+0x4000 prot=r-- max=rw- | Wine vprot of the 4 KB pages of host page 0x73ffd44000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: 0x1504d9660 | 32 bytes at rip, loaded image: e9 71 b8 61 f9 00 00 00 f6 04 25 08 03 fe 7f 01 75 03 0f 05 c3 cd 2e c3 00 00 00 00 00 00 00 00 | pool copy: 4c 8b d1 b8 33 00 00 00 f6 04 25 08 03 fe 7f 01 75 03 0f 05 c3 cd 2e c3 00 00 00 00 00 00 00 00 | image and pool copy DIFFER
+[fault-host] 156323144: 53047c08 b00015a9 9134c129 4a403508 4a405908 92402108 8b081528 f9400109
+[fault-host] 156323164: eb00013f 540002e0 5280008a 5280010b b00015cc 9134c18c f100013f 9a8a0169
+[fault-host] 156323184: 8b090189 5280002a b82a0129 f9000501 b9001902 140c5029 d0001669 b9407d29
+[fault-host] 1563231a4: f8697969 91400129 91002129 f9000909 c89ffd00 91004188 f82a0108 b900018a
+[fault-host] 1563231c4: d65f03c0 00000000 000f0581 b4000260 53047c08 b00015a9 9134c129 4a403508
+[fault-host] 1563231e4: 4a405908 92402108 8b081528 f9400109 eb00013f 54000121 b00015c9 9134e129
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0x9100a3e291002021  (x16=0x28 pe=0x73f8ed0000 rva_pc=0x23244)
+[mach_exc] insn_stream PC-12..PC+8: 2a1f03e8 b9407d29 5288000b [f8697949] b00015aa 9134c14a 91400129
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x73fffb0000 TEB=0x73fffb0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf8697949 pc=0x156323244 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89cf5e0 (pc=0x156323244 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x156323244 hinsn=0xf8697949 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x73ffd45660 pc=0x156323244 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x156323244 addr=0x0 x18=0x0 type=1 lr=0x156318854 sp=0x73f89cf5e0 x16=0x28 x17=0x7c07cd0334
+[guest-code] rev=ml333 pool_rip=0x1504d9660 (PE 0x73ffd45660): 4c 8b d1 b8 33 00 00 00 f6 04 25 08 03 fe 7f 01
+[fault-host] 1563231a4: f8697969 91400129 91002129 f9000909 c89ffd00 91004188 f82a0108 b900018a
+[fault-host] 1563231c4: d65f03c0 00000000 000f0581 b4000260 53047c08 b00015a9 9134c129 4a403508
+[fault-host] 1563231e4: 4a405908 92402108 8b081528 f9400109 eb00013f 54000121 b00015c9 9134e129
+[fault-host] 156323204: 5280002b 9100212a f82b014a c89ffd1f 12800008 b8280128 d65f03c0 00000000
+[fault-host] 156323224: 00000000 00000000 000f0de1 d0001669 140c5007 2a1f03e8 b9407d29 5288000b
+[fault-host] 156323244: f8697949 b00015aa 9134c14a 91400129 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0x9100a3e291002021  (x16=0x28 pe=0x73f8ed0000 rva_pc=0x23244)
+[mach_exc] insn_stream PC-12..PC+8: 2a1f03e8 b9407d29 5288000b [f8697949] b00015aa 9134c14a 91400129
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x73fffb0000 TEB=0x73fffb0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0030:err:seh:segv_handler [x18-decline] #1 pc=0x156323244 fault_addr=0x0 insn=f8697949 rn=10 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x73fffb0000
+0030:err:seh:segv_handler   x8=0x0 x9=0x0 x10=0x0 x16=0x28 x17=0x7c07cd0334 x18=0x0 x19=0x2 x20=0x7c07cb0ad0
+0030:err:seh:segv_handler   [guest-rip-sec] rip=0x73ffd45660 in image 0x73ffcc0000: rva 0x85660, section #0 '.text' rva 0x10000+0x770a5 chars 0x60000020 (R-X CODE), vprot=0x25
+0030:err:seh:segv_handler   [guest-exact] ml885 block=0x0 unresolved: 
+0030:err:seh:segv_handler   [fex-fault] pc=libarm64ecfex.dll+0x108244 lr=libarm64ecfex.dll+0xfd854 fault-addr=0x0 sp=0x73f89cf5e0 fp=0x712552d2e0 teb=0x0 rev=r624
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x73f8fd8244 RX from -32, 64 of 64 bytes: 00 00 00 00 00 00 00 00 e1 0d 0f 00 69 16 00 d0 4a 2e 40 f9 e8 03 1f 2a 29 7d 40 b9 0b 00 88 52 49 79 69 f8 aa 15 00 b0 4a c1 34 91 29 01 40 91 29 21 00 91 04 00 00 14 4a 81 00 91 6b 81 00 f1 
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x73f8fd8244 (not an anon-JIT page)
+D 30 Exception: Code: C0000005 Address: 73F8FD8244 AV READ of 0
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89ce630 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x73ffd45660 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x0 addr=0x0 x18=0x0 type=1 lr=0x0 sp=0x73f89ce630 x16=0x28 x17=0x7c07cd0334
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x73fffb0000 TEB=0x73fffb0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[av-detail] ml613 #4 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x73ffd45660 pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x0 addr=0x0 x18=0x0 type=1 lr=0x0 sp=0x73f89ce630 x16=0x28 x17=0x7c07cd0334
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+[av-detail] ml613 #5 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+[av-detail] ml613 #6 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c97c0 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c8810 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c7860 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c68b0 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c5900 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x73f89c4950 (pc=0x0 x18=0x0 registry=0x73fffb0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #19 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #20 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #21 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #22 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #23 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #24 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+D 30 Exception: Code: C0000005 Address: 0 AV EXEC of 0
+[store-noalias] #3 rev=ml348 addr=0x73f898ffe0 insn=0xa90553f3 pc=0x15634f684 NO pool/anon alias | region 0x73f8990000+0x40000 prot=3 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach_exc] UNHANDLED #5 pc=0x15634f684 addr=0x73f898ffe0 x18=0x73fffb0000 type=1 lr=0x15634f500 sp=0x73f898ff90 x16=0x1fffffffffffff x17=0x558d
+[mach_exc] insn_stream PC-12..PC+8: d4200020 000d18c1 d10243ff [a90553f3] a9065bf5 a9076bf9 a9087bfb
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #4 rev=ml348 addr=0x73f898ffe0 insn=0xa90553f3 pc=0x15634f684 NO pool/anon alias | region 0x73f8990000+0x40000 prot=3 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+0030:err:seh:segv_handler   [fex-fault] pc=libarm64ecfex.dll+0x134684 lr=libarm64ecfex.dll+0x134500 fault-addr=0x73f898ffe0 sp=0x73f898ff90 fp=0x73f89909c8 teb=0x73fffb0000 rev=r624
+[fault-rgn]   small-view history: view 0x73f8990000+0x40000 (ends 0x73f89d0000) protect=0x23 CREATED by tid 0030 7 ms ago
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Saved Games/The Last of Us Part I/log.txt
+[guest-log] #1 tid=0024 monitor
+[xp] 10:42:10.671 +0.93 dt=311 cpu=315 (thr 225) P=309 E=6 run=320 pgw=-1.0 GHz P=4.18 E=2.23 Minst=5295 IPC=4.06 mJ=1476 pin=15 rdKB=1528 fpMB=1407
+[image-reload] unmapped image 0x73f81f0000+0x20000: 1 pool copy marked
+[image-reload] unmapped image 0x73f8120000+0xb0000: 1 pool copy marked
+[win-pos] #1 hwnd=0x1002a after=0x0 flags=8000003c vis={0,0,1920,1080} surface=0x1075ae5c0 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x1002a class='T1X' text="" rev=ml853
+[win-pos] #2 hwnd=0x10032 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1075ae5c0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10032 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10032 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1075ae5c0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10032 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x1002a after=0x0 flags=80000018 vis={0,0,1920,1080} surface=0x1075ae5c0 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x1002a class='T1X' text="The Last of Us? Part I " rev=ml853
+[win-pos] #5 hwnd=0x1002a after=0x0 flags=8000101e vis={0,0,1416,682} surface=0x1075ae5c0 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #5 hwnd=0x1002a class='T1X' text="The Last of Us? Part I " rev=ml853
+[win-pos] #6 hwnd=0x1002a after=0x0 flags=8000181f vis={0,0,1416,682} surface=0x1075ae5c0 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x1002a class='T1X' text="The Last of Us? Part I " rev=ml853
+[image-reload] unmapped image 0x73f8110000+0xc0000: 1 pool copy marked
+[free-delay] #1 release of 0x7142660000+0x7d0000 held for 2000 ms (1 in flight)
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[swap] ml1150 pool: decommit 0x7141ab0000+0x70000 zeroed in place (1)
+[swap] ml1150 pool: decommit 0x7141aa0000+0x10000 zeroed in place (2)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] nvapi64.dll: OK, 45 .text pages executable (copy @0x157189000)
+[xp] 10:42:10.954 +1.21 dt=283 cpu=547 (thr 428) P=334 E=213 run=668 pgw=-1.0 GHz P=4.19 E=2.58 Minst=6452 IPC=3.31 mJ=1549 pin=431 rdKB=19352 fpMB=1546
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[image-reload] unmapped image 0x73f7b10000+0xe2000: 1 pool copy marked
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"atiadlxx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"atiadlxy.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc200, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc200, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc200, create)
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc100, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc100, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc100, create)
+[madeira-d3d12] feature level 0xc100 refused; 12_0 is the ceiling claimed (d3d12-fl-12-1 = 1 claims 12_1)
+[madeira-d3d12] feature level 0xc100 refused; 12_0 is the ceiling claimed (d3d12-fl-12-1 = 1 claims 12_1)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc000, create)
+[madeira-d3d12] d3d12-pipeline-library = 1 (opt-in): CreatePipelineLibrary makes a library that keeps no pipeline (loads answer not-found, stores are accepted and forgotten)
+[madeira-d3d12] d3d12-pipeline-library = 1 (opt-in): CreatePipelineLibrary makes a library that keeps no pipeline (loads answer not-found, stores are accepted and forgotten)
+[d3d12-caps] binding-tier=3 (d3d12-binding-tier): OPTIONS reports ResourceBindingTier 3
+[d3d12-caps] binding-tier=3 (d3d12-binding-tier): OPTIONS reports ResourceBindingTier 3
+[d3d12-caps] ml1970 typed-uav-load-additional=1 (opt-in)
+[d3d12-caps] ml1970 typed-uav-load-additional=1 (opt-in)
+[guest-log] #2 tid=0024 -[ GPU Adapter Info ]------------------------------------------------
+[guest-log] #3 tid=0024     Number of Adapters          : 1
+[guest-log] #4 tid=0024     Number of Supported Adapters: 1
+[guest-log] #5 tid=0024     1. Apple A19 Pro GPU [used]
+[guest-log] #6 tid=0024             Graphics Preemption : dma
+[guest-log] #7 tid=0024             Dedicated GPU       : 1
+[guest-log] #8 tid=0024           + PSO Driver InProc Cache   - No       [not required    ]
+[guest-log] #9 tid=0024           + PSO Driver Disk Cache     - No       [not required    ]
+[guest-log] #10 tid=0024 -[ NVIDIA Driver Info ]----------------------------------------------
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=000000712415BD60, feature level 0xc000, create)
+[image-reload] unmapped image 0x73f7c00000+0x2d000: 1 pool copy marked
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[xp] 10:42:11.257 +1.51 dt=304 cpu=302 (thr 286) P=300 E=2 run=310 pgw=-1.0 GHz P=4.17 E=1.90 Minst=6664 IPC=5.31 mJ=1715 pin=105 rdKB=1128 fpMB=1645
+[xp] 10:42:11.581 +1.84 dt=324 cpu=325 (thr 325) P=324 E=1 run=329 pgw=-1.0 GHz P=4.15 E=1.62 Minst=8428 IPC=6.25 mJ=2067 pin=0 rdKB=0 fpMB=1645
+[footprint] rev=ml358 phys=1656 MB (peak 1656) internal=1757 MB compressed=0 MB external=136 MB reusable=13 MB (cycle=2)
+[swap] ml1077 stats: 7843 MB file-backed now (peak 7843), 231 extents, file used 5156 of 131072 MB, backs 253 releases 233 unbacks 200 refused 0 | coverage broad: disk 0 MB of 8192 cap, reservations 215, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 5146 MB (peak 5156), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 2697 MB in use (peak 2697), 252 takes, 0 guarded, 14 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 3792 MB available
+[xp] 10:42:11.889 +2.15 dt=308 cpu=418 (thr 417) P=413 E=5 run=429 pgw=-1.0 GHz P=4.01 E=1.57 Minst=8714 IPC=5.23 mJ=2105 pin=2 rdKB=20 fpMB=1656
+[madeira-d3d12] dxil-target-latest = 1: shaders are converted for family 1010 and iOS 26.0 (device reports apple10=1)
+[madeira-d3d12] dxil-target-latest = 1: shaders are converted for family 1010 and iOS 26.0 (device reports apple10=1)
+[madeira-d3d12] msc-unbounded-retry = 1: a DXIL shader the converter refuses with code 4 is converted again with its root signature's unbounded ranges given a size (2048 samplers, 1000000 other descriptors)
+[madeira-d3d12] msc-unbounded-retry = 1: a DXIL shader the converter refuses with code 4 is converted again with its root signature's unbounded ranges given a size (2048 samplers, 1000000 other descriptors)
+[madeira-d3d12] ml1145 heap-backing = 0 (DEFAULT heaps are descriptions only)
+[madeira-d3d12] ml1145 heap-backing = 0 (DEFAULT heaps are descriptions only)
+[bigres] tid=0024 #1 size=0x10200000 (258 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x73fffe0000 total=258 MB
+[winios] game window hwnd=0x1002a presents through Metal; its GDI surface is not drawn
+[ptr-map] the picture is window hwnd=0x1002a's client (4,30 1408x648) on a 1408x648 screen: points on it go there (a swapchain window)
+[bigres] tid=0024 #2 size=0x3e000000 (992 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x73fffe0000 total=1250 MB
+[bigres] tid=0078 #3 size=0x3e000000 (992 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x73fffe0000 total=2242 MB
+[swap] ml1077 backed 0x7670000000+0x2e000000 (file off 4238 MB): 10168 MB in 243 extents, peak 10168 MB, 0 refused
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=3759MB: tex-RT=109MB/133 (peak 109) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/2 (peak 0) tex-sampled=0MB/11 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=1315MB/145 (peak 1315) buf-shared=2333MB/31 (peak 2333)
+[madeira-d3d12] ml1060 shader libraries created: 1, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 1, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 3878 MB = standalone textures 135 (110 MB as Metal sizes them, 109 MB estimated) + texture heaps 64 MB + application heaps 0 MB + buffers 3649 MB + argument ring chunks 0 (0 MB) + the rest 55 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 3878 MB = standalone textures 135 (110 MB as Metal sizes them, 109 MB estimated) + texture heaps 64 MB + application heaps 0 MB + buffers 3649 MB + argument ring chunks 0 (0 MB) + the rest 55 MB; frees waiting for the GPU: 0
+[free-delay] #2 release of 0x71e2c60000+0xfd0000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x71e3c30000+0xfd0000 held for 2000 ms (2 in flight)
+[madeira-d3d12] d3d12-pso-cached-blob = 1 (opt-in): GetCachedBlob answers a 16-byte blob
+[madeira-d3d12] d3d12-pso-cached-blob = 1 (opt-in): GetCachedBlob answers a 16-byte blob
+[win-pos] #10 hwnd=0x20038 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1075ae5c0 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #10 hwnd=0x20038 class='Wine IME' text="" rev=ml853
+[win-pos] #11 hwnd=0x20038 after=0x1002a flags=0000181b vis={0,0,1,1} surface=0x1075ae5c0 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #11 hwnd=0x20038 class='Wine IME' text="" rev=ml853
+[win-pos] #12 hwnd=0x1002a after=0x0 flags=80001967 vis={0,0,1416,682} surface=0x114f41c80 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #12 hwnd=0x1002a class='T1X' text="The Last of Us? Part I " rev=ml853
+007c:err:module:load_dll [dll-missing] rev=ml336 #9 L"RzChromaSDK64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[10:42:13.745] [INFO] Game is presenting (#1, splash) — early detach in 20s
+007c:err:module:load_dll [dll-missing] rev=ml336 #10 L"RzChromaSDK64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[madeira-ir] dxil-loop-guard: 4 shader hash(es) get their loops capped at 65536 iterations
+[footprint] rev=ml358 phys=2889 MB (peak 2889) internal=1006 MB compressed=701 MB external=305 MB reusable=0 MB (cycle=3)
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml1060 fast phys=2892 MB compressed=695 MB internal=1015 MB
+[footprint] rev=ml1060 fast phys=2909 MB compressed=693 MB internal=1037 MB
+D 78 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 73F7000000
+[footprint] rev=ml1060 fast phys=2983 MB compressed=680 MB internal=1157 MB
+[footprint] rev=ml1060 fast phys=3004 MB compressed=673 MB internal=1189 MB
+[footprint] rev=ml358 phys=3103 MB (peak 3103) internal=1288 MB compressed=673 MB external=415 MB reusable=0 MB (cycle=4)
+008c:err:module:load_dll [dll-missing] rev=ml336 #11 L"hkCompatFormats.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=3128 MB compressed=662 MB internal=1365 MB
+[footprint] rev=ml1060 fast phys=3148 MB compressed=635 MB internal=1434 MB
+[footprint] rev=ml358 phys=3207 MB (peak 3207) internal=1516 MB compressed=668 MB external=818 MB reusable=0 MB (cycle=5)
+[madeira-d3d12] metal-gap: Metal 2992 MB = standalone textures 140 (121 MB as Metal sizes them, 120 MB estimated) + texture heaps 128 MB + application heaps 0 MB + buffers 2675 MB + argument ring chunks 2 (0 MB) + the rest 66 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 2992 MB = standalone textures 140 (121 MB as Metal sizes them, 120 MB estimated) + texture heaps 128 MB + application heaps 0 MB + buffers 2675 MB + argument ring chunks 2 (0 MB) + the rest 66 MB; frees waiting for the GPU: 0
+[free-delay] #4 release of 0x7163c50000+0xfd0000 held for 2000 ms (1 in flight)
+[free-delay] #5 release of 0x7164c20000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x7165bf0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #7 release of 0x7166bc0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #8 release of 0x7167b90000+0xfd0000 held for 2000 ms (5 in flight)
+[swap] ml1077 backed 0x7163c50000+0xfd0000 (whole reservation, ml1257) (file off 8796093025194 MB): 9374 MB in 276 extents, peak 10238 MB, 0 refused
+[mip0] r#1937 352x160x1 dx34 flags 0x4: MipLevels 0 (D3D12: the full chain, 9 levels) -> 1 level(s); GetDesc answers 0 (bcd.cfg mip0-full = 1 resolves it)
+[mip0] r#1937 352x160x1 dx34 flags 0x4: MipLevels 0 (D3D12: the full chain, 9 levels) -> 1 level(s); GetDesc answers 0 (bcd.cfg mip0-full = 1 resolves it)
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[win-pos] #13 hwnd=0x1002a after=0x0 flags=80000816 vis={0,0,1408,648} surface=0x114f41c80 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #13 hwnd=0x1002a class='T1X' text="The Last of Us? Part I " rev=ml853
+[ptr-map] off: points map to the whole screen (window frame)
+[hwinput] keyboard focus: program (program cursor)
+[mip0] r#1985 352x160x1 dx34 flags 0x4: MipLevels 0 (D3D12: the full chain, 9 levels) -> 1 level(s); GetDesc answers 0 (bcd.cfg mip0-full = 1 resolves it)
+[mip0] r#1985 352x160x1 dx34 flags 0x4: MipLevels 0 (D3D12: the full chain, 9 levels) -> 1 level(s); GetDesc answers 0 (bcd.cfg mip0-full = 1 resolves it)
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[rb-tex] madeira-bcd new readback #1: fmt 55 176x80 level 0 (texture 176x80, 1 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 13 176x80 level 0 (texture 176x80, 1 mips)
+[rb-tex] madeira-bcd new readback #3: fmt 55 352x160 level 0 (texture 352x160, 1 mips)
+[rb-tex] madeira-bcd new readback #4: fmt 13 352x160 level 0 (texture 352x160, 1 mips)
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[madeira-d3d12] helper kernels: ready (library 1, indirect tessellation kernel 1, probe kernel 1, ring 1, CPU-visible)
+[rb-tex] madeira-bcd new readback #5: fmt 123 512x1 level 0 (texture 512x1, 1 mips)
+[rb-tex] madeira-bcd new readback #10: fmt 260 704x320 level 0 (texture 704x320, 1 mips)
+[win-pos] #14 hwnd=0x1003e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #14 hwnd=0x1003e class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #15 hwnd=0x1003e after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #15 hwnd=0x1003e class='__wine_xinput_devnotify' text="" rev=ml853
+0154:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0154 status=00000001 caller=0000000150B0A32C
+[mem-burst] rev=624 +274 MB in 255 ms phys=3685 internal=1739 compressed=730 other=1216 | guest commits since the last sample: n=461, 335 MB, biggest 8 MB tid=0154 | swap backed=6067 MB | pool head=250 MB tail=144 MB
+008c:err:module:load_dll [dll-missing] rev=ml336 #12 L"RzChromaSDK64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x7427900000+0x100000 (file off 8796093025200 MB): 9321 MB in 331 extents, peak 10238 MB, 0 refused
+D 13C Load module schannel.dll (schannel.dll-b6824dedbc2abf6e): 73F6C30000
+[madeira-d3d12] ml1151 UAV clear value 0xdead001b 0xdead001b 0xdead001b 0xdead001b: exact pattern buffer 32 of 32
+[madeira-d3d12] ml1151 UAV clear value 0xdead001b 0xdead001b 0xdead001b 0xdead001b: exact pattern buffer 32 of 32
+008c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\cmd.exe" cmdline=L"C:\\windows\\system32\\cmd.exe /c wmic path win32_physicalmedia get SerialNumber"
+[phase] spawn:L"C:\\windows\\system32\\cmd.exe" t+ 12.814s rev=ml526
+008c:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\cmd.exe /c wmic path win32_physicalmedia get SerialNumber" (fd=348, unixdir=349, dup_unixdir=355) cwd=L"C:\\The Last of Us\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x133930000+0xa0000 (?) → pool 0x157b70000 used=0xfc14000/0x23000000 tramp+0x4000
+[nls-getptr] type=11 id=1252 peb=0x11fd18000
+[nls-getptr] type=11 id=437 peb=0x11fd18000
+[jit-pool] image 0x73f63f0000+0x2f0000 (kernelbase.dll) → pool 0x15836c000 used=0x1066c000/0x23000000 tramp+0x10000
+[swap] ml1077 backed 0x7165560000+0x100000 (whole reservation, ml1257) (file off 8796093025203 MB): 9214 MB in 327 extents, peak 10238 MB, 0 refused
+016c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+ 12.908s rev=ml526
+[nls-getptr] type=11 id=20127 peb=0x11fd18000
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 16C Load module cmd.exe (cmd.exe-73d1b53c511fe6c6): 133930000
+D 16C Load module  (-2d1580055211ffc7): 73FFCC0000
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x1000 type=0x103000 protect=0x40
+[store-noalias] #5 rev=ml348 addr=0x38 insn=0xf9401d29 pc=0x157e62c14 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #6 rev=ml348 addr=0x38 insn=0xf9401d29 pc=0x157e62c14 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+016c:err:seh:segv_handler   [fex-fault] pc=ntdll.dll+0x113c14 lr=ntdll.dll+0x58ffc fault-addr=0x38 sp=0x71663fd3a0 fp=0x0 teb=0x7140a10000 rev=r624
+016c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x73f6923c14 RX from -32, 64 of 64 bytes: 49 00 00 b5 e9 03 12 aa 0a 21 a0 52 4a 00 0a 0a aa 00 0a 2a 2a 01 00 35 04 01 00 34 29 c5 4b f9 29 1d 40 f9 a9 00 00 b4 a0 15 00 f0 00 60 3c 91 e2 03 08 aa 75 6a 00 14 c0 03 5f d6 0d 4c 0e 00 
+016c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x73f6923c14 (not an anon-JIT page)
+[store-noalias] #7 rev=ml348 addr=0x0 insn=0x39400108 pc=0x157c75378 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[fault_rip] cnt=9 rip=0x0 pc=0x157c75378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[store-noalias] #8 rev=ml348 addr=0x0 insn=0x39400108 pc=0x157c75378 NO pool/anon alias | region 0x1045ac000+0x2e60000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[fault_rip] cnt=10 rip=0x0 pc=0x157c75378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+016c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x73ffd21378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+016c:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x73ffd21378 (not an anon-JIT page)
+[redeliv] 256 identical redeliveries pc=0x157c75378 addr=0x0 — storm forming rev=ml461
+[redeliv] 2000 identical redeliveries pc=0x157c75378 addr=0x0 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] the storm is in a child Windows process (peb=0x11fd18000, thread teb=0x7140a10000), not the session's first one: ending that process and that thread only, the app keeps running rev=ajan11
+[redeliv] the storming thread is ended (kr=0) rev=ajan11
+[redeliv] ending only the Windows process cmd.exe (peb=0x11fd18000, master socket 352): the app and the other processes keep running rev=ajan11
+[redeliv] the Windows process cmd.exe (peb=0x11fd18000) is released: socket, child table, JIT allocations, guest window rev=ajan11
+008c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\cmd.exe" cmdline=L"C:\\windows\\system32\\cmd.exe /c wmic path win32_physicalmedia get SerialNumber"
+[phase] spawn:L"C:\\windows\\system32\\cmd.exe" t+ 13.007s rev=ml526
+008c:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\cmd.exe /c wmic path win32_physicalmedia get SerialNumber" (fd=352, unixdir=349, dup_unixdir=355) cwd=L"C:\\The Last of Us\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x7165700000+0xa0000 (?) → pool 0x158670000 used=0x10714000/0x23000000 tramp+0x4000
+[nls-getptr] type=11 id=1252 peb=0x120170000
+[nls-getptr] type=11 id=437 peb=0x120170000
+[jit-pool] image 0x73f5fc0000+0x41c000 (libarm64ecfex.dll) → pool 0x15884f000 used=0x10c73000/0x23000000 tramp+0x4000
+[jit-pool] image 0x73f5e90000+0x130000 (ucrtbase.dll) → pool 0x158c70000 used=0x10da4000/0x23000000 tramp+0x4000
+[jit-pool] image 0x73f5dd0000+0xc0000 (kernel32.dll) → pool 0x158da4000 used=0x10e6c000/0x23000000 tramp+0x8000
+[jit-pool] image 0x73f5ae0000+0x2f0000 (kernelbase.dll) → pool 0x158e6c000 used=0x1116c000/0x23000000 tramp+0x10000
+0174:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+ 13.079s rev=ml526
+[nls-getptr] type=11 id=20127 peb=0x120170000
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 174 Load module cmd.exe (cmd.exe-73d1b53c511fe6c6): 7165700000
+D 174 Load module  (-2d1580055211ffc7): 73FFCC0000
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x1000 type=0x103000 protect=0x40
+[fault_rip] cnt=11 rip=0x0 pc=0x158962c14 addr=0x38 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1045ac000+0x2e60000 rev=ml555
+[fault_rip] cnt=12 rip=0x0 pc=0x158962c14 addr=0x38 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1045ac000+0x2e60000 rev=ml555
+0174:err:seh:segv_handler   [fex-fault] pc=ntdll.dll+0x113c14 lr=ntdll.dll+0x58ffc fault-addr=0x38 sp=0x716728d3a0 fp=0x0 teb=0x73ffdf0000 rev=r624
+[fault_rip] cnt=13 rip=0x0 pc=0x158775378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[fault_rip] cnt=14 rip=0x0 pc=0x158775378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x73ffd21378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x73ffd21378 (not an anon-JIT page)
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x73ffd21378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x73ffd21378 (not an anon-JIT page)
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x73ffd21378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0174:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x73ffd21378 (not an anon-JIT page)
+[redeliv] 256 identical redeliveries pc=0x158775378 addr=0x0 — storm forming rev=ml461
+[redeliv] 2000 identical redeliveries pc=0x158775378 addr=0x0 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] the storm is in a child Windows process (peb=0x120170000, thread teb=0x73ffdf0000), not the session's first one: ending that process and that thread only, the app keeps running rev=ajan11
+[redeliv] the storming thread is ended (kr=0) rev=ajan11
+[redeliv] ending only the Windows process cmd.exe (peb=0x120170000, master socket 353): the app and the other processes keep running rev=ajan11
+[redeliv] the Windows process cmd.exe (peb=0x120170000) is released: socket, child table, JIT allocations, guest window rev=ajan11
+[madeira-d3d12] metal-gap: Metal 3477 MB = standalone textures 448 (363 MB as Metal sizes them, 354 MB estimated) + texture heaps 256 MB + application heaps 0 MB + buffers 2734 MB + argument ring chunks 456 (28 MB) + the rest 95 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 3477 MB = standalone textures 448 (363 MB as Metal sizes them, 354 MB estimated) + texture heaps 256 MB + application heaps 0 MB + buffers 2734 MB + argument ring chunks 456 (28 MB) + the rest 95 MB; frees waiting for the GPU: 0
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 10.08 s of audio in 10.01 s (100.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 10.08 s of audio in 10.01 s (100.7%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b852230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16bb0aac0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=18% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=18% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=15% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[10:42:33.956] [OK] Early detach: game presenting and settled
+[10:42:35.960] [INFO] Detaching debugger...
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=84 resident=3331MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=10% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x71409b0000 cpu=69% RUN pc=libsystem_platform.dylib`_platform_memchr+0x48 lr=libmetalirconverter.dylib`_ZNK4llvm16InstCombinerImpl16shouldChangeTypeEPNS_4TypeES2_+0x98 sp=0x134a779e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml1115 native sample pc=0x1a01f2200 (_platform_memmove) x16=6981361568 lr=0x16e335cbc (_ZN4llvm10DataLayout12setAlignmentENS_13AlignTypeEnumENS_5AlignES2_j)
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[freeze] alive t+60s beats=2 gaps=0 iter=237 gen=1 threads=84 resident=2628MB dbg=DEBUGGED rev=ml525
+[file-census] r624 53s: case-sensitive=1 full-path-tries=473 full-path-hits=351 component-lookups=1048 shortcut-hits=804 misses=244 scans=244 entries-scanned=4188 us-in-lookup=98110 (0% of the window) slowest=0.706 ms ...1BF-8664-4809-B961-67C071480DDE/Documents/wine/dosdevices/c:
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=10% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x7140990000 cpu=36% RUN pc=libsystem_platform.dylib`_platform_memchr+0x54 lr=libmetalirconverter.dylib`_ZL20sanitizeFunctionNameN4llvm9StringRefE+0x24 sp=0x134e77070 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 stats: 9229 MB file-backed now (peak 10238), 333 extents, file used 6179 of 131072 MB, backs 467 releases 441 unbacks 200 refused 0 | coverage broad: disk 843 MB of 8192 cap, reservations 270, holes 1525, disk-full refusals 0 | ml1258 churn: 2 sizes, 127 blocks left anonymous | committed data in the file 6057 MB (peak 6117), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[freeze] alive t+90s beats=3 gaps=0 iter=345 gen=1 threads=82 resident=2755MB dbg=DEBUGGED rev=ml525
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[freeze] alive t+120s beats=4 gaps=0 iter=452 gen=1 threads=84 resident=2930MB dbg=DEBUGGED rev=ml525
+[file-census] r624 19s: case-sensitive=1 full-path-tries=392 full-path-hits=296 component-lookups=864 shortcut-hits=672 misses=192 scans=192 entries-scanned=646 us-in-lookup=405899 (2% of the window) slowest=29.540 ms ...c:/users/mobile/Saved Games/The Last of Us Part I/users/6144
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[freeze] alive t+151s beats=5 gaps=0 iter=561 gen=1 threads=82 resident=2785MB dbg=DEBUGGED rev=ml525
+[file-census] r624 16s: case-sensitive=1 full-path-tries=393 full-path-hits=296 component-lookups=870 shortcut-hits=676 misses=194 scans=194 entries-scanned=718 us-in-lookup=344311 (2% of the window) slowest=50.202 ms ...mobile/Saved Games/The Last of Us Part I/users/6144/gamedata
+[swap] ml1077 stats: 9240 MB file-backed now (peak 10238), 337 extents, file used 6179 of 131072 MB, backs 500 releases 470 unbacks 200 refused 0 | coverage broad: disk 847 MB of 8192 cap, reservations 298, holes 1525, disk-full refusals 0 | ml1258 churn: 2 sizes, 187 blocks left anonymous | committed data in the file 6057 MB (peak 6117), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1077 backed 0x7718000000+0x6d8000 (file off 8796093025279 MB): 9242 MB in 355 extents, peak 10238 MB, 0 refused
+[freeze] alive t+181s beats=6 gaps=0 iter=673 gen=1 threads=80 resident=3176MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[swap] ml1077 backed 0x7810000000+0x764000 (file off 8796093025759 MB): 9243 MB in 462 extents, peak 10238 MB, 0 refused
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x7140990000 cpu=57% RUN pc=libsystem_platform.dylib`_platform_memchr+0x54 lr=libmetalirconverter.dylib`_ZNK4llvm9StringRef5splitERNS_15SmallVectorImplIS0_EEcib+0x44 sp=0x134878900 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x25 pc=0x152f112a8 user-sp=0x721d7fb310 user-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x71409c0000 cpu=47% RUN pc=libsystem_platform.dylib`_platform_memcmp+0x8c lr=libmetalirconverter.dylib`_ZN4llvm3ARM9parseArchENS_9StringRefE+0x5c sp=0x134e77e80 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[freeze] alive t+211s beats=7 gaps=0 iter=792 gen=1 threads=80 resident=2188MB dbg=DEBUGGED rev=ml525
+[swap] ml1150 pool: BCD is at its own limit's warning mark; the pool goes on taking
+[swap] ml1150 pool: system memory pressure warning; pool 3691 MB in use
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[swap] ml1077 stats: 9253 MB file-backed now (peak 10238), 465 extents, file used 6179 of 131072 MB, backs 581 releases 771 unbacks 200 refused 0 | coverage broad: disk 1709 MB of 8192 cap, reservations 305, holes 1525, disk-full refusals 0 | ml1258 churn: 2 sizes, 204 blocks left anonymous | committed data in the file 5552 MB (peak 6117), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 3700 MB in use (peak 4082), 573 takes, 0 guarded, 16 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 1212 MB available
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=32% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c07fcc0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "wine-x18-exc" teb=0x0 cpu=31% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "wine-x18-exc" teb=0x0 cpu=30% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c07fcc0 NATIVE (unresolved: header unreadable) sp-cand=[ ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=27% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c081030 NATIVE (no FEX state) sp-cand=[ ]
+[freeze] alive t+241s beats=8 gaps=0 iter=905 gen=1 threads=78 resident=1735MB dbg=DEBUGGED rev=ml525
+[swap] ml1150 pool: guard closed (969 MB available, margin 1024 MB, system pressure 1); 3694 MB in use
+[swap] ml1077 stats: 9253 MB file-backed now (peak 10238), 465 extents, file used 6179 of 131072 MB, backs 586 releases 776 unbacks 200 refused 0 | coverage broad: disk 1725 MB of 8192 cap, reservations 310, holes 1525, disk-full refusals 0 | ml1258 churn: 2 sizes, 208 blocks left anonymous | committed data in the file 5558 MB (peak 6117), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 3694 MB in use (peak 4082), 577 takes, 1 guarded, 16 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 895 MB available
+[fault-cost] ml685 emulated-store faults=359 total=1 ms avg=3194 ns dropped=0 (one handler thread serves all threads)
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 238 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 1728..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 10.01 s of audio in 10.01 s (100.0%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 238 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 237 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=7599 MB (peak 7599) internal=1124 MB compressed=3919 MB external=267 MB reusable=1 MB (cycle=107)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=Madeira`main_loop+0x994 sp=0x16ba7ea60 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[madeira-d3d12] metal-gap: Metal 5272 MB = standalone textures 1129 (1259 MB as Metal sizes them, 1247 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2867 MB + argument ring chunks 2136 (133 MB) + the rest 115 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 5272 MB = standalone textures 1129 (1259 MB as Metal sizes them, 1247 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2867 MB + argument ring chunks 2136 (133 MB) + the rest 115 MB; frees waiting for the GPU: 0
+[thread-sample] ml876 modmap peb=0x73fffe0000 modules=77 first=tlou-i-l.exe@0x127000000
+[footprint] rev=ml358 phys=7617 MB (peak 7617) internal=1117 MB compressed=3947 MB external=268 MB reusable=2 MB (cycle=108)
+[footprint] rev=ml358 phys=7638 MB (peak 7638) internal=1109 MB compressed=3950 MB external=289 MB reusable=0 MB (cycle=109)
+[xp] 10:46:33.507 +263.76 dt=582 cpu=1494 (thr 1545) P=733 E=761 run=3283 pgw=-1.0 GHz P=1.31 E=2.11 Minst=6145 IPC=2.39 mJ=525 pin=235 rdKB=5560 fpMB=7626 | pres 5/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.2 cmt 0.5) pool=0.0 caller-ecl 119/268.9
+[xp] 10:46:33.839 +264.09 dt=333 cpu=1006 (thr 1005) P=522 E=484 run=1983 pgw=-1.0 GHz P=1.37 E=2.09 Minst=4049 IPC=2.35 mJ=363 pin=175 rdKB=4804 fpMB=7686 | pres 3/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.1 cmt 0.2) pool=0.0 caller-ecl 66/161.4
+[madeira-d3d12] metal-gap: Metal 5378 MB = standalone textures 1227 (1349 MB as Metal sizes them, 1338 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2883 MB + argument ring chunks 2136 (133 MB) + the rest 115 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 5378 MB = standalone textures 1227 (1349 MB as Metal sizes them, 1338 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2883 MB + argument ring chunks 2136 (133 MB) + the rest 115 MB; frees waiting for the GPU: 0
+[footprint] rev=ml358 phys=7723 MB (peak 7723) internal=1035 MB compressed=4055 MB external=270 MB reusable=0 MB (cycle=110)
+[xp] 10:46:35.437 +265.24 dt=1150 cpu=4545 (thr 3854) P=2463 E=2082 run=11860 pgw=-1.0 GHz P=1.60 E=2.26 Minst=19530 IPC=2.26 mJ=1909 pin=733 rdKB=22788 fpMB=7753 | pres 11/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 0.3 cmt 0.7) pool=0.0 caller-ecl 255/1195.6
+[footprint] rev=ml1060 fast phys=7858 MB compressed=4222 MB internal=871 MB
+[xp] 10:46:35.949 +266.11 dt=870 cpu=1863 (thr 2319) P=893 E=970 run=5027 pgw=-1.0 GHz P=1.61 E=2.28 Minst=8469 IPC=2.32 mJ=785 pin=713 rdKB=22772 fpMB=7913 | pres 8/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 0.2 cmt 0.4) pool=0.0 caller-ecl 181/472.5
+[ios_audio] ml1230 pacing stream=0x1145a5a00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1145a4f00 lead 60 ms: client wrote 10.03 s of audio in 10.00 s (100.2%) over 237 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=7966 MB (peak 7966) internal=862 MB compressed=4345 MB external=254 MB reusable=0 MB (cycle=111)
+[footprint] rev=ml1060 fast phys=8020 MB compressed=4394 MB internal=814 MB
+[footprint] rev=ml1060 fast phys=8042 MB compressed=4422 MB internal=785 MB
+[xp] 10:46:37.252 +267.27 dt=1151 cpu=3623 (thr 3518) P=2207 E=1416 run=8784 pgw=-1.0 GHz P=1.61 E=2.19 Minst=16589 IPC=2.49 mJ=1632 pin=1410 rdKB=38608 fpMB=8043 | pres 7/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.2 cmt 0.4) pool=0.0 caller-ecl 161/511.5
+[thread-sample] ml876 b0 "" teb=0x73fffd0000 cpu=0% wait pc=libsystem_kernel.dylib`__select+0x8 lr=Madeira`NtDelayExecution+0x304 sp=0x11fe1fc40 NATIVE (no FEX state) sp-cand=[ tlou-i-l.exe+0x307e990 kernel32.dll+0x1350c tlou-i-l.exe+0x307e990 ] last-syscall id=0x34 pc=0x1504af748 user-sp=0x712381dca0 user-cand=[ tlou-i-l.exe+0x11d6bc1 tlou-i-l.exe+0x307e990 tlou-i-l.exe+0x11d6874 ]
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=5190MB: tex-RT=656MB/669 (peak 656) tex-DS=420MB/445 (peak 420) tex-UAV=74MB/262 (peak 74) tex-sampled=1148MB/11031 (peak 1148) tex-MSAA=0MB/0 (peak 0) buf-private=1547MB/560 (peak 1551) buf-shared=1342MB/42 (peak 2333)
+[madeira-d3d12] ml1060 shader libraries created: 70683, 1431 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 70683, 1431 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[footprint] rev=ml1060 fast phys=8065 MB compressed=4495 MB internal=712 MB
+[waiters]  tid=0090 addr=0x12b8ddcd8 age=267s INF w0=00000000 w1=00000000
+[waiters]  tid=00cc addr=0x12d42cbb0 age=267s INF w0=00000000 w1=00000000
+[waiters]  tid=00c8 addr=0x12d42cbb0 age=267s INF w0=00000000 w1=00000000
+[waiters]  tid=00e0 addr=0x12d428290 age=253s INF w0=00000002 w1=00000000
+[waiters]  tid=00dc addr=0x12d428210 age=265s INF w0=00000000 w1=00000000
+[waiters]  tid=00f8 addr=0x757113a130 age=265s INF w0=00000000 w1=00000000
+[footprint] rev=ml358 phys=8101 MB (peak 8101) internal=726 MB compressed=4514 MB external=260 MB reusable=2 MB (cycle=112)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=5263MB: tex-RT=698MB/705 (peak 698) tex-DS=448MB/485 (peak 448) tex-UAV=74MB/262 (peak 74) tex-sampled=1148MB/11031 (peak 1148) tex-MSAA=0MB/0 (peak 0) buf-private=1550MB/560 (peak 1551) buf-shared=1342MB/42 (peak 2333)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=5263MB: tex-RT=698MB/705 (peak 698) tex-DS=448MB/485 (peak 448) tex-UAV=74MB/262 (peak 74) tex-sampled=1148MB/11031 (peak 1148) tex-MSAA=0MB/0 (peak 0) buf-private=1550MB/560 (peak 1551) buf-shared=1342MB/42 (peak 2333)
+[madeira-d3d12] ml1060 shader libraries created: 70749, 1432 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 70749, 1432 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[footprint] rev=ml1060 fast phys=8098 MB compressed=4519 MB internal=721 MB
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=5281MB: tex-RT=712MB/717 (peak 712) tex-DS=456MB/495 (peak 456) tex-UAV=74MB/262 (peak 74) tex-sampled=1148MB/11031 (peak 1148) tex-MSAA=0MB/0 (peak 0) buf-private=1547MB/560 (peak 1552) buf-shared=1342MB/42 (peak 2333)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=5281MB: tex-RT=712MB/717 (peak 712) tex-DS=456MB/495 (peak 456) tex-UAV=74MB/262 (peak 74) tex-sampled=1148MB/11031 (peak 1148) tex-MSAA=0MB/0 (peak 0) buf-private=1547MB/560 (peak 1552) buf-shared=1342MB/42 (peak 2333)
+[madeira-d3d12] ml1060 shader libraries created: 70778, 1433 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 70778, 1433 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 5662 MB = standalone textures 1526 (1626 MB as Metal sizes them, 1618 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2890 MB + argument ring chunks 2136 (133 MB) + the rest 117 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 5662 MB = standalone textures 1526 (1626 MB as Metal sizes them, 1618 MB estimated) + texture heaps 896 MB + application heaps 0 MB + buffers 2890 MB + argument ring chunks 2136 (133 MB) + the rest 117 MB; frees waiting for the GPU: 0
+[swap] ml1150 pool: system memory pressure CRITICAL; pool 3688 MB in use, no new takes until it eases
+[footprint] rev=ml1060 fast phys=8187 MB compressed=4650 MB internal=591 MB
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16bcaedd0 NATIVE (no FEX state) sp-cand=[ ]
+[xp] 10:46:39.388 +268.12 dt=851 cpu=6709 (thr 6809) P=3651 E=3058 run=17563 pgw=-1.0 GHz P=1.61 E=2.15 Minst=30617 IPC=2.46 mJ=2880 pin=1929 rdKB=65960 fpMB=8210 | pres 18/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.1 lat 0/0.0 draw 0.4 cmt 1.1) pool=0.0 caller-ecl 418/1321.6
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16be52f00 NATIVE (no FEX state) sp-cand=[ ]
+[10:46:39.388] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16be52f00 NATIVE (no FEX state) sp-cand=[ ]

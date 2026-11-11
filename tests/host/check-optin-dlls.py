@@ -45,7 +45,8 @@ opt = opt[:opt.index('\nfi\n') + 4]
 check('each is built only where no <name>.dll ships, and MADEIRA_OPTIN_BUILD=0 skips them',
       '"${MADEIRA_OPTIN_BUILD:-1}" != 0' in opt and 'shipped "$d" && continue' in opt and
       'targets="$targets dlls/$d/arm64ec-windows/$d.dll"; OPT="$OPT $d"' in opt)
-check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624)', '$WER$WTY$OPT$SDL$DCO" ]' in build)
+check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624; combase-optin.dll, CMB, round 2026-11-11)',
+      '$WER$WTY$OPT$SDL$DCO$CMB" ]' in build)
 ship = build[build.index('for d in $OPT; do'):]
 ship = ship[:ship.index('\ndone\n') + 6]
 check('each ships as <name>-optin.dll, stripped and padded, never as <name>.dll',
@@ -127,8 +128,8 @@ recs = json.loads((root / 'recommended/recommendations.json').read_text())
 # twinapi.appcore DLL and the auto-tune rule are engine-level and stay. No list may name twinapi.appcore before build 579.
 named = [r['id'] for r in recs['rules'] if 'twinapi.appcore' in json.dumps(r)]
 # 2026-10-24: the recipe of thebcd69/bcd-games#16 by le0-VV (Minecraft Dungeons II) names it; no other list does.
-check("only Minecraft Dungeons II's list names twinapi.appcore (Hellblade II's only log was a copy; the DLL and the rule stay engine-level)",
-      named == ['minecraft-dungeons-2'])
+check("only Minecraft Dungeons II's list and (night round 2026-11-11) DRAGON BALL FighterZ's name twinapi.appcore (Hellblade II's only log was a copy; the DLL and the rule stay engine-level)",
+      named == ['minecraft-dungeons-2', 'dragon-ball-fighterz'])   # night round 2026-11-11 (agent G3 S5): DRAGON BALL FighterZ's GameChat2 needs it before msvcp_win
 
 # oledlg, fwpuclnt and sensapi (2026-10-23, testers' logs of build 580): Digimon Story Cyber Sleuth's exe imports oledlg.dll (PGET5A),
 # FINAL FANTASY XV's ffxv_s.exe fwpuclnt.dll (DM9SAF, CDC7AK), Borderlands 3's vivoxsdk.dll SensApi.dll (VFM84T); each ended with
@@ -188,7 +189,7 @@ if (wine / 'dlls/msi/Makefile.in').exists():
 launchers = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
 check('only the EA app\'s launcher entry names them',
       launchers.count('"env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr,dxva2"') == 1 and
-      not any('mspatcha' in json.dumps(r) for r in recs['rules']))
+      not any('mspatcha' in json.dumps(r) for r in recs['rules'] if r['id'] != 'hearts-of-iron-iv'))   # night round 2026-11-11 (G5 S11): the Paradox launcher's installer needs the same set
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('RecommendationsPolicy lets a downloaded list name oledlg, fwpuclnt and sensapi',
       '["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0)' in policy and 'wmadmod, or oledlg, fwpuclnt, sensapi' in policy)
@@ -236,6 +237,73 @@ check('the Bloons TD 6 fixture has the import failure and Unity\'s fatal text',
       any('UnhandledExceptionHandler caught: Unable to load DLL' in l for l in fxq))
 check('its fixture proves the rule', '"qwave-dll-optin"' in (root / 'tests/fixtures/autotune/bloons-td-6-qwave-2026-10-28.expect').read_text())
 check('RecommendationsPolicy lets a downloaded list name qwave', '"gamingtcui", "qwave"].contains($0)' in policy and 'tdh, gamingtcui, qwave' in policy)
+# Round 2026-11-11 (build 652): six more libraries a 64-bit program imports that only the 32-bit set had (c0000135 at the loader, or at a
+# delay load), each its own rule and the log that showed it. The line is the first column; the signal is how the tester's log spelled the name.
+NEW6 = {
+    # name: (auto-tune rule, line the rule adds, the import line as the log spells it, fixture)
+    'msvcp_win': ('msvcp-win-dll-optin', 'env.MADEIRA_OPTIN_DLLS = msvcp_win', 'err:module:import_dll Library msvcp_win.dll',
+                  'dragon-ball-fighterz-msvcp-win-2026-11-10'),
+    'bluetoothapis': ('bluetoothapis-dll-optin', 'env.MADEIRA_OPTIN_DLLS = bluetoothapis', 'err:module:import_dll Library bluetoothapis.dll (which is needed by',
+                      'dolphin-bluetoothapis-2026-11-08'),
+    'gameinput': ('gameinput-dll-optin', 'env.MADEIRA_OPTIN_DLLS = gameinput', 'err:module:import_dll Library GameInput.dll',
+                  'assassins-creed-black-flag-resynced-gameinput-2026-11-09'),
+    'ntdsapi': ('pspcsdk-imports-ntdsapi-tbs', 'env.MADEIRA_OPTIN_DLLS = tbs,ntdsapi,evr', 'err:module:import_dll Library NTDSAPI.dll (which is needed by',
+                'ghost-of-tsushima-pspcsdk-imports-2026-11-09'),
+    'avicap32': ('avicap32-dll-optin', 'env.MADEIRA_OPTIN_DLLS = avicap32', 'err:module:import_dll Library avicap32.dll',
+                 'football-manager-2020-avicap32-2026-11-05'),
+    # coremessaging (agent G7 S6): Momo Game's program (ER8RD6, c0000135 at the loader)
+    'coremessaging': ('coremessaging-dll-optin-main-import', 'env.MADEIRA_OPTIN_DLLS = coremessaging', 'err:module:import_dll Library CoreMessaging.dll',
+                      'momo-game-coremessaging-2026-11-05'),
+}
+check('OPTIN_WANT also lists msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32 and coremessaging (round 2026-11-11)',
+      {'msvcp_win', 'bluetoothapis', 'gameinput', 'ntdsapi', 'mfplay', 'avicap32', 'coremessaging'} <= set(names))
+check('none of them is in the list shipped under its own name, and none ships in the 64-bit set (the script skips one that ships)',
+      not any(re.search(r'\b%s\b' % n, want) for n in list(NEW6) + ['mfplay'])
+      and not any((shipdir / (n + '.dll')).exists() or (shipdir / (n.upper() + '.dll')).exists() for n in list(NEW6) + ['mfplay']))
+if (wine / 'dlls/msvcp_win/Makefile.in').exists():
+    for n in list(NEW6) + ['mfplay']:
+        mk = (wine / 'dlls' / n / 'Makefile.in').read_text()
+        imports = re.search(r'^IMPORTS\s*=\s*(.*)$', mk, re.M)
+        imports = imports.group(1).split() if imports else []
+        check('Wine builds %s.dll from dlls/%s; its imports %s all ship in the 64-bit set (or are import-only libraries)' % (n, n, imports),
+              re.search(r'^MODULE\s*=\s*%s\.dll$' % n, mk, re.M) and
+              all((shipdir / (i + '.dll')).exists() or i in ('uuid', 'dxguid', 'strmiids', 'mfuuid') for i in imports))
+    spec = (wine / 'dlls/msvcp_win/msvcp_win.spec').read_text()
+    fwd = set(re.findall(r'-arch=win64 [^\n]*? (msvcp\d+[a-z_0-9]*)\.', spec))
+    check('msvcp_win forwards its win64 exports to msvcp140 only, which ships (%s)' % sorted(fwd), fwd == {'msvcp140'} and (shipdir / 'msvcp140.dll').exists())
+else:
+    print('note SKIPPED: no Wine sources here (set WINE_SRC); the new DLLs\' Makefile.in files are not read')
+rules_by_id = {r['id']: r for r in atr.RULES}
+for n, (rid, line, spelled, fixture) in NEW6.items():
+    r = rules_by_id.get(rid)
+    check('auto-tune has %s for %s: the line %s, no retry of the unchanged start, not again once linked' % (rid, n, line),
+          r and r['lines'] == [line] and r.get('noRetry') is True and r['priority'] == 10
+          and any('MADEIRA_OPTIN_DLLS: %s.dll -> %s-optin.dll' % (n, n) in json.dumps(x) for x in r['none']))
+    sigs = json.dumps(r.get('all', []) + r.get('any', [])) if r else ''
+    check('its signals carry the import line as the log spelled it (%s)' % spelled, spelled in sigs)
+    fxp = root / 'tests/fixtures/autotune' / (fixture + '.log')
+    check('fixture %s has that line and its .expect names the rule' % fixture,
+          fxp.exists() and any(spelled in l for l in fxp.read_text(errors='replace').split('\n'))
+          and ('"%s"' % rid) in (root / 'tests/fixtures/autotune' / (fixture + '.expect')).read_text())
+# mfplay: Unreal's media player; the game plays, so only a fixedIn rule (ranOnly) can speak for the session (a line rule needs a failed one)
+rm = rules_by_id.get('unreal-wmfmedia-no-mfplay')
+check('auto-tune has unreal-wmfmedia-no-mfplay: fixedIn 652, no lines, for a session that played only, quiet once mfplay is linked',
+      rm and rm['lines'] == [] and rm.get('fixedIn') == 652 and rm.get('evaluateWhenRan') is True and rm.get('ranOnly') is True
+      and rm['all'] == [{'has': ['[guest-log]', 'LogWmfMedia: Failed to load mfplay.dll']}]
+      and rm['none'] == [{'has': ['MADEIRA_OPTIN_DLLS: mfplay.dll -> mfplay-optin.dll']}])
+check('its fixture proves it', '"unreal-wmfmedia-no-mfplay"' in (root / 'tests/fixtures/autotune/grind-survivors-wmfmedia-no-mfplay-2026-11-05.expect').read_text())
+# the Paradox launcher's installer (G5 S11, D S2): the five-DLL line the EA app's service already gets, for a build before the Dock does it
+rp = rules_by_id.get('paradox-launcher-installer-msi')
+check('auto-tune has paradox-launcher-installer-msi: the five msi DLLs, only for Msi.dll\'s c0000135 with Wiutil\'s error, not again once linked',
+      rp and rp['lines'] == ['env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr'] and rp.get('noRetry') is True
+      and rp['all'] == [{'has': ['[dll-missing]', 'Msi.dll', 'status=c0000135']}, {'has': ['[guest-log]', 'Failed to initialize Wiutil']}]
+      and rp['none'] == [{'has': ['MADEIRA_OPTIN_DLLS: msi.dll -> msi-optin.dll']}])
+check('its fixture proves it', '"paradox-launcher-installer-msi"' in (root / 'tests/fixtures/autotune/paradox-launcher-wiutil-qzb4qb-2026-11-08.expect').read_text())
+check('RecommendationsPolicy lets a downloaded list name the new libraries and combase',
+      '["msvcp_win", "bluetoothapis", "gameinput", "ntdsapi", "mfplay", "avicap32", "coremessaging", "combase"].contains($0)' in policy
+      and 'or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase")' in policy)
+# the catalog note names them
+check('the catalog note names the libraries and combase', 'msvcp_win (DRAGON BALL FighterZ' in gen and 'combase is the second name BCD ships for every game' in gen)
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'python3 tests/host/check-optin-dlls.py' in wf)
 print('PASS: opt-in DLLs' if ok else 'FAILED: opt-in DLLs')

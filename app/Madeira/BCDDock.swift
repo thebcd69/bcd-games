@@ -53,6 +53,9 @@ struct BCDDockComponents: Equatable {
     var stepIndex: Int?
     var steps = 0
     var error: String?
+    /// Night round 2026-11-11 (A1 S7): the client files are a Valve build the Dock host does not support (the first 12 hex digits of its SHA-256);
+    /// nil for a supported build. Settings then offers "Replace client components".
+    var unsupportedBuild: String?
 }
 
 struct BCDDockSectionState: Equatable {
@@ -78,6 +81,8 @@ struct BCDDockSectionState: Equatable {
     var state: BCDDockSectionState { get }
     func refresh()
     func downloadComponents()
+    /// Night round 2026-11-11 (A1 S7): renames the client folder of an unsupported build aside and installs the pinned one.
+    func replaceComponents()
     /// Starts the game through Dock, as the rest of the interface starts a Steam game.
     func start(_ appID: Int)
     func setCompactPool(_ on: Bool)
@@ -195,7 +200,19 @@ struct BCDDockSection<Backend: BCDDockBackend>: View {
         if state.inBuild && state.switchedOn {
             let parts = state.components
             BCDSectionKit.Card(eyebrow: "Valve's client files", symbol: "shippingbox") {
-                if parts.installed {
+                if parts.installed, let build = parts.unsupportedBuild, !parts.working {
+                    // Night round 2026-11-11 (A1 S7): a Steam run on the Desktop can replace the client files; Dock refuses any build it has not checked.
+                    BCDSectionKit.Note(text: "These client files (build \(build)) are not a build BCD Dock supports, so Dock cannot start games.",
+                                       symbol: "exclamationmark.triangle.fill", tone: .bad)
+                    Text("Replace them with the pinned build. BCD renames the old folder (nothing is deleted) and keeps your installed games.")
+                        .bcdFont(.body, 13).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true)
+                    if let error = parts.error {
+                        BCDSectionKit.Note(text: error, symbol: "exclamationmark.triangle.fill", tone: .bad)
+                    }
+                    BCDSectionKit.ActionButton(title: "Replace client components (\(BCDFormat.bytes(parts.downloadBytes)))",
+                                               symbol: "arrow.triangle.2.circlepath", kind: .primary, fill: true,
+                                               id: Self.prefix + "replace") { backend.replaceComponents() }
+                } else if parts.installed {
                     BCDSectionKit.Note(text: "Installed and checked.", symbol: "checkmark.circle.fill", tone: .good)
                     Text("Dock uses only the client build it knows; any other build is refused.")
                         .bcdFont(.body, 13).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true)

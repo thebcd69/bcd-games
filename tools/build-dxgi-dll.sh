@@ -96,6 +96,16 @@ python3 "$R/tools/patch-dxgi-budget-events.py" "$OUT/src/dxgi_adapter.cpp" || {
     echo "::warning::tools/patch-dxgi-budget-events.py did not apply: dxgi-src.dll is built without budget events (env.MADEIRA_DXGI_BUDGET_EVENTS has no effect)"
 }
 
+# Opt-in for one game (night round 2026-11-11, Crash Bandicoot N. Sane Trilogy): a display mode list for a format whose bits per pixel differ
+# from the monitor's modes' under env.DXMT_MODE_LIST_ANY_BPP = 1, on a copy of the output too. A missed anchor must not cost every game
+# dxgi-src.dll: the copy is left unpatched and the build goes on.
+cp "$G/dxgi_output.cpp" "$OUT/src/dxgi_output.cpp"
+MODE_ANY_BPP=" + opt-in any-bpp display mode lists"
+python3 "$R/tools/patch-dxgi-modes-any-bpp.py" "$OUT/src/dxgi_output.cpp" || {
+    MODE_ANY_BPP=""
+    echo "::warning::tools/patch-dxgi-modes-any-bpp.py did not apply: dxgi-src.dll is built without any-bpp mode lists (env.DXMT_MODE_LIST_ANY_BPP has no effect)"
+}
+
 # DXMT's meson.build: compiler_args, the project defines, buildtype=release
 # (-O3, b_ndebug=if-release -> NDEBUG), C++20, the include paths of dxgi's
 # dependencies (dxmt_dep, util_dep, winemetal_dep, airconv_forward_dep).
@@ -138,9 +148,11 @@ done
 compile "$D/src/dxmt/dxmt_format.cpp" "$OUT/obj/dxmt_format.o"
 "$AR" csrDT "$OUT/libdxmt.a" "$OUT/obj/dxmt_format.o"
 
-for s in dxgi_output dxgi_options dxgi; do
+for s in dxgi_options dxgi; do
     compile "$G/$s.cpp" "$OUT/obj/$s.o"
 done
+compile "$G/dxgi_output.cpp" "$OUT/obj/dxgi_output_plain.o"
+compile "$OUT/src/dxgi_output.cpp" "$OUT/obj/dxgi_output.o"
 compile "$G/dxgi_adapter.cpp" "$OUT/obj/dxgi_adapter_plain.o"
 compile "$OUT/src/dxgi_adapter.cpp" "$OUT/obj/dxgi_adapter.o"
 compile "$G/dxgi_factory.cpp" "$OUT/obj/dxgi_factory_plain.o"
@@ -151,17 +163,17 @@ compile "$OUT/src/dxgi_factory.cpp" "$OUT/obj/dxgi_factory.o" "-DMADEIRA_DXGI_SR
 # dependency archives, -static (libc++ in, UCRT through api-ms-win-crt-*), file
 # alignment 4096, util_dep's -lntdll and meson's default Windows libraries
 # (cpp_winlibs; gdi32 has D3DKMTOpenAdapterFromLuid).
-link_dll() {  # link_dll <factory object> <output> <adapter object>
+link_dll() {  # link_dll <factory object> <output> <adapter object> <output-class object>
     "$CXX" -shared -o "$2" \
-        "$3" "$1" "$OUT/obj/dxgi_output.o" "$OUT/obj/dxgi_options.o" "$OUT/obj/dxgi.o" \
+        "$3" "$1" "$4" "$OUT/obj/dxgi_options.o" "$OUT/obj/dxgi.o" \
         "$OUT/obj/version.o" "$G/dxgi.def" \
         "$OUT/libdxmt.a" "$OUT/libutil.a" -L"$OUT" -lwinemetal -lntdll \
         -static -Wl,--file-alignment=4096 \
         -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 \
         2>> "$OUT/build.err" || { grep -m 20 "error" "$OUT/build.err"; fail "linking $(basename "$2") failed"; }
 }
-link_dll "$OUT/obj/dxgi_factory_plain.o" "$OUT/plain/dxgi.dll" "$OUT/obj/dxgi_adapter_plain.o"
-link_dll "$OUT/obj/dxgi_factory.o" "$OUT/dxgi.dll" "$OUT/obj/dxgi_adapter.o"
+link_dll "$OUT/obj/dxgi_factory_plain.o" "$OUT/plain/dxgi.dll" "$OUT/obj/dxgi_adapter_plain.o" "$OUT/obj/dxgi_output_plain.o"
+link_dll "$OUT/obj/dxgi_factory.o" "$OUT/dxgi.dll" "$OUT/obj/dxgi_adapter.o" "$OUT/obj/dxgi_output.o"
 
 # The new DLL must export exactly what upstream's does: Wine and every game
 # bind to these names (DXMT's d3d11 and our nvapi64 import them too).
@@ -181,6 +193,9 @@ fi
 "$NM" --defined-only "$OUT/dxgi.dll" | grep -q "RegisterAdaptersChangedEvent" || fail "RegisterAdaptersChangedEvent is not in the result"
 if [ -n "$BUDGET_EVENTS" ]; then
     LC_ALL=C grep -aq "\[budget-event\] registered cookie=" "$OUT/dxgi.dll" || fail "the budget events patch is not in the result"
+fi
+if [ -n "$MODE_ANY_BPP" ]; then
+    LC_ALL=C grep -aq "\[dxgi-modes\] madeira-bcd any-bpp #" "$OUT/dxgi.dll" || fail "the any-bpp mode list patch is not in the result"
 fi
 if [ -n "$COMPOSITION" ]; then
     LC_ALL=C grep -aq "MADEIRA_DXGI_COMPOSITION" "$OUT/dxgi.dll" || fail "the composition swap chain patch is not in the result"
@@ -206,4 +221,4 @@ if [ "${DXGI_NO_SHIP:-0}" = "1" ]; then
     exit 0
 fi
 cp "$OUT/dxgi.dll" "$DEST.tmp" && mv -f "$DEST.tmp" "$DEST" || fail "copying into the bundle failed"
-echo "::notice::dxgi-src.dll built from DXMT $REV with IDXGIFactory7 + EnumAdapterByLuid + the D3DKMT UMD version$BUDGET_EVENTS$COMPOSITION ($(wc -c < "$DEST" | tr -d ' ') bytes, exports = upstream's) and shipped next to upstream's dxgi.dll, which stays the default (env.MADEIRA_DXGI_SRC = 1 selects it); the recipe $MATCH"
+echo "::notice::dxgi-src.dll built from DXMT $REV with IDXGIFactory7 + EnumAdapterByLuid + the D3DKMT UMD version$BUDGET_EVENTS$COMPOSITION$MODE_ANY_BPP ($(wc -c < "$DEST" | tr -d ' ') bytes, exports = upstream's) and shipped next to upstream's dxgi.dll, which stays the default (env.MADEIRA_DXGI_SRC = 1 selects it); the recipe $MATCH"

@@ -54,7 +54,7 @@ check('it frees the half-built resource, logs the description (mad_refuse_log) a
       'free(r);' in line and 'mad_refuse_log(desc, heap_type, "zero-size texture' in line and 'return E_INVALIDARG;' in line)
 check('it tests only width and height of the Metal description', re.fullmatch(r'if \(!ti\.width \|\| !ti\.height\) \{.*\}', line.strip()) is not None)
 
-info = src[src.index('static int mad_texinfo_from_desc(const D3D12_RESOURCE_DESC *desc, struct WMTTextureInfo *ti, enum WMTPixelFormat *pf, int *is_depth) {'):]
+info = src[src.index('static int mad_texinfo_from_desc(struct mad_device *d, const D3D12_RESOURCE_DESC *desc, struct WMTTextureInfo *ti, enum WMTPixelFormat *pf, int *is_depth) {'):]
 info = info[:info.index('\n}\n')]
 check('depth and array length are at least 1 by construction, a 1D height is 1',
       'UINT layers = desc->DepthOrArraySize ? desc->DepthOrArraySize : 1;' in info and 'ti->depth = 1;' in info
@@ -64,7 +64,7 @@ check('depth and array length are at least 1 by construction, a 1D height is 1',
 ai = src[src.index('device_GetResourceAllocationInfo('):]
 ai = ai[:ai.index('\n}\n')]
 check("GetResourceAllocationInfo's Metal size query needs a non-zero extent",
-      'if (mad_texinfo_from_desc(d, &ti, &pf, &isd) && ti.width && ti.height)' in ai
+      'if (mad_texinfo_from_desc(md, d, &ti, &pf, &isd) && ti.width && ti.height)' in ai
       and ai.index('ti.width && ti.height') < ai.index('MTLDevice_heapTextureSizeAndAlign'))
 print('PASS: d3d12 zero extent' if ok else 'FAIL: d3d12 zero extent')
 raise SystemExit(0 if ok else 1)

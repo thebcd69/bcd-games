@@ -58,6 +58,9 @@ void *ios_jit_rx_base_global, *ios_jit_rw_base_global;
 static int dprintf_quiet;
 const char *ios_pe_module_name( const void *image_base, size_t image_size )
 { (void)image_base; (void)image_size; return "model.dll"; }
+/* night round 2026-11-11 (R1 S8): the diagnostics read the name through the kernel-checked reader (tests/host/check-pe-module-name-safe.py runs the real one) */
+static const char *ios_pe_module_name_safe( const void *image_base, size_t image_size, char *out, size_t out_size )
+{ (void)out; (void)out_size; return ios_pe_module_name( image_base, image_size ); }
 '''
 code += between(native, '#define IOS_JIT_MAX_MAPPINGS', '\n};')
 code += 'static struct ios_jit_mapping ios_jit_mappings[IOS_JIT_MAX_MAPPINGS];\n'

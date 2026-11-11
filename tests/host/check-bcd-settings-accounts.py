@@ -437,7 +437,7 @@ require('let startable = game.installed && state.components.installed && state.a
         'Dock: Start only for a fully installed game, with the client files in place and Steam signed in')
 model = (app / 'MadeiraDockModel.swift').read_text()
 require('DockInstallers.setRequest(appID, request, prefix: MadeiraDock.prefix)' in block(model, 'func setInstallRequest(')
-        and 'SteamRuntimeInstaller.shared.prepare(' in block(model, 'func prepareClient()'),
+        and 'SteamRuntimeInstaller.shared.prepare(' in block(model, 'func prepareClient(replacing: Bool = false)'),
         'Dock: the model\'s setInstallRequest and prepareClient are still the reset flow and the pinned download')
 runtime = (app / 'SteamRuntime.swift').read_text()
 require('part \\(index + 1) of \\(SteamRuntimeFiles.packages.count)' in runtime
@@ -459,7 +459,7 @@ PARITY = {
                      'backend.openLocalDevVPN()', 'backend.setShortcut(', 'backend.addShortcut()', 'backend.runShortcut()',
                      'backend.runSetup()', 'ShareSheet(items:', 'state.txm', 'case .code(let pin)', 'shortBackground', 'BCDJITPairingPanel(run: state.pairing',
                      'BCDJITLinks.stikDebug', 'BCDJITLinks.pairingFileGuide', 'case .pairAgain', 'case .connectVPN', 'case .runShortcut'],
-    'BCDDock.swift': ['backend.downloadComponents()', 'backend.start(game.id)', 'backend.setCompactPool(', 'backend.setRunsInstalls(',
+    'BCDDock.swift': ['backend.downloadComponents()', 'backend.replaceComponents()', 'backend.start(game.id)', 'backend.setCompactPool(', 'backend.setRunsInstalls(',
                       'backend.setRequest(game.id, .record)', 'backend.setRequest(game.id, .reset)',
                       'backend.setRequest(game.id, .resetAndSignOut)', 'backend.setRequest(game.id, nil)', 'state.lastResult',
                       'parts.error', 'signIn'],

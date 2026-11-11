@@ -30,6 +30,11 @@ enum SteamRuntimeFiles {
                 sha256: "1369615c795b60de822876b4dc4042186cf58d0dc8f63ea1371167f667e16925")
     ]
     static let clientSHA256 = "71b391fe9f3e2006cbc81a5c75eef3eb4186012deabfdb2c8b7e8d4850ecf640"
+    /// Night round 2026-11-11 (A1 S7, A2 S7; SQDE4K, T12JFC, AT5CSS): every client build the Dock host accepts (madeira-dock src/client_layout.c, the
+    /// table the host checks `steamclient64.dll` against): the pinned build above (202601) and the 202609 build that has no download pin. A client
+    /// whose SHA-256 is in neither makes the host end every start with code 30 (session-unsupported-client=1).
+    /// tests/host/check-dock-client-status.py keeps this set equal to the host's table.
+    static let supportedClientSHA256: Set<String> = [clientSHA256, "caba4826aa3501039d095aee1843a6bfb270fb43a3ab4455b2d6733223579fee"]
     static let relativeRoot = "Program Files (x86)/Steam"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"
 
@@ -202,6 +207,51 @@ enum SteamRuntimeFiles {
         }
         return lines.joined(separator: "\n")
     }
+
+    /// Night round 2026-11-11 (G10 S1, A2 S3, G9 S5, G5 S8; GNWWRT, RAC3KD, ZB8E97, GWX5H2, DP9TVR): the Dock host opens HKLM Software\Valve\Steam
+    /// (32-bit view) and HKCU Software\Valve\Steam\ActiveProcess before it asks Valve's client to start the game, and ends with result 42 when one
+    /// is missing. `SteamRuntimeInstaller.prepare` seeds both hives once, at the client download, and refuses to run again once steam.exe is there,
+    /// so a prefix that lost the sections was never put right (five logs, three players, every game of those prefixes failed). Called by startDock
+    /// before each Dock start, while no session runs: `registry` returns the text unchanged when everything is there (nothing is written); a section
+    /// or value that is missing is added (the hive's `.dock-setup-bak` copy is kept first); a value that differs stays as it is. Returns one word
+    /// per hive and logs the line `[dock-registry]`, so the next log says what each hive held. env.MADEIRA_DOCK_REGISTRY_REPAIR = 0 skips it.
+    @discardableResult
+    static func repairRegistry(prefix: URL, log: (String) -> Void) -> [String] {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: prefix.appendingPathComponent("drive_c/\(relativeRoot)/steamclient64.dll").path) else { return [] }
+        guard wine_process_is_running() == 0, wineserver_is_running() == 0 else {
+            log("[dock-registry] skipped: a session is running")
+            return ["skipped"]
+        }
+        let kept = lastConflict
+        defer { lastConflict = kept }
+        func headers(_ text: String) -> [String] { text.split(separator: "\n").filter { $0.hasPrefix("[") }.map(String.init) }
+        var state: [String] = []
+        for (file, machine) in [("system.reg", true), ("user.reg", false)] {
+            let url = prefix.appendingPathComponent(file)
+            guard url.standardizedFileURL.path == url.resolvingSymlinksInPath().standardizedFileURL.path,
+                  let text = try? String(contentsOf: url, encoding: .utf8) else { state.append("\(file)=unreadable"); continue }
+            lastConflict = nil
+            do {
+                let fixed = try registry(text, machine: machine)
+                if fixed == text { state.append("\(file)=ok"); continue }
+                let known = Set(headers(text).map { $0.lowercased() })
+                let added = headers(fixed).filter { !known.contains($0.lowercased()) }
+                let backup = url.appendingPathExtension("dock-setup-bak")
+                if !fm.fileExists(atPath: backup.path) { try fm.copyItem(at: url, to: backup) }
+                try Data(fixed.utf8).write(to: url, options: .atomic)
+                state.append("\(file)=put-back(sections \(added.count), values \(max(0, fixed.split(separator: "\n").count - text.split(separator: "\n").count - added.count)))")
+            } catch Failure.prefixMissing {
+                state.append("\(file)=not-a-registry-file")
+            } catch Failure.conflict {
+                state.append("\(file)=left-alone(\(lastConflict ?? "conflict"))")
+            } catch {
+                state.append("\(file)=not-written")
+            }
+        }
+        log("[dock-registry] " + state.joined(separator: " "))
+        return state
+    }
 }
 
 #if canImport(CryptoKit)
@@ -215,12 +265,73 @@ private final class SteamRuntimeRedirects: NSObject, URLSessionTaskDelegate, @un
     }
 }
 
+/// Night round 2026-11-11 (A1 S7, A2 S7): which Valve client build is in the prefix.
+extension SteamRuntimeFiles {
+    enum ClientStatus: Equatable {
+        /// No steamclient64.dll in the prefix: Dock's own "download the client files" message applies.
+        case missing
+        /// One of `supportedClientSHA256`, or a file that could not be read (the host decides then).
+        case supported
+        /// Another build; `sha` is its SHA-256 (64 hex digits).
+        case unsupported(sha: String)
+    }
+
+    /// The SHA-256 of a file read in 1 MB pieces (a 15 MB client costs tens of milliseconds); nil when it cannot be read.
+    static func sha256(ofFile url: URL) -> String? {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? handle.close() }
+        var hasher = SHA256()
+        do {
+            while let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty { hasher.update(data: chunk) }   // nil at the end
+        } catch { return nil }
+        return hasher.finalize().map { String(format: "%02x", $0) }.joined()
+    }
+
+    static func clientStatus(drive: URL) -> ClientStatus { clientStatus(drive: drive, supported: supportedClientSHA256) }
+
+    static func clientStatus(drive: URL, supported: Set<String>) -> ClientStatus {
+        let url = drive.appendingPathComponent(relativeRoot + "/steamclient64.dll")
+        guard FileManager.default.fileExists(atPath: url.path) else { return .missing }
+        guard let sha = sha256(ofFile: url) else { return .supported }
+        return supported.contains(sha) ? .supported : .unsupported(sha: sha)
+    }
+
+    /// Renames the client folder of an unsupported build to "Steam.unsupported-<sha12>" beside it (a second one gets a number); nothing is deleted.
+    static func moveClientAside(root: URL, sha: String) throws -> URL {
+        let fm = FileManager.default
+        let parent = root.deletingLastPathComponent()
+        var aside = parent.appendingPathComponent("Steam.unsupported-" + sha.prefix(12))
+        var number = 1
+        while fm.fileExists(atPath: aside.path) { number += 1; aside = parent.appendingPathComponent("Steam.unsupported-\(sha.prefix(12))-\(number)") }
+        try fm.moveItem(at: root, to: aside)
+        return aside
+    }
+
+    /// The installed games stay where Dock looks for them: `steamapps` moves from the renamed folder into the new client folder when the new one has none.
+    @discardableResult
+    static func moveSteamapps(from aside: URL, into root: URL) -> Bool {
+        let fm = FileManager.default
+        let old = aside.appendingPathComponent("steamapps"), new = root.appendingPathComponent("steamapps")
+        guard fm.fileExists(atPath: old.path), !fm.fileExists(atPath: new.path) else { return false }
+        do { try fm.moveItem(at: old, to: new); return true } catch { return false }
+    }
+
+    /// The words for the player when the client is a build the Dock host does not know.
+    static func unsupportedClientWords(sha: String) -> String {
+        "The Steam client files in BCD's Windows folder (build \(sha.prefix(12))) are not a build BCD Dock supports; running Steam on the Desktop can "
+            + "replace them. Open Settings > BCD Dock and choose Replace client components, then play again."
+    }
+}
+
 actor SteamRuntimeInstaller {
     static let shared = SteamRuntimeInstaller()
     private var busy = false
 
     // Runs before any Wine session in this app run; no Wine/JIT run.
-    func prepare(prefix: URL, progress: @Sendable (String) async -> Void) async throws {
+    // Night round 2026-11-11 (A1 S7): `replacing` is Settings' "Replace client components": the client folder of a build the Dock host does not
+    // support is RENAMED to "Steam.unsupported-<sha12>" (nothing is deleted) after the download was verified, the pinned client is installed, and the
+    // old folder's steamapps (the installed games) moves into the new one. Without it an existing client is never touched.
+    func prepare(prefix: URL, replacing: Bool = false, progress: @Sendable (String) async -> Void) async throws {
         guard !busy, wine_process_is_running() == 0, wineserver_is_running() == 0 else {
             throw SteamRuntimeFiles.Failure.activeSession
         }
@@ -241,9 +352,18 @@ actor SteamRuntimeInstaller {
             throw SteamRuntimeFiles.Failure.conflict
         }
         // Existing installs are retained; this trial prepares missing files.
-        guard !fm.fileExists(atPath: root.appendingPathComponent("steam.exe").path) else {
-            SteamRuntimeFiles.lastConflict = "steam.exe already there"
-            throw SteamRuntimeFiles.Failure.conflict
+        var unsupportedSHA: String?
+        if replacing {
+            guard case .unsupported(let sha) = SteamRuntimeFiles.clientStatus(drive: drive) else {
+                SteamRuntimeFiles.lastConflict = "the client is a supported build"
+                throw SteamRuntimeFiles.Failure.conflict
+            }
+            unsupportedSHA = sha
+        } else {
+            guard !fm.fileExists(atPath: root.appendingPathComponent("steam.exe").path) else {
+                SteamRuntimeFiles.lastConflict = "steam.exe already there"
+                throw SteamRuntimeFiles.Failure.conflict
+            }
         }
         let stage = fm.temporaryDirectory.appendingPathComponent("madeira-runtime-" + UUID().uuidString)
         try fm.createDirectory(at: stage, withIntermediateDirectories: true)
@@ -302,6 +422,15 @@ actor SteamRuntimeInstaller {
             let text = try String(contentsOf: url, encoding: .utf8)
             pending.append((url, Data(try SteamRuntimeFiles.registry(text, machine: machine, stale: stale).utf8)))
         }
+        // Replacing: the old client folder moves aside (a rename: nothing is deleted); the install below then finds an empty folder.
+        var renamedClient: URL?
+        if let sha = unsupportedSHA {
+            do { renamedClient = try SteamRuntimeFiles.moveClientAside(root: root, sha: sha) } catch {
+                SteamRuntimeFiles.lastConflict = "the old client folder could not be renamed"
+                throw SteamRuntimeFiles.Failure.conflict
+            }
+            SteamLog.event("[dock-client] replaced: the old client folder is now \(renamedClient?.lastPathComponent ?? "?") (sha256=\(sha))")
+        }
         for name in files {
             let target = try SteamRuntimeFiles.destination(SteamRuntimeFiles.relativeRoot + "/" + name, under: drive)
             if fm.fileExists(atPath: target.path), !fm.contentsEqual(atPath: target.path, andPath: stage.appendingPathComponent(name).path) {
@@ -323,6 +452,11 @@ actor SteamRuntimeInstaller {
             if fm.fileExists(atPath: target.path) { continue }
             try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
             try fm.moveItem(at: stage.appendingPathComponent(name), to: target)
+        }
+        // The installed games stay where Dock looks for them: steamapps moves from the renamed folder into the new client folder.
+        if let renamedClient {
+            SteamLog.event(SteamRuntimeFiles.moveSteamapps(from: renamedClient, into: root) ? "[dock-client] steamapps moved into the new client folder"
+                                                                                              : "[dock-client] steamapps stays in \(renamedClient.lastPathComponent)")
         }
         await progress("Done. The client components are in place.")
     }

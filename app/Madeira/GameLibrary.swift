@@ -86,6 +86,8 @@ enum GameLibrary {
         "unitycrashhandler32.exe", "crashreportclient.exe", "crashpad_handler.exe",
         "dxsetup.exe", "installermessage.exe", "easyanticheat_setup.exe",
         "easyanticheat_eos_setup.exe", "cleanup.exe", "touchup.exe",
+        // Night round 2026-11-11 (G3 S11; DOOM 3: BFG Edition DVXP0H, RATRZ0): the Qt language chooser that runs before the game.
+        "language_setup.exe", "languagesetup.exe",
     ]
 
     static var driveC: URL? {
@@ -105,26 +107,20 @@ enum GameLibrary {
 
         func walk(_ dir: URL, depth: Int, title: String?) {
             guard depth <= maxDepth else { return }
-            // The SSD folder (C:\External and below, while it is connected) is listed by path, so the entries stay under
-            // drive_c: the URL listing does not follow the link and returns the resolved path below it (ExternalGameStorage).
-            guard let entries = ExternalGameStorage.shared.linkedChildren(of: dir) ?? (try? fm.contentsOfDirectory(
+            guard let entries = try? fm.contentsOfDirectory(
                 at: dir,
                 includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey],
                 options: [.skipsHiddenFiles]
-            )) else { return }
+            ) else { return }
 
             for entry in entries {
-                // C:\External is a link to the SSD folder the player chose in Settings > Storage. It is followed
-                // only while that folder is connected (ExternalGameStorage), and its children are the titles;
-                // every other link is left as it always was.
-                let externalMount = depth == 0 && entry.lastPathComponent == "External" && ExternalGameStorage.shared.admits(entry)
-                let values = try? (externalMount ? entry.resolvingSymlinksInPath() : entry).resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
+                let values = try? entry.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
                 if values?.isDirectory == true {
                     let lower = entry.lastPathComponent.lowercased()
                     if depth == 0 && skippedRoots.contains(lower) { continue }
                     if skippedAnywhere.contains(lower) { continue }
                     // The first directory below drive_c (or below Program Files) names the title.
-                    walk(entry, depth: depth + 1, title: externalMount ? nil : title ?? titleFor(entry))
+                    walk(entry, depth: depth + 1, title: title ?? titleFor(entry))
                 } else if entry.pathExtension.lowercased() == "exe" {
                     if noiseNames.contains(entry.lastPathComponent.lowercased()) { continue }
                     guard let windows = windowsPath(for: entry, root: root) else { continue }

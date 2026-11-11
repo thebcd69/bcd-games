@@ -61,8 +61,10 @@ check(BCDGOGRegistry.write([moved], in: near, now: 3).outcome.present == 0, "a s
 // ---- the files ---------------------------------------------------------------------------------
 let fm = FileManager.default
 let work = fm.temporaryDirectory.appendingPathComponent("gog-script-bcd-\(getpid())")
+// A folder left by an earlier run with the same process id (exit() below skips a top-level defer, so none was removed) held its
+// system.reg.bcd-bak and failed "the first-time backup" (build 646's first run, 2026-11-08): start empty, and remove it before exit.
+try? fm.removeItem(at: work)
 try? fm.createDirectory(at: work, withIntermediateDirectories: true)
-defer { try? fm.removeItem(at: work) }
 let prefix = work.appendingPathComponent("prefix")
 try? fm.createDirectory(at: prefix, withIntermediateDirectories: true)
 try! base.write(to: prefix.appendingPathComponent("system.reg"), atomically: true, encoding: .utf8)
@@ -169,6 +171,7 @@ check(BCDGOGContent.supportKept("support\\goggame-5.script") == .script("goggame
       && BCDGOGContent.supportKept("goggame-5.info") == nil, "supportKept: the script by name, app/ by its first folder, nothing else")
 
 print(failures == 0 ? "ALL OK" : "\(failures) FAILED")
+try? fm.removeItem(at: work)
 exit(failures == 0 ? 0 : 1)
 
 extension GOGInstallScript.Value {

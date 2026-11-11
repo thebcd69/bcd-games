@@ -1,0 +1,289 @@
+[00:12:04.506] [INFO] Checking entitlements...
+[00:12:04.507] [INFO] [build] v0.1.626 (626)
+[00:12:04.508] [INFO] [device] model=iPhone15,3 idiom=phone os=iOS Version 26.4.2 (Build 23E261) ram=5636MB available=4076MB cores=6
+[00:12:04.508] [INFO] [device] address-map=[0x100890000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[00:12:04.513] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=4d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[00:12:04.528] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=120 utc-offset=+03:00 free-disk=108GB stikdebug-url=0
+[00:12:04.532] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:12:05.788] [INFO] Requesting JIT with Built-in StikJIT...
+[00:12:07.301] [INFO] [bcd] library launch MirrorsEdge.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[00:12:07.337] [INFO] Running full Wine sequence...
+[00:12:07.337] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100890000,0xfc0000000) 63GB available=4069MB low-power=0 thermal=nominal
+[00:12:07.339] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[00:12:07.347] [INFO] Allocating 768MB JIT pool (BRK will suspend process)...
+[00:12:07.348] [INFO] Allocating 768MB JIT pool via debugger...
+[00:12:07.348] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:12:07.348] [INFO] [jit-debugger] attached=1 at the pool request
+[00:12:08.662] [INFO] RX pool at 0x300000000
+[00:12:08.695] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.401s rev=ml526
+[00:12:08.749] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 12 x 512 MB registered, extension exited
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: window body after failed reservations (OCCUPIED 0x400000000+0x20000000 prot=3/3 shared=0 (and the range continues past this region))
+[wow-window] B=0x400000000 REJECTED: 4GB+guard unavailable and the page at 0x500000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x500000000 are free, next region 0xfc0000000 (+0xabfffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x500000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x500000000..0x600000000 (guard owned)
+[wow-window] B=0x400000000 REJECTED: the 4GB range is not free (OCCUPIED 0x400000000+0x20000000 prot=3/3 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x500000000..0x600000000 guard=owned
+[wow-window] reserved B=0x500000000..0x600000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x10f7c0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x57ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x57ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x57fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x57ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x57ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x500000000 bound to peb=0x57ffd0000
+[fdtrace] pipes tid=0000 peb=0x57ffd0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[00:12:09.442] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3286 MB + phys_footprint=809 MB = 4096 MB (hw.memsize says 5636 MB)
+[fex-arena] ml793 PUBLISHED [0xca0000000,0xea0000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x4ffef0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x30000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x57ffd0000
+[nls-getptr] type=11 id=437 peb=0x57ffd0000
+[jit-pool] image 0x4ffe80000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x30000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x1000 so .data lands on a 16KB page
+[jit-pool] image 0x4ffac0000+0x3bc000 (libwow64fex.dll) → pool 0x300191000 used=0x555000/0x30000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x300191000)
+ml957: libwow64fex.dll backing 0x4ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x4ff9a0000+0x120000 (ucrtbase.dll) → pool 0x300554000 used=0x678000/0x30000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300554000)
+[jit-pool] image 0x4ff900000+0xa0000 (KERNEL32.dll) → pool 0x300678000 used=0x720000/0x30000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300678000)
+[jit-pool] image 0x4ff790000+0x170000 (kernelbase.dll) → pool 0x300720000 used=0x8a0000/0x30000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300720000)
+[nls-getptr] type=11 id=20127 peb=0x57ffd0000
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=mirrorsedge.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x57ffd0000 total=256 MB
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x4ffac0000) -> 64-bit table (0x103718828)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module MirrorsEdge.exe (mirrorsedge.exe-c5945942afaae11c): 500400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83cc2925): 5FFF40000
+[window] 0x120400000..0xca0000000 regions=98513 occupied=18095 MB of 47100 MB free=31532 MB maxhole=24575 MB@0x600004000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=853 MB (peak 853) internal=851 MB compressed=0 MB external=70 MB reusable=0 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1d1ddc1): 57BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728aa9cf0b): 57BC40000
+[nls-getptr] type=11 id=1252 peb=0x57ffd0000
+[nls-getptr] type=11 id=437 peb=0x57ffd0000
+D 24 Load module wxmsw28u_core_vc_custom.dll (wxmsw28u_core_vc_custom.dll-a4f79b2a5a55e910): 510000000
+D 24 Load module COMCTL32.dll (comctl32.dll-8c5c2d137b4902d7): 57BB00000
+[jit-pool] image 0x57b830000+0x1b000 (?) → pool 0x3009ba000 used=0x9da000/0x30000000 tramp+0x0
+ml957: ? backing 0x57b848000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x57b610000+0x1b000 (?) → pool 0x3009db000 used=0x9fb000/0x30000000 tramp+0x0
+ml957: ? backing 0x57b628000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x57a9b0000+0x13000 (?) → pool 0x3009f9000 used=0xa11000/0x30000000 tramp+0x0
+ml957: ? backing 0x57a9c0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x57a5e0000+0x1a000 (?) → pool 0x300a13000 used=0xa33000/0x30000000 tramp+0x0
+ml957: ? backing 0x57a5f8000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x57a480000+0x12000 (?) → pool 0x300a33000 used=0xa4b000/0x30000000 tramp+0x0
+ml957: ? backing 0x57a490000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x57a440000+0x7000 (?) → pool 0x300a48000 used=0xa50000/0x30000000 tramp+0x0
+ml957: ? backing 0x57a444000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x579660000+0xa000 (?) → pool 0x300aa2000 used=0xab2000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300aa2000)
+ml957: ? backing 0x579668000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x579510000+0x1b000 (?) → pool 0x300ab3000 used=0xad3000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 3 .text pages executable (copy @0x300ab3000)
+ml957: ? backing 0x579528000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x5794f0000+0xe000 (?) → pool 0x300ad3000 used=0xae7000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x300ad3000)
+ml957: ? backing 0x5794fc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x5794c0000+0x1f000 (?) → pool 0x300ae4000 used=0xb04000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300ae4000)
+ml957: ? backing 0x5794dc000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module NETAPI32.dll (netapi32.dll-67f045b4a9a3190e): 5794C0000
+[jit-pool] image 0x5794a0000+0x7000 (?) → pool 0x300b04000 used=0xb0c000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300b04000)
+ml957: ? backing 0x5794a4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module netutils.dll (netutils.dll-77547757313e0e94): 5794A0000
+D 24 Load module d3dx9_35.dll (d3dx9_35.dll-13472117ec0eb66f): 579400000
+[nls-getptr] type=11 id=20127 peb=0x57ffd0000
+[gdi-shared] session table 0x122430000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x57ffd0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x579790000) -> wow64 table (0x103720828)
+[stale-heal]   3 slot(s) in the copy of 0x4ffac0000 (libwow64fex.dll) -> 0x300073294 for peb=0x57ffd0000 (owner=0x0 mapper=0x57ffd0000)
+D 24 Load module uxtheme.dll (uxtheme.dll-4e148963445f3c30): 5793C0000
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x57bc52f79 pc=300135be8 nparams=2 p0=83 p1=57964129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x57bc52f79 pc=300135be8 nparams=2 p0=2 p1=5796410a0
+[xp] 00:12:10.062 +0.56 dt=308 cpu=247 (thr 247) P=66 E=181 run=309 pgw=-1.0 GHz P=3.31 E=2.01 Minst=1579 IPC=2.71 mJ=234 pin=38 rdKB=552 fpMB=924
+[exc-disp] dispatch tid=0024 code=406d1388 flags=0 addr=0x57bc52f79 pc=300135be8 nparams=4 p0=1000 p1=501cce584
+[xp] 00:12:10.317 +0.81 dt=254 cpu=249 (thr 239) P=16 E=234 run=258 pgw=-1.0 GHz P=2.69 E=2.01 Minst=1225 IPC=2.39 mJ=87 pin=0 rdKB=108 fpMB=941
+[xp] 00:12:10.569 +1.07 dt=252 cpu=237 (thr 237) P=39 E=198 run=263 pgw=-1.0 GHz P=3.16 E=2.01 Minst=1748 IPC=3.35 mJ=156 pin=0 rdKB=260 fpMB=942
+[xp] 00:12:10.850 +1.35 dt=281 cpu=264 (thr 264) P=23 E=241 run=276 pgw=-1.0 GHz P=2.87 E=2.01 Minst=1746 IPC=3.17 mJ=117 pin=0 rdKB=336 fpMB=943
+[xp] 00:12:11.174 +1.67 dt=324 cpu=306 (thr 306) P=27 E=279 run=321 pgw=-1.0 GHz P=2.93 E=2.01 Minst=2159 IPC=3.37 mJ=143 pin=0 rdKB=312 fpMB=943
+[xp] 00:12:11.452 +1.95 dt=278 cpu=266 (thr 266) P=10 E=256 run=269 pgw=-1.0 GHz P=2.11 E=2.01 Minst=1793 IPC=3.34 mJ=89 pin=0 rdKB=396 fpMB=943
+[guest-stk] sp+0x198 0x3001a7ba0 = libwow64fex.dll+0x16ba0
+[guest-stk] sp+0x1c0 0x30036e4f9 = libwow64fex.dll+0x1dd4f9
+[guest-stk] sp+0x1d0 0x3001a7a0c = libwow64fex.dll+0x16a0c
+[guest-stk] sp+0x3d8 0x300294768 = libwow64fex.dll+0x103768
+[guest-stk] sp+0x438 0x3002946ec = libwow64fex.dll+0x1036ec
+[guest-stk] sp+0x558 0x3002946e4 = libwow64fex.dll+0x1036e4
+[footprint] rev=ml358 phys=946 MB (peak 946) internal=944 MB compressed=0 MB external=72 MB reusable=0 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage blocks: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb
+[nls-getptr] type=11 id=10000 peb=0x57ffd0000
+[nls-getptr] type=11 id=10000 peb=0x57ffd0000
+[nls-getptr] type=11 id=10000 peb=0x57ffd0000
+[nls-getptr] type=11 id=10000 peb=0x57ffd0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+D 24 Load module gameux.dll (gameux.dll-427bfd69f7c9e7dd): 5793D0000
+[nls-getptr] type=11 id=1254 peb=0x57ffd0000
+0024:err:seh:ios_cxx_throw_diag [cxx-type] build591 32-bit throw at 0x57bc52f79: thrown .?AVCAtlException@ATL@@; also catchable as: nothing (1 catchable type(s), ThrowInfo 0x1dede50 attributes 0, object 0x2b1e43c, magic 0x19930520)
+0024:err:seh:ios_cxx_throw_diag [cxx-type]   ATL::CAtlException hr=0x80070057
+[exc-disp] dispatch tid=0024 code=e06d7363 flags=1 addr=0x57bc52f79 pc=300135be8 nparams=3 p0=19930520 p1=2b1e43c
+[jit-pool] image 0x5793b0000+0x7000 (?) → pool 0x300b0d000 used=0xb19000/0x30000000 tramp+0x0
+[copy-verify] ?: OK, 1 .text pages executable (copy @0x300b0d000)
+ml957: ? backing 0x5793b4000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+D 24 Load module PSAPI.DLL (psapi.dll-d7ed89fa3acc5ed2): 5793B0000
+[footprint] rev=ml358 phys=968 MB (peak 968) internal=966 MB compressed=0 MB external=81 MB reusable=0 MB (cycle=3)
+[store-noalias] #1 rev=ml348 addr=0x5756e654b insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x5756e654b hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654b kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x2a8cc8b0c addr=0x5756e654b x18=0x0 type=1 lr=0x101e819d8 sp=0x12080fbd0 x16=0x2a8cc8950 x17=0x2b5355170
+[guest-code] rev=ml333 pool_rip=0x2a0000 (PE 0x2a0000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x16fa570e0 x9=0xcbed x10=0x292069c34c847239 x11=0x292069c36dec9769 x0=0x502b1cf7c x2=0x4 | teb=0x57ffc0000 peb=0x57ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 2a8cc8a0c: ac400420 91008021 f1008042 54ffff68 8b020021 ac400c22 ad000460 8b020063
+[fault-host] 2a8cc8a2c: ad010c62 d65f03c0 f140105f 54000303 91008063 927be863 ad400c22 cb000065
+[fault-host] 2a8cc8a4c: 8b050021 ad400420 91008021 cb050042 ac000c02 f1010042 540000e9 ac000460
+[fault-host] 2a8cc8a6c: 91008063 ad400420 91008021 f1008042 54ffff68 8b020021 ad400c22 ac000460
+[fault-host] 2a8cc8a8c: 8b020063 ac010c62 d65f03c0 91008063 927be863 ad400c22 cb000065 8b050021
+[fault-host] 2a8cc8aac: ad400420 91008021 cb050042 ad000c02 f1010042 540000e9 ad000460 91008063
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[x86_seg] State.gs_cached=0x0 TEB=0x57ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x5756e654b insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x5756e654b hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654b kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x2a8cc8b0c addr=0x5756e654b x18=0x0 type=1 lr=0x101e819d8 sp=0x12080fbd0 x16=0x2a8cc8950 x17=0x2b5355170
+[guest-code] rev=ml333 pool_rip=0x2a0000 (PE 0x2a0000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x16fa570e0 x9=0xcbed x10=0x292069c34c847239 x11=0x292069c36dec9769 x0=0x502b1cf7c x2=0x4 | teb=0x57ffc0000 peb=0x57ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 2a8cc8a6c: 91008063 ad400420 91008021 f1008042 54ffff68 8b020021 ad400c22 ac000460
+[fault-host] 2a8cc8a8c: 8b020063 ac010c62 d65f03c0 91008063 927be863 ad400c22 cb000065 8b050021
+[fault-host] 2a8cc8aac: ad400420 91008021 cb050042 ad000c02 f1010042 540000e9 ad000460 91008063
+[fault-host] 2a8cc8acc: ad400420 91008021 f1008042 54ffff68 8b020021 ad400c22 ad000460 8b020063
+[fault-host] 2a8cc8aec: ad010c62 d65f03c0 f8408426 f8008466 f1002042 54ffffa2 b1002042 540000a0
+[fault-host] 2a8cc8b0c: 38401426 38001466 f1000442 54ffffa1 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[x86_seg] State.gs_cached=0x0 TEB=0x57ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler BUS #1: pc=0x2a8cc8b0c addr=0x5756e654b x16=0x2a8cc8950 x17=0x2b5355170 x18=0x0 lr=0x101e819d8 insn=0x38401426 branch@lr-4=0x9430d689
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e654b inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[store-noalias] #3 rev=ml348 addr=0x5756e654f insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=READ p1=0x5756e654f hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654f kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x2a8cc8b0c addr=0x5756e654f x18=0x0 type=1 lr=0x101e819d8 sp=0x12080fbd0 x16=0x2a8cc8950 x17=0x2b5355170
+[guest-code] rev=ml333 pool_rip=0x2a0000 (PE 0x2a0000) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x16fa570e0 x9=0xcbed x10=0x292069c34c847239 x11=0x292069c36dec9769 x0=0x502b1cfdc x2=0x4 | teb=0x57ffc0000 peb=0x57ffd0000 peb->EcCodeBitMap=0x0
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[x86_seg] State.gs_cached=0x0 TEB=0x57ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #4 rev=ml348 addr=0x5756e654f insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x5756e654f hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654f kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x2a8cc8b0c addr=0x5756e654f x18=0x0 type=1 lr=0x101e819d8 sp=0x12080fbd0 x16=0x2a8cc8950 x17=0x2b5355170
+[guest-code] rev=ml333 pool_rip=0x2a0000 (PE 0x2a0000) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e654f inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[store-noalias] #5 rev=ml348 addr=0x5756e6553 insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x5756e6553 hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e6553 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x2a8cc8b0c addr=0x5756e6553 x18=0x0 type=1 lr=0x101e819d8 sp=0x12080fbd0 x16=0x2a8cc8950 x17=0x2b5355170
+[guest-code] rev=ml333 pool_rip=0x2a0000 (PE 0x2a0000) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 54ffffa2 b1002042 540000a0 [38401426] 38001466 f1000442 54ffffa1
+[mach_exc] sym pc=/usr/lib/system/libsystem_platform.dylib`_platform_memmove+0x1bc lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtReadVirtualMemory+0xf4
+[store-noalias] #6 rev=ml348 addr=0x5756e6553 insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x5756e6553 hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e6553 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e6553 inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[store-noalias] #7 rev=ml348 addr=0x5756e6557 insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x5756e6557 insn=0x38401426 pc=0x2a8cc8b0c NO pool/anon alias | region 0x570000000+0x8000000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+0024:err:seh:bus_handler BUS #4: pc=0x2a8cc8b0c addr=0x5756e6557 x16=0x2a8cc8950 x17=0x2b5355170 x18=0x0 lr=0x101e819d8 insn=0x38401426 branch@lr-4=0x9430d689
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e6557 inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+0024:err:seh:bus_handler BUS #5: pc=0x2a8cc8b0c addr=0x5756e655b x16=0x2a8cc8950 x17=0x2b5355170 x18=0x0 lr=0x101e819d8 insn=0x38401426 branch@lr-4=0x9430d689
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e655b inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #11 p0=READ p1=0x5756e654b hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=11 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654b kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[mach-deliver] rev=ml378 no TEB owns sp=0x12080fbd0 (pc=0x2a8cc8b0c x18=0x0 registry=0x57ffc0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #12 p0=READ p1=0x5756e654b hostpc=0x2a8cc8b0c hinsn=0x38401426 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=12 rip=0x0 pc=0x2a8cc8b0c addr=0x5756e654b kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x570000000+0x8000000 rev=ml555
+[syscall-fault] a protection fault (SIGBUS) at 0x5756e654b inside a system call with a __TRY: the call fails (pc=0x2a8cc8b0c lr=0x101e819d8) instead of the process ending rev=ajan11
+[av-detail] ml613 #13 p0=READ p1=0x500000000 hostpc=0x32f776a8c hinsn=0xb8bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x32effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=13 rip=0x0 pc=0x32f776a8c addr=0x500000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x500000000+0x110000 rev=ml555
+[av-detail] ml613 #14 p0=READ p1=0x500000000 hostpc=0x32f776a8c hinsn=0xb8bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x32effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=14 rip=0x0 pc=0x32f776a8c addr=0x500000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x500000000+0x110000 rev=ml555
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x500000000 pc=0x32f776a8c rw=0 rev=ml420
+[wow-null32] rev=ajan7-arkham #1 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x32f776a8c; EAX=0x2b1d988 ECX=0x0 EDX=0x1dec2e0 EBX=0x0 ESI=0x0 EDI=0x1f97840 EBP=0x2b1da04 ESP=0x2b1d9a8 (79 modules in the PEB32 list)
+[wow-null32]   registers that point into a module: EDX=0x1dec2e0(MirrorsEdge.exe+0x19ec2e0) EDI=0x1f97840(MirrorsEdge.exe+0x1b97840)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:7a084315(D3D11.DLL+0x334315) +04:1dec2e0(MirrorsEdge.exe+0x19ec2e0) +08:0 +0c:18c0150(MirrorsEdge.exe+0x14c0150) +10:30783020 +14:75747320 +18:a62 +1c:0 +20:0 +24:0 +28:0 +2c:0 +30:0 +34:0 +38:0 +3c:0
+[wow-null32]   TEB32=0x7ffc2000 PEB32=0x7ffd1000 TlsBitmapBits=0x000000000fffffff TlsExpansionSlots=0x0; 6 cell(s) hold a value: [19]=0x30cc920 [20]=0x30ce978 [22]=0x30cf128 [23]=0x7bedcabc(kernel32.dll+0xcabc) [24]=0x7bedcabc(kernel32.dll+0xcabc) [25]=0x7bedcabc(kernel32.dll+0xcabc)
+[wow-null32]   22 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 21 26 27
+[x86-fault] #1 a 32-bit guest faulted reading guest 0x00000000 at EIP 0x004058b3 (MirrorsEdge.exe+0x58b3) [exact: the block table of FEX for host pc 0x32f776a8c; State.rip=0x018c0150 is only the last block entry], window 0x500000000, 79 modules in the PEB32 list; EAX=0x2b1d988 ECX=0x0 EDX=0x1dec2e0 EBX=0x0 ESI=0x0 EDI=0x1f97840 EBP=0x2b1da04 ESP=0x2b1d9a8
+[av-detail] ml613 #15 p0=READ p1=0x500000000 hostpc=0x32f77fa38 hinsn=0xb8bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x32effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=15 rip=0x0 pc=0x32f77fa38 addr=0x500000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x500000000+0x110000 rev=ml555
+[av-detail] ml613 #16 p0=READ p1=0x500000000 hostpc=0x32f77fa38 hinsn=0xb8bfc304 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x32effc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=16 rip=0x0 pc=0x32f77fa38 addr=0x500000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x500000000+0x110000 rev=ml555
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x500000000 pc=0x32f77fa38 rw=0 rev=ml420
+[wow-null32] rev=ajan7-arkham #2 the 32-bit guest used the NULL page: guest address 0x0, host pc 0x32f77fa38; EAX=0x4b80000 ECX=0x0 EDX=0x1101950 EBX=0x1dec340 ESI=0x1 EDI=0x2b1feb0 EBP=0x2b1fec0 ESP=0x2b1fc30 (79 modules in the PEB32 list)
+[wow-null32]   registers that point into a module: EDX=0x1101950(MirrorsEdge.exe+0xd01950) EBX=0x1dec340(MirrorsEdge.exe+0x19ec340)
+[wow-null32]   guest stack from ESP (offset:dword, module+RVA when code or data of a module): +00:4010a5(MirrorsEdge.exe+0x10a5) +04:401767(MirrorsEdge.exe+0x1767) +08:7a0867d1(D3D11.DLL+0x3367d1) +0c:2079ee0(MirrorsEdge.exe+0x1c79ee0) +10:3b8130d +14:0 +18:1000 +1c:4 +20:10000 +24:3f50000 +28:3bb3050 +2c:2b1fc88 +30:40a100(MirrorsEdge.exe+0xa100) +34:0 +38:10000 +3c:1000
+[wow-null32]   TEB32=0x7ffc2000 PEB32=0x7ffd1000 TlsBitmapBits=0x000000000fffffff TlsExpansionSlots=0x0; 6 cell(s) hold a value: [19]=0x30cc920 [20]=0x30ce978 [22]=0x30cf128 [23]=0x7bedcabc(kernel32.dll+0xcabc) [24]=0x7bedcabc(kernel32.dll+0xcabc) [25]=0x7bedcabc(kernel32.dll+0xcabc)
+[wow-null32]   22 allocated index(es) whose cell is NULL in this thread: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 21 26 27
+[x86-fault] #2 a 32-bit guest faulted reading guest 0x00000000 at EIP 0x00abc796 (MirrorsEdge.exe+0x6bc796) [exact: the block table of FEX for host pc 0x32f77fa38; State.rip=0x01101950 is only the last block entry], window 0x500000000, 79 modules in the PEB32 list; EAX=0x4b80000 ECX=0x0 EDX=0x1101950 EBX=0x1dec340 ESI=0x1 EDI=0x2b1feb0 EBP=0x2b1fec0 ESP=0x2b1fc30
+[x86-fault]     #1211 alloc 0x0c790000+0x10000 type=0x1000 prot=0x4 tid=0024 86 ms ago
+[x86-fault]     #1212 alloc 0x0c870000+0x20000 type=0x2000 prot=0x4 tid=0024 78 ms ago
+[x86-fault]     #1213 alloc 0x0c870000+0x10000 type=0x1000 prot=0x4 tid=0024 78 ms ago
+[x86-fault]     #1214 alloc 0x0c890000+0x6000 type=0x3000 prot=0x4 tid=0024 78 ms ago
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x32f77fa38 pc=32f77fa38 nparams=2 p0=0 p1=500000000
+wine: Unhandled page fault on read access to 00000000 at address 00ABC796 (thread 0024), starting debugger...
+[xp-names] m496785 "wine-x18-exc"
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=869
+[srv-kill] kill_thread tid=0028 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=977 MB compressed=0 MB external=86 MB reusable=0 MB (cycle=4)
+[00:12:15.841] [INFO] [session] length=8s play=0s frames=0 stalls=0/0s peak=979MB limit=4095MB thermal=nominal lpm=0 api=D3D10/D3D9/DirectDraw/32 res=1424x656 cap=60 game=MirrorsEdge
+[00:12:15.857] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[00:12:17.594] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=982 MB (peak 982) internal=980 MB compressed=0 MB external=88 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=983 MB (peak 983) internal=981 MB compressed=0 MB external=89 MB reusable=0 MB (cycle=6)
+[footprint] rev=ml358 phys=983 MB (peak 983) internal=981 MB compressed=0 MB external=89 MB reusable=0 MB (cycle=7)
+[xp] 00:12:23.155 +13.65 dt=320 cpu=51 (thr 51) P=0 E=51 run=52 pgw=-1.0 GHz P=0.00 E=1.01 Minst=88 IPC=1.71 mJ=4 pin=0 rdKB=0 fpMB=987
+[xp] 00:12:23.428 +13.92 dt=273 cpu=76 (thr 76) P=26 E=50 run=91 pgw=-1.0 GHz P=1.93 E=1.01 Minst=200 IPC=1.98 mJ=21 pin=107 rdKB=1796 fpMB=987
+[footprint] rev=ml358 phys=988 MB (peak 988) internal=986 MB compressed=0 MB external=98 MB reusable=0 MB (cycle=8)
+[xp] 00:12:23.755 +14.25 dt=327 cpu=42 (thr 42) P=33 E=9 run=45 pgw=-1.0 GHz P=2.09 E=1.48 Minst=163 IPC=1.97 mJ=23 pin=129 rdKB=3944 fpMB=988
+[xp] 00:12:24.039 +14.54 dt=284 cpu=68 (thr 68) P=19 E=49 run=77 pgw=-1.0 GHz P=1.90 E=0.82 Minst=115 IPC=1.53 mJ=13 pin=2 rdKB=96 fpMB=988
+[00:12:24.040] [xp] 00:12:24.039 +14.54 dt=284 cpu=68 (thr 68) P=19 E=49 run=77 pgw=-1.0 GHz P=1.90 E=0.82 Minst=115 IPC=1.53 mJ=13 pin=2 rdKB=96 fpMB=988
+[00:12:24.366] [xp] 00:12:24.366 +14.86 dt=327 cpu=90 (thr 90) P=2 E=88 run=87 pgw=-1.0 GHz P=1.16 E=1.54 Minst=239 IPC=1.73 mJ=10 pin=6 rdKB=48 fpMB=988

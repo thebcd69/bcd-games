@@ -198,7 +198,7 @@ recs = json.loads((root / 'recommended/recommendations.json').read_text())
 sts = next(r for r in recs['rules'] if r['id'] == 'slay-the-spire-2')
 want = [{'line': 'env.MADEIRA_DXGI_SRC = 1', 'minBuild': 624}, {'line': 'env.MADEIRA_DXGI_COMPOSITION = 1', 'minBuild': 624},
         {'line': 'env.MADEIRA_OPTIN_DLLS = dcomp', 'minBuild': 624}]
-check('Slay the Spire 2\'s list (v3, v4 since round 625, v5 since 2026-11-01) gives the three from build 624', sts['version'] == 5 and all(w in sts['config'] for w in want))
+check('Slay the Spire 2\'s list (v3, v4 since round 625, v5 since 2026-11-01) gives the three from build 624 (v6: night round 2026-11-11 adds pool-window-cut)', sts['version'] == 6 and all(w in sts['config'] for w in want))
 rules = (root / 'build/tools/autotune_rules.py').read_text()
 r = rules[rules.index('"id": "godot-d3d12-composition-swapchain"'):]
 r = r[:r.index('\n    },\n')]

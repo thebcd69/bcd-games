@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2026 125hz
 # Madeira Converter Exception: see LICENSE-EXCEPTION.md
+# Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Madeira Dock's app-side contract, compiled from production Swift on the host.
 
 Synthetic data only: no Steam, Wine or credentials. Covers the JIT pool policy
@@ -49,8 +51,17 @@ for name, text in [('MadeiraDock.swift', dock), ('MadeiraDockModel.swift', view)
     # madeira-bcd (round 626, agent A1 S12, 1a47d821): DockInstallers.isEAAppInstaller tells the EA app's installer (EAappInstaller.exe), which
     # a Steam game from EA runs as a one-time install, by its file name; it is EA's client installer, not a game's program, and only its
     # install session gets msiexec in system32 (tests/host/check-dock-ea-installer.py).
+    # madeira-bcd: DockInstallScripts.sharedLauncherInstallers names Ubisoft Connect's installer (UbisoftConnectInstaller.exe), which every
+    # Ubisoft game's install script runs, and the two programs that say the launcher is already in the shared prefix (UbisoftConnect.exe,
+    # upc.exe); they are the launcher's, not a game's, and only a run of that installer is planned as provided (check-dock-installers.py).
+    # madeira-bcd (night round 2026-11-11, agent A2 S5, 5972e55e): DockInstallScripts.isCapcomCodecNotice names Capcom's codec notice
+    # (InstallerMessage.exe), a .NET program every Capcom game's install script runs that installs nothing; it is Capcom's notice, not
+    # a game's program, and it is only planned as provided (tests/host/check-dock-capcom-notice.py).
+    # madeira-bcd (night round 2026-11-11): MadeiraDock.isParadoxLauncher names Paradox's launcher stub (dowser.exe) by its file name: only that start gets
+    # msiexec in system32 and the msi DLLs (tests/host/check-dock-contract.py).
     require(names <= {'dockhost.exe', 'explorer.exe', 'steam.exe', '.exe', 'msiexec.exe', 'steamservice.exe',
-                      'dxsetup.exe', 'dxwebsetup.exe', 'eaappinstaller.exe'},
+                      'dxsetup.exe', 'dxwebsetup.exe', 'eaappinstaller.exe',
+                      'ubisoftconnectinstaller.exe', 'ubisoftconnect.exe', 'upc.exe', 'installermessage.exe', 'dowser.exe'},
             f'{name}: no program-name list ({sorted(names)})')
     for line in text.splitlines():
         if re.search(r'SteamLog\.(event|trace)|LogStore|print\(|NSLog', line):
@@ -121,7 +132,16 @@ enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): M
 enum SteamRuntimeFiles {
     static let relativeRoot = "Program Files (x86)/Steam"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"
+    // Night round 2026-11-11 (A1 S7): the client check validate() asks; the stub reads only the file's existence (the real hash check is
+    // tests/host/check-dock-client-status.py's).
+    enum ClientStatus: Equatable { case missing, supported, unsupported(sha: String) }
+    static let supportedClientSHA256: Set<String> = []
+    static func clientStatus(drive: URL) -> ClientStatus {
+        FileManager.default.fileExists(atPath: drive.appendingPathComponent(relativeRoot + "/steamclient64.dll").path) ? .supported : .missing
+    }
+    static func unsupportedClientWords(sha: String) -> String { "unsupported client build " + sha.prefix(12) }
 }
+enum ExternalDrives { static var steamLibraries: [String] { [] } }   /* no external drive opened (Madeira #464's stub) */
 '''
 checks = r'''
 import Foundation
@@ -220,6 +240,11 @@ func jwt(_ claims: String) -> String {
         require(refused({ try MadeiraDock.validate(alpha, drive: drive, bundled: true) }, "fully installed"), "missing game folder: refused")
         try FileManager.default.createDirectory(at: apps.appendingPathComponent("common/A"), withIntermediateDirectories: true)
         require((try? MadeiraDock.validate(alpha, drive: drive, bundled: true)) != nil, "installed game with client: accepted")
+        // Night round 2026-11-11 (A1 S7): a client build the host does not support is refused before the start, with its fingerprint's words.
+        require(refused({ try MadeiraDock.validate(alpha, drive: drive, bundled: true, clientStatus: { _ in .unsupported(sha: String(repeating: "a", count: 64)) }) },
+                        "unsupported client build aaaaaaaaaaaa"), "an unsupported client build: refused before the start")
+        require((try? MadeiraDock.validate(alpha, drive: drive, bundled: true, clientStatus: { _ in .supported })) != nil, "a supported client build: accepted")
+        require(refused({ try MadeiraDock.validate(alpha, drive: drive, bundled: true, clientStatus: { _ in .missing }) }, "client files"), "a missing client: refused as before")
         require(refused({ try MadeiraDock.validate(updating, drive: drive, bundled: true) }, "fully installed"), "a game whose folder is absent is refused")
 
         // Transfer envelope (synthetic account 1 SteamID).
@@ -267,6 +292,17 @@ func jwt(_ claims: String) -> String {
         require(MadeiraDock.launchArguments(width: 1280, height: 720) == "/desktop=madeira,1280x720 C:\\windows\\system32\\dockhost.exe", "explorer desktop runs the host")
         require(!MadeiraDock.launchArguments(width: 1280, height: 720).contains("\""), "no quotes: MADEIRA_ARGS is split at spaces and passed on as is")
         require(!MadeiraDock.executable.contains(" "), "the host path has no spaces")
+        // Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A): the install record's numbers for the log of an update refusal
+        let acf = "\"AppState\"\n{\n\t\"appid\"\t\t\"730\"\n\t\"StateFlags\"\t\t\"6\"\n\t\"buildid\"\t\t\"100\"\n\t\"TargetBuildID\"\t\t\"200\"\n\t\"LastUpdated\"\t\t\"1700000000\"\n\t\"SizeOnDisk\"\t\t\"123456789\"\n\t\"BytesToDownload\"\t\t\"0\"\n}\n"
+        require(MadeiraDock.appStateLine(manifest: Data(acf.utf8), downloading: true)
+                == "[dock-app-state] StateFlags=6 buildid=100 TargetBuildID=200 LastUpdated=1700000000 SizeOnDisk=123456789 BytesToDownload=0 BytesDownloaded=- downloading=1",
+                "the install record's numbers (a missing one is a dash) and the downloading folder, no path")
+        require(MadeiraDock.appStateLine(manifest: Data("not a record".utf8), downloading: false) == nil, "an unreadable record: no line")
+        // Night round 2026-11-11 (D S2; Prison Architect KQ3E87, Hearts of Iron IV QZB4QB): Paradox's launcher stub as the launch option's program
+        require(MadeiraDock.isParadoxLauncher(executable: "Launcher\\dowser.exe") && MadeiraDock.isParadoxLauncher(executable: "launcher/DOWSER.EXE") && MadeiraDock.isParadoxLauncher(executable: "dowser.exe"),
+                "dowser.exe, whatever the folder separator and case, is Paradox's launcher stub")
+        require(!MadeiraDock.isParadoxLauncher(executable: "PrisonArchitect.exe") && !MadeiraDock.isParadoxLauncher(executable: "tools\\mydowser.exe")
+                && !MadeiraDock.isParadoxLauncher(executable: "dowser.exe.bat") && !MadeiraDock.isParadoxLauncher(executable: ""), "the game's own program, a lookalike name and an empty path are not")
         require(MadeiraDock.launchArguments(width: 1280, height: 720, installers: "C:\\i.cmd") ==
                 "/desktop=madeira,1280x720 C:\\windows\\system32\\cmd.exe /c call C:\\i.cmd & C:\\windows\\system32\\dockhost.exe",
                 "with one-time installs: cmd.exe runs them, then the host, in the same session")
