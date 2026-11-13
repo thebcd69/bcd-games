@@ -58,7 +58,7 @@ check("both lists of the wineserver build name the object (compiled, and swapped
 body = src[src.index("int madeira_luajit_compat_fd( int unix_fd, off_t file_size )"):]
 first = [l.strip() for l in body.split("{", 1)[1].splitlines() if l.strip() and not l.strip().startswith(("/*", "*", "const", "char ", "int fd"))]
 check("the key gate is the function's first statement: nothing is read without it",
-      first[0] == "if (!gl || !*gl) return -1;" and 'getenv( "MADEIRA_GL_BACKEND" )' in body, first[:2])
+      first[0] == "int c_comments = comments && !strcmp( comments, \"1\" );" and first[1] == "if (!c_comments && (!gl || !*gl)) return -1;" and 'getenv( "MADEIRA_GL_BACKEND" )' in body, first[:2])
 check("the file keeps Connor Gow's LGPL header (the credit stays)", src.startswith("/*\n * Madeira: substitute a GC64 LuaJIT") and "Copyright 2026 Connor Gow" in src
       and "GNU Lesser General Public" in src)
 
@@ -98,6 +98,8 @@ int main( int argc, char **argv )
         bundle = t / "bundle"
         (bundle / "compat/love").mkdir(parents=True)
         (bundle / "compat/love/lua51.dll").write_bytes(b"GC64-BUNDLED-DLL")
+        (bundle / "compat/lua-c-comments").mkdir()
+        (bundle / "compat/lua-c-comments/lua51.dll").write_bytes(b"C-COMMENTS-DLL")
         names = ["lua_newstate", "luaL_newstate", "luaJIT_setmode", "lua_pcall", "luaopen_jit"]
         images = {
             "low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)": build_pe(exports=names, blob=b"xx NtAllocateVirtualMemory yy"),
@@ -113,10 +115,12 @@ int main( int argc, char **argv )
             p.write_bytes(data)
             paths[label] = p
 
-        def run(path, key, bundle_dir=bundle):
+        def run(path, key, bundle_dir=bundle, comments=None):
             env = {"PATH": os.environ.get("PATH", "")}
             if key:
                 env["MADEIRA_GL_BACKEND"] = key
+            if comments is not None:
+                env["MADEIRA_LUAJIT_C_COMMENTS"] = comments
             if bundle_dir:
                 env["WINEDLLPATH"] = str(bundle_dir)
             r = subprocess.run([str(exe), str(path)], capture_output=True, text=True, env=env)
@@ -136,6 +140,20 @@ int main( int argc, char **argv )
                 if out != ["-1"] or err:
                     quiet = False
         check("an empty key counts as no key", quiet)
+
+        for backend in (None, "zink"):
+            out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], backend, comments="1")
+            check("C-style comments select the dedicated DLL regardless of OpenGL",
+                  out == ["fd", "bundled:C-COMMENTS"] and "with C-style comments" in err, (out, err))
+        for label in ("GC64 x64 LuaJIT (no allocator string)", "32-bit LuaJIT", "not a PE"):
+            out, err = run(paths[label], None, comments="1")
+            check(f"C-style comments do not replace {label}", out == ["-1"], (out, err))
+        out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], None, comments="0")
+        check("C-style comments require an explicit 1", out == ["-1"] and not err, (out, err))
+        (bundle / "compat/lua-c-comments/lua51.dll").unlink()
+        out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], "zink", comments="1")
+        check("a missing comment DLL leaves the original in place",
+              out == ["-1"] and "/lua-c-comments/lua51.dll is missing" in err, (out, err))
 
         out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], "zink")
         check("with the key a low-memory x64 LuaJIT gets the bundled GC64 DLL's fd", out[:1] == ["fd"] and out[1:] == ["bundled:GC64-BUNDL"]
@@ -157,18 +175,18 @@ check("the build pins LuaJIT's commit, checks it out when another is there, and 
       re.search(r"LUAJIT_COMMIT=[0-9a-f]{40}\n", ljb) and 'git clone -q -b v2.1 https://github.com/LuaJIT/LuaJIT "$SRC"' in ljb
       and 'git -C "$SRC" checkout -q "$LUAJIT_COMMIT"' in ljb)
 check("interpreter only, GC64 (the default), internal unwinding; the DLL is stripped into app/Madeira/compat/love",
-      'XCFLAGS="-DLUAJIT_DISABLE_JIT -DLUAJIT_NO_UNWIND"' in ljb and "DISABLE_GC64" not in ljb and 'x86_64-w64-mingw32-strip -o "$OUT/lua51.dll"' in ljb
+      'XCFLAGS="-DLUAJIT_DISABLE_JIT -DLUAJIT_NO_UNWIND"' in ljb and "DISABLE_GC64" not in ljb and 'x86_64-w64-mingw32-strip -o "$destination/lua51.dll"' in ljb
       and 'OUT="$R/app/Madeira/compat/love"' in ljb)
-check("a DLL that still holds the low-memory allocator is refused", "grep -aq NtAllocateVirtualMemory" in ljb and 'rm -f "$OUT/lua51.dll"' in ljb)
+check("a DLL that still holds the low-memory allocator is refused", "grep -aq NtAllocateVirtualMemory" in ljb and 'rm -f "$destination/lua51.dll"' in ljb)
 i_restore = wf.index("- name: Restore GC64 LuaJIT (LOVE games)")
 check("CI: after llvm-mingw is saved, restored from a cache keyed on the script, built only on a miss, never failing the build, then saved",
       wf.index("- name: Save llvm-mingw") < i_restore < wf.index("- name: Build the GC64 LuaJIT (LOVE games)") < wf.index("- name: Save GC64 LuaJIT (LOVE games)")
-      and "key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh') }}" in wf
+      and "key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/c-style-comments.patch') }}" in wf
       and "continue-on-error: true\n        run: bash build/luajit-x64/build.sh" in wf)
 check("CI runs this check", "python3 tests/host/check-luajit-compat.py" in wf)
 gi = (R / ".gitignore").read_text()
 check("the DLL, its version and the licence copy are not committed",
-      "app/Madeira/compat/love/lua51.dll" in gi and "app/Madeira/licenses/LuaJIT-MIT.txt" in gi)
+      "app/Madeira/compat/love/lua51.dll" in gi and "app/Madeira/compat/lua-c-comments/lua51.dll" in gi and "app/Madeira/licenses/LuaJIT-MIT.txt" in gi)
 proj = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
 check("the Xcode project bundles the compat folder as a resource", "A1000704 /* compat in Resources */" in proj and "A2000704 /* compat */" in proj)
 

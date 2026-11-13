@@ -3598,6 +3598,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_TINY_WINDOW_FIX"); /* madeira-bcd: likewise (American Truck Simulator's tiny window) */
     unsetenv("MADEIRA_OPTIN_DLLS");   /* madeira-bcd: likewise */
     unsetenv("MADEIRA_GL_BACKEND"); unsetenv("MADEIRA_GL_DIR");   /* madeira-bcd (OpenGL): likewise (the game's gl-backend key) */
+    unsetenv("MADEIRA_LUAJIT_C_COMMENTS");
     unsetenv("MADEIRA_VULKAN_LIBRARY");   /* madeira-bcd (Windows Vulkan): likewise (the game's vulkan key) */
     if (g_gl_love_hint_set) { unsetenv("LOVE_GRAPHICS_USE_OPENGLES"); g_gl_love_hint_set = 0; }
     unsetenv("MADEIRA_NLS_EXTRA");    /* madeira-bcd: likewise (env_ios.c reads it at every code page request) */
