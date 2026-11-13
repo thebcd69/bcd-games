@@ -18613,22 +18613,40 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "No SteamUtils011"
+    ],
+    "sinceLaunch": true
+   }
+  ],
+  "any": [
+   {
+    "has": [
      "[guest-log]",
      "SteamAPI failed to initialize",
      "No SteamUtils011"
-    ]
+    ],
+    "sinceLaunch": true
+   },
+   {
+    "has": [
+     "[win-name] #",
+     "Steamworks Error",
+     "No SteamUtils011"
+    ],
+    "sinceLaunch": true
    }
   ],
   "evaluateWhenRan": true,
   "evidence": [
    "hades-ii-steamworks-interface-2026-11-04 (Send Log 3XXGJE, build 630)",
-   "app/Madeira/SteamRuntime.swift"
+   "grim-dawn-steamworks-dialog-2026-11-13 (issue #48, build 634.1)"
   ],
   "id": "steamworks-interface-missing",
+  "lead": "Steam interface unavailable",
   "lines": [],
   "noFix": true,
   "priority": 3,
-  "reason": "The game wants a newer Steam interface than the Steam client that BCD's Dock runs, so it plays without Steam features (achievements, cloud saves). No setting changes this; it needs a newer Steam client in BCD.",
+  "reason": "The game's Steam library asks for SteamUtils011, which this Steam client does not provide. If the game offers a SteamOS/Linux compatibility launch option, select it under Options > Steam > Steam launch option and try again. Otherwise the game may need a newer Steam client.",
   "session": "dock"
  },
  {
