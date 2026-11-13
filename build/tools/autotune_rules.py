@@ -9634,12 +9634,17 @@ RULES = [
         "evaluateWhenRan": True,
         "priority": 3,
         "session": "dock",
-        # Night round 2026-11-11 (agent T2 S-EN1; Hades II 3XXGJE, build 630): "SteamAPI failed to initialize: No SteamUtils011": the game wants a newer
-        # Steam interface than the Steam client BCD's Dock runs (the milder cousin of steamworks-version-mismatch); non-fatal, the game plays.
-        "all": [s("[guest-log]", "SteamAPI failed to initialize", "No SteamUtils011")],
-        "reason": "The game wants a newer Steam interface than the Steam client that BCD's Dock runs, so it plays without Steam features "
-                  "(achievements, cloud saves). No setting changes this; it needs a newer Steam client in BCD.",
-        "evidence": ["hades-ii-steamworks-interface-2026-11-04 (Send Log 3XXGJE, build 630)", "app/Madeira/SteamRuntime.swift"],
+        # Some games log this Steam API error and continue (Hades II). Others only show a dialog (Grim Dawn, #48).
+        # Read both signatures from the current launch so an earlier game's error cannot trigger this advice.
+        "all": [s("No SteamUtils011", since_launch=True)],
+        "any": [s("[guest-log]", "SteamAPI failed to initialize", "No SteamUtils011", since_launch=True),
+                s("[win-name] #", "Steamworks Error", "No SteamUtils011", since_launch=True)],
+        "lead": "Steam interface unavailable",
+        "reason": "The game's Steam library asks for SteamUtils011, which this Steam client does not provide. "
+                  "If the game offers a SteamOS/Linux compatibility launch option, select it under Options > Steam > "
+                  "Steam launch option and try again. Otherwise the game may need a newer Steam client.",
+        "evidence": ["hades-ii-steamworks-interface-2026-11-04 (Send Log 3XXGJE, build 630)",
+                     "grim-dawn-steamworks-dialog-2026-11-13 (issue #48, build 634.1)"],
     },
     {
         "id": "fex-exit-runaway",
