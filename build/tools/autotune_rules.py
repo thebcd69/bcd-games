@@ -5861,6 +5861,18 @@ RULES = [
         "evidence": ["hotline-miami-gog-hotlinegl-opengl-2026-10-29 (Send Logs ACQX6S = 87GYEH, build 623)", "docs/OPENGL.md"],
     },
     {
+        "id": "bgfx-opengl-no-context",
+        "lines": ["gl-backend = zink"],
+        "noRetry": True,
+        "priority": 2,
+        # BGFX also supports Direct3D. Require BCD's OpenGL stub in the same launch as the renderer error.
+        "all": [s("[unixlib] opengl32 (GL-absent stub table)", since_launch=True),
+                s("[guest-log]", "BGFX failed to initialize", since_launch=True)],
+        "reason": "The game could not initialize its BGFX renderer with OpenGL off. "
+                  "Auto-tune will try Desktop OpenGL on the next start.",
+        "evidence": ["heroes-of-hammerwatch-ii-bgfx-opengl-2026-11-13 (build 634.1, iPhone Duo)"],
+    },
+    {
         "id": "opengl-only-no-context",
         # Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend = zink: desktop OpenGL through Mesa's Zink on MoltenVK, or gles;
         # docs/OPENGL.md, Game details > Direct3D > OpenGL), off until it is chosen, so what this rule says now is the line that turns it on.

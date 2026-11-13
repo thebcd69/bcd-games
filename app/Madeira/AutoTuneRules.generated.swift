@@ -10950,6 +10950,33 @@ enum AutoTuneBuiltInRules {
    {
     "has": [
      "[unixlib] opengl32 (GL-absent stub table)"
+    ],
+    "sinceLaunch": true
+   },
+   {
+    "has": [
+     "[guest-log]",
+     "BGFX failed to initialize"
+    ],
+    "sinceLaunch": true
+   }
+  ],
+  "evidence": [
+   "heroes-of-hammerwatch-ii-bgfx-opengl-2026-11-13 (build 634.1, iPhone Duo)"
+  ],
+  "id": "bgfx-opengl-no-context",
+  "lines": [
+   "gl-backend = zink"
+  ],
+  "noRetry": true,
+  "priority": 2,
+  "reason": "The game could not initialize its BGFX renderer with OpenGL off. Auto-tune will try Desktop OpenGL on the next start."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[unixlib] opengl32 (GL-absent stub table)"
     ]
    }
   ],
