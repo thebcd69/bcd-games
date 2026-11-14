@@ -67,18 +67,23 @@ build_dll() {
     fi
 }
 
-build_dll "$SRC" "$OUT"
+# Build each variant from a clean copy of the pin.
+staging="$(mktemp -d "${TMPDIR:-/tmp}/bcd-luajit.XXXXXXXX")"
+trap 'rm -rf "$staging"' EXIT
+set -o pipefail
+
+build_variant() {
+    local name="$1" patch_name="$2" destination="$3"
+    local source="$staging/$name"
+    mkdir -p "$source"
+    git -C "$SRC" archive "$LUAJIT_COMMIT" | tar -xf - -C "$source"
+    # LuaJIT's rolling release build derives the timestamp from git.
+    git -C "$SRC" show -s --format=%ct "$LUAJIT_COMMIT" > "$source/.relver"
+    (cd "$source" && patch -s -p1 < "$R/build/luajit-x64/$patch_name")
+    build_dll "$source" "$destination"
+}
+
+build_variant stock c-style-comments-diagnostic.patch "$OUT"
 git -C "$SRC" rev-parse --short HEAD > "$OUT/lua51.dll.version"
 cp "$SRC/COPYRIGHT" "$R/app/Madeira/licenses/LuaJIT-MIT.txt"
-ls -l "$OUT/lua51.dll"
-
-# Build the extended dialect from a clean copy of the pin, leaving the
-# standard lexer and the caller's source tree alone.
-comments_src="$(mktemp -d "${TMPDIR:-/tmp}/bcd-luajit-comments.XXXXXXXX")"
-trap 'rm -rf "$comments_src"' EXIT
-set -o pipefail
-git -C "$SRC" archive "$LUAJIT_COMMIT" | tar -xf - -C "$comments_src"
-# LuaJIT's rolling release build derives the timestamp from git.
-git -C "$SRC" show -s --format=%ct "$LUAJIT_COMMIT" > "$comments_src/.relver"
-(cd "$comments_src" && patch -s -p1 < "$R/build/luajit-x64/c-style-comments.patch")
-build_dll "$comments_src" "$R/app/Madeira/compat/lua-c-comments"
+build_variant comments c-style-comments.patch "$R/app/Madeira/compat/lua-c-comments"

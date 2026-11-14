@@ -1441,6 +1441,9 @@ OVERLAY = {
                         "instead of waiting about 75 s, twice, on a network that drops that host (Garry's Mod, Red Dead Redemption 2 in a Dock start "
                         "took 2.5-4 minutes to begin). BCD refuses the dump anyway. Every other name is looked up as always. Set it in the game's "
                         "own file; read at the first lookup."},
+    "env.MADEIRA_LUAJIT_C_COMMENTS": {"category": "Wine libraries", "title": "C-style Lua comments", "kind": "bool", "default": "0",
+                "note": "1 selects BCD's GC64 LuaJIT with C-style comments for compatible x64 DLLs that need memory below 2 GB.",
+                "sources": ["build/wineserver/luajit_compat.c"]},
     "env.MADEIRA_GL_BACKEND": {"category": "Graphics", "title": "OpenGL backend of this session (set by gl-backend)", "kind": "text", "default": "",
                 "note": "Set by the app from the game's gl-backend line (zink or gles); every OpenGL path of the engine waits for it. Do not set it "
                         "by hand: an env line works the same as gl-backend, but gl-backend is the setting.",

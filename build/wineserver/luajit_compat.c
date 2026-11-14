@@ -163,6 +163,11 @@ int madeira_luajit_compat_fd( int unix_fd, off_t file_size )
     if (c_comments)
         fprintf( stderr, "[luajit-compat] mapping bundled GC64 LuaJIT with C-style comments\n" );
     else
+    {
         fprintf( stderr, "[luajit-compat] x64 LuaJIT needs memory below 2 GB; mapping the bundled GC64 build instead\n" );
+        if (snprintf( path, sizeof(path), "%s/compat/lua-c-comments/lua51.dll", bundle ) < (int)sizeof(path) &&
+            access( path, R_OK ) == 0)
+            fprintf( stderr, "[luajit-compat] C-style comment variant available\n" );
+    }
     return fd;
 }

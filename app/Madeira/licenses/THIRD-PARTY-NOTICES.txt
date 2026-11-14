@@ -112,8 +112,8 @@ Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend se
 - MoltenVK 1.4.2 (Khronos Group; The Brenwill Workshop Ltd), Apache-2.0 (MoltenVK-Apache-2.0.txt): gl/libMoltenVK.dylib, unmodified.
   It contains SPIRV-Cross and SPIRV-Tools (Apache-2.0: SPIRV-Cross-Apache-2.0.txt, SPIRV-Tools-Apache-2.0.txt) and cereal
   (BSD-3-Clause: cereal-BSD-3-Clause.txt).
-- LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built from the unmodified source
-  (build/luajit-x64/build.sh), loaded in place of a LOVE game's lua51.dll when that is an x64 LuaJIT needing memory below 2 GB;
+- LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built with a C-style comment diagnostic
+  (MIT, build/luajit-x64/c-style-comments-diagnostic.patch), loaded in place of a LOVE game's lua51.dll when that is an x64 LuaJIT needing memory below 2 GB;
   the game's file is not modified. The optional compat/lua-c-comments/lua51.dll uses BCD's MIT-licensed
   build/luajit-x64/c-style-comments.patch.
 

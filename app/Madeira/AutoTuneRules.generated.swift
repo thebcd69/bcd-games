@@ -19693,6 +19693,44 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[luajit-compat] C-style comment variant available"
+    ],
+    "sinceLaunch": true
+   },
+   {
+    "has": [
+     "OutputDebugStringA: \"[bcd-luajit] C-style comment token\""
+    ],
+    "sinceLaunch": true
+   }
+  ],
+  "evidence": [
+   "Synthetic LuaJIT diagnostic replay; Grim Dawn campaign verified with the C-style comment variant (#51)"
+  ],
+  "id": "luajit-c-style-comments",
+  "lines": [
+   "env.MADEIRA_LUAJIT_C_COMMENTS = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[luajit-compat] mapping bundled GC64 LuaJIT with C-style comments"
+    ],
+    "sinceLaunch": true
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "exited-early"
+  ],
+  "priority": 2,
+  "reason": "The bundled Lua parser encountered a C-style comment. Try BCD's LuaJIT build that accepts those comments."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[nt-fail] #",
      "NtAllocateVirtualMemory status=c0000017",
      "size=0x20000 type=0x3000 prot=0x4 hint=0x0 zb=0x1"

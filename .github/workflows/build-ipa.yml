@@ -2249,7 +2249,7 @@ jobs:
             app/Madeira/compat/love/lua51.dll.version
             app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/c-style-comments.patch') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       - name: Build the GC64 LuaJIT (LOVE games)
         if: steps.lovecache.outputs.cache-hit != 'true' && env.MINGW_OK == '1'
@@ -2265,7 +2265,7 @@ jobs:
             app/Madeira/compat/love/lua51.dll.version
             app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/c-style-comments.patch') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       # env.MADEIRA_DXGI_BUDGET_EVENTS = 1 (opt-in): the budget-change events
       # tools/patch-dxgi-budget-events.py adds to dxgi-src.dll, checked (and

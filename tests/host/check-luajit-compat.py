@@ -150,7 +150,14 @@ int main( int argc, char **argv )
             check(f"C-style comments do not replace {label}", out == ["-1"], (out, err))
         out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], None, comments="0")
         check("C-style comments require an explicit 1", out == ["-1"] and not err, (out, err))
+        stock_candidate = paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"]
+        out, err = run(stock_candidate, "zink")
+        check("standard LuaJIT reports the comment variant when shipped",
+              out == ["fd", "bundled:GC64-BUNDL"] and "C-style comment variant available" in err, (out, err))
         (bundle / "compat/lua-c-comments/lua51.dll").unlink()
+        out, err = run(stock_candidate, "zink")
+        check("standard LuaJIT does not advertise a missing comment variant",
+              out == ["fd", "bundled:GC64-BUNDL"] and "C-style comment variant available" not in err, (out, err))
         out, err = run(paths["low-memory x64 LuaJIT (NtAllocateVirtualMemory inside)"], "zink", comments="1")
         check("a missing comment DLL leaves the original in place",
               out == ["-1"] and "/lua-c-comments/lua51.dll is missing" in err, (out, err))
@@ -181,7 +188,7 @@ check("a DLL that still holds the low-memory allocator is refused", "grep -aq Nt
 i_restore = wf.index("- name: Restore GC64 LuaJIT (LOVE games)")
 check("CI: after llvm-mingw is saved, restored from a cache keyed on the script, built only on a miss, never failing the build, then saved",
       wf.index("- name: Save llvm-mingw") < i_restore < wf.index("- name: Build the GC64 LuaJIT (LOVE games)") < wf.index("- name: Save GC64 LuaJIT (LOVE games)")
-      and "key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/c-style-comments.patch') }}" in wf
+      and "key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}" in wf
       and "continue-on-error: true\n        run: bash build/luajit-x64/build.sh" in wf)
 check("CI runs this check", "python3 tests/host/check-luajit-compat.py" in wf)
 gi = (R / ".gitignore").read_text()
