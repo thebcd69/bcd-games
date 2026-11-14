@@ -44,6 +44,7 @@ def function(signature):
 
 
 helper = function('private static func poolRunSize(')
+release = function('@discardableResult private static func releasePoolMapping(')
 take = function('private static func takeSecondRegion(')
 take = take[:take.index('        // madeira-bcd pool-mid:')]
 take += '        return (base: b, size: size)\n    }\n'
@@ -58,7 +59,7 @@ check('the last miss and a failed release keep the old message and end with nil 
 check('the old landing test is unchanged',
       'b < aEnd || b + size > ceiling || (aEnd < exeWindow.base + exeWindow.size && b > exeWindow.base)' in take)
 check('the plugs are rebuilt and released inside every attempt', take.index('for attempt in 0..<attempts {') < take.index('var plugs:')
-      < take.index('requestRegion(Int(size), region: "B")') < take.index('for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }'))
+      < take.index('requestRegion(Int(size), region: "B")') < take.index('for (a, sz) in plugs { releasePoolMapping(a, sz) }'))
 check('the first region\'s placement loop (BAD POOL re-rolls) was not touched', src.count('for attempt in 0..<3 {') == 1
       and 'BAD POOL placement 0x%lx (%@) — re-rolling (attempt %d)' in src)
 check('build-ipa.yml runs this check', 'python3 tests/host/check-pool-split-retry.py' in ci)
@@ -70,6 +71,7 @@ prefix = r'''
 import Foundation
 typealias vm_address_t = UInt
 typealias vm_size_t = UInt
+typealias kern_return_t = Int32
 let mach_task_self_: Int32 = 0
 let KERN_SUCCESS: Int32 = 0
 let VM_PROT_NONE: Int32 = 0
@@ -111,6 +113,8 @@ func vm_allocate(_ task: Int32, _ address: UnsafeMutablePointer<UInt>, _ size: U
     return 0
 }
 struct StikJITHelper {
+    static var taggedPool = false, taggedRestartRequired = false
+    static var poolFailure: String? = nil
     static func freeRuns(_ lo: UInt, _ hi: UInt, minSize: UInt) -> [(base: UInt, size: UInt)] {
         if lo != 0x100000000 { return [(0x16fab8000, 261 << 20)] }       // the census above the first region
         return [(0x11d7a4000, 540 << 20)]                                 // the lower run that first-fit would take
@@ -191,7 +195,7 @@ if swiftc is None:
 else:
     with tempfile.TemporaryDirectory(prefix='bcd-pool-split-retry-') as td:
         td = Path(td)
-        (td / 't.swift').write_text(prefix + helper + take + suffix)
+        (td / 't.swift').write_text(prefix + release + helper + take + suffix)
         build = subprocess.run(['xcrun', 'swiftc', '-module-cache-path', str(td / 'modules'), '-warnings-as-errors', str(td / 't.swift'),
                                 '-o', str(td / 't')], capture_output=True, text=True)
         check('the production poolRunSize and takeSecondRegion compile against the fake address space', build.returncode == 0,

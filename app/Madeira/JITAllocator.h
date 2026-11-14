@@ -110,6 +110,11 @@ int jit_txm_in_device_tree(void);
 // Returns the prepared address (may differ from input on allocation).
 void *jit26_prepare_region(void *addr, size_t len);
 
+// Fresh normally charged tagged RX; cleanup failure requires restarting the app.
+void *jit_tagged_region(size_t size, int *cleanup_error);
+// Prepare only final unpublished RX/RW aliases. Neither mapping is released here.
+bool jit_tagged_prepare_owned_region(void *rx, void *rw, size_t size);
+
 // iOS 26 BRK-based protocol: Tell the debugger to detach.
 void jit26_detach(void);
 

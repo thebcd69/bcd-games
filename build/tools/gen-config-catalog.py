@@ -2146,6 +2146,13 @@ OVERLAY = {
                         "remainders in free runs without increasing the requested pool budget. With pool-low on, "
                         "also fit region C to pages while preserving pool-low-margin. Costs the additional pages in memory. Off by default; read at "
                         "launch, the game's own file wins. Restart Madeira and enable JIT again after changing it."},
+    "pool-tagged": {"category": "Memory & JIT pool", "title": "Experimental normally charged tagged JIT backing",
+                "kind": "bool", "default": "0",
+                "note": "Experimental: exactly 1 prepares normally charged tagged memory with an attached debugger. "
+                        "Keeps pool sizes and placement unchanged and does not request a memory-accounting exemption. "
+                        "Only the final accepted mappings are prepared. Preparation or cleanup failure blocks further pool attempts until BCD restarts. Requires enabling JIT again; "
+                        "the game file wins. Off by default; executable compatibility and memory savings require device testing.",
+                "sources": ["app/Madeira/StikJITHelper.swift", "app/Madeira/JITAllocator.c"]},
     "pool-window-cut": {"category": "Memory & JIT pool", "title": "JIT pool: keep clear of an executable window that was not held",
                 "kind": "bool", "default": "0",
                 "note": "Off by default (build 624). 1: when the app could not hold the 0x140000000 executable window at launch, the "
