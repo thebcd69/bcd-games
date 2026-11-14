@@ -2079,6 +2079,9 @@ jobs:
       - name: Patch wine so non-alertable sleeps can run I/O completions
         run: python3 tools/patch-wine-sleep-kernel-apc.py wine/dlls/ntdll/unix/sync.c
 
+      - name: Enable opt-in overlapped I/O completion checkpoints
+        run: python3 tools/patch-wine-overlapped-system-apc.py wine
+
       # madeira-bcd: env.MADEIRA_WOA_RECHECK = 1 (default off): an infinite RtlWaitOnAddress in the 32-bit ntdll (the i386 farm's)
       # waits in one-second slices and returns when a waker removed its entry but the alert never came; the unix side keeps the
       # [waiters] registry's park across the slices, and without the switch waits a slice out as the infinite wait it stands for.
@@ -4525,6 +4528,9 @@ jobs:
       - name: Check sleep-kernel-apc
         run: python3 tests/host/check-sleep-kernel-apc.py
 
+      - name: Check nonblocking I/O completion delivery
+        run: python3 tests/host/check-overlapped-system-apc.py
+
       # madeira-bcd: env.MADEIRA_WOA_RECHECK (tools/patch-wine-woa-recheck.py).
       - name: Check woa-recheck
         run: python3 tests/host/check-woa-recheck.py
@@ -4887,6 +4893,9 @@ jobs:
       - name: Build extra Wine DLLs for arm64ec
         continue-on-error: true
         run: bash tools/build-wine-extra-dlls.sh "$GITHUB_WORKSPACE/wine/build-native"
+
+      - name: Build kernelbase completion polling for ARM64EC
+        run: bash build/wine-pe/build-modules.sh kernelbase
 
       # madeira-bcd (build 663): the 64-bit kernel32 whose GetTickCount and GetTickCount64 read KUSER_SHARED_DATA where BCD keeps it,
       # not at 0x7ffe0000, where every read was a Mach exception (RDR2: about 20,000 a second). Built by the step above next to the shipped

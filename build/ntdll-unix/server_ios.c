@@ -598,6 +598,12 @@ static inline void ios_section_set_state( uintptr_t state )
     if (ios_section_key_ready) pthread_setspecific( ios_section_key, (void *)state );
 }
 
+/* Completion checkpoints must not re-enter Wine while a section is held or exit is underway. */
+int ios_alert_exit_safe(void)
+{
+    return ios_section_key_ready && !(ios_section_state() & (IOS_SECTION_DEPTH | IOS_SECTION_ABORT | IOS_SECTION_EXITING));
+}
+
 /* A dead pipe on the current thread. TRUE: fail the request, the thread exits when
  * it leaves its sections. FALSE: exit now (not in a section, or switched off). */
 static BOOL ios_defer_section_abort(void)
