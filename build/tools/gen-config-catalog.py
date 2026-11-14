@@ -891,6 +891,10 @@ OVERLAY = {
                         "names for the session (a Steam game's install folder, else the library entry's program's). Set it in the game's "
                         "own file; read at each new buffer; [pool-fg] names each program's class.",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    "env.MADEIRA_FEX_ZERO_FILE": {"category": "Memory & JIT pool", "title": "Share fresh zero-backed translator allocations",
+                "kind": "bool", "default": "0",
+                "note": "Exactly 1 uses immutable private zero-file backing for eligible fresh, non-executable native translator allocations. Writes remain private; page protections and allocation metadata stay unchanged. Read at startup; restart BCD after changing it. Off by default.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_POOL_CARVE_MERGE": {"category": "Memory & JIT pool", "kind": "bool", "default": "0",
                 "title": "Free code buffers merge and are cut to the size asked",
                 "note": "Default off (build 652). 1: a code buffer FEX releases merges with the free buffers next to it, and a free buffer "

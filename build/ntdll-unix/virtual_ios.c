@@ -8842,6 +8842,7 @@ struct file_view
 };
 #define IOS_VIEW_QUARANTINED 0x4   /* a dead thread's stack held by the stack quarantine */
 #define IOS_VIEW_WOW_CPU     0x8   /* madeira-bcd [wow-cpu-pool]: the WoW64 CPU module (xtajit.dll) */
+#define IOS_VIEW_ZERO_FILE 0x40 /* eligible private zero backing; partial tail may remain anonymous */
 
 /* per-page protection flags */
 #define VPROT_READ       0x01
@@ -27323,6 +27324,135 @@ static void zero_partial_decommit_range( void *addr, SIZE_T len )
     memset( addr, 0, len );
 }
 
+/* fex-zero-file:begin
+ * Fresh private zero pages can be shared until written. The backing is immutable;
+ * this changes host backing only, never Wine's protection/commit/view metadata. */
+#ifdef WINE_IOS
+#define IOS_ZERO_FILE_SIZE (64u << 20)
+static int ios_zero_file_fd = -1;
+
+/* virtual_init, before any VM lock or guest allocation. One host-lifetime FD. */
+static void ios_zero_file_init(void)
+{
+    const char *env = getenv( "MADEIRA_FEX_ZERO_FILE" ), *temp;
+    char path[1024];
+    struct stat a, b;
+    int fd = -1, ro = -1, n, saved_errno = errno;
+    int linked = 0;
+    if (ios_zero_file_fd >= 0 || !env || strcmp( env, "1" )) return;
+    temp = getenv( "TMPDIR" );
+    if (!temp || temp[0] != '/') goto done;
+    n = snprintf( path, sizeof(path), "%s/bcd-zero-private-XXXXXX", temp );
+    if (n < 0 || (size_t)n >= sizeof(path)) goto done;
+    fd = mkstemp( path );
+    if (fd < 0) goto done;
+    linked = 1;
+    if (fcntl( fd, F_SETFD, FD_CLOEXEC ) || fchmod( fd, 0600 ) ||
+        ftruncate( fd, IOS_ZERO_FILE_SIZE ) || fstat( fd, &a ) ||
+        !S_ISREG(a.st_mode) || (a.st_mode & 0777) != 0600 || a.st_size != IOS_ZERO_FILE_SIZE) goto done;
+    ro = open( path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW );
+    if (ro < 0 || fstat( ro, &b ) || b.st_dev != a.st_dev || b.st_ino != a.st_ino ||
+        b.st_size != a.st_size || unlink( path )) goto done;
+    linked = 0;
+    if (close( fd )) { fd = -1; goto done; }
+    fd = -1;
+    ios_zero_file_fd = ro;
+    ro = -1;
+done:
+    if (ro >= 0) close( ro );
+    if (fd >= 0) close( fd );
+    if (linked) unlink( path );
+    dprintf( 2, "[zero-file] %s: immutable private zero backing, max=%u MiB\n",
+             ios_zero_file_fd >= 0 ? "enabled" : "unavailable; anonymous fallback", IOS_ZERO_FILE_SIZE >> 20 );
+    errno = saved_errno;
+}
+
+/* VM lock held. Only whole host pages entirely owned by this private view. */
+static int ios_zero_file_range( struct file_view *view, void *base, size_t size )
+{
+    uintptr_t lo = (uintptr_t)base, vb = (uintptr_t)view->base;
+    const char *page;
+    if (ios_zero_file_fd < 0 || !size || size > IOS_ZERO_FILE_SIZE ||
+        (lo & host_page_mask) || (size & host_page_mask) ||
+        lo < vb || lo - vb > view->size || size > view->size - (lo - vb) ||
+        !ios_fex_arena_base_unix || lo < ios_fex_arena_base_unix ||
+        lo >= ios_fex_arena_end_unix || size > ios_fex_arena_end_unix - lo ||
+        !is_view_valloc( view ) || find_view( base, size ) != view ||
+        ios_wow_window_covering( base, (const char *)base + size ) || force_exec_prot ||
+        (view->protect & (SEC_FILE | SEC_IMAGE | SEC_RESERVE | SEC_COMMIT | VPROT_SYSTEM |
+                          VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER | VPROT_ARM64EC |
+                          VPROT_EXEC | VPROT_WRITECOPY | VPROT_GUARD | VPROT_WRITEWATCH)) ||
+        ios_jit_pool_intersects( base, size ) || ios_swap_overlaps( base, size ) ||
+        ios_jit_anon_alias_overlaps( base, size, NULL, NULL )) return 0;
+    for (page = base; page < (const char *)base + size; page += page_size)
+        if (get_page_vprot( page ) & (VPROT_EXEC | VPROT_WRITECOPY | VPROT_GUARD | VPROT_WRITEWATCH)) return 0;
+    return 1;
+}
+
+/* A failed file replacement must still leave a valid anonymous reservation.
+ * Return failure if that fallback fails; callers must not publish success. */
+static NTSTATUS ios_zero_file_replace( void *base, size_t size, int prot, int reset )
+{
+    if (mmap( base, size, prot, MAP_FIXED | MAP_PRIVATE, ios_zero_file_fd, 0 ) == base)
+    {
+        static unsigned long long reserve_bytes, reset_bytes;
+        static unsigned int mappings;
+        if (!reset) reserve_bytes += size;
+        else reset_bytes += size;
+        if (++mappings <= 16 || !(mappings & (mappings - 1)))
+            dprintf( 2, "[zero-file] mapped #%u bytes=%zu reserve-total=%llu reset-total=%llu\n",
+                     mappings, size, reserve_bytes, reset_bytes );
+        return STATUS_SUCCESS;
+    }
+    {
+        static unsigned int failures;
+        int error = errno;
+        void *fallback = anon_mmap_fixed( base, size, prot, 0 );
+        if (++failures <= 8 || !(failures % 128))
+            dprintf( 2, "[zero-file] map failed errno=%d base=%p bytes=%zu anonymous-fallback=%s\n",
+                     error, base, size, fallback == base ? "ok" : "failed" );
+        if (fallback == base) return STATUS_SUCCESS;
+    }
+    return STATUS_NO_MEMORY;
+}
+
+static NTSTATUS ios_zero_file_reserve( struct file_view *view, unsigned int type,
+                                      unsigned int protect, ULONG attributes )
+{
+    size_t size = view->size & ~(size_t)host_page_mask;
+    const char *page;
+    unsigned int expected;
+    int prot;
+    NTSTATUS status;
+    if (ios_zero_file_fd < 0) return STATUS_SUCCESS;
+    if ((type & ~MEM_TOP_DOWN) == MEM_RESERVE && protect == PAGE_NOACCESS)
+        expected = 0;
+    else if ((type & ~MEM_TOP_DOWN) == MEM_RESERVE && protect == PAGE_READWRITE)
+        expected = VPROT_READ | VPROT_WRITE;
+    else if ((type & ~MEM_TOP_DOWN) == (MEM_RESERVE | MEM_COMMIT) && protect == PAGE_READWRITE)
+        expected = VPROT_READ | VPROT_WRITE | VPROT_COMMITTED;
+    else return STATUS_SUCCESS;
+    prot = get_unix_prot( expected );
+    if (attributes || view->protect != expected || view->ios_flags ||
+        view->size < (1u << 20) || view->size > IOS_ZERO_FILE_SIZE ||
+        !ios_zero_file_range( view, view->base, size ) ||
+        view->size > ios_fex_arena_end_unix - (uintptr_t)view->base) return STATUS_SUCCESS;
+    for (page = view->base; page < (const char *)view->base + size; page += page_size)
+        if (get_page_vprot( page ) != expected) return STATUS_SUCCESS;
+    status = ios_zero_file_replace( view->base, size, prot, 0 );
+    if (!status)
+    {
+        static unsigned int backed;
+        view->ios_flags |= IOS_VIEW_ZERO_FILE;
+        if (++backed <= 16 || !(backed % 128))
+            dprintf( 2, "[zero-file] eligible reserve #%u base=%p bytes=%zu view-bytes=%zu\n",
+                     backed, view->base, size, view->size );
+    }
+    return status;
+}
+#endif
+/* fex-zero-file:end */
+
 static NTSTATUS decommit_pages( struct file_view *view, char *base, size_t size )
 {
     char *host_end, *host_start = (char *)ROUND_SIZE( 0, base, host_page_mask );
@@ -27418,6 +27548,20 @@ static NTSTATUS decommit_pages( struct file_view *view, char *base, size_t size 
         }
         else if (host_start < host_end)
         {
+#ifdef WINE_IOS
+            /* fex-zero-file-decommit-hook:begin */
+            if ((view->ios_flags & IOS_VIEW_ZERO_FILE) &&
+                ios_zero_file_range( view, host_start, host_end - host_start ))
+            {
+                NTSTATUS status = ios_zero_file_replace( host_start, host_end - host_start,
+                                                        PROT_READ | PROT_WRITE, 1 );
+                if (status) return status;
+                dc_branch = "zero-file-private";
+                dc_verify = NULL; /* do not fault every reconstructed zero page merely to measure it */
+            }
+            else
+            /* fex-zero-file-decommit-hook:end */
+#endif
             if (ios_swap_punch_resv( host_start, host_end - host_start ))   /* ml1257 */
                 dc_branch = "swap-hole";   /* no read-back: no file-page touches under the lock (ml1081) */
             else
@@ -27507,6 +27651,15 @@ static NTSTATUS decommit_pages( struct file_view *view, char *base, size_t size 
                     if (dc_n <= 8 || (dc_n % 4096) == 0)
                         dprintf( 2, "[decommit-zero] #%lu base=%p size=0x%lx branch=swap-hole "
                                  "(zero by hole, not read back)\n", dc_n, base, (unsigned long)size );
+                }
+                else if (!strcmp( dc_branch, "zero-file-private" ))
+                {
+                    /* fex-zero-file-zero-log:begin */
+                    if (dc_n <= 8 || (dc_n % 4096) == 0)
+                        dprintf( 2, "[decommit-zero] #%lu base=%p size=0x%lx branch=zero-file-private "
+                                 "(zero by fresh private backing, not read back)\n",
+                                 dc_n, base, (unsigned long)size );
+                    /* fex-zero-file-zero-log:end */
                 }
                 else
                     dprintf( 2, "[decommit-zero] #%lu base=%p size=0x%lx branch=%s "
@@ -30223,6 +30376,9 @@ void virtual_init(void)
     (void)ios_big_hint_enabled();          /* round 634: likewise */
 
     ios_log_running_image_identity();   /* ml989 */
+#ifdef WINE_IOS
+    ios_zero_file_init();
+#endif
 
 #ifdef __aarch64__
     host_page_size = sysconf( _SC_PAGESIZE );
@@ -34218,6 +34374,16 @@ static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG typ
                     else if (!(attributes & MEM_EXTENDED_PARAMETER_EC_CODE)) ios_swap_reserve( base, size, vprot, view );
                 }
 
+#ifdef WINE_IOS
+                /* fex-zero-file-reserve-hook:begin */
+                if ((status = ios_zero_file_reserve( view, type, protect, attributes )))
+                {
+                    delete_view( view );
+                    goto allocation_done;
+                }
+                /* fex-zero-file-reserve-hook:end */
+#endif
+
                 /* iOS-Madeira ml308 (task #54): DETECT VA HANDED OUT TWICE.
                  *
                  * ml308's [vname] map (which only became readable once ml294 turned the iOS
@@ -34340,6 +34506,9 @@ static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG typ
         set_arm64ec_range( base, size );
     }
 
+#ifdef WINE_IOS
+allocation_done:
+#endif
     if (!status) VIRTUAL_DEBUG_DUMP_VIEW( view );
 
     ios_alloc_ec_code = 0;
