@@ -142,9 +142,8 @@ struct SteamAppInfo {
         var publicDownloadBytes: UInt64 = 0
         /// On-disk size from `manifests.public.size`. 0 when absent.
         var publicSizeBytes: UInt64 = 0
-        /// `sharedinstall "1"` marks redistributable depots (DirectX, VC++
-        /// runtimes) that live in Steam's common store, not the game dir;
-        /// they are excluded from size math.
+        /// `sharedinstall "1"` also covers required launcher installers, not
+        /// just the DirectX/VC++ redistributables BCD already provides.
         var isSharedInstall: Bool = false
         /// `config.language`: empty for common content, otherwise one
         /// language pack ("english", "german", ...).
@@ -154,6 +153,10 @@ struct SteamAppInfo {
         /// `depotfromapp`: the depot belongs to another app, and Valve's client
         /// installs it as that app ("required app N").
         var fromApp: UInt32? = nil
+
+        /// Only Steamworks Common Redistributables are supplied by Wine;
+        /// other shared installers must be downloaded with the game.
+        var isProvidedRedistributable: Bool { isSharedInstall && fromApp == 228980 }
 
         /// Check if depot is for the specified OS
         func supports(os: String) -> Bool {
@@ -226,7 +229,7 @@ struct SteamAppInfo {
 
     /// The depots a Windows install takes: matching OS, architecture-neutral
     /// or matching osarch, common or requested-language content (by default
-    /// `depotLanguage`), no low-violence alternates, no DLC or shared
+    /// `depotLanguage`), no low-violence alternates, no DLC or provided
     /// redistributables, and only depots that publish a manifest for the chosen
     /// branch (`branch`, else the public one). A
     /// 64-bit selection falls back to 32-bit depots when the app only
@@ -236,7 +239,7 @@ struct SteamAppInfo {
         let language = language ?? depotLanguage
         func select(_ arch: String) -> [DepotInfo] {
             depots.filter { d in
-                d.supports(os: os) && d.dlcAppID == nil && !d.isSharedInstall &&
+                d.supports(os: os) && d.dlcAppID == nil && !d.isProvidedRedistributable &&
                 d.manifestID(branch) != nil && !d.lowViolence &&
                 (d.osarch.isEmpty || d.osarch == arch) &&
                 (d.language.isEmpty || d.language.caseInsensitiveCompare(language) == .orderedSame)
@@ -268,7 +271,7 @@ struct SteamAppInfo {
         if chosen.contains(d.depotID) { return "sel" }
         if !d.supports(os: os) { return "os" }
         if d.dlcAppID != nil { return "dlc" }
-        if d.isSharedInstall { return "shared" }
+        if d.isProvidedRedistributable { return "provided" }
         if d.manifestID(branch) == nil { return "nomanifest" }
         if d.lowViolence { return "lowviolence" }
         if !d.language.isEmpty && d.language.caseInsensitiveCompare(language) != .orderedSame { return "lang" }
@@ -283,7 +286,7 @@ struct SteamAppInfo {
     /// Approximate compressed download size for a platform. Per depot it
     /// prefers the modern `manifests.public.download` figure (present for most
     /// apps since Valve's 2023 PICS change) and falls back to the legacy
-    /// `maxsize`. DLC depots and `sharedinstall` redistributables are not part
+    /// `maxsize`. DLC depots and provided redistributables are not part
     /// of the base install and are left out. Treat the figure as "about".
     func downloadSize(for os: String) -> UInt64 {
         installDepots(os: os).reduce(0) { total, d in

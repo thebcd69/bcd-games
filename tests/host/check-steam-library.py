@@ -983,7 +983,7 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
       "105" { "config" { "oslist" "windows" "osarch" "64" } "manifests" { "public" { "gid" "1005" "download" "80" } } }
       "106" { "config" { "oslist" "windows" "lowviolence" "1" } "manifests" { "public" { "gid" "1006" } } }
       "107" { "dlcappid" "999" "manifests" { "public" { "gid" "1007" } } }
-      "108" { "sharedinstall" "1" "manifests" { "public" { "gid" "1008" } } }
+      "108" { "sharedinstall" "1" "depotfromapp" "228980" "manifests" { "public" { "gid" "1008" } } }
       "109" { "config" { "oslist" "windows" } }
       "110" { "config" { "oslist" "macos" } "manifests" { "public" { "gid" "1010" } } }
       "branches" { "public" { "buildid" "4242" } }
@@ -1047,6 +1047,49 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     var sharing = SteamAppInfo.parse(appID: 7200, from: appVDF(#""common" { "name" "User" "type" "Game" "oslist" "windows" } "depots" { "7109" { "depotfromapp" "7100" } "7201" { "manifests" { "public" "71" } } }"#))!
     require(sharing.depots.first { $0.depotID == 7109 }?.fromApp == 7100 && sharing.installDepots().map(\.depotID) == [7201], "a depot from another app has no manifest of its own")
     require(sharing.inheritDepots(from: owners) == 1 && sharing.installDepots().map(\.depotID) == [7109, 7201], "it inherits the owner's manifest")
+
+    // Trackmania's public PICS (2026-11-14): the launcher installer is a
+    // required shared install, owned by Ubisoft Connect Services, not 228980.
+    let launcherSession = ScriptedSession()
+    launcherSession.appInfo = [
+        2225070: #"""
+        "appinfo" {
+          "common" { "name" "Trackmania" "type" "Game" "oslist" "windows" }
+          "config" { "installdir" "Trackmania" }
+          "depots" {
+            "2225071" { "config" { "oslist" "windows" "osarch" "64" }
+              "manifests" { "public" { "gid" "9066463832979889462" "size" "6897633717" "download" "5809247376" } } }
+            "4099821" { "depotfromapp" "4099820" "sharedinstall" "1" }
+            "228981" { "depotfromapp" "228980" "sharedinstall" "1" }
+          }
+        }
+        """#,
+        4099820: #"""
+        "appinfo" {
+          "common" { "name" "Ubisoft Connect Services" "type" "Tool" }
+          "config" { "installdir" "Ubisoft Connect Services" }
+          "depots" { "4099821" { "manifests" { "public" {
+            "gid" "2926377012241035160" "size" "262728043" "download" "262616384"
+          } } } }
+        }
+        """#
+    ]
+    let launcherFetcher = SteamLibraryFetcher(session: launcherSession)
+    let trackmania = try await launcherFetcher.fetchInstallInfo(appID: 2225070)!
+    require(trackmania.installDepots().map(\.depotID) == [2225071, 4099821], "required shared launcher content is selected; supplied Steamworks runtimes stay out")
+    require(trackmania.depots.first { $0.depotID == 4099821 }?.publicManifestID == 2926377012241035160,
+            "the launcher's sharedinstall flag does not prevent owner manifest resolution")
+    require(trackmania.sharedOwners[4099820]?.installDir == "Ubisoft Connect Services",
+            "the launcher owner is retained for its install record")
+    require(trackmania.downloadSize(for: "windows") == 6071863760 && trackmania.installSize(for: "windows") == 7160361760,
+            "download and installed sizes include the required launcher")
+    require(launcherSession.picsAppRequests.flatMap { $0 }.sorted() == [2225070, 4099820],
+            "resolve the launcher owner, without fetching Steamworks Common Redistributables")
+    var unownedShared = info
+    let sharedIndex = unownedShared.depots.firstIndex { $0.depotID == 108 }!
+    unownedShared.depots[sharedIndex].fromApp = nil
+    require(unownedShared.installDepots().contains { $0.depotID == 108 },
+            "sharedinstall alone is not evidence that BCD supplies the content")
 
     // ---- beta branches (SteamBranch): the list, a public beta, a password-protected one, the record
     var beta = SteamAppInfo.parse(appID: 9200, from: appVDF(#"""
@@ -1292,7 +1335,7 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
             "\"9001\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"\(gid)\" \"size\" \"1\" \"download\" \"1\" } " +
             (beta ? "\"preview\" { \"gid\" \"\(fx["gid1"] as! Int)\" \"size\" \"1\" \"download\" \"1\" } " : "") + "} } " +
             "\"9002\" { \"config\" { \"oslist\" \"windows\" \"language\" \"german\" } \"manifests\" { \"public\" { \"gid\" \"222\" } } } " +
-            "\"9003\" { \"config\" { \"oslist\" \"windows\" } \"depotfromapp\" \"9100\" } " +
+            "\"9003\" { \"config\" { \"oslist\" \"windows\" } \"depotfromapp\" \"9100\" \"sharedinstall\" \"1\" } " +
             "\"9004\" { \"config\" { \"oslist\" \"windows\" } \"manifests\" { \"public\" { \"gid\" \"444\" } } } " +
             "\"branches\" { \"public\" { \"buildid\" \"\(build)\" } " + (beta ? "\"preview\" { \"buildid\" \"1002\" \"description\" \"Next\" } " : "") + "} } }",
         9100: "\"appinfo\" { \"common\" { \"name\" \"Fixture Base\" \"type\" \"Game\" \"oslist\" \"windows\" } \"config\" { \"installdir\" \"Fixture Game\" } " +

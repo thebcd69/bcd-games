@@ -39,7 +39,7 @@ extension SteamAppInfo {
     /// of `installDepots()` without its DLC rule. A depot another app owns (`depotfromapp`) is left out
     /// of the DLC's depots: Valve records such depots as shared ones, which BCD's DLC support does not do.
     private func ordinaryRules(_ d: DepotInfo, os: String, language: String) -> Bool {
-        d.supports(os: os) && !d.isSharedInstall && d.publicManifestID != nil && !d.lowViolence &&
+        d.supports(os: os) && !d.isProvidedRedistributable && d.publicManifestID != nil && !d.lowViolence &&
             (d.language.isEmpty || d.language.caseInsensitiveCompare(language) == .orderedSame)
     }
 

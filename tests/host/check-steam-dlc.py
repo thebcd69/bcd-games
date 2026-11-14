@@ -107,8 +107,8 @@ check("no DLC is looked up for a game nothing was chosen for and no DLC is insta
       "if wanted == nil, installed.isEmpty { return .none }" in service and "if wanted == nil, installed.isEmpty { return .none }" in rules)
 check("SteamOwnedLibrary asks the service for the request in run() and passes it to the downloader",
       "let dlcRequest = await dlc.request(for: info, steamApps: steamApps)" in owned and "dlc: dlcRequest)" in owned)
-check("the installDepots() rules themselves are untouched (no DLC depot without a DLC choice)",
-      "d.supports(os: os) && d.dlcAppID == nil && !d.isSharedInstall &&" in read(APP / "SwiftSteam/Library/SteamAppInfo.swift"))
+check("the base install excludes DLC without a choice and supplied Steamworks redistributables",
+      "d.supports(os: os) && d.dlcAppID == nil && !d.isProvidedRedistributable &&" in read(APP / "SwiftSteam/Library/SteamAppInfo.swift"))
 
 # Steam decides ownership; a refused DLC depot never fails the game's install.
 check("a DLC depot Steam gives no key for is left out, not an error",
