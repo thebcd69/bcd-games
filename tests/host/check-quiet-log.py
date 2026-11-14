@@ -222,9 +222,12 @@ check(bool(sm2) and "quiet-log = 1" in config(sm2) and "env.MADEIRA_SRV_FGETPATH
 mcd = rules.get("minecraft-dungeons-2")   # 2026-10-24: the recipe of thebcd69/bcd-games#16 by le0-VV (debug-output waits of ten seconds)
 check(bool(mcd) and "quiet-log = 1" in config(mcd) and not any("MADEIRA_SRV_FGETPATH" in line for line in config(mcd)),
       "Minecraft Dungeons II's list sets quiet-log only (the PR's recipe: the D3D12 runtime's OutputDebugString waits)")
+tlou = rules.get("the-last-of-us-part-1")   # 2026-11-12 (TLOU v22): two thirds of each 17-51 MB log were per-shader lines
+check(bool(tlou) and "quiet-log = 1" in config(tlou) and not any("MADEIRA_SRV_FGETPATH" in line for line in config(tlou)),
+      "The Last of Us Part I's list sets quiet-log only (v22: the per-shader \"converted at runtime\" lines, each an OutputDebugString)")
 others = [line for ident, rule in rules.items()
           if ident not in ("horizon-zero-dawn", "horizon-forbidden-west", "ratchet-clank-rift-apart", "marvels-spider-man-miles-morales",
-                           "marvels-spider-man-remastered", "marvels-spider-man-2", "minecraft-dungeons-2")
+                           "marvels-spider-man-remastered", "marvels-spider-man-2", "minecraft-dungeons-2", "the-last-of-us-part-1")
           for line in config(rule)]
 check(not any("quiet-log" in line or "MADEIRA_SRV_FGETPATH" in line for line in others),
       "no other game's list sets either switch")

@@ -189,7 +189,13 @@ enum AutoTune {
         }
         let s = state(path)
         let blocked = userKeys(entry)
-        let lines = s.layerLines.filter { !blocked.contains(AutoTuneRules.key($0)) }
+        // madeira-bcd (Porthole port, item 10): with "Ask before trying a fix" on, a fix the player has not said yes to waits
+        // (AutoTuneAsk.swift); off, AutoTuneAsk.layer is the layer as always.
+        let waiting = AutoTuneAsk.waiting(s, path)
+        if !waiting.isEmpty {
+            LogStore.shared.log("[autotune] \(entry.title): \(waiting.joined(separator: "; ")) waits for the player's yes (Ask before trying a fix); this start runs without it")
+        }
+        let lines = AutoTuneAsk.layer(s, path).filter { !blocked.contains(AutoTuneRules.key($0)) }
         guard !lines.isEmpty, let launch = launchURL else { return }
         let profile = GameProfile(windowsPath: path)
         var own = profile.text
@@ -251,12 +257,14 @@ enum AutoTune {
         let log = LogStore.shared.logFileURL
         let attrs = try? FileManager.default.attributesOfItem(atPath: log.path)
         let inode = (attrs?[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0
-        let m = Marker(windowsPath: entry.windowsPath, title: entry.title, startedAt: Date(),
+        var m = Marker(windowsPath: entry.windowsPath, title: entry.title, startedAt: Date(),
                        build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "",
                        logInode: inode, limitMB: memoryLimitMB(),
                        fingerprint: fingerprint(entry), userKeys: Array(userKeys(entry)).sorted(),
                        listValues: listValues(entry), end: nil,
                        layer: state(entry.windowsPath).layerLines.filter { !userKeys(entry).contains(AutoTuneRules.key($0)) })
+        // madeira-bcd (Porthole port, item 10): the lines this start really got while a fix waits for the player's yes.
+        if AutoTuneAsk.on { m.layer = AutoTuneAsk.layer(state(entry.windowsPath), entry.windowsPath).filter { !userKeys(entry).contains(AutoTuneRules.key($0)) } }
         if let d = try? JSONEncoder().encode(m) { try? d.write(to: url, options: .atomic) }
         armed = m
     }
@@ -425,6 +433,11 @@ enum AutoTune {
             if let running = armed, running.windowsPath == m.windowsPath, let lines = after.candidate, !lines.isEmpty,
                Set(lines).isSubset(of: Set(running.layer ?? [])) {
                 LogStore.shared.log("[autotune] \(m.title): result not shown, the running session already carries \(lines.joined(separator: "; "))")
+                return
+            }
+            // madeira-bcd (Porthole port, item 10): the player put this very fix off and it still waits: nothing new to say (the game's page has it).
+            if AutoTuneAsk.quiet(offer) {
+                LogStore.shared.log("[autotune] \(m.title): result not shown, the fix it would try waits for the player's yes")
                 return
             }
             AutoTuneOffers.shared.offer = offer

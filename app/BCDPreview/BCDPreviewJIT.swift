@@ -8,7 +8,8 @@ import SwiftUI
 /// Settings › JIT on sample data, for the preview app. Variants (-BCDTab settings-jit-<variant>):
 /// none (iOS 27, paired, JIT on), "ios26" (an iPhone 12 on iOS 26: StikDebug needs Always Run
 /// Scripts; a connection error), "ios18" (StikDebug only; Automatic comes down to it), "lc" (iOS 18 inside
-/// LiveContainer: StikDebug unseen, so Automatic would pick Built-in; JIT switched on outside BCD).
+/// LiveContainer: StikDebug unseen, so Automatic would pick Built-in; JIT switched on outside BCD), "lc-ready" and "lc-off"
+/// (iOS 27 inside LiveContainer with its Helper Process Support ready, or switched off).
 @MainActor final class BCDPreviewJITBackend: BCDJITBackend {
     @Published private(set) var state: BCDJITSectionState
 
@@ -44,6 +45,19 @@ import SwiftUI
             s.method = .automatic
             s.resolved = .builtIn
             s.vpn = .unknown
+            state = s
+        case "lc-ready", "lc-off":
+            // iOS 27 inside LiveContainer: its Helper Process Support starts BCD's helper ("lc-ready"), or the switch is off ("lc-off").
+            let ready = variant == "lc-ready"
+            var s = BCDJITSectionState(platform: BCDJITPlatform(osMajor: 27, osMinor: 0, model: "iPhone18,2", inLiveContainer: true,
+                                                                lcHelper: ready ? .ready : .switchOff))
+            s.now = .off
+            s.method = ready ? .builtIn : .automatic
+            s.resolved = ready ? .builtIn : .stikDebug
+            s.stikDebugFound = true
+            s.pairingFile = ready ? .pairedHere : .none
+            s.vpn = .connected
+            s.setupAvailable = true
             state = s
         default:
             var s = BCDJITSectionState(platform: BCDJITPlatform(osMajor: 27, osMinor: 0, model: "iPhone18,2"))

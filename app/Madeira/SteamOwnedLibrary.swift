@@ -7,6 +7,8 @@
 // `enterBetaCode`, the branch-aware update check and the chosen branch in `run`. A game whose player picked no beta downloads as before.
 // Modified by BCD (thebcd69), 2026-11-05: Steam Workshop (BCDSteamWorkshop/): `SteamOwnedGame.workshop`, the Workshop's calls over the app's own
 // connection (`workshopCall`, `downloadWorkshopItem`), and its downloads stopping when a game session starts.
+// Modified by BCD (thebcd69), 2026-11-13: one app's licence asked of the account's list and a download for BCD's own use (`licenceNow`,
+// `downloadForApp`), for Lossless Scaling's frame generation (BCDLosslessLive.swift). Nothing calls them for a game's download.
 // Portions copyright 2026 ft7t8drgwf-wq, wamei, 125hz and alantangok: code taken from https://github.com/willfaust/Madeira (pull requests #237, #381, #382, #404, #490, #491 and 2 more)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 Connor Gow, intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
@@ -717,6 +719,7 @@ final class SteamOwnedLibrary: ObservableObject {
             let plan = SteamCloudPlan.make(audit: audit, baseline: baseline(appID))
             recordBaseline(appID, settled: plan.settled)
             state.audit = audit; state.conflicts = plan.conflicts; state.checked = Date(); state.phase = .ready
+            state.pendingUp = plan.upload; state.pendingDown = plan.download   // madeira-bcd: for the page's list (BCDCloudPending)
             cloud[appID] = state
             let roots = Set(saveFiles.map(\.root)).sorted().joined(separator: ",")
             SteamLog.event("[steam-cloud] app=\(appID) \(audit.summary) patterns=\(saveFiles.count) roots=\(roots.isEmpty ? "-" : roots) overrides=\(context.info.rootOverrides.count) | plan download=\(plan.download.count) upload=\(plan.upload.count) ask=\(plan.conflicts.count)")
@@ -1529,6 +1532,30 @@ final class SteamOwnedLibrary: ObservableObject {
         SteamDownloadBackground.shared.downloadEnded(appID: appID, name: game(appID)?.name ?? "Steam game",
                                                      outcome: outcome, queueEmpty: queue.isEmpty)
         pump()
+    }
+
+    // MARK: Lossless Scaling (BCDLosslessLive.swift): one app's licence, and a download for BCD's own use
+
+    /// madeira-bcd: whether the signed-in account's licences hold `appID`, read again from the list Steam gave this connection (not
+    /// from the library's cache). Not while a game session holds the account's connection, and not without a sign-in.
+    func licenceNow(appID: UInt32) async throws -> Bool {
+        guard Self.enabled, signedIn else { throw SteamFileError.invalid("Sign in to Steam first.") }
+        guard !inSession else { throw SteamFileError.invalid("A game is running. Try again when it has ended.") }
+        fetcher.forgetOwnedApps()
+        return try await fetcher.ownedAppIDs().contains(appID)
+    }
+
+    /// madeira-bcd: downloads `appID` with the account's own licence into `steamApps`, a folder of BCD's own (not a Steam library: no
+    /// library entry is made and nothing is registered with Dock). Returns the folder the files are in.
+    func downloadForApp(appID: UInt32, steamApps: URL, progress: @escaping (SteamDownloadProgress) -> Void) async throws -> URL {
+        guard Self.enabled, signedIn else { throw SteamFileError.invalid("Sign in to Steam first.") }
+        guard !inSession else { throw SteamFileError.invalid("A game is running. Try again when it has ended.") }
+        guard active == nil else { throw SteamFileError.invalid("A game is downloading. Try again when it has finished or is paused.") }
+        guard let info = try await fetcher.fetchInstallInfo(appID: appID) else { throw SteamError.appInfoNotFound(appID) }
+        downloader.directoryFallback = SteamSignIn.flag("MADEIRA_STEAM_CDN_FALLBACK", default: true)
+        SteamLog.event("[steam-depot] app download for BCD's own use app=\(appID)")
+        return try await downloader.install(info, steamApps: steamApps,
+                                            ownedDepots: { [weak self] in try? await self?.fetcher.ownedDepotIDs() }, progress: progress)
     }
 
     // MARK: Messages

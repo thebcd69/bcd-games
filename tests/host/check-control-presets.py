@@ -109,9 +109,10 @@ require(ids.count == expected.count, "built-in controls have distinct ids")
 
 // --- The Xbox controller preset as data: what a user is offered and what each button does.
 let builtIn = ControlPresetStore.builtIns
-require(builtIn.count == 2 && builtIn[0].id == ControlPresetLayout.xboxID && builtIn[0].name == "Xbox controller"
+// madeira-bcd (Porthole port, item 9): six more built-ins follow the two (tests/host/check-touch-floating.py checks them).
+require(builtIn.count == 8 && builtIn[0].id == ControlPresetLayout.xboxID && builtIn[0].name == "Xbox controller"
         && builtIn[1].id == ControlPresetLayout.keyboardID && builtIn[1].name == "PC keyboard",
-        "two built-ins: \"Xbox controller\" first, then \"PC keyboard\"")
+        "the built-ins: \"Xbox controller\" first, then \"PC keyboard\" (and six more after them)")
 require(builtIn[0].controls.count == 18 && Set(builtIn[0].controls.compactMap { $0.action.padName }) == Set(expected),
         "the built-in binds the 18 controller inputs, none twice")
 require(builtIn[0].controls.allSatisfy { c in
@@ -347,7 +348,8 @@ assert fin.index('saveCurrentProfile()') < fin.index('controls.layoutID = savedL
 assert '.flag("MADEIRA_TOUCH_GAME_DEFAULT")' in presets and '.optIn("MADEIRA_TOUCH_GAME_DEFAULT")' not in presets, \
     'the game default is on, with a kill switch at 0'
 available = function(presets, 'var available: [ControlPreset] {')
-assert '$0.id != ControlPresetLayout.xboxID || Self.touchPad' in available, 'only the controller built-in needs touch XInput'
+# madeira-bcd (Porthole port, item 9): the pad layouts that follow the two need it too (ControlPresetLayout.needsTouchPad).
+assert 'ControlPresetLayout.needsTouchPad($0.id) == false || Self.touchPad' in available, 'only the controller built-ins need touch XInput'
 apply = function(presets, '@discardableResult func applyGameDefault(steam: Bool, reason: String) -> Bool {')
 for needle in ('Self.enabled', 'm.visible', '!m.editing', 'm.controls.isEmpty', 'm.layoutID == nil'):
     assert needle in apply.split('guard Self.gameDefault')[0], 'the game default only fills an empty overlay: ' + needle

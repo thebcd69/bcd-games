@@ -17,6 +17,14 @@ struct MadeiraApp: App {
         // passes, blit encoders) cover the game. Off unless bcd.cfg says
         // env.MTL_HUD_INSIGHTS_ENABLED = 1, which is exported later and wins.
         setenv("MTL_HUD_INSIGHTS_ENABLED", "0", 0)
+        // madeira-bcd (Porthole port, item 6): a Steam download to a slow external drive is written with fewer writers when bcd.cfg
+        // says drive-gentle-writes = 1 (BCDDriveSpeed.swift). Without the line the answer is nil at once and nothing is measured.
+        DepotDownloader.gentleChunks = { folder in
+            guard MadeiraConfig.get(BCDDriveGentle.key) == "1" else { return nil }
+            let decision = await Task.detached(priority: .utility) { BCDDriveGentle.decision(for: folder, keyOn: true) }.value
+            if let line = decision.log { SteamLog.event(line) }
+            return decision.limit
+        }
         // ml1172: read the screen on the main thread; library entries, whose
         // default Resolution comes from it, are also made on other threads.
         _ = ResolutionChoices.screen

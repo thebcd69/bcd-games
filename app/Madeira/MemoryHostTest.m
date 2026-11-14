@@ -171,7 +171,8 @@ void MadeiraMemoryHostTest(void (^log)(NSString *line), void (^done)(void)) {
         say([NSString stringWithFormat:@"Run 6 (read-back from the compressor). Device RAM %llu MB. BCD pid %d: footprint %llu MB, available %zu MB; %@",
              ram / MB, getpid(), baseline / MB, os_proc_available_memory() / MB, mh_system()]);
 
-        NSString *identifier = [NSBundle.mainBundle.bundleIdentifier stringByAppendingString:@".MemoryHost"];
+        extern NSString *MadeiraMemoryHostIdentifier(void);   /* MemoryPool.m: the appex's own id inside LiveContainer */
+        NSString *identifier = MadeiraMemoryHostIdentifier();
         Class<MHExtensionClass> extensionClass = (Class<MHExtensionClass>)NSClassFromString(@"NSExtension");
         NSError *error = nil;
         id<MHExtension> extension = [extensionClass extensionWithIdentifier:identifier error:&error];

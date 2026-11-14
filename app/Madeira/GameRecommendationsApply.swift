@@ -243,15 +243,14 @@ extension GameRecommendations {
 /// madeira-bcd (owner, 2026-10-28, build 622): the heavy games BCD runs (RDR2, GTA V, Ghost of Tsushima, God of War,
 /// the two Horizons, the three Spider-Man games, Rift Apart, the Crysis remasters) carry `low-graphics-tip = 1` in their
 /// recommended lists. Before such a game's first start BCD says once to turn the game's own graphics to the lowest preset
-/// and AMD FSR, where the game has it, to Balanced or Performance; OK starts the game. The game's own file decides (a
+/// and AMD FSR, where the game has it, to Performance (owner 2026-11-14; was "Balanced or Performance"); OK starts the game. The game's own file decides (a
 /// player who sets 0 is not told); a game with no file yet is read from its list. Once per game (its Windows path).
 enum BCDGraphicsTip {
     static let key = "low-graphics-tip"
     private static let shownKey = "bcd.lowGraphicsTip.shown"
     static let title = "Before you play"
     static let message = "This is a demanding game. In the game's own graphics settings, set everything to the lowest "
-        + "preset (Very Low, or Low where there is no Very Low). If the game offers AMD FSR, set it to Balanced or "
-        + "Performance.\n\nBCD's recommended settings limit it to 30 FPS; you can change the limit on the game's page."
+        + "preset (Very Low, or Low where there is no Very Low). If the game offers AMD FSR, set it to Performance.\n\nBCD's recommended settings limit it to 30 FPS; you can change the limit on the game's page."
 
     /// True when the tip is due before this start.
     static func due(_ entry: LibraryEntry) -> Bool {

@@ -1,5 +1,8 @@
 /* Host controller snapshot shared with win32u. GPL-3.0-or-later WITH the
  * Madeira Converter Exception, version 1; see LICENSE-EXCEPTION.md. */
+/* Portions copyright 2026 The Porthole authors: the declaration of winios_gamepad_read_count, taken from
+ * https://github.com/tylerkaska112/Porthole (commit 99ec315, patches/0019-pad-read-counters.patch) under GPL-3.0-or-later in
+ * November 2026. See THIRD-PARTY-NOTICES.md. */
 #ifndef WINIOS_GAMEPAD_H
 #define WINIOS_GAMEPAD_H
 #include <stdint.h>
@@ -21,6 +24,8 @@ struct winios_gamepad {
  * not advance them. All callers may run concurrently. No callbacks under lock. */
 void winios_gamepad_set_state(int index, const struct winios_gamepad *state);
 int winios_gamepad_get_state(int index, struct winios_gamepad *out);
+/* madeira-bcd (from Porthole's patch 0019): how many times the game has read an XInput slot, all four together. */
+uint64_t winios_gamepad_read_count(void);
 
 /* ml2100: the opt-in HID controller (env.MADEIRA_PAD_MODE = hid). Player 1
  * only, served by the wineserver (build/wineserver/hidpad_ios.c) as a DualSense

@@ -16,7 +16,7 @@ import SwiftUI
 // MARK: - What the interface shows
 
 enum BCDStoreFront: String, CaseIterable, Codable, Hashable {
-    case steam, epic, gog, itch, ea, local
+    case steam, epic, gog, itch, ea, amazon, local
     var title: String {
         switch self {
         case .steam: return "Steam"
@@ -24,6 +24,7 @@ enum BCDStoreFront: String, CaseIterable, Codable, Hashable {
         case .gog: return "GOG"
         case .itch: return "itch.io"
         case .ea: return "EA games"
+        case .amazon: return "Amazon Games"   // madeira-bcd (Porthole port, item 13): only while the experimental store is on
         case .local: return "Local"
         }
     }

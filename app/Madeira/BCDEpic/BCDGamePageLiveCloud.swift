@@ -23,6 +23,9 @@ extension BCDGamePageLive {
     }
 
     /// The page's Sync now: true when the game is Epic's (the sync is Epic Cloud's, and does nothing for a game whose switch is off).
+    /// madeira-bcd: this game's cloud saves are another store's (the page's Check again is Steam's comparison and leaves such a game alone).
+    func storeCloudOwns(_ game: BCDGame) -> Bool { storeCloudApp(game) != nil }
+
     func storeCloudSync(_ game: BCDGame) -> Bool {
         guard let app = storeCloudApp(game) else { return false }
         Task { await BCDEpicCloud.shared.syncNow(app) }

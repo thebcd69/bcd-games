@@ -1,5 +1,7 @@
 /* Portions copyright 2026 spitefulowl and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #462 and #516)
  * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
+/* Portions copyright 2026 The Porthole authors: code taken from https://github.com/tylerkaska112/Porthole (commit 99ec315, patches 0191 and 0196)
+ * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*  madeira-d3d12: M2 native D3D12 ABI slice.
  *
  *  The minimum set of objects the design's M2 gate names: a device that can
@@ -733,6 +735,17 @@ static UINT64 mad_tick_freq(void) {
     }
     return g_es_freq;
 }
+/* madeira-bcd (build 657): milliseconds for the layer's own bookkeeping, from the CPU's counter (mad_tick: one mrs).
+ * GetTickCount() is three instructions in kernel32 that read the shared data page at its Windows address
+ * (mov w8, #0x7ffe0320; ldr w0, [x8]), and iOS maps nothing below 4 GB: each call is an exception that Wine's
+ * exception thread serves ("[subfloor] ml956 serviced N access(es) ... latest guest 0x7ffe0320 ... insn=0xb9400100").
+ * The indirect-argument probe called it for every indirect draw and dispatch replayed, before it looked at its own
+ * switch, and pipeline creation once per pipeline: The Last of Us Part I (the owner's log of 2026-11-12 19:48,
+ * build 656) took 983,041 such exceptions in 222 s, 6,000 to 15,000 a second in play, with the exception thread at
+ * 16-28 % of a core and the thread inside ExecuteCommandLists stopped for each one. Only differences of two values
+ * are used, so the count's start does not matter; it wraps like GetTickCount's.
+ * tests/host/check-d3d12-tick-ms.py. */
+static DWORD mad_tick_ms(void) { return (DWORD)(mad_tick() * 1000 / mad_tick_freq()); }
 /* madeira-bcd ENCODE-BATCH (bcd.cfg encode-batch, default 1; = 0 turns it
  * off). Every draw handed its command chain to Metal in an encodeCommands call
  * of its own, and every encoder its fence wait and its fence update in two
@@ -9968,11 +9981,12 @@ static void exec_indirect_probe(struct mad_exec *e, const struct mad_cmd *c) {
     const struct mad_pso *p = c->kind == MC_DISPATCH_INDIRECT ? e->cpso : e->pso;
     struct wmtcmd_compute_setpso sp; struct wmtcmd_compute_setbuffer sb[2]; struct wmtcmd_compute_setbytes sby; struct wmtcmd_compute_dispatch dsp;
     UINT32 n = c->kind == MC_DISPATCH_INDIRECT ? 3 : c->kind == MC_DRAW_INDEXED_INDIRECT ? 5 : 4;
-    DWORD now = GetTickCount();
+    DWORD now;
     unsigned k, slot = ~0u;
     UINT64 off;
     if (on < 0) on = (int)mad_cfg_int_pe("ind-probe", 1);
     if (!on || !p || (c->u.ind.off & 3) || said >= 1500 || !mad_kernels_ready(d) || !d->k_probe_pso || !d->k_ring_cpu) return;
+    now = mad_tick_ms();   /* build 657: read after the checks, and no longer GetTickCount() (an exception per indirect command, see mad_tick_ms) */
     AcquireSRWLockExclusive(&g_iprobe_lock);
     for (k = 0; k < sizeof g_iprobe / sizeof g_iprobe[0]; k++) {
         if (g_iprobe[k].pso == p) { slot = k; break; }
@@ -10135,11 +10149,11 @@ static void mad_pso_first(struct mad_pso *p) {
     if (p->is_compute)
         d3d12_log("[pso-first] present #%lld: compute %s/%016llx first bound (created at present #%lld, %lu ms ago)%s\n",
                   (long long)g_presents_now, p->vs_name, (unsigned long long)p->cs_hash, (long long)p->born_present,
-                  (unsigned long)(GetTickCount() - p->born_tick), n == 30000 ? " -- limit of 30000 lines reached" : "");
+                  (unsigned long)(mad_tick_ms() - p->born_tick), n == 30000 ? " -- limit of 30000 lines reached" : "");
     else
         d3d12_log("[pso-first] present #%lld: graphics vs '%s' ps '%s' first bound (created at present #%lld, %lu ms ago)%s\n",
                   (long long)g_presents_now, p->vs_name, p->ps_name, (long long)p->born_present,
-                  (unsigned long)(GetTickCount() - p->born_tick), n == 30000 ? " -- limit of 30000 lines reached" : "");
+                  (unsigned long)(mad_tick_ms() - p->born_tick), n == 30000 ? " -- limit of 30000 lines reached" : "");
 }
 static int exec_tess_indirect_prep(struct mad_exec *e, const struct mad_cmd *c, UINT64 *out_off) {
     struct mad_device *d = e->q->device;
@@ -13614,6 +13628,50 @@ static unsigned mad_tvh_find(const struct mad_resource *r, UINT fmt, UINT64 off,
     }
     return r->ntview;
 }
+/* madeira-bcd typed-view-unlocked (bcd.cfg / a game's config, opt-in, default 0; build 657). Every typed buffer view is a
+ * Metal texture buffer, made while the device's one view lock is held, so threads that create views make them one at a
+ * time (and the DXBC path's replay, which looks typed views up under the same lock, waits behind them).
+ * The Last of Us Part I (the owner's log of 2026-11-12 19:48, build 656) re-creates its 6-20 MB frame buffers every frame
+ * and makes 64 to over 1,000 views on each from six job threads while they record: 20,000 to 58,000 views a second in
+ * play, and "[xp-api] CS contended 22-63k/s ... wait 0.9-1.3 s per second" with 93 % of the sampled contended enters on
+ * this lock ("[xp-api-cs]": device + 0x43a8 beside its live_lock and fence_lock).
+ * With the switch a plain view (no copy of the data, the default 64-byte alignment, no ShaderAtomic usage) has its
+ * texture made with the lock released: the lock is taken again, the view is looked up once more, and a view another
+ * thread made meanwhile wins (ours is released). The texture's inputs depend only on the resource, the format and the
+ * range, so whichever thread makes it makes the same one. A texture Metal refuses there is made under the lock as
+ * before, with the same retries and the same report. 0: every view is made under the lock, as before.
+ * tests/host/check-d3d12-typed-view-unlocked.py, check-skin-check.py (the function itself, both ways). */
+static volatile LONG g_tv_unl_made, g_tv_unl_lost;
+static int mad_tv_unlocked(void) {
+    static int on = -1;
+    if (on < 0) {
+        on = mad_cfg_int_pe("typed-view-unlocked", 0) ? 1 : 0;   /* 1: a typed buffer view's Metal texture is made outside the device's view lock (build 657); 0: under it (as before) */
+        if (on) d3d12_log("[madeira-d3d12] typed-view-unlocked = 1: typed buffer views are made outside the device's view lock\n");
+    }
+    return on;
+}
+/* typed-view-unlocked: the texture mad_typed_buffer_view makes for a plain view, by the same arithmetic as there
+ * (al: the alignment in bytes; *cut_out: cut at the end of the buffer or at 2^28 texels). 0: there is none to make
+ * (the function's own path says why). */
+/* tv-unlocked-test:begin */
+static int mad_tv_plain_shape(UINT64 res_size, int shared, UINT pf, UINT bytes, UINT64 byte_off, UINT64 num, int uav, UINT al,
+                              struct WMTTextureInfo *ti, UINT64 *aligned_out, UINT64 *bpr_out, int *cut_out) {
+    UINT64 aligned = byte_off & ~(UINT64)(al - 1);
+    UINT64 width = num + (byte_off - aligned) / bytes;
+    int cut = 0;
+    if (aligned >= res_size) return 0;
+    if (aligned + width * bytes > res_size) { width = (res_size - aligned) / bytes; cut = 1; }
+    if (!width) return 0;
+    if (width > (1u << 28)) { width = (1u << 28); cut = 1; }
+    memset(ti, 0, sizeof *ti);
+    ti->pixel_format = (enum WMTPixelFormat)pf; ti->width = (uint32_t)width; ti->height = 1; ti->depth = 1; ti->array_length = 1;
+    ti->type = WMTTextureTypeTextureBuffer; ti->mipmap_level_count = 1; ti->sample_count = 1;
+    ti->usage = uav ? (WMTTextureUsageShaderRead | WMTTextureUsageShaderWrite) : WMTTextureUsageShaderRead;
+    ti->options = shared ? WMTResourceStorageModeShared : WMTResourceStorageModePrivate;
+    *aligned_out = aligned; *bpr_out = width * bytes; *cut_out = cut;
+    return 1;
+}
+/* tv-unlocked-test:end */
 /* why (may be NULL): 0, or the g_vc_why index of a refusal (1-8) or of a view
  * cut short (9, still made). */
 static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, DXGI_FORMAT fmt,
@@ -13643,6 +13701,32 @@ static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, D
     if (k == r->ntview) {
         UINT al = mad_tv_align(d, pf, bytes);   /* madeira-bcd typed-view-align: 64 unless the switch says otherwise */
         int cut;
+        /* madeira-bcd typed-view-unlocked: a plain view's texture is made with the lock released; the view is then looked up
+         * again, and either another thread's stays (have) or this one is published by the code below (made). */
+        if (!x3 && al == 64 && mad_tv_unlocked() && !mad_tvs_on() &&
+            !(uav && (pf == WMTPixelFormatR32Uint || pf == WMTPixelFormatR32Sint) && mad_typed_uav_atomic())) {
+            struct WMTTextureInfo pti; UINT64 pre_aligned = 0, pre_bpr = 0; int pre_cut = 0;
+            if (mad_tv_plain_shape(r->size, r->cpu || r->own_mem, (UINT)pf, bytes, byte_off, num, uav, al, &pti, &pre_aligned, &pre_bpr, &pre_cut)) {
+                obj_handle_t pre; LONG m;
+                LeaveCriticalSection(&d->view_lock);
+                pre = MTLBuffer_newTexture(r->buffer, &pti, pre_aligned, pre_bpr);
+                EnterCriticalSection(&d->view_lock);
+                if (pre && !pti.gpu_resource_id) { NSObject_release(pre); pre = 0; }   /* refused: the code below tries and reports as before */
+                k = mad_tvh_find(r, (UINT)fmt, byte_off, num, (UINT)uav);
+                if (k != r->ntview) {   /* another thread made this very view meanwhile: it stays, ours goes */
+                    if (pre) { NSObject_release(pre); InterlockedIncrement(&g_tv_unl_lost); }
+                    goto have;
+                }
+                if (pre) {   /* ours to publish: what the code below computes for these inputs, and the texture made above */
+                    aligned = pre_aligned; elem_off = (byte_off - aligned) / bytes; width = pti.width; bpr = pre_bpr;
+                    ti = pti; cut = pre_cut; sh_gpu = 0; sh = NULL; tex = pre;
+                    if ((m = InterlockedIncrement(&g_tv_unl_made)) == 1 || !(m % 500000))
+                        d3d12_log("[typed-view] typed-view-unlocked: %ld views made outside the view lock, %ld more given up for the same "
+                                  "view made by another thread meanwhile\n", (long)m, (long)g_tv_unl_lost);
+                    goto made;
+                }
+            }
+        }
     again:
         cut = 0;
         aligned = byte_off & ~(UINT64)(al - 1);             /* linear texture alignment on Apple GPUs is <= 64 */
@@ -13688,6 +13772,7 @@ static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, D
             ti.gpu_resource_id = 0;
             goto again;
         }
+    made:   /* madeira-bcd typed-view-unlocked: also reached with a texture made while the lock was released */
         if (cut && why) *why = 9;
         if (!tex || !ti.gpu_resource_id) {
             if (said_fail++ < 8)
@@ -13730,6 +13815,7 @@ static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, D
                       (unsigned)fmt, (unsigned long long)first, (unsigned long long)num, uav ? " (UAV)" : "",
                       (unsigned)width, (unsigned long long)elem_off);
     }
+have:   /* madeira-bcd typed-view-unlocked: also reached when another thread made the view while the lock was released */
     elem_off = r->tview[k].eoff;   /* as the view was made (madeira-bcd typed-view-align may have moved its start) */
     if (r->tview[k].sh) mad_tvs_touch(r->tview[k].sh);   /* madeira-bcd typed-view-shadow: in use, refresh it at the next calls */
     e->gpu_va = r->tview[k].sh_gpu ? r->tview[k].sh_gpu : r->gpu_address + r->tview[k].off;   /* madeira-bcd typed-view-shadow: the copy */
@@ -19563,7 +19649,7 @@ static HRESULT device_CreateGraphicsPipelineState_impl(ID3D12Device *This,
     p = calloc(1, sizeof *p);
     if (!p) return E_OUTOFMEMORY;
     p->vtbl = &g_pso_vtbl; p->refs = 1; p->iid = &IID_ID3D12PipelineState; p->name = "PipelineState";
-    p->born_present = g_presents_now; p->born_tick = GetTickCount();   /* madeira-bcd: pso-first-use */
+    p->born_present = g_presents_now; p->born_tick = mad_tick_ms();   /* madeira-bcd: pso-first-use (build 657: mad_tick_ms, not GetTickCount) */
     if (mad_skin_on()) {   /* madeira-bcd skin-check: the vertex shader's bytecode, by hash */
         p->vs_hash = mad_fnv64(desc->VS.pShaderBytecode, desc->VS.BytecodeLength);
         mad_skin_layout(p, &desc->InputLayout);   /* skin-check-trace: an integer input keeps the bytecode past the shared store */
@@ -20103,7 +20189,7 @@ static HRESULT device_CreateComputePipelineState_impl(ID3D12Device *This,
     p = calloc(1, sizeof *p);
     if (!p) return E_OUTOFMEMORY;
     p->vtbl = &g_pso_vtbl; p->refs = 1; p->iid = &IID_ID3D12PipelineState; p->name = "ComputePipelineState";
-    p->born_present = g_presents_now; p->born_tick = GetTickCount();   /* madeira-bcd: pso-first-use */
+    p->born_present = g_presents_now; p->born_tick = mad_tick_ms();   /* madeira-bcd: pso-first-use (build 657: mad_tick_ms, not GetTickCount) */
     p->is_compute = 1;
     {   /* madeira-bcd: identify the bytecode for GPU fault reports */
         const unsigned char *b = desc->CS.pShaderBytecode; UINT64 hh = 0xcbf29ce484222325ull; SIZE_T q;
@@ -20528,6 +20614,86 @@ static UINT mad_pack_clear(DXGI_FORMAT fmt, const UINT32 v[4], int is_float, uns
     }
     return nch * bits / 8;
 }
+/* madeira-bcd (2026-11-11, The Last of Us Part I, build 655): a buffer UAV clear through a TYPED view.
+ * Direct3D 12 clears a typed buffer view as it clears a texture: every element gets the four values, each in its own
+ * channel (ClearUnorderedAccessViewUint copies each value's low bits, ClearUnorderedAccessViewFloat converts). Only raw
+ * and structured views take Values[0] for every 32 bits, and that is what mad_record_uav_clear wrote for every buffer view.
+ * The game keeps its deferred lighting's 44 indirect dispatch records (16 bytes each: thread groups X, Y, Z and a spare
+ * word) in a buffer it clears every frame to (0, 1, 1, 0) through an R32G32B32A32_UINT view, and a compute pass then
+ * counts screen tiles into X (tlou-i-l.exe 1.1.5: the buffer "uber-shader-offset" is described at 0x14216423c with these
+ * four values, its clear at 0x142286820 goes through 0x142194ea8, which picks the view's format by the buffer's stride:
+ * 1 R8_UINT, 2 R8G8_UINT, 4 R8G8B8A8_UINT, 8 R32G32_UINT, else R32G32B32A32_UINT). With Values[0] in every word, Y and Z
+ * were 0 and every DispatchIndirect of CS_DeferredLighting ran no thread group at all (the owner's log of 2026-11-11
+ * 21:58: "[probe] dispatch 'CS_DeferredLighting' first record: 258 0 0", 628 samples and never a Y or Z;
+ * "ClearUnorderedAccessViewUint with value 0 is approximated by byte 0"): the scene got no deferred light, only what is
+ * drawn forward showed (lamp shades, hair), on a target nothing rewrote, so it kept every earlier frame (trails).
+ * A typed view the runtime made a texture buffer for is now cleared per element in the view's format; a clear whose
+ * result is what the plain path writes (an R32 view, four equal values of one repeated byte, ...) still takes that path,
+ * and a view the runtime has no texture buffer for (raw, structured, R32G32B32) is cleared as before. */
+/* uav-buf-clear-test:begin */
+/* One element of bpp bytes (px, as mad_pack_clear packed it) laid end to end over the 16 bytes a fill pattern repeats.
+ * 0 when the element size does not divide 16: the caller clears as before. */
+static int mad_buf_clear_period(const unsigned char *px, UINT bpp, UINT32 per[4]) {
+    unsigned char b[16]; unsigned i;
+    if (bpp != 1 && bpp != 2 && bpp != 4 && bpp != 8 && bpp != 16) return 0;
+    for (i = 0; i < 16; i++) b[i] = px[i % bpp];
+    memcpy(per, b, 16);
+    return 1;
+}
+/* 1 when the 16 bytes are one byte repeated (a byte fill writes them). */
+static int mad_buf_clear_uniform(const UINT32 per[4]) {
+    const unsigned char *b = (const unsigned char *)per; unsigned i;
+    for (i = 1; i < 16; i++) if (b[i] != b[0]) return 0;
+    return 1;
+}
+/* What a typed buffer UAV clear writes, as the 16-byte period of its elements. 1: per is set and differs from Values[0]
+ * in every 32 bits (the plain path's result); 0: the plain path is right, or the format is not one this packs. An integer
+ * view cleared with ClearUnorderedAccessViewFloat is not a valid Direct3D 12 call and stays on the plain path. */
+static int mad_buf_clear_typed(DXGI_FORMAT fmt, const UINT32 v[4], int is_float, int fmt_is_int, UINT32 per[4], UINT *bpp_out) {
+    unsigned char px[16]; UINT32 plain[4]; UINT bpp;
+    if (fmt == DXGI_FORMAT_UNKNOWN || (is_float && fmt_is_int)) return 0;
+    bpp = mad_pack_clear(fmt, v, is_float, px);
+    if (!mad_buf_clear_period(px, bpp, per)) return 0;
+    plain[0] = plain[1] = plain[2] = plain[3] = v[0];
+    if (!memcmp(per, plain, 16)) return 0;
+    if (bpp_out) *bpp_out = bpp;
+    return 1;
+}
+/* uav-buf-clear-test:end */
+/* The format of the typed buffer UAV a descriptor names in r (a texture-buffer view mad_typed_buffer_view made at the
+ * descriptor's address), or DXGI_FORMAT_UNKNOWN: a raw or structured view, a counter's view, or a typed view that fell
+ * back to a plain descriptor. */
+static DXGI_FORMAT mad_typed_uav_format(struct mad_device *d, struct mad_resource *r, const struct mad_descriptor *e) {
+    DXGI_FORMAT f = DXGI_FORMAT_UNKNOWN; unsigned k;
+    if (!d || !r || !e->texture_view_id || !(e->metadata >> 63)) return f;
+    EnterCriticalSection(&d->view_lock);
+    for (k = 0; k < r->ntview; k++)
+        if (r->tview[k].id == e->texture_view_id && r->tview[k].uav && r->gpu_address + r->tview[k].off == e->gpu_va) {
+            f = (DXGI_FORMAT)r->tview[k].fmt; break;
+        }
+    LeaveCriticalSection(&d->view_lock);
+    return f;
+}
+/* 1 when the fill command c was set up per element (a byte, a cached pattern or a one-off one); 0: the caller's plain path. */
+static int mad_record_typed_buf_clear(struct mad_list *l, struct mad_cmd *c, struct mad_resource *r, const struct mad_descriptor *e,
+                                      const UINT32 v[4], int is_float, const char *what) {
+    UINT32 per[4]; UINT bpp = 0; DXGI_FORMAT fmt;
+    static volatile LONG said;
+    if (!v) return 0;
+    fmt = mad_typed_uav_format(l->device, r, e);
+    if (!mad_buf_clear_typed(fmt, v, is_float, mad_format_is_int(fmt), per, &bpp)) return 0;
+    c->u.fill.byte = (UINT8)(per[0] & 0xff); c->u.fill.pattern = 0; c->u.fill.oneoff = 0;
+    if (!mad_buf_clear_uniform(per)) {
+        c->u.fill.pattern = mad_fill_pattern16(l->device, per);
+        if (!c->u.fill.pattern) { memcpy(c->u.fill.per, per, 16); c->u.fill.oneoff = 1; }   /* the cache is full: a one-off pattern when the list runs */
+    }
+    if (InterlockedIncrement(&said) <= 8)
+        d3d12_log("[madeira-d3d12] %s through a typed buffer view (format %u, %u-byte elements): values %#x %#x %#x %#x -> every element "
+                  "%08x %08x %08x %08x (16 bytes of the fill), resource '%s' %llu bytes, range +%llu len %llu\n",
+                  what, (unsigned)fmt, bpp, v[0], v[1], v[2], v[3], per[0], per[1], per[2], per[3], r->name ? r->name : "?",
+                  (unsigned long long)r->size, (unsigned long long)c->u.fill.off, (unsigned long long)c->u.fill.len);
+    return 1;
+}
 static obj_handle_t mad_fill_pattern(struct mad_device *d, UINT32 v);
 static void mad_record_uav_tex_clear(struct mad_list *l, UINT64 view_id, struct mad_resource *res, const UINT32 v[4], int is_float, const char *what) {
     static unsigned said_miss, said_fmt, said_ok;
@@ -20636,6 +20802,7 @@ static void mad_record_uav_clear(ID3D12GraphicsCommandList *This, D3D12_CPU_DESC
                       v ? v[3] : 0, t, (unsigned long long)off, (unsigned long long)len);
         }
     }
+    if (mad_record_typed_buf_clear(l, c, r, e, v, is_float, what)) return;   /* madeira-bcd: a typed view is cleared per element in its format */
     {
         UINT32 x = v ? v[0] : 0; UINT8 b = (UINT8)(x & 0xff);
         int exact = v && v[0] == v[1] && v[1] == v[2] && v[2] == v[3] &&
@@ -22350,12 +22517,49 @@ static void mad_swap_release_fx(struct mad_swapchain *s) {
  * Animation. Everything here is optional: any failure leaves the plain copy.
  * The scaler reads a 2D view of the back buffer (they are 2D arrays, ml932)
  * and writes a private 2D texture that the present blit then copies. */
+/* madeira-bcd present-fx (Porthole port, item 4; dxmt: tools/patch-winemetal-present-fx.py). MadeiraCtl op 30 asks winemetal two
+ * things; a winemetal without the op answers neither and everything is as before.
+ *  - With env.MADEIRA_PRESENT_FX = 1 winemetal enlarges the presented picture itself (and can change the factor while the game
+ *    runs), so this swap chain makes no scaler of its own: returns 1.
+ *  - `metalfx-upscale = fit` ("to the screen") without present-fx: *f gets the factor that brings this swap chain's picture to the
+ *    screen, the smaller of screen / picture in both directions (the screen's long side with the picture's long side). The caller
+ *    caps it at 2 and makes no scaler under 1.1, so a game that already draws about as large as the screen is left alone. The rule
+ *    is Porthole's patch 0196 (https://github.com/tylerkaska112/Porthole, GPL-3.0-or-later, copyright 2026 The Porthole authors),
+ *    modified for BCD in November 2026: the screen's size comes from winemetal, not from the value. */
+static int mad_pfx_upscale(const struct mad_swapchain *s, const char *v, double *f) {
+    struct madeira_ctl_args a;
+    UINT32 pi[5];
+    static LONG said;
+    memset(pi, 0, sizeof pi);
+    memset(&a, 0, sizeof a);
+    a.op = 30; a.ptr = (UINT64)(ULONG_PTR)pi; a.len = sizeof pi;
+    MadeiraCtl(&a);
+    if (!a.ret) return 0;
+    if (pi[0]) {
+        if (InterlockedIncrement(&said) <= 2)
+            d3d12_log("[madeira-d3d12] metalfx-upscale %s: present-fx is on, the presenter enlarges the picture -- no scaler in this swap chain\n", v);
+        return 1;
+    }
+    if (!strcmp(v, "fit") && pi[3] && pi[4] && s->desc.Width && s->desc.Height) {
+        double sw = s->desc.Width >= s->desc.Height ? (double)pi[3] : (double)pi[4];
+        double sh = s->desc.Width >= s->desc.Height ? (double)pi[4] : (double)pi[3];
+        *f = sw / (double)s->desc.Width;
+        if (sh / (double)s->desc.Height < *f) *f = sh / (double)s->desc.Height;
+        if (*f <= 0.0) *f = 1.0;
+        d3d12_log("[madeira-d3d12] metalfx-upscale fit: %ux%u on a %ux%u screen is a factor of %.3f%s\n", s->desc.Width, s->desc.Height,
+                  (unsigned)pi[3], (unsigned)pi[4], *f, *f < 1.1 ? " -- under 1.1, no scaler" : "");
+    }
+    return 0;
+}
+
 static void mad_swap_make_fx(struct mad_swapchain *s) {
     char v[32]; double f; UINT i, ow, oh;
     struct WMTFXSpatialScalerInfo si; struct WMTTextureInfo ti; struct WMTTextureSwizzleChannels sw;
     static LONG said;
     if (!mad_cfg_str_pe("metalfx-upscale", v, sizeof v) || !v[0]) return;
-    f = strtod(v, NULL);
+    f = 0.0;
+    if (mad_pfx_upscale(s, v, &f)) return;   /* madeira-bcd present-fx: winemetal enlarges the picture; or f is "fit"'s factor */
+    if (f == 0.0) f = strtod(v, NULL);
     if (!(f >= 1.1)) return;
     if (f > 2.0) f = 2.0;   /* as DXMT's D3D11 MetalFX swapchain, which takes 1 to 2 */
     ow = ((UINT)(s->desc.Width * f + 0.5)) & ~1u;
@@ -22504,6 +22708,131 @@ static HRESULT STDMETHODCALLTYPE swap_QI(IDXGISwapChain4 *T, REFIID riid, void *
     return E_NOINTERFACE;
 }
 static ULONG STDMETHODCALLTYPE swap_AddRef(IDXGISwapChain4 *T) { return mad_addref((struct mad_obj *)T); }
+/* madeira-bcd: Lossless Scaling frame generation for Direct3D 12 games (Porthole port, item 1). The passes are Direct3D 11 compute shaders and
+ * run on a device of their own in DXMT's d3d11.dll (tools/patch-d3d11-src-lsfg-bridge.py: d3d11_lsfg_bridge.cpp, whose struct DXMTLsfgFrame this
+ * mirrors; only d3d11-src.dll has it). Present copies the finished picture into a texture that DLL hands out, signals a Metal shared event, lets it
+ * run the passes, then presents each generated picture (after waiting for the DLL's event) before the game's own. Any failure means "no extra
+ * frames". Nothing of this runs unless the app set MADEIRA_LSFG_CTL for the session (a game's own `lossless-scaling` line): the first Present
+ * reads the variable once, and without it that is all that ever happens.
+ * From Porthole's patches 0191 and 0196 (https://github.com/tylerkaska112/Porthole, GPL-3.0-or-later, copyright 2026 The Porthole authors),
+ * modified for BCD in November 2026: the swap chain it follows is given up when that swap chain is released, so a recreated one is followed. */
+struct lsfg_bridge_frame {
+    UINT size, width, height, dxgi_format;
+    UINT64 input_texture, input_event, input_value;
+    UINT count, reserved;
+    UINT64 out_texture[3];
+    UINT64 out_event, out_value;
+    UINT64 done_event, done_value;
+};
+static struct {
+    int state;   /* 0 = not looked at yet, 1 = available, -1 = off for this process */
+    int (*begin)(struct lsfg_bridge_frame *);
+    int (*run)(struct lsfg_bridge_frame *);
+    void (*abort_)(struct lsfg_bridge_frame *);
+    const void *sc;   /* the one swap chain that gets extra frames; compared, never dereferenced */
+} g_lsfg;
+static void mad_blit_texture(obj_handle_t enc, obj_handle_t src, obj_handle_t dst, UINT w, UINT h) {
+    struct wmtcmd_blit_copy_from_texture_to_texture t2t;
+    memset(&t2t, 0, sizeof t2t);
+    t2t.type = WMTBlitCommandCopyFromTextureToTexture;
+    t2t.src = src;
+    t2t.src_size.width = w;
+    t2t.src_size.height = h;
+    t2t.src_size.depth = 1;
+    t2t.dst = dst;
+    MTLBlitCommandEncoder_encodeCommands(enc, (const struct wmtcmd_base *)&t2t);
+}
+/* Before the game's picture is presented: returns how many generated pictures are to be shown first (lf describes them). */
+static UINT mad_lsfg_before(struct mad_swapchain *s, struct mad_resource *src, struct lsfg_bridge_frame *lf) {
+    struct mad_device *dv;
+    obj_handle_t cb, enc;
+    if (g_lsfg.state < 0) return 0;
+    if (g_lsfg.state == 0) {
+        char b[8];
+        HMODULE m;
+        if (!GetEnvironmentVariableA("MADEIRA_LSFG_CTL", b, sizeof b)) { g_lsfg.state = -1; return 0; }
+        m = LoadLibraryA("d3d11.dll");
+        if (m) {
+            g_lsfg.begin = (int (*)(struct lsfg_bridge_frame *))(void *)GetProcAddress(m, "DXMTLsfgBegin");
+            g_lsfg.run = (int (*)(struct lsfg_bridge_frame *))(void *)GetProcAddress(m, "DXMTLsfgRun");
+            g_lsfg.abort_ = (void (*)(struct lsfg_bridge_frame *))(void *)GetProcAddress(m, "DXMTLsfgAbort");
+        }
+        if (!g_lsfg.begin || !g_lsfg.run || !g_lsfg.abort_) {
+            d3d12_log("[lsfg] madeira-bcd Direct3D 12 frame generation is not available: d3d11.dll has no bridge (%s; it is in d3d11-src.dll, env.MADEIRA_D3D11_SRC = 1)\n",
+                      m ? "functions missing" : "d3d11.dll did not load");
+            g_lsfg.state = -1;
+            return 0;
+        }
+        g_lsfg.state = 1;
+        d3d12_log("[lsfg] madeira-bcd Direct3D 12 frame generation: bridge found in d3d11.dll\n");
+    }
+    if (!src || !src->texture) return 0;
+    if (g_lsfg.sc && g_lsfg.sc != (const void *)s) return 0;
+    if (!g_lsfg.sc) {
+        if (src->width < 640 || src->height < 360) return 0;   /* a probe or helper window */
+        g_lsfg.sc = (const void *)s;
+        d3d12_log("[lsfg] madeira-bcd Direct3D 12 frame generation follows swap chain %p (%ux%u, DXGI format %u)\n", (void *)s, (unsigned)src->width,
+                  (unsigned)src->height, (unsigned)s->desc.Format);
+    }
+    dv = s->queue->device;
+    if (!dv->mtl_queue) return 0;
+    memset(lf, 0, sizeof *lf);
+    lf->size = sizeof *lf; lf->width = src->width; lf->height = src->height; lf->dxgi_format = (UINT)s->desc.Format;
+    if (!g_lsfg.begin(lf)) return 0;
+    cb = MTLCommandQueue_commandBuffer(dv->mtl_queue);
+    enc = cb ? MTLCommandBuffer_blitCommandEncoder(cb) : 0;
+    if (!enc) { g_lsfg.abort_(lf); return 0; }
+    g_enc_seq++;
+    if (g_f6_used && dv->enc_fence) { obj_handle_t df = dv->enc_fence; f6_encode(enc, F6_BLIT, &df, 1, 0); }
+    mad_blit_texture(enc, src->texture, (obj_handle_t)lf->input_texture, src->width, src->height);
+    MTLCommandEncoder_endEncoding(enc);
+    MTLCommandBuffer_encodeSignalEvent(cb, (obj_handle_t)lf->input_event, lf->input_value);
+    MTLCommandBuffer_commit(cb);
+    return (UINT)g_lsfg.run(lf);
+}
+/* The generated pictures go to the screen before the game's own, each from a command buffer of its own (see the Direct3D 11 swap chain: three
+ * drawables only). With MetalFX upscaling in this swap chain (bcd.cfg metalfx-upscale without present-fx) each is enlarged like the game's own. */
+static void mad_lsfg_show(struct mad_swapchain *s, struct lsfg_bridge_frame *lf, UINT n, UINT w, UINT h) {
+    UINT i;
+    int signalled = 0;
+    /* Wait for the passes on the CPU first, for a moment only. The queue is in order: a copy that waited on the GPU for passes that are slow (the
+     * first run compiles the shaders) would hold every later command buffer of the game behind it. Not ready in time: this frame is shown without
+     * the extra pictures, and the bridge starts no new passes until these are done. */
+    if (!MTLSharedEvent_waitUntilSignaledValue((obj_handle_t)lf->out_event, lf->out_value, 40)) {
+        static LONG said;
+        if (InterlockedIncrement(&said) <= 5)
+            d3d12_log("[lsfg] madeira-bcd Direct3D 12: the passes were not done after 40 ms (event %llu of %llu); this frame goes without the extra pictures\n",
+                      (unsigned long long)MTLSharedEvent_signaledValue((obj_handle_t)lf->out_event), (unsigned long long)lf->out_value);
+        MTLSharedEvent_signalValue((obj_handle_t)lf->done_event, lf->done_value);
+        return;
+    }
+    for (i = 0; i < n && i < 3; i++) {
+        obj_handle_t dr = MetalLayer_nextDrawable(s->layer), tex, cb, enc;
+        obj_handle_t copy_src = (obj_handle_t)lf->out_texture[i];
+        UINT cw = w, ch = h;
+        if (!dr) break;
+        tex = MetalDrawable_texture(dr);
+        cb = tex ? MTLCommandQueue_commandBuffer(s->queue->device->mtl_queue) : 0;
+        if (!cb) break;
+        MTLCommandBuffer_encodeWaitForEvent(cb, (obj_handle_t)lf->out_event, lf->out_value);
+        if (s->fx_scaler && s->fx_out) {   /* the generated picture is enlarged like the game's own (the scaler takes any texture of its input format) */
+            obj_handle_t ff = (g_f6_used && s->queue->device->enc_fence) ? s->queue->device->enc_fence : 0;
+            MTLCommandBuffer_encodeSpatialScale(cb, s->fx_scaler, copy_src, s->fx_out, ff);
+            copy_src = s->fx_out; cw = s->fx_w; ch = s->fx_h;
+        }
+        enc = MTLCommandBuffer_blitCommandEncoder(cb);
+        if (enc) {
+            g_enc_seq++;
+            mad_blit_texture(enc, copy_src, tex, cw, ch);
+            MTLCommandEncoder_endEncoding(enc);
+        }
+        if (i + 1 == n || i + 1 == 3) { MTLCommandBuffer_encodeSignalEvent(cb, (obj_handle_t)lf->done_event, lf->done_value); signalled = 1; }
+        MTLCommandBuffer_presentDrawable(cb, dr);
+        MTLCommandBuffer_commit(cb);
+    }
+    if (!signalled) MTLSharedEvent_signalValue((obj_handle_t)lf->done_event, lf->done_value);   /* the bridge's next run must not wait for what was not queued */
+}
+
 static ULONG STDMETHODCALLTYPE swap_Release(IDXGISwapChain4 *T) {
     struct mad_swapchain *s = (struct mad_swapchain *)T;
     LONG n = InterlockedDecrement(&s->refs);
@@ -22519,6 +22848,7 @@ static ULONG STDMETHODCALLTYPE swap_Release(IDXGISwapChain4 *T) {
         t1 = mad_tick();
         mad_swap_release_buffers(s);
         if (g_layer_cfg_owner == s) g_layer_cfg_owner = NULL;   /* the next Present re-applies its own layer settings */
+        if (g_lsfg.sc == (const void *)s) g_lsfg.sc = NULL;   /* madeira-bcd: Lossless Scaling frame generation follows the next large swap chain */
         if (s->view) ReleaseMetalView(s->view);
         if (s->latency_event) CloseHandle(s->latency_event);
         if (s->factory) IDXGIFactory1_Release(s->factory);
@@ -22896,6 +23226,11 @@ static void mad_present_run(struct mad_swapchain *s, UINT idx) {
                       s->desc.Width, s->desc.Height, (void *)s->hwnd, (unsigned long long)s->presents);
         mad_swd_step(s->queue, 'A');
         mad_swap_apply_layer(s);
+    }
+    {   /* madeira-bcd: Lossless Scaling frame generation (Direct3D 12 bridge): nothing without MADEIRA_LSFG_CTL (g_lsfg.state is -1 after the first Present) */
+        struct lsfg_bridge_frame lf;
+        UINT ngen = mad_lsfg_before(s, src, &lf);
+        if (ngen) mad_lsfg_show(s, &lf, ngen, src->width, src->height);
     }
     mad_swd_step(s->queue, 'D');
     { LONG64 td = mad_qpc();   /* ml1128 */

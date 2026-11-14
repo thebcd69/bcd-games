@@ -512,7 +512,8 @@ shown_text = re.findall(r"(?:Text|Label|Link)\(([^\n]*)", code(chip) + code(upda
 check(not [t for t in shown_text if re.search(r"page|absoluteString|html_url|http", t)] and "UIApplication.shared.open(page)" in updates,
       "updates: no address is drawn as text; Go to update opens the page")
 check("if checker.showsChip" in chip and "var showsChip: Bool { autoCheck && state == .updateAvailable }" in updates
-      and 'Text("Update available")' in chip, "updates: the chip shows only while checking automatically and a newer release exists")
+      and 'Text(compact ? "Update" : "Update available")' in chip and '.accessibilityLabel("Update available")' in chip,
+      "updates: the chip shows only while checking automatically and a newer release exists (\"Update\" on an upright phone beside JIT off, build 655)")
 chips = block(front, "private func page(_ item: BCDDuoTab) -> some View")
 check("BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }" in chips
       and "section: settingsSection" in front, "updates: the native toolbar keeps the update action and opens Settings at Updates")

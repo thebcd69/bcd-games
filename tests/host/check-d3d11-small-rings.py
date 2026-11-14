@@ -417,9 +417,9 @@ check("the DXMT core is compiled from the submodule and from the copy",
       and 'job "$OUT/tree" "$OUT/tree/src/dxmt/$s.cpp" "$o" dxmt; DXMT_OBJ+=("$o")' in sh)
 check("the unpatched DLL links the submodule's core, d3d11-src.dll the copy's",
       '"$AR" csrDT "$OUT/plain/libdxmt.a" "${PLAIN_DXMT_OBJ[@]}"' in sh and '"$AR" csrDT "$OUT/libdxmt.a" "${DXMT_OBJ[@]}"' in sh
-      and 'link_dll "$OUT/plain/d3d11.dll" "$OUT/plain/libdxmt.a" "${PLAIN_OBJ[@]}"' in sh
-      and 'link_dll "$OUT/d3d11.dll" "$OUT/libdxmt.a" "${PATCHED_OBJ[@]}"' in sh
-      and 'local out="$1" dxmt="$2"; shift 2' in sh and '"$OUT/libDXBCParser.a" "$dxmt" -L"$OUT"' in sh)
+      and 'link_dll "$OUT/plain/d3d11.dll" "$OUT/plain/libdxmt.a" "$D/src/d3d11/d3d11.def" "${PLAIN_OBJ[@]}"' in sh
+      and 'link_dll "$OUT/d3d11.dll" "$OUT/libdxmt.a" "$PATCHED_DEF" "${PATCHED_OBJ[@]}"' in sh   # the copy's .def: the Lossless Scaling bridge's exports
+      and 'local out="$1" dxmt="$2" def="$3"; shift 3' in sh and '"$OUT/libDXBCParser.a" "$dxmt" -L"$OUT"' in sh)
 # Round 620: the pin's own source has carried the small rings since the 2026-10-15 upstream merge, so the unpatched
 # build is refused for the marker only when the pin's source lacks it (PIN_RINGS=0).
 check("build script refuses a result that lacks the patch it applied, and an unpatched DLL that has it",

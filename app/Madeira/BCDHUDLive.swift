@@ -469,6 +469,7 @@ final class BCDHUDState: ObservableObject {
             if parts.count == 2 { out.outputSize = "\(Int(Double(parts[0]) * factor))x\(Int(Double(parts[1]) * factor))" }
             out.upscale = "MetalFX " + (factor == factor.rounded() ? String(Int(factor)) : String(format: "%.1f", factor)) + "x"
         }
+        if factor == nil, (profile.get("metalfx-upscale") ?? MadeiraConfig.get("metalfx-upscale")) == BCDUpscale.fit { out.upscale = "MetalFX to the screen" }   // madeira-bcd: the "to the screen" choice
         if (profile.get("env.MADEIRA_FRAMEGEN") ?? MadeiraConfig.get("env.MADEIRA_FRAMEGEN")) == "1" { out.frameGen = "frame gen" }
         out.gpuName = entry.reportNVIDIA == true ? "GeForce RTX 3060" : "Apple GPU"
         return out

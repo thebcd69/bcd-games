@@ -83,6 +83,49 @@ void madeira_set_fence_mode(int mode);
 void madeira_set_vsync_locked(int locked);
 int madeira_get_vsync_locked(void);
 
+// madeira-bcd: frame generation's live switch (winemetal_unix.c, tools/patch-winemetal-framegen-live.py). madeira_fgl_set: 1 = on,
+// 0 = off, -1 = as the game started (env.MADEIRA_FRAMEGEN); it and madeira_fgl_get return what is in force (1 or 0; always 0 below
+// iOS 26). madeira_fgl_set_measure(1): the interpolator runs, nothing extra is shown. madeira_fgl_set_guard: the GPU guard's limit in
+// percent (0 = off, 1 = 95, -1 = the key env.MADEIRA_FRAMEGEN_GPU_GUARD or the default). madeira_fgl_status returns 0 off, 1 on and
+// waiting, 2 generating, 3 paused (the GPU is full), 4 cannot run here, 5 measuring only; gpu_busy is 0 to 1, or -1 without the guard.
+int madeira_fgl_set(int on);
+// madeira-bcd: a session ended: frame generation's and present-fx's readings of their keys go, so a later session reads its own.
+void madeira_fgl_session_reset(void);
+void madeira_pfx_session_reset(void);
+int madeira_fgl_get(void);
+void madeira_fgl_set_measure(int on);
+void madeira_fgl_set_guard(int percent);
+int madeira_fgl_status(int *width, int *height, double *game_fps, double *generated_fps, double *gpu_busy);
+// madeira-bcd: present-fx (winemetal_unix.c, tools/patch-winemetal-present-fx.py; only a session with env.MADEIRA_PRESENT_FX = 1 acts on
+// them). madeira_pfx_set_screen: the screen's size in pixels, for "to the screen". madeira_pfx_set_upscale: 0 = none, 1 = a factor
+// (milli = the factor times 1000, 1100 to 2000), 2 = to the screen; it takes effect at the next frame. madeira_pfx_status returns the
+// mode in force (-1 before a layer was set up) with the size the game draws, the size shown and how the last frame was enlarged
+// (0 a copy, 1 MetalFX, 2 bilinear).
+// madeira-bcd: Lossless Scaling frame generation's pacing (winemetal_unix.c, tools/patch-winemetal-lsfg-pacing.py): how many frames are
+// shown per game frame (2 to 4 while frames are added; 1 = none, the default). The frame-rate limit then counts every frame shown.
+void madeira_lsfg_set_shown(int frames_per_game_frame);
+void madeira_pfx_set_screen(int a, int b);
+void madeira_pfx_set_upscale(int mode, int milli);
+int madeira_pfx_status(int *game_w, int *game_h, int *shown_w, int *shown_h, int *kind);
+// madeira-bcd: the VideoToolbox frame interpolation experiment (winemetal_unix.c, tools/patch-winemetal-vt-interp.py). madeira_vti_set:
+// the in-game menu's switch (1, 0, -1 = as the game started); returns what is in force. madeira_vti_status: 0 off, 1 the model is
+// loading, 2 ready, 3 making pictures, 4 not possible (madeira_vti_why writes the reason and returns its length). madeira_vti_probe: the
+// device test, slow (a model is loaded for every line), never on the main thread; `out` gets its lines. All of them do nothing in a
+// session without MADEIRA_VT_INTERP, except the probe, which needs no session.
+int madeira_vti_set(int on);
+int madeira_vti_status(int *width, int *height, double *game_fps, double *generated_fps, double *pair_ms);
+int madeira_vti_why(char *out, int cap);
+void madeira_vti_session_ended(void);
+int madeira_vti_probe(char *out, int cap);
+// madeira-bcd: scheduler hints and the fast cores' clock (BCDSchedHints.m; bcd.cfg sched-hints). madeira_sched_task_tiers reads the
+// process's latency and throughput tiers (0 = read); madeira_sched_task_qos asks for two tiers and returns the kernel's two answers
+// (0 = taken); madeira_cpu_clock_sample: milliseconds the process ran on the fast cores, their cycles, and the time now (0 = read).
+int madeira_sched_task_tiers(unsigned *latency, unsigned *throughput);
+void madeira_sched_task_qos(unsigned latency, unsigned throughput, int *kr_latency, int *kr_throughput);
+unsigned madeira_sched_first_latency_tier(void);
+unsigned madeira_sched_first_throughput_tier(void);
+int madeira_cpu_clock_sample(double *fast_ms, double *fast_cycles, double *wall_ms);
+
 // ml1050: what the PANEL can do and what we asked it for, published from
 // Swift (only UIKit knows) so the native [frame] line can print the
 // quantisation grid every present snaps to. panel_hz = the display's own

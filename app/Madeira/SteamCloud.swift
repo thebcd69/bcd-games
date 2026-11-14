@@ -830,6 +830,10 @@ struct SteamCloudState: Equatable, Sendable {
     }
     /// What the last comparison leaves to the user.
     var conflicts: [SteamCloudEntry] = []
+    /// madeira-bcd: what the last comparison's plan would move without asking: up to the cloud, and down to this device. For the
+    /// game's page, which lists them before anything moves; a sync works from its own fresh plan, not from these.
+    var pendingUp: [SteamCloudEntry] = []
+    var pendingDown: [SteamCloudEntry] = []
     var phase: Phase = .checking
     var audit = SteamCloudAudit()
     var checked: Date?

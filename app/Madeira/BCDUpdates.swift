@@ -157,6 +157,9 @@ extension BCDUpdateChecker {
 /// on and a newer release exists. A tap (or A) opens Settings › Updates; it never opens by itself.
 struct BCDUpdateChip: View {
     @ObservedObject private var checker = BCDUpdateChecker.shared
+    /// "Update" instead of "Update available": a phone held upright that also shows Home's "JIT off" chip has room for
+    /// the title, both chips and Settings only with the short word (build 655).
+    var compact = false
     let open: () -> Void
 
     var body: some View {
@@ -165,7 +168,7 @@ struct BCDUpdateChip: View {
                 HStack(spacing: 6) {
                     Image(systemName: "arrow.down.circle.fill").font(.system(size: 12, weight: .bold))
                         .foregroundStyle(BCDStyle.glow)
-                    Text("Update available").font(BCDStyle.label(12)).lineLimit(1)
+                    Text(compact ? "Update" : "Update available").font(BCDStyle.label(12)).lineLimit(1)
                 }
                 .fixedSize()                       // whole, even in a crowded bar
                 .padding(.horizontal, 10).padding(.vertical, 6)
@@ -175,6 +178,7 @@ struct BCDUpdateChip: View {
             .buttonStyle(.plain)
             .layoutPriority(1)
             .bcdFocusable("shell.update", cornerRadius: 16, action: open)
+            .accessibilityLabel("Update available")
             .accessibilityHint("Opens Settings at Updates")
         }
     }

@@ -130,6 +130,12 @@ extension TouchControl {
         AnyView(TouchPadSurface(control: control, action: name, changed: changed))
     }
 
+    /// madeira-bcd (Porthole port, item 9): a floating stick's surface over its zone.
+    func floatingPadSurface(control: UUID, name: String, diameter: CGFloat, changed: @escaping (CGSize, Bool) -> Void,
+                            landed: @escaping (CGSize?) -> Void) -> AnyView {
+        AnyView(TouchPadSurface(control: control, action: name, changed: changed, floatDiameter: diameter, landed: landed))
+    }
+
     // MARK: State for the views
 
     var items: [BCDTouchItem] { model.controls.map(BCDTouchItem.init(stored:)) }
@@ -341,7 +347,8 @@ struct BCDTouchControlsLive: View {
                       // A library game's Control opacity; full while editing.
                       opacity: session && !model.editing ? library.opacity : 1,
                       editing: model.editing, selected: model.selected,
-                      input: BCDTouchLive.shared, arranging: BCDTouchLive.shared, look: looks.look)
+                      input: BCDTouchLive.shared, arranging: BCDTouchLive.shared, look: looks.look,
+                      floatingSticks: BCDTouchFeel.floatingSticks)   // madeira-bcd (Porthole port, item 9): off unless the in-game menu turned it on
             .id(feel.revision)
     }
 }

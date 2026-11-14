@@ -50,6 +50,7 @@ private enum BCDLiveKey {
     static let frameCap = "env.MADEIRA_FPS_CAP"
     static let promote = "env.MADEIRA_PROMOTE"
     static let metalFX = "metalfx-upscale"
+    static let presentFX = "env.MADEIRA_PRESENT_FX"
     static let direct3D9 = "d3d9"
     static let orientation = BCDOrientationLive.key              // "orientation-lock": a BCDOrientationChoice word
     static let xinput = "MADEIRA_XINPUT"                      // MadeiraConfig.flag name, written as env.MADEIRA_XINPUT
@@ -173,6 +174,13 @@ private enum BCDLiveKey {
         read()
     }
 
+    /// madeira-bcd: bcd.cfg's sched-hints, read when a game starts, so it never asks for a restart.
+    @Published private(set) var schedHints = BCDSchedHints.mode(MadeiraConfig.get(BCDSchedHints.key)).rawValue
+    func setSchedHints(_ value: String) {
+        MadeiraConfig.set(BCDSchedHints.key, value.isEmpty ? nil : value)
+        schedHints = BCDSchedHints.mode(value).rawValue
+        LogStore.shared.log("[runtime-settings] sched-hints=\(value.isEmpty ? "off" : value)")
+    }
     func setEco(_ on: Bool) {
         MadeiraConfig.set(BCDLiveKey.eco, on ? "1" : nil)
         LogStore.shared.log("[runtime-settings] eco=\(on ? 1 : 0)")
@@ -204,9 +212,12 @@ private enum BCDLiveKey {
         guard !extensionTestRunning else { return }
         // madeira-bcd (round 630; Discord agent D S10: 15 of 15 "no extension" logs since 10-31 are LiveContainer installs): inside
         // LiveContainer the helper extension is not registered with iOS, so the test can only fail; say why instead.
-        if getenv("LC_HOME_PATH") != nil {
-            extensionTestLine = "Not available inside LiveContainer: the helper extension is there only when BCD is installed as its own app."
-            LogStore.shared.log("[memhost] test skipped: LiveContainer (lc=1), the helper extension is not registered there")
+        // Follow-up of the night round 2026-11-11: with LiveContainer's Helper Process Support ready (JITBuiltInHost.swift) the test runs
+        // there too; the test is the player's own tap, so it needs no key.
+        if getenv("LC_HOME_PATH") != nil, LiveContainerHelper.state != .ready {
+            extensionTestLine = "Inside LiveContainer the helper extension starts only through LiveContainer's Helper Process Support. "
+                + "Settings › JIT says what is missing."
+            LogStore.shared.log("[memhost] test skipped: LiveContainer (lc=1), helper process support \(LiveContainerHelper.state.rawValue)")
             return
         }
         extensionTestRunning = true
@@ -232,6 +243,7 @@ private enum BCDLiveKey {
     @Published private(set) var frameCap: Int?
     @Published private(set) var holdMaximumRate = false
     @Published private(set) var metalFX = ""
+    @Published private(set) var presentFX = false
     @Published private(set) var direct3D9 = ""
     @Published private(set) var orientation = ""
     @Published private(set) var hudEveryGame = BCDHUDState.everyGame == .off ? "" : BCDHUDState.everyGame.rawValue
@@ -253,6 +265,7 @@ private enum BCDLiveKey {
             return BCDResolution(width: choice.w, height: choice.h, shape: shape)
         }
         read()
+        _ = losslessWatch
     }
 
     private func read() {
@@ -264,6 +277,7 @@ private enum BCDLiveKey {
         frameCap = Int(values[BCDLiveKey.frameCap] ?? "").flatMap { (10...120).contains($0) ? $0 : nil }
         holdMaximumRate = ProMotionIntent.holdMaximum
         metalFX = values[BCDLiveKey.metalFX] ?? ""
+        presentFX = values[BCDLiveKey.presentFX] == "1"
         direct3D9 = values[BCDLiveKey.direct3D9] ?? ""
         orientation = BCDOrientationChoice(setting: values[BCDLiveKey.orientation]).setting ?? ""
     }
@@ -277,6 +291,31 @@ private enum BCDLiveKey {
     func setResolution(_ value: String) { write(BCDLiveKey.desktopSize, value) }
     func setFrameCap(_ fps: Int?) { write(BCDLiveKey.frameCap, fps.map(String.init)) }
     func setMetalFX(_ value: String) { write(BCDLiveKey.metalFX, value) }
+    func setPresentFX(_ on: Bool) { write(BCDLiveKey.presentFX, on ? "1" : nil) }
+
+    // madeira-bcd: Lossless Scaling's setup (BCDLosslessLive.swift); the page follows its changes.
+    var lossless: BCDLossless.Setup { BCDLosslessLive.shared.setup }
+    func losslessCheck() { Task { await BCDLosslessLive.shared.verify() } }
+    func losslessDownload() { Task { await BCDLosslessLive.shared.download() } }
+    func losslessRemove() { BCDLosslessLive.shared.remove() }
+    private lazy var losslessWatch = BCDLosslessLive.shared.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+
+    // madeira-bcd: the device test of Apple frame interpolation (BCDVTInterpLive.swift). No game may run meanwhile.
+    @Published private(set) var vtProbe = BCDVTInterp.Probe()
+    var vtProbeBlocked: String? {
+        guard #available(iOS 26.0, *) else { return BCDVTInterp.Probe.needsIOS26 }
+        return wine_process_is_running() != 0 || LibraryModel.shared.current != nil ? BCDVTInterp.Probe.whileGameRuns : nil
+    }
+    func vtProbeRun() {
+        guard !vtProbe.running, vtProbeBlocked == nil else { return }
+        vtProbe = BCDVTInterp.Probe(running: true, text: "")
+        LogStore.shared.log(BCDVTInterp.Probe.logPrefix + "started from Settings")
+        BCDVTInterpLive.probe { [weak self] text in
+            let lines = text.split(separator: "\n").map(String.init)
+            for line in lines { LogStore.shared.log(BCDVTInterp.Probe.logPrefix + line) }
+            self?.vtProbe = BCDVTInterp.Probe(running: false, text: lines.isEmpty ? "The test wrote nothing." : lines.joined(separator: "\n"))
+        }
+    }
     func setDirect3D9(_ value: String) { write(BCDLiveKey.direct3D9, value) }
     /// Only a word BCDOrientationChoice knows is written, and "off" is the key removed (it is what no key means).
     func setOrientation(_ value: String) { write(BCDLiveKey.orientation, BCDOrientationChoice(setting: value).setting) }
@@ -574,6 +613,26 @@ struct BCDTouchEditorHost: View {
             self?.externalGamesBusy = false
             self?.externalGamesMessage = added == 0 ? "No new games were found on \(folder.name). Steam games there are in your library already."
                 : "\(added) \(added == 1 ? "game" : "games") from \(folder.name) added to your library."
+        }
+    }
+
+    /// madeira-bcd (Porthole port, item 6): how fast the drive is as BCD uses it. About 70 MB are written and read in a folder of
+    /// their own, off the main thread; the result is the drives' message and a line in the log.
+    func testSpeed(ofDrive id: String) {
+        guard let folder = folder(id), let root = ExternalDrives.shared.mounted[folder.id], beginExternalWork() else { return }
+        externalGamesMessage = "Testing \(folder.name)…"
+        Task { [weak self] in
+            let result = await Task.detached(priority: .utility) { Result { try BCDDriveSpeedTest.run(in: root) } }.value
+            self?.externalGamesBusy = false
+            switch result {
+            case .success(let speed):
+                LogStore.shared.log("[drive] speed test of \(folder.name): \(speed.summary)")
+                self?.externalGamesMessage = "\(folder.name): \(speed.summary)."
+                    + (BCDDriveWriteMode.mode(forWriteMBps: speed.writeMBps) == .gentle ? " This is a slow drive: a download to it takes long." : "")
+            case .failure(let error):
+                LogStore.shared.log("[drive] speed test of \(folder.name) failed: \(error.localizedDescription)")
+                self?.externalGamesMessage = "The speed test of \(folder.name) did not finish: \(error.localizedDescription)"
+            }
         }
     }
 
@@ -987,6 +1046,28 @@ struct BCDLiveSwitch {
     func setPerfTrace(_ on: Bool) {
         BCDPerfTraceLive.switchOn = on
         LogStore.shared.log("[bcd-settings] the performance trace = \(on ? "on" : "off")")
+        configTick += 1
+    }
+
+    // madeira-bcd (Porthole port, item 10): Ask before trying a fix (AutoTuneAsk.swift).
+    var asksBeforeFix: Bool {
+        _ = configTick
+        return UserDefaults.standard.bool(forKey: AutoTuneAsk.key)
+    }
+    func setAsksBeforeFix(_ on: Bool) {
+        UserDefaults.standard.set(on, forKey: AutoTuneAsk.key)
+        LogStore.shared.log("[bcd-settings] ask before trying a fix = \(on ? "on" : "off")")
+        configTick += 1
+    }
+
+    // madeira-bcd (Porthole port, item 11): Make big logs smaller before sending (BCDLogThin.swift).
+    var thinsLogs: Bool {
+        _ = configTick
+        return UserDefaults.standard.bool(forKey: BCDLogThinner.switchKey)
+    }
+    func setThinsLogs(_ on: Bool) {
+        UserDefaults.standard.set(on, forKey: BCDLogThinner.switchKey)
+        LogStore.shared.log("[bcd-settings] make big logs smaller = \(on ? "on" : "off")")
         configTick += 1
     }
 }

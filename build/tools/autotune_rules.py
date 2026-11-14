@@ -1035,6 +1035,32 @@ RULES = [
         "evidence": ["tlou1-heap-backing0-memory-kill-2026-11-10 (The Last of Us Part I, build 651, the owner's start of 10:42)"],
     },
     {
+        "id": "pso-libraries-memory-kill",
+        "lines": ["pso-lazy-libs = 1"],
+        "priority": 3,   # as heap-backing-0-placed-alias-kill: ahead of the swap rules (the libraries are the host's own memory, which the
+                         # swap file does not reach) and of fex-runtime-fault (4), which every TLOU log matches through its crash reporter
+        "outcomes": ["killed"],
+        "memoryMinPct": 90,
+        # The Last of Us Part I (the owner's warm start of 2026-11-12 13:10, build 656, iPhone18,2, after the game had built all its
+        # shaders in the menu): iOS closed the game at 8144 of 8191 MB as the first level finished loading ("[swap] ml1150 pool: system
+        # memory pressure CRITICAL", then the log stops). The game creates about 126,500 pipeline states at every start (96,082 graphics,
+        # 30,384 compute); BCD kept a Metal library for every stage of every one: "ml1060 shader libraries created: 104502, 2163 MB of
+        # metallib", and the host's own allocator held 1.31 times that ("[phys-map] tag 2 totals dirty=2865 MB"; the same ratio in all six
+        # logs of that day: 828 -> 1149, 1618 -> 2195, 2102 -> 2769 MB), while only 748 pipelines were ever drawn. pso-lazy-libs = 1
+        # (build 481, Horizon Zero Dawn's 52,570 pipelines; in its list, Horizon Forbidden West's, Rift Apart's and Spider-Man 2's since)
+        # lets a pipeline that is built at its first draw give its libraries back once it is created and reads them from the shader
+        # cache when it is first drawn. The signal is the shader cache's own count line, printed every 1,000 stage lookups: 60 of them
+        # are 60,000 stages, more than any game without such a pipeline flood makes.
+        "all": [s("[madeira-d3d12] shader cache: ", " hits, ", count=60)],
+        "none": [s("pso-lazy-libs = 1: a lazy pipeline's shader libraries are let go")],
+        "reason": "iOS closed the game at its memory limit while BCD held a compiled shader library for each of the game's tens of "
+                  "thousands of pipelines, nearly all of them never drawn. The line gives a library back until its pipeline is first "
+                  "drawn.",
+        "evidence": ["tlou1-pso-libraries-memory-kill-2026-11-12 (The Last of Us Part I, build 656, the owner's warm start of 13:10)",
+                     "Horizon Zero Dawn, build 480 (2026-10-09 20:28): 23,045 libraries, killed at 8,189 MB two seconds into play; build 481 "
+                     "with the line"],
+    },
+    {
         "id": "cage-skip-host-malloc",
         "lines": ["env.MADEIRA_CAGE_RELEASE = 2"],
         "priority": 9,
@@ -2505,6 +2531,59 @@ RULES = [
         "reason": "The game clears its ray-cast results to a new value every time, and after 32 different values BCD wrote only one byte "
                   "of the value, so the game found its own markers wrong and stopped. Update BCD: build 650 writes every value exactly.",
         "evidence": ["tlou1-clear-pattern-cache-full-2026-11-09 (the owner's start of tlou-i-l.exe at 22:00, build 649, iPhone18,2)"],
+    },
+    {
+        "id": "d3d12-typed-buffer-uav-clear",
+        "lines": [],
+        "fixedIn": 656,
+        "evaluateWhenRan": True,
+        "priority": 60,   # a wrong picture, never the reason a session stopped: after every rule that names a stop
+        # The Last of Us Part I (the owner's start of 2026-11-11 21:58, build 655 with heap-backing = 2, iPhone18,2; the first scene, 152 s):
+        # the character was not drawn, things left trails when the camera turned, the picture was dark with wrong colours. The game keeps
+        # the 44 indirect dispatch records of its deferred lighting (16 bytes each: thread groups X, Y, Z, a spare word; "uber-shader-offset"
+        # in tlou-i-l.exe, described at 0x14216423c) in a buffer it clears every frame to (0, 1, 1, 0) through an R32G32B32A32_UINT view
+        # (its clear helper 0x142194ea8 picks the view's format by the buffer's stride), and a compute pass then counts screen tiles into X.
+        # Direct3D 12 writes the four values into each element's channels; BCD wrote Values[0] into every 32 bits of any buffer view
+        # ("ClearUnorderedAccessViewUint with value 0 is approximated by byte 0 (no pattern buffer)": printed only when the four values
+        # differ), so Y and Z were 0 and no DispatchIndirect of CS_DeferredLighting ran a thread group ("[probe] dispatch
+        # 'CS_DeferredLighting' first record: 258 0 0 0 0", 628 samples, never a Y or Z): no deferred light at all, only what is drawn
+        # forward (lamp shades, hair) on a target nothing rewrote. Build 656 clears a typed buffer view per element in the view's format
+        # (tests/host/check-uav-typed-buffer-clear.py); such a clear then prints "through a typed buffer view" instead of the first line.
+        # The second signal is the indirect-argument probe's line for a dispatch whose record has no Y and no Z (three zeros and the
+        # line's own two).
+        "all": [s("ClearUnorderedAccessViewUint with value", "is approximated by byte"),
+                s("[probe] dispatch '", "first record:", " 0 0 0 0 (")],
+        "reason": "The game resets the work list of its lighting every frame in a way BCD did wrong, so the lighting never ran: dark "
+                  "picture, missing characters, trails behind moving things. Update BCD: build 656 does that reset right.",
+        "evidence": ["tlou1-typed-buffer-clear-no-lighting-2026-11-11 (the owner's start of tlou-i-l.exe at 21:58, build 655, iPhone18,2)",
+                     "tests/host/check-uav-typed-buffer-clear.py"],
+    },
+    {
+        "id": "d3d12-tick-count-exceptions",
+        "lines": [],
+        "fixedIn": 657,
+        "evaluateWhenRan": True,
+        "ranOnly": True,   # a lower frame rate, never the reason a session stopped: a crash or a kill keeps its own verdict
+        "api": "d3d12",
+        "priority": 61,    # after the picture rule above (60)
+        # The Last of Us Part I (the owner's start of 2026-11-12 19:48, build 656 with pso-lazy-libs = 1 and quiet-log = 1, iPhone18,2;
+        # 222 s, the last 57 s in the first level at 11-16 fps): 983,041 exceptions for a read of 0x7ffe0320, 6,000 to 15,000 a second
+        # in play. kernel32's GetTickCount is "mov w8, #0x7ffe0320; ldr w0, [x8]" (the line's insn=0xb9400100): it reads the shared data
+        # page at its Windows address, where iOS maps nothing, so Wine's exception thread serves every call (16-28 % of a core in play,
+        # and the calling thread stops for each one). The Direct3D 12 layer's indirect-argument probe called it for every indirect draw
+        # and dispatch it replayed, before it looked at ind-probe (the game makes 4,500 to 16,800 ExecuteIndirect calls a second), and
+        # pipeline creation once per pipeline. The handler's own count by caller, from the 13:00 log of the same build: 913,610 of
+        # 1,048,576 inside ExecuteCommandLists, 86,039 and 28,350 at pipeline creation. Build 657 reads the CPU's counter instead
+        # (mad_tick_ms; tests/host/check-d3d12-tick-ms.py). The first signal is the handler's line, printed every 4,096 exceptions:
+        # 64 of them are 262,144 reads of the tick count; the second is a line of the probe, which is only printed when the layer
+        # replays indirect commands.
+        "all": [s("[subfloor] ml956 serviced", "latest guest 0x7ffe0320", "insn=0xb9400100", count=64),
+                s("[probe] ", " first record: ")],
+        "reason": "BCD read the clock in a way that costs an exception on iOS for every indirect draw the game makes, hundreds of "
+                  "thousands of times in this session: a lower frame rate, not a fault of the game. Update BCD: build 657 reads it "
+                  "without one.",
+        "evidence": ["tlou1-tick-count-exceptions-2026-11-12 (The Last of Us Part I, build 656, the owner's start of 19:48)",
+                     "tests/host/check-d3d12-tick-ms.py"],
     },
     {
         "id": "tlou1-meshraycaster-guards",

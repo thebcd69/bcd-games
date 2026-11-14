@@ -117,6 +117,11 @@ final class DepotDownloader {
         self.session = session
     }
 
+    /// madeira-bcd (Porthole port, item 6): asked once before a download's chunks are fetched: how many chunks are in flight for a
+    /// download into this folder when that is fewer than usual. nil keeps the usual number, and it is nil until the app sets it
+    /// (MadeiraApp.swift: BCDDriveGentle's answer under bcd.cfg's drive-gentle-writes = 1; nil without that line).
+    static var gentleChunks: (@Sendable (URL) async -> Int?)?
+
     // MARK: - Public API
 
     /// Download an app into `steamApps/common/<installdir>` and write its
@@ -286,6 +291,9 @@ final class DepotDownloader {
         let started = Date()
         let resumedBytes = state.doneBytes
         var lastReport = Date.distantPast
+        // madeira-bcd (Porthole port, item 6): with bcd.cfg drive-gentle-writes = 1 a slow external drive gets fewer writers
+        // (BCDDriveSpeed.swift); nil, the usual number, in every other case and always without the key.
+        let gentleChunks = await Self.gentleChunks?(installURL)
         for (index, plan) in plans.enumerated() {
             let journal = try JournalWriter(url: prepared.journals[index])
             defer { journal.close() }
@@ -305,7 +313,7 @@ final class DepotDownloader {
                         return (item.key, UInt64(chunk.compressedSize), false)
                     }
                 }
-                for _ in 0..<min(maximum, work.count) { enqueue() }
+                for _ in 0..<min(gentleChunks ?? maximum, work.count) { enqueue() }
                 for try await (key, bytes, reused) in group {
                     journal.append(key)
                     state.doneBytes += bytes
@@ -1588,6 +1596,7 @@ extension DepotDownloader {
         defer { journal.close() }
         let work = pending[0], paths = prepared.paths[0]
         let attempts = attemptsPerChunk
+        let maximum = await Self.gentleChunks?(folder) ?? maxConcurrentChunks   // madeira-bcd: as in install (nil without the key)
         let started = Date(), resumedBytes = state.doneBytes
         var lastReport = Date.distantPast
         try await withThrowingTaskGroup(of: (UInt64, UInt64).self) { group in
@@ -1602,7 +1611,7 @@ extension DepotDownloader {
                     return (item.key, UInt64(chunk.compressedSize))
                 }
             }
-            for _ in 0..<min(maxConcurrentChunks, work.count) { enqueue() }
+            for _ in 0..<min(maximum, work.count) { enqueue() }
             for try await (key, bytes) in group {
                 journal.append(key)
                 state.doneBytes += bytes

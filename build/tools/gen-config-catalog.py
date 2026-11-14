@@ -272,6 +272,13 @@ OVERLAY = {
                         "1: the closed browser's own reservations are given back before the next one starts (3 s after the crash). "
                         "A browser that closes normally is left as before. 0: keep them, as before build 631. Read at session start.",
                 },
+    "env.MADEIRA_LC_HELPER_MEMORY": {"category": "Memory & JIT pool", "title": "Helper memory inside LiveContainer",
+                "kind": "bool", "default": "0",
+                "note": "Off unless set (build 654). Inside LiveContainer 3.8.13 or newer, with its Helper Process Support on for BCD, "
+                        "BCD's helper extension can give games memory there too (Helper memory, mempool-mb). 1: use it inside "
+                        "LiveContainer. Off: helper memory is skipped there, as every LiveContainer install had it before. Outside "
+                        "LiveContainer this does nothing. Read from bcd.cfg or the game's settings when the session starts.",
+                },
     "env.MADEIRA_POOL_LAZY_WINDOWS": {"category": "Memory & JIT pool", "title": "Helper memory: do not keep its regions mapped",
                 "kind": "bool", "default": "0",
                 "note": "Off unless set (build 630). Helper memory maps every region of its pool into BCD's address space for the whole "
@@ -642,6 +649,15 @@ OVERLAY = {
                         "refreshed at every ExecuteCommandLists (the GPU rounds a texture buffer's start down to 16 bytes "
                         "and the shader converter ignores the element offset). view-census counts them. Read once per "
                         "game start."},
+    # Build 657 (The Last of Us Part I, the owner's log of 2026-11-12 19:48): 20,000 to 58,000 typed views a second from six job
+    # threads, 0.9-1.3 s of waiting on the device's view lock per second. tests/host/check-d3d12-typed-view-unlocked.py.
+    "typed-view-unlocked": {"category": "Direct3D 12", "title": "Experiment: make typed buffer views outside the view lock",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: the Metal texture of a typed buffer view is made while the device's view lock is "
+                        "released (the view is looked up again afterwards, and a view another thread made meanwhile is "
+                        "kept), so threads that create views no longer wait for each other. For a game that makes tens "
+                        "of thousands of typed views a second from several threads. Views that need a copy of the data, "
+                        "another alignment or atomic access are made under the lock as before. Read once per game start."},
     "present-lum": {"category": "Direct3D 12", "title": "Diagnostic: brightness of presented frames",
                 "kind": "bool", "default": "0",
                 "note": "Default off. 1: at presents 2, 30, 120, 600 and 1800 of each swapchain a log line (\"[present-lum]\") says how bright the frame the game "
@@ -1030,6 +1046,147 @@ OVERLAY = {
                         "every window again (the old behaviour, which stopped GTA V and Red Dead Redemption 2 with a graphics-driver error "
                         "within a minute). Only read when env.MADEIRA_FRAMEGEN is on.",
                 "sources": ["dxmt/src/winemetal/unix/winemetal_unix.c"]},
+    # Porthole port, item 11: the end-of-session [benchmark] line (app/Madeira/BCDPerfTraceCore.swift, BCDPerfTraceLive.swift).
+    "benchmark-line": {"category": "Debugging", "kind": "bool", "default": "0",
+                       "title": "A [benchmark] line at the end of each session",
+                       "sources": ["app/Madeira/BCDPerfTraceLive.swift"],
+                       "note": "Default off; bcd.cfg or a game's own line. 1: BCD reads the frame rate, the memory, the swap, the JIT pool and the "
+                               "heat once a second while the game runs (without the performance trace's file) and writes one line when the "
+                               "session ends: the build, the average and the slowest 1 % and 5 % of the seconds with frames, the slowest "
+                               "second, the worst frame, the most memory used and the least left, the swap and JIT peaks, the heat and the "
+                               "graphics switches in force (present-fx, frame generation, Lossless Scaling, Apple frame interpolation, "
+                               "upscaling, the Direct3D 11 source build, the FEX call return experiment). For comparing builds and switches."},
+    # Porthole port, item 8: a game that never asks for a controller (app/Madeira/BCDPadAuto.swift, BCDPadAutoLive.swift,
+    # Winios/WiniosGamepad.c).
+    "pad-auto": {"category": "Controllers", "kind": "bool", "default": "0",
+                "title": "Controller as keys when the game has no controller support (experimental)",
+                "sources": ["app/Madeira/BCDPadAutoLive.swift"],
+                "note": "Default off; a game's own line. 1: the engine counts how often the game asks for a controller (XInput). When it "
+                        "has not asked 25 seconds after its start and a controller is connected, the controller works as keyboard and "
+                        "mouse (the keyboard-and-mouse mode with its bindings), and is a controller again the moment the game asks; a "
+                        "game whose last run never asked starts that way. It stands down when a Controller mode or another Controller "
+                        "API than XInput is chosen for the game, and never changes those settings. With the on-screen Xbox layout "
+                        "showing and no controller connected, a line over the game suggests the keyboard layout once per game after "
+                        "20 seconds. [pad-auto] lines in the log."},
+    # Porthole port, item 6: a slow external drive is written with fewer writers (app/Madeira/BCDDriveSpeed.swift,
+    # SwiftSteam/Content/DepotDownloader.swift).
+    "drive-gentle-writes": {"category": "App & front end", "kind": "bool", "default": "0",
+                "title": "Write downloads to a slow drive gently",
+                "sources": ["app/Madeira/MadeiraApp.swift"],
+                "note": "Default off. 1: before a Steam download to a folder that is not on the device's own storage, 8 MB are "
+                        "written to that drive once (per drive and app run); when that comes in under 40 MB/s, a thumb drive, the "
+                        "download keeps 4 chunks in flight instead of 8 (or 16 from a PC on the network), in order, so the drive "
+                        "is not made to jump between many files. A [drive] line in the log says what was measured. Faster drives "
+                        "and the device itself are written as before."},
+    # Porthole port, item 5: scheduler hints for a running game and the watch on the fast cores' clock, an experiment
+    # (app/Madeira/BCDSchedHints.swift, BCDSchedHintsLive.swift, BCDSchedHints.m).
+    "sched-hints": {"category": "App & front end", "kind": "choice", "default": "",
+                "title": "Tell iOS a game is running (experimental)",
+                "sources": ["app/Madeira/BCDSchedHintsLive.swift"],
+                "choices": [("", "Off"), ("watch", "Log only"), ("1", "On")],
+                "note": "Default off. 1: while a game runs BCD asks iOS to treat it as the person's foreground work: an activity of the "
+                        "user-initiated, latency-critical kind, and the kernel's first latency and throughput tiers for the process "
+                        "(put back when the game ends). A request only: iOS may ignore it. With 1 or watch the fast cores' clock is "
+                        "watched once a second: [clamp] lines say when they run at 1.3 GHz or below under load for three seconds (iOS "
+                        "is holding them back) and when they run free again; watch gives no hint, for comparing. [sched] lines say "
+                        "what the kernel answered. A game's own line comes first. Read when the game starts."},
+    # Porthole port, item 3: Apple's VideoToolbox frame interpolation as a frame generator, an experiment (app/Madeira/BCDVTInterp.swift,
+    # BCDVTInterpLive.swift; tools/patch-winemetal-vt-interp.py).
+    "vt-interpolation": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "choice", "default": "",
+                "title": "Apple frame interpolation (experimental)",
+                "sources": ["app/Madeira/BCDVTInterpLive.swift"],
+                "choices": [("", "Off"), ("1", "One frame between two"), ("3", "Up to three")],
+                "note": "Default off. An experiment, iOS 26 and later, Direct3D 9 to 12: 1 or 3 makes iOS's own video frame interpolation "
+                        "(VideoToolbox) add that many pictures between every two frames the game draws, from the two pictures alone. "
+                        "Only a game's own line counts, and the game also needs env.MADEIRA_PRESENT_FX = 1 (the game's page sets both); "
+                        "with Lossless Scaling frame generation in the session it stays off. The session then runs with "
+                        "MADEIRA_VT_INTERP, MetalFX frame generation is off, and a frame-rate limit holds the game's own frames with "
+                        "the extra ones on top. Whether a device takes the game's resolution and how long a pair takes is what the "
+                        "test in Settings (Graphics, Experimental) reports; [vt-interp] lines in the log. The in-game menu (Display) "
+                        "switches it off and on while the game runs. Read when the game starts."},
+    "env.MADEIRA_VT_INTERP": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
+                "title": "", "sources": ["tools/patch-winemetal-vt-interp.py"],
+                "note": "Set by the app for a session of a game with vt-interpolation (1 or 3): winemetal hands the frames of one "
+                        "layer to a worker thread that lets VideoToolbox make the pictures between them. Without it, or without "
+                        "MADEIRA_PRESENT_FX = 1, nothing of that code runs. Not for typing."},
+    # Porthole port, item 1: Lossless Scaling frame generation (app/Madeira/BCDLossless.swift, BCDLosslessLive.swift; tools/patch-dxmt-lsfg.py).
+    "lossless-scaling": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "choice", "default": "",
+                "title": "Lossless Scaling frame generation (experimental)",
+                "sources": ["app/Madeira/BCDLosslessLive.swift"],
+                "choices": [("", "Off"), ("1", "2x (one frame added)"), ("2", "3x (two added)"), ("3", "4x (three added)")],
+                "note": "Default off. 1 to 3: the person's own copy of Lossless Scaling (Steam app 993090) makes that many pictures "
+                        "between every two frames the game draws: in DXMT's Direct3D 11 swap chain, and for a Direct3D 12 game through a bridge in d3d11-src.dll (madeira_d3d12.dll copies each picture over and presents the generated ones). It has to be set up first in Settings "
+                        "(Graphics, Lossless Scaling): BCD checks the purchase with Steam, downloads the program with the person's "
+                        "account and keeps its Lossless.dll sealed on the device; nothing of it is in BCD. While a game with this line "
+                        "runs, the frame generation's compiled shaders are in the prefix (C:\\ProgramData\\BCD\\lsfg.bin) and are "
+                        "removed when the session ends; the game runs with env.MADEIRA_D3D11_SRC = 1, MetalFX frame generation is off "
+                        "and the frame-rate limit counts every frame shown. The in-game menu (Display) switches it while the game "
+                        "runs. Usually set per game in Game details > Display; read when the game starts."},
+    "lossless-flow": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
+                "title": "Lossless Scaling: motion search divisor", "sources": ["app/Madeira/BCDLosslessLive.swift"],
+                "note": "Default 1. 1 to 4: the motion search of Lossless Scaling's frame generation works on the picture's size "
+                        "divided by this (2 = half the size: cheaper, a little less exact). The in-game menu writes it (Motion search "
+                        "detail). Only read with lossless-scaling."},
+    "lossless-quality": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Lossless Scaling: quality passes", "sources": ["app/Madeira/BCDLosslessLive.swift"],
+                "note": "Default off: the lighter (performance) pass layout, with fewer and smaller intermediate pictures. 1: the "
+                        "quality layout, which costs clearly more GPU time. The in-game menu writes it (Lighter passes). Only read "
+                        "with lossless-scaling."},
+    "env.MADEIRA_LSFG_CTL": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
+                "title": "", "sources": ["tools/patch-dxmt-lsfg.py"],
+                "note": "Set by the app for a session of a game with lossless-scaling: the control file of Lossless Scaling's frame "
+                        "generation inside the prefix (C:\\ProgramData\\BCD\\lsfg.ctl), which the in-game menu rewrites and DXMT "
+                        "reads twice a second. Without it the frame generation code does nothing. Not for typing."},
+    "env.MADEIRA_LSFG_SHADERS": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
+                "title": "", "sources": ["tools/patch-dxmt-lsfg.py"],
+                "note": "Set by the app with env.MADEIRA_LSFG_CTL: the file the frame generation's compiled shaders are in for the "
+                        "length of the session (C:\\ProgramData\\BCD\\lsfg.bin). Not for typing."},
+    "env.MADEIRA_LSFG_ANY_PROCESS": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Lossless Scaling: frame generation for launchers and helpers too", "sources": ["tools/patch-dxmt-lsfg.py"],
+                "note": "Default off: a program whose name marks it as a launcher, a helper, a service or an installer (Rockstar's "
+                        "launcher, Steam, browser helpers) gets no generated frames, and neither does a window under 640x360. 1 lifts "
+                        "the name test. Only read with lossless-scaling."},
+    # Porthole port, item 2 (tools/patch-winemetal-framegen-live.py): read by libwinemetal once per session.
+    "env.MADEIRA_PRESENT_FX": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Live upscaling and frame generation (experimental)",
+                "sources": ["tools/patch-winemetal-framegen-live.py", "tools/patch-winemetal-present-fx.py"],
+                "note": "Default off. 1: the presenter itself enlarges the picture (metalfx-upscale: a factor, or fit for the screen's "
+                        "size) from a picture of the game's size, for Direct3D 9 to 12 alike, so MetalFX upscaling can be switched from "
+                        "the in-game menu while the game runs, and frame generation works on the picture before it is enlarged. Frame "
+                        "generation (env.MADEIRA_FRAMEGEN) is switched on and off from the in-game menu too, "
+                        "and it gets three defaults of its own: it never waits for its extra screen buffer "
+                        "(env.MADEIRA_FRAMEGEN_GATE), it pauses while the GPU is full (env.MADEIRA_FRAMEGEN_GPU_GUARD = 95) and a frame "
+                        "counts as a stall only above 160 ms (env.MADEIRA_FRAMEGEN_STALL_MS), so games at 10 to 15 FPS are served. "
+                        "The screen is held at its top rate while frames are generated. Off: frame generation is as before and is "
+                        "read when the game starts. A game's own page has the switch (Display); Settings has it for every game. "
+                        "Needs iOS 26; read at session start."},
+    "env.MADEIRA_PFX_UPSCALE": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
+                "title": "", "sources": ["tools/patch-winemetal-present-fx.py"],
+                "note": "Set by the app when a session with env.MADEIRA_PRESENT_FX = 1 starts: the game's metalfx-upscale choice for the "
+                        "presenter (off, fit, or a factor from 1.1 to 2). Not for typing: choose MetalFX upscaling on the game's page."},
+    "env.MADEIRA_FRAMEGEN_GATE": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Frame generation never waits for a screen buffer",
+                "sources": ["tools/patch-winemetal-framegen-live.py"],
+                "note": "Default off, on with env.MADEIRA_PRESENT_FX = 1. 1: frames presented and not yet on the screen are counted, "
+                        "and a frame whose extra screen buffer is not free goes out as it is instead of waiting for one (the wait held "
+                        "slow games at 20 FPS); a game the screen cannot show twice per frame (frame time under 1.9 screen refreshes) "
+                        "gets no extra frames. 0 with env.MADEIRA_PRESENT_FX keeps the old wait. Only read when frame generation is "
+                        "on; read at session start."},
+    "env.MADEIRA_FRAMEGEN_GPU_GUARD": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "int", "default": "0",
+                "title": "Frame generation pauses when the GPU is this busy (%)",
+                "sources": ["tools/patch-winemetal-framegen-live.py"],
+                "note": "Default 0 (off), 95 with env.MADEIRA_PRESENT_FX = 1. 50 to 100 (1 means 95): while the GPU is busy that share of "
+                        "the time for three seconds with frames being generated, generation pauses for at least 10 seconds and the "
+                        "game's own frames are shown as they are; it comes back when the GPU has room for what the generated frames "
+                        "took, and a pause that follows a resume within 30 seconds lasts twice as long (up to 5 minutes). 0 turns it "
+                        "off; the in-game menu has the switch (Display, Pause when the GPU is full). Only read when frame generation "
+                        "is on."},
+    "env.MADEIRA_FRAMEGEN_STALL_MS": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "int", "default": "0",
+                "title": "Frame generation: a frame longer than this is a stall (ms)",
+                "sources": ["tools/patch-winemetal-framegen-live.py"],
+                "note": "Default 0: 66 ms, or 160 ms with env.MADEIRA_PRESENT_FX = 1. A game frame longer than this drops frame "
+                        "generation's history, so nothing is generated across it. 66 ms shut out every game below 15 FPS. 34 to 500. "
+                        "Only read when frame generation is on; read at session start."},
     # build 632 (dxmt 880241a + 4842a04 by Ixion, ajan66): read by DXMT's Direct3D 9 frontend (dxmt/src/d3d9/d3d9_buffer.cpp)
     "env.MADEIRA_D3D9_DIRECT_MAP": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
                 "title": "Direct3D 9, 64-bit games: lock dynamic buffers in place",
@@ -1674,7 +1831,7 @@ OVERLAY = {
     "low-graphics-tip": {"category": "Windows, display & input", "title": "Graphics tip before the first start",
                 "kind": "bool", "default": "0",
                 "note": "1: before this game's first start BCD says once to set the game's own graphics to the lowest "
-                        "preset (Very Low, or Low) and AMD FSR, where the game has it, to Balanced or Performance; OK "
+                        "preset (Very Low, or Low) and AMD FSR, where the game has it, to Performance; OK "
                         "starts the game, and the tip is not shown for it again. The recommended settings of the heavy "
                         "games set it (RDR2, GTA V, Ghost of Tsushima, God of War, the Horizons, the Spider-Man games, "
                         "Rift Apart, the Crysis remasters). 0 or unset: no tip.",
@@ -2654,6 +2811,15 @@ OVERLAY = {
                         "atomic runs as before. Without it the trap stays. Set by the Dock for a game that runs Ubisoft Connect and by the "
                         "recommended lists of Ubisoft Connect, Far Cry 3 and Far Cry 4. Read when each program starts.",
                 "sources": ["tools/patch-fex-ios-split-lock.py"]},
+    # Porthole port, item 14 (tools/patch-fex-ios-callret-lean.py): an A/B experiment, off by default.
+    "env.MADEIRA_FEX_CALLRET_LEAN": {"category": "x86 emulation (FEX)", "title": "64-bit JIT: no suspend check after a call returns (experiment)",
+                "kind": "bool", "default": "0", "sources": ["tools/patch-fex-ios-callret-lean.py"],
+                "note": "Default off; for comparing. 1: in the 64-bit (ARM64EC) JIT the point a guest CALL returns to no longer tests "
+                        "the thread's suspend doorbell (the callee's own entry point, or the exit into ARM64EC code, tested it on "
+                        "the way): two instructions fewer on every return from a call, and twelve bytes less code per call site. "
+                        "Every other entry point and every backward jump keeps its test. It changes the code of every 64-bit "
+                        "program of the session, so it is set per game, and no downloaded list can set it. The log says \"FEX: "
+                        "callret-lean-v1 madeira-bcd enabled=1\" when it is on. Read when each program starts."},
     "env.MADEIRA_FEX_CALLRET_ELIDE": {"category": "x86 emulation (FEX)", "title": "64-bit JIT without the call-return shadow stack",
                 "kind": "bool", "default": "1", "sources": ["tools/patch-fex-ios-callret-elide.py"],
                 "note": "Default on. The 64-bit (ARM64EC) JIT no longer keeps FEX's call-return shadow stack, which "
@@ -3032,8 +3198,11 @@ OVERLAY = {
                      "e.g. d3d11.mipClampBC=1;d3d11.preferredMaxFrameRate=30. DXMT reads at most 259 characters of it, "
                      "and nothing at all from a longer value (ml1255)."},
     "metalfx-upscale": {"title": "MetalFX upscaling factor", "kind": "choice",
-             "note": "Scales the presented picture with Apple's MetalFX spatial scaler (Direct3D 11 and 12). Usually set per game in Game details > Display.",
-             "choices": [("", "Off"), ("1.5", "1.5x"), ("2", "2x")]},
+             "note": "Scales the presented picture with Apple's MetalFX spatial scaler (Direct3D 11 and 12). Usually set per game in Game details > Display. "
+                     "fit (To the screen): the factor that brings the game's picture to this screen, at most 2, and none when the picture is already within a "
+                     "tenth of the screen's size; without env.MADEIRA_PRESENT_FX a Direct3D 11 game gets it from the size of its desktop, a Direct3D 12 game "
+                     "for each swap chain.",
+             "choices": [("", "Off"), ("fit", "To the screen"), ("1.5", "1.5x"), ("2", "2x")]},
     # Round 603: "Look like this GPU" (app/Madeira/BCDGPUCards.swift, BCDGPUCardsLive.swift). tests/host/check-gpu-cards.py keeps the choices equal to the app's table.
     "env.MADEIRA_GPU_VENDOR": {"note": "Set by the app for a game's gpu-card choice (four hex digits of the PCI vendor id); win32u names that adapter in the registry, EnumDisplayDevices and D3DKMT. Not for typing: choose a card with gpu-card."},
     "env.MADEIRA_GPU_DEVICE": {"note": "Set by the app for a game's gpu-card choice (four hex digits of the PCI device id). Not for typing: choose a card with gpu-card."},

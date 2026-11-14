@@ -351,6 +351,33 @@ for major in [18, 26, 27] {
     expect(BCDJITRules.builtInBlock(platform) == (major < 26 ? .needsIOS26 : .liveContainer), "iOS \(major) in LiveContainer: why Built-in is out")
     expect(!BCDJITRules.canPairOnDevice(platform) && !BCDJITRules.shortcutAvailable(platform), "iOS \(major) in LiveContainer: no pairing here, no shortcut")
 }
+// Inside LiveContainer with its Helper Process Support (LiveContainer 3.8.13; follow-up of the night round 2026-11-11): only a proven
+// ready helper opens Built-in, by hand (no Automatic); every other state is the old LiveContainer answer with its own words.
+for major in [26, 27] {
+    var ready = p(major, "iPhone15,2", lc: true)
+    ready.lcHelper = .ready
+    expect(BCDJITRules.offered(ready) == [.stikDebug, .builtIn] && BCDJITRules.builtInBlock(ready) == nil,
+           "iOS \(major) in LiveContainer, helper ready: StikDebug and Built-in, no Automatic")
+    expect(BCDJITRules.canPairOnDevice(ready) == (major >= 27) && !BCDJITRules.shortcutAvailable(ready),
+           "iOS \(major) in LiveContainer, helper ready: pairing here on iOS 27, still no shortcut")
+    for s in [BCDLCHelper.notAvailable, .multitask, .switchOff, .tooOld, .notPrepared, .noHook] {
+        var q = p(major, "iPhone15,2", lc: true)
+        q.lcHelper = s
+        expect(BCDJITRules.offered(q) == [.stikDebug] && BCDJITRules.builtInBlock(q) == .liveContainer && !BCDJITRules.canPairOnDevice(q),
+               "iOS \(major) in LiveContainer, helper \(s.rawValue): StikDebug only")
+        expect(!BCDJITRules.lcHelperText(s).isEmpty && BCDJITRules.lcHelperText(s) != BCDJITRules.lcHelperText(.ready),
+               "helper \(s.rawValue) has its own words")
+    }
+}
+var old18 = p(18, "iPhone15,2", lc: true)
+old18.lcHelper = .ready
+expect(BCDJITRules.builtInBlock(old18) == .needsIOS26 && BCDJITRules.offered(old18) == [.stikDebug], "iOS 18 in LiveContainer: the helper state changes nothing")
+// Outside LiveContainer the helper state cannot change a thing.
+for s in [BCDLCHelper.notAvailable, .ready, .switchOff] {
+    var q = p(27, "iPhone18,2")
+    q.lcHelper = s
+    expect(BCDJITRules.offered(q) == all && BCDJITRules.builtInBlock(q) == nil, "outside LiveContainer, helper \(s.rawValue): every method")
+}
 expect(BCDJITRules.offered(p(27, "x86_64", sim: true)) == [.stikDebug] && BCDJITRules.builtInBlock(p(27, "arm64", sim: true)) == .simulator
        && !BCDJITRules.shortcutAvailable(p(27, "arm64", sim: true)), "simulator: no built-in helper, no shortcut")
 expect(BCDJITRules.model("iPhone14,2")! == ("iPhone", 14, 2) && BCDJITRules.model("x86_64") == nil && BCDJITRules.model("iPad8,11")! == ("iPad", 8, 11)
@@ -376,8 +403,14 @@ else:
 
 host = (app / 'JITBuiltInHost.swift').read_text()
 reason = block(host, 'static var unavailableReason: String?')
-require('targetEnvironment(simulator)' in reason and '#available(iOS 26.0, *)' in reason and 'getenv("LC_HOME_PATH")' in reason,
-        'JIT rules mirror the app: the built-in helper needs a device, iOS 26 and no LiveContainer (JITBuiltInHost.swift)')
+require('targetEnvironment(simulator)' in reason and '#available(iOS 26.0, *)' in reason
+        and 'if getenv("LC_HOME_PATH") != nil, LiveContainerHelper.state != .ready {' in reason
+        and 'return BCDJITRules.lcHelperText(LiveContainerHelper.state)' in reason,
+        'JIT rules mirror the app: the built-in helper needs a device, iOS 26 and, inside LiveContainer, its proven Helper Process Support (JITBuiltInHost.swift)')
+lc_look = block(host, 'private static func look() -> BCDLCHelper')
+require(lc_look[lc_look.index('{') + 1:].lstrip().startswith('guard getenv("LC_HOME_PATH") != nil else { return .notAvailable }')
+        and 'probe == "LCGuestExtension" && prepared' in lc_look and 'static let state: BCDLCHelper = look()' in host,
+        'LiveContainer: outside it the look returns at once; ready needs LiveContainer\'s own extension object and its install-time preparation')
 pairing = (app / 'JITPairing.swift').read_text()
 network = (app / 'JITNetwork.swift').read_text()
 require('majorVersion: 27' in block(pairing, 'static var isSupported: Bool') and 'static let hostName = "BCD"' in pairing,

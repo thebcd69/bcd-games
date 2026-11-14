@@ -30,26 +30,69 @@ struct BCDJITPlatform: Hashable {
     /// BCD runs as a guest of LiveContainer.
     var inLiveContainer = false
     var simulator = false
+    /// Inside LiveContainer: whether its Helper Process Support starts BCD's own helper (LiveContainerHelper, JITBuiltInHost.swift).
+    var lcHelper: BCDLCHelper = .notAvailable
+}
+
+/// LiveContainer's Helper Process Support (LiveContainer 3.8.13, the nightly of 2026-11-08) as BCD finds it: with it LiveContainer
+/// starts a guest's own app extensions, so BCD's built-in helper can run inside LiveContainer (follow-up of the night round 2026-11-11,
+/// owner's go). Only `ready`, which BCD proves, lets the helper run there; the other states choose the words.
+enum BCDLCHelper: String, Hashable {
+    /// Not inside LiveContainer, or not looked at.
+    case notAvailable
+    case ready
+    /// BCD runs in a LiveContainer multitask window, where LiveContainer starts no helper.
+    case multitask
+    case switchOff
+    /// This LiveContainer has no Helper Process Support.
+    case tooOld
+    /// The switch is on, but LiveContainer has not prepared BCD's helper: it does that only when BCD is installed.
+    case notPrepared
+    /// Everything looks right, but LiveContainer handed BCD no helper.
+    case noHook
 }
 
 enum BCDJITRules {
     enum BuiltInBlock: Equatable { case needsIOS26, liveContainer, simulator }
 
     /// Why BCD's built-in helper cannot run here, or nil when it can: it needs iOS 26 or
-    /// newer and a real device, and it cannot start inside LiveContainer (the same gates as
-    /// the app's helper host, JITBuiltInHost.swift).
+    /// newer and a real device, and inside LiveContainer it starts only through LiveContainer's
+    /// Helper Process Support (the same gates as the app's helper host, JITBuiltInHost.swift).
     static func builtInBlock(_ p: BCDJITPlatform) -> BuiltInBlock? {
         if p.simulator { return .simulator }
         if p.osMajor < 26 { return .needsIOS26 }
-        if p.inLiveContainer { return .liveContainer }
+        if p.inLiveContainer && p.lcHelper != .ready { return .liveContainer }
         return nil
     }
 
     /// The methods worth offering here, in the order shown. StikDebug works on every iOS
     /// version BCD runs on; Built-in, and Automatic (which can pick Built-in), only where
-    /// the helper can run. On iOS 18 and inside LiveContainer that leaves StikDebug alone.
+    /// the helper can run. On iOS 18 and inside LiveContainer that leaves StikDebug alone,
+    /// unless LiveContainer's Helper Process Support is ready: then Built-in too, chosen by
+    /// hand (Automatic stays StikDebug there, so it is not offered).
     static func offered(_ p: BCDJITPlatform) -> [BCDJITMethodChoice] {
-        builtInBlock(p) == nil ? [.automatic, .stikDebug, .builtIn] : [.stikDebug]
+        guard builtInBlock(p) == nil else { return [.stikDebug] }
+        return p.inLiveContainer ? [.stikDebug, .builtIn] : [.automatic, .stikDebug, .builtIn]
+    }
+
+    /// What BCD says about its built-in helper inside LiveContainer, for each state.
+    static func lcHelperText(_ s: BCDLCHelper) -> String {
+        switch s {
+        case .ready:
+            return "Built-in works here through LiveContainer's Helper Process Support."
+        case .multitask:
+            return "BCD is open in a LiveContainer multitask window, where its built-in helper can't start. Open BCD with a normal launch, or use StikDebug."
+        case .switchOff:
+            return "To use BCD's built-in helper here, turn on Helper Process Support: in LiveContainer, hold BCD, tap Settings, turn it on, then close BCD and open it again. Until then, StikDebug is the way here."
+        case .tooOld:
+            return "BCD's built-in helper runs inside LiveContainer 3.8.13 (the nightly of 8 November 2026) or newer, with Helper Process Support on for BCD. Until then, StikDebug is the way here."
+        case .notPrepared:
+            return "Helper Process Support is on, but LiveContainer prepares BCD's helper only when BCD is installed. Install BCD's IPA again in LiveContainer (choose Replace), then open it. Until then, StikDebug is the way here."
+        case .noHook:
+            return "LiveContainer didn't hand BCD its helper. Check that LiveContainer was installed with its app extensions. Until then, StikDebug is the way here."
+        case .notAvailable:
+            return "BCD's built-in helper can't run inside LiveContainer, so StikDebug is the way here."
+        }
     }
 
     /// Pairing on the device itself, with no computer: iOS 27 and the helper.
@@ -325,6 +368,8 @@ struct BCDJITSection<Backend: BCDJITBackend>: View {
             }
             if let block = BCDJITRules.builtInBlock(platform) {
                 BCDSectionKit.Note(text: blockText(block), symbol: "info.circle")
+            } else if platform.inLiveContainer {
+                BCDSectionKit.Note(text: BCDJITRules.lcHelperText(.ready), symbol: "checkmark.circle")
             }
             if state.setupAvailable {
                 BCDSectionKit.ActionButton(title: "Run setup again", symbol: "wand.and.stars", kind: .quiet,
@@ -375,7 +420,7 @@ struct BCDJITSection<Backend: BCDJITBackend>: View {
     private func blockText(_ block: BCDJITRules.BuiltInBlock) -> String {
         switch block {
         case .needsIOS26: return "BCD's built-in helper needs iOS 26 or newer, so StikDebug is the way on this \(device)."
-        case .liveContainer: return "BCD's built-in helper can't run inside LiveContainer, so StikDebug is the way here."
+        case .liveContainer: return BCDJITRules.lcHelperText(platform.lcHelper)
         case .simulator: return "BCD's built-in helper needs a real device."
         }
     }

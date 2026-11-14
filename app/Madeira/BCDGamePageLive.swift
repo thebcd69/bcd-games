@@ -66,7 +66,9 @@ import UniformTypeIdentifiers
             // An installed Epic game is the library entry its install made (BCDLiveStoreEpic).
             if let id = BCDLiveStore.shared.epicEntryID(game.id) { return library.entries.first { $0.id == id } }
             // An installed itch.io game, and one of the experimental EA store, is the library entry its install made (BCDLiveStoreItch, BCDLiveStoreEA).
-            if let id = BCDLiveStore.shared.itchEntryID(game.id) ?? BCDLiveStore.shared.eaEntryID(game.id) { return library.entries.first { $0.id == id } }
+            if let id = BCDLiveStore.shared.itchEntryID(game.id) ?? BCDLiveStore.shared.eaEntryID(game.id) ?? BCDLiveStore.shared.amazonEntryID(game.id) {
+                return library.entries.first { $0.id == id }
+            }
             guard game.store == .local else { return nil }
             return library.entries.first { $0.desktop != true && $0.steamAppID == nil && $0.title == game.title }
         }
@@ -135,7 +137,7 @@ import UniformTypeIdentifiers
         d.readiness = BCDReadinessLive.shared.note(for: entry) { [weak self] in self?.onChange?() }   // round 604: what the game's programs import that this device lacks
         // GOG's runtimes the game's build names that BCD does not install yet.
         d.storeNote = BCDLiveStore.shared.gogNote(game.id) ?? BCDLiveStore.shared.epicNote(game.id)
-            ?? BCDLiveStore.shared.itchNote(game.id) ?? BCDLiveStore.shared.eaNote(game.id)
+            ?? BCDLiveStore.shared.itchNote(game.id) ?? BCDLiveStore.shared.eaNote(game.id) ?? BCDLiveStore.shared.amazonNote(game.id)
         // The sections only while Options is open: nothing is built for what is not on screen.
         if settings {
             d.groups = [display(entry, profile), direct3D(entry, profile), compatibility(entry), controls(entry, profile), gyro(entry)]
@@ -152,7 +154,8 @@ import UniformTypeIdentifiers
             if !desktop { d.groups.append(helpGroup(game, entry)) }   // round 604: BCDGamePageLiveHelp.swift (debug run, game feedback, launch check)
             if !desktop { d.groups.append(libraryGroup(entry, gog: game.store == .gog || game.store == .epic)) }
             // An itch.io or EA game's name and pictures are the store's too: its Library group is GOG's and Epic's (no Name or Find on Steam row).
-            if !desktop, game.store == .itch || game.store == .ea, let at = d.groups.lastIndex(where: { $0.id == "library" }) { d.groups[at] = libraryGroup(entry, gog: true) }
+            if !desktop, game.store == .itch || game.store == .ea || game.store == .amazon,
+               let at = d.groups.lastIndex(where: { $0.id == "library" }) { d.groups[at] = libraryGroup(entry, gog: true) }
             if !desktop, let location = locationGroup(game, entry) { d.groups.append(location) }   // external drives: where the game is, Move to
         }
         if let id {
@@ -172,7 +175,7 @@ import UniformTypeIdentifiers
                 d.canRepair = BCDGOG.enabled && BCDGOG.shared.signedIn && !d.updating
             }
             storeCloudDetails(game, entry, into: &d)   // build 632: another store's cloud saves (off until the player turns them on)
-        } else if game.store == .itch || game.store == .ea {
+        } else if game.store == .itch || game.store == .ea || game.store == .amazon {   // madeira-bcd (Porthole port, item 13): Amazon's too
             // The same for an itch.io or EA game (BCDLiveStoreItch, BCDLiveStoreEA). The EA store checks every installed file against EA's
             // current build (Check files); GOG's Repair is above (build 632), Epic and itch.io have no such check.
             d.removal = .uninstall(frees: entry.folderBytes ?? game.size)
@@ -293,12 +296,21 @@ import UniformTypeIdentifiers
             BCDGameSetting(id: "fps", title: "Frame-rate limit", kind: .choice(rates), value: String(entry.fpsMode), defaultValue: "1",
                            note: "The most frames a second the game shows. 30 and 40 keep the device cooler; No limit lets the game run as fast as it can."),
             Self.line("metalfx-upscale", "MetalFX upscaling", profile, Self.named(GameProfile.metalFXChoices, ["": "Off"]),
-                      note: "Direct3D 11 and 12 games draw at the resolution above, and Apple's MetalFX enlarges the picture by this much. Pair it with a small resolution for more frames."),
+                      note: "Direct3D 11 and 12 games draw at the resolution above, and Apple's MetalFX enlarges the picture by this much. To the screen picks the size that fills this screen, at most twice the game's. Pair it with a small resolution for more frames."),
+            // madeira-bcd (Porthole port): Lossless Scaling frame generation, the game's own line `lossless-scaling` (BCDLossless.swift).
+            Self.line(BCDLossless.key, BCDLossless.title, profile, BCDLossless.choices, note: BCDLossless.note),
+            // madeira-bcd (Porthole port): env.MADEIRA_PRESENT_FX, the game's own line; without one, Settings' switch for every game applies.
+            Self.toggle("presentfx", BCDFrameGenMenu.switchTitle, (profile.get("env.MADEIRA_PRESENT_FX") ?? MadeiraConfig.get("env.MADEIRA_PRESENT_FX")) == "1",
+                        note: BCDFrameGenMenu.switchNote),
         ]
         // MetalFX frame interpolation needs iOS 26; below it the switch is not offered (check-frame-gen-ios26.py).
         if #available(iOS 26.0, *) {
             settings.append(Self.toggle("framegen", "Frame generation (experimental)", profile.get("env.MADEIRA_FRAMEGEN") == "1",
                                         note: "MetalFX makes up a frame between every two the game draws: twice the frames, for GPU time, a little delay and some smearing at edges and the HUD. The frame-rate limit is ignored while it is on. Turn it off if the game runs below about 40 FPS without it: it waits for screen buffers and can hold such a game at 20 FPS."))
+        }
+        if #available(iOS 26.0, *) {
+            // madeira-bcd (Porthole port, item 3): Apple frame interpolation, an experiment; the game's own line `vt-interpolation` (BCDVTInterp.swift).
+            settings.append(Self.line(BCDVTInterp.key, BCDVTInterp.title, profile, BCDVTInterp.choices, note: BCDVTInterp.note))
         }
         return BCDGameSettingGroup(id: "display", title: "Display", symbol: "display", settings: settings,
                                    headline: entry.resolution.replacingOccurrences(of: "x", with: " × ") + " · " + fps)
@@ -414,6 +426,8 @@ import UniformTypeIdentifiers
                                                value: changed == 0 ? "BCD's layout" : "\(changed) changed", defaultValue: "BCD's layout",
                                                note: "What each stick and button presses in keyboard-and-mouse mode."))
             }
+            // madeira-bcd (Porthole port, item 8): the game's own line `pad-auto` (BCDPadAuto.swift); off unless switched on.
+            settings.append(Self.toggle("padauto", BCDPadAuto.title, BCDPadAuto.on(profile.get(BCDPadAuto.key)), note: BCDPadAuto.note))
         }
         settings += [
             BCDGameSetting(id: "hud", title: "Performance HUD", kind: .choice(BCDHUDLayout.allCases.map { BCDGameChoice(value: $0.rawValue, label: $0.title) }),
@@ -817,6 +831,7 @@ import UniformTypeIdentifiers
     private func cloud(_ appID: Int, into d: inout BCDGameDetails) {
         let steam = SteamOwnedLibrary.shared
         guard steam.signedIn else { d.cloud = .signedOut; return }
+        d.cloudCanCheck = true   // madeira-bcd: Steam's cloud can be compared again without moving anything
         guard let state = steam.cloud[appID] else { d.cloud = .notChecked; return }
         d.cloudProblem = state.problem
         if let last = state.lastDownload {
@@ -836,6 +851,9 @@ import UniformTypeIdentifiers
                                  deviceDate: save.kind == .cloudOnly ? nil : (seconds(save.localTime) ?? .distantPast),
                                  deviceBytes: Int64(clamping: save.localSize))
             }
+            // madeira-bcd: what the next sync would move, for the page's list
+            d.cloudPending = state.pendingUp.map { BCDCloudPending(name: $0.name, bytes: Int64(clamping: $0.localSize), up: true) }
+                + state.pendingDown.map { BCDCloudPending(name: $0.name, bytes: Int64(clamping: $0.cloudSize), up: false) }
             let audit = state.audit
             let waiting = audit.count(.differ) + audit.count(.cloudOnly) + audit.count(.localOnly)
             if !state.conflicts.isEmpty {
@@ -890,7 +908,11 @@ import UniformTypeIdentifiers
             }
         default: status = "Play once: the first start is the baseline."
         }
-        d.tuning = BCDGameTuning(on: tuned.on, status: tuned.on || history ? status : nil, canUndo: history, found: state.kept, history: steps)
+        // madeira-bcd (Porthole port, item 10): Ask before trying a fix: the fix that waits for the player's yes.
+        let waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []
+        if !waiting.isEmpty { status = AutoTuneAsk.pageStatus(waiting) }
+        d.tuning = BCDGameTuning(on: tuned.on, status: tuned.on || history ? status : nil, canUndo: history, found: state.kept, history: steps,
+                                 waiting: waiting)
         if tuned.on && history { d.settings = "Auto-tune on" }   // on for every game now: the label says so only once it has a search or kept lines, so "Recommended" and "Your own" stay visible
     }
 
@@ -1000,6 +1022,10 @@ import UniformTypeIdentifiers
     }
 
     func set(_ setting: String, to value: String, for game: BCDGame) {
+        if setting == BCDCloudPendingList.checkAction {   // madeira-bcd: the cloud page's Check again: Steam's comparison, which moves nothing
+            if !storeCloudOwns(game), let id = appID(game) { Task { await SteamOwnedLibrary.shared.checkCloud(id) } }
+            return
+        }
         if helpSet(setting, to: value, for: game) { return }   // round 604: the "Help with this game" section's rows (BCDGamePageLiveHelp.swift)
         if soundSet(setting, to: value, for: game) { return }   // round 604: the Sound section's audio delay, volume and resume rows (BCDGamePageLiveSound.swift)
         if dlcSet(setting, to: value, for: game) { return }
@@ -1021,6 +1047,19 @@ import UniformTypeIdentifiers
             change(game) { $0.orientationLock = value.isEmpty ? nil : value }
         case "metalfx-upscale", "dxil-tess-max-factor", "async-submit", "fence-chain", GamepadInput.padModeKey, BCDGPUCards.key, BCDGPUCards.memoryKey:
             setLine(game, setting, value)
+        case BCDLossless.key:
+            // madeira-bcd: Lossless Scaling frame generation, a plain line in the game's own file like the choices above.
+            setLine(game, setting, value)
+        case "padauto":
+            setLine(game, BCDPadAuto.key, on ? "1" : "")
+        case BCDVTInterp.key:
+            // madeira-bcd: Apple frame interpolation works on the picture the live present path holds, so choosing it switches that
+            // path on for this game too (its own switch on this page then shows it); Off leaves that switch as it is.
+            setLine(game, BCDVTInterp.key, value)
+            if BCDVTInterp.frames(value) > 0, let entry = entry(for: game),
+               (GameProfile(windowsPath: entry.windowsPath).get(BCDVTInterp.presentKey) ?? MadeiraConfig.get(BCDVTInterp.presentKey)) != "1" {
+                setLine(game, BCDVTInterp.presentKey, "1")
+            }
         case BCDOpenGL.key:
             // OpenGL (docs/OPENGL.md): a plain line in the game's own file, like the Direct3D choices above.
             setLine(game, setting, value)
@@ -1031,6 +1070,9 @@ import UniformTypeIdentifiers
             if #available(iOS 26.0, *) {
                 setLine(game, "env.MADEIRA_FRAMEGEN", on ? "1" : "")
             }
+        case "presentfx":
+            // Off while Settings has it on for every game needs a line of its own ("0"); otherwise off is no line at all.
+            setLine(game, "env.MADEIRA_PRESENT_FX", on ? "1" : (MadeiraConfig.get("env.MADEIRA_PRESENT_FX") == "1" ? "0" : ""))
         case "gyro-aim", "gyro-sens", "gyro-hold", "gyro-invert", "gyro-deadzone", "gyro-turn":
             // madeira-bcd (2026-10-25, round 603): gyro aim, kept for the game by its path (BCDGyroStore).
             if let entry = entry(for: game) {
@@ -1225,6 +1267,13 @@ import UniformTypeIdentifiers
     func undoTuning(_ game: BCDGame) {
         guard let path = entry(for: game)?.windowsPath else { return }
         if AutoTune.enabled { AutoTune.reset(path) }
+        AutoTuneAsk.forget(path)   // madeira-bcd (Porthole port, item 10): the player's answers go with the lines
+    }
+
+    /// madeira-bcd (Porthole port, item 10): Try the suggested fix (Ask before trying a fix).
+    func approveTuning(_ game: BCDGame) {
+        guard let path = entry(for: game)?.windowsPath, AutoTune.enabled else { return }
+        AutoTuneAsk.approve(AutoTune.state(path), path)
     }
 
     /// Each line auto-tune kept goes into the game's own file, then auto-tune starts over.
@@ -1427,6 +1476,7 @@ import UniformTypeIdentifiers
             storeCloudChanges,   // build 632: a sync of another store's cloud saves moved on
             BCDLiveStore.shared.itchDetailChanges,
             BCDLiveStore.shared.eaDetailChanges,
+            BCDLiveStore.shared.amazonDetailChanges,
             GameMover.shared.$moving.dropFirst().map { _ in () }.eraseToAnyPublisher(),   // Location › Move to
             ExternalDrives.shared.$mounted.dropFirst().map { _ in () }.eraseToAnyPublisher(),
         ]

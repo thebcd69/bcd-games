@@ -244,8 +244,9 @@ typedef struct { int x; } SRWLOCK, CRITICAL_SECTION;
 #define SRWLOCK_INIT { 0 }
 static void AcquireSRWLockExclusive(SRWLOCK *l) { (void)l; }
 static void ReleaseSRWLockExclusive(SRWLOCK *l) { (void)l; }
-static void EnterCriticalSection(CRITICAL_SECTION *l) { (void)l; }
-static void LeaveCriticalSection(CRITICAL_SECTION *l) { (void)l; }
+static int lock_depth;   /* typed-view-unlocked: how deep the calling thread is in the view lock */
+static void EnterCriticalSection(CRITICAL_SECTION *l) { (void)l; lock_depth++; }
+static void LeaveCriticalSection(CRITICAL_SECTION *l) { (void)l; lock_depth--; }
 static LONG InterlockedIncrement(volatile LONG *p) { return ++*p; }
 static char logbuf[16384]; static size_t loglen;
 static void d3d12_log(const char *fmt, ...) {
@@ -310,13 +311,26 @@ static void mad_format_info(DXGI_FORMAT f, UINT *bytes, UINT *block) {
     if (f == 71) *block = 4;
 }
 static int mad_typed_uav_atomic(void) { return 0; }
+/* typed-view-unlocked: the depth of the view lock at the last texture made, and "another thread": when armed, a texture made
+ * with the lock released first has the very same view made by a nested call, as a second thread would in that window. */
+static int make_depth = -1, tex_released; static obj_handle_t last_released;
+struct mad_resource;
+static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, DXGI_FORMAT fmt,
+                                 UINT64 first, UINT64 num, int uav, struct mad_descriptor *e, int *why);
+static struct { int armed, fired, ret; struct mad_device *d; struct mad_resource *r; DXGI_FORMAT fmt; UINT64 first, num; int uav;
+                struct mad_descriptor e; } race;
 static obj_handle_t MTLBuffer_newTexture(obj_handle_t b, struct WMTTextureInfo *ti, UINT64 off, UINT64 bpr) {
     (void)b; (void)bpr;
+    if (race.armed && !lock_depth) {
+        race.armed = 0; race.fired = 1;
+        race.ret = mad_typed_buffer_view(race.d, race.r, race.fmt, race.first, race.num, race.uav, &race.e, NULL);
+    }
+    make_depth = lock_depth;
     if (metal_refuses || (refuse_unaligned64 && (off & 63)) || (refuse_unaligned16 && (off & 15))) return NULL;
     ti->gpu_resource_id = next_id++;
     return (obj_handle_t)(uintptr_t)ti->gpu_resource_id;
 }
-static void NSObject_release(obj_handle_t h) { (void)h; }
+static void NSObject_release(obj_handle_t h) { tex_released++; last_released = h; }
 static int mad_view_grow(struct mad_resource *r, void **arr, unsigned *cap, unsigned need, size_t elem) {
     (void)r;
     if (grow_fails) return 0;
@@ -351,16 +365,17 @@ static obj_handle_t mad_tvs_view_x(struct mad_device *d, struct mad_resource *r,
     if (ti->pixel_format != WMTPixelFormatRGBA32Float) return 0;
     return mad_tvs_view(d, r, ti, byte_off, num, bytes, gpu, rec);
 }
-static long long tvh_cfg = 1;
-static long long mad_cfg_int_pe(const char *k, long long d) { (void)k; (void)d; return tvh_cfg; }
+static long long tvh_cfg = 1, tvu_cfg;   /* tvu_cfg: typed-view-unlocked, set by the harness's argument */
+static long long mad_cfg_int_pe(const char *k, long long d) { (void)d; return !strcmp(k, "typed-view-unlocked") ? tvu_cfg : tvh_cfg; }
 ''' + pe[pe.index('#define MAD_TVH_MIN'):pe.index('/* why (may be NULL): 0, or the g_vc_why index')] + body('static int mad_typed_buffer_view(struct mad_device *d, struct mad_resource *r, DXGI_FORMAT fmt,') + r'''
 static int bad;
 #define EXPECT(c, what) do { if (!(c)) { printf("FAIL %s\n", what); bad = 1; } else printf("ok   %s\n", what); } while (0)
 static int qa, qb;
-int main(void) {
+int main(int argc, char **argv) {
     char t[24]; int n = 0;
     float v[4][4] = { { 0, 0, 0, 1 }, { 1, -2, 3, 1 }, { NAN, 0, 0, 1 }, { 2e5f, 0, 0, 1 } };
     unsigned char *buf = calloc(1, 4096);
+    (void)argv; tvu_cfg = argc > 1;   /* any argument: every typed view below is made with typed-view-unlocked = 1 */
     mad_sk_cat(t, sizeof t, &n, "%s", "0123456789");
     mad_sk_cat(t, sizeof t, &n, "%s", "0123456789abcdefghij");
     mad_sk_cat(t, sizeof t, &n, "%s", "more");
@@ -573,6 +588,52 @@ int main(void) {
             EXPECT(ok && lin.ntview == 100 && !lin.tvh && e.texture_view_id == lin.tview[40].id, "tv-hash = 0: no table, the scan finds the same view");
             g_tvh_on = save; free(lin.tview);
         }
+        {   /* typed-view-unlocked (build 657): where the texture is made, and another thread making the same view meanwhile */
+            struct mad_resource u = { (obj_handle_t)9, NULL, 1u << 20, 0x500000000ull, NULL, 0, 0 };
+            LONG made0 = g_tv_unl_made, lost0 = g_tv_unl_lost; int rel0 = tex_released; UINT64 id0;
+            make_depth = -1;
+            why = -1; ok = mad_typed_buffer_view(&d, &u, 41, 4, 8, 0, &e, &why) == 1;
+            EXPECT(ok && why == -1 && u.ntview == 1 && lock_depth == 0 && make_depth == (tvu_cfg ? 0 : 1) &&
+                   g_tv_unl_made - made0 == (tvu_cfg ? 1 : 0) && tex_released == rel0,
+                   "a plain view's texture is made under the view lock, and outside it with typed-view-unlocked = 1");
+            id0 = e.texture_view_id; make_depth = -1;
+            why = -1; ok = mad_typed_buffer_view(&d, &u, 41, 4, 8, 0, &e, &why) == 1;
+            EXPECT(ok && u.ntview == 1 && e.texture_view_id == id0 && make_depth == -1 && lock_depth == 0,
+                   "... the same view again: found, nothing made, either way");
+            make_depth = -1; tv_align = 16;
+            why = -1; ok = mad_typed_buffer_view(&d, &u, 41, 5, 8, 0, &e, &why) == 1;
+            EXPECT(ok && u.ntview == 2 && make_depth == 1 && lock_depth == 0, "... another alignment (typed-view-align): under the lock, either way");
+            tv_align = 64; make_depth = -1; tvs_on = 1;
+            why = -1; ok = mad_typed_buffer_view(&d, &u, 41, 32, 8, 0, &e, &why) == 1;
+            EXPECT(ok && u.ntview == 3 && make_depth == 1 && lock_depth == 0, "... with typed-view-shadow on: under the lock, either way");
+            tvs_on = 0; made0 = g_tv_unl_made; rel0 = tex_released;
+            memset(&race, 0, sizeof race);
+            race.armed = 1; race.d = &d; race.r = &u; race.fmt = 41; race.first = 100; race.num = 8; race.uav = 0;
+            why = -1; ok = mad_typed_buffer_view(&d, &u, 41, 100, 8, 0, &e, &why) == 1;
+            if (tvu_cfg)
+                EXPECT(ok && why == -1 && race.fired && race.ret == 1 && u.ntview == 4 && lock_depth == 0 &&
+                       e.texture_view_id == race.e.texture_view_id && e.gpu_va == race.e.gpu_va && e.metadata == race.e.metadata &&
+                       u.tview[3].id == race.e.texture_view_id && g_tv_unl_lost - lost0 == 1 && g_tv_unl_made - made0 == 1 &&
+                       tex_released - rel0 == 1 && (UINT64)(uintptr_t)last_released != race.e.texture_view_id,
+                       "typed-view-unlocked: the same view made by another thread while the lock was released stays; ours is released, "
+                       "one view in the list, the descriptor names theirs");
+            else
+                EXPECT(ok && !race.fired && u.ntview == 4 && lock_depth == 0 && g_tv_unl_lost == lost0 && tex_released == rel0,
+                       "by default the lock is never released around the texture, so no other thread gets in");
+            race.armed = 0; metal_refuses = 1; rel0 = tex_released; made0 = g_tv_unl_made;
+            why = 0; ok = mad_typed_buffer_view(&d, &u, 41, 200, 8, 0, &e, &why) == 0;
+            EXPECT(ok && why == 7 && u.ntview == 4 && lock_depth == 0 && make_depth == 1 && g_tv_unl_made == made0 && tex_released == rel0,
+                   "... a texture Metal refuses: tried under the lock last, reason 7, nothing published, either way");
+            metal_refuses = 0; grow_fails = 1; rel0 = tex_released;
+            why = 0; ok = mad_typed_buffer_view(&d, &u, 41, 300, 8, 0, &e, &why) == 0;
+            EXPECT(ok && why == 8 && u.ntview == 4 && lock_depth == 0 && tex_released - rel0 == 1,
+                   "... the view list cannot grow: the texture is released, reason 8, either way");
+            grow_fails = 0;
+            why = 0; ok = mad_typed_buffer_view(&d, &u, 2, (1u << 16) - 2, 16, 0, &e, &why) == 1;
+            EXPECT(ok && why == 9 && lock_depth == 0 && make_depth == (tvu_cfg ? 0 : 1) && last_vmap_a == 16,
+                   "... a view cut at the end of its buffer: made, reason 9, the descriptor keeps its count, either way");
+            free(u.tview); free(u.tvh);
+        }
         free(big.tview); free(big.tvh);
     }
     printf("%s\n", bad ? "harness FAILED" : "harness ok");
@@ -752,6 +813,12 @@ else:
             run = subprocess.run([str(exe)], capture_output=True, text=True)
             print(run.stdout, end='')
             check('the helpers behave', run.returncode == 0)
+            # Build 657: the same harness with typed-view-unlocked = 1 (a plain view's texture is made with the view lock
+            # released): every expectation above holds, and the cases at its end show where the texture is made.
+            run = subprocess.run([str(exe), 'unlocked'], capture_output=True, text=True)
+            bad_lines = [ln for ln in run.stdout.splitlines() if ln.startswith('FAIL')]
+            print('\n'.join(bad_lines + [ln for ln in run.stdout.splitlines() if 'typed-view-unlocked' in ln or 'either way' in ln]))
+            check('the helpers behave with typed-view-unlocked = 1 too (the whole harness again)', run.returncode == 0 and not bad_lines)
         src2 = Path(tmp) / 'skin2.c'
         exe2 = Path(tmp) / 'skin2'
         src2.write_text(harness2)

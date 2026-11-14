@@ -49,6 +49,7 @@ struct BCDStoreCards: View {
         VStack(alignment: .leading, spacing: 16) {
             BCDItchCard()
             BCDEACard()
+            BCDAmazonCard()   // madeira-bcd (Porthole port, item 13): the experimental Amazon Games store, off by default
         }
         .onAppear { ui.focus = focus }
     }

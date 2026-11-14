@@ -685,7 +685,7 @@ check("gpu-sync: after the replay leaves the queue lock, commit and wait for the
 check("pso-first-use: the replay hook is behind g_sd_state and the key, once per pipeline",
       "if (g_sd_state > 0 && g_pso_first && c->u.pso && !c->u.pso->first_used) mad_pso_first(c->u.pso);" in SRC and
       "if (InterlockedExchange(&p->first_used, 1)) return;" in SRC and
-      SRC.count("p->born_present = g_presents_now; p->born_tick = GetTickCount();") == 2)
+      SRC.count("p->born_present = g_presents_now; p->born_tick = mad_tick_ms();") == 2)   # build 657: the layer's own count (check-d3d12-tick-ms.py)
 check("present-min-ms: the sleep is inside Present's sync-diagnostics block",
       pr.index("if (g_sd_state > 0) {   /* madeira-bcd: sync diagnostics") < pr.index("if (g_present_min_ms) {") <
       pr.index("drawable = MetalLayer_nextDrawable(s->layer);"))

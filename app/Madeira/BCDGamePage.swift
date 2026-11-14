@@ -241,6 +241,44 @@ struct BCDCloudConflict: Identifiable, Equatable {
     }
 }
 
+// cloud-pending-begin (tests/host/check-cloud-pending.py compiles the lines down to cloud-pending-end on their own)
+// madeira-bcd (Porthole port, item 7): the cloud page lists the saves a sync would move, before anything moves, and can check again
+// without moving anything (it had listed only the saves that differ on both sides). That such a list is shown before a sync, and
+// "Check again", are ideas from Porthole's Steam Cloud page (knowledge only: no code of Porthole is here).
+/// One save the next sync would move.
+struct BCDCloudPending: Identifiable, Equatable {
+    var name: String
+    var bytes: Int64
+    /// It goes up to the cloud; false: it comes down to this device.
+    var up: Bool
+    var id: String { (up ? "up." : "down.") + name }
+}
+
+enum BCDCloudPendingList {
+    /// The most rows a direction shows; the rest is counted in one more line.
+    static let most = 12
+
+    /// The heading over a direction's rows.
+    static func heading(up: Bool, cloud: String) -> String {
+        up ? "Waiting to go up to \(cloud)" : "Waiting to come down from \(cloud)"
+    }
+
+    /// A direction's rows: the first `most` names with their sizes, largest first among equals in the order given, and how many more.
+    static func rows(_ all: [BCDCloudPending], up: Bool, size: (Int64) -> String) -> (rows: [(id: String, title: String, detail: String)], more: String?) {
+        let mine = all.filter { $0.up == up }
+        let shown = mine.prefix(most).map { (id: $0.id, title: $0.name, detail: size($0.bytes)) }
+        let rest = mine.count - shown.count
+        return (shown, rest > 0 ? "and \(rest) more" : nil)
+    }
+
+    /// "Check again" is offered for Steam's cloud when nothing is being checked or moved and the player is signed in.
+    static let checkTitle = "Check again"
+    static let checkDetail = "Compares this device with the cloud again. Nothing is moved."
+    /// The action's name for the page's backend (its `set(_:to:for:)` with "run").
+    static let checkAction = "cloud-check"
+}
+// cloud-pending-end
+
 /// A game in Steam's store, found by name (Find on Steam).
 struct BCDStoreMatch: Identifiable, Hashable {
     var id: Int
@@ -274,9 +312,11 @@ struct BCDGameTuning: Equatable {
     var found: [String] = []
     /// What it tried, newest first: a title and a line under it each.
     var history: [(title: String, detail: String)] = []
+    /// madeira-bcd (Porthole port, item 10): the fix that waits for the player's yes (Settings › Logs › Ask before trying a fix); empty: none.
+    var waiting: [String] = []
 
     static func == (a: BCDGameTuning, b: BCDGameTuning) -> Bool {
-        a.on == b.on && a.status == b.status && a.canUndo == b.canUndo && a.found == b.found
+        a.on == b.on && a.status == b.status && a.canUndo == b.canUndo && a.found == b.found && a.waiting == b.waiting
             && a.history.map(\.title) == b.history.map(\.title) && a.history.map(\.detail) == b.history.map(\.detail)
     }
 }
@@ -376,6 +416,10 @@ struct BCDGameDetails: Equatable {
     var cloudNames = BCDCloudNames()
     /// The saves Steam Cloud and this device disagree on.
     var cloudConflicts: [BCDCloudConflict] = []
+    /// The saves the next sync would move, one way or the other (the last comparison's plan). Empty for a store that does not tell.
+    var cloudPending: [BCDCloudPending] = []
+    /// The cloud page offers Check again (Steam's cloud: a comparison that moves nothing).
+    var cloudCanCheck = false
     /// Why the last sync stopped, beside what it compared.
     var cloudProblem: String? = nil
     /// The last sync: saves received (and how many replaced ones were backed up first), sent.
@@ -452,6 +496,8 @@ struct BCDGameDetails: Equatable {
     func applyRecommendedSettings(_ game: BCDGame)
     func setTuning(_ on: Bool, for game: BCDGame)
     func undoTuning(_ game: BCDGame)
+    /// madeira-bcd (Porthole port, item 10): the player says yes to the fix that waits.
+    func approveTuning(_ game: BCDGame)
     /// Writes the lines auto-tune kept into the game's own config.
     func writeTuningLines(_ game: BCDGame)
     /// Auto-tune's report for this game, to share; nil: nothing to report.
@@ -482,6 +528,7 @@ struct BCDGameDetails: Equatable {
 }
 
 extension BCDGameDetailBackend {
+    func approveTuning(_ game: BCDGame) {}
     func setWallpaper(from file: URL, for game: BCDGame) async throws { throw BCDGameError("A wallpaper cannot be set here.") }
     func logComment(for log: BCDGameLog) async -> String? { await logComment() }
 }
@@ -518,6 +565,8 @@ enum BCDGameAction: Hashable {
     case setTuning(Bool)
     case undoTuning
     case writeTuningLines
+    /// madeira-bcd (Porthole port, item 10).
+    case approveTuning
     case restoreSaves(URL)
     case sendLog(BCDGameLog)
     case saveConfig(String)
@@ -1282,6 +1331,9 @@ struct BCDGamePending: Equatable {
             configDraft = nil
             backend?.writeTuningLines(game)
             messages["tuning"] = "Written into this game's config."
+        case .approveTuning:
+            backend?.approveTuning(game)
+            messages["tuning"] = "The next start tries it. Restart BCD before you play."
         case .restoreSaves(let file):
             work("restore") { backend in
                 let count = try await backend.restoreSaves(from: file)
@@ -2746,6 +2798,11 @@ private struct BCDGameOptionsList: View {
             rows.append(BCDGameRow(id: "sync", title: title, symbol: "arrow.triangle.2.circlepath", enabled: !working,
                                    run: { model.request(.syncCloud) }))
         }
+        if d.cloudCanCheck, !working, cloud != .signedOut, cloud != .off, cloud != .unsupported {
+            // madeira-bcd: a comparison that moves nothing ("cloud-check" is the live backend's action for it)
+            rows.append(BCDGameRow(id: "cloudcheck", title: BCDCloudPendingList.checkTitle, symbol: "arrow.clockwise",
+                                   detail: BCDCloudPendingList.checkDetail, run: { model.request(.set(BCDCloudPendingList.checkAction, "run")) }))
+        }
         if case .differ = cloud {
             rows.append(BCDGameRow(id: "cloudwins", title: "Use \(names.cloud)'s saves",
                                    detail: "This device's copies are backed up first.", run: { model.request(.keepCloud(fromCloud: true)) }))
@@ -2763,6 +2820,8 @@ private struct BCDGameOptionsList: View {
             BCDGameRow(id: "save." + conflict.id, title: conflict.name,
                        detail: conflict.lines(names.cloud).cloud + "\n" + conflict.lines(names.cloud).device, still: true)
         }
+        let goingUp = BCDCloudPendingList.rows(d.cloudPending, up: true, size: BCDFormat.bytes)
+        let comingDown = BCDCloudPendingList.rows(d.cloudPending, up: false, size: BCDFormat.bytes)
         var history: [String] = []
         if d.cloudReceived > 0 {
             history.append("Received \(BCDGameText.saves(d.cloudReceived)) from \(names.cloud)"
@@ -2784,6 +2843,18 @@ private struct BCDGameOptionsList: View {
             if !files.isEmpty {
                 BCDEyebrow(text: "Saves that differ").padding(.top, 10).padding(.leading, 4)
                 ForEach(files) { BCDGameRowView(row: $0) }
+            }
+            // madeira-bcd: what the next sync would move, before it moves (nothing is shown when nothing waits)
+            ForEach([(true, goingUp), (false, comingDown)], id: \.0) { up, list in
+                if !list.rows.isEmpty {
+                    BCDEyebrow(text: BCDCloudPendingList.heading(up: up, cloud: names.cloud)).padding(.top, 10).padding(.leading, 4)
+                    ForEach(list.rows, id: \.id) { row in
+                        BCDGameRowView(row: BCDGameRow(id: "pending." + row.id, title: row.title, detail: row.detail, still: true))
+                    }
+                    if let more = list.more {
+                        Text(more).font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft).padding(.horizontal, 4)
+                    }
+                }
             }
             ForEach(history, id: \.self) { line in
                 Text(line).font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft)
@@ -2835,6 +2906,11 @@ private struct BCDGameOptionsList: View {
     private func tuningPage(_ tuning: BCDGameTuning) -> some View {
         var rows = [BCDGameRow(id: "tuning", title: "Auto-tune this game", detail: model.messages["tuning"] ?? tuning.status,
                                toggle: tuning.on, run: { model.request(.setTuning(!tuning.on)) })]
+        if !tuning.waiting.isEmpty {
+            // madeira-bcd (Porthole port, item 10): Ask before trying a fix.
+            rows.append(BCDGameRow(id: "approve", title: "Try the suggested fix", detail: tuning.waiting.joined(separator: "\n"),
+                                   run: { model.request(.approveTuning) }))
+        }
         if !tuning.found.isEmpty {
             rows.append(BCDGameRow(id: "write", title: "Keep what it found", detail: tuning.found.joined(separator: "\n"),
                                    run: { model.request(.writeTuningLines) }))

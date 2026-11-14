@@ -276,6 +276,10 @@ respective owners; BCD is not affiliated with or endorsed by them.
 code from Madeira and from the people who contribute to it; every file, author and source is listed in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
+**Porthole** ([tylerkaska112/Porthole](https://github.com/tylerkaska112/Porthole)), another fork of Madeira, by The Porthole
+authors: BCD carries their code for frame generation with Lossless Scaling, live MetalFX upscaling, floating sticks and touch
+layouts, the Amazon Games store and more, listed file by file in THIRD-PARTY-NOTICES.md.
+
 **Contributors to BCD:** [mckenna654](https://github.com/mckenna654), [Pardoxum](https://github.com/Pardoxum),
 [le0-VV](https://github.com/le0-VV), [rtmtree](https://github.com/rtmtree), [vancez](https://github.com/vancez),
 [creeper4004](https://github.com/creeper4004), [iqui27](https://github.com/iqui27), [Taala2](https://github.com/Taala2),

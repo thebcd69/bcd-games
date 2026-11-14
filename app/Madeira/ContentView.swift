@@ -1910,6 +1910,24 @@ struct ContentView: View {
             // upscaling writes it to the game's own lines). The D3D12 runtime reads
             // the key itself; D3D11 games get DXMT's MetalFX swapchain at the same
             // factor (DXMT takes 1 to 2).
+            // madeira-bcd Lossless Scaling frame generation (BCDLosslessLive.swift): only a game whose own line `lossless-scaling` asks
+            // for it gets the shaders and the control file in its prefix; nil (and nothing exported) for every other game.
+            if let line = BCDLosslessLive.launch() { logStore.log(line) }
+            // madeira-bcd Apple frame interpolation, an experiment (BCDVTInterpLive.swift): only a game whose own line `vt-interpolation`
+            // asks for it gets the engine's variable; nil (and nothing exported) for every other game.
+            if let line = BCDVTInterpLive.launch() { logStore.log(line) }
+            // madeira-bcd scheduler hints, an experiment (BCDSchedHintsLive.swift): only with bcd.cfg's or the game's `sched-hints`;
+            // without the key nothing is asked of iOS and nothing is logged.
+            BCDSchedHintsLive.launch()
+            // madeira-bcd a game that never asks for a controller, an experiment (BCDPadAutoLive.swift): only with the game's own line
+            // `pad-auto = 1`; without it no timer runs and nothing is read.
+            BCDPadAutoLive.launch()
+            // madeira-bcd present-fx: with env.MADEIRA_PRESENT_FX = 1 the presenter enlarges the picture, and "to the screen" without it
+            // becomes a factor here (BCDPresentFXLive.launch); nil for every other choice, which is handled as before.
+            if let fx = BCDPresentFXLive.launch() {
+                if let option = fx.option { dxmtOptions.append(option) }
+                logStore.log(fx.log)
+            } else
             if let txt = MadeiraConfig.gameValue("metalfx-upscale") ?? MadeiraConfig.get("metalfx-upscale"),
                let factor = Double(txt), factor >= 1.1 {
                 setenv("DXMT_METALFX_SPATIAL_SWAPCHAIN", "1", 1)
@@ -2964,6 +2982,15 @@ final class TouchControlsModel: ObservableObject {
                 continue
             }
             if hypot(p.x - cx, p.y - cy) <= r { return true }
+        }
+        // madeira-bcd (Porthole port, item 9): with floating sticks (BCDTouchFeel.floatingSticks, the in-game menu's touch settings; off by
+        // default) a controller stick also takes a touch in its zone (BCDFloatingStick.zone); a control there keeps its own (BCDTouchLayer).
+        if BCDTouchFeel.floatingSticks, !editing {
+            for c in controls where c.action.padName == "LS" || c.action.padName == "RS" {
+                let d = Self.diameter(c)
+                let frame = CGRect(x: area.minX + CGFloat(c.nx) * area.width - d / 2, y: area.minY + CGFloat(c.ny) * area.height - d / 2, width: d, height: d)
+                if BCDFloatingStick.zone(of: frame).contains(p) { return true }
+            }
         }
         return false
     }

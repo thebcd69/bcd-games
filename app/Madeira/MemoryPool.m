@@ -95,13 +95,25 @@ static void MPStartPressureSource(void) {
     dispatch_resume(source);
 }
 
+/* Follow-up of the night round 2026-11-11 (owner's go): the memory host's bundle id. Outside LiveContainer as always,
+ * <main bundle id>.MemoryHost. Inside LiveContainer the appex's own id from PlugIns/MadeiraMemoryHost.appex, because
+ * LiveContainer's Helper Process Support finds a guest's appex by that id (and one archived log had LiveContainer's own bundle id
+ * as the main id); the old name when the appex has none. Also used by MemoryHostTest.m. */
+NSString *MadeiraMemoryHostIdentifier(void) {
+    NSString *fallback = [NSBundle.mainBundle.bundleIdentifier stringByAppendingString:@".MemoryHost"];
+    if (!getenv("LC_HOME_PATH")) return fallback;
+    NSURL *url = [NSBundle.mainBundle.builtInPlugInsURL URLByAppendingPathComponent:@"MadeiraMemoryHost.appex"];
+    NSString *own = url ? [NSBundle bundleWithURL:url].bundleIdentifier : nil;
+    return own.length ? own : fallback;
+}
+
 /// Blocks for at most ~15 s. Returns the MB registered with the tier.
 long MadeiraMemoryPoolStart(long megabytes) {
     const uint64_t region = 512ull << 20;
     const int64_t timeout = 10 * NSEC_PER_SEC;
     long regions = megabytes / 512, added = 0;
     if (regions <= 0) return 0;
-    NSString *identifier = [NSBundle.mainBundle.bundleIdentifier stringByAppendingString:@".MemoryHost"];
+    NSString *identifier = MadeiraMemoryHostIdentifier();
     Class<MPExtensionClass> cls = (Class<MPExtensionClass>)NSClassFromString(@"NSExtension");
     id<MPExtension> extension = [cls extensionWithIdentifier:identifier error:nil];
     if (!extension) { fprintf(stderr, "[swap] ml1150 pool: no extension %s\n", identifier.UTF8String); return 0; }

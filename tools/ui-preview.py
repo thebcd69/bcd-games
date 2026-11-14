@@ -92,6 +92,22 @@ ENGINE_BOUND |= {"BCDTurboLive.swift", "BCDInputLive.swift", "BCDPlayersLive.swi
 # the touch feel model and the magnifier's bar are plain Swift and build here; everything that reads or drives the engine stays out.
 ENGINE_BOUND |= {"BCDMenuMore.swift", "BCDSessionFeelLive.swift", "BCDMagnifierLive.swift", "BCDWindowsLive.swift",
                  "BCDDebugLive.swift", "BCDPauseLive.swift"}
+# Live frame generation (Porthole port, item 2): the status words and the menu's rows are plain values (BCDFrameGen.swift); the engine calls stay out.
+ENGINE_BOUND |= {"BCDFrameGenLive.swift"}
+# Live upscaling (Porthole port, item 4): the route, the "to the screen" factor and the menu's rows are plain values (BCDPresentFX.swift).
+ENGINE_BOUND |= {"BCDPresentFXLive.swift"}
+# Lossless Scaling frame generation (Porthole port, item 1): the licence rules, the shader reader and the menu's rows are plain values
+# (BCDLossless.swift); Steam, the Keychain and the files stay out.
+ENGINE_BOUND |= {"BCDLosslessLive.swift"}
+# Apple frame interpolation, an experiment (Porthole port, item 3): the line, the start rule, the status words and the menu's rows are plain
+# values (BCDVTInterp.swift); the engine calls and the device test stay out.
+ENGINE_BOUND |= {"BCDVTInterpLive.swift"}
+# Scheduler hints, an experiment (Porthole port, item 5): the key, the clamp rule and the words are plain values (BCDSchedHints.swift);
+# iOS, the kernel helpers (BCDSchedHints.m) and the timer stay out.
+ENGINE_BOUND |= {"BCDSchedHintsLive.swift"}
+# A game that never asks for a controller, an experiment (Porthole port, item 8): the two rules and the words are plain values
+# (BCDPadAuto.swift); the engine's read count, the controller and the timer stay out.
+ENGINE_BOUND |= {"BCDPadAutoLive.swift"}
 
 # PC launchers (Battle.net, EA app: BCDLaunchers.swift, BCDLauncherView.swift): their engine side stays out; the screens are
 # -BCDTab library -BCDSection launcher-battlenet[+installed|downloading|failed|starting] (app/BCDPreview/BCDLauncherSample.swift).

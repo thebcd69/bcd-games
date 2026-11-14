@@ -46,6 +46,11 @@ import UIKit
     private var rows = 0
     private var cutAt = 0
     private var seconds = 0
+    /// madeira-bcd (Porthole port, item 11): the session's seconds for its [benchmark] line, and the switches it started with (nil: no line).
+    private var benchmark: [BCDTraceSample]?
+    private var benchmarkSwitches: [String] = []
+    /// The trace's file is being written this session (the switch or a guided run).
+    private var recording = false
 
     var running: Bool { timer != nil }
 
@@ -54,30 +59,40 @@ import UIKit
     /// The session started (BCDSessionRecorderLive.began).
     func began() {
         stop()
-        guard BCDTraceRules.records(switchOn: Self.switchOn, guidedRun: Self.guidedRun), let store = Self.store else { return }
-        let fm = FileManager.default
-        try? fm.createDirectory(at: store.folder, withIntermediateDirectories: true)
-        let inode = ((try? fm.attributesOfItem(atPath: LogStore.shared.logFileURL.path))?[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0
-        guard inode != 0 else {
-            LogStore.shared.log("[trace] not recording: the session log has no file number")
-            return
+        // madeira-bcd (Porthole port, item 11): the [benchmark] line (bcd.cfg or the game's own `benchmark-line = 1`; off by default) needs the
+        // same second-by-second readings; with it alone the sampler runs without a file. Without either, nothing below runs, as before.
+        benchmark = BCDBenchmark.on(MadeiraConfig.gameValue(BCDBenchmark.key) ?? MadeiraConfig.get(BCDBenchmark.key)) ? [] : nil
+        benchmarkSwitches = benchmark == nil ? [] : BCDBenchmark.switchNames.compactMap { name in
+            getenv(name).map { name + "=" + String(cString: $0) }.flatMap { $0.hasSuffix("=") ? nil : $0 }
         }
-        store.prune(keep: BCDTraceRules.keptFiles - 1)
-        let url = store.url(inode: inode)
-        let now = Date()
-        let civil = BCDFormat.civil(now)
-        let date = String(format: "%04d-%02d-%02d", civil.year, civil.month, civil.day)
-        let start = String(format: "%02d:%02d:%02d.%03d", civil.hour, civil.minute, civil.second, civil.millisecond)
-        var used: UInt64 = 0, total: UInt64 = 0
-        madeira_hud_jit_pool(&used, &total)
-        let header = BCDTraceStore.header(date: date, start: start, jitTotalMB: total > 0 ? Int(total >> 20) : nil) + "\n"
-        guard fm.createFile(atPath: url.path, contents: Data(header.utf8)), let h = try? FileHandle(forWritingTo: url) else {
-            LogStore.shared.log("[trace] not recording: the file could not be made")
-            return
+        let records = BCDTraceRules.records(switchOn: Self.switchOn, guidedRun: Self.guidedRun)
+        guard records || benchmark != nil, let store = Self.store else { return }
+        recording = records
+        if records {
+            let fm = FileManager.default
+            try? fm.createDirectory(at: store.folder, withIntermediateDirectories: true)
+            let inode = ((try? fm.attributesOfItem(atPath: LogStore.shared.logFileURL.path))?[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0
+            guard inode != 0 else {
+                LogStore.shared.log("[trace] not recording: the session log has no file number")
+                return
+            }
+            store.prune(keep: BCDTraceRules.keptFiles - 1)
+            let url = store.url(inode: inode)
+            let now = Date()
+            let civil = BCDFormat.civil(now)
+            let date = String(format: "%04d-%02d-%02d", civil.year, civil.month, civil.day)
+            let start = String(format: "%02d:%02d:%02d.%03d", civil.hour, civil.minute, civil.second, civil.millisecond)
+            var used: UInt64 = 0, total: UInt64 = 0
+            madeira_hud_jit_pool(&used, &total)
+            let header = BCDTraceStore.header(date: date, start: start, jitTotalMB: total > 0 ? Int(total >> 20) : nil) + "\n"
+            guard fm.createFile(atPath: url.path, contents: Data(header.utf8)), let h = try? FileHandle(forWritingTo: url) else {
+                LogStore.shared.log("[trace] not recording: the file could not be made")
+                return
+            }
+            _ = try? h.seekToEnd()
+            handle = h
+            fileURL = url
         }
-        _ = try? h.seekToEnd()
-        handle = h
-        fileURL = url
         reader = bcd_frame_reader_start()
         cpu = CPUMeter()
         _ = cpu?.sample()   // the first reading only sets the baseline
@@ -95,8 +110,11 @@ import UIKit
         t.tolerance = 0.25   // the system may fold it into another wake-up
         RunLoop.main.add(t, forMode: .common)
         timer = t
-        LogStore.shared.log("[trace] recording one line a second to logs/traces/\(url.lastPathComponent)"
-                            + (Self.switchOn ? "" : " (guided debug run)"))
+        if let url = fileURL, records {
+            LogStore.shared.log("[trace] recording one line a second to logs/traces/\(url.lastPathComponent)"
+                                + (Self.switchOn ? "" : " (guided debug run)"))
+        }
+        if benchmark != nil { LogStore.shared.log("[benchmark] measuring this session for its [benchmark] line (benchmark-line = 1)") }
         sample()
     }
 
@@ -105,8 +123,17 @@ import UIKit
         guard timer != nil else { return }
         sample()
         let lines = rows
+        let measured = benchmark, switches = benchmarkSwitches
         stop()
-        LogStore.shared.log("[trace] \(lines) lines kept")
+        if recording { LogStore.shared.log("[trace] \(lines) lines kept") }
+        // madeira-bcd (Porthole port, item 11): only when the session asked for it, and only when the game showed a frame.
+        if let measured, let line = BCDBenchmark.line(game: LibraryModel.shared.activeEntry?.title ?? "Game",
+                                                      build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?",
+                                                      samples: measured, switches: switches) {
+            LogStore.shared.log(line)
+        }
+        benchmark = nil
+        recording = false
     }
 
     private func stop() {
@@ -121,7 +148,7 @@ import UIKit
     // MARK: A second
 
     private func sample() {
-        guard let handle else { return }
+        guard handle != nil || benchmark != nil else { return }
         let now = bcd_frame_ticks_to_seconds(bcd_frame_now_ticks())
         var times: [Double] = []
         var lost: UInt64 = 0
@@ -155,6 +182,8 @@ import UIKit
             if level >= 0 { s.batteryPercent = Int((level * 100).rounded()) }
         }
         seconds = s.t
+        if (benchmark?.count ?? Int.max) < 86_400 { benchmark?.append(s) }   // madeira-bcd (Porthole port, item 11): a day of seconds at most
+        guard let handle else { return }
         try? handle.write(contentsOf: Data((s.row() + "\n").utf8))
         rows += 1
         if rows >= cutAt { cutBack() }

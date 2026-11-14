@@ -100,6 +100,11 @@ jobs:
       - name: Check auto-tune
         run: python3 tests/host/check-autotune.py --require-swift
 
+      # madeira-bcd (build 657): the log scanner searches a signal only in lines that hold the needles' byte pairs (a 51 MB log of
+      # The Last of Us Part I was scanned for two minutes on a core while the next session started); every fixture both ways.
+      - name: Check the auto-tune log scanner's pair filter
+        run: python3 tests/host/check-autotune-scan-filter.py
+
       # GTA V Legacy's GPU reset at the first scene frame (tester logs 574-592, the owner's build 546 start): auto-tune
       # adds env.MADEIRA_DXMT_FAULT_INFO = 1, the one line the owner's build 547 start differed by, after that failure only.
       - name: Check GTA V Legacy GPU reset rule
@@ -2925,6 +2930,23 @@ jobs:
       - name: Patch DXMT view private references (opt-in)
         run: python3 tools/patch-dxmt-view-private-ref.py
 
+      # madeira-bcd (Porthole port, item 1): Lossless Scaling frame generation in DXMT's Direct3D 11 swap chain (new
+      # d3d11_lsfg.hpp; Present1 presents the generated pictures before the game's frame). Nothing of Lossless Scaling is in
+      # BCD: the shaders are read on the device from the person's own Steam copy. Inactive unless the app set MADEIRA_LSFG_CTL
+      # for the session (a game's own `lossless-scaling` line). The i386 d3d11.dll and d3d11-src.dll (BCD_PATCHES in
+      # tools/build-d3d11-dll.sh, marker "[lsfg] madeira-bcd "). Before the i386 farm key.
+      - name: Check Lossless Scaling frame generation
+        run: python3 tests/host/check-lsfg.py
+
+      # madeira-bcd (Porthole port, item 1): the same for Direct3D 12 games. The passes are Direct3D 11 compute shaders, so they run on a
+      # Direct3D 11 device inside d3d11-src.dll (the bridge: applied to that DLL's copy of the sources by tools/build-d3d11-dll.sh, never
+      # to the submodule) and madeira_d3d12.dll presents the pictures (mad_lsfg_before, mad_lsfg_show). Nothing without MADEIRA_LSFG_CTL.
+      - name: Check Lossless Scaling frame generation for Direct3D 12
+        run: python3 tests/host/check-lsfg-d3d12.py
+
+      - name: Patch DXMT Lossless Scaling frame generation (opt-in)
+        run: python3 tools/patch-dxmt-lsfg.py
+
       # env.MADEIRA_DXMT_FAULT_INFO = 1 (off by default): command buffers with
       # encoder execution status, labelled encoders and a [fault-enc] line after
       # "Device error", so a GPU hang names its encoder (GTA V Legacy hung the GPU
@@ -3208,6 +3230,16 @@ jobs:
       - name: Patch winemetal frame generation below iOS 26
         run: python3 tools/patch-winemetal-framegen-ios26.py
 
+      # madeira-bcd (Porthole port, item 2): frame generation gets a live switch (the in-game menu, madeira_fgl_set), keeps the
+      # interpolator of the size before as a spare (always: the rebuild storm of rounds 624/626), and with env.MADEIRA_PRESENT_FX = 1
+      # (off by default) or their own keys a drawable gate, a GPU guard and a longer stall limit. Without the keys and without a
+      # call from the menu the decisions, waits and log lines are the old ones. Native only.
+      - name: Check winemetal frame generation live control
+        run: python3 tests/host/check-framegen-live.py
+
+      - name: Patch winemetal frame generation live control
+        run: python3 tools/patch-winemetal-framegen-live.py
+
       # madeira-bcd env.MADEIRA_PAUSE_IN_BACKGROUND = 1 (opt-in): commits and
       # presents wait while the app is not active (WineProcessBridge.m), so iOS
       # never refuses the game's GPU work from the background. Native only.
@@ -3216,6 +3248,83 @@ jobs:
 
       - name: Patch winemetal pause while inactive
         run: python3 tools/patch-winemetal-pause-inactive.py
+
+      # madeira-bcd (Porthole port, items 2 and 4): env.MADEIRA_PRESENT_FX = 1 (off by default): winemetal enlarges the picture itself
+      # (MetalFX spatial, a factor or "to the screen", switchable while the game runs) from a picture of the game's size, frame
+      # generation works on that picture, and every frame takes its drawable when it is presented. Without the key every hook
+      # falls through to the old code (tests/host/check-present-fx.py). After the live-control patch and after the pause-while-inactive
+      # patch (which anchors on the present call's first lines); native only.
+      - name: Check winemetal present-fx
+        run: python3 tests/host/check-present-fx.py
+
+      - name: Patch winemetal present-fx
+        run: python3 tools/patch-winemetal-present-fx.py
+
+      # madeira-bcd (Porthole port, item 1): while Lossless Scaling frame generation adds frames (the app raises a number for a
+      # session with the game's `lossless-scaling` line), the frame-rate limit counts every frame shown. With the number at 1, the
+      # default, the present call reads its mode as before (tests/host/check-lsfg.py). Native only.
+      - name: Patch winemetal Lossless Scaling pacing
+        run: python3 tools/patch-winemetal-lsfg-pacing.py
+
+      # madeira-bcd (Porthole port, item 3): an experiment. Apple's VideoToolbox low-latency frame interpolation (iOS 26) as a frame
+      # generator that needs nothing from the game: MADEIRA_VT_INTERP = 1 or 3 (the app exports it for a game whose own line
+      # `vt-interpolation` asks, with env.MADEIRA_PRESENT_FX = 1) hands the frames of one layer to a worker thread, which lets
+      # VideoToolbox make the pictures between two frames and presents them. madeira_vti_probe (Settings > Graphics > Experimental)
+      # finds out on a device which sizes it takes and how long a pair takes. Without the variable both hooks return at their first
+      # test (tests/host/check-vt-interp.py). After the pacing patch (it builds on present-fx). Native only.
+      - name: Check the VideoToolbox frame interpolation experiment
+        run: python3 tests/host/check-vt-interp.py
+
+      # madeira-bcd (Porthole port, item 5): scheduler hints for a running game (bcd.cfg sched-hints = 1: an activity for the process and
+      # the kernel's first latency and throughput tiers) and a watch on the fast cores' clock ([clamp] lines; sched-hints = watch logs
+      # without a hint). App only; without the key nothing is asked of iOS (tests/host/check-sched-hints.py runs the kernel calls here).
+      - name: Check scheduler hints
+        run: python3 tests/host/check-sched-hints.py
+
+      # madeira-bcd (Porthole port, item 6): the drive speed test (Settings > Storage > External drives > Test speed) and, with bcd.cfg
+      # drive-gentle-writes = 1, four chunks in flight instead of eight for a Steam download to a drive that writes under 40 MB/s.
+      # Without the key the downloader's numbers are what they were (tests/host/check-drive-speed.py runs the measurement here).
+      - name: Check the drive speed test
+        run: python3 tests/host/check-drive-speed.py
+
+      # madeira-bcd (Porthole port, item 7): a game's cloud page lists the saves the next sync would move, both ways, before anything
+      # moves, and has Check again for Steam's cloud (a comparison that only reads). The page's other rows are as they were.
+      - name: Check the cloud page's list of waiting saves
+        run: python3 tests/host/check-cloud-pending.py
+
+      # madeira-bcd (Porthole port, item 8): with a game's own line pad-auto = 1, a controller that the game never asks for works as
+      # keyboard and mouse after 25 seconds, and is a controller again the moment the game asks (the engine counts the game's
+      # controller reads in app/Madeira/Winios/WiniosGamepad.c). Without the line no timer runs and nothing is read.
+      - name: Check the controller-as-keys rule for games without controller support
+        run: python3 tests/host/check-pad-auto.py
+
+      # madeira-bcd (Porthole port, item 9): floating sticks (the in-game menu's touch settings, off by default: a controller stick's
+      # ring appears where the thumb lands in its zone) and six more built-in touch layouts after the controller and the PC keyboard.
+      - name: Check floating sticks and the extra built-in touch layouts
+        run: python3 tests/host/check-touch-floating.py
+
+      # madeira-bcd (Porthole port, item 10): auto-tune's "Ask before trying a fix" (Settings › Logs; off by default): a fix waits for
+      # the player's yes, Not now is not asked again, Undo takes back what was kept. Off, auto-tune is what it was.
+      - name: Check auto-tune's ask before trying a fix
+        run: python3 tests/host/check-autotune-ask.py
+
+      # madeira-bcd (Porthole port, item 11): Send Log's "Make big logs smaller before sending" (Settings › Logs; off by default: a log of
+      # 1.5 MB or more without most of its repeated diagnostics) and the end-of-session [benchmark] line (benchmark-line = 1; off by default).
+      - name: Check log thinning and the benchmark line
+        run: python3 tests/host/check-log-thin.py
+
+      # madeira-bcd (Porthole port, item 15): "What does this mean?" under the library's messages that BCDExplain has words for, in the
+      # app (no website); every other message reads as it did.
+      - name: Check the in-app explanations
+        run: python3 tests/host/check-bcd-explain.py
+
+      # madeira-bcd (Porthole port, item 13): the experimental Amazon Games store (Settings › Accounts; env.BCD_AMAZON, off by default):
+      # the signed build manifest, the entitlements, fuel.json, the sign-in's address; off, every hook returns at its first test.
+      - name: Check the experimental Amazon Games store
+        run: python3 tests/host/check-amazon.py
+
+      - name: Patch winemetal VideoToolbox frame interpolation (experiment, opt-in)
+        run: python3 tools/patch-winemetal-vt-interp.py
 
       # madeira-bcd: env.MADEIRA_X64_MACHINE = 1 (off by default): a 32-bit program that asks which machine is native
       # (IsWow64Process2, PROCESSOR_ARCHITEW6432) hears AMD64 instead of ARM64 (BeamNG.drive's launcher starts its
@@ -3473,6 +3582,23 @@ jobs:
       # (The Last of Us Part I's ray-cast guards; it fell back to the value's low byte).
       - name: Check UAV clears past the pattern cache
         run: python3 tests/host/check-uav-clear-oneoff.py
+
+      # madeira-bcd (build 656): a buffer UAV clear through a typed view writes each value into its channel of every element
+      # (The Last of Us Part I clears its deferred lighting's dispatch records to (0, 1, 1, 0); with Values[0] in every word
+      # no lighting dispatch ran).
+      - name: Check typed buffer UAV clears
+        run: python3 tests/host/check-uav-typed-buffer-clear.py
+
+      # madeira-bcd (build 657): the Direct3D 12 layer reads its own millisecond count from the CPU's counter. GetTickCount reads
+      # the shared data page at its Windows address, which is an exception in BCD: the indirect-argument probe took one for every
+      # indirect draw and dispatch replayed (The Last of Us Part I: 6,000 to 15,000 a second in play).
+      - name: Check the Direct3D 12 layer's millisecond count
+        run: python3 tests/host/check-d3d12-tick-ms.py
+
+      # madeira-bcd (build 657): typed-view-unlocked = 1 (off unless set) makes a typed buffer view's Metal texture outside the
+      # device's view lock (The Last of Us Part I: 20,000 to 58,000 views a second, 0.9-1.3 s of waiting on that lock per second).
+      - name: Check typed buffer views made outside the view lock
+        run: python3 tests/host/check-d3d12-typed-view-unlocked.py
 
       # madeira-bcd (build 651): env.MADEIRA_CAGE_RELEASE = 2 never holds the 8 GB V8 cage holdback, so Wine's band and the host share
       # it (The Last of Us Part I ran out of both while loading its first level).
@@ -4508,7 +4634,7 @@ jobs:
           # Round 624: Dark Souls III's [srv-getdesc] and WRC 9's [query-stuck] too (build 624's first IPA shipped a
           # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it). Night round 2026-11-11: FIFA 23's
           # [update-subresource-staging], Wesnoth's [swapchain-rotation], [dxmt-tex-limit] and Hatred's [view-ref] too.
-          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 " "[update-subresource-staging] skipped #" "[swapchain-rotation] madeira-bcd: SetRotation(" "[dxmt-tex-limit] CreateTexture2D refused " "[view-ref] madeira-bcd #"; do
+          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 " "[update-subresource-staging] skipped #" "[swapchain-rotation] madeira-bcd: SetRotation(" "[dxmt-tex-limit] CreateTexture2D refused " "[view-ref] madeira-bcd #" "[lsfg] madeira-bcd "; do
             LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11.dll && continue
             [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ] && LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11-src.dll && continue
             NEED="$NEED \"$m\""
@@ -4927,6 +5053,12 @@ jobs:
       # trapping (tools/patch-fex-ios-split-lock.py, both FEX builds); the patch, and the emitted code on the host (unicorn when present).
       - name: Check the FEX split-lock fast path
         run: python3 tests/host/check-fex-split-lock.py
+
+      # madeira-bcd (Porthole port, item 14; an A/B experiment): with MADEIRA_FEX_CALLRET_LEAN=1 the ARM64EC JIT leaves the suspend doorbell
+      # test out of the entry point directly after a guest CALL (tools/patch-fex-ios-callret-lean.py, the ARM64EC build only). Off by
+      # default: the check compiles FEX's entry point code before and after the overlay and compares what both emit, state by state.
+      - name: Check the FEX lean call return (opt-in)
+        run: python3 tests/host/check-fex-callret-lean.py
 
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_IMAGE_LOW_ALIAS = 1 (the narrowed form of an image's address gets a name)
       # and env.MADEIRA_QUERY_CLIP = 1 (VirtualQuery calls only allocatable memory free); both off unless set; the switches and the pure

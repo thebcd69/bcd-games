@@ -142,9 +142,14 @@ enum LogUpload {
             // Round 604: the session's performance trace, when the player asked for one, goes after the log's last line (BCDPerfTraceLive.swift).
             let trace = BCDPerfTraceSend.lines(for: log)
             if !trace.isEmpty { LogStore.shared.log("[bcd-logs] the performance trace goes with \(log.lastPathComponent): \(max(0, trace.count - 2)) lines") }
+            // madeira-bcd (Porthole port, item 11): Settings › Logs › Make big logs smaller before sending (off by default): a log of 1.5 MB or
+            // more goes without most of its repeated diagnostics (BCDLogThin.swift); the file on the device stays whole.
+            var thin = UserDefaults.standard.bool(forKey: BCDLogThinner.switchKey) ? BCDLogThinner.plan(log) : nil
+            if let thin { LogStore.shared.log("[bcd-logs] \(log.lastPathComponent) goes thinned: " + thin.note.prefix(160)) }
             do {
                 say("Compressing…")
-                packed = try LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace) { f in say("Compressing… \(Int(f * 100))%") }
+                packed = try LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace, head: thin.map { [$0.note] } ?? [],
+                                                keep: thin == nil ? nil : { thin!.thinner.keep($0) }) { f in say("Compressing… \(Int(f * 100))%") }
             } catch {
                 try? FileManager.default.removeItem(at: gz)
                 return finish(.failure(error))

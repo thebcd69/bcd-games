@@ -216,10 +216,23 @@ private struct BCDOriginalFrontEnd: View {
     @ViewBuilder private var statusChips: some View {
         let system = store.system
         HStack(spacing: 8) {
-            BCDUpdateChip { settingsSection = .updates; showSettings = true }
+            BCDUpdateChip(compact: layout == .phonePortrait && system.jit != .on) { settingsSection = .updates; showSettings = true }
             if layout != .phonePortrait || system.jit != .on {
-                BCDStatusChip(text: system.jit == .on ? "JIT on" : system.jit == .waiting ? "JIT…" : "JIT off",
-                              color: system.jit == .on ? BCDStyle.mint : BCDStyle.amber)
+                // Its words are never cut (beside "Update available" on a phone it used to shrink to its dot); there the update
+                // chip says "Update" so the title keeps its line.
+                let chip = BCDStatusChip(text: system.jit == .on ? "JIT on" : system.jit == .waiting ? "JIT…" : "JIT off",
+                                         color: system.jit == .on ? BCDStyle.mint : BCDStyle.amber)
+                    .fixedSize()
+                // Build 655 (owner, 2026-11-11; a tester's idea): "JIT off" is a button for Enable JIT, the same action as
+                // Settings › JIT's own button. "JIT on" and "JIT…" stay plain labels.
+                if system.jit == .off {
+                    Button { store.actions?.enableJIT() } label: { chip }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("JIT is off. Turn JIT on")
+                        .accessibilityIdentifier("bcd.home.jit-chip")
+                } else {
+                    chip
+                }
             }
             if layout == .pad, let limit = system.memoryLimitBytes {
                 BCDStatusChip(text: "Memory \(BCDFormat.bytes(limit))",
@@ -461,13 +474,21 @@ private struct BCDDuoFrontEnd: View {
 
     // MARK: Native navigation controls
 
-    private var jitStatus: some View {
+    @ViewBuilder private var jitStatus: some View {
         let ready = store.system.jit == .on
-        return Label(ready ? "JIT on" : store.system.jit == .waiting ? "JIT…" : "JIT off",
-                     systemImage: ready ? "bolt.fill" : "bolt.slash")
+        let label = Label(ready ? "JIT on" : store.system.jit == .waiting ? "JIT…" : "JIT off",
+                          systemImage: ready ? "bolt.fill" : "bolt.slash")
             .font(.caption.weight(.semibold))
             .foregroundStyle(ready ? BCDStyle.mint : BCDStyle.textSoft)
-            .accessibilityLabel(ready ? "JIT is enabled" : "JIT is not enabled")
+        // Build 655 (owner, 2026-11-11): "JIT off" runs Enable JIT here too, as on the classic Home.
+        if store.system.jit == .off {
+            Button { store.actions?.enableJIT() } label: { label }
+                .buttonStyle(.plain)
+                .accessibilityLabel("JIT is off. Turn JIT on")
+                .accessibilityIdentifier("bcd.duo.jit-chip")
+        } else {
+            label.accessibilityLabel(ready ? "JIT is enabled" : "JIT is not enabled")
+        }
     }
 
     /// The system bar yields space to gamepad browsing, but destinations remain visible.

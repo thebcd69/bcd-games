@@ -1,4 +1,6 @@
 /* GPL-3.0-or-later WITH the Madeira Converter Exception, version 1. */
+/* Portions copyright 2026 The Porthole authors: code taken from https://github.com/tylerkaska112/Porthole (commit 99ec315,
+ * patches/0019-pad-read-counters.patch) under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 #include "WiniosGamepad.h"
 #include <pthread.h>
 #include <string.h>
@@ -8,6 +10,12 @@
  * covers only a 20-byte snapshot, never framework work or a Wine server call. */
 static pthread_mutex_t pad_lock = PTHREAD_MUTEX_INITIALIZER;
 static struct winios_gamepad pads[WINIOS_GAMEPAD_MAX];
+
+/* madeira-bcd (Porthole port, item 8; from Porthole's patch 0019): how many times the game has asked for each XInput slot (any
+ * answer, connected or not). A game that never asks is not reading the controller at all (app/Madeira/BCDPadAuto.swift; only a
+ * game with `pad-auto = 1` has a reader of the count). Relaxed atomics: the reader is another thread and only the trend matters.
+ * BCD counts the XInput slots only: its HID pad exists only when the player chose that identity, and then the rule stands down. */
+static uint64_t pad_reads[WINIOS_GAMEPAD_MAX];
 
 void winios_gamepad_set_state(int index, const struct winios_gamepad *state)
 {
@@ -31,6 +39,7 @@ int winios_gamepad_get_state(int index, struct winios_gamepad *out)
 {
     struct winios_gamepad value = {0};
     if (index >= 0 && index < WINIOS_GAMEPAD_MAX) {
+        __atomic_fetch_add(&pad_reads[index], 1, __ATOMIC_RELAXED);
         pthread_mutex_lock(&pad_lock);
         value = pads[index];
         pthread_mutex_unlock(&pad_lock);
@@ -40,6 +49,14 @@ int winios_gamepad_get_state(int index, struct winios_gamepad *out)
         else memset(out, 0, sizeof(*out));
     }
     return value.connected != 0;
+}
+
+/* madeira-bcd (from Porthole's patch 0019): the read counters above, summed over every XInput slot. */
+uint64_t winios_gamepad_read_count(void)
+{
+    uint64_t total = 0;
+    for (int i = 0; i < WINIOS_GAMEPAD_MAX; i++) total += __atomic_load_n(&pad_reads[i], __ATOMIC_RELAXED);
+    return total;
 }
 
 /* ml2100: the HID controller's snapshot and the game's output state. Their own

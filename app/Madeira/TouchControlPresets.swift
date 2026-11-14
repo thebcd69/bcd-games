@@ -1,3 +1,5 @@
+// Portions copyright 2026 The Porthole authors: code taken from https://github.com/tylerkaska112/Porthole (commit 99ec315,
+// app/Sources/Core/VirtualPadModel.swift) under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 import Foundation
 import SwiftUI
 import UIKit
@@ -241,6 +243,197 @@ enum ControlPresetLayout {
     }
 }
 
+// MARK: - More built-in layouts (Porthole port, item 9)
+
+/// madeira-bcd (Porthole port, item 9): six more built-in layouts to start from, each a choice in the layout list like the two above
+/// (none is put on screen by itself; a game's default stays the controller or the PC keyboard). The left-handed one is BCD's own
+/// controller layout turned round. The other five are Porthole's arrangements (app/Sources/Core/VirtualPadModel.swift,
+/// `VirtualPadLayout.place` and `frames`: the proportions of each part, the room kept between them and the shrinking until nothing
+/// touches), made of BCD's controls: a stick is a stick of the same size, Porthole's diamond of face buttons is four round buttons
+/// where Porthole draws them, its direction pad four round buttons that fill the cross (BCD has no cross of one piece), a shoulder
+/// is BCD's wide shoulder as wide as Porthole's, a racing pedal is a trigger in an upright rectangle. Two changes for BCD's screen:
+/// View and Menu sit either side of the overlay's top buttons instead of between them, and the right edge keeps BCD's margin
+/// (Porthole keeps 44 points there for its menu's swipe).
+extension ControlPresetLayout {
+    enum Arrangement: String, CaseIterable {
+        case leftHanded, middleSticks, handheld, retro, racing, small
+
+        var id: String { "builtin." + rawValue }
+        var name: String {
+            switch self {
+            case .leftHanded: return "Left-handed controller"
+            case .middleSticks: return "Sticks in the middle"
+            case .handheld: return "Handheld controller"
+            case .retro: return "Retro pad"
+            case .racing: return "Racing pad"
+            case .small: return "Small controller"
+            }
+        }
+    }
+
+    /// The built-ins that press the touch controller (all but the PC keyboard): without touch XInput their buttons are inert.
+    static func needsTouchPad(_ id: String) -> Bool { id == xboxID || Arrangement.allCases.contains { $0.id == id } }
+
+    static func arranged(_ a: Arrangement, for screen: ControlPresetScreen) -> [TouchControl] {
+        let s = screen.landscape
+        guard s.width > 0, s.height > 0 else { return [] }
+        if a == .leftHanded {
+            // The controller layout the other way round, across the middle of the room between the margins.
+            let (L, R, _, _) = margins(s)
+            return xbox(for: screen).map { c in
+                var c = c
+                c.nx = (L + s.width - R) / s.width - c.nx
+                return c
+            }
+        }
+        var scale = 1.0
+        while true {
+            let parts = porthole(a, s, scale: scale)
+            let out = controls(parts, s)
+            if scale <= 0.5 || fits(out, s) { return out }
+            scale = max(0.5, scale * 0.95)
+        }
+    }
+
+    /// The parts of an arrangement as Porthole's VirtualPadLayout places them: frames in points, from the top-left corner.
+    private enum Part: Hashable { case leftStick, rightStick, dpad, face, leftBumper, rightBumper, leftTrigger, rightTrigger, back, start }
+
+    private static func porthole(_ a: Arrangement, _ s: ControlPresetScreen, scale: Double) -> [Part: CGRect] {
+        let (L, R, T, B) = margins(s)
+        let W = s.width, H = s.height
+        let u = min(min(W, H), 470) * scale                    // the sizes belong to a screen up to 470 points: a tablet gets a big phone's
+        let m = 0.035 * u + 8                                   // the room from the edges and between parts
+        let left = L + m, right = W - R - m * 0.6
+        let bottom = H - B - m, top = T + m * 0.8
+        let bw = 0.20 * u, bh = 0.08 * u                        // a bumper or a trigger
+        let sw = 0.14 * u, sh = 0.075 * u                       // View and Menu
+        var out: [Part: CGRect] = [:]
+        func bumpers() {
+            out[.leftBumper] = CGRect(x: left, y: top + (out[.leftTrigger] != nil ? bh + m * 0.4 : 0), width: bw, height: bh)
+            out[.rightBumper] = CGRect(x: right - bw, y: top + (out[.rightTrigger] != nil ? bh + m * 0.4 : 0), width: bw, height: bh)
+        }
+        func centre() {
+            // BCD: either side of the overlay's top buttons (topBarRect), level with the top row.
+            let bar = topBarRect(s)
+            out[.back] = CGRect(x: bar.minX - m * 0.4 - sw, y: top, width: sw, height: sh)
+            out[.start] = CGRect(x: bar.maxX + m * 0.4, y: top, width: sw, height: sh)
+        }
+        switch a {
+        case .leftHanded:
+            break
+        case .middleSticks:
+            let stick = 0.22 * u, face = 0.33 * u, dpad = 0.22 * u
+            out[.dpad] = CGRect(x: left, y: bottom - dpad, width: dpad, height: dpad)
+            out[.face] = CGRect(x: right - face, y: bottom - face, width: face, height: face)
+            // The sticks side by side in the middle of the room between the direction pad and the face buttons.
+            let room = (right - face - m) - (left + dpad + m)
+            let start = left + dpad + m + max(0, (room - (2 * stick + m)) / 2)
+            out[.leftStick] = CGRect(x: start, y: bottom - stick, width: stick, height: stick)
+            out[.rightStick] = CGRect(x: start + stick + m, y: bottom - stick, width: stick, height: stick)
+            out[.leftTrigger] = CGRect(x: left, y: top, width: bw, height: bh)
+            out[.rightTrigger] = CGRect(x: right - bw, y: top, width: bw, height: bh)
+            bumpers(); centre()
+        case .handheld:
+            // Two columns: a stick over the direction pad on the left, the face buttons over a stick on the right.
+            let stick = 0.22 * u, face = 0.33 * u, dpad = 0.22 * u
+            out[.dpad] = CGRect(x: left, y: bottom - dpad, width: dpad, height: dpad)
+            out[.leftStick] = CGRect(x: left, y: bottom - dpad - m - stick, width: stick, height: stick)
+            out[.rightStick] = CGRect(x: right - face / 2 - stick / 2, y: bottom - stick, width: stick, height: stick)
+            out[.face] = CGRect(x: right - face, y: bottom - stick - m - face, width: face, height: face)
+            out[.leftTrigger] = CGRect(x: left, y: top, width: bw, height: bh)
+            out[.rightTrigger] = CGRect(x: right - bw, y: top, width: bw, height: bh)
+            bumpers(); centre()
+        case .retro:
+            let dpad = 0.30 * u, face = 0.40 * u
+            out[.dpad] = CGRect(x: left, y: bottom - dpad, width: dpad, height: dpad)
+            out[.face] = CGRect(x: right - face, y: bottom - face, width: face, height: face)
+            bumpers(); centre()
+        case .racing:
+            let stick = 0.27 * u, face = 0.30 * u
+            let pw = 0.115 * u, ph = 0.32 * u                   // the pedals: the right trigger (gas) at the edge, the left (brake) beside it
+            out[.leftStick] = CGRect(x: left, y: bottom - stick, width: stick, height: stick)
+            out[.rightTrigger] = CGRect(x: right - pw, y: bottom - ph, width: pw, height: ph)
+            out[.leftTrigger] = CGRect(x: right - 2 * pw - m * 0.6, y: bottom - ph, width: pw, height: ph)
+            out[.face] = CGRect(x: right - 2 * pw - m * 0.6 - m - face, y: bottom - face, width: face, height: face)
+            bumpers(); centre()
+        case .small:
+            let stick = 0.26 * u, face = 0.38 * u
+            out[.leftStick] = CGRect(x: left, y: bottom - stick, width: stick, height: stick)
+            out[.face] = CGRect(x: right - face, y: bottom - face, width: face, height: face)
+            bumpers(); centre()
+        }
+        return out
+    }
+
+    /// Porthole's parts as BCD's controls, normalised to the screen.
+    private static func controls(_ parts: [Part: CGRect], _ s: ControlPresetScreen) -> [TouchControl] {
+        var out: [TouchControl] = []
+        func add(_ name: String, _ diameter: Double, _ x: Double, _ y: Double, aspect: Double? = nil) {
+            var c = TouchControl()
+            c.action = .pad(name)
+            c.scale = diameter / baseDiameter
+            c.nx = x / s.width
+            c.ny = y / s.height
+            if let aspect { c.face = TouchControl.Face(shape: "rectangle", aspect: aspect, text: nil) }
+            out.append(c)
+        }
+        /// Four buttons of a cluster: `across` of its width across, `out` of it from its middle, never under BCD's smallest size.
+        func cluster(_ f: CGRect, _ names: (up: String, left: String, right: String, down: String), across: Double, out: Double) {
+            let d = max(f.width * across, baseDiameter * 0.5), o = f.width * out
+            add(names.up, d, f.midX, f.midY - o)
+            add(names.left, d, f.midX - o, f.midY)
+            add(names.right, d, f.midX + o, f.midY)
+            add(names.down, d, f.midX, f.midY + o)
+        }
+        if let f = parts[.leftStick] { add("LS", f.width, f.midX, f.midY) }
+        if let f = parts[.rightStick] { add("RS", f.width, f.midX, f.midY) }
+        // The direction pad: BCD's four buttons fill Porthole's cross (39 % across, 30 % out); the face buttons sit where Porthole
+        // draws them (36 % across, 32 % out).
+        if let f = parts[.dpad] { cluster(f, ("D↑", "D←", "D→", "D↓"), across: 0.39, out: 0.30) }
+        if let f = parts[.face] { cluster(f, ("Y", "X", "B", "A"), across: 0.36, out: 0.32) }
+        for (part, name) in [(Part.leftTrigger, "LT"), (.leftBumper, "LB"), (.rightBumper, "RB"), (.rightTrigger, "RT")] {
+            guard let f = parts[part] else { continue }
+            if f.height > f.width {
+                // A pedal: an upright rectangle of the pedal's own proportions (a rectangle keeps a square's area).
+                add(name, (f.width * f.height).squareRoot(), f.midX, f.midY, aspect: f.width / f.height)
+            } else {
+                add(name, f.width / 1.6, f.midX, f.midY)        // BCD's wide shoulder is 1.6 diameters across
+            }
+        }
+        if let f = parts[.back] { add("View", f.width / 1.2, f.midX, f.midY) }   // BCD's View and Menu are 1.2 diameters across
+        if let f = parts[.start] { add("Menu", f.width / 1.2, f.midX, f.midY) }
+        return out
+    }
+
+    /// Porthole's test for a size: every control on the screen and none touching another (here: BCD's drawn boxes inside the
+    /// margins and clear of the overlay's top buttons; two round controls as circles 2 points apart, as the layouts are checked).
+    static func fits(_ cs: [TouchControl], _ s: ControlPresetScreen) -> Bool {
+        let (L, R, T, B) = margins(s)
+        let safe = CGRect(x: L, y: T, width: s.width - L - R, height: s.height - T - B).insetBy(dx: -0.5, dy: -0.5)
+        let boxes = cs.map { arrangedBox($0, s) }
+        let bar = topBarRect(s)
+        for b in boxes where !safe.contains(b) || b.intersects(bar) { return false }
+        for i in boxes.indices {
+            for j in boxes.indices where j > i {
+                let a = boxes[i], b = boxes[j]
+                let round = abs(a.width - a.height) < 1e-9 && abs(b.width - b.height) < 1e-9
+                let dx = a.midX - b.midX, dy = a.midY - b.midY
+                if round ? (dx * dx + dy * dy).squareRoot() < a.width / 2 + b.width / 2 + 2 : a.insetBy(dx: -1, dy: -1).intersects(b) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    /// A control's drawn box, its own shape counted (a pedal's rectangle).
+    static func arrangedBox(_ c: TouchControl, _ s: ControlPresetScreen) -> CGRect {
+        guard let aspect = c.face?.aspect, c.face?.shape == "rectangle" else { return box(c, screen: s) }
+        let d = baseDiameter * c.scale, k = aspect.squareRoot()
+        return CGRect(x: c.nx * s.width - d * k / 2, y: c.ny * s.height - d / k / 2, width: d * k, height: d / k)
+    }
+}
+
 /// What a layout's controls do for the game (the log's `kind=`): `pad` presses the virtual XInput pad,
 /// `keys` posts keyboard keys and mouse buttons (winios_post_key / winios_pointer, nothing of the controller
 /// hub's "keys and mouse" mapping, which turns a physical pad into keys), `mixed` has both.
@@ -303,7 +496,9 @@ struct ControlPresetStore: Equatable {
                       controls: ControlPresetLayout.xbox(for: .referencePhone)),
         ControlPreset(id: ControlPresetLayout.keyboardID, name: ControlPresetLayout.keyboardName,
                       controls: ControlPresetLayout.keyboard(for: .referencePhone)),
-    ]
+    ] + ControlPresetLayout.Arrangement.allCases.map {   // madeira-bcd (Porthole port, item 9): six more to start from, after the two
+        ControlPreset(id: $0.id, name: $0.name, controls: ControlPresetLayout.arranged($0, for: .referencePhone))
+    }
     static let maxNameLength = 40
 
     private(set) var user: [ControlPreset] = []
@@ -402,7 +597,8 @@ struct ControlPresetStore: Equatable {
         var controls = p.controls
         if let screen {
             let fitted = p.id == ControlPresetLayout.xboxID ? ControlPresetLayout.xbox(for: screen)
-                : p.id == ControlPresetLayout.keyboardID ? ControlPresetLayout.keyboard(for: screen) : []
+                : p.id == ControlPresetLayout.keyboardID ? ControlPresetLayout.keyboard(for: screen)
+                : ControlPresetLayout.Arrangement.allCases.first(where: { $0.id == p.id }).map { ControlPresetLayout.arranged($0, for: screen) } ?? []
             if !fitted.isEmpty { controls = fitted }
         }
         return controls.map { c in
@@ -459,7 +655,7 @@ final class ControlPresetsModel: ObservableObject {
 
     /// What the layout menu lists. The controller built-in needs touch XInput; the keyboard one does not.
     var available: [ControlPreset] {
-        ControlPresetStore.builtIns.filter { $0.id != ControlPresetLayout.xboxID || Self.touchPad } + store.user
+        ControlPresetStore.builtIns.filter { ControlPresetLayout.needsTouchPad($0.id) == false || Self.touchPad } + store.user
     }
 
     var active: ControlPreset? { TouchControlsModel.shared.layoutID.flatMap { store.preset($0) } }

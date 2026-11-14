@@ -49,6 +49,11 @@ enum BCDLaunch {
         }
         // MetalFX: the D3D12 runtime reads metalfx-upscale from that file; a
         // D3D11 game gets DXMT's own MetalFX swapchain at the same factor.
+        // madeira-bcd present-fx: with env.MADEIRA_PRESENT_FX = 1, or for "to the screen", the session's start decides
+        // (BCDPresentFXLive.launch in ContentView, which knows the desktop's size); in every other case this is as before.
+        if BCDPresentFXLive.decidesAtStart(profile) {
+            unsetenv("DXMT_METALFX_SPATIAL_SWAPCHAIN")
+        } else
         if let f = profile?.metalFXFactor {
             setenv("DXMT_METALFX_SPATIAL_SWAPCHAIN", "1", 1)
             dxmtExtra.append("d3d11.metalSpatialUpscaleFactor=\(f)")

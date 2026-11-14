@@ -147,7 +147,8 @@ for needle in ('eaChanges,', 'eaAppeared()', 'eaBecameActive()', 'eaMerge(&games
                'if ea(.pause, id) { return }', 'if ea(.resume, id) { return }', 'if ea(.cancel, id) { return }',
                'if eaAccountAction(signIn: true, front) { return }', 'if eaAccountAction(signIn: false, front) { return }', 'eaRefresh()'):
     require(needle in store, f'BCDLiveStore: {needle}')
-require('case steam, epic, gog, itch, ea, local' in (app / 'BCDStore.swift').read_text() and 'case .ea: return "EA games"' in (app / 'BCDStore.swift').read_text(),
+require(re.search(r'case steam, epic, gog, itch, ea(, amazon)?, local', (app / 'BCDStore.swift').read_text()) is not None   # Porthole port, item 13
+        and 'case .ea: return "EA games"' in (app / 'BCDStore.swift').read_text(),
         'BCDStoreFront: ea')
 views = (app / 'BCDEA/BCDEAViews.swift').read_text()
 require('MadeiraConfig.set("env.BCD_EA", on ? "1" : nil)' in views, 'the switch writes env.BCD_EA (removed when off)')

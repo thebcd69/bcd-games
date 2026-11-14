@@ -98,7 +98,7 @@ struct GameProfile {
     /// MetalFX spatial upscaling factor: the D3D12 runtime reads
     /// metalfx-upscale itself; a D3D11 game gets DXMT's own MetalFX swapchain
     /// with the same factor (BCDLaunch.applyExtras).
-    static let metalFXChoices: [(String, String)] = [("", "Off"), ("1.5", "1.5×"), ("2", "2×")]
+    static let metalFXChoices: [(String, String)] = [("", "Off"), ("fit", "To the screen"), ("1.5", "1.5×"), ("2", "2×")]
 
     /// Frame limit the session starts with (the Session panel still changes it).
     static let fpsChoices: [(String, String)] = [("", "Default (60)"), ("30", "30 FPS"), ("40", "40 FPS"),

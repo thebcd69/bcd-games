@@ -97,7 +97,9 @@ cls = block(live, "@MainActor final class BCDPerfTraceLive {")
 began = block(cls, "func began() {")
 check(cls.count("Timer(") == 1 and "Timer(" in began and "RunLoop.main.add(t" in began and "DispatchSource" not in cls and "DispatchQueue" not in cls,
       "one timer, made in began() and nowhere else; no queue of its own")
-check(began.index("guard BCDTraceRules.records(switchOn: Self.switchOn, guidedRun: Self.guidedRun)") < began.index("Timer("),
+# Porthole port, item 11: the [benchmark] line's key (off by default) may also start the sampler, without a file.
+check(began.index("let records = BCDTraceRules.records(switchOn: Self.switchOn, guidedRun: Self.guidedRun)")
+      < began.index("guard records || benchmark != nil, let store = Self.store else { return }") < began.index("Timer("),
       "... only after the switch or a guided debug run says so")
 check("t.tolerance = 0.25" in began and "BCDTraceRules.intervalSeconds" in began, "a second, with a tolerance the system may fold into another wake-up")
 stop = block(cls, "private func stop() {")

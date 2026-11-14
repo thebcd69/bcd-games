@@ -152,14 +152,14 @@ for needle in ('itchChanges,', 'itchAppeared()', 'itchBecameActive()', 'itchMerg
                'if itchAccountAction(signIn: true, front) { return }', 'if itchAccountAction(signIn: false, front) { return }', 'itchRefresh()',
                'case itchKey, itchFind', 'func openStoreTool(', 'func present(_ sheet: BCDLiveSheet)'):
     require(needle in store, f'BCDLiveStore: {needle}')
-require(re.search(r'case steam, epic, gog, itch(, ea)?, local', (app / 'BCDStore.swift').read_text()) is not None and 'case .itch: return "itch.io"' in (app / 'BCDStore.swift').read_text(),
+require(re.search(r'case steam, epic, gog, itch(, ea)?(, amazon)?, local', (app / 'BCDStore.swift').read_text()) is not None and 'case .itch: return "itch.io"' in (app / 'BCDStore.swift').read_text(),
         'BCDStoreFront: itch.io')
 live = (app / 'BCDGamePageLive.swift').read_text()
 for needle in ('BCDLiveStore.shared.itchEntryID(game.id)', 'BCDLiveStore.shared.itchNote(game.id)', 'BCDLiveStore.shared.itchOpened(game.id)',
                'BCDLiveStore.shared.itchDetailChanges', 'BCDLiveStore.shared.itchInstallAdvice(game.id)'):
     require(needle in live, f'the game page: {needle}')
-require(re.search(r'game\.store == \.itch(?: \|\| game\.store == \.ea)?, let at', live) is not None
-        and re.search(r'else if game\.store == \.itch(?: \|\| game\.store == \.ea)? \{', live) is not None,
+require(re.search(r'game\.store == \.itch(?: \|\| game\.store == \.ea)?(?: \|\| game\.store == \.amazon)?,\s*let at', live) is not None
+        and re.search(r'else if game\.store == \.itch(?: \|\| game\.store == \.ea)?(?: \|\| game\.store == \.amazon)? \{', live) is not None,
         'the game page: an itch.io game has no Name row and is uninstalled through the store')
 accounts = (app / 'BCDAccounts.swift').read_text()
 require('var extraStoreCards: AnyView { get }' in accounts and 'backend.extraStoreCards' in accounts and 'backend.closeExtraStoreQuestion()' in accounts

@@ -92,7 +92,9 @@ _re = ["resident-evil-requiem", "resident-evil-requiem-demo"]
 check("only the two Resident Evil Requiem lists (minBuild 598) and The Last of Us Part I (minBuild 643) set it",
       carriers == _re + ["the-last-of-us-part-1"]
       and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 598} in r["config"] for r in lists["rules"] if r["id"] in _re)
-      and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 643} in r["config"] for r in lists["rules"] if r["id"] == "the-last-of-us-part-1"))
+      # TLOU v24 (2026-11-14): builds 643-657 by the old line, 658 on by the owner's pinned list
+      and all({"line": "d3d12-pso-cached-blob = 1", "minBuild": 643, "maxBuild": 657} in r["config"]
+              and {"line": "d3d12-pso-cached-blob = 1", "minBuild": 658} in r["config"] for r in lists["rules"] if r["id"] == "the-last-of-us-part-1"))
 rules = (R / "build/tools/autotune_rules.py").read_text()
 check("auto-tune's rule adds the line after the GetCachedBlob stub line and the comctl32 stub line, never twice",
       '"id": "d3d12-pso-cached-blob-fatal"' in rules and '"lines": ["d3d12-pso-cached-blob = 1"]' in rules

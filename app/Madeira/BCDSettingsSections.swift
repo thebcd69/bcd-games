@@ -59,6 +59,9 @@ struct BCDMemoryStatus: Hashable {
     func set(_ key: BCDMemoryKey, _ value: String)
     var eco: Bool { get }
     func setEco(_ on: Bool)
+    /// bcd.cfg's sched-hints (BCDSchedHints.swift): "" off, "watch" log only, "1" on. It is read when a game starts.
+    var schedHints: String { get }
+    func setSchedHints(_ value: String)
     /// In the background (BackgroundRun.swift): minutes a running game, and a download, keep going after BCD leaves the screen. "" is off, the
     /// default: iOS pauses them within seconds, as it always did. The effect starts the next time BCD is left, so it never asks for a restart.
     var backgroundGame: String { get }
@@ -75,6 +78,11 @@ struct BCDMemoryStatus: Hashable {
     var extensionTestLine: String? { get }
     func runExtensionTest()
     func refresh()
+}
+
+extension BCDMemoryBackend {
+    var schedHints: String { "" }
+    func setSchedHints(_ value: String) {}
 }
 
 /// The minutes Memory & performance's In the background rows offer ("" is off, the engine's own default). Outside the generic view: Swift
@@ -138,7 +146,7 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                         "Which of a game's allocations may move into helper memory or the swap file. The wider, the more memory it saves and the more it can slow a game.",
                         enabled: backend.value(.swap) != "" || backend.value(.memoryPool) != "")
                     row(.memoryPool, "Helper memory",
-                        "Memory from BCD's helper extension, outside BCD's own limit, used first while the device has some to spare. Works without the swap file. On a device with 8 GB or less, keep it to a quarter of its memory. Not available when BCD runs inside LiveContainer. Experimental.")
+                        "Memory from BCD's helper extension, outside BCD's own limit, used first while the device has some to spare. Works without the swap file. On a device with 8 GB or less, keep it to a quarter of its memory. Inside LiveContainer only with its Helper Process Support and the setting \"Helper memory inside LiveContainer\" on. Experimental.")
                 }
                 BCDSettingsGroup(title: "Speed and power") {
                     row(.syncEngine, "Thread sync",
@@ -146,6 +154,10 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                     BCDSettingsToggleRow(id: BCDSettingsID.control(.memory, "eco"), title: "Eco mode",
                                          note: "Every game starts with its threads at low priority: cooler and longer on battery, but slower. Handy for loading screens.",
                                          isOn: backend.eco) { backend.setEco($0) }
+                    // madeira-bcd (Porthole port, item 5): scheduler hints for a running game, an experiment; off unless chosen.
+                    BCDSettingsValueRow(id: BCDSettingsID.control(.memory, "sched-hints"), title: BCDSchedHints.title, note: BCDSchedHints.note,
+                                        choices: BCDSchedHints.choices.map { BCDSettingsChoice(value: $0.0, label: $0.1) },
+                                        value: backend.schedHints) { backend.setSchedHints($0) }
                 }
                 if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
             }
@@ -248,11 +260,33 @@ struct BCDResolution: Hashable {
     /// The performance HUD every game takes that has none of its own (BCDHUDCore.swift): "" for none, else "1" to "4".
     var hudEveryGame: String { get }
     func setHUDEveryGame(_ value: String)
+    /// env.MADEIRA_PRESENT_FX for every game that has no line of its own: frame generation is switched while the game runs.
+    var presentFX: Bool { get }
+    func setPresentFX(_ on: Bool)
+    /// Lossless Scaling's setup on this device, for its frame generation (BCDLossless.swift): the state, and the three things to do.
+    var lossless: BCDLossless.Setup { get }
+    func losslessCheck()
+    func losslessDownload()
+    func losslessRemove()
+    /// The device test of Apple frame interpolation (BCDVTInterp.swift): its state and text, whether it can run now (iOS 26, no game
+    /// running), and the button.
+    var vtProbe: BCDVTInterp.Probe { get }
+    var vtProbeBlocked: String? { get }
+    func vtProbeRun()
 }
 
 extension BCDGraphicsBackend {
     var hudEveryGame: String { "" }
     func setHUDEveryGame(_ value: String) {}
+    var presentFX: Bool { false }
+    func setPresentFX(_ on: Bool) {}
+    var lossless: BCDLossless.Setup { BCDLossless.Setup() }
+    func losslessCheck() {}
+    func losslessDownload() {}
+    func losslessRemove() {}
+    var vtProbe: BCDVTInterp.Probe { BCDVTInterp.Probe() }
+    var vtProbeBlocked: String? { nil }
+    func vtProbeRun() {}
 }
 
 struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
@@ -273,8 +307,8 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                 }
                 BCDSettingsValueRow(id: BCDSettingsID.control(.graphics, "metalfx"), title: "MetalFX upscaling",
                                     note: "Apple's MetalFX draws each frame smaller and scales it up: faster, a little softer.",
-                                    choices: [BCDSettingsChoice(value: "", label: "Off"), BCDSettingsChoice(value: "1.5", label: "1.5×"),
-                                              BCDSettingsChoice(value: "2", label: "2×")],
+                                    choices: [BCDSettingsChoice(value: "", label: "Off"), BCDSettingsChoice(value: BCDUpscale.fit, label: "To the screen"),
+                                              BCDSettingsChoice(value: "1.5", label: "1.5×"), BCDSettingsChoice(value: "2", label: "2×")],
                                     value: backend.metalFX) { backend.setMetalFX($0) }
                 BCDSettingsValueRow(id: BCDSettingsID.control(.graphics, "d3d9"), title: "Direct3D 9 (32-bit games)",
                                     note: "How 32-bit Direct3D 9 games draw: through the emulated frontend, the standard, or a native ARM64 one.",
@@ -293,6 +327,41 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                                     choices: [BCDSettingsChoice(value: "", label: "Off"), BCDSettingsChoice(value: "1", label: "1"), BCDSettingsChoice(value: "2", label: "2"),
                                               BCDSettingsChoice(value: "3", label: "3"), BCDSettingsChoice(value: "4", label: "4")],
                                     value: backend.hudEveryGame) { backend.setHUDEveryGame($0) }
+            }
+            BCDSettingsGroup(title: "Experimental", footer: "A game's own switch, on its page under Display, comes first.") {
+                BCDSettingsToggleRow(id: BCDSettingsID.control(.graphics, "present-fx"),
+                                     title: "Live upscaling and frame generation",
+                                     note: BCDFrameGenMenu.switchNote,
+                                     isOn: backend.presentFX) { backend.setPresentFX($0) }
+                // madeira-bcd (Porthole port, item 3): what iOS's own frame interpolation does on this device, without a game. iOS 26
+                // has it; below that the page is as it was.
+                if #available(iOS 26.0, *) {
+                    let probe = backend.vtProbe
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "vt-probe"), title: BCDVTInterp.Probe.title,
+                                         note: backend.vtProbeBlocked ?? BCDVTInterp.Probe.detail,
+                                         symbol: "film.stack", enabled: !probe.running && backend.vtProbeBlocked == nil) { backend.vtProbeRun() }
+                    if probe.running || !probe.text.isEmpty {
+                        BCDSettingsInfoRow(title: "Apple frame interpolation on this device", note: probe.words, value: probe.value)
+                    }
+                }
+            }
+            BCDSettingsGroup(title: "Lossless Scaling", footer: BCDLossless.setupFooter) {
+                let setup = backend.lossless
+                BCDSettingsInfoRow(title: "Frame generation with your copy",
+                                   note: [setup.words + (setup.progress.map { " \(Int(($0 * 100).rounded()))%" } ?? ""), setup.message].compactMap { $0 }.joined(separator: " "),
+                                   value: setup.usable ? "Ready" : setup.installed ? "Check needed" : "Not set up")
+                if setup.installed {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "lossless-check"), title: "Check my Steam purchase again",
+                                         note: "Asks Steam whether this account still owns Lossless Scaling, and renews the week.",
+                                         symbol: "checkmark.seal", enabled: setup.signedIn && setup.busy == nil) { backend.losslessCheck() }
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "lossless-remove"), title: "Remove it from this device",
+                                         note: "Deletes the sealed file and the record of the check. Games go back to running without it.",
+                                         symbol: "trash", destructive: true, enabled: setup.busy == nil) { backend.losslessRemove() }
+                } else {
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.graphics, "lossless-download"), title: "Check my purchase and download from Steam",
+                                         note: "A few megabytes, with your own Steam account. Only its Lossless.dll is kept, sealed for this device and account.",
+                                         symbol: "arrow.down.circle", enabled: setup.signedIn && setup.busy == nil) { backend.losslessDownload() }
+                }
             }
             if backend.displaySwitchesShown && backend.displayRate > 60 {
                 BCDSettingsGroup(title: "Display") {
@@ -694,6 +763,8 @@ struct BCDStorageItem: Identifiable, Hashable {
     /// Opens a drive again without the picker; `chooseAgain` runs when iOS no longer opens it (the picker, to pick it again).
     func reconnectExternalDrive(_ id: String, chooseAgain: @escaping () -> Void)
     func findGames(onDrive id: String)
+    /// How fast the drive is as BCD uses it (BCDDriveSpeed.swift); the answer is the drives' message.
+    func testSpeed(ofDrive id: String)
     func removeExternalDrive(_ id: String)
     func setSteamInstallDrive(_ id: String)
     /// What the folder picker did ("opened", "answered", "failed: ...", "closed"), for the log.
@@ -723,6 +794,7 @@ extension BCDStorageBackend {
     func addExternalDrive(_ url: URL) {}
     func reconnectExternalDrive(_ id: String, chooseAgain: @escaping () -> Void) {}
     func findGames(onDrive id: String) {}
+    func testSpeed(ofDrive id: String) {}
     func removeExternalDrive(_ id: String) {}
     func setSteamInstallDrive(_ id: String) {}
     func noteExternalPicker(_ what: String) {}
@@ -855,6 +927,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             var choices: [BCDSettingsConfirm.Choice] = []
             if drive.connected {
                 choices.append(.init(title: "Find games") { backend.findGames(onDrive: drive.id) })
+                choices.append(.init(title: "Test speed") { backend.testSpeed(ofDrive: drive.id) })   // madeira-bcd (Porthole port, item 6)
             } else {
                 choices.append(.init(title: "Reconnect") {
                     backend.reconnectExternalDrive(drive.id) {
@@ -873,7 +946,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             })
             model.ask(BCDSettingsConfirm(title: "\(drive.letter): \(drive.name)",
                                          message: drive.connected
-                                            ? "Find games adds the games on it to your library (its Steam libraries are already there)."
+                                            ? "Find games adds the games on it to your library (its Steam libraries are already there). Test speed writes and reads about 70 MB on it and says how fast it is."
                                             : "Plug the drive in, then tap Reconnect. If iOS no longer opens it, Files opens: choose the same folder again, and its games stay in your library.",
                                          choices: choices))
         }
@@ -1230,6 +1303,12 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
     /// A line a second (frame rate, CPU, memory, heat) kept for the session and sent with its log (BCDPerfTraceLive.swift). Off unless turned on.
     var perfTrace: Bool { get }
     func setPerfTrace(_ on: Bool)
+    /// madeira-bcd (Porthole port, item 10): auto-tune asks before it tries a fix. Off unless turned on.
+    var asksBeforeFix: Bool { get }
+    func setAsksBeforeFix(_ on: Bool)
+    /// madeira-bcd (Porthole port, item 11): a big log is sent without most of its repeated diagnostics. Off unless turned on.
+    var thinsLogs: Bool { get }
+    func setThinsLogs(_ on: Bool)
 }
 
 extension BCDLogsBackend {
@@ -1240,6 +1319,10 @@ extension BCDLogsBackend {
     func setScreenshotsToPhotos(_ on: Bool) {}
     var perfTrace: Bool { false }
     func setPerfTrace(_ on: Bool) {}
+    var asksBeforeFix: Bool { false }
+    func setAsksBeforeFix(_ on: Bool) {}
+    var thinsLogs: Bool { false }
+    func setThinsLogs(_ on: Bool) {}
 }
 
 struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
@@ -1292,6 +1375,10 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "perftrace"), title: "Performance trace",
                                      note: "While a game runs, BCD writes one line a second (frame rate, the slowest frame, CPU, memory left, heat) to a small file, an hour at most. When you send that game's log, the trace goes with it, so a slowdown can be seen in time. Costs nothing while off.",
                                      isOn: backend.perfTrace) { backend.setPerfTrace($0) }
+                // madeira-bcd (Porthole port, item 11): off by default.
+                BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "thinlogs"), title: "Make big logs smaller before sending",
+                                     note: "A log of 1.5 MB or more is sent without most of its repeated diagnostics: the first 150 lines of each kind and one in 40 after that, with BCD's own lines, its measurements and the start and end of the log kept whole. It sends faster; the log on this device stays complete. Off: logs are sent whole.",
+                                     isOn: backend.thinsLogs) { backend.setThinsLogs($0) }
                 ForEach(BCDDiagnostic.allCases) { item in
                     BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, item.rawValue), title: item.title, note: item.note,
                                          isOn: backend.diagnostic(item)) { backend.setDiagnostic(item, $0) }
@@ -1305,6 +1392,12 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "autotune"), title: "Auto-tune",
                                      note: "On by default for every game (each game's page has its own switch). When a game crashes, freezes or is closed by iOS, BCD looks through its log afterwards and tries one known fix at its next start, and keeps it if the game gets further. Your own settings always win.",
                                      isOn: backend.crashTuning) { backend.setCrashTuning($0) }
+                // madeira-bcd (Porthole port, item 10): off by default; auto-tune then waits for a yes before it tries a fix.
+                if backend.crashTuning {
+                    BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "askfix"), title: "Ask before trying a fix",
+                                         note: "Auto-tune still reads the log after a crash, but before it adds a fix to a game it says what it would try and waits for Try it next start. Not now keeps the game as it is; the game's page keeps the suggestion. Once a fix is kept, you can undo it from the same message.",
+                                         isOn: backend.asksBeforeFix) { backend.setAsksBeforeFix($0) }
+                }
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "crashprompt"), title: "Ask about a session that closed unexpectedly",
                                      note: "When BCD was closed while a game was running (iOS ran out of memory, or it crashed), BCD asks once at the next start whether to send that session's log. It never asks twice about the same session.",
                                      isOn: backend.asksAfterUnexpectedClose) { backend.setAsksAfterUnexpectedClose($0) }

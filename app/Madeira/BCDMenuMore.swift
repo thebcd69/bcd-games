@@ -44,7 +44,10 @@ import os
             }
         case .display:
             insert(pictureSection, after: "scale")
+            insert(upscaleSection, after: nil)
             insert(frameGenSection, after: nil)
+            insert(losslessSection, after: nil)
+            insert(vtInterpSection, after: nil)
             insert(heatSection, after: nil)
         case .controls:
             insert(touchFeelSection, after: "touch")
@@ -160,8 +163,47 @@ import os
         }
     }
 
+    /// madeira-bcd: MetalFX upscaling, switched while the game runs: only in a session whose presenter enlarges the picture
+    /// (env.MADEIRA_PRESENT_FX = 1; BCDPresentFXLive.swift). In any other session there is no such section, as before.
+    private static var upscaleSection: BCDMenuSection? {
+        guard BCDPresentFXLive.live, let entry = model.activeEntry, entry.desktop != true else { return nil }
+        let profile = GameProfile(windowsPath: entry.windowsPath)
+        return BCDUpscale.section(value: profile.get(BCDUpscale.key) ?? MadeiraConfig.get(BCDUpscale.key), status: BCDPresentFXLive.status)
+    }
+
+    /// madeira-bcd: Lossless Scaling frame generation (BCDLossless.swift). Shown when it is set up on this device, when this game's
+    /// line asks for it, or when this session runs with it; otherwise there is no such section, as before.
+    private static var losslessSection: BCDMenuSection? {
+        guard let entry = model.activeEntry, entry.desktop != true else { return nil }
+        let lossless = BCDLosslessLive.shared
+        let wanted = BCDLossless.generated(GameProfile(windowsPath: entry.windowsPath).get(BCDLossless.key))
+        if lossless.live { BCDFrameGenLive.sectionBuilt() }   // the status line follows the engine while the menu shows it
+        return BCDLosslessMenu.section(live: lossless.live, ready: lossless.usable, wanted: wanted, control: lossless.control,
+                                       status: lossless.engineStatus())
+    }
+
+    /// madeira-bcd: Apple frame interpolation, an experiment (BCDVTInterp.swift). Shown when this game's line asks for it or this session
+    /// runs with it; otherwise there is no such section, as before.
+    private static var vtInterpSection: BCDMenuSection? {
+        guard #available(iOS 26.0, *), let entry = model.activeEntry, entry.desktop != true else { return nil }
+        if BCDLosslessLive.shared.live { return nil }   // one frame generator per session
+        let wanted = BCDVTInterp.frames(GameProfile(windowsPath: entry.windowsPath).get(BCDVTInterp.key))
+        let live = BCDVTInterpLive.live
+        guard wanted > 0 || live else { return nil }
+        if live { BCDFrameGenLive.sectionBuilt() }   // the status line follows the engine while the menu shows it
+        return BCDVTInterp.section(wanted: wanted, live: live, on: BCDVTInterpLive.on, status: live ? BCDVTInterpLive.status : BCDVTInterp.Status())
+    }
+
     private static var frameGenSection: BCDMenuSection? {
         guard #available(iOS 26.0, *), let entry = model.activeEntry, entry.desktop != true else { return nil }
+        if BCDLosslessLive.shared.live { return nil }   // madeira-bcd: one frame generator per session: this one runs with Lossless Scaling's
+        if BCDVTInterpLive.live { return nil }          // madeira-bcd: or with Apple frame interpolation (false without the game's vt-interpolation line)
+        if BCDFrameGenLive.live {   // madeira-bcd: a session with env.MADEIRA_PRESENT_FX = 1 switches it while the game runs (BCDFrameGenLive.swift)
+            let on = BCDFrameGenLive.on
+            if on { BCDFrameGenLive.sectionBuilt() }
+            return BCDFrameGenMenu.section(on: on, status: BCDFrameGenLive.status,
+                                           guardOn: BCDFrameGenLive.guardOn(GameProfile(windowsPath: entry.windowsPath)), measuring: BCDFrameGenLive.measuring)
+        }
         let wanted = GameProfile(windowsPath: entry.windowsPath).get("env.MADEIRA_FRAMEGEN") == "1"
         let running = ProcessInfo.processInfo.environment["MADEIRA_FRAMEGEN"].map { $0 != "0" && !$0.isEmpty } ?? false
         var rows = [BCDMenuRow(id: "mm.fgen",
@@ -201,6 +243,13 @@ import os
                                    title: "Hide the controls after",
                                    detail: "With no finger on a control for this long, the controls go; a touch on the game brings them back.",
                                    kind: .choice(BCDHideAfter.choices.map { BCDChoice(id: $0.id, title: $0.title) }, selected: String(current.hideAfter ?? 0))))
+            // madeira-bcd (Porthole port, item 9): only for a layout with a controller stick.
+            if TouchControlsModel.shared.controls.contains(where: { $0.action.padName == "LS" || $0.action.padName == "RS" }) {
+                rows.append(BCDMenuRow(id: "mm.float",
+                                       title: "Floating sticks",
+                                       detail: "A stick's ring appears where your thumb lands near it, so you do not have to find the stick. Other controls nearby keep their touches.",
+                                       kind: .toggle(current.floatingSticks == true)))
+            }
             rows.append(BCDMenuRow(id: "mm.color",
                                                                                   title: "Colour",
                                                                                   kind: .choice(BCDControlColor.choices.map { BCDChoice(id: $0.id, title: $0.title) },
@@ -391,6 +440,7 @@ import os
 
     /// A page was opened (its id) or closed (nil): the Windows page keeps a list while it is open, the Task Manager page a refresh.
     static func pageShown(_ id: String?, refresh: @escaping () -> Void) {
+        if BCDFrameGenLive.live || BCDLosslessLive.shared.live || BCDVTInterpLive.live { BCDFrameGenLive.menuShown(refresh: refresh) }   // madeira-bcd: a frame generator's status line follows the engine while the menu shows it
         let windows = BCDWindowsLive.shared
         if id == "mm.windows" {
             windows.changed = refresh
@@ -415,6 +465,7 @@ import os
     /// The menu closed: the page timers stop.
     static func menuClosed() {
         pageShown(nil, refresh: {})
+        BCDFrameGenLive.stopWatching()
         saveNote = nil
         logFrozen = nil   // the log page starts live and whole the next time the menu opens
         logCleared = nil
@@ -458,6 +509,17 @@ import os
         case "mm.log.pause": logToggle(on)
         case "mm.tick": feel.update { $0.touchHaptics = on ? nil : false }
         case "mm.vibe": feel.update { $0.phoneVibration = on ? true : nil }
+        case "mm.float": feel.update { $0.floatingSticks = on ? true : nil }
+        case "mm.fgen.guard":   // madeira-bcd: live frame generation's two switches (rows only a session with env.MADEIRA_PRESENT_FX shows)
+            if let entry = model.activeEntry { BCDFrameGenLive.setGuard(on, profile: GameProfile(windowsPath: entry.windowsPath)) }
+        case "mm.fgen.measure": BCDFrameGenLive.setMeasuring(on)
+        case "mm.lsfg.light", "mm.lsfg.force", "mm.lsfg.measure":   // madeira-bcd: Lossless Scaling's switches (rows only a session with it shows)
+            var next = BCDLosslessLive.shared.control
+            if row == "mm.lsfg.light" { next.performance = on } else if row == "mm.lsfg.force" { next.force = on } else { next.measure = on }
+            BCDLosslessLive.shared.apply(next)
+            if row == "mm.lsfg.light", let entry = model.activeEntry {
+                GameProfile(windowsPath: entry.windowsPath).set(BCDLossless.qualityKey, on ? nil : "1")
+            }
         case "mm.dbg.timestamps":
             var plan = BCDDebugLive.plan
             plan.timestamps = on
@@ -488,8 +550,42 @@ import os
             if #available(iOS 26.0, *) {
                 if let entry = model.activeEntry {
                     GameProfile(windowsPath: entry.windowsPath).set("env.MADEIRA_FRAMEGEN", value.isEmpty ? nil : value)
-                    LogStore.shared.log("[feel] frame generation \(value.isEmpty ? "off" : "on") from the next start")
+                    if BCDFrameGenLive.live { BCDFrameGenLive.switched(on: !value.isEmpty) }   // madeira-bcd: it takes effect now
+                    else { LogStore.shared.log("[feel] frame generation \(value.isEmpty ? "off" : "on") from the next start") }
                 }
+            }
+        case "mm.vti":   // madeira-bcd: the game's line is written; a session that started with Apple frame interpolation switches off and on at once
+            if let entry = model.activeEntry {
+                let frames = BCDVTInterp.frames(value)
+                GameProfile(windowsPath: entry.windowsPath).set(BCDVTInterp.key, frames > 0 ? String(frames) : nil)
+                if BCDVTInterpLive.live { BCDVTInterpLive.switched(on: frames > 0) }
+                else { LogStore.shared.log("[feel] Apple frame interpolation \(frames > 0 ? "\(frames) between two frames" : "off") from the next start") }
+            }
+        case "mm.lsfg":   // madeira-bcd: the game's line is written; a session that runs with Lossless Scaling follows at once, any other from the next start
+            if let entry = model.activeEntry {
+                GameProfile(windowsPath: entry.windowsPath).set(BCDLossless.key, BCDLossless.generated(value).map(String.init))
+                let lossless = BCDLosslessLive.shared
+                if lossless.live {
+                    var next = lossless.control
+                    next.enabled = BCDLossless.generated(value) != nil
+                    if let n = BCDLossless.generated(value) { next.generated = n }
+                    lossless.apply(next)
+                } else {
+                    LogStore.shared.log("[feel] Lossless Scaling frame generation \(value.isEmpty ? "off" : value + " added") from the next start")
+                }
+            }
+        case "mm.lsfg.flow":
+            let lossless = BCDLosslessLive.shared
+            if lossless.live, let entry = model.activeEntry {
+                var next = lossless.control
+                next.flow = BCDLossless.flow(value)
+                lossless.apply(next)
+                GameProfile(windowsPath: entry.windowsPath).set(BCDLossless.flowKey, next.flow == 1 ? nil : value)
+            }
+        case "mm.upscale":   // madeira-bcd: only a present-fx session shows the row; the game's line is written and the presenter follows at once
+            if BCDPresentFXLive.live, let entry = model.activeEntry {
+                GameProfile(windowsPath: entry.windowsPath).set(BCDUpscale.key, value.isEmpty ? nil : value)
+                BCDPresentFXLive.chosen(value)
             }
         case "mm.heat": setHeat(!value.isEmpty)
         case "mm.hide": feel.update { $0.hideAfter = Int(value).flatMap { $0 == 0 ? nil : $0 } }
@@ -583,6 +679,12 @@ import os
     /// A session ended: the log page starts fresh.
     static func sessionEnded() {
         menuClosed()
+        BCDFrameGenLive.sessionEnded()
+        BCDLosslessLive.shared.sessionEnded()
+        BCDVTInterpLive.sessionEnded()
+        BCDPresentFXLive.sessionEnded()
+        BCDSchedHintsLive.end()
+        BCDPadAutoLive.end()
         if heatSetHere { unsetenv("MADEIRA_THERMAL_CAP"); heatSetHere = false }
     }
 }

@@ -51,7 +51,15 @@ check("every place that writes env.MADEIRA_FRAMEGEN from a control is that one",
       and not any("MADEIRA_FRAMEGEN" in p.read_text() for p in app.glob("*.swift")
                   if p.name not in ("BCDGamePageLive.swift", "ConfigCatalog.generated.swift", "GameRecommendationsApply.swift",
                                     "GameRecommendations.swift", "GameRecommendationsList.swift", "GameProfiles.swift",
-                                    "LibraryBCD.swift", "Library.swift", "BCDHUDLive.swift", "BCDMenuMore.swift")))
+                                    "LibraryBCD.swift", "Library.swift", "BCDHUDLive.swift", "BCDMenuMore.swift", "BCDFrameGenLive.swift",
+                                    # Porthole port, item 11: the [benchmark] line names the switches in force; it only reads them
+                                    "BCDPerfTraceCore.swift")))
+# Porthole port, item 2: BCDFrameGenLive.swift names only the GPU guard's own key; it never writes or exports env.MADEIRA_FRAMEGEN itself,
+# and it does nothing below iOS 26 (its `live` is false there).
+_fgl = (app / "BCDFrameGenLive.swift").read_text()
+check("live frame generation (BCDFrameGenLive.swift): only the GPU guard's key, no setenv, off below iOS 26",
+      _fgl.count("MADEIRA_FRAMEGEN") == _fgl.count('"env.MADEIRA_FRAMEGEN_GPU_GUARD"') == 1 and "setenv" not in _fgl
+      and 'guard #available(iOS 26.0, *), let v = getenv("MADEIRA_PRESENT_FX") else { return false }' in _fgl)
 # Round 604: the in-game menu's Display row writes the same line, for the next start, and only from iOS 26 (it neither shows nor writes below).
 menu_more = (app / "BCDMenuMore.swift").read_text()
 check("the in-game menu's frame generation row: shown and written only from iOS 26, and it writes the game's own line only",

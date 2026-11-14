@@ -144,17 +144,19 @@ check("LibraryController.shared.configure(enabled: true, ownsInput: true)" in bl
 
 # ---- play ----------------------------------------------------------------------------------
 start = block(store, "private func start(_ game: BCDGame)")
-# Six starts, all through the connected Play: a GOG game's entry (BCDLiveStoreGOG's hook, which returns nil for
-# every other game), an Epic game's entry (BCDLiveStoreEpic's, the same), an itch.io game's and an EA game's (the same), a game from
+# Seven starts, all through the connected Play: a GOG game's entry (BCDLiveStoreGOG's hook, which returns nil for
+# every other game), an Epic game's entry (BCDLiveStoreEpic's, the same), an itch.io game's, an EA game's and an Amazon game's (the same), a game from
 # Files or the desktop, and a Steam game.
 # Build 622: through begin(), which shows a heavy game's one-time graphics tip first (BCDGraphicsTip, check-bcd-launch.py).
-check(start.count("begin(entry, launch)") == 6 and "launch(entry)" not in start.replace("begin(entry, launch)", "")
+check(start.count("begin(entry, launch)") == 7 and "launch(entry)" not in start.replace("begin(entry, launch)", "")
       and "guard let launch else { return }" in start
       and "if let entry = gogPlayEntry(game) { begin(entry, launch); return }" in start
       and "if let entry = epicPlayEntry(game) { begin(entry, launch); return }" in start
       and "if let entry = itchPlayEntry(game) { begin(entry, launch); return }" in start
-      and "if let entry = eaPlayEntry(game) { begin(entry, launch); return }" in start,
-      "Play: the live store starts a game only through the connected Play (GOG, Epic, itch.io, EA, local, Steam)")
+      and "if let entry = eaPlayEntry(game) { begin(entry, launch); return }" in start
+      # Porthole port, item 13: the experimental Amazon Games store's entry (BCDLiveStoreAmazon's hook, nil for every other game).
+      and "if let entry = amazonPlayEntry(game) { begin(entry, launch); return }" in start,
+      "Play: the live store starts a game only through the connected Play (GOG, Epic, itch.io, EA, Amazon Games, local, Steam)")
 # Wave 3 (2026-10-19): the classic Game details page, which asked this check too, is deleted; the check moved
 # unchanged to SteamGames.swift (SteamPlayCheck.blocker) and BCD's Play is the only caller.
 check("library.steamEntry(installed, title: title)" in start

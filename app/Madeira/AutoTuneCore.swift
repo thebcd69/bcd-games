@@ -380,14 +380,41 @@ final class AutoTuneLogScanner {
     private(set) var lineCount = 0
     private(set) var firstLine: [Int]
     private let needles: [[[UInt8]]]
+    /// 2026-11-12 (The Last of Us Part I, build 656: a 51 MB log of 357,000 lines was scanned for ~2 minutes at 70 to 100 % of an efficiency
+    /// core while the next session started, "[xp-names] ... uses 100% of a core; its stack ... memmem <- AutoTuneLogScanner.find"): a filter in
+    /// front of the per-signal search. A needle can only be in a line when every pair of neighbouring bytes of the needle is in the line, so
+    /// each line's pairs are noted once (hashed into 4096 bits) and a signal is searched only when the pairs of all its needles are there. It
+    /// never drops a match (a pair of the needle that is in the line is in the line's bits); a line that passes is searched as before.
+    /// `pairStart[i] ..< pairStart[i + 1]` are signal i's entries in `pairBits` (at most `maxPairs` per needle, spread over it).
+    static let maxPairs = 8
+    /// False only in the host test that compares both ways (init's `pairFilter`); the app always filters.
+    private let usePairs: Bool
+    private let pairStart: [Int32]
+    private let pairBits: [UInt16]
+    private var linePairs = [UInt64](repeating: 0, count: 64)
     /// madeira-bcd (round 630): the signals marked sinceLaunch, whose counts start again at each game launch.
     private let sinceLaunch: [Int]
     /// Whether a signal's first line is already in `evidence` (a count that starts again does not add a second line).
     private var evidenced: [Bool]
     private var carry: [UInt8] = []
 
-    init(signals: [AutoTuneSignal]) {
+    init(signals: [AutoTuneSignal], pairFilter: Bool = true) {
+        usePairs = pairFilter
         needles = signals.map { $0.has.map { Array($0.utf8) } }
+        var starts: [Int32] = [], bits: [UInt16] = []
+        for list in needles {
+            starts.append(Int32(bits.count))
+            for n in list where n.count >= 2 {
+                let pairs = n.count - 1, take = min(pairs, Self.maxPairs)
+                for k in 0..<take {
+                    let at = take == pairs ? k : k * (pairs - 1) / (take - 1)
+                    bits.append(Self.pairHash(n[at], n[at + 1]))
+                }
+            }
+        }
+        starts.append(Int32(bits.count))
+        pairStart = starts
+        pairBits = bits
         counts = Array(repeating: 0, count: signals.count)
         sinceLaunch = signals.indices.filter { signals[$0].sinceLaunch == true }
         evidenced = Array(repeating: false, count: signals.count)
@@ -463,7 +490,9 @@ final class AutoTuneLogScanner {
         if !sinceLaunch.isEmpty, Self.find(l, Self.mLibraryLaunch) != nil {
             for i in sinceLaunch { counts[i] = 0 }
         }
-        for i in needles.indices where Self.hasAll(l, needles[i]) {
+        let filtered = usePairs
+        if filtered { notePairs(l) }
+        for i in needles.indices where (!filtered || pairsPresent(i)) && Self.hasAll(l, needles[i]) {
             counts[i] += 1
             if firstLine[i] == 0 { firstLine[i] = lineCount }
             if !evidenced[i] && evidence.count < 24 {
@@ -472,6 +501,36 @@ final class AutoTuneLogScanner {
             }
         }
         markers(l)
+    }
+
+    @inline(__always) private static func pairHash(_ a: UInt8, _ b: UInt8) -> UInt16 {
+        UInt16(truncatingIfNeeded: (UInt32(a) &* 31 &+ UInt32(b)) & 4095)
+    }
+
+    /// The pairs of neighbouring bytes of the line, for `pairsPresent`.
+    private func notePairs(_ l: UnsafeRawBufferPointer) {
+        linePairs.withUnsafeMutableBufferPointer { w in
+            for k in 0..<64 { w[k] = 0 }
+            guard l.count >= 2 else { return }
+            var prev = l[0]
+            for k in 1..<l.count {
+                let c = l[k], h = Int(Self.pairHash(prev, c))
+                w[h >> 6] |= 1 << UInt64(h & 63)
+                prev = c
+            }
+        }
+    }
+
+    /// False only when a needle of signal i cannot be in the line noted last.
+    @inline(__always) private func pairsPresent(_ i: Int) -> Bool {
+        var k = Int(pairStart[i])
+        let end = Int(pairStart[i + 1])
+        while k < end {
+            let h = Int(pairBits[k])
+            if linePairs[h >> 6] & (1 << UInt64(h & 63)) == 0 { return false }
+            k += 1
+        }
+        return true
     }
 
     private static func find(_ l: UnsafeRawBufferPointer, _ needle: [UInt8]) -> Int? {

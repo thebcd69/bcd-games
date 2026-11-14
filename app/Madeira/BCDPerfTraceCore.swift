@@ -197,6 +197,47 @@ struct BCDTraceStore {
     }
 }
 
+// MARK: - The [benchmark] line (Porthole port, item 11)
+
+/// One line at the end of a session for comparing builds and switches (bcd.cfg or a game's own line `benchmark-line = 1`; off by default):
+///
+///     [benchmark] build=658 seconds=612 fps-avg=41.3 fps-1pct=18.0 fps-5pct=27.0 fps-min=12.0 worst-ms=402 peak-mb=4210 least-free-mb=820
+///                 swap-peak-mb=0 jit-peak-mb=311 heat=fair switches=MADEIRA_PRESENT_FX=1,MADEIRA_FRAMEGEN=1 game=Name
+///
+/// The frame rates are over the seconds in which the game showed a frame: the average, the slowest 1 % and 5 % of those seconds, and the
+/// slowest one. The [session] line beside it (BCDSessionCore.swift) has the per-frame numbers; this one adds the build, the per-second view,
+/// the least memory left, the swap and JIT peaks and the switches in force. The idea and the fields follow Porthole's `[benchmark]` line
+/// (app/Sources/Core/Telemetry.swift, knowledge only); the code is BCD's.
+enum BCDBenchmark {
+    static let key = "benchmark-line"
+    static func on(_ value: String?) -> Bool { value?.trimmingCharacters(in: .whitespaces) == "1" }
+    /// The switches the line names when they are set for the session (their values as the session got them).
+    static let switchNames = ["MADEIRA_PRESENT_FX", "MADEIRA_FRAMEGEN", "MADEIRA_PFX_UPSCALE", "MADEIRA_LSFG_CTL", "MADEIRA_VT_INTERP",
+                              "DXMT_METALFX_SPATIAL_SWAPCHAIN", "MADEIRA_D3D11_SRC", "MADEIRA_FEX_CALLRET_LEAN"]
+
+    /// The line, or nil when the session showed no frame.
+    static func line(game: String, build: String, samples: [BCDTraceSample], switches: [String]) -> String? {
+        let rates = samples.compactMap(\.fps).filter { $0 > 0 }.sorted()
+        guard !rates.isEmpty else { return nil }
+        func low(_ share: Double) -> Double { rates[min(rates.count - 1, Int(Double(rates.count) * share))] }
+        let d = BCDTraceDigest.of(samples)
+        var parts = ["build=\(build)", "seconds=\(d.seconds)",
+                     String(format: "fps-avg=%.1f", rates.reduce(0, +) / Double(rates.count)),
+                     String(format: "fps-1pct=%.1f", low(0.01)), String(format: "fps-5pct=%.1f", low(0.05)), String(format: "fps-min=%.1f", rates[0]),
+                     String(format: "worst-ms=%.0f", d.worstMs), "peak-mb=\(d.peakMemoryMB)"]
+        if let least = d.leastFreeMB { parts.append("least-free-mb=\(least)") }
+        parts += ["swap-peak-mb=\(d.swapPeakMB)", "jit-peak-mb=\(d.jitPeakMB)", "heat=" + BCDSessionHeat.words[min(max(d.thermalPeak, 0), 3)],
+                  "switches=" + (switches.isEmpty ? "none" : switches.joined(separator: ",")),
+                  "game=" + game.replacingOccurrences(of: "\n", with: " ")]
+        return "[benchmark] " + parts.joined(separator: " ")
+    }
+}
+
+/// The heat levels in the words the [session] line uses.
+enum BCDSessionHeat {
+    static let words = ["nominal", "fair", "serious", "critical"]
+}
+
 // MARK: - What it says (for the readers)
 
 /// A trace read back and summarised, for the card tools/log-facts.py makes and for the host check to hold the two to the same words.

@@ -108,7 +108,8 @@ HEAVY = ('rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other', 'gta5l-steam'
          'marvels-spider-man-2', 'marvels-spider-man-miles-morales', 'crysis-remastered', 'crysis-2-remastered', 'crysis-3-remastered',
          'batman-arkham-knight', 'reanimal',   # round 625 (owner's items 12 and 14): the same recipe, no forced resolution
          'ghpc',   # round 626 (agent T S6): the same recipe, plus the swap tier on small devices
-         'clair-obscur-expedition-33')   # round 626 (agent C S2; HWMBZ2, Lumen and Nanite, ~10 FPS reported): the same recipe
+         'clair-obscur-expedition-33',   # round 626 (agent C S2; HWMBZ2, Lumen and Nanite, ~10 FPS reported): the same recipe
+         'the-last-of-us-part-1')   # v25 (owner 2026-11-14): the same tip and the 30 FPS start
 for r in recs['rules']:
     tips = [line for line in r['config'] + r.get('smallRAMConfig', []) if 'low-graphics-tip' in (line if isinstance(line, str) else line['line'])]
     if r['id'] in HEAVY:
@@ -161,10 +162,11 @@ _live = (app / 'BCDLiveStore.swift').read_text()
 _front = (app / 'BCDLiveFrontEnd.swift').read_text()
 _start = _live[_live.index('    private func start(_ game: BCDGame) {'):_live.index('    /// A start: a heavy game\'s one-time graphics tip first')]
 # round 632: itch.io's and EA's starts (itchPlayEntry, eaPlayEntry) go through begin() too, as GOG's and Epic's (check-bcd-live.py names each)
-assert _start.count('begin(entry, launch)') == 6 and 'launch(entry)' not in _start.replace('begin(entry, launch)', ''), _start
+# Porthole port, item 13: the experimental Amazon Games store's (amazonPlayEntry) too: seven
+assert _start.count('begin(entry, launch)') == 7 and 'launch(entry)' not in _start.replace('begin(entry, launch)', ''), _start
 assert 'if BCDGraphicsTip.due(entry) {' in _live and 'BCDGraphicsTip.markShown(entry)' in _live and 'launch?(entry)' in _live
 assert '.alert(BCDGraphicsTip.title, isPresented:' in _front and 'Button("OK") { live.graphicsTipAnswered() }' in _front
-assert 'Very Low' in apply_src and 'AMD FSR' in apply_src and 'Balanced or ' in apply_src and '30 FPS' in apply_src
+assert 'Very Low' in apply_src and 'AMD FSR' in apply_src and 'set it to Performance.' in apply_src and '30 FPS' in apply_src
 assert list(presets) == ['rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other', 'gta5l-steam', 'gta5l-other', 'ghost-of-tsushima', 'god-of-war',
                          'horizon-zero-dawn', 'horizon-forbidden-west', 'ratchet-clank-rift-apart', 'crysis-remastered',
                          'crysis-2-remastered', 'crysis-3-remastered', 'msfs-2024', 'counter-strike-2', 'warcraft-2-bne',
@@ -643,8 +645,8 @@ assert not any(line.startswith('env.MADEIRA_SRV_FGETPATH')
                for p in presets.values() if p not in (hzd, hfw, rca, sm2) for line in p['lines']), \
     'the build 494 fgetpath switch is the two Horizon games\', Rift Apart\'s and Spider-Man 2\'s only'
 assert not any(line.startswith('quiet-log')
-               for p in presets.values() if p not in (hzd, hfw, rca, mm, smr, sm2, mcd2) for line in p['lines']), \
-    'quiet-log is the two Horizon games\', Rift Apart\'s, the three Spider-Man games\' and Minecraft Dungeons II\'s only'
+               for p in presets.values() if p not in (hzd, hfw, rca, mm, smr, sm2, mcd2, presets['the-last-of-us-part-1']) for line in p['lines']), \
+    'quiet-log is the two Horizon games\', Rift Apart\'s, the three Spider-Man games\', Minecraft Dungeons II\'s and The Last of Us Part I\'s only'
 assert hzd['version'] == 18 and hzd['switches'] == 'avx: false, nvidia: false, wineVCRT: false, fastSync: true, fpsMode: 3, display: "fit"', hzd
 assert not any(line.startswith(('d3d12-wave-ops', 'd3d12-raw-typed-views', 'typed-uav-atomic', 'ignore-volatile-metadata',
                                  'env.FEX_MEMCPYSETTSOENABLED = 1', 'env.FEX_STRICTINPROCESSSPLITLOCKS'))
@@ -658,8 +660,8 @@ assert _osu['line_builds'][-2:] == [(0, 1000000000), (619, 1000000000)], _osu['l
 assert not any(line.startswith('clear-rects')
                for p in presets.values() if p is not hzd for line in p['lines']), 'clear-rects is Horizon Zero Dawn\'s only'
 assert not any(line.startswith('pso-lazy-libs')
-               for p in presets.values() if p not in (hzd, hfw, rca, sm2) for line in p['lines']), \
-    'pso-lazy-libs is the two Horizon games\', Rift Apart\'s and Spider-Man 2\'s only'
+               for p in presets.values() if p not in (hzd, hfw, rca, sm2, presets['the-last-of-us-part-1']) for line in p['lines']), \
+    'pso-lazy-libs is the two Horizon games\', Rift Apart\'s, Spider-Man 2\'s and The Last of Us Part I\'s only'
 assert not any(line.startswith(('skin-check', 'skin-dump', 'fence-strict', 'vis-trace', 'readback-far', 'desc-guard', 'readback-swap',
                                  'static-cbv', 'env.FEX_VECTORTSOENABLED = 1'))
                for ident, p in presets.items() if ident != 'osu' for line in p['lines']), 'the build 482-491 experiments are in no list'   # osu!: round 625, below
@@ -744,9 +746,11 @@ assert sm2['version'] == 8 and sm2['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE =
                                                     'swap-mb = 2048', 'swap-mode = 2', 'swap-min-mb = 16'] and sm2['switches'] == 'avx: true, nvidia: true, wineVCRT: false, fastSync: true, fpsMode: 3, display: "fit"', sm2
 assert rca['version'] == 8 and rca['switches'] == ('avx: true, nvidia: true, wineVCRT: false, fastSync: true, fpsMode: 3, '
                                                    'display: "fit"'), rca
+# (The Last of Us Part I v21, build 656 only: view-census = 1, log only, names its R32G32B32 typed buffer views.)
 assert not any(line.startswith(('view-census', 'typed-view-align', 'typed-view-shadow'))
-               for p in presets.values() if p not in (hzd, got, hfw) for line in p['lines']), \
-    'the typed-view fix is HZD\'s, GoT\'s and HFW\'s only'
+               for p in presets.values() if p not in (hzd, got, hfw) for line in p['lines']
+               if not (p is presets['the-last-of-us-part-1'] and line == 'view-census = 1')), \
+    'the typed-view fix is HZD\'s, GoT\'s and HFW\'s only (TLOU: the census line alone)'
 # Crysis Remastered, version 1 (build 528, 2026-10-13 22:08, the owner: it ran perfectly): the standard
 # list's line with every switch off, at Fit.
 crysis = presets['crysis-remastered']
@@ -1572,30 +1576,38 @@ _tlou = _rules632['the-last-of-us-part-1']
 # v20 (build 652, the owner's build-651 start of 10:42: Ellie in the first scene, faces black, walls missing, killed at 8187 MB):
 #     heap-backing = 0 ends with build 651, heap-backing = 2 (buffer and render-target/depth heaps backed) from build 652; the exposure
 #     traces end with build 651 (the menu's exposure is the game's own fixed EV).
-assert _tlou['version'] == 20 and _tlou['minBuild'] == 634 and _tlou['switches'] == {'avx': True, 'nvidia': True}, _tlou
-assert presets['the-last-of-us-part-1']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_JUMBO_CODE_DUMP = 1', 'env.MADEIRA_BIG_HINT_EXACT = 1',
-                                                         'env.MADEIRA_BIG_HINT_EXACT = 2', 'env.MADEIRA_BIG_HINT_EXACT = 3', 'd3d12-device9 = 1', 'env.MADEIRA_NVAPI_DEVICE_ID = 2544',
-                                                         'env.MADEIRA_DIALOG_CODE_DUMP = 1', 'd3d12-binding-tier = 3', 'd3d12-typed-uav-load = 1',
-                                                         'd3d12-pipeline-library = 1', 'd3d12-pso-cached-blob = 1', 'heap-backing = 0', 'heap-backing = 2',
-                                                         'dxil-target-latest = 1', 'pso-placeholder = 1', 'msc-unbounded-retry = 1',
-                                                         'swap-mb = 8192', 'swap-mode = 2', 'swap-min-mb = 1', 'mempool-mb = 4096', 'vram-mb = 2304',
-                                                         'encoder-labels = 1', 'dxil-dump = CS_ComputeVolProbeBufferWriteCache,CS_ComputeVolProbeBufferReadCache,'
-                                                         'CS_ComputeVolProbeBuffer,CS_VolumetricsProbeCacheReset,CS_ApplyVolProbeBuffer',
-                                                         'dxil-loop-guard = 0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c',
-                                                         'trace-buffer-size = 56832,272,454656',
-                                                         'trace-dispatch = Cs_GenerateRayHitPolygonInfo,CS_ComputeVolProbeBufferWriteCache',
-                                                         'trace-dispatch-cb-offset = 8704', 'env.MADEIRA_CAGE_RELEASE = 1', 'env.MADEIRA_CAGE_RELEASE = 2',
-                                                         'dxil-dump = CS_ExposureControl,CS_DoHistogramFast,CS_DoHistogramMerge,CS_DoHistogramCollect,Cs_ComputeAiExposureMap',
-                                                         'trace-dispatch = CS_ExposureControl,CS_DoHistogramMerge', 'trace-dispatch-every = 301',
-                                                         'trace-dispatch-max = 24'] \
-    and presets['the-last-of-us-part-1']['line_builds'][3:] == [(634, 1000000000), (634, 634), (635, 645), (646, 1000000000), (639, 1000000000), (640, 1000000000), (641, 1000000000),
-                                                                 (641, 1000000000), (641, 1000000000), (643, 1000000000), (643, 1000000000),
-                                                                 (643, 651), (652, 1000000000), (646, 1000000000), (646, 1000000000), (646, 1000000000),
-                                                                 (646, 1000000000), (646, 1000000000), (646, 1000000000), (646, 1000000000),
-                                                                 (646, 1000000000), (647, 1000000000), (647, 648), (648, 1000000000),
-                                                                 (649, 650), (649, 650), (649, 650), (650, 650), (651, 1000000000), (650, 650),
-                                                                 (651, 651), (651, 651), (651, 651)], \
-    presets['the-last-of-us-part-1']
+# v21 (build 656, the owner's build-655 start of 2026-11-11 21:58: no deferred light, fixed in the code: typed buffer UAV clears):
+#     view-census = 1 for build 656 only (log only: the typed buffer views without a Metal texture-buffer format, R32G32B32).
+# v22 (the owner's six build-656 starts of 2026-11-12: the picture right; the warm start killed at 8144 MB with 104,502 Metal shader
+#     libraries, 2.8 GB, kept for ~126,500 pipelines): pso-lazy-libs = 1 and quiet-log = 1 from build 656; encoder-labels and the two
+#     code dumps end with build 656; ind-probe = 0 from build 657.
+# v23 (the owner's build-656 start of 2026-11-12 19:48 with pso-lazy-libs and quiet-log: no kill, peak 5746 MB; 11-16 fps in play):
+#     typed-view-unlocked = 1 from build 657 (25,000 to 100,000 typed buffer views a second, 0.9-1.7 s of waiting on the view lock
+#     per second). The swap lines stay (the file holds the game's own 5156 MB arena and its 992 MB upload buffer).
+#     env.MADEIRA_LOCK_ORPHAN = stamped from build 656 (the reaper released the layer's private-data lock while its owner lived).
+# v24 (the owner, 2026-11-14: "şu listeyi TLOU1 için sabitle"): from build 658 the list is exactly the owner's tested lines in his
+#     order (Lossless Scaling frame generation worked); env.MADEIRA_SWAP_HEAT = 1 from build 659 (its app allows the env name);
+#     every older line ends with build 657, so builds 634-657 keep v23's lines.
+assert _tlou['version'] == 25 and _tlou['minBuild'] == 634 and _tlou['switches'] == {'avx': True, 'nvidia': True, 'fpsMode': 3}, _tlou
+def _tlou_at(build):
+    return [l if isinstance(l, str) else l['line'] for l in _tlou['config']
+            if isinstance(l, str) or l.get('minBuild', 0) <= build <= l.get('maxBuild', 10**9)]
+_tlou_owner = ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_JUMBO_CODE_DUMP = 1', 'env.MADEIRA_BIG_HINT_EXACT = 3', 'd3d12-device9 = 1',
+               'env.MADEIRA_SWAP_HEAT = 1', 'replay-split = 1', 'env.MADEIRA_NVAPI_DEVICE_ID = 2544', 'env.MADEIRA_DIALOG_CODE_DUMP = 1',
+               'd3d12-binding-tier = 3', 'd3d12-typed-uav-load = 1', 'd3d12-pipeline-library = 1', 'd3d12-pso-cached-blob = 1',
+               'heap-backing = 2', 'dxil-target-latest = 1', 'pso-placeholder = 1', 'msc-unbounded-retry = 1', 'swap-mb = 2048', 'swap-mode = 2',
+               'swap-min-mb = 1', 'mempool-mb = 4096', 'vram-mb = 2304', 'pso-lazy-libs = 1', 'quiet-log = 1', 'encoder-labels = 1',
+               'dxil-loop-guard = 0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c', 'env.MADEIRA_CAGE_RELEASE = 2',
+               'view-census = 1', 'lossless-scaling = 1']
+assert _tlou_at(659)[2:] == _tlou_owner + ['low-graphics-tip = 1'], _tlou_at(659)
+assert _tlou_at(658)[2:] == [l for l in _tlou_owner if l != 'env.MADEIRA_SWAP_HEAT = 1'] + ['low-graphics-tip = 1'], _tlou_at(658)
+assert _tlou_at(657)[2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_BIG_HINT_EXACT = 3', 'd3d12-device9 = 1', 'env.MADEIRA_NVAPI_DEVICE_ID = 2544',
+                             'd3d12-binding-tier = 3', 'd3d12-typed-uav-load = 1', 'd3d12-pipeline-library = 1', 'd3d12-pso-cached-blob = 1',
+                             'heap-backing = 2', 'dxil-target-latest = 1', 'pso-placeholder = 1', 'msc-unbounded-retry = 1', 'swap-mb = 8192',
+                             'swap-mode = 2', 'swap-min-mb = 1', 'mempool-mb = 4096', 'vram-mb = 2304',
+                             'dxil-loop-guard = 0ce675ed7672ae5c,f29c8ad0554fb5d1,04433266053a3aea,fab3cc183c227c6c', 'env.MADEIRA_CAGE_RELEASE = 2',
+                             'pso-lazy-libs = 1', 'quiet-log = 1', 'ind-probe = 0', 'typed-view-unlocked = 1', 'env.MADEIRA_LOCK_ORPHAN = stamped',
+                             'low-graphics-tip = 1'], _tlou_at(657)
 # Slime Rancher 2 (2026-11-08, a tester's "Failed to load il2cpp" fixed with a wintypes.dll copy): Megabonk's two Unity IL2CPP lines.
 assert presets['slime-rancher-2']['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'env.MADEIRA_WINTYPES = 1', 'env.MADEIRA_WGI_HOST_PADS = 1'] \
     and presets['slime-rancher-2']['version'] == 1 and presets['slime-rancher-2']['line_builds'][3:] == [(575, 1000000000), (0, 1000000000)], \

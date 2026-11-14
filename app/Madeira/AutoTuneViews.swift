@@ -28,6 +28,14 @@ struct AutoTuneAlert: ViewModifier {
                 Button("It froze") { offers.offer = nil; AutoTune.answer("froze") }
                 Button("It closed by itself") { offers.offer = nil; AutoTune.answer("closed-by-itself") }
                 Button("I closed BCD", role: .cancel) { offers.offer = nil; AutoTune.answer("i-closed") }
+            } else if AutoTuneAsk.asks(offer) {
+                // madeira-bcd (Porthole port, item 10): "Ask before trying a fix" is on and a fix waits for the player's yes.
+                Button("Try it next start") { AutoTuneAsk.approve(offer.state, offer.windowsPath); offers.offer = nil }
+                Button("Stop for this game", role: .destructive) {
+                    AutoTune.setOn(offer.windowsPath, false)
+                    offers.offer = nil
+                }
+                Button("Not now", role: .cancel) { AutoTuneAsk.decline(offer.state, offer.windowsPath); offers.offer = nil }
             } else {
                 if offer.state.candidate != nil {
                     Button("Close BCD") {
@@ -50,10 +58,20 @@ struct AutoTuneAlert: ViewModifier {
                     AutoTune.setOn(offer.windowsPath, false)
                     offers.offer = nil
                 }
+                // madeira-bcd (Porthole port, item 10): with "Ask before trying a fix" on, what auto-tune kept can be taken back here
+                // (the game page's Undo auto-tune: the lines and the history go).
+                if AutoTuneAsk.offersUndo(offer) {
+                    Button("Undo what it kept", role: .destructive) {
+                        AutoTune.reset(offer.windowsPath)
+                        AutoTuneAsk.forget(offer.windowsPath)
+                        LogStore.shared.log("[autotune] \(offer.title): the player took back \(offer.state.kept.joined(separator: "; ")) (Undo)")
+                        offers.offer = nil
+                    }
+                }
                 Button("OK", role: .cancel) { offers.offer = nil }
             }
         } message: { offer in
-            Text(offer.message)
+            Text(AutoTuneAsk.asks(offer) ? AutoTuneAsk.message(offer) : offer.message)
         }
     }
 

@@ -138,7 +138,10 @@ enum LogUploadCore {
 
     /// `trailer`: lines that follow the log's last line (the performance trace, BCDPerfTraceCore.swift): after it, so no line number of the
     /// log moves. Scrubbed like every other line. Empty: nothing is added.
+    /// madeira-bcd (Porthole port, item 11): `head`, lines after the comment and before the log (the thinned log's note), and `keep`, asked
+    /// once for every line of the log in order: false leaves the line out (BCDLogThin.swift). By default nothing is added and every line goes.
     static func pack(_ source: URL, to dest: URL, comment: String? = nil, trailer: [String] = [],
+                     head: [String] = [], keep: ((UnsafeRawBufferPointer) -> Bool)? = nil,
                      progress: ((Double) -> Void)? = nil) throws -> (raw: Int, packed: Int) {
         guard let input = try? FileHandle(forReadingFrom: source) else { throw PackError.read }
         defer { try? input.close() }
@@ -187,6 +190,12 @@ enum LogUploadCore {
         }
         // The sender's comment goes first, so whoever opens the log reads it before anything else.
         for line in commentLines(comment) { Data(line.utf8).withUnsafeBytes { emit($0) } }
+        for line in head { Data(line.utf8).withUnsafeBytes { emit($0) } }
+        /// A line of the log itself (not the comment, the head or the trailer).
+        func emitLine(_ line: UnsafeRawBufferPointer) {
+            if let keep, !keep(line) { return }
+            emit(line)
+        }
         while true {
             let chunk = (try? input.read(upToCount: 1 << 20)) ?? nil
             guard let chunk, !chunk.isEmpty else { break }
@@ -200,10 +209,10 @@ enum LogUploadCore {
                     }
                     let end = UnsafeRawPointer(nl) - raw.baseAddress!
                     if carry.isEmpty {
-                        emit(UnsafeRawBufferPointer(rebasing: raw[start..<end]))
+                        emitLine(UnsafeRawBufferPointer(rebasing: raw[start..<end]))
                     } else {
                         carry.append(contentsOf: UnsafeRawBufferPointer(rebasing: raw[start..<end]))
-                        carry.withUnsafeBytes { emit($0) }
+                        carry.withUnsafeBytes { emitLine($0) }
                         carry.removeAll(keepingCapacity: true)
                     }
                     start = end + 1
@@ -217,8 +226,9 @@ enum LogUploadCore {
             }
         }
         if !carry.isEmpty {
-            carry.withUnsafeBytes { emit($0) }
-            if trailer.isEmpty { pending.removeLast() }   // the source did not end with a newline (with a trailer, that line is ended here and the trailer follows)
+            let before = pending.count
+            carry.withUnsafeBytes { emitLine($0) }
+            if trailer.isEmpty, pending.count > before { pending.removeLast() }   // the source did not end with a newline (with a trailer, that line is ended here and the trailer follows)
         }
         for line in trailer { Data(line.utf8).withUnsafeBytes { emit($0) } }
         try pending.withUnsafeBytes { try deflateChunk($0, flush: Z_FINISH) }

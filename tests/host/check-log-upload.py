@@ -80,7 +80,8 @@ check("by hand only: no toggle, no automatic path, no session hooks in the libra
 check("only the 20 newest logs are listed, and send refuses any other",
       "static let listed = 20" in app and "(runs + own).sorted { modified($0) > modified($1) }.prefix(listed)" in app
       and "let urls = LogUpload.recentLogs()" in bcd_logs and "guard !sending, let url = files[log.id] else { return }" in bcd_logs
-      and app.index("guard recentLogs().contains(") < app.index("LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace)")
+      # Porthole port, item 11: the thinned log's head and per-line decision follow the trailer (nothing without the switch).
+      and app.index("guard recentLogs().contains(") < app.index("LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace,")
       and "return finish(.failure(UploadError.notRecent))" in app)
 check("build 562's automatic setting and session marker are cleared",
       'UserDefaults.standard.removeObject(forKey: "madeira.bcd.logs.autosend")' in app and '"bcd-log-session.json"' in app

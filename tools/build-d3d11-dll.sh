@@ -117,6 +117,7 @@ done
 #   tools/patch-dxmt-d11-swapchain-rotation.py      The Battle for Wesnoth / SDL2 (IDXGISwapChain1::SetRotation/GetRotation answer the identity rotation, [swapchain-rotation])
 #   tools/patch-dxmt-texture-limit.py         The Witness, Tomb Raider, Transformers, Danganronpa (a texture over Direct3D 11's limits gets E_INVALIDARG, [dxmt-tex-limit])
 #   tools/patch-dxmt-view-private-ref.py      Hatred (opt-in, env.MADEIRA_VIEW_PRIVATE_REF = 1: a view holds its resource with a private reference, [view-ref])
+#   tools/patch-dxmt-lsfg.py                  Lossless Scaling frame generation (opt-in: only with MADEIRA_LSFG_CTL, which the app sets for a game's `lossless-scaling` line; [lsfg])
 BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skipped #"
              "patch-dxmt-buffer-rtv.py" "[rtv-fail] #"
              "patch-dxmt-srv-getdesc-mips.py" "[srv-getdesc] madeira-bcd #"
@@ -125,7 +126,8 @@ BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skippe
              "patch-dxmt-update-subresource-staging.py" "[update-subresource-staging] skipped #"
              "patch-dxmt-d11-swapchain-rotation.py" "[swapchain-rotation] madeira-bcd: SetRotation("
              "patch-dxmt-texture-limit.py" "[dxmt-tex-limit] CreateTexture2D refused "
-             "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #")
+             "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #"
+             "patch-dxmt-lsfg.py" "[lsfg] madeira-bcd ")
 SHIP_HAS_BCD=1
 for ((i = 1; i < ${#BCD_PATCHES[@]}; i += 2)); do
     LC_ALL=C grep -aqF "${BCD_PATCHES[$i]}" "$SHIP/d3d11.dll" || SHIP_HAS_BCD=0
@@ -243,6 +245,20 @@ for ((i = 0; i < ${#BCD_PATCHES[@]}; i += 2)); do
     (cd "$OUT/patchroot" && python3 "$R/tools/${BCD_PATCHES[$i]}") || fail "tools/${BCD_PATCHES[$i]} did not apply to the copy"
     BCD_NOTE="$BCD_NOTE + ${BCD_PATCHES[$i]%.py}"
 done
+# madeira-bcd (Porthole port, item 1): the Lossless Scaling bridge for Direct3D 12 games (tools/patch-d3d11-src-lsfg-bridge.py:
+# d3d11_lsfg_bridge.cpp, a fence whose shared event is handed out, three exports), on the copy only: the 32-bit d3d11.dll never gets
+# it (Direct3D 12 games are 64-bit) and upstream's d3d11.dll does not have it. It needs patch-dxmt-lsfg.py's d3d11_lsfg.hpp, applied
+# just above. Opt-in per game, so a missed anchor must not cost every game d3d11-src.dll: the copy is then left without the bridge
+# (a Direct3D 12 game gets no generated frames; Direct3D 11 games are not affected) and the build goes on.
+LSFG_BRIDGE=1
+PATCHED_DEF="$OUT/tree/src/d3d11/d3d11.def"
+python3 "$R/tools/patch-d3d11-src-lsfg-bridge.py" "$OUT/tree/src/d3d11" || {
+    LSFG_BRIDGE=0
+    PATCHED_DEF="$D/src/d3d11/d3d11.def"
+    rm -f "$OUT/tree/src/d3d11/d3d11_lsfg_bridge.cpp"
+    echo "::warning::tools/patch-d3d11-src-lsfg-bridge.py did not apply: d3d11-src.dll is built without the Lossless Scaling bridge for Direct3D 12 games"
+}
+[ "$LSFG_BRIDGE" = 1 ] && BCD_NOTE="$BCD_NOTE + patch-d3d11-src-lsfg-bridge"
 
 # DXMT's meson.build: compiler_args, the project defines, buildtype=release
 # (-O3, b_ndebug=if-release -> NDEBUG), C++20. -fmacro-prefix-map maps the
@@ -346,6 +362,9 @@ for s in "${D3D11_SRC[@]}"; do
     o="$OUT/plain/obj/$(obj_name "$s").o"; job "$D" "$D/src/$s.cpp" "$o" d3d11; PLAIN_OBJ+=("$o")
     o="$OUT/obj/$(obj_name "$s").o"; job "$OUT/tree" "$OUT/tree/src/$s.cpp" "$o" d3d11; PATCHED_OBJ+=("$o")
 done
+if [ "$LSFG_BRIDGE" = 1 ]; then   # madeira-bcd: the Lossless Scaling bridge, in d3d11-src.dll only
+    o="$OUT/obj/d3d11_d3d11_lsfg_bridge.o"; job "$OUT/tree" "$OUT/tree/src/d3d11/d3d11_lsfg_bridge.cpp" "$o" d3d11; PATCHED_OBJ+=("$o")
+fi
 echo "compiling $(wc -l < "$OUT/jobs" | tr -d ' ') files, $JOBS at a time"
 run_jobs
 "$WINDRES" -i "$D/src/d3d11/version.rc" -o "$OUT/obj/version.o" 2>> "$OUT/build.err" || fail "windres version.rc failed"
@@ -361,21 +380,31 @@ run_jobs
 # file, the dependency libraries in d3d11's dependency order (dxgi, DXBCParser,
 # dxmt, winemetal, util), util_dep's -lntdll, -static (libc++ in, UCRT through
 # api-ms-win-crt-*), file alignment 4096 and meson's default Windows libraries.
-link_dll() {  # link_dll <output> <libdxmt.a> <objects...>
-    local out="$1" dxmt="$2"; shift 2
-    "$CXX" -shared -o "$out" "$@" "$OUT/obj/version.o" "$D/src/d3d11/d3d11.def" \
+link_dll() {  # link_dll <output> <libdxmt.a> <module definition file> <objects...>
+    local out="$1" dxmt="$2" def="$3"; shift 3
+    "$CXX" -shared -o "$out" "$@" "$OUT/obj/version.o" "$def" \
         "$OUT/libdxgi.a" "$OUT/libDXBCParser.a" "$dxmt" -L"$OUT" -lwinemetal "$OUT/libutil.a" -lntdll \
         -static -Wl,--file-alignment=4096 \
         -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 \
         2>> "$OUT/build.err" || { grep -m 20 "error" "$OUT/build.err"; fail "linking $(basename "$out") failed"; }
 }
-link_dll "$OUT/plain/d3d11.dll" "$OUT/plain/libdxmt.a" "${PLAIN_OBJ[@]}"
-link_dll "$OUT/d3d11.dll" "$OUT/libdxmt.a" "${PATCHED_OBJ[@]}"
+link_dll "$OUT/plain/d3d11.dll" "$OUT/plain/libdxmt.a" "$D/src/d3d11/d3d11.def" "${PLAIN_OBJ[@]}"
+link_dll "$OUT/d3d11.dll" "$OUT/libdxmt.a" "$PATCHED_DEF" "${PATCHED_OBJ[@]}"   # madeira-bcd: the copy's d3d11.def names the bridge's exports
 
 # The new DLL must export exactly what upstream's does, and import from the
 # same DLLs (DXGI.DLL, winemetal.dll, the system and UCRT ones).
 exports "$SHIP/d3d11.dll" > "$OUT/exports.upstream"
-exports "$OUT/d3d11.dll" > "$OUT/exports.built"
+# madeira-bcd: except the Lossless Scaling bridge's three (tools/patch-d3d11-src-lsfg-bridge.py), which must be there with the
+# bridge and absent without it.
+exports "$OUT/d3d11.dll" > "$OUT/exports.built.all"
+grep -vxE 'DXMTLsfg(Begin|Run|Abort)' "$OUT/exports.built.all" > "$OUT/exports.built"
+BRIDGE_EXPORTS=$(grep -cxE 'DXMTLsfg(Begin|Run|Abort)' "$OUT/exports.built.all" || true)
+if [ "$LSFG_BRIDGE" = 1 ]; then
+    [ "$BRIDGE_EXPORTS" = 3 ] || fail "the Lossless Scaling bridge's three exports are not in the result ($BRIDGE_EXPORTS of 3)"
+    LC_ALL=C grep -aqF "[lsfg] (Direct3D 12 bridge)" "$OUT/d3d11.dll" || fail "the Lossless Scaling bridge is not in the result"
+else
+    [ "$BRIDGE_EXPORTS" = 0 ] || fail "the result exports the Lossless Scaling bridge although its patch did not apply"
+fi
 [ -s "$OUT/exports.upstream" ] || fail "could not read the exports of the committed d3d11.dll"
 diff "$OUT/exports.upstream" "$OUT/exports.built" > "$OUT/exports.diff" \
     || { cat "$OUT/exports.diff"; fail "its exports differ from the committed d3d11.dll"; }

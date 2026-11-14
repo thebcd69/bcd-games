@@ -1495,6 +1495,38 @@ enum AutoTuneBuiltInRules {
  {
   "all": [
    {
+    "count": 60,
+    "has": [
+     "[madeira-d3d12] shader cache: ",
+     " hits, "
+    ]
+   }
+  ],
+  "evidence": [
+   "tlou1-pso-libraries-memory-kill-2026-11-12 (The Last of Us Part I, build 656, the owner's warm start of 13:10)",
+   "Horizon Zero Dawn, build 480 (2026-10-09 20:28): 23,045 libraries, killed at 8,189 MB two seconds into play; build 481 with the line"
+  ],
+  "id": "pso-libraries-memory-kill",
+  "lines": [
+   "pso-lazy-libs = 1"
+  ],
+  "memoryMinPct": 90,
+  "none": [
+   {
+    "has": [
+     "pso-lazy-libs = 1: a lazy pipeline's shader libraries are let go"
+    ]
+   }
+  ],
+  "outcomes": [
+   "killed"
+  ],
+  "priority": 3,
+  "reason": "iOS closed the game at its memory limit while BCD held a compiled shader library for each of the game's tens of thousands of pipelines, nearly all of them never drawn. The line gives a library back until its pipeline is first drawn."
+ },
+ {
+  "all": [
+   {
     "has": [
      "[cage] holdback handed to the allocator"
     ]
@@ -4037,6 +4069,63 @@ enum AutoTuneBuiltInRules {
   "lines": [],
   "priority": 2,
   "reason": "The game clears its ray-cast results to a new value every time, and after 32 different values BCD wrote only one byte of the value, so the game found its own markers wrong and stopped. Update BCD: build 650 writes every value exactly."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "ClearUnorderedAccessViewUint with value",
+     "is approximated by byte"
+    ]
+   },
+   {
+    "has": [
+     "[probe] dispatch '",
+     "first record:",
+     " 0 0 0 0 ("
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "tlou1-typed-buffer-clear-no-lighting-2026-11-11 (the owner's start of tlou-i-l.exe at 21:58, build 655, iPhone18,2)",
+   "tests/host/check-uav-typed-buffer-clear.py"
+  ],
+  "fixedIn": 656,
+  "id": "d3d12-typed-buffer-uav-clear",
+  "lines": [],
+  "priority": 60,
+  "reason": "The game resets the work list of its lighting every frame in a way BCD did wrong, so the lighting never ran: dark picture, missing characters, trails behind moving things. Update BCD: build 656 does that reset right."
+ },
+ {
+  "all": [
+   {
+    "count": 64,
+    "has": [
+     "[subfloor] ml956 serviced",
+     "latest guest 0x7ffe0320",
+     "insn=0xb9400100"
+    ]
+   },
+   {
+    "has": [
+     "[probe] ",
+     " first record: "
+    ]
+   }
+  ],
+  "api": "d3d12",
+  "evaluateWhenRan": true,
+  "evidence": [
+   "tlou1-tick-count-exceptions-2026-11-12 (The Last of Us Part I, build 656, the owner's start of 19:48)",
+   "tests/host/check-d3d12-tick-ms.py"
+  ],
+  "fixedIn": 657,
+  "id": "d3d12-tick-count-exceptions",
+  "lines": [],
+  "priority": 61,
+  "ranOnly": true,
+  "reason": "BCD read the clock in a way that costs an exception on iOS for every indirect draw the game makes, hundreds of thousands of times in this session: a lower frame rate, not a fault of the game. Update BCD: build 657 reads it without one."
  },
  {
   "all": [

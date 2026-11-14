@@ -81,6 +81,9 @@ HOOKS = {
     # whole of BCD's settings code names auto-tune nowhere else).
     "BCDSettingsLive.swift": [
         "private let tune = BCDLiveSwitch(read: { AutoTune.preferred }, write: { AutoTune.preferred = $0 }, running: AutoTune.enabled)   // madeira-bcd: auto-tune's switch in BCD's Settings, on by default",
+        # Porthole port, item 10: Settings › Logs › After a crash › Ask before trying a fix (off by default), a UserDefaults bool.
+        "return UserDefaults.standard.bool(forKey: AutoTuneAsk.key)",
+        "UserDefaults.standard.set(on, forKey: AutoTuneAsk.key)",
     ],
     # BCD's interface (BCDLiveStore.swift, 2026-10-18): a tuned game's badge, read only while auto-tune is on.
     "BCDLiveStore.swift": [
@@ -119,6 +122,13 @@ HOOKS = {
         "let kept = AutoTune.enabled ? AutoTune.state(path).kept : []",
         "if AutoTune.enabled { AutoTune.reset(path) }",
         "guard let state = AutoTune.enabled ? AutoTune.state(path) : nil else { return nil }",
+        # Porthole port, item 10 (AutoTuneAsk.swift): "Ask before trying a fix": the fix that waits for the player's yes on the page,
+        # the page's Try the suggested fix, and Undo forgets the answers too. Read only while Settings › Auto-tune is on.
+        "let waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []",
+        "if !waiting.isEmpty { status = AutoTuneAsk.pageStatus(waiting) }",
+        "AutoTuneAsk.forget(path)   // madeira-bcd (Porthole port, item 10): the player's answers go with the lines",
+        "guard let path = entry(for: game)?.windowsPath, AutoTune.enabled else { return }",
+        "AutoTuneAsk.approve(AutoTune.state(path), path)",
     ],
 }
 for swift in sorted(APP.glob("*.swift")):
@@ -417,8 +427,10 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
     if engine:
         r = subprocess.run([str(engine)], capture_output=True, text=True)
         check("the engine checks pass", r.returncode == 0, "\n".join(l for l in r.stdout.splitlines() if not l.startswith("ok"))[-3000:])
+    # Porthole port, item 10: the glue calls AutoTuneAsk (AutoTuneAsk.swift), which with its switch absent returns auto-tune's own values.
     glue_exe = build(tmp, "madeira-autotune-glue-check",
-                     [GLUE, CORE, RULES_SWIFT, R / "tests/host/autotune_glue_stubs.swift", R / "tests/host/autotune_glue_checks.swift"])
+                     [GLUE, CORE, RULES_SWIFT, APP / "AutoTuneAsk.swift", R / "tests/host/autotune_glue_stubs.swift",
+                      R / "tests/host/autotune_glue_checks.swift"])
     if glue_exe:
         for mode in ("off", "on", "default"):
             t = Path(tmp) / mode

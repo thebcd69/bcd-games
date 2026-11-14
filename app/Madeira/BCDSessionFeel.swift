@@ -182,6 +182,9 @@ enum BCDTouchFeel {
     nonisolated(unsafe) static var tintRevision = 0
     /// The controls are hidden for want of a touch (BCDTouchFeelModel): the window's hit test gives every touch to the game then.
     nonisolated(unsafe) static var controlsHidden = false
+    /// madeira-bcd (Porthole port, item 9): controller sticks float (BCDSessionFeel.floatingSticks): read by the touch layer and the
+    /// controls' window. Off unless the session's value says so.
+    nonisolated(unsafe) static var floatingSticks = false
 
     static func setTint(_ color: BCDControlColor) {
         let rgb = color.rgb
@@ -193,6 +196,7 @@ enum BCDTouchFeel {
     static func reset() {
         haptics = true
         controlsHidden = false
+        floatingSticks = false
         setTint(.violet)
     }
 }
@@ -223,6 +227,8 @@ struct BCDSessionFeel: Codable, Equatable {
     var touchSpeed: Double?
     /// Eco mode (nil: off).
     var eco: Bool?
+    /// madeira-bcd (Porthole port, item 9): floating sticks (nil: off). A controller stick's ring appears where the thumb lands near it.
+    var floatingSticks: Bool?
 
     var isEmpty: Bool { self == BCDSessionFeel() }
 
@@ -242,6 +248,7 @@ struct BCDSessionFeel: Codable, Equatable {
         if out.touchHaptics == true { out.touchHaptics = nil }
         if out.phoneVibration == false { out.phoneVibration = nil }
         if out.eco == false { out.eco = nil }
+        if out.floatingSticks == false { out.floatingSticks = nil }
         return out
     }
 
@@ -258,6 +265,7 @@ struct BCDSessionFeel: Codable, Equatable {
         if let pointerMode { out.append("pointer: \(pointerMode)") }
         if touchSpeed != nil { out.append("touch speed") }
         if eco == true { out.append("eco mode") }
+        if floatingSticks == true { out.append("floating sticks") }
         return out
     }
 }

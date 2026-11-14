@@ -34,6 +34,8 @@ struct BCDLiveFrontEnd: View {
     @StateObject private var focus = BCDFocus(watchControllers: false)
     @StateObject private var systemMenu = BCDMenuModel()
     @State private var appSheetPresented = false
+    /// madeira-bcd (Porthole port, item 15): the explanation the library's message asked for ("What does this mean?"), shown after it.
+    @State private var explaining: BCDExplanation?
     var waitForCloud: (Int) -> Void = { _ in }
     @Environment(\.scenePhase) private var scenePhase
     /// What a game's page opens on: Cloud saves for Choose saves, Library for a game just added.
@@ -122,11 +124,19 @@ struct BCDLiveFrontEnd: View {
                 .alert(jitProblem == nil ? "Library" : "Enabling JIT Failed",
                        isPresented: Binding<Bool>(get: { !BCDDuoFeatures.active && library.error != nil }, set: { if !$0 { library.error = nil } })) {
                     if let jitProblem { jitConnectionActions(jitProblem, retry: enableJIT) { library.error = nil } }
+                    // madeira-bcd (Porthole port, item 15): only for a message BCDExplain has words for; any other reads as it always did.
+                    if jitProblem == nil, let why = BCDExplain.explanation(for: library.error) {
+                        Button(BCDExplain.buttonTitle) { explaining = why; library.error = nil }
+                    }
                     Button("OK", role: .cancel) { library.error = nil }
                 } message: { Text(library.error ?? "") }
                 .alert("Steam", isPresented: Binding<Bool>(get: { !BCDDuoFeatures.active && steam.error != nil }, set: { if !$0 { steam.error = nil } })) {
+                    if let why = BCDExplain.explanation(for: steam.error) {   // madeira-bcd (Porthole port, item 15)
+                        Button(BCDExplain.buttonTitle) { explaining = why; steam.error = nil }
+                    }
                     Button("OK", role: .cancel) { steam.error = nil }
                 } message: { Text(steam.error ?? "") }
+                .modifier(BCDExplainAlert(explaining: $explaining))
                 .modifier(BCDEpicPromptAlert())   // Epic's sign-in question when a start can't be signed in (BCDEpicStart.swift); nothing until one asks
                 // An install without the increased memory limit (MemoryRights.swift): told, never blocked;
                 // only over the library, OK is the only button.
@@ -384,6 +394,19 @@ struct BCDLiveFrontEnd: View {
         case "tab-previous": focus.press(.leftShoulder)
         case "tab-next": focus.press(.rightShoulder)
         default: break
+        }
+    }
+}
+
+/// madeira-bcd (Porthole port, item 15): the explanation, in an alert of its own after the message's. OK closes it; nothing else happens.
+struct BCDExplainAlert: ViewModifier {
+    @Binding var explaining: BCDExplanation?
+
+    func body(content: Content) -> some View {
+        content.alert(explaining?.title ?? "", isPresented: Binding(get: { explaining != nil }, set: { if !$0 { explaining = nil } })) {
+            Button("OK", role: .cancel) { explaining = nil }
+        } message: {
+            Text(explaining?.text ?? "")
         }
     }
 }

@@ -79,6 +79,7 @@ import os
             epicChanges,
             itchChanges,   // BCDItch/BCDLiveStoreItch.swift: says something only once itch.io is in use
             eaChanges,     // BCDEA/BCDLiveStoreEA.swift: only while the experimental EA store is switched on
+            amazonChanges, // BCDAmazon/BCDLiveStoreAmazon.swift: only while the experimental Amazon Games store is switched on
             // External drives (ExternalDrives.swift): a drive connected or removed moves games between "on this device" and
             // "on the external drive"; a game being moved (GameMover) shows on its page.
             ExternalDrives.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
@@ -172,6 +173,7 @@ import os
         if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.start(); SteamOwnedLibrary.shared.reconcileSession() }
         itchAppeared()
         eaAppeared()
+        amazonAppeared()
         rebuild()
         refreshSystem()
         refreshMetadata()
@@ -185,6 +187,7 @@ import os
         if SteamOwnedLibrary.enabled { SteamOwnedLibrary.shared.reconcileSession(); SteamOwnedLibrary.shared.refreshAfterForeground() }
         itchBecameActive()
         eaBecameActive()
+        amazonBecameActive()
         refreshSystem()
     }
 
@@ -254,11 +257,12 @@ import os
         epicMerge(&games)
         itchMerge(&games)
         eaMerge(&games)
+        amazonMerge(&games)   // BCDAmazon/: nothing while the store is off
         games.sort { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
         if store.games != games { store.games = games }
 
         let downloads = downloadList(names: names) + gogDownloads() + epicDownloads()
-        let allDownloads = downloads + itchDownloads() + eaDownloads()   // itch.io's and the EA store's downloads (BCDItch/, BCDEA/)
+        let allDownloads = downloads + itchDownloads() + eaDownloads() + amazonDownloads()   // itch.io's, the EA store's and Amazon's downloads (BCDItch/, BCDEA/, BCDAmazon/)
         if store.downloads != allDownloads { store.downloads = allDownloads }
         let today = finished.filter { Calendar.current.isDateInToday($0.finished) }
         if store.finishedToday != today { store.finishedToday = today }
@@ -266,7 +270,7 @@ import os
             BCDAccount(store: .steam, name: SteamSignInModel.shared.accountName, available: SteamSignIn.isEnabled || MadeiraDock.enabled),
             epicAccount(),
             gogAccount(),
-        ] + itchAccounts() + eaAccounts()
+        ] + itchAccounts() + eaAccounts() + amazonAccounts()
         if store.accounts != accounts { store.accounts = accounts }
         noteSavesDiffer()
         refreshStorage()
@@ -641,6 +645,7 @@ import os
         if let entry = epicPlayEntry(game) { begin(entry, launch); return }
         if let entry = itchPlayEntry(game) { begin(entry, launch); return }
         if let entry = eaPlayEntry(game) { begin(entry, launch); return }
+        if let entry = amazonPlayEntry(game) { begin(entry, launch); return }
         let library = LibraryModel.shared
         switch BCDLiveID.parse(game.id) {
         case .local(let id)?:
@@ -702,6 +707,7 @@ import os
         if epic(.install, game.id, place: place) { return }
         if itch(.install, game.id) { return }
         if ea(.install, game.id) { return }
+        if amazon(.install, game.id) { return }
         // A game from Files is added, not installed.
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         // Where the download goes (from Madeira #464, the install sheet's Install on): this device's Steam library, or the
@@ -723,6 +729,7 @@ import os
         if epic(.update, game.id) { return }
         if itch(.update, game.id) { return }
         if ea(.update, game.id) { return }
+        if amazon(.install, game.id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }
         download(appID)
     }
@@ -764,6 +771,7 @@ import os
         if epic(.uninstall, game.id) { return }
         if itch(.uninstall, game.id) { return }
         if ea(.uninstall, game.id) { return }
+        if amazon(.uninstall, game.id) { return }
         switch BCDLiveID.parse(game.id) {
         case .steam(let appID)?:
             settled {
@@ -787,6 +795,7 @@ import os
         if epic(.pause, id) { return }
         if itch(.pause, id) { return }
         if ea(.pause, id) { return }
+        if amazon(.pause, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.pause(appID)
     }
@@ -796,6 +805,7 @@ import os
         if epic(.resume, id) { return }
         if itch(.resume, id) { return }
         if ea(.resume, id) { return }
+        if amazon(.resume, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         download(appID)
     }
@@ -807,6 +817,7 @@ import os
         if epic(.cancel, id) { return }
         if itch(.cancel, id) { return }
         if ea(.cancel, id) { return }
+        if amazon(.cancel, id) { return }
         guard case .steam(let appID)? = BCDLiveID.parse(id) else { return }
         SteamOwnedLibrary.shared.cancelInstall(appID, installed: SteamGamesModel.shared.games.contains { $0.id == appID })
     }
@@ -837,6 +848,7 @@ import os
         if epicAccountAction(signIn: true, front) { return }
         if itchAccountAction(signIn: true, front) { return }
         if eaAccountAction(signIn: true, front) { return }
+        if amazonAccountAction(signIn: true, front) { return }
         guard front == .steam else { return }
         settled { [weak self] in self?.sheet = .steamSignIn }
     }
@@ -846,6 +858,7 @@ import os
         if epicAccountAction(signIn: false, front) { return }
         if itchAccountAction(signIn: false, front) { return }
         if eaAccountAction(signIn: false, front) { return }
+        if amazonAccountAction(signIn: false, front) { return }
         guard front == .steam else { return }
         SteamSignInModel.shared.signOut()
     }
@@ -866,6 +879,7 @@ import os
         epicRefresh()
         itchRefresh()
         eaRefresh()
+        amazonRefresh()
         rebuild()
     }
 }

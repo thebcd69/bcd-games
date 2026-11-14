@@ -633,7 +633,8 @@ func touch(_ url: URL, _ data: Data = Data("x".utf8)) {
         catch { check((error as? BCDLauncherError)?.logReason == "redirected", "Gecko model: a redirect off WineHQ is refused", "\(error)") }
         Mock.redirects["dl.winehq.org/wine/wine-gecko/test/b.msi"] = nil
         gecko.install()
-        for _ in 0..<300 { if gecko.isReady { break }; try? await Task.sleep(nanoseconds: 10_000_000) }
+        // Up to 30 s (was 3 s): build 657 failed here on a loaded host (WindowServer at 4.6 cores), the download itself was fine.
+        for _ in 0..<3000 { if gecko.isReady { break }; try? await Task.sleep(nanoseconds: 10_000_000) }
         check(gecko.isReady && gecko.lastError == nil && gecko.state == .installed, "Gecko model: Settings' Download finishes the job after a failure")
 
         print(failed ? "DRIVER FAILED" : "DRIVER OK")

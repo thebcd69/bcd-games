@@ -2071,7 +2071,15 @@ static void *wine_process_thread(void *arg) {
                         LOG("ml1077 swap tier armed: %{public}s, %ld MB", swapPath.UTF8String, capMB);
                         fprintf(stderr, "[swap] ml1077 app: backing file %s, cap %ld MB\n", swapPath.UTF8String, capMB);
                         /* ml1150: memory pool, the tier's first stage (MemoryPool.m). */
-                        if (poolMB >= 512) {
+                        /* Follow-up of the night round 2026-11-11 (owner's go): inside LiveContainer the helper memory runs only with
+                         * env.MADEIRA_LC_HELPER_MEMORY = 1 (bcd.cfg or the game's config; off unless set). Before LiveContainer's Helper
+                         * Process Support the attempt always ended in "no extension" there, so off keeps the outcome every LiveContainer
+                         * game had; with the switch on in LiveContainer it would start for real, which is unmeasured there. */
+                        if (poolMB >= 512 && getenv("LC_HOME_PATH") && !madeira_cfg_bool("env.MADEIRA_LC_HELPER_MEMORY", 0)) {
+                            fprintf(stderr, "[swap] ml1150 pool: LiveContainer helper memory off (env.MADEIRA_LC_HELPER_MEMORY = 1 turns it on)\n");
+                        } else if (poolMB >= 512) {
+                            if (getenv("LC_HOME_PATH"))
+                                fprintf(stderr, "[swap] ml1150 pool: LiveContainer helper memory on (env.MADEIRA_LC_HELPER_MEMORY)\n");
                             extern long MadeiraMemoryPoolStart(long megabytes);
                             extern int MadeiraMemoryPoolMore;
                             MadeiraMemoryPoolMore = poolMore;   /* round 625: its pressure source */
@@ -3608,6 +3616,9 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_WOA_RECHECK"); /* madeira-bcd: likewise (Ubisoft Connect's waits) */
     unsetenv("MADEIRA_GL_EMPTY_EXTENSIONS"); /* madeira-bcd: likewise (Far Cry 4's hardware detection) */
     unsetenv("MADEIRA_FEX_SPLIT_LOCK"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
+    unsetenv("MADEIRA_FEX_CALLRET_LEAN"); /* madeira-bcd: likewise (the A/B switch belongs to the game that set it) */
+    unsetenv("MADEIRA_PRESENT_FX"); unsetenv("MADEIRA_FRAMEGEN_GATE");   /* madeira-bcd: likewise (present-fx; winemetal reads them anew, */
+    unsetenv("MADEIRA_FRAMEGEN_GPU_GUARD"); unsetenv("MADEIRA_FRAMEGEN_STALL_MS");   /* madeira_fgl_session_reset) */
     unsetenv("MADEIRA_POOL_CODE_FOREGROUND"); /* madeira-bcd: likewise (the code-buffer policy) */
     unsetenv("MADEIRA_POOL_CARVE_MERGE"); /* madeira-bcd: likewise (the code-buffer merge) */
     unsetenv("MADEIRA_UBI_CEF"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */

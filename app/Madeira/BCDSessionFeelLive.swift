@@ -163,6 +163,11 @@ import UIKit
         BCDTouchFeel.setTint(BCDControlColor(rawValue: current.controlColor ?? "") ?? .violet)
         if revision != BCDTouchFeel.tintRevision { BCDTouchFeelModel.shared.colorChanged() }
         BCDTouchFeelModel.shared.configure(seconds: current.hideAfter ?? 0)
+        // madeira-bcd (Porthole port, item 9): floating sticks; the controls are drawn again only when it changes.
+        if BCDTouchFeel.floatingSticks != (current.floatingSticks == true) {
+            BCDTouchFeel.floatingSticks = current.floatingSticks == true
+            BCDTouchFeelModel.shared.colorChanged()
+        }
         TouchMouseGate.override = Self.gateMode(BCDTouchMouse(rawValue: current.touchMouse ?? "") ?? .automatic)
         bcd_phone_rumble_set_enabled(current.phoneVibration == true && bcd_phone_rumble_available() != 0 ? 1 : 0)
         let sharp = current.filter == BCDPictureFilter.sharp.rawValue
