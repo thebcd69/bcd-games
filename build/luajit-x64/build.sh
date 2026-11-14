@@ -3,7 +3,7 @@
 # under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # GPL-3.0-or-later WITH the Madeira Converter Exception, version 1.
 # Build an x86-64 Windows lua51.dll (LuaJIT 2.1) that Madeira can run, and
-# stage it at app/Madeira/compat/love/lua51.dll.
+# stage the standard and C-style comment variants under app/Madeira/compat.
 #
 # Why this exists: LOVE games (Balatro, ...) ship LuaJIT built in the old
 # 32-bit-GC-pointer mode, which requires every GC object to live below 2 GB.
@@ -47,23 +47,43 @@ if [ "$(git -C "$SRC" rev-parse HEAD)" != "$LUAJIT_COMMIT" ]; then
     git -C "$SRC" checkout -q "$LUAJIT_COMMIT" || { echo "LuaJIT $LUAJIT_COMMIT is not in $SRC" >&2; exit 1; }
 fi
 
-make -C "$SRC/src" clean >/dev/null
-make -C "$SRC/src" -j"${LUAJIT_JOBS:-$(sysctl -n hw.ncpu)}" \
-    HOST_CC="xcrun clang" \
-    CROSS=x86_64-w64-mingw32- \
-    TARGET_SYS=Windows \
-    BUILDMODE=dynamic \
-    XCFLAGS="-DLUAJIT_DISABLE_JIT -DLUAJIT_NO_UNWIND" \
-    lua51.dll
+build_dll() {
+    local source="$1" destination="$2"
+    make -C "$source/src" clean >/dev/null
+    make -C "$source/src" -j"${LUAJIT_JOBS:-$(sysctl -n hw.ncpu)}" \
+        HOST_CC="xcrun clang" \
+        CROSS=x86_64-w64-mingw32- \
+        TARGET_SYS=Windows \
+        BUILDMODE=dynamic \
+        XCFLAGS="-DLUAJIT_DISABLE_JIT -DLUAJIT_NO_UNWIND" \
+        lua51.dll
 
-mkdir -p "$OUT"
-x86_64-w64-mingw32-strip -o "$OUT/lua51.dll" "$SRC/src/lua51.dll"
-# the whole point: no 32-bit GC references, so none of LuaJIT's low-memory allocator (LJ_ALLOC_NTAVM, which names NtAllocateVirtualMemory)
-if LC_ALL=C grep -aq NtAllocateVirtualMemory "$OUT/lua51.dll"; then
-    echo "lua51.dll still holds the low-memory allocator: it is not a GC64 build" >&2
-    rm -f "$OUT/lua51.dll"
-    exit 1
-fi
+    mkdir -p "$destination"
+    x86_64-w64-mingw32-strip -o "$destination/lua51.dll" "$source/src/lua51.dll"
+    if LC_ALL=C grep -aq NtAllocateVirtualMemory "$destination/lua51.dll"; then
+        echo "$destination/lua51.dll still holds the low-memory allocator: it is not a GC64 build" >&2
+        rm -f "$destination/lua51.dll"
+        return 1
+    fi
+}
+
+# Build each variant from a clean copy of the pin.
+staging="$(mktemp -d "${TMPDIR:-/tmp}/bcd-luajit.XXXXXXXX")"
+trap 'rm -rf "$staging"' EXIT
+set -o pipefail
+
+build_variant() {
+    local name="$1" patch_name="$2" destination="$3"
+    local source="$staging/$name"
+    mkdir -p "$source"
+    git -C "$SRC" archive "$LUAJIT_COMMIT" | tar -xf - -C "$source"
+    # LuaJIT's rolling release build derives the timestamp from git.
+    git -C "$SRC" show -s --format=%ct "$LUAJIT_COMMIT" > "$source/.relver"
+    (cd "$source" && patch -s -p1 < "$R/build/luajit-x64/$patch_name")
+    build_dll "$source" "$destination"
+}
+
+build_variant stock c-style-comments-diagnostic.patch "$OUT"
 git -C "$SRC" rev-parse --short HEAD > "$OUT/lua51.dll.version"
 cp "$SRC/COPYRIGHT" "$R/app/Madeira/licenses/LuaJIT-MIT.txt"
-ls -l "$OUT/lua51.dll"
+build_variant comments c-style-comments.patch "$R/app/Madeira/compat/lua-c-comments"

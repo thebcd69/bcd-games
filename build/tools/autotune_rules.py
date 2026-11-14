@@ -10200,6 +10200,18 @@ RULES = [
         "evidence": ["ddlc-wow-window-small-map-2026-10-30 (Send Log VXSV79, build 623, iPad13,1, 17 GB map)"],
     },
     {
+        "id": "luajit-c-style-comments",
+        "lines": ["env.MADEIRA_LUAJIT_C_COMMENTS = 1"],
+        "noRetry": True,
+        "priority": 2,
+        "outcomes": ["crashed", "exited-early"],
+        "all": [s("[luajit-compat] C-style comment variant available", since_launch=True),
+                s('OutputDebugStringA: "[bcd-luajit] C-style comment token"', since_launch=True)],
+        "none": [s("[luajit-compat] mapping bundled GC64 LuaJIT with C-style comments", since_launch=True)],
+        "reason": "The bundled Lua parser encountered a C-style comment. Try BCD's LuaJIT build that accepts those comments.",
+        "evidence": ["Synthetic LuaJIT diagnostic replay; Grim Dawn campaign verified with the C-style comment variant (#51)"],
+    },
+    {
         "id": "luajit-no-low-memory",
         # Build 632: BCD builds a GC64 LuaJIT (build/luajit-x64) and the wineserver maps it in place of such a lua51.dll (build/wineserver/
         # luajit_compat.c), but only in a session whose game has gl-backend on: a LOVE game cannot draw without OpenGL either, and without the key the

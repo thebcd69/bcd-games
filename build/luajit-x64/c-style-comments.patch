@@ -1,0 +1,34 @@
+SPDX-License-Identifier: MIT
+
+diff --git a/src/lj_lex.c b/src/lj_lex.c
+index 7a9ab09d..eb833ee5 100644
+--- a/src/lj_lex.c
++++ b/src/lj_lex.c
+@@ -399,2 +399,27 @@ static LexToken lex_scan(LexState *ls, TValue *tv)
+       continue;
++    case '/':
++      lex_next(ls);
++      if (ls->c == '/') {
++        do { lex_next(ls); } while (!lex_iseol(ls) && ls->c != LEX_EOF);
++        continue;
++      }
++      if (ls->c == '*') {
++        lex_next(ls);
++        for (;;) {
++          if (ls->c == LEX_EOF)
++            lj_lex_error(ls, TK_eof, LJ_ERR_XLCOM);
++          if (lex_iseol(ls)) {
++            lex_newline(ls);
++          } else if (ls->c == '*') {
++            if (lex_next(ls) == '/') {
++              lex_next(ls);
++              break;
++            }
++          } else {
++            lex_next(ls);
++          }
++        }
++        continue;
++      }
++      return '/';
+     case '[': {

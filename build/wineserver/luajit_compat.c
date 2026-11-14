@@ -137,25 +137,37 @@ int madeira_luajit_compat_fd( int unix_fd, off_t file_size )
 {
     const char *bundle = getenv( "WINEDLLPATH" );
     const char *gl = getenv( "MADEIRA_GL_BACKEND" );
+    /* A game config can opt in with env.MADEIRA_LUAJIT_C_COMMENTS = 1. */
+    const char *comments = getenv( "MADEIRA_LUAJIT_C_COMMENTS" );
+    int c_comments = comments && !strcmp( comments, "1" );
     char path[4096];
     int fd;
 
-    /* madeira-bcd: only in a session whose game has the gl-backend key on. A LOVE game cannot draw without OpenGL, and every other
-     * program never reaches the reads below: without the key this answers -1 (the section is made from the game's file) at once. */
-    if (!gl || !*gl) return -1;
+    /* The LÖVE fallback follows OpenGL. The C-style comment variant can
+     * be selected independently for games with a modified Lua dialect. */
+    if (!c_comments && (!gl || !*gl)) return -1;
     if (!ljc_exports_luajit( unix_fd )) return -1;
     if (!ljc_contains( unix_fd, file_size, "NtAllocateVirtualMemory" ))
     {
         fprintf( stderr, "[luajit-compat] x64 LuaJIT with GC64, left as is\n" );
         return -1;
     }
-    if (!bundle || snprintf( path, sizeof(path), "%s/compat/love/lua51.dll", bundle ) >= (int)sizeof(path))
+    if (!bundle || snprintf( path, sizeof(path), "%s/compat/%s/lua51.dll", bundle,
+                             c_comments ? "lua-c-comments" : "love" ) >= (int)sizeof(path))
         return -1;
     if ((fd = open( path, O_RDONLY | O_CLOEXEC )) == -1)
     {
         fprintf( stderr, "[luajit-compat] x64 LuaJIT needs memory below 2 GB, but %s is missing\n", path );
         return -1;
     }
-    fprintf( stderr, "[luajit-compat] x64 LuaJIT needs memory below 2 GB; mapping the bundled GC64 build instead\n" );
+    if (c_comments)
+        fprintf( stderr, "[luajit-compat] mapping bundled GC64 LuaJIT with C-style comments\n" );
+    else
+    {
+        fprintf( stderr, "[luajit-compat] x64 LuaJIT needs memory below 2 GB; mapping the bundled GC64 build instead\n" );
+        if (snprintf( path, sizeof(path), "%s/compat/lua-c-comments/lua51.dll", bundle ) < (int)sizeof(path) &&
+            access( path, R_OK ) == 0)
+            fprintf( stderr, "[luajit-compat] C-style comment variant available\n" );
+    }
     return fd;
 }

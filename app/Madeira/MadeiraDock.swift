@@ -522,6 +522,7 @@ enum MadeiraDock {
         if let url = transferURL { try? FileManager.default.removeItem(at: url) }
         unsetenv("MADEIRA_DOCK_AUTH_FILE")
         unsetenv("MADEIRA_DOCK_OFFLINE")
+        unsetenv("MADEIRA_LUAJIT_C_COMMENTS")
     }
 
     /// Writes the one-use transfer to protected Application Support storage
@@ -564,6 +565,12 @@ enum MadeiraDock {
         }
         setenv("MADEIRA_STEAM_HOST_APPID", String(game.id), 1)
         setenv("MADEIRA_STEAM_HOST_LAUNCH_OPTION", String(launchOption), 1)
+        // Grim Dawn's SteamOS/Linux compatibility executable (key 1) uses C-style Lua comments.
+        if game.id == 219990 && launchOption == 1 {
+            setenv("MADEIRA_LUAJIT_C_COMMENTS", "1", 1)
+        } else {
+            unsetenv("MADEIRA_LUAJIT_C_COMMENTS")
+        }
         setenv("MADEIRA_STEAM_HOST_CLIENT_DIR", SteamRuntimeFiles.windowsRoot, 1)
         setenv("MADEIRA_STEAM_HOST_EXPECTED_INSTALL", game.windowsInstallPath, 1)
         // madeira-bcd: the same folder is the program being played for the session's code-buffer budget (virtual_ios.c ios_pool_fg_class).

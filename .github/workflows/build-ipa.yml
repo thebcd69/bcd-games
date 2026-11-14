@@ -2237,10 +2237,9 @@ jobs:
           path: toolchains/llvm-mingw-20260421-ucrt-macos-universal
           key: llvm-mingw-20260421-ucrt-macos-universal
 
-      # madeira-bcd (OpenGL, LOVE games such as Balatro): a GC64 LuaJIT (build/luajit-x64) the wineserver maps in place of a game's own lua51.dll
-      # when that is an x64 LuaJIT that needs memory below 2 GB, which iOS never gives (build/wineserver/luajit_compat.c; only in a session whose game
-      # has gl-backend on). The source is fetched at its pinned commit. A failure only loses that substitution (the game keeps its own DLL, as before),
-      # so it does not fail the build.
+      # Bundle stock GC64 LuaJIT for LÖVE games and a second variant for
+      # games whose Lua scripts use C-style comments. The loader selects the
+      # variant for the session (build/wineserver/luajit_compat.c).
       - name: Restore GC64 LuaJIT (LOVE games)
         id: lovecache
         uses: actions/cache/restore@v4
@@ -2248,8 +2247,9 @@ jobs:
           path: |
             app/Madeira/compat/love/lua51.dll
             app/Madeira/compat/love/lua51.dll.version
+            app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       - name: Build the GC64 LuaJIT (LOVE games)
         if: steps.lovecache.outputs.cache-hit != 'true' && env.MINGW_OK == '1'
@@ -2257,14 +2257,15 @@ jobs:
         run: bash build/luajit-x64/build.sh
 
       - name: Save GC64 LuaJIT (LOVE games)
-        if: steps.lovecache.outputs.cache-hit != 'true' && hashFiles('app/Madeira/compat/love/lua51.dll') != ''
+        if: steps.lovecache.outputs.cache-hit != 'true' && hashFiles('app/Madeira/compat/love/lua51.dll') != '' && hashFiles('app/Madeira/compat/lua-c-comments/lua51.dll') != ''
         uses: actions/cache/save@v4
         with:
           path: |
             app/Madeira/compat/love/lua51.dll
             app/Madeira/compat/love/lua51.dll.version
+            app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       # env.MADEIRA_DXGI_BUDGET_EVENTS = 1 (opt-in): the budget-change events
       # tools/patch-dxgi-budget-events.py adds to dxgi-src.dll, checked (and
