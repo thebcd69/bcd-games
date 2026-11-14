@@ -150,6 +150,7 @@ BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skippe
              "patch-dxmt-tess-pso-failed.py" "[mesh-skip] ml870 "
              "patch-dxmt-update-subresource-staging.py" "[update-subresource-staging] skipped #"
              "patch-dxmt-d11-swapchain-rotation.py" "[swapchain-rotation] madeira-bcd: SetRotation("
+             "patch-dxmt-x64-swapchain-entry.py" "[graphics-entry] x64 patchable D3D11 swapchain methods enabled (PE entries)"
              "patch-dxmt-texture-limit.py" "[dxmt-tex-limit] CreateTexture2D refused "
              "patch-dxmt-layer-format.py" "[layer-format] madeira-bcd: back buffer format "
              "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #"
@@ -496,6 +497,9 @@ if [ "$FRESH_SHADERS" = 1 ]; then
     LC_ALL=C grep -aqF "[dxmt-shaders] madeira-bcd" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the [dxmt-shaders] switch"
 fi
 LC_ALL=C grep -aqF "$VER" "$OUT/d3d11.dll" || fail "the DXMT version string is not in the result"
+# A marker alone cannot prove the generated entry ABI or the 45-word table.
+python3 "$R/tests/host/check-x64-graphics-entry.py" --d3d11 "$OUT/d3d11.dll" \
+    || fail "the x64 D3D11 swapchain entries failed validation"
 
 # The recipe check: the unpatched link against upstream's binary. Same
 # symbols at the same addresses = same code and layout (only the timestamp and

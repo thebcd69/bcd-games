@@ -822,6 +822,7 @@ OVERLAY = {
                 "kind": "bool", "default": "0",
                 "note": "Default off. 1 exposes typed x64 ARM64EC entries for swapchain Present/Present1, "
                         "ResizeBuffers/ResizeBuffers1 and queue ExecuteCommandLists/GetTimestampFrequency/GetClockCalibration/GetDesc/Signal/Wait. "
+                        "With MADEIRA_D3D11_SRC=1, the same switch selects DXMT's patchable D3D11 swapchain entries. "
                         "With MADEIRA_DXGI_SRC=1, "
                         "also selects the factory's patchable MakeWindowAssociation and swapchain-creation entries. "
                         "The x64 entries use the loader's PE addresses so code patches and nearby allocations agree. "

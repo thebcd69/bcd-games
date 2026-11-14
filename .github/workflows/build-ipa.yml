@@ -3180,6 +3180,9 @@ jobs:
       - name: Patch DXMT swap chain rotation
         run: python3 tools/patch-dxmt-d11-swapchain-rotation.py
 
+      - name: Patch DXMT opt-in x64 swapchain entries
+        run: python3 tools/patch-dxmt-x64-swapchain-entry.py
+
       # The Witness, Rise/Shadow of the Tomb Raider, Transformers, Danganronpa (night round 2026-11-11, G10 S9): a texture over Direct3D 11's
       # limits (16384 / 2048 slices; 3D 2048) reached Metal, whose validation aborts the process; it gets E_INVALIDARG as on Windows
       # ([dxmt-tex-limit]). Same two DLLs as above.
@@ -5077,9 +5080,14 @@ jobs:
           PYEOF
           # Verify the linked x64 entries; never silently ship a fallback DLL
           # that accepts the option but lacks the required interop ABI.
+          D3D11_CHECK=app/Madeira/arm64ec-windows/d3d11.dll
+          if [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ]; then
+            D3D11_CHECK=app/Madeira/arm64ec-windows/d3d11-src.dll
+          fi
           python3 tests/host/check-x64-graphics-entry.py \
             --factory app/Madeira/arm64ec-windows/dxgi-src.dll \
-            --d3d12 app/Madeira/arm64ec-windows/madeira_d3d12.dll
+            --d3d12 app/Madeira/arm64ec-windows/madeira_d3d12.dll \
+            --d3d11 "$D3D11_CHECK"
           # Likewise tools/build-d3d11-dll.sh (env.MADEIRA_D3D11_SRC). Round 620: BCD's Direct3D 11
           # patches reach a 64-bit game only through d3d11-src.dll, and recommended lists ask for it
           # (F1 2020), so an IPA in which no 64-bit d3d11.dll carries them is refused.
