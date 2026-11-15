@@ -22,7 +22,9 @@ jobs:
   build:
     # madeira-bcd: runs only in the owner's repository; a fork's run is skipped.
     if: github.repository == 'thebcd69/madeira-bcd'
-    runs-on: macos-15
+    runs-on: xcode-27
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
     # contents: write only so the token can see DRAFT releases, which is where
     # the Metal Shader Converter installer is kept (drafts are not public).
     # Nothing in this job creates, edits or pushes anything.
@@ -34,20 +36,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      # ContentView.swift uses glassEffect(.regular, in:), which needs the
-      # iOS 26 SDK. The runner defaults to Xcode 16.4 (iOS 18.5), so pick the
-      # newest Xcode installed rather than whatever xcode-select points at.
-      - name: Select newest Xcode
-        shell: bash
-        run: |
-          echo "-- installed Xcodes --"
-          ls -d /Applications/Xcode*.app 2>/dev/null || echo "(none beyond the default)"
-          NEWEST=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
-          if [ -n "$NEWEST" ]; then
-            sudo xcode-select -s "$NEWEST/Contents/Developer"
-            echo "::notice::selected $NEWEST"
-          fi
 
       # madeira-bcd FORK-ONLY: one build-number sequence across GitHub Actions
       # and the owner's Mac (owner's decision 2026-10-13). This build's number is
@@ -70,7 +58,12 @@ jobs:
         run: |
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-path
-          xcrun --sdk iphoneos --show-sdk-version
+          SDK_VERSION=$(xcrun --sdk iphoneos --show-sdk-version)
+          echo "iPhoneOS SDK: $SDK_VERSION"
+          case "$SDK_VERSION" in
+            27.[1-9]*) ;;
+            *) echo "::error::Full-screen iPhone Duo support requires the iOS 27.1 SDK or later in Xcode 27."; exit 1 ;;
+          esac
           clang --version
 
       - name: Check generated settings catalog
@@ -2641,7 +2634,7 @@ jobs:
 
       # Xcode 27's Metal compiler rejects the private atomic intrinsic of DXMT's tessellation shader (thebcd69/bcd-games#43 by
       # Paulo Eduardo Correa; #22 by creeper4004 has the same one-line patch). --if-needed patches only when this machine's compiler
-      # rejects it: Xcode 26, the one BCD builds with today, keeps the shader byte for byte as it has run on devices.
+      # rejects it: older supported compilers keep the original shader.
       - name: Use public Metal atomics when the compiler needs them (Xcode 27)
         run: |
           python3 tools/patch-dxmt-metal-atomics.py --if-needed
