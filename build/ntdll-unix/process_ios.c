@@ -4664,6 +4664,23 @@ NTSTATUS WINAPI NtQueryInformationProcess( HANDLE handle, PROCESSINFOCLASS class
 
     TRACE( "(%p,0x%08x,%p,0x%08x,%p)\n", handle, class, info, size, ret_len );
 
+    /* madeira-bcd (build 663; tools/patch-wine-kernel32-usd-direct.py): BCD's private class 1011, the host address where
+     * KUSER_SHARED_DATA really is (0 while it is not mapped yet). The 64-bit kernel32's GetTickCount and GetTickCount64 ask once
+     * and read the page there: at 0x7ffe0000, below iOS's 4 GB floor, every read was a Mach exception that the sub-floor service
+     * answered from this same page (RDR2: about 20,000 a second). The calling process only. Outside the switch: 1011 is no
+     * member of PROCESSINFOCLASS. */
+    if (class == (PROCESSINFOCLASS)1011)
+    {
+        extern unsigned long long ios_get_real_usd(void);
+
+        if (size != sizeof(ULONG_PTR)) return STATUS_INFO_LENGTH_MISMATCH;
+        if (handle != GetCurrentProcess()) return STATUS_INVALID_PARAMETER;
+        if (!info) return STATUS_ACCESS_VIOLATION;
+        *(ULONG_PTR *)info = (ULONG_PTR)ios_get_real_usd();
+        if (ret_len) *ret_len = sizeof(ULONG_PTR);
+        return STATUS_SUCCESS;
+    }
+
     switch (class)
     {
     UNIMPLEMENTED_INFO_CLASS(ProcessBasePriority);

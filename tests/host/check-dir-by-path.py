@@ -519,8 +519,10 @@ order = ['guest-log', 'guest-log-tag', 'guest-log-service', 'guest-log-renpy', '
 wf_order = [m.group(1) for m in re.finditer(r'python3 tools/patch-wine-([a-z-]+)\.py wine/dlls/ntdll/unix/file\.c', wf)]
 # tools/patch-wine-guest-log-secrets.py (W07) may sit after the account-name script; nothing else may be added or moved
 check('the workflow applies exactly these thirteen scripts to file.c, in this order (and the sign-in-value script after the account names, when present)',
-      [s_ for s_ in wf_order if s_ != 'guest-log-secrets'] == order and (('guest-log-secrets' not in wf_order) or
-                                                                       wf_order.index('guest-log-secrets') == wf_order.index('guest-log-redact') + 1), str(wf_order))
+      [s_ for s_ in wf_order if s_ not in ('guest-log-secrets', 'guest-log-ring')] == order and (('guest-log-secrets' not in wf_order) or
+                                                                       wf_order.index('guest-log-secrets') == wf_order.index('guest-log-redact') + 1)
+      # round 660 (M032): the mirror's ring of 16 lines comes right after the sign-in values
+      and (('guest-log-ring' not in wf_order) or wf_order.index('guest-log-ring') == wf_order.index('guest-log-secrets') + 1), str(wf_order))
 order = wf_order
 with tempfile.TemporaryDirectory() as t:
     f = Path(t) / 'file.c'

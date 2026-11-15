@@ -1,3 +1,5 @@
+/* Portions copyright 2026 netheritenee: a change taken from netheritenee's fork of BCD 0.1.659 (the child-process condition of
+ * ios_jit_heal_aux_iat) under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 125hz, Connor Gow, meshoklv and 4 other Madeira contributors: code taken from https://github.com/willfaust/Madeira (pull requests #227, #240, #353, #385, #462, #516, #517, #556 and 2 more; commits 74e05ae, 4eea7e5, 62e47df and a15332c)
@@ -6668,6 +6670,21 @@ static int ios_aux_heal_enabled( void )
     return cached;
 }
 
+static int ios_image_reload_mode( void );   /* defined below: what an image mapped again at an unloaded copy's base gets */
+
+/* build 665: MADEIRA_AUX_IAT_HEAL_CHILD=0 keeps a process's own (owner-less) caller copy from being healed to that
+ * process's own copy of the target (a child's ntdll), as before build 665 */
+static int ios_aux_heal_child_enabled( void )
+{
+    static int cached = -1;
+    if (cached < 0)
+    {
+        const char *e = getenv( "MADEIRA_AUX_IAT_HEAL_CHILD" );
+        cached = !(e && e[0] == '0' && !e[1]);
+    }
+    return cached;
+}
+
 static uintptr_t ios_aux_adrp_page( uintptr_t pc, uint32_t insn )
 {
     int64_t imm = (int64_t)((((insn >> 5) & 0x7FFFFu) << 2) | ((insn >> 29) & 3u));
@@ -6804,13 +6821,24 @@ int ios_jit_heal_aux_iat( uintptr_t fault_pc, uintptr_t lr, void *thread_peb, ui
     }
     /* exactly where the redirect sends this process */
     if ((uintptr_t)ios_jit_translate_addr_for_owner( (void *)fault_pc, thread_peb ) != jit_pc) return 0;
-    /* a caller copy without an owner serves every process that maps the image, so it
-     * may only be sent to a target copy that is shared too, never to one process's own
-     * (each child has its own ntdll copy) */
+    /* A caller copy without an owner was checked above to be mapped by this process alone (map_peb, and no other
+     * entry for its image): a process's kernel32 copy is its own (another process maps the image at another
+     * address, and a copy is rebuilt in place only for the process that mapped it, ios_jit_reload_choice).
+     * Its slot may therefore go to a shared target copy or to this process's own copy (each child has its own
+     * ntdll copy), never to another process's. Build 665: before, only a shared target was allowed, so a child
+     * process (RDR2.exe, GTA5_Enhanced.exe, SocialClubHelper.exe started by the launcher) never healed its
+     * kernel32 -> ntdll calls: timeGetTime's RtlQueryPerformanceCounter/Frequency took an exec fault per call
+     * for the whole session (about 18,000 a second in RDR2; found by netheritenee in a fork of BCD 0.1.659, 2026-11-15).
+     * MADEIRA_AUX_IAT_HEAL_CHILD=0 restores the shared-only rule. */
     if (!ios_jit_mappings[i].owner_peb)
     {
         int t = ios_aux_find_copy( jit_pc );
-        if (t < 0 || ios_jit_mappings[t].owner_peb) return 0;
+        if (t < 0) return 0;
+        /* MADEIRA_IMAGE_RELOAD=0 adopts an unloaded copy as it is, for whichever process maps the image there
+         * next: then a copy is not one process's for good, and only a shared target is safe */
+        if (ios_jit_mappings[t].owner_peb &&
+            (ios_jit_mappings[t].owner_peb != thread_peb || !ios_aux_heal_child_enabled() || !ios_image_reload_mode()))
+            return 0;
     }
 
     __atomic_store_n( (uint64_t *)(rw + (slot - rx)), (uint64_t)jit_pc, __ATOMIC_RELEASE );
@@ -13404,9 +13432,13 @@ extern const void *opengl32_unix_call_wow64_funcs[];
 /* madeira-bcd (Windows Vulkan): winevulkan's unix side, compiled from wine/dlls/winevulkan/{vulkan,vulkan_thunks}.c into libntdll_unix.a
  * (build/ntdll-unix/build.sh). It reaches the session's Vulkan library through win32u (build/win32u-unix/vulkan_ios.c); without
  * MADEIRA_VULKAN_LIBRARY its init call fails and vulkan-1.dll reports no ICD. Only a game whose file has vulkan = moltenvk has a
- * winevulkan.dll in its prefix at all (WineProcessBridge.m), so no other session reaches the branch. 64-bit callers only: its wow64
- * thunks do not add a 32-bit window's base to guest pointers (see the build.sh comment). */
+ * winevulkan.dll in its prefix at all (WineProcessBridge.m), so no other session reaches the branch.
+ * 32-bit callers (build 660, docs/VULKAN.md "32-bit programs"): tools/patch-wine-vulkan-wow64.py makes the wow64 thunks add the
+ * caller's window base to guest pointers (ios_wow_host_ptr), so the wow64 table is bound for the i386 winevulkan.dll, and only
+ * in a session whose game has the key (ios_vk_session_on): a session without it has no i386 winevulkan.dll to load, and if one
+ * turned up it would be refused by the generic branch, as it always was. */
 extern const void *winevulkan_unix_call_funcs[];
+extern const void *winevulkan_unix_call_wow64_funcs[];
 
 /* MADEIRA 2026-10-22: winedmo's unix side (winedmo_unixlib_ios.c): the FFmpeg demuxer behind Wine's
  * ASF media source (mfasfsrcsnk.dll).  Only an opt-in game loads winedmo.dll at all (nothing shipped
@@ -13575,6 +13607,19 @@ static BOOL ios_module_mapped_file_name( const void *module, char *buf, size_t b
     return out != 0;
 }
 
+
+/***********************************************************************
+ *           ios_vk_session_on
+ *
+ * madeira-bcd (Vulkan for 32-bit programs): does this session have the game's vulkan key? WineProcessBridge.m exports
+ * MADEIRA_VULKAN_LIBRARY only then (and removes it at the session's end). Asked only when a 32-bit module named winevulkan
+ * binds its unix side; a session without the key never loads one.
+ */
+static int ios_vk_session_on( void )
+{
+    const char *e = getenv( "MADEIRA_VULKAN_LIBRARY" );
+    return e && *e;
+}
 
 /***********************************************************************
  *           ios_gl_real_unixlib
@@ -13791,12 +13836,14 @@ static NTSTATUS load_builtin_unixlib( void *module, BOOL wow, const void **funcs
             }
             libname = "win32u (stub table)";
             funcs64 = funcs_wow64 = (const void *)ios_stub_unix_call_table;
-        } else if (!wow && match && strstr(match, "winevulkan")) {
+        } else if (match && strstr(match, "winevulkan") && (!wow || ios_vk_session_on())) {
             /* madeira-bcd (Windows Vulkan): "winevulkan" matches the export name winevulkan.dll and a unix_path of winevulkan.so.
-             * No wow64 table: a 32-bit caller falls through to the generic branch, which refuses it loudly. */
+             * A 32-bit caller gets the wow64 table (its thunks convert guest pointers, tools/patch-wine-vulkan-wow64.py) only in a
+             * session with the vulkan key; without the key it falls through to the generic branch, which refuses it loudly. A
+             * 64-bit caller gets the 64-bit table, as before. */
             libname = "winevulkan (Vulkan through win32u, MADEIRA_VULKAN_LIBRARY)";
             funcs64 = (const void *)winevulkan_unix_call_funcs;
-            funcs_wow64 = NULL;
+            funcs_wow64 = (const void *)winevulkan_unix_call_wow64_funcs;
         } else if (match && strstr(match, "opengl32") && ios_gl_real_unixlib( module, wow )) {
             /* madeira-bcd (OpenGL): the real opengl32 unix side (win32u's WGL layer over the winios driver, build/win32u-unix/
              * opengl_ios.c). The wow64 table's thunks convert every embedded guest pointer with ios_wow_host_ptr() (the Wine
@@ -24339,6 +24386,11 @@ static int ios_arena_guard_refuses( void *base, size_t size, ULONG_PTR limit_low
     return 0;
 }
 
+/* madeira-bcd (round 660 M023 W3ALLOC, agent K7R, build 663): the anchor of bcd.cfg oversize-reserve-virtual = 1 (ios_vres_place). base is
+ * non-zero while a reserve served that way holds the top of the band: its real part ends where the emulator's arena begins, and the arena and
+ * the space above the address map's end are the rest of what the program was told it owns. */
+static struct { ULONG_PTR base, real, size, top, end; void *peb; } ios_vres;
+
 /* madeira-bcd: [arena-guard] may NtAllocateVirtualMemory's steering valve use
  * its top slot [ios_steer_slot, host_addr_space_limit)?
  *
@@ -24355,7 +24407,19 @@ static int ios_arena_guard_refuses( void *base, size_t size, ULONG_PTR limit_low
 static int ios_steer_top_slot_usable(void)
 {
     static int said;
+    ULONG_PTR vres = __atomic_load_n( &ios_vres.base, __ATOMIC_ACQUIRE );
 
+    /* madeira-bcd (K7R, build 663): an oversize-reserve-virtual anchor counts the arena as part of a program's reserve, so no steered guest
+     * reserve may land there while it lives (nothing else of a program can then lie inside that reserve). Never set without the key. */
+    if (vres)
+    {
+        static int vsaid;
+        if (!__atomic_exchange_n( &vsaid, 1, __ATOMIC_RELAXED ))
+            dprintf( 2, "[oversize] vres r663 steering valve: the emulator's arena [0x%lx,0x%lx) is part of the reserve at 0x%lx; steered "
+                        "reserves use the 0x7400000000 slot or normal placement (oversize-reserve-virtual = 1)\n",
+                     (unsigned long)ios_vres.top, (unsigned long)ios_vres.end, (unsigned long)vres );
+        return 0;
+    }
     if (!ios_arena_guard_enabled()) return 1;
     if (!ios_fex_arena_base_unix || ios_fex_arena_end_unix <= ios_steer_slot ||
         ios_fex_arena_base_unix >= (ULONG_PTR)host_addr_space_limit) return 1;
@@ -28431,6 +28495,28 @@ static int ios_oversize_eager( void )
     return eager;
 }
 
+/* madeira-bcd (round 660 M023 W3ALLOC, agent K7R, build 663): bcd.cfg oversize-scan = 1 (default off, LOG ONLY), see ios_oversize_scan;
+ * the size it looks for is oversize-scan-mb (default 65536 = The Witcher 3's 64 GB arena). 0: off. */
+static unsigned long long ios_oversize_scan_bytes( void )
+{
+    static long long mb = -1;
+    if (mb < 0)
+        mb = madeira_cfg_bool( "oversize-scan", 0 )   /* K7R: log where the main program loads the size of its huge reserve */
+             ? madeira_cfg_int( "oversize-scan-mb", 65536 )   /* K7R: that size (MB) */
+             : 0;
+    return mb > 0 ? (unsigned long long)mb << 20 : 0;
+}
+
+/* madeira-bcd (round 660 M023 W3ALLOC, agent K7R, build 663): bcd.cfg oversize-reserve-virtual = 1 (with oversize-reserve = 1; default
+ * off), see ios_vres_place. */
+static int ios_oversize_virtual_on( void )
+{
+    static int on = -1;
+    if (on < 0)
+        on = ios_oversize_real_mb() > 0 && madeira_cfg_bool( "oversize-reserve-virtual", 0 );   /* K7R: the real part at the top of the band */
+    return on;
+}
+
 /* ml1299 (upstream Madeira v0.2.0, 74e05ae): Final Fantasy Tactics - The Ivalice Chronicles' 64 GB arena, sized to the real part of ml1298.
  *
  * With ml1298 its 256 GB reserve succeeds with a real start, but the allocator that owns the first 64 GB of it places every block above
@@ -28559,6 +28645,83 @@ static void ios_fft_arena_patch( char *base, const IMAGE_NT_HEADERS *nt, const I
     ios_fft_arena_size = arena;
     dprintf( 2, "[fft-arena] ml1299 %s: arena 65536 MB -> %llu MB (movabs at rva 0x%lx); ml1298 reserves it real\n",
              exe, (unsigned long long)(arena >> 20), (unsigned long)(a - 2 - (uintptr_t)base) );
+}
+
+/* madeira-bcd (round 660 M023 W3ALLOC, report A1 S3; The Witcher 3 DX12 5EV18N, GW9R17, build 653; agent K7R, build 663): bcd.cfg
+ * oversize-scan = 1, LOG ONLY. Where does the main program take the size of its huge reserve from? ios_fft_arena_patch could be written for
+ * FINAL FANTASY TACTICS because its allocator init was known byte for byte; for The Witcher 3 no log has those bytes. This prints them: in the
+ * main program (64-bit, not a DLL), right after it is mapped and relocated (where ios_fft_arena_patch reads), every movabs of the size
+ * (REX.W B8+r imm64, the immediate equal to oversize-scan-mb) in an executable section with 64 bytes before it and 32 after (8 lines at
+ * most), every 8-aligned raw copy of the size in an initialised data section with 16 bytes on each side (4 lines at most), then a count.
+ * Nothing is written; without the key nothing is read. */
+static void ios_oversize_hex( char *out, size_t cap, const unsigned char *p, size_t n )
+{
+    static const char hx[] = "0123456789abcdef";
+    size_t i, o = 0;
+
+    for (i = 0; i < n && o + 3 < cap; i++)
+    {
+        out[o++] = hx[p[i] >> 4];
+        out[o++] = hx[p[i] & 15];
+        out[o++] = ' ';
+    }
+    if (o) o--;
+    out[o] = 0;
+}
+
+static void ios_oversize_scan( const char *base, const IMAGE_NT_HEADERS *nt, const IMAGE_SECTION_HEADER *sec,
+                               SIZE_T total_size, const UNICODE_STRING *nt_name )
+{
+    unsigned long long want = ios_oversize_scan_bytes();
+    unsigned code_hits = 0, data_hits = 0;
+    unsigned char imm[8];
+    int i;
+
+    if (!want || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || (nt->FileHeader.Characteristics & IMAGE_FILE_DLL)) return;
+    memcpy( imm, &want, sizeof(imm) );
+    for (i = 0; i < nt->FileHeader.NumberOfSections; i++)
+    {
+        SIZE_T size = sec[i].SizeOfRawData, off;
+        const unsigned char *sb = (const unsigned char *)base + sec[i].VirtualAddress;
+        int exec = (sec[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+
+        if (sec[i].VirtualAddress >= total_size) continue;
+        if (!exec && !(sec[i].Characteristics & IMAGE_SCN_CNT_INITIALIZED_DATA)) continue;
+        if (sec[i].Misc.VirtualSize && sec[i].Misc.VirtualSize < size) size = sec[i].Misc.VirtualSize;
+        if (size > total_size - sec[i].VirtualAddress) size = total_size - sec[i].VirtualAddress;
+        for (off = 0; off + 8 <= size; off++)
+        {
+            char before[64 * 3 + 1], after[32 * 3 + 1];
+            SIZE_T b0, a1;
+
+            if (exec)
+            {
+                if (off + 10 > size || (sb[off] != 0x48 && sb[off] != 0x49) || (sb[off + 1] & 0xf8) != 0xb8 || memcmp( sb + off + 2, imm, 8 ))
+                    continue;
+                if (code_hits++ >= 8) continue;
+                b0 = off >= 64 ? off - 64 : 0;
+                a1 = off + 10 + 32 <= size ? off + 10 + 32 : size;
+                ios_oversize_hex( before, sizeof(before), sb + b0, off - b0 );
+                ios_oversize_hex( after, sizeof(after), sb + off + 10, a1 - (off + 10) );
+                dprintf( 2, "[oversize-scan] r663 %s: movabs r%u, 0x%llx at rva 0x%lx: %s | %02x %02x <imm64> | %s\n",
+                         debugstr_us( nt_name ), (unsigned)((sb[off] & 1) << 3 | (sb[off + 1] & 7)), want,
+                         (unsigned long)(sec[i].VirtualAddress + off), before, sb[off], sb[off + 1], after );
+            }
+            else
+            {
+                if ((off & 7) || memcmp( sb + off, imm, 8 )) continue;
+                if (data_hits++ >= 4) continue;
+                b0 = off >= 16 ? off - 16 : 0;
+                a1 = off + 8 + 16 <= size ? off + 8 + 16 : size;
+                ios_oversize_hex( before, sizeof(before), sb + b0, off - b0 );
+                ios_oversize_hex( after, sizeof(after), sb + off + 8, a1 - (off + 8) );
+                dprintf( 2, "[oversize-scan] r663 %s: the value 0x%llx at rva 0x%lx (data): %s | <imm64> | %s\n",
+                         debugstr_us( nt_name ), want, (unsigned long)(sec[i].VirtualAddress + off), before, after );
+            }
+        }
+    }
+    dprintf( 2, "[oversize-scan] r663 %s: %u movabs of 0x%llx in code, %u copies in data (oversize-scan = 1, log only)\n",
+             debugstr_us( nt_name ), code_hits, want, data_hits );
 }
 #endif
 
@@ -29022,6 +29185,7 @@ static NTSTATUS map_image_into_view( struct file_view *view, const UNICODE_STRIN
         }
     }
     ios_fft_arena_patch( ptr, nt, sec, total_size, nt_name );   /* upstream ml1299, bcd.cfg fft-arena-patch (off); FFT_classic/FFT_enhanced only */
+    ios_oversize_scan( ptr, nt, sec, total_size, nt_name );   /* madeira-bcd (K7R, build 663): bcd.cfg oversize-scan (off), log only */
 #endif
 
     /* set the image protections */
@@ -29347,6 +29511,18 @@ static void ios_hook_zone_owner_died( void *dead_peb )
 }
 #endif
 
+#ifdef WINE_IOS
+/* madeira-bcd (round 660, R1 S1): env.MADEIRA_IMAGE_RELAX = 0 keeps the old rule (an image that finds no gap under the furniture ceiling fails). On otherwise.
+ * Read at each use (only after such a failure, so rarely): this library stays in the app for the next session of the app run, and a value
+ * kept from the first read would reach a later game (the wineserver's APC switches had that defect). */
+static int ios_image_relax_enabled( void )
+{
+    const char *e = getenv( "MADEIRA_IMAGE_RELAX" );
+
+    return !(e && e[0] == '0' && !e[1]);
+}
+#endif
+
 static NTSTATUS map_image_view( struct file_view **view_ret, struct pe_image_info *image_info, SIZE_T size,
                                 ULONG_PTR limit_low, ULONG_PTR limit_high, ULONG alloc_type,
                                 BOOL is_builtin )
@@ -29370,6 +29546,8 @@ static NTSTATUS map_image_view( struct file_view **view_ret, struct pe_image_inf
     int hook_zone = ios_hook_zone_pending && !wow_image;
     const void *hook_zone_owner = ios_hook_zone_pending_owner;
     ULONG_PTR zone_high;
+    /* madeira-bcd (round 660, R1 S1): the caller named no ceiling, so the limit_high set below is BCD's own furniture ceiling (advisory) */
+    const BOOL own_ceiling = !limit_high;
 #else
     const ULONG_PTR wow_base = 0;
     const BOOL wow_image = FALSE;
@@ -29559,6 +29737,25 @@ static NTSTATUS map_image_view( struct file_view **view_ret, struct pe_image_inf
     status = map_view( view_ret, NULL, size, top_down ? MEM_TOP_DOWN : 0, vprot, limit_low, limit_high, 0 );
     if (status && limit_high != zone_high)   /* madeira-bcd x64-hook-zone: no room below the zone: anywhere, as before */
         status = map_view( view_ret, NULL, size, top_down ? MEM_TOP_DOWN : 0, vprot, limit_low, zone_high, 0 );
+    /* madeira-bcd (round 660, R1 S1; GTA IV KA69B6, 1BFMGY): map_view's rule "the ceiling is advisory, never fatal" only holds for a view
+     * that comes with no limit_high, and an image always got the furniture ceiling as one: a 64-bit image that finds no gap below the ceiling
+     * failed with c0000017 although the map had room (the Rockstar Launcher's wininet.dll, 40 s into a GTA IV session, with 1.6 GB free above
+     * the 32-bit window: the Launcher died of the delay-load failure and the stub said "Unable to launch game"). Only when the ceiling was
+     * BCD's own (own_ceiling), the image is not a 32-bit guest's (its window is its limit) and nothing above placed it: the same request
+     * without a limit_high, which takes the relaxable path (the band above the windows, then the kernel's pick). A request that succeeded
+     * before is not touched; one that failed with c0000017 gets one more try. env.MADEIRA_IMAGE_RELAX = 0 turns it off. */
+    if (status == STATUS_NO_MEMORY && own_ceiling && !wow_image && !hook_zone && ios_image_relax_enabled())
+    {
+        static LONG relax_n;
+        LONG n = InterlockedIncrement( &relax_n );
+        NTSTATUS relaxed = map_view( view_ret, NULL, size, top_down ? MEM_TOP_DOWN : 0, vprot, limit_low, 0, 0 );
+
+        if (n <= 16 || !(n % 64))
+            dprintf( 2, "[image-relax] #%ld image of 0x%lx bytes found no gap under the furniture ceiling %p: unclamped retry %s (%p) rev=r660\n",
+                     (long)n, (unsigned long)size, (void *)limit_high, relaxed ? "FAILED" : "placed",
+                     relaxed ? NULL : (*view_ret)->base );
+        status = relaxed;
+    }
     return status;
 #else
     return map_view( view_ret, NULL, size, top_down ? MEM_TOP_DOWN : 0, vprot, limit_low, limit_high, 0 );
@@ -36104,6 +36301,104 @@ static int ios_soft_decommit( char *base, SIZE_T size )
 static struct { uintptr_t base; SIZE_T real, size; } ios_oversize[IOS_OVERSIZE_SLOTS];
 static unsigned ios_oversize_n;
 static pthread_mutex_t ios_oversize_lock = PTHREAD_MUTEX_INITIALIZER;
+static void ios_oversize_tail_census( ULONG_PTR b, SIZE_T real, SIZE_T full );   /* madeira-bcd (K7R, build 663): below, log only */
+
+/* madeira-bcd (round 660 M023 W3ALLOC / M059 CODIW, agent K7R, build 663): bcd.cfg oversize-reserve-virtual = 1 (default off, per game; only
+ * with oversize-reserve = 1). A virtual reservation: the program is told it owns the whole range it asked for and nothing else can ever be
+ * placed inside that range, while only its real part takes address space.
+ *
+ * Why: a reserve served in part (ios_oversize_reserve below) puts its unmapped part over memory others then get: The Witcher 3's 64 GB arena
+ * at 0x7040000000 claimed [0x7040000000, 0x8040000000), its own 16 GB and 32 GB pools were placed inside that, and its free gave a block of the
+ * third pool to the arena's allocator (ios_oversize_tail_census has the mechanism). A real 64 GB range cannot be had on any device in the logs:
+ * on iOS 27 (512 GB map, the same with or without the extended-virtual-addressing entitlement) everything below 0x7000000000 is the shared
+ * region, kernel ranges and the GPU carveout, and [0x7000000000, 0x8000000000) is 64 GB that already holds the JIT pool's alias, Wine's
+ * furniture, the V8 cage and the emulator's 16 GB arena, which ends at the map's end on every such device; iOS 26 and older give a 63 GB map
+ * with the arena in its middle. What can be had is a range whose unmapped part lies only where no allocation of a program can be placed: the
+ * emulator's arena (FEX_ONLY; the steering valve is kept out of it while the anchor lives, ios_steer_top_slot_usable) and the space above the
+ * map's end. So the real part, oversize-reserve-mb rounded down to 64 MB and halved down to 1 GB (never below an ml1299 arena) while that slot
+ * is taken, is placed so that it ends exactly where the arena begins: [arena - real, arena).
+ *
+ * Only a reserve of 64 GB or more; one anchor at a time. It is not placed, and the request goes on to the serving below exactly as without the
+ * key, when the arena does not end at the map's end (a 63 GB map, a small map without the increased-memory entitlement), when an anchor still
+ * lives, when a steered reserve of this program already lies in the arena, or when no slot of at least 1 GB below the arena is free. A commit
+ * past the real part lands in the arena, which holds no view for it, or above the map: it fails as today (STATUS_NOT_MAPPED_VIEW, logged by
+ * ios_oversize_commit_failed); the emulator's own views there are the one thing a commit could still reach, and only a program that grows past
+ * its real part could do that. MEM_RELEASE of the base gives the anchor back (ios_oversize_note_free). */
+static NTSTATUS ios_vres_place( void **ret, SIZE_T *size_ptr, ULONG protect, SIZE_T want, SIZE_T real, SIZE_T floor )
+{
+    ULONG_PTR top = ios_fex_arena_base_unix, end = ios_fex_arena_end_unix, ceil = (ULONG_PTR)host_addr_space_limit;
+    SIZE_T full = ROUND_SIZE( 0, want, page_mask ), r;
+    void *peb = ios_jit_current_peb();
+    const char *why = NULL;
+    static unsigned said;
+    sigset_t sigset;
+    unsigned i;
+
+    real &= ~(SIZE_T)(IOS_OVERSIZE_ALIGN - 1);
+    if (!top || !end || !ceil || end != ceil || (top & (IOS_OVERSIZE_ALIGN - 1)))
+        why = "the emulator's arena does not end at the end of the address map";
+    else if (want > ((SIZE_T)1 << 40))
+        why = "it is larger than any address map";   /* a wrapped negative size (FINAL FANTASY RESONANCE, Geometry Dash) */
+    else
+    {
+        server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+        if (ios_vres.base)
+        {
+            struct file_view *v = find_view( (void *)ios_vres.base, 0 );
+
+            if (v && (ULONG_PTR)v->base == ios_vres.base) why = "another reserve already holds the top of the band";
+            else __atomic_store_n( &ios_vres.base, 0, __ATOMIC_RELEASE );   /* its view is gone: the anchor is free again */
+        }
+        for (i = 0; !why && i < ios_steer_n; i++)
+        {
+            struct file_view *v;
+
+            if (!ios_steer[i].base || ios_steer[i].freed || ios_steer[i].base < top || ios_steer[i].base >= ceil) continue;
+            v = find_view( (void *)(ULONG_PTR)ios_steer[i].base, 0 );
+            if (v && v->ios_owner && v->ios_owner == peb) why = "a steered reserve of this program already lies in the emulator's arena";
+        }
+        server_leave_uninterrupted_section( &virtual_mutex, &sigset );
+    }
+    for (r = real; !why && r >= floor && r >= IOS_OVERSIZE_ALIGN && !(r & (IOS_OVERSIZE_ALIGN - 1)) && r <= top; r >>= 1)
+    {
+        void *b = (void *)(top - r);
+        SIZE_T sz = r;
+        unsigned slot;
+
+        if (allocate_virtual_memory( &b, &sz, MEM_RESERVE, protect, 0, 0, 0, 0 )) continue;
+        if ((ULONG_PTR)b != top - r || sz != r)
+        {
+            SIZE_T zero = 0;
+            NtFreeVirtualMemory( NtCurrentProcess(), &b, &zero, MEM_RELEASE );
+            continue;
+        }
+        pthread_mutex_lock( &ios_oversize_lock );
+        slot = ios_oversize_n++ % IOS_OVERSIZE_SLOTS;
+        ios_oversize[slot].base = (uintptr_t)b;
+        ios_oversize[slot].real = sz;
+        ios_oversize[slot].size = full;
+        pthread_mutex_unlock( &ios_oversize_lock );
+        ios_vres.real = sz;
+        ios_vres.size = full;
+        ios_vres.top = top;
+        ios_vres.end = end;
+        ios_vres.peb = peb;
+        __atomic_store_n( &ios_vres.base, (ULONG_PTR)b, __ATOMIC_RELEASE );
+        dprintf( 2, "[oversize] vres r663 unhinted reserve of %llu MB: real %p+%llu MB at the top of the band; the other %llu MB lie in the "
+                    "emulator's arena [0x%lx,0x%lx) and above the map's end, where nothing of the program can be placed "
+                    "(oversize-reserve-virtual = 1)\n", (unsigned long long)(want >> 20), b, (unsigned long long)(sz >> 20),
+                 (unsigned long long)((full - sz) >> 20), (unsigned long)top, (unsigned long)end );
+        ios_oversize_tail_census( (ULONG_PTR)b, sz, full );
+        *ret = b;
+        *size_ptr = full;
+        return STATUS_SUCCESS;
+    }
+    if (!why) why = "no free range of 1 GB or more ends where the emulator's arena begins";
+    if (said++ < 4)
+        dprintf( 2, "[oversize] vres r663 unhinted reserve of %llu MB: not placed at the top of the band (%s); served as without "
+                    "oversize-reserve-virtual\n", (unsigned long long)(want >> 20), why );
+    return STATUS_NO_MEMORY;
+}
 
 static NTSTATUS ios_oversize_reserve( void **ret, SIZE_T *size_ptr, ULONG type, ULONG protect )
 {
@@ -36122,6 +36417,10 @@ static NTSTATUS ios_oversize_reserve( void **ret, SIZE_T *size_ptr, ULONG type, 
     real = (SIZE_T)cap_mb << 20;
     floor = min( real, (SIZE_T)1 << 30 );
     if (ios_fft_arena_size > floor) floor = ios_fft_arena_size;   /* ml1299: the patched arena must be real */
+    /* madeira-bcd (K7R, build 663): bcd.cfg oversize-reserve-virtual = 1 first, for a reserve of 64 GB or more (ios_vres_place); when it is
+     * not placed, the loop below serves the request exactly as without the key. */
+    if (ios_oversize_virtual_on() && want >= IOS_OVERSIZE_MIN && !ios_vres_place( ret, size_ptr, protect, want, real, floor ))
+        return STATUS_SUCCESS;
     for (; real >= floor; real >>= 1)
     {
         void *base = NULL;
@@ -36138,6 +36437,7 @@ static NTSTATUS ios_oversize_reserve( void **ret, SIZE_T *size_ptr, ULONG type, 
         dprintf( 2, "[oversize] ml1298 unhinted reserve of %llu MB: real %p+%llu MB, the other %llu MB "
                  "is not mapped\n", (unsigned long long)(want >> 20), base, (unsigned long long)(sz >> 20),
                  (unsigned long long)((full - sz) >> 20) );
+        ios_oversize_tail_census( (ULONG_PTR)base, sz, full );   /* madeira-bcd (K7R, build 663): log only */
         *ret = base;
         *size_ptr = full;
         return STATUS_SUCCESS;
@@ -36167,6 +36467,125 @@ static void ios_oversize_commit_failed( const void *addr, SIZE_T size, NTSTATUS 
                  (unsigned long long)(ios_oversize[i].real >> 20) );
         return;
     }
+}
+
+/* madeira-bcd (round 660 M023 W3ALLOC / D5, agent K7R, build 663; LOG ONLY, no key): who else lives inside a reserve served in part.
+ *
+ * The Witcher 3's DirectX 12 build (5EV18N, GW9R17, build 653, iPhone18,1, 512 GB map) reserves 16, 64 and 32 GB. With oversize-reserve = 1
+ * the 64 GB one got a real 6 GB at 0x7040000000 (0x703c000000 in GW9R17) and the program was told it owns [base, base + 64 GB). The rest was
+ * not reserved, so the 32 GB request's 16 GB half (0x7800000000), the 16 GB pool made before it (0x73ffff0000), 1, 1, 3 GB and 500 MB blocks,
+ * steered reserves and the emulator's own memory all lie inside that range. The game's free (witcher3.exe+0xbcb703) picks the allocator by
+ * address: the 16 GB pool's range first, then the 64 GB arena's [start, end) (its TLSF control block holds 0x7040000000 / 0x8040000000), then
+ * the third pool. A block of the third pool at 0x7805260000 (0x7802760000) was therefore handed to the 64 GB arena's free, whose merge read a
+ * zero "previous block" (AV READ of 18 at witcher3.exe+0x2801f80) 13 s in. Nothing in the log said so; these lines do:
+ * - ios_oversize_tail_census, once per reserve served in part: what already lies in its unmapped part, the emulator's arena and the space
+ *   above the address map's end counted apart ("[oversize] ml1298 tail");
+ * - ios_oversize_note_alloc, after every successful NtAllocateVirtualMemory while such a reserve exists: an allocation inside its unmapped
+ *   part ("[oversize] ml1298 OVERLAP", 16 lines at most). The reserve's own base and the emulator committing pages in its own arena are not
+ *   counted. Nothing is placed, refused or changed by either; with no reserve served in part (every game without oversize-reserve = 1)
+ *   the note returns at its first test. */
+static void ios_oversize_tail_census( ULONG_PTR b, SIZE_T real, SIZE_T full )
+{
+    char *lo = (char *)(b + real), *hi = (char *)(b + full);
+    ULONG_PTR ceil = (ULONG_PTR)host_addr_space_limit, fb = ios_fex_arena_base_unix, fe = ios_fex_arena_end_unix;
+    unsigned long long out_mb = 0, in_mb = 0, above_mb = 0, big[4][2] = { { 0 } };
+    unsigned out_n = 0, in_n = 0, own = 0, k;
+    void *peb = ios_jit_current_peb();
+    struct file_view *v;
+    sigset_t sigset;
+
+    if (full <= real || b + full < b) return;
+    if (ceil && (ULONG_PTR)hi > ceil)
+    {
+        above_mb = ((ULONG_PTR)hi - max( (ULONG_PTR)lo, ceil )) >> 20;
+        hi = (char *)ceil;
+    }
+    if (hi > lo)
+    {
+        server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+        for (v = ios_lowest_view_in( lo, hi ); v && (char *)v->base < hi; )
+        {
+            struct rb_entry *e;
+            unsigned long long vb = (ULONG_PTR)v->base, vs = v->size;
+
+            if (fe && vb >= fb && vb < fe) { in_n++; in_mb += vs; }
+            else
+            {
+                out_n++;
+                out_mb += vs;
+                if (v->ios_owner && v->ios_owner == peb) own++;
+                for (k = 0; k < 4; k++)
+                    if (vs > big[k][1])
+                    {
+                        memmove( big[k + 1], big[k], (3 - k) * sizeof(big[0]) );
+                        big[k][0] = vb; big[k][1] = vs;
+                        break;
+                    }
+            }
+            e = rb_next( &v->entry );
+            v = e ? RB_ENTRY_VALUE( e, struct file_view, entry ) : NULL;
+        }
+        server_leave_uninterrupted_section( &virtual_mutex, &sigset );
+    }
+    dprintf( 2, "[oversize] ml1298 tail r663: the unmapped [0x%llx,0x%llx) of the reserve at 0x%llx holds %u views (%llu MB, %u of this "
+                "program) outside the emulator's arena, %u views (%llu MB) in the arena [0x%lx,0x%lx), and %llu MB lie above the map's end "
+                "0x%lx%s\n", (unsigned long long)(b + real), (unsigned long long)(b + full), (unsigned long long)b, out_n, out_mb >> 20, own,
+             in_n, in_mb >> 20, (unsigned long)fb, (unsigned long)fe, above_mb, (unsigned long)ceil,
+             out_n ? ": the program may count them as part of its reserve" : "" );
+    for (k = 0; k < 4 && big[k][1]; k++)
+        dprintf( 2, "[oversize] ml1298 tail r663:   view 0x%llx+%llu MB\n", big[k][0], big[k][1] >> 20 );
+}
+
+static void ios_oversize_note_alloc( const void *addr, SIZE_T size, ULONG type )
+{
+    static unsigned logged;
+    uintptr_t a = (uintptr_t)addr, e = a + size;
+    unsigned i, n;
+
+    if (!__atomic_load_n( &ios_oversize_n, __ATOMIC_RELAXED ) || !size || e < a || __atomic_load_n( &logged, __ATOMIC_RELAXED ) >= 16)
+        return;
+    if ((type & MEM_COMMIT) && !(type & MEM_RESERVE) && ios_fex_arena_end_unix &&
+        a >= ios_fex_arena_base_unix && e <= ios_fex_arena_end_unix) return;   /* the emulator committing its own pages */
+    /* no lock on this path (every allocation of such a session passes here): a slot is written once when it is served, and a torn read
+     * could only misname one log line */
+    n = __atomic_load_n( &ios_oversize_n, __ATOMIC_ACQUIRE );
+    if (n > IOS_OVERSIZE_SLOTS) n = IOS_OVERSIZE_SLOTS;
+    for (i = 0; i < n; i++)
+    {
+        uintptr_t b = ios_oversize[i].base, lo = b + ios_oversize[i].real, hi = b + ios_oversize[i].size;
+
+        if (!b || e <= lo || a >= hi || ((type & MEM_RESERVE) && a == b)) continue;
+        if (__atomic_fetch_add( &logged, 1, __ATOMIC_RELAXED ) >= 16) break;
+        dprintf( 2, "[oversize] ml1298 OVERLAP r663: %s %p+0x%llx (tid %04x) lies inside the unmapped part [0x%llx,0x%llx) of the reserve "
+                    "at 0x%llx: the program may count it as part of that reserve\n", (type & MEM_RESERVE) ? "reserve" : "commit", addr,
+                 (unsigned long long)size, NtCurrentTeb() ? (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread : 0,
+                 (unsigned long long)lo, (unsigned long long)hi, (unsigned long long)b );
+        break;
+    }
+}
+
+/* madeira-bcd (same, LOG ONLY): a reserve served in part that the program gives back is forgotten, so the two lines above and the commit
+ * line never name a range that is free again. */
+static void ios_oversize_note_free( HANDLE process, const void *addr, ULONG type )
+{
+    unsigned i, n;
+
+    if (!(type & MEM_RELEASE) || process != NtCurrentProcess() || !addr || !__atomic_load_n( &ios_oversize_n, __ATOMIC_RELAXED )) return;
+    if ((ULONG_PTR)addr == __atomic_load_n( &ios_vres.base, __ATOMIC_ACQUIRE ))   /* oversize-reserve-virtual (K7R): the anchor is free again */
+    {
+        dprintf( 2, "[oversize] vres r663 the reserve at %p is released: the top of the band is free again\n", addr );
+        __atomic_store_n( &ios_vres.base, 0, __ATOMIC_RELEASE );
+    }
+    pthread_mutex_lock( &ios_oversize_lock );
+    n = ios_oversize_n < IOS_OVERSIZE_SLOTS ? ios_oversize_n : IOS_OVERSIZE_SLOTS;
+    for (i = 0; i < n; i++)
+        if (ios_oversize[i].base && ios_oversize[i].base == (uintptr_t)addr)
+        {
+            dprintf( 2, "[oversize] ml1298 the reserve at %p (real %llu MB) is released\n", addr,
+                     (unsigned long long)(ios_oversize[i].real >> 20) );
+            ios_oversize[i].base = 0;
+        }
+    pthread_mutex_unlock( &ios_oversize_lock );
 }
 #endif
 
@@ -37940,6 +38359,9 @@ NTSTATUS WINAPI NtAllocateVirtualMemory( HANDLE process, PVOID *ret, ULONG_PTR z
 
     if (NT_ERROR( status ))
         ios_ntfail_alloc( "NtAllocateVirtualMemory", status, process, hint, want, type, protect, zero_bits, NULL, 0 );
+    /* madeira-bcd (K7R, build 663): log only. Here, not at the end of the implementation, so that the answers the big-reserve path gives
+     * before that end (jumbo-half, the holdbacks, the steering valve, the oversize serving itself) are seen too. */
+    else if (process == NtCurrentProcess() && ret && size_ptr) ios_oversize_note_alloc( *ret, *size_ptr, type );
     return status;
 }
 
@@ -39898,6 +40320,7 @@ NTSTATUS WINAPI NtFreeVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T *si
 
 #ifdef WINE_IOS
     ios_vm_note_free( addr, size, type );
+    ios_oversize_note_free( process, addr, type );   /* madeira-bcd (K7R, build 663): log only */
     /* ml966: a low guest allocation must be freed through its backing, and the
      * translation retired so nothing can resolve through it afterwards.
      * MEM_RELEASE retires; MEM_DECOMMIT keeps the mapping and so keeps the

@@ -17,6 +17,9 @@ thunks as the loader leaves them (ml943). Checks:
     IAT value that does not decode to the faulting pc, a call that is not a
     BL, a redirect target other than the process's own copy: nothing written;
   - MADEIRA_AUX_IAT_HEAL=0 writes nothing;
+  - build 665: a child process (its own kernel32 copy, no owner, mapped by it alone; its own ntdll copy) heals to
+    its own ntdll copy; never to another process's copy, not with MADEIRA_AUX_IAT_HEAL_CHILD=0 and not with
+    MADEIRA_IMAGE_RELOAD=0 (an unloaded copy may then be adopted by another process);
 and textually that the exec-fault handler calls it with lr and the faulting
 thread's PEB before it redirects pc.
 Needs python3 and a C compiler (CC, default cc).
@@ -119,6 +122,8 @@ static int ios_safe_read64( uint64_t addr, uint64_t *out )
 }
 #endif
 ''' + translate + heal + r'''
+static int reload_mode = 1;
+static int ios_image_reload_mode(void) { return reload_mode; }   /* production: MADEIRA_IMAGE_RELOAD, default 1 */
 #define POOL_SIZE 0x400000ul
 static unsigned char *rx_view, *rw_view;
 #define K32_COPY ((uintptr_t)rx_view + 0x10000)
@@ -168,6 +173,18 @@ int main( int argc, char **argv )
     if (mmap( (void *)PE_NTD, NTD_SIZE_ALIGNED, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0 ) != (void *)PE_NTD) return 2;
     memcpy( (void *)PE_K32, k32, K32_SIZE ); memcpy( (void *)PE_NTD, ntd, NTD_SIZE );
 
+    if (argc > 3 && !strcmp( argv[3], "child-off" ))   /* MADEIRA_AUX_IAT_HEAL_CHILD=0 run */
+    {
+        reset( k32, ntd, 1 );
+        ios_jit_mappings[1].map_peb = PEB_B;                          /* the parent's ntdll copy */
+        memcpy( rw_view + (NTD_COPY + NTD_SIZE_ALIGNED - (uintptr_t)rx_view), ntd, NTD_SIZE );
+        ios_jit_mappings[2] = ios_jit_mappings[1]; ios_jit_mappings[2].owner_peb = PEB_A; ios_jit_mappings[2].map_peb = PEB_A;
+        ios_jit_mappings[2].jit_base = (void *)(NTD_COPY + NTD_SIZE_ALIGNED); ios_jit_mapping_count = 3;
+        CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, NTD_COPY + NTD_SIZE_ALIGNED + 0x71aac ) );
+        CHECK( rd64( K32_COPY + 0x6d0e0 ) == K32_COPY + 0x2b300 );
+        if (!fails) puts( "PASS: MADEIRA_AUX_IAT_HEAL_CHILD=0 leaves a child's slot (shared targets only, as before build 665)" );
+        return fails != 0;
+    }
     if (argc > 3)   /* MADEIRA_AUX_IAT_HEAL=0 run */
     {
         reset( k32, ntd, 0 );
@@ -227,10 +244,43 @@ int main( int argc, char **argv )
         CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, NTD_COPY + 0x71aac ) );
         memcpy( pe + lf + 24 + 112 + 8 * 12, &save, 4 );
     }
+    /* build 665: a child process. Its kernel32 copy has no owner and is mapped by it alone (map_peb = PEB_A); ntdll has
+     * the parent's shared copy and the child's own (owner PEB_A), which is where the redirect sends the child */
+    memcpy( rw_view + (NTD_COPY + NTD_SIZE_ALIGNED - (uintptr_t)rx_view), ntd, NTD_SIZE );
+    #define CHILD_NTD (NTD_COPY + NTD_SIZE_ALIGNED)
+    #define CHILD_SETUP() do { reset( k32, ntd, 1 ); ios_jit_mappings[1].map_peb = PEB_B; \
+        memcpy( rw_view + (CHILD_NTD - (uintptr_t)rx_view), ntd, NTD_SIZE ); \
+        ios_jit_mappings[2] = ios_jit_mappings[1]; ios_jit_mappings[2].owner_peb = PEB_A; ios_jit_mappings[2].map_peb = PEB_A; \
+        ios_jit_mappings[2].jit_base = (void *)CHILD_NTD; ios_jit_mapping_count = 3; } while (0)
+    CHILD_SETUP();
+    CHECK( (uintptr_t)ios_jit_translate_addr_for_owner( (void *)qpc, PEB_A ) == CHILD_NTD + 0x71aac );
+    CHECK( ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, CHILD_NTD + 0x71aac ) == 1 );   /* its own ntdll copy */
+    CHECK( rd64( K32_COPY + 0x6d0e0 ) == CHILD_NTD + 0x71aac );
+    CHECK( ios_jit_heal_aux_iat( qpf, K32_COPY + 0x25758, PEB_A, CHILD_NTD + 0x71d04 ) == 1 );
+    CHECK( rd64( K32_COPY + 0x6d0e8 ) == CHILD_NTD + 0x71d04 );
+    CHILD_SETUP();                                                                          /* the parent's copy is not where it goes */
+    CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, NTD_COPY + 0x71aac ) );
+    CHECK( rd64( K32_COPY + 0x6d0e0 ) == K32_COPY + 0x2b300 );
+    CHILD_SETUP();                                                                          /* another child's thread */
+    CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_B, CHILD_NTD + 0x71aac ) );
+    CHILD_SETUP();                                                                          /* only another process's ntdll copy */
+    ios_jit_mappings[1] = ios_jit_mappings[2]; ios_jit_mappings[1].owner_peb = PEB_B; ios_jit_mappings[1].map_peb = PEB_B;
+    ios_jit_mapping_count = 2;
+    CHECK( (uintptr_t)ios_jit_translate_addr_for_owner( (void *)qpc, PEB_A ) == CHILD_NTD + 0x71aac );   /* ml454's any-live */
+    CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, CHILD_NTD + 0x71aac ) );
+    CHECK( rd64( K32_COPY + 0x6d0e0 ) == K32_COPY + 0x2b300 );
+    CHILD_SETUP(); reload_mode = 0;                                                         /* MADEIRA_IMAGE_RELOAD=0 */
+    CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, CHILD_NTD + 0x71aac ) );
+    CHECK( rd64( K32_COPY + 0x6d0e0 ) == K32_COPY + 0x2b300 );
+    reload_mode = 2;
+    CHECK( ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, CHILD_NTD + 0x71aac ) == 1 );   /* mode 2: always a new copy */
+    reload_mode = 1;
+    CHILD_SETUP(); ios_jit_mappings[0].map_peb = PEB_B;                                     /* the kernel32 copy is another process's */
+    CHECK( !ios_jit_heal_aux_iat( qpc, K32_COPY + 0x25750, PEB_A, CHILD_NTD + 0x71aac ) );
     reset( k32, ntd, 1 );                                                                   /* lr outside the pool */
     CHECK( !ios_jit_heal_aux_iat( qpc, PE_K32 + 0x25750, PEB_A, NTD_COPY + 0x71aac ) );
-    if (!fails) puts( "PASS: timeGetTime's QPC/QPF stubs healed to the process's ntdll copy through the RW view; "
-                      "shared or foreign copies, other targets, other slot values and non-BL calls left alone" );
+    if (!fails) puts( "PASS: timeGetTime's QPC/QPF stubs healed to the process's ntdll copy through the RW view, a child's "
+                      "to its own copy (build 665); shared or foreign copies, other targets, other slot values and non-BL calls left alone" );
     return fails != 0;
 }
 '''
@@ -264,6 +314,11 @@ with tempfile.TemporaryDirectory() as tmp:
     out = subprocess.run([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'off'], capture_output=True, text=True, env=env)
     print(out.stdout.strip()); print(out.stderr.strip()) if out.returncode else None
     assert out.returncode == 0, 'switch-off run failed'
+    env = dict(os.environ, MADEIRA_AUX_IAT_HEAL_CHILD='0')
+    env.pop('MADEIRA_AUX_IAT_HEAL', None)
+    out = subprocess.run([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'child-off'], capture_output=True, text=True, env=env)
+    print(out.stdout.strip()); print(out.stderr.strip()) if out.returncode else None
+    assert out.returncode == 0, 'child switch-off run failed'
 
 block = signal[signal.index('/* madeira-bcd: an EC import stub that reached this'):]
 block = block[:block.index('handled = 1;')]

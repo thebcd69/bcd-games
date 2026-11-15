@@ -2,12 +2,13 @@
  "dialogs": [],
  "end": {},
  "matched": [
+  "x64-image-atomic-store-nocopy",
   "x64-image-smc-nocopy"
  ],
  "next": [
   "env.MADEIRA_X64_IMAGE_NOCOPY = 1"
  ],
- "note": "Mad Max (Steam, 64-bit MadMax.exe, through BCD Dock), build 569, iPhone17,2 (7.6 GB; Send Logs VZKCF3, KK9H24, 6DB55D identical): the exe's lock xadd / xchg on its own RWX section (0x143291ff0) faulted on a page FEX had armed; the untrap never made the page writable (vprot 0x25, host_prot=1, not a strip), two faults and a recompile per pass, redelivery guard at 2000. In the app auto-tune had added env.MADEIRA_WOW_RWX_PLAIN (rule wow-rwx-plain-smc, a 32-bit switch) and the storm was the same.",
+ "note": "Mad Max (Steam, 64-bit MadMax.exe, through BCD Dock), build 569, iPhone17,2 (7.6 GB; Send Logs VZKCF3, KK9H24, 6DB55D identical): the exe's lock xadd / xchg on its own RWX section (0x143291ff0) faulted on a page FEX had armed; the untrap never made the page writable (vprot 0x25, host_prot=1, not a strip), two faults and a recompile per pass, redelivery guard at 2000. In the app auto-tune had added env.MADEIRA_WOW_RWX_PLAIN (rule wow-rwx-plain-smc, a 32-bit switch) and the storm was the same. Round 660 (M122): x64-image-atomic-store-nocopy matches too (the same LSE store into the image, before the redelivery guard); the next line is unchanged.",
  "outcome": "crashed",
  "stage": 2,
  "status": "trying"

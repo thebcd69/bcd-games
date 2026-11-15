@@ -1,0 +1,240 @@
+[15:33:30.827] [INFO] [prev-tail] the last 60 line(s) of the previous run's log (explorer.exe-2026-11-12_15-31-14.txt), scrubbed:
+[15:33:30.830] [INFO] [prev-tail] [evt-life] obj=0x11e6896c0 create=1 SET=7 reset=8 pulse=0 | wait begin=0 end=0 timeout=0 success=0 | last_set tid=0080 seq=417 | last_reset tid=0080 seq=418
+[15:33:30.830] [INFO] [prev-tail] [evt-life]   seq=395 tid=0080 create status=00000000
+[15:33:30.830] [INFO] [prev-tail] [evt-life]   seq=396 tid=0080 reset status=00000000
+[15:33:30.830] [INFO] [prev-tail] [evt-life]   seq=397 tid=0080 SET status=00000000
+[15:33:30.831] [INFO] [prev-tail] [evt-life]   seq=398 tid=0080 reset status=00000000
+[15:33:30.831] [INFO] [prev-tail] [evt-life]   seq=399 tid=0080 SET status=00000000
+[15:33:30.845] [INFO] [prev-tail] [evt-before]
+[15:33:30.846] [INFO] [prev-tail] [evt-entry]
+[15:33:30.846] [INFO] [prev-tail] [evt-hist] obj=0x1132a2490: no recorded operations in the GLOBAL ring (1024 entries, WRAPPED). The ring WRAPPED, so this does NOT mean the producer never ran -- older operations were overwritten and this verdict is UNSAFE
+[15:33:30.846] [INFO] [prev-tail] [evt-after] matched=0
+[15:33:30.847] [INFO] [prev-tail] E A0 [iOS-xrem] via=aligned #44416 tracker=0x304b6e008 0x472bf0000-0x473000000
+[15:33:30.847] [INFO] [prev-tail] [mach_exc] EMULATED STR #1106000 pc=0x32f1cf264 insn=b8f5031b rx=0x4003ec140→rw=0x33d014140 | dual-map readback rx=4eb149b800000004 rw=4eb149b800000004 OK
+[15:33:31.183] [INFO] Checking entitlements...
+[15:33:31.184] [INFO] [build] v0.1.653 (653)
+[15:33:31.185] [INFO] [device] model=iPhone14,2 idiom=phone os=iOS Version 26.3 (Build 23D127) ram=5667MB available=4074MB cores=6
+[15:33:31.185] [INFO] [device] address-map=[0x1006bc000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[15:33:31.196] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=5d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[15:33:31.217] [INFO] [device] settings: low-power=0 thermal=serious screen=1170x2532@3.0x max-fps=120 utc-offset=+03:00 free-disk=6GB stikdebug-url=1
+[15:33:31.227] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:33:43.652] [INFO] [bcd-ui] play local
+[15:33:43.655] [INFO] Requesting JIT with StikDebug...
+[15:33:43.688] [INFO] Opening StikDebug to enable JIT...
+[15:33:47.791] [INFO] [bcd] library launch eurotrucks2.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[15:33:47.831] [INFO] Running full Wine sequence...
+[15:33:47.831] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1006bc000,0xfc0000000) 63GB available=4066MB low-power=0 thermal=serious
+[15:33:47.834] [INFO] [game-cfg] dxmt=d3d11.mipClampBC=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_MIP_CLAMP_AUTO=1
+[15:33:47.840] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[15:33:47.847] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:33:48.252] [INFO] Allocating 896MB JIT pool via debugger...
+[15:33:48.253] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:33:48.254] [INFO] [jit-debugger] attached=1 at the pool request
+[15:33:48.254] [INFO] [jit-age] attach age=0s source=enable-jit method=stikdebug thermal=2
+[15:33:48.256] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[15:33:52.309] [INFO] RX pool at 0x300000000
+[15:33:52.364] [OK] JIT pool ready (debugger still attached).
+[15:33:52.369] [INFO] BRK suspension lasted 4.11s
+[15:33:52.372] [INFO] Detaching debugger...
+[15:33:52.377] [OK] Debugger detached.
+[phase] wine-start             t+  4.580s rev=ml526
+[game-cfg] <container>/Library/Application Support/GameConfigs/c0ed942d89e3476b.cfg (read)
+[game-cfg]   dxmt = d3d11.mipClampBC=1
+[WineProc] PE probe: machine=0x14c (i386: WoW64)
+[msiexec64] removed BCD's system32\msiexec.exe link (not asked for this session)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[15:33:53.089] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=40, sending init_first_thread...
+[15:33:53.089] [Wine init_process] reply_pipe=40, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3155 MB + phys_footprint=940 MB = 4096 MB (hw.memsize says 5667 MB)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11fef0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+[jit-pool] image 0x11fe80000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x11f940000+0x3c0000 (libwow64fex.dll) → pool 0x300192000 used=0x55a000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 120 .text pages executable (copy @0x300192000)
+ml957: libwow64fex.dll backing 0x11f940000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x11fd60000+0x120000 (ucrtbase.dll) → pool 0x300558000 used=0x67c000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300558000)
+[jit-pool] image 0x11f8a0000+0xa0000 (KERNEL32.dll) → pool 0x30067c000 used=0x724000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x30067c000)
+[jit-pool] image 0x11f730000+0x170000 (kernelbase.dll) → pool 0x300724000 used=0x8a4000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300724000)
+[window] 0x122c00000..0xb30000000 regions=100001 occupied=7841 MB of 41172 MB free=33330 MB maxhole=31974 MB@0x36198c000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=962 MB (peak 962) internal=960 MB compressed=0 MB external=76 MB reusable=4 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[jit-pool] image 0x11f6b0000+0x80000 (wow64win.dll) → pool 0x3008a4000 used=0x928000/0x38000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x3008a4000)
+[jit-pool] image 0x11f620000+0x90000 (win32u.dll) → pool 0x300928000 used=0x9bc000/0x38000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x300928000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=eurotrucks2.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300515ed0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x11f940000) -> 64-bit table (0x103e3e840)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module eurotrucks2.exe (eurotrucks2.exe-23030aace0cdc503): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83de50cc): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1c3a466): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728abbb6e4): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+D 24 Load module WS2_32.dll (ws2_32.dll-5902ca9b51e1f9b7): 47BC00000
+D 24 Load module ucrtbase.dll (ucrtbase.dll-c2fc888ed004fb2c): 47BB10000
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x11bc80000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[alias-prot] ml638 #1 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #1 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #2 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #2 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #3 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #3 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #4 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #4 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #5 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #5 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #6 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[anon-cas] build580 insn=88e4ff07 pc=337006ef0 addr=4002bf57c rw=3389bf57c width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002be8f4 rw=3389be8f4 width=4
+[alias-own] ml640 #6 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #8 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #9 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #9 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #10 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #10 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #11 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+[alias-own] ml640 #11 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #12 0x4002be000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x4002bc000,0x4002c0000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"LumaEmu_CEG.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002be8f4 rw=3389be8f4 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337153338 addr=4002bdc70 rw=3389bdc70 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337153338 addr=4002bdcb0 rw=3389bdcb0 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337153338 addr=4002bdcf0 rw=3389bdcf0 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002beedc rw=3389beedc width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002beedc rw=3389beedc width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002be8f4 rw=3389be8f4 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002beedc rw=3389beedc width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002be8f4 rw=3389be8f4 width=4
+[anon-cas] build580 insn=88e4ff07 pc=337014780 addr=4002be8f4 rw=3389be8f4 width=4
+[stale-heal]   3 slot(s) in the copy of 0x11f940000 (libwow64fex.dll) -> 0x300073294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+[xp-names] m3693813 "wine-x18-exc"
+[xp] 15:33:53.764 +0.58 dt=325 cpu=311 (thr 311) P=311 E=0 run=316 pgw=-1.0 GHz P=3.02 E=1.58 Minst=3231 IPC=3.44 mJ=761 pin=91 rdKB=3524 fpMB=1011
+[alias-own] ml640 #12 0x4002bc000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009bc000 rw=0x3389bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[bigres] tid=0024 #1 size=0x19000000 (400 MB) type=0x3000 prot=0x4 hint=0x0 peb=0x47ffd0000 total=400 MB
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[xp] 15:33:54.084 +0.90 dt=320 cpu=353 (thr 299) P=348 E=5 run=400 pgw=-1.0 GHz P=2.80 E=1.99 Minst=3281 IPC=3.33 mJ=693 pin=13 rdKB=3748 fpMB=1468
+[vmode] synthesized CURRENT = 1416x656 @60Hz
+[win-pos] #3 hwnd=0x2002e after=0x0 flags=0000003c vis={702,296,834,334} surface=0x1038890d0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x2002e class='prism3d' text="" rev=ml853
+[win-pos] #4 hwnd=0x10036 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1038890d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1038890d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x2002e after=0x0 flags=00000018 vis={702,296,834,334} surface=0x1038890d0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x2002e class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+[win-name] #7 hwnd=0x2002e class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+E 24 [iOS-xins] tracker=0x300516008 WININET.dll sec=0x47a331000-0x47a364f6c
+D 24 Load module WININET.dll (wininet.dll-7ed1ba985c2f5654): 47A330000
+[xp] 15:33:54.366 +1.18 dt=282 cpu=346 (thr 344) P=340 E=5 run=429 pgw=-1.0 GHz P=2.78 E=1.88 Minst=2826 IPC=2.96 mJ=591 pin=9 rdKB=9384 fpMB=1481
+[alias-prot] ml638 #13 0x401d50000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x401d50000,0x401d54000)
+[alias-own] ml640 #13 0x401d50000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009c0000 rw=0x3389c0000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #14 0x401d50000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x401d50000,0x401d54000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"VAC2.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 24 Load module swopenal32.dll (swopenal32.dll-32312e50477b60fa): 47A160000
+D 24 Load module WINMM.dll (winmm.dll-1143775136573502): 47A090000
+D 24 Load module msacm32.dll (msacm32.dll-6ba578b32975b792): 47A060000
+D 40 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbeaded3): 47A020000
+D 40 Load module version.dll (version.dll-f3fe55759b2551f0): 47A000000
+D 24 Load module dsound.dll (dsound.dll-541344d6eb196203): 479FB0000
+0024:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Euro Truck Simulator 2" / L"Euro Truck Simulator 2 can not access Steam client. Suggested steps:\n\n1. Check that the Steam client is running.\n2. Check that you have updated version of the Steam client\n3. Check that the automatic updates are enabled and the game is updated to the latest version.": main exe base 00400000 size 0x863000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-name] #75 hwnd=0x1004e class='Button' text="OK" rev=ml853
+[win-pos] #76 hwnd=0x1003e after=0x0 flags=00001967 vis={539,235,877,421} surface=0x121c5f000 rev=ml505 style=94c801c4 visible=1 parent=0x10020
+[win-name] #76 hwnd=0x1003e class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[xp] 15:33:54.676 +1.49 dt=310 cpu=238 (thr 186) P=229 E=9 run=257 pgw=-1.0 GHz P=2.92 E=1.83 Minst=2303 IPC=3.36 mJ=507 pin=129 rdKB=5348 fpMB=1533
+[launch-view] dismissed reason=surface logs=0
+[xp] 15:33:54.942 +1.76 dt=266 cpu=34 (thr 31) P=2 E=32 run=39 pgw=-1.0 GHz P=0.88 E=1.17 Minst=40 IPC=1.01 mJ=2 pin=1 rdKB=0 fpMB=1533
+[guest-stk] sp+0x188 0x3001a92e0 = libwow64fex.dll+0x172e0
+[guest-stk] sp+0x1b0 0x3003714f9 = libwow64fex.dll+0x1df4f9
+[guest-stk] sp+0x1c0 0x3001a914c = libwow64fex.dll+0x1714c
+[guest-stk] sp+0x3c8 0x300296c18 = libwow64fex.dll+0x104c18
+[guest-stk] sp+0x428 0x300296b9c = libwow64fex.dll+0x104b9c
+[guest-stk] sp+0x548 0x300296b94 = libwow64fex.dll+0x104b94
+[footprint] rev=ml358 phys=1536 MB (peak 1536) internal=1533 MB compressed=0 MB external=82 MB reusable=4 MB (cycle=2)
+[xp] 15:33:55.267 +2.08 dt=321 cpu=69 (thr 66) P=8 E=62 run=81 pgw=-1.0 GHz P=1.15 E=0.93 Minst=65 IPC=0.98 mJ=4 pin=0 rdKB=0 fpMB=1536
+[hwinput] keyboard focus: program (program cursor)
+[srv-input] btn msg=0x201 at (697,400) hit win=0001003e thread=0x121837900
+[srv-input] btn msg=0x201 at (697,400) hit win=0001003e thread=0x121837900
+[srv-input] btn msg=0x201 at (697,400) hit win=0001003e thread=0x121837900
+[win-pos] #77 hwnd=0x1003e after=0x0 flags=000018bf vis={539,235,877,421} surface=0x1038890d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #77 hwnd=0x1003e class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #78 hwnd=0x1003e after=0x0 flags=0000181f vis={539,235,877,421} surface=0x1038890d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #78 hwnd=0x1003e class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #79 hwnd=0x1003e after=0x0 flags=0000181f vis={539,235,877,421} surface=0x1038890d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #79 hwnd=0x1003e class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #80 hwnd=0x1003e after=0x0 flags=0000181f vis={539,235,877,421} surface=0x1038890d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #80 hwnd=0x1003e class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[footprint] rev=ml358 phys=1535 MB (peak 1536) internal=1534 MB compressed=0 MB external=82 MB reusable=4 MB (cycle=3)
+[win-pos] #81 hwnd=0x2002e after=0x0 flags=000018bf vis={-32000,-32000,-31868,-31962} surface=0x1038890d0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #81 hwnd=0x2002e class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+[srv-own] read_request EOF tid=0034 pid=0020 request_unixfd=125 -> kill_thread rev=ml586
+[srv-kill] kill_thread tid=0034 pid=0020 violent=0 rev=ml586
+[srv-own] read_request EOF tid=0030 pid=0020 request_unixfd=124 -> kill_thread rev=ml586
+[srv-kill] kill_thread tid=0030 pid=0020 violent=0 rev=ml586
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=890
+[srv-kill] kill_thread tid=0040 pid=0020 violent=1 rev=ml586
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=901
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[15:33:58.335] [INFO] [session] length=10s play=0s frames=0 stalls=0/0s peak=1537MB limit=4095MB thermal=serious lpm=0 res=1416x656 cap=60 game=eurotrucks2
+[frontend] returned to library
+[footprint] rev=ml358 phys=1067 MB (peak 1536) internal=1066 MB compressed=0 MB external=83 MB reusable=4 MB (cycle=4)
+[15:34:00.244] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1070 MB (peak 1536) internal=1067 MB compressed=0 MB external=83 MB reusable=4 MB (cycle=5)
+[15:34:02.333] [INFO] [bcd-ui] play local
+[footprint] rev=ml358 phys=1069 MB (peak 1536) internal=1068 MB compressed=0 MB external=85 MB reusable=4 MB (cycle=6)
+[xp] 15:34:05.328 +12.14 dt=279 cpu=291 (thr 292) P=5 E=286 run=288 pgw=-1.0 GHz P=1.84 E=1.58 Minst=1311 IPC=2.84 mJ=49 pin=0 rdKB=0 fpMB=1071
+[15:34:05.601] [INFO] [bcd-ui] play local
+[xp] 15:34:05.626 +12.44 dt=298 cpu=335 (thr 335) P=34 E=301 run=342 pgw=-1.0 GHz P=3.16 E=1.59 Minst=1621 IPC=2.76 mJ=118 pin=0 rdKB=0 fpMB=1071
+[footprint] rev=ml358 phys=1069 MB (peak 1536) internal=1068 MB compressed=0 MB external=85 MB reusable=4 MB (cycle=7)
+[xp] 15:34:05.940 +12.75 dt=314 cpu=317 (thr 317) P=2 E=315 run=318 pgw=-1.0 GHz P=2.64 E=1.65 Minst=1493 IPC=2.85 mJ=55 pin=0 rdKB=0 fpMB=1069
+[xp] 15:34:06.205 +13.02 dt=265 cpu=273 (thr 273) P=12 E=261 run=281 pgw=-1.0 GHz P=2.69 E=1.63 Minst=1239 IPC=2.71 mJ=56 pin=0 rdKB=0 fpMB=1070
+[xp] 15:34:06.533 +13.35 dt=328 cpu=337 (thr 327) P=4 E=333 run=340 pgw=-1.0 GHz P=1.76 E=1.59 Minst=1523 IPC=2.84 mJ=55 pin=0 rdKB=0 fpMB=1069
+[15:34:06.533] [xp] 15:34:06.533 +13.35 dt=328 cpu=337 (thr 327) P=4 E=333 run=340 pgw=-1.0 GHz P=1.76 E=1.59 Minst=1523 IPC=2.84 mJ=55 pin=0 rdKB=0 fpMB=1069

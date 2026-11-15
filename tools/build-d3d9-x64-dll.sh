@@ -149,6 +149,30 @@ if command -v xcrun > /dev/null 2>&1 && xcrun -sdk macosx metal --version > /dev
     fi
 fi
 
+# madeira-bcd (2026-11-15): DXMT's internal shaders compiled from this tree's dxmt_command.metal with the Metal flags of DXMT's meson
+# build and build/dxmt-ios/build.sh, embedded as dxmt_command_fresh next to upstream's library and loaded instead of it only when the
+# process has MADEIRA_DXMT_FRESH=1 (tools/patch-d3d11-src-metallib.py on a COPY of dxmt_command.cpp, which this DLL then compiles; the
+# tree itself stays as it is). Without a Metal compiler, or if the patch does not apply, the tree's dxmt_command.cpp is compiled as
+# before and the build goes on.
+FRESH_SHADERS=0
+DXMT_COMMAND_CPP="$X/dxmt_command.cpp"
+DXMT_METAL_STD="${DXMT_METAL_STD:-metal3.1}"
+mkdir -p "$OUT/tree/src/dxmt"
+cp "$X/dxmt_command.cpp" "$OUT/tree/src/dxmt/dxmt_command.cpp"
+if command -v xcrun > /dev/null 2>&1 \
+        && (cd "$OUT/gen" && xcrun -sdk macosx metal -std="$DXMT_METAL_STD" --target=air64-apple-macos14.0 \
+                -o dxmt_command_fresh.air -c "$X/dxmt_command.metal" \
+            && xcrun -sdk macosx metallib -o dxmt_command_fresh.metallib dxmt_command_fresh.air \
+            && xxd -n dxmt_command_fresh -i dxmt_command_fresh.metallib dxmt_command_fresh.h) > "$OUT/gen/metal-fresh.log" 2>&1 \
+        && python3 "$R/tools/patch-d3d11-src-metallib.py" "$OUT/tree/src/dxmt/dxmt_command.cpp"; then
+    FRESH_SHADERS=1
+    DXMT_COMMAND_CPP="$OUT/tree/src/dxmt/dxmt_command.cpp"
+    METAL_NOTE="$METAL_NOTE; plus the library compiled from this tree for MADEIRA_DXMT_FRESH=1 ($(wc -c < "$OUT/gen/dxmt_command_fresh.metallib" | tr -d ' ') bytes, -std=$DXMT_METAL_STD)"
+else
+    tail -5 "$OUT/gen/metal-fresh.log" 2> /dev/null || true
+    echo "::warning::DXMT's internal shaders were not compiled from the tree (no Metal compiler, or tools/patch-d3d11-src-metallib.py did not apply): d3d9-dxmt.dll embeds upstream's library only"
+fi
+
 # DXMT's meson.build: compiler_args, the project defines, buildtype=release
 # (-O3, b_ndebug=if-release -> NDEBUG), C++20. -fmacro-prefix-map maps the source root away
 # as meson's '-fmacro-prefix-map=../=' does from its build directory. An arm64ec host is
@@ -177,8 +201,8 @@ compile_one() {  # compile_one <source> <object> <flag set>
         d3d9) inc=("${INC_D3D9[@]}") ;;
     esac
     case "$src" in
-        *.c) "$CC" "${CFLAGS[@]}" -fmacro-prefix-map="$D/=" "${inc[@]}" -c "$src" -o "$obj" ;;
-        *)   "$CXX" "${CXXFLAGS[@]}" -fmacro-prefix-map="$D/=" "${inc[@]}" -c "$src" -o "$obj" ;;
+        *.c) "$CC" "${CFLAGS[@]}" -fmacro-prefix-map="$D/=" -fmacro-prefix-map="$OUT/tree/=" "${inc[@]}" -c "$src" -o "$obj" ;;
+        *)   "$CXX" "${CXXFLAGS[@]}" -fmacro-prefix-map="$D/=" -fmacro-prefix-map="$OUT/tree/=" "${inc[@]}" -c "$src" -o "$obj" ;;
     esac > "$obj.err" 2>&1 || { echo "$src" >> "$OUT/failed"; return 1; }
 }
 run_jobs() {
@@ -224,7 +248,8 @@ for s in "${UTIL_SRC[@]}"; do
     o="$OUT/obj/util_$(obj_name "$s").o"; job "$U/$s" "$o" util; UTIL_OBJ+=("$o")
 done
 for s in "${DXMT_SRC[@]}"; do
-    o="$OUT/obj/dxmt_$s.o"; job "$X/$s.cpp" "$o" dxmt; DXMT_OBJ+=("$o")
+    src="$X/$s.cpp"; [ "$s" = dxmt_command ] && src="$DXMT_COMMAND_CPP"   # madeira-bcd: the copy with [dxmt-shaders], when it applied
+    o="$OUT/obj/dxmt_$s.o"; job "$src" "$o" dxmt; DXMT_OBJ+=("$o")
 done
 for s in "${D3D9_SRC[@]}"; do
     [ -f "$N/$s.cpp" ] || fail "$s.cpp is not in dxmt/src/d3d9: the source list of this script is out of date (src/d3d9/meson.build)"
@@ -290,6 +315,9 @@ if grep -iE '^(dxgi|d3d11|d3d10core|d3d12|opengl32|wined3d)\.dll$' "$OUT/imports
 fi
 LC_ALL=C grep -aqF "$VER" "$OUT/d3d9.dll" || fail "the DXMT version string is not in the result"
 LC_ALL=C grep -aqF "rev=ajan17-ds2" "$OUT/d3d9.dll" || fail "the [fault-dump] report (tools/d3d9-x64-fault-dump.cpp) is not in the result"
+if [ "$FRESH_SHADERS" = 1 ]; then
+    LC_ALL=C grep -aqF "[dxmt-shaders] madeira-bcd" "$OUT/d3d9.dll" || fail "the [dxmt-shaders] switch is not in the result"
+fi
 
 if [ "${D3D9X64_NO_SHIP:-0}" = "1" ]; then
     echo "d3d9.dll built at $OUT/d3d9.dll (not shipped, D3D9X64_NO_SHIP=1; DXMT $VER, $METAL_NOTE)"

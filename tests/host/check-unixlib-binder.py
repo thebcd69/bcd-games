@@ -83,15 +83,18 @@ assert len(dmo) == 1, len(dmo)
 assert dmo[0].split("\n")[0].rstrip().endswith("&& !wow) {"), dmo[0].split("\n")[0]
 assert "funcs64 = (const void *)winedmo_unix_call_funcs;" in dmo[0] and "funcs_wow64" not in dmo[0], dmo[0]
 branches = [b for b in branches if b is not dmo[0]]
-# winevulkan's branch is new too (Windows Vulkan, madeira-bcd; upstream Madeira #400/#462): entered by 64-bit callers only (`!wow`), it offers
-# no wow64 table, so a 32-bit caller falls through to the generic branch, which refuses it loudly. Only a game whose file has vulkan = moltenvk
-# has a winevulkan.dll in its prefix at all (WineProcessBridge.m, bcd_vulkan_session_setup).
+# winevulkan's branch is new too (Windows Vulkan, madeira-bcd; upstream Madeira #400/#462). A 64-bit caller always enters it and gets the
+# 64-bit table. A 32-bit caller enters it only in a session with the vulkan key (ios_vk_session_on: MADEIRA_VULKAN_LIBRARY is set) and gets
+# winevulkan's own wow64 table, whose thunks convert guest pointers (build 660, tools/patch-wine-vulkan-wow64.py; tests/host/
+# check-vulkan-wow64.py); without the key it falls through to the generic branch, which refuses it loudly, as before. Only a game whose file
+# has vulkan = moltenvk has a winevulkan.dll in its prefix at all (WineProcessBridge.m, bcd_vulkan_session_setup).
 vulkan = [b for b in branches if 'strstr(match, "winevulkan")' in b.split("\n")[0]]
 assert len(vulkan) == 1, len(vulkan)
-assert "if (!wow && match &&" in vulkan[0].split("\n")[0], vulkan[0].split("\n")[0]
-assert "funcs64 = (const void *)winevulkan_unix_call_funcs;" in vulkan[0] and "funcs_wow64 = NULL;" in vulkan[0], vulkan[0]
+assert vulkan[0].split("\n")[0] == 'if (match && strstr(match, "winevulkan") && (!wow || ios_vk_session_on())) {', vulkan[0].split("\n")[0]
+assert "funcs64 = (const void *)winevulkan_unix_call_funcs;" in vulkan[0], vulkan[0]
+assert "funcs_wow64 = (const void *)winevulkan_unix_call_wow64_funcs;" in vulkan[0] and "funcs_wow64 = NULL" not in vulkan[0], vulkan[0]
 branches = [b for b in branches if b is not vulkan[0]]
-print("PASS: WineVulkan binds only its native 64-bit Unix table; WoW64 is not advertised")
+print("PASS: WineVulkan binds its 64-bit Unix table for 64-bit callers and its own WoW64 table for 32-bit callers of a session with the key")
 # the real opengl32 branch is new too (OpenGL, madeira-bcd): it is entered only when ios_gl_real_unixlib() says so (the session has
 # gl-backend on, and for a 64-bit module it is not the shipped base-0x7a800000 file), it offers a 32-bit caller opengl32's own
 # wow64 table (never the 64-bit one), and it stands BEFORE upstream's GL-absent stub branch, which stays the compared one below.

@@ -467,7 +467,7 @@ cat = (root / "app/Madeira/ConfigCatalog.generated.swift").read_text()
 check("catalog lists env.MADEIRA_KMT_ADAPTER, off by default",
       re.search(r'key: "env.MADEIRA_KMT_ADAPTER".*kind: \.bool, defaultValue: "0"', cat) is not None)
 check("catalog keeps vram-mb in DXMT with its note",
-      re.search(r'key: "vram-mb".*category: "Direct3D 9/10/11 \(DXMT\)", note: "ml1095: bcd.cfg vram-mb = N"', cat)
+      re.search(r'key: "vram-mb".*category: "Direct3D 9/10/11 \(DXMT\)", note: "ml1095: bcd.cfg vram-mb = N[."]', cat)   # round 660 (M117): the note goes on
       is not None)
 
 print("PASS" if ok else "FAILED")

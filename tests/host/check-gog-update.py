@@ -114,7 +114,7 @@ else:
         shutil.copy(R / "tests/host/gog-update/bcd_main.swift", main)
         engine = [str(CONTENT / f) for f in ["BCDContentPlan.swift", "BCDContentCodec.swift", "BCDContentJournal.swift", "BCDContentFetch.swift",
                                               "BCDContentEngine.swift", "BCDContentQueue.swift", "BCDContentSecrets.swift"]]
-        files = [str(GOG / f) for f in ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift",
+        files = [str(GOG / f) for f in ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGContentV1.swift", "BCDGOGInstall.swift",
                                          "GOGInstallScript.swift", "GOGSetup.swift", "BCDGOGUpdate.swift"]]
         exe = work / "update"
         build = subprocess.run([swiftc, "-swift-version", "5", "-Onone", "-o", str(exe), str(main)] + engine + files, capture_output=True, text=True)

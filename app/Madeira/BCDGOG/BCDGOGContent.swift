@@ -8,12 +8,15 @@ import Foundation
 // own public manifests show it, docs/GOG.md): the newest public build of content system
 // generation 2, its build manifest (zlib JSON), the depots for the game, the language and 64-bit
 // (or neutral) builds, each depot's manifest of files made of chunks (zlib, checked by MD5 before
-// and after unpacking), and the secure links that serve the chunks. Foundation only.
+// and after unpacking), and the secure links that serve the chunks. Foundation only. Build 663: a game whose only public build
+// is of generation 1 is read by BCDGOGContentV1.swift (newest, plan and available hand it over; nothing else here changed).
 
 struct BCDGOGBuild: Equatable {
     var id: String
     var version: String
     var link: URL
+    /// The content system the build is in: 2, or (build 663) 1, whose link is the build's repository (BCDGOGContentV1.swift).
+    var generation = 2
 }
 
 struct BCDGOGBuildManifest {
@@ -142,6 +145,12 @@ enum BCDGOGContent {
             let version = ((item["version_name"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             return BCDGOGBuild(id: id, version: String(version.prefix(80)), link: link)
         }
+        // Round 660 (M040; the GOG generation-1 case of the round's logs): the shape of a list with no public generation-2 build, in counts only,
+        // so the next log says whether the game has only the old content system or only branches.
+        let gens = items.map { ($0["generation"] as? NSNumber)?.intValue ?? 0 }
+        let branches = items.filter { !($0["branch"] == nil || $0["branch"] is NSNull) }.count
+        BCDContentLog.write("[gog-content] no public generation-2 build: items=\(items.count) gen1=\(gens.filter { $0 == 1 }.count) "
+                            + "gen2=\(gens.filter { $0 == 2 }.count) branches=\(branches)")
         throw older ? BCDGOGError.olderBuildsOnly : BCDGOGError.noWindowsBuild
     }
 
@@ -382,7 +391,13 @@ enum BCDGOGContent {
 
     /// The newest public build of a product.
     static func newest(_ id: String, fetch: Fetch) async throws -> BCDGOGBuild {
-        try newestBuild(await fetch(buildsURL(id), true))
+        let object = try await fetch(buildsURL(id), true)
+        do {
+            return try newestBuild(object)
+        } catch BCDGOGError.olderBuildsOnly {
+            // Build 663: no public generation-2 build, but a public generation-1 one (Return to Castle Wolfenstein): read it.
+            return try newestBuildV1(object)
+        }
     }
 
     // MARK: DLC and updates
@@ -426,6 +441,9 @@ enum BCDGOGContent {
         guard dlc else { return nil }
         let owned = try await owned(fetch: fetch, required: true)
         guard owned.contains(where: { $0 != product }) else { return nil }
+        if build.generation == 1 {   // build 663: the DLC of a generation-1 build, from its repository
+            return try await availableDLCV1(product: product, build: build, depots: installed, language: language, owned: owned, fetch: fetch)
+        }
         let manifest = try parseBuildManifest(await fetch(build.link, false))
         let wanted = depots(manifest, products: Set([product]).union(owned), language: language)
         let have = Set(installed)
@@ -462,6 +480,10 @@ enum BCDGOGContent {
     static func plan(_ key: BCDContentKey, title: String, build: BCDGOGBuild, preferred: [String], containers: Bool,
                      redistributables: Bool = false, hasMsiexec: Bool = false, ownedDLC: Set<String> = [], current: Current? = nil,
                      fetch: Fetch) async throws -> (plan: BCDContentPlan, info: BCDGOGPlanInfo) {
+        if build.generation == 1 {   // build 663: GOG's older content system (BCDGOGContentV1.swift); generation 2 goes on below as before
+            return try await planV1(key, title: title, build: build, preferred: preferred, redistributables: redistributables,
+                                    hasMsiexec: hasMsiexec, ownedDLC: ownedDLC, current: current, fetch: fetch)
+        }
         let manifest = try parseBuildManifest(await fetch(build.link, false))
         let products: Set<String> = Set([key.id]).union(ownedDLC.filter { $0 != key.id && BCDGOGCatalog.validID($0) })
         // The game's own depots decide the language (a DLC with another language list must not change it).
@@ -518,7 +540,13 @@ enum BCDGOGContent {
             total.current += added.current
             total.currentBytes += added.currentBytes
         }
-        let supportKept = addSupportFiles(total.kept, to: &builder, isCurrent: isCurrent)
+        // Build 663 (agent K7G's finding): in an update or a repair a game file that is right already is not in the builder, so a support
+        // app/ file of the same path was laid over it; the depots' own list is asked, as generation 1 does (an install has every game file
+        // in the builder, and addSupportFiles' own test keeps the game's file there).
+        let listed = Set(total.seen)
+        let kept = total.kept.filter { !listed.contains(BCDContentPaths.fold($0.path)) }
+        total.support += total.kept.count - kept.count
+        let supportKept = addSupportFiles(kept, to: &builder, isCurrent: isCurrent)
         total.support += supportKept.skipped
         var setup: GOGSetup.Plan?
         if redistributables, !manifest.dependencies.isEmpty {

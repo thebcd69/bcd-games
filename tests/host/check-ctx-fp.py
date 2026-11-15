@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Copyright 2026 Henry Morin. This file was taken from https://github.com/willfaust/Madeira (pull request #556)
-# under GPL-3.0-or-later with the Madeira Converter Exception. See THIRD-PARTY-NOTICES.md.
+# Copyright 2026 Henry Morin and 125hz. This file was taken from https://github.com/willfaust/Madeira (pull request #556 and
+# commit 18fcffa) under GPL-3.0-or-later with the Madeira Converter Exception. See THIRD-PARTY-NOTICES.md.
 """Vector registers in a cross-thread context (build/wineserver/mach_ios.c); no Wine runs.
 
 The server's Mach capture read only ARM_THREAD_STATE64, so every cross-thread GetThreadContext
@@ -54,7 +54,10 @@ fill = function(src, "int ios_fill_thread_context(")
 neon = fill.index("thread_get_state( port, ARM_NEON_STATE64")
 assert fill.index("thread_suspend( port )") < fill.index("thread_get_state( port, ARM_THREAD_STATE64") < neon
 assert neon < fill.index("f + IOS_SCF_V") < fill.rindex("thread_resume( port );")
-assert "if (have_native && ios_ctx_fp_enabled())" in fill[:neon]
+# Round 660 (M001): the switch is read before the halt (a config read while the target is suspended can wait on a lock it holds),
+# and the capture tests the value read then.
+assert "ctx_fp = ios_ctx_fp_enabled();" in fill[:fill.index("thread_suspend( port )")]
+assert "if (have_native && ctx_fp)" in fill[:neon]
 assert "(native->flags & SERVER_CTX_FLOATING_POINT)" in fill[neon:fill.index("f + IOS_SCF_V")]
 assert "native->flags |= SERVER_CTX_FLOATING_POINT;" in fill
 print("PASS: the vector capture is gated by MADEIRA_CTX_FP, runs while the thread is halted, and the "
@@ -72,16 +75,25 @@ static int madeira_cfg_get(const char *key, char *buf, size_t cap)
     snprintf(buf, cap, "%s", cfg_value);
     return 1;
 }
+/* the server's clock: the answer is kept for a second, so the checks step it */
+typedef long long timeout_t;
+#define TICKS_PER_SEC 10000000
+static timeout_t monotonic_time;
 """ + switch + r"""
 #define CHECK(x) do { if (!(x)) { printf("failed line %d: %s\n", __LINE__, #x); return 1; } } while (0)
+#define LATER (monotonic_time += TICKS_PER_SEC)
 int main(void)
 {
     unsetenv("MADEIRA_CTX_FP");
     CHECK(ios_ctx_fp_enabled());
-    setenv("MADEIRA_CTX_FP", "1", 1); CHECK(ios_ctx_fp_enabled());
-    setenv("MADEIRA_CTX_FP", "0", 1); CHECK(!ios_ctx_fp_enabled());
-    cfg_value = "1"; CHECK(ios_ctx_fp_enabled());
-    unsetenv("MADEIRA_CTX_FP"); cfg_value = "0"; CHECK(!ios_ctx_fp_enabled());
+    LATER; setenv("MADEIRA_CTX_FP", "1", 1); CHECK(ios_ctx_fp_enabled());
+    LATER; setenv("MADEIRA_CTX_FP", "0", 1); CHECK(!ios_ctx_fp_enabled());
+    /* within the second the kept answer stands: no file read for a program that captures often */
+    setenv("MADEIRA_CTX_FP", "1", 1); CHECK(!ios_ctx_fp_enabled());
+    LATER; CHECK(ios_ctx_fp_enabled());
+    LATER; cfg_value = "0"; CHECK(!ios_ctx_fp_enabled());
+    LATER; cfg_value = "1"; setenv("MADEIRA_CTX_FP", "0", 1); CHECK(ios_ctx_fp_enabled());
+    LATER; unsetenv("MADEIRA_CTX_FP"); cfg_value = "0"; CHECK(!ios_ctx_fp_enabled());
     return 0;
 }
 """

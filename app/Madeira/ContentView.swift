@@ -1410,6 +1410,12 @@ struct ContentView: View {
     /// applies the entry's launch profile and runs the same full sequence as the
     /// developer interface's buttons.
     private func launchLibraryEntry(_ entry: LibraryEntry) {
+        // Round 660 (M140, owner 2026-11-15): a game whose earlier session ended unclean and whose verdict is still being written waits for
+        // it first, off the main thread and at most 5 s, then comes back here once (AutoTune.holdPlayForVerdict); any other Play goes on.
+        let spinner: (Bool) -> Void = { on in   // the Play button's spinner; the JIT step after the wait sets it again when JIT is off
+            if on { library.startingJIT = entry.id } else if library.startingJIT == entry.id { library.startingJIT = nil }
+        }
+        if AutoTune.holdPlayForVerdict(entry, spinner: spinner, then: { launchLibraryEntry(entry) }) { return }
         // A game on an external drive (Settings › Storage › External drives): when the drive is not open, its saved folder is
         // opened again without the picker; if the program is still out of reach, say so. Nothing here for any other game.
         if let drive = ExternalDrives.driveName(library: entry.relativePath) {
@@ -1513,6 +1519,11 @@ struct ContentView: View {
         guard entry.launchWindowsPath.utf8.count < 1024, entry.launchArguments.utf8.count < 4096 else {
             library.error = "The program path or its launch arguments are longer than BCD allows."; return
         }
+        // madeira-bcd (GOG Galaxy features, per game and off by default: env.BCD_GOG_GALAXY; BCDGOG/Galaxy/BCDGOGGalaxy.swift): a GOG game BCD installed
+        // whose switch is on gets BCD's answer on the Galaxy SDK's local port while it runs. The first such start of a build reads the game's
+        // Galaxy client from GOG first and runs this start again. Any other start goes straight on and opens nothing.
+        let galaxyEntry = entry
+        guard BCDGOGGalaxy.shared.preLaunch(galaxyEntry, retry: { startLibraryEntry(galaxyEntry) }) else { return }
         entry.configureLaunch()
         if BCDEpic.enabled { BCDEpic.shared.applyLaunch(entry) }   // madeira-bcd (2026-10-22): an Epic game's signed-in start goes through BCD Host (BCDEpicStart.swift)
         // madeira-bcd: the game's own options (LibraryBCD.swift); this run's
@@ -1630,7 +1641,7 @@ struct ContentView: View {
         }
 
         // Night round 2026-11-11 (M7): the JIT method as the main thread reads it (the pool request's log fields and its caption rule use it).
-        StikJITHelper.noteRequestMethod(jitCoordinator.resolvedMethod)
+        StikJITHelper.noteRequestMethod(jitCoordinator.requestMethod)   // round 660 (M138): the method that attached, not the one an attach would use
 
         // Pause UI flushing — prevents ALL SwiftUI re-renders during Wine execution,
         // so zero main thread hang time accumulates while debugger is attached

@@ -53,6 +53,12 @@ check("...stays off when the library or a DLL is missing, and removes only links
       'access([stack stringByAppendingPathComponent:@"winevulkan.dll"].fileSystemRepresentation, R_OK) != 0' in setup
       and '[dest rangeOfString:@"/vulkan/arm64ec-windows/"].location != NSNotFound' in setup, setup[:1500])
 call = bridge.find("bcd_vulkan_session_setup(fm, prefix, bundlePath, use_arm64ec);")
+# Round 660 (M007): the real winevulkan.dll / vulkan-1.dll go into system32 AND sysx64 in every session. A Dock or library session starts
+# explorer.exe from the aarch64 bundle (use_arm64ec NO); with sysx64 alone the game's x64 process found the farm's 122,880-byte stand-in in
+# system32 first and got no Vulkan (skate. EBRECM, P9ZRP4, Q4D2RJ, GP8RY2).
+check("the Vulkan links go into system32 and sysx64 in every session, whatever the bundle of the session's first program",
+      'NSArray<NSString *> *dirs = @[@"system32", @"sysx64"];' in setup and "use_arm64ec ? @[" not in setup
+      and "Vulkan DLL links in \"\n            \"system32 + sysx64 for x64 programs" in setup, setup[:1500])
 check("...is decided after the OpenGL key (after the farm passes) and cleared at the session's end",
       0 < bridge.find("bcd_gl_session_setup(bundlePath);") < call
       and 'unsetenv("MADEIRA_VULKAN_LIBRARY");   /* madeira-bcd (Windows Vulkan): likewise' in body(bridge, "static void wine_session_end(void)\n{"))
@@ -65,7 +71,7 @@ check("a downloaded list may set vulkan only to moltenvk",
 gen = (root / "build/tools/gen-config-catalog.py").read_text()
 catalog = (root / "app/Madeira/ConfigCatalog.generated.swift").read_text()
 check("the settings catalog has the vulkan key, off by default, with moltenvk as its one choice",
-      '"vulkan": {"category": "Graphics", "title": "Vulkan for this game (x64)", "kind": "choice", "default": "",' in gen
+      '"vulkan": {"category": "Graphics", "title": "Vulkan for this game", "kind": "choice", "default": "",' in gen
       and '("moltenvk", "Vulkan on Metal (MoltenVK)")' in gen and 'ConfigOption(key: "vulkan"' in catalog)
 check("...and its two environment names (the library the app exports, Madeira's present switch), both curated",
       '"env.MADEIRA_VULKAN_LIBRARY": {' in gen and '"env.MADEIRA_VK_HOST_SUBOPTIMAL": {' in gen
@@ -109,7 +115,7 @@ check("CI builds the two DLLs after the extra Wine DLLs, verifies the pieces aft
       and all(("python3 tests/host/%s" % t) in ci for t in ("check-vulkan-opt-in.py", "check-vulkan-surface.py", "check-vk-surface-query.py",
                                                            "check-vulkan-layer-geometry.py", "check-vulkan-bcd.py", "check-unixlib-binder.py")))
 check("CI checks libntdll_unix.a defines winevulkan's unix table and that its objects are not empty",
-      "opengl32_unix_call_funcs opengl32_unix_call_wow64_funcs winevulkan_unix_call_funcs; do" in ci
+      "opengl32_unix_call_funcs opengl32_unix_call_wow64_funcs winevulkan_unix_call_funcs winevulkan_unix_call_wow64_funcs; do" in ci
       and "opengl32_wgl opengl32_thunks winevulkan_vulkan winevulkan_thunks; do" in ci)
 
 # the Wine patch, on a copy (never on the tree)

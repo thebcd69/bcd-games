@@ -3,6 +3,8 @@
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
 // Portions copyright 2026 llamajose: code taken from https://github.com/willfaust/Madeira (commit d6857d5)
 // under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 NevesHenry: code taken from https://github.com/willfaust/Madeira (pull request #604)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). The protobuf
@@ -163,7 +165,11 @@ struct ProtobufDecoder {
         guard let wireType = ProtoWireType(rawValue: wireTypeRaw) else {
             throw SteamError.protobufError("unknown field type \(wireTypeRaw)")
         }
-        return (fieldNumber: UInt32(tag >> 3), wireType: wireType)
+        // Tags come from the network: a field number past 32 bits must throw, not trap.
+        guard let fieldNumber = UInt32(exactly: tag >> 3) else {
+            throw SteamError.protobufError("a field number is out of range")
+        }
+        return (fieldNumber: fieldNumber, wireType: wireType)
     }
 
     /// A length prefix, checked against the bytes that remain. Lengths come

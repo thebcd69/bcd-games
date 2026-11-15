@@ -84,6 +84,10 @@ struct BCDContentChunk: Codable, Hashable {
     var fetchDigest: BCDDigest?
     var digest: BCDDigest?
     var codec: BCDChunkCodec
+    /// Build 663: the chunk is the bytes [rangeStart, rangeStart + fetchSize) of the file its addresses name, asked for with an
+    /// HTTP Range (GOG's generation 1, where every game file is a slice of one main.bin per product). nil: the whole answer is the
+    /// chunk, as for every chunk before; such a chunk's identity line and saved form are what they were. Stored chunks only.
+    var rangeStart: Int64? = nil
 }
 
 /// A slice of a chunk's decoded bytes and where it goes in a file.
@@ -290,7 +294,9 @@ struct BCDContentPlan: Codable {
         for directory in directories { add("D \(directory)") }
         for file in files { add("F \(file.path)\t\(file.size)\t\(file.digest?.description ?? "-")") }
         for chunk in chunks {
-            add("C \(chunk.group)\t\(chunk.locator)\t\(chunk.fetchSize)\t\(chunk.size)\t\(chunk.fetchDigest?.description ?? "-")\t\(chunk.digest?.description ?? "-")\t\(chunk.codec.rawValue)")
+            // A ranged chunk's line gains its start; every other line is the one it always was (a saved plan keeps its identity).
+            let range = chunk.rangeStart.map { "\tR\($0)" } ?? ""
+            add("C \(chunk.group)\t\(chunk.locator)\t\(chunk.fetchSize)\t\(chunk.size)\t\(chunk.fetchDigest?.description ?? "-")\t\(chunk.digest?.description ?? "-")\t\(chunk.codec.rawValue)" + range)
         }
         for part in parts { add("P \(part.chunk) \(part.chunkOffset) \(part.length) \(part.file) \(part.fileOffset)") }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
@@ -314,6 +320,9 @@ struct BCDContentPlan: Codable {
             guard chunk.size > 0, chunk.fetchSize > 0, chunk.size <= 1 << 30, chunk.fetchSize <= 1 << 30,
                   chunk.codec != .stored || chunk.size == chunk.fetchSize, !chunk.locator.isEmpty else {
                 throw BCDContentError.badPlan("chunk")
+            }
+            if let start = chunk.rangeStart {
+                guard chunk.codec == .stored, start >= 0, start <= 1 << 50 else { throw BCDContentError.badPlan("chunk range") }
             }
         }
         var lastChunk = -1, lastOffset: Int64 = -1

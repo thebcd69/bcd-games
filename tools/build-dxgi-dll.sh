@@ -151,6 +151,14 @@ compile "$D/src/dxmt/dxmt_format.cpp" "$OUT/obj/dxmt_format.o"
 for s in dxgi_options dxgi; do
     compile "$G/$s.cpp" "$OUT/obj/$s.o"
 done
+# madeira-bcd (upstream merge 2026-11-14, willfaust/dxmt 91cf47a3): dxgi_factory.cpp hands a Direct3D 12 queue that presents through
+# Vulkan (vkd3d-proton) to CreateVkSwapChain, which lives in dxgi_swapchain_vk.cpp (dxgi_src in src/dxgi/meson.build). A pin without
+# the file builds as before.
+VK_OBJ=""
+if [ -f "$G/dxgi_swapchain_vk.cpp" ]; then
+    compile "$G/dxgi_swapchain_vk.cpp" "$OUT/obj/dxgi_swapchain_vk.o"
+    VK_OBJ="$OUT/obj/dxgi_swapchain_vk.o"
+fi
 compile "$G/dxgi_output.cpp" "$OUT/obj/dxgi_output_plain.o"
 compile "$OUT/src/dxgi_output.cpp" "$OUT/obj/dxgi_output.o"
 compile "$G/dxgi_adapter.cpp" "$OUT/obj/dxgi_adapter_plain.o"
@@ -165,7 +173,7 @@ compile "$OUT/src/dxgi_factory.cpp" "$OUT/obj/dxgi_factory.o" "-DMADEIRA_DXGI_SR
 # (cpp_winlibs; gdi32 has D3DKMTOpenAdapterFromLuid).
 link_dll() {  # link_dll <factory object> <output> <adapter object> <output-class object>
     "$CXX" -shared -o "$2" \
-        "$3" "$1" "$4" "$OUT/obj/dxgi_options.o" "$OUT/obj/dxgi.o" \
+        "$3" "$1" "$4" "$OUT/obj/dxgi_options.o" ${VK_OBJ:+"$VK_OBJ"} "$OUT/obj/dxgi.o" \
         "$OUT/obj/version.o" "$G/dxgi.def" \
         "$OUT/libdxmt.a" "$OUT/libutil.a" -L"$OUT" -lwinemetal -lntdll \
         -static -Wl,--file-alignment=4096 \

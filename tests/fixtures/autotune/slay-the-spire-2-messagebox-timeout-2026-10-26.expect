@@ -1,0 +1,18 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "godot-d3d12-composition-swapchain",
+  "dotnet-gc-region-range-hostfxr",
+  "messagebox-timeout-ignored"
+ ],
+ "next": [
+  "env.MADEIRA_DXGI_SRC = 1",
+  "env.MADEIRA_DXGI_COMPOSITION = 1",
+  "env.MADEIRA_OPTIN_DLLS = dcomp"
+ ],
+ "note": "Round 660 M106, round 2026-11-15: Slay the Spire 2 (Send Log CGEZSY, build 611): the 64-bit user32.dll logs 'MessageBoxTimeoutA timeout not supported' (a box that should close itself); the session crashed in Godot's composition swap chain, whose rules come first, and messagebox-timeout-ignored is the third match (the rebuilt 64-bit set closes the box). Ultimate Chicken Horse (8X921R, build 653) shows the same line in a session the player ended, which auto-tune reads as 'ran'.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

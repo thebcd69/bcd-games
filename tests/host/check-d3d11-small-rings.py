@@ -316,7 +316,10 @@ else:
         check("second run: already patched, file unchanged",
               rc == 0 and "already patched" in out and (copy / "dxmt_ring_bump_allocator.hpp").read_text() == once)
         check("the ring asks ring_block_size() for its block size everywhere it used BlockSize",
-              src.count("ring_block_size()") == 7
+              # the definition and six uses; one more in free_blocks_keep_first where the pin has DXMT_CMDLIST_KEEP_BLOCK
+              # (willfaust/dxmt a4d8ab22, upstream merge 2026-11-14), which compares a block with the ring's size the same way
+              src.count("ring_block_size()") == 7 + ("free_blocks_keep_first()" in src)
+              and ("free_blocks_keep_first()" not in src or "if (first.total_size == ring_block_size() && !first.reusable_oversize) {" in src)
               and "static size_t\n  ring_block_size() {\n    return madeiraRingBlockSize(BlockSize);" in src
               and ".total_size = ring_block_size()," in src and ".block = allocator_.allocate(ring_block_size())," in src
               and "std::max(size, ring_block_size())" in src
@@ -409,7 +412,7 @@ check("build script: a patch that does not apply only warns; d3d11-src.dll is st
                 r'    echo "::warning::tools/patch-d3d11-src-small-rings\.py did not apply', sh) is not None)
 cmp = sh[sh.index("compile_one() {"):sh.index("\n}\n", sh.index("compile_one() {"))]
 check("each object includes the dxmt headers of its own root (no fixed $X in compile_one)",
-      'dxmt)   inc=(-I"$root/src/dxmt" "${INC_DXMT[@]}") ;;' in cmp
+      'dxmt)   inc=(-I"$root/src/dxmt" ' in cmp and '"${INC_DXMT[@]}") ;;' in cmp   # 2026-11-15: and the root's util before it
       and '-I"$root/src/d3d11" -I"$G" -I"$root/src/dxmt"' in cmp and '-I"$X"' not in cmp
       and re.search(r'INC_DXMT=\([^)]*-I"\$X"', sh) is None)
 check("the DXMT core is compiled from the submodule and from the copy",

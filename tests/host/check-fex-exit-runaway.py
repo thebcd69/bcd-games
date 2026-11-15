@@ -10,8 +10,9 @@ Checks (FEX tree: FEX_SRC, default ~/madeira-bcd/FEX; that part is skipped witho
 Core.cpp after the Mono opt-in patch (the build's order), a second run says "already in" and changes nothing, a moved anchor refuses
 it; the declarations sit at file scope right before ContextImpl::CompileBlock, the stop is the first thing inside the host-address
 gate and only under FEX_IOS_HOST and _WIN32; nothing else changes. The stop block, cut from the patched file and compiled on the host
-with stub RtlDllShutdownInProgress/NtTerminateProcess/LogMan: outside a shutdown 1,000 hits end nothing; in a shutdown the 63rd hit
-ends nothing, the 64th ends the process once with 0xC000010A and logs one line. The ARM64EC build applies it without failing the
+with stub RtlDllShutdownInProgress/NtTerminateProcess/LogMan: outside a shutdown 1,000 hits end nothing; in a shutdown the first hit
+ends the process once with 0xC000010A and logs one line, and later hits end nothing more (round 660: Football Manager 27's spin
+reached the gate once and then ran its block from the cache, 06G98C). The ARM64EC build applies it without failing the
 build and restores Core.cpp; CI runs this check.
 """
 from pathlib import Path
@@ -97,14 +98,13 @@ int main() {
   for (int i = 0; i < 1000; i++) gate(0x7c2be10000ull);
   if (g_ends || g_logs) { std::puts("FAIL: outside a shutdown the gate ended the process"); return 1; }
   g_shutdown = true;
-  /* the counter is shared: the 1,000 hits above did not count (the stop counts only while the loader shuts down) */
-  for (int i = 0; i < 63; i++) gate(0x7c2be10000ull);
-  if (g_ends) { std::puts("FAIL: ended before the 64th hit"); return 1; }
+  /* the counter is shared: the 1,000 hits above did not count (the stop counts only while the loader shuts down); one hit in a
+   * shutdown is enough (v2, round 660: a spin that runs its block from the cache reaches the gate once) */
   gate(0x7c2be10000ull);
   if (g_ends != 1 || g_status != (int32_t)0xC000010A || g_logs != 1) { std::printf("FAIL: ends=%d status=%x logs=%d\n", g_ends, g_status, g_logs); return 1; }
   for (int i = 0; i < 100; i++) gate(0x7c2be10000ull);
   if (g_ends != 1 || g_logs != 1) { std::puts("FAIL: more than one end"); return 1; }
-  std::puts("ok: no end outside a shutdown; in one, the 64th hit ends the process once with STATUS_PROCESS_IS_TERMINATING");
+  std::puts("ok: no end outside a shutdown; in one, the first hit ends the process once with STATUS_PROCESS_IS_TERMINATING");
   return 0;
 }
 '''

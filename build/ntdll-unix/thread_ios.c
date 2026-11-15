@@ -1485,11 +1485,12 @@ static void ios_eco_prio_note( HANDLE handle, LONG priority )
  * changes: madeira_guest_qos_self passes the class through untouched. */
 #define TQ_MAX_RULES   32
 #define TQ_MAX_THREADS 512
-struct tq_rule { char pat[64]; qos_class_t cls; };
+struct tq_rule { char pat[64]; qos_class_t cls; char exe; };   /* exe: an "exe:<program>" rule (build 663) */
 struct tq_thread { unsigned tid; qos_class_t cls; char name[48]; };
 static struct tq_rule tq_rules[TQ_MAX_RULES];
 static int tq_nrules;
 static int tq_on;
+static int tq_have_exe;   /* build 663: at least one "exe:" rule */
 static pthread_once_t tq_once = PTHREAD_ONCE_INIT;
 static pthread_mutex_t tq_lock = PTHREAD_MUTEX_INITIALIZER;
 static struct tq_thread tq_threads[TQ_MAX_THREADS];   /* tid 0 = free slot */
@@ -1566,6 +1567,18 @@ static void tq_init_once(void)
             dprintf( 2, "[thread-qos] ignored rule \"%s=%s\": unknown class\n", pat, cls );
             continue;
         }
+        /* build 663: "exe:<program>=class" names a Windows program (its file name, letter case aside) instead of a thread: every
+         * thread of that program runs at the class unless a thread-name rule matches it. */
+        if (!strncmp( pat, "exe:", 4 ))
+        {
+            char *q;
+            pat += 4;
+            if (!*pat) continue;
+            for (q = pat; *q; q++) if (*q >= 'A' && *q <= 'Z') *q += 'a' - 'A';
+            tq_rules[tq_nrules].exe = 1;
+            tq_have_exe = 1;
+        }
+        else tq_rules[tq_nrules].exe = 0;
         strcpy( tq_rules[tq_nrules].pat, pat );
         tq_rules[tq_nrules++].cls = c;
     }
@@ -1627,6 +1640,22 @@ static int tq_store( unsigned tid, qos_class_t cls, const char *name )
     return changed;
 }
 
+/* build 663: the class of the first "exe:" rule whose pattern matches the program's file name (letter case aside); 0 = none.
+ * For a program that runs beside the game and needs no performance core: Rockstar's Launcher.exe and SocialClubHelper.exe beside
+ * RDR2 and GTA V (exe:Launcher.exe=utility;exe:SocialClubHelper.exe=utility). */
+static qos_class_t tq_exe_class( const char *exe )
+{
+    char low[64];
+    int i;
+    for (i = 0; exe[i] && i < (int)sizeof(low) - 1; i++) low[i] = (exe[i] >= 'A' && exe[i] <= 'Z') ? exe[i] + ('a' - 'A') : exe[i];
+    low[i] = 0;
+    for (i = 0; i < tq_nrules; i++)
+        if (tq_rules[i].exe && tq_glob( tq_rules[i].pat, low )) return tq_rules[i].cls;
+    return QOS_CLASS_UNSPECIFIED;
+}
+
+static void tq_process_exe( char *out, size_t size );   /* this thread's Windows program, its file name (below the cut of the host check) */
+
 /* sync.c's ios_eco_apply_self calls this in place of pthread_set_qos_class_self_np */
 int madeira_guest_qos_self( qos_class_t cls, int rel )
 {
@@ -1655,18 +1684,43 @@ int madeira_guest_qos_self( qos_class_t cls, int rel )
     return pthread_set_qos_class_self_np( cls, rel );
 }
 
-/* start_thread, once the TEB is published: a thread named before it ran */
+/* start_thread, once the TEB is published: a thread named before it ran, or (build 663) one of a program an "exe:" rule names */
 static void ios_thread_qos_start( unsigned tid )
 {
     extern void ios_eco_apply_self(void);
     tq_self_tid = tid;
-    if (tq_enabled() && tq_lookup( tid, NULL )) ios_eco_apply_self();
+    if (!tq_enabled()) return;
+    if (tq_have_exe && !tq_lookup( tid, NULL ))
+    {
+        char exe[64];
+        qos_class_t c;
+        tq_process_exe( exe, sizeof(exe) );
+        if (exe[0] && (c = tq_exe_class( exe ))) tq_store( tid, c, exe );
+    }
+    if (tq_lookup( tid, NULL )) ios_eco_apply_self();
 }
 
 /* thread exit: a reused tid must not inherit the class */
 void ios_thread_qos_exit( unsigned tid )
 {
     if (tq_enabled()) tq_store( tid, QOS_CLASS_UNSPECIFIED, NULL );
+}
+
+/* build 663: the file name of the calling thread's Windows program (ImagePathName's last part, ASCII; "" when unknown) */
+static void tq_process_exe( char *out, size_t size )
+{
+    const RTL_USER_PROCESS_PARAMETERS *params = NtCurrentTeb()->Peb ? NtCurrentTeb()->Peb->ProcessParameters : NULL;
+    const WCHAR *path, *start;
+    size_t len, i, n = 0;
+
+    out[0] = 0;
+    if (!params || !params->ImagePathName.Buffer || !params->ImagePathName.Length) return;
+    path = params->ImagePathName.Buffer;
+    len = params->ImagePathName.Length / sizeof(WCHAR);
+    start = path;
+    for (i = 0; i < len; i++) if (path[i] == '\\' || path[i] == '/') start = path + i + 1;
+    for (; start < path + len && n + 1 < size; start++) out[n++] = (*start < 0x80) ? (char)*start : '?';
+    out[n] = 0;
 }
 
 /* set_native_thread_name */
@@ -1677,6 +1731,7 @@ static void ios_thread_qos_named( HANDLE handle, const char *name )
     unsigned self, tid = 0;
     qos_class_t cls = QOS_CLASS_UNSPECIFIED;
     int i, changed;
+    char exe[64];   /* build 663: the program's file name for an "exe:" rule */
 
     if (!tq_enabled()) return;
     self = (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread;
@@ -1693,7 +1748,15 @@ static void ios_thread_qos_named( HANDLE handle, const char *name )
     }
     if (!tid) return;
     for (i = 0; i < tq_nrules; i++)
-        if (tq_glob( tq_rules[i].pat, name )) { cls = tq_rules[i].cls; break; }
+        if (!tq_rules[i].exe && tq_glob( tq_rules[i].pat, name )) { cls = tq_rules[i].cls; break; }
+    /* build 663: a name no rule matches leaves a thread of an "exe:" program at that program's class (its own process's; a thread
+     * named by another one keeps what it has) */
+    if (!cls && tq_have_exe)
+    {
+        if (tid != self) return;
+        tq_process_exe( exe, sizeof(exe) );
+        if (exe[0] && (cls = tq_exe_class( exe ))) name = exe;
+    }
     changed = tq_store( tid, cls, name );
     if (tid == self)
     {

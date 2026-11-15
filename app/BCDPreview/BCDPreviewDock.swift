@@ -7,7 +7,7 @@ import SwiftUI
 
 /// Settings › BCD Dock on sample data, for the preview app. Variants (-BCDTab
 /// settings-dock-<variant>): none (ready, two games with one-time installs), "new" (no client
-/// files, nobody signed in), "downloading".
+/// files, nobody signed in), "downloading", "newer" (ready on the January 2026 client with the newer one chosen: the Switch button).
 @MainActor final class BCDPreviewDockBackend: BCDDockBackend {
     @Published private(set) var state: BCDDockSectionState
 
@@ -26,6 +26,8 @@ import SwiftUI
         default:
             s.accountName = "player"
             s.components.installed = true
+            s.components.installedBuild = 202601
+            if variant == "newer" { s.components.chosenBuild = 202609; s.components.downloadBytes = 66_368_576 }
             s.games = [
                 BCDDockGame(id: 271590, name: "Grand Theft Auto V Legacy", installed: true),
                 BCDDockGame(id: 367520, name: "Hollow Knight", installed: true),
@@ -49,6 +51,7 @@ import SwiftUI
         state.components.steps = 4
     }
     func replaceComponents() { downloadComponents() }
+    func setNewerClient(_ on: Bool) { state.components.chosenBuild = on ? 202609 : 202601 }
     func start(_ appID: Int) {
         let name = state.games.first { $0.id == appID }?.name ?? "the game"
         state.lastResult = "Sample: starting \(name) through BCD Dock."

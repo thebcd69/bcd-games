@@ -10,7 +10,9 @@ game froze. The watchdog logged (malloc, Swift) with its thread suspended.
 
 This check reads build/ntdll-unix/server_ios.c, finds every thread_suspend and
 the standalone thread_resume that closes its window, and fails when the window
-calls anything that can take a lock.
+calls anything that can take a lock. It does the same for the Windows server's two
+captures in build/wineserver/mach_ios.c (round 660), where a getenv or an fprintf
+inside the halt froze the server (Requiem, Counter-Strike Nexon).
 """
 import re
 import sys
@@ -97,6 +99,50 @@ def main():
         'watchdog: resume before logging'
     assert seg.count('thread_resume(') == 1, 'watchdog: exactly one resume'
     print(f'suspend windows: {len(found)} checked, none takes a lock')
+    check_server_captures()
+
+
+# madeira-bcd (round 660, M001): the Windows server's own captures (build/wineserver/mach_ios.c). Wine's threads are threads of
+# this process, so a getenv (the environment lock), a config file read, an fprintf (stdio's lock) or a malloc while a thread is
+# halted waits for ever when the halted thread holds that lock, and the server stops with it: Requiem 643J42, 66HCT0, AJEJWV and
+# Counter-Strike Nexon YK0CTE froze with the server thread in getenv under ios_fill_thread_context. The persistent hold of
+# ios_thread_mach_hold is not a momentary halt and is not checked here.
+MACH = ROOT / 'build/wineserver/mach_ios.c'
+MACH_FORBIDDEN = FORBIDDEN + ('getenv', 'madeira_cfg_get', 'ios_ctx_fp_enabled(', 'ios_real_suspend_enabled(', 'rs_flag_ok(',
+                              'ios_real_suspend_stats(', 'rs_tick(')
+MACH_FUNCTIONS = ('int ios_fill_thread_context(', 'int ios_apply_resume_context(')
+
+
+def check_server_captures(path=MACH):
+    raw = path.read_text()
+    code = strip_comments(raw)
+    bad = []
+    for head in MACH_FUNCTIONS:
+        start = code.find(head)
+        if start < 0:
+            raise SystemExit(f'{path.name}: {head} not found')
+        body = code[start:code.index('\n}\n', start)]
+        lines = body.splitlines()
+        s = next((i for i, l in enumerate(lines) if CALL.search(l)), None)
+        r = next((i for i in range(len(lines) - 1, -1, -1) if RESUME.match(lines[i])), None) if s is not None else None
+        if s is None or r is None or r <= s:
+            raise SystemExit(f'{path.name}: {head} has no thread_suspend ... thread_resume window')
+        for n in range(s, r):
+            text = lines[n][CALL.search(lines[n]).end():] if n == s else lines[n]
+            for f in MACH_FORBIDDEN:
+                if f in text:
+                    bad.append(f'{path.name}: {head.split("(")[0].split()[-1]}: {f} inside the halt: {text.strip()[:90]}')
+    if bad:
+        raise SystemExit('\n'.join(bad))
+    fill = code[code.find(MACH_FUNCTIONS[0]):]
+    fill = fill[:fill.index('\n}\n')]
+    halt = fill.index('if (thread_suspend( port ))')
+    assert fill.index('ctx_fp = ios_ctx_fp_enabled();') < halt and fill.index('keep_hold = ios_pending_persistent_hold == thread') < halt, \
+        'ios_fill_thread_context: the switches are read before the halt'
+    assert fill.index('fprintf( stderr, "[ctx-frame] ml716') > fill.rindex('thread_resume( port );') \
+        and fill.index('fprintf( stderr, "[srv-getctx] ml715') > fill.rindex('thread_resume( port );'), \
+        'ios_fill_thread_context: its two lines are printed after the halt'
+    print(f'{path.name}: the server\'s two captures read no switch and print nothing while a thread is halted')
 
 
 if __name__ == '__main__':

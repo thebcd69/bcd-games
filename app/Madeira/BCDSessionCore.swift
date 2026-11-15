@@ -292,4 +292,36 @@ enum BCDPrevTail {
         let real = all.filter { !isNoise($0) }
         return Array((real.isEmpty ? all : real).suffix(maxLines))
     }
+
+    /// Round 660 (M036): one line after the tail that says how the previous run ended as far as its log knows: the last footprint, the last
+    /// "alive" beat and the last session summary (the tail drops footprint lines as noise), and a verdict from the newest phys= against the
+    /// newest limit= of those lines: 95 % or more is a likely memory kill. `nil` when the log has none of the three.
+    static func endLine(_ data: Data) -> String? {
+        var footprint: String?, alive: String?, summary: String?, limit: Int?
+        for bytes in data.split(separator: UInt8(ascii: "\n"), omittingEmptySubsequences: true) {
+            let line = String(decoding: bytes.last == UInt8(ascii: "\r") ? bytes.dropLast() : bytes, as: UTF8.self)
+            if line.contains("[footprint] ") { footprint = line; if let n = number(after: "limit=", in: line) { limit = n } }
+            else if line.contains("[freeze] alive") { alive = line }
+            else if line.contains("[session] length=") { summary = line; if let n = number(after: "limit=", in: line) { limit = n } }
+        }
+        guard footprint != nil || alive != nil || summary != nil else { return nil }
+        func quoted(_ s: String?) -> String {
+            guard var s else { return "none" }
+            if let at = s.range(of: "] [") { s = String(s[s.index(before: at.upperBound)...]) }   // the time and level a logged line starts with
+            return "\"" + String(s.prefix(160)) + "\""
+        }
+        var verdict = "unknown"
+        if let line = footprint, let phys = number(after: "phys=", in: line), let limit, limit > 0 {
+            let pct = phys * 100 / limit
+            verdict = pct >= 95 ? "memory kill likely (\(pct) % of the limit)" : "no memory pressure (\(pct) % of the limit)"
+        }
+        return "[prev-end] last footprint \(quoted(footprint)) | last alive \(quoted(alive)) | last summary \(quoted(summary)) | verdict: \(verdict)"
+    }
+
+    /// The whole number right after `key` in `line` ("phys=3752 MB", "limit=4095MB"), or nil.
+    static func number(after key: String, in line: String) -> Int? {
+        guard let at = line.range(of: key, options: .backwards) else { return nil }
+        let digits = line[at.upperBound...].prefix { $0.isASCII && $0.isNumber }
+        return digits.isEmpty ? nil : Int(digits)
+    }
 }

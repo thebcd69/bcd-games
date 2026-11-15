@@ -194,15 +194,41 @@ final class JITCoordinator: ObservableObject {
             .flatMap(JITMethod.init(rawValue:)) ?? .automatic
     }
 
+    /// Round 660 (M138, owner 2026-11-15): with StikDebug installed, Automatic still takes BCD's own helper when this device is paired with
+    /// it and the helper runs here. In testers' logs 8 of 109 StikDebug pool requests were never answered (7.3 %, six of them on a fresh
+    /// attach) and none of 248 built-in ones; both go through the same LocalDevVPN. env.MADEIRA_JIT_AUTO_BUILTIN = 0 restores the order
+    /// before (StikDebug whenever it is installed).
+    static var automaticPrefersBuiltIn: Bool { MadeiraConfig.flag("MADEIRA_JIT_AUTO_BUILTIN") }
+
     var resolvedMethod: JITMethod {
         guard method == .automatic else { return method }
+        guard StikJITHelper.isAvailable else { return .builtIn }
+        return automaticTakesBuiltIn ? .builtIn : .stikDebug
+    }
+
+    /// Automatic with StikDebug installed takes the built-in helper (round 660, M138).
+    var automaticTakesBuiltIn: Bool {
+        Self.automaticPrefersBuiltIn && pairingImported && MadeiraBuiltInJIT.isAvailable
+    }
+
+    /// The method that attached the debugger through BCD in this app run; nil when none did (StikDebug started BCD with JIT on, say).
+    private(set) var attachedMethod: JITMethod?
+
+    /// The method the pool requests of this start go to (their log fields and the caption rule): the one that attached through BCD, else
+    /// the order before round 660, since an attach BCD did not make is StikDebug's whenever it is installed.
+    var requestMethod: JITMethod {
+        if let attachedMethod { return attachedMethod }
+        if method != .automatic { return method }
         return StikJITHelper.isAvailable ? .stikDebug : .builtIn
     }
 
     var automaticDescription: String {
-        StikJITHelper.isAvailable
-            ? "BCD found StikDebug and will open it to enable JIT."
-            : "BCD didn't find StikDebug and will enable JIT with the helper it ships with."
+        if StikJITHelper.isAvailable {
+            return automaticTakesBuiltIn
+                ? "BCD found StikDebug, but this device is paired with BCD, so it will enable JIT with the helper it ships with."
+                : "BCD found StikDebug and will open it to enable JIT."
+        }
+        return "BCD didn't find StikDebug and will enable JIT with the helper it ships with."
     }
 
     func refreshPairingStatus() {
@@ -310,33 +336,62 @@ final class JITCoordinator: ObservableObject {
         case .automatic:
             assertionFailure("Automatic must resolve to a concrete JIT method")
         case .stikDebug:
-            guard StikJITHelper.isAvailable else {
-                let message = "BCD can't find StikDebug. Install it, or switch the method to Built-in StikJIT."
-                error = message
-                showSetup = true
-                completion(.failure(CoordinatorError.setupRequired(message)))
-                return
-            }
-            busy = true
-            status = "StikDebug is attaching…"
-            StikJITHelper.enableJIT { [weak self] result in
-                Task { @MainActor in
-                    self?.busy = false
-                    self?.status = (try? result.get()).map { _ in "StikDebug has attached." }
-                    if case .failure(let failure) = result { self?.error = failure.localizedDescription }
-                    completion(result)
-                }
-            }
+            enableStikDebug(completion: completion)
         case .builtIn:
+            // Round 660 (M138): when Automatic took the helper over an installed StikDebug, a pairing this device no longer accepts (or
+            // one that is gone) falls back to StikDebug in the same attempt, with its own pairing; a connection problem does not, since
+            // StikDebug goes through the same LocalDevVPN.
+            let stikDebugBehind = method == .automatic && StikJITHelper.isAvailable
             guard JITPairingFileStore.isImported else {
+                if stikDebugBehind { fallBackToStikDebug("the pairing file is gone", completion: completion); return }
                 let message = "Built-in StikJIT still needs a pairing. Pair this device, or import its pairing file."
                 error = message
                 showSetup = true
                 completion(.failure(CoordinatorError.setupRequired(message)))
                 return
             }
-            enableBuiltIn(completion: completion)
+            enableBuiltIn { [weak self] result in
+                guard let self, stikDebugBehind, case .failure(let failure) = result, pairingRefused(failure) else {
+                    completion(result)
+                    return
+                }
+                fallBackToStikDebug(failure.localizedDescription, completion: completion)
+            }
         }
+    }
+
+    private func enableStikDebug(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard StikJITHelper.isAvailable else {
+            let message = "BCD can't find StikDebug. Install it, or switch the method to Built-in StikJIT."
+            error = message
+            showSetup = true
+            completion(.failure(CoordinatorError.setupRequired(message)))
+            return
+        }
+        busy = true
+        status = "StikDebug is attaching…"
+        StikJITHelper.enableJIT { [weak self] result in
+            Task { @MainActor in
+                self?.busy = false
+                self?.status = (try? result.get()).map { _ in "StikDebug has attached." }
+                if case .failure(let failure) = result { self?.error = failure.localizedDescription }
+                if case .success = result { self?.attachedMethod = .stikDebug }
+                completion(result)
+            }
+        }
+    }
+
+    /// The built-in helper's failure was this device refusing (or missing) BCD's pairing, not the connection.
+    private func pairingRefused(_ failure: Error) -> Bool {
+        if case CoordinatorError.pairingMissing = failure { return true }
+        return connectionProblem == .pairing
+    }
+
+    private func fallBackToStikDebug(_ why: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        LogStore.shared.log("[jit] Automatic: the built-in helper could not use this device's pairing (\(why)); StikDebug attaches instead")
+        error = nil
+        connectionProblem = nil
+        enableStikDebug(completion: completion)
     }
 
     func importPairingFile(_ source: URL) {
@@ -430,6 +485,7 @@ final class JITCoordinator: ObservableObject {
                     case .success:
                         self?.status = "The built-in helper has attached."
                         self?.error = nil
+                        self?.attachedMethod = .builtIn
                     case .failure(let failure):
                         self?.error = failure.localizedDescription
                     }

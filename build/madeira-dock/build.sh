@@ -43,8 +43,11 @@ trap 'rm -rf "$TMP"' EXIT
 section() { printf '\n\n==== %s ====\n\n' "$1"; }
 {
     cat "$SRC/LICENSE"
-    printf '\nCorresponding source: https://github.com/125hz/madeira-dock (commit %s)\n' \
+    # madeira-bcd: since the Friends change (willfaust/madeira-dock pull request #10, taken before it merged) the pinned commit is one of
+    # BCD's fork, which willfaust/madeira-dock does not have; the source this executable is built from is that commit plus tools/patch-dock-*.py.
+    printf '\nCorresponding source: https://github.com/thebcd69/bcd-dock (commit %s), a fork of https://github.com/willfaust/madeira-dock,\n' \
         "$(git -C "$SRC" rev-parse HEAD 2>/dev/null || echo unknown)"
+    printf 'built with the changes that tools/patch-dock-*.py of https://github.com/thebcd69/bcd-games make to it.\n'
     section 'LICENSE-EXCEPTION.md (Madeira Converter Exception)'
     cat "$SRC/LICENSE-EXCEPTION.md"
     section 'COPYING (GNU General Public License, version 3)'

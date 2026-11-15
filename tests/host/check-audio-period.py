@@ -126,7 +126,8 @@ _io = sorted(r["id"] for r in _recs["rules"] if "MADEIRA_AUDIO_IO_MS" in json.du
 # Round 626 (agent T S8): Murder Miners' row asks for the same 5 ms buffer.
 # Night round 2026-11-11 (agent T3 S5): Quake II's and Resonance's rows ask for the same 5 ms buffer (XAudio2 clients that queue 960 frames under iOS's 1024).
 check("only Dead Rising's, Murder Miners', Quake II's and Resonance's lists set the IO buffer (5 ms, build 625); no list sets the period and no auto-tune rule sets either",
-      _io == ["dead-rising", "murder-miners", "quake-ii", "resonance"] and all({"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == i)["config"] for i in _io)
+      # round 660 (M029): Mewgenics v3 (NZ3EFT, XX0KAV)
+      _io == ["dead-rising", "mewgenics", "murder-miners", "quake-ii", "resonance"] and all({"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == i)["config"] for i in _io)
       and "MADEIRA_AUDIO_PERIOD_MS" not in text and "MADEIRA_AUDIO_IO_MS" not in (R / "build/tools/autotune_rules.py").read_text())
 
 print("PASS: audio period" if ok else "FAIL: audio period")

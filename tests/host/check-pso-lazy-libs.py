@@ -64,7 +64,8 @@ check('the key is taken after a successful conversion, before the sized ranges a
       'mad_sc_key(&a, o->lz->key); o->lz->ok = mad_sc_exists(o->lz->key);' in conv)
 real = body('static obj_handle_t mad_pso_realize(struct mad_pso *p)')
 check('the first draw reads the libraries back before building',
-      real.index('if (!p->lz || mad_lzlib_restore(p))') < real.index('MTLDevice_newRenderPipelineStateVD(p->device_handle, &p->rp, &p->vd, &err)'))
+      # round 660 (M010): the build goes through mad_new_render_pipeline (one retry without dual-source blending), vertex descriptor or not
+      real.index('if (!p->lz || mad_lzlib_restore(p))') < real.index('mad_new_render_pipeline(p->device_handle, &p->rp, p->has_vd ? &p->vd : NULL, &err, p->vs_name)'))
 creal = body('static obj_handle_t mad_cpso_realize(struct mad_pso *p)')
 check('the first dispatch too, and only then takes the function',
       creal.index('if (!p->lz || mad_lzlib_restore(p))') < creal.index('ci.compute_function = p->vs_fn;'))

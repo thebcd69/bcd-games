@@ -109,9 +109,12 @@ finish = install[install.index("    static func finish("):]
 finish = finish[:finish.index("\n    }\n")]
 check(finish.count("scripts: true") == 1 and "var scripts: Bool?" in install, "the install marks the record (scripts: true); a record from before has none")
 gcontent = (GOG / "BCDGOGContent.swift").read_text()
-check("supportKept(listed)" in gcontent and "addSupportFiles(total.kept, to: &builder" in gcontent
-      and gcontent.index("addSupportFiles(total.kept, to: &builder") > gcontent.index("for depot in chosen"),
-      "the plan keeps the install script and the support folder's app/ files, added after every depot's own files")
+# Build 663: the kept support files are first filtered by the depots' own file list (an update or a repair leaves a right game file out of
+# the builder; tests/host/gog-update/bcd_main.swift checks that a support app/ file is never laid over it).
+check("supportKept(listed)" in gcontent and "addSupportFiles(kept, to: &builder, isCurrent: isCurrent)" in gcontent
+      and "let kept = total.kept.filter { !listed.contains(BCDContentPaths.fold($0.path)) }" in gcontent
+      and gcontent.index("addSupportFiles(kept, to: &builder") > gcontent.index("for depot in chosen"),
+      "the plan keeps the install script and the support folder's app/ files, added after every depot's own files and never over one")
 ci = (R / ".github/workflows/build-ipa.yml").read_text()
 check("python3 tests/host/check-gog-script.py --require-swift" in ci, "build-ipa.yml runs this check")
 
@@ -136,7 +139,7 @@ else:
         shutil.copy(R / "tests/host/gog-script/bcd_main.swift", main)
         engine = [str(CONTENT / f) for f in ["BCDContentPlan.swift", "BCDContentCodec.swift", "BCDContentJournal.swift", "BCDContentFetch.swift",
                                               "BCDContentEngine.swift", "BCDContentQueue.swift", "BCDContentSecrets.swift"]]
-        files = [str(GOG / f) for f in ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift",
+        files = [str(GOG / f) for f in ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGContentV1.swift", "BCDGOGInstall.swift",
                                          "GOGInstallScript.swift", "GOGSetup.swift", "BCDGOGUpdate.swift", "BCDGOGRegistry.swift"]]
         ours = work / "ours"
         build = subprocess.run([swiftc, "-swift-version", "5", "-Onone", "-o", str(ours), str(main)] + engine + files, capture_output=True, text=True)

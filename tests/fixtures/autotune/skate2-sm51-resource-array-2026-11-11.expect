@@ -1,0 +1,18 @@
+{
+ "dialogs": [
+  "Skate 2 stopped because of an error:??panicked at ~\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wgpu-30.0.1\\src\\backend\\wgpu_core.rs:1414:26:?wgpu error: Validation Error??Caused by:?  In De"
+ ],
+ "end": {},
+ "matched": [
+  "wgpu-fxc-sm51-dxcompiler",
+  "d3dcompile-sm51-resource-array",
+  "vulkan-stand-in-in-system32"
+ ],
+ "next": [
+  "env.MADEIRA_OPTIN_DLLS = dxcompiler"
+ ],
+ "note": "skate. 2 PC port on its Direct3D 12 back end (Send Log JQ0202, build 653): wgpu 30 compiled with FXC (no dxcompiler.dll), and vkd3d-shader has no Shader Model 5.1 resource arrays (E5017) for naga's sampler heap. From build 663 wgpu-fxc-sm51-dxcompiler adds env.MADEIRA_OPTIN_DLLS = dxcompiler (BCD's DXC 1.9); d3dcompile-sm51-resource-array (M136, noFix) is what is left once that ran.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

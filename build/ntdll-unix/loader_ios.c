@@ -2278,12 +2278,43 @@ static int ios_ntdll_xsec_on( void )
     return e && e[0] == '1' && !e[1];
 }
 
+/* madeira-bcd: env.MADEIRA_WIN64_FRESH = 1 (default off; tools/build-wine-fresh-dlls.sh): the rebuilt 64-bit Wine set. The committed 64-bit Wine
+ * DLLs are frozen binaries that no step rebuilds, so a source fix reaches only the 32-bit build; the rebuilt set (the pinned Wine source plus
+ * BCD's patch scripts) ships next to them as <name>-fresh.dll in both PE folders, only for the modules whose rebuild is not the committed file.
+ * The ntdll of a process comes from here: ntdll-fresh.dll, or with env.MADEIRA_NTDLL_XSEC = 1 / MADEIRA_NTDLL_SYNC the same variant built on the
+ * rebuilt source (ntdll-fresh-xsec.dll, ntdll-fresh-sync.dll, ARM64EC only). A file the build did not make is not an error: the older name below is
+ * used and one line says so. Every other DLL of the set is linked by app/Madeira/WineProcessBridge.m. Exactly "1" turns it on. */
+static int ios_win64_fresh_on( void )
+{
+    const char *e = getenv( "MADEIRA_WIN64_FRESH" );
+    return e && e[0] == '1' && !e[1];
+}
+
 static char *ios_ec_ntdll_name( const char *dir, const char *pe_dir )
 {
     static int said;
     char *name = NULL;
     int mode = ios_ntdll_sync_mode();
 
+    if (ios_win64_fresh_on() && (strstr( pe_dir, "arm64ec" ) || strstr( pe_dir, "aarch64" )))   /* the 64-bit PE folders only */
+    {
+        static int fresh_said[3];
+        int ec = strstr( pe_dir, "arm64ec" ) != NULL;
+        int v = ec ? (ios_ntdll_xsec_on() ? 1 : mode ? 2 : 0) : 0;
+        const char *suffix[3] = { "", "-xsec", "-sync" };
+
+        if (asprintf( &name, "%s%s/ntdll-fresh%s.dll", dir, pe_dir, suffix[v] ) < 0) name = NULL;
+        if (name && !access( name, R_OK ))
+        {
+            if (!fresh_said[v]++)
+                dprintf( 2, "[win64-fresh] %s (opt-in, env.MADEIRA_WIN64_FRESH = 1; unset maps the committed ntdll.dll%s)\n", name,
+                         v ? "; this is the variant built on the rebuilt source" : "" );
+            return name;
+        }
+        if (!fresh_said[v]++) dprintf( 2, "[win64-fresh] this build has no ntdll-fresh%s.dll -- the ntdll of the older sets is mapped\n", suffix[v] );
+        free( name );
+        name = NULL;
+    }
     if (ios_ntdll_xsec_on() && !strcmp( pe_dir, "/arm64ec-windows" ))
     {
         static int xsec_said;

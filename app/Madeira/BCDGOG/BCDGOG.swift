@@ -448,6 +448,13 @@ import Foundation
         return BCDContentQueue.reason(error)
     }
 
+    // MARK: GOG Galaxy features (BCDGOGGalaxy.swift; per game, off by default)
+
+    /// The store's sign-in and its web API, for the Galaxy service of a game whose switch is on: the game's token is minted from this
+    /// sign-in, and its build manifest is read through this API. Nothing else reaches them.
+    var galaxySession: BCDGOGSession { session }
+    var galaxyAPI: BCDGOGAPI { api }
+
     // MARK: BCDContentDriver
 
     func blocker(_ key: BCDContentKey) -> String? {
@@ -485,6 +492,8 @@ import Foundation
 
     func source(for plan: BCDContentPlan) async throws -> BCDChunkSource {
         let api = self.api
+        // Build 663: a generation-1 plan (slices of main.bin, BCDGOGContentV1.swift) has its own source; any other plan is served as before.
+        if plan.chunks.contains(where: { $0.rangeStart != nil }) { return BCDGOGContent.v1Source(api: api) }
         return BCDGOGChunkSource(fetch: { product in
             // The redistributables' chunks come from GOG's open link: no sign-in.
             product == BCDGOGContent.redistGroup
@@ -495,7 +504,13 @@ import Foundation
 
     func root(for key: BCDContentKey) -> BCDInstallRoot { Self.root }
 
-    func options(for plan: BCDContentPlan) -> BCDContentOptions { BCDContentOptions() }
+    func options(for plan: BCDContentPlan) -> BCDContentOptions {
+        var options = BCDContentOptions()
+        // Build 663: a generation-1 file cut into several slices has one MD5 for the whole file, checked once its slices are in.
+        // No other plan has such a chunk: its options are the defaults, as before.
+        if plan.chunks.contains(where: { $0.rangeStart != nil && $0.digest == nil }) { options.verifyFiles = true }
+        return options
+    }
 
     func finish(_ plan: BCDContentPlan, stage: URL) async throws {
         let id = plan.key.id

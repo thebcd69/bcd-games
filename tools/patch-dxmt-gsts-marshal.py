@@ -26,6 +26,10 @@ END_OLD = "    if (task.end_of_command)\n      break;\n  };\n}\n"
 END_NEW = ("    if (task.end_of_command)\n      break;\n"
            "    index++;   /* madeira-bcd: GS/TS marshal advances to the next task (a batch of two or more draws spun on tasks[0]) */\n"
            "  };\n}\n")
+# The same change as upstream wrote it (willfaust/dxmt d811847f).
+UP_GUARD = ("    if ((task.draw_arguments.x * task.draw_arguments.y) == 0 ||\n"
+            "        x * task.draw_arguments.y > task.max_object_threadgroups) {\n")
+UP_END = "    if (task.end_of_command)\n      break;\n    index++;\n  };\n}\n"
 
 
 def main():
@@ -37,6 +41,12 @@ def main():
     gs = s.index("[[vertex]] void gs_draw_arguments_marshal(")
     end = s.index("struct depth_stencil_out", gs)
     region = s[ts:end]
+    # Since the dxmt pin of the 2026-11-14 upstream merge the fork carries willfaust/dxmt d811847f itself (the same two lines in
+    # both functions, without this script's comments): nothing is left to do, on the pristine pin and on a patched tree alike.
+    if (region.count(UP_GUARD) == 2 and region.count(UP_END) == 2
+            and region.count(GUARD_OLD) == 0 and region.count(END_OLD) == 0):
+        print(f"{PATH}: the GS/TS marshal fix is upstream (willfaust/dxmt d811847f); nothing to do")
+        return
     if region.count(GUARD_OLD) != 2 or region.count(END_OLD) != 2:
         sys.exit(f"patch-dxmt-gsts-marshal: anchors not found twice in the two marshal functions of {PATH}")
     region = region.replace(GUARD_OLD, GUARD_NEW).replace(END_OLD, END_NEW)

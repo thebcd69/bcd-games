@@ -2,12 +2,13 @@
  "dialogs": [],
  "end": {},
  "matched": [
+  "kuser-rebase-protected-nocopy",
   "rwx-protector-multiblock0"
  ],
  "next": [
-  "env.FEX_MULTIBLOCK = 0"
+  "env.MADEIRA_KUSER_KEEP_REGS = 1"
  ],
- "note": "Stellar Blade Demo: protector block, [rwx-fault] trap: OFF, c0000005",
+ "note": "Stellar Blade Demo: protector block, [rwx-fault] trap: OFF, c0000005 Round 660 (M020): the five signals of kuser-rebase-protected-nocopy hold here as in Planet Coaster 2 7X70J7 (a KUSER read serviced at 0x7038000320, then the wild pointer 0xdfe9a1f170 in the protector), so env.MADEIRA_KUSER_KEEP_REGS = 1 (as for Yakuza Kiwami 3 and Metaphor) comes before env.FEX_MULTIBLOCK = 0, which is the owner's decision inside a protection layer.",
  "outcome": "crashed",
  "stage": 2,
  "status": "trying"

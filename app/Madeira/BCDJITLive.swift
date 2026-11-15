@@ -145,6 +145,7 @@ struct BCDJITSetupSheet: View {
         }
         next.method = BCDJITMethodChoice(rawValue: jit.method.rawValue) ?? .automatic
         next.resolved = BCDJITMethodChoice(rawValue: jit.resolvedMethod.rawValue) ?? .stikDebug
+        next.builtInFirst = JITCoordinator.automaticPrefersBuiltIn
         next.stikDebugFound = StikJITHelper.isAvailable
         next.pairingFile = !jit.pairingImported ? .none : (jit.pairingSource == .onDevice ? .pairedHere : .imported)
 

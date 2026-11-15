@@ -1580,6 +1580,9 @@ final class SteamOwnedLibrary: ObservableObject {
         case SteamError.disconnected: return "disconnected"
         case SteamError.contentHTTP(let status): return "http-\(status)"
         case SteamError.contentRefused(let status): return "refused-\(status)"
+        // Round 660 (M101; Lust Goddess PX0YJF): a reply that does not parse said only "SteamError"; the parser's own words are fixed texts
+        // (SteamProtoMessages.swift), so the line reads "failed reason=proto-it-ends-inside-a-number-field".
+        case SteamError.protobufError(let why): return "proto-" + why.replacingOccurrences(of: " ", with: "-")
         case let url as URLError: return "url-\(url.code.rawValue)"
         default: return String(describing: type(of: error))
         }

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 NevesHenry and intraducine: code taken from https://github.com/willfaust/Madeira (pull request #604)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
@@ -62,6 +64,7 @@ struct DepotManifest {
                 ? Int(data[4..<8].withUnsafeBytes { UInt32(littleEndian: $0.loadUnaligned(as: UInt32.self)) })
                 : 0
             let end = (len > 0 && 8 + len <= data.count) ? 8 + len : data.count
+            guard end >= 8 else { throw SteamError.manifestFetchFailed("It's too short to be valid.") }
             payload = Data(data[8..<end])
         }
 
@@ -101,6 +104,9 @@ struct DepotManifest {
             case 1: // FileMapping
                 let fileData = try decoder.readBytes()
                 if let entry = try parseFileEntry(from: fileData, depotKey: depotKey) {
+                    guard entry.size <= UInt64(Int64.max) - totalUncompressed else {
+                        throw SteamError.manifestFetchFailed("Its file sizes are too large.")
+                    }
                     totalUncompressed += entry.size
                     for chunk in entry.chunks {
                         totalCompressed += UInt64(chunk.compressedSize)
@@ -150,7 +156,7 @@ struct DepotManifest {
             switch tag.fieldNumber {
             case 1: filename = try decoder.readString()
             case 2: size = try decoder.readVarint()
-            case 3: flags = UInt32(try decoder.readVarint())
+            case 3: flags = UInt32(truncatingIfNeeded: try decoder.readVarint())
             case 6: // ChunkData
                 let chunkData = try decoder.readBytes()
                 if let chunk = try parseChunkEntry(from: chunkData) {
@@ -182,13 +188,18 @@ struct DepotManifest {
             case 1: sha = try decoder.readBytes()
             case 2: crc = try decoder.readFixed32()
             case 3: offset = try decoder.readVarint()
-            case 4: uncompressedSize = UInt32(try decoder.readVarint()) // cb_original
-            case 5: compressedSize = UInt32(try decoder.readVarint())   // cb_compressed
+            case 4: uncompressedSize = UInt32(truncatingIfNeeded: try decoder.readVarint()) // cb_original
+            case 5: compressedSize = UInt32(truncatingIfNeeded: try decoder.readVarint())   // cb_compressed
             default: try decoder.skip(wireType: tag.wireType)
             }
         }
 
         guard !sha.isEmpty else { return nil }
+        // madeira-bcd: the downloader writes a chunk at off_t(offset) and adds its size to the offset; an offset that does not fit
+        // a signed 64-bit file position would stop the app there, so such a manifest throws here (no real file comes near it).
+        guard offset <= UInt64(Int64.max) - UInt64(uncompressedSize) else {
+            throw SteamError.manifestFetchFailed("A chunk lies beyond the largest file size.")
+        }
 
         return ChunkEntry(
             sha: sha,

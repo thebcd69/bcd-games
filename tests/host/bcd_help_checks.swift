@@ -152,6 +152,23 @@ func readiness() {
     func ids(_ m: [BCDReadinessModule], files: [String] = [], _ p: BCDReadinessProvided = none) -> [String] {
         BCDReadiness.evaluate(modules: m, files: Set(files), provided: p).map(\.id)
     }
+    // Round 660 (M112): a path with a character outside Windows-1252 is named, with the character; an accent of 1252 or a plain path is not.
+    let plainGame = [module("g.exe", true, ["kernel32.dll"])]
+    let ansi = BCDReadiness.evaluate(modules: plainGame, files: [], provided: none, mainPath: "Games/Foo\u{2713} /Foo.exe")
+    check("a folder name with a check mark gets the ANSI note, no fix, naming the character",
+          ansi.map { ($0.id, $0.fixable) }.first! == ("ansi-path", false) && ansi[0].text.contains("\u{2713}")
+          && BCDReadiness.logLine(game: "G", modules: 1, findings: ansi).hasSuffix("ansi-path(no fix)"))
+    check("an accent Windows-1252 holds (Caf\u{E9}, Gr\u{F6}\u{DF}e, \u{20AC}) or a plain path gets no ANSI note",
+          BCDReadiness.evaluate(modules: plainGame, files: [], provided: none, mainPath: "Games/Caf\u{E9} Gr\u{F6}\u{DF}e \u{20AC}/Foo.exe").isEmpty
+          && BCDReadiness.evaluate(modules: plainGame, files: [], provided: none, mainPath: "Games/Foo/Foo.exe").isEmpty
+          && BCDReadiness.evaluate(modules: plainGame, files: [], provided: none).isEmpty
+          && BCDReadiness.firstNonANSI("C:\\\u{65E5}\u{672C}") == "\u{65E5}")
+    // Round 660 (M111): a program that imports glide2x.dll without it beside it is named; a folder that carries it, or a scan cut short, is not.
+    let glide = [module("3DFX.exe", false, ["kernel32.dll", "glide2x.dll"])]
+    check("a Glide program without glide2x.dll in the folder gets the Glide note, no fix",
+          BCDReadiness.evaluate(modules: glide, files: [], provided: none).map { ($0.id, $0.fixable) }.first! == ("glide", false))
+    check("... not when the folder carries it, not when the scan stopped at its limit",
+          ids(glide, files: ["glide2x.dll"]).isEmpty && BCDReadiness.evaluate(modules: glide, files: [], provided: none, complete: false).isEmpty)
     check("a game that imports only what Windows and BCD have has nothing missing",
           ids([module("g.exe", true, ["kernel32.dll", "d3d11.dll", "vcruntime140.dll", "msvcp140.dll", "xinput1_3.dll"])]).isEmpty)
     check("a 64-bit MFC game without Microsoft's Visual C++ runtime is told to download it",

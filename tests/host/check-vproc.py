@@ -68,7 +68,7 @@ FLAGS = [
     "--disable-asm", "--disable-shared", "--enable-static", "--enable-pic", "--disable-debug",
 ]
 prefix = os.environ.get("MADEIRA_HOST_FFMPEG") or str(
-    Path.home() / ".cache/madeira-host-ffmpeg" / ("7.1.1-" + hashlib.sha256(" ".join(FLAGS).encode()).hexdigest()[:12]))
+    Path.home() / ".cache/madeira-host-ffmpeg" / ("7.1.5-" + hashlib.sha256(" ".join(FLAGS).encode()).hexdigest()[:12]))
 if not (Path(prefix) / "lib/libavcodec.a").exists():
     print("SKIP the harness: no host FFmpeg at %s (run tests/host/check-wmv-asf.py once, it builds it)" % prefix)
     print("PASS: raw video converter (source checks)" if ok else "FAILED: raw video converter")

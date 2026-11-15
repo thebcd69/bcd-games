@@ -398,6 +398,7 @@ struct BCDSessionLiveLayer: View {
 
     func dispose() {
         BCDMenuMore.menuClosed()   // madeira-bcd (round 604): the Windows and Task Manager pages stop their timers
+        DockFriendsMenu.menuClosed()   // madeira-bcd (Steam Friends): the Friends page's timer stops
         pageShown(nil)
         watchers.removeAll()
     }
@@ -441,6 +442,9 @@ struct BCDSessionLiveLayer: View {
             out.append(BCDMenuSection(id: "home", rows: [BCDMenuRow(id: "desktop.home", title: "BCD Home", detail: "Keep Windows running in the background.", symbol: "house", kind: .action())]))
         }
         if let cloud = cloudSection { out.append(cloud) }
+        // madeira-bcd (Steam Friends, default off): a BCD Dock session started with a Friends status chosen in Settings › Accounts › Steam
+        // has a Friends page while Dock's list is current (DockFriendsMenu.swift); nil, and nothing read, in every other session.
+        if let friends = DockFriendsMenu.section() { out.append(friends) }
         if model.activeEntry?.desktop == true, !BCDDuoFeatures.active, MadeiraConfig.flag("MADEIRA_DESKTOP_CLOSE") {
             // night round 2026-11-11 (A4 S1): the Windows desktop has no game to quit; Close asks its programs to close and ends the session
             // (LibraryModel.watchDesktopClose). The words are DesktopExitRules' (Library.swift); the preview app keeps copies. The native Duo interface
@@ -632,6 +636,7 @@ struct BCDSessionLiveLayer: View {
 
     func page(_ id: String) -> BCDMenuPage? {
         if let own = BCDMenuMore.page(id) { return own }   // madeira-bcd (round 604)
+        if let friends = DockFriendsMenu.page(id) { return friends }   // madeira-bcd (Steam Friends)
         if BCDInputMenu.handles(id) { return BCDInputMenuLive.page(id, model.activeEntry) }   // madeira-bcd (2026-10-25, round 604)
         switch id {
         case "binds": return bindsPage
@@ -651,6 +656,7 @@ struct BCDSessionLiveLayer: View {
 
     func pageShown(_ id: String?) {
         BCDMenuMore.pageShown(id) { [weak self] in self?.menu?.changed() }   // madeira-bcd (round 604): the Windows and Task Manager pages keep themselves fresh while open
+        DockFriendsMenu.pageShown(id) { [weak self] in self?.menu?.changed() }   // madeira-bcd (Steam Friends): the Friends page follows Dock's list while open
         let wantLog = id == "log"
         guard wantLog != logShown else { return }
         logShown = wantLog
@@ -717,6 +723,7 @@ struct BCDSessionLiveLayer: View {
 
     func choose(_ row: String, _ value: String) {
         if BCDMenuMore.handles(row) { return BCDMenuMore.choose(row, value) { [weak self] in self?.menu?.changed() } }   // madeira-bcd (round 604)
+        if DockFriendsMenu.handles(row) { return DockFriendsMenu.choose(row, value) }   // madeira-bcd (Steam Friends): the status chips
         if BCDInputMenu.handles(row) { return BCDInputMenuLive.change(row, value, entry: model.activeEntry) }   // madeira-bcd (2026-10-25, round 604)
         if BCDHUDMenu.owns(row) { return applyHUD(BCDHUDMenu.choose(row, value, BCDHUDState.shared.setup, screen: hudScreen)) }
         switch row {
@@ -762,6 +769,7 @@ struct BCDSessionLiveLayer: View {
 
     func answer(_ row: String, _ answer: String) {
         if BCDMenuMore.handles(row) { return BCDMenuMore.answer(row, answer) { [weak self] in self?.menu?.changed() } }   // madeira-bcd (round 604)
+        if DockFriendsMenu.handles(row) { return DockFriendsMenu.answer(row, answer) }   // madeira-bcd (Steam Friends): Accept, Join, Invite
         if BCDHUDMenu.owns(row) { return applyHUD(BCDHUDMenu.answer(row, answer, BCDHUDState.shared.setup)) }
         switch (row, answer) {
         case ("quit", "quit"): model.requestQuit()

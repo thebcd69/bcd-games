@@ -1321,6 +1321,8 @@ struct BCDLiveSwitch {
         "MoltenVK-Apache-2.0.txt": "MoltenVK · Apache 2.0 license", "SPIRV-Cross-Apache-2.0.txt": "SPIRV-Cross · Apache 2.0 license",
         "SPIRV-Tools-Apache-2.0.txt": "SPIRV-Tools · Apache 2.0 license", "cereal-BSD-3-Clause.txt": "cereal · BSD 3-clause license",
         "LuaJIT-MIT.txt": "LuaJIT · MIT license",
+        // KosmicKrisp (build 660): Mesa's Vulkan on Metal 4 (build/mesa-ios/build-kosmickrisp-bcd.sh copies the second into the bundle with the library).
+        "MIT-Mesa-KosmicKrisp.txt": "Mesa KosmicKrisp · MIT license", "KosmicKrisp-Mesa-license.rst": "Mesa KosmicKrisp · the licenses of its parts",
     ]
 }
 

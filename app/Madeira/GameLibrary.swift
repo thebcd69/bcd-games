@@ -90,6 +90,18 @@ enum GameLibrary {
         "language_setup.exe", "languagesetup.exe",
     ]
 
+    /// Round 660 (M126; Send Log HSQDK4): a GOG offline installer beside the game's files, setup_<name>_<version>.exe
+    /// (setup_medal_of_honor_2.0.0.21.exe), is never the game; the folder scan listed it as one. The player runs it once
+    /// (Add a game) and then adds the game's own program. Only that exact shape: the version after the last "_" is digits and dots.
+    static func isGOGInstallerName(_ lower: String) -> Bool {
+        guard lower.hasPrefix("setup_"), lower.hasSuffix(".exe") else { return false }
+        let stem = lower.dropFirst(6).dropLast(4)
+        guard let cut = stem.lastIndex(of: "_") else { return false }
+        let version = stem[stem.index(after: cut)...]
+        guard !stem[..<cut].isEmpty, let first = version.first, first.isASCII, first.isNumber else { return false }
+        return version.allSatisfy { ($0.isASCII && $0.isNumber) || $0 == "." }
+    }
+
     static var driveC: URL? {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
             .appendingPathComponent("wine")
@@ -123,6 +135,7 @@ enum GameLibrary {
                     walk(entry, depth: depth + 1, title: title ?? titleFor(entry))
                 } else if entry.pathExtension.lowercased() == "exe" {
                     if noiseNames.contains(entry.lastPathComponent.lowercased()) { continue }
+                    if isGOGInstallerName(entry.lastPathComponent.lowercased()) { continue }
                     guard let windows = windowsPath(for: entry, root: root) else { continue }
                     found.append(GuestExecutable(
                         windowsPath: windows,

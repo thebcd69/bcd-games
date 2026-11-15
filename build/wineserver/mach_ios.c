@@ -1,6 +1,6 @@
 // Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
-/* Portions copyright 2026 ft7t8drgwf-wq and Henry Morin: code taken from https://github.com/willfaust/Madeira (pull requests #469 and #556)
- * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
+/* Portions copyright 2026 ft7t8drgwf-wq, Henry Morin and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #469 and #556,
+ * and commit 494274a) under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
  * Server-side debugger support using Mach primitives
  *
@@ -894,14 +894,23 @@ done:
 struct thread *ios_pending_persistent_hold;
 
 /* MADEIRA_CTX_FP=0: a cross-thread GetThreadContext returns zeroed vector registers, as
- * before. Read on every capture, madeira.cfg (and the game's own lines) first: this server
- * starts before the app exports env.* lines (ml1236) and runs again for the next session. */
+ * before. madeira.cfg (and the game's own lines) are read first: this server starts before
+ * the app exports env.* lines (ml1236) and runs again for the next session. The answer is
+ * kept for a second: madeira_cfg_get reads the config files, and a program that samples
+ * its threads' contexts often (a garbage collector, a profiler) would otherwise put that
+ * file I/O on every capture, inside the single-threaded server. */
 static int ios_ctx_fp_enabled(void)
 {
+    static timeout_t checked_at;
+    static int enabled = 1;
     char buf[16];
-    const char *e = madeira_cfg_get( "env.MADEIRA_CTX_FP", buf, sizeof(buf) ) ? buf
-                  : getenv( "MADEIRA_CTX_FP" );
-    return !(e && e[0] == '0');
+    const char *e;
+
+    if (checked_at && monotonic_time - checked_at < TICKS_PER_SEC) return enabled;
+    e = madeira_cfg_get( "env.MADEIRA_CTX_FP", buf, sizeof(buf) ) ? buf : getenv( "MADEIRA_CTX_FP" );
+    enabled = !(e && e[0] == '0');
+    checked_at = monotonic_time ? monotonic_time : 1;
+    return enabled;
 }
 
 int ios_fill_thread_context( struct thread *thread,
@@ -915,7 +924,26 @@ int ios_fill_thread_context( struct thread *thread,
     kern_return_t kr;
     int have_native = 0;
 
+    /* madeira-bcd (round 660, M001): every switch is read and every line printed OUTSIDE the halt below. Wine's threads are
+     * threads of this one process, so the halted thread can hold a lock of the C library (getenv's environment lock,
+     * stdio's file lock, malloc's zone lock); a getenv, a config file read or an fprintf inside the halt then waited for
+     * it for ever, with the server stopped (Requiem froze in 3 of 3 sessions, Counter-Strike Nexon too: the [main-stall]
+     * dumps show the server thread in getenv under this function and the halted thread inside libc). The values are the
+     * same ones, read a few microseconds earlier; the lines are the same ones, printed a few microseconds later. */
+    static int ctx_frame_env = -1;
+    int ctx_fp, keep_hold, n_frame_line = 0;
+    uint64_t frame_line[5] = { 0 };   /* mach_pc, sp, frame, frame_pc, frame_sp of the [ctx-frame] line */
+
     if (thread->unix_pid == -1 || thread->unix_tid == (unsigned int)-1) return 0;
+    if (ctx_frame_env < 0)
+    {
+        /* MADEIRA_CTX_FRAME=1: a thread parked inside a syscall reports its saved syscall frame (ml716, below; opt-in while
+         * unproven). Read once. */
+        const char *e = getenv( "MADEIRA_CTX_FRAME" );
+        ctx_frame_env = (e && e[0] == '1') ? 1 : 0;
+    }
+    ctx_fp = ios_ctx_fp_enabled();
+    keep_hold = ios_pending_persistent_hold == thread && ios_real_suspend_enabled() && rs_flag_ok( thread, "capture" );
     if (mach_port_extract_right( mach_task_self(), thread->unix_tid,
                                  MACH_MSG_TYPE_COPY_SEND, &port, &type ))
         return 0;
@@ -944,7 +972,7 @@ int ios_fill_thread_context( struct thread *thread,
      * reads its floating-point context into a CONTEXT in the image and jumps to the
      * XMM13 slot. A thread blocked in a syscall is overridden below from the saved frame.
      * MADEIRA_CTX_FP=0 restores the zeroed vector registers. */
-    if (have_native && ios_ctx_fp_enabled())
+    if (have_native && ctx_fp)
     {
         arm_neon_state64_t neon;
         mach_msg_type_number_t ncount = ARM_NEON_STATE64_COUNT;
@@ -1012,12 +1040,6 @@ int ios_fill_thread_context( struct thread *thread,
      * through to the old behaviour rather than inventing state. */
     if (have_native)
     {
-        static int ctx_frame_env = -1;
-        if (ctx_frame_env < 0)
-        {
-            const char *e = getenv( "MADEIRA_CTX_FRAME" );
-            ctx_frame_env = (e && e[0] == '1') ? 1 : 0;
-        }
         if (ctx_frame_env && thread->teb)
         {
             uint64_t frame = 0, kstack = 0;
@@ -1045,11 +1067,11 @@ int ios_fill_thread_context( struct thread *thread,
                         native->ctl.arm64_regs.pc     = fpc;
                         native->ctl.arm64_regs.pstate = *(uint32_t *)(f + IOS_SCF_CPSR);
                         if (n_sub++ < 48)
-                            fprintf( stderr, "[ctx-frame] ml716 #%d tid=%04x source=syscall-frame "
-                                     "mach_pc=%p sp=%p inside_syscall=1 frame=%p frame_pc=%p frame_sp=%p\n",
-                                     n_sub, thread->id, (void *)(uintptr_t)mach_pc,
-                                     (void *)(uintptr_t)sp, (void *)(uintptr_t)frame,
-                                     (void *)(uintptr_t)fpc, (void *)(uintptr_t)fsp );
+                        {   /* printed after the halt (M001) */
+                            n_frame_line = n_sub;
+                            frame_line[0] = mach_pc; frame_line[1] = sp; frame_line[2] = frame;
+                            frame_line[3] = fpc; frame_line[4] = fsp;
+                        }
                     }
                 }
             }
@@ -1123,6 +1145,32 @@ int ios_fill_thread_context( struct thread *thread,
      * the critical section its target needs. Pair this with the [ec-getctx] record on the
      * ntdll side; correlate on tid/teb + native pc, NOT on line order, because the two
      * counters live in different modules. Log-only, capped. */
+    /* ml730: if this capture IS the first logical suspend, keep the halt we
+     * already have instead of resuming and re-suspending -- that window is
+     * exactly where the target would leave its blocking region. A snapshot-only
+     * capture (ios_pending_persistent_hold == NULL) resumes as it always did,
+     * and never releases a hold established by an earlier suspend. */
+    if (keep_hold && !thread->ios_mach_suspended)   /* the switch and the flag were read before the halt (M001) */
+    {
+        thread->ios_mach_suspended = 1;   /* inherit THIS thread_suspend(): do not resume */
+        rs_holds++;
+    }
+    else
+    {
+        /* Drop only the momentary halt taken at entry. If a persistent hold was
+         * established earlier its own thread_suspend() is still outstanding, so
+         * the target stays stopped -- Mach suspend counts nest. */
+        thread_resume( port );
+    }
+    mach_port_deallocate( mach_task_self(), port );
+
+    /* The lines of this capture, after the halt (M001). */
+    if (n_frame_line)
+        fprintf( stderr, "[ctx-frame] ml716 #%d tid=%04x source=syscall-frame "
+                 "mach_pc=%p sp=%p inside_syscall=1 frame=%p frame_pc=%p frame_sp=%p\n",
+                 n_frame_line, thread->id, (void *)(uintptr_t)frame_line[0],
+                 (void *)(uintptr_t)frame_line[1], (void *)(uintptr_t)frame_line[2],
+                 (void *)(uintptr_t)frame_line[3], (void *)(uintptr_t)frame_line[4] );
     {
         static int n_ctx;
         if (n_ctx++ < 48)
@@ -1136,26 +1184,6 @@ int ios_fill_thread_context( struct thread *thread,
                      (void *)(uintptr_t)(wow ? wow->ctl.x86_64_regs.rsp : 0),
                      have_native );
     }
-
-    /* ml730: if this capture IS the first logical suspend, keep the halt we
-     * already have instead of resuming and re-suspending -- that window is
-     * exactly where the target would leave its blocking region. A snapshot-only
-     * capture (ios_pending_persistent_hold == NULL) resumes as it always did,
-     * and never releases a hold established by an earlier suspend. */
-    if (ios_pending_persistent_hold == thread && ios_real_suspend_enabled() &&
-        rs_flag_ok( thread, "capture" ) && !thread->ios_mach_suspended)
-    {
-        thread->ios_mach_suspended = 1;   /* inherit THIS thread_suspend(): do not resume */
-        rs_holds++;
-    }
-    else
-    {
-        /* Drop only the momentary halt taken at entry. If a persistent hold was
-         * established earlier its own thread_suspend() is still outstanding, so
-         * the target stays stopped -- Mach suspend counts nest. */
-        thread_resume( port );
-    }
-    mach_port_deallocate( mach_task_self(), port );
 
     return have_native;
 }

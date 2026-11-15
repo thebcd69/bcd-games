@@ -9,9 +9,11 @@
  "matched": [
   "exception-dispatcher-null-cpu-area"
  ],
- "next": [],
+ "next": [
+  "env.MADEIRA_WIN64_FRESH = 1"
+ ],
  "note": "Night round 2026-11-11 (W-FEX; R1 S3b): Rockstar's installer in an ARM64EC session: its 32-bit vc_redist children end in the ntdll's own [rtcs] pre: NULL CPU area read (redelivery storm). The ntdll no longer reads it from build 652 (if the lead ships the fix); the child may still fail for its own reason. Send Log MRX800, build 634.",
  "outcome": "crashed",
  "stage": 3,
- "status": "known"
+ "status": "trying"
 }

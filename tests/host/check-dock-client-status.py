@@ -31,13 +31,17 @@ def check(what, cond, detail=""):
     ok = ok and bool(cond)
 
 
-pinned = re.search(r'static let clientSHA256 = "([0-9a-f]{64})"', runtime).group(1)
-second = re.search(r'supportedClientSHA256: Set<String> = \[clientSHA256, "([0-9a-f]{64})"\]', runtime)
-check("the supported set is the pinned build and one more", second is not None)
+# Round 660 (M139, owner 2026-11-15): the supported set is the client DLLs of the two builds BCD can install (January 2026, the default, and
+# September 2026, chosen in Settings > BCD Dock).
+builds = re.findall(r'static let (january|september) = Build\(id: (\d+),', runtime)
+clients = re.findall(r'\], clientSHA256: "([0-9a-f]{64})"\)', runtime)
+check("two client builds, 202601 and 202609, each with its client DLL", builds == [('january', '202601'), ('september', '202609')] and len(clients) == 2,
+      (builds, clients))
+check("the supported set is both builds' client DLLs", 'static let supportedClientSHA256: Set<String> = Set(builds.map(\\.clientSHA256))' in runtime)
 layouts = next((d / 'src/client_layout.c' for d in (root / 'madeira-dock', Path.home() / 'madeira-bcd/madeira-dock') if (d / 'src/client_layout.c').is_file()), None)
-if layouts and second:
+if layouts and len(clients) == 2:
     table = re.findall(r'^\s*\{\s*\n?\s*"([0-9a-f]{64})"', layouts.read_text(), re.M)
-    check("the supported set equals the Dock host's client_layout.c table", set(table) == {pinned, second.group(1)}, table)
+    check("the supported set equals the Dock host's client_layout.c table", set(table) == set(clients), table)
 else:
     print("skip: the Dock source is not at hand (madeira-dock submodule)")
 
@@ -58,6 +62,19 @@ assert(got == sha, "sha \(got) vs \(sha)")
 assert(SteamRuntimeFiles.clientStatus(drive: drive, supported: [sha]) == .supported)
 assert(SteamRuntimeFiles.clientStatus(drive: drive, supported: SteamRuntimeFiles.supportedClientSHA256) == .unsupported(sha: sha))
 assert(SteamRuntimeFiles.supportedClientSHA256.count == 2 && SteamRuntimeFiles.supportedClientSHA256.contains(SteamRuntimeFiles.clientSHA256))
+// Round 660 (M139): January 2026 unless Settings chose September 2026; the two builds' DLLs map back to them.
+UserDefaults.standard.removeObject(forKey: SteamRuntimeFiles.buildKey)
+assert(SteamRuntimeFiles.selected == SteamRuntimeFiles.january && SteamRuntimeFiles.packages.count == 3
+       && SteamRuntimeFiles.clientSHA256 == SteamRuntimeFiles.january.clientSHA256)
+UserDefaults.standard.set(202609, forKey: SteamRuntimeFiles.buildKey)
+assert(SteamRuntimeFiles.selected == SteamRuntimeFiles.september && SteamRuntimeFiles.packages.count == 2
+       && SteamRuntimeFiles.clientSHA256 == SteamRuntimeFiles.september.clientSHA256)
+UserDefaults.standard.set(1, forKey: SteamRuntimeFiles.buildKey)
+assert(SteamRuntimeFiles.selected == SteamRuntimeFiles.january, "any other value is January")
+UserDefaults.standard.removeObject(forKey: SteamRuntimeFiles.buildKey)
+assert(SteamRuntimeFiles.build(sha: SteamRuntimeFiles.january.clientSHA256) == SteamRuntimeFiles.january
+       && SteamRuntimeFiles.build(sha: SteamRuntimeFiles.september.clientSHA256) == SteamRuntimeFiles.september && SteamRuntimeFiles.build(sha: sha) == nil)
+assert(SteamRuntimeFiles.installedBuild(drive: drive) == nil, "an unsupported client is no build")
 let words = SteamRuntimeFiles.unsupportedClientWords(sha: sha)
 assert(words.contains(String(sha.prefix(12))) && words.contains("Replace client components") && words.contains("Settings"))
 // the rename: the folder moves, nothing is deleted, steamapps follows into the new client folder
@@ -79,6 +96,22 @@ let again = drive.appendingPathComponent("Program Files (x86)/Steam")
 try fm.createDirectory(at: again.appendingPathComponent("steamapps"), withIntermediateDirectories: true)
 try fm.createDirectory(at: second.appendingPathComponent("steamapps"), withIntermediateDirectories: true)
 assert(!SteamRuntimeFiles.moveSteamapps(from: second, into: again))
+// Round 660 (M139): a supported build that makes way for the other one is "Steam.<id>-<sha12>"; the player's folders move along, never over
+// one that is there.
+let third = try SteamRuntimeFiles.moveClientAside(root: again, sha: sha, label: "202601")
+assert(third.lastPathComponent == "Steam.202601-" + sha.prefix(12) && !fm.fileExists(atPath: again.path))
+for folder in ["userdata/123/730", "config", "depotcache"] {
+    try fm.createDirectory(at: third.appendingPathComponent(folder), withIntermediateDirectories: true)
+}
+try Data("cloud".utf8).write(to: third.appendingPathComponent("userdata/123/730/remote.vdf"))
+try fm.createDirectory(at: again.appendingPathComponent("config"), withIntermediateDirectories: true)   // the new client made its own config already
+assert(SteamRuntimeFiles.playerFolders == ["steamapps", "userdata", "config", "depotcache"])
+assert(SteamRuntimeFiles.moveFolder("steamapps", from: third, into: again), "steamapps moves")
+assert(SteamRuntimeFiles.moveFolder("userdata", from: third, into: again)
+       && fm.fileExists(atPath: again.appendingPathComponent("userdata/123/730/remote.vdf").path), "userdata moves with its files")
+assert(!SteamRuntimeFiles.moveFolder("config", from: third, into: again) && fm.fileExists(atPath: third.appendingPathComponent("config").path),
+       "config is never moved over the new client's own")
+assert(SteamRuntimeFiles.moveFolder("depotcache", from: third, into: again))
 print("PASS: clientStatus, the supported set, the rename aside and the steamapps move")
 '''
 with tempfile.TemporaryDirectory(prefix='madeira-client-status-') as tmp:
@@ -115,6 +148,18 @@ check("Settings > BCD Dock offers Replace client components for an unsupported b
       and 'prepare(prefix: MadeiraDock.prefix, replacing: replacing)' in (app / 'MadeiraDockModel.swift').read_text())
 prep = runtime[runtime.index('func prepare(prefix: URL, replacing: Bool = false'):]
 check("prepare(replacing:) renames the old folder only after the download passed its pinned hashes and before the install",
-      prep.index('SteamRuntimeFiles.clientSHA256') < prep.index('moveClientAside(root: root, sha: sha)') < prep.index('for (url, bytes) in pending'))
+      prep.index('== chosen.clientSHA256') < prep.index('moveClientAside(root: root, sha: sha, label:') < prep.index('for (url, bytes) in pending'))
+# Round 660 (M139): replace mode also changes between the two supported builds, only to the one Settings chose and never to the same one;
+# a fresh install takes the chosen build; the change between supported builds moves the player's folders, the unsupported case steamapps only.
+check("replace mode takes an unsupported client, or a supported one of the other build, never the chosen build itself",
+      'case .unsupported(let sha):\n                unsupportedSHA = sha' in prep
+      and 'guard let installed = SteamRuntimeFiles.installedBuild(drive: drive), installed != chosen else {' in prep
+      and 'let chosen = SteamRuntimeFiles.selected' in prep and 'for (index, package) in chosen.packages.enumerated()' in prep)
+check("between supported builds the old folder is named by its build and the player's folders follow; an unsupported one keeps the old name",
+      'label: switchingFrom.map { String($0.id) } ?? "unsupported"' in prep and 'if let renamedClient, switchingFrom == nil {' in prep
+      and 'for folder in SteamRuntimeFiles.playerFolders {' in prep)
+check("Settings > BCD Dock: the Newer Steam client switch and the Switch button run replace mode",
+      'func setNewerClient(_ on: Bool)' in live and 'SteamRuntimeFiles.buildKey' in live and 'newerClientSwitch(parts)' in view
+      and 'id: Self.prefix + "switch") { backend.replaceComponents() }' in view)
 print("PASS: Dock client status" if ok else "FAILED: Dock client status")
 sys.exit(0 if ok else 1)

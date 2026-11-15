@@ -18,6 +18,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 /* madeira-bcd: the app's activity notifications (MADEIRA_AUDIO_RESUME, MADEIRA_PAUSE_IN_BACKGROUND). */
 #import <UIKit/UIKit.h>
+#import <Metal/Metal.h>   /* madeira-bcd (KosmicKrisp): the Metal 4 question of bcd_vulkan_session_setup */
 #include <stdatomic.h>
 #include <sys/time.h>
 #include <time.h>
@@ -33,6 +34,7 @@
 #include "../../build/bcd_epic_mask.h"   /* madeira-bcd (2026-10-22): Epic's sign-in arguments masked in the argv lines */
 #include "../../build/madeira_redact.h"   /* the arguments are logged with credential-like values redacted */
 #include "BCDGraphicsRoutes.h"   /* madeira-bcd (round 602): env.MADEIRA_D3D8 = d3d9 and env.MADEIRA_DDRAW = cnc replace Wine's d3d8.dll and ddraw.dll in syswow64 */
+#include "BCDJapanese.h"   /* madeira-bcd (upstream Madeira #567 by nekodesusan-prog): env.MADEIRA_JAPANESE = 1, a game's Japanese locale and font */
 #include <sys/stat.h>
 #include <pwd.h>
 #include <limits.h>
@@ -573,22 +575,90 @@ static void bcd_gl_session_setup(NSString *bundlePath)
 }
 
 /* madeira-bcd (Windows Vulkan, docs/BUILDING.md 6c; Madeira #353, #400 and #462, see THIRD-PARTY-NOTICES.md): the game's `vulkan` key (bcd.cfg, or
- * the game's own file, which wins) turns Vulkan on for the x64 programs of THIS session:
+ * the game's own file, which wins) turns Vulkan on for the programs of THIS session (x64; 32-bit ones too from build 660, below):
  *   moltenvk     winevulkan on MoltenVK, the gl/ folder's libMoltenVK.dylib (the one Zink uses)
- *   kosmickrisp  the same on gl/libvulkan_kosmickrisp.dylib, if a build bundles it (BCD's does not yet: Vulkan then stays off)
+ *   kosmickrisp  the same on gl/libvulkan_kosmickrisp.dylib (Mesa's KosmicKrisp, build/mesa-ios/build-kosmickrisp-bcd.sh), when the build
+ *                bundles it and the device can run it: the library is written against Metal 4, so it needs iOS 26 and a GPU of the
+ *                Metal 4 family (bcd_kosmickrisp_usable). Otherwise Vulkan stays off and the log says why; MoltenVK is never taken instead.
+ *                Its shader cache goes to Library/Caches/KosmicKrisp for the session (MESA_SHADER_CACHE_DIR, when nothing else set one).
  * Only these two words count. Unset, empty, "off" or anything else: Vulkan stays off, MADEIRA_VULKAN_LIBRARY is not exported, the prefix
  * gets no winevulkan.dll and keeps the farm's vulkan-1.dll stand-in (tools/build-stub-dlls.py: a game that probes finds no Vulkan driver,
  * as always), and win32u lists no Vulkan GPU (build/win32u-unix/vulkan_ios.c): the session is what it was before. On: MADEIRA_VULKAN_LIBRARY
- * names the library and system32 (in an ARM64EC session) and sysx64 get links to the bundle's vulkan/arm64ec-windows/winevulkan.dll and
+ * names the library and system32 and sysx64 (both in every session since build 660) get links to the bundle's vulkan/arm64ec-windows/winevulkan.dll and
  * vulkan-1.dll, over the stand-in; the next session's farm pass restores the stand-in, and winevulkan.dll's link, which no farm holds, is
- * removed here when the key is gone. x64 programs only: the unix side binds no 32-bit table (build/ntdll-unix/virtual_ios.c). */
+ * removed here when the key is gone. 32-bit programs (build 660): bcd_vulkan32_session_links below. */
+/* madeira-bcd (KosmicKrisp): can this device load gl/libvulkan_kosmickrisp.dylib? The library's minimum is iOS 26.0 (it uses the Metal 4
+ * queue, compiler and argument tables; dyld refuses it on an older iOS) and its device search takes only a GPU of the Metal 4 family
+ * (Mesa src/kosmickrisp/bridge/mtl_device.m). NULL: yes; else the reason, for the log. */
+static const char *bcd_kosmickrisp_unusable(void)
+{
+    if (@available(iOS 26.0, *)) {
+        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+        if (device && [device supportsFamily:MTLGPUFamilyMetal4]) return NULL;
+        return "this device's GPU is not of the Metal 4 family";
+    }
+    return "KosmicKrisp needs iOS 26 or later";
+}
+
+/* The shader cache variables this file set for a KosmicKrisp session, so that the session's end removes exactly those (the OpenGL
+ * driver uses an existing MESA_SHADER_CACHE_DIR as it is, build/win32u-unix/opengl_ios.c). */
+static int g_kk_cache_dir_set, g_kk_cache_size_set;
+
+/* madeira-bcd (Vulkan for 32-bit programs, build 660; docs/VULKAN.md "32-bit programs"): the same key gives a 32-bit program Vulkan.
+ * `want` is the key's word when the session's Vulkan is on, NULL when it is off. On: C:\windows\syswow64 (the 32-bit system folder,
+ * of any session: a 64-bit launcher or the Dock starts 32-bit games) gets links to the bundle's vulkan/i386-windows/winevulkan.dll and
+ * vulkan-1.dll, Wine's own two DLLs built for i386 (tools/build-vulkan-dlls.sh); the i386 farm has neither file, so a 32-bit program
+ * without the key finds no vulkan-1.dll at all, as always. Their unix side is winevulkan's wow64 table (build/ntdll-unix/virtual_ios.c
+ * binds it only while MADEIRA_VULKAN_LIBRARY is set), whose thunks know the program's guest window (tools/patch-wine-vulkan-wow64.py).
+ * Off, or the folder not in this build: a link an earlier session made is removed (only links into vulkan/i386-windows are touched),
+ * nothing is linked, and the session is what it was. A file of that name that is not such a link (the user's own) is left alone. */
+static void bcd_vulkan32_session_links(NSFileManager *fm, NSString *prefix, NSString *bundlePath, const char *want)
+{
+    NSString *sys = [prefix stringByAppendingPathComponent:@"drive_c/windows/syswow64"];
+    NSString *stack = [bundlePath stringByAppendingPathComponent:@"vulkan/i386-windows"];
+    NSArray<NSString *> *dlls = @[@"winevulkan.dll", @"vulkan-1.dll"];
+    BOOL isDir = NO;
+    int linked = 0;
+
+    for (NSString *dll in dlls) {
+        NSString *path = [sys stringByAppendingPathComponent:dll];
+        NSString *dest = [fm destinationOfSymbolicLinkAtPath:path error:nil];
+        if (dest && [dest rangeOfString:@"/vulkan/i386-windows/"].location != NSNotFound)
+            [fm removeItemAtPath:path error:nil];
+    }
+    if (!want) return;
+    if (![fm fileExistsAtPath:sys isDirectory:&isDir] || !isDir) return;   /* a build without the 32-bit set: no 32-bit program runs */
+    for (NSString *dll in dlls)
+        if (access([stack stringByAppendingPathComponent:dll].fileSystemRepresentation, R_OK) != 0) {
+            dprintf(STDERR_FILENO, "[WineProc] vulkan=%s: no Vulkan for 32-bit programs in this build (the bundle's vulkan/i386-windows/%s is "
+                    "missing); 64-bit programs are not affected\n", want, dll.UTF8String);
+            return;
+        }
+    for (NSString *dll in dlls) {
+        NSString *dst = [sys stringByAppendingPathComponent:dll];
+        struct stat st;
+        if (lstat(dst.fileSystemRepresentation, &st) == 0 && !S_ISLNK(st.st_mode)) {
+            dprintf(STDERR_FILENO, "[WineProc] vulkan=%s: syswow64\\%s is a file, not a link: left as it is\n", want, dll.UTF8String);
+            continue;
+        }
+        [fm removeItemAtPath:dst error:nil];
+        if ([fm createSymbolicLinkAtPath:dst withDestinationPath:[stack stringByAppendingPathComponent:dll] error:nil]) linked++;
+    }
+    dprintf(STDERR_FILENO, "[WineProc] vulkan=%s: Vulkan for 32-bit programs is on for this session (%d Vulkan DLL links in syswow64; "
+            "mapped memory is placed inside the program's address space)\n", want, linked);
+}
+
 static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSString *bundlePath, BOOL use_arm64ec)
 {
     char want[64] = "";
     NSString *win = [prefix stringByAppendingPathComponent:@"drive_c/windows"];
     NSString *stack = [bundlePath stringByAppendingPathComponent:@"vulkan/arm64ec-windows"];
     NSArray<NSString *> *dlls = @[@"winevulkan.dll", @"vulkan-1.dll"];
-    NSArray<NSString *> *dirs = use_arm64ec ? @[@"system32", @"sysx64"] : @[@"sysx64"];
+    /* madeira-bcd (round 660, M007): system32 too in EVERY session, not only an ARM64EC one. A Dock or library session starts
+     * explorer.exe from the aarch64 bundle (use_arm64ec is NO), and the farm's cross-link pass leaves Wine's 122,880-byte
+     * vulkan-1.dll stand-in in system32, which the game's x64 process finds first: it answered VK_ERROR_INCOMPATIBLE_DRIVER to every
+     * probe and no game ever got Vulkan there (skate. EBRECM, P9ZRP4, Q4D2RJ; GP8RY2: the stand-in mapped, no winevulkan line). */
+    NSArray<NSString *> *dirs = @[@"system32", @"sysx64"];
     NSString *lib = nil;
     int linked = 0;
 
@@ -600,6 +670,7 @@ static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSStri
             if (dest && [dest rangeOfString:@"/vulkan/arm64ec-windows/"].location != NSNotFound)
                 [fm removeItemAtPath:path error:nil];
         }
+    bcd_vulkan32_session_links(fm, prefix, bundlePath, NULL);   /* and its 32-bit links (syswow64); made again below only with the key */
 
     if (madeira_cfg_get("vulkan", want, sizeof(want)) && want[0]) {
         for (char *c = want; *c; c++) if (*c >= 'A' && *c <= 'Z') *c += 'a' - 'A';
@@ -607,6 +678,14 @@ static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSStri
         else if (!strcmp(want, "kosmickrisp")) lib = [bundlePath stringByAppendingPathComponent:@"gl/libvulkan_kosmickrisp.dylib"];
         else if (strcmp(want, "off") && strcmp(want, "0") && strcmp(want, "no"))
             dprintf(STDERR_FILENO, "[WineProc] vulkan=%s is not moltenvk or kosmickrisp: Vulkan stays off\n", want);
+    }
+    /* madeira-bcd (KosmicKrisp): a bundled library this device cannot load is as good as none; the reason goes into the log. */
+    if (lib && !strcmp(want, "kosmickrisp") && access(lib.fileSystemRepresentation, R_OK) == 0) {
+        const char *why = bcd_kosmickrisp_unusable();
+        if (why) {
+            dprintf(STDERR_FILENO, "[WineProc] vulkan=kosmickrisp: Vulkan stays off, %s\n", why);
+            lib = nil;
+        }
     }
     if (!lib) {
         unsetenv("MADEIRA_VULKAN_LIBRARY");
@@ -621,14 +700,32 @@ static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSStri
         return;
     }
     setenv("MADEIRA_VULKAN_LIBRARY", lib.UTF8String, 1);   /* read by build/win32u-unix/vulkan_ios.c */
+    if (!strcmp(want, "kosmickrisp")) {
+        /* Mesa's disk cache (the driver's pipeline cache and compiled shaders; Playport's patches 0014 and 0015): a folder of its own in
+         * Library/Caches, 512 MB at most. Never over a value that is already there (a line of the game's file, or the OpenGL driver's). */
+        NSString *cache = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject
+                            stringByAppendingPathComponent:@"KosmicKrisp"] copy];
+        if (cache && !getenv("MESA_SHADER_CACHE_DIR") && !getenv("MADEIRA_GL_BACKEND") &&
+            [fm createDirectoryAtPath:cache withIntermediateDirectories:YES attributes:nil error:nil]) {
+            setenv("MESA_SHADER_CACHE_DIR", cache.fileSystemRepresentation, 1);
+            g_kk_cache_dir_set = 1;
+            if (!getenv("MESA_SHADER_CACHE_MAX_SIZE")) {
+                setenv("MESA_SHADER_CACHE_MAX_SIZE", "512M", 1);
+                g_kk_cache_size_set = 1;
+            }
+        }
+        dprintf(STDERR_FILENO, "[WineProc] vulkan=kosmickrisp: shader cache %s\n",
+                g_kk_cache_dir_set ? "in Library/Caches/KosmicKrisp (512M at most)" : "left as the session has it");
+    }
     for (NSString *dir in dirs)
         for (NSString *dll in dlls) {
             NSString *dst = [[win stringByAppendingPathComponent:dir] stringByAppendingPathComponent:dll];
             [fm removeItemAtPath:dst error:nil];
             if ([fm createSymbolicLinkAtPath:dst withDestinationPath:[stack stringByAppendingPathComponent:dll] error:nil]) linked++;
         }
-    dprintf(STDERR_FILENO, "[WineProc] vulkan=%s: Vulkan is on for this session (MADEIRA_VULKAN_LIBRARY=%s; %d Vulkan DLL links in %s; "
-            "x64 programs only)\n", want, lib.UTF8String, linked, use_arm64ec ? "system32 + sysx64" : "sysx64");
+    dprintf(STDERR_FILENO, "[WineProc] vulkan=%s: Vulkan is on for this session (MADEIRA_VULKAN_LIBRARY=%s; %d Vulkan DLL links in "
+            "system32 + sysx64 for x64 programs)\n", want, lib.UTF8String, linked);
+    bcd_vulkan32_session_links(fm, prefix, bundlePath, want);   /* the same key for 32-bit programs (syswow64) */
 }
 
 /* The profile's AppData\LocalLow folder.
@@ -828,6 +925,14 @@ void madeira_seed_prefix_if_needed(const char *prefix_path) {
         madeira_undo_appdata_skeleton( prefix );
         madeira_ensure_locallow( prefix );
         madeira_seed_fonts_and_vc80_amd64( fm, prefix );
+        /* madeira-bcd (upstream Madeira #567 by nekodesusan-prog, BCDJapanese.c): with env.MADEIRA_JAPANESE = 1 the bundle's Japanese
+         * font is linked into C:\windows\Fonts and the Windows Japanese font names are mapped onto it in user.reg; a session without
+         * it takes back what such a session left (one stat when there is nothing). Only while no wineserver runs: the call from
+         * wine_process_thread comes after the server has read the registry and leaves the prefix alone. */
+        if (!wineserver_is_running()) {
+            extern void ws_log(const char *fmt, ...);
+            bcd_japanese_prefix( prefix_path, [[NSBundle mainBundle] resourcePath].fileSystemRepresentation, bcd_japanese_on(), ws_log );
+        }
     }
 }
 
@@ -2197,6 +2302,11 @@ static void *wine_process_thread(void *arg) {
                     LOG("game config env: %{public}s=%{public}s", k.UTF8String, v.UTF8String);
                     fprintf(stderr, "[madeira-env] game %s=%s\n", k.UTF8String, v.UTF8String);
                 }
+                /* madeira-bcd (upstream Madeira #567 by nekodesusan-prog, BCDJapanese.c): env.MADEIRA_JAPANESE = 1, after the game's own
+                 * lines: Wine's system and user locale ja-JP (LC_ALL = ja_JP.UTF-8 unless the file already set a Japanese one, so ANSI and
+                 * OEM code page 932) and the extra code page tables (MADEIRA_NLS_EXTRA), only when the bundle has the font. The session
+                 * end puts LC_ALL and LANG back. */
+                bcd_japanese_session_env(bcd_japanese_on(), [[NSBundle mainBundle] resourcePath].fileSystemRepresentation, STDERR_FILENO);
                 {   /* madeira-bcd (round 624, agent R: the Epic GTA V / RDR2 starts 7Z8VKR, TV6H06): env.MADEIRA_STEAM_IDENTITY = none from the
                      * game's OWN file. The check near the start of this function runs before these lines are exported, so a key from the game's
                      * file was never seen there (0 of 2,182 logs printed the line below). Same effect as that check; it still works for a key
@@ -2646,6 +2756,51 @@ static void *wine_process_thread(void *arg) {
                 }
             }
 
+            /* madeira-bcd (2026-11-15, owner's decision: the frozen 64-bit DLLs audited and rebuilt, chosen by a key): env.MADEIRA_DXMT_FRESH = 1
+             * (the game's own file, or bcd.cfg for every game) runs the 64-bit DXMT set built from BCD's dxmt pin instead of the four binaries
+             * upstream committed (d3d11.dll and dxgi.dll built 2026-10-14 from dxmt 2dc8d16, d3d10core.dll and winemetal.dll built 2026-09-28
+             * from dxmt b15e8ba; each reproduced from that source): d3d11-src.dll, dxgi-src.dll, d3d10core-src.dll and winemetal-src.dll are
+             * linked in as d3d11.dll, dxgi.dll, d3d10core.dll and winemetal.dll, and the DXMT DLLs then load DXMT's internal shaders compiled
+             * from the pin (they read the same variable: tools/patch-d3d11-src-metallib.py). All four or none: a build that lacks one keeps the
+             * committed set and the variable is removed, so no DLL acts on it. Off by default: every game keeps the committed set, and dropping
+             * the line restores it at the next start (the farms above are relinked from the bundle every session). Linked like dxgi-src.dll:
+             * sysx64 in any session, system32 too in an ARM64EC one. The MADEIRA_DXGI_SRC and MADEIRA_D3D11_SRC lines below link the same two
+             * files again (nothing changes under this key), and DXMT's opt-in 64-bit Direct3D 9 (the block below) loads this winemetal.dll too. Only the
+             * value "1" counts. */
+            {
+                const char *dxmtFresh = getenv("MADEIRA_DXMT_FRESH");
+                if (dxmtFresh && strcmp(dxmtFresh, "1") == 0) {
+                    static const char *const freshSet[][2] = {
+                        { "d3d11.dll", "d3d11-src.dll" }, { "dxgi.dll", "dxgi-src.dll" },
+                        { "d3d10core.dll", "d3d10core-src.dll" }, { "winemetal.dll", "winemetal-src.dll" },
+                    };
+                    NSString *ecDir = [bundlePath stringByAppendingPathComponent:@"arm64ec-windows"];
+                    const char *missing = NULL;
+                    for (size_t i = 0; i < sizeof(freshSet) / sizeof(freshSet[0]) && !missing; i++) {
+                        if (![fm fileExistsAtPath:[ecDir stringByAppendingPathComponent:@(freshSet[i][1])]])
+                            missing = freshSet[i][1];
+                    }
+                    if (missing) {
+                        unsetenv("MADEIRA_DXMT_FRESH");
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_DXMT_FRESH=1 but this build has no %s -- the committed DXMT set stays\n", missing);
+                    } else {
+                        NSMutableArray *dirs = [NSMutableArray arrayWithObject:
+                            [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"]];
+                        if (use_arm64ec) [dirs addObject:sys32Dir];
+                        for (NSString *dir in dirs) {
+                            for (size_t i = 0; i < sizeof(freshSet) / sizeof(freshSet[0]); i++) {
+                                NSString *dst = [dir stringByAppendingPathComponent:@(freshSet[i][0])];
+                                [fm removeItemAtPath:dst error:nil];
+                                [fm createSymbolicLinkAtPath:dst withDestinationPath:[ecDir stringByAppendingPathComponent:@(freshSet[i][1])] error:nil];
+                            }
+                        }
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_DXMT_FRESH=1: d3d11.dll, dxgi.dll, d3d10core.dll, winemetal.dll -> the -src builds "
+                                "(the 64-bit DXMT set built from BCD's pin, its own internal shaders; %s)\n",
+                                use_arm64ec ? "system32 + sysx64" : "sysx64 only");
+                    }
+                }
+            }
+
             /* madeira-bcd: env.MADEIRA_DXGI_SRC = 1 (the game's own file) runs the
              * 64-bit dxgi.dll built from the dxmt submodule source
              * (tools/build-dxgi-dll.sh ships it as dxgi-src.dll): upstream's committed
@@ -2913,6 +3068,93 @@ static void *wine_process_thread(void *arg) {
             /* madeira-bcd (Windows Vulkan): the game's vulkan key, after the farm passes above (it re-points two links of the prefix). */
             bcd_vulkan_session_setup(fm, prefix, bundlePath, use_arm64ec);
 
+            /* madeira-bcd: env.MADEIRA_WIN64_FRESH = 1 (exactly "1"; default off; a game's file, a list line or bcd.cfg) runs the rebuilt 64-bit Wine set.
+             * The Wine DLLs of both 64-bit folders are committed binaries that no step rebuilds, so a source fix (the pinned Wine's own commits,
+             * BCD's tools/patch-wine-*.py scripts) reaches only the 32-bit build. tools/build-wine-fresh-dlls.sh rebuilds them from the pinned
+             * source plus those scripts and ships a <name>-fresh.dll NEXT TO the committed <name>.dll in arm64ec-windows and aarch64-windows,
+             * only for a module whose rebuild is not the committed file (programs and drivers: <name>-fresh.exe, .drv, .cpl; a rebuild that
+             * equals the committed file apart from time stamps is not shipped, so those names stay as they are). With the key on, each such
+             * file is linked over the farm's link of its name: arm64ec files in sysx64 (and system32 in an ARM64EC session), aarch64 files in
+             * sysaa64 (and system32 in any other session), the same places as the opt-in DLLs below. The ntdll of a process is chosen by the
+             * unix loader (build/ntdll-unix/loader_ios.c ios_ec_ntdll_name: ntdll-fresh.dll, or its -xsec / -sync variant built on the rebuilt
+             * source), and system32 and sysx64 name the same file here. The opt-in loop below runs after this one, so a game that lists an
+             * opt-in DLL (kernelbase, setupapi, ...) keeps that variant, as before; the kernel32-usd block after the loop leaves a kernel32-fresh.dll linked here
+             * (it carries the same patch) and links kernel32-usd.dll otherwise. Off: nothing here, and the farms above (relinked from the
+             * bundle at the start of every session) are what they always were. */
+            BOOL freshNtdll = NO;
+            BOOL freshKernel32 = NO;   /* the arm64ec kernel32-fresh.dll took the kernel32.dll links: the kernel32-usd block below then leaves them */
+            {
+                const char *freshKey = getenv("MADEIRA_WIN64_FRESH");
+                if (freshKey && freshKey[0] == '1' && !freshKey[1]) {
+                    /* build 663: the rebuilt kernel32 is built with tools/patch-wine-kernel32-usd-direct.py (its GetTickCount reads KUSER_SHARED_DATA
+                     * through BCD's answer, as kernel32-usd.dll's does); env.MADEIRA_USD_DIRECT = 0 asks for the committed kernel32.dll, and that
+                     * wins here too: no kernel32-fresh.dll is linked then, in either folder. */
+                    const char *usdKey = getenv("MADEIRA_USD_DIRECT");
+                    BOOL usdOff = usdKey && !strcmp(usdKey, "0");
+                    struct { const char *folder; const char *farm; BOOL inSystem32; } sets[2] = {
+                        { "arm64ec-windows", "sysx64", use_arm64ec },
+                        { "aarch64-windows", "sysaa64", !use_arm64ec },
+                    };
+                    int totalLinked = 0;
+                    for (int k = 0; k < 2; k++) {
+                        NSString *folderName = [NSString stringWithUTF8String:sets[k].folder];
+                        NSString *dir = [bundlePath stringByAppendingPathComponent:folderName];
+                        NSMutableArray *dsts = [NSMutableArray arrayWithObject:
+                            [prefix stringByAppendingPathComponent:[@"drive_c/windows/" stringByAppendingString:[NSString stringWithUTF8String:sets[k].farm]]]];
+                        if (sets[k].inSystem32) [dsts addObject:sys32Dir];
+                        int linked = 0;
+                        for (NSString *file in [fm contentsOfDirectoryAtPath:dir error:nil]) {
+                            NSString *ext = file.pathExtension;
+                            NSString *stem = [file stringByDeletingPathExtension];
+                            if (![stem hasSuffix:@"-fresh"] || [stem isEqualToString:@"ntdll-fresh"]) continue;   /* ntdll: below */
+                            NSString *target = [[stem substringToIndex:stem.length - 6] stringByAppendingPathExtension:ext];
+                            if (usdOff && [target isEqualToString:@"kernel32.dll"]) continue;
+                            NSString *src = [dir stringByAppendingPathComponent:file];
+                            NSMutableArray *to = [NSMutableArray arrayWithArray:dsts];
+                            /* an ARM64 program or library the ARM64EC folder does not have (services.exe, wineboot.exe, explorer.exe ...) is in system32 of an
+                             * ARM64EC session through the farm's cross-link pass: its fresh file takes that link too, or the session would still start the
+                             * committed one */
+                            if (k == 1 && use_arm64ec && ![fm fileExistsAtPath:[[bundlePath stringByAppendingPathComponent:@"arm64ec-windows"]
+                                                                               stringByAppendingPathComponent:target]])
+                                [to addObject:sys32Dir];
+                            for (NSString *d in to) {
+                                NSString *dst = [d stringByAppendingPathComponent:target];
+                                [fm removeItemAtPath:dst error:nil];
+                                [fm createSymbolicLinkAtPath:dst withDestinationPath:src error:nil];
+                            }
+                            if (k == 0 && [target isEqualToString:@"kernel32.dll"]) freshKernel32 = YES;
+                            linked++;
+                        }
+                        /* ntdll: the file the unix loader maps for this folder (loader_ios.c ios_ec_ntdll_name: the same order, and the same
+                         * fall back to the older variants when the file is missing, which the blocks below then link as before). */
+                        {
+                            const char *sx = getenv("MADEIRA_NTDLL_XSEC"), *sy = getenv("MADEIRA_NTDLL_SYNC");
+                            BOOL ec = (k == 0);
+                            BOOL xsecOn = ec && sx && sx[0] == '1' && !sx[1];
+                            BOOL syncOn = ec && sy && ((sy[0] == '1' && !sy[1]) || !strcmp(sy, "native"));
+                            NSString *name = xsecOn ? @"ntdll-fresh-xsec.dll" : syncOn ? @"ntdll-fresh-sync.dll" : @"ntdll-fresh.dll";
+                            NSString *src = [dir stringByAppendingPathComponent:name];
+                            if ([fm fileExistsAtPath:src]) {
+                                for (NSString *d in dsts) {
+                                    NSString *dst = [d stringByAppendingPathComponent:@"ntdll.dll"];
+                                    [fm removeItemAtPath:dst error:nil];
+                                    [fm createSymbolicLinkAtPath:dst withDestinationPath:src error:nil];
+                                }
+                                linked++;
+                                if (ec) freshNtdll = YES;
+                                dprintf(STDERR_FILENO, "[WineProc] ntdll.dll -> %s (MADEIRA_WIN64_FRESH=1; %s%s)\n", name.UTF8String,
+                                        sets[k].farm, sets[k].inSystem32 ? " + system32" : "");
+                            }
+                        }
+                        totalLinked += linked;
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_WIN64_FRESH=1: %d %s files linked (%s%s)\n", linked, sets[k].folder,
+                                sets[k].farm, sets[k].inSystem32 ? " + system32" : "");
+                    }
+                    if (!totalLinked)
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_WIN64_FRESH=1 but this build ships no *-fresh files -- the committed 64-bit set\n");
+                }
+            }
+
             /* madeira-bcd: env.MADEIRA_OPTIN_DLLS = dxva2,evr (comma or semicolon separated) runs each
              * listed <name>-optin.dll that this build ships (tools/build-wine-extra-dlls.sh, OPTIN_WANT)
              * as <name>.dll, as MADEIRA_WER and MADEIRA_WINTYPES above. Fort Solis and DRAGON BALL
@@ -3028,6 +3270,38 @@ static void *wine_process_thread(void *arg) {
                             name.UTF8String, name.UTF8String);
             }
 
+            /* madeira-bcd (build 663): kernel32-usd.dll (tools/build-wine-extra-dlls.sh, tools/patch-wine-kernel32-usd-direct.py) is the
+             * shipped kernel32 rebuilt from the pin with one change: GetTickCount and GetTickCount64 read KUSER_SHARED_DATA where it
+             * really is (BCD's private process class 1011) instead of at 0x7ffe0000, where every read took a Mach exception that the
+             * sub-floor service answered from the same page (RDR2: about 20,000 a second, a large part of a performance core). The
+             * same values without the fault. Linked as kernel32.dll for every 64-bit program of the session, where the farm links
+             * the shipped one (sysx64, and system32 in an ARM64EC session); env.MADEIRA_USD_DIRECT = 0, or a build without the file,
+             * keeps the shipped kernel32.dll, which the next session's farm relink puts back anyway. */
+            /* This block runs after the rebuilt-set block and the opt-in loop above (round 2026-11-15, K6W): with env.MADEIRA_WIN64_FRESH = 1 and
+             * a kernel32-fresh.dll in the arm64ec folder (built with the same patch) that block has linked the rebuilt kernel32, and this one
+             * leaves it. Key off: the rebuilt-set block did nothing, and this one is what it was. */
+            {
+                const char *usdDirect = getenv("MADEIRA_USD_DIRECT");
+                NSString *usdSrc = [[bundlePath stringByAppendingPathComponent:@"arm64ec-windows"] stringByAppendingPathComponent:@"kernel32-usd.dll"];
+                if (usdDirect && !strcmp(usdDirect, "0")) {
+                    dprintf(STDERR_FILENO, "[WineProc] MADEIRA_USD_DIRECT=0: the shipped kernel32.dll (GetTickCount reads 0x7ffe0000 through the fault service)\n");
+                } else if (freshKernel32) {
+                    dprintf(STDERR_FILENO, "[WineProc] kernel32.dll stays kernel32-fresh.dll (MADEIRA_WIN64_FRESH=1: the rebuilt kernel32 reads KUSER_SHARED_DATA "
+                                           "directly as well; kernel32-usd.dll is not linked)\n");
+                } else if ([fm fileExistsAtPath:usdSrc]) {
+                    NSString *sysx64Dir = [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"];
+                    for (NSString *dir in (use_arm64ec ? @[ sysx64Dir, sys32Dir ] : @[ sysx64Dir ])) {
+                        NSString *dst = [dir stringByAppendingPathComponent:@"kernel32.dll"];
+                        [fm removeItemAtPath:dst error:nil];
+                        [fm createSymbolicLinkAtPath:dst withDestinationPath:usdSrc error:nil];
+                    }
+                    dprintf(STDERR_FILENO, "[WineProc] kernel32.dll -> kernel32-usd.dll (GetTickCount reads KUSER_SHARED_DATA directly; "
+                                           "MADEIRA_USD_DIRECT=0 keeps the shipped one)\n");
+                } else {
+                    dprintf(STDERR_FILENO, "[WineProc] this build has no kernel32-usd.dll: the shipped kernel32.dll\n");
+                }
+            }
+
             /* madeira-bcd: ntdll-sync.dll (tools/patch-wine-ntdll-sync.py, built by
              * tools/build-wine-extra-dlls.sh next to the shipped ntdll.dll) is the
              * ARM64EC ntdll the unix loader maps when env.MADEIRA_NTDLL_SYNC = 1 or
@@ -3044,7 +3318,7 @@ static void *wine_process_thread(void *arg) {
                 BOOL ntSyncOn = ntSync && ((ntSync[0] == '1' && !ntSync[1]) || !strcmp(ntSync, "native"));
                 NSString *syncDll = [[bundlePath stringByAppendingPathComponent:@"arm64ec-windows"]
                                      stringByAppendingPathComponent:@"ntdll-sync.dll"];
-                if (ntSyncOn && [fm fileExistsAtPath:syncDll]) {
+                if (ntSyncOn && !freshNtdll && [fm fileExistsAtPath:syncDll]) {
                     NSMutableArray *dirs = [NSMutableArray arrayWithObject:
                         [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"]];
                     if (use_arm64ec) [dirs addObject:sys32Dir];
@@ -3055,7 +3329,7 @@ static void *wine_process_thread(void *arg) {
                     }
                     dprintf(STDERR_FILENO, "[WineProc] ntdll.dll -> ntdll-sync.dll (opt-in MADEIRA_NTDLL_SYNC=%s; %s)\n",
                             ntSync, use_arm64ec ? "system32 + sysx64" : "sysx64 only");
-                } else if (ntSyncOn) {
+                } else if (ntSyncOn && !freshNtdll) {
                     dprintf(STDERR_FILENO, "[WineProc] MADEIRA_NTDLL_SYNC=%s but this build has no ntdll-sync.dll: the shipped ntdll.dll\n", ntSync);
                 }
             }
@@ -3071,7 +3345,7 @@ static void *wine_process_thread(void *arg) {
                 BOOL xsecOn = xsec && xsec[0] == '1' && !xsec[1];
                 NSString *xsecDll = [[bundlePath stringByAppendingPathComponent:@"arm64ec-windows"]
                                      stringByAppendingPathComponent:@"ntdll-xsec.dll"];
-                if (xsecOn && [fm fileExistsAtPath:xsecDll]) {
+                if (xsecOn && !freshNtdll && [fm fileExistsAtPath:xsecDll]) {
                     NSMutableArray *dirs = [NSMutableArray arrayWithObject:
                         [prefix stringByAppendingPathComponent:@"drive_c/windows/sysx64"]];
                     if (use_arm64ec) [dirs addObject:sys32Dir];
@@ -3082,7 +3356,7 @@ static void *wine_process_thread(void *arg) {
                     }
                     dprintf(STDERR_FILENO, "[WineProc] ntdll.dll -> ntdll-xsec.dll (opt-in MADEIRA_NTDLL_XSEC=1; %s)\n",
                             use_arm64ec ? "system32 + sysx64" : "sysx64 only");
-                } else if (xsecOn) {
+                } else if (xsecOn && !freshNtdll) {
                     dprintf(STDERR_FILENO, "[WineProc] MADEIRA_NTDLL_XSEC=1 but this build has no ntdll-xsec.dll: the shipped ntdll.dll\n");
                 }
             }
@@ -3593,6 +3867,7 @@ static void wine_session_end(void)
      * of this app run (GTA V Enhanced runs without them). */
     unsetenv("MADEIRA_UCRT_X64_MATH"); unsetenv("MADEIRA_SRV_FGETPATH");
     unsetenv("MADEIRA_NTDLL_SYNC");   /* madeira-bcd: a game's switch is its own */
+    unsetenv("MADEIRA_WIN64_FRESH");  /* madeira-bcd: likewise (the rebuilt 64-bit Wine set; read by the unix loader and linked above per session) */
     unsetenv("MADEIRA_ANON_LDADDAL32"); /* build 608: opt-in belongs only to the game that enabled it */
     unsetenv("MADEIRA_REAL_SUSPEND");   /* a game's switch is its own: the server reads it per session now (mach_ios.c ios_real_suspend_enabled), so a later game must not inherit it */
     unsetenv("MADEIRA_FIRST_PROC_OWN_EXIT_FLAG");   /* a game's switch is its own (server_ios.c ios_process_exiting_ptr reads it when a process exits) */
@@ -3607,8 +3882,14 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_OPTIN_DLLS");   /* madeira-bcd: likewise */
     unsetenv("MADEIRA_GL_BACKEND"); unsetenv("MADEIRA_GL_DIR");   /* madeira-bcd (OpenGL): likewise (the game's gl-backend key) */
     unsetenv("MADEIRA_VULKAN_LIBRARY");   /* madeira-bcd (Windows Vulkan): likewise (the game's vulkan key) */
+    /* madeira-bcd (KosmicKrisp): and the shader cache variables a vulkan = kosmickrisp session got from this file, only those */
+    if (g_kk_cache_dir_set) { unsetenv("MESA_SHADER_CACHE_DIR"); g_kk_cache_dir_set = 0; }
+    if (g_kk_cache_size_set) { unsetenv("MESA_SHADER_CACHE_MAX_SIZE"); g_kk_cache_size_set = 0; }
+    unsetenv("MADEIRA_D3D9_LUMINANCE_RT");   /* madeira-bcd (build 660, #575): likewise (DXMT's Direct3D 9 reads it once per process) */
+    unsetenv("MADEIRA_FX_WRITER");   /* madeira-bcd (build 660, #575): likewise (the effect writer's switch, read once per process) */
     if (g_gl_love_hint_set) { unsetenv("LOVE_GRAPHICS_USE_OPENGLES"); g_gl_love_hint_set = 0; }
     unsetenv("MADEIRA_NLS_EXTRA");    /* madeira-bcd: likewise (env_ios.c reads it at every code page request) */
+    bcd_japanese_session_end();       /* madeira-bcd (#567): LC_ALL and LANG as before the Japanese locale, MADEIRA_JAPANESE unset */
     unsetenv("MADEIRA_WG_64BIT");     /* madeira-bcd: likewise (Resident Evil 2's decoders; a later game keeps the stub table) */
     unsetenv("MADEIRA_VCRT_ARM64_KEY"); /* madeira-bcd: likewise (the Runtimes\\arm64 marker is per game) */
     unsetenv("MADEIRA_X64_HOOK_ZONE"); /* madeira-bcd: likewise (Far Cry 4's hook zone) */
@@ -3617,6 +3898,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_GL_EMPTY_EXTENSIONS"); /* madeira-bcd: likewise (Far Cry 4's hardware detection) */
     unsetenv("MADEIRA_FEX_SPLIT_LOCK"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_FEX_CALLRET_LEAN"); /* madeira-bcd: likewise (the A/B switch belongs to the game that set it) */
+    unsetenv("MADEIRA_FEX_X87_EXACT_INT64"); /* madeira-bcd: likewise (the exact-integer x87 switch belongs to the game that set it) */
     unsetenv("MADEIRA_PRESENT_FX"); unsetenv("MADEIRA_FRAMEGEN_GATE");   /* madeira-bcd: likewise (present-fx; winemetal reads them anew, */
     unsetenv("MADEIRA_FRAMEGEN_GPU_GUARD"); unsetenv("MADEIRA_FRAMEGEN_STALL_MS");   /* madeira_fgl_session_reset) */
     unsetenv("MADEIRA_POOL_CODE_FOREGROUND"); /* madeira-bcd: likewise (the code-buffer policy) */
@@ -3625,12 +3907,15 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_KILL_REAP"); /* madeira-bcd: likewise (the game starter's ended copy) */
     unsetenv("MADEIRA_SELF_WRITE"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_APC_BUSY_QUEUE"); /* madeira-bcd: likewise (the Dock sets it for a Ubisoft game's session, ContentView.startDock) */
+    unsetenv("MADEIRA_APC_DEFER_ISSUER"); /* madeira-bcd: likewise (build 660; a game's own line must not reach a later game) */
     unsetenv("MADEIRA_TAIL_CARVE_EXEC_CHECK"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_POOL_CLAMP_SECTIONS"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_LUM_PROBE");      /* madeira-bcd: likewise */
     unsetenv("MADEIRA_FEX_BAND_KEEP_MB"); /* madeira-bcd: likewise */
     unsetenv("MADEIRA_BUFFER_RTV_EMPTY"); /* round 620: likewise (Frostbite 2's render target views on a buffer) */
     unsetenv("MADEIRA_D3D11_SRC");        /* round 620: likewise (the 64-bit d3d11.dll with BCD's patches) */
+    unsetenv("MADEIRA_USD_DIRECT");       /* build 663: likewise (a game's 0 keeps the shipped kernel32.dll for that game only) */
+    unsetenv("MADEIRA_DXMT_FRESH");       /* madeira-bcd (2026-11-15): likewise (the 64-bit DXMT set built from the pin; the DLLs read it too) */
     g_madeira_srv_fgetpath = 0;
     /* madeira-bcd: the server's per-launch switches end with the session as well */
     unsetenv("MADEIRA_SRV_ECO_FOLLOW"); unsetenv("MADEIRA_SRV_DIRECT");

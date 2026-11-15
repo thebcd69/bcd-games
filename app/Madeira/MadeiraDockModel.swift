@@ -14,6 +14,8 @@ final class MadeiraDockModel: ObservableObject {
     @Published private(set) var clientInstalled = false
     /// Night round 2026-11-11 (A1 S7): the first 12 hex digits of the SHA-256 of a client the Dock host does not support, else nil.
     @Published private(set) var clientUnsupportedBuild: String?
+    /// Round 660 (M139): the supported client build in the prefix (202601, 202609), nil when there is none or it is unknown.
+    @Published private(set) var clientBuild: Int?
     @Published private(set) var preparing = false
     @Published private(set) var progress = ""
     @Published var error: String?
@@ -38,7 +40,8 @@ final class MadeiraDockModel: ObservableObject {
             var unsupported: String?
             if case .unsupported(let sha) = SteamRuntimeFiles.clientStatus(drive: drive) { unsupported = String(sha.prefix(12)) }
             let build = unsupported
-            await MainActor.run { self.clientUnsupportedBuild = build }
+            let installed = unsupported == nil ? SteamRuntimeFiles.installedBuild(drive: drive)?.id : nil
+            await MainActor.run { self.clientUnsupportedBuild = build; self.clientBuild = installed }
             let found = MadeiraDock.games(drive: drive)
             var programs: [Int: Int] = [:], runNext: [Int: Bool] = [:], requests: [Int: DockInstallRequest] = [:]
             if DockInstallers.choiceEnabled {

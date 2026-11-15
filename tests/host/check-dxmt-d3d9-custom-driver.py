@@ -65,8 +65,13 @@ else:
         shutil.copy(src, t / 'dxmt/src/d3d9/d3d9_interface.cpp')
         r1 = subprocess.run([sys.executable, str(script)], cwd=t, capture_output=True, text=True)
         r2 = subprocess.run([sys.executable, str(script)], cwd=t, capture_output=True, text=True)
-        check('it applies (or finds the file patched) and a second run says "already patched"',
-              r1.returncode == 0 and 'patched' in r1.stdout and r2.returncode == 0 and 'already patched' in r2.stdout,
+        # On a pin that carries willfaust/dxmt f25e5568 itself (since the 2026-11-14 upstream merge) both runs say so and change
+        # nothing; the checks below then read the fork's own lines.
+        upstream = 'is upstream' in r1.stdout
+        check('it applies (or finds the file patched) and a second run says "already patched"; or the option is upstream, twice',
+              r1.returncode == 0 and r2.returncode == 0
+              and (('is upstream' in r2.stdout and 'nothing to do' in r1.stdout) if upstream
+                   else ('patched' in r1.stdout and 'already patched' in r2.stdout)),
               r1.stdout + r1.stderr + r2.stdout + r2.stderr)
         s = (t / 'dxmt/src/d3d9/d3d9_interface.cpp').read_text()
         a = s.index('struct AdapterIdOverride {')

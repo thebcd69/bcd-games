@@ -332,7 +332,11 @@ struct Checks {
         lines["env.MADEIRA_FEX_CPUID_CLASSIC"] = "1"
         require(choice().classicCPUID && BCDEAMachine.classicEDXBits == 0xC, "env.MADEIRA_FEX_CPUID_CLASSIC = 1: DE and PSE (EDX bits 2 and 3)")
         lines["env.MADEIRA_FEX_CPUID_CLASSIC"] = "2"
-        require(!choice().classicCPUID, "any other value: plain")
+        require(choice().classicCPUID, "env.MADEIRA_FEX_CPUID_CLASSIC = 2: the same two bits of leaf 1 (and 1 GB pages in leaf 0x80000001, which the hash does not read)")
+        for other in ["3", "0", "11", "22", "yes", ""] {
+            lines["env.MADEIRA_FEX_CPUID_CLASSIC"] = other
+            require(!choice().classicCPUID, "any other value (\(other)): plain")
+        }
 
         // Dates from numbers: no ICU date formatter in the app (EAClock), the same answers as ISO8601DateFormatter's on the texts a licence has.
         let moment = Date(timeIntervalSince1970: 1793881845)

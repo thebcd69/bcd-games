@@ -1,12 +1,12 @@
 {
   "format": 1,
-  "version": 63,
-  "generated": "2026-11-14",
+  "version": 74,
+  "generated": "2026-11-15",
   "rules": [
     {
       "id": "rdr2-steam",
       "title": "Red Dead Redemption 2 (Steam)",
-      "version": 15,
+      "version": 16,
       "match": {
         "steamAppIDs": [1174180],
         "steamFolders": ["red dead redemption 2"],
@@ -20,7 +20,7 @@
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "d3d12-caps-log = 2",
         "d3d12-shader-pack = 1",
-        "replay-split = 1",
+        {"line": "replay-split = 1", "maxBuild": 664},
         "ring-share = 1",
         "pool-low = 1",
         "pool-mid = 1",
@@ -29,8 +29,8 @@
         "vram-mb = 2304",
         "swap-mb = 8192",
         "swap-mode = 2",
-        "swap-min-mb = 1",
-        "swap-images = 1",
+        {"line": "swap-min-mb = 1", "maxBuild": 664},
+        {"line": "swap-images = 1", "maxBuild": 664},
         "pso-warm = 2",
         "fence-chain = 6",
         "avail-phys = 1",
@@ -73,8 +73,30 @@
         {"line": "env.MADEIRA_POOL_LAZY_WINDOWS = 1", "minBuild": 630},
         {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580},
         {"line": "totalphys-cap = 8191", "minBuild": 631},
-        {"line": "mempool-mb = 4096", "minBuild": 634},
+        {"line": "mempool-mb = 4096", "minBuild": 634, "maxBuild": 664},
         {"line": "env.MADEIRA_DONOR_BROWSERS = 0", "minBuild": 634},
+        {"line": "env.MADEIRA_BG_QOS_DELAY_S = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_PROBES = light", "minBuild": 665},
+        {"line": "env.MADEIRA_LEAN_DIAG = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_ECO_NATIVE = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_FEX_CALLRET_LEAN = 1", "minBuild": 665},
+        {"line": "mempool-mb = 16384", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MARGIN_MB = 1024", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MORE = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_FEX = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MIN_KB = 64", "minBuild": 665},
+        {"line": "swap-min-mb = 8", "minBuild": 665},
+        {"line": "swap-images = 0", "minBuild": 665},
+        {"line": "heap-untracked = 1", "minBuild": 665},
+        {"line": "sampler-reduction = 3", "minBuild": 665},
+        {"line": "typed-view-unlocked = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_D3D12_ONEPASS = 1", "minBuild": 665},
+        {"line": "async-submit = 1", "minBuild": 665},
+        {"line": "fence-early = 2", "minBuild": 665},
+        {"line": "f6-rar = 1", "minBuild": 665},
+        {"line": "rp-carry = 1", "minBuild": 665},
+        {"line": "rp-discard = 1", "minBuild": 665},
+        {"line": "replay-split = 0", "minBuild": 665},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "fastSync": true, "semaphoreFastPath": false, "fpsMode": 3, "resolution": "screen@720", "display": "fit"},
@@ -127,13 +149,14 @@
         "GB iPads, 15,389 MB) RDR2.exe reserved 7/8 of 32 GB, 28,672 MB, which no address map here can place, and showed its own error box.",
         "The cap reports at most 8191 MB (a smaller report stays); the game then reserves the 8960 MB this list holds free (4DTB43: 193 s,",
         "11,201 frames).",
-        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk."
+        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk.",
+        "Version 16 (build 665, owner 2026-11-15: \"adamın satırlarını koyalım direkt\"): netheritenee's RDR2 settings from netheritenee's own BCD 0.1.659 fork (report of 2026-11-15; 30 FPS held on an iPhone with 12 GB): the launcher's helpers leave the performance cores 1 s after the game presents instead of 60 (MADEIRA_BG_QOS_DELAY_S), BCD's own samplers light (MADEIRA_PROBES = light, MADEIRA_LEAN_DIAG, MADEIRA_ECO_NATIVE), the emulator's lean call/return, helper memory 16 GB with its pool lines, the swap file for game data only from 8 MB, and the Direct3D 12 fast paths that fork ran. swap-min-mb, swap-images, replay-split and mempool-mb keep their old values up to build 664 (maxBuild); every new line reads from build 665 (the env names join the list policy in 665). Not tried on the owner's device."
       ]
     },
     {
       "id": "rdr2-other",
       "title": "Red Dead Redemption 2 (not Steam)",
-      "version": 6,
+      "version": 7,
       "match": {
         "programs": [
           {"name": "rdr2.exe", "steam": false},
@@ -146,7 +169,7 @@
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "d3d12-caps-log = 2",
         "d3d12-shader-pack = 1",
-        "replay-split = 1",
+        {"line": "replay-split = 1", "maxBuild": 664},
         "ring-share = 1",
         "pool-low = 1",
         "pool-mid = 1",
@@ -155,8 +178,8 @@
         "vram-mb = 2304",
         "swap-mb = 8192",
         "swap-mode = 2",
-        "swap-min-mb = 1",
-        "swap-images = 1",
+        {"line": "swap-min-mb = 1", "maxBuild": 664},
+        {"line": "swap-images = 1", "maxBuild": 664},
         "pso-warm = 2",
         "fence-chain = 6",
         "avail-phys = 1",
@@ -201,8 +224,30 @@
         {"line": "totalphys-cap = 8191", "minBuild": 631},
         {"line": "env.MADEIRA_STEAM_IDENTITY = none", "minBuild": 624},
         {"line": "env.BCD_EPIC_HOST_START = 1", "minBuild": 598},
-        {"line": "mempool-mb = 4096", "minBuild": 634},
+        {"line": "mempool-mb = 4096", "minBuild": 634, "maxBuild": 664},
         {"line": "env.MADEIRA_DONOR_BROWSERS = 0", "minBuild": 634},
+        {"line": "env.MADEIRA_BG_QOS_DELAY_S = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_PROBES = light", "minBuild": 665},
+        {"line": "env.MADEIRA_LEAN_DIAG = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_ECO_NATIVE = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_FEX_CALLRET_LEAN = 1", "minBuild": 665},
+        {"line": "mempool-mb = 16384", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MARGIN_MB = 1024", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MORE = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_FEX = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_POOL_MIN_KB = 64", "minBuild": 665},
+        {"line": "swap-min-mb = 8", "minBuild": 665},
+        {"line": "swap-images = 0", "minBuild": 665},
+        {"line": "heap-untracked = 1", "minBuild": 665},
+        {"line": "sampler-reduction = 3", "minBuild": 665},
+        {"line": "typed-view-unlocked = 1", "minBuild": 665},
+        {"line": "env.MADEIRA_D3D12_ONEPASS = 1", "minBuild": 665},
+        {"line": "async-submit = 1", "minBuild": 665},
+        {"line": "fence-early = 2", "minBuild": 665},
+        {"line": "f6-rar = 1", "minBuild": 665},
+        {"line": "rp-carry = 1", "minBuild": 665},
+        {"line": "rp-discard = 1", "minBuild": 665},
+        {"line": "replay-split = 0", "minBuild": 665},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "fastSync": true, "semaphoreFastPath": false, "fpsMode": 3, "resolution": "screen@720", "display": "fit"},
@@ -231,7 +276,8 @@
         "11,201 frames). env.MADEIRA_STEAM_IDENTITY = none (build 624) and env.BCD_EPIC_HOST_START = 1 (build 598), as GTA V's Epic rows:",
         "Epic's RDR2 starts through BCD Host, which build 631 also gives Windows' service manager for RockstarService.exe; BCD's Steam",
         "values are not published to a copy that is not Steam's (6XG0C2: the Launcher's error 113). Not tried on a device yet.",
-        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk."
+        "Build 634 (the owner's test B2, 2026-11-06, iPhone18,2): mempool-mb = 4096 and env.MADEIRA_DONOR_BROWSERS = 0 (helper memory for the game, not Social Club's browser); with swap-mb 8192 the game played 522 s, peak 6033 of 8191 MB, 3.7 GB in helper memory, 1.7 GB on the disk.",
+        "Version 7 (build 665, owner 2026-11-15: \"adamın satırlarını koyalım direkt\"): netheritenee's RDR2 settings from netheritenee's own BCD 0.1.659 fork (report of 2026-11-15; 30 FPS held on an iPhone with 12 GB): the launcher's helpers leave the performance cores 1 s after the game presents instead of 60 (MADEIRA_BG_QOS_DELAY_S), BCD's own samplers light (MADEIRA_PROBES = light, MADEIRA_LEAN_DIAG, MADEIRA_ECO_NATIVE), the emulator's lean call/return, helper memory 16 GB with its pool lines, the swap file for game data only from 8 MB, and the Direct3D 12 fast paths that fork ran. swap-min-mb, swap-images, replay-split and mempool-mb keep their old values up to build 664 (maxBuild); every new line reads from build 665 (the env names join the list policy in 665). Not tried on the owner's device."
       ]
     },
     {
@@ -1661,7 +1707,7 @@
     {
       "id": "final-fantasy-resonance-demo",
       "title": "FINAL FANTASY RESONANCE DEMO",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [4474710],
         "steamFolders": ["final fantasy resonance demo"],
@@ -1675,7 +1721,8 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_VCRT_ARM64_KEY = 1", "minBuild": 576},
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
-        {"line": "exe-window-mb = 496", "minBuild": 575}
+        {"line": "exe-window-mb = 496", "minBuild": 575},
+        {"line": "env.MADEIRA_KUSER_KEEP_REGS = 1", "minBuild": 602}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "display": "fit"},
       "notes": [
@@ -1692,7 +1739,8 @@
         "Version 3 (2026-10-28, round 620): exe-window-mb = 496. Build 614, iPhone19,4 (Send Logs J4DADQ, TQ3VF6): with both lines the",
         "start-up program passes and starts FFRS-Win64-Shipping.exe, a 474.1 MiB image with its relocations stripped (charact 0x23) that",
         "must load at 0x140000000, where BCD keeps 128 MB: \"failed to create main module ... status c0000018\" (J4DADQ L3669). 496 MB",
-        "(the image plus 16 MB, as auto-tune's exe-window-fixed-base computes) holds it; the JIT pool may get smaller. Not tried on a device."
+        "(the image plus 16 MB, as auto-tune's exe-window-fixed-base computes) holds it; the JIT pool may get smaller. Not tried on a device.",
+        "Version 4 (round 660, M065/M020): env.MADEIRA_KUSER_KEEP_REGS = 1. The demo's protector reads KUSER_SHARED_DATA like the full game's (Send Log 44VB6A) and the other protected programs of M020: the line hands back the address the game had. Not tried on a device yet."
       ]
     },
     {
@@ -1753,7 +1801,7 @@
     {
       "id": "quaver",
       "title": "Quaver",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [980610],
         "steamFolders": ["quaver"],
@@ -1765,7 +1813,10 @@
         "# BCD's recommended settings for Quaver.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.DOTNET_EnableWriteXorExecute = 0", "minBuild": 576}
+        {"line": "env.DOTNET_EnableWriteXorExecute = 0", "minBuild": 576},
+        {"line": "env.MADEIRA_GUEST_LOG = all", "minBuild": 598},
+        {"line": "env.MADEIRA_FILE_TRACE = 1", "minBuild": 598},
+        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 8000", "minBuild": 630}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "display": "fit"},
       "notes": [
@@ -1773,7 +1824,9 @@
         "runtime stopped at start with \"CLR: Assert failure ... m_pRegionToGenTableImmediate\" and exit 0xc0000602.",
         "It keeps its code in two views of one memory section (write-xor-execute); BCD gives the executable view a",
         "copy of its own, so what the runtime writes never shows there. env.DOTNET_EnableWriteXorExecute = 0 (build 576)",
-        "makes the runtime use plain executable memory. Not tried on a device yet."
+        "makes the runtime use plain executable memory. Not tried on a device yet.",
+        "Version 2 (round 660, M131; Send Log VSSYJD, build 653): the game says it is already running. The game's own log and the files it reads",
+        "before that go into the log, so a stale lock or PID file can be named. Diagnostic lines only."
       ]
     },
     {
@@ -2099,7 +2152,7 @@
     {
       "id": "clair-obscur-expedition-33",
       "title": "Clair Obscur: Expedition 33",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [1903340],
         "steamFolders": ["expedition 33"],
@@ -2114,6 +2167,9 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
         {"line": "d3d12-heap-va-align = 1", "minBuild": 626},
+        {"line": "env.MADEIRA_OPTIN_DLLS = mfplay,dbgcore", "minBuild": 652},
+        {"line": "env.MADEIRA_FILE_TRACE = 1", "minBuild": 598},
+        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 100000", "minBuild": 630},
         {"line": "low-graphics-tip = 1", "minBuild": 622}
       ],
       "switches": {"fpsMode": 3},
@@ -2135,7 +2191,11 @@
         "the heap's whole size got no memory and the engine a NULL buffer. d3d12-heap-va-align = 1 (build 626) starts such a heap on",
         "the boundary (the Metal heap is 64 KB larger). The heavy games' recipe from build 622 on (30 FPS at first sight and the",
         "one-time tip to lower the game's own graphics): the game is Lumen and Nanite, and about 10 FPS was reported from the runs",
-        "that started. Auto-tune's ue-transient-heap-misaligned-va rule proposes the same line. Not tried on a device yet."
+        "that started. Auto-tune's ue-transient-heap-misaligned-va rule proposes the same line. Not tried on a device yet.",
+        "Version 3 (round 660, M064; Send Log T6EH7T, build 653): a NULL member read at exe+0x61ec5da on the game thread, no engine failure in the",
+        "log. The experiment: Unreal's WmfMedia module may need mfplay.dll (BCD's opt-in DLL from build 652; dbgcore named too, so auto-tune does not",
+        "fight the key), and the file trace shows what the game reads before the fault. If the next log has the same fault, the mfplay idea is dead",
+        "and the trace lines go. Not tried on a device yet."
       ]
     },
     {
@@ -2388,7 +2448,7 @@
     {
       "id": "dark-souls-iii",
       "title": "DARK SOULS III",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [374320],
         "steamFolders": ["dark souls iii"],
@@ -2402,7 +2462,7 @@
         {"line": "env.MADEIRA_D3D11_SRC = 1", "minBuild": 624},
         {"line": "env.MADEIRA_SRV_GETDESC_RESOLVE = 1", "minBuild": 624}
       ],
-      "smallRAMConfig": [{"line": "env.MADEIRA_MIP_CLAMP_AUTO = 1", "minBuild": 625}],
+      "smallRAMConfig": [{"line": "env.MADEIRA_MIP_CLAMP_AUTO = 1", "minBuild": 625}, {"line": "dxmt = d3d11.mipClampBC=1", "minBuild": 625}],
       "notes": [
         "DARK SOULS III (Steam 374320), build 579, iPad17,3 (11.4 GB, a 7-day profile with increased memory; Send Log A3V7SV, 2026-10-21; game",
         "settings: the standard line only): DarkSoulsIII.exe runs from a JIT-pool copy of its image and writes into its own code. The first",
@@ -2422,7 +2482,12 @@
         "memory and the swap file work but cannot take graphics; the one run with the blanket clamp (d3d11.mipClampBC=1) lived 993 s against 301 s. On a device",
         "with less than 10 GB the pressure-only clamp (build 625) drops the top mip of large BC textures while the process is within 1536 MB of its limit (from",
         "about 2560 MB on this phone). If that proves too late, the escalation is the blanket dxmt = d3d11.mipClampBC=1 that auto-tune's bc-decode-memory-kill",
-        "already tries."
+        "already tries.",
+        "Version 4 (round 660, M043; Send Logs 4XCJR7, C87WFF, ZMGWHS, 1XW37B, 3AM5SR, build 653, iPhones with a 4,095 MB limit, A15/A16 without BC):",
+        "Metal 1.9-2.5 GB plus 1.37-1.64 GB of CPU-expanded BC textures plus the game hit the limit; with the pressure clamp alone the game lived",
+        "52-86 s, with the blanket clamp 135-600 s. On a device under 10 GB the row now has both (dxmt = d3d11.mipClampBC=1 drops the top level of",
+        "every BC texture: softer textures on exactly those devices). The swap file holds game data only, not graphics. Not enough on a 6 GB phone",
+        "yet: lower the game's texture quality too."
       ]
     },
     {
@@ -2695,7 +2760,7 @@
     {
       "id": "metal-gear-solid-peace-walker",
       "title": "METAL GEAR SOLID: Peace Walker - Master Collection Version",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [2492660],
         "steamFolders": ["mgs_pw"]
@@ -2704,7 +2769,9 @@
         "# BCD's recommended settings for METAL GEAR SOLID: Peace Walker - Master Collection Version.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_WINTYPES = 1", "minBuild": 575}
+        {"line": "env.MADEIRA_WINTYPES = 1", "minBuild": 575},
+        {"line": "env.MADEIRA_GUEST_LOG = all", "minBuild": 598},
+        {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 800", "minBuild": 598}
       ],
       "notes": [
         "METAL GEAR SOLID: Peace Walker - Master Collection Version (Steam 2492660, Unity IL2CPP), build 579, iPhone15,4 (Send Logs RWF4GR,",
@@ -2713,7 +2780,9 @@
         "adds env.MADEIRA_WINTYPES = 1 (B05CYJ L32: \"trying wintypes-dll-optin\"), Wine's own wintypes.dll for this game (\"[WineProc]",
         "MADEIRA_WINTYPES=1: wintypes.dll -> wintypes-optin.dll\", B05CYJ L217), and the game plays: B05CYJ presents 22,348 frames in 390 s,",
         "TQQM87 6,432 in 120 s. The list gives the first start the line (build 575 and later link Wine's copy for a game with it). The rule",
-        "has no program name: the game's program is launcher.exe, too common a name. Steam installs only."
+        "has no program name: the game's program is launcher.exe, too common a name. Steam installs only.",
+        "Version 2 (round 660, M086; Send Logs 0C75QF, JR4H99, build 653: the picture stays black): the game's own log goes into BCD's log",
+        "(Unity's player log), to find why. Presents are not a picture: B05CYJ presented 22,348 frames in 390 s of a cleared screen."
       ]
     },
     {
@@ -2845,7 +2914,7 @@
     {
       "id": "resident-evil-requiem",
       "title": "Resident Evil Requiem",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [3764200],
         "steamFolders": ["resident evil requiem biohazard requiem"],
@@ -2857,9 +2926,13 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "exe-window-mb = 592", "minBuild": 575},
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
-        {"line": "d3d12-pso-cached-blob = 1", "minBuild": 598}
+        {"line": "d3d12-pso-cached-blob = 1", "minBuild": 598},
+        {"line": "env.MADEIRA_KUSER_KEEP_REGS = 1", "minBuild": 602}
       ],
       "notes": [
+        "v4 (round 660, agent G5 S1; Send Logs AP5J04, PB9J0X, build 653): the game's protection layer stops at its cpuid stub after reading Windows'",
+        "shared-data page; env.MADEIRA_KUSER_KEEP_REGS = 1 (PRAGMATA's line) leaves the registers it reads as the game had them. Not proved for this game:",
+        "the stop may be the brand string the layer reads there. Not tried on a device yet.",
         "Resident Evil Requiem (Steam 3764200, RE Engine, Madeira Dock), iPad17,3 (12 GB, 512 GB map, iPadOS 27.0.1; Send Logs YQRQ86, build",
         "579, and P0GY6V, build 580, 2026-10-22): re9.exe is a program with its relocations stripped, 0x23f12000 bytes = 575.07 MiB, that",
         "must load at 0x140000000 (\"ml985: map_image_view size=0x23f12000 base=0x140000000 ... charact=0x23\", YQRQ86 L8459); the window there",
@@ -2887,7 +2960,7 @@
     {
       "id": "resident-evil-requiem-demo",
       "title": "Resident Evil Requiem Demo",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [4459100],
         "steamFolders": ["resident evil requiem biohazard requiem - demo"],
@@ -2902,7 +2975,8 @@
         {"line": "env.MADEIRA_GUEST_LOG = all", "minBuild": 630},
         {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 1500", "minBuild": 630},
         {"line": "env.MADEIRA_FILE_TRACE = 1", "minBuild": 630},
-        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 30000", "minBuild": 630}
+        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 30000", "minBuild": 630},
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598}
       ],
       "notes": [
         "Resident Evil Requiem Demo (Steam 4459100, re9demo.exe, RE Engine, Direct3D 12, BCD Dock), iPhone18,3 (7.7 GB, 512 GB map, full memory",
@@ -2920,7 +2994,10 @@
         "else, the next log names it. The same line is on the full game's rule (resident-evil-requiem).",
         "Version 2 (round 624): the program match no longer needs a Steam install; nothing in these lines is about Steam, so every copy of",
         "the game gets them.",
-        "Version 3 (round 630, agent G2 S15; 148HH2, KZ1HCB, build 626): the cached-blob line works (\"GetCachedBlob answers a 16-byte blob\" in both logs); the demo then stops in its own hash table lookup (a NULL bucket, exe RVA 0x567cd83). Four log-only lines carry the demo's own text and the files it opens in the next log; take them out once a log has answered."
+        "Version 3 (round 630, agent G2 S15; 148HH2, KZ1HCB, build 626): the cached-blob line works (\"GetCachedBlob answers a 16-byte blob\" in both logs); the demo then stops in its own hash table lookup (a NULL bucket, exe RVA 0x567cd83). Four log-only lines carry the demo's own text and the files it opens in the next log; take them out once a log has answered.",
+        "Version 4 (round 660, M083; Send Logs PRSACE, JCSJQZ, build 653): env.MADEIRA_X86_FAULT_DUMP = 1 prints the registers, the module of RIP and 96",
+        "bytes behind each register at the fault, so the table object (in RBP, RAX or R9) can be read. The guest-log and file-trace lines printed",
+        "nothing the game wrote and can go once the dump has been read."
       ]
     },
     {
@@ -3115,7 +3192,7 @@
     {
       "id": "project-zomboid",
       "title": "Project Zomboid",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [108600],
         "steamFolders": ["projectzomboid"],
@@ -3127,7 +3204,9 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env._JAVA_OPTIONS = -XX:-UseZGC", "minBuild": 591},
         {"line": "env.MADEIRA_GUEST_LOG = all", "minBuild": 598},
-        {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 800", "minBuild": 598}
+        {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 3000", "minBuild": 598},
+        "env.FEX_VECTORTSOENABLED = 1",
+        {"line": "env.FEX_MEMCPYSETTSOENABLED = 1", "minBuild": 619}
       ],
       "notes": [
         "Project Zomboid (Steam 108600, Java), iPhone15,4 (Send Log GCN1GC, build 580, 2026-10-22): ProjectZomboid64.exe is a Java launcher",
@@ -3142,7 +3221,13 @@
         "tried on a device yet (the JVM's own choice of collector afterwards is not shown by any log).",
         "Version 2 (round 624): the program match no longer needs a Steam install; nothing in these lines is about Steam, so every copy of",
         "the game gets them.",
-        "Version 3 (round 630, agent T2 S3; Send Logs 0HAYBP and 84X3TM, build 626): with -XX:-UseZGC the JVM starts, loads lwjgl and Steam, then one JVM thread calls RtlEnterCriticalSection and RtlLeaveCriticalSection 1.4-2.1 million times a second (jvm.dll+0x21c058) and no window comes. The guest-log lines copy the JVM's own log files (hs_err, the game's console) into BCD's log, so the next report says what the JVM is doing. A diagnostic only."
+        "Version 3 (round 630, agent T2 S3; Send Logs 0HAYBP and 84X3TM, build 626): with -XX:-UseZGC the JVM starts, loads lwjgl and Steam, then one JVM thread calls RtlEnterCriticalSection and RtlLeaveCriticalSection 1.4-2.1 million times a second (jvm.dll+0x21c058) and no window comes. The guest-log lines copy the JVM's own log files (hs_err, the game's console) into BCD's log, so the next report says what the JVM is doing. A diagnostic only.",
+        "Version 4 (round 660, M025; Send Logs 6ZTBA4, 3W404B, 8J4RJD, KBBXF7, HH88YT, 3X8BRY, build 653, iPad19,1): the JVM's own fatal-error report",
+        "(EXCEPTION_ACCESS_VIOLATION): the interpreter stores into an \"array\" whose klass word is text, at the same heap address in two runs,",
+        "8.8 s in. The mirror now keeps 3000 lines (800 ended inside the stack dump, before the heap and GC-history sections), and the first",
+        "experiment is the emulator's memory order for vector stores and block copies (FEX_VECTORTSOENABLED, FEX_MEMCPYSETTSOENABLED; slower).",
+        "Next lines for a tester, in order, in the game's own file: env._JAVA_OPTIONS = -XX:-UseZGC -XX:+UseSerialGC, then",
+        "-XX:-UseCompressedOops -XX:-UseCompressedClassPointers. Not tried on a device yet."
       ]
     },
     {
@@ -5215,7 +5300,7 @@
     {
       "id": "rise-of-the-tomb-raider",
       "title": "Rise of the Tomb Raider",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [391220],
         "steamFolders": ["rise of the tomb raider"],
@@ -5226,10 +5311,13 @@
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         "env.DXMT_WSI_MONITOR_IDENTITY = 1",
-        "env.DXMT_WSI_MODE_TABLE = 1"
+        "env.DXMT_WSI_MODE_TABLE = 1",
+        {"line": "env.MADEIRA_D3D11_SRC = 1", "minBuild": 652}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "display": "fit"},
       "notes": [
+        "v2 (round 660, Send Log SBZ4D6, build 653): the game makes a 1160 x 2147484416 back buffer and every frame failed on upstream's 64-bit",
+        "d3d11.dll ([mtl-tex-fail]); d3d11-src.dll refuses it with E_INVALIDARG as Windows does ([dxmt-tex-limit]). Not tried on a device yet.",
         "Rise of the Tomb Raider (Steam 391220, ROTTR.exe, Nixxes' PC port, 64-bit D3D11/D3D12), builds 579-623, iPhone18,2 / iPad17,1 / iPad17,4 (Send Logs 4J7QYS, X13D3X, H25BSZ, K2CQKG,",
         "MQ2TQE, NKWAC3, SBVQDR, Y8R5R7, TSWGN2, 2026-10-28/29; older: 2Z3H2S, AYBZYC, 5EK5BZ, EHB921, QYCBPB): the game starts a 790x445 window and ends itself after 5 s with exit 0. Its own log",
         "(mirrored as [guest-log]) lists the monitor it got from user32 as handle 0x10001 but the DXGI output as handle 0x1 (the private sentinel of DXMT's WSI), finds \"no display mode\",",
@@ -5403,7 +5491,7 @@
     {
       "id": "the-witcher-3",
       "title": "The Witcher 3: Wild Hunt",
-      "version": 3,
+      "version": 4,
       "match": {
         "steamAppIDs": [292030],
         "steamFolders": ["the witcher 3", "the witcher 3 wild hunt"],
@@ -5417,7 +5505,10 @@
         {"line": "env.MADEIRA_X64_NOCOPY_DATAIMP = 1", "minBuild": 626},
         {"line": "env.MADEIRA_JUMBO_HALF = 2", "minBuild": 652},
         {"line": "oversize-reserve = 1", "minBuild": 632},
-        {"line": "oversize-reserve-mb = 6144", "minBuild": 632}
+        {"line": "oversize-reserve-mb = 6144", "minBuild": 632},
+        {"line": "oversize-reserve-virtual = 1", "minBuild": 663},
+        {"line": "oversize-scan = 1", "minBuild": 663},
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 652}
       ],
       "switches": {"avx": true},
       "notes": [
@@ -5437,7 +5528,14 @@
         "Witcher3.exe+0x27f85b4); round 630's witcher3-user-va-cap did not stop it in any of the five logs. oversize-reserve = 1 (build 632) serves such an",
         "unhinted reservation in part: a real 6 GB at its start (oversize-reserve-mb = 6144), the rest reported but not mapped; commits past the real part fail",
         "and print '[oversize] ml1298 commit ... failed' (that line names where the game really grows). env.MADEIRA_JUMBO_HALF = 2 (build 652) keeps halving",
-        "the next 32 GB request down to 4 GB when no 16 GB slot is left (builds 624-651 keep = 1). Not tried on a device yet."
+        "the next 32 GB request down to 4 GB when no 16 GB slot is left (builds 624-651 keep = 1). Not tried on a device yet.",
+        "Version 4 (round 660 M023, agent K7R; Send Logs 5EV18N and GW9R17, build 653, iPhone18,1): with the version 3 lines the game runs 13 s more and",
+        "crashes in its own free (AV READ of 18 at witcher3.exe+0x2801f80): the 64 GB arena it was told it owns, [0x7040000000, 0x8040000000), also held",
+        "the 32 GB request's 16 GB half at 0x7800000000, and its free (witcher3.exe+0xbcb703, which picks the allocator by address) gave a block of that",
+        "pool to the arena's allocator. oversize-reserve-virtual = 1 (build 663) puts the 6 GB real part at the top of the band, ending where the",
+        "emulator's memory area begins, so the rest of the 64 GB lies only in that area and above the end of the address map, where nothing else of the",
+        "game can be placed. oversize-scan = 1 logs where the program loads the 64 GB size (log only) and MADEIRA_X86_FAULT_DUMP = 1 the full fault",
+        "report (log only). The DirectX 11 program reserves no 64 GB block: none of the three lines changes anything for it. Not tried on a device yet."
       ]
     },
     {
@@ -6029,7 +6127,7 @@
     {
       "id": "football-manager-27",
       "title": "Football Manager 27",
-      "version": 3,
+      "version": 4,
       "match": {"steamAppIDs": [4530370], "steamFolders": ["football manager 27"], "programs": [{"name": "fm.exe", "steam": true}]},
       "config": [
         "# BCD's recommended settings for Football Manager 27.",
@@ -6039,7 +6137,9 @@
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
         {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 579},
         {"line": "env.MADEIRA_ZERO_MITIGATION_POLICY = 1", "minBuild": 630},
-        {"line": "env.MADEIRA_KUSER_KEEP_REGS = 1", "minBuild": 652}
+        {"line": "env.MADEIRA_KUSER_KEEP_REGS = 1", "minBuild": 652},
+        {"line": "env.FEX_MULTIBLOCK = 0", "minBuild": 630},
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598}
       ],
       "notes": [
         "Football Manager 27 (Steam 4530370, Unity, 64-bit), build 623, iPad17,1 (Send Log ANXA7R): a frozen loading screen. The game's",
@@ -6049,7 +6149,11 @@
         "Version 2 (round 630, agent U S2; Send Log 88YTP3, build 626, iPad M5): the game's plugin loads and plays 26 s, then right after 13 calls of GetProcessMitigationPolicy jumps to 0x47fe0000 and stops. Wine's GetProcessMitigationPolicy answered yes without filling the answer; env.MADEIRA_ZERO_MITIGATION_POLICY = 1 (build 630 brings the opt-in kernelbase along) fills it with zeros. An experiment: if the next log stops at the same place, the line does not help.",
         "Version 3 (round 2026-11-11, agent G5 S1; Send Logs 703X7S and N5YQZG, build 630, iPhone A20 Pro): the plugin loads and plays 40 s, then an API-name",
         "hash loop reads a pointer that is the real shared-data address instead of the canonical one (an exact function of both). env.MADEIRA_KUSER_KEEP_REGS =",
-        "1 (build 602) leaves the registers alone. Not tried on this game yet."
+        "1 (build 602) leaves the registers alone. Not tried on this game yet.",
+        "Version 4 (round 660, agents G3 S1 and A1 S4; Send Logs 96MX2R, DH4NMR, FR852Z, GS0V73, HPCR3K, NPJG0F and 62CWVY, build 653, iPad16,8): with",
+        "KEEP_REGS the plugin plays 13-40 s, then computes a pointer 1.7 GB past its image, or a thread starts on a bad block, inside its copy-protection",
+        "layer. env.FEX_MULTIBLOCK = 0 (build 630) makes the emulator translate one block at a time, an emulator experiment that does not touch the layer;",
+        "the fault dump says where it stops if it still does."
       ]
     },
     {
@@ -6210,7 +6314,7 @@
     {
       "id": "hitman-blood-money",
       "title": "Hitman: Blood Money",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [6860],
         "steamFolders": ["hitman blood money"],
@@ -6222,12 +6326,16 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598},
         {"line": "env.MADEIRA_FILE_TRACE = 1", "minBuild": 598},
-        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 6000", "minBuild": 598}
+        {"line": "env.MADEIRA_FILE_TRACE_LIMIT = 6000", "minBuild": 598},
+        {"line": "env.FEX_MULTIBLOCK = 0", "minBuild": 630}
       ],
       "notes": [
         "Hitman: Blood Money (Steam 6860, 32-bit): the game stops at start-up on a read of an address that is free in its address space, inside the program's own",
         "start-up code (Send Logs JP5NZQ 614, ZVQSNK 625). Diagnostic only: the dump prints the code around the fault, the stack and the registers' objects; the file",
-        "trace names the files the start-up code reads. Round 630, agent O1 S19."
+        "trace names the files the start-up code reads. Round 630, agent O1 S19.",
+        "Version 2 (round 660, agent G3 S9; Send Log Y3DN0Z, build 653): the exe's packer stub runs a second time and reads a 4 MB window that never",
+        "came into being, at the same address in every start. env.FEX_MULTIBLOCK = 0 (build 630) makes the emulator translate one block at a time, in case",
+        "the second run is a stale translation; the dump and the file trace stay."
       ]
     },
     {
@@ -7224,7 +7332,7 @@
     {
       "id": "mewgenics",
       "title": "Mewgenics",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [686060],
         "steamFolders": ["mewgenics"],
@@ -7236,7 +7344,8 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "gl-backend = zink", "minBuild": 632},
         {"line": "env.MADEIRA_THIN_RESERVE = 1", "minBuild": 652},
-        {"line": "env.MADEIRA_THIN_RESERVE_MB = 16", "minBuild": 652}
+        {"line": "env.MADEIRA_THIN_RESERVE_MB = 16", "minBuild": 652},
+        {"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625}
       ],
       "notes": [
         "Mewgenics (Steam 686060, Mewgenics.exe, SDL and OpenGL only, BCD Dock): \"Could not create window: No matching GL pixel format available\" (Send Logs 0CBF7Q, W4AJG1, Y6RAEH, build 600;",
@@ -7254,7 +7363,7 @@
     {
       "id": "doom-3-bfg-edition",
       "title": "DOOM 3: BFG Edition",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [208200],
         "steamFolders": ["doom 3 bfg edition"],
@@ -7264,14 +7373,19 @@
         "# BCD's recommended settings for DOOM 3: BFG Edition.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "gl-backend = zink", "minBuild": 632}
+        {"line": "gl-backend = zink", "minBuild": 632},
+        {"line": "env.MADEIRA_GL_EXTENSIONS_MAX = 0", "minBuild": 660}
       ],
       "notes": [
         "DOOM 3: BFG Edition (Steam 208200, Doom3BFG.exe, 32-bit, OpenGL only): it prints nothing about OpenGL; its next call after \"enabled Denormals-Are-Zero mode\" reads a string through the value a GL call",
         "returned, and every call of the stub table returns STATUS_NOT_SUPPORTED, so the wild pointer is 0xC00000BB (\"Unhandled page fault on read access to C00000BB at address 0075CC7E\", Send Logs HVZ6P1, build 622;",
         "XAY19N, build 614; J787G9). A 32-bit game needs the 32-bit GL thunks the Wine fork now carries.",
         "Build 632: BCD has its own OpenGL driver, a game's choice (gl-backend, docs/OPENGL.md); the line turns it on for this game. Nothing else changes for the game.",
-        "Not tried on a device yet."
+        "Not tried on a device yet.",
+        "Version 2 (round 660, M063; Send Log MSSWB4, build 653): Zink starts (4.1 Core), and the game throws its idException 0.1 s after BCD cut",
+        "GL_EXTENSIONS at 3,017 bytes, before GL_EXT_texture_buffer_object (the cut is for the id Tech 2/3 games that copy the text into a 4 KB",
+        "buffer; this engine reads it whole). env.MADEIRA_GL_EXTENSIONS_MAX = 0 gives it the whole text. If it still throws, a legacy extension that",
+        "Zink's core profile does not have is missing. Not tried on a device yet."
       ]
     },
     {
@@ -7742,7 +7856,7 @@
     {
       "id": "dying-light-the-beast",
       "title": "Dying Light: The Beast",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [3008130],
         "steamFolders": ["dying light the beast"],
@@ -7757,9 +7871,16 @@
         "env.LC_ALL = en_US.UTF-8",
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576},
         {"line": "env.MADEIRA_GUEST_LOG = all", "minBuild": 598},
-        {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 800", "minBuild": 598}
+        {"line": "env.MADEIRA_GUEST_LOG_LIMIT = 800", "minBuild": 598},
+        {"line": "d3d12-fl-12-1 = 1", "minBuild": 540},
+        {"line": "d3d12-pipeline-library = 1", "minBuild": 576}
       ],
       "notes": [
+        "v2 (round 660, agent G2 S1; Send Logs AG00TH = 1YJ3KK = CGC5SX, W3H803, WHH0J4 = F5S2YD, 2MKK2Y, 5Q16ES, 9FVE05, D5W2SS = N3T0XZ, build 653): past",
+        "the code page, the game creates a pipeline library (ID3D12Device10::CreatePipelineLibrary, \"unimplemented\" by default), keeps the NULL it got and",
+        "stores its PSOs through it: AV READ of 0 at rd3d12_x64_rwdi.dll+0x8cfe7 with RAX = 7197, its own \"Saved PSOs: 7197\". d3d12-pipeline-library = 1",
+        "answers the call (Returnal and The Last of Us Part I have it); d3d12-fl-12-1 = 1 reports feature level 12_1, which the renderer asks for first. The",
+        "next wall may be memory (peak 6.3-7.0 GB at 2 s of play on an 8 GB phone). Not tried on a device yet.",
         "Dying Light: The Beast (Steam 3008130), Send Logs HWXC8V/SG9PR6 (the same session sent twice), K932P3 and A5MR8Z (build 634, iPhone18,1, a phone set",
         "to Turkish): the game loaded Techland's engine and renderer DLLs, asked for the phone's own ANSI code page 1254 (19 loads in four groups), never",
         "loaded a graphics backend and the game DLL then called a renderer thunk through a NULL global (AV READ of 0 in renderer_x64_rwdi.dll): blank screen.",
@@ -8637,7 +8758,7 @@
     {
       "id": "half-sword-demo",
       "title": "Half Sword Demo",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [2642680],
         "steamFolders": ["half sword demo"],
@@ -8651,7 +8772,16 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_MIP_CLAMP_AUTO = 1", "minBuild": 652}
       ],
+      "smallRAMConfig": [
+        {"line": "swap-mb = 3072", "minBuild": 630},
+        {"line": "swap-mode = 2", "minBuild": 630},
+        {"line": "swap-min-mb = 1", "minBuild": 630}
+      ],
       "notes": [
+        "v2 (round 660, agent G3 S6; Send Logs 58D6W0, 3FCN8V, feedback DWYW11, build 653, 8 GB iPhones): with the mip clamp and auto-tune's",
+        "d3d11.mipClampBC=1 both on, the texture burst still went 4.4 -> 5.9 GB in 3 s (+1089 MB in 517 ms, 1152 BC resources) and iOS closed the game",
+        "near 6.1-6.6 GB. Below 12 GB the row now also moves large allocations to the swap file (3 GB, as the 8 GB tier of the swap rules). Not tried on a",
+        "device yet.",
         "Half Sword Demo (Steam 2642680, Unreal Engine 5, Direct3D 11, 64-bit), Send Log SGFKY6 (build 634, iPad14,8 M2, 8 GB): 30 s in, the texture load takes",
         "the footprint from 4.5 to 8.0 GB in six bursts (+767, +449, +681, +433, +790, +281 MB, each in 0.25-0.8 s; at the end internal 1.4 GB, compressed 3.9",
         "GB, other (Metal textures) 2.7 GB) and iOS closes the game 150 MB under its 8191 MB limit ([bc-census]: 768 BC resources, 2.6 GB of BC data, up to",
@@ -8936,7 +9066,7 @@
     {
       "id": "crash-bandicoot-n-sane-trilogy",
       "title": "Crash Bandicoot N. Sane Trilogy",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [731490],
         "steamFolders": ["crash bandicoot - n sane trilogy"],
@@ -8950,7 +9080,8 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.DXMT_WSI_MONITOR_IDENTITY = 1", "minBuild": 630},
         {"line": "env.DXMT_WSI_MODE_TABLE = 1", "minBuild": 630},
-        {"line": "env.DXMT_DISPLAY_MODE_STATS = 1", "minBuild": 652}
+        {"line": "env.DXMT_DISPLAY_MODE_STATS = 1", "minBuild": 652},
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598}
       ],
       "notes": [
         "Crash Bandicoot N. Sane Trilogy (Steam 731490, 64-bit, Direct3D 11 through DXMT, BCD Dock), Send Logs XQ53FC, 3CH670 and SWC63G: the game takes the",
@@ -8958,7 +9089,10 @@
         "handle is a private sentinel while the game asks user32 (env.DXMT_WSI_MONITOR_IDENTITY = 1 makes it user32's primary handle; env.DXMT_WSI_MODE_TABLE =",
         "1, both build 630, as in two other rows); (2) GetDisplayModeList1 returns zero modes for the format the game asks. env.DXMT_DISPLAY_MODE_STATS = 1",
         "(build 652) prints '[dxgi-modes] monitor= format= count= capacity= fill=' so the next log says which. Not tried on a device yet. Round 2026-11-11,",
-        "agent A1 S6."
+        "agent A1 S6.",
+        "Version 2 (round 660, M061; Send Logs SDKF8K = AFMZXX, build 653): the monitor lines worked (the empty display list became 20 modes); the",
+        "next wall is a jump to address 0 (pc=0 lr=0 x0=0x80004001) at the first Present of the second swap chain. env.MADEIRA_X86_FAULT_DUMP = 1",
+        "prints the registers and the bytes behind them at that fault. Diagnostic line."
       ]
     },
     {
@@ -9209,6 +9343,504 @@
         "twinapi-appcore-dll-optin cleared the first wall; then GameChat2.dll (Xbox Game Chat) imports msvcp_win.dll, which only the 32-bit set ships ('Library",
         "msvcp_win.dll ... not found', Fatal error box). env.MADEIRA_OPTIN_DLLS = twinapi.appcore,msvcp_win (build 652) gives the game both. Not proved that",
         "the next import of GameChat2 (vcruntime140_app, api-ms-win-*) resolves; the next log shows it. Round 2026-11-11, agent G3 S5."
+      ]
+    },
+    {
+      "id": "firewatch",
+      "title": "Firewatch",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [383870],
+        "programs": [{"name": "firewatch.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Firewatch.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0"
+      ],
+      "smallRAMConfig": [{"line": "env.MADEIRA_MIP_CLAMP_AUTO = 1", "minBuild": 625}],
+      "notes": [
+        "Firewatch (Steam 383870, firewatch.exe, Unity), round 660 (Send Logs P965CV = XVSSRZ, 4EA904, build 653, 6 GB iPhones with a 4,095 MB limit): the",
+        "A15 reads no BC, so DXMT expands 128-192 BC textures four to eight times (tex-private 1,302 MB for 313 MB logical) and iOS closed the game at",
+        "4,091 MB; the swap file was tried and reverted by auto-tune. On a device under 10 GB the row turns on env.MADEIRA_MIP_CLAMP_AUTO = 1 (build",
+        "625), which drops the top mip of large compressed textures only within 1.5 GB of the limit; auto-tune's bc-decode-memory-kill-4gb-limit",
+        "(dxmt = d3d11.mipClampBC=1) is the next step if it is still closed. A 12 GB device gets the standard lines (FBW48X ran 118 s). Not tried on",
+        "a device yet."
+      ]
+    },
+    {
+      "id": "final-fantasy-resonance",
+      "title": "FINAL FANTASY RESONANCE",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [3259780]
+      },
+      "config": [
+        "# BCD's recommended settings for FINAL FANTASY RESONANCE.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_KUSER_KEEP_REGS = 1"
+      ],
+      "notes": [
+        "FINAL FANTASY RESONANCE (Steam 3259780, the full game), round 660 (Send Log 44VB6A, build 653): the protector reads KUSER_SHARED_DATA",
+        "(serviced at 0x7038000320) and its own handler ends the process inside the protected section (exit 0xbdb2e). The KUSER line hands back",
+        "the address the game had (as for Planet Coaster 2, Yakuza Kiwami 3, Metaphor); auto-tune's ffrs-full-protected-code-stop says what",
+        "happened if it still stops. Steam installs only (the demo has its own row). Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "bugsnax",
+      "title": "Bugsnax",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [674140],
+        "programs": [{"name": "bugsnax.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Bugsnax.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_FRAME_STATS = 1",
+        "env.MADEIRA_GUEST_LOG = all",
+        "env.MADEIRA_GUEST_LOG_LIMIT = 400",
+        "env.MADEIRA_FILE_TRACE = 1",
+        "env.MADEIRA_FILE_TRACE_LIMIT = 20000"
+      ],
+      "notes": [
+        "Bugsnax (Steam 674140), round 660 (Send Log VRE4WH, build 653): the game stalls after its first frames and the log does not say why.",
+        "Diagnostic lines only: frame statistics, the game's own log and the files it reads, so the next log names the wait. It may also wait",
+        "for a controller (no pad in that session: 'press any button'). Leave the game alone 90 s on the first screen and send the log."
+      ]
+    },
+    {
+      "id": "fernbus-simulator",
+      "title": "Fernbus Simulator",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamFolders": ["fernbus simulator"],
+        "programs": [{"name": "fernbus-win64-shipping.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Fernbus Simulator.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "exe-window-mb = 512",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1"
+      ],
+      "notes": [
+        "Fernbus Simulator (Fernbus-Win64-Shipping.exe, UE4), round 660 (Send Log T340YY, build 653): with exe-window-mb = 512 (the line auto-tune",
+        "added: the image needs 139 MB at 0x140000000) it loads, and its first atomic store into its own image faults on BCD's pool copy",
+        "(insn 0xb8e60008, prot=1 max=3, SEC_IMAGE WRITECOPY). env.MADEIRA_X64_IMAGE_NOCOPY = 1 runs the pure x64 image from its loaded view, as",
+        "for Mad Max and Dark Souls III. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "unreal-tournament-goty",
+      "title": "Unreal Tournament: Game of the Year Edition",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [13240],
+        "steamFolders": ["unreal tournament"],
+        "programs": [{"name": "unrealtournament.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Unreal Tournament: Game of the Year Edition.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X86_FAULT_DUMP = 1", "minBuild": 598}
+      ],
+      "notes": [
+        "Unreal Tournament: Game of the Year Edition (System/UnrealTournament.exe, 32-bit), round 660 (Send Log 3DZGNH, build 653): the game stops",
+        "with its own ConstantTimeTick box after Fire.dll loads, and the log has no self-modifying-code event (unlike Unreal Gold's), so the",
+        "texture code's rewrite is likely not seen by the emulator (the trap-OFF family). Diagnostic line only: the x86 fault dump names the",
+        "code and the registers at the stop. The emulator experiment (FEX_SMCCHECKS = full) is the owner's decision."
+      ]
+    },
+    {
+      "id": "state-of-decay-year-one",
+      "title": "State of Decay: Year-One Survival Edition",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [329430],
+        "steamFolders": ["state of decay yose"],
+        "programs": [{"name": "stateofdecay.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for State of Decay: Year-One Survival Edition.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "gpu-card = nvidia-gtx1060"
+      ],
+      "notes": [
+        "State of Decay: Year-One Survival Edition (Steam 329430, StateOfDecay.exe, CryEngine), round 660 (Send Log JTTP00, build 653): CryEngine's own",
+        "box (Unsupported video card detected!) at start; the row shows the game a GeForce GTX 1060, a card it knows. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "wreckfest",
+      "title": "Wreckfest",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [228380],
+        "steamFolders": ["wreckfest"],
+        "programs": [{"name": "wreckfest_x64.exe"}, {"name": "wreckfest.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Wreckfest.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.DXMT_WSI_MONITOR_IDENTITY = 1",
+        "env.DXMT_WSI_MODE_TABLE = 1",
+        "env.DXMT_DISPLAY_MODE_STATS = 1",
+        "env.MADEIRA_GUEST_LOG = all"
+      ],
+      "notes": [
+        "Wreckfest (Steam 228380), round 660 (Send Log N3RRD2, build 653): the game read the first entry of its empty adapter / display list and",
+        "faulted. The two WSI lines give the virtual monitor an identity and a mode table; the mode statistics and the guest log say what the game",
+        "asked if that is not enough. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "anodyne",
+      "title": "Anodyne",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "programs": [{"name": "anodyne.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Anodyne.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_WOW_RWX_PLAIN = 1"
+      ],
+      "notes": [
+        "Anodyne (Anodyne.exe, a 32-bit .NET game on FNA and Wine Mono), round 660 (Send Log JK1DJX, build 653): Mono's code emitter writes into its own",
+        "code pages and every store was emulated (4 million in 30 s, no frame). env.MADEIRA_WOW_RWX_PLAIN = 1 maps such pages plainly for a 32-bit",
+        "program, as for the 32-bit Unity games on their own Mono. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "day-of-the-tentacle-remastered",
+      "title": "Day of the Tentacle Remastered",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [388210],
+        "steamFolders": ["day of the tentacle remastered"],
+        "programs": [{"name": "dott.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Day of the Tentacle Remastered.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "gl-backend = zink",
+        "env.MADEIRA_GUEST_LOG = all"
+      ],
+      "notes": [
+        "Day of the Tentacle Remastered (Steam 388210, dott.exe), round 660 (Send Log S960C7, build 653): the game renders with OpenGL only, which needs",
+        "BCD's OpenGL (zink); the guest log shows the game's own text. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "hitman-2016",
+      "title": "HITMAN (2016)",
+      "version": 2,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [236870],
+        "steamFolders": ["hitman"],
+        "programs": [{"name": "hitman.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for HITMAN (2016).",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "oversize-reserve = 1",
+        {"line": "oversize-reserve-virtual = 1", "minBuild": 663}
+      ],
+      "notes": [
+        "HITMAN (2016, Steam 236870), round 660 (Send Log 128FS9, build 653): the game asks for a 64 GiB block of address space and retries it 16 KiB",
+        "smaller each time it is refused: 3.17 million refusals in 363 s and no frame. oversize-reserve = 1 (build 632) serves such a reserve, as for",
+        "The Witcher 3. Not tried on a device yet.",
+        "Version 2 (round 660, agent K7R): oversize-reserve-virtual = 1 (build 663) places the real part at the top of the band so that nothing else",
+        "of the game can lie inside the rest of the 64 GB (the way The Witcher 3's DirectX 12 build crashed with the version 3 lines, 5EV18N). Not tried",
+        "on a device yet."
+      ]
+    },
+    {
+      "id": "metal-gear-solid-2-mc",
+      "title": "Metal Gear Solid 2: Sons of Liberty - Master Collection",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamFolders": ["mgs2"],
+        "programs": [{"name": "metal gear solid2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Metal Gear Solid 2: Sons of Liberty - Master Collection.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_WG_64BIT = 1",
+        "env.MADEIRA_OPTIN_DLLS = msvproc",
+        "env.MADEIRA_WG_VPROC = 1",
+        "env.MADEIRA_GUEST_LOG = all",
+        "env.MADEIRA_GUEST_LOG_LIMIT = 800"
+      ],
+      "notes": [
+        "Metal Gear Solid 2: Sons of Liberty - Master Collection (METAL GEAR SOLID2.exe), round 660, agents T1/T2 (Send Logs APQJ9M = 23M4PV, ZXHNTV =",
+        "CGGTMS, build 653, a 6 GB iPhone): after the title the game opens an MP4 through Media Foundation, mfmp4srcsnk.dll is missing and the 64-bit",
+        "decoders are the stub table; the game then commits 211 MB ten times in 14 s and iOS closes it at the 4,095 MB limit. The three video lines are",
+        "Hollow Knight: Silksong's; the guest log shows the game's own text next time. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "demons-tilt",
+      "title": "DEMON'S TILT",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "programs": [{"name": "demon's tilt.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for DEMON'S TILT.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.DXMT_WSI_MONITOR_IDENTITY = 1",
+        "env.DXMT_WSI_MODE_TABLE = 1"
+      ],
+      "notes": [
+        "DEMON'S TILT (DEMON'S TILT.exe, Unity 2019, 64-bit Direct3D 11), round 660 (Send Log FGFKTK, build 653): Unity's player read element 0 of an",
+        "empty display-record array at start (UnityPlayer.dll+0xc70d92). The two DXMT lines give the virtual monitor an identity and a mode table",
+        "(Crash Bandicoot went from an empty list to 20 modes with them). Not tried on a device for this game yet."
+      ]
+    },
+    {
+      "id": "operator",
+      "title": "OPERATOR",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [1913370],
+        "steamFolders": ["operator"],
+        "programs": [{"name": "operator.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for OPERATOR.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "dxmt = d3d11.mipClampBC=2"
+      ],
+      "notes": [
+        "OPERATOR (Steam 1913370, Unity IL2CPP, Direct3D 11), round 660, agent G5 (Send Logs 92YE3D, K3XY3F, M4P145 = 4J0KRZ, build 653, an 8 GB iPhone):",
+        "iOS closed the game at 8,010-8,133 of 8,191 MB while it loaded (compressed textures 3.25 GB logical, Metal 3.1 GB); the swap tier did not help",
+        "and the one-level texture clamp was not enough. The row drops the two largest levels of the compressed textures. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "planet-zoo-2",
+      "title": "Planet Zoo 2",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [3219030],
+        "programs": [{"name": "planetzoo2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Planet Zoo 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "exe-window-mb = 512",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "env.MADEIRA_OPTIN_DLLS = sfc,sfc_os,tbs",
+        "env.MADEIRA_KUSER_KEEP_REGS = 1"
+      ],
+      "notes": [
+        "Planet Zoo 2 (Steam 3219030, PlanetZoo2.exe), round 660, agent G5 S1/S2 (Send Log ST9ZFC, build 653): the lines auto-tune kept on the device: a",
+        "fixed-base window and no image copy for the large program, the three system DLLs its protection layer imports, and the shared-data line that",
+        "gets the layer past its first wall. It then stops after its vendor-server contact (rule protection-layer-after-vendor-server): no setting is",
+        "known for that yet."
+      ]
+    },
+    {
+      "id": "planet-coaster-2",
+      "title": "Planet Coaster 2",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [2688950],
+        "programs": [{"name": "planetcoaster2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Planet Coaster 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "exe-window-mb = 512",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "env.MADEIRA_KUSER_KEEP_REGS = 1"
+      ],
+      "notes": [
+        "Planet Coaster 2 (Steam 2688950, PlanetCoaster2.exe), round 660, agent G5 S1 (Send Log 7X70J7, build 653): its protection layer read Windows'",
+        "shared-data page and died on a pointer BCD had rewritten in a register (RDI = a value off by the page's real address); the KUSER line keeps",
+        "such registers as the game had them (rule kuser-rebase-protected-nocopy), the other two lines are the ones auto-tune kept. Expect the same",
+        "second wall as Planet Zoo 2. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "onimusha-way-of-the-sword",
+      "title": "ONIMUSHA: Way of the Sword",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamFolders": ["onimushawots"],
+        "programs": [{"name": "onimushawots.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for ONIMUSHA: Way of the Sword.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "exe-window-mb = 608",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "env.MADEIRA_KUSER_KEEP_REGS = 1"
+      ],
+      "notes": [
+        "ONIMUSHA: Way of the Sword (onimushawots.exe), round 660, agents G5 S3 and G4 S19 (Send Logs 17YGHC, CHFGZK, MC41WA, build 653): the first-wall",
+        "runs had no lines at all; the row gives the large program its fixed-base window and no image copy, and the shared-data line its protection",
+        "layer needs. A later fatal branch to address 0 is delivered with the emulator's stack today (a 64-bit fix is planned). Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "meccha-chameleon",
+      "title": "MECCHA CHAMELEON",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [4704690],
+        "programs": [{"name": "penguinhotel.exe"}, {"name": "penguinhotel-win64-shipping.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for MECCHA CHAMELEON.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_OPTIN_DLLS = combase"
+      ],
+      "notes": [
+        "MECCHA CHAMELEON (Steam 4704690, PenguinHotel-Win64-Shipping.exe, Unreal Engine 5), round 660, agent G4 S4 (Send Log RSQH4M, build 653; F4WD9B,",
+        "build 634): the engine's loading thread asks COM for the audio device enumerator without having started COM, gets CO_E_NOTINITIALIZED",
+        "(0x800401f0) and calls through the empty answer. env.MADEIRA_OPTIN_DLLS = combase gives such a thread a shared apartment (combase-optin.dll,",
+        "build 652; Hubert got past the same wall). Not tried on a device for this game yet."
+      ]
+    },
+    {
+      "id": "kingdom-come-deliverance-ii",
+      "title": "Kingdom Come: Deliverance II",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [1771300],
+        "steamFolders": ["kingdomcomedeliverance2"],
+        "programs": [{"name": "kingdomcome.exe", "beside": "WHGameArm.dll"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Kingdom Come: Deliverance II.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MADEIRA_OPTIN_DLLS = rstrtmgr"
+      ],
+      "notes": [
+        "Kingdom Come: Deliverance II (Steam 1771300, KingdomCome.exe beside WHGameArm.dll, so the first game's KingdomCome.exe is not matched), round 660,",
+        "agent G3 S14 (Send Logs 2HNWPC, AYWV4C, build 653): the game DLL WHGameArm.dll imports RstrtMgr.DLL, which the 64-bit set does not ship for every",
+        "game (c0000135), and the game ended with \"Failed to load the Game DLL WHGameArm.dll\" (exit 0x12f). env.MADEIRA_OPTIN_DLLS = rstrtmgr gives",
+        "this game Wine's copy (rstrtmgr-optin.dll, build 595). What comes after that first wall (its Direct3D 12 renderer) is not known yet."
+      ]
+    },
+    {
+      "id": "lego-city-undercover",
+      "title": "LEGO City Undercover",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [578330],
+        "steamFolders": ["lego city undercover"],
+        "programs": [{"name": "legolcur_dx11.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for LEGO City Undercover.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_D3D11_SRC = 1", "minBuild": 660}
+      ],
+      "notes": [
+        "LEGO City Undercover (Steam 578330, LEGOLCUR_DX11.exe, 64-bit Direct3D 11), round 660, build 653 (Send Logs X025QA, 5MB6KT, 8WY1G4,",
+        "QFDQB1, 536JZ2): the first Present gave CAMetalLayer pixel format 0 and iOS ended the app ('CAMetalLayerInvalid ... invalid pixel",
+        "format 0'). BCD's fix (tools/patch-dxmt-layer-format.py) was in the 32-bit DLLs only; from build 660 d3d11-src.dll has it, and this",
+        "line selects d3d11-src.dll. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "persona-3-reload",
+      "title": "Persona 3 Reload",
+      "version": 1,
+      "minBuild": 660,
+      "match": {
+        "steamAppIDs": [2161700],
+        "steamFolders": ["p3r"],
+        "programs": [{"name": "p3r.exe"}]
+      },
+      "switches": {"avx": true},
+      "config": [
+        "# BCD's recommended settings for Persona 3 Reload.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "typed-view-align = 16",
+        "typed-view-shadow = 1",
+        "pool-split = 1",
+        {"line": "env.MADEIRA_REAL_SUSPEND = 1", "minBuild": 620},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Persona 3 Reload (Steam 2161700; its program P3R.exe in P3R\\Binaries\\Win64). The game's logos and movies flashed (a flat",
+        "colour or diagonal streaks in most frames): the quad that shows them reads its UVs from a typed view in an UPLOAD ring off a 64-byte",
+        "boundary; typed-view-align and typed-view-shadow (BCD's Horizon fix) stop that. The other lines are the tester's working list as it ran:",
+        "pool-split, real thread suspension (env.MADEIRA_REAL_SUSPEND, the downloadable form of real-suspend) and pure-x64 images without a pool",
+        "copy, with AVX on. Not seen on a BCD device log yet: every BCD log that starts the game (13 logs, builds 579 to 653) stops before its",
+        "first frame (auto-tune's p3r-protected-syscall-site, and older starts that end with 0xc0000018). The rule starts with build 660, so no",
+        "older build gets it; a line's own minBuild is the build that first reads its key.",
+        "Ported on 2026-11-14 from the tested list of Henry Morin (willfaust/Madeira #568, AVX through the switch as in its follow-up by 125hz)."
+      ]
+    },
+    {
+      "id": "skate2-pc",
+      "title": "skate. 2 PC port",
+      "version": 1,
+      "minBuild": 663,
+      "match": {
+        "programs": [{"name": "skate2-pc.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for skate. 2 PC port.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "d3d12-fence-flags = 1",
+        "env.MADEIRA_OPTIN_DLLS = dxcompiler"
+      ],
+      "notes": [
+        "skate. 2 PC port (skate2-pc.exe, a Rust program on wgpu 30; its WGPU_BACKEND variable picks the back end, which players set in a .bat),",
+        "round 663, item 7c. On Direct3D 12 (Send Log JQ0202, build 653) wgpu found no dxcompiler.dll and compiled every shader with FXC, Wine's",
+        "vkd3d-shader, which has no Shader Model 5.1 resource arrays; naga declares one (its 2048-entry sampler heap) in every shader with a",
+        "texture: E5017 and the game's own error box. env.MADEIRA_OPTIN_DLLS = dxcompiler gives the game BCD's build of the DirectX Shader",
+        "Compiler (DXC 1.9, tools/build-dxcompiler.sh); wgpu's default compiler choice (Auto) then uses it and hands DXIL to madeira-d3d12.",
+        "d3d12-fence-flags = 1: wgpu's fence is created SHARED; without the line the device is lost at once (0XWQCV, build 632; JQ0202 passed",
+        "it with the line auto-tune kept). On the Vulkan and OpenGL back ends neither line does anything. A library entry that starts a .bat",
+        "is not matched by a list (programs are .exe files); auto-tune's wgpu-fxc-sm51-dxcompiler adds the DXC line there after the first E5017.",
+        "Not tried on a device yet."
       ]
     },
     {

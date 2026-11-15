@@ -62,7 +62,8 @@ check("the bridge script is not a workflow DXMT patch step (the submodule and th
 with tempfile.TemporaryDirectory() as tmp:
     t = Path(tmp)
     root = t / "copy"
-    for part in ("d3d11", "d3d10", "dxmt"):
+    # madeira-bcd (2026-11-15): the copy holds util and winemetal too (BCD_PATCHES' wsi-tiny-fullscreen and d3d11-fault-info edit them)
+    for part in ("d3d11", "d3d10", "dxmt", "util", "winemetal"):
         shutil.copytree(SRC / part, root / "dxmt/src" / part)
     d3d11 = root / "dxmt/src/d3d11"
     came_patched = (d3d11 / "d3d11_lsfg_bridge.cpp").exists()

@@ -39,8 +39,13 @@ check('the substitution needs the switch and a thread with a TEB', 'if (ctx_fram
 check("the substitution is Wine's own test: the stack pointer between the kernel stack and the syscall frame, frame and stack valid",
       'frame && kstack && !(frame & 7) && kstack < frame &&\n                sp >= kstack && sp <= frame' in srv)
 sub = srv[srv.index('if (ctx_frame_env && thread->teb)'):srv.index('/* --- WoW64 (i386) process')]
-check('it only replaces the native context (pc, sp, x0-x30, pstate) and logs a capped [ctx-frame] ml716 line',
-      'native->ctl.arm64_regs.pc     = fpc;' in sub and 'n_sub++ < 48' in sub and '[ctx-frame] ml716' in sub)
+# Round 660 (M001): the [ctx-frame] values are kept inside the substitution and the line is printed after the thread's momentary halt
+# (a write to stderr while the target is suspended can wait on a lock it holds), so the print follows thread_resume().
+after = srv[srv.index('if (ctx_frame_env && thread->teb)'):]
+check('it only replaces the native context (pc, sp, x0-x30, pstate) and logs a capped [ctx-frame] ml716 line, after the halt',
+      'native->ctl.arm64_regs.pc     = fpc;' in sub and 'n_sub++ < 48' in sub and 'n_frame_line = n_sub;' in sub
+      and '[ctx-frame] ml716' not in sub and 'thread_resume( port );' in after
+      and after.index('thread_resume( port );') < after.index('[ctx-frame] ml716'))
 check('a failed validation changes nothing (no else branch that fills a context)', 'else' not in sub.replace('n_sub++ < 48', ''))
 
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()

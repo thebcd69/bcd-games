@@ -305,7 +305,7 @@ class SteamSession {
                     // EMsg 5515: standard protobuf ClientLogonResponse
                     do {
                         let logonResponse = try CMsgClientLogonResponse.deserialize(from: message.body)
-                        eResultCode = UInt32(logonResponse.eresult)
+                        eResultCode = UInt32(bitPattern: logonResponse.eresult)   // as the legacy body below reads it; a negative value must not trap
                         heartbeatSecs = logonResponse.heartbeatSeconds > 0 ? logonResponse.heartbeatSeconds : 30
                         outCellID = logonResponse.cellID
                     } catch {

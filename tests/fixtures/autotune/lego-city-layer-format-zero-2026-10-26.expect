@@ -2,11 +2,14 @@
  "dialogs": [],
  "end": {},
  "matched": [
+  "metal-layer-format-zero-x64",
   "metal-layer-format-zero"
  ],
- "next": [],
- "note": "BHZRNE, build 600: iOS terminates on CAMetalLayer invalid pixel format 0. Production fallback is host-tested; gameplay after this first blocker requires a device log.",
+ "next": [
+  "env.MADEIRA_D3D11_SRC = 1"
+ ],
+ "note": "BHZRNE, build 600: iOS terminates on CAMetalLayer invalid pixel format 0. Production fallback is host-tested; gameplay after this first blocker requires a device log. Round 660: the same 64-bit game; metal-layer-format-zero-x64 (priority 0) now proposes env.MADEIRA_D3D11_SRC = 1 first.",
  "outcome": "crashed",
  "stage": 2,
- "status": "known"
+ "status": "trying"
 }

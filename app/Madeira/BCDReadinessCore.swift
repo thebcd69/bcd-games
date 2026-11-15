@@ -74,7 +74,7 @@ enum BCDReadiness {
     /// folder tree (a DLL the game carries itself is found next to it, so it is not missing). `complete` is false when the scan stopped at
     /// its limit: a file the game carries may then simply not have been reached, so nothing is called missing from the game's own copy.
     static func evaluate(modules: [BCDReadinessModule], files: Set<String>, provided: BCDReadinessProvided,
-                         complete: Bool = true, mainFile: String? = nil) -> [BCDReadinessFinding] {
+                         complete: Bool = true, mainFile: String? = nil, mainPath: String? = nil) -> [BCDReadinessFinding] {
         var out: [BCDReadinessFinding] = []
         func add(_ id: String, _ text: String, fixable: Bool = true) {
             if !out.contains(where: { $0.id == id }) { out.append(BCDReadinessFinding(id: id, text: text, fixable: fixable)) }
@@ -121,6 +121,11 @@ enum BCDReadiness {
                 case "physxloader.dll" where !provided.physX
                     && (!files.contains(name) || (complete && !files.contains("physxcore.dll") && !files.contains("physxcore64.dll"))):
                     add("physx", "\(m.file) wants NVIDIA PhysX. Install it from the Start menu: BCD Runtimes › PhysX (legacy).")
+                // Round 660 (M111; Requiem: Avenging Angel's GOG 3DFX.exe F40PAW): a program that imports a Glide runtime the game's folder does not carry
+                // stops with c0000135 at once; the Steam copy ships a wrapper, the GOG copy's 3dfx program has none.
+                case "glide2x.dll" where complete && !files.contains(name), "glide3x.dll" where complete && !files.contains(name):   // a where binds one pattern
+                    add("glide", "\(m.file) needs a Glide runtime (\(name)) that is not in the game's folder. Start the game's other program "
+                        + "(Direct3D or software), or put a Glide wrapper beside it.", fixable: false)
                 default:
                     break
                 }
@@ -152,6 +157,12 @@ enum BCDReadiness {
         if !provided.xna && files.contains("microsoft.xna.framework.dll") && !files.contains("xnafx40_redist.msi") {
             add("xna", "This game uses Microsoft XNA. Install it from the Start menu: BCD Runtimes › XNA Framework 4.0.")
         }
+        // Round 660 (M112): the program's path (relative to drive C) holds a character Windows' ANSI code page (1252) cannot hold: every ANSI-API
+        // path of that folder reads "?" there, so a game that opens its files that way cannot find them (the player's retry was wasted).
+        if let mainPath, let bad = firstNonANSI(mainPath) {
+            add("ansi-path", "The game's folder or file name contains a character (\u{201C}\(bad)\u{201D}) that Windows' older file functions "
+                + "cannot hold, so a game that uses them cannot open its own files. Rename the folder to plain letters and digits.", fixable: false)
+        }
         // Blocking findings (nothing BCD offers fixes them) come last: the fixable ones tell the player what to do.
         return out.filter(\.fixable) + out.filter { !$0.fixable }
     }
@@ -168,6 +179,11 @@ enum BCDReadiness {
     static func logLine(game: String, modules: Int, findings: [BCDReadinessFinding]) -> String {
         "[readiness] \(game): \(modules) program file\(modules == 1 ? "" : "s") read; "
             + (findings.isEmpty ? "nothing missing" : findings.map { $0.id + (($0.fixable) ? "" : "(no fix)") }.joined(separator: ", "))
+    }
+
+    /// Round 660 (M112): the first character of `path` that Windows-1252 (the ANSI code page of an English Windows) cannot hold, or nil.
+    static func firstNonANSI(_ path: String) -> Character? {
+        path.first { String($0).data(using: .windowsCP1252, allowLossyConversion: false) == nil }
     }
 
     /// A program file name for the check's reading of a folder: .exe and .dll only.

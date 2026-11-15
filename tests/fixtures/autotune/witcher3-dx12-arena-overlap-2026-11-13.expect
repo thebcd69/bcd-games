@@ -1,0 +1,16 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "witcher3-oversize-virtual"
+ ],
+ "next": [
+  "oversize-reserve = 1",
+  "oversize-reserve-mb = 6144",
+  "oversize-reserve-virtual = 1"
+ ],
+ "note": "The Witcher 3 DirectX 12 build (Steam 292030 through BCD Dock), build 653, iPhone18,1, Send Log 5EV18N (GW9R17 is the same crash): with the list's oversize-reserve lines the 64 GB arena got a real 6 GB at 0x7040000000 and was told it owns [0x7040000000, 0x8040000000), which also holds the 16 GB pool and the 32 GB request's 16 GB half; the game's free picks the allocator by address and gave a block of the third pool to the arena's TLSF free (AV READ of 18 at witcher3.exe+0x2801f80). witcher3-oversize-virtual (K7R, build 663) proposes oversize-reserve-virtual = 1. UNPROVEN on a device.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

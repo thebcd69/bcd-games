@@ -87,8 +87,11 @@ check("only The Adventures of Elliot's list (build 603, its Denuvo TLS fault) an
       "Metaphor, Prince of Persia: The Lost Crown, PRAGMATA) set it; the two rules kuser-register-rebase-protected-unity and kuser-rebase-protected-program offer it",
       sorted(r["id"] for r in recs if "MADEIRA_KUSER_KEEP_REGS" in json.dumps(r["config"])) == sorted([
           "the-adventures-of-elliot", "football-manager-27", "football-manager-other", "yakuza-kiwami-3-dark-ties", "metaphor-refantazio",
-          "prince-of-persia-the-lost-crown", "pragmata"])
-      and rules_text.count("MADEIRA_KUSER_KEEP_REGS = 1\"]") == 2 and "kuser-register-rebase-protected-unity" in rules_text and "kuser-rebase-protected-program" in rules_text)
+          "prince-of-persia-the-lost-crown", "pragmata",
+          # round 660 (M020, M065): Planet Zoo 2, Planet Coaster 2, ONIMUSHA, RE Requiem v4 and FINAL FANTASY RESONANCE (the full game and the demo's v4)
+          "planet-zoo-2", "planet-coaster-2", "onimusha-way-of-the-sword", "resident-evil-requiem", "final-fantasy-resonance", "final-fantasy-resonance-demo"])
+      and rules_text.count("MADEIRA_KUSER_KEEP_REGS = 1\"]") == 3 and "kuser-register-rebase-protected-unity" in rules_text and "kuser-rebase-protected-program" in rules_text
+      and "kuser-rebase-protected-nocopy" in rules_text)   # round 660 (M020): the third rule, for the protector that reads KUSER once
 
 print("PASS: KUSER keep regs" if ok else "FAIL: KUSER keep regs")
 sys.exit(0 if ok else 1)

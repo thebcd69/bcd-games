@@ -62,18 +62,48 @@ require(("jit_check_debugged()" in ready or "SigningStatus.current.debugged" in 
         and "isDebuggerTraced()" in ready and "isDebuggerAttached()" not in ready,
         "readiness requires CS_DEBUGGED and a live debugger")
 
-# Automatic selection is deterministic: installed StikDebug first, otherwise
-# the built-in helper. A failure never silently falls through to another method.
+# Automatic selection is deterministic. Round 660 (M138, owner 2026-11-15): BCD's own helper when this device is paired with BCD and the
+# helper runs here (iOS 26, LiveContainer's helper support), even with StikDebug installed; otherwise installed StikDebug, otherwise the
+# helper. env.MADEIRA_JIT_AUTO_BUILTIN = 0 restores the order before.
 resolved = function(setup, "var resolvedMethod: JITMethod")
-require("StikJITHelper.isAvailable ? .stikDebug : .builtIn" in resolved,
-        "Automatic prefers installed StikDebug, then Built-in StikJIT")
+takes = function(setup, "var automaticTakesBuiltIn: Bool")
+require("guard method == .automatic else { return method }" in resolved
+        and "guard StikJITHelper.isAvailable else { return .builtIn }" in resolved
+        and "return automaticTakesBuiltIn ? .builtIn : .stikDebug" in resolved,
+        "Automatic: no StikDebug -> built-in; StikDebug installed -> built-in only when automaticTakesBuiltIn")
+require("Self.automaticPrefersBuiltIn && pairingImported && MadeiraBuiltInJIT.isAvailable" in takes
+        and 'MadeiraConfig.flag("MADEIRA_JIT_AUTO_BUILTIN")' in setup,
+        "the helper is taken over StikDebug only with a pairing, where it runs, and with the key not 0")
 coordinator_enable = function(setup, "func enable(completion:")
 coordinator_route = function(setup, "private func enableResolved(")
 require("ensureLoopback" in coordinator_enable and "self?.enableResolved" in coordinator_enable
         and "switch resolvedMethod" in coordinator_route
-        and "enableBuiltIn(completion: completion)" in coordinator_route
+        and "enableBuiltIn { [weak self] result in" in coordinator_route
+        and "enableStikDebug(completion: completion)" in coordinator_route
         and setup.count("StikJITHelper.enableJIT") == 1,
         "the coordinator routes each selected JIT method once, after the loopback check")
+# A failure falls through to StikDebug only when Automatic took the helper over an installed StikDebug and the device refused (or lost)
+# BCD's pairing; a connection problem never does (StikDebug goes through the same LocalDevVPN), and a chosen method never does.
+refused = function(setup, "private func pairingRefused(")
+require("let stikDebugBehind = method == .automatic && StikJITHelper.isAvailable" in coordinator_route
+        and "guard let self, stikDebugBehind, case .failure(let failure) = result, pairingRefused(failure) else {" in coordinator_route
+        and "if stikDebugBehind { fallBackToStikDebug(" in coordinator_route
+        and "case CoordinatorError.pairingMissing = failure" in refused
+        and "return connectionProblem == .pairing" in refused
+        and ".vpn" not in refused,
+        "the only fall-back: Automatic over StikDebug, pairing refused or gone, never a connection problem")
+fallback = function(setup, "private func fallBackToStikDebug(")
+require('LogStore.shared.log("[jit] Automatic: the built-in helper could not use this device' in fallback
+        and "enableStikDebug(completion: completion)" in fallback,
+        "the fall-back is logged and goes through StikDebug's own path")
+# The pool requests' method is the one that attached, else the order before round 660 (an attach BCD did not make, such as StikDebug
+# starting BCD with JIT on, is StikDebug's whenever it is installed).
+reqm = function(setup, "var requestMethod: JITMethod")
+require("if let attachedMethod { return attachedMethod }" in reqm
+        and "return StikJITHelper.isAvailable ? .stikDebug : .builtIn" in reqm
+        and "self?.attachedMethod = .stikDebug" in setup and "self?.attachedMethod = .builtIn" in setup
+        and "StikJITHelper.noteRequestMethod(jitCoordinator.requestMethod)" in content,
+        "the pool request is labelled with the method that attached")
 # ContentView's on-demand JIT setup is BCD's (BCDJITSetupSheet, 2026-10-18).
 # Wave 3 (2026-10-19): the classic JITSettingsSection and JITSetupView are deleted; Settings › JIT is BCD's section.
 require("BCDJITSetupSheet(enableJIT: { enableJIT() })" in content

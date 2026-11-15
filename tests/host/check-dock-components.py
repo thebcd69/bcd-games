@@ -20,16 +20,22 @@ source = root / 'app/Madeira/SteamRuntime.swift'
 text = source.read_text()
 assert 'static let origin = "https://client-update.akamai.steamstatic.com/"' in text
 pins = re.findall(r'Package\(file: "([^"]+)", bytes: ([0-9_]+),\s*sha256: "([0-9a-f]+)"\)', text)
-assert len(pins) == 3 and all(len(s) == 64 and int(b.replace('_', '')) > 0 and '/' not in f for f, b, s in pins), pins
-client = re.search(r'static let clientSHA256 = "([0-9a-f]{64})"', text).group(1)
+# Round 660 (M139, owner 2026-11-15): two client builds, January 2026 (three win32-manifest packages, the default) and September 2026 (two
+# win64-manifest packages: bins_win64 with steamclient.dll and steamclient64.dll, steam_win64 with steam.exe).
+assert len(pins) == 5 and all(len(s) == 64 and int(b.replace('_', '')) > 0 and '/' not in f for f, b, s in pins), pins
+assert [f.split('.zip')[0] for f, _, _ in pins] == ['bins_win32', 'bins_win64_win32', 'steam_win32', 'bins_win64', 'steam_win64_steamrow'], pins
+clients = re.findall(r'\], clientSHA256: "([0-9a-f]{64})"\)', text)
+assert len(clients) == 2 and clients[0].startswith('71b391fe9f3e') and clients[1].startswith('caba4826aa35'), clients
+assert 'UserDefaults.standard.integer(forKey: buildKey) == september.id ? september : january' in text
+print('PASS: two client builds, January 2026 (3 packages) the default and September 2026 (2 packages) only when Settings chose it')
 layouts = root / 'madeira-dock/src/client_layout.c'
 if layouts.exists():
-    assert f'"{client}"' in layouts.read_text(), 'the pinned client DLL is not a build the Dock host supports'
-    print('PASS: pinned client DLL is a build the pinned Dock host supports')
+    assert all(f'"{c}"' in layouts.read_text() for c in clients), 'a pinned client DLL is not a build the Dock host supports'
+    print('PASS: both pinned client DLLs are builds the pinned Dock host supports')
 else:
     print('SKIP: madeira-dock not checked out; client pin cross-check not run')
 assert 'url?.host == "client-update.akamai.steamstatic.com"' in text and 'url?.scheme == "https"' in text
-print('PASS: three pinned packages from one HTTPS Valve host; redirects stay on it')
+print('PASS: the pinned packages come from one HTTPS Valve host; redirects stay on it')
 with tempfile.TemporaryDirectory(prefix='madeira-runtime-') as tmp:
     tmp = Path(tmp)
     # Linux has no zlib module; macOS's SDK has its own (Modified by BCD, 2026-10-25: the shim only where /usr/include/zlib.h exists).

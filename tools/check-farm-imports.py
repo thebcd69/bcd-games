@@ -21,6 +21,7 @@ tools/farm-baseline.json, which records what is known and accepted today:
 A gap the baseline lists but the farm no longer has is reported as stale (a warning). --warn-only turns every failure into a warning (exit 0).
 """
 import json
+import re
 import struct
 import sys
 from pathlib import Path
@@ -156,13 +157,17 @@ def check(folder, baseline):
         problems.append("%s: not a readable PE file: %s" % (farm, item))
     accepted_static = {k.lower(): set(v) for k, v in entry.get("staticGaps", {}).items()}
     accepted_delay = {k.lower(): set(v) for k, v in entry.get("delayGaps", {}).items()}
+
+    def baseline_name(n):
+        """the rebuilt 64-bit set (tools/build-wine-fresh-dlls.sh) ships <name>-fresh.<ext> next to <name>.<ext>: the baseline knows the second name"""
+        return re.sub(r"-fresh(-sync|-xsec)?(\.[a-z0-9]+)$", r"\2", n)
     for name, deps in sorted(static.items()):
         for dep in deps:
-            if dep not in accepted_static.get(name, set()):
+            if dep not in accepted_static.get(baseline_name(name), set()):
                 problems.append("%s: %s imports %s, which the farm does not have" % (farm, name, dep))
     for name, deps in sorted(delay.items()):
         for dep in deps:
-            if dep not in accepted_delay.get(name, set()):
+            if dep not in accepted_delay.get(baseline_name(name), set()):
                 warnings.append("%s: %s delay-imports %s, which the farm does not have (a new gap: look at it, then add it to the baseline)" % (farm, name, dep))
     stale = [("static", n, d) for n, ds in accepted_static.items() for d in sorted(ds) if d not in static.get(n, [])]
     stale += [("delay", n, d) for n, ds in accepted_delay.items() for d in sorted(ds) if d not in delay.get(n, [])]

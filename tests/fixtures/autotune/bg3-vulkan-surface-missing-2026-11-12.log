@@ -1,0 +1,328 @@
+[19:18:41.638] [INFO] Checking entitlements...
+[19:18:41.638] [INFO] [build] v0.1.653 (653)
+[19:18:41.639] [INFO] [device] model=iPhone19,4 idiom=phone os=iOS Version 27.2.1 (Build 24B91034) ram=11564MB available=8160MB cores=6
+[19:18:41.639] [INFO] [device] address-map=[0x102594000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[19:18:41.640] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=348d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=1 wildcard=0 lc=0
+[19:18:41.659] [INFO] [device] settings: low-power=0 thermal=fair screen=1398x2034@3.0x max-fps=120 utc-offset=+01:00 free-disk=477GB stikdebug-url=1
+[19:18:41.662] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:18:42.889] [INFO] [bcd-ui] play local
+[19:18:42.891] [INFO] Requesting JIT with Built-in StikJIT...
+[19:18:44.304] [INFO] [bcd] library launch bg3.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[19:18:44.333] [INFO] Running full Wine sequence...
+[19:18:44.333] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102594000,0x8000000000) 512GB available=8140MB low-power=0 thermal=fair
+[19:18:44.350] [INFO] [game-cfg] env.MADEIRA_ANON_CAS_FLUSH=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[19:18:44.355] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:18:44.356] [INFO] Allocating 896MB JIT pool via debugger...
+[19:18:44.356] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:18:44.356] [INFO] [jit-debugger] attached=1 at the pool request
+[19:18:44.356] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=1
+[19:18:44.357] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[19:18:44.358] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:18:44.997] [INFO] RX pool at 0x148000000
+[19:18:45.014] [OK] JIT pool ready (debugger still attached).
+[19:18:45.015] [INFO] BRK suspension lasted 0.66s
+[19:18:45.016] [INFO] Detaching debugger...
+[19:18:45.021] [OK] Debugger detached.
+[phase] wine-start             t+  0.696s rev=ml526
+[19:18:45.051] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=25 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] Target exe: C:\External\Steam Games\Baldurs Gate 3\bin\bg3.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[19:18:45.245] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7534 MB + phys_footprint=657 MB = 8192 MB (hw.memsize says 11564 MB)
+ml985: map_image_view size=0x683f000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x140000000+0x683f000 (bg3.exe) → pool 0x148006000 used=0x684a000/0x25000000 tramp+0x0
+[copy-verify] bg3.exe: OK, 5272 .text pages executable (copy @0x148006000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14e848000 used=0x6980000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14e848000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x14e983000 used=0x6da7000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x14e983000)
+[window] 0x123c00000..0x7805000000 regions=75949 occupied=462133 MB of 486932 MB free=41262 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=876 MB (peak 876) internal=873 MB compressed=0 MB external=82 MB reusable=0 MB (cycle=1)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x14eda4000 used=0x6ed8000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14eda4000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x14eed8000 used=0x6fa0000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14eed8000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x14efa0000 used=0x72a0000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14efa0000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module bg3.exe (bg3.exe-906a4685771ff987): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+D 24 Load module COMCTL32.dll (comctl32.dll-8c564d137baf4ee2): 71FE1F0000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FDFD0000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FDEE0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDE30000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x145261000+0x1000: 496 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x145261000+0x1000: 496 slot(s), 0 data import(s) bound
+D 24 Load module SDL2.dll (sdl2.dll-7bd8f3bb096e3377): 71FDA70000
+[x64-data-imp] ml1245 importer pe=0x71fda70000 IAT window 0x71fdb77000+0xc48: 374 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fda70000 IAT window 0x71fdb77000+0xc48: 374 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fda70000 IAT window 0x71fdb77000+0xc48: 374 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fda70000 IAT window 0x71fdb77000+0xc48: 374 slot(s), 0 data import(s) bound
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x1500c8000)
+[copy-verify] imm32.dll: OK, 5 .text pages executable (copy @0x15015c000)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x150200000)
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x150334000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x1503c8000)
+[x64-data-imp] ml1245 importer pe=0x71fc4a0000 IAT window 0x71fc50a000+0x590: 167 slot(s), 3 data import(s) bound
+ml985: map_image_view size=0x4a36000 base=0x6ffff8770000 info_base=0x180000000 map_addr=0x6ffff8770000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[copy-verify] winemetal.dll: OK, 2 .text pages executable (copy @0x15605e000)
+[x64-data-imp] ml1245 importer pe=0x71f7760000 IAT window 0x71fc16c000+0x1000: 220 slot(s), 3 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71f6f30000 IAT window 0x71f6fc0000+0x898: 262 slot(s), 2 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71f7020000 IAT window 0x71f71ef000+0x4f0: 147 slot(s), 1 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71f6b70000 IAT window 0x71f6e72000+0xae8: 320 slot(s), 3 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x145261000+0x1000: 496 slot(s), 4 data import(s) bound
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=2 first=0000000144E7BAD0
+[jumbo#1] +0ms tid=16e1b3000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe454f00 grip=0x0 size=0x68030000 (1664 MB) hint=0x0 -> 0x7038010000 st=0x0 | granted=1664 MB ok=1 fail=0
+[xp] 19:18:45.940 +0.60 dt=281 cpu=225 (thr 225) P=225 E=0 run=232 pgw=3.1 GHz P=4.32 E=1.86 Minst=4521 IPC=4.65 mJ=904 pin=17 rdKB=208 fpMB=1141
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x16bffc000 size=0x1000000 -> free-list rev=ml438
+[xp] 19:18:46.252 +0.91 dt=312 cpu=313 (thr 313) P=313 E=0 run=315 pgw=0.0 GHz P=4.79 E=1.62 Minst=6121 IPC=4.08 mJ=1834 pin=0 rdKB=0 fpMB=1269
+0028:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\External\\Steam Games\\Baldurs Gate 3\\bin\\crashpad_handler.exe" cmdline=L"crashpad_handler.exe --no-rate-limit --database=db --metrics-dir=db --url=https://bt.larian.com:6098 --annotation=build.type=Gold --annotation=format=minidump --annotation=nametag= --annotation=token=3b8262700eca12b8d9bc8a268f17db6e11f6c8391b7041137822597b25cc49f7 --annotation=version=4.1"...
+[phase] spawn:L"C:\\External\\Steam Games\\Baldurs Gate 3\\bin\\crashpad_handler.exe" t+  2.111s rev=ml526
+0028:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "................................................"
+0028:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0028 status=00000001 caller=000000014EEFE32C
+E 28 [thr-term] rev=ml435 deinit #1 tid=0x28
+[xp-names] m4474350 "wine-x18-exc"
+[xp] 19:18:46.564 +1.22 dt=311 cpu=277 (thr 265) P=275 E=2 run=277 pgw=0.0 GHz P=4.64 E=2.37 Minst=5110 IPC=3.98 mJ=1434 pin=63 rdKB=0 fpMB=1313
+[jit-pool] image 0x71df0f0000+0xb0000 (uxtheme.dll) → pool 0x1573f0000 used=0xf4a4000/0x25000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71DF0F0000
+[image-reload] unmapped image 0x71df0f0000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,864,594} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='SDLHelperWindowInputCatcher' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,864,594} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='SDLHelperWindowInputCatcher' text="SDLHelperWindowInputMsgWindow" rev=ml853
+[vmode] synthesized CURRENT = 1152x792 @60Hz
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg-mismatch] QueryDisplayConfig flags=0x2 answered success with 0 paths 0 modes (room for 1 paths 2 modes offered; 1 monitor(s) without a source skipped) after GetDisplayConfigBufferSizes said 1 paths 2 modes: a program that trusts the sizes call and reads the result finds no monitor; env.MADEIRA_VDCFG_PATH = 1 lists the virtual monitor's path
+[jit-pool] image 0x71df110000+0x90000 (hid.dll) → pool 0x1574a4000 used=0xf538000/0x25000000 tramp+0x4000
+D 24 Load module hid.dll (hid.dll-c3a5177fc021edec): 71DF110000
+[win-pos] #3 hwnd=0x3002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #3 hwnd=0x3002e class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[win-pos] #4 hwnd=0x3002e after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #4 hwnd=0x3002e class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+0034:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0034 status=00000001 caller=000000014EEFE32C
+E 34 [thr-term] rev=ml435 deinit #2 tid=0x34
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #5 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #6 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[jit-pool] image 0x71df060000+0xb0000 (dinput8.dll) → pool 0x157538000 used=0xf5ec000/0x25000000 tramp+0x4000
+D 24 Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71DF060000
+[jit-pool] image 0x71defd0000+0x90000 (xinput1_4.dll) → pool 0x1575ec000 used=0xf680000/0x25000000 tramp+0x4000
+D 24 Load module XInput1_4.dll (xinput1_4.dll-a6149d3778c9ba46): 71DEFD0000
+[win-name] #7 hwnd=0x10036 class='__wine_xinput_devnotify' text="" rev=ml853
+[jit-pool] image 0x71deeb0000+0xa0000 (windows.gaming.input.dll) → pool 0x157680000 used=0xf724000/0x25000000 tramp+0x4000
+D 24 Load module windows.gaming.input.dll (windows.gaming.input.dll-3f9af7d1c93bc642): 71DEEB0000
+[free-delay] #1 release of 0x71deb90000+0x2e0000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x71dea40000+0x150000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x71de140000+0x7a0000 held for 2000 ms (3 in flight)
+[xp] 19:18:46.873 +1.53 dt=309 cpu=243 (thr 236) P=241 E=2 run=253 pgw=2.1 GHz P=4.52 E=2.25 Minst=5073 IPC=4.64 mJ=1174 pin=43 rdKB=704 fpMB=1433
+[free-delay] #4 release of 0x71ddc90000+0x4b0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x71dd7e0000+0x150000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x71dcf20000+0x750000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x71dcd90000+0x190000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x71dc160000+0xa50000 held for 2000 ms (8 in flight)
+[xp] 19:18:47.155 +1.82 dt=282 cpu=210 (thr 210) P=209 E=1 run=213 pgw=0.0 GHz P=4.47 E=1.60 Minst=4028 IPC=4.30 mJ=865 pin=0 rdKB=0 fpMB=1511
+[footprint] rev=ml358 phys=1543 MB (peak 1543) internal=1540 MB compressed=0 MB external=126 MB reusable=0 MB (cycle=2)
+[xp] 19:18:47.435 +2.10 dt=280 cpu=365 (thr 363) P=362 E=2 run=364 pgw=0.0 GHz P=4.55 E=1.95 Minst=7025 IPC=4.25 mJ=1805 pin=0 rdKB=0 fpMB=1547
+[guest-log] file /private/var/mobile/Library/LiveFiles/com.apple.filesystems.userfsd/<uuid>/Steam Games/Baldurs Gate 3/bin/gold.2026-11-12T19-18-46-506610.log
+[guest-log] #1 tid=0024 [12-11-2026 18:18:47:682][D:\Jenkins\workspace\Repo\FW4\Release\Stable\LSProjects\Framework\Code\DiscordBinding\DiscordAPIManager.cpp 71 dsc::DiscordAPIManager::Init]: Failed to initialize discord core: 4
+[jit-pool] image 0x71d9cc0000+0x23000 (vulkan-1.dll) → pool 0x157726000 used=0xf752000/0x25000000 tramp+0x4000
+D 24 Load module vulkan-1.dll (vulkan-1.dll-2c1a3868f828427f): 71D9CC0000
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014EFB8110 flags=1 nparams=4 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000014EFB8110 flags=1 nparams=4 tid=0024 hit=2
+[guest-log] #2 tid=0024 [12-11-2026 18:18:47:691][D:\Jenkins\workspace\Repo\FW4\Release\Stable\LSProjects\Framework\Code\RenderFramework\vk\API.cpp 751 rf::vk::API::Die]:  ^ critical error -> aborting
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #65 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #69 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #70 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #71 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #72 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #73 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #74 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #75 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #76 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #78 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #79 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #81 hwnd=0x10060 class='Static' text="required extension VK_KHR_surface not found in list of available extensions" rev=ml853
+[win-pos] #82 hwnd=0x10054 after=0x0 flags=0000001c vis={140,48,192,74} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x10042
+[win-name] #82 hwnd=0x10054 class='Button' text="OK" rev=ml853
+[win-pos] #83 hwnd=0x10042 after=0x0 flags=00001967 vis={410,339,742,453} surface=0x118c56b80 rev=ml505 style=94c801c4 visible=1 parent=0x10020
+[win-name] #83 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=1578 MB (peak 1578) internal=1573 MB compressed=0 MB external=126 MB reusable=0 MB (cycle=3)
+[srv-input] btn msg=0x201 at (566,418) hit win=00010042 thread=0x11ceec000
+[srv-input] btn msg=0x201 at (566,418) hit win=00010042 thread=0x11ceec000
+[srv-input] btn msg=0x201 at (566,418) hit win=00010042 thread=0x11ceec000
+[win-pos] #84 hwnd=0x10042 after=0x0 flags=000018bf vis={410,339,742,453} surface=0x104731370 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #84 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #85 hwnd=0x10042 after=0x0 flags=0000181f vis={410,339,742,453} surface=0x104731370 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #85 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #86 hwnd=0x10042 after=0x0 flags=0000181f vis={410,339,742,453} surface=0x104731370 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #86 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #87 hwnd=0x10042 after=0x0 flags=0000181f vis={410,339,742,453} surface=0x104731370 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #87 hwnd=0x10042 class='#32770' text="Fatal Error" rev=ml853
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x1681e5e04 fault_addr=0x0 insn=990000df rn=6 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffe0000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0x990000df pc=0x1681e5e04 NO pool/anon alias | region 0x102594000+0x1fe0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3b0000 (pc=0x1681e5e04 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=WRITE p1=0x0 hostpc=0x1681e5e04 hinsn=0x990000df rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x163ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x14414312e pc=0x1681e5e04 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1681e5e04 addr=0x0 x18=0x0 type=1 lr=0x14414312e sp=0x71fe3b0000 x16=0x16cffc108 x17=0x11b830000
+[guest-code] rev=ml333 pool_rip=0x14c14912e (PE 0x14414312e): ff c7 48 83 c3 08 3b 3e 7c e8 48 8b 5c 24 30 48
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x1681e5e04; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RBX=0x702580e6d0 "required extension VK_KHR_surface not found in l..."
+[av-args]   RSI=0x145b82720 = bg3.exe+0x5b82720 "D:\Jenkins\workspace\Repo\FW4\Release\Stable\LSP..."
+[av-args]   RDI=0x145b82878 = bg3.exe+0x5b82878 "rf::vk::API::Die"
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x144074f2d (block entry 0x14414312e) rva 0x4074f2d, section #0 '.text' rva 0x1000+0x525fd77 chars 0x60000020 (R-X CODE) | host region 0x140000000+0x5264000 prot=r-- max=rw- | Wine vprot of the 4 KB pages of host page 0x144074000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: 0x14c07af2d | 32 bytes at rip, loaded image: c7 04 25 00 00 00 00 00 00 00 00 ff 15 32 d6 1e 01 cc cc 48 89 5c 24 10 48 89 74 24 18 48 89 7c | pool copy: c7 04 25 00 00 00 00 00 00 00 00 ff 15 32 d6 1e 01 cc cc 48 89 5c 24 10 48 89 74 24 18 48 89 7c | image and pool copy equal
+[x64-fault] #1 a 64-bit guest faulted at address 0x0 at RIP 0x144074f2d (bg3.exe+0x4074f2d) [exact RIP from FEX's block table]; RAX=0x0 RCX=0x0 RDX=0x14ea9b178 RBX=0x702580e6d0 RSP=0x702580e560 RBP=0x702580e6b0 RSI=0x145b82720 RDI=0x145b82878 R8=0x7026661648 R9=0x46 R10=0x702580e530 R11=0x2a R12=0x4 R13=0x0 R14=0x0 R15=0x0
+[fault-host] 1681e5d04: d4395fc0 d2851201 f2a8b701 f2c00021 52880006 f90012e6 910082e0 f90016f9
+[fault-host] 1681e5d24: f9001afa 52805de6 b9003ae6 d289e186 f2a880e6 f2c00026 f81f8ee6 1000004a
+[fault-host] 1681e5d44: 9400018c 10fff7ca f900038a b945eb8b 3400004b d4395fc0 aa1b03e1 d2855600
+[fault-host] 1681e5d64: f2a8b700 f2c00020 d289e366 f2a880e6 f2c00026 f81f8ee6 1000004a 94000221
+[fault-host] 1681e5d84: 10fff5ea f900038a b945eb8b 3400004b d4395fc0 d289e406 f2a880e6 f2c00026
+[fault-host] 1681e5da4: f81f8ee6 1000004a 9400025e 10fff48a f900038a b945eb8b 3400004b d4395fc0
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 52800006 d503201f [990000df] d284ae06 f2a8a4c6 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702604c850 *(gs_cached+0x58)=0x702604c850
+[x86_live] RAX=0x0 RCX=0x0 RDX=0x14ea9b178 RBX=0x702580e6d0 RSP=0x702580e560 RBP=0x702580e6b0 RSI=0x145b82720 RDI=0x145b82878
+[x86_live]  R8=0x7026661648  R9=0x46 R10=0x702580e530 R11=0x2a R12=0x4 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x14414312e callret_sp=0x7c01001000
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0x990000df pc=0x1681e5e04 NO pool/anon alias | region 0x102594000+0x1fe0000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3b0000 (pc=0x1681e5e04 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=WRITE p1=0x0 hostpc=0x1681e5e04 hinsn=0x990000df rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x163ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x14414312e pc=0x1681e5e04 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1681e5e04 addr=0x0 x18=0x0 type=1 lr=0x14414312e sp=0x71fe3b0000 x16=0x16cffc108 x17=0x11b830000
+[guest-code] rev=ml333 pool_rip=0x14c14912e (PE 0x14414312e): ff c7 48 83 c3 08 3b 3e 7c e8 48 8b 5c 24 30 48
+[fault-host] 1681e5d64: f2a8b700 f2c00020 d289e366 f2a880e6 f2c00026 f81f8ee6 1000004a 94000221
+[fault-host] 1681e5d84: 10fff5ea f900038a b945eb8b 3400004b d4395fc0 d289e406 f2a880e6 f2c00026
+[fault-host] 1681e5da4: f81f8ee6 1000004a 9400025e 10fff48a f900038a b945eb8b 3400004b d4395fc0
+[fault-host] 1681e5dc4: f1000109 540001a0 aa0803e0 d289e5a6 f2a880e6 f2c00026 f81f8ee6 1000004a
+[fault-host] 1681e5de4: 94000274 10fff2ca f900038a b945eb8b 3400004b d4395fc0 52800006 d503201f
+[fault-host] 1681e5e04: 990000df d284ae06 f2a8a4c6 f2c00026 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 52800006 d503201f [990000df] d284ae06 f2a8a4c6 f2c00026
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702604c850 *(gs_cached+0x58)=0x702604c850
+[x86_live] RAX=0x0 RCX=0x0 RDX=0x14ea9b178 RBX=0x702580e6d0 RSP=0x702580e560 RBP=0x702580e6b0 RSI=0x145b82720 RDI=0x145b82878
+[x86_live]  R8=0x7026661648  R9=0x46 R10=0x702580e530 R11=0x2a R12=0x4 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x14414312e callret_sp=0x7c01001000
+0024:err:seh:segv_handler SEGV #1: pc=0x1681e5e04 addr=0x0 uctx_x18=0x0 disp=0 mach_exc=2639
+0024:err:seh:segv_handler [x18-decline] #1 pc=0x1681e5e04 fault_addr=0x0 insn=990000df rn=6 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffe0000
+0024:err:seh:segv_handler [x18-decline] #1 insns pc-64..pc+16: [f1000109 540001a0 aa0803e0 d289e5a6 f2a880e6 f2c00026 f81f8ee6 1000004a 94000274 10fff2ca f900038a b945eb8b 3400004b d4395fc0 52800006 d503201f 990000df d284ae06 f2a8a4c6 f2c00026 d94000c6]
+0024:err:seh:segv_handler [x18-decline] #1 markers(words=320): brk#CAFE@92 brk#0@-1 mrs_TPIDRRO@-1 msr_TPIDR_EL0@-1
+0024:err:seh:segv_handler [callret] State.rip=0x14414312e
+0024:err:seh:segv_handler [callret] frame=0x7c00801140 sp=0x7c01001000(ok=1) base=0x7c00c01000(ok=1) in_range=1
+0024:err:seh:segv_handler   x8=0x0 x9=0x702580e550 x10=0x1681e5c40 x16=0x16cffc108 x17=0x11b830000 x18=0x0 x19=0x4 x20=0x0
+0024:err:seh:segv_handler   [guest-state] x28=0x7c00801140 rip=0x14414312e
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x14414312e in image 0x140000000: rva 0x414312e, section #0 '.text' rva 0x1000+0x525fd77 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x1681e5c40 rip=0x144074f2d x86=c7 04 25 00 00 00 00 00 00 00 00 ff 15 32 d6 1e
+0024:err:seh:segv_handler   [guest-state]   rax=0x145b912b0 rcx=0x71f61a0010 rdx=0x14ea9b178 rbx=0x703812a360
+0024:err:seh:segv_handler   [guest-state]   rsp=0x702580e528 rbp=0x702580e6b0 rsi=0x703812a3e0 rdi=0x0
+0024:err:seh:segv_handler   [guest-state]   r8 =0x7026661648 r9 =0x46 r10=0x1f8 r11=0x2a
+0024:err:seh:segv_handler   [guest-state]   r12=0x4 r13=0x0 r14=0x0 r15=0x0
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=8/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-24  f900038a b945eb8b 3400004b d4395fc0 52800006 d503201f
+0024:err:seh:segv_handler   [emit-dump]   +0    990000df d284ae06 f2a8a4c6 f2c00026 d94000c6 d503201f
+0024:err:seh:segv_handler   [emit-dump]   +24   d289e7c7 f2a880e7 f2c00027 f81f8ee7 a94a2f8a 8a06116b
+0024:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x702580e560  gregs[RSP]=0x702580e528  NZCV/flags[24]=0x20000000  callret_sp=0x7c01001000 base=0x7c00c01000  x28=0x7c00801140
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: d4395fc0 52800006 d503201f [990000df] d284ae06 f2a8a4c6 f2c00026
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x1681e5e04 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x1681e5e04 RX from -32, 64 of 64 bytes: 74 02 00 94 ca f2 ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 06 00 80 52 1f 20 03 d5 df 00 00 99 06 ae 84 d2 c6 a4 a8 f2 26 00 c0 f2 c6 00 40 d9 1f 20 03 d5 c7 e7 89 d2 e7 80 a8 f2 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x1681e5e04 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 1681E5E04 AV WRITE of 0
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x144074f2d RX from -32, 64 of 64 bytes: 8b d3 48 8d 0d 9a db b0 01 e8 15 af 0a 00 e8 80 c2 50 fc 48 85 c0 74 08 48 8b c8 e8 d3 e1 0c 00 c7 04 25 00 00 00 00 00 00 00 00 ff 15 32 d6 1e 01 cc cc 48 89 5c 24 10 48 89 74 24 18 48 89 7c 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x144074f2d (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 144074F2D AV WRITE of 0
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=0000000144074F2D flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7025810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................................................ORS=1."
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffff7001) syscalls=0 unix_calls=2425
+[unwind] term ml661 begin rip=71fe454ba0 rsp=702580c918 window=[702580c918..702600c918) max=32
+[unwind] term ml661 #00 pc=71fe454ba0 rsp=702580c918  kernelbase.dll+0x84ba0
+[unwind] term ml662 #00 nv: rbx=1 rbp=702580cb80 rsi=702580dc10 rdi=702580ce20 r12=702580ce20 r13=0 r14=c0000005 r15=702580e490
+[unwind] term ml662   rbp=702580cb80: b0e68025 70000000 dc84fb4e 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml662   rsi=702580dc10: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=1442d397a rsp=702580c920  bg3.exe+0x42d397a
+[unwind] term ml661 #02 pc=14f0181fc rsp=702580cb60  kernelbase.dll+0x781fc
+[unwind] term ml662 #02 nv: rbx=702580e490 rbp=702580cb80 rsi=702580dc10 rdi=7025810000 r12=702580ce20 r13=0 r14=c0000005 r15=702580e490
+[unwind] term ml662   rbx=702580e490: 050000c0 00000000 00000000 00000000 2d4f0744 01000000 02000000 00000000
+[unwind] term ml662   rbp=702580cb80: b0e68025 70000000 dc84fb4e 01000000 00000000 00000000 00000000 00000000
+[unwind] term ml661 #03 pc=702580e490 rsp=702580cb68  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 1442d397a  bg3.exe+0x42d397a
+[term-stack] ml660 sp+038:   ? 1458c8d88  bg3.exe+0x58c8d88
+[term-stack] ml660 sp+040:   ? 1452ad3b8  bg3.exe+0x52ad3b8
+[term-stack] ml660 sp+0c0:   ? 1452ad438  bg3.exe+0x52ad438
+[term-stack] ml660 sp+120:   ? 1452ad448  bg3.exe+0x52ad448
+[term-stack] ml660 sp+3d8:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+608: CALL 144073e99  bg3.exe+0x4073e99
+[term-stack] ml660 sp+610: call* 143ac2ee4  bg3.exe+0x3ac2ee4
+[term-stack] ml660 sp+618: call* 143ac18f2  bg3.exe+0x3ac18f2
+[term-stack] ml660 sp+620: call* 140578b39  bg3.exe+0x578b39
+[term-stack] ml660 sp+628: CALL 144e7b602  bg3.exe+0x4e7b602
+[term-stack] ml660 sp+d60: CALL 144074f2d  bg3.exe+0x4074f2d
+[srv-kill] kill_thread tid=0030 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0038 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=003c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0040 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0044 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0048 pid=0020 violent=1 rev=ml586
+0024:err:thread:abort_process abort_process: status=0xffff7001 — tearing down this pseudo-process only (ml937; was _exit, which killed the app)
+[Wine ntdll/server] process_exit_wrapper(-36863)
+[WineProc] Wine exited with code -36863 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:18:51.334] [INFO] [session] length=7s play=0s frames=0 stalls=0/0s peak=1624MB limit=8191MB thermal=fair lpm=0 api=D3D11/D3D12/D3D9/Vulkan/64 res=1152x792 cap=60 game=Baldurs Gate 3
+[19:18:51.343] [INFO] [exit-report] status=0xffff7001
+[frontend] returned to library
+[footprint] rev=ml358 phys=1627 MB (peak 1627) internal=1626 MB compressed=0 MB external=127 MB reusable=0 MB (cycle=4)
+[hwinput] keyboard focus: elsewhere (poll)
+[19:18:53.121] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1639 MB (peak 1639) internal=1636 MB compressed=0 MB external=132 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=1638 MB (peak 1639) internal=1636 MB compressed=0 MB external=132 MB reusable=0 MB (cycle=6)
+[xp] 19:18:56.217 +10.88 dt=261 cpu=176 (thr 176) P=125 E=51 run=212 pgw=13.4 GHz P=3.79 E=1.98 Minst=1730 IPC=3.01 mJ=347 pin=201 rdKB=3488 fpMB=1644
+[xp] 19:18:56.543 +11.20 dt=325 cpu=17 (thr 17) P=7 E=11 run=24 pgw=2.7 GHz P=3.33 E=1.85 Minst=82 IPC=1.97 mJ=15 pin=1 rdKB=32 fpMB=1643
+[xp] 19:18:56.803 +11.46 dt=261 cpu=60 (thr 61) P=0 E=60 run=66 pgw=0.0 GHz P=1.44 E=1.46 Minst=206 IPC=2.35 mJ=8 pin=0 rdKB=0 fpMB=1643
+[xp] 19:18:57.128 +11.79 dt=326 cpu=26 (thr 19) P=0 E=26 run=30 pgw=0.0 GHz P=0.00 E=1.31 Minst=48 IPC=1.39 mJ=2 pin=0 rdKB=16 fpMB=1642
+[xp] 19:18:57.449 +12.11 dt=320 cpu=76 (thr 75) P=39 E=37 run=107 pgw=0.0 GHz P=1.91 E=1.27 Minst=251 IPC=2.07 mJ=30 pin=0 rdKB=0 fpMB=1643
+[footprint] rev=ml358 phys=1643 MB (peak 1643) internal=1642 MB compressed=0 MB external=141 MB reusable=0 MB (cycle=7)
+[19:18:57.743] [xp] 19:18:57.743 +12.40 dt=294 cpu=178 (thr 178) P=121 E=57 run=196 pgw=0.0 GHz P=3.62 E=1.70 Minst=2645 IPC=4.96 mJ=381 pin=0 rdKB=0 fpMB=1643

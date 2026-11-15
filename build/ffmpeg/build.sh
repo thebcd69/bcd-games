@@ -1,4 +1,6 @@
 #!/bin/bash
+# Portions copyright 2026 intraducine: code taken from https://github.com/willfaust/Madeira (pull request #607)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # Cross-compile a minimal, LGPL-only FFmpeg as static libraries for iOS arm64.
 # Output prefix: toolchains/ffmpeg-ios/ (headers for build/ntdll-unix/build.sh),
 # and the four archives copied to app/Madeira/ for the app target's link.
@@ -46,9 +48,9 @@
 # needs no network. It is checked against build/ffmpeg/src/SHA256SUMS before
 # anything is extracted; a mismatch aborts. No patches are applied. The
 # checksum is the one pinned when the tarball was downloaded from
-# https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz.
+# https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz.
 #
-# Re-runnable: configure runs again only when the configure arguments change
+# Re-runnable: configure runs again only when the source checksum or configure arguments change
 # (they are stamped into the build tree) or when --reconfigure is passed.
 set -euo pipefail
 
@@ -59,10 +61,9 @@ OBJ_DIR="$BUILD_DIR/obj"
 PREFIX="$REPO_ROOT/toolchains/ffmpeg-ios"
 APP_DIR="$REPO_ROOT/app/Madeira"
 
-FFMPEG_VERSION=7.1.1
+FFMPEG_VERSION=7.1.5
 TARBALL="$SRC_DIR/ffmpeg-${FFMPEG_VERSION}.tar.xz"
-SRC="$OBJ_DIR/ffmpeg-${FFMPEG_VERSION}"
-BUILD="$OBJ_DIR/build"
+BUILD="$OBJ_DIR/build-$FFMPEG_VERSION"
 
 RECONFIGURE=0
 for a in "$@"; do
@@ -90,10 +91,12 @@ if [ -z "$WANT" ] || [ "$GOT" != "$WANT" ]; then
     echo "  got      $GOT" >&2
     exit 1
 fi
-if [ ! -f "$SRC/configure" ]; then
+SRC="$OBJ_DIR/ffmpeg-${FFMPEG_VERSION}-${GOT}"
+if [ ! -f "$SRC/.madeira-extracted" ]; then
     echo "=== extracting ffmpeg-$FFMPEG_VERSION ==="
-    rm -rf "$SRC"
-    tar -C "$OBJ_DIR" -xJf "$TARBALL"
+    mkdir -p "$SRC"
+    tar -C "$SRC" --strip-components=1 -xJf "$TARBALL"
+    touch "$SRC/.madeira-extracted"
 fi
 
 # ------------------------------------------------------------------ configure
@@ -156,17 +159,22 @@ CONFIG_ARGS=(
 
 mkdir -p "$BUILD"
 STAMP="$BUILD/madeira-configure.args"
-WANT_STAMP="$(printf '%s\n' "${CONFIG_ARGS[@]}")"
+WANT_STAMP="$(printf '%s\n' "$GOT" "${CONFIG_ARGS[@]}")"
 if [ $RECONFIGURE -eq 0 ] && [ -f "$BUILD/config.h" ] && [ "$(cat "$STAMP" 2>/dev/null)" != "$WANT_STAMP" ]; then
-    echo "=== configure arguments changed: reconfiguring ==="
+    echo "=== FFmpeg source or configure arguments changed: reconfiguring ==="
     RECONFIGURE=1
 fi
 if [ $RECONFIGURE -eq 1 ] || [ ! -f "$BUILD/config.h" ]; then
     echo "=== configuring ffmpeg-$FFMPEG_VERSION ==="
     cd "$BUILD"
     # A reconfigure over an old tree keeps stale objects of components that
-    # are now disabled; start clean.
-    [ ! -f Makefile ] || make distclean >/dev/null 2>&1 || true
+    # are now disabled; start clean. An interrupted configure can leave a
+    # Makefile without ffbuild/config.mak, which distclean cannot read; then the
+    # version's build folder is emptied instead, with one line (madeira-bcd).
+    if [ -f Makefile ] && ! make distclean > /dev/null 2>&1; then
+        echo "=== make distclean failed: starting from an empty build folder ==="
+        cd "$OBJ_DIR" && rm -rf "$BUILD" && mkdir -p "$BUILD" && cd "$BUILD"
+    fi
     "$SRC/configure" "${CONFIG_ARGS[@]}" > "$OBJ_DIR/configure.log" 2>&1 \
         || { echo "configure failed; see $OBJ_DIR/configure.log" >&2; exit 1; }
     printf '%s' "$WANT_STAMP" > "$STAMP"

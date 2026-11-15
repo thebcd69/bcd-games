@@ -163,6 +163,12 @@ static NTSTATUS allocate_virtual_memory(void **ret, SIZE_T *size_ptr, ULONG type
     if (consume) { hole -= (SIZE_T)(((ULONG_PTR)*ret - hole_base) + *size_ptr); hole_base = (ULONG_PTR)*ret + *size_ptr; }
     return STATUS_SUCCESS;
 }
+/* round 660 (agent K7R, build 663): ios_oversize_reserve also reaches bcd.cfg oversize-reserve-virtual's anchor and the log-only tail census;
+ * both are driven in tests/host/check-oversize-virtual.py. Here the key is off and the census logs nothing. */
+static int ios_oversize_virtual_on( void ) { return 0; }
+static NTSTATUS ios_vres_place( void **ret, SIZE_T *size_ptr, ULONG protect, SIZE_T want, SIZE_T real, SIZE_T floor )
+{ (void)ret; (void)size_ptr; (void)protect; (void)want; (void)real; (void)floor; return STATUS_NO_MEMORY; }
+static void ios_oversize_tail_census( ULONG_PTR b, SIZE_T real, SIZE_T full ) { (void)b; (void)real; (void)full; }
 @REALLOC@
 @FAILED@
 @IMAGEIS@

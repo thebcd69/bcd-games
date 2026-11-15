@@ -5,6 +5,7 @@
 import Combine
 import Foundation
 import ImageIO
+import Metal
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -148,6 +149,7 @@ import UniformTypeIdentifiers
             if let id { d.groups.append(steamGroup(entry, id)) }
             if let dlc = dlcGroup(game) { d.groups.append(dlc) }
             if let version = versionGroup(game) { d.groups.append(version) }   // the game's version (BCDSteamBranches/BCDGamePageLiveVersion.swift): only for a game Steam lists a beta for
+            if !desktop, let galaxy = galaxyGroup(game, entry) { d.groups.append(galaxy) }   // GOG Galaxy features, only for a GOG game BCD installed (BCDGOG/Galaxy/BCDGamePageLiveGalaxy.swift)
             if !desktop { d.groups.append(midiGroup(entry)) }   // round 603: BCDMidi/BCDGamePageLiveMidi.swift
             if !desktop, let sound = d.groups.lastIndex(where: { $0.id == "sound" }) { d.groups[sound].settings += soundSettings(entry) }   // round 604: BCDGamePageLiveSound.swift (audio delay, volume, resume)
             if !desktop { d.groups.append(saveBackupsGroup(game, entry)) }   // round 603: BCDSaveBackups/BCDGamePageLiveSaves.swift
@@ -236,6 +238,28 @@ import UniformTypeIdentifiers
         UIDevice.current.userInterfaceIdiom == .pad
             ? " An iPad's screen has many pixels, so a lower Resolution (with MetalFX upscaling below) is the first thing to try when a game stutters."
             : ""
+    }
+
+    /// madeira-bcd (KosmicKrisp): gl/libvulkan_kosmickrisp.dylib is in this build and this device can load it. The library is written
+    /// against Metal 4: iOS 26 and a GPU of the Metal 4 family (WineProcessBridge.m bcd_kosmickrisp_unusable asks the same at a start).
+    static let kosmicKrispUsable: Bool = {
+        guard let folder = Bundle.main.resourceURL?.appendingPathComponent("gl", isDirectory: true),
+              FileManager.default.isReadableFile(atPath: folder.appendingPathComponent("libvulkan_kosmickrisp.dylib").path) else { return false }
+        if #available(iOS 26.0, *) { return MTLCreateSystemDefaultDevice()?.supportsFamily(.metal4) ?? false }
+        return false
+    }()
+
+    /// The Vulkan driver of a game, where there is a choice (kosmicKrispUsable): Off, MoltenVK, KosmicKrisp. It is the game's `vulkan` line.
+    private static func vulkanChoice(_ profile: GameProfile) -> BCDGameSetting {
+        let value = profile.get("vulkan") ?? ""
+        var choices = [BCDGameChoice(value: "", label: "Off"), BCDGameChoice(value: "moltenvk", label: "MoltenVK"),
+                       BCDGameChoice(value: "kosmickrisp", label: "KosmicKrisp")]
+        if !choices.contains(where: { $0.value == value }) { choices.append(BCDGameChoice(value: value, label: value)) }
+        return BCDGameSetting(id: "vulkan.driver", title: "Vulkan (experimental)", kind: .choice(choices), value: value, defaultValue: "",
+                              note: "For a game that needs Vulkan, 64-bit (Detroit: Become Human) or 32-bit: Wine's Vulkan on Metal, drawn into the game's window. "
+                                + "MoltenVK is the one to try first. KosmicKrisp is Mesa's newer driver (iOS 26): it has geometry shaders and transform "
+                                + "feedback, which MoltenVK lacks, and is less tried. Off, the game finds no Vulkan driver, as before. "
+                                + "Takes effect at the game's next start.")
     }
 
     /// A choice kept in the game's own file; a value typed into the file by hand is listed too.
@@ -358,8 +382,11 @@ import UniformTypeIdentifiers
                       note: BCDOpenGL.pageNote),
             // Windows Vulkan (docs/VULKAN.md; owner 2026-11-09: a switch on the game's page, not a typed line): on writes
             // `vulkan = moltenvk` into the game's own file, off takes the line out; the bridge reads it at the next start.
+            // madeira-bcd (KosmicKrisp): where this build bundles Mesa's KosmicKrisp and the device can run it (iOS 26, a Metal 4 GPU), the switch
+            // is a choice of the Vulkan driver instead (Self.vulkanChoice, the same line of the game's file). Everywhere else: the switch, as before.
+            Self.kosmicKrispUsable ? Self.vulkanChoice(profile) :
             Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk",
-                        note: "For a 64-bit game that needs Vulkan (Detroit: Become Human): Wine's Vulkan on Metal (MoltenVK), drawn into the game's window. Off, the game finds no Vulkan driver, as before. Takes effect at the game's next start."),
+                        note: "For a game that needs Vulkan, 64-bit (Detroit: Become Human) or 32-bit: Wine's Vulkan on Metal (MoltenVK), drawn into the game's window. Off, the game finds no Vulkan driver, as before. Takes effect at the game's next start."),
             Self.toggle("nvidia", "Show the game an NVIDIA card", LibraryPrefs.nvidia(entry.windowsPath),
                         note: "For games that stop with \"no graphics card\" or \"failed to get GPU driver info\": Windows then reports an NVIDIA card and driver."),
             // madeira-bcd (2026-10-25, round 603): the same, for any maker (BCDGPUCards.swift), and the video memory a game is told it has.
@@ -377,7 +404,7 @@ import UniformTypeIdentifiers
         let fastsync = SyncEngine.current == .fastsync
         let lock = fastsync ? nil : "This belongs to Fastsync: choose it in Settings › Memory & sync to change it."
         let cpus = [BCDGameChoice(value: "0", label: "This device's")] + [1, 2, 4, 6].map { BCDGameChoice(value: "\($0)", label: "\($0)") }
-        return BCDGameSettingGroup(id: "compat", title: "Compatibility", symbol: "cpu", settings: [
+        var settings = [
             Self.toggle("avx", "AVX and AVX2", LibraryPrefs.avx(path),
                         note: "For a 64-bit game that quits at start with an illegal instruction (c000001d), or says it needs AVX or that the processor does not meet its requirements, because it expects AVX. The emulator then emulates AVX, which is slower."),
             Self.toggle("x87", "Faster x87 math", entry.reducedX87,
@@ -386,12 +413,25 @@ import UniformTypeIdentifiers
                            defaultValue: "0", note: "How many processors Windows tells the game about."),
             Self.toggle("winevcrt", "Wine's C++ runtime", LibraryPrefs.wineVCRT(path),
                         note: "Wine's own C++ runtime libraries in place of Microsoft's, for a game that crashes right after loading them."),
+        ]
+        // Japanese locale (upstream Madeira #567 by nekodesusan-prog; BCDJapanese.c): the line env.MADEIRA_JAPANESE = 1 in the game's own
+        // file, off unless switched on; the bridge reads it at the next start. Only in a build that has the font (its fetch can fail).
+        if Self.japaneseFontBundled {
+            settings.append(Self.toggle("japanese", "Japanese locale", GameProfile(windowsPath: path).get("env.MADEIRA_JAPANESE") == "1",
+                        note: "For a Japanese game or visual novel whose text comes out as boxes or garbled characters, or that will not start: Windows runs it with a Japanese system locale (Shift-JIS, code page 932) and a Japanese font that answers to MS Gothic, Meiryo and the other Japanese font names. Other games keep their own locale. For this game it replaces a locale its own settings or its list row set (env.LC_ALL: a few rows run a game in US English because it does not start otherwise). From the next start."))
+        }
+        settings += [
             Self.toggle("fastsync", "Fast synchronization", entry.fastSync ?? true, default: true,
                         note: "Fastsync handles this game's events inside its own process instead of in the Wine server.", locked: lock),
             Self.toggle("semaphores", "Fast semaphore waits (experimental)", entry.semaphoreFastPath ?? false,
                         note: "Fastsync also handles semaphores inside the game's process.", locked: lock),
-        ])
+        ]
+        return BCDGameSettingGroup(id: "compat", title: "Compatibility", symbol: "cpu", settings: settings)
     }
+
+    /// The Japanese locale exists only in a build whose font fetch worked (tools/fetch-japanese-font.sh; BCDJapanese.c
+    /// bcd_japanese_font_in says the same to the bridge).
+    private static let japaneseFontBundled = Bundle.main.path(forResource: "NotoSansJP-Regular", ofType: "otf", inDirectory: "fonts-ja") != nil
 
     // MARK: Controls and the screen during play
 
@@ -1035,6 +1075,7 @@ import UniformTypeIdentifiers
         if inputSet(setting, to: value, for: game) { return }   // round 604: BCDInputPage.swift's rows (turbo and macros, ...)
         if setupSet(setting, to: value, for: game) { return }   // round 604: the setup sections' rows (BCDGameSetup/BCDGamePageLiveSetup.swift)
         if storeCloudSet(setting, to: value, for: game) { return }   // build 632: a store's cloud saves on or off (the game's own config line)
+        if galaxySet(setting, to: value, for: game) { return }   // GOG Galaxy features of a GOG game, off by default (BCDGOG/Galaxy/BCDGamePageLiveGalaxy.swift)
         let on = value == "1"
         switch setting {
         case "resolution": change(game) { $0.resolution = value }
@@ -1066,6 +1107,9 @@ import UniformTypeIdentifiers
         case "vulkan":
             // Windows Vulkan (docs/VULKAN.md): the switch is the line `vulkan = moltenvk` in the game's own file.
             setLine(game, "vulkan", on ? "moltenvk" : "")
+        case "vulkan.driver":
+            // madeira-bcd (KosmicKrisp): the driver choice (Self.vulkanChoice) writes the same line; anything but the two drivers takes it out.
+            setLine(game, "vulkan", value == "moltenvk" || value == "kosmickrisp" ? value : "")
         case "framegen":
             if #available(iOS 26.0, *) {
                 setLine(game, "env.MADEIRA_FRAMEGEN", on ? "1" : "")
@@ -1083,6 +1127,7 @@ import UniformTypeIdentifiers
         case "nvidia": entry(for: game).map { LibraryPrefs.setNvidia(on, for: $0.windowsPath) }
         case "avx": entry(for: game).map { LibraryPrefs.setAVX(on, for: $0.windowsPath) }
         case "winevcrt": entry(for: game).map { LibraryPrefs.setWineVCRT(on, for: $0.windowsPath) }
+        case "japanese": setLine(game, "env.MADEIRA_JAPANESE", on ? "1" : "")   // Japanese locale (#567): a line in the game's own file
         case "x87": change(game) { $0.reducedX87 = on }
         case "cpus": change(game) { $0.cpuCount = Int(value).flatMap { $0 == 0 ? nil : $0 } }
         case "fastsync": change(game) { $0.fastSync = on }

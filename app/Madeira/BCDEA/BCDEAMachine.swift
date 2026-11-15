@@ -8,7 +8,8 @@ import Foundation
 /// machine, so the hash must be made from what BCD's launch of that game reports. Three things BCD changes per game reach the hash:
 /// the graphics card (the game's `gpu-card` line, else the NVIDIA switch, else Apple's: build/win32u-unix/sysparams_ios.c,
 /// ios_virtual_gpu_ids), AVX (FEX's CPUID leaf 1 ECX: Game details › AVX, or `env.MADEIRA_FEX_AVX` = 1 or 2) and the classic CPUID
-/// (`env.MADEIRA_FEX_CPUID_CLASSIC` = 1 sets DE and PSE in leaf 1 EDX: tools/patch-fex-ios-cpuid-classic.py). Plain values and rules, no
+/// (`env.MADEIRA_FEX_CPUID_CLASSIC` = 1 or 2 sets DE and PSE in leaf 1 EDX: tools/patch-fex-ios-cpuid-classic.py; 2 also sets a bit of
+/// leaf 0x80000001, which the hash does not read). Plain values and rules, no
 /// engine type: tests/host/check-ea.py compiles this file with BCDGPUCards.swift. BCDEAMachineLive.swift reads a game's lines.
 enum BCDEAMachine {
     struct Choice: Equatable {
@@ -37,7 +38,8 @@ enum BCDEAMachine {
         }
         let avx = (line("env.MADEIRA_FEX_AVX") ?? "").trimmingCharacters(in: .whitespaces)
         choice.avx = avxSwitch || avx == "1" || avx == "2"
-        choice.classicCPUID = (line("env.MADEIRA_FEX_CPUID_CLASSIC") ?? "").trimmingCharacters(in: .whitespaces) == "1"
+        let classic = (line("env.MADEIRA_FEX_CPUID_CLASSIC") ?? "").trimmingCharacters(in: .whitespaces)
+        choice.classicCPUID = classic == "1" || classic == "2"   // exactly what the emulator accepts (2: build 660)
         return choice
     }
 }

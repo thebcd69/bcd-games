@@ -75,6 +75,13 @@
 		A1000C21 /* BCDGOG/BCDGOGRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C21 /* BCDGOGRegistry.swift */; };
 		A1000C22 /* BCDGOG/GOGSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C22 /* GOGSetup.swift */; };
 		A1000C23 /* BCDGOG/BCDGOGUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C23 /* BCDGOGUpdate.swift */; };
+		A1000C24 /* BCDGOG/BCDGOGContentV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C24 /* BCDGOGContentV1.swift */; };
+		A100E611 /* BCDGOG/Galaxy/GalaxyWire.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E611 /* GalaxyWire.swift */; };
+		A100E612 /* BCDGOG/Galaxy/GalaxyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E612 /* GalaxyService.swift */; };
+		A100E613 /* BCDGOG/Galaxy/GalaxyListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E613 /* GalaxyListener.swift */; };
+		A100E614 /* BCDGOG/Galaxy/BCDGOGGalaxyCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E614 /* BCDGOGGalaxyCore.swift */; };
+		A100E615 /* BCDGOG/Galaxy/BCDGOGGalaxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E615 /* BCDGOGGalaxy.swift */; };
+		A100E616 /* BCDGOG/Galaxy/BCDGamePageLiveGalaxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E616 /* BCDGamePageLiveGalaxy.swift */; };
 		A1000DA0 /* BCDGameDLC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA0 /* BCDGameDLC.swift */; };
 		A1000DA1 /* BCDSteamDLC/BCDSteamDLC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA1 /* BCDSteamDLC.swift */; };
 		A1000DA2 /* BCDSteamDLC/BCDSteamDLCDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA2 /* BCDSteamDLCDownload.swift */; };
@@ -206,6 +213,7 @@
 		A1000020 /* WineServerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A200001E /* WineServerBridge.m */; };
 		A1000021 /* libwineserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000020 /* libwineserver.a */; };
 		A1000022 /* nls in Resources */ = {isa = PBXBuildFile; fileRef = A2000021 /* nls */; };
+		A10009A1 /* fonts-ja in Resources */ = {isa = PBXBuildFile; fileRef = A20009A1 /* fonts-ja */; };
 		A1000030 /* WineProcessBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000030 /* WineProcessBridge.m */; };
 		A1F5600B /* BCDSchedHints.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F5600B /* BCDSchedHints.m */; };
 		A1000031 /* libntdll_unix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000032 /* libntdll_unix.a */; };
@@ -420,11 +428,14 @@
 		A1005603 /* BCDFoldableSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2005603 /* BCDFoldableSettings.swift */; };
 		A1005604 /* BCDFoldableUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2005604 /* BCDFoldableUI.swift */; };
 		A1004103 /* BCDGraphicsRoutes.c in Sources */ = {isa = PBXBuildFile; fileRef = A2004103 /* BCDGraphicsRoutes.c */; };
+		A10041A1 /* BCDJapanese.c in Sources */ = {isa = PBXBuildFile; fileRef = A20041A1 /* BCDJapanese.c */; };
 		A10013C3 /* BCDOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013C3 /* BCDOrientation.swift */; };
 		A10013C4 /* BCDOrientationLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013C4 /* BCDOrientationLive.swift */; };
 		A1000B03 /* VCRuntimeDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000B03 /* VCRuntimeDownload.swift */; };
 		A1000913 /* DockReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000913 /* DockReset.swift */; };
 		A1000F90 /* DockGameEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F90 /* DockGameEnd.swift */; };
+		A100E601 /* DockFriends.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E601 /* DockFriends.swift */; };
+		A100E602 /* DockFriendsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200E602 /* DockFriendsMenu.swift */; };
 		A1000209 /* StorageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000209 /* StorageModel.swift */; };
 		A1E46401 /* ExternalDrives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E46401 /* ExternalDrives.swift */; };
 		A1E46402 /* ExternalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E46402 /* ExternalStorage.swift */; };
@@ -559,6 +570,13 @@
 		A2000C21 /* BCDGOGRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDGOGRegistry.swift"; sourceTree = "<group>"; };
 		A2000C22 /* GOGSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/GOGSetup.swift"; sourceTree = "<group>"; };
 		A2000C23 /* BCDGOGUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDGOGUpdate.swift"; sourceTree = "<group>"; };
+		A2000C24 /* BCDGOGContentV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDGOGContentV1.swift"; sourceTree = "<group>"; };
+		A200E611 /* GalaxyWire.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/GalaxyWire.swift"; sourceTree = "<group>"; };
+		A200E612 /* GalaxyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/GalaxyService.swift"; sourceTree = "<group>"; };
+		A200E613 /* GalaxyListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/GalaxyListener.swift"; sourceTree = "<group>"; };
+		A200E614 /* BCDGOGGalaxyCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/BCDGOGGalaxyCore.swift"; sourceTree = "<group>"; };
+		A200E615 /* BCDGOGGalaxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/BCDGOGGalaxy.swift"; sourceTree = "<group>"; };
+		A200E616 /* BCDGamePageLiveGalaxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/Galaxy/BCDGamePageLiveGalaxy.swift"; sourceTree = "<group>"; };
 		A2000DA0 /* BCDGameDLC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDGameDLC.swift; sourceTree = "<group>"; };
 		A2000DA1 /* BCDSteamDLC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDSteamDLC.swift"; sourceTree = "<group>"; };
 		A2000DA2 /* BCDSteamDLCDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDSteamDLCDownload.swift"; sourceTree = "<group>"; };
@@ -701,6 +719,7 @@
 		A200001F /* WineServerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WineServerBridge.h; sourceTree = "<group>"; };
 		A2000020 /* libwineserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwineserver.a; sourceTree = "<group>"; };
 		A2000021 /* nls */ = {isa = PBXFileReference; lastKnownFileType = folder; path = nls; sourceTree = "<group>"; };
+		A20009A1 /* fonts-ja */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "fonts-ja"; sourceTree = "<group>"; };
 		A2000030 /* WineProcessBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WineProcessBridge.m; sourceTree = "<group>"; };
 		A2F5600B /* BCDSchedHints.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BCDSchedHints.m; sourceTree = "<group>"; };
 		A2000031 /* WineProcessBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WineProcessBridge.h; sourceTree = "<group>"; };
@@ -928,11 +947,15 @@
 		A2005604 /* BCDFoldableUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDFoldableUI.swift; sourceTree = "<group>"; };
 		A2004103 /* BCDGraphicsRoutes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = BCDGraphicsRoutes.c; sourceTree = "<group>"; };
 		A2004104 /* BCDGraphicsRoutes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BCDGraphicsRoutes.h; sourceTree = "<group>"; };
+		A20041A1 /* BCDJapanese.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = BCDJapanese.c; sourceTree = "<group>"; };
+		A20041A2 /* BCDJapanese.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BCDJapanese.h; sourceTree = "<group>"; };
 		A20013C3 /* BCDOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDOrientation.swift; sourceTree = "<group>"; };
 		A20013C4 /* BCDOrientationLive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDOrientationLive.swift; sourceTree = "<group>"; };
 		A2000B03 /* VCRuntimeDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCRuntimeDownload.swift; sourceTree = "<group>"; };
 		A2000913 /* DockReset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockReset.swift; sourceTree = "<group>"; };
 		A2000F90 /* DockGameEnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockGameEnd.swift; sourceTree = "<group>"; };
+		A200E601 /* DockFriends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockFriends.swift; sourceTree = "<group>"; };
+		A200E602 /* DockFriendsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockFriendsMenu.swift; sourceTree = "<group>"; };
 		A2000209 /* StorageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageModel.swift; sourceTree = "<group>"; };
 		A2E46401 /* ExternalDrives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDrives.swift; sourceTree = "<group>"; };
 		A2E46402 /* ExternalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalStorage.swift; sourceTree = "<group>"; };
@@ -1093,6 +1116,8 @@
 				A2005604 /* BCDFoldableUI.swift */,
 				A2004103 /* BCDGraphicsRoutes.c */,
 				A2004104 /* BCDGraphicsRoutes.h */,
+				A20041A1 /* BCDJapanese.c */,
+				A20041A2 /* BCDJapanese.h */,
 				A2000602 /* SteamDownloadBackground.swift */,
 				A2008B01 /* BackgroundRun.swift */,
 				A2008B02 /* Winios/MetalBackgroundGate.m */,
@@ -1118,6 +1143,13 @@
 				A2000C21 /* BCDGOGRegistry.swift */,
 				A2000C22 /* GOGSetup.swift */,
 				A2000C23 /* BCDGOGUpdate.swift */,
+				A2000C24 /* BCDGOGContentV1.swift */,
+				A200E611 /* GalaxyWire.swift */,
+				A200E612 /* GalaxyService.swift */,
+				A200E613 /* GalaxyListener.swift */,
+				A200E614 /* BCDGOGGalaxyCore.swift */,
+				A200E615 /* BCDGOGGalaxy.swift */,
+				A200E616 /* BCDGamePageLiveGalaxy.swift */,
 				A2000C0E /* BCDLiveStoreGOG.swift */,
 				A2000DA0 /* BCDGameDLC.swift */,
 				A2000DA1 /* BCDSteamDLC.swift */,
@@ -1382,6 +1414,8 @@
 				A2F55001 /* BCDPerfTraceCore.swift */,
 				A2000913 /* DockReset.swift */,
 				A2000F90 /* DockGameEnd.swift */,
+				A200E601 /* DockFriends.swift */,
+				A200E602 /* DockFriendsMenu.swift */,
 				A2000209 /* StorageModel.swift */,
 				A2E46401 /* ExternalDrives.swift */,
 				A2E46402 /* ExternalStorage.swift */,
@@ -1416,6 +1450,7 @@
 				B2000004 /* madeira-jit.js */,
 				B2000051 /* Madeira JIT.shortcut */,
 				A2000021 /* nls */,
+				A20009A1 /* fonts-ja */,
 				A2000033 /* aarch64-windows */,
 				A20000F1 /* legal */,
 				A2000080 /* arm64ec-windows */,
@@ -1631,6 +1666,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000022 /* nls in Resources */,
+				A10009A1 /* fonts-ja in Resources */,
 				A1000032 /* aarch64-windows in Resources */,
 				A10000F1 /* legal in Resources */,
 				A1000080 /* arm64ec-windows in Resources */,
@@ -1763,6 +1799,7 @@
 				A1005603 /* BCDFoldableSettings.swift in Sources */,
 				A1005604 /* BCDFoldableUI.swift in Sources */,
 				A1004103 /* BCDGraphicsRoutes.c in Sources */,
+				A10041A1 /* BCDJapanese.c in Sources */,
 				A1000602 /* SteamDownloadBackground.swift in Sources */,
 				A1008B01 /* BackgroundRun.swift in Sources */,
 				A1008B02 /* Winios/MetalBackgroundGate.m in Sources */,
@@ -1789,6 +1826,13 @@
 				A1000C21 /* BCDGOG/BCDGOGRegistry.swift in Sources */,
 				A1000C22 /* BCDGOG/GOGSetup.swift in Sources */,
 				A1000C23 /* BCDGOG/BCDGOGUpdate.swift in Sources */,
+				A1000C24 /* BCDGOG/BCDGOGContentV1.swift in Sources */,
+				A100E611 /* BCDGOG/Galaxy/GalaxyWire.swift in Sources */,
+				A100E612 /* BCDGOG/Galaxy/GalaxyService.swift in Sources */,
+				A100E613 /* BCDGOG/Galaxy/GalaxyListener.swift in Sources */,
+				A100E614 /* BCDGOG/Galaxy/BCDGOGGalaxyCore.swift in Sources */,
+				A100E615 /* BCDGOG/Galaxy/BCDGOGGalaxy.swift in Sources */,
+				A100E616 /* BCDGOG/Galaxy/BCDGamePageLiveGalaxy.swift in Sources */,
 				A1000DA0 /* BCDGameDLC.swift in Sources */,
 				A1000DA1 /* BCDSteamDLC/BCDSteamDLC.swift in Sources */,
 				A1000DA2 /* BCDSteamDLC/BCDSteamDLCDownload.swift in Sources */,
@@ -2044,6 +2088,8 @@
 				A1F55001 /* BCDPerfTraceCore.swift in Sources */,
 				A1000913 /* DockReset.swift in Sources */,
 				A1000F90 /* DockGameEnd.swift in Sources */,
+				A100E601 /* DockFriends.swift in Sources */,
+				A100E602 /* DockFriendsMenu.swift in Sources */,
 				A1000209 /* StorageModel.swift in Sources */,
 				A1E46401 /* ExternalDrives.swift in Sources */,
 				A1E46402 /* ExternalStorage.swift in Sources */,

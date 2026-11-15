@@ -101,7 +101,7 @@ Statically linked into the application binary:
   BSD-3-Clause selected from its BSD / GPL-2.0 dual licence (ZSTD-BSD.txt).
 - liblzma: public domain / 0BSD, the iOS SDK's system library, linked
   dynamically; nothing is bundled.
-- FFmpeg 7.1.1 (libavformat, libavcodec, libavutil, libswresample):
+- FFmpeg 7.1.5 (libavformat, libavcodec, libavutil, libswresample):
   LGPL-2.1-or-later (LGPL-2.1.txt), configured without any GPL, version3 or
   non-free component. Source tarball (the unmodified upstream release from
   ffmpeg.org) and its SHA-256: build/ffmpeg/src, built by build/ffmpeg/build.sh.
@@ -114,6 +114,14 @@ Separate Windows DLLs built from unmodified third-party source (opt-in per game;
   Vandevenne; legal/LICENSES/zlib-lodepng.txt) and DetourEnumerateModules from Microsoft Detours (MIT, (c) Microsoft
   Corporation; legal/LICENSES/MIT-Detours.txt).
 
+A separate Windows DLL built from third-party source with one patch (opt-in per game; nothing runs without it):
+- DirectX Shader Compiler 1.9.2609 (https://github.com/microsoft/DirectXShaderCompiler), University of Illinois/NCSA licence,
+  (C) 2003-2015 University of Illinois at Urbana-Champaign and (C) Microsoft Corporation, with miniz (MIT) and the other parts its
+  licence lists (legal/LICENSES/DirectXShaderCompiler-LICENSE.txt, DirectXShaderCompiler-ThirdPartyNotices.txt):
+  arm64ec-windows/dxcompiler-optin.dll, an x86-64 Windows DLL built from the tag v1.9.2609 with Raed Rizqie's MinGW-w64 port
+  (DXC pull request #8265, adapted by BCD: build/dxc-win), offered under the project's licence. Used only by a game whose file
+  says env.MADEIRA_OPTIN_DLLS = dxcompiler.
+
 Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend setting is zink or gles; nothing runs without it):
 - Mesa 25.0.7 (https://mesa3d.org; OSMesa, Zink and softpipe), MIT and other permissive licences (legal/LICENSES/MIT-Mesa.txt,
   Mesa-license.rst): gl/libOSMesa.dylib, built from the unmodified release with BCD's patches
@@ -121,6 +129,10 @@ Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend se
 - MoltenVK 1.4.2 (Khronos Group; The Brenwill Workshop Ltd), Apache-2.0 (MoltenVK-Apache-2.0.txt): gl/libMoltenVK.dylib, unmodified.
   It contains SPIRV-Cross and SPIRV-Tools (Apache-2.0: SPIRV-Cross-Apache-2.0.txt, SPIRV-Tools-Apache-2.0.txt) and cereal
   (BSD-3-Clause: cereal-BSD-3-Clause.txt).
+- Mesa KosmicKrisp (https://mesa3d.org; Mesa's Vulkan on Metal 4 by LunarG and Google, at Mesa commit b39d173c), MIT and other
+  permissive licences (legal/LICENSES/MIT-Mesa-KosmicKrisp.txt, KosmicKrisp-Mesa-license.rst): gl/libvulkan_kosmickrisp.dylib, when this build has it, built from that source with the
+  Playport authors' patches (build/mesa-ios/playport-patches, offered under MIT). Used only by a game whose vulkan setting is
+  kosmickrisp (iOS 26 or later).
 - LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built from the unmodified source
   (build/luajit-x64/build.sh), loaded in place of a LOVE game's lua51.dll when that is an x64 LuaJIT needing memory below 2 GB;
   the game's file is not modified.
@@ -133,12 +145,17 @@ Separate Windows programs built from unmodified third-party source (started from
   supported. Source (the unmodified release) and its SHA-256: third-party/7zip, built by tools/build-7zip.py. Statically linked
   with llvm-mingw's runtime (LLVM-Apache-2.0-with-exception.txt; legal/LICENSES/MinGW-w64-runtime.txt).
 
-Bundled data file (not part of the source repository; the build downloads it, checks its SHA-256 and does not change it):
+Bundled data files (not part of the source repository; the build downloads them, checks their SHA-256 and does not change them):
 - TimGM6mb.sf2 (soundfont/), the General MIDI sound bank games' MIDI music is played with by Apple's synthesizer:
   GNU General Public License, version 2 (legal/LICENSES/GPL-2.0.txt), Copyright 2004 Tim Brechbill, 2010 David
   Bolton; some samples are the author's own, the others public domain or under the GPL. It is a data file beside
   BCD, not linked into it, and stays under its own licence. The file is its own source. Notice:
   soundfont/NOTICE-TimGM6mb.txt. SHA-256 c5378b62028c920cb11e4803327983fee2f2cdff5dc89c708e39da417e51c854.
+- NotoSansJP-Regular.otf (fonts-ja/), Noto Sans JP, the font a game with the Japanese locale gets: SIL Open Font
+  License 1.1 (fonts-ja/LICENSE-NotoSansJP-OFL-1.1.txt, legal/LICENSES/OFL-1.1-NotoSansJP.txt), Copyright 2014-2021
+  Adobe; "Noto is a trademark of Google Inc." It is a data file beside BCD, not linked into it, and stays under its
+  own licence. Notice: fonts-ja/NOTICE-NotoSansJP.txt. SHA-256
+  dff723ba59d57d136764a04b9b2d03205544f7cd785a711442d6d2d085ac5073.
 
 Inside Wine's Windows modules, unmodified, from Wine's libs/ (licence files
 as Wine ships them in legal/LICENSES/wine-libs/): capstone (3-clause

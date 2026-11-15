@@ -51,7 +51,8 @@ enum DeviceCapability {
 
     static let gpuMessage = "This device's graphics chip (A12 or older) cannot run Direct3D games in BCD: they "
         + "need Metal's Tier 2 argument buffers, which it lacks, and would crash or draw garbage. The Desktop "
-        + "and 2D programs may still work."
+        + "and 2D programs may still work: a launcher, an installer or a client that does not draw with Direct3D "
+        + "starts from the Desktop's Start menu (Run)."   // round 660 (M108): the way past the refusal for such a program
     static let cpuMessage = "This device's processor (A10) cannot run 64-bit Windows programs in BCD: the x64 "
         + "emulator needs instructions (LSE atomics, LDAPR) it lacks. 32-bit programs may still work."
     static let meshNotice = "This device's graphics chip (A13) has no mesh shaders. Direct3D 10 and 11 games run "

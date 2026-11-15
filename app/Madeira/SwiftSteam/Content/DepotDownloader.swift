@@ -1158,7 +1158,7 @@ final class DepotDownloader {
 
         let keyResponse = try CMsgClientGetDepotDecryptionKeyResponse.deserialize(from: response.body)
         // Steam only issues keys for depots this account owns.
-        guard EResult(rawValue: UInt32(keyResponse.eresult))?.isSuccess == true,
+        guard EResult(rawValue: UInt32(bitPattern: keyResponse.eresult))?.isSuccess == true,
               keyResponse.depotEncryptionKey.count == 32 else {
             // BCD DLC: the first of a DLC depot's two tries (under the game's App ID) logs its own line instead (BCDSteamDLCDownload).
             if logRefusal { SteamLog.event("[steam-depot] depot-key refused app=\(appID) depot=\(depotID) eresult=\(keyResponse.eresult)") }

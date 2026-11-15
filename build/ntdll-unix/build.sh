@@ -175,8 +175,9 @@ compile_unixlib "$WINE_SRC/dlls/opengl32/unix_thunks.c" "opengl32_thunks" "openg
     -I"$WINE_SRC/dlls/opengl32"
 # madeira-bcd (Windows Vulkan, docs/BUILDING.md 6c): winevulkan's unix side (instance/device wrappers + the generated thunks). It
 # dispatches to win32u's Vulkan layer (build/win32u-unix/vulkan_ios.c), which loads the session's Vulkan library
-# (MADEIRA_VULKAN_LIBRARY; set only for a game whose file has vulkan = moltenvk). Bound for 64-bit callers only (virtual_ios.c): the
-# wow64 thunks pass 32-bit guest pointers through UlongToPtr, without the window base a 32-bit program here needs (ios_wow_host_ptr).
+# (MADEIRA_VULKAN_LIBRARY; set only for a game whose file has vulkan = moltenvk). The wow64 table (winevulkan_unix_call_wow64_funcs) is
+# bound for a 32-bit winevulkan.dll in such a session (virtual_ios.c): tools/patch-wine-vulkan-wow64.py, run on the wine tree before
+# this script, makes its thunks add the window base a 32-bit program here needs (ios_wow_host_ptr) instead of Wine's UlongToPtr.
 compile_unixlib "$WINE_SRC/dlls/winevulkan/vulkan.c" "winevulkan_vulkan" "winevulkan" \
     -I"$WINE_SRC/dlls/winevulkan"
 compile_unixlib "$WINE_SRC/dlls/winevulkan/vulkan_thunks.c" "winevulkan_thunks" "winevulkan" \

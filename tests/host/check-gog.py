@@ -79,10 +79,11 @@ HEADER = ("// SPDX-License-Identifier: GPL-3.0-only\n"
           "// Copyright 2026 thebcd69 (BCD)\n"
           "// BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.\n")
 FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift", "BCDGOG.swift",
-         "BCDLiveStoreGOG.swift", "BCDGOGRegistry.swift", "BCDGOGUpdate.swift"]
+         "BCDLiveStoreGOG.swift", "BCDGOGRegistry.swift", "BCDGOGUpdate.swift", "BCDGOGContentV1.swift"]
 # Upstream Madeira's files, as they came (their own licence headers; tests/host/check-gog-script.py checks them): not BCD Material.
 UPSTREAM_FILES = ["GOGInstallScript.swift", "GOGSetup.swift"]
-HOST_FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift", "GOGInstallScript.swift", "GOGSetup.swift", "BCDGOGUpdate.swift"]
+HOST_FILES = ["BCDGOGAuth.swift", "BCDGOGCatalog.swift", "BCDGOGContent.swift", "BCDGOGInstall.swift", "GOGInstallScript.swift", "GOGSetup.swift", "BCDGOGUpdate.swift",
+              "BCDGOGContentV1.swift"]
 CONTENT_HOST_FILES = ["BCDContentPlan.swift", "BCDContentCodec.swift", "BCDContentJournal.swift", "BCDContentFetch.swift",
                       "BCDContentEngine.swift", "BCDContentQueue.swift", "BCDContentSecrets.swift"]
 SECRET = "9d85c43b1482497dbbce61f6e4aa173a433796eeae2ca8c5f6129f2dc4de46d9"

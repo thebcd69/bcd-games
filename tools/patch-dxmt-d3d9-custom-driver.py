@@ -28,12 +28,24 @@ EDITS = [
     ('(ov.vendorId >= 0 || ov.deviceId >= 0 || !ov.desc.empty()) ? "  [overridden by DXMT_CONFIG d3d9.custom*]" : ""',
      '(ov.vendorId >= 0 || ov.deviceId >= 0 || !ov.desc.empty() || !ov.driver.empty()) ? "  [overridden by DXMT_CONFIG d3d9.custom*]" : ""'),
 ]
+# The same change as upstream wrote it (willfaust/dxmt f25e5568).
+UPSTREAM = [
+    "  std::string desc;\n  std::string driver;\n};\n",
+    '    o.driver = cfg.getOption<std::string>("d3d9.customDriver", "");\n',
+    '  if (!ov.driver.empty())\n    std::snprintf(pIdentifier->Driver, MAX_DEVICE_IDENTIFIER_STRING, "%s", ov.driver.c_str());\n',
+    '(ov.vendorId >= 0 || ov.deviceId >= 0 || !ov.desc.empty() || !ov.driver.empty()) ? "  [overridden by DXMT_CONFIG d3d9.custom*]" : ""',
+]
 
 
 def main():
     s = PATH.read_text()
     if MARKER in s:
         print(f"{PATH}: already patched")
+        return
+    # Since the dxmt pin of the 2026-11-14 upstream merge the fork carries willfaust/dxmt f25e5568 itself (the same four
+    # changes, without this script's comments): nothing is left to do, on the pristine pin and on a patched tree alike.
+    if all(s.count(up) == 1 for up in UPSTREAM) and all(s.count(old) == 0 for old, _ in EDITS[:1] + EDITS[3:]):
+        print(f"{PATH}: d3d9.customDriver is upstream (willfaust/dxmt f25e5568); nothing to do")
         return
     for old, new in EDITS:
         if s.count(old) != 1:

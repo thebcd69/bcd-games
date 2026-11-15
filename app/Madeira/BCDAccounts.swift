@@ -32,6 +32,41 @@ struct BCDSteamAccount: Equatable {
     var lanAvailable = false
     var lanOn = false
     var lanHost = ""
+    /// Steam Friends for games started through BCD Dock can be chosen in this copy (signed in), and the status chosen (off until one is).
+    var friendsAvailable = false
+    var friendsStatus = BCDSteamFriends.Status.off
+}
+
+/// Settings › Accounts › Steam › Steam Friends: the choices and the words. Off is the default and leaves a game's start exactly as it was;
+/// the other three sign the game's Steam session in to Friends with that status (the live backend hands the choice to BCD Dock).
+enum BCDSteamFriends {
+    /// The raw value is Steam's persona state, which is what BCD Dock is handed.
+    enum Status: Int, CaseIterable, Identifiable {
+        case off = 0, online = 1, away = 3, invisible = 7
+        var id: Int { rawValue }
+        var title: String {
+            switch self {
+            case .off: return "Off"
+            case .online: return "Online"
+            case .away: return "Away"
+            case .invisible: return "Invisible"
+            }
+        }
+    }
+
+    static let title = "Steam Friends"
+
+    /// Under the choices: what the chosen one does.
+    static func detail(_ status: Status) -> String {
+        switch status {
+        case .off:
+            return "Off. A game started through BCD Dock does not sign in to Steam Friends: no friends list or invites in the game, and nothing about Friends is sent to Steam."
+        case .online, .away, .invisible:
+            return "\(status.title). A game started through BCD Dock signs in to Steam Friends with this status, the way Steam's own Friends window does. "
+                + "While the game runs, the in-game menu has a Friends page: join a friend, accept or send an invite, change the status. "
+                + "It applies from the next start of a game."
+        }
+    }
 }
 
 /// Settings › Accounts › Steam › Downloads from a PC on this network: the words, and the one rule the page keeps for the address it takes.
@@ -96,6 +131,8 @@ struct BCDSteamSignIn: Equatable {
     /// BCDSteamLAN.isAddress accepts, or "", is handed over).
     func setLAN(_ on: Bool)
     func setLANHost(_ address: String)
+    /// Steam Friends for games started through BCD Dock: off, or the status to sign in to Friends with.
+    func setFriendsStatus(_ status: BCDSteamFriends.Status)
     func runSetup()
     /// GOG's account: `name` nil while signed out, `available` false when this copy has no GOG.
     var gogAccount: BCDAccount { get }
@@ -117,6 +154,8 @@ struct BCDSteamSignIn: Equatable {
 }
 
 extension BCDAccountsBackend {
+    /// A copy without Steam Friends (the preview app) leaves `friendsAvailable` false and is never asked.
+    func setFriendsStatus(_ status: BCDSteamFriends.Status) {}
     var extraStoreCards: AnyView { AnyView(EmptyView()) }
     var extraStoreKey: String { "" }
     func closeExtraStoreQuestion() -> Bool { false }
@@ -251,6 +290,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                                         id: Self.prefix + "steam.cloud") { backend.setCloud($0) }
             }
             if steam.available && steam.lanAvailable { lanRows(steam) }
+            if steam.available && steam.friendsAvailable { friendsRows(steam) }
             if steam.setupAvailable {
                 BCDSectionKit.ActionButton(title: "Run setup again", symbol: "wand.and.stars", kind: .quiet,
                                            id: Self.prefix + "setup") { backend.runSetup() }
@@ -280,6 +320,16 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
             }
             BCDSectionKit.Note(text: BCDSteamLAN.note, symbol: "desktopcomputer")
         }
+    }
+
+    /// Steam Friends for games started through BCD Dock: Off (the default) or the status to sign in with. Nothing happens by turning the
+    /// page; a choice applies from the next start of a game.
+    @ViewBuilder private func friendsRows(_ steam: BCDSteamAccount) -> some View {
+        Divider().overlay(BCDStyle.stroke)
+        Text(BCDSteamFriends.title).bcdFont(.label, 16).foregroundStyle(BCDStyle.text)
+        BCDSectionKit.Segments(options: BCDSteamFriends.Status.allCases.map { (value: $0, title: $0.title) }, selected: steam.friendsStatus,
+                               idPrefix: Self.prefix + "steam.friends.") { backend.setFriendsStatus($0) }
+        BCDSectionKit.Note(text: BCDSteamFriends.detail(steam.friendsStatus), symbol: "person.2")
     }
 
     private func cloudDetail(_ steam: BCDSteamAccount) -> String {

@@ -187,6 +187,19 @@ func sample() -> BCDSessionSummary {
         let long = BCDPrevTail.lines(Data((String(repeating: "x", count: 1000) + "\n").utf8), offset: 0)
         check("a line is cut to 400 characters", long.count == 1 && long[0].count == 400)
         check("an empty file gives nothing", BCDPrevTail.lines(Data(), offset: 0).isEmpty)
+        // Round 660 (M036): the end line: the newest footprint, alive beat and summary, and a verdict from phys= against limit=.
+        let kill = Data(("[20:18:00.001] [INFO] [footprint] rev=r624 90% of the limit: phys=3752 MB limit=4095 MB (343 MB left)\n"
+                         + "[freeze] alive t+60s beats=2 gaps=0\n[footprint] rev=ml358 phys=4091 MB (peak 4091) internal=4000 MB\n").utf8)
+        let killLine = BCDPrevTail.endLine(kill) ?? ""
+        check("the end line: a footprint at 99 % of the limit is a likely memory kill, with the newest lines quoted",
+              killLine.hasPrefix("[prev-end] last footprint \"[footprint] rev=ml358 phys=4091 MB") && killLine.contains("| last alive \"[freeze] alive t+60s")
+              && killLine.contains("| last summary none |") && killLine.hasSuffix("verdict: memory kill likely (99 % of the limit)"))
+        let calm = Data(("[session] length=60s play=50s frames=3000 peak=900MB limit=6143MB\n[footprint] rev=ml358 phys=1000 MB (peak 1000)\n").utf8)
+        check("... 16 % is no memory pressure; the limit may come from the summary",
+              BCDPrevTail.endLine(calm)?.hasSuffix("verdict: no memory pressure (16 % of the limit)") == true)
+        check("... no limit anywhere: unknown; none of the three lines: no end line",
+              BCDPrevTail.endLine(Data("[footprint] rev=ml358 phys=1000 MB\n".utf8))?.hasSuffix("verdict: unknown") == true
+              && BCDPrevTail.endLine(Data("line 1\nline 2\n".utf8)) == nil)
         check("the read is the last 256 KB (night round 2026-11-11, A1 S9), 60 lines at most", BCDPrevTail.maxBytes == 262144 && BCDPrevTail.maxLines == 60)
         // Night round 2026-11-11 (A1 S9; 1WYNY2, 5WC97M, C2VRHJ, CT4ND5, TFTCJ5): the idle samples go, the real lines stay.
         let real = ["wine: a real line 1", "err:module:load_dll one", "[srv-stuck] tid=0084 age=30590ms op=1", "[session] length=3s partial=1", "[thread-sample] ml876 modmap pid=0024 explorer.exe"]

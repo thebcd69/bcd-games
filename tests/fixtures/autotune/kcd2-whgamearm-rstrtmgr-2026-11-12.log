@@ -1,0 +1,241 @@
+[13:44:59.225] [INFO] Checking entitlements...
+[13:44:59.225] [INFO] [build] v0.1.653 (653)
+[13:44:59.226] [INFO] [device] model=iPhone19,4 idiom=phone os=iOS Version 27.2.1 (Build 24B91034) ram=11564MB available=8164MB cores=6
+[13:44:59.226] [INFO] [device] address-map=[0x1002f4000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[13:44:59.226] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=348d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=1 wildcard=0 lc=0
+[13:44:59.233] [INFO] [device] settings: low-power=0 thermal=nominal screen=1398x2034@3.0x max-fps=120 utc-offset=+01:00 free-disk=126GB stikdebug-url=1
+[13:44:59.236] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[13:45:00.352] [INFO] [bcd-ui] play local
+[13:45:00.353] [INFO] Requesting JIT with Built-in StikJIT...
+[13:45:01.774] [INFO] [bcd] library launch KingdomCome.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[13:45:01.804] [INFO] Running full Wine sequence...
+[13:45:01.805] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1002f4000,0x8000000000) 512GB available=8144MB low-power=0 thermal=nominal
+[13:45:01.806] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[13:45:01.812] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[13:45:01.813] [INFO] Allocating 896MB JIT pool via debugger...
+[13:45:01.813] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[13:45:01.813] [INFO] [jit-debugger] attached=1 at the pool request
+[13:45:01.813] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[13:45:01.814] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[13:45:01.815] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[13:45:02.490] [INFO] RX pool at 0x148000000
+[13:45:02.506] [OK] JIT pool ready (debugger still attached).
+[13:45:02.507] [INFO] BRK suspension lasted 0.69s
+[13:45:02.509] [INFO] Detaching debugger...
+[13:45:02.513] [OK] Debugger detached.
+[phase] wine-start             t+  0.730s rev=ml526
+[13:45:02.542] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/7bc45946f2fb0182.cfg (read)
+[WineProc] Target exe: C:\Program Files (x86)\Steam\steamapps\common\KingdomComeDeliverance2\Bin\Win64MasterMasterSteamPGO\KingdomCome.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[13:45:02.734] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[13:45:02.734] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[13:45:02.734] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7508 MB + phys_footprint=683 MB = 8192 MB (hw.memsize says 11564 MB)
+ml985: preferred base 0x140000000+0x179000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x17c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11a420000+0x179000 (KingdomCome.exe) → pool 0x148007000 used=0x187000/0x27000000 tramp+0x0
+[copy-verify] KingdomCome.exe: OK, 3 .text pages executable (copy @0x148007000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148184000 used=0x2bc000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148184000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x1482bf000 used=0x6e3000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x1482bf000)
+[window] 0x7048000000..0x7400000000 regions=83 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x1486e0000 used=0x814000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1486e0000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148814000 used=0x8dc000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148814000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x1488dc000 used=0xbdc000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1488dc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module KingdomCome.exe (kingdomcome.exe-f2f93fc1d6b06f05): 11A420000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a420000 IAT window 0x11a42a000+0x440: 120 slot(s), 0 data import(s) bound
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[window] 0x126180000..0x7817000000 regions=80103 occupied=462239 MB of 487182 MB free=41695 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=726 MB (peak 726) internal=725 MB compressed=0 MB external=69 MB reusable=10 MB (cycle=1)
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x14a1c4000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[copy-verify] imm32.dll: OK, 5 .text pages executable (copy @0x14a248000)
+[copy-verify] CONCRT140.dll: OK, 12 .text pages executable (copy @0x14a2ec000)
+[copy-verify] VCRUNTIME140_1.dll: OK, 1 .text pages executable (copy @0x14a33c000)
+[image-reload] unmapped image 0x71fcba0000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x1002c after=0x0 flags=0000003c vis={170,188,982,604} surface=0x102491370 rev=ml505 style=84800844 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x1002c class='#32770' text="" rev=ml853
+[win-pos] #2 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x102491370 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10030 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x102491370 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10030 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x1002c after=0x0 flags=00000018 vis={170,188,982,604} surface=0x102491370 rev=ml505 style=84800844 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x1002c class='#32770' text="" rev=ml853
+[win-pos] #5 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,1200,673} surface=0x0 rev=ml505 style=4000000e visible=0 parent=0x1002c
+[win-name] #5 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-pos] #6 hwnd=0x10032 after=0x0 flags=0000101e vis={0,0,800,414} surface=0x0 rev=ml505 style=4000000e visible=0 parent=0x1002c
+[win-name] #6 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-name] #7 hwnd=0x10032 class='Static' text="?l" rev=ml853
+[blit] #1 rop=cc0020  SRC phys=0,0 800x414 vis={0,0,800,414}  DST phys=0,0 810x414 vis={0,0,810,414} rev=ml506
+E 24 [iOS-xins] tracker=0x148689f98 WININET.dll sec=0x71fb760000-0x71fb79b029
+E 24 [iOS-xins] tracker=0x148689f98 WININET.dll sec=0x71fb7a0000-0x71fb7a0f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FB750000
+E 24 [iOS-xins] tracker=0x148689f98 WININET.dll sec=0x71fb760000-0x71fb79b029
+E 24 [iOS-xins] tracker=0x148689f98 WININET.dll sec=0x71fb7a0000-0x71fb7a0f90
+E 24 [img-map] ml710 #26 intervals-only WININET.dll base=0x71fb750000
+[x64-data-imp] ml1245 importer pe=0x71fbf90000 IAT window 0x71fbfef000+0x400: 115 slot(s), 3 data import(s) bound
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x71fb610000 size=0x1000 type=0x3000 protect=0x40
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14bdb0000)
+ml985: map_image_view size=0x4a36000 base=0x6ffff5a50000 info_base=0x180000000 map_addr=0x6ffff5a50000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-data-imp] ml1245 importer pe=0x71f4ae0000 IAT window 0x71f94ec000+0x1000: 220 slot(s), 3 data import(s) bound
+ml985: map_image_view size=0x9e42000 base=0x6fffe7ab0000 info_base=0x180000000 map_addr=0x6fffe7ab0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-data-imp] ml1245 importer pe=0x71e68c0000 IAT window 0x71e6959000+0x6c8: 204 slot(s), 1 data import(s) bound
+[alias-own] ml640 #1 0x71fb610000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14ba34000 rw=0x7003a34000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[launch-view] dismissed reason=surface logs=0
+ml985: map_image_view size=0x6bbb000 base=0x6fffdf8e0000 info_base=0x180000000 map_addr=0x6fffdf8e0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[xp-names] m4131624 "wine-x18-exc"
+[xp] 13:45:03.348 +0.58 dt=318 cpu=325 (thr 325) P=324 E=1 run=328 pgw=0.0 GHz P=4.82 E=2.30 Minst=5498 IPC=3.51 mJ=1630 pin=0 rdKB=124 fpMB=1600
+[jit-pool] image 0x71dea40000+0xa5000 (BugSplat64.dll) → pool 0x168650000 used=0x206f8000/0x27000000 tramp+0x0
+ml957: BugSplat64.dll backing 0x71dea40000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+E 24 [iOS-xins] tracker=0x148689f98 BugSplat64.dll sec=0x71dea41000-0x71deab7b00
+D 24 Load module BugSplat64.dll (bugsplat64.dll-a7388774fec2b5fc): 71DEA40000
+E 24 [iOS-xins] tracker=0x148689f98 BugSplat64.dll sec=0x71dea41000-0x71deab7b00
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"RstrtMgr.DLL" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library RstrtMgr.DLL (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\KingdomComeDeliverance2\\Bin\\Win64MasterMasterSteamPGO\\WHGameArm.dll") not found
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x168d18000)
+[jit-pool] image 0x71ddea0000+0x90000 (mswsock.dll) → pool 0x169234000 used=0x212c8000/0x27000000 tramp+0x4000
+D 24 Load module mswsock.dll (mswsock.dll-e1b26fc99ab81cd3): 71DDEA0000
+[jit-pool] image 0x71dde10000+0x90000 (psapi.dll) → pool 0x1692c8000 used=0x2135c000/0x27000000 tramp+0x4000
+D 24 Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 71DDE10000
+[jit-pool] image 0x71ddd60000+0xb0000 (avifil32.dll) → pool 0x16935c000 used=0x21410000/0x27000000 tramp+0x4000
+D 24 Load module AVIFIL32.dll (avifil32.dll-2ba970815d2c9115): 71DDD60000
+[jit-pool] image 0x71ddcd0000+0x90000 (msvfw32.dll) → pool 0x169410000 used=0x214a4000/0x27000000 tramp+0x4000
+D 24 Load module msvfw32.dll (msvfw32.dll-a548a2a416738d8f): 71DDCD0000
+[jit-pool] image 0x71ddc40000+0x90000 (dwmapi.dll) → pool 0x1694a4000 used=0x21538000/0x27000000 tramp+0x4000
+D 24 Load module dwmapi.dll (dwmapi.dll-760d02687737907f): 71DDC40000
+[jit-pool] image 0x71ddbb0000+0x90000 (xinput9_1_0.dll) → pool 0x169538000 used=0x215cc000/0x27000000 tramp+0x4000
+D 24 Load module XINPUT9_1_0.dll (xinput9_1_0.dll-356a14f2ff866963): 71DDBB0000
+[xp] 13:45:03.661 +0.89 dt=313 cpu=316 (thr 316) P=314 E=1 run=316 pgw=0.0 GHz P=4.84 E=2.27 Minst=7868 IPC=5.16 mJ=1700 pin=0 rdKB=0 fpMB=1732
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"WHGameArm.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] file <container>/Documents/wine/drive_c/Program Files (x86)/Steam/steamapps/common/KingdomComeDeliverance2/Bin/Win64MasterMasterSteamPGO/kcd_launcher.log
+[guest-log] #1 tid=0024 ERROR: Failed to load the Game DLL 'WHGameArm.dll'
+[guest-log] #2 tid=0024 Win error ID: 183
+[win-name] #69 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #70 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #71 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #72 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #73 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #74 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #75 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #76 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #77 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #79 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #80 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-name] #82 hwnd=0x10052 class='Static' text="Failed to load the Game DLL 'WHGameArm.dll'" rev=ml853
+[win-pos] #83 hwnd=0x10046 after=0x0 flags=0000001c vis={131,48,183,74} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x2002c
+[win-name] #83 hwnd=0x10046 class='Button' text="OK" rev=ml853
+[win-pos] #84 hwnd=0x2002c after=0x0 flags=00001967 vis={418,339,733,453} surface=0x10e859200 rev=ml505 style=94c801c4 visible=1 parent=0x10024
+[win-name] #84 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[free-delay] #1 release of 0x70284b0000+0x1c0000 held for 2000 ms (1 in flight)
+[xp] 13:45:03.972 +1.20 dt=310 cpu=60 (thr 59) P=57 E=2 run=64 pgw=0.0 GHz P=4.43 E=0.95 Minst=1645 IPC=6.41 mJ=286 pin=1 rdKB=0 fpMB=1733
+[xp] 13:45:04.249 +1.48 dt=277 cpu=6 (thr 6) P=0 E=6 run=12 pgw=0.0 GHz P=1.03 E=0.83 Minst=9 IPC=1.80 mJ=0 pin=0 rdKB=0 fpMB=1733
+[xp] 13:45:04.554 +1.78 dt=306 cpu=7 (thr 7) P=0 E=7 run=12 pgw=0.0 GHz P=0.00 E=0.93 Minst=13 IPC=1.83 mJ=1 pin=0 rdKB=0 fpMB=1733
+[footprint] rev=ml358 phys=1739 MB (peak 1739) internal=1737 MB compressed=0 MB external=110 MB reusable=10 MB (cycle=2)
+[xp] 13:45:04.879 +2.11 dt=324 cpu=61 (thr 60) P=21 E=40 run=61 pgw=0.0 GHz P=1.99 E=1.59 Minst=216 IPC=2.06 mJ=14 pin=0 rdKB=0 fpMB=1739
+[srv-input] btn msg=0x201 at (0,0) hit win=00010024 thread=0x0
+[srv-input] btn msg=0x201 at (0,0) hit win=00010024 thread=0x0
+[hwinput] keyboard focus: program (program cursor)
+[footprint] rev=ml358 phys=1736 MB (peak 1739) internal=1735 MB compressed=0 MB external=110 MB reusable=10 MB (cycle=3)
+[srv-input] btn msg=0x201 at (569,418) hit win=0002002c thread=0x11c0b7000
+[srv-input] btn msg=0x201 at (569,418) hit win=0002002c thread=0x11c0b7000
+[srv-input] btn msg=0x201 at (569,418) hit win=0002002c thread=0x11c0b7000
+[win-pos] #85 hwnd=0x2002c after=0x0 flags=000018bf vis={418,339,733,453} surface=0x102491370 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #85 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-pos] #86 hwnd=0x2002c after=0x0 flags=0000181f vis={418,339,733,453} surface=0x102491370 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #86 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-pos] #87 hwnd=0x2002c after=0x0 flags=0000181f vis={418,339,733,453} surface=0x102491370 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #87 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+[win-pos] #88 hwnd=0x2002c after=0x0 flags=0000181f vis={418,339,733,453} surface=0x102491370 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #88 hwnd=0x2002c class='#32770' text="KCD2 Error" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x12f) syscalls=0 unix_calls=2469
+[unwind] term ml661 begin rip=1487711d4 rsp=702780fe28 window=[702780fe28..702800fe28) max=32
+[unwind] term ml661 #00 pc=1487711d4 rsp=702780fe28  ucrtbase.dll+0x911d4
+[unwind] term ml662 #00 nv: rbx=12f rbp=702780fe50 rsi=0 rdi=0 r12=7028046460 r13=1487711bc r14=7028046460 r15=1487c1000
+[unwind] term ml662   rbp=702780fe50: 00000000 00000000 00000000 00000000 b05c1b48 01000000 a45c1b48 01000000
+[unwind] term ml662   r12=7028046460: b02a9728 70000000 a8038427 70000000 6092421a 01000000 e093421a 01000000
+[unwind] term ml661 #01 pc=702780fde0 rsp=702780fe30  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+140: CALL 11a4289ec  KingdomCome.exe+0x89ec
+[free-delay] #2 release of 0x7028f30000+0x110000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x7028e20000+0x110000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x7028d10000+0x110000 held for 2000 ms (3 in flight)
+[footprint] rev=ml358 phys=1755 MB (peak 1755) internal=1754 MB compressed=0 MB external=110 MB reusable=10 MB (cycle=4)
+[vfree] ml842 # base=0x7c00330000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c00360000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c02410000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c01410000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #1 0x7c01410000+0x1000000 tid=0024 live=0 rev=ml435
+[vfree] ml842 # base=0x16effc000 size=0x0 type=0x8000 tid=0024
+[jit-pool] tail FREE rx=0x16effc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x12f) syscalls=0 unix_calls=2565
+[unwind] term ml661 begin rip=14820216c rsp=702780fcb0 window=[702780fcb0..702800fcb0) max=32
+[unwind] term ml661 #00 pc=14820216c rsp=702780fcb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+020:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+098:   ? 71fe3d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0d8: CALL 71e56ca35a  steam_api64.dll+0x1a35a
+[term-stack] ml660 sp+2b8: CALL 11a4289ec  KingdomCome.exe+0x89ec
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(303)
+[Wine ntdll/server] process_exit_wrapper(303)
+[WineProc] Wine exited with code 303 (caught by longjmp)
+[WineProc] stopping wineserver...
+[13:45:09.804] [INFO] [session] length=8s play=0s frames=0 stalls=0/0s peak=1756MB limit=8191MB thermal=nominal lpm=0 res=1152x792 cap=60 game=Kingdom Come: Deliverance II
+[frontend] returned to library
+[footprint] rev=ml358 phys=1772 MB (peak 1772) internal=1770 MB compressed=0 MB external=115 MB reusable=9 MB (cycle=5)
+[13:45:11.613] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1771 MB (peak 1772) internal=1770 MB compressed=0 MB external=115 MB reusable=9 MB (cycle=6)
+[footprint] rev=ml358 phys=1771 MB (peak 1772) internal=1770 MB compressed=0 MB external=115 MB reusable=9 MB (cycle=7)
+[xp] 13:45:16.988 +14.22 dt=326 cpu=13 (thr 13) P=0 E=13 run=17 pgw=0.0 GHz P=0.00 E=1.03 Minst=17 IPC=1.28 mJ=1 pin=0 rdKB=0 fpMB=1771
+[footprint] rev=ml358 phys=1771 MB (peak 1772) internal=1770 MB compressed=0 MB external=116 MB reusable=9 MB (cycle=8)
+[hwinput] keyboard focus: elsewhere (responder)
+[xp] 13:45:17.308 +14.54 dt=319 cpu=185 (thr 184) P=126 E=59 run=221 pgw=13.6 GHz P=3.66 E=1.61 Minst=1675 IPC=3.02 mJ=320 pin=288 rdKB=5864 fpMB=1776
+[xp] 13:45:17.591 +14.82 dt=284 cpu=121 (thr 122) P=114 E=7 run=125 pgw=0.0 GHz P=3.88 E=2.08 Minst=2434 IPC=5.32 mJ=396 pin=0 rdKB=0 fpMB=1777
+[xp] 13:45:17.842 +15.07 dt=251 cpu=29 (thr 29) P=0 E=29 run=33 pgw=0.0 GHz P=0.00 E=1.71 Minst=127 IPC=2.52 mJ=5 pin=0 rdKB=0 fpMB=1777
+[xp] 13:45:18.145 +15.37 dt=304 cpu=20 (thr 20) P=0 E=20 run=24 pgw=0.0 GHz P=0.00 E=1.04 Minst=25 IPC=1.23 mJ=1 pin=0 rdKB=0 fpMB=1777
+[xp] 13:45:18.428 +15.66 dt=282 cpu=60 (thr 59) P=30 E=30 run=76 pgw=0.0 GHz P=1.84 E=1.69 Minst=218 IPC=2.05 mJ=24 pin=0 rdKB=0 fpMB=1777

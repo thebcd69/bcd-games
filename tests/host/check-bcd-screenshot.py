@@ -119,7 +119,15 @@ sections = (APP / "BCDSettingsSections.swift").read_text()
 check("screenshotsToPhotos" in sections and 'BCDSettingsID.control(.logs, "shotphotos")' in sections, "Settings › Logs has the Photos switch")
 
 # ---- 3. Send Log --------------------------------------------------------------------------------------------------
-ask = block(comp, "static func ask(for log: URL? = nil, _ send: @escaping (String) -> Void, cancelled: (() -> Void)? = nil) {")
+ask_entry = block(comp, "static func ask(for log: URL? = nil, _ send: @escaping (String) -> Void, cancelled: (() -> Void)? = nil) {")
+# Round 660 (M123): the box is built by the private ask that looks again while another controller is still presenting or dismissing
+# (six times, half a second apart) and then ends as a cancel, so whoever waits always gets an answer.
+ask = block(comp, "private static func ask(for log: URL?, starting: String, _ send: @escaping (String) -> Void, cancelled: (() -> Void)?, attempt: Int) {")
+check("ask(for: log, starting: starting, send, cancelled: cancelled, attempt: 0)" in ask_entry
+      and "if top.presentedViewController != nil || top.isBeingDismissed || top.isBeingPresented {" in ask
+      and "if attempt < 6 { return ask(for: log, starting: starting, send, cancelled: cancelled, attempt: attempt + 1) }" in ask
+      and "if let cancelled { cancelled() } else { send(\"\") }" in ask,
+      "a box that cannot be presented yet is tried again six times, then ends as a cancel (no leaked wait)")
 check("let shot = log.flatMap { screenshotFor?($0) }" in ask and "if shot != nil { message += " in ask and "BCDScreenshotRules.sentAsItIs" in ask,
       "the comment dialog offers a picture only when one belongs to the log, and says it is sent as it is")
 check('title: "Send with the screenshot"' in ask and ask.count("screenshotChosen?(log, shot)") == 1 and "alert.preferredAction = sendAction" in ask,

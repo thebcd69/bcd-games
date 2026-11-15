@@ -30,15 +30,17 @@ dependency license texts are in `LICENSES/`. See "Why GPL-3.0-or-later" below.
 | **GnuTLS** 3.8.9 | LGPL-2.1-or-later | Static (`libgnutls.a`). Used by Wine's bcrypt/secur32/crypt32. |
 | **FreeType** 2.13.3 | FreeType License (FTL), chosen from its FTL / GPL-2.0 dual licence | Static, merged into `libwin32u_unix.a` (`build/freetype-ios/build.sh`) | Wine's font rendering. Portions of this software are copyright © 2024 The FreeType Project (www.freetype.org). All rights reserved. The software is based in part on the work of the FreeType Team. Licence text: `app/Madeira/legal/LICENSES/FTL-FreeType-2.13.3.txt`. |
 | **Libraries inside Wine's modules** | per library, below | Unmodified, built into Wine's Windows modules from Wine's `libs/` | capstone (3-clause BSD-style, with LLVM's licence for its LLVM-derived parts), compiler-rt (University of Illinois/NCSA or MIT), FAudio (zlib), FluidSynth (LGPL-2.1-or-later), GSM 06.10 (its own permissive licence), libjpeg (IJG: this software is based in part on the work of the Independent JPEG Group), jxrlib (BSD-2-Clause), Little CMS (MIT), OpenLDAP (OpenLDAP Public License), mpg123 (LGPL-2.1), musl (MIT), libpng (libpng licence), libtiff (libtiff licence), LibTomCrypt (public domain / WTFPL), vkd3d (LGPL-2.1-or-later), zlib (zlib). Their licence files, as Wine ships them: `app/Madeira/legal/LICENSES/wine-libs/`. |
-| **FFmpeg** 7.1.1 — libavformat, libavcodec, libavutil, libswresample | **LGPL-2.1-or-later** | Static (`libavformat.a`, `libavcodec.a`, `libavutil.a`, `libswresample.a`). Configured `--disable-gpl --disable-nonfree --disable-version3 --disable-everything`, then only: the WMA-family decoders (`wmav1,wmav2,wmapro,wmalossless,xma1,xma2`), the `mp1,mp2,mp3` and `pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le` decoders, the Windows Media Video decoders (`wmv1,wmv2,wmv3,vc1`; they select FFmpeg's h263 decoder code, and its `h263` parser comes with it), the `mp3`, `wav`, `mov` (MP4/MOV/M4A) and `asf` demuxers and the `mpegaudio` parser. No H.264, HEVC or AAC decoder or parser (those streams are decoded by Apple's VideoToolbox/AudioToolbox), no protocols, no muxers, no zlib. No GPL, version3 or non-free component is enabled, so the result is LGPL-2.1-or-later. Used only by `build/ntdll-unix/winegstreamer_unixlib_ios.c`, `build/ntdll-unix/winegstreamer_wmv_ios.c` and `build/ntdll-unix/wg_parser_av_ios.c`, winegstreamer's unix side on this port (the Windows WMA and WMV decoder MFT/DMOs, and the wg_parser behind quartz's MP3/WAV splitters and Media Foundation's MP4 source); upstream Wine implements all of it with GStreamer, which does not exist on iOS; and by `build/ntdll-unix/winedmo_unixlib_ios.c`, winedmo's unix side (the ASF demuxer behind Wine's ASF media source, for the games that opt in), which is taken from Wine's `dlls/winedmo` (LGPL-2.1-or-later, Copyright 2024 Rémi Bernon for CodeWeavers) and carries a "Modified by BCD" notice. |
+| **FFmpeg** 7.1.5 — libavformat, libavcodec, libavutil, libswresample | **LGPL-2.1-or-later** | Static (`libavformat.a`, `libavcodec.a`, `libavutil.a`, `libswresample.a`). Configured `--disable-gpl --disable-nonfree --disable-version3 --disable-everything`, then only: the WMA-family decoders (`wmav1,wmav2,wmapro,wmalossless,xma1,xma2`), the `mp1,mp2,mp3` and `pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le` decoders, the Windows Media Video decoders (`wmv1,wmv2,wmv3,vc1`; they select FFmpeg's h263 decoder code, and its `h263` parser comes with it), the `mp3`, `wav`, `mov` (MP4/MOV/M4A) and `asf` demuxers and the `mpegaudio` parser. No H.264, HEVC or AAC decoder or parser (those streams are decoded by Apple's VideoToolbox/AudioToolbox), no protocols, no muxers, no zlib. No GPL, version3 or non-free component is enabled, so the result is LGPL-2.1-or-later. Used only by `build/ntdll-unix/winegstreamer_unixlib_ios.c`, `build/ntdll-unix/winegstreamer_wmv_ios.c` and `build/ntdll-unix/wg_parser_av_ios.c`, winegstreamer's unix side on this port (the Windows WMA and WMV decoder MFT/DMOs, and the wg_parser behind quartz's MP3/WAV splitters and Media Foundation's MP4 source); upstream Wine implements all of it with GStreamer, which does not exist on iOS; and by `build/ntdll-unix/winedmo_unixlib_ios.c`, winedmo's unix side (the ASF demuxer behind Wine's ASF media source, for the games that opt in), which is taken from Wine's `dlls/winedmo` (LGPL-2.1-or-later, Copyright 2024 Rémi Bernon for CodeWeavers) and carries a "Modified by BCD" notice. |
 | **TimGM6mb SoundFont** (the General MIDI sound bank for games' MIDI music) | **GPL-2.0** (as Debian's copyright file for `timgm6mb-soundfont` records it; Copyright 2004 Tim Brechbill, 2010 David Bolton, who tidied it for MuseScore). The author told the MuseScore project that some of the samples are his own and that the rest are public domain or under the GPL | Unmodified data file (5,969,788 bytes), downloaded at build time by `tools/fetch-soundfont.sh` into `app/Madeira/soundfont/` (SHA-256 `c5378b62028c920cb11e4803327983fee2f2cdff5dc89c708e39da417e51c854`, checked; two sources give the same file: Debian's archive and the MuseScore repository) and bundled; it is **not** committed to this repository | Played by Apple's AUMIDISynth when a game opens a MIDI output device (`build/ntdll-unix/bcd_midi_synth_ios.m`). It is a data file read by Apple's synthesizer, not a program linked with BCD, so it stays under its own licence beside BCD's as part of an aggregate (GPL-2.0 and GPL-3.0 section 5). A SoundFont is its own source: the file is the form it is edited in. Licence text: `LICENSES/GPL-2.0.txt` (in the app: `legal/LICENSES/GPL-2.0.txt`); the notice that ships beside it: `app/Madeira/soundfont/NOTICE-TimGM6mb.txt`. A bank of the player's own (Files > BCD > SoundFonts) is the player's, never part of BCD. |
+| **Noto Sans JP** (Noto Sans CJK, the Japanese SubsetOTF file, Regular, version 2.004; the Japanese locale's font) | **SIL Open Font License 1.1** (Copyright 2014-2021 Adobe, the file's own copyright record; "Noto is a trademark of Google Inc.", its trademark record) | Unmodified font file (4,533,028 bytes), downloaded at build time by `tools/fetch-japanese-font.sh` into `app/Madeira/fonts-ja/` (SHA-256 `dff723ba59d57d136764a04b9b2d03205544f7cd785a711442d6d2d085ac5073`, checked; two sources give the same file: [`notofonts/noto-cjk`](https://github.com/notofonts/noto-cjk) commit `f8d157532fbfaeda587e826d4cd5b21a49186f7c` and Madeira commit `025c0ca2` of pull request #567, by nekodesusan-prog, which bundles it) and bundled; it is **not** committed to this repository | Linked into a game's `C:\windows\Fonts` only for a session with the Japanese locale (`env.MADEIRA_JAPANESE = 1`, `app/Madeira/BCDJapanese.c`), with the Windows Japanese font names mapped onto it; the next session without it takes both away. A data file read by Wine's font code, not a program linked with BCD, so it stays under its own licence beside BCD's. Licence text: `app/Madeira/fonts-ja/LICENSE-NotoSansJP-OFL-1.1.txt` and `LICENSES/OFL-1.1-NotoSansJP.txt` (in the app: `fonts-ja/` and `legal/LICENSES/OFL-1.1-NotoSansJP.txt`); the notice beside it: `app/Madeira/fonts-ja/NOTICE-NotoSansJP.txt`. The Japanese locale also uses Wine's code page tables `c_932/936/949/950.nls`, which BCD has shipped unmodified in `app/Madeira/nls/extra` since build 591. |
 | **{fmt}** | MIT | Static (`libfmt.a`), via FEX. |
 | **xxHash** | BSD-2-Clause | Static (`libxxhash.a`). |
 | **Cephes** | permissive (Moshier) | Static (`libcephes_128bit.a`), via FEX. |
 | **Berkeley SoftFloat 3e** | BSD-3-Clause | Static (`libsoftfloat_3e.a`), via FEX. |
 | **Steam sign-in, owned library and downloads (`app/Madeira/SwiftSteam/`)** | Derived from Jfishin's Madeira Steam client, used with the author's permission (see below); Jfishin confirmed that he wrote the depot downloader himself | GPL-3.0-or-later + Converter Exception, Copyright 2026 Jfishin, 125hz | Sign-in to Steam's public `IAuthenticationService` over HTTPS and a Keychain token store; a Steam connection (WebSocket over TLS) that lists the account's owned games; downloads from Steam's content servers into Madeira Dock's Steam library folder. File-by-file provenance and the licence audit of the downloader: `docs/STEAM_SIGNIN.md`, `docs/STEAM_LIBRARY.md`. No Valve or third-party Steam code or binaries, and no Steam Cloud, launch-emulator or DRM code. |
 | **Epic Cloud saves (`app/Madeira/BCDEpic/EpicFormats.swift`, `EpicCloudSaves.swift`)** | Upstream Madeira's files: GPL-3.0-or-later + Converter Exception; `EpicFormats.swift` Copyright 2026 Akshay CM. `EpicCloudSaves.swift` is a port of parts of **Legendary** (`https://github.com/derrod/legendary`, GPL-3.0-or-later, derrod and contributors): `api/egs.py`, `core.py`, `utils/savegame_helper.py`, `models/chunk.py`, `models/manifest.py`, `utils/rolling_hash.py`. Madeira's `docs/EPIC.md` credits the game client to Akshay CM (Madeira #265) and the cloud save code and its fixtures to Tabîrcă Nicolae-Eduard (Madeira #207); intraducine combined them in Madeira #443 (see "Code from Madeira after BCD's fork") | Kept with their own headers; `EpicCloudSaves.swift` carries BCD's changes marked in its header (the URLSession transport is not carried; the date formatters are integer arithmetic). BCD's `BCDEpicCloudCore.swift` is BCD's own and `BCDEpicCloud.swift` is adapted from upstream Madeira's `EpicCloud.swift` (its header says so) | Compares a game's saves with Epic's cloud save snapshots, only for a game the player turned it on for, and writes a new snapshot only on the player's choice. The rest of BCD's Epic engine (`BCDEpic/`, `BCDContent/`) is BCD's own code, written from protocol facts. |
-| **GOG install script and redistributables (`app/Madeira/BCDGOG/GOGInstallScript.swift`, `GOGSetup.swift`)** | Upstream Madeira's files: GPL-3.0-or-later + Converter Exception, Copyright 2026 Madeira contributors. They follow **Playport's** `GOGInstallScript` and `GOGDependencies` (`https://github.com/playportdev/playport`, commit `412de5f`, GPL-3.0-or-later; carried by upstream Madeira from willfaust/Madeira #479) | Kept with their own headers; `GOGSetup.swift` carries BCD's changes marked in its header (BCD's own helpers instead of upstream's app types, the result folder, BCD's wording, an argument filter). Notice: `app/Madeira/legal/PLAYPORT.txt` | Reads a GOG build's `goggame-<id>.script` (its registry values are written into the prefix before a start) and GOG's dependency repository (which redistributables a build needs and which installer runs). The rest of BCD's GOG (`BCDGOG/`, `BCDContent/`) is BCD's own code, written from GOG's public replies and community documentation; the formats follow Heroic's `gogdl` (GPL-3.0) and no gogdl code is included. |
+| **GOG install script and redistributables (`app/Madeira/BCDGOG/GOGInstallScript.swift`, `GOGSetup.swift`)** | Upstream Madeira's files: GPL-3.0-or-later + Converter Exception, Copyright 2026 Madeira contributors. They follow **Playport's** `GOGInstallScript` and `GOGDependencies` (`https://github.com/playportdev/playport`, commit `412de5f`, GPL-3.0-or-later; carried by upstream Madeira from willfaust/Madeira #479) | Kept with their own headers; `GOGSetup.swift` carries BCD's changes marked in its header (BCD's own helpers instead of upstream's app types, the result folder, BCD's wording, an argument filter). Notice: `app/Madeira/legal/PLAYPORT.txt` | Reads a GOG build's `goggame-<id>.script` (its registry values are written into the prefix before a start) and GOG's dependency repository (which redistributables a build needs and which installer runs). The rest of BCD's GOG (`BCDGOG/`, `BCDContent/`) is BCD's own code, written from GOG's public replies and community documentation; the formats follow Heroic's `gogdl` (GPL-3.0); of gogdl's code only the language table of GOG's generation-1 downloads is in BCD (`app/Madeira/BCDGOG/BCDGOGContentV1.swift`, see "Code from heroic-gogdl"). |
+| **GOG Galaxy service (`app/Madeira/BCDGOG/Galaxy/GalaxyWire.swift`, `GalaxyService.swift`, `GalaxyListener.swift`)** | The **Playport** authors' files (`https://github.com/playportdev/playport`, commit `412de5f`): GPL-3.0-or-later with the Madeira Converter Exception, version 1, as the Playport authors adopted it for their own code on 2026-09-24 (an additional permission under GPL-3.0 section 7 with the same text as `LICENSE-EXCEPTION.md`); carried by upstream Madeira on its branch `playport/gog` (commit `9d6dad8`, intraducine; not merged into Madeira's main when BCD took it on 2026-11-14) | `GalaxyWire.swift` as it came; the other two with BCD's changes listed in their headers (Playport's ContentKit types replaced by three small ones in `BCDGOGGalaxyCore.swift`, BCD's own GOG sign-in as the token source). The game's Galaxy client type and the token grant in `BCDGOGGalaxyCore.swift` follow Playport's `GOGContent.swift` and `GOGSession.swift`; Playport's Galaxy tests are `tests/host/gog-galaxy/GalaxyTests.swift`. Notice: `app/Madeira/legal/PLAYPORT.txt`. BCD's section 7 terms do not apply to these files | Answers a GOG game's Galaxy SDK on 127.0.0.1:9977 while the game runs (the game's sign-in, achievements, statistics, leaderboards, play time), only for a game whose switch is on (`env.BCD_GOG_GALAXY = 1`, off by default). Playport's install engine (ContentKit, GOGInstaller) and its start helper were not taken: BCD's GOG installs, updates and repairs are its own code. |
 | **Zstandard educational decoder** | BSD-3-Clause or GPL-2.0 | BSD-3-Clause selected | `app/Madeira/SwiftSteam/zstd_edu.c/.h` (Meta Platforms). Decodes Steam's zstd content chunks. Madeira's error-recovery wrapper (Jfishin's, kept) is serialized across threads. Licence text in `LICENSES/ZSTD-BSD.txt`. |
 | **liblzma** | Public domain / 0BSD | System library | Linked dynamically from the iOS SDK (`liblzma.tbd`) for Steam's LZMA content chunks; nothing is bundled. |
 | **Madeira Dock (`madeira-dock`, built into `arm64ec-windows/dockhost.exe`)** | original work, Copyright 2026 125hz | GPL-3.0-or-later + Converter Exception | Headless host for Valve's Steam client, a separate Windows program started in the Wine session. Built from the submodule by `build/madeira-dock/build.sh`; not committed as a binary. Its statically linked LLVM/MinGW-w64 runtime notices ship in `dock-notices.txt`. Valve's client files are downloaded by the user from Valve and are not covered by Madeira's licence. See `docs/MADEIRA_DOCK.md`. |
@@ -48,8 +50,10 @@ dependency license texts are in `LICENSES/`. See "Why GPL-3.0-or-later" below.
 | **NVAPI SDK headers** | MIT (NVIDIA Corporation & affiliates) | Unmodified headers, compiled into DXMT's `nvapi64.dll` (`arm64ec-windows`) | `dxmt/external/nvapi`. DXMT's own NVAPI implementation answers only with Madeira's opt-in "Report an NVIDIA GPU" switch; no NVIDIA binary is shipped. Licence text in `LICENSES/MIT-NVAPI.txt`. |
 | **d3d8to9** v1.16.0 (crosire) | BSD-2-Clause | Unmodified source (`third-party/d3d8to9`), built by `tools/build-d3d8to9-dll.sh` as the separate DLL `i386-windows/d3d8to9.dll` | Direct3D 8 on Direct3D 9 (which is DXMT's in a 32-bit session) for old games, opt-in per game (`env.MADEIRA_D3D8 = d3d9`); Wine's `d3d8.dll` stays the default. Copyright (C) 2015 Patrick Mours. Licence text: `LICENSES/BSD-2-d3d8to9.txt`; the project's source and tag are recorded in `third-party/d3d8to9/BCD-SOURCE.txt`. |
 | **cnc-ddraw** v7.1.0.0 (FunkyFr3sh) | MIT; inside it: LodePNG (zlib licence), Khronos GL headers (MIT), `DetourEnumerateModules` from Microsoft Detours (MIT), CRC-32 by Craig Bruce (public domain), mingw-w64's `versionhelpers.h` | Unmodified source (`third-party/cnc-ddraw`, without its two Microsoft DirectX SDK headers and without Detours), built by `tools/build-cnc-ddraw-dll.sh` as the separate DLL `i386-windows/cnc-ddraw.dll` | A DirectDraw replacement for old 2D games (scaling, borderless full screen, Direct3D 9 or GDI drawing), opt-in per game (`env.MADEIRA_DDRAW = cnc`); Wine's `ddraw.dll` stays the default. Copyright (c) 2022 github.com/FunkyFr3sh. Licence texts: `LICENSES/MIT-cnc-ddraw.txt`, `LICENSES/zlib-lodepng.txt`, `LICENSES/MIT-Detours.txt`; provenance in `third-party/cnc-ddraw/BCD-SOURCE.txt`. |
+| **DirectX Shader Compiler (DXC)** 1.9.2609 (Microsoft and the LLVM Team) | University of Illinois/NCSA Open Source Licence; inside it: miniz (MIT; `miniz.c` public domain), Henry Spencer's regex code (its own permissive terms), ConvertUTF (Unicode, Inc.), MD5 (public domain), `regstrlcpy.c` (ISC-style, Todd C. Miller) | **Patched**: one patch, `build/dxc-win/0001-mingw-w64-build.patch`, the MinGW-w64 port of DXC pull request #8265 by **Raed Rizqie** (five commits of 2026-03-11, head `c1d55772d52b54a28c69f713964295d7a407da7f`, offered to the project under its licence; closed unmerged), applied for BCD in November 2026 without the second of its two `StringRef.h` hunks (the removal of the `is_nothrow_constructible` specialisations, which this tag already skips under libc++) and with its MinGW `MS_SUPPORT_VARIABLE_LANGOPTS` define replaced by the out-of-class language-option definitions LLVM's Unix build already has (`LangOptions.cpp`; with the define the compiler read HLSL as C) | The DLL `arm64ec-windows/dxcompiler-optin.dll` (x86-64 Windows), built by `tools/build-dxcompiler.sh` from the project's tag `v1.9.2609` (commit `01b62ad47db7dee3dd33f90e7339cf9e860b3f93`, cloned at build time and checked) with the tracked llvm-mingw; the binary is not committed. Runs as `dxcompiler.dll` only for a game whose file says `env.MADEIRA_OPTIN_DLLS = dxcompiler`: wgpu games compile their Direct3D 12 shaders with it instead of Wine's FXC (round 663). Microsoft's own release binaries and their `dxil.dll` are **not** used (that package's Microsoft Software License Terms restrict it to Windows). Copyright (c) 2003-2015 University of Illinois at Urbana-Champaign; Copyright (C) Microsoft Corporation. Licence texts, as the project ships them: `LICENSES/DirectXShaderCompiler-LICENSE.txt`, `LICENSES/DirectXShaderCompiler-ThirdPartyNotices.txt`; provenance in `build/dxc-win/BCD-SOURCE.txt`. Linked statically against llvm-mingw's runtime (libc++, libunwind: Apache-2.0 with LLVM exception; the MinGW-w64 runtime: `LICENSES/MinGW-w64-runtime.txt`). A separate DLL a Windows program loads; nothing of DXC is linked into BCD. |
 | **Mesa** 25.0.7 (OSMesa, Zink, softpipe; the Mesa project, mesa3d.org) | MIT; individual files carry other permissive licences (the source's `docs/license.rst`, copied into the bundle as `licenses/Mesa-license.rst`) | **Patched**: `build/mesa-ios/patches` (eight patches, offered under Mesa's MIT licence) | Separate dylib `gl/libOSMesa.dylib`, the desktop OpenGL backend of BCD's OpenGL driver (OSMesa draws through Zink): used only by a game whose `gl-backend` is `zink`. Built by `build/mesa-ios/build.sh` from the unmodified 25.0.7 release tarball (SHA-256 in the script) plus those patches; the binary is not committed. Licence text: `LICENSES/MIT-Mesa.txt`. |
 | **MoltenVK** 1.4.2 (Khronos Group; The Brenwill Workshop Ltd) | Apache-2.0; inside it SPIRV-Cross and SPIRV-Tools (Apache-2.0) and cereal (BSD-3-Clause) | Unmodified. | Separate dylib `gl/libMoltenVK.dylib` (Vulkan on Metal), the Vulkan driver Mesa's Zink runs on. Built by `build/moltenvk-ios/build.sh` from the v1.4.2 tag (its commit is pinned in the script) and the dependencies its `fetchDependencies` pins; not committed. The script copies the licence texts of MoltenVK, SPIRV-Cross, SPIRV-Tools and cereal into the bundle's `licenses/` (`MoltenVK-Apache-2.0.txt`, `SPIRV-Cross-Apache-2.0.txt`, `SPIRV-Tools-Apache-2.0.txt`, `cereal-BSD-3-Clause.txt`). |
+| **Mesa KosmicKrisp** (Mesa's Vulkan-on-Metal-4 driver by LunarG and Google, `src/kosmickrisp`; Mesa at commit `b39d173c`, 26.3.0-devel; the Mesa project, mesa3d.org) | MIT; individual files carry other permissive licences (the source's `docs/license.rst`, copied into the bundle as `licenses/KosmicKrisp-Mesa-license.rst`; licence text and copyright holders: `LICENSES/MIT-Mesa-KosmicKrisp.txt`) | **Patched**: `build/mesa-ios/playport-patches` (nineteen patches by the Playport authors, from playportdev/playport `412de5f` as Madeira's branch `playport/kosmickrisp` carries them; they change Mesa code and are offered under Mesa's MIT licence). The other build profile (`KK_PROFILE=release`, not the default) is the unmodified Mesa 26.2.4 release tarball with the six patches of `build/mesa-ios/kosmickrisp-patches` (125hz, Madeira #462; MIT). | Separate dylib `gl/libvulkan_kosmickrisp.dylib` (Vulkan 1.4 on Metal 4): used only by a game whose own file says `vulkan = kosmickrisp`, on iOS 26 or later with a GPU of the Metal 4 family. Built by `build/mesa-ios/build-kosmickrisp-bcd.sh` from the source archive of that commit (its SHA-256 is in `build/mesa-ios/fetch-playport.py`) plus those patches; the binary is not committed, and a build without it keeps Vulkan off for such a game. Build-time tools only, not shipped: LLVM, SPIRV-LLVM-Translator and SPIRV-Tools (they turn Mesa's own OpenCL C kernels into the shader source the library carries). |
 | **LuaJIT** 2.1 (Mike Pall) | MIT | Unmodified source at the commit pinned in `build/luajit-x64/build.sh`, built by it for x86-64 Windows | The DLL `compat/love/lua51.dll` (interpreter only, GC64): loaded in place of a LÖVE game's own `lua51.dll` when that one is an x64 LuaJIT that needs memory below 2 GB, only in a session whose game has `gl-backend` on (`build/wineserver/luajit_compat.c`); the game's file is never changed. The script copies LuaJIT's licence into the bundle as `licenses/LuaJIT-MIT.txt`. |
 | **7-Zip** 26.05 (Igor Pavlov) | LGPL-2.1-or-later; BSD 3-clause for its LZFSE and Zstandard decoders (`CPP/7zip/Compress/LzfseDecoder.cpp`, `C/ZstdDec.c`); BSD 2-clause for `C/Xxh64.c`; parts public domain. The RAR decoders carry the "unRAR licence restriction" and are **not built** | Unmodified source (`third-party/7zip`, the project's `7z2605-src.tar.xz`, SHA-256 `0b6080b8c3e7a579161d2d495224c0e51c467576cb4c7048b0ab485ef44cc22e`), built by `tools/build-7zip.py` as the two separate Windows programs `arm64ec-windows/7zFM.exe` (the File Manager) and `7z.exe` (the command-line program) | An archive manager in the Wine desktop's Start menu ("7-Zip" folder); BCD's runtime installer also unpacks NVIDIA's PhysX package with `7z.exe`. Built with 7-Zip's own `DISABLE_RAR` / `DISABLE_RAR_COMPRESS` code selection, so `.rar` archives are not supported and the unRAR restriction does not apply to anything BCD ships. Copyright (C) 1999-2026 Igor Pavlov. The project's `License.txt` is kept as received: `LICENSES/7-Zip-License.txt`; provenance and what is excluded: `third-party/7zip/BCD-SOURCE.txt`. The programs are linked statically against llvm-mingw's runtime (libc++, libunwind: Apache-2.0 with LLVM exception; the MinGW-w64 runtime: `LICENSES/MinGW-w64-runtime.txt`). Separate programs started by the user; nothing of 7-Zip is linked into BCD. |
 | **Wine Mono** 11.0.0 | Mono: LGPL or MIT X11 per part; FNA: Ms-PL and MIT; FAudio, FNA3D, MojoShader, SDL3: zlib; winforms, wpf, monoDX, System.Speech and Wine Mono's own code: MIT (`build/wine-mono/COPYING`) | Prebuilt runtime, unmodified except `lib/mono/4.5/mscorlib.dll` (4 IL bytes in `GC.Collect`, `build/wine-mono/bundle.sh`), bundled as `wine-mono/` with that COPYING only in a development build made after `build/wine-mono/fetch.sh`; **release builds do not include it** (the packaging step removes `wine-mono/`). Instead the app downloads it from WineHQ when the user asks (setup or Settings › .NET Framework, `app/Madeira/WineMono.swift`), checks it against the same SHA-256, unpacks it without `lib/mono/*-api` and applies the same mscorlib patch on the device | Runs .NET Framework programs; Wine's mscoree loads it. The x86 tarball from `dl.winehq.org`, SHA-256 pinned in `build/wine-mono/pin.sh`. The compile-time reference assemblies (`lib/mono/*-api`, which include the GPL-licensed ICSharpCode.SharpZipLib) are not bundled. Exact corresponding source: `wine-mono-11.0.0-src.tar.xz` from the same folder; see "Corresponding source" below. |
@@ -155,8 +159,11 @@ which licence.
 | 2026-11-03 | LSE read-modify-write atomics on aliased pages (Ash Hopkins, Madeira `b7640ef`) | 282 |
 | 2026-11-04 | The first lines of Madeira's Social Club table for helper build 2.4.0.296 (125hz, Madeira commit `15ebc3d` of 2026-11-03, #559), in BCD's commit of that day; BCD took the whole table on 2026-11-05 | 82 |
 | 2026-11-05 | The port of Madeira v0.2.0 (Madeira commit `5fda6a0`, 2026-11-03), with Social Club helper build 2.4.0.296 (Madeira #559): the EA app and itch.io stores, Steam game versions, Workshop and downloads from a PC on the same network, the GOG install script and redistributables, Epic cloud saves, the OpenGL driver with Mesa and MoltenVK, keeping games and downloads running in the background, Direct3D 12 and memory items, log redaction and diagnostics | 13,751 |
+| 2026-11-14 | From Madeira's branch `codex/d3d12-consolidation` (not merged into its main at that date): the Direct3D 12 sampler cache (`sampler-cache`) and the concurrent compute encoders (`cs-concurrent`), by Shitiz Garg with follow-ups by intraducine; the first is on by default in BCD with a switch that turns it off, the second is off unless set | 42 |
+| 2026-11-14 | Madeira #575 (125hz): the host check of the fx_2_0 effect writer, taken with the writer itself (Madeira's Wine fork) and Direct3D 9 luminance render targets (Madeira's DXMT fork) | 37 |
+| 2026-11-14 | Madeira #567 (nekodesusan-prog): the Japanese locale per game | 3 |
 
-In all, **16,769 lines in 161 files** of this repository are identical to code that 23 people wrote for Madeira, counted as
+In all, **16,851 lines in 163 files** of this repository are identical to code that 25 people wrote for Madeira, counted as
 described below. BCD's own changes to those files are marked "Modified by BCD" in the file headers where the files carry such a note.
 The code in BCD's submodule forks is covered by the forks' own notices (see "The submodule forks" below).
 
@@ -264,18 +271,26 @@ number in Madeira is `https://github.com/willfaust/Madeira/pull/<number>`.
 | #475 | ft7t8drgwf-wq (insertfloppy) | 2026-10-28 | 2026-11-05 | 4 | 1 | ntdll iOS: drop a dead process's directory listings; Wine directory and heap fixes |
 | commit `dc4a4e3` | intraducine | 2026-10-28 | 2026-11-05 | 3 | 1 | Build complete IPAs from the Terraria Wine pin |
 | commit `1dbd877` | 125hz | 2026-11-02 | 2026-11-05 | 3 | 1 | Audio: the background keep-alive leaves an endpoint iOS holds stopped |
+| commit `3557bae` | intraducine | 2026-11-11 | 2026-11-14 | 15 | 1 | Fix D3D12 cache lifetime and scan accounting (the sampler cache per device) |
+| commit `5a3db65` | Shitiz Garg | 2026-11-08 | 2026-11-14 | 13 | 1 | madeira-d3d12: identical CreateSampler descriptions share one Metal sampler |
+| commit `984ed08` | Shitiz Garg | 2026-11-08 | 2026-11-14 | 7 | 1 | madeira-d3d12: opt-in concurrent compute encoders between barriers (cs-concurrent) |
+| commit `826a967` | intraducine | 2026-11-12 | 2026-11-14 | 7 | 1 | Initialize concurrent compute option atomically |
+| #575 | 125hz | 2026-11-05 | 2026-11-14 | 37 | 1 | Run-time compiled fx_2_0 effects and luminance render targets (the host check of the effect writer; the writer is in Madeira's Wine fork, the render targets in its DXMT fork, see "The submodule forks") |
+| #567 | nekodesusan-prog | 2026-11-05 | 2026-11-14 | 3 | 1 | Japanese locale per game: code page 932, the CJK code page tables and a bundled Japanese font |
 
 Madeira #461, #462 and #443 are pull requests in which intraducine combined other contributors' pull requests; the lines
 are listed under the contributors whose commits they come from. Madeira's `docs/EPIC.md` states that the Epic game client is Akshay CM's
 (Madeira #265) and the cloud save code and its interoperability fixtures are Tabîrcă Nicolae-Eduard's (Madeira #207), and that the cloud save code
-follows Legendary (see the Epic row above); #443 also carries work by Ash Hopkins (#248) and Sacha Tardat.
+follows Legendary (see the Epic row above); #443 also carries work by Ash Hopkins (#248) and Sacha Tardat. The four commits taken on
+2026-11-14 are on Madeira's branch `codex/d3d12-consolidation`; they are counted without the run-of-three rule, because the two authors'
+lines alternate inside the functions BCD took.
 
 ### People
 
 | Author | Lines | Files |
 |---|---|---|
 | ft7t8drgwf-wq (insertfloppy) | 6990 | 55 |
-| 125hz | 2421 | 35 |
+| 125hz | 2458 | 36 |
 | Connor Gow | 1802 | 24 |
 | Ash Hopkins | 820 | 7 |
 | llamajose | 806 | 7 |
@@ -289,14 +304,16 @@ follows Legendary (see the Epic row above); #443 also carries work by Ash Hopkin
 | Jelly-RayTian | 257 | 6 |
 | SirDank | 183 | 5 |
 | Ixion | 179 | 2 |
-| intraducine | 68 | 4 |
+| intraducine | 90 | 5 |
 | domainus | 68 | 2 |
 | NevesHenry | 56 | 5 |
 | Tomba247 | 53 | 1 |
 | byKAYRA | 44 | 2 |
+| Shitiz Garg | 20 | 1 |
 | JMRBDev | 12 | 1 |
 | Kesavamoorthi G | 11 | 1 |
 | Nikita Kiselov | 8 | 1 |
+| nekodesusan-prog | 3 | 1 |
 
 ### Files
 
@@ -313,6 +330,7 @@ follows Legendary (see the Epic row above); #443 also carries work by Ash Hopkin
 | `app/Madeira/BCDGPUCards.swift` | portions | 9 | `adec653` ft7t8drgwf-wq 9 |
 | `app/Madeira/BCDGPUCardsLive.swift` | portions | 9 | `adec653` ft7t8drgwf-wq 9 |
 | `app/Madeira/BCDItch/BCDItchViews.swift` | portions | 6 | #499 ft7t8drgwf-wq 6 |
+| `app/Madeira/BCDJapanese.c` | portions | 3 | #567 nekodesusan-prog 3 |
 | `app/Madeira/BCDSteamWorkshop/SteamWorkshopFiles.swift` | whole file | 222 | #491 ft7t8drgwf-wq 222 |
 | `app/Madeira/BCDSteamWorkshop/SteamWorkshopModel.swift` | whole file | 205 | #491 ft7t8drgwf-wq 205 |
 | `app/Madeira/BackgroundRun.swift` | whole file | 181 | #498 ft7t8drgwf-wq 181 |
@@ -410,7 +428,7 @@ follows Legendary (see the Epic row above); #443 also carries work by Ash Hopkin
 | `docs/STEAM_CLOUD.md` | portions | 22 | #404 wamei 14; #237 125hz 8 |
 | `docs/STEAM_LIBRARY.md` | portions | 9 | #382 wamei 5; #223 domainus 4 |
 | `madeira-d3d12/src/pe/mad_bcn.cpp` | whole file | 9 | #462 spitefulowl 9 |
-| `madeira-d3d12/src/pe/madeira_d3d12.c` | portions | 233 | #462 spitefulowl 141; #516 125hz 92 |
+| `madeira-d3d12/src/pe/madeira_d3d12.c` | portions | 275 | #462 spitefulowl 141; #516 125hz 92; `3557bae` intraducine 15; `5a3db65` Shitiz Garg 13; `984ed08` Shitiz Garg 7; `826a967` intraducine 7 |
 | `tests/host/check-background-run.py` | portions | 188 | #498 ft7t8drgwf-wq 188 |
 | `tests/host/check-clipboard-paste.py` | whole file | 134 | `abca30a` alantangok 70; `9806664` alantangok 51; `91e1e57` alantangok 10; `facd2cc` alantangok 3 |
 | `tests/host/check-dircache.py` | whole file | 172 | #461 Ixion 172 |
@@ -494,6 +512,54 @@ lines. Counted as above (833 lines in 13 files: Connor Gow 334, intraducine with
 Single lines of #464 below the count's threshold are credited in their files' headers too (`ContentView.swift`, `MadeiraApp.swift`,
 `SteamGames.swift`). `docs/EXTERNAL-STORAGE.md` names the pull requests and their authors.
 
+Taken after this count (2026-11-14, build 660), from Madeira's main (pull request #462) and three Madeira branches that were not merged into
+Madeira's main on that day, under
+GPL-3.0-or-later with the Madeira Converter Exception unless said otherwise; BCD's section 7 terms do not apply to these lines. Counted as above.
+
+*Steam Friends through the Dock*: Madeira pull request #572 by Vugar (branch `steam-friends-pr-572-replacement`: commits `ac65265`, `6626a28`,
+`044babd`, `244ebd8`, `ccd7a3d`, `8286d1b`, `f9bf0c3` of 2026-11-04 to 2026-11-08) with `willfaust/madeira-dock` pull request #10 (see "The submodule
+forks"). 408 lines in 6 files, all Vugar:
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/Madeira/DockFriends.swift` | whole file (Madeira's row view left out) | 178 | #572 Vugar 178 |
+| `app/Madeira/DockFriendsMenu.swift` | portions | 3 | #572 Vugar 3 |
+| `app/Madeira/MadeiraDock.swift` | portions | 19 | #572 Vugar 19 |
+| `docs/MADEIRA_DOCK.md` | portions | 5 | #572 Vugar 5 |
+| `tests/host/check-dock-friends.py` | whole file | 197 | #572 Vugar 197 |
+| `tests/host/check-dock-report.py` | portions | 6 | #572 Vugar 6 |
+
+*KosmicKrisp*: the build recipe of Madeira pull request #462 (125hz's `build-kosmickrisp.sh` and cross file, squashed by intraducine) and
+branch `playport/kosmickrisp` (commit `07471e3`, intraducine, 2026-10-28: the profile switch, the pinned source and the Playport authors'
+patches). 215 lines in 6 files, without the patches:
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `build/mesa-ios/build-kosmickrisp.sh` | whole file | 84 | #462 125hz 80; `07471e3` intraducine 4 |
+| `build/mesa-ios/kosmickrisp-ios-arm64.cross` | whole file | 25 | #462 125hz 25 |
+| `build/mesa-ios/build-playport-kosmickrisp.sh` | whole file | 10 | `07471e3` intraducine 10 |
+| `build/mesa-ios/fetch-playport.py` | whole file | 24 | `07471e3` intraducine 24 |
+| `build/mesa-ios/playport-patches/README.md` | whole file | 16 | `07471e3` intraducine 16 |
+| `tests/host/check-playport-mesa-profile.py` | whole file | 56 | `07471e3` intraducine 56 |
+
+Files taken whole that are left without a header comment, because the build applies them with `patch`: the six Mesa patches
+`build/mesa-ios/kosmickrisp-patches/kosmickrisp-ios-0001-*.patch` to `0006-*.patch` (125hz, Madeira #462; 652 lines) and the nineteen Mesa
+patches `build/mesa-ios/playport-patches/0001-*.patch` to `0019-*.patch` (the Playport authors, playportdev/playport `412de5f`, each with its
+own `From:` line; 5,022 lines). All twenty-five change Mesa code and are offered under Mesa's licence (MIT), not under the GPL. Five lines of
+`build/mesa-ios/build-kosmickrisp-bcd.sh` (how SPIRV-LLVM-Translator is built) are from Madeira #476 (intraducine) and credited in its header.
+
+*GOG Galaxy service*: branch `playport/gog` (commit `9d6dad8`, intraducine, 2026-10-28), which carries the Playport authors' code
+(playportdev/playport `412de5f`; GPL-3.0-or-later with the same exception text, adopted by the Playport authors for their own code). The
+copyright is the Playport authors'. 1,138 lines in 5 files:
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/Madeira/BCDGOG/Galaxy/GalaxyWire.swift` | whole file | 385 | `9d6dad8` the Playport authors 385 |
+| `app/Madeira/BCDGOG/Galaxy/GalaxyService.swift` | whole file (the token source over Playport's session left out) | 303 | `9d6dad8` the Playport authors 303 |
+| `app/Madeira/BCDGOG/Galaxy/GalaxyListener.swift` | whole file | 124 | `9d6dad8` the Playport authors 124 |
+| `app/Madeira/BCDGOG/Galaxy/BCDGOGGalaxyCore.swift` | portions | 24 | `9d6dad8` the Playport authors 24 |
+| `tests/host/gog-galaxy/GalaxyTests.swift` | whole file | 302 | `9d6dad8` the Playport authors 302 |
+
 Taken after this count (2026-11-08, build 646): Madeira pull request #556 by Henry Morin ("Vector registers in thread contexts; stop JIT
 pool code-buffer leaks (Persona 5 Royal reaches gameplay)", commit `10df6a1` of 2026-11-05), under GPL-3.0-or-later with the Madeira
 Converter Exception (the lines in `virtual_ios.c` and `mach_ios.c`: LGPL-2.1-or-later, as those Wine files); BCD's section 7 terms do
@@ -526,10 +592,47 @@ Madeira Converter Exception; BCD's section 7 terms do not apply to these lines. 
 | `build/win32u-unix/vulkan_surface_ios.c` | whole file | 87 | #400 Jelly-RayTian and #462 intraducine 87 |
 | `tests/host/check-unixlib-binder.py` | portions | 2 | #400 Jelly-RayTian 2 |
 | `tests/host/check-vk-surface-query.py` | whole file | 124 | #462 intraducine and #353 125hz 124 |
+| `tests/host/check-vkd3d-fx2-effects.py` | portions | 37 | #575 125hz 37 |
 | `tests/host/check-vulkan-layer-geometry.py` | whole file | 62 | #400 Jelly-RayTian 62 |
 | `tests/host/check-vulkan-opt-in.py` | portions | 61 | #400 Jelly-RayTian and #462 intraducine 61 |
 | `tests/host/check-vulkan-surface.py` | portions | 89 | #400 Jelly-RayTian and #462 intraducine 89 |
 | `tools/patch-wine-vulkan-suboptimal.py` | portions | 23 | Madeira's Wine commit df1c5ea5 (#353) 125hz 23 |
+
+Taken after this count (2026-11-14, build 660): from Madeira's main after `5fda6a0`, pull requests #604 (NevesHenry, with intraducine's
+limit on manifest totals: malformed Steam protobuf tags and manifests throw instead of stopping the app), #541 (alantangok: the built-in
+JIT's Prepare retries a duplicate Cryptex install once the Developer Disk Image is mounted; BCD took the Prepare half), #607 (intraducine:
+FFmpeg 7.1.5, its build objects by version), #579 (NevesHenry: the check of a wineserver that dies at start-up; BCD had the fix itself
+since round 624), #568 (Henry Morin, with 125hz's follow-up `43c2011`: Persona 3 Reload's list), #564 (NevesHenry: `-fno-builtin` for
+check-vcrt-arm64-key, commit `ba96c15`) and 125hz's #556 follow-ups `494274a` (the MADEIRA_CTX_FP answer kept for a second) and `18fcffa`
+(its check), under GPL-3.0-or-later with the Madeira Converter Exception (the lines in `mach_ios.c`: LGPL-2.1-or-later, as that Wine
+file); BCD's section 7 terms do not apply to these lines.
+Counted as above (355 lines in 10 files: alantangok 107, NevesHenry with intraducine 103, NevesHenry 60, intraducine 58, 125hz 22, Henry Morin 5):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/MadeiraJITHelper/MadeiraJITHelper.swift` | portions | 17 | #541 alantangok 17 |
+| `build/ffmpeg/build.sh` | portions | 3 | #607 intraducine 3 |
+| `build/wineserver/mach_ios.c` | portions | 10 | commit `494274a` (#556 follow-up) 125hz 10 |
+| `recommended/recommendations.json` | portions | 5 | #568 Henry Morin 5 |
+| `tests/host/check-ctx-fp.py` | whole file | 12 | commit `18fcffa` (#556 follow-up) 125hz 12 (the rest: #556 Henry Morin, above) |
+| `tests/host/check-ffmpeg-source-reuse.py` | whole file | 55 | #607 intraducine 55 |
+| `tests/host/check-jit-cryptex-recovery.py` | whole file | 90 | #541 alantangok 90 |
+| `tests/host/check-steam-malformed-protobuf.py` | whole file | 103 | #604 NevesHenry and intraducine 103 |
+| `tests/host/check-vcrt-arm64-key.py` | portions | 3 | #564 NevesHenry 3 |
+| `tests/host/check-wineserver-fatal.py` | whole file | 57 | #579 NevesHenry 57 |
+
+Lines of #604 below the count's threshold are credited in their files' headers too (`SteamProtoMessages.swift`, `DepotManifest.swift`).
+
+Vulkan for 32-bit programs (2026-11-14, build 660) is BCD's own work on that route and on Wine's own WoW64 Vulkan path; Madeira has no 32-bit
+Vulkan and no Madeira code was taken for it. `tools/patch-wine-vulkan-wow64.py` changes Wine's `dlls/winevulkan` (the generator `make_vulkan`, the
+generated `vulkan_thunks.c`, `vulkan.c`, `vulkan_private.h`) and `dlls/win32u/vulkan.c` in the checked-out tree at build time: the text it writes and
+the Wine lines it quotes to find its places are LGPL-2.1-or-later like Wine, and Wine's own copyright lines in those files stand (Roderick
+Colenbrander, Jacek Caban for CodeWeavers and Wine's other authors). It builds on two things that are in Madeira's Wine fork already and are credited
+in the fork's `LICENSE-MADEIRA.md`: 125hz's guest-window helpers `ios_wow_host_ptr` / `ios_wow_guest_ptr32` (`include/wine/unixlib.h`, `970dac54a4e`
+and `db62a711998`) and his per-process `caller_zero_bits()` in win32u's Vulkan memory code (`1a73c698b8c`); and it does for `make_vulkan` what
+Madeira's OpenGL change by Connor Gow does for `make_opengl` (the WoW64 thunks convert embedded guest pointers and keep handles and callbacks
+unchanged; the idea, no code). `tests/host/vulkan-wow64/harness.c` follows
+Wine's `dlls/winevulkan/loader.c` where it plays the 32-bit `winevulkan.dll` (the client objects and the decoding of the two debug callback blocks).
 
 ### Game lists
 
@@ -537,13 +640,27 @@ These entries of BCD's recommended settings follow tested lists of Madeira, and 
 Fallout 3 (the older NVIDIA card, ported 2026-10-28 from the list of ft7t8drgwf-wq, Madeira `adec653`, with DXMT `f25e556`); Call of Duty:
 Black Ops (the card and the resolution, from Madeira #519 by ft7t8drgwf-wq), The Escapists 2 (from Madeira #548 by ft7t8drgwf-wq),
 Borderlands 2 (from Madeira #531 by ft7t8drgwf-wq) and Dark Souls: Remastered (from Madeira #461, combined by intraducine), all ported on
-2026-11-05.
+2026-11-05; Persona 3 Reload (from Madeira #568 by Henry Morin, with 125hz's follow-up), ported on 2026-11-14.
 
 ### The submodule forks
 
 BCD's forks of Wine, FEX-Emu and DXMT hold commits that Madeira's forks hold too, with their authors kept in the commit history:
 the file `LICENSE-MADEIRA.md` of each fork lists them, with the Madeira commit each comes from (`wine/LICENSE-MADEIRA.md`,
-`FEX/LICENSE-MADEIRA.md`, `dxmt/LICENSE-MADEIRA.md`). BCD's `madeira-dock` is at a commit of Madeira's own and holds nothing of BCD's.
+`FEX/LICENSE-MADEIRA.md`, `dxmt/LICENSE-MADEIRA.md`). BCD's `madeira-dock` is a commit of Madeira's own (`72558e4`) plus one commit: Steam Friends
+(`willfaust/madeira-dock` pull request #10 by Vugar, head `9ce5d63`, taken on 2026-11-14 before it merged; GPL-3.0-or-later with the Madeira
+Converter Exception, Vugar the commit's author). Its files are kept byte for byte with the pull request: the new files `src/friends.c`,
+`src/friends.h`, `src/friends_format.c`, `src/friends_format.h` and `tests/test-friends_format.c` carry Madeira's usual header naming 125hz,
+but they are Vugar's work (every commit of the pull request is his). It holds nothing of BCD's beyond the three lines that place the change in
+that tree; BCD's own changes to the Dock are made at build time by `tools/patch-dock-*.py`.
+
+Two changes of Wine itself, made after the Wine 11.4 that BCD's fork is based on, are not commits of the fork: BCD writes them into the
+Wine tree at build time, for the 32-bit ntdll only (the 64-bit ntdll.dll is a committed binary). Both are by Paul Gofman for CodeWeavers,
+**LGPL-2.1-or-later** like Wine (BCD's section 7 terms do not apply to these lines); the scripts and their checks are BCD's.
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `tools/patch-wine-veh-next-handler.py` | portions | 1 | Wine commit da00e5f5cc9 (2026-03-23, "ntdll: Do not keep next handler pointer outside of lock in call_vectored_handlers().") Paul Gofman 1 |
+| `tools/patch-wine-woa-wake-order.py` | portions | 5 | Wine commit 81e52628b25 (2026-10-12, "ntdll: Make sure entry is removed from queue if unlocked entry.addr precheck in RtlWaitOnAddress() suggests so.") Paul Gofman 5 |
 
 ### Other people's work in BCD
 
@@ -551,6 +668,15 @@ Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by
 #46 by rbarton124) and work from rtmtree's
 Persona 3 Reload fork of BCD (helper memory, root certificate enumeration, the bytes at the instruction pointer in the guest log) are credited
 in the files that hold them and in `README-BCD.md`.
+
+Work from netheritenee's fork of BCD 0.1.659 (a report shared through the owner on 2026-11-15; netheritenee on Reddit), taken in build 665:
+the finding that a process started by another one (RDR2 and GTA V Enhanced from Rockstar's launcher, Social Club's helper) never
+healed its kernel32 imports into its own ntdll copy, with the one-condition change of `ios_jit_heal_aux_iat` that lets it
+(`build/ntdll-unix/virtual_ios.c`, LGPL-2.1-or-later like that Wine file; BCD added the off switch `env.MADEIRA_AUX_IAT_HEAL_CHILD`, the
+`MADEIRA_IMAGE_RELOAD=0` guard and the cases of `tests/host/check-aux-iat-heal.py`); the Red Dead Redemption 2 settings of the two RDR2
+rows of `recommended/recommendations.json` (rdr2-steam v16, rdr2-other v7, 22 lines from build 665, listed in the rows' notes); and the
+finding that `env.MADEIRA_NTDLL_SYNC = native` dies at start (the catalog note). The report's other findings (a binary kernel32 timer
+patch, which BCD's own `kernel32-usd.dll` of build 663 replaces) were not taken.
 
 Pull request #46 of `thebcd69/bcd-games` by rbarton124 (Russell Barton), "Ubisoft Connect and its
 games now run on BCD" (taken 2026-11-11, build 652): twenty commits written against 0.1.634 and signed off under the Developer Certificate of Origin (the author says the
@@ -641,6 +767,7 @@ Each file below also carries the author's "Portions copyright" line in its heade
 | #43, 2026-11-04 | pauloec (Paulo Eduardo Correa) | The native iPhone Duo interface: `app/Madeira/BCDFrontEnd.swift` (`BCDDuoFrontEnd`), `BCDLibraryView.swift` (`BCDDuoLibraryView`), `BCDSettings.swift` (`BCDDuoSettingsRoot`), `BCDHomeView.swift` (Windows desktop card, controller navigation), `BCDDownloadsView.swift`, `BCDFocus.swift` (navigators, layer ownership), `BCDFoldable.swift` (`BCDDuoFeatures`, `BCDDuoPageOwner`), `BCDFoldableSettings.swift`, `BCDFoldableUI.swift`, `BCDGamePage.swift` (embedded page), `BCDLiveFrontEnd.swift` (system prompts as menus), `BCDLiveStore.swift`, `BCDMenu.swift`, `BCDSessionLive.swift`, `BCDStyle.swift` (Liquid Glass), `BCDArt.swift`, `BCDSectionKit.swift`, `BCDSettingsCore.swift`, `BCDSettingsSections.swift`, `BCDStore.swift`, `BCDGyroLive.swift`, `BCDInputLive.swift`, `ContentView.swift`, `GamepadInput.swift`, `HardwareInput.swift`, `Library.swift`; the Windows desktop's quit and background compositor: `WineProcessBridge.m/.h`, `WineServerBridge.m/.h`, `Winios/Winios.m/.h`, `build/wineserver/fd_ios.c`, `mach_ios.c`; `tools/patch-dxmt-metal-atomics.py`; host checks `check-duo-controller-navigation.py`, `check-duo-download-session.py`, `check-desktop-quit.py`, `check-dxmt-metal-atomics.py` and edits to six existing checks |
 | #31, 2026-10-27 | iqui27 (Henrique Rocha) | The tabletop pose: `app/Madeira/ContentView.swift` (`FoldTabletop`, the game surface, touch mapping and touch controls below the fold), `BCDFoldable.swift` (`BCDTabletop`), `tests/host/check-bcd-touch.py` |
 | #27, 2026-10-27 | creeper4004 | Colour profiles: `app/Madeira/BCDThemeCore.swift`, `BCDTheme.swift`, `BCDThemes.json`, `BCDSettingsAppearance.swift`, `docs/color-profiles.md`, `tests/host/check-bcd-themes.py`; one-line colour changes in `BCDStyle.swift`, `BCDSettings.swift`, `BCDSettingsCore.swift`, `BCDAccounts.swift`, `BCDComponents.swift`, `BCDControllerScreen.swift`, `BCDFrontEnd.swift`, `BCDGamePage.swift`, `BCDHomeView.swift`, `BCDInGameMenu.swift`, `BCDSectionKit.swift`, `BCDSession.swift`, `BCDSetupView.swift`, `BCDStartingScreen.swift`, `BCDTouchControls.swift`, `BCDTouchEditor.swift`, `MadeiraApp.swift`, `tools/ui-preview.py` |
+| netheritenee's fork, 2026-11-15 | netheritenee | The child-process condition of `ios_jit_heal_aux_iat` in `build/ntdll-unix/virtual_ios.c`; the RDR2 settings of `recommended/recommendations.json` (rdr2-steam v16, rdr2-other v7) |
 | #33, 2026-10-30 | Taala2 | Cross-process TlsFree diagnostics: `build/ntdll-unix/ios_tls_diag_util.h`, `ios_nw_tls_diag.h`, parts of `ios_tls_clear.h`, `virtual_ios.c`, `signal_arm64_ios.c`; `tests/host/check-tls-clear-process.py` |
 
 ## Code from Porthole (tylerkaska112/Porthole)
@@ -714,6 +841,26 @@ in the app. A person who owns it lets BCD download it from Steam with their own 
 reads the frame generation's compiled shaders out of it in memory when a game with the switch on starts, and removes them from the game's prefix
 when the session ends. Porthole's LS1 / LS1 performance upscaler (its patches 0200 to 0202) was not taken.
 
+## Code from heroic-gogdl (Heroic-Games-Launcher/heroic-gogdl)
+
+heroic-gogdl ([Heroic-Games-Launcher/heroic-gogdl](https://github.com/Heroic-Games-Launcher/heroic-gogdl)) is the GOG download module
+of the Heroic Games Launcher, by Paweł Lidwin (imLinguin) and its contributors. In November 2026 (build 663) BCD took the code listed
+here from it, at commit `6c6ef53f` of 2026-10-28.
+
+**Licence position.** heroic-gogdl is licensed under the **GNU General Public License version 3** (its `LICENSE`; its `pyproject.toml`
+says `GPL-3`), which BCD's GPL-3.0-only licence is the same as. The copyright of the code taken stays with its author; BCD's additional
+terms under GPL-3.0 section 7 (`LICENSE-BCD.md`) do not apply to it, including where it sits in a file that also holds BCD's own text.
+The file carries a "Portions copyright" line in its header naming the source and the date (GPL-3.0 section 5).
+
+**What is not code.** The rest of BCD's generation-1 reader (the builds list, the repository and depot manifests, main.bin read by
+HTTP Range through the generation-1 secure link, the MD5 checks, the support folder's `app/` files) is BCD's own code, written from
+GOG's public replies and following the formats as gogdl's `gogdl/dl/managers/v1.py`, `gogdl/dl/objects/v1.py` and
+`gogdl/dl/dl_utils.py` read them (knowledge only: no statement of them is copied).
+
+| File | Taken | Lines | From heroic-gogdl (path at commit `6c6ef53f`), author, what |
+|---|---|---|---|
+| `app/Madeira/BCDGOG/BCDGOGContentV1.swift` | portions | 0 (22) | `gogdl/languages.py` (Paweł Lidwin, its list from commit `e0db474` of 2025-03-09; the comparison rule from `eee0bbb` and `27d06fd` of 2026-06): GOG's 84 language codes, English names and older codes (`v1Languages`, the native names left out) and the rule that a language matches by code, name or older code, letter case aside (`v1LanguageCode`). "Lines" by the rule of the Madeira section above: no line is identical (Python into Swift); the 22 table lines in brackets follow gogdl's entries one for one, counted by hand |
+
 ## Microsoft Visual C++ runtime redistributables — NOT DISTRIBUTED
 
 Games built with MSVC require Microsoft's Visual C++ runtime DLLs. Those are
@@ -753,10 +900,10 @@ FFmpeg's archives are git-ignored outputs of its build script (like
 `libntdll_unix.a`), but the app links them, so a built package contains them
 and the exact source they are built from is tracked here in the same way:
 
-- `build/ffmpeg/src/ffmpeg-7.1.1.tar.xz` -- the unmodified upstream release
+- `build/ffmpeg/src/ffmpeg-7.1.5.tar.xz` -- the unmodified upstream release
   from `ffmpeg.org`
 - `build/ffmpeg/src/SHA256SUMS` -- its checksum
-  (`733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1`), which
+  (`de668509caf9e35e3cd162473441fdb29538c6d96ed080292b3cf9e6fc5d558f`), which
   every run of the build script verifies before extracting
 - `build/ffmpeg/build.sh` -- the exact build machinery and configure flags. No
   patches are applied, and the script needs no network.

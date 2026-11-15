@@ -5,6 +5,8 @@
 // under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
 // under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Vugar: code taken from https://github.com/willfaust/Madeira (pull request #572, branch steam-friends-pr-572-replacement)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import Darwin
@@ -69,6 +71,9 @@ enum MadeiraDock {
     nonisolated(unsafe) static var paradoxLauncherSession = false
     /// Night round 2026-11-11 (T1 S7): the game of the Dock start that is on its way (set by `configure`), for the log lines about its install record.
     nonisolated(unsafe) static var launchedGame: DockGame?
+    /// This launch passed a Friends status to Dock (configure); false again once the session's files are cleaned up. The in-game menu
+    /// reads Dock's friends list only while it is true (DockFriendsMenu.swift).
+    nonisolated(unsafe) static var friendsRequested = false
 
     /// Night round 2026-11-11 (T1 S7; Counter-Strike 2 G7B80A and tur630's 9JZ3V7, 0NBYBW): the numbers of the game's install record (appmanifest) and whether
     /// its downloading folder exists, for a launch that Valve's client refused with an update error (17, 19, 20). Numbers only, no path. nil when the record
@@ -454,12 +459,23 @@ enum MadeiraDock {
         "launch-view-mirror", "launch-view-error", "launch-host-pid", "launch-steamapi-probe-pre", "launch-steamapi-probe", "launch-steamapi-probe-t", "launch-steamapi-probe-running",
         "launch-client-discovery-published", "launch-request-submitted", "launch-game-running",
         "launch-game-ended", "launch-discovery-restored", "launch-host-result",
+        // Steam Friends (Madeira #572, madeira-dock #10; src/friends.c): counts and result codes only, never a SteamID or a name.
+        // friends-available=0 is the one line of a session with Friends off (the default).
+        "friends-available", "friends-own-state", "friends-signin-available", "friends-signin", "friends-subscribed", "friends-persona-chosen",
+        "friends-requested", "friends-own-game", "friends-total", "friends-valid-ids", "friends-online", "friends-named", "friends-playing",
+        "friends-seconds", "friends-count", "friends-cmd-seq", "friends-cmd-result", "friends-state-set", "friends-invite-connect",
+        "friends-invite-received", "friends-persona-flags", "friends-persona-updates",
         "shutdown-begin", "shutdown-complete", "probe-result"]
     /// The host's report rounds (madeira-dock src/main.c).
     static let reportRounds: Set<String> = ["ml1820", "ml1830", "ml1860", "ml1870", "ml1970", "ml1990", "ml2000", "ml2011", "ml2015", "ml2016"]
 
+    /// The largest report read. Dock bounds its friends lines, but a long session
+    /// still writes more than the old 32 KB, and a report past the cap would hide
+    /// probe-result at game end.
+    static let reportCap = 1 << 20
+
     static func parseReport(_ data: Data) -> Report {
-        guard data.count <= 32768, let text = String(data: data, encoding: .utf8) else { return Report() }
+        guard data.count <= reportCap, let text = String(data: data, encoding: .utf8) else { return Report() }
         var report = Report()
         // Ignore a partial final line until the writer completes and flushes it.
         for line in text.replacingOccurrences(of: "\r\n", with: "\n")
@@ -493,7 +509,7 @@ enum MadeiraDock {
         let url = drive.appendingPathComponent("madeira-dock.txt")
         guard let file = try? FileHandle(forReadingFrom: url) else { return lastReport }
         defer { try? file.close() }
-        guard let data = try? file.read(upToCount: 32769), data.count <= 32768 else { return lastReport }
+        guard let data = try? file.read(upToCount: reportCap + 1), data.count <= reportCap else { return lastReport }
         let report = parseReport(data)
         for key in report.fields.keys.sorted() where report.fields[key] != lastReport.fields[key] {
             SteamLog.event("[dock-report] \(key)=\(report.fields[key]!)")
@@ -522,6 +538,13 @@ enum MadeiraDock {
         if let url = transferURL { try? FileManager.default.removeItem(at: url) }
         unsetenv("MADEIRA_DOCK_AUTH_FILE")
         unsetenv("MADEIRA_DOCK_OFFLINE")
+        // The friends feed and command too: a host that did not end cleanly
+        // leaves them, and a later session must not show its list.
+        friendsRequested = false
+        // madeira-bcd (U6 counter-review M2): only for a player who ever chose a Friends status. Without one the Dock writes no Friends
+        // file (madeira-dock src/friends.c: disabled() without MADEIRA_DOCK_PERSONA_STATE), so there is nothing to remove and the app's
+        // start, sign-out and Dock start stay as they were.
+        if SteamOnlineStatus.everChosen { DockFriends.shared.endSession() }
     }
 
     /// Writes the one-use transfer to protected Application Support storage
@@ -563,6 +586,15 @@ enum MadeiraDock {
             setenv(key, "1", 1)
         }
         setenv("MADEIRA_STEAM_HOST_APPID", String(game.id), 1)
+        // Steam Friends (madeira-dock README, "Friends"): opt-in. Only a chosen status (Online, Away, Invisible) is passed; with Offline, the
+        // default, the variable is removed and Dock leaves Friends off for the session, as before Friends existed.
+        if let state = SteamOnlineStatus.current.personaState {
+            setenv("MADEIRA_DOCK_PERSONA_STATE", String(state), 1)
+        } else {
+            unsetenv("MADEIRA_DOCK_PERSONA_STATE")
+        }
+        friendsRequested = SteamOnlineStatus.current != .offline
+        SteamLog.event("[dock-launch] friends=\(friendsRequested ? 1 : 0)")
         setenv("MADEIRA_STEAM_HOST_LAUNCH_OPTION", String(launchOption), 1)
         setenv("MADEIRA_STEAM_HOST_CLIENT_DIR", SteamRuntimeFiles.windowsRoot, 1)
         setenv("MADEIRA_STEAM_HOST_EXPECTED_INSTALL", game.windowsInstallPath, 1)
@@ -734,4 +766,22 @@ enum DockOffline {
         NotificationCenter.default.post(name: changed, object: nil)
     }
     static let changed = Notification.Name("MadeiraDockOfflineChanged")
+}
+
+/// The Steam status Dock signs in to Friends with (Settings › Accounts › Steam › Friends),
+/// passed to Dock as MADEIRA_DOCK_PERSONA_STATE; the raw value is Steam's
+/// persona state. Offline, the default, leaves Friends off for the session:
+/// Dock then sends Steam nothing of its own (madeira-dock README, "Friends").
+enum SteamOnlineStatus: Int, CaseIterable, Identifiable {
+    case online = 1, away = 3, invisible = 7, offline = 0
+    var id: Int { rawValue }
+    private static let key = "steamOnlineStatus"
+    /// Whether a status was ever stored (madeira-bcd): Friends ran, or could have, only for such a player.
+    static var everChosen: Bool { UserDefaults.standard.object(forKey: key) != nil }
+    static var current: SteamOnlineStatus {
+        get { (UserDefaults.standard.object(forKey: key) as? Int).flatMap(SteamOnlineStatus.init(rawValue:)) ?? .offline }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: key) }
+    }
+    /// What the launch passes to Dock: nil for Offline (madeira-bcd: the variable is then not set at all).
+    var personaState: Int? { self == .offline ? nil : rawValue }
 }

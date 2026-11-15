@@ -14,9 +14,12 @@ that ends the process, is never reached. A process that exits normally frees the
 
 With this patch ContextImpl::CompileBlock's host-address gate (a guest RIP >= 0x7400000000 or inside FEX's code buffer; nothing there
 can be emulated) ends the process the way the loader was about to, once the loader is shutting the process down
-(RtlDllShutdownInProgress()) and the gate was reached 64 times: "[exit-runaway] ..." and NtTerminateProcess(-1,
+(RtlDllShutdownInProgress()), at the first such address: "[exit-runaway] ..." and NtTerminateProcess(-1,
 STATUS_PROCESS_IS_TERMINATING). Anywhere else the gate does what it did (a log line); a running game never has the loader in its
-shutdown. The threshold lets a few transient hits pass and is reached within milliseconds in the spin.
+shutdown. Round 660 (v2, M003): the first version waited for 64 hits, but a spin can compile its block once and then run it from
+the cache for ever, so the gate is reached only once: Football Manager 27's Unity crash reporter (06G98C, build 653) wrote 737,163
+[CB_SUMMARY] lines (a 257 MB log) and took the app from 2.3 to 5.1 GB after its child had exited. Nothing that runs after the loader
+began its shutdown can use a host address as code, so one hit is enough.
 
 Applied by tools/build-xtajit64.sh (the 64-bit module; Core.cpp is restored after the build); idempotent; a moved anchor refuses
 the patch and the build goes on without it (a warning).
@@ -25,7 +28,7 @@ Usage: patch-fex-ios-exit-runaway.py FEX-ROOT
 from pathlib import Path
 import sys
 
-MARKER = "exit-runaway-v1 madeira-bcd"
+MARKER = "exit-runaway-v2 madeira-bcd"
 CORE = "FEXCore/Source/Interface/Core/Core.cpp"
 
 HEAD = "uintptr_t ContextImpl::CompileBlock(FEXCore::Core::CpuStateFrame* Frame, uint64_t GuestRIP, uint64_t MaxInst) {\n"
@@ -43,9 +46,9 @@ STOP = ("  if (GuestRIP >= 0x7400000000ULL || RIPInFEXCodeBuffer) {\n"
         "     * about to (its second NtTerminateProcess) instead of compiling the same page for ever (Enshrouded PG716Q, 0CAY0F, 2TKD32). */\n"
         "    if (RtlDllShutdownInProgress()) {\n"
         "      static std::atomic<uint32_t> ExitRunaway {0};\n"
-        "      if (ExitRunaway.fetch_add(1, std::memory_order_relaxed) + 1 == 64) {\n"
-        "        LogMan::Msg::EFmt(\"[exit-runaway] madeira-bcd: the process is shutting down and the emulator was asked for host address {:#x} \"\n"
-        "                          \"64 times: ending the process (STATUS_PROCESS_IS_TERMINATING)\", GuestRIP);\n"
+        "      if (ExitRunaway.fetch_add(1, std::memory_order_relaxed) == 0) {   // v2 (round 660): the first hit, see the docstring\n"
+        "        LogMan::Msg::EFmt(\"[exit-runaway] madeira-bcd: the process is shutting down and the emulator was asked for host address {:#x}: \"\n"
+        "                          \"ending the process (STATUS_PROCESS_IS_TERMINATING)\", GuestRIP);\n"
         "        NtTerminateProcess(reinterpret_cast<void*>(-1), static_cast<int32_t>(0xC000010A)); // STATUS_PROCESS_IS_TERMINATING\n"
         "      }\n"
         "    }\n"

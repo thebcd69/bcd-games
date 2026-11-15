@@ -181,6 +181,18 @@ do {
           "repair: every file that is missing or wrong, none that is right (the readme stays out), nothing removed: \(rep.plan.files.map(\.path))")
     check(!seenReports.isEmpty && seenReports == seenReports.sorted(), "repair: progress is reported while the files are read (\(seenReports.last ?? 0) bytes)")
 
+    // Build 663: a support app/ file at the path of a game file the disk has right is not laid over it in a repair (an install keeps the
+    // game's file too, through addSupportFiles' own test).
+    let supportDepot = depot([file("Bin\\Game.exe", [X1], packed: 100), file("Data\\Pak.bin", [P1, P3], packed: 210), file("New\\Added.dat", [N1], packed: 500),
+                              file("Docs\\readme.txt", [R1], packed: 300),
+                              file("app\\Docs\\readme.txt", [bytes("a-support-readme")], packed: 700, extra: ["flags": ["support"]])])
+    let supportNet = Net()
+    let sup = try await BCDGOGContent.plan(planKey(), title: "Game", build: build78, preferred: ["en-US"], containers: false, ownedDLC: [],
+                                           current: .init(kind: .repair, folder: installed, oldDepots: [], language: "en-US"),
+                                           fetch: { url, signedIn in url.absoluteString.hasSuffix(hash("b")) ? supportDepot : try await supportNet.answer(url, signedIn) })
+    check(!sup.plan.files.map(\.path).contains("Docs/readme.txt") && sup.info.supportFiles >= 1,
+          "repair: a support app/ file never goes over a game file the disk has right: \(sup.plan.files.map(\.path))")
+
     // An update whose old file lists cannot be read checks every file as a repair does.
     let blind = Net()
     blind.failing = [hash("a")]

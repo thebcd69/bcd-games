@@ -330,6 +330,10 @@ enum JITShortcutFile {
         self.waiting = nil
         switch outcome {
         case .done(let result): LogStore.shared.log("[jit-shortcut] returned output=\(result.isEmpty ? "none" : "a VPN name")")
+        // Round 660 (M103; VZR5FW): a shortcut that is not installed is not an error of the run (the session went on with the built-in way);
+        // Shortcuts' own words for it, in English, get an INFO line that says so. Every other failure stays an error.
+        case .failed(let why) where why.lowercased().contains("could not find the shortcut"):
+            LogStore.shared.log("[jit-shortcut] not installed (\(why)); the start goes on without it")
         case .failed(let why):  LogStore.shared.log("[jit-shortcut] failed: \(why)", level: .error)
         }
         waiting(outcome)

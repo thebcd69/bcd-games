@@ -18,12 +18,14 @@ Needs the FEX submodule and a host C++ compiler; no Wine, FEX build or game.
 4. What the script's reasoning rests on is still true of the tree: a callee's entry point is emitted by the same EmitEntryPoint
    call (with its check), ExitFunctionEC reads the doorbell, an unconditional backward branch keeps its check.
 5. Build wiring: applied by the ARM64EC build only, after its other overlays, a refusal is a warning, the three files are restored;
-   the catalog entry (off by default); no downloaded list may set it; the session end clears it; the credit; CI runs this check.
+   the catalog entry (off by default); a downloaded list sets it only in the two RDR2 rows from build 665 (owner, 2026-11-15);
+   the session end clears it; the credit; CI runs this check.
 NOT covered: the JIT's bytes on a device, and a suspend arriving while a game runs (the device A/B is the owner's).
 SKIP (exit 0) without the FEX sources.
 """
 from pathlib import Path
 import importlib.util
+import json
 import os
 import re
 import shutil
@@ -314,8 +316,15 @@ check("the catalog documents the switch, off by default",
       re.search(r'"env\.MADEIRA_FEX_CALLRET_LEAN": \{[^}]*"default": "0"', gen, re.S) is not None
       and re.search(r'key: "env\.MADEIRA_FEX_CALLRET_LEAN", title: "[^"]*", kind: \.bool, defaultValue: "0"', cat) is not None)
 policy = (R / "app/Madeira/GameRecommendationsList.swift").read_text()
-check("no downloaded list may set it (an A/B switch for a person at the device), and the session end clears it",
-      "MADEIRA_FEX_CALLRET_LEAN" not in policy and 'unsetenv("MADEIRA_FEX_CALLRET_LEAN");' in (R / "app/Madeira/WineProcessBridge.m").read_text())
+# Build 665 (owner 2026-11-15, "adamın satırlarını koyalım direkt"): netheritenee's RDR2 settings carry it, so the list policy allows
+# it from build 665; the two RDR2 rows are the only lists that set it, from build 665, and the session end still clears it.
+_recs = json.loads((R / "recommended/recommendations.json").read_text())
+_setting = sorted(r["id"] for r in _recs["rules"] if "MADEIRA_FEX_CALLRET_LEAN" in json.dumps(r["config"] + r.get("smallRAMConfig", [])))
+_lines = [c for r in _recs["rules"] for c in r["config"] if "MADEIRA_FEX_CALLRET_LEAN" in json.dumps(c)]
+check("a downloaded list sets it only in the two RDR2 rows from build 665 (owner, 2026-11-15), and the session end clears it",
+      '"MADEIRA_FEX_CALLRET_LEAN"' in policy and _setting == ["rdr2-other", "rdr2-steam"]
+      and _lines == [{"line": "env.MADEIRA_FEX_CALLRET_LEAN = 1", "minBuild": 665}] * 2
+      and 'unsetenv("MADEIRA_FEX_CALLRET_LEAN");' in (R / "app/Madeira/WineProcessBridge.m").read_text())
 notices = (R / "THIRD-PARTY-NOTICES.md").read_text()
 head = SCRIPT.read_text()[:700]
 check("the credit: Porthole's patch 0143 in the script's header and in the notices",

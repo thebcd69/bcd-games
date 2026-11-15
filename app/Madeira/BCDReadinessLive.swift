@@ -32,11 +32,11 @@ import Foundation
         let signature = BCDGraphicsDefaults.folderSignature(root, target: LibraryModel.drive.appendingPathComponent(entry.launchRelativePath))
         if let scan = scans[root.path], scan.signature == signature {
             return BCDReadiness.note(BCDReadiness.evaluate(modules: scan.modules, files: scan.files, provided: Self.provided(), complete: scan.complete,
-                                                           mainFile: Self.mainFile(entry)))
+                                                           mainFile: Self.mainFile(entry), mainPath: entry.launchRelativePath))
         }
         guard !running.contains(root.path) else { return nil }
         running.insert(root.path)
-        let title = entry.title, main = Self.mainFile(entry)
+        let title = entry.title, main = Self.mainFile(entry), mainPath = entry.launchRelativePath
         DispatchQueue.global(qos: .utility).async {
             let result = BCDReadiness.scan(root)
             DispatchQueue.main.async { [weak self] in
@@ -45,7 +45,7 @@ import Foundation
                     self.running.remove(root.path)
                     self.scans[root.path] = Scan(signature: signature, modules: result.modules, files: result.files, complete: result.complete)
                     let findings = BCDReadiness.evaluate(modules: result.modules, files: result.files, provided: Self.provided(),
-                                                         complete: result.complete, mainFile: main)
+                                                         complete: result.complete, mainFile: main, mainPath: mainPath)
                     LogStore.shared.log(BCDReadiness.logLine(game: title, modules: result.modules.count, findings: findings)
                                         + (result.complete ? "" : " (the scan stopped at its limit)"))
                     if !findings.isEmpty { changed() }

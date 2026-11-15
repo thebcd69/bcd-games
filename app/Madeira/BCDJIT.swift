@@ -179,6 +179,9 @@ struct BCDJITSectionState: Equatable {
     /// The method chosen in Settings, and the one Enable JIT will use.
     var method: BCDJITMethodChoice = .automatic
     var resolved: BCDJITMethodChoice = .stikDebug
+    /// Automatic takes BCD's own helper over an installed StikDebug once this device is paired with BCD (round 660, M138;
+    /// env.MADEIRA_JIT_AUTO_BUILTIN = 0 turns it off).
+    var builtInFirst = true
     var stikDebugFound = false
     var pairingFile: BCDJITPairingFile = .none
     var pairing: BCDJITPairingRun = .idle
@@ -403,7 +406,9 @@ struct BCDJITSection<Backend: BCDJITBackend>: View {
     private func detail(_ method: BCDJITMethodChoice) -> String {
         switch method {
         case .automatic:
-            return "BCD uses StikDebug when it's installed, otherwise its own helper. Right now: \(title(state.resolved))."
+            return state.builtInFirst
+                ? "BCD uses its own helper once this \(device) is paired with it, otherwise StikDebug when it's installed. Right now: \(title(state.resolved))."
+                : "BCD uses StikDebug when it's installed, otherwise its own helper. Right now: \(title(state.resolved))."
         case .stikDebug:
             if platform.inLiveContainer { return "The StikDebug app attaches to BCD. Inside LiveContainer BCD can't see whether it's installed." }
             return state.stikDebugFound ? "The StikDebug app attaches to BCD for a moment, then sends you back. Installed."

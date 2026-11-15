@@ -311,7 +311,8 @@ rule = next(r for r in mod.RULES if r["id"] == "d3d8-to-d3d9")
 # round 624 (agent D2): Red Faction's launcher (8R8V3Z) joins with its three lines, 16 in all.
 # night round 2026-11-11 (agents R1 S6, G2 S4, G5 S13): Vice City, Battlefield 1942 and Hitman: Contracts join with three signals each (9 more, 25 in all).
 check("auto-tune's rule adds the one line, needs the GL failure and a loaded d3d8.dll, is the five games' alone and stops once the bridge linked (or lacked) the DLL",
-      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 25
+      # round 660 (M075): Hotline Miami's HotlineMiami.exe copy (XNR28K) adds its three launch forms (28 in all)
+      rule["lines"] == ["env.MADEIRA_D3D8 = d3d9"] and rule.get("noRetry") and len(rule["all"]) == 2 and len(rule["any"]) == 28
       and {"has": ["(d3d8.dll-", "Load module"]} in rule["all"] and {"has": ["wined3d_adapter_gl_init Failed to get a GL context"]} in rule["all"]
       and {"has": ["MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll"]} in rule["none"] and "noFix" not in rule and "fixedIn" not in rule)
 fx = root / "tests/fixtures/autotune"
@@ -329,7 +330,8 @@ def rule_matches(r, text):
 
 for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-miami-d3d8-2026-10-21", "exited-early"), ("gta-iii-d3d8-2026-10-24", "exited-early"),
                            ("red-faction-d3d8-2026-10-29", "exited-early"), ("gta-vice-city-d3d8-2026-11-10", "exited-early"),
-                           ("battlefield-1942-d3d8-2026-11-05", "exited-early"), ("hitman-contracts-d3d8-2026-11-07", "crashed")):
+                           ("battlefield-1942-d3d8-2026-11-05", "exited-early"), ("hitman-contracts-d3d8-2026-11-07", "crashed"),
+                           ("hotline-miami-d3d8-2026-11-12", "exited-early")):   # round 660 (M075)
     expect = json.loads((fx / (name + ".expect")).read_text())
     log = (fx / (name + ".log")).read_text()
     check(f"{name}: the fixture proposes the line ({expect['outcome']}, stage {expect['stage']})",
@@ -347,7 +349,7 @@ for name, want_outcome in (("postal-2-d3d8-2026-10-24", "crashed"), ("hotline-mi
 others = [p.name[:-7] for p in fx.glob("*.expect") if "d3d8-to-d3d9" in json.loads(p.read_text()).get("matched", [])]
 check("no other fixture matches it (Peggle, the D3D9 and D3D11 games; Mafia's NULL-adapter crash is d3d8-null-adapter-crash's): %s" % others,
       sorted(others) == ["battlefield-1942-d3d8-2026-11-05", "gta-iii-d3d8-2026-10-24", "gta-vice-city-d3d8-2026-11-10", "hitman-contracts-d3d8-2026-11-07",
-                         "hotline-miami-d3d8-2026-10-21", "postal-2-d3d8-2026-10-24", "red-faction-d3d8-2026-10-29"])
+                         "hotline-miami-d3d8-2026-10-21", "hotline-miami-d3d8-2026-11-12", "postal-2-d3d8-2026-10-24", "red-faction-d3d8-2026-10-29"])
 catalog_ok = '"env.MADEIRA_D3D8"' in (root / "build/tools/gen-config-catalog.py").read_text()
 check("the rule's key is in the settings catalog's overlay", catalog_ok)
 

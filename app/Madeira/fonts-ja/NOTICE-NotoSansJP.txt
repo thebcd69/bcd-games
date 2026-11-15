@@ -1,0 +1,37 @@
+NotoSansJP-Regular.otf: the Japanese font of BCD's Japanese locale
+
+What it is
+  Noto Sans JP Regular (version 2.004), the Japanese subset OpenType file of
+  Noto Sans CJK. A game with the Japanese locale on (the game page's
+  Compatibility > Japanese locale, env.MADEIRA_JAPANESE = 1) gets it linked into
+  its prefix's C:\windows\Fonts, and the Windows Japanese font names (MS Gothic,
+  MS PGothic, MS UI Gothic, MS Mincho, MS PMincho, Meiryo, Meiryo UI, Yu Gothic,
+  Yu Gothic UI, Yu Mincho and their Japanese names) are mapped onto it for that
+  game's sessions only (app/Madeira/BCDJapanese.c).
+
+Who made it, and under what licence
+  Copyright 2014-2021 Adobe (http://www.adobe.com/), the font file's own
+  copyright record; its designers are Ryoko Nishizuka (kana, bopomofo and
+  ideographs), Paul D. Hunt (Latin, Greek and Cyrillic) and Sandoll
+  Communications (hangul), with Dr. Ken Lunde (project architect) and Masataka
+  Hattori (production), as the file names them. "Noto is a trademark of Google Inc." (the file's trademark
+  record). Licence: the SIL Open Font License, version 1.1
+  (LICENSE-NotoSansJP-OFL-1.1.txt, next to this notice; the font carries the
+  licence in its own name table too). It is used unmodified and is not sold by
+  itself.
+
+How it is carried
+  This file is not part of BCD's source repository and is not changed in any way:
+  the build downloads it (tools/fetch-japanese-font.sh), checks its SHA-256 and
+  puts it next to this notice. It is a data file read by Wine's font code, not a
+  program linked with BCD, so it stays under its own licence beside BCD's.
+  Madeira's pull request #567 (by nekodesusan-prog), which brought the Japanese
+  locale, bundles the same file.
+
+Where it comes from (both give the same file)
+  SHA-256 dff723ba59d57d136764a04b9b2d03205544f7cd785a711442d6d2d085ac5073
+  4,533,028 bytes
+  https://github.com/notofonts/noto-cjk (Sans/SubsetOTF/JP/NotoSansJP-Regular.otf,
+  commit f8d157532fbfaeda587e826d4cd5b21a49186f7c)
+  https://github.com/willfaust/Madeira (app/Madeira/fonts-ja/NotoSansJP-Regular.otf,
+  commit 025c0ca2e59f15af653f67d59c23c7e59020b274)

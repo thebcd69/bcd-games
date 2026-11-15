@@ -565,6 +565,10 @@ enum ExternalGameScan {
     private static let skipNames = ["unins", "setup", "install", "redist", "vcredist", "vc_redist", "dxsetup", "directx",
                                     "dotnet", "crash", "report", "update", "patch", "launcherhelper", "helper", "cef",
                                     "touchup", "easyanticheat", "battleye", "ue4prereq", "prereq", "config", "settings"]
+    /// madeira-bcd (round 660, M011): a crash handler or reporter is never the game, wherever its name has the word: Unity's
+    /// UnityCrashHandler64.exe ("unity" first, so the prefix test above let it through) became Timberborn's card from an external drive
+    /// (5BM9HV: the card started the crash handler, which exits 0 after 0.8 s). Names such as Crashlands or Crash Bandicoot stay.
+    static let skipAnywhere = ["crashhandler", "crashreport", "crashpad"]
     private static let skipFolders: Set<String> = ["steamapps", "_commonredist", "commonredist", "redist",
                                                    "redistributables", "directx", "dotnet", "vcredist", "__installer", "windows", "system32",
                                                    "$recycle.bin", "system volume information", "engine", "node_modules"]
@@ -587,7 +591,8 @@ enum ExternalGameScan {
             let name = item.lastPathComponent.lowercased()
             if (try? item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
                 if depth > 0, !skipFolders.contains(name), !item.isSymlink { walk(item, depth: depth - 1, into: &found, budget: &budget) }
-            } else if item.pathExtension.lowercased() == "exe", !skipNames.contains(where: { name.hasPrefix($0) || name.contains("_" + $0) || name.contains("-" + $0) }) {
+            } else if item.pathExtension.lowercased() == "exe", !skipNames.contains(where: { name.hasPrefix($0) || name.contains("_" + $0) || name.contains("-" + $0) }),
+                      !skipAnywhere.contains(where: { name.contains($0) }) {
                 found.append(item)
             }
         }

@@ -52,7 +52,8 @@ check("the script compiles for arm64ec with llvm-mingw and links with the DXMT r
       "arm64ec-w64-mingw32-clang++" in sh and "-O3 -DNDEBUG" in sh and "-std=c++20" in sh and "-static -Wl,--file-alignment=4096" in sh)
 check("it builds in its own work directory (build/dxmt-d3d9-x64) and ships only d3d9-dxmt.dll",
       'OUT="${D3D9X64_OUT:-$R/build/dxmt-d3d9-x64}"' in sh and 'DEST="$SHIP/d3d9-dxmt.dll"' in sh)
-writes = re.findall(r'^\s*(?:cp|mv)\b[^\n]*', sh, re.M)
+# madeira-bcd (2026-11-15): copies inside the work directory (the [dxmt-shaders] copy of dxmt_command.cpp) are not writes into the bundle
+writes = [w for w in re.findall(r'^\s*(?:cp|mv)\b[^\n]*', sh, re.M) if '"$OUT/' not in w.split()[-1]]
 check("the only copy into the bundle is d3d9-dxmt.dll (through a temporary name)",
       len(writes) == 1 and 'cp "$OUT/d3d9.dll" "$DEST.tmp" && mv -f "$DEST.tmp" "$DEST"' in writes[0])
 check("it never writes d3d9.dll, the i386 farm, the d3d9 shim, d3d9-emulated.dll, d3d11, dxgi or winemetal",

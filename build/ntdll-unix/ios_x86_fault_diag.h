@@ -312,6 +312,18 @@ static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t t
         /* round 624 (E1 S17 a1): a readable page is the write protection of translated code or a guard page: not one of the three */
         if (ios_av_args_read( base + (uint64_t)fault_addr, &probe, 1 )) return;
     }
+    if (fault_addr == -1)
+    {   /* round 660 (M130; The Amazing Spider-Man TRH25H, Black Ops II AA07A1): a copy-protection layer runs the same harmless int3 again and
+         * again and its reports took the whole budget, so the fatal fault that followed had none. One report per int3 address, and int3s get
+         * at most IOS_X86F_MAX_REPORTS - 1 of the budget: the last report is always left for a fault. */
+        static volatile uint32_t seen_int3[4];
+        static volatile int int3_reports;
+        unsigned s;
+
+        for (s = 0; s < 4; s++) if (seen_int3[s] == (uint32_t)eip64) return;
+        for (s = 0; s < 4; s++) if (__sync_bool_compare_and_swap( &seen_int3[s], 0, (uint32_t)eip64 )) break;
+        if (__sync_add_and_fetch( &int3_reports, 1 ) > IOS_X86F_MAX_REPORTS - 1) return;
+    }
     if ((num = __sync_add_and_fetch( &reports, 1 )) > IOS_X86F_MAX_REPORTS) return;
 
     if (resolve && fault_addr >= 0)

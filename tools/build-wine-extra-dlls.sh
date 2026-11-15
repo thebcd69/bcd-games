@@ -44,7 +44,16 @@ WANT="msvcr70 msvcr71 msvcr80 msvcr90 msvcr100 msvcr110 msvcrt20 msvcrt40 msvcir
       d3dx11_42 d3dx11_43"
 for n in $(seq 24 42); do WANT="$WANT d3dx9_$n"; done
 
-shipped() { ls "$SHIP" | tr 'A-Z' 'a-z' | grep -qx "$1.dll"; }
+# Round 2026-11-15 (K6W): a name already in the folder is never rebuilt, and a persistent tree (the owner's build clone) keeps what an earlier run built: its extras
+# were built on 2026-10-13 and miss every later patch script and Wine commit (the local xaudio2_7.dll has no MADEIRA_XAUDIO2_CALLBACK_ORDER, the 32-bit one has);
+# a fresh checkout builds them again every time. MADEIRA_EXTRAS_REBUILD=1 (default 0: nothing changes) rebuilds the extras an earlier run built when the Wine pin,
+# a tools/patch-wine-*.py script or this script changed since: the stamp is written at the end of such a run, next to the build tree. Tracked files are never rebuilt.
+extras_stamp() { { git -C "$R/wine" rev-parse HEAD 2>/dev/null; cat "$R"/tools/patch-wine-*.py "$R/tools/build-wine-extra-dlls.sh"; } | shasum -a 256 | cut -d' ' -f1; }
+EXTRAS_STAMP_FILE="$B.extras-stamp"
+STALE_EXTRAS=0
+if [ "${MADEIRA_EXTRAS_REBUILD:-0}" = 1 ] && [ "$(cat "$EXTRAS_STAMP_FILE" 2>/dev/null)" != "$(extras_stamp)" ]; then STALE_EXTRAS=1; fi
+tracked_name() { git -C "$R" ls-files "app/Madeira/arm64ec-windows" 2>/dev/null | tr 'A-Z' 'a-z' | grep -qx "app/madeira/arm64ec-windows/$1.dll"; }
+shipped() { ls "$SHIP" | tr 'A-Z' 'a-z' | grep -qx "$1.dll" && { [ "$STALE_EXTRAS" = 0 ] || tracked_name "$1"; }; }
 targets=""; todo=""
 for d in $WANT; do
     [ -d "$R/wine/dlls/$d" ] || continue
@@ -266,7 +275,17 @@ CMB=""
 if [ "${MADEIRA_COMBASE_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/combase/apartment.c" ] && [ -f "$SHIP/combase.dll" ]; then
     CMB=combase
 fi
-[ -n "$todo$OGL$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO$CMB" ] || { echo "nothing to build"; exit 0; }
+# madeira-bcd (build 663): kernel32-usd.dll, the tree's kernel32 with tools/patch-wine-kernel32-usd-direct.py: its GetTickCount and
+# GetTickCount64 read KUSER_SHARED_DATA where it really is, instead of at 0x7ffe0000 (below iOS's 4 GB floor every such read was a Mach
+# exception that the sub-floor service answered from the real page: RDR2 about 20,000 a second). Only from a kernel32 the pin left as it
+# is (the shipped kernel32.dll reproduces from the pin but for import hints); checked by tools/verify-kernel32-usd.py (the shipped file's
+# exports, the two functions no longer load 0x7ffe0000) before it ships NEXT TO the shipped kernel32.dll, which stays byte for byte.
+# app/Madeira/WineProcessBridge.m links it as kernel32.dll unless env.MADEIRA_USD_DIRECT = 0. MADEIRA_KERNEL32_USD_BUILD=0 skips it.
+KUD=""
+if [ "${MADEIRA_KERNEL32_USD_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/kernel32/sync.c" ] && [ -f "$SHIP/kernel32.dll" ]; then
+    KUD=kernel32
+fi
+[ -n "$todo$OGL$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO$CMB$KUD" ] || { echo "nothing to build"; exit 0; }
 
 # The cached tree may have disabled winegstreamer because macOS has no
 # GStreamer headers. Only its real PE frontend is needed here; the iOS unix
@@ -447,6 +466,32 @@ if [ -n "$ZMP" ]; then
     fi
     if [ "$ZMPDIAG" = 1 ]; then git -C "$R/wine" checkout -- dlls/kernelbase/process.c dlls/kernelbase/kernelbase.spec; fi
     rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
+fi
+# madeira-bcd (build 663): kernel32-usd.dll (see KUD above), from a kernel32 the pin left as it is; sync.c is put back afterwards.
+if [ -n "$KUD" ]; then
+    k32="$B/dlls/kernel32/arm64ec-windows/kernel32.dll"
+    if git -C "$R/wine" diff --quiet -- dlls/kernel32; then
+        if python3 "$R/tools/patch-wine-kernel32-usd-direct.py" "$R/wine/dlls/kernel32/sync.c"; then
+            rm -f "$k32" "$B"/dlls/kernel32/arm64ec-windows/*.o
+            make -C "$B" -j"$JOBS" dlls/kernel32/arm64ec-windows/kernel32.dll > "$B.kernel32-usd.log" 2>&1
+            if [ -f "$k32" ] && cp "$k32" "$SHIP/kernel32-usd.dll.tmp" &&
+               "$MINGW/arm64ec-w64-mingw32-strip" --strip-debug "$SHIP/kernel32-usd.dll.tmp" &&
+               python3 "$R/tools/verify-kernel32-usd.py" "$SHIP/kernel32-usd.dll.tmp" "$SHIP/kernel32.dll"; then
+                mv "$SHIP/kernel32-usd.dll.tmp" "$SHIP/kernel32-usd.dll"
+                echo "::notice::kernel32-usd.dll (GetTickCount without a fault per call; env.MADEIRA_USD_DIRECT = 0 keeps the shipped one): built next to the shipped kernel32.dll"
+            else
+                rm -f "$SHIP/kernel32-usd.dll.tmp"
+                echo "::warning::kernel32-usd.dll did not build or failed its check; not shipped (every session runs the shipped kernel32.dll)"
+                grep -m 10 "error" "$B.kernel32-usd.log"
+            fi
+        else
+            echo "::warning::the kernel32 usd-direct patch did not apply; kernel32-usd.dll not built"
+        fi
+        git -C "$R/wine" checkout -- dlls/kernel32/sync.c
+    else
+        echo "::warning::wine/dlls/kernel32 differs from the pin; kernel32-usd.dll not built"
+    fi
+    rm -f "$k32" "$B"/dlls/kernel32/arm64ec-windows/*.o
 fi
 # madeira-bcd (OpenGL): opengl32-optin.dll (see OGL above), from the restored tree. Only from an opengl32 the pin left as it is and that has the
 # fork's change; stripped like the kernelbase variant and padded to at least SizeOfImage + 0x10000 like the other extra DLLs; verified (the
@@ -820,6 +865,7 @@ PY
         echo "::warning::$d-optin.dll did not build; env.MADEIRA_OPTIN_DLLS = $d does nothing"
     fi
 done
-echo "::notice::built $built extra Wine DLLs for arm64ec${failed:+ (failed:$failed)}"
+echo "::notice::built $built extra Wine DLLs for arm64ec${failed:+ (failed:$failed)}$([ "$STALE_EXTRAS" = 1 ] && echo " (extras of an earlier run rebuilt: MADEIRA_EXTRAS_REBUILD=1)")"
 [ -n "$failed" ] && grep -m 10 "error" "$B.build.log"
+[ "${MADEIRA_EXTRAS_REBUILD:-0}" = 1 ] && [ -z "$failed" ] && extras_stamp > "$EXTRAS_STAMP_FILE"
 exit 0

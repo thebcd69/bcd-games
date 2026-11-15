@@ -1,0 +1,32 @@
+[17:21:42.297] [INFO] Checking entitlements...
+[17:21:42.297] [INFO] [build] v0.1.653 (653)
+[17:21:42.298] [INFO] [device] model=iPhone14,3 idiom=phone os=iOS Version 27.0 (Build 24A5390f) ram=5639MB available=4074MB cores=6
+[17:21:42.299] [INFO] [device] address-map=[0x104ce4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[17:21:42.299] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=0 wildcard=0 lc=1
+[17:21:42.312] [INFO] [device] settings: low-power=0 thermal=nominal screen=1284x2778@3.0x max-fps=120 utc-offset=-04:00 free-disk=56GB stikdebug-url=1
+[17:21:42.316] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:21:43.745] [INFO] [bcd] library launch Grand Theft Auto IV: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[17:21:43.747] [INFO] Requesting JIT with StikDebug...
+[17:21:43.780] [INFO] Opening StikDebug to enable JIT...
+[17:21:53.784] [INFO] [madeira-dock] launch option 0
+[17:21:53.784] [INFO] [madeira-dock] launch option 0 entry: program=GTAIV/PlayGTAIV.exe arguments="" oslist= osarch= type=none dlc=0 beta=0 workingDir=1
+[17:21:53.794] [INFO] [dock-launch] image-retire=1
+[17:21:53.795] [INFO] [dock-launch] image-map-guard=1
+[17:21:53.795] [INFO] [dock-offline] enabled=1 network=up request=0 account-saved=1 game-started-online=0
+[17:21:53.987] [INFO] [dock-installers] app=12210 program=<ip> file=Social-Club-Setup.exe status=done key=HKLM\Software\Rockstar Games\Steam\SDK recorded=1 minimum=1 machine=0x8664
+[17:21:54.051] [INFO] [dock-installers] app=12210 program=101103150 file=Rockstar-Games-Launcher.exe status=done key=HKLM\Software\Rockstar Games\Steam\Launcher recorded=1 minimum=1 machine=0x8664
+[17:21:54.052] [INFO] [dock-installers] app=12210 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[17:21:54.144] [INFO] [madeira-dock] starting the host for app 12210; Valve's client authenticates and authorizes the launch
+[17:21:54.159] [INFO] Running full Wine sequence...
+[17:21:54.159] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104ce4000,0x8000000000) 512GB available=4046MB low-power=0 thermal=nominal
+[17:21:54.161] [INFO] [game-cfg] env.MADEIRA_DOCK_GAME_SCM=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=0 env.MADEIRA_GUEST_LOG=all env.MADEIRA_GUEST_LOG_LIMIT=800 env.MADEIRA_OPTIN_DLLS=tbs env.MADEIRA_POOL_HEAD_RESERVE_MB=128 env.MADEIRA_POOL_LAZY_WINDOWS=1 env.MADEIRA_POOL_LOW_IMAGES=1 env.MADEIRA_POOL_RECYCLE_IMAGES=1 env.MADEIRA_SC_ALIGN1G=1 env.MADEIRA_SC_PA_POOLS=2 env.MADEIRA_SPAWN_BLOCK=RockstarErrorHandler env.MADEIRA_SRV_POLLOUT_GUARD=1 env.MADEIRA_WOW_MIN_FREE_GB=2 env.MADEIRA_WOW_PLACEHOLDER_SLOTS=1 env.MADEIRA_X64_IMAGE_NOCOPY=1 pool-low=1 pool-page-fit=1 pool-split=1
+[17:21:54.163] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): GTAIV.exe names dxgi (Grand Theft Auto IV, remembered)
+[17:21:54.169] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:21:54.169] [INFO] Allocating 896MB JIT pool via debugger...
+[17:21:54.169] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:21:54.169] [INFO] [jit-debugger] attached=1 at the pool request
+[17:21:54.170] [INFO] [jit-age] attach age=0s source=enable-jit method=stikdebug thermal=0
+[17:21:54.170] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[17:21:54.173] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[17:22:00.294] [INFO] RX pool at 0x148000000
+[17:22:03.553] [INFO] [pool-low] region C 0x12d484000+299MB (free runs below the window: 0x125484000+427MB; 128MB of the run left free for the low images, pool-low-margin = 128)

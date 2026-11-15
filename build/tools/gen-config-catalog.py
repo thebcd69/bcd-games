@@ -130,6 +130,21 @@ OVERLAY = {
                         "Read at every request, so it ends with the session. Logged as [nls-extra]; [nls-missing] names a code "
                         "page whose table was not found. Auto-tune adds it after a crash in a game that asked for 932, 936, 949, 950 or 874.",
                 "sources": ["build/ntdll-unix/env_ios.c"]},
+    # Upstream Madeira #567 (nekodesusan-prog, 025c0ca2), BCD's form (app/Madeira/BCDJapanese.c): build 660.
+    "env.MADEIRA_JAPANESE": {"category": "Wine core (ntdll)", "title": "Japanese locale",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: this game runs with a Japanese system and user locale (LC_ALL = ja_JP.UTF-8 unless the game's "
+                        "file sets a Japanese LC_ALL itself, so the ANSI and OEM code page is 932, Shift-JIS) and the extra code page "
+                        "tables (env.MADEIRA_NLS_EXTRA), and BCD's Japanese font (Noto Sans JP, SIL OFL 1.1, fetched by the build) is "
+                        "linked into C:\\windows\\Fonts with MS Gothic, MS PGothic, MS UI Gothic, MS Mincho, MS PMincho, Meiryo, Meiryo UI, "
+                        "Yu Gothic, Yu Gothic UI, Yu Mincho and their Japanese names mapped onto it (a real font of such a name wins). "
+                        "For Japanese games and visual novels whose text comes out as boxes or garbled characters, or that do not start. "
+                        "The next session without the line takes the font and the names back, so other games keep the prefix as it "
+                        "was. For this game's session the Japanese LC_ALL replaces one its own file or its list row sets (a few rows set "
+                        "env.LC_ALL = en_US.UTF-8 for a game that does not start otherwise). A build without the font (its fetch "
+                        "failed) has no Japanese locale: the switch is hidden and the line changes nothing. The game page's "
+                        "Compatibility switch writes the line. Logged as [japanese]. Read at session start.",
+                "sources": ["app/Madeira/BCDJapanese.c", "app/Madeira/WineProcessBridge.m"]},
     "env.MADEIRA_APP_DLL_SHADOW": {"category": "Wine core (ntdll)", "title": "Ignore these DLLs in the game's folder",
                 "kind": "text", "default": "",
                 "note": "Default empty. DLL names separated by ';' (e.g. vcruntime140.dll): a plain x64 copy of one of "
@@ -658,6 +673,28 @@ OVERLAY = {
                         "kept), so threads that create views no longer wait for each other. For a game that makes tens "
                         "of thousands of typed views a second from several threads. Views that need a copy of the data, "
                         "another alignment or atomic access are made under the lock as before. Read once per game start."},
+    # build 660 (upstream Madeira's codex/d3d12-consolidation, 5a3db65f + 3557bae9, Shitiz Garg and intraducine; always on there, on by
+    # default here with 0 as the way back): madeira_d3d12.c device_CreateSampler. tests/host/check-d3d12-sampler-cache.py.
+    "sampler-cache": {"category": "Direct3D 12", "title": "Identical samplers share one Metal sampler",
+                "kind": "bool", "default": "1",
+                "note": "On by default. A Direct3D 12 CreateSampler call whose description this device has seen before gets the "
+                        "first sampler made for it, where every call used to make a new Metal sampler that was kept until the game "
+                        "ended: fewer calls into the system and no growth for a game that creates samplers every frame from a "
+                        "handful of descriptions (Path of Exile 2: about 16 a frame). Per device, 512 descriptions; beyond that "
+                        "every call makes its own again. 0: every call makes its own sampler, as before build 660. Read once per "
+                        "game start; a \"sampler-cache\" line says which.",
+                "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
+    # build 660 (upstream Madeira's codex/d3d12-consolidation, 984ed082 + 826a9678, Shitiz Garg and intraducine; opt-in there too):
+    # madeira_d3d12.c exec_dispatch. tests/host/check-d3d12-cs-concurrent.py.
+    "cs-concurrent": {"category": "Direct3D 12", "title": "Experiment: compute work between barriers runs concurrently",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: the compute encoder a Direct3D 12 dispatch opens is concurrent, so the dispatches a game "
+                        "issues between two resource barriers no longer wait for each other on the GPU (Direct3D 12 orders them "
+                        "only at a barrier, and a barrier ends the encoder). For a game with thousands of small dispatches a "
+                        "frame (Path of Exile 2 fights: 52.6 to 45.2 ms of GPU time a frame upstream). Not with fence-chain = 6. "
+                        "Opt-in: a game that relies on the order of two dispatches with no barrier between them would render "
+                        "wrongly. Read once per game start; a \"cs-concurrent\" line says it is on. Not tried on a device in BCD yet.",
+                "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
     "present-lum": {"category": "Direct3D 12", "title": "Diagnostic: brightness of presented frames",
                 "kind": "bool", "default": "0",
                 "note": "Default off. 1: at presents 2, 30, 120, 600 and 1800 of each swapchain a log line (\"[present-lum]\") says how bright the frame the game "
@@ -1004,6 +1041,26 @@ OVERLAY = {
                         "changed) to the real part, so the whole arena is real memory. It is applied only when the allocator's start-up code matches "
                         "byte for byte exactly once and the 256 GB reservation does not fit the map; each case is logged as [fft-arena]. Set it in "
                         "the game's own file; read when the game's program is loaded."},
+    # madeira-bcd (round 660 M023 W3ALLOC, agent K7R, build 663): a virtual reservation for a 64 GB+ reserve, and the scan for a later arena patch.
+    "oversize-reserve-virtual": {"category": "Memory & JIT pool", "title": "Large memory reservations: keep everything else out of the rest", "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default off (build 663). With oversize-reserve = 1: a reservation of 64 GB or more that the map cannot hold gets its real part at the "
+                        "top of the band, ending where the emulator's own memory area begins, so the part the game is told it owns but is not mapped lies in "
+                        "that area and above the end of the address map, where nothing of the game can be placed. Without it the real part goes wherever "
+                        "it fits and the game's later reservations can land inside the rest (The Witcher 3's DirectX 12 build then handed a block of one "
+                        "pool to another pool's allocator and crashed). Needs the 512 GB address map of iOS 27; elsewhere, or when that slot is taken, "
+                        "the reservation is served as without this key and the log says why ([oversize] vres). Set it in the game's own file; read when "
+                        "the session starts."},
+    "oversize-scan": {"category": "Memory & JIT pool", "title": "Diagnostic: find where a game loads the size of its huge reservation", "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default off (build 663). Log only. 1: when the game's main program is loaded, every instruction that loads the size in "
+                        "oversize-scan-mb as a 64-bit constant is logged with the bytes around it ([oversize-scan]), and every copy of that size in "
+                        "the program's data. The input for a later fix that sizes the game's own memory pool to what BCD can give (as fft-arena-patch "
+                        "does for FINAL FANTASY TACTICS). Nothing is changed. Read when the program is loaded."},
+    "oversize-scan-mb": {"category": "Memory & JIT pool", "title": "Diagnostic: the reservation size oversize-scan looks for (MB)", "kind": "int", "default": "65536",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default 65536 (64 GB, The Witcher 3's arena). With oversize-scan = 1: the size, in MB, whose 64-bit constant is looked for. "
+                        "Read when the program is loaded."},
     # ajan65 (upstream port 2026-11-05, item 10): kill switches for two behaviours BCD took without one (upstream Madeira v0.2.0, #516).
     "env.MADEIRA_CREATE_VIEW_REFUSE": {"category": "Memory & JIT pool", "kind": "bool", "default": "1", "title": "Refuse a new memory view that overlaps a live one",
                 "sources": ["build/ntdll-unix/virtual_ios.c"],
@@ -1033,7 +1090,10 @@ OVERLAY = {
     "env.MADEIRA_THREAD_QOS": {"category": "Exceptions & threads", "kind": "text", "default": "", "title": "QoS class per guest thread, by its name",
                 "note": "Default off. pattern=class;pattern=class: a thread whose name (SetThreadDescription) matches a pattern runs at that QoS class. First match wins; * and ? are wildcards; classes: "
                         "user-interactive, user-initiated, default, utility, background. Unnamed and unmatched threads stay user-interactive, and eco still overrides everything. For a game whose worker "
-                        "pools take the performance cores from its main thread (Dark Souls III: GXWorker*=user-initiated;FD4JobWorker*=utility). Set it in the game's own file; read at session start."},
+                        "pools take the performance cores from its main thread (Dark Souls III: GXWorker*=user-initiated;FD4JobWorker*=utility). From build 663 a pattern "
+                        "exe:<program> names a Windows program instead (its file name, letter case aside): every thread of it runs at that class unless a "
+                        "thread-name rule matches the thread, e.g. exe:Launcher.exe=utility;exe:SocialClubHelper.exe=utility keeps Rockstar's launcher and its "
+                        "Social Club helper off the performance cores beside RDR2 or GTA V. Set it in the game's own file; read at session start."},
     "env.DXMT_CENSUS_THROTTLE": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "1", "title": "Throttle DXMT's memory census",
                 "note": "On for every session (BCD sets it): DXMT's memory census writes one [mem-census] report every 10 s instead of four to nine a second in a 64-bit game; a memory warning and the "
                         "first report of the process are always written. 0 restores the old cadence."},
@@ -1197,6 +1257,80 @@ OVERLAY = {
                         "games keep the copy whatever this says. Set it in the game's own file; read at session start. "
                         "Not tried on a device in BCD yet.",
                 "sources": ["dxmt/src/d3d9/d3d9_buffer.cpp"]},
+    # upstream merge 2026-11-14 (dxmt fork commits of willfaust/dxmt ios-port and codex/dxmt-consolidation): every one off by default
+    "env.DXMT_CMDLIST_KEEP_BLOCK": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 11: a recycled command list keeps its first block",
+                "note": "Default off. 1: a deferred context's command list keeps its first 2 MB block, emptied, when it is recycled, "
+                        "instead of freeing every block and allocating one again for the next recording (Dark Souls III records on "
+                        "its worker threads and does that about 960 times a second; on a 64-bit game each free also makes FEX "
+                        "invalidate the range on every thread). The 32-bit d3d11.dll, and a 64-bit game with env.MADEIRA_D3D11_SRC = 1. "
+                        "Set it in the game's own file; read once. Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/d3d11/d3d11_context_impl.cpp"]},
+    "env.DXMT_DYN_KEEP": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "int", "default": "0",
+                "title": "Direct3D 9/10/11: retired names kept per dynamic buffer",
+                "note": "Default 0 (off: at most 64 retired names per dynamic buffer, as before). N (65 to 65536): a dynamic buffer keeps "
+                        "up to max(64, min(N, DXMT_DYN_KEEP_KB * 1024 / its size)) retired Metal buffers for reuse, so a game that renames a "
+                        "constant buffer on every draw stops creating and releasing thousands of them a frame (Dark Souls III: "
+                        "15-30 thousand a second). More memory is held per buffer. It is in DXMT's core, so it acts in the 32-bit DLLs "
+                        "(Direct3D 9, 10 and 11), in the 64-bit Direct3D 9 route (d3d9-dxmt.dll) and in a 64-bit Direct3D 11 game with "
+                        "env.MADEIRA_D3D11_SRC = 1; never in upstream's own 64-bit d3d11.dll. Set it in the game's own file; read once. "
+                        "Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/dxmt/dxmt_dynamic.cpp"]},
+    "env.DXMT_DYN_KEEP_KB": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "int", "default": "4096",
+                "title": "Direct3D 9/10/11: memory bound of the kept retired names (KB per buffer)",
+                "note": "Default 4096 (64 to 65536). Only with env.DXMT_DYN_KEEP: a dynamic buffer keeps retired names only up to this "
+                        "many kilobytes in total, so large buffers still keep 64. The same binaries as env.DXMT_DYN_KEEP.",
+                "sources": ["dxmt/src/dxmt/dxmt_dynamic.cpp"]},
+    "env.DXMT_D9_LATE_READBACK": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 9: tiny render-target readbacks one frame late",
+                "note": "Default off. 1: GetRenderTargetData on a render target of at most 64 pixels (4096 bytes), such as a 1x1 "
+                        "exposure sample a game reads back every frame, stops waiting for the GPU after three calls: the copy is "
+                        "posted and the previous finished result is returned. The value the game reads is one frame old. "
+                        "At most 8 destination surfaces of a process get this, and a surface that was destroyed keeps its place (after "
+                        "8, later surfaces are read back the slow way); an entry left by an earlier device starts again. "
+                        "Set it in the game's own file; read once. Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/d3d9/d3d9_device.cpp"]},
+    "env.MADEIRA_DXGI_VK_SWAPCHAIN": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "1",
+                "title": "DXGI swap chains for a Direct3D 12 device that presents through Vulkan",
+                "note": "Default on. A Direct3D 12 command queue that is not DXMT's and offers vkd3d-proton's swap chain factory gets "
+                        "its swap chain through that factory (windowed only). Before, CreateSwapChain failed for such a device with "
+                        "\"Unsupported device type\", and 0 restores that. BCD's own Direct3D 12 never takes this path. The 32-bit "
+                        "dxgi.dll, and a 64-bit game with env.MADEIRA_DXGI_SRC = 1.",
+                "sources": ["dxmt/src/dxgi/dxgi_swapchain_vk.cpp"]},
+    "env.MADEIRA_D3D11_LOCAL_SHARE": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 11: shared texture handles inside the process",
+                "note": "Default off. 1: a texture made without a shared flag answers GetSharedHandle with a handle that "
+                        "OpenSharedResource resolves inside the process (on another device: a second texture over the same Metal "
+                        "texture), where Windows answers NULL. Unity's video output opens its render textures on the video device "
+                        "that way (upstream: Hollow Knight's cinematics stayed black without it). The 32-bit d3d11.dll, and a 64-bit "
+                        "game with env.MADEIRA_D3D11_SRC = 1. Set it in the game's own file; read once. Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/d3d11/d3d11_texture_device.cpp"]},
+    "env.DXMT_TYPELESS_COMPRESSION": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 11: lossless compression kept on colour typeless textures",
+                "note": "Default off. 1: a colour TYPELESS texture (Unity makes its render textures that way) is created without "
+                        "Metal's pixelFormatView usage, which turns Apple's lossless framebuffer compression off; depth, stencil and "
+                        "block-compressed formats keep the usage. A view that changes such a texture's component layout is reported "
+                        "([pfv-view], the first 32). env.DXMT_TYPELESS_PFV = 1 puts the usage back on every typeless format. The 32-bit "
+                        "d3d11.dll, and a 64-bit game with env.MADEIRA_D3D11_SRC = 1. Set it in the game's own file; read once. "
+                        "Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/d3d11/d3d11_resource_helper.cpp", "dxmt/src/dxmt/dxmt_texture.cpp"]},
+    "env.DXMT_TYPELESS_PFV": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 11: pixelFormatView on every typeless texture",
+                "note": "Default off. Only with env.DXMT_TYPELESS_COMPRESSION = 1: 1 puts Metal's pixelFormatView usage back on "
+                        "every typeless format (the behaviour without either key).",
+                "sources": ["dxmt/src/d3d11/d3d11_resource_helper.cpp"]},
+    # Upstream Madeira #575 (125hz; dxmt e82c8646 + 3d62913b), opt-in in BCD (dxmt fork 121e8552): build 660.
+    "env.MADEIRA_D3D9_LUMINANCE_RT": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "bool", "default": "0",
+                "title": "Direct3D 9: luminance render targets",
+                "note": "Default off. 1: DXMT's Direct3D 9 lets a game render into D3DFMT_L8, A8L8 and L16 textures and surfaces "
+                        "(stored as R8Unorm, RG8Unorm and R16Unorm; a pixel shader's red, or red and green for A8L8, is what lands in "
+                        "them), and CheckDeviceFormat says so. A program or a mod that builds one-channel targets (an anti-aliasing mod "
+                        "loaded into a 32-bit game, build 634) asked for L8 targets, the log said \"CreateTexture: format 50 not "
+                        "render-target-capable\" and the game stopped there; auto-tune names this line when the log says it. Off, such a "
+                        "request is refused as before, so a game that probes L8 and takes its fallback is not changed. StretchRect "
+                        "conversions never include the three formats. 32-bit games and the 64-bit d3d9-dxmt.dll route; read once per "
+                        "session. No list row sets it. Not tried on a device in BCD yet.",
+                "sources": ["dxmt/src/d3d9/d3d9_format.cpp", "dxmt/src/d3d9/d3d9_interface.cpp"]},
     "env.MADEIRA_RESTORE_BORN_MINIMIZED_LATE": {"category": "Windows, display & input", "kind": "bool", "default": "0", "title": "Restore a window shown minimized after the starting screen",
                 "note": "Default off. 1: after a BCD Dock start's starting screen has found the game's window, a window the game shows minimized for the first time is still restored (once), "
                         "until the session ends; a game whose main window comes up minimized behind its splash screen then no longer sits there. Off, the restore ends with the starting screen. "
@@ -1229,9 +1363,10 @@ OVERLAY = {
     # Read by winemetal (the DXGI budget) and, for the opt-in D3DKMT adapter, by
     # build/win32u-unix/d3dkmt_ios.c; keep the DXMT category and note.
     "vram-mb": {"title": "Video memory budget (MB)", "category": "Direct3D 9/10/11 (DXMT)",
-                "note": "ml1095: bcd.cfg vram-mb = N"},
+                "note": "ml1095: bcd.cfg vram-mb = N. The video memory the game is told about; on a phone with 4 GB leave it at its default."},
     "pool": { "category": "Memory & JIT pool","title": "JIT pool size (MB)",
-                "note": "The JIT pool size in MB (256 to 1152) for every launch; wins over the size the launch would pick. With pool-above-window = 1 a pool line in the game's own file counts too and wins."},
+                "note": "The JIT pool size in MB (256 to 1152) for every launch; wins over the size the launch would pick. With pool-above-window = 1 a pool line in the game's own file counts too and wins. "
+                        "On a phone with 4 GB (a memory limit of about 2.3 GB) keep it at 640 or less: the JIT pool counts against the memory limit."},
     "pool-above-window": {"category": "Memory & JIT pool", "title": "Pool above a widened executable window", "kind": "bool", "default": "0",
                 "note": "Default off. 1, in the game's own file: (a) a pool line in the game's file sets its pool size, to fit a free run above its executable window; "
                         "(b) with pool-split, the pool takes two runs above the window when together they are larger than the single run it would get, also when that run lies above the window "
@@ -1376,6 +1511,16 @@ OVERLAY = {
                         "Log line: [gog-script].",
                 "sources": ["app/Madeira/BCDGOG/BCDGOG.swift", "app/Madeira/BCDGOG/BCDGOGRegistry.swift"]},
     # build 632 (Epic cloud saves): read by BCDEpicCloud through BCDEpic.flag (the game's own lines, then bcd.cfg), which the patterns above do not see
+    # madeira-bcd (GOG Galaxy features; Playport's Galaxy service as Madeira's branch playport/gog carries it; app/Madeira/BCDGOG/Galaxy/BCDGOGGalaxy.swift).
+    "env.BCD_GOG_GALAXY": {"category": "App & front end", "title": "GOG: achievements, statistics and leaderboards (GOG Galaxy features)", "kind": "choice",
+                "choices": [("", "Default (off)"), ("1", "On"), ("0", "Off")],
+                "note": "Default off. 1 (the game's page: GOG Galaxy > Achievements and leaderboards; or bcd.cfg for every GOG game BCD installed): while "
+                        "the game runs, BCD listens where a game's Galaxy SDK looks for GOG's own client (127.0.0.1, port 9977) and serves its requests "
+                        "from GOG's servers: sign-in of the game as the GOG account BCD is signed in to, achievements, statistics, leaderboards and play "
+                        "time. The first start of an installed build reads the game's Galaxy client from GOG's build manifest (at most 12 s). Nothing is "
+                        "served that GOG's client keeps to itself: no overlay, friends, multiplayer or cloud saves. Off: no port is opened and the game "
+                        "finds no GOG Galaxy, as before. Experimental. Log tag: [gog-galaxy] (request names and status codes only).",
+                "sources": ["app/Madeira/BCDGOG/Galaxy/BCDGOGGalaxy.swift", "app/Madeira/BCDGOG/Galaxy/GalaxyService.swift"]},
     "env.BCD_EPIC_CLOUD": {"category": "App & front end", "title": "Epic: sync this game's saves with Epic Cloud", "kind": "choice",
                 "choices": [("", "Default (off)"), ("1", "On"), ("0", "Off")],
                 "note": "Default off, because a sync writes to your Epic account. 1 (the game's page: Cloud saves > Turn on, which asks first; or bcd.cfg for "
@@ -1551,19 +1696,26 @@ OVERLAY = {
                         "the log says \"gl-backend=...: OpenGL is on for this session\" and the [winios-gl] lines follow."},
     # madeira-bcd (Windows Vulkan, docs/BUILDING.md 6c): the game's choice, read by WineProcessBridge.m (bcd_vulkan_session_setup). Category Graphics, not
     # the app-level one, so a recommended list or auto-tune may set it (RecommendationsPolicy: moltenvk only).
-    "vulkan": {"category": "Graphics", "title": "Vulkan for this game (x64)", "kind": "choice", "default": "",
-               "choices": [("", "Off (no Vulkan driver, as always)"), ("moltenvk", "Vulkan on Metal (MoltenVK)")],
-               "sources": ["app/Madeira/WineProcessBridge.m", "build/win32u-unix/vulkan_ios.c"],
-               "note": "Off (default): a game that asks for Vulkan finds no driver, as always. moltenvk: x64 programs get Vulkan through Wine's winevulkan "
-                       "on MoltenVK (the gl folder's libMoltenVK.dylib), drawn into the game's window. Experimental. The word goes into the game's "
-                       "own file (Game details > This game's config), where a recommended list or auto-tune may also put it. 32-bit programs get "
-                       "no Vulkan. From the next start; the log says \"vulkan=moltenvk: Vulkan is on for this session\" and the [winios-vk], "
-                       "[vk-surface] and [vk-layer] lines follow."},
+    "vulkan": {"category": "Graphics", "title": "Vulkan for this game", "kind": "choice", "default": "",
+               "choices": [("", "Off (no Vulkan driver, as always)"), ("moltenvk", "Vulkan on Metal (MoltenVK)"),
+                           ("kosmickrisp", "Vulkan on Metal 4 (Mesa KosmicKrisp; iOS 26)")],
+               "sources": ["app/Madeira/WineProcessBridge.m", "build/win32u-unix/vulkan_ios.c", "tools/patch-wine-vulkan-wow64.py"],
+               "note": "Off (default): a game that asks for Vulkan finds no driver, as always. moltenvk: the game's programs get Vulkan through "
+                       "Wine's winevulkan on MoltenVK (the gl folder's libMoltenVK.dylib), drawn into the game's window. Experimental. The word "
+                       "goes into the game's own file (Game details > This game's config), where a recommended list or auto-tune may also put "
+                       "it. 64-bit and, from build 660, 32-bit programs: for a 32-bit program the memory it maps is placed inside its own "
+                       "address space, so a game that maps a lot of graphics memory has less room left. From the next start; the log says "
+                       "\"vulkan=moltenvk: Vulkan is on for this session\" (and \"Vulkan for 32-bit programs is on\") and the [winios-vk], "
+                       "[vk-surface] and [vk-layer] lines follow. kosmickrisp: the same on Mesa's KosmicKrisp (the gl folder's "
+                       "libvulkan_kosmickrisp.dylib), which has geometry shaders and transform feedback and is less tried; it needs iOS 26 "
+                       "and a GPU of the Metal 4 family, and a build that bundles it. Where it cannot run, Vulkan stays off and the log "
+                       "says why (MoltenVK is not taken instead). A recommended list may choose only moltenvk."},
     # madeira-bcd (Windows Vulkan): set by the app from the game's vulkan line; and the present-result switch of Madeira's Wine commit df1c5ea5
     # (tools/patch-wine-vulkan-suboptimal.py writes it into wine/dlls/win32u/vulkan.c at build time).
     "env.MADEIRA_VULKAN_LIBRARY": {"category": "Graphics", "title": "Vulkan library of this session (set by vulkan)", "kind": "text", "default": "",
                 "sources": ["app/Madeira/WineProcessBridge.m", "build/win32u-unix/vulkan_ios.c"],
-                "note": "Set by the app from the game's vulkan line (moltenvk: the gl folder's libMoltenVK.dylib); win32u's Vulkan layer loads "
+                "note": "Set by the app from the game's vulkan line (moltenvk: the gl folder's libMoltenVK.dylib; kosmickrisp: its "
+                        "libvulkan_kosmickrisp.dylib); win32u's Vulkan layer loads "
                         "it. Unset: no Vulkan, as always. Do not set it by hand: vulkan is the setting (it also links the Vulkan DLLs)."},
     "env.MADEIRA_VK_HOST_SUBOPTIMAL": {"category": "Graphics", "title": "Vulkan: pass MoltenVK's suboptimal presents through", "kind": "bool",
                 "default": "0", "sources": ["tools/patch-wine-vulkan-suboptimal.py"],
@@ -1578,6 +1730,18 @@ OVERLAY = {
                         "S.T.A.L.K.E.R.) refuses a shader, the log gets the compiler's text and the shader's source as the compiler reads it, "
                         "with its line numbers ([hlsl-fail] lines; 3 shaders a run, 800 lines each), so the next unsupported construct can be "
                         "named in one run. Set it in the game's own file; read when a shader fails."},
+    # Upstream Madeira #575 (125hz; Wine fork 8be7412f882 + ddf92babc5b) with BCD's compile-state reset: build 660. Read by vkd3d-shader in the
+    # Wine fork (libs/vkd3d/libs/vkd3d-shader/fx.c, fx_writer_enabled), which the scan above does not cover.
+    "env.MADEIRA_FX_WRITER": {"category": "Wine libraries", "title": "Effects built from text: the effect compiler of build 660",
+                "kind": "bool", "default": "1", "sources": ["wine/libs/vkd3d/libs/vkd3d-shader/fx.c"],
+                "note": "Default on (build 660). Wine's HLSL compiler (vkd3d), for 32-bit games that build their effects from .fx text while "
+                        "they run: a Direct3D 9 effect (D3DXCreateEffect) gets its sampler settings, pass settings and pass shaders "
+                        "written, and every shader of an effect, Direct3D 9, 10 or 11, is compiled as it would be on its own (before, a "
+                        "later shader could carry an earlier one's constants, and a Direct3D 10/11 effect's shaders read their constants "
+                        "at the wrong place). 0: the compiler of the builds before 660, byte for byte: it refused such a Direct3D 9 effect "
+                        "(E5017 \"Writing fx_2_0 sampler objects initializers is not implemented\", \"Write pass assignments\"), so the "
+                        "game runs without it as before; for a game that played better that way. 64-bit games keep the older compiler "
+                        "whatever this says. Set it in the game's own file; read once per game process."},
     # madeira-bcd (night round 2026-11-11, Horizon Zero Dawn A1 S4): read by the wineserver only in the build (tools/patch-wineserver-object-open-trace.py).
     "env.MADEIRA_OBJ_TRACE": {"category": "Wine core (ntdll)", "title": "Log every failed open of a named object",
                 "kind": "bool", "default": "0", "sources": ["tools/patch-wineserver-object-open-trace.py"],
@@ -1811,6 +1975,37 @@ OVERLAY = {
                         "pass, A13 with a one-time notice (no geometry shaders or tessellation). 0: start them "
                         "anyway; Direct3D then crashes or draws garbage on such a GPU.",
                 "sources": ["app/Madeira/DeviceCapability.swift"]},
+    # Build 663: the 64-bit kernel32's tick count without a fault per call (tools/patch-wine-kernel32-usd-direct.py).
+    "env.MADEIRA_AUX_IAT_HEAL": {"category": "Wine core (ntdll)", "title": "Direct calls between 64-bit Windows libraries",
+                "kind": "bool", "default": "1",
+                "note": "On (default): a 64-bit Windows library's call into another one (kernel32's timeGetTime into ntdll's performance "
+                        "counter) that took an exception on every call is pointed at its target once, at its first exception: the same code "
+                        "runs, without the exception. 0 leaves every such call on the exception path. Set it in the game's own file or in "
+                        "bcd.cfg; read at session start."},
+    "env.MADEIRA_AUX_IAT_HEAL_CHILD": {"category": "Wine core (ntdll)", "title": "Direct library calls in programs started by another one",
+                "kind": "bool", "default": "1",
+                "note": "On (default, build 665): the direct calls of env.MADEIRA_AUX_IAT_HEAL also in a program that another program "
+                        "started (RDR2 and GTA V Enhanced from Rockstar's launcher, Social Club's helper, a game started from Steam), which "
+                        "has its own copy of ntdll. Before build 665 only the first program got them: in RDR2 about 18,000 exceptions a "
+                        "second stayed, each costing the exception thread time on a performance core. 0 restores the old rule. Set it in "
+                        "the game's own file or in bcd.cfg; read at session start."},
+    "env.MADEIRA_USD_DIRECT": {"category": "Wine libraries", "title": "Tick count without a fault per call (64-bit)",
+                "kind": "bool", "default": "1",
+                "note": "On (default, build 663): every 64-bit program runs kernel32-usd.dll as its kernel32.dll, the same DLL rebuilt "
+                        "from BCD's Wine source with one change: GetTickCount and GetTickCount64 read the system's shared data page "
+                        "where BCD really keeps it. Before, each call read it at 0x7ffe0000, where iOS maps nothing, and took an "
+                        "exception that BCD answered from the same page: RDR2 asks about 20,000 times a second, which cost a large "
+                        "part of a performance core and made iOS throttle the CPU sooner. The values are the same. 0: the shipped "
+                        "kernel32.dll, as before build 663. Set it in the game's own file or in bcd.cfg; read at session start.",
+                "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh", "tools/patch-wine-kernel32-usd-direct.py"]},
+    # Round 660 (M138, owner 2026-11-15): Automatic JIT prefers BCD's own helper over an installed StikDebug once the device is paired with BCD.
+    "env.MADEIRA_JIT_AUTO_BUILTIN": {"category": "App & front end", "title": "Automatic JIT prefers the built-in helper",
+                "kind": "bool", "default": "1",
+                "note": "On (default, build 663): with the JIT method on Automatic and StikDebug installed, BCD still enables JIT with "
+                        "its own helper once this device is paired with BCD (paired here or a pairing file imported) and the helper "
+                        "runs here (iOS 26 or later). If the device refuses that pairing, the same attempt goes on with StikDebug. "
+                        "0: StikDebug whenever it is installed, as before build 663. A method chosen by hand is never changed.",
+                "sources": ["app/Madeira/JITSetup.swift"]},
     # madeira-bcd (2026-10-28): the in-place External SSD folder picker fix (ExternalGamesPicker.swift).
     "external-picker-fix": {"category": "App & front end", "title": "In-place fix for the External SSD folder picker",
                 "kind": "choice", "default": "auto",
@@ -2117,7 +2312,25 @@ OVERLAY = {
                         "Direct3D 11's size limits gets E_INVALIDARG (The Witness) and env.MADEIRA_VIEW_PRIVATE_REF is available. "
                         "Off (default): upstream's committed d3d11.dll. A 32-bit game is not affected. Set it in the game's own "
                         "file, not for every game; read at session start. (Builds 543-619 built no d3d11-src.dll and the "
-                        "switch changed nothing.)"},
+                        "switch changed nothing.) Since build 663: a constant buffer bound shorter than the shader declares reads "
+                        "0 past its end and 16-bit index ranges at 2 mod 4 are realigned (env.MADEIRA_IDX_REALIGN = 0 turns that "
+                        "off), as in every 32-bit game; a fullscreen swapchain's window under 160x120 gets the monitor's size; "
+                        "env.MADEIRA_DXMT_FAULT_INFO works for the game."},
+    # madeira-bcd (2026-11-15, owner's decision): the 64-bit DXMT set built from BCD's pin (WineProcessBridge.m; tools/build-d3d11-dll.sh,
+    # build-dxgi-dll.sh, build-dxmt-src-dlls.sh; the DLLs read it in tools/patch-d3d11-src-metallib.py).
+    "env.MADEIRA_DXMT_FRESH": {"category": "Direct3D 9/10/11 (DXMT)", "title": "64-bit DXMT built from BCD's source (all four DLLs)",
+                "kind": "bool", "default": "0",
+                "sources": ["app/Madeira/WineProcessBridge.m", "tools/patch-d3d11-src-metallib.py"],
+                "note": "1: a 64-bit game runs DXMT's d3d11.dll, dxgi.dll, d3d10core.dll and winemetal.dll as BCD builds them from "
+                        "its DXMT source (d3d11-src.dll, dxgi-src.dll, d3d10core-src.dll, winemetal-src.dll), and DXMT's own "
+                        "shaders compiled from that source, instead of the four files upstream committed in September and "
+                        "October 2026. It brings every BCD Direct3D 10/11 fix to the game (the ones env.MADEIRA_D3D11_SRC = 1 "
+                        "has) and the geometry/tessellation draw fix of the internal shaders (a batch of two or more such "
+                        "draws hung the GPU: Dark Souls III); in build 663 d3d10core and winemetal are the same code as the "
+                        "committed ones. "
+                        "Direct3D 12 games use the new dxgi.dll and winemetal.dll too. Off (default): the committed set, as "
+                        "before. Set it in bcd.cfg to try it on every game, or in one game's file; read at session start. "
+                        "With it, env.MADEIRA_D3D11_SRC and env.MADEIRA_DXGI_SRC change nothing. Not tried on a device yet."},
     # madeira-bcd (round 620): render target views on a buffer (tools/patch-dxmt-buffer-rtv.py; DXMT reads it).
     "env.MADEIRA_BUFFER_RTV_EMPTY": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Render target views on a buffer: no view instead of an error",
                 "kind": "bool", "default": "0", "sources": ["tools/patch-dxmt-buffer-rtv.py"],
@@ -2129,12 +2342,17 @@ OVERLAY = {
                         "env.MADEIRA_D3D11_SRC = 1 as well. Set it in the game's own file; read once per game start."},
     # madeira-bcd (round 624): the SHA extension hidden from one game (WineProcessBridge.m madeira_publish_host_probe; FEX reads the probe).
     # round 626 (agent G1 S7): read by FEX through tools/patch-fex-ios-cpuid-classic.py (a build-time patch the scan does not see)
+    # build 660 (upstream merge 2026-11-14): value 2 = FEX-Emu 9365e6240 (Ryan Houdek; Madeira's fork e0f03c4e1) in full; the three bits are
+    # on for every program there, opt-in here (an EA licence is bound to a hash that reads CPUID leaf 1 EDX: BCDEAMachine.swift).
     "env.MADEIRA_FEX_CPUID_CLASSIC": {"category": "x86 emulation (FEX)", "title": "Report the classic processor bits (DE, PSE)",
-                "kind": "bool", "default": "0",
+                "kind": "int", "default": "0",
+                "choices": [("", "Off"), ("1", "DE and PSE"), ("2", "DE, PSE and 1 GB pages")],
                 "note": "Default off. 1: CPUID leaf 1 reports debugging extensions (DE) and page size extension (PSE) in EDX, "
                         "as every real x86 processor since the Pentium does; the emulator reports both as missing. Burnout "
-                        "Paradise's CPU check tests DE and stops with its own \"CPU Error\" box without it. Programs cannot use "
-                        "the features behind the two bits, so only a program that tests them sees a difference. Read once when "
+                        "Paradise's CPU check tests DE and stops with its own \"CPU Error\" box without it. 2: the same, and leaf "
+                        "0x80000001 also reports 1 GB pages (from build 660). Programs cannot use "
+                        "the features behind the bits, so only a program that tests them sees a difference; an EA game's licence "
+                        "is asked for again when the value changes. Read once when "
                         "the game's process starts; a \"[fex-cpuid]\" line says it is on.",
                 "sources": ["tools/patch-fex-ios-cpuid-classic.py"]},
     "env.MADEIRA_THREAD_FAULT_ISOLATE": {"category": "Exceptions & threads", "title": "A DLL's dying thread ends only itself",
@@ -2390,6 +2608,9 @@ OVERLAY = {
                 "note": "Off by default since build 499: on build 498, where it was on, every 64-bit game died at "
                         "start (ARM64EC code reached the x64 lock bodies through kernel32's forwarders, and their "
                         "exit thunk had no dispatcher yet). Kept for that fix; do not turn it on for a game yet. "
+                        "\"native\" dies at start the same way (RDR2, reported 2026-11-15: ucrtbase's _lock reaches "
+                        "RtlEnterCriticalSection through check_icall while its bit in the EC code map is 0, and the exit "
+                        "thunk jumps to address 0 before the emulator is up). "
                         "1: 64-bit sessions run ntdll-sync.dll, Wine's ntdll from the same source as the shipped "
                         "ntdll.dll (the build checks that it rebuilds it byte for byte) with cheaper SRW locks and "
                         "critical sections: same lock word and rules, but a release wakes only a waiter the word "
@@ -2410,6 +2631,22 @@ OVERLAY = {
                         "page cannot be read, so the program gets the fault at its own address and not at BCD's. Without ntdll-xsec.dll in "
                         "the build the shipped ntdll.dll is mapped. Wins over env.MADEIRA_NTDLL_SYNC. Logged as [ntdll-xsec], "
                         "[section-notify] and [ec-probe-fallback]. Set it in the game's own file; read at session start."},
+    # madeira-bcd (round 2026-11-15, owner's decision on the frozen 64-bit DLLs): the rebuilt 64-bit Wine set (tools/build-wine-fresh-dlls.sh).
+    "env.MADEIRA_WIN64_FRESH": {"category": "Wine core (ntdll)", "title": "Rebuilt 64-bit Wine libraries (experimental)",
+                "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/loader_ios.c", "app/Madeira/WineProcessBridge.m", "tools/build-wine-fresh-dlls.sh"],
+                "note": "Default off. 1: the 64-bit Wine libraries of the game's session (the ARM64EC set that runs 64-bit games and the ARM64 set "
+                        "of its helper programs: ntdll, kernelbase, msvcrt, user32, and the rest of the committed files) come from a rebuild of "
+                        "the pinned Wine source plus BCD's patches, where the build ships one that differs from the committed file. The committed "
+                        "libraries are prebuilt files no step rebuilds, so a fix in Wine's source (or one of BCD's patches: a message box "
+                        "timeout, the exception dispatcher of a helper process, the vectored handler list, import and delay-load diagnostics) "
+                        "reached only the 32-bit set. With the key on, each rebuilt file is used in place of the committed one of its name and "
+                        "the session's ntdll is ntdll-fresh.dll (with env.MADEIRA_NTDLL_XSEC or MADEIRA_NTDLL_SYNC, the same variant built on "
+                        "the rebuilt source); a library a game lists in env.MADEIRA_OPTIN_DLLS keeps its opt-in file. The rebuilt kernel32 reads the "
+                        "tick count where BCD keeps it, as kernel32-usd.dll does (env.MADEIRA_USD_DIRECT = 0 keeps the committed kernel32 even "
+                        "with this key on). Without the files in the "
+                        "build the committed set runs and one line says so. Logged as [win64-fresh] and [WineProc] MADEIRA_WIN64_FRESH. "
+                        "Read at session start; a later game of the same app run does not inherit it."},
     "env.MADEIRA_SHARED_SECTION_EXEC": {"category": "Memory & JIT pool", "title": "Executable section views keep their shared memory",
                 "kind": "bool", "default": "0",
                 "sources": ["build/ntdll-unix/virtual_ios.c"],
@@ -2475,7 +2712,9 @@ OVERLAY = {
                         "and blit encoder gets a label (rp#<seq> <w>x<h> cmds=<n> gs=<0|1> ts=<0|1> ...); after "
                         "\"Device error at frame N\" a [fault-enc] line names the faulted, affected and unknown encoders. "
                         "For D3D9/10/11 games that hang or fault the GPU (GTA V Legacy at Story Mode, build 546). A "
-                        "diagnostic with some GPU cost; off (default): unchanged. Set it in the game's own file."},
+                        "diagnostic with some GPU cost; off (default): unchanged. Set it in the game's own file. A 64-bit "
+                        "Direct3D 10/11 game needs env.MADEIRA_D3D11_SRC = 1 or env.MADEIRA_DXMT_FRESH = 1 (build 663; before "
+                        "that only 64-bit Direct3D 9 had it); a 32-bit game gets the labels, not the [fault-enc] line."},
     "env.MADEIRA_WG_VPROC": {"category": "Media", "title": "BCD's video converter (Unity cutscenes)",
                 "kind": "bool", "default": "0",
                 "sources": ["build/ntdll-unix/winegstreamer_vproc_ios.c", "build/ntdll-unix/winegstreamer_unixlib_ios.c"],
@@ -2498,7 +2737,7 @@ OVERLAY = {
                 "kind": "text", "default": "",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh",
                             "tools/patch-wine-setupapi-devinst-lock.py", "tools/patch-wine-mfasfsrcsnk-winedmo.py",
-                            "tools/patch-wine-dxdiagn-directshow.py", "tools/patch-wine-combase-implicit-mta.py"],
+                            "tools/patch-wine-dxdiagn-directshow.py", "tools/patch-wine-combase-implicit-mta.py", "tools/build-dxcompiler.sh"],
                 "note": "A comma-separated list (dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore, setupapi): each named DLL, which BCD ships as "
                         "<name>-optin.dll and never for every game, runs as <name>.dll for this game. For a program that "
                         "imports one and exits at once with c0000135 (\"Library dxva2.dll ... not found\"; Fort Solis, "
@@ -2530,9 +2769,13 @@ OVERLAY = {
                         "that never started COM, where no thread of the process made a shared (multithreaded) apartment, uses one that is created for it "
                         "instead of failing with CO_E_NOTINITIALIZED (Unreal Engine 5's loading thread asks for the audio device that way and calls through the "
                         "empty answer: Meccha Chameleon, Hubert; build 652). "
+                        "dxcompiler is not one of Wine's: dxcompiler-optin.dll is Microsoft's open-source DirectX Shader Compiler (DXC 1.9), which BCD "
+                        "builds for 64-bit (x86-64) programs. A program that compiles Direct3D 12 shaders at run time and looks for dxcompiler.dll uses "
+                        "it instead of the old FXC compiler: wgpu games (skate. 2 PC port) do, and Wine's FXC cannot compile the Shader Model 5.1 "
+                        "sampler array every wgpu shader with a texture declares (\"E5017: ... Shader model 5.1+ resource array\"; build 663). "
                         "An earlier session's links are removed when a name is gone. "
                         "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint, oledlg, fwpuclnt, sensapi, gamingtcui, qwave, "
-                        "xinputuap, httpapi, dbgcore, setupapi, dxdiagn, msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase and (with "
+                        "xinputuap, httpapi, dbgcore, setupapi, dxdiagn, msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase, dxcompiler and (with "
                         "env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},
     "env.MADEIRA_WINTYPES": {"category": "Wine libraries", "title": "Give the game Wine's wintypes.dll",
                 "kind": "bool", "default": "0",
@@ -2557,9 +2800,10 @@ OVERLAY = {
                 "note": "1: a window a Direct3D swapchain presents into, whose client area stays under 160x120 for 3 seconds while "
                         "the swapchain draws 320x200 or more into it, is sized to the virtual screen (at most twice per window). "
                         "American Truck Simulator opens as a 132x38 window that way (its picture is 1024x768) and nothing ever "
-                        "sizes it; on Windows a fullscreen swapchain does, and from build 578 so does DXMT's fullscreen path "
-                        "(a client area under 160x120, no switch); this line covers a swapchain that never asks for "
-                        "fullscreen. Needs a desktop (Dock) session. Without it the log says [tiny-win] once and nothing "
+                        "sizes it; on Windows a fullscreen swapchain does, and so does DXMT's fullscreen path (a client area "
+                        "under 160x120, no switch) in a 64-bit game on d3d11-src.dll (env.MADEIRA_D3D11_SRC = 1 or "
+                        "env.MADEIRA_DXMT_FRESH = 1) from build 663 (builds 578-662 compiled it into no DLL that called it); "
+                        "this line covers a swapchain that never asks for fullscreen. Needs a desktop (Dock) session. Without it the log says [tiny-win] once and nothing "
                         "changes. [win-create] in the log shows what size each program asked its window for. Set it in the "
                         "game's own file; read at session start."},
     "env.MADEIRA_WER": {"category": "Wine libraries", "title": "Give the game Wine's wer.dll",
@@ -2691,14 +2935,14 @@ OVERLAY = {
                         "Smaller moves the cap sooner and more often. Read at session start."},
     # madeira-bcd: small staging rings in d3d11-src.dll (tools/patch-d3d11-src-small-rings.py).
     "env.MADEIRA_LOCK_ORPHAN": {"category": "Wine core (ntdll)", "title": "Orphan-lock reaper mode",
-                "kind": "choice", "default": "", "sources": ["tools/patch-wine-lock-orphan.py"],
-                "choices": [("", "As before"), ("stamped", "Only stamped locks"), ("0", "Off")],
-                "note": "The monitor releases an SRW lock it believes a dead thread left held. Unset (default): as "
-                        "before, which counts one strike per parked waiter, so a busy lock with 3 waiters is released "
-                        "at once even while its owner lives (Horizon Zero Dawn stopped with \"Error\" right after such "
-                        "a release, build 479). stamped: one strike per monitor cycle, three in a row, and only locks a "
-                        "live thread has stamped (FEX's code-buffer locks) can be released. 0: no releases. The "
-                        "dead-thread reaper is unchanged. Restart the session after changing it."},
+                "kind": "choice", "default": "", "sources": ["tools/patch-wine-lock-orphan.py", "tools/patch-wine-lock-orphan-default.py"],
+                "choices": [("", "Default (only stamped locks)"), ("legacy", "As before build 663"), ("stamped", "Only stamped locks"), ("0", "Off")],
+                "note": "The monitor releases an SRW lock it believes a dead thread left held. Unset (default from build 663) or stamped: "
+                        "one strike per monitor cycle, three in a row, and only locks a live thread has stamped (FEX's code-buffer "
+                        "locks) can be released. legacy: the reaper as before build 663, which counts one strike per parked waiter, "
+                        "so a busy lock with 3 waiters is released at once even while its owner lives (Horizon Zero Dawn stopped with "
+                        "\"Error\" right after such a release, build 479). 0: no releases. The dead-thread reaper is unchanged. "
+                        "Restart the session after changing it."},
     "env.DXMT_SMALL_RINGS": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Small DXMT staging rings for these programs",
                 "kind": "text", "default": "", "sources": ["tools/patch-d3d11-src-small-rings.py"],
                 "note": "Needs env.MADEIRA_D3D11_SRC = 1 before build 543; since then upstream's d3d11.dll has it. Program file names separated by ';' (e.g. "
@@ -2802,6 +3046,19 @@ OVERLAY = {
                         "so it is for a game that needs it. Read once, at the first unused load the emulator meets; a \"[fex-keep-loads]\" "
                         "line says it is on.",
                 "sources": ["FEX/FEXCore/Source/Interface/IR/Passes/RedundantFlagCalculationElimination.cpp"]},
+    # build 660 (Madeira's FEX fork, branch codex/fex-runtime-consolidation: 16 commits by intraducine, the first a port of the Playport
+    # authors' work; opt-in in BCD's fork): FEXCore::FPState::X87ExactInt64. tests/host/check-fex-x87-exact.py.
+    "env.MADEIRA_FEX_X87_EXACT_INT64": {"category": "x86 emulation (FEX)", "title": "Experiment: exact 64-bit integers through the fast x87 mode",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: with the fast 64-bit x87 math (the default for 32-bit games), a 64-bit integer a program loads "
+                        "with FILD and stores again with FISTP comes back bit for bit, where the fast mode rounds it to 53 bits. "
+                        "32-bit programs built with Visual C++ read 64-bit values atomically that way; Batman: Arkham City and "
+                        "Injustice read a list head so and crash on the rounded pointer (the log's \"[x87-int64] ... verdict: LOST\"), "
+                        "and need Fast 64-bit x87 math off today. With it, saved x87 state (FXSAVE, FNSAVE, thread contexts) is "
+                        "also written in the processor's 80-bit format. It changes the code of every x87 instruction of the "
+                        "session's 32-bit programs, so it is set per game. Read when each program starts; a \"[fex-x87-exact]\" "
+                        "line says it is on. Not tried on a device in BCD yet.",
+                "sources": ["FEX/FEXCore/Source/Utils/FPState.cpp"]},
     "env.MADEIRA_FEX_SPLIT_LOCK": {"category": "x86 emulation (FEX)", "title": "Atomics across a 16-byte boundary done inline",
                 "kind": "bool", "default": "0",
                 "note": "Default off (build 652). 1: an x86 atomic (xchg with memory, lock xadd/add/sub/and/or/xor) whose operand crosses a "
@@ -2814,7 +3071,7 @@ OVERLAY = {
     # Porthole port, item 14 (tools/patch-fex-ios-callret-lean.py): an A/B experiment, off by default.
     "env.MADEIRA_FEX_CALLRET_LEAN": {"category": "x86 emulation (FEX)", "title": "64-bit JIT: no suspend check after a call returns (experiment)",
                 "kind": "bool", "default": "0", "sources": ["tools/patch-fex-ios-callret-lean.py"],
-                "note": "Default off; for comparing. 1: in the 64-bit (ARM64EC) JIT the point a guest CALL returns to no longer tests "
+                "note": "Default off; for comparing; Red Dead Redemption 2's recommended settings turn it on from build 665 (a player's tested RDR2 settings). 1: in the 64-bit (ARM64EC) JIT the point a guest CALL returns to no longer tests "
                         "the thread's suspend doorbell (the callee's own entry point, or the exit into ARM64EC code, tested it on "
                         "the way): two instructions fewer on every return from a call, and twelve bytes less code per call site. "
                         "Every other entry point and every backward jump keeps its test. It changes the code of every 64-bit "
@@ -2989,6 +3246,29 @@ OVERLAY = {
                         "actions in a helper that asks Windows Installer for everything over a pipe, and the first answer was dropped "
                         "(JunoInitializeSession returned 1603, build 593). Read at the first handover of a session.",
                 "sources": ["wine/server/thread.c"]},
+    # Build 660 (upstream Madeira's Wine fork, commit 243c626d56f by intraducine, taken behind a switch): read in the Windows server's thread.c
+    # (ios_apc_defer_issuer_enabled). Madeira does this in every session; here the "dropped" path is in half of all logs, so it is off.
+    "env.MADEIRA_APC_DEFER_ISSUER": {"category": "Exceptions & threads", "title": "An answer to a waiting request stays with its thread",
+                "kind": "bool", "default": "0",
+                "note": "Default off. BCD cannot interrupt a thread that is running, so when a read or write finishes for a thread that is not "
+                        "waiting, the finished request is handed to another thread of the program that is waiting; if there is none it is "
+                        "dropped (log: [apc-requeue] ... dropped, no waiting thread). 1: when the request is a synchronous one (the thread "
+                        "that started it is about to wait for it), it stays with that thread, which takes it at that wait (log: ... -> "
+                        "issuing thread). Unlike MADEIRA_APC_BUSY_QUEUE it also works in a session that uses the in-process sync engine, "
+                        "and only for synchronous requests. Off (or anything but exactly 1) changes nothing. Read for each session.",
+                "sources": ["wine/server/thread.c"]},
+    # Build 660 (upstream Madeira's ml1310, Wine fork a46ac90cd8a, narrowed by BCD in 23e42159f72): read in setupapi's queue.c
+    # (madeira_media_fix_applies). The scanner cut upstream's comment before it said what the values do.
+    "env.MADEIRA_SETUPAPI_MEDIA_FIX": {"category": "Wine libraries", "title": "Setup asks for the same disc only once",
+                "kind": "choice", "default": "",
+                "choices": [("", "Automatic: only for Windows' default answer"), ("1", "For every installer"), ("0", "Off: ask again for ever")],
+                "note": "An installer that copies files with Windows' setup functions asks for the source disc when a file is missing. "
+                        "With Windows' own default answer (\"same place\") that question came again for ever and the install never "
+                        "ended. Unset: for that default answer the missing file becomes a copy error, which the default answer skips, "
+                        "and a program's own answer is asked again as on Windows. 1: every program's answer is treated that way "
+                        "(a missing file after \"same place\" is a copy error). 0: ask again for ever, as before build 660. "
+                        "32-bit programs, and a 64-bit game that has setupapi in env.MADEIRA_OPTIN_DLLS.",
+                "sources": ["wine/dlls/setupapi/queue.c"]},
     # ajan16/bnet-apc (build 596): read through build/ntdll-unix/ios_iosb_dead.h by server_ios.c (invoke_system_apc); auto-tune's rule
     # wow64-native-iosb-completion-store says the crash it prevents is fixed in 596.
     "env.MADEIRA_IOSB_DEAD_TARGET": {"category": "Exceptions & threads", "title": "A finished read or write never stores into memory that is not there",
@@ -3292,6 +3572,8 @@ def scan():
             for pat, is_env in ((CFG, False), (ENV, True)):
                 for m in pat.finditer(txt):
                     reader, name, arg = m.group(1), m.group(2), (m.group(3) or "").strip()
+                    if name.endswith("."):   # madeira-bcd: a name built at run time ("env." + name) is no option of its own
+                        continue
                     if is_env or reader == "MadeiraConfig.flag":
                         key = "env." + name
                     else:

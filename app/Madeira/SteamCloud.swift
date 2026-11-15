@@ -787,6 +787,17 @@ struct SteamCloudUploadBlock: Sendable {
 }
 
 extension SteamCloudTransfer {
+    /// madeira-bcd: the bytes of a file of `fileCount` bytes that one upload block asks for, or nil when the block lies outside the file.
+    /// offset and length come from Steam: a sum past 2^64 or a length past Int.max stopped the app before; both lie outside the file.
+    static func blockRange(offset: UInt64, length: UInt64, fileCount: Int) -> Range<Int>? {
+        let (stop, overflow) = offset.addingReportingOverflow(length)
+        guard !overflow, length <= UInt64(fileCount) else { return nil }
+        let start = Int(min(offset, UInt64(fileCount)))
+        let end = Int(min(stop, UInt64(fileCount)))
+        guard end - start == Int(length) else { return nil }
+        return start..<end
+    }
+
     /// Sends the parts of one file where Steam asked for them. k_EHTTPMethodPOST
     /// is 3; Steam's storage otherwise takes PUT. Returns each part's HTTP status.
     @discardableResult
@@ -796,10 +807,10 @@ extension SteamCloudTransfer {
             guard let url = block.url else { throw SteamFileError.invalid("Steam gave no usable address for an upload.") }
             var body = block.explicitBody
             if body.isEmpty {
-                let start = Int(min(block.offset, UInt64(file.count)))
-                let end = Int(min(block.offset + block.length, UInt64(file.count)))
-                guard end - start == Int(block.length) else { throw SteamFileError.invalid("Steam asked for a part outside the file.") }
-                body = file.subdata(in: start..<end)
+                guard let range = blockRange(offset: block.offset, length: block.length, fileCount: file.count) else {
+                    throw SteamFileError.invalid("Steam asked for a part outside the file.")
+                }
+                body = file.subdata(in: range)
             }
             var request = URLRequest(url: url)
             request.httpMethod = block.method == 3 ? "POST" : "PUT"

@@ -97,7 +97,10 @@ struct BCDSteamSignInSheet: View {
                                       personaName: nil, avatar: nil,
                                       cloudAvailable: SteamOwnedLibrary.enabled, cloudOn: SteamCloudSetting.shared.on,
                                       setupAvailable: OnboardingModel.shared.available,
-                                      lanAvailable: SteamOwnedLibrary.enabled, lanOn: SteamLANSetting.enabled, lanHost: SteamLANSetting.host)
+                                      lanAvailable: SteamOwnedLibrary.enabled, lanOn: SteamLANSetting.enabled, lanHost: SteamLANSetting.host,
+                                      // Steam Friends (BCD Dock): offered once signed in; SteamOnlineStatus.offline is "Off", the default.
+                                      friendsAvailable: model.accountName != nil,
+                                      friendsStatus: BCDSteamFriends.Status(rawValue: SteamOnlineStatus.current.rawValue) ?? .off)
         if account != steam { steam = account }
         let progress = BCDSteamSignIn(busy: model.signInBusy, steamGuard: model.guardPrompt.map(Self.steamGuard),
                                       qrImage: model.qrImage, qrLink: model.qrLink, error: model.signInError)
@@ -140,6 +143,13 @@ struct BCDSteamSignInSheet: View {
     func setLANHost(_ address: String) {
         guard address.isEmpty || SteamLANSetting.isValidAddress(address) else { return }
         SteamLANSetting.host = address
+        read()
+    }
+    /// Steam Friends for games started through BCD Dock (SteamOnlineStatus, MadeiraDock.swift): off until the player chooses a status. The next
+    /// Dock start passes it on (MadeiraDock.configure); a running game is not touched. A defaults value does not publish, so the section is read again.
+    func setFriendsStatus(_ status: BCDSteamFriends.Status) {
+        SteamOnlineStatus.current = SteamOnlineStatus(rawValue: status.rawValue) ?? .offline
+        SteamLog.event("[dock-friends] setting \(status == .off ? "off" : "on")")
         read()
     }
     func runSetup() { OnboardingModel.shared.rerun() }

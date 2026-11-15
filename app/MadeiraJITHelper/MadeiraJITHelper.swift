@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 alantangok: code taken from https://github.com/willfaust/Madeira (pull request #541)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 // Madeira's JIT helper: a classic app extension that Madeira starts by its bundle ID
 // (app/Madeira/JITBuiltInHost.swift), so a sideloader's renamed install still finds it.
@@ -39,12 +41,30 @@ private enum StikJIT {
                         "Built-in JIT works only on a real device, not in the simulator."])
     }
     static func resetCachedDDI(at paths: DDIPaths) throws {}
+    static func isDDIMounted(pairingFile: URL) throws -> Bool { false }
 }
 #endif
 
 private enum MadeiraJITWork {
     /// One request at a time, as the XPC handler ran them before.
     static let queue = DispatchQueue(label: "com.willfaust.madeora.jit-helper")
+
+    /// Another preparation may install the cryptex after StikJIT's initial check
+    /// ("system: cryptex already exists", com.apple.security.cryptex 17).
+    /// Verify that it is now mounted, then retry the normal operation just once.
+    static func retryInstalledCryptex<T>(verifyMounted: () throws -> Bool,
+                                        operation: () throws -> T) throws -> T {
+        do { return try operation() }
+        catch {
+            let message = error.localizedDescription.lowercased()
+            guard message.contains("cryptexd("), message.contains("routine: \"install\""),
+                  message.contains("system: cryptex already exists:"),
+                  message.contains("com.apple.security.cryptex: 17)"),
+                  (try? verifyMounted()) == true else { throw error }
+            NSLog("[MadeiraJIT] DDI cryptex already installed and mounted; retrying once")
+            return try operation()
+        }
+    }
 
     static func handle(_ request: MadeiraJITRequest) -> MadeiraJITRequest.Response {
         let manager = FileManager.default
@@ -71,9 +91,18 @@ private enum MadeiraJITWork {
 
             switch request.operation {
             case .prepare:
-                let readiness = StikJIT.prepareDevice(
-                    pairingFile: pairingURL, paths: paths,
-                    progress: { NSLog("[MadeiraJIT] prepare: %@", String(describing: $0)) })
+                let readiness = try retryInstalledCryptex(verifyMounted: {
+                    try StikJIT.isDDIMounted(pairingFile: pairingURL)
+                }) {
+                    let state = StikJIT.prepareDevice(
+                        pairingFile: pairingURL, paths: paths,
+                        progress: { NSLog("[MadeiraJIT] prepare: %@", String(describing: $0)) })
+                    if case .preparationFailed(let reason) = state {
+                        throw NSError(domain: "MadeiraJITHelper", code: 3,
+                                      userInfo: [NSLocalizedDescriptionKey: reason])
+                    }
+                    return state
+                }
                 switch readiness {
                 case .ready(let security):
                     return .init(success: true,
@@ -95,6 +124,9 @@ private enum MadeiraJITWork {
                                   userInfo: [NSLocalizedDescriptionKey:
                                     "The request is missing the target process or BCD's JIT script."])
                 }
+                // madeira-bcd: no retry here (upstream #541 retries this call too). Enable attaches a debugger to BCD, and a retry
+                // that ran while another debugger session was live would attach a second one (U1 counter-review F1). The app joins
+                // overlapping Enables (JITBuiltInHost.swift, MadeiraBuiltInJIT.start); a duplicate install is reported as before.
                 try StikJIT.enableJIT(
                     targetPID: targetPID,
                     pairingFile: pairingURL,

@@ -41,6 +41,7 @@ Behaviour (swiftc; --require-swift makes its absence a failure):
 --bless writes NAME.expect from the current result (review it before committing).
 """
 import argparse
+import concurrent.futures
 import importlib.util
 import json
 import os
@@ -110,6 +111,8 @@ HOOKS = {
         # One modifier: ContentView's chain of alerts is at the type checker's limit (build of
         # 2026-10-16: "unable to type-check this expression in reasonable time").
         ".modifier(AutoTuneAlert())   // madeira-bcd: auto-tune's result (AutoTuneViews.swift); never shown while it is off",
+        # Round 660 (M140, owner 2026-11-15): Play waits (off the main thread, at most 5 s) for the verdict of an unclean earlier session.
+        "if AutoTune.holdPlayForVerdict(entry, spinner: spinner, then: { launchLibraryEntry(entry) }) { return }",
     ],
     # BCD's game page (BCDGamePage.swift): the game's switch, where its search stands, what it
     # tried, its report, keeping the found lines and Undo, each only while Settings › Auto-tune
@@ -401,13 +404,25 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
                 prior.update({k: out[k] for k in KEYS})
                 exp_path.write_text(json.dumps(prior, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
                 print(f"blessed {name}: {out['outcome']}, stage {out['stage']}, matched {out['matched']}, next {out['next']}")
-        for p in logs:
+        def replay_fixture(p):
+            """The fixture's replays: three chunk sizes, and a normal end for a killed session that crashed (checked below)."""
             exp = json.loads((FIX / (p.stem + ".expect")).read_text())
             runs = {}
             for chunk in (0, 4093, 7):
                 r = subprocess.run([str(replay), "--chunk", str(chunk), "--end", json.dumps(exp["end"])] + uk(exp) + [str(p)],
                                    capture_output=True, text=True)
                 runs[chunk] = json.loads(r.stdout) if r.returncode == 0 else {"error": r.stderr}
+            alt = None
+            if exp.get("end", {}).get("killed") and exp["outcome"] in ("crashed", "exited-early") and exp["matched"]:
+                r = subprocess.run([str(replay), "--end", "{}"] + uk(exp) + [str(p)], capture_output=True, text=True)
+                alt = json.loads(r.stdout)
+            return exp, runs, alt
+
+        # Build 663 (owner 2026-11-15, faster builds): the replays run AUTOTUNE_JOBS at a time (default 4), each its own process;
+        # the checks below read them in the fixtures' order, so the output is the serial run's.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, int(os.environ.get("AUTOTUNE_JOBS", "4")))) as pool:
+            replayed = list(pool.map(replay_fixture, logs))
+        for p, (exp, runs, alt) in zip(logs, replayed):
             got = runs[0]
             same = all(runs[c].get(k) == got.get(k) for c in (4093, 7) for k in KEYS + ("facts", "monoMissing"))
             diff = {k: (exp.get(k), got.get(k)) for k in KEYS if exp.get(k) != got.get(k)}
@@ -418,9 +433,7 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
                   not diff and same, "expected/got: %s; chunk sizes agree: %s" % (diff, same))
             # A crash read from the log alone (the app never came back) reads the same when the
             # session ended normally. A memory kill or a hang exists only on the first path.
-            if exp.get("end", {}).get("killed") and exp["outcome"] in ("crashed", "exited-early") and exp["matched"]:
-                r = subprocess.run([str(replay), "--end", "{}"] + uk(exp) + [str(p)], capture_output=True, text=True)
-                alt = json.loads(r.stdout)
+            if alt is not None:
                 check(f"{p.stem}: a normal end gives the same rules ({alt['outcome']})",
                       alt["outcome"] in ("crashed", "hung", "exited-early") and alt["matched"] == exp["matched"])
     engine = build(tmp, "engine", [CORE, RULES_SWIFT, R / "tests/host/autotune_engine_checks.swift"])

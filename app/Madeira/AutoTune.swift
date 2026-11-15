@@ -166,6 +166,48 @@ enum AutoTune {
         _ = group.wait(timeout: .now() + .seconds(waitCapSeconds))
         return Int((DispatchTime.now().uptimeNanoseconds - began.uptimeNanoseconds) / 1_000_000)
     }
+    /// Round 660 (M140, owner 2026-11-15): Play of a game whose earlier session ended unclean (only such a session holds the next start:
+    /// sessionEnded's holdsNextStart, recoverUnfinishedSession) and whose verdict is still being written waits for that verdict, off the main
+    /// thread and at most `playWaitSeconds`, so the line it prepares (the swap tier after a kill) reaches this start. In the logs the start
+    /// right after a kill missed it every time (HM8BT2, VE7JPH, 0AT1JC, AXH30R, G965DR, N2VA0W, XX0KAV), and each cost one more kill.
+    /// Main thread only. True: Play is held, `spinner(true)` has run, and `spinner(false)` then `then` run on the main thread once the
+    /// verdict landed or the wait ran out; a second Play of that game meanwhile is dropped. False: nothing is pending, or this start already
+    /// waited for this verdict once (`then` comes back through here): go straight on.
+    static let playWaitSeconds = 5
+    private static var playHeld: Set<String> = []
+    private static var playWaitedFor: [String: ObjectIdentifier] = [:]
+
+    static func holdPlayForVerdict(_ entry: LibraryEntry, spinner: @escaping (Bool) -> Void = { _ in },
+                                   then: @escaping () -> Void) -> Bool {
+        guard enabled else { return false }
+        let key = entry.windowsPath.lowercased()
+        if playHeld.contains(key) {
+            LogStore.shared.log("[autotune] \(entry.title): this Play is dropped; the one before it waits for the earlier session's verdict")
+            return true
+        }
+        pendingLock.lock()
+        let group = pendingAnalyses[key]
+        pendingLock.unlock()
+        guard let group, group.wait(timeout: .now()) == .timedOut, playWaitedFor[key] != ObjectIdentifier(group) else { return false }
+        playWaitedFor[key] = ObjectIdentifier(group)
+        playHeld.insert(key)
+        spinner(true)
+        LogStore.shared.log("[autotune] \(entry.title): the earlier session's verdict is still being written; this start waits for it (at most \(playWaitSeconds) s)")
+        let began = DispatchTime.now()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let landed = group.wait(timeout: .now() + .seconds(playWaitSeconds)) == .success
+            let ms = Int((DispatchTime.now().uptimeNanoseconds - began.uptimeNanoseconds) / 1_000_000)
+            DispatchQueue.main.async {
+                playHeld.remove(key)
+                spinner(false)
+                LogStore.shared.log("[autotune] \(entry.title): " + (landed ? "the verdict landed after \(ms) ms; this start goes on with it"
+                                                                         : "no verdict after \(ms) ms; this start goes on with the game's state as it was"))
+                then()
+            }
+        }
+        return true
+    }
+
     /// Whether the game's earlier session is still being analysed (no wait).
     static func analysisPending(_ windowsPath: String) -> Bool {
         pendingLock.lock()
@@ -183,7 +225,8 @@ enum AutoTune {
         let path = entry.windowsPath
         // Night round 2026-11-11 (agent T3 S7): the verdict about the last session of this game may still be being written. The lead did
         // not take the agent's wait (up to 20 s on the main thread, where this runs: the interface would freeze and iOS may end the app);
-        // the start says so instead, and the line that verdict prepares reaches the next start. An asynchronous wait is an owner's decision.
+        // the start says so instead, and the line that verdict prepares reaches the next start. Round 660 (M140): Play now waits for it
+        // off the main thread first (holdPlayForVerdict, at most 5 s); this line is left for a wait that ran out and for other starts.
         if analysisPending(path) {
             LogStore.shared.log("[autotune] \(entry.title): the earlier session's verdict is still being written; this start uses the game's state as it was")
         }
@@ -517,6 +560,10 @@ struct AutoTuneOffer: Equatable {
                     let limit = Self.limitWords(peakMB: peak, memoryPct: report.memoryPct)
                     text += "This iPhone lets apps use about \(limit), and \(title) needed more (its memory reached \(peak) MB). A swap file moves part "
                         + "of it to storage; an iPad or a newer iPhone has more room.\n\n"
+                } else if report.outcome == "killed", let words = Self.memoryKillWords(peakMB: report.peakMB, memoryPct: report.memoryPct) {
+                    // Round 660 (M089; ET20PC, D1JV6Y, APQJ9M, ZXHNTV, GRJN0M, W9K5YR, 64NXB1: every kill at 92-100 % of the limit): the reason in words,
+                    // before the lines; until now the player read only which lines BCD changed.
+                    text += words + "\n\n"
                 }
                 text += c.isEmpty ? "The next start runs the same settings once more: a first failure after an update often clears on its own."
                                  : "The next start tries: " + c.joined(separator: "; ") + "."
@@ -532,6 +579,13 @@ struct AutoTuneOffer: Equatable {
         guard let pct = memoryPct, (50...110).contains(pct), peakMB > 0 else { return "4 GB" }
         let gb = (Double(peakMB) * 100 / Double(pct) / 1024 * 10).rounded() / 10
         return gb == gb.rounded() ? "\(Int(gb)) GB" : String(format: "%.1f GB", gb)
+    }
+
+    /// Round 660 (M089): a memory kill whose last footprint line was at 95 % of the limit or more, in words; nil below that or without the numbers.
+    static func memoryKillWords(peakMB: Int?, memoryPct: Int?) -> String? {
+        guard let peak = peakMB, let pct = memoryPct, (95...110).contains(pct), peak > 0 else { return nil }
+        return "iOS ended the game because it used all the memory iOS gives BCD on this device (it reached \(peak) MB of about "
+            + "\(limitWords(peakMB: peak, memoryPct: pct))). BCD tries other memory settings on the next start."
     }
 
     /// Night round 2026-11-11 (T1 S2): for a memory kill on a phone whose limit is about 6 GB (8 GB phones: 6143 MB), the class in words; nil for any

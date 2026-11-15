@@ -167,7 +167,8 @@ pool = pool[:pool.index('let elapsed = CFAbsoluteTimeGetCurrent() - t0')]
 require('let requestCaption = StikJITHelper.announceRiskyRequest()' in pool and 'if requestCaption { StikJITHelper.clearRequestCaption() }' in pool
         and pool.index('announceRiskyRequest()') < pool.index('let t0 = CFAbsoluteTimeGetCurrent()') < pool.index('StikJITHelper.allocatePool(') < pool.index('clearRequestCaption()'),
         'ContentView: the caption before the request (not counted in "BRK suspension lasted"), cleared when it returns')
-require('StikJITHelper.noteRequestMethod(jitCoordinator.resolvedMethod)' in content
+# Round 660 (M138): the method that attached through BCD (requestMethod), else the order before round 660; see check-jit-method.py.
+require('StikJITHelper.noteRequestMethod(jitCoordinator.requestMethod)' in content
         and content.index('StikJITHelper.noteRequestMethod(') < content.index('logStore.uiPaused = true'), 'the method is read on the main thread, before the sequence goes to a background queue')
 require('@Published var poolWait: String?' in library and 'poolWait = nil   // night round 2026-11-11 (M7)' in library and 'desktopNotices = []; poolWait = nil' in library,
         'LibraryModel keeps the line, a start begins and ends without one')

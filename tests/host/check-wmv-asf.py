@@ -32,7 +32,7 @@ This test (Linux or macOS, needs a configured Wine tree for the generated header
   4. The demuxer (winedmo's unix side): the same files read through its unix call table with the PE
      callbacks emulated, stream types, packets, BUFFER_TOO_SMALL, seek, EOF.
 
-Environment: MADEIRA_FFMPEG_TARBALL (default: build/ffmpeg/src/ffmpeg-7.1.1.tar.xz), MADEIRA_HOST_FFMPEG (prefix
+Environment: MADEIRA_FFMPEG_TARBALL (default: build/ffmpeg/src/ffmpeg-7.1.5.tar.xz), MADEIRA_HOST_FFMPEG (prefix
 of an existing host build with the components below), MADEIRA_WINE_SRC (default: wine/; the submodule's test
 media), MADEIRA_WINE_BUILD (a configured Wine build tree whose include/ holds config.h and the widl-generated
 headers; default: wine/build-macos, the tree build/ntdll-unix/build.sh uses).
@@ -157,7 +157,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check("only the three intended lines of Wine's file change", len(changed) == 3)
 
 # ------------------------------------------------------------------ 2. host FFmpeg
-tarball = os.environ.get("MADEIRA_FFMPEG_TARBALL") or str(root / "build/ffmpeg/src/ffmpeg-7.1.1.tar.xz")
+tarball = os.environ.get("MADEIRA_FFMPEG_TARBALL") or str(root / "build/ffmpeg/src/ffmpeg-7.1.5.tar.xz")
 FLAGS = [
     "--disable-everything", "--disable-autodetect", "--disable-gpl", "--disable-nonfree", "--disable-version3",
     "--enable-decoder=wmav1,wmav2,wmapro,wmalossless,xma1,xma2",
@@ -173,18 +173,18 @@ FLAGS = [
 prefix = os.environ.get("MADEIRA_HOST_FFMPEG")
 if not prefix:
     key = hashlib.sha256(" ".join(FLAGS).encode()).hexdigest()[:12]
-    prefix = str(Path.home() / ".cache/madeira-host-ffmpeg" / ("7.1.1-" + key))
+    prefix = str(Path.home() / ".cache/madeira-host-ffmpeg" / ("7.1.5-" + key))
     if not (Path(prefix) / "lib/libavcodec.a").exists():
         assert Path(tarball).exists(), "no FFmpeg tarball at %s" % tarball
         src = Path(prefix + "-src")
         src.mkdir(parents=True, exist_ok=True)
-        if not (src / "ffmpeg-7.1.1/configure").exists():
+        if not (src / "ffmpeg-7.1.5/configure").exists():
             subprocess.run(["tar", "-xJf", tarball, "-C", str(src)], check=True)
         bld = Path(prefix + "-build")
         bld.mkdir(parents=True, exist_ok=True)
         print("building host FFmpeg into", prefix, flush=True)
         log = open(str(bld) + ".log", "w")
-        subprocess.run([str(src / "ffmpeg-7.1.1/configure"), "--prefix=" + prefix, "--cc=cc"] + FLAGS,
+        subprocess.run([str(src / "ffmpeg-7.1.5/configure"), "--prefix=" + prefix, "--cc=cc"] + FLAGS,
                        cwd=bld, check=True, stdout=log, stderr=subprocess.STDOUT)
         subprocess.run(["make", "-j%d" % (os.cpu_count() or 4)], cwd=bld, check=True, stdout=log, stderr=subprocess.STDOUT)
         subprocess.run(["make", "install"], cwd=bld, check=True, stdout=log, stderr=subprocess.STDOUT)

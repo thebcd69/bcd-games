@@ -45,8 +45,9 @@ opt = opt[:opt.index('\nfi\n') + 4]
 check('each is built only where no <name>.dll ships, and MADEIRA_OPTIN_BUILD=0 skips them',
       '"${MADEIRA_OPTIN_BUILD:-1}" != 0' in opt and 'shipped "$d" && continue' in opt and
       'targets="$targets dlls/$d/arm64ec-windows/$d.dll"; OPT="$OPT $d"' in opt)
-check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624; combase-optin.dll, CMB, round 2026-11-11)',
-      '$WER$WTY$OPT$SDL$DCO$CMB" ]' in build)
+check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624; combase-optin.dll, CMB, round 2026-11-11; '
+      'kernel32-usd.dll, KUD, build 663)',
+      '$WER$WTY$OPT$SDL$DCO$CMB$KUD" ]' in build)
 ship = build[build.index('for d in $OPT; do'):]
 ship = ship[:ship.index('\ndone\n') + 6]
 check('each ships as <name>-optin.dll, stripped and padded, never as <name>.dll',
@@ -301,7 +302,7 @@ check('auto-tune has paradox-launcher-installer-msi: the five msi DLLs, only for
 check('its fixture proves it', '"paradox-launcher-installer-msi"' in (root / 'tests/fixtures/autotune/paradox-launcher-wiutil-qzb4qb-2026-11-08.expect').read_text())
 check('RecommendationsPolicy lets a downloaded list name the new libraries and combase',
       '["msvcp_win", "bluetoothapis", "gameinput", "ntdsapi", "mfplay", "avicap32", "coremessaging", "combase"].contains($0)' in policy
-      and 'or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase")' in policy)
+      and 'or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase, or dxcompiler")' in policy)
 # the catalog note names them
 check('the catalog note names the libraries and combase', 'msvcp_win (DRAGON BALL FighterZ' in gen and 'combase is the second name BCD ships for every game' in gen)
 wf = (root / '.github/workflows/build-ipa.yml').read_text()

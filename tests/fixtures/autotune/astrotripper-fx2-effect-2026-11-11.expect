@@ -1,0 +1,13 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "hlsl-fx2-effect-writer",
+  "install-script-registry-silent-exit"
+ ],
+ "next": [],
+ "note": "AstroTripper (AstroTripper.exe, 32-bit, BCD Dock, Send Log 41T6YN, build 653, iPad16,3): the fx_2_0 effect ..\\package\\xstyles\\fx\\z_default.fx compiled from text at start is refused (E5017 'Writing fx_2_0 sampler objects initializers is not implemented', 'Write pass assignments'), and 0.2 s later the same thread calls ID3DXEffect::GetParameterByName on the NULL effect (AstroTripper.exe+0x2d785: a COM call of vtable slot 9 with this pushed). Rule hlsl-fx2-effect-writer (fixedIn 660: Madeira #575's fx_2_0 writer, Wine fork 8be7412f882 + ddf92babc5b, with BCD's compile-state reset) speaks; steam-sdk-null-client-32bit, the same fault on the builds before the compile diagnostic, is silent while the refusal is in the log (none:). Not proven: that the game's own effect has no construct the new writer still refuses, and that d3dx9 then runs it on a device.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "known"
+}

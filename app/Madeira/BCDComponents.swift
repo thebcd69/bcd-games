@@ -461,10 +461,22 @@ enum BCDLogComment {
     static func ask(for log: URL? = nil, _ send: @escaping (String) -> Void, cancelled: (() -> Void)? = nil) {
         let starting = prefill
         prefill = ""
+        ask(for: log, starting: starting, send, cancelled: cancelled, attempt: 0)
+    }
 
+    /// Round 660 (M123; Epimutation SA3XES: Send Log pressed while auto-tune's offer was on screen): a controller that is still
+    /// presenting or dismissing another one cannot present this box; UIKit dropped it, neither `send` nor `cancelled` ran, and the
+    /// game page's await leaked its continuation ("SWIFT TASK CONTINUATION MISUSE"). Look again every half second, six times, then
+    /// end as a cancel (or an empty comment for a caller without one), so that whoever waits always gets an answer.
+    private static func ask(for log: URL?, starting: String, _ send: @escaping (String) -> Void, cancelled: (() -> Void)?, attempt: Int) {
         // A moment later: the button that asked may be closing its own alert or menu.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + (attempt == 0 ? 0.4 : 0.5)) {
             guard let top = topController() else { return send("") }
+            if top.presentedViewController != nil || top.isBeingDismissed || top.isBeingPresented {
+                if attempt < 6 { return ask(for: log, starting: starting, send, cancelled: cancelled, attempt: attempt + 1) }
+                if let cancelled { cancelled() } else { send("") }
+                return
+            }
             let shot = log.flatMap { screenshotFor?($0) }
             var message = "Add a comment if you like: what happened, what the log can't show (low FPS and "
                 + "where, a stutter, what was on screen). Please don't write personal details."

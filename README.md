@@ -283,7 +283,8 @@ layouts, the Amazon Games store and more, listed file by file in THIRD-PARTY-NOT
 **Contributors to BCD:** [mckenna654](https://github.com/mckenna654), [Pardoxum](https://github.com/Pardoxum),
 [le0-VV](https://github.com/le0-VV), [rtmtree](https://github.com/rtmtree), [vancez](https://github.com/vancez),
 [creeper4004](https://github.com/creeper4004), [iqui27](https://github.com/iqui27), [Taala2](https://github.com/Taala2),
-[pauloec](https://github.com/pauloec) and [rbarton124](https://github.com/rbarton124).
+[pauloec](https://github.com/pauloec), [rbarton124](https://github.com/rbarton124) and
+[netheritenee](https://www.reddit.com/user/netheritenee).
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by

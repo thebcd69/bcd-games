@@ -439,7 +439,7 @@ check(kind(editRule("rdr2-steam") { $0["switches"] = ["fpsMode": 9] }) == .forma
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["resolution": "huge"] }) == .format, "a resolution that is not WxH")
 check(kind(editRule("rdr2-steam") { $0["switches"] = ["display": "zoom"] }) == .format, "a display mode that does not exist")
 check(kind(editRule("rdr2-steam") { $0["version"] = "11" }) == .format, "a version as text")
-check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 15,", with: "\"version\": 15.5,")   /* rdr2-steam v15 (build 634) */.utf8)) == .format,
+check(kind(Data(String(decoding: builtInData, as: UTF8.self).replacingOccurrences(of: "\"version\": 16,", with: "\"version\": 16.5,")   /* rdr2-steam v16 (build 665) */.utf8)) == .format,
       "a version that is not whole")
 check(kind(editRule("breakneck") { $0["match"] = ["programs": [["name": #"C:\Games\breakneck.exe"#]]] }) == .format, "a program with a folder")
 check(kind(editRule("breakneck") { $0["match"] = ["steamFolders": ["Breakneck"]] }) == .format, "a Steam folder not lowercased")

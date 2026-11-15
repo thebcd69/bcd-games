@@ -25,11 +25,14 @@ final class BCDHTTPStream: NSObject, URLSessionDataDelegate, @unchecked Sendable
     private final class Request {
         let consumer: BCDHTTPConsumer
         let offset: Int64
+        /// Where the bytes asked for start in the server's file: 0, or a slice's first byte (`fetch(slice:)`, build 663).
+        let base: Int64
         let continuation: CheckedContinuation<Void, Error>
         var failure: Error?
-        init(_ consumer: BCDHTTPConsumer, _ offset: Int64, _ continuation: CheckedContinuation<Void, Error>) {
+        init(_ consumer: BCDHTTPConsumer, _ offset: Int64, _ base: Int64, _ continuation: CheckedContinuation<Void, Error>) {
             self.consumer = consumer
             self.offset = offset
+            self.base = base
             self.continuation = continuation
         }
     }
@@ -62,15 +65,21 @@ final class BCDHTTPStream: NSObject, URLSessionDataDelegate, @unchecked Sendable
 
     /// GETs `request` into `consumer`, continuing a dropped connection up to `resumes` times.
     /// Status codes other than 200 and 206 throw `BCDContentError.http`.
-    func fetch(_ request: URLRequest, into consumer: BCDHTTPConsumer, resumes: Int = 2) async throws {
+    ///
+    /// `slice` (build 663, GOG's generation 1): only these bytes of the server's file are the body, asked for with a Range every
+    /// time (from what arrived so far); the whole file (200) is refused for a slice that does not start at its first byte. nil: the
+    /// whole file, exactly as before.
+    func fetch(_ request: URLRequest, into consumer: BCDHTTPConsumer, resumes: Int = 2, slice: ClosedRange<Int64>? = nil) async throws {
         var dropped = 0
         while true {
             try Task.checkCancellation()
             let offset = consumer.received
             var attempt = request
-            if offset > 0 { attempt.setValue("bytes=\(offset)-", forHTTPHeaderField: "Range") }
+            if let slice {
+                attempt.setValue("bytes=\(slice.lowerBound + offset)-\(slice.upperBound)", forHTTPHeaderField: "Range")
+            } else if offset > 0 { attempt.setValue("bytes=\(offset)-", forHTTPHeaderField: "Range") }
             do {
-                try await one(attempt, offset: offset, consumer: consumer)
+                try await one(attempt, offset: offset, base: slice?.lowerBound ?? 0, consumer: consumer)
                 return
             } catch let error as URLError where Self.resumable(error) && dropped < resumes && consumer.received > offset {
                 dropped += 1
@@ -89,12 +98,12 @@ final class BCDHTTPStream: NSObject, URLSessionDataDelegate, @unchecked Sendable
         [.networkConnectionLost, .timedOut, .cannotParseResponse, .badServerResponse].contains(error.code)
     }
 
-    private func one(_ request: URLRequest, offset: Int64, consumer: BCDHTTPConsumer) async throws {
+    private func one(_ request: URLRequest, offset: Int64, base: Int64, consumer: BCDHTTPConsumer) async throws {
         let task = session.dataTask(with: request)
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 lock.lock()
-                requests[task.taskIdentifier] = Request(consumer, offset, continuation)
+                requests[task.taskIdentifier] = Request(consumer, offset, base, continuation)
                 lock.unlock()
                 if Task.isCancelled { task.cancel() }
                 task.resume()
@@ -119,13 +128,15 @@ final class BCDHTTPStream: NSObject, URLSessionDataDelegate, @unchecked Sendable
         do {
             switch status {
             case 200:
+                // The whole file for a slice that starts further in: not the bytes asked for (base is 0 for every other request).
+                guard request.base == 0 else { throw BCDContentError.http(200) }
                 try request.consumer.begin(at: 0)
             case 206:
                 // "bytes <start>-<end>/<total>": the body must start where the request asked.
                 let range = (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Range") ?? ""
                 let start = range.hasPrefix("bytes ") ? Int64(range.dropFirst(6).prefix { $0 != "-" }) : nil
-                guard let start, start == request.offset else { throw BCDContentError.http(206) }
-                try request.consumer.begin(at: start)
+                guard let start, start == request.base + request.offset else { throw BCDContentError.http(206) }
+                try request.consumer.begin(at: start - request.base)
             default:
                 throw BCDContentError.http(status)
             }

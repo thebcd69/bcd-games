@@ -1,0 +1,42 @@
+DirectX Shader Compiler (DXC): dxcompiler.dll for 64-bit Windows programs
+
+  Project:   https://github.com/microsoft/DirectXShaderCompiler (Microsoft and the LLVM Team; DXC is a fork of LLVM/Clang 3.7)
+  Licence:   the University of Illinois/NCSA Open Source Licence (LLVM's old release licence) for the compiler, with the third-party
+             parts its LICENSE.TXT lists: miniz (MIT; public domain for miniz.c), Henry Spencer's regex code (its own permissive
+             terms), ConvertUTF (Unicode, Inc.), MD5 (public domain / permissive), regstrlcpy.c (ISC-style, Todd C. Miller).
+             Copyright (c) 2003-2015 University of Illinois at Urbana-Champaign; DXC's own files: Copyright (C) Microsoft Corporation,
+             "distributed under the University of Illinois Open Source License". All of it may be combined with GPL-3.0 code. The
+             project's LICENSE.TXT and ThirdPartyNotices.txt are kept exactly as received in LICENSES/DirectXShaderCompiler-LICENSE.txt
+             and LICENSES/DirectXShaderCompiler-ThirdPartyNotices.txt (and in the app: legal/LICENSES/).
+  Version:   DXC 1.9.2609 (released 2026-09-29), tag v1.9.2609, commit 01b62ad47db7dee3dd33f90e7339cf9e860b3f93.
+  Taken from the project's repository at that tag (tools/build-dxcompiler.sh clones it and refuses any other commit); three of its
+  submodules are fetched at the commits the tag pins, only because the macOS configure of the two host tablegen tools asks for them
+  (DXC turns SPIR-V on for every non-Windows host): external/DirectX-Headers (MIT, 980971e835876dc0cde415e8f9bc646e64667bf7),
+  external/SPIRV-Headers (Khronos, MIT-style, 496543121ce6419f23d6fa5d7194ba66c36212d2) and external/SPIRV-Tools (Apache-2.0,
+  ef96ed763b43b59b33b31b362f09a02b729fa1c9). Nothing of them is built into the DLL (the Windows build has SPIR-V off).
+  NOT used: Microsoft's own release binaries (dxc_2026_09_29.zip). That package carries the Microsoft Software License Terms
+  ("solely for use on Windows", distribution restrictions), and its dxil.dll is a separate validator BCD does not need: since DXC
+  1.8.2502 the compiler hashes ("signs") its output itself, and wgpu does not load dxil.dll.
+
+  Changes by BCD to the source: one patch, build/dxc-win/0001-mingw-w64-build.patch, which makes the tree build with MinGW-w64
+  (llvm-mingw). It is DXC pull request #8265 by Raed Rizqie ("[MinGW] Test building on different platforms",
+  https://github.com/microsoft/DirectXShaderCompiler/pull/8265, five commits of 2026-03-11, head c1d55772d52b54a28c69f713964295d7a407da7f;
+  closed unmerged on 2026-10-29), offered to the project under its licence, applied with two changes: (1) the second of its two
+  StringRef.h hunks is left out (it removes the is_nothrow_constructible specialisations, which v1.9.2609 already skips under libc++;
+  the first, #include <cstdint>, is kept); (2) its MinGW define of
+  MS_SUPPORT_VARIABLE_LANGOPTS (tools/clang/CMakeLists.txt) is replaced: that define turns DXC's fixed HLSL language options into clang's
+  variable ones with C defaults, and the DLL then read HLSL as C ("unknown type name 'float4'", seen on the Mac's Wine). BCD keeps them
+  fixed and gives MinGW the out-of-class definitions LLVM's Unix build already has (tools/clang/lib/Basic/LangOptions.cpp).
+  What the patch does: under MinGW the Windows build uses MinGW-w64's own COM headers (unknwn.h, objidl.h) instead of DXC's non-Windows
+  adapter, so the COM objects keep the Windows vtable layout a Windows program calls; MSVC-only parts (ETW tracing, DIA, the DXBC
+  converter) are left out; COFF enum names that clash with MinGW-w64's winnt.h are taken from it.
+
+  Build (tools/build-dxcompiler.sh): llvm-tblgen and clang-tblgen for the Mac from the same tree, then the dxcompiler target for
+  x86_64-w64-mingw32 with the tracked llvm-mingw (20260421, ucrt) and build/dxc-win/mingw-x86_64.cmake; SPIR-V, the tests and the DXBC
+  converter are off; libc++, libunwind and the MinGW-w64 runtime are linked in statically (-static): Apache-2.0 with LLVM exception
+  and LICENSES/MinGW-w64-runtime.txt. The stripped DLL (about 21 MB) imports only kernel32, ole32, oleaut32 and the UCRT's api-ms-win-crt
+  sets (tools/check-dxcompiler-shipped.py). The build maps its source and build directories away (-ffile-prefix-map), so no path of the
+  build machine is inside. Its version resource is DXC's own, unchanged.
+  It ships as app/Madeira/arm64ec-windows/dxcompiler-optin.dll and runs as dxcompiler.dll only in a session of a game whose file has
+  env.MADEIRA_OPTIN_DLLS = dxcompiler (app/Madeira/WineProcessBridge.m links it into sysx64, and system32 in an ARM64EC session).
+  It is a separate DLL a Windows program loads at run time; nothing of DXC is linked into BCD.

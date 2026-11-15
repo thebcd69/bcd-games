@@ -654,9 +654,12 @@ volatile int g_madeira_srv_fgetpath = 0, g_madeira_srv_eco_follow = 0, g_madeira
 static int g_stops;
 static int g_wine_exit_code = 0;   /* wine_process_exit_code()'s plain global (the boot thread copies the thread-local status into it) */
 static int g_gl_love_hint_set;   /* round 632 (OpenGL): bcd_gl_session_setup's LOVE hint, defined elsewhere in the bridge; the session end drops it */
+static int g_kk_cache_dir_set, g_kk_cache_size_set;   /* KosmicKrisp: the shader cache variables bcd_vulkan_session_setup set; the session end drops them */
 int g_wineserver_desktop_shutdown;   /* the desktop Stop flag (WineServerBridge.m; native Duo interface): idle, so the session end runs as always */
 _Thread_local volatile int wine_ios_exit_code = 0;
 void wineserver_stop(void) { g_stops++; }
+static int g_japanese_ends;   /* round 660 (U2): the session end puts back LC_ALL and LANG as before the Japanese locale (BCDJapanese.c) */
+void bcd_japanese_session_end(void) { g_japanese_ends++; }
 void wine_session_note_launch_exit(int status);
 int wine_launched_exit_stuck(int32_t *code, double *seconds);
 void wine_session_abandon(void);

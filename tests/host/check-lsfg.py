@@ -91,7 +91,7 @@ check("the workflow runs the script before the i386 farm key, and this check",
       SCRIPT in chain and wf.index("python3 tools/patch-dxmt-lsfg.py") < wf.index("name: i386 farm revision")
       and "run: python3 tests/host/check-lsfg.py" in wf)
 check("d3d11-src.dll is built with it and an IPA without it is refused (BCD_PATCHES, the workflow's marker list)",
-      '"patch-dxmt-lsfg.py" "[lsfg] madeira-bcd ")' in sh and '"[view-ref] madeira-bcd #" "[lsfg] madeira-bcd "; do' in wf
+      '"patch-dxmt-lsfg.py" "[lsfg] madeira-bcd "' in sh and '"[view-ref] madeira-bcd #" "[lsfg] madeira-bcd "' in wf
       and "[lsfg] madeira-bcd {} {} get frame generation" in mod.HEADER)
 
 came_patched = mod.MARKER in (SRC / "d3d11/d3d11_swapchain.cpp").read_text()

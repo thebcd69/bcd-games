@@ -2,6 +2,8 @@
  * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 The Porthole authors: code taken from https://github.com/tylerkaska112/Porthole (commit 99ec315, patches 0191 and 0196)
  * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
+/* Portions copyright 2026 Shitiz Garg and intraducine: code taken from https://github.com/willfaust/Madeira (branch codex/d3d12-consolidation,
+ * commits 5a3db65, 984ed08, 3557bae and 826a967) under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*  madeira-d3d12: M2 native D3D12 ABI slice.
  *
  *  The minimum set of objects the design's M2 gate names: a device that can
@@ -26,6 +28,7 @@
 #include <d3d12.h>
 #include <dxgi1_5.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -373,6 +376,9 @@ struct mad_copy {
     UINT64 len;
 };
 
+struct mad_smp_cache_ent;
+static SRWLOCK g_smp_cache_lock = SRWLOCK_INIT;   /* sampler-cache: guards every device's smp_cache and smp_cache_n */
+
 struct mad_device {
     ID3D12Device10Vtbl *vtbl;   /* ml877: full Device10 slot table, Device1..8 answered */
     LONG refs;
@@ -495,6 +501,10 @@ struct mad_device {
     struct { UINT64 key; obj_handle_t pso; } clr_pso[32]; unsigned nclr_pso;
     LONG64 hp_live_bytes, hp_total_bytes; LONG hp_textures, hp_fallbacks;
     LUID adapter_luid;   /* madeira-bcd: GetAdapterLuid, the DXGI adapter it was created on */
+    /* sampler-cache (bcd.cfg, default 1; see CreateSampler): NULL and 0 until the first sampler is cached. Last, so that no
+     * other member moves. */
+    struct mad_smp_cache_ent *smp_cache;
+    LONG smp_cache_n;
 };
 static LONG g_tview_live, g_tview_made, g_xview_live;   /* ml1126 */
 static LONG g_resolve_locked, g_resolve_miss;   /* ml1132: address lookups that took live_lock */
@@ -1130,6 +1140,50 @@ static void mad_skip_report(void) {
 }
 
 static void mad_log_nserror(const char *what, obj_handle_t err);
+
+/* madeira-bcd (round 660, M010): a pipeline whose blend factors read the pixel shader's second output (SRC1_* / INV_SRC1_*) while the
+ * converted pixel shader writes none: Metal refuses it ("Fragment shader does not write to render target color(0), index(1) that is
+ * required for blending"), and every draw with it was skipped (Freddy's House Z2YH7Y, Poppy Playtime and ReSkate: 16 logs). Only the
+ * SM5 (DXBC) path compiles a dual-source pixel stage; a DXIL one never gets that output. For such a refusal the pipeline is built
+ * once more with those factors dropped (SRC1 -> ZERO, INV_SRC1 -> ONE): the target blends as if the second output were zero, which
+ * draws the object instead of leaving it out. Any other refusal, and every pipeline Metal accepts, is untouched. */
+static int mad_err_wants_dual_source(obj_handle_t err) {
+    char text[600] = "";
+    obj_handle_t desc;
+    if (!err) return 0;
+    desc = NSObject_description(err);
+    if (desc) NSString_getCString(desc, text, sizeof text, WMTUTF8StringEncoding);
+    return strstr(text, "index(1) that is required for blending") != NULL;
+}
+static int mad_rp_drop_dual_source(struct WMTRenderPipelineInfo *rp) {
+    int changed = 0;
+    unsigned i, k;
+    for (i = 0; i < 8; i++) {
+        enum WMTBlendFactor *f[4] = { &rp->colors[i].src_rgb_blend_factor, &rp->colors[i].dst_rgb_blend_factor,
+                                      &rp->colors[i].src_alpha_blend_factor, &rp->colors[i].dst_alpha_blend_factor };
+        for (k = 0; k < 4; k++) {
+            if (*f[k] == WMTBlendFactorSource1Color || *f[k] == WMTBlendFactorSource1Alpha) { *f[k] = WMTBlendFactorZero; changed = 1; }
+            else if (*f[k] == WMTBlendFactorOneMinusSource1Color || *f[k] == WMTBlendFactorOneMinusSource1Alpha) { *f[k] = WMTBlendFactorOne; changed = 1; }
+        }
+    }
+    return changed;
+}
+/* The pipeline as Metal builds it; one second try without the dual-source factors after that one refusal (see above). The first
+ * refusal is logged here; err holds the second one's, or nothing when it worked. */
+static obj_handle_t mad_new_render_pipeline(obj_handle_t dev, struct WMTRenderPipelineInfo *rp, const struct WMTVertexDescriptorInfo *vd,
+                                            obj_handle_t *err, const char *what) {
+    obj_handle_t rps = vd ? MTLDevice_newRenderPipelineStateVD(dev, rp, vd, err) : MTLDevice_newRenderPipelineState(dev, rp, err);
+    if (!rps && *err && mad_err_wants_dual_source(*err) && mad_rp_drop_dual_source(rp)) {
+        static LONG said;
+        mad_log_nserror(what, *err);
+        *err = 0;
+        rps = vd ? MTLDevice_newRenderPipelineStateVD(dev, rp, vd, err) : MTLDevice_newRenderPipelineState(dev, rp, err);
+        if (InterlockedIncrement(&said) <= 8)
+            d3d12_log("[madeira-d3d12] dual-source blend dropped for pipeline (vs '%s'): its pixel shader writes no second output; %s\n",
+                      what ? what : "", rps ? "built without the SRC1 factors" : "still refused");
+    }
+    return rps;
+}
 static void mad_queue_revive(struct mad_device *d);
 struct mad_list; struct mad_queue;
 static void mad_list_rings_rewind(struct mad_list *l);
@@ -1185,15 +1239,17 @@ static int mad_smpdesc_get(UINT64 id, struct mad_smpdesc *out) {
     ReleaseSRWLockShared(&g_smpdesc_lock);
     return found;
 }
-static void mad_note_sampler(struct mad_device *d, obj_handle_t smp) {
+/* Returns whether the list kept the sampler (0: it was released here). Only sampler-cache reads the answer. */
+static int mad_note_sampler(struct mad_device *d, obj_handle_t smp) {
     int kept = 0;
-    if (!d || !smp) return;
+    if (!d || !smp) return 0;
     AcquireSRWLockExclusive(&d->list_lock);
     if (mad_grow((void **)&d->samplers, &d->samplers_cap, d->nsamplers + 1, sizeof *d->samplers)) {
         d->samplers[d->nsamplers++] = smp; kept = 1;
     }
     ReleaseSRWLockExclusive(&d->list_lock);
     if (!kept) NSObject_release(smp);
+    return kept;
 }
 /* ---- resources ----------------------------------------------------------
  * Buffers only for now. The CPU-visible heaps get storage allocated here and
@@ -6519,8 +6575,7 @@ static obj_handle_t mad_pso_realize(struct mad_pso *p) {
         obj_handle_t err = 0, built = 0;
         LONG64 t0 = mad_qpc();   /* madeira-bcd */
         if (!p->lz || mad_lzlib_restore(p))   /* madeira-bcd pso-lazy-libs: the libraries come back first */
-            built = p->has_vd ? MTLDevice_newRenderPipelineStateVD(p->device_handle, &p->rp, &p->vd, &err)
-                              : MTLDevice_newRenderPipelineState(p->device_handle, &p->rp, &err);
+            built = mad_new_render_pipeline(p->device_handle, &p->rp, p->has_vd ? &p->vd : NULL, &err, p->vs_name);   /* M010 */
         if (built) { MemoryBarrier(); p->rps = built; }   /* pso-async: draws on other threads read rps without the lock */
         if (err) mad_log_nserror(p->vs_name, err);
         InterlockedExchangeAdd64(&g_pt_realize, mad_qpc() - t0); InterlockedIncrement(&g_pn_realize);
@@ -10291,6 +10346,7 @@ static void exec_resolve(struct mad_exec *e, const struct mad_cmd *c) {
     if (dview) NSObject_release(dview);
 }
 
+static volatile LONG g_cs_concurrent = -1;   /* madeira-duo cs-concurrent, see exec_dispatch */
 static void exec_dispatch(struct mad_exec *e, const struct mad_cmd *c) {
     struct wmtcmd_compute_setpso c_pso;
     e->wr_all = 1;   /* ml1116: a dispatch writes through UAVs we do not enumerate here */
@@ -10332,7 +10388,26 @@ static void exec_dispatch(struct mad_exec *e, const struct mad_cmd *c) {
     if (!e->cenc) {
         if (e->renc) InterlockedIncrement(&g_pass_end_dispatch);
         exec_end(e);
-        e->cenc = MTLCommandBuffer_computeCommandEncoder(e->cb, false); if (e->cenc) g_enc_seq++;
+        /* madeira-duo cs-concurrent: D3D12 orders dispatches only at a UAV or
+         * transition barrier, and every barrier here ends the compute encoder
+         * (fence-chain 1..5; f6 keeps it open, so stays serial). Inside one
+         * encoder the dispatches are independent, so a concurrent encoder lets
+         * the GPU overlap them. PoE2 fights issue 2,500-5,300 dispatches a frame
+         * of ~4 threadgroups each in ~35 encoders; serial, each waits for the
+         * last to drain (text14: GPU 72-116 ms a frame). Opt-in:
+         * bcd.cfg cs-concurrent = 1 (default 0 = serial encoders, as before).
+         * madeira-bcd (build 660): taken from upstream Madeira's codex/d3d12-consolidation
+         * (984ed082, 826a9678). A game that relies on the order of two dispatches with no
+         * barrier between them would render wrongly with it, which is why it is a switch. */
+        LONG cs_concurrent = InterlockedCompareExchange(&g_cs_concurrent, 0, 0);
+        if (cs_concurrent < 0) {
+            LONG configured = mad_cfg_int_pe("cs-concurrent", 0) ? 1 : 0;   /* 1 = compute encoders are concurrent between barriers (fence modes 1-5); 0 = serial, as before (default) */
+            LONG previous = InterlockedCompareExchange(&g_cs_concurrent, configured, -1);
+            cs_concurrent = previous < 0 ? configured : previous;
+            if (previous < 0 && configured)
+                d3d12_log("[madeira-d3d12] cs-concurrent: compute encoders are concurrent between barriers (bcd.cfg cs-concurrent)\n");
+        }
+        e->cenc = MTLCommandBuffer_computeCommandEncoder(e->cb, cs_concurrent > 0 && e->mode != 6); if (e->cenc) g_enc_seq++;
         e->cenc_pso = e->cpso; e->cenc_seq = g_enc_seq;
         if (g_fault_diag) mad_label(e->cenc, "C#%u %s fn=%llx:%s", g_enc_seq, e->cpso->vs_name,
                                     (unsigned long long)e->cpso->vs_fn, e->cpso->vs_name);
@@ -12461,6 +12536,7 @@ static ULONG STDMETHODCALLTYPE device_Release(ID3D12Device *This) {
         if (d->dsso) NSObject_release(d->dsso);
         if (d->mtl_queue) NSObject_release(d->mtl_queue);
         if (d->mtl_device) NSObject_release(d->mtl_device);
+        free(d->smp_cache);   /* sampler-cache: the table only (the samplers stay, as before); NULL with sampler-cache = 0 */
         DeleteCriticalSection(&d->live_lock);
         DeleteCriticalSection(&d->view_lock); free(d->vmap);
         d3d12_log("[madeira-d3d12] destroyed %s\n", d->name);
@@ -17162,6 +17238,60 @@ static void mad_sampler_info(struct WMTSamplerInfo *si, UINT filter, UINT au, UI
     if (red >= 2 || g_smp_census) mad_sampler_log(si, filter, cmp, who ? who : "?");
 }
 
+/* sampler-cache (bcd.cfg or the game's file, default 1; from upstream Madeira's codex/d3d12-consolidation, 5a3db65f and
+ * 3557bae9, where it is always on). A game that calls CreateSampler every frame from a handful of descriptions (Path of
+ * Exile 2: about 16 a frame, 60,000 in ten minutes from 9 descriptions) got a new Metal sampler each time, a host call,
+ * and the device kept every one for the process's life. Now an identical description gets the device's first sampler
+ * for it: the key is the converted WMTSamplerInfo up to gpu_resource_id (mad_sampler_info zeroes the whole structure
+ * first, so its padding is part of the key, and sampler-reduction = 3 keeps its mode in the padding byte), per device,
+ * 512 entries; a full table goes back to one sampler per call. The LOD bias is not part of a Metal sampler (it travels in
+ * the descriptor's metadata), so two descriptions that differ only in it share one. A Metal sampler is immutable and is
+ * never released here, so a descriptor that names the first sampler of a description samples exactly as one that names
+ * its own (tests/host/check-d3d12-sampler-cache.py runs both ways side by side).
+ * sampler-cache = 0: every call makes its own sampler, call for call as before the cache existed. */
+#define MAD_SMP_CACHE_N 512
+struct mad_smp_cache_ent { unsigned char key[offsetof(struct WMTSamplerInfo, gpu_resource_id)]; UINT64 id; obj_handle_t smp; };
+static volatile LONG g_smp_cache_on = -1;
+static LONG g_smp_cache_said;
+static int mad_smp_cache_on(void) {
+    LONG on = g_smp_cache_on;
+    if (on < 0) {
+        LONG cfg = mad_cfg_int_pe("sampler-cache", 1) ? 1 : 0;   /* 1 (default) = identical CreateSampler descriptions share one Metal sampler; 0 = one per call, as before the cache */
+        LONG prev = InterlockedCompareExchange(&g_smp_cache_on, cfg, -1);
+        on = prev < 0 ? cfg : prev;
+        if (prev < 0)
+            d3d12_log("[madeira-d3d12] sampler-cache = %ld: %s (bcd.cfg sampler-cache; 0 turns the sharing off)\n", (long)cfg,
+                      cfg ? "identical CreateSampler descriptions share one Metal sampler" : "every CreateSampler call makes its own Metal sampler");
+    }
+    return on > 0;
+}
+static int mad_smp_cache_get(struct mad_device *d, struct WMTSamplerInfo *si, obj_handle_t *out) {
+    LONG i, n; int hit = 0;
+    AcquireSRWLockShared(&g_smp_cache_lock);
+    n = d->smp_cache_n;
+    for (i = 0; i < n; i++)
+        if (!memcmp(d->smp_cache[i].key, si, sizeof d->smp_cache[i].key)) {
+            si->gpu_resource_id = d->smp_cache[i].id; *out = d->smp_cache[i].smp; hit = 1; break;
+        }
+    ReleaseSRWLockShared(&g_smp_cache_lock);
+    if (hit && !g_smp_cache_said && !InterlockedExchange(&g_smp_cache_said, 1))
+        d3d12_log("[madeira-d3d12] sampler-cache: a CreateSampler description seen before got its first sampler again\n");
+    return hit;
+}
+static void mad_smp_cache_put(struct mad_device *d, const struct WMTSamplerInfo *si, obj_handle_t smp) {
+    AcquireSRWLockExclusive(&g_smp_cache_lock);
+    if (!d->smp_cache) d->smp_cache = calloc(MAD_SMP_CACHE_N, sizeof *d->smp_cache);
+    /* madeira-bcd (U5 counter-review, finding 2): two threads that made the same new description at once both reach here; the
+     * second keeps its own sampler for its descriptor and adds no second entry (a duplicate only wasted a slot). */
+    for (LONG i = 0; d->smp_cache && i < d->smp_cache_n; i++)
+        if (!memcmp(d->smp_cache[i].key, si, sizeof d->smp_cache[i].key)) { ReleaseSRWLockExclusive(&g_smp_cache_lock); return; }
+    if (d->smp_cache && d->smp_cache_n < MAD_SMP_CACHE_N) {
+        struct mad_smp_cache_ent *e = &d->smp_cache[d->smp_cache_n];
+        memcpy(e->key, si, sizeof e->key); e->id = si->gpu_resource_id; e->smp = smp;
+        d->smp_cache_n++;
+    }
+    ReleaseSRWLockExclusive(&g_smp_cache_lock);
+}
 static void STDMETHODCALLTYPE device_CreateSampler(ID3D12Device *This,
         const D3D12_SAMPLER_DESC *desc, D3D12_CPU_DESCRIPTOR_HANDLE h) {
     struct mad_device *d = (struct mad_device *)This;
@@ -17170,12 +17300,23 @@ static void STDMETHODCALLTYPE device_CreateSampler(ID3D12Device *This,
     if (g_sd_state > 0) mad_dg_write(e, 1, "CreateSampler");   /* madeira-bcd: desc-guard */
 
     struct WMTSamplerInfo si;
+    obj_handle_t smp = 0; int cached = 0;
+    const int cache_on = mad_smp_cache_on();   /* sampler-cache, see above; on unless bcd.cfg says 0 */
     if (desc) {
         UINT border = (desc->BorderColor[0] > 0.5f) ? 2u : (desc->BorderColor[3] > 0.5f) ? 1u : 0u;
         mad_sampler_info(&si, desc->Filter, desc->AddressU, desc->AddressV, desc->AddressW, desc->MaxAnisotropy, desc->ComparisonFunc, border, desc->MinLOD, desc->MaxLOD, "CreateSampler");
     } else mad_sampler_info(&si, D3D12_FILTER_MIN_MAG_MIP_LINEAR, 3, 3, 3, 1, 0, 0, 0.0f, 1000.0f, "CreateSampler (no description)");
 
-    obj_handle_t smp = MTLDevice_newSamplerState(d->mtl_device, &si);
+    if (cache_on) cached = mad_smp_cache_get(d, &si, &smp);
+    if (!cached) {
+        smp = MTLDevice_newSamplerState(d->mtl_device, &si);
+        /* sampler-cache: the device's list takes the new sampler first, as upstream does: one the list could not keep was
+         * released there and must be neither cached nor bound. sampler-cache = 0: the list takes it at the end, as before. */
+        if (cache_on && smp) {
+            if (!mad_note_sampler(d, smp)) smp = 0;
+            else if (si.gpu_resource_id) mad_smp_cache_put(d, &si, smp);
+        }
+    }
     if (!smp || !si.gpu_resource_id) {
         d3d12_log("[madeira-d3d12] CreateSampler: the backend gave no argument-buffer sampler\n");
         memset(e, 0, sizeof *e);
@@ -17201,7 +17342,7 @@ static void STDMETHODCALLTYPE device_CreateSampler(ID3D12Device *This,
      * life. Samplers are few and immutable, and tying one to a descriptor slot
      * that the application may overwrite would need a lifetime story that this
      * milestone does not have. */
-    mad_note_sampler(d, smp);
+    if (!cache_on) mad_note_sampler(d, smp);
 }
 
 /* ---- pipeline state -------------------------------------------------------
@@ -20030,8 +20171,7 @@ static HRESULT device_CreateGraphicsPipelineState_impl(ID3D12Device *This,
             mad_pso_warm(p->device_handle, &p->rp, p->has_vd ? &p->vd : NULL, p->has_vd ? 1 : 0);   /* pso-warm */
         } else {
             obj_handle_t err = 0;
-            p->rps = has_vd ? MTLDevice_newRenderPipelineStateVD(d->mtl_device, &rp, &vd, &err)
-                            : MTLDevice_newRenderPipelineState(d->mtl_device, &rp, &err);
+            p->rps = mad_new_render_pipeline(d->mtl_device, &rp, has_vd ? &vd : NULL, &err, p->vs_name);   /* M010 */
             if (err) mad_log_nserror(p->vs_name, err);
         }
     }

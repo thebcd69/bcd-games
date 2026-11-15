@@ -1,0 +1,174 @@
+[03:51:08.885] [INFO] Checking entitlements...
+[03:51:08.886] [INFO] [build] v0.1.653 (653)
+[03:51:08.886] [INFO] [device] model=iPhone12,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=3851MB available=2331MB cores=6
+[03:51:08.887] [INFO] [device] address-map=[0x100e64000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[03:51:08.888] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[03:51:08.905] [INFO] [device] settings: low-power=0 thermal=serious screen=828x1792@2.208x max-fps=60 utc-offset=+03:00 free-disk=37GB stikdebug-url=1
+[03:51:08.912] [INFO] [device] gpu="Apple A13 GPU" family=apple6 argument-buffers=tier2 mesh=0 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=no-mesh x64=ok
+[03:51:30.284] [INFO] Requesting JIT with StikDebug...
+[03:51:30.329] [INFO] Opening StikDebug to enable JIT...
+[03:51:41.237] [INFO] [bcd-ui] play local
+[03:51:41.245] [INFO] [bcd] library launch Tecuha.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[03:51:41.266] [INFO] Running full Wine sequence...
+[03:51:41.266] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100e64000,0x8000000000) 512GB available=2314MB low-power=0 thermal=serious
+[03:51:41.268] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[03:51:41.276] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[03:51:41.682] [INFO] Allocating 896MB JIT pool via debugger...
+[03:51:41.683] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[03:51:41.685] [INFO] [jit-debugger] attached=1 at the pool request
+[03:51:41.685] [INFO] [jit-age] attach age=5s source=enable-jit method=stikdebug thermal=2
+[03:51:41.691] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[03:51:41.698] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 608MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[03:51:47.788] [INFO] RX pool at 0x1196dc000
+[03:51:47.852] [OK] JIT pool ready (debugger still attached).
+[03:51:47.853] [INFO] BRK suspension lasted 6.17s
+[03:51:47.857] [INFO] Detaching debugger...
+[03:51:47.863] [OK] Debugger detached.
+[03:51:47.865] [OK] [early-detach] rev=ml524 took 9 ms
+[03:51:47.888] [INFO] Starting wineserver...
+[phase] wine-start             t+  6.675s rev=ml526
+[03:51:47.952] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/263bc0a9d8887734.cfg (read)
+[WineProc] PE probe: machine=0x14c (i386: WoW64)
+[WineProc] Target exe: C:\Program Files\Call-of-Duty-1\Tecuha.exe (bundle=aarch64-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: reserved exactly 4GB; guard BORROWED from the pre-existing PROT_NONE region at 0x7200000000
+[wow-window] placeholder reserved B=0x7100000000..0x7200000000 (guard borrowed)
+[wow-window] adopted placeholder B=0x7100000000..0x7200000000 guard=borrowed
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x717fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x717ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x7100000000 bound to peb=0x717ffd0000
+[03:51:48.727] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x717ffd0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[03:51:48.727] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=1693 MB + phys_footprint=654 MB = 2348 MB (hw.memsize says 3851 MB)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x70ffef0000+0x110000 (ntdll.dll) → pool 0x1196e0000 used=0x11c000/0x26000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x1196e0000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[window] 0x7048000000..0x7400000000 regions=120 occupied=12289 MB of 15232 MB free=2943 MB maxhole=2942 MB@0x7048000000 rev=ml787 (periodic)
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[jit-pool] image 0x70ffe80000+0x70000 (wow64.dll) → pool 0x1197f8000 used=0x190000/0x26000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x1197f8000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x70ffac0000+0x3c0000 (libwow64fex.dll) → pool 0x11986e000 used=0x55a000/0x26000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 120 .text pages executable (copy @0x11986e000)
+ml957: libwow64fex.dll backing 0x70ffac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[window] 0x151800000..0x7806000000 regions=39132 occupied=465529 MB of 486216 MB free=37166 MB maxhole=16480 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=664 MB (peak 664) internal=389 MB compressed=273 MB external=91 MB reusable=15 MB (cycle=1)
+[jit-pool] image 0x70ff9a0000+0x120000 (ucrtbase.dll) → pool 0x119c34000 used=0x67c000/0x26000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x119c34000)
+[jit-pool] image 0x70ff900000+0xa0000 (KERNEL32.dll) → pool 0x119d58000 used=0x724000/0x26000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x119d58000)
+[jit-pool] image 0x70ff790000+0x170000 (kernelbase.dll) → pool 0x119e00000 used=0x8a4000/0x26000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x119e00000)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[jit-pool] image 0x70ff710000+0x80000 (wow64win.dll) → pool 0x119f80000 used=0x928000/0x26000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x119f80000)
+[jit-pool] image 0x70ff680000+0x90000 (win32u.dll) → pool 0x11a004000 used=0x9bc000/0x26000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x11a004000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x717ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x119bf1ed0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+[unixlib] libwow64fex.dll (module 0x70ffac0000) -> 64-bit table (0x1045e6840)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module Tecuha.exe (tecuha.exe-33279490a91f62e5): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83de50cc): 71FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+E 24 [dep-off] DEP disabled for this process: a committed readable page becomes executable when the guest first branches into it
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1c3a466): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728abbb6e4): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280cf9de8): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5aafd89a): 717B9F0000
+D 24 Load module advapi32.dll (advapi32.dll-e40424e11a0d96d6): 717B9A0000
+D 24 Load module sechost.dll (sechost.dll-b367444c07b4afc2): 717B970000
+D 24 Load module ucrtbase.dll (ucrtbase.dll-c2fc888ed004fb2c): 717B880000
+D 24 Load module msvcrt.dll (msvcrt.dll-23623f236d8784c2): 717B7D0000
+D 24 Load module win32u.dll (win32u.dll-e453971e400cdaf3): 717B780000
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7026270000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+D 24 Load module imm32.dll (imm32.dll-d32574d787dac6ed): 717B750000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[stp-emul] ml629 #1 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7101540088 rw=0x70009bc088 base 0x7101540088 -> 0x71015400a8 (writeback)
+[stp-emul] ml629 #2 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71015400c0 rw=0x70009bc0c0 base 0x71015400c0 -> 0x71015400e0 (writeback)
+[stp-emul] ml629 #3 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71015400e0 rw=0x70009bc0e0 base 0x71015400e0 -> 0x7101540100 (writeback)
+[span-census] ALLOC #8 0x7c07000000+0x1000000 tid=0024 live=7 rev=ml435
+[vfree] ml842 # base=0x7c05001000 size=0x3ff000 type=0x4000 tid=0024
+[vfree] ml842 # base=0x7c013f1000 size=0xf000 type=0x4000 tid=0024
+UHARC 0.4   -----   high compression multimedia archiver   -----   BETA version
+Usage: UHARC command [-switches..] archive[.uha] [files..@listfile..!exclude..]
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=184
+[vfree] ml842 # base=0x7c013e1000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0x7c01221000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0x7c01221000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=184
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[03:51:49.265] [INFO] [session] length=8s play=0s frames=0 stalls=0/0s peak=696MB limit=2347MB thermal=serious lpm=0 res=800x600 cap=60 game=Tecuha
+[frontend] returned to library
+[xp-names] m1199293 "wine-x18-exc"
+[xp] 03:51:49.396 +0.59 dt=315 cpu=461 (thr 394) P=259 E=202 run=489 pgw=-1.0 GHz P=2.54 E=1.73 Minst=2920 IPC=2.90 mJ=840 pin=29 rdKB=652 fpMB=696
+[xp] 03:51:49.741 +0.90 dt=318 cpu=411 (thr 379) P=33 E=378 run=414 pgw=-1.0 GHz P=2.59 E=1.73 Minst=1770 IPC=2.40 mJ=223 pin=38 rdKB=520 fpMB=696
+[xp] 03:51:50.057 +1.25 dt=345 cpu=325 (thr 356) P=4 E=321 run=327 pgw=-1.0 GHz P=2.16 E=1.73 Minst=1319 IPC=2.34 mJ=113 pin=0 rdKB=0 fpMB=696
+[xp] 03:51:50.351 +1.54 dt=294 cpu=297 (thr 297) P=3 E=294 run=299 pgw=-1.0 GHz P=2.20 E=1.73 Minst=1204 IPC=2.34 mJ=103 pin=0 rdKB=0 fpMB=696
+[xp] 03:51:50.678 +1.87 dt=327 cpu=332 (thr 332) P=3 E=329 run=334 pgw=-1.0 GHz P=2.12 E=1.73 Minst=1345 IPC=2.34 mJ=114 pin=0 rdKB=0 fpMB=696
+[footprint] rev=ml358 phys=698 MB (peak 698) internal=399 MB compressed=299 MB external=97 MB reusable=17 MB (cycle=2)
+[xp] 03:51:50.953 +2.14 dt=275 cpu=375 (thr 374) P=92 E=283 run=376 pgw=-1.0 GHz P=2.65 E=1.73 Minst=1791 IPC=2.45 mJ=337 pin=0 rdKB=0 fpMB=698
+[03:51:51.474] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=699 MB (peak 699) internal=399 MB compressed=299 MB external=99 MB reusable=18 MB (cycle=3)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=699 MB (peak 699) internal=400 MB compressed=299 MB external=100 MB reusable=18 MB (cycle=4)
+[footprint] rev=ml358 phys=702 MB (peak 702) internal=402 MB compressed=298 MB external=105 MB reusable=19 MB (cycle=5)
+[footprint] rev=ml358 phys=702 MB (peak 702) internal=402 MB compressed=298 MB external=106 MB reusable=19 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=13% RUN pc=libswiftCore.dylib`<redacted>+0x19c lr=libswiftCore.dylib`<redacted>+0x4cc sp=0x16ef7ff40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f1c6b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16f73ccb0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f7c89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-stale-heal" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16f856f20 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f8e2b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x1c sp=0x16f482c40 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=20 MB (cycle=11)
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=20 MB (cycle=12)
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=20 MB (cycle=13)
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=20 MB (cycle=14)
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=20 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=14 resident=529MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=703 MB (peak 703) internal=395 MB compressed=306 MB external=112 MB reusable=21 MB (cycle=16)
+[xp] 03:52:19.788 +30.98 dt=318 cpu=23 (thr 22) P=0 E=23 run=25 pgw=-1.0 GHz P=1.06 E=1.13 Minst=33 IPC=1.28 mJ=3 pin=0 rdKB=0 fpMB=703
+[xp] 03:52:20.092 +31.28 dt=304 cpu=118 (thr 118) P=60 E=58 run=142 pgw=-1.0 GHz P=1.58 E=1.14 Minst=182 IPC=1.13 mJ=35 pin=4 rdKB=80 fpMB=703
+[xp] 03:52:20.382 +31.57 dt=290 cpu=31 (thr 31) P=1 E=30 run=36 pgw=-1.0 GHz P=0.90 E=1.41 Minst=36 IPC=0.82 mJ=4 pin=0 rdKB=0 fpMB=703
+[03:52:20.392] [xp] 03:52:20.382 +31.57 dt=290 cpu=31 (thr 31) P=1 E=30 run=36 pgw=-1.0 GHz P=0.90 E=1.41 Minst=36 IPC=0.82 mJ=4 pin=0 rdKB=0 fpMB=703
+[xp] 03:52:20.720 +31.89 dt=319 cpu=364 (thr 327) P=29 E=335 run=391 pgw=-1.0 GHz P=2.12 E=1.71 Minst=1242 IPC=1.95 mJ=126 pin=17 rdKB=388 fpMB=705
+[03:52:20.720] [xp] 03:52:20.720 +31.89 dt=319 cpu=364 (thr 327) P=29 E=335 run=391 pgw=-1.0 GHz P=2.12 E=1.71 Minst=1242 IPC=1.95 mJ=126 pin=17 rdKB=388 fpMB=705

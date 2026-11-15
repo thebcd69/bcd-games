@@ -8,3 +8,17 @@ This covers two files of upstream Madeira's, which BCD carries:
   actions matter;
 - the redistributables reader (app/Madeira/BCDGOG/GOGSetup.swift), which follows Playport's GOGDependencies: the dependency
   repository's format and which redistributables are skipped.
+
+GOG Galaxy features (build 660). Three more files are the Playport authors' own, taken as upstream Madeira's branch playport/gog
+carries them (willfaust/Madeira commit 9d6dad8 by intraducine; Playport's app/ at the commit above):
+- app/Madeira/BCDGOG/Galaxy/GalaxyWire.swift (not modified), GalaxyService.swift and GalaxyListener.swift (BCD's changes are listed in
+  their headers): the Galaxy SDK's local protocol and the service that answers it;
+- in app/Madeira/BCDGOG/Galaxy/BCDGOGGalaxyCore.swift, the game's Galaxy client type and the token grant follow Playport's GOGContent.swift
+  and GOGSession.swift.
+Playport's own additional permission for this code (its PLAYPORT-LICENSE-EXCEPTION: the Madeira Converter Exception, version 1,
+adopted by the Playport authors on 2026-09-24 for the code whose copyright they hold) is the same text as LICENSE-EXCEPTION.md.
+
+KosmicKrisp (build 660). The 19 patches in build/mesa-ios/playport-patches are the Playport authors' Mesa patches 0001 to 0019 from
+the same Playport commit, as upstream Madeira's branch playport/kosmickrisp carries them (commit 07471e3 by intraducine). They change
+Mesa code and are offered under Mesa's licence (MIT), not under the GPL. The library built with them is
+gl/libvulkan_kosmickrisp.dylib; Mesa's licence text is licenses/KosmicKrisp-Mesa-license.rst.

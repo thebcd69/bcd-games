@@ -102,7 +102,35 @@ enum MadeiraBuiltInJIT {
             fail(4, "BCD couldn't package the request for its JIT helper.")
             return
         }
-        let helper = HelperRequest(extension: found, operation: request.operation.rawValue, completion: completion)
+        start(request.operation, data: data, extension: found, identifier: identifier, started: started, completion: completion)
+    }
+
+    /// madeira-bcd (upstream merge of 2026-11-14, U1; log R4Z1MY, build 630): one Enable of this app at a time. Two Enable JIT requests
+    /// (two taps on Enable JIT, or Play and a button) each started a helper; the two helpers prepared the Developer Disk Image at once,
+    /// one lost the Cryptex install ("cryptex already exists", com.apple.security.cryptex 17) and failed while the other attached, and
+    /// two helpers debugging BCD's own pid are never right. An Enable while another one of this app runs now joins it: it gets that
+    /// request's start and its result, and no second helper starts. Only while the running Enable can still be the one that attaches:
+    /// it began less than `enableJoinWindow` ago (JITCoordinator waits that long for the debugger), or a debugger is attached now; an
+    /// older one with no debugger attached is left alone and a new helper starts, as before. Prepare and Reset are never joined.
+    static let enableJoinWindow: TimeInterval = 90
+
+    /// Whether a new request of `operation` joins a running Enable of age `runningAge` (nil: none runs); pure, for the host check.
+    static func joins(_ operation: MadeiraJITRequest.Operation, runningAge: TimeInterval?, traced: Bool) -> Bool {
+        guard operation == .enable, let age = runningAge else { return false }
+        return traced || age < enableJoinWindow
+    }
+
+    /// Starts the helper for one request, or joins the running Enable (see `joins`).
+    static func start(_ operation: MadeiraJITRequest.Operation, data: Data, extension found: AnyObject, identifier: String,
+                      started: @escaping () -> Void,
+                      completion: @escaping (Result<MadeiraJITRequest.Response, Error>) -> Void) {
+        if let current = running.last(where: { $0.isOpenEnable }),
+           joins(operation, runningAge: current.age, traced: isDebuggerTraced()) {
+            LogStore.shared.log("[jit-helper] enable: one is already running (\(Int(current.age)) s); this request joins it (one helper, one debugger)")
+            current.join(started: started, completion: completion)
+            return
+        }
+        let helper = HelperRequest(extension: found, operation: operation.rawValue, completion: completion)
         running.append(helper)
         helper.begin(data: data, identifier: identifier, started: started)
     }
@@ -119,6 +147,20 @@ private final class HelperRequest {
     private let `extension`: AnyObject   // the NSExtension, kept alive for the request
     private let operation: String
     private var completion: ((Result<MadeiraJITRequest.Response, Error>) -> Void)?
+    // madeira-bcd (U1): the requests that joined this one (MadeiraBuiltInJIT.start) get its start and its result too.
+    private let begunAt = Date()
+    private var hasStarted = false
+    private var joinedStarts: [() -> Void] = []
+    private var joinedCompletions: [(Result<MadeiraJITRequest.Response, Error>) -> Void] = []
+
+    /// An Enable that has not ended yet.
+    var isOpenEnable: Bool { operation == MadeiraJITRequest.Operation.enable.rawValue && completion != nil }
+    var age: TimeInterval { Date().timeIntervalSince(begunAt) }
+
+    func join(started: @escaping () -> Void, completion: @escaping (Result<MadeiraJITRequest.Response, Error>) -> Void) {
+        joinedCompletions.append(completion)
+        if hasStarted { started() } else { joinedStarts.append(started) }
+    }
 
     init(extension found: AnyObject, operation: String,
          completion: @escaping (Result<MadeiraJITRequest.Response, Error>) -> Void) {
@@ -158,7 +200,11 @@ private final class HelperRequest {
                 // Inside LiveContainer the helper runs in a LiveProcess process and attaches to this one (host-pid).
                 let host = getenv("LC_HOME_PATH") != nil ? " host-pid=\(getpid())" : ""
                 LogStore.shared.log("[jit-helper] \(self.operation): started \(identifier) as pid \(self.shim.pid(forRequestIdentifier: uuid))\(host)")
+                self.hasStarted = true
                 started()
+                let joined = self.joinedStarts
+                self.joinedStarts = []
+                joined.forEach { $0() }
             } }
         }
     }
@@ -179,7 +225,10 @@ private final class HelperRequest {
             LogStore.shared.log("[jit-helper] \(operation): \(error.localizedDescription)", level: .error)
         }
         MadeiraBuiltInJIT.finished(self)
+        let joined = joinedCompletions
+        joinedCompletions = []
         completion(result)
+        joined.forEach { $0(result) }
     }
 
     private static func error(_ code: Int, _ message: String) -> NSError {

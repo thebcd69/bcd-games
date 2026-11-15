@@ -290,7 +290,8 @@ private actor BCDContentRun {
             do {
                 var request = URLRequest(url: url)
                 request.timeoutInterval = 30
-                try await stream.fetch(request, into: writer)
+                // A ranged chunk (build 663, GOG's generation 1) is its slice of the file; any other chunk is fetched as before.
+                try await stream.fetch(request, into: writer, slice: chunk.rangeStart.map { $0...($0 + chunk.fetchSize - 1) })
                 try writer.finish()
                 health.succeeded(url)
                 return

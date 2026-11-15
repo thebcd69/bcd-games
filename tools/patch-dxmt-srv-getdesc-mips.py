@@ -14,6 +14,10 @@ translated copy as before. Off by default: nothing changes for a game without th
 ([srv-getdesc]). A 64-bit game gets it with env.MADEIRA_D3D11_SRC = 1 (the CI compiles the 32-bit d3d11.dll from the patched
 sources and tools/build-d3d11-dll.sh the 64-bit d3d11-src.dll).
 
+Since the dxmt pin of the 2026-11-14 upstream merge the fork also carries willfaust/dxmt 988c6335, which resolves MipLevels = -1 for
+every shader resource view without a switch (ExtractEntireResourceViewDescription); this opt-in still resolves ArraySize = -1 and
+logs, and a list line that sets it keeps working.
+
 Idempotent; fails by name if an anchor moved. Run from the repository root.
 """
 import pathlib
@@ -24,6 +28,7 @@ MARKER = "madeira-bcd: SRV GetDesc resolves"
 DEV = ROOT / "d3d11/d3d11_texture_device.cpp"
 
 NS_OLD = "\nnamespace dxmt {\n\n#pragma region DeviceTexture\n"
+REGION = "\n#pragma region DeviceTexture\n"
 NS_NEW = r'''
 namespace dxmt {
 
@@ -108,11 +113,14 @@ def main():
     if MARKER in text:
         print("already patched:", DEV)
         return 0
-    if text.count(NS_OLD) != 1:
+    # The helpers go right before the DeviceTexture region, inside namespace dxmt. Up to the pin of 2026-11-05 the region follows
+    # the namespace's opening line directly (NS_OLD); since the 2026-11-14 upstream merge (willfaust/dxmt ebb9189f) the in-process
+    # share table stands between the two, so the region's own line is the anchor. The text written is the same either way.
+    if text.count(REGION) != 1 or "\nnamespace dxmt {\n" not in text[:text.index(REGION)]:
         sys.exit("anchor not found (namespace dxmt / DeviceTexture) in " + str(DEV))
     if text.count(CALL_OLD) != 1:
         sys.exit("anchor not found (TextureSRV creation in CreateShaderResourceView) in " + str(DEV))
-    text = text.replace(NS_OLD, NS_NEW).replace(CALL_OLD, CALL_NEW)
+    text = text.replace(REGION, NS_NEW[len("\nnamespace dxmt {\n"):]).replace(CALL_OLD, CALL_NEW)
     DEV.write_text(text)
     print("patched:", DEV)
     return 0

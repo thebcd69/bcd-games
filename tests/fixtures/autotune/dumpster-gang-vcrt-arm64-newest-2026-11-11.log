@@ -1,0 +1,240 @@
+[16:20:45.894] [INFO] Checking entitlements...
+[16:20:45.894] [INFO] [build] v0.1.653 (653)
+[16:20:45.895] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 26.5.2 (Build 23F84) ram=11721MB available=6122MB cores=6
+[16:20:45.895] [INFO] [device] address-map=[0x104b74000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[16:20:45.895] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[16:20:45.906] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=+04:00 free-disk=15GB stikdebug-url=0
+[16:20:45.909] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:20:58.801] [INFO] [bcd-ui] play local
+[16:20:58.804] [INFO] Requesting JIT with Built-in StikJIT...
+[16:21:00.176] [INFO] [bcd] library launch RaccoonGame.exe: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off lc=0
+[16:21:00.217] [INFO] Running full Wine sequence...
+[16:21:00.217] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104b74000,0xfc0000000) 63GB available=6110MB low-power=0 thermal=nominal
+[16:21:00.219] [INFO] [game-cfg] env.FRAMEGEN_ONE_LAYER=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_OPTIN_DLLS=sfc,sfc_os,tbs env.MADEIRA_VCRT_ARM64_KEY=1 env.MADEIRA_X64_IMAGE_NOCOPY=1
+[16:21:00.222] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[16:21:00.226] [INFO] Allocating 768MB JIT pool (BRK will suspend process)...
+[16:21:00.226] [INFO] Allocating 768MB JIT pool via debugger...
+[16:21:00.226] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:21:00.227] [INFO] [jit-debugger] attached=1 at the pool request
+[16:21:00.227] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[16:21:00.228] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[16:21:01.164] [INFO] RX pool at 0x300000000
+[16:21:01.187] [OK] JIT pool ready (debugger still attached).
+[16:21:01.188] [INFO] BRK suspension lasted 0.96s
+[16:21:01.190] [INFO] Detaching debugger...
+[16:21:01.194] [OK] Debugger detached.
+[16:21:01.196] [OK] [early-detach] rev=ml524 took 6 ms
+[16:21:01.197] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.000s rev=ml526
+[16:21:01.226] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 4 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/e62d64c961cec6b1.cfg (read)
+[WineProc] Target exe: C:\Program Files (x86)\Steam\steamapps\common\Dumpster Gang Demo\Windows\RaccoonGame.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_OPTIN_DLLS: tbs.dll -> tbs-optin.dll (Wine's tbs.dll for this game)
+[WineProc] MADEIRA_OPTIN_DLLS: sfc.dll -> sfc-optin.dll (Wine's sfc.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[swap] ml1150 pool: 4 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 5466 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x114b00000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[swap] ml1077 backed 0xfbfe00000+0x200000 (file off 8796093022208 MB): 2 MB in 1 extents, peak 2 MB, 0 refused
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[16:21:01.779] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[16:21:01.779] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[16:21:01.779] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[16:21:01.780] [vcrt-arm64] madeira-bcd: HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\arm64 (volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5329 MB + phys_footprint=814 MB = 6144 MB (hw.memsize says 11721 MB)
+ml985: preferred base 0x140000000+0x85000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x88000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dumpster Gang Demo\\Windows\\RaccoonGame.exe" 0x1218f0000+0x85000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x1218f0000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x1218f0000+0x14000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x121904000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x121904000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x121910000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0xba0000000,0xda0000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x300004000 used=0x13c000/0x30000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x114b00320 insn=0xb9432100
+[jit-pool] image 0xfbf6b0000+0x41c000 (libarm64ecfex.dll) → pool 0x30013f000 used=0x563000/0x30000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x30013f000)
+[jit-pool] image 0xfbf580000+0x130000 (ucrtbase.dll) → pool 0x300560000 used=0x694000/0x30000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x300560000)
+[jit-pool] image 0xfbf4c0000+0xc0000 (kernel32.dll) → pool 0x300694000 used=0x75c000/0x30000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x300694000)
+[jit-pool] image 0xfbf1d0000+0x2f0000 (kernelbase.dll) → pool 0x30075c000 used=0xa5c000/0x30000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x30075c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[swap] ml1077 backed 0x127d30000+0x100000 (file off 8796093022210 MB): 3 MB in 2 extents, peak 3 MB, 0 refused
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[swap] ml1077 backed 0x129ec0000+0x24c000 (file off 8796093022211 MB): 5 MB in 3 extents, peak 5 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module RaccoonGame.exe (raccoongame.exe-055e5b28e038cb26): 1218F0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x129000000..0xba0000000 regions=98372 occupied=9875 MB of 42864 MB free=65244 MB maxhole=32256 MB@0x3c0000000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=854 MB (peak 854) internal=852 MB compressed=0 MB external=78 MB reusable=7 MB (cycle=1)
+[jit-pool] image 0xfbef50000+0x220000 (user32.dll) → pool 0x300a60000 used=0xc88000/0x30000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x300a60000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): FBEF50000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): FBEE60000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): FBEDB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBED30000
+[x64-image] #18 0x121904000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #19 0x121904000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #20 0x121904000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #21 0x121904000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #22 0x121904000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #23 0x121904000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[swap] ml1077 backed 0x127e30000+0x100000 (file off 8796093022213 MB): 6 MB in 4 extents, peak 6 MB, 0 refused
+[swap] ml1077 backed 0x12a110000+0x180000 (file off 8796093022213 MB): 6 MB in 4 extents, peak 6 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[swap] ml1077 backed 0x12a290000+0x200000 (file off 8796093022214 MB): 8 MB in 5 extents, peak 8 MB, 0 refused
+[jit-pool] image 0xfbdf20000+0x80000 (cryptbase.dll) → pool 0x301c64000 used=0x1ce8000/0x30000000 tramp+0x4000
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x301c64000)
+D 24 Load module cryptbase.dll (cryptbase.dll-e47fe560728c2647): FBDF20000
+[jit-pool] image 0xfbde70000+0xb0000 (uxtheme.dll) → pool 0x301ce8000 used=0x1d9c000/0x30000000 tramp+0x4000
+[copy-verify] uxtheme.dll: OK, 5 .text pages executable (copy @0x301ce8000)
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): FBDE70000
+[image-reload] unmapped image 0xfbde70000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={147,101,477,406} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-pos] #2 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x107d410d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x10030 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x107d410d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10030 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x10028 after=0x0 flags=00000018 vis={147,101,477,406} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-pos] #5 hwnd=0x10032 after=0x0 flags=00000014 vis={12,33,36,59} surface=0x0 rev=ml505 style=40000003 visible=0 parent=0x10028
+[win-name] #5 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-pos] #6 hwnd=0x10032 after=0x1 flags=00000010 vis={12,33,36,59} surface=0x0 rev=ml505 style=40000003 visible=0 parent=0x10028
+[win-name] #6 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-name] #7 hwnd=0x10032 class='Static' text="" rev=ml853
+[win-name] #8 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #12 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #16 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #20 hwnd=0x10028 class='#32770' text="" rev=ml853
+[win-name] #53 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #54 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #55 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #56 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #57 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #58 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #59 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #60 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #61 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #62 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-name] #64 hwnd=0x10048 class='Static' text="The following component(s) are required to run this program:??Microsoft Visual C++ 2015-2022 Redistributable (arm64)?" rev=ml853
+[jit-pool] image 0xfbde00000+0x120000 (ole32.dll) → pool 0x301d9c000 used=0x1ec0000/0x30000000 tramp+0x4000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x301d9c000)
+D 24 Load module ole32.dll (ole32.dll-424c26e02d7b7d0d): FBDE00000
+[jit-pool] image 0xfbdd50000+0xb0000 (combase.dll) → pool 0x301ec0000 used=0x1f74000/0x30000000 tramp+0x4000
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x301ec0000)
+D 24 Load module combase.dll (combase.dll-87add9b7d0a5b955): FBDD50000
+[jit-pool] image 0xfbdc60000+0xf0000 (rpcrt4.dll) → pool 0x301f74000 used=0x2068000/0x30000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x301f74000)
+D 24 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): FBDC60000
+[jit-pool] image 0xfbdbd0000+0x90000 (coml2.dll) → pool 0x302068000 used=0x20fc000/0x30000000 tramp+0x4000
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x302068000)
+D 24 Load module coml2.dll (coml2.dll-735614df14a136bf): FBDBD0000
+[win-name] #69 hwnd=0x30042 class='Wine IME' text="" rev=ml853
+[win-pos] #70 hwnd=0x1003c after=0x0 flags=0000001c vis={113,81,165,107} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x10028
+[win-name] #70 hwnd=0x1003c class='Button' text="OK" rev=ml853
+[win-pos] #71 hwnd=0x10028 after=0x0 flags=00001967 vis={500,286,779,433} surface=0x114c467c0 rev=ml505 style=94c801c4 visible=1 parent=0x10020
+[win-name] #71 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[launch-view] dismissed reason=surface logs=0
+[xp] 16:21:02.349 +0.52 dt=266 cpu=25 (thr 25) P=1 E=24 run=27 pgw=-1.0 GHz P=0.90 E=1.05 Minst=36 IPC=1.39 mJ=2 pin=0 rdKB=0 fpMB=879
+[xp] 16:21:02.670 +0.84 dt=321 cpu=12 (thr 12) P=0 E=12 run=14 pgw=-1.0 GHz P=0.00 E=0.81 Minst=16 IPC=1.64 mJ=1 pin=0 rdKB=0 fpMB=879
+[xp] 16:21:02.995 +1.17 dt=325 cpu=7 (thr 7) P=0 E=7 run=9 pgw=-1.0 GHz P=0.00 E=0.81 Minst=12 IPC=2.03 mJ=0 pin=0 rdKB=0 fpMB=879
+[xp] 16:21:03.316 +1.49 dt=321 cpu=11 (thr 10) P=0 E=11 run=12 pgw=-1.0 GHz P=0.00 E=0.85 Minst=16 IPC=1.82 mJ=1 pin=0 rdKB=0 fpMB=879
+[srv-input] btn msg=0x201 at (0,0) hit win=00010020 thread=0x0
+[xp] 16:21:03.567 +1.74 dt=251 cpu=15 (thr 15) P=0 E=15 run=17 pgw=-1.0 GHz P=0.00 E=0.88 Minst=22 IPC=1.69 mJ=1 pin=0 rdKB=0 fpMB=877
+[hwinput] keyboard focus: program (program cursor)
+[xp] 16:21:03.829 +2.00 dt=261 cpu=22 (thr 21) P=0 E=22 run=25 pgw=-1.0 GHz P=0.00 E=0.82 Minst=31 IPC=1.76 mJ=1 pin=0 rdKB=0 fpMB=875
+[footprint] rev=ml358 phys=880 MB (peak 880) internal=879 MB compressed=0 MB external=100 MB reusable=7 MB (cycle=2)
+[swap] ml1077 stats: 8 MB file-backed now (peak 8), 5 extents, file used 0 of 2048 MB, backs 6 releases 1 unbacks 0 refused 0 | coverage wide: disk 0 MB of 2048 cap, reservations 3, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 8 MB in use (peak 8), 6 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 5444 MB available
+[srv-input] btn msg=0x201 at (648,413) hit win=00010028 thread=0x120f3d500
+[srv-input] btn msg=0x201 at (648,413) hit win=00010028 thread=0x120f3d500
+[srv-input] btn msg=0x201 at (648,413) hit win=00010028 thread=0x120f3d500
+[win-pos] #72 hwnd=0x10028 after=0x0 flags=000018bf vis={500,286,779,433} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #72 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-pos] #73 hwnd=0x10028 after=0x0 flags=0000181f vis={500,286,779,433} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #73 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-pos] #74 hwnd=0x10028 after=0x0 flags=0000181f vis={500,286,779,433} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #74 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+[win-pos] #75 hwnd=0x10028 after=0x0 flags=0000181f vis={500,286,779,433} surface=0x107d410d0 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #75 hwnd=0x10028 class='#32770' text="Error" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x2329) syscalls=0 unix_calls=609
+[unwind] term ml661 begin rip=fbf500690 rsp=129b7fed8 window=[129b7fed8..12a37fed8) max=32
+[unwind] term ml661 #00 pc=fbf500690 rsp=129b7fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=2329 rbp=129b7ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=129b7ff60: d0ffb729 01000000 3c288f21 01000000 29230000 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=1218f9915 rsp=129b7fee0  (exe)+0x9915
+[unwind] term ml662 #01 nv: rbx=2329 rbp=129b7ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml661 #02 pc=1218f98e0 rsp=129b7ff10  (exe)+0x98e0
+[unwind] term ml661 #03 pc=1218f283c rsp=129b7ff70  (exe)+0x283c
+[unwind] term ml662   global @+0x69 -> 121907348 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=3006c59cc rsp=129b7ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+1c8:   ? fbf1d0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+1d0:   ? fbf281757  kernelbase.dll+0xb1757
+[term-stack] ml660 sp+210:   ? fbf282d9f  kernelbase.dll+0xb2d9f
+[term-stack] ml660 sp+220:   ? fbf2800d8  kernelbase.dll+0xb00d8
+[term-stack] ml660 sp+2a0:   ? fbf250200  kernelbase.dll+0x80200
+[vfree] ml842 # base=0xba02a0000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0xba02b0000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0xba2410000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0xba1410000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x32fffc000 size=0x0 type=0x8000 tid=0024
+[jit-pool] tail FREE rx=0x32fffc000 size=0x4000 -> free-list rev=ml438
+[vfree] ml842 # base=0xba04f1000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x2329) syscalls=0 unix_calls=615
+[unwind] term ml661 begin rip=3000822fc rsp=129b7fd28 window=[129b7fd28..12a37fd28) max=32
+[unwind] term ml661 #00 pc=3000822fc rsp=129b7fd28  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+038:   ? fbf1d0000  kernelbase.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(9001)
+[Wine ntdll/server] process_exit_wrapper(9001)
+[WineProc] Wine exited with code 9001 (caught by longjmp)
+[WineProc] stopping wineserver...
+[16:21:04.717] [INFO] [session] length=4s play=0s frames=0 stalls=0/0s peak=880MB limit=6143MB thermal=nominal lpm=0 res=1280x720 cap=60 game=RaccoonGame
+[frontend] returned to library
+[xp-names] m1658989 "wine-x18-exc"
+[footprint] rev=ml358 phys=900 MB (peak 900) internal=897 MB compressed=0 MB external=110 MB reusable=6 MB (cycle=3)
+[16:21:06.776] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=891 MB (peak 900) internal=890 MB compressed=0 MB external=113 MB reusable=9 MB (cycle=4)
+[xp] 16:21:09.100 +7.27 dt=320 cpu=34 (thr 33) P=0 E=34 run=34 pgw=-1.0 GHz P=0.00 E=1.15 Minst=59 IPC=1.53 mJ=2 pin=0 rdKB=0 fpMB=890
+[xp] 16:21:09.427 +7.60 dt=327 cpu=56 (thr 54) P=2 E=54 run=54 pgw=-1.0 GHz P=1.60 E=1.31 Minst=126 IPC=1.70 mJ=5 pin=0 rdKB=0 fpMB=890
+[hwinput] keyboard focus: elsewhere (responder)
+[xp] 16:21:09.684 +7.86 dt=257 cpu=96 (thr 94) P=87 E=9 run=124 pgw=-1.0 GHz P=3.21 E=2.20 Minst=806 IPC=2.70 mJ=194 pin=0 rdKB=0 fpMB=894
+[xp] 16:21:09.988 +8.16 dt=304 cpu=21 (thr 21) P=0 E=21 run=22 pgw=-1.0 GHz P=0.00 E=1.04 Minst=36 IPC=1.68 mJ=1 pin=0 rdKB=0 fpMB=894
+[footprint] rev=ml358 phys=894 MB (peak 900) internal=893 MB compressed=0 MB external=121 MB reusable=9 MB (cycle=5)
+[xp] 16:21:10.247 +8.42 dt=258 cpu=75 (thr 74) P=9 E=66 run=84 pgw=-1.0 GHz P=1.59 E=1.51 Minst=187 IPC=1.64 mJ=12 pin=0 rdKB=0 fpMB=894
+[xp] 16:21:10.538 +8.71 dt=292 cpu=82 (thr 84) P=36 E=46 run=84 pgw=-1.0 GHz P=2.07 E=1.69 Minst=510 IPC=3.33 mJ=44 pin=0 rdKB=0 fpMB=894
+2.07 E=1.69 Minst=510 IPC=3.33 mJ=44 pin=0 rdKB=0 fpMB=894

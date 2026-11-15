@@ -1,0 +1,364 @@
+[19:41:52.811] [INFO] Checking entitlements...
+[19:41:52.811] [INFO] [build] v0.1.653 (653)
+[19:41:52.812] [INFO] [device] model=iPad17,3 idiom=pad os=iPadOS Version 27.0 (Build 24A437) ram=11443MB available=12253MB cores=9
+[19:41:52.812] [INFO] [device] address-map=[0x10203c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:41:52.813] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[19:41:52.820] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+00:00 free-disk=47GB stikdebug-url=1
+[19:41:52.823] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:41:55.536] [INFO] [epic-launch] start app=b8..5c signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[19:41:55.540] [INFO] [bcd] library launch DEMON'S TILT.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[19:41:55.552] [INFO] Running full Wine sequence...
+[19:41:55.552] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10203c000,0x8000000000) 512GB available=12246MB low-power=0 thermal=nominal
+[19:41:55.553] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[19:41:55.555] [INFO] [msiexec64] Epic game: msiexec in system32 for this session
+[19:41:55.557] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:41:55.557] [INFO] Allocating 896MB JIT pool via debugger...
+[19:41:55.557] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:41:55.557] [INFO] [jit-debugger] attached=1 at the pool request
+[19:41:55.557] [INFO] [jit-age] attach age=4s source=at-start method=stikdebug thermal=0
+[19:41:55.558] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[19:41:55.559] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:41:57.255] [INFO] RX pool at 0x148000000
+[19:41:57.280] [OK] JIT pool ready (debugger still attached).
+[19:41:57.281] [INFO] BRK suspension lasted 1.72s
+[19:41:57.282] [INFO] Detaching debugger...
+[19:41:57.285] [OK] Debugger detached.
+[19:41:57.294] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.765s rev=ml526
+[19:41:57.322] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] Target exe: C:\Program Files\Epic Games\DEMONSTILT\DEMON'S TILT.exe (bundle=arm64ec-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[19:41:57.559] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[19:41:57.559] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11638 MB + phys_footprint=649 MB = 12288 MB (hw.memsize says 11443 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11443 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0xa3000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xa4000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x10db50000+0xa3000 (WindowsPlayer.exe) → pool 0x148004000 used=0xa8000/0x25000000 tramp+0x0
+[copy-verify] WindowsPlayer.exe: OK, 3 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x1480a8000 used=0x1e0000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1480a8000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x10db50000 IAT window 0x10db5b000+0x220: 66 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x10db50000 IAT window 0x10db5b000+0x220: 66 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71fe8b0000+0x41c000 (libarm64ecfex.dll) → pool 0x1481e3000 used=0x607000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x1481e3000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x148604000 used=0x738000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148604000)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x148738000 used=0x800000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148738000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x148800000 used=0xb00000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148800000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+D 24 Load module DEMON'S TILT.exe (demon's tilt.exe-ead67b69db603f03): 10DB50000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x124ae8000..0x7805000000 regions=75975 occupied=462167 MB of 486917 MB free=41213 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=667 MB (peak 667) internal=664 MB compressed=0 MB external=122 MB reusable=6 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+D 24 Load module UnityPlayer.dll (unityplayer.dll-560f447ec8a77007): 71FCBA0000
+[x64-data-imp] ml1245 importer pe=0x71fcba0000 IAT window 0x71fde12000+0x1000: 492 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fcba0000 IAT window 0x71fde12000+0x1000: 492 slot(s), 0 data import(s) bound
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FC980000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FC890000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FC7E0000
+[x64-data-imp] ml1245 importer pe=0x71fcba0000 IAT window 0x71fde12000+0x1000: 492 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fcba0000 IAT window 0x71fde12000+0x1000: 492 slot(s), 0 data import(s) bound
+[copy-verify] shcore.dll: OK, 3 .text pages executable (copy @0x14ae0c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14ae90000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14af74000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x14aff8000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14b97c000)
+[copy-verify] iphlpapi.dll: OK, 4 .text pages executable (copy @0x14cb3c000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fb3e0000) -> 64-bit table (0x1126ba840)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\DEMONSTILT\\UnityCrashHandler64.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\DEMONSTILT\\UnityCrashHandler64.exe\" --attach 32 481678659584"
+[image-reload] unmapped image 0x71fa160000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+E 24 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f9aa0000 xend=0x71f9e26e10 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+D 24 Load module mono-2.0-bdwgc.dll (mono-2.0-bdwgc.dll-0f6458a12086bb65): 71F9AA0000
+E 24 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f9aa0000 xend=0x71f9e26e10 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/mscorlib.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[stp-emul] ml629 #1 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0c30 rw=0x70055bcc30 base 0x70290e0c30 -> 0x70290e0c50 (writeback)
+[stp-emul] ml629 #2 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0c50 rw=0x70055bcc50 base 0x70290e0c50 -> 0x70290e0c70 (writeback)
+[stp-emul] ml629 #3 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0c70 rw=0x70055bcc70 base 0x70290e0c70 -> 0x70290e0c90 (writeback)
+[stp-emul] ml629 #4 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0c90 rw=0x70055bcc90 base 0x70290e0c90 -> 0x70290e0cb0 (writeback)
+[stp-emul] ml629 #5 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0cb0 rw=0x70055bccb0 base 0x70290e0cb0 -> 0x70290e0cd0 (writeback)
+[stp-emul] ml629 #6 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0cd0 rw=0x70055bccd0 base 0x70290e0cd0 -> 0x70290e0cf0 (writeback)
+[stp-emul] ml629 #7 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0cf0 rw=0x70055bccf0 base 0x70290e0cf0 -> 0x70290e0d10 (writeback)
+[stp-emul] ml629 #8 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x70290e0d10 rw=0x70055bcd10 base 0x70290e0d10 -> 0x70290e0d30 (writeback)
+[alias-own] ml640 #1 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #2 0x7028ba0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5ac000 rw=0x70055ac000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[swp-emul] ml626 #1 insn=0xf8fa80da size=8 Rs=x26 Rt=x26 addr=0x70290e0bb8 rw=0x70055bcbb8 in=0x70290e0d50 old=0x70290e0c0b
+[alias-own] ml640 #3 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #4 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #5 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #6 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[win-pos] #3 hwnd=0x2002e after=0x0 flags=4000003c vis={0,0,320,240} surface=0x1120fd0d0 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[win-pos] #4 hwnd=0x10036 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1120fd0d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1120fd0d0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x2002e after=0x0 flags=40000018 vis={0,0,320,240} surface=0x1120fd0d0 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x2002e class='UnityWndClass' text="" rev=ml853
+[vkmt] tid=0024 OpenAdapterFromLuid luid=88050000:01000000 -> 0 hAdapter=0x40000000
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000000 -> 0 hDevice=0x40000040
+[vkmt] tid=0024 OpenAdapterFromLuid luid=88050000:01000000 -> 0 hAdapter=0x40000080
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000080 -> 0
+[jit-pool] image 0x71f8990000+0xa0000 (compstui.dll) → pool 0x14ddb8000 used=0x5e5c000/0x25000000 tramp+0x4000
+D 24 Load module compstui.dll (compstui.dll-6caceb67ab4f8333): 71F8990000
+[jit-pool] image 0x71f8810000+0x180000 (comctl32.dll) → pool 0x14de5c000 used=0x5fe0000/0x25000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71F8810000
+[guest-log] file <container>/Documents/Data/Application/<uuid>/Documents/wine/drive_c/users/mobile/AppData/LocalLow/FLARB LLC/DEMON'S TILT/Player.log
+[guest-log] #1 tid=0024     Renderer: Apple M5 GPU (ID=0x0)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[jit-pool] image 0x71f8730000+0xa0000 (mmdevapi.dll) → pool 0x14dfe0000 used=0x6084000/0x25000000 tramp+0x4000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71F8730000
+E B0 [thr-term] rev=ml435 deinit #1 tid=0xb0
+[jit-pool] image 0x71f8630000+0x80000 (avrt.dll) → pool 0x14e084000 used=0x6108000/0x25000000 tramp+0x4000
+D B4 Load module avrt.dll (avrt.dll-cbf6d88ff1151c3b): 71F8630000
+[image-reload] unmapped image 0x71f8630000+0x80000: 1 pool copy marked
+[xp-names] m424874 "wine-x18-exc"
+[xp] 19:41:58.205 +0.61 dt=299 cpu=412 (thr 266) P=362 E=50 run=444 pgw=-1.0 GHz P=4.18 E=2.96 Minst=5138 IPC=3.09 mJ=1797 pin=92 rdKB=684 fpMB=1314
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/UnityEngine.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\UnityEngine.AIModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/UnityEngine.AIModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #1 release of 0x703e830000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x703f030000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7040000000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7040fd0000+0xfd0000 held for 2000 ms (4 in flight)
+0024:err:module:load_dll [dll-missing] rev=ml336 #55 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\UnityEngine.ProfilerModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/UnityEngine.ProfilerModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #57 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\UnityEngine.ScreenCaptureModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #58 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/UnityEngine.ScreenCaptureModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed\\UnityEngine.SharedInternalsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files\\Epic Games\\DEMONSTILT\\DEMON'S TILT_Data\\Managed/mono/aot-cache/amd64/UnityEngine.SharedInternalsModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp] 19:41:58.513 +0.91 dt=309 cpu=312 (thr 310) P=310 E=2 run=315 pgw=-1.0 GHz P=4.26 E=2.85 Minst=7551 IPC=5.70 mJ=1981 pin=0 rdKB=3176 fpMB=1330
+[alias-own] ml640 #27 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #28 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #29 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #30 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #31 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #32 0x70290e0000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14d5bc000 rw=0x70055bc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x70290f0000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #1 status=c0000018 hint=0x70290f0000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #1 NtAllocateVirtualMemory status=c0000018 proc=demon's tilt.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x70290f0000 zb=0x0 hits=1 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #5 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemory #6 req_addr=0x7037130000 size=0x10000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #2 status=c0000018 hint=0x7037130000 size=0x10000 type=0x3000 protect=0x40 tid=0024 | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=demon's tilt.exe tid=0024 size=0x10000 type=0x3000 prot=0x40 hint=0x7037130000 zb=0x0 hits=2 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #7 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000170 status=00000000 native_pc=0000000255A96EE8 is_ec=0 -> returned rip=0000000255A96EE8 rsp=000000011F1FE9D0 flags=00100003
+[xp] 19:41:58.767 +1.17 dt=254 cpu=272 (thr 272) P=270 E=2 run=288 pgw=-1.0 GHz P=4.17 E=2.96 Minst=4670 IPC=4.13 mJ=1441 pin=0 rdKB=0 fpMB=1338
+[vmode] synthesized CURRENT = 1112x832 @60Hz
+[vmode] synthesized CURRENT = 1112x832 @60Hz
+[win-pos] #7 hwnd=0x2002e after=0x0 flags=4000181f vis={0,0,320,240} surface=0x1120fd0d0 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #7 hwnd=0x2002e class='UnityWndClass' text="DEMON'S TILT" rev=ml853
+[jit-pool] image 0x71f8560000+0x90000 (xinput1_3.dll) → pool 0x14e128000 used=0x61bc000/0x25000000 tramp+0x4000
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e6b917460955688): 71F8560000
+00c4:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00c4 status=00000001 caller=000000014875E32C
+E C4 [thr-term] rev=ml435 deinit #2 tid=0xc4
+[vkmt] tid=0024 OpenAdapterFromLuid luid=88050000:01000000 -> 0 hAdapter=0x400000c0
+[vkmt] tid=0024 CloseAdapter hAdapter=0x400000c0 -> 0
+[vmode] synthesized CURRENT = 1112x832 @60Hz
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0x994000d5 pc=0x16cb9c030 NO pool/anon alias | region 0x10203c000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x16cb9c030 hinsn=0x994000d5 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16bffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fd810be3 pc=0x16cb9c030 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16cb9c030 addr=0x0 x18=0x71fffe0000 type=1 lr=0x16cffc274 sp=0x71fe3b0000 x16=0x1481019a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x149775be3 (PE 0x71fd810be3): f7 45 38 00 00 40 00 75 07 44 89 64 24 64 eb 11
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x71fd810d92 (block entry 0x71fd810be3) rva 0xc70d92, section #0 '.text' rva 0x1000+0x1270d10 chars 0x60000020 (R-X CODE) | host region 0x71fcba0000+0x1274000 prot=r-- max=rw- | Wine vprot of the 4 KB pages of host page 0x71fd810000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: 0x149775d92 | 32 bytes at rip, loaded image: 46 8b 34 df 48 8d 0c cf e8 f1 ef ff ff 46 8b 64 df 04 48 8b d8 0f b6 bd e0 01 00 00 48 89 44 24 | pool copy: 46 8b 34 df 48 8d 0c cf e8 f1 ef ff ff 46 8b 64 df 04 48 8b d8 0f b6 bd e0 01 00 00 48 89 44 24 | image and pool copy equal
+[x64-fault] #1 a 64-bit guest faulted at address 0x0 at RIP 0x71fd810d92 (UnityPlayer.dll+0xc70d92) [exact RIP from FEX's block table]; RAX=0x0 RCX=0x0 RDX=0x0 RBX=0x7fffffff RSP=0x702580f780 RBP=0x702580f880 RSI=0x7026e41cb8 RDI=0x0 R8=0x3c R9=0x11dbef855 R10=0x0 R11=0x0 R12=0x438 R13=0x0 R14=0x780 R15=0x0
+[fault-host] 16cb9bf30: 1000004a 97ec75ac 10ff9aca f900038a b945eb8b 3400004b d4395fc0 d29bd406
+[fault-host] 16cb9bf50: f2bfbc46 f2c00e26 bd4000c7 6f00e409 d299c206 f2bfbc26 f2c00e26 bd4000c8
+[fault-host] 16cb9bf70: d28d6e06 f2bfbc66 f2c00e26 bd4000c6 9944c106 d503201f 93407cc0 d9430108
+[fault-host] 16cb9bf90: d503201f b9407ef5 b94072f3 8b000801 d37be821 51000b5a 910743a6 d503201f
+[fault-host] 16cb9bfb0: 990000da 910783a6 194000da 8b080026 994680c8 d503201f 9107c3a6 d503201f
+[fault-host] 16cb9bfd0: 990000c8 93407e88 d503201f d91903a8 d503201f d91883a8 52800002 52800026
+[mach_exc] insn_stream PC-12..PC+8: d503201f 8b080900 8b050f46 [994000d5] d503201f 8b000f40 d281b3e6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702584fe20 *(gs_cached+0x58)=0x702584fe20
+[x86_live] RAX=0x0 RCX=0x0 RDX=0x0 RBX=0x7fffffff RSP=0x702580f780 RBP=0x702580f880 RSI=0x7026e41cb8 RDI=0x0
+[x86_live]  R8=0x3c  R9=0x11dbef855 R10=0x0 R11=0x0 R12=0x438 R13=0x0 R14=0x780 R15=0x0
+[x86_live] State.RIP=0x71fd810be3 callret_sp=0x7c01001000
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0x994000d5 pc=0x16cb9c030 NO pool/anon alias | region 0x10203c000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x16cb9c030 hinsn=0x994000d5 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16bffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fd810be3 pc=0x16cb9c030 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16cb9c030 addr=0x0 x18=0x71fffe0000 type=1 lr=0x16cffc274 sp=0x71fe3b0000 x16=0x1481019a4 x17=0x71fe3aff20
+[guest-code] rev=ml333 pool_rip=0x149775be3 (PE 0x71fd810be3): f7 45 38 00 00 40 00 75 07 44 89 64 24 64 eb 11
+[fault-host] 16cb9bf90: d503201f b9407ef5 b94072f3 8b000801 d37be821 51000b5a 910743a6 d503201f
+[fault-host] 16cb9bfb0: 990000da 910783a6 194000da 8b080026 994680c8 d503201f 9107c3a6 d503201f
+[fault-host] 16cb9bfd0: 990000c8 93407e88 d503201f d91903a8 d503201f d91883a8 52800002 52800026
+[fault-host] 16cb9bff0: b90076e6 b90072e2 710002c9 54000461 d95b03a0 d503201f 8b080905 b94066e2
+[fault-host] 16cb9c010: 910803a6 994000c1 d503201f 93407e88 d940001a d503201f 8b080900 8b050f46
+[fault-host] 16cb9c030: 994000d5 d503201f 8b000f40 d281b3e6 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d503201f 8b080900 8b050f46 [994000d5] d503201f 8b000f40 d281b3e6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702584fe20 *(gs_cached+0x58)=0x702584fe20
+[x86_live] RAX=0x0 RCX=0x0 RDX=0x0 RBX=0x7fffffff RSP=0x702580f780 RBP=0x702580f880 RSI=0x7026e41cb8 RDI=0x0
+[x86_live]  R8=0x3c  R9=0x11dbef855 R10=0x0 R11=0x0 R12=0x438 R13=0x0 R14=0x780 R15=0x0
+[x86_live] State.RIP=0x71fd810be3 callret_sp=0x7c01001000
+0024:err:seh:segv_handler SEGV #1: pc=0x16cb9c030 addr=0x0 uctx_x18=0x71fffe0000 disp=0 mach_exc=24629
+0024:err:seh:segv_handler SEGV at pc=0x16cb9c030 addr=0x0 esr=0x92000006 TPIDR_EL0=0x1007 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0x0 x1=0x0 x2=0x3c x3=0x11dbef855
+0024:err:seh:segv_handler   x8=0x0 x9=0x0 x10=0x16cb9b290 x16=0x1481019a4 x17=0x71fe3aff20 x18=0x71fffe0000 x19=0x438 x20=0x0
+0024:err:seh:segv_handler   fp=0x702580f880 lr=0x16cffc274 sp=0x71fe3b0000
+0024:err:seh:segv_handler   [teb-tsd] base=0x16e67f0e0 offset=0x908 raw=0x71fffe0000 teb_key_val=0x71fffe0000
+0024:err:seh:segv_handler   [guest-state] x28=0x7c00801140 rip=0x71fd810be3
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x71fd810be3 in image 0x71fcba0000: rva 0xc70be3, section #0 '.text' rva 0x1000+0x1270d10 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x16cb9b290 rip=0x71fd810d92 x86=46 8b 34 df 48 8d 0c cf e8 f1 ef ff ff 46 8b 64
+0024:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x1 rdx=0x1482fb178 rbx=0x7fffffff
+0024:err:seh:segv_handler   [guest-state]   rsp=0x702580f778 rbp=0x702580f880 rsi=0x7026e41cb8 rdi=0x2
+0024:err:seh:segv_handler   [guest-state]   r8 =0x2d r9 =0x11dbef855 r10=0x0 r11=0x11dbefc70
+0024:err:seh:segv_handler   [guest-state]   r12=0x0 r13=0x0 r14=0x704420a8d0 r15=0x0
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=7/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-24  d503201f 93407e88 d940001a d503201f 8b080900 8b050f46
+0024:err:seh:segv_handler   [emit-dump]   +0    994000d5 d503201f 8b000f40 d281b3e6 f2bfb026 f2c00e26
+0024:err:seh:segv_handler   [emit-dump]   +24   f81f8ee6 1000004a 940001ce 10ff91ea f900038a b945eb8b
+0024:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x702580f780  gregs[RSP]=0x702580f778  NZCV/flags[24]=0x60000000  callret_sp=0x7c01001000 base=0x7c00c01000  x28=0x7c00801140
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: d503201f 8b080900 8b050f46 [994000d5] d503201f 8b000f40 d281b3e6
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x16cb9c030 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16cb9c030 RX from -32, 64 of 64 bytes: a6 03 08 91 c1 00 40 99 1f 20 03 d5 88 7e 40 93 1a 00 40 d9 1f 20 03 d5 00 09 08 8b 46 0f 05 8b d5 00 40 99 1f 20 03 d5 40 0f 00 8b e6 b3 81 d2 26 b0 bf f2 26 0e c0 f2 e6 8e 1f f8 4a 00 00 10 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16cb9c030 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 16CB9C030 AV READ of 0
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71fd810d92 RX from -32, 64 of 64 bytes: ff 75 40 48 8b 4d b0 4c 8d 1c 80 44 8b 44 24 64 8b 95 00 02 00 00 49 63 c5 48 8b 39 48 8d 0c 80 46 8b 34 df 48 8d 0c cf e8 f1 ef ff ff 46 8b 64 df 04 48 8b d8 0f b6 bd e0 01 00 00 48 89 44 24 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71fd810d92 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 71FD810D92 AV READ of 0
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=00000071FD810D92 flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7025810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+[jit-pool] image 0x71f8470000+0xf0000 (dbghelp.dll) → pool 0x14e1bc000 used=0x62b0000/0x25000000 tramp+0x4000
+D 24 Load module dbghelp.dll (dbghelp.dll-043eb877bc0ae473): 71F8470000
+[xp] 19:41:59.042 +1.44 dt=275 cpu=290 (thr 288) P=288 E=2 run=302 pgw=-1.0 GHz P=4.21 E=2.95 Minst=5829 IPC=4.79 mJ=1675 pin=60 rdKB=10424 fpMB=1394
+[guest-log] #2 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'No more files.' (Address: 00000071FD810D92)
+[guest-log] #3 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD1222B8)
+[guest-log] #4 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD25D256)
+[guest-log] #5 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD36380C)
+[guest-log] #6 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD123590)
+[guest-log] #7 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'Success.' (Address: 00000071FD12721B)
+[guest-log] #8 tid=0024   ERROR: SymGetSymFromAddr64, GetLastError: 'No more files.' (Address: 000000010DB511F2)
+[free-delay] #5 release of 0x7046790000+0x170000 held for 2000 ms (5 in flight)
+[image-reload] unmapped image 0x71f8470000+0xf0000: 1 pool copy marked
+wine: Unhandled page fault on read access to 0000000000000000 at address 00000071FD810D92 (thread 0024), starting debugger...
+[xp] 19:41:59.320 +1.72 dt=278 cpu=287 (thr 287) P=286 E=2 run=285 pgw=-1.0 GHz P=4.24 E=2.91 Minst=7330 IPC=6.02 mJ=1832 pin=7 rdKB=160 fpMB=1361
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=3914
+[unwind] term ml661 begin rip=1488781fc rsp=702580dcf8 window=[702580dcf8..702600dcf8) max=32
+[unwind] term ml661 #00 pc=1488781fc rsp=702580dcf8  kernelbase.dll+0x781fc
+[unwind] term ml662 #00 nv: rbx=702580f6d0 rbp=702580ddc0 rsi=702580ee50 rdi=702580e060 r12=702580e060 r13=0 r14=c0000005 r15=702580f6d0
+[unwind] term ml662   rbx=702580f6d0: 050000c0 00000000 00000000 00000000 920d81fd 71000000 02000000 00000000
+[unwind] term ml662   rbp=702580ddc0: 648b8148 01000000 648b8148 01000000 0d31feff 71000000 02000000 70000000
+[unwind] term ml661 #01 pc=7025840000 rsp=702580dd00  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+010:   ? 71fd810d92  UnityPlayer.dll+0xc70d92
+[term-stack] ml660 sp+0a8: CALL 71fd810d00  UnityPlayer.dll+0xc70d00
+[term-stack] ml660 sp+378: CALL 71fd1222b8  UnityPlayer.dll+0x5822b8
+[term-stack] ml660 sp+448: CALL 71fd166dbe  UnityPlayer.dll+0x5c6dbe
+[term-stack] ml660 sp+458:   ? 71fe198450  UnityPlayer.dll+0x15f8450
+[term-stack] ml660 sp+488: call* 71fd25d256  UnityPlayer.dll+0x6bd256
+[term-stack] ml660 sp+4a8: call* 71fd1632b5  UnityPlayer.dll+0x5c32b5
+[term-stack] ml660 sp+4d8: CALL 71fd36380c  UnityPlayer.dll+0x7c380c
+[term-stack] ml660 sp+598: CALL 71fd123590  UnityPlayer.dll+0x583590
+[term-stack] ml660 sp+7f8: call* 10db517be  WindowsPlayer.exe+0x17be
+[term-stack] ml660 sp+868: CALL 71fd12721b  UnityPlayer.dll+0x58721b
+[term-stack] ml660 sp+898: CALL 10db511f2  WindowsPlayer.exe+0x11f2
+[srv-kill] kill_thread tid=00a8 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00ac pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00b4 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00b8 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00bc pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=00c0 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:41:59.552] [INFO] [session] length=4s play=0s frames=0 stalls=0/0s peak=1404MB limit=12287MB thermal=nominal lpm=0 api=D3D11/D3D12/D3D9/OpenGL/Vulkan/64 res=1112x832 cap=60 game=DEMON'S TILT
+[19:41:59.556] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[xp] 19:41:59.576 +1.98 dt=256 cpu=95 (thr 64) P=44 E=50 run=102 pgw=-1.0 GHz P=3.32 E=2.97 Minst=1318 IPC=4.45 mJ=276 pin=0 rdKB=0 fpMB=1363
+[footprint] rev=ml358 phys=1370 MB (peak 1370) internal=1348 MB compressed=0 MB external=174 MB reusable=6 MB (cycle=2)
+[19:41:59.845] [INFO] [bcd-host] no report
+[footprint] rev=ml1060 fast phys=1387 MB compressed=0 MB internal=1365 MB
+[footprint] rev=ml1060 fast phys=1405 MB compressed=0 MB internal=1383 MB
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml1060 fast phys=1443 MB compressed=0 MB internal=1422 MB
+[footprint] rev=ml1060 fast phys=1466 MB compressed=0 MB internal=1445 MB
+[footprint] rev=ml1060 fast phys=1489 MB compressed=0 MB internal=1468 MB
+[footprint] rev=ml1060 fast phys=1514 MB compressed=0 MB internal=1493 MB
+[19:42:01.357] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1551 MB (peak 1551) internal=1531 MB compressed=0 MB external=175 MB reusable=6 MB (cycle=3)
+[footprint] rev=ml358 phys=1665 MB (peak 1665) internal=1646 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=4)
+[footprint] rev=ml358 phys=1822 MB (peak 1822) internal=1802 MB compressed=0 MB external=175 MB reusable=7 MB (cycle=5)
+[footprint] rev=ml358 phys=1999 MB (peak 1999) internal=1979 MB compressed=0 MB external=176 MB reusable=8 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ddc1d40 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=99% RUN pc=libsystem_c.dylib`memmem+0x80 lr=libsystem_c.dylib`memmem+0x9c sp=0x16e079470 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16e190c90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16e21eac0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e3349e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=2% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16ea66500 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=99% RUN pc=libsystem_c.dylib`memmem+0x80 lr=libsystem_c.dylib`memmem+0x9c sp=0x16e079470 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16df62b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=99% RUN pc=libsystem_c.dylib`memmem+0x80 lr=libsystem_c.dylib`memmem+0x9c sp=0x16e079470 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=0% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16e67e500 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=2925 MB compressed=0 MB internal=2905 MB
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[footprint] rev=ml1060 fast phys=2950 MB compressed=0 MB internal=2930 MB
+[footprint] rev=ml1060 fast phys=2974 MB compressed=0 MB internal=2954 MB
+[footprint] rev=ml1060 fast phys=2998 MB compressed=0 MB internal=2978 MB
+[footprint] rev=ml1060 fast phys=3022 MB compressed=0 MB internal=3002 MB
+[footprint] rev=ml1060 fast phys=3048 MB compressed=0 MB internal=3027 MB
+[footprint] rev=ml358 phys=1411 MB (peak 2878) internal=1392 MB compressed=0 MB external=189 MB reusable=13 MB (cycle=12)
+[footprint] rev=ml358 phys=1412 MB (peak 2878) internal=1392 MB compressed=0 MB external=190 MB reusable=13 MB (cycle=13)
+[footprint] rev=ml358 phys=1412 MB (peak 2878) internal=1392 MB compressed=0 MB external=190 MB reusable=13 MB (cycle=14)
+[footprint] rev=ml358 phys=1386 MB (peak 2878) internal=1366 MB compressed=0 MB external=190 MB reusable=39 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=23 resident=1596MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1386 MB (peak 2878) internal=1366 MB compressed=0 MB external=190 MB reusable=39 MB (cycle=16)
+[xp] 19:42:28.512 +30.91 dt=323 cpu=40 (thr 40) P=0 E=40 run=44 pgw=-1.0 GHz P=0.00 E=1.22 Minst=124 IPC=2.54 mJ=5 pin=0 rdKB=0 fpMB=1386
+[xp] 19:42:28.790 +31.19 dt=278 cpu=44 (thr 44) P=0 E=44 run=54 pgw=-1.0 GHz P=0.00 E=1.76 Minst=156 IPC=2.00 mJ=9 pin=0 rdKB=0 fpMB=1386
+[xp] 19:42:29.049 +31.45 dt=259 cpu=29 (thr 29) P=0 E=29 run=34 pgw=-1.0 GHz P=0.00 E=1.12 Minst=90 IPC=2.76 mJ=4 pin=0 rdKB=0 fpMB=1386
+[xp] 19:42:29.324 +31.73 dt=275 cpu=42 (thr 42) P=0 E=42 run=46 pgw=-1.0 GHz P=0.00 E=1.24 Minst=136 IPC=2.63 mJ=5 pin=0 rdKB=0 fpMB=1386
+[xp] 19:42:29.649 +32.05 dt=324 cpu=77 (thr 76) P=33 E=44 run=93 pgw=-1.0 GHz P=2.79 E=2.16 Minst=414 IPC=2.22 mJ=61 pin=10 rdKB=160 fpMB=1386
+[xp] 19:42:29.959 +32.36 dt=311 cpu=173 (thr 174) P=12 E=162 run=180 pgw=-1.0 GHz P=2.06 E=2.71 Minst=1719 IPC=3.72 mJ=120 pin=0 rdKB=0 fpMB=1388
+[footprint] rev=ml358 phys=1392 MB (peak 2878) internal=1373 MB compressed=0 MB external=190 MB reusable=39 MB (cycle=17)
+=2.06 E=2.71 Minst=1719 IPC=3.72 mJ=120 pin=0 rdKB=0 fpMB=1388

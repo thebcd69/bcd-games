@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "wineserver-suspend-window-deadlock"
+ ],
+ "next": [],
+ "note": "Requiem: Avenging Angel (BCD Dock, Send Log 643J42, build 653): the game froze 50 s in; the [main-stall] dump shows the Windows server thread in getenv under ios_fill_thread_context while it had a game thread halted, and the halted thread inside libc (the C library's environment lock). Rule wineserver-suspend-window-deadlock (fixedIn 660: the server reads its switches before the halt and prints after it, build/wineserver/mach_ios.c, M001). 66HCT0 and AJEJWV are the same freeze.",
+ "outcome": "exited-early",
+ "stage": 3,
+ "status": "known"
+}

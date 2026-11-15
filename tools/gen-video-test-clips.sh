@@ -12,7 +12,7 @@
 #             30 frames at 15 fps, 44100 Hz, 2.0 s. macOS only (swiftc).
 #   test.wmv  Windows Media Video 8 (wmv2) and Windows Media Audio 2 (wmav2) in an ASF file, the same pictures and tone. Made
 #             with FFmpeg's own native encoders from the tarball the repository tracks for the app's FFmpeg
-#             (build/ffmpeg/src/ffmpeg-7.1.1.tar.xz, SHA-256 checked, unmodified): a throw-away command-line build on the host
+#             (build/ffmpeg/src/ffmpeg-7.1.5.tar.xz, SHA-256 checked, unmodified): a throw-away command-line build on the host
 #             with only the encoders and the ASF muxer this needs, LGPL-2.1-or-later, configured --disable-gpl --disable-nonfree
 #             --disable-version3. Set FFMPEG=<path> to use a build you already have.
 #
@@ -33,12 +33,12 @@ swiftc -O "$R/tools/video-test-clips/mkmp4.swift" -o "$T/mkmp4"
 echo "== test.wmv (FFmpeg wmv2 + wmav2 in ASF) =="
 FF="${FFMPEG:-}"
 if [ -z "$FF" ]; then
-    TAR="$R/build/ffmpeg/src/ffmpeg-7.1.1.tar.xz"
+    TAR="$R/build/ffmpeg/src/ffmpeg-7.1.5.tar.xz"
     WANT="$(awk '{print $1}' "$R/build/ffmpeg/src/SHA256SUMS")"
     [ "$(shasum -a 256 "$TAR" | awk '{print $1}')" = "$WANT" ] || { echo "the tracked FFmpeg tarball does not match build/ffmpeg/src/SHA256SUMS" >&2; exit 1; }
     mkdir -p "$T/ff/build"
     tar -xf "$TAR" -C "$T/ff"
-    (cd "$T/ff/build" && ../ffmpeg-7.1.1/configure --disable-everything --disable-gpl --disable-nonfree --disable-version3 --disable-autodetect \
+    (cd "$T/ff/build" && ../ffmpeg-7.1.5/configure --disable-everything --disable-gpl --disable-nonfree --disable-version3 --disable-autodetect \
         --disable-doc --disable-network --disable-ffplay --disable-ffprobe --enable-ffmpeg --disable-x86asm --enable-small \
         --enable-encoder=wmv2,wmav2 --enable-decoder=rawvideo,pcm_s16le --enable-demuxer=rawvideo,pcm_s16le --enable-muxer=asf \
         --enable-protocol=file --enable-filter=scale,format,aresample,anull,null >/dev/null && nice -n 10 make -j3 >/dev/null 2>&1)

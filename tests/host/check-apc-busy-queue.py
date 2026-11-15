@@ -118,8 +118,11 @@ if wine:
     enabled = function(thread_c, 'static int ios_apc_busy_queue_enabled( void )\n{')
     target = function(thread_c, 'static struct thread *ios_apc_requeue_target( struct thread *thread, const struct thread_apc *apc )')
     req = function(thread_c, 'static int ios_apc_requeue_enabled( void )\n{')
-    check('the switch is MADEIRA_APC_BUSY_QUEUE, read once, and only a value starting with 1 turns it on',
-          'getenv( "MADEIRA_APC_BUSY_QUEUE" )' in enabled and 'enabled = e && e[0] == \'1\';' in enabled and 'static int enabled = -1;' in enabled)
+    # Build 660: the switch is read on every call (the server runs again in the same process for the next session of an app run; a cached
+    # answer kept the first game's setting: tests/host/check-apc-switches-per-session.py). The first session of an app run is unchanged,
+    # which is what the comparison with the original functions below shows.
+    check('the switch is MADEIRA_APC_BUSY_QUEUE, read where it is used (no answer kept from an earlier session), and only a value starting with 1 turns it on',
+          'getenv( "MADEIRA_APC_BUSY_QUEUE" )' in enabled and 'int enabled = e && e[0] == \'1\';' in enabled and 'static int enabled' not in enabled)
     check('it is announced once, from the first-use line of the requeue switch, only when it is on',
           'if (enabled) ios_apc_busy_queue_enabled();' in req and 'if (enabled)\n            fprintf( stderr, "[apc-requeue] MADEIRA_APC_BUSY_QUEUE=1' in enabled)
     new_line = 'if (!target && !thread->alert_sync && ios_apc_busy_queue_enabled()) target = thread;'
@@ -170,7 +173,10 @@ static struct thread *ios_apc_requeue_target( struct thread *thread, const struc
     return target;
 }
 '''
-    PATCHED = ('static int ios_apc_busy_queue_enabled( void );\n\n' + req + '\n' + enabled + '\n' + target)
+    # Build 660: ios_apc_requeue_target also asks MADEIRA_APC_DEFER_ISSUER (tests/host/check-apc-defer-issuer.py). That switch is unset in
+    # every run below, so its function is compiled in as it is and the server's async predicate is a stand-in that is never reached.
+    defer = function(thread_c, 'static int ios_apc_defer_issuer_enabled( void )\n{') if 'ios_apc_defer_issuer_enabled' in thread_c else ''
+    PATCHED = ('static int ios_apc_busy_queue_enabled( void );\n\n' + req + '\n' + enabled + '\n' + defer + '\n' + target)
 
     HARNESS = r'''
 #include <stdio.h>
@@ -196,11 +202,14 @@ struct thread
     unsigned int id;
     int suspended;
 };
+struct object;
 struct thread_apc
 {
+    struct object *owner;
     struct { enum apc_type type; struct { unsigned int status; } async_io; } call;
 };
 static int is_thread_suspended( struct thread *thread ) { return thread->suspended; }
+static int async_can_defer_to_issuer( struct object *obj, struct thread *thread ) { abort(); }   /* only with MADEIRA_APC_DEFER_ISSUER=1 */
 
 #include "CODE"
 

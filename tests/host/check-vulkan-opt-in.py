@@ -24,7 +24,8 @@ for on in [False,True]:
  assert 'winevulkan_unix_call_funcs' in code
  assert ('dxmt_winemetal_unix_call_funcs' in code)
  assert 'dxmt_winemetal_unix_call_wow64_funcs' in code
- assert '!wow && match && strstr(match, "winevulkan")' in code
+ assert 'match && strstr(match, "winevulkan") && (!wow || ios_vk_session_on())' in code   # madeira-bcd (build 660): a 32-bit caller only with the key
+ assert 'winevulkan_unix_call_wow64_funcs' in code
  print('PASS binder Vulkan gate',on)
 script=(root/'build/win32u-unix/build.sh').read_text()
 case=script[script.index('    case "$name" in'):script.index('    esac')+len('    esac')]

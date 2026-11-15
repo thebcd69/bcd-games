@@ -163,5 +163,14 @@ check("CI runs this check before the patch",
 check("CI patches before the i386 farm key and the native DXMT build",
       0 < step < wf.find("- name: i386 farm revision") and step < wf.find("bash build/dxmt-ios/build.sh"))
 
+# Round 660 (M002): a 64-bit Direct3D 11 game gets the fix only through d3d11-src.dll (LEGO City Undercover X025QA ended with format 0 on
+# build 653, the 32-bit DLLs having had the fix since build 559): BCD_PATCHES names the script with its marker, and the IPA is refused
+# when no 64-bit d3d11.dll carries the marker.
+sh = (R / "tools/build-d3d11-dll.sh").read_text()
+check("tools/build-d3d11-dll.sh applies it to d3d11-src.dll and requires its marker in the result",
+      '"patch-dxmt-layer-format.py" "[layer-format] madeira-bcd: back buffer format "' in sh[sh.index("BCD_PATCHES=("):sh.index("SHIP_HAS_BCD=1")])
+loop = wf[wf.index('for m in "[copy-structure-count] skipped #"'):]
+check("the IPA check refuses a package whose 64-bit d3d11.dll lacks it", '"[layer-format] madeira-bcd: back buffer format "' in loop[:loop.index("; do")])
+
 print("PASS: dxmt layer format" if ok else "FAILED: dxmt layer format")
 sys.exit(0 if ok else 1)
