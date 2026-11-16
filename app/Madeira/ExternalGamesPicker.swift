@@ -250,3 +250,61 @@ final class BCDExternalPickerFix {
         return value
     }
 }
+
+// MARK: - UIKit folder picker (replaces SwiftUI .fileImporter for Settings > Storage > External drives)
+//
+// On some devices SwiftUI's `.fileImporter(allowedContentTypes: [.folder])` on the External SSD group never presents:
+// the log shows "[ext-storage] picker opened" and never "closed", because the `isPresented` flag stays true while no
+// picker appears (the saves backup's .fileImporter on the same page still works). Presenting the same system picker from
+// UIKit, as the controls-share import already does, does not depend on SwiftUI's presentation of the importer.
+// `asCopy: false` keeps the in-place read the External SSD feature needs (no -Inbox copy).
+
+@MainActor enum BCDExternalFolderPicker {
+    /// Keeps the delegate alive while the picker is up.
+    private static var pending: Delegate?
+
+    /// Presents the folder picker. `answered` gets the chosen folder; `closed` runs once when the picker is gone
+    /// (after an answer, Cancel or a swipe down). Returns false when there was no screen to present from.
+    @discardableResult
+    static func present(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) -> Bool {
+        guard let top = topController() else { return false }
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)
+        picker.allowsMultipleSelection = false
+        let delegate = Delegate(answered: answered, closed: closed)
+        picker.delegate = delegate
+        picker.presentationController?.delegate = delegate
+        pending = delegate
+        top.present(picker, animated: true)
+        return true
+    }
+
+    private static func topController() -> UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        var top = scene?.keyWindow?.rootViewController
+        while let presented = top?.presentedViewController, !presented.isBeingDismissed { top = presented }
+        return top
+    }
+
+    private final class Delegate: NSObject, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate {
+        private var answered: ((URL) -> Void)?
+        private var closed: (() -> Void)?
+        init(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) {
+            self.answered = answered; self.closed = closed
+        }
+        private func finish() {
+            let done = closed
+            answered = nil; closed = nil
+            DispatchQueue.main.async { MainActor.assumeIsolated {
+                BCDExternalFolderPicker.pending = nil
+                done?()
+            } }
+        }
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            if let url = urls.first, let answered { answered(url) }
+            finish()
+        }
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) { finish() }
+        func presentationControllerDidDismiss(_ presentationController: UIPresentationController) { if closed != nil { finish() } }
+    }
+}

@@ -769,6 +769,9 @@ struct BCDStorageItem: Identifiable, Hashable {
     func setSteamInstallDrive(_ id: String)
     /// What the folder picker did ("opened", "answered", "failed: ...", "closed"), for the log.
     func noteExternalPicker(_ what: String)
+    /// Opens the system folder picker (UIKit; SwiftUI's .fileImporter did not present on some devices). `reason` goes to the log;
+    /// a chosen folder reaches `addExternalDrive`.
+    func chooseExternalFolder(reason: String)
     var prefixToolsView: AnyView? { get }
 }
 
@@ -798,6 +801,7 @@ extension BCDStorageBackend {
     func removeExternalDrive(_ id: String) {}
     func setSteamInstallDrive(_ id: String) {}
     func noteExternalPicker(_ what: String) {}
+    func chooseExternalFolder(reason: String) {}
 }
 
 struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
@@ -807,7 +811,6 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
     @Environment(\.bcdLayout) private var layout
     @State private var backup: BCDShareItems?
     @State private var choosingBackup = false
-    @State private var choosingExternalGames = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -876,8 +879,8 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
 
     /// Settings › Storage › External drives (from Madeira #464, Settings › External drives): every drive or folder added from
     /// Files, its letter, whether it is connected and its free room; a tap offers Find games, Reconnect and Remove; Steam
-    /// installs picks where a Steam game's Install goes by default. The folder picker is attached here, on the group, not on the
-    /// page: the page already carries the saves backup's importer, and two importers on one view can displace each other.
+    /// installs picks where a Steam game's Install goes by default. The folder picker is presented from UIKit by the live
+    /// backend (`chooseExternalFolder`), not by a SwiftUI `.fileImporter`, which did not present on some devices.
     private var externalGames: some View {
         let drives = backend.externalDrives
         return BCDSettingsGroup(title: "External drives",
@@ -887,8 +890,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
                                  title: drives.isEmpty ? "Add a drive or folder" : "Add another drive or folder",
                                  note: drives.isEmpty ? backend.externalGamesMessage : nil, symbol: "externaldrive.badge.plus",
                                  enabled: backend.canChangeExternalDrives) {
-                backend.noteExternalPicker("opened")
-                choosingExternalGames = true
+                backend.chooseExternalFolder(reason: "opened")
             }
             if !drives.isEmpty {
                 BCDSettingsValueRow(id: BCDSettingsID.control(.storage, "external-steam"), title: "Steam installs",
@@ -903,16 +905,6 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
                 }
             }
         }
-        .fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder]) { result in
-            switch result {
-            case .success(let url):
-                backend.noteExternalPicker("answered")
-                backend.addExternalDrive(url)
-            case .failure(let error):
-                backend.noteExternalPicker("failed: \(error.localizedDescription)")
-            }
-        }
-        .onChange(of: choosingExternalGames) { _, open in if !open { backend.noteExternalPicker("closed") } }
     }
 
     private func driveRow(_ drive: BCDExternalDrive) -> some View {
@@ -931,8 +923,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             } else {
                 choices.append(.init(title: "Reconnect") {
                     backend.reconnectExternalDrive(drive.id) {
-                        backend.noteExternalPicker("opened (after reconnect)")
-                        choosingExternalGames = true
+                        backend.chooseExternalFolder(reason: "opened (after reconnect)")
                     }
                 })
             }

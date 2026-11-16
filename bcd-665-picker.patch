@@ -1,0 +1,191 @@
+diff --git a/app/Madeira/BCDSettingsLive.swift b/app/Madeira/BCDSettingsLive.swift
+--- a/app/Madeira/BCDSettingsLive.swift	2026-11-16 03:04:01.111164577 +0000
++++ b/app/Madeira/BCDSettingsLive.swift	2026-11-16 03:04:01.112277562 +0000
+@@ -653,6 +653,20 @@
+         ExternalDrives.shared.folders.first { $0.id.uuidString == id }
+     }
+ 
++    func chooseExternalFolder(reason: String) {
++        noteExternalPicker(reason)
++        let shown = BCDExternalFolderPicker.present(
++            answered: { [weak self] url in
++                self?.noteExternalPicker("answered")
++                self?.addExternalDrive(url)
++            },
++            closed: { [weak self] in self?.noteExternalPicker("closed") })
++        if !shown {
++            noteExternalPicker("failed: no screen to present from")
++            noteExternalPicker("closed")
++        }
++    }
++
+     func noteExternalPicker(_ what: String) {
+         if what.hasPrefix("opened") {
+             // Arm the in-place host-identity fix before iOS builds the picker. A no-op on installs that
+diff --git a/app/Madeira/BCDSettingsSections.swift b/app/Madeira/BCDSettingsSections.swift
+--- a/app/Madeira/BCDSettingsSections.swift	2026-11-16 03:04:01.106622018 +0000
++++ b/app/Madeira/BCDSettingsSections.swift	2026-11-16 03:04:01.107649948 +0000
+@@ -769,6 +769,9 @@
+     func setSteamInstallDrive(_ id: String)
+     /// What the folder picker did ("opened", "answered", "failed: ...", "closed"), for the log.
+     func noteExternalPicker(_ what: String)
++    /// Opens the system folder picker (UIKit; SwiftUI's .fileImporter did not present on some devices). `reason` goes to the log;
++    /// a chosen folder reaches `addExternalDrive`.
++    func chooseExternalFolder(reason: String)
+     var prefixToolsView: AnyView? { get }
+ }
+ 
+@@ -798,6 +801,7 @@
+     func removeExternalDrive(_ id: String) {}
+     func setSteamInstallDrive(_ id: String) {}
+     func noteExternalPicker(_ what: String) {}
++    func chooseExternalFolder(reason: String) {}
+ }
+ 
+ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
+@@ -807,7 +811,6 @@
+     @Environment(\.bcdLayout) private var layout
+     @State private var backup: BCDShareItems?
+     @State private var choosingBackup = false
+-    @State private var choosingExternalGames = false
+ 
+     var body: some View {
+         VStack(alignment: .leading, spacing: 18) {
+@@ -876,8 +879,8 @@
+ 
+     /// Settings › Storage › External drives (from Madeira #464, Settings › External drives): every drive or folder added from
+     /// Files, its letter, whether it is connected and its free room; a tap offers Find games, Reconnect and Remove; Steam
+-    /// installs picks where a Steam game's Install goes by default. The folder picker is attached here, on the group, not on the
+-    /// page: the page already carries the saves backup's importer, and two importers on one view can displace each other.
++    /// installs picks where a Steam game's Install goes by default. The folder picker is presented from UIKit by the live
++    /// backend (`chooseExternalFolder`), not by a SwiftUI `.fileImporter`, which did not present on some devices.
+     private var externalGames: some View {
+         let drives = backend.externalDrives
+         return BCDSettingsGroup(title: "External drives",
+@@ -887,8 +890,7 @@
+                                  title: drives.isEmpty ? "Add a drive or folder" : "Add another drive or folder",
+                                  note: drives.isEmpty ? backend.externalGamesMessage : nil, symbol: "externaldrive.badge.plus",
+                                  enabled: backend.canChangeExternalDrives) {
+-                backend.noteExternalPicker("opened")
+-                choosingExternalGames = true
++                backend.chooseExternalFolder(reason: "opened")
+             }
+             if !drives.isEmpty {
+                 BCDSettingsValueRow(id: BCDSettingsID.control(.storage, "external-steam"), title: "Steam installs",
+@@ -903,16 +905,6 @@
+                 }
+             }
+         }
+-        .fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder]) { result in
+-            switch result {
+-            case .success(let url):
+-                backend.noteExternalPicker("answered")
+-                backend.addExternalDrive(url)
+-            case .failure(let error):
+-                backend.noteExternalPicker("failed: \(error.localizedDescription)")
+-            }
+-        }
+-        .onChange(of: choosingExternalGames) { _, open in if !open { backend.noteExternalPicker("closed") } }
+     }
+ 
+     private func driveRow(_ drive: BCDExternalDrive) -> some View {
+@@ -931,8 +923,7 @@
+             } else {
+                 choices.append(.init(title: "Reconnect") {
+                     backend.reconnectExternalDrive(drive.id) {
+-                        backend.noteExternalPicker("opened (after reconnect)")
+-                        choosingExternalGames = true
++                        backend.chooseExternalFolder(reason: "opened (after reconnect)")
+                     }
+                 })
+             }
+diff --git a/app/Madeira/ExternalGamesPicker.swift b/app/Madeira/ExternalGamesPicker.swift
+--- a/app/Madeira/ExternalGamesPicker.swift	2026-11-16 03:04:01.101791360 +0000
++++ b/app/Madeira/ExternalGamesPicker.swift	2026-11-16 03:04:01.102931891 +0000
+@@ -250,3 +250,61 @@
+         return value
+     }
+ }
++
++// MARK: - UIKit folder picker (replaces SwiftUI .fileImporter for Settings > Storage > External drives)
++//
++// On some devices SwiftUI's `.fileImporter(allowedContentTypes: [.folder])` on the External SSD group never presents:
++// the log shows "[ext-storage] picker opened" and never "closed", because the `isPresented` flag stays true while no
++// picker appears (the saves backup's .fileImporter on the same page still works). Presenting the same system picker from
++// UIKit, as the controls-share import already does, does not depend on SwiftUI's presentation of the importer.
++// `asCopy: false` keeps the in-place read the External SSD feature needs (no -Inbox copy).
++
++@MainActor enum BCDExternalFolderPicker {
++    /// Keeps the delegate alive while the picker is up.
++    private static var pending: Delegate?
++
++    /// Presents the folder picker. `answered` gets the chosen folder; `closed` runs once when the picker is gone
++    /// (after an answer, Cancel or a swipe down). Returns false when there was no screen to present from.
++    @discardableResult
++    static func present(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) -> Bool {
++        guard let top = topController() else { return false }
++        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)
++        picker.allowsMultipleSelection = false
++        let delegate = Delegate(answered: answered, closed: closed)
++        picker.delegate = delegate
++        picker.presentationController?.delegate = delegate
++        pending = delegate
++        top.present(picker, animated: true)
++        return true
++    }
++
++    private static func topController() -> UIViewController? {
++        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
++        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
++        var top = scene?.keyWindow?.rootViewController
++        while let presented = top?.presentedViewController, !presented.isBeingDismissed { top = presented }
++        return top
++    }
++
++    private final class Delegate: NSObject, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate {
++        private var answered: ((URL) -> Void)?
++        private var closed: (() -> Void)?
++        init(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) {
++            self.answered = answered; self.closed = closed
++        }
++        private func finish() {
++            let done = closed
++            answered = nil; closed = nil
++            DispatchQueue.main.async { MainActor.assumeIsolated {
++                BCDExternalFolderPicker.pending = nil
++                done?()
++            } }
++        }
++        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
++            if let url = urls.first, let answered { answered(url) }
++            finish()
++        }
++        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) { finish() }
++        func presentationControllerDidDismiss(_ presentationController: UIPresentationController) { if closed != nil { finish() } }
++    }
++}
+diff --git a/tests/host/check-external-storage.py b/tests/host/check-external-storage.py
+--- a/tests/host/check-external-storage.py	2026-11-16 03:04:01.116203048 +0000
++++ b/tests/host/check-external-storage.py	2026-11-16 03:04:01.117394842 +0000
+@@ -205,14 +205,16 @@
+ # Settings.
+ sections = read("app/Madeira/BCDSettingsSections.swift")
+ group = slice_(sections, "    private var externalGames: some View {", "    private var games: [BCDGame] {")
+-check("the folder picker is attached to the External drives group",
+-      ".fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder])" in group)
+-check("the picker asks for folders only", group.count("allowedContentTypes:") == 1)
++check("the folder picker is presented from UIKit by the live backend, not by a SwiftUI .fileImporter",
++      "backend.chooseExternalFolder(reason:" in group and ".fileImporter(" not in group)
++check("the picker asks for folders only and reads in place (no copy)",
++      "UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)" in read("app/Madeira/ExternalGamesPicker.swift"))
+ check("the saves backup's importer is still alone on the page",
+-      sections.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1 and sections.count(".fileImporter(") == 2)
++      sections.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1 and sections.count(".fileImporter(") == 1)
+ check("the group is shown only where the backend supports it", "if backend.supportsExternalGames { externalGames }" in sections)
+ check("the picker's open, answer and close are logged (a silent Open shows in the log)",
+-      'noteExternalPicker("opened")' in group and 'noteExternalPicker("answered")' in group and 'noteExternalPicker("closed")' in group)
++      'chooseExternalFolder(reason: "opened")' in group and 'noteExternalPicker("answered")' in read("app/Madeira/BCDSettingsLive.swift")
++      and 'noteExternalPicker("closed")' in read("app/Madeira/BCDSettingsLive.swift"))
+ check("Reconnect tries the saved bookmark before the picker", "backend.reconnectExternalDrive(drive.id) {" in group)
+ check("Remove asks first and says the drive's files stay", "The files on the drive are kept." in group)
+ code_lines = "\n".join(line for line in sections.splitlines() if not line.lstrip().startswith("//"))

@@ -205,14 +205,16 @@ check("a failed move removes only its copy", "for item in items { try? fm.remove
 # Settings.
 sections = read("app/Madeira/BCDSettingsSections.swift")
 group = slice_(sections, "    private var externalGames: some View {", "    private var games: [BCDGame] {")
-check("the folder picker is attached to the External drives group",
-      ".fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder])" in group)
-check("the picker asks for folders only", group.count("allowedContentTypes:") == 1)
+check("the folder picker is presented from UIKit by the live backend, not by a SwiftUI .fileImporter",
+      "backend.chooseExternalFolder(reason:" in group and ".fileImporter(" not in group)
+check("the picker asks for folders only and reads in place (no copy)",
+      "UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)" in read("app/Madeira/ExternalGamesPicker.swift"))
 check("the saves backup's importer is still alone on the page",
-      sections.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1 and sections.count(".fileImporter(") == 2)
+      sections.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1 and sections.count(".fileImporter(") == 1)
 check("the group is shown only where the backend supports it", "if backend.supportsExternalGames { externalGames }" in sections)
 check("the picker's open, answer and close are logged (a silent Open shows in the log)",
-      'noteExternalPicker("opened")' in group and 'noteExternalPicker("answered")' in group and 'noteExternalPicker("closed")' in group)
+      'chooseExternalFolder(reason: "opened")' in group and 'noteExternalPicker("answered")' in read("app/Madeira/BCDSettingsLive.swift")
+      and 'noteExternalPicker("closed")' in read("app/Madeira/BCDSettingsLive.swift"))
 check("Reconnect tries the saved bookmark before the picker", "backend.reconnectExternalDrive(drive.id) {" in group)
 check("Remove asks first and says the drive's files stay", "The files on the drive are kept." in group)
 code_lines = "\n".join(line for line in sections.splitlines() if not line.lstrip().startswith("//"))

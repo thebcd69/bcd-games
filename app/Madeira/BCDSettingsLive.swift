@@ -653,6 +653,20 @@ struct BCDTouchEditorHost: View {
         ExternalDrives.shared.folders.first { $0.id.uuidString == id }
     }
 
+    func chooseExternalFolder(reason: String) {
+        noteExternalPicker(reason)
+        let shown = BCDExternalFolderPicker.present(
+            answered: { [weak self] url in
+                self?.noteExternalPicker("answered")
+                self?.addExternalDrive(url)
+            },
+            closed: { [weak self] in self?.noteExternalPicker("closed") })
+        if !shown {
+            noteExternalPicker("failed: no screen to present from")
+            noteExternalPicker("closed")
+        }
+    }
+
     func noteExternalPicker(_ what: String) {
         if what.hasPrefix("opened") {
             // Arm the in-place host-identity fix before iOS builds the picker. A no-op on installs that
