@@ -152,4 +152,10 @@ for symbol in _vkGetInstanceProcAddr _vkGetDeviceProcAddr; do
     xcrun nm -gU "$LIB" | grep -q " T $symbol\$" || { echo "$LIB does not export $symbol" >&2; exit 1; }
 done
 if command -v shasum >/dev/null 2>&1; then shasum -a 256 "$LIB"; fi
+# kk-retry (build/mesa-ios/kk-retry): retries Metal compiles the iOS compiler service drops under memory
+# pressure, limits parallel compiles and raises the shader cache cap. BCD_KK_RETRY=0 leaves the library bare.
+if [ "${BCD_KK_RETRY:-1}" = 1 ]; then
+    rm -f "$OUT/libvulkan_kosmickrisp_real.dylib"
+    "$R/build/mesa-ios/kk-retry/build.sh"
+fi
 ls -l "$OUT/libvulkan_kosmickrisp.dylib" "$OUT/libvulkan_kosmickrisp.version" "$R/app/Madeira/licenses/KosmicKrisp-Mesa-license.rst"

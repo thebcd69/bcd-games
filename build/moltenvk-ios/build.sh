@@ -12,7 +12,13 @@
 # and the Vulkan headers into External/; the first run takes a while.
 #
 # madeira-bcd: the same script as Madeira's apart from the place of the source, the
-# commit check and the clone; MoltenVK itself is used unmodified.
+# commit check and the clone.
+#
+# BCD patches (BCD_MVK_PATCHES=0 builds plain v1.4.2): patches/0001-moltenvk-enshrouded.patch is
+# v1.4.2 plus MoltenVK main and github.com/nivogli/MoltenVK fixes and a few local ones, the set that
+# gets Enshrouded (Steam 1203620) compiling shaders on iPad with vulkan = moltenvk. It moves
+# SPIRV-Cross to aa217aeb; patches/spirv-cross-0001-*.patch adds instance_relative_patch_id on top,
+# built from toolchains/SPIRV-Cross-bcd through fetchDependencies --spirv-cross-root.
 set -eu
 R="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SRC="${MOLTENVK_SRC:-$R/toolchains/MoltenVK}"
@@ -31,7 +37,24 @@ if [ "$(git -C "$SRC" rev-parse HEAD)" != "$MVK_COMMIT" ]; then
 fi
 
 cd "$SRC"
-[ -d External/build ] || ./fetchDependencies --ios
+FETCH_ARGS=(--ios)
+if [ "${BCD_MVK_PATCHES:-1}" = 1 ]; then
+    P="$R/build/moltenvk-ios/patches"
+    if ! git apply --reverse --check "$P/0001-moltenvk-enshrouded.patch" 2>/dev/null; then
+        git apply "$P/0001-moltenvk-enshrouded.patch"
+    fi
+    SPC="$R/toolchains/SPIRV-Cross-bcd"
+    SPC_REV="$(cat ExternalRevisions/SPIRV-Cross_repo_revision)"
+    [ -d "$SPC/.git" ] || git clone -q https://github.com/KhronosGroup/SPIRV-Cross "$SPC"
+    if [ "$(git -C "$SPC" rev-parse HEAD^ 2>/dev/null)" != "$SPC_REV" ] || ! git -C "$SPC" log -1 --format=%s | grep -q instance_relative_patch_id; then
+        git -C "$SPC" fetch -q origin
+        git -C "$SPC" checkout -q --force "$SPC_REV"
+        git -C "$SPC" -c user.name=bcd -c user.email=bcd@localhost am -q "$P/spirv-cross-0001-instance-relative-patch-id.patch"
+        rm -rf External/build
+    fi
+    FETCH_ARGS+=(--spirv-cross-root "$SPC")
+fi
+[ -d External/build ] || ./fetchDependencies "${FETCH_ARGS[@]}"
 # MOLTENVK_JOBS: xcodebuild's -jobs (default: Xcode's own choice). The Makefile finds xcodebuild on the PATH and turns every variable given on
 # its command line into a preprocessor definition, so a shim in front of it is the way to add the flag.
 if [ -n "${MOLTENVK_JOBS:-}" ]; then

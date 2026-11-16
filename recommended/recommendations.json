@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": 74,
+  "version": 75,
   "generated": "2026-11-15",
   "rules": [
     {
@@ -9841,6 +9841,44 @@
         "it with the line auto-tune kept). On the Vulkan and OpenGL back ends neither line does anything. A library entry that starts a .bat",
         "is not matched by a list (programs are .exe files); auto-tune's wgpu-fxc-sm51-dxcompiler adds the DXC line there after the first E5017.",
         "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "enshrouded-steam",
+      "title": "Enshrouded (Steam)",
+      "version": 1,
+      "minBuild": 665,
+      "match": {
+        "steamAppIDs": [
+          1203620
+        ],
+        "steamFolders": [
+          "enshrouded"
+        ],
+        "programs": [
+          {
+            "name": "enshrouded.exe",
+            "steam": true
+          }
+        ]
+      },
+      "config": [
+        "# BCD's recommended settings for Enshrouded.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "vulkan = moltenvk",
+        "mempool-mb = 2048",
+        "env.MADEIRA_POOL_MARGIN_MB = 3072",
+        "swap-mb = 4096",
+        "swap-mode = 2",
+        "vram-mb = 4096"
+      ],
+      "notes": [
+        "Enshrouded (Steam 1203620), BCD 0.1.665 on iPad16,6 (M4, 16 GB), iPadOS 27.2, 2026-11-16. With KosmicKrisp and 6 GB helper",
+        "memory: MTL4Compiler XPC_ERROR_CONNECTION_INTERRUPTED, \"Failed to create MTLLibrary\", then the game's own null write",
+        "(c0000005) and a dockhost.exe teardown crash on a freed steamclient object. With smaller helper memory and the kk-retry",
+        "shim the compiles survive but one library compile took 12+ minutes (0% screen). With vulkan = moltenvk on the patched",
+        "MoltenVK the shader compile runs to completion. In-game play not yet confirmed. See docs/enshrouded-ipad.md."
       ]
     },
     {

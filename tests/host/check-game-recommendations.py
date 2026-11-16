@@ -147,8 +147,8 @@ for _id, _want in R634.items():
     assert _got == [(l, (b, 1000000000)) for l, b in _want], (_id, _got)
     del presets[_id]['lines'][-len(_want):]
     del presets[_id]['line_builds'][-len(_want):]
-# The Last of Us Part I v13 (build 646) carries mempool-mb = 4096 too: the owner's line of 2026-11-08 19:59, checked with its list below.
-for _key, _want in (('mempool-mb', ['rdr2-other', 'rdr2-steam', 'the-last-of-us-part-1']), ('MADEIRA_DONOR_BROWSERS', ['rdr2-other', 'rdr2-steam'])):
+# Enshrouded (docs/enshrouded-ipad.md) sets mempool-mb = 2048. The Last of Us Part I v13 (build 646) carries mempool-mb = 4096 too: the owner's line of 2026-11-08 19:59, checked with its list below.
+for _key, _want in (('mempool-mb', ['enshrouded-steam', 'rdr2-other', 'rdr2-steam', 'the-last-of-us-part-1']), ('MADEIRA_DONOR_BROWSERS', ['rdr2-other', 'rdr2-steam'])):
     _rows = sorted(r['id'] for r in recs['rules'] if _key in json.dumps(r['config']))
     assert _rows == _want, (_key, _rows)
 # Round 631 (Rockstar after the 2026-11-03 Launcher/Social Club update; agents R1, R3, round 630 R S1/S8 and the owner's decisions of
@@ -231,6 +231,7 @@ assert list(presets) == ['rdr2-steam', 'rdr2-other', 'gta5e-steam', 'gta5e-other
                          'lego-city-undercover',   # round 660 (LEGO City Undercover: d3d11-src.dll with the layer-format fix, minBuild 660; pinned below)
                          'persona-3-reload',   # 2026-11-14, build 660 (upstream Madeira #568; pinned below with the night round's new rows)
                          'skate2-pc',   # round 663 (item 7c: BCD's dxcompiler.dll for wgpu's Direct3D 12 shaders, minBuild 663; pinned below)
+                         'enshrouded-steam',   # 2026-11-16, build 665 (docs/enshrouded-ipad.md: vulkan = moltenvk and memory for the Metal compiler; pinned below)
                          'standard'], list(presets)
 
 catalog_keys = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog))
@@ -447,6 +448,16 @@ assert _sk['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'd3d12-fence-flags 
 assert _sk['match'] == {'programs': [{'name': 'skate2-pc.exe'}]}, _sk['match']
 del presets['skate2-pc']
 recs['rules'] = [r for r in recs['rules'] if r['id'] != 'skate2-pc']
+# Enshrouded (docs/enshrouded-ipad.md, iPad16,6, 2026-11-16): MoltenVK (BCD's patched build) and helper memory kept small so iOS
+# does not kill the Metal compiler service; from build 665.
+_en_r = next(r for r in recs['rules'] if r['id'] == 'enshrouded-steam')
+_en = presets['enshrouded-steam']
+assert _en_r['version'] == 1 and _en_r['minBuild'] == 665 and 'switches' not in _en_r, _en_r
+assert _en['lines'][2:] == ['env.MADEIRA_EC_HOOK_TRACE = 0', 'vulkan = moltenvk', 'mempool-mb = 2048', 'env.MADEIRA_POOL_MARGIN_MB = 3072',
+                            'swap-mb = 4096', 'swap-mode = 2', 'vram-mb = 4096'] and _en['small'] == [], _en
+assert _en['match'] == {'steamAppIDs': [1203620], 'steamFolders': ['enshrouded'], 'programs': [{'name': 'enshrouded.exe', 'steam': True}]}, _en['match']
+del presets['enshrouded-steam']
+recs['rules'] = [r for r in recs['rules'] if r['id'] != 'enshrouded-steam']
 # Round 660 (M020, M019): Planet Zoo 2, Planet Coaster 2, ONIMUSHA: the lines auto-tune kept on the device and the KUSER line; from build 660.
 for _id, _lines, _match in (
         ('final-fantasy-resonance', ['env.MADEIRA_KUSER_KEEP_REGS = 1'], {'steamAppIDs': [3259780]}),

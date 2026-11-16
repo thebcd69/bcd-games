@@ -1,0 +1,180 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: BCD contributors <noreply@github.com>
+Date: Mon, 16 Nov 2026 05:19:58 -0500
+Subject: [PATCH] local: instance_relative_patch_id for tessellation gl_PrimitiveID
+
+---
+ spirv_msl.cpp | 63 +++++++++++++++++++++++++++++++++++++++++++++------
+ spirv_msl.hpp |  7 ++++++
+ 2 files changed, 63 insertions(+), 7 deletions(-)
+
+diff --git a/spirv_msl.cpp b/spirv_msl.cpp
+index 21232ee8..dd544689 100644
+--- a/spirv_msl.cpp
++++ b/spirv_msl.cpp
+@@ -4203,8 +4203,33 @@ void CompilerMSL::fix_up_interface_member_indices(StorageClass storage, uint32_t
+ 
+ // Add an interface structure for the type of storage, which is either StorageClassInput or StorageClassOutput.
+ // Returns the ID of the newly added variable, or zero if no variable was added.
++bool CompilerMSL::patch_id_is_instance_relative() const
++{
++	return msl_options.instance_relative_patch_id &&
++	       ((is_tesc_shader() && msl_options.multi_patch_workgroup) || is_tese_shader());
++}
++
++string CompilerMSL::flat_patch_id_expr()
++{
++	if (!patch_id_is_instance_relative())
++		return to_expression(builtin_primitive_id_id);
++	return "spvFlatPatchID";
++}
++
+ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ {
++	if (patch_id_is_instance_relative() && !uses_flat_patch_id)
++	{
++		uses_flat_patch_id = true;
++		auto &entry_func = get<SPIRFunction>(ir.default_entry_point);
++		entry_func.fixup_hooks_in.push_back([=]() {
++			if (is_tesc_shader())
++				statement("uint spvFlatPatchID = min(", to_expression(builtin_invocation_id_id), ".x / ",
++				          get_entry_point().output_vertices, ", spvIndirectParams[1] - 1);");
++			else
++				statement("uint spvFlatPatchID = ", to_expression(builtin_primitive_id_id), ";");
++		});
++	}
+ 	// Accumulate the variables that should appear in the interface struct.
+ 	SmallVector<SPIRVariable *> vars;
+ 	bool incl_builtins = storage == StorageClassOutput || is_tessellation_shader();
+@@ -4354,7 +4379,7 @@ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ 		{
+ 			// In this case, we won't add the builtin to the interface struct,
+ 			// but we still need the hook to run to populate the arrays.
+-			string base_ref = join(tess_factor_buffer_var_name, "[", to_expression(builtin_primitive_id_id), "]");
++			string base_ref = join(tess_factor_buffer_var_name, "[", flat_patch_id_expr(), "]");
+ 			const char *mbr_name =
+ 			    bi_type == BuiltInTessLevelOuter ? "edgeTessellationFactor" : "insideTessellationFactor";
+ 			add_tess_level_input(base_ref, mbr_name, var);
+@@ -4431,7 +4456,7 @@ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ 				    [=]()
+ 				    {
+ 					    statement("const device ", to_name(ir.default_entry_point), "_", ib_var_ref, "& ", ib_var_ref,
+-					              " = ", patch_input_buffer_var_name, "[", to_expression(builtin_primitive_id_id),
++					              " = ", patch_input_buffer_var_name, "[", flat_patch_id_expr(),
+ 					              "];");
+ 				    });
+ 			}
+@@ -4441,7 +4466,7 @@ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ 				    [=]()
+ 				    {
+ 					    statement("const device ", to_name(ir.default_entry_point), "_", ib_var_ref, "* gl_in = &",
+-					              input_buffer_var_name, "[", to_expression(builtin_primitive_id_id), " * ",
++					              input_buffer_var_name, "[", flat_patch_id_expr(), " * ",
+ 					              get_entry_point().output_vertices, "];");
+ 				    });
+ 			}
+@@ -4545,7 +4570,7 @@ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ 					{
+ 						entry_func.fixup_hooks_in.push_back([=]() {
+ 							statement("device ", to_name(ir.default_entry_point), "_", ib_var_ref, "& ", ib_var_ref,
+-							          " = ", patch_output_buffer_var_name, "[", to_expression(builtin_primitive_id_id),
++							          " = ", patch_output_buffer_var_name, "[", flat_patch_id_expr(),
+ 							          "];");
+ 						});
+ 					}
+@@ -4553,7 +4578,7 @@ uint32_t CompilerMSL::add_interface_block(StorageClass storage, bool patch)
+ 					{
+ 						entry_func.fixup_hooks_in.push_back([=]() {
+ 							statement("device ", to_name(ir.default_entry_point), "_", ib_var_ref, "* gl_out = &",
+-							          output_buffer_var_name, "[", to_expression(builtin_primitive_id_id), " * ",
++							          output_buffer_var_name, "[", flat_patch_id_expr(), " * ",
+ 							          get_entry_point().output_vertices, "];");
+ 						});
+ 					}
+@@ -15341,6 +15366,14 @@ void CompilerMSL::entry_point_args_builtin(string &ep_args)
+ 			ep_args += join("const device ", type_to_glsl(get_stage_in_struct_type()), "* ", input_buffer_var_name,
+ 			                " [[buffer(", convert_to_string(msl_options.shader_input_buffer_index), ")]]");
+ 		}
++
++		if (patch_id_is_instance_relative() && active_input_builtins.get(BuiltInPrimitiveId))
++		{
++			if (!ep_args.empty())
++				ep_args += ", ";
++			ep_args += join("constant uint* spvIndirectParams [[buffer(",
++			                convert_to_string(msl_options.indirect_params_buffer_index), ")]]");
++		}
+ 	}
+ 
+ 	if (is_mesh_shader())
+@@ -15914,9 +15947,25 @@ void CompilerMSL::fix_up_shader_inputs_outputs()
+ 			case BuiltInPrimitiveId:
+ 				// This is natively supported by fragment and tessellation evaluation shaders.
+ 				// In tessellation control shaders, this is direct-mapped without multi-patch workgroups.
++				if (is_tese_shader() && patch_id_is_instance_relative())
++				{
++					entry_func.fixup_hooks_in.push_back([=]() {
++						statement(to_expression(var_id), " = spvFlatPatchID % spvIndirectParams[2];");
++					});
++					break;
++				}
+ 				if (!is_tesc_shader() || !msl_options.multi_patch_workgroup)
+ 					break;
+ 
++				if (patch_id_is_instance_relative())
++				{
++					entry_func.fixup_hooks_in.push_back([=]() {
++						statement(builtin_type_decl(bi_type), " ", to_expression(var_id),
++						          " = spvFlatPatchID % spvIndirectParams[2];");
++					});
++					break;
++				}
++
+ 				entry_func.fixup_hooks_in.push_back([=]() {
+ 					statement(builtin_type_decl(bi_type), " ", to_expression(var_id), " = min(",
+ 					          to_expression(builtin_invocation_id_id), ".x / ", this->get_entry_point().output_vertices,
+@@ -18544,7 +18593,7 @@ string CompilerMSL::builtin_to_glsl(BuiltIn builtin, StorageClass storage)
+ 		if (is_tesc_shader() && storage != StorageClassInput && current_function &&
+ 		    (current_function->self == ir.default_entry_point))
+ 		{
+-			return join(tess_factor_buffer_var_name, "[", to_expression(builtin_primitive_id_id),
++			return join(tess_factor_buffer_var_name, "[", flat_patch_id_expr(),
+ 			            "].edgeTessellationFactor");
+ 		}
+ 		break;
+@@ -18553,7 +18602,7 @@ string CompilerMSL::builtin_to_glsl(BuiltIn builtin, StorageClass storage)
+ 		if (is_tesc_shader() && storage != StorageClassInput && current_function &&
+ 		    (current_function->self == ir.default_entry_point))
+ 		{
+-			return join(tess_factor_buffer_var_name, "[", to_expression(builtin_primitive_id_id),
++			return join(tess_factor_buffer_var_name, "[", flat_patch_id_expr(),
+ 			            "].insideTessellationFactor");
+ 		}
+ 		break;
+diff --git a/spirv_msl.hpp b/spirv_msl.hpp
+index 913cb740..6bd63454 100644
+--- a/spirv_msl.hpp
++++ b/spirv_msl.hpp
+@@ -429,6 +429,10 @@ public:
+ 		// vertex shader, but allows the use of nested arrays.
+ 		bool raw_buffer_tese_input = false;
+ 
++		// If true, gl_PrimitiveID in tessellation shaders is relative to the instance: the flat patch index modulo
++		// spvIndirectParams[2] (patches per instance). Tese needs spvIndirectParams bound at indirect_params_buffer_index.
++		bool instance_relative_patch_id = false;
++
+ 		// If set, a vertex shader will be compiled as part of a tessellation pipeline.
+ 		// It will be translated as a compute kernel, so it can use the global invocation ID
+ 		// to index the output buffer.
+@@ -1205,6 +1209,9 @@ protected:
+ 	uint32_t builtin_layer_id = 0;
+ 	uint32_t builtin_invocation_id_id = 0;
+ 	uint32_t builtin_primitive_id_id = 0;
++	bool uses_flat_patch_id = false;
++	std::string flat_patch_id_expr();
++	bool patch_id_is_instance_relative() const;
+ 	uint32_t builtin_subgroup_invocation_id_id = 0;
+ 	uint32_t builtin_subgroup_size_id = 0;
+ 	uint32_t builtin_dispatch_base_id = 0;
+-- 
+2.46.2
+
