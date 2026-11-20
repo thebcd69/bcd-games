@@ -122,6 +122,25 @@ static void *worker( void *arg )
         fflush( stdout );
         return NULL;
     }
+    if (scenario == 8)                                         /* madeira-bcd: diagnostic only, where the pool lives on this Mac */
+    {
+        uintptr_t b; void **tsd; int s, phase;
+        @TSDBASE@
+        tsd = (void **)(b & ~7ULL);
+        void *(*push8)( void ) = (void *(*)( void ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPush" );
+        id o8 = 0;
+        for (phase = 0; phase < 4; phase++)
+        {
+            if (phase == 1) push8();
+            if (phase == 2) { o8 = class_createInstance( objc_getClass( "NSObject" ), 0 ); objc_autorelease( o8 ); }
+            if (phase == 3) object_dispose( o8 );
+            printf( "slots %s:", phase == 0 ? "start" : phase == 1 ? "push" : phase == 2 ? "autorelease" : "dispose" );
+            for (s = 0; s < 128; s++) if (tsd[s]) printf( " %d=%p", s, tsd[s] );
+            printf( "\n" );
+        }
+        fflush( stdout );
+        _exit( 0 );
+    }
     void *(*push)( void ) = (void *(*)( void ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPush" );
     void *token = push();
     (void)token;
@@ -171,6 +190,11 @@ int main( int argc, char **argv )
             fix = run(1, MADEIRA_EXIT_POOL_SKIP="1")
             check("with MADEIRA_EXIT_POOL_SKIP=1 the same thread exits cleanly, and the log says it cleared the slot (the pool's pages leak)",
                   fix.returncode == 0 and "survived" in fix.stdout and "clears libobjc's autorelease-pool slot" in fix.stderr, "rc=%d %s" % (fix.returncode, fix.stderr))
+            if not (fix.returncode == 0 and "survived" in fix.stdout):
+                # madeira-bcd (2026-11-17): diagnostic only, no verdict: which TSD slots this Mac's libobjc uses for a pool
+                # (macos-15 runner: the found slot held 0x1, the empty-pool placeholder, at exit, and the thread still crashed).
+                d = run(8)
+                print("     diagnostic, non-NULL TSD slots (rc=%d):\n     %s" % (d.returncode, d.stdout.strip().replace("\n", "\n     ")))
             diag = run(3, MADEIRA_EXIT_POOL_DIAG="1")
             check("with MADEIRA_EXIT_POOL_DIAG=1 a healthy pool is described (tid, stack bounds, key and slot) and the thread exits cleanly",
                   diag.returncode == 0 and "survived" in diag.stdout and re.search(r"\[exit-pool\] tid=00ec exiting: stack=\[0x[0-9a-f]+,0x[0-9a-f]+\)", diag.stderr), "rc=%d %s" % (diag.returncode, diag.stderr))
