@@ -423,6 +423,10 @@ final class AutoTuneLogScanner {
     /// Whether a signal's first line is already in `evidence` (a count that starts again does not add a second line).
     private var evidenced: [Bool]
     private var carry: [UInt8] = []
+    /// madeira-bcd (2026-11-20): system32 programs Wine failed to start for want of their file (see `mSystem32StartFail`) whose
+    /// NtTerminateProcess(exit_code=0xc0000135) and "child exited with code -1073741515" lines are still to come and do not count.
+    private var missingProgramTerminates = 0
+    private var missingProgramChildExits = 0
 
     init(signals: [AutoTuneSignal], pairFilter: Bool = true) {
         usePairs = pairFilter
@@ -714,6 +718,13 @@ final class AutoTuneLogScanner {
     private static let mFpMB = Array(" fpMB=".utf8)
     private static let mPrevTail = Array("[prev-tail]".utf8)
     private static let mPrevEnd = Array("[prev-end]".utf8)
+    /// madeira-bcd (2026-11-20): Wine starting a system32 program the bundle does not ship, `wine: failed to start
+    /// L"C:\\windows\\system32\\winemenubuilder.exe": c0000135` (build/wine-i386/build.sh leaves winemenubuilder out: there is no host
+    /// desktop). Shell32 starts it by itself (`winemenubuilder.exe -a`), also after the game's first frame.
+    private static let mSystem32StartFail = Array("wine: failed to start L\"C:\\\\windows\\\\system32\\\\".utf8)
+    private static let mStartFailNoFile = Array("\": c0000135".utf8)
+    private static let mExitNoFile = Array("exit_code=0xc0000135)".utf8)
+    private static let mChildExitNoFile = Array("child exited with code -1073741515".utf8)
     /// "[user-comment] " as bytes, not as an Array("...".utf8) literal: tools/autotune-fixture.py keeps every line a literal matches, and a
     /// sender's comment must never reach a fixture because of this marker.
     private static let mUserComment: [UInt8] = [0x5B, 0x75, 0x73, 0x65, 0x72, 0x2D, 0x63, 0x6F, 0x6D, 0x6D, 0x65, 0x6E, 0x74, 0x5D, 0x20]
@@ -966,7 +977,19 @@ final class AutoTuneLogScanner {
         }
         if S.find(l, S.mLaunchView) != nil, S.find(l, S.mCoverByPresent) != nil { facts.frameSeen = true }
         if S.find(l, S.mDeviceError) != nil { facts.gpuErrors += 1 }
-        if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
+        // madeira-bcd (2026-11-20): a system32 program Wine could not start because the bundle has no file for it is not the game failing.
+        // Its pseudo-process ends with NtTerminateProcess(exit_code=0xc0000135) and "child exited with code -1073741515" (0xc0000135):
+        // after the first frame those two scored a session that played 105 s and went to the background "crashed" instead of "ran".
+        // One of each per such start; any other error exit, and a c0000135 the game's own start or a DLL gives, still count.
+        if S.find(l, S.mSystem32StartFail) != nil, S.find(l, S.mStartFailNoFile) != nil {
+            missingProgramTerminates += 1
+            missingProgramChildExits += 1
+        }
+        if missingProgramTerminates > 0, S.find(l, S.mTerminate) != nil, S.find(l, S.mExitNoFile) != nil {
+            missingProgramTerminates -= 1
+        } else if missingProgramChildExits > 0, S.find(l, S.mChildExitNoFile) != nil {
+            missingProgramChildExits -= 1
+        } else if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
             || S.find(l, S.mChildNegative) != nil || S.find(l, S.mInitFailed) != nil
             || S.find(l, S.mObjCException) != nil || S.find(l, S.mRedelivKill) != nil {
             if !facts.cleanMainExit { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }

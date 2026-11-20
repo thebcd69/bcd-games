@@ -1142,6 +1142,28 @@ struct AutoTuneEngineChecks {
             heScan.finish()
             expect(beforeFrame && heScan.facts.errorExits == 2 && heScan.facts.lastErrorExitAfterFrame,
                    "the scanner notes whether the last error exit came after a frame")
+            // (j2) 2026-11-20: after the first frame Wine starts winemenubuilder.exe, which the bundle does not ship; its pseudo-process's
+            // c0000135 exit and child exit are not the game's. The same two lines without Wine's "failed to start" line still count, and a
+            // second pair after one failed start counts too.
+            let wmbFail = "wine: failed to start L\"C:\\\\windows\\\\system32\\\\winemenubuilder.exe\": c0000135\n"
+            let wmbExits = "03e8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=21967\n"
+                + "[Wine child thread] child exited with code -1073741515\n"
+            let wmbPlayed = "[INFO] detach-wait: presents=900 running=1 elapsed=30s\n"
+            func wmbScan(_ text: String) -> AutoTuneLogScanner {
+                let sc = AutoTuneLogScanner(signals: ueSigs); sc.feed(Data(text.utf8)); sc.finish(); return sc
+            }
+            let wmb = wmbScan(wmbPlayed + wmbFail + wmbExits), wmbBare = wmbScan(wmbPlayed + wmbExits)
+            let wmbTwice = wmbScan(wmbPlayed + wmbFail + wmbExits + wmbExits)
+            expect(wmb.facts.errorExits == 0 && wmbBare.facts.errorExits == 2 && wmbBare.facts.lastErrorExitAfterFrame
+                   && wmbTwice.facts.errorExits == 2,
+                   "a system32 program Wine could not start is no error exit: \(wmb.facts.errorExits), bare \(wmbBare.facts.errorExits), "
+                   + "twice \(wmbTwice.facts.errorExits)")
+            var left = AutoTuneLogFacts(); left.stage = 4; left.frameSeen = true; left.presentsCounted = true; left.presentsLogged = 3000
+            left.sessionPartial = true; left.sessionPlaySeconds = 105; left.lastFootprintMB = 4642
+            var leftCrash = left; leftCrash.errorExits = 2; leftCrash.lastErrorExitAfterFrame = true
+            let leftEnd = AutoTuneSessionEnd(seconds: 136, killed: true, limitMB: 6143)
+            expect(AutoTuneEngine.outcome(leftEnd, left) == "ran" && AutoTuneEngine.outcome(leftEnd, leftCrash) == "crashed",
+                   "105 s of play, then the app went to the background: ran; the same with two error exits after a frame: crashed")
             // (k) round 624, Farming Simulator 22 on Discord: an unhandled host fault with no TEB, no frame for 695 s: hung, not ran by the clock
             var nt = AutoTuneLogFacts(); nt.stage = 5; nt.aliveSeconds = 695; nt.dock = true; nt.machFaultNoTeb = 1; nt.presentsCounted = true
             nt.presentsLogged = 0
