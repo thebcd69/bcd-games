@@ -83,8 +83,8 @@ for path in sorted(APP.rglob("*")):
     for n, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
         if names.search(line) and not line.strip().startswith("//"):   # code lines only: comments may name it
             where.setdefault(path.name, []).append(line.strip())
-check("only three files outside the new ones mention it: ContentView (the two hooks and the two gates of the tabletop pose), GuestDisplay and BCDSettingsSections, one hook each",
-      {k: len(v) for k, v in where.items()} == {"ContentView.swift": 4, "GuestDisplay.swift": 1, "BCDSettingsSections.swift": 2}, where)
+check("only three files outside the new ones mention it: ContentView (the two hooks, the two gates of the tabletop pose and the touchpad's gate), GuestDisplay and BCDSettingsSections, one hook each",
+      {k: len(v) for k, v in where.items()} == {"ContentView.swift": 5, "GuestDisplay.swift": 1, "BCDSettingsSections.swift": 2}, where)
 content = (APP / "ContentView.swift").read_text()
 check("the game view's hook tests the gate first and sits at the end of the layout pass's window branch",
       re.search(r"winios_set_compositor_frame\(full\.minX, full\.minY, full\.width, full\.height\)\n"
@@ -126,6 +126,31 @@ check("the model table has the one identifier", 'static let identifiers: [String
 check("the pure part needs no UIKit, no engine type and no logging", not re.search(r"import UIKit|import SwiftUI|LogStore|MadeiraConfig|LibraryModel|fputs|print\(", pure))
 check("the switch row keeps its answer in UserDefaults, not in bcd.cfg (no catalog entry is needed)",
       "UserDefaults.standard" in pure and "MadeiraConfig" not in row and "MadeiraConfig" not in pure)
+
+# the touchpad below the fold (2026-11-20, the owner): a gesture that starts below the fold takes the trackpad path, behind the same gate
+pad_fn = content[content.index("private func padBegins("):content.index("override func touchesBegan(")]
+check("the touchpad starts only behind the gate, in the tabletop pose, with the first finger(s) of a gesture below the fold and the touchpad on",
+      "guard BCDFoldable.active, let below = FoldTabletop.shared.bottom, let w = window, let t = touches.first else { return false }" in pad_fn
+      and "guard mine.count == touches.count," in pad_fn
+      and "BCDTabletopTouchpad.owns(t.location(in: w), below: below, on: BCDTabletopTouchpad.on) else { return false }" in pad_fn)
+check("only a touchpad gesture counts its own fingers; every other gesture counts every touch as before",
+      "let all = padGesture ? (event?.touches(for: self) ?? []) : (event?.allTouches ?? [])" in content)
+handlers = {ph: content[content.index(f"override func touches{ph}("):] for ph in ("Began", "Moved", "Ended", "Cancelled")}
+check("each touch handler passes a touchpad gesture by the touch-to-mouse gate, Tap to click and Windows touch, to the trackpad path",
+      all(f"guard let touches = pad ? touches : tmgFilter(touches, .{ph.lower()}) else {{ return }}" in handlers[ph][:1300]
+          and "&& !pad {" in handlers[ph][:1300] and "guard pad || desktopMode || !InputSettings.shared.directTouch else {" in handlers[ph][:1300]
+          for ph in handlers))
+check("a touchpad gesture starts in touchesBegan and ends with its last finger, or on a cancel",
+      "if !padGesture && padBegins(touches, event) { padGesture = true }" in handlers["Began"][:1300]
+      and "defer { if pad && activeTouches(event).isEmpty { padGesture = false } }" in handlers["Ended"][:700]
+      and "defer { if pad { padGesture = false } }" in handlers["Cancelled"][:700])
+check("the pad's surface is drawn under the controls only in the tabletop pose, never in the editor, and takes no touch",
+      "if let pad = fold.bottom, !m.editing, !library.blocksGameplayTouch, BCDTabletopTouchpad.on {\n                        BCDTabletopTouchpadSurface(area: pad, screen: geo.size)" in content
+      and ".allowsHitTesting(false)" in ui[ui.index("struct BCDTabletopTouchpadSurface"):])
+check("Settings has the touchpad's switch in the foldable iPhone's group; it is kept in UserDefaults and on by default",
+      "BCDFoldableSettingsRow()\n                    BCDTabletopTouchpadSettingsRow()" in sections
+      and 'static let key = "bcd.foldable.touchpad"' in pure and '!= "0"' in pure[pure.index("enum BCDTabletopTouchpad"):]
+      and "BCDTabletopTouchpad.store(value)" in row)
 
 # ---------------------------------------------------------------- 4. the engine side only follows
 check("the engine side has one entry point, layoutPass", len(re.findall(r"^\s+static func layoutPass", live, re.M)) == 1

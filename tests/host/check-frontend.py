@@ -637,13 +637,15 @@ check('GuestDisplay.configureSessionDefault(' in block(lib, 'func configureLaunc
 check('id: "start"' in page and 'case "start": change(game) { $0.launchMode = value == "desktop" ? "desktop" : nil }' in page
       and 'entry.workingDirectory = ' in page.replace('$0.workingDirectory = ', 'entry.workingDirectory = ') and 'Self.toggle("services", "Start Windows services first"' in page,
       'game page: start mode, working folder and services')
-check('settings.append(BCDGameSetting(id: "command", title: "What starts", kind: .info, value: entry.commandPreview))' in page,
-      'game page: the command line shows what the next start runs, launch mode included')
+check('settings.append(BCDGameSetting(id: "command", title: "What starts", kind: .info,\n'
+      '                                       value: dock ? "Steam starts the game (BCD Dock)" + (entry.arguments.isEmpty ? "" : " with " + entry.arguments) : entry.commandPreview))' in page,
+      'game page: the command line shows what the next start runs, launch mode included (2026-11-20: a Dock start says Steam starts it, with its arguments)')
 check('programExtensions: Set<String> = ["exe", "bat", "cmd"]' in model and 'programExtensions.contains(url.pathExtension.lowercased())' in lib,
       'the launch check accepts .bat and .cmd')
 check('GameSurfaceLayout.rect(' in content and 'GameSurfaceLayout.map(' in content and 'effectiveDisplayMode()' in content
       and '* 1024 / r.width' not in content, 'the game view lays out and maps touches through GameSurfaceLayout')
-check('if touchPointerMode { touchModeBegan(touches); return }' in content, 'the game view handles the Touch pointer mode')
+check('if touchPointerMode && !pad { touchModeBegan(touches); return }' in content,   # 2026-11-20: but for iPhone Duo's touchpad below the fold (BCDTabletopTouchpad)
+      'the game view handles the Touch pointer mode')
 check('static func diameter(' in content and 'library.opacity' in (root / 'app/Madeira/BCDTouchLive.swift').read_text(),
       "touch controls follow the session's size and opacity (BCD's controls, BCDTouchLive.swift)")
 

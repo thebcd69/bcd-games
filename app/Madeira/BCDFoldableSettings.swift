@@ -49,3 +49,21 @@ struct BCDFoldableSettingsRow: View {
         return on == BCDFoldable.active ? base : base + " Applies the next time BCD starts."
     }
 }
+
+/// The touchpad below the fold (BCDTabletopTouchpad, BCDFoldable.swift; 2026-11-20). Kept in UserDefaults like the two switches above;
+/// read at each gesture, so it applies at once.
+struct BCDTabletopTouchpadSettingsRow: View {
+    @State private var on = BCDTabletopTouchpad.on
+
+    var body: some View {
+        BCDSettingsToggleRow(id: BCDSettingsID.control(.graphics, "foldable-touchpad"), title: "Touchpad below the fold",
+                             note: "With Foldable iPhone support on, when the phone is half folded with the fold across the screen, the game is above "
+                                 + "the fold and the screen below it is a touchpad: one finger moves the pointer, a tap clicks, two fingers "
+                                 + "right-click and scroll. The on-screen controls stay where they are. Off: only the controls are below the fold.",
+                             isOn: on) { value in
+            BCDTabletopTouchpad.store(value)
+            on = value
+            fputs("[foldable] touchpad below the fold \(value ? "on" : "off")\n", stderr)
+        }
+    }
+}

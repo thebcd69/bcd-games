@@ -657,6 +657,20 @@ func installPhase() async {
     let root = BCDEpicInstall.root
     check(root.drive == "C" && root.folder == "Program Files/Epic Games" && root.windowsPath("Limbo", "Limbo.exe") == "C:\\Program Files\\Epic Games\\Limbo\\Limbo.exe"
           && root.url == drive.appendingPathComponent("Program Files/Epic Games", isDirectory: true), "the install root: Epic's own default, C:\\Program Files\\Epic Games, kept in one place")
+    // 2026-11-20: Epic's folder on an external drive, through the drive's C:\External\<name> link
+    let usb = BCDEpicInstall.driveRoot("My SSD")
+    check(usb.drive == "C" && usb.folder == "External/My SSD/Epic Games" && usb.windowsPath("Limbo", "Limbo.exe") == "C:\\External\\My SSD\\Epic Games\\Limbo\\Limbo.exe"
+          && usb.url == drive.appendingPathComponent("External/My SSD/Epic Games", isDirectory: true) && usb.stagingURL == usb.url!.appendingPathComponent(".bcd-stage", isDirectory: true),
+          "a drive's root: drive C, External/<name>/Epic Games, staged on the drive itself")
+    check(BCDEpicInstall.driveName(usb) == "My SSD" && BCDEpicInstall.driveName(root) == nil, "a drive's name, none for the device")
+    check(BCDEpicInstall.driveName(BCDInstallRoot(drive: "C", folder: "External/../Epic Games")) == nil
+          && BCDEpicInstall.driveName(BCDInstallRoot(drive: "C", folder: "External/A/B/Epic Games")) == nil
+          && BCDEpicInstall.driveName(BCDInstallRoot(drive: "C", folder: "External/A/Games")) == nil
+          && BCDEpicInstall.driveName(BCDInstallRoot(drive: "D", folder: "External/A/Epic Games")) == nil,
+          "no other folder is taken for a drive's (.., deeper, another name, another letter)")
+    check(BCDEpicInstall.validRoot(root) && BCDEpicInstall.validRoot(usb) && !BCDEpicInstall.validRoot(BCDInstallRoot(drive: "C", folder: "windows"))
+          && !BCDEpicInstall.validRoot(BCDInstallRoot(drive: "C", folder: "External/A/Games")),
+          "a record may hold only the device's root or a drive's Epic folder (an uninstall removes nothing else)")
     let token = "TOKEN-SECRET-123"
     let key = BCDContentKey(store: "epic", id: "Fixture")
     let catalogID = "0123456789abcdef0123456789abcdef"

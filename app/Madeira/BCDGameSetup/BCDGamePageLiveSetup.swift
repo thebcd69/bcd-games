@@ -48,6 +48,7 @@ extension BCDGamePageLive {
         state.fixProblems = listed.problems
         state.dll.shadow = BCDDllComponents.names(values[BCDDllComponents.shadowKey])
         state.dll.off = BCDDllComponents.switchedOff(values[BCDDllComponents.overridesKey])
+        state.dll.nativeFirst = BCDDllComponents.nativeFirst(values[BCDDllComponents.overridesKey])
         state.dll.shipped = shippedDLLs(game, entry)
         state.dll.runtimes = Self.runtimesInstalled(drive: drive)
         let key = GameSaveAuto.key(entry)
@@ -160,8 +161,30 @@ extension BCDGamePageLive {
                 setupSay(game, setting, "Not saved: \(parsed.rejected.joined(separator: ", ")) \(parsed.rejected.count == 1 ? "is" : "are") not a DLL name (letters, digits, _ . - and ending in .dll).")
                 return true
             }
+            let first = Set(BCDDllComponents.nativeFirst(profile.get(BCDDllComponents.overridesKey)).map(BCDDllComponents.bare))
+            let both = parsed.names.filter { first.contains(BCDDllComponents.bare($0)) }
+            guard both.isEmpty else {
+                setupSay(game, setting, "Not saved: \(both.joined(separator: ", ")) \(both.count == 1 ? "is" : "are") set to the game's own copy first below. Take \(both.count == 1 ? "it" : "them") out there first.")
+                return true
+            }
             let line = BCDDllComponents.settingOff(profile.get(BCDDllComponents.overridesKey), to: parsed.names)
             setupLine(entry, BCDDllComponents.overridesKey, line)
+            setupSay(game, setting, nil)
+
+        case BCDGameSetupPage.dllNativeFirst:   // 2026-11-20: a mod loader's DLL from the game's folder first (WINEDLLOVERRIDES n,b)
+            let parsed = BCDGameSetupPage.parseOff(value)
+            guard parsed.rejected.isEmpty else {
+                setupSay(game, setting, "Not saved: \(parsed.rejected.joined(separator: ", ")) \(parsed.rejected.count == 1 ? "is" : "are") not a DLL name (letters, digits, _ . - and ending in .dll).")
+                return true
+            }
+            let current = profile.get(BCDDllComponents.overridesKey)
+            let off = Set(BCDDllComponents.switchedOff(current).map(BCDDllComponents.bare))
+            let both = parsed.names.filter { off.contains(BCDDllComponents.bare($0)) }
+            guard both.isEmpty else {
+                setupSay(game, setting, "Not saved: \(both.joined(separator: ", ")) \(both.count == 1 ? "is" : "are") switched off above. Take \(both.count == 1 ? "it" : "them") out there first.")
+                return true
+            }
+            setupLine(entry, BCDDllComponents.overridesKey, BCDDllComponents.settingNativeFirst(current, to: parsed.names))
             setupSay(game, setting, nil)
 
         case let id where id.hasPrefix(BCDGameSetupPage.componentsPrefix):

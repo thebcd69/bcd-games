@@ -199,7 +199,11 @@ struct BCDTouchPreviewRoot: View {
 
     var body: some View {
         GeometryReader { geo in
-            BCDTouchPreviewCase(spec: spec, screen: geo.size, insets: BCDTouchSafeArea.insets())
+            if spec == "touch-tabletop" {
+                BCDTouchTabletopPreview(store: store, available: geo.size)   // iPhone Duo's tabletop pose with the touchpad below the fold
+            } else {
+                BCDTouchPreviewCase(spec: spec, screen: geo.size, insets: BCDTouchSafeArea.insets())
+            }
         }
         .ignoresSafeArea()
         .background {
@@ -287,5 +291,42 @@ private struct BCDTouchPreviewCase: View {
     private var bar: some View {
         BCDTouchPlayBar(visible: true, showsLayouts: true, keyboard: {}, toggleVisible: {}, layouts: {}, edit: {}, menu: {})
             .frame(width: screen.width)
+    }
+}
+
+/// -BCDTab touch-tabletop (2026-11-20): iPhone Duo's tabletop pose as TouchControlsOverlay lays it out, on the inner display held upright
+/// (669 x 951 pt, which no simulator can show: the picture is scaled to fit). The fold is the screen's middle, 16 pt; the regions come
+/// from the app's own BCDTabletop.regions: the game above, the touchpad's surface and the controls below.
+private struct BCDTouchTabletopPreview: View {
+    let store: BCDStore
+    let available: CGSize
+    @StateObject private var model = BCDTouchPreviewModel()
+    private let screen = CGSize(width: 669, height: 951)
+
+    var body: some View {
+        let fold = CGRect(x: 0, y: screen.height / 2 - 8, width: screen.width, height: 16)
+        let split = BCDTabletop.regions(bounds: CGRect(origin: .zero, size: screen), division: fold)
+        let top = split?.top ?? CGRect(origin: .zero, size: screen)
+        let bottom = split?.bottom ?? .zero
+        let scale = min(available.width / screen.width, available.height / screen.height)
+        ZStack(alignment: .topLeading) {
+            Color.black
+            if let game = store.games.first(where: { $0.id == "367520" }) ?? store.games.first {
+                BCDGameArt(game: game, kind: .hero, showTitle: false)
+                    .frame(width: top.width, height: top.height)
+                    .clipped()
+            }
+            Rectangle().fill(Color(white: 0.1)).frame(width: fold.width, height: fold.height).offset(y: fold.minY)   // the hinge
+            BCDTabletopTouchpadSurface(area: bottom, screen: screen)
+            BCDTouchLayer(items: model.items, screen: bottom.size, layoutScale: model.layoutScale, opacity: model.opacity, editing: false,
+                          selected: nil, input: model, arranging: model, look: BCDTouchLookModel.shared.look)
+                .frame(width: bottom.width, height: bottom.height)
+                .offset(x: bottom.minX, y: bottom.minY)
+        }
+        .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+        .scaleEffect(scale, anchor: .center)
+        .frame(width: available.width, height: available.height)
+        .background(Color(white: 0.16))
+        .onAppear { model.configure(keys: false, screen: bottom.size) }
     }
 }

@@ -378,6 +378,7 @@ struct BCDGraphicsSettings<Backend: BCDGraphicsBackend>: View {
                 BCDSettingsGroup(title: "Foldable iPhone") {
                     BCDDuoEnhancementsSettingsRow()
                     BCDFoldableSettingsRow()
+                    BCDTabletopTouchpadSettingsRow()
                 }
             }
             if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }

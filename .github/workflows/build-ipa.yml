@@ -1416,6 +1416,11 @@ jobs:
             echo ""
             echo "/* iOS SDK fixups appended by CI */"
             echo "#undef HAVE_GETATTRLIST"
+            echo "/* pipe2() is new in iOS 27's libc: with the iOS 27 SDK configure finds it, the app"
+            echo " * imports it weakly, and on iOS 26 and older the call goes to address 0 and every game"
+            echo " * launch crashes in server_pipe (0.1.682, iPadOS 26.6.2 crash reports). The app runs"
+            echo " * on iOS 18 and later: use pipe() + FD_CLOEXEC, as Wine does without pipe2. */"
+            echo "#undef HAVE_PIPE2"
             echo "#ifndef D_TAPE"
             echo "#define D_TAPE 1"
             echo "#endif"
@@ -3090,6 +3095,10 @@ jobs:
           python3 tools/patch-dock-ceg-service-restart.py madeira-dock/src/scm.c || echo "::warning::Dock CEG service restart patch not applied"
           python3 tools/patch-dock-ceg-retry.py madeira-dock/src/launch.c || echo "::warning::Dock CEG retry patch not applied"
           python3 tools/patch-dock-ceg-already-prepared.py madeira-dock/src/launch.c madeira-dock/src/validation.c || echo "::warning::Dock CEG already-prepared patch not applied"
+          # 2026-11-20 (a Discord request: Steam launch options): a Steam game's Launch arguments go to Valve's LaunchApp as its user arguments
+          # (MADEIRA_STEAM_HOST_ARGUMENTS, set by the app only when the game has some; none: "" as before)
+          python3 tests/host/check-dock-user-args.py
+          python3 tools/patch-dock-user-args.py madeira-dock/src/launch.c || echo "::warning::Dock user arguments patch not applied"
           bash build/madeira-dock/build.sh
 
       # madeira-bcd (round 624, Steam 113: 39 of 187 Rockstar Dock sessions): the Dock patches in order on a copy, the readback
@@ -4837,6 +4846,20 @@ jobs:
       - name: Check the kk-retry shim
         run: python3 tests/host/check-kk-retry.py
 
+      # 2026-11-20: 0.1.682 crashed every game launch on iOS 26 and older (pipe2 from the iOS 27 SDK, imported weakly): HAVE_PIPE2
+      # undefined in the iOS config.h, and the weak C import check on the archived app.
+      - name: Check weak C imports (pipe2)
+        run: python3 tests/host/check-weak-libsystem.py
+
+      # 2026-11-20: the app's system imports against older iOS simulator runtimes (tools/check-ios-runtime-symbols.py): the CI step,
+      # the dyld cache reader on a hand-made trie, and on a Mac with an older runtime: 0.1.682 fails on pipe2, 0.1.665 passes.
+      - name: Check the older-iOS runtime check
+        run: python3 tests/host/check-ios-runtime-symbols.py
+
+      # 2026-11-20: availability warnings above the app's oldest iOS stop the build (tools/check-availability-warnings.py).
+      - name: Check the availability-warning check
+        run: python3 tests/host/check-availability-warnings.py
+
       # Round 669 (X-Plane 12): KosmicKrisp's in-process opaque fds (playport patch 0020, env.MADEIRA_KK_OPAQUE_FD), Wine's win32
       # sharing on them and Zink on the session's KosmicKrisp (env.MADEIRA_ZINK_VULKAN): the patch's gates, its handle registry
       # compiled on the host, Wine's extension mapping, the list policy, the catalog, the row and the rule.
@@ -6004,6 +6027,24 @@ jobs:
           else
             echo "::notice::all six macdrv symbols are exported"
           fi
+
+      # 0.1.682 (the first iOS 27 SDK build) imported pipe2() weakly: NULL on iOS 26 and older, and every game launch crashed.
+      # A weak C import from libSystem/libc++/libobjc outside the script's known list stops the build here.
+      - name: Check the app for weak C imports newer than its oldest iOS
+        run: python3 tools/check-weak-libsystem.py build-out/Madeira.xcarchive/Products/Applications/Madeira.app
+
+      # Every system symbol the app's Mach-O files import, against the dyld shared caches of the older iOS simulator runtimes installed
+      # on the machine (the SDK's own runtime as the baseline). Only warns when no older runtime is installed (a GitHub runner).
+      - name: Check the app against older iOS runtimes
+        run: python3 tools/check-ios-runtime-symbols.py build-out/Madeira.xcarchive/Products/Applications/Madeira.app --auto
+
+      # clang's "'X' is only available on iOS N or newer" comes from the SDK headers, so it holds for real devices: pipe2 (iOS 27) was
+      # one in 0.1.682, while the iOS 26.4 simulator's libsystem_kernel even exports pipe2. Any such warning above the app's oldest iOS
+      # in the build's diagnostics (per-file .err, the archive and unix-side logs) stops the build.
+      - name: Check compiler availability warnings above the app's oldest iOS
+        run: |
+          MIN=$(plutil -extract MinimumOSVersion raw build-out/Madeira.xcarchive/Products/Applications/Madeira.app/Info.plist)
+          python3 tools/check-availability-warnings.py --min "$MIN" build archive.log ntdll.log win32u.log
 
       - name: Package Madeira and Madeira2 unsigned IPAs
         run: python3 tools/ota-variants.py package build-out/Madeira.xcarchive/Products/Applications/Madeira.app build-out ${{ steps.bn.outputs.n }}

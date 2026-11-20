@@ -69,7 +69,7 @@ for line in friends.splitlines():
     if 'SteamLog.' in line:
         require(re.search(r'\\\((?:[^)]*\.)?(name|steamID|id|friend|data|url)\b', line) is None,
                 f'DockFriends.swift: no SteamID, name or path logged in "{line.strip()[:60]}"')
-configure = dock[dock.index('    static func configure(_ game: DockGame, launchOption: UInt32 = 0) {'):]
+configure = dock[dock.index('    static func configure(_ game: DockGame, launchOption: UInt32 = 0, arguments: String = "") {'):]
 configure = configure[:configure.index('\n    }\n')]
 require('        if let state = SteamOnlineStatus.current.personaState {\n'
         '            setenv("MADEIRA_DOCK_PERSONA_STATE", String(state), 1)\n'

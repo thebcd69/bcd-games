@@ -57,8 +57,17 @@ enum BCDContentEngine {
         while !FileManager.default.fileExists(atPath: probe.path), probe.pathComponents.count > 1 {
             probe.deleteLastPathComponent()
         }
-        return (try? probe.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
+        let important = (try? probe.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
             .volumeAvailableCapacityForImportantUsage
+        // 2026-11-20 (an Epic game on an external drive): an exFAT drive reports 0 for important usage, so the plain figure of a
+        // volume that is not the device's own is taken there (as Steam's URL.freeSpace does). The device's answer is as before.
+        if let important, important > 0 { return important }
+        let real = probe.resolvingSymlinksInPath()
+        guard (try? real.resourceValues(forKeys: [.volumeIsInternalKey]))?.volumeIsInternal == false else { return important }
+        if let plain = (try? real.resourceValues(forKeys: [.volumeAvailableCapacityKey]))?.volumeAvailableCapacity, plain > 0 { return Int64(plain) }
+        var info = statfs()
+        if statfs(real.path, &info) == 0, info.f_bavail > 0 { return Int64(info.f_bavail) * Int64(info.f_bsize) }
+        return important
     }
 
     /// Bytes still to be written for the chunks the journal does not list.
@@ -177,7 +186,11 @@ enum BCDContentEngine {
     static func commit(stage: URL, to destination: URL) throws {
         try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
         #if canImport(Darwin)
-        let moved = renamex_np(stage.path, destination.path, UInt32(RENAME_EXCL))
+        var moved = renamex_np(stage.path, destination.path, UInt32(RENAME_EXCL))
+        // 2026-11-20: a file system without exclusive renames (exFAT on an external drive may answer ENOTSUP): the same rule by hand.
+        if moved != 0, errno == ENOTSUP || errno == EINVAL {
+            moved = FileManager.default.fileExists(atPath: destination.path) ? { errno = EEXIST; return -1 }() : rename(stage.path, destination.path)
+        }
         #else
         let moved: Int32 = FileManager.default.fileExists(atPath: destination.path) ? { errno = EEXIST; return -1 }() : rename(stage.path, destination.path)
         #endif

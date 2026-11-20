@@ -113,8 +113,12 @@ extension BCDLiveStore {
         let epic = BCDEpic.shared, queue = BCDContentQueue.shared
         switch action {
         case .install where place == .externalDrive:
-            // Epic's games install on the device in this version (the external drive comes with its own merge).
-            epic.tell("Epic games install on this device for now. Choose Install.")
+            // 2026-11-20: Epic games can install on the external drive the page offers (Settings › Storage › External drives).
+            guard let target = ExternalDrives.shared.externalInstallTarget else {
+                epic.tell("No external drive is connected. Plug it in, or choose This device.")
+                break
+            }
+            epic.install(app, drive: target.name)
         case .install, .resume:
             epic.install(app)
         case .update, .verify:

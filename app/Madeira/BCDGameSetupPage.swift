@@ -30,6 +30,8 @@ struct BCDSetupDllState: Equatable {
     var shipped: [String] = []
     /// The DLLs the file switches off (env.WINEDLLOVERRIDES entries with no mode).
     var off: [String] = []
+    /// The DLLs the file loads from the game's folder first (env.WINEDLLOVERRIDES entries with mode n,b).
+    var nativeFirst: [String] = []
     /// What BCD's Runtimes installer says is installed (BCDRuntimes status file), or nil when it never ran.
     var runtimes: [String]?
 }
@@ -90,6 +92,7 @@ enum BCDGameSetupPage {
     static let version = "setup.version"
     static let componentsPrefix = "setup.dll."
     static let dllOff = "setup.dll-off"
+    static let dllNativeFirst = "setup.dll-native-first"
     static let dll32 = "setup.dll-32bit"
     static let runtimes = "setup.runtimes"
     static let fex = "setup.fex"
@@ -126,7 +129,8 @@ enum BCDGameSetupPage {
 
     static func componentsSummary(_ d: BCDSetupDllState) -> String {
         let wines = BCDDllComponents.all.filter { BCDDllComponents.isWines($0, shadow: d.shadow) }.count
-        let parts = [wines == 0 ? nil : "\(wines) set to Wine's own", d.off.isEmpty ? nil : "\(d.off.count) switched off"].compactMap { $0 }
+        let parts = [wines == 0 ? nil : "\(wines) set to Wine's own", d.off.isEmpty ? nil : "\(d.off.count) switched off",
+                     d.nativeFirst.isEmpty ? nil : "\(d.nativeFirst.count) game's own first"].compactMap { $0 }
         return parts.isEmpty ? "As the games have them" : parts.joined(separator: " · ")
     }
 
@@ -156,6 +160,10 @@ enum BCDGameSetupPage {
             id: dllOff, title: "Switched off", kind: .text(prompt: "dsound.dll;mfplat.dll"), value: d.off.joined(separator: ";"),
             note: s.notes[dllOff] ?? "DLLs the game cannot load at all, separated by semicolons, for a game that fails in one of them (a sound or video library, say). Empty: none. From the next start.",
             heading: "Switch a DLL off"))
+        list.append(BCDGameSetting(
+            id: dllNativeFirst, title: "Game's own copy first", kind: .text(prompt: "dinput8.dll;version.dll"), value: d.nativeFirst.joined(separator: ";"),
+            note: s.notes[dllNativeFirst] ?? "For a mod loader that puts its own DLL in the game's folder (an ASI loader's dinput8.dll or version.dll, say): these DLLs load from the game's folder first, and Wine's own copy when the folder has none. The WINEDLLOVERRIDES=\"name=n,b\" of Steam launch options in Proton guides. Separated by semicolons. Empty: none. From the next start.",
+            heading: "Mod loaders"))
         list.append(BCDGameSetting(
             id: runtimes, title: "Runtimes installed", kind: .info,
             value: d.runtimes.map { $0.isEmpty ? "None" : $0.joined(separator: ", ") } ?? "None installed yet",

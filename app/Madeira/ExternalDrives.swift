@@ -383,7 +383,7 @@ final class ExternalDrives: ObservableObject {
     @MainActor func remove(_ id: UUID) {
         guard let folder = folders.first(where: { $0.id == id }) else { return }
         guard wine_process_is_running() == 0, GameMover.shared.moving == nil,
-              !SteamOwnedLibrary.shared.hasStorageWork else {
+              !SteamOwnedLibrary.shared.hasStorageWork, !BCDContentQueue.shared.hasWork else {   // 2026-11-20: an Epic or GOG download too
             LogStore.shared.log("[external] drive kept while a game, download or cloud operation uses storage")
             return
         }
@@ -397,6 +397,7 @@ final class ExternalDrives: ObservableObject {
         unlink(folder)
         mounted.removeValue(forKey: id)?.stopAccessingSecurityScopedResource()
         SteamOwnedLibrary.shared.forgetTargets(onDrive: folder.name)   // BCD: downloads meant for this drive
+        BCDEpic.forgetTargets(onDrive: folder.name)   // 2026-11-20: Epic's too
         publishOpened()
         refreshSteam()
         Task { @MainActor in SteamGamesModel.shared.refresh() }
@@ -445,6 +446,8 @@ final class ExternalDrives: ObservableObject {
                 guard path.hasPrefix(base + "/") else { continue }
                 let below = path.dropFirst(base.count + 1).split(separator: "/").map(String.init)
                 guard !below.isEmpty else { continue }
+                // 2026-11-20: Epic's folder on the drive holds BCD's Epic installs, which have their records and entries already.
+                guard below.count < 2 || below[0] != "Epic Games" else { continue }
                 let relative = "External/\(name)/" + below.joined(separator: "/")
                 let linked = drive.appendingPathComponent(relative)
                 let folders = below.dropLast()

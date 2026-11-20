@@ -104,6 +104,11 @@ import Foundation
         guard BCDContentQueue.shared.job(epic.key(app)) == nil else {
             throw EpicContentError.invalid("Finish or cancel this game's download before you sync saves.")
         }
+        // 2026-11-20: a game on an external drive syncs only while the drive is there (a save folder in the game's folder would
+        // otherwise be made on the device, under the drive's missing link).
+        if let drive = BCDEpicInstall.driveName(record.root), !ExternalDrives.isConnected(drive) {
+            throw EpicContentError.invalid("This game is on \(drive), which is not connected. Plug it in, then sync saves.")
+        }
         guard let tokens = await epic.session.current(), let account = tokens.accountID else {
             throw EpicContentError.invalid("Sign in to Epic Games to sync saves.")
         }

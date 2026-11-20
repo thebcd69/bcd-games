@@ -88,6 +88,19 @@ func check(_ what: String, _ ok: Bool, _ detail: String = "") {
               BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: 1300, width: 440, height: 16)) == nil
               && BCDTabletop.regions(bounds: screenBounds, division: CGRect(x: 0, y: -400, width: 440, height: 16)) == nil
               && BCDTabletop.regions(bounds: CGRect(x: 0, y: 0, width: 375, height: 667), division: CGRect(x: 0, y: 900, width: 375, height: 16)) == nil)
+        // ---------------------------------------------------------------- the touchpad below the fold (2026-11-20)
+        let below = split?.bottom
+        check("the touchpad is on unless the stored answer is 0",
+              BCDTabletopTouchpad.resolve(nil) && BCDTabletopTouchpad.resolve("1") && BCDTabletopTouchpad.resolve(" 1 ")
+              && !BCDTabletopTouchpad.resolve("0") && !BCDTabletopTouchpad.resolve(" 0") && BCDTabletopTouchpad.resolve("yes"))
+        check("a gesture starting below the fold is the touchpad's; above the fold, on the fold or with no pose it is not",
+              BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 700), below: below, on: true)
+              && BCDTabletopTouchpad.owns(CGPoint(x: 0, y: 486), below: below, on: true)
+              && !BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 300), below: below, on: true)
+              && !BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 478), below: below, on: true)
+              && !BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 700), below: nil, on: true)
+              && !BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 700), below: .zero, on: true))
+        check("turned off, nothing below the fold is the touchpad's", !BCDTabletopTouchpad.owns(CGPoint(x: 220, y: 700), below: below, on: false))
         check("the regions follow a window that does not start at the origin",
               BCDTabletop.regions(bounds: CGRect(x: 10, y: 20, width: 440, height: 956), division: CGRect(x: 10, y: 490, width: 440, height: 16))?.top == CGRect(x: 10, y: 20, width: 440, height: 470))
         check("an empty division or an empty window gives nothing",

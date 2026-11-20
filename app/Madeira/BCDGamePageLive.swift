@@ -602,8 +602,8 @@ import UniformTypeIdentifiers
     // MARK: Launch
 
     /// How the program starts, for a game BCD starts itself (a game added from Files, or a Steam
-    /// game started as its own program); nil for a Steam game started through BCD Dock and for
-    /// the Wine desktop.
+    /// game started as its own program); for a Steam game started through BCD Dock only its Launch
+    /// arguments (2026-11-20); nil for the Wine desktop.
     private func launch(_ entry: LibraryEntry) -> BCDGameSettingGroup? {
         var settings: [BCDGameSetting] = []
         if entry.usesLaunchOptions {
@@ -619,9 +619,15 @@ import UniformTypeIdentifiers
                             note: "Starts Windows' services before the game, for launchers that need them (Steam-style COM). BCD writes a small batch file for it."),
             ]
         }
-        if entry.desktop != true && entry.steamAppID == nil {
+        // 2026-11-20 (a Discord request: Steam launch options): a Steam game has them too. Through BCD Dock, Steam hands them to the game
+        // (Valve's LaunchApp, tools/patch-dock-user-args.py); started as "The game", they follow Steam's own arguments for the program.
+        let dock = entry.steamAppID != nil && !entry.startsSteamGameDirectly
+        if entry.desktop != true {
+            let note = entry.steamAppID == nil ? "Handed to the program each time it starts."
+                : dock ? "Steam hands them to the game when it starts it, like Steam's own Launch Options."
+                : "Added after the arguments Steam gives this program."
             settings.append(BCDGameSetting(id: "arguments", title: "Launch arguments", kind: .text(prompt: "-windowed -nosplash"),
-                                           value: entry.arguments, note: "Handed to the program each time it starts.",
+                                           value: entry.arguments, note: note,
                                            chips: BCDLaunchFlags.quick))
             let words = ["-dx12": "Ask for Direct3D 12", "-dx11": "Ask for Direct3D 11", "-dx10": "Ask for Direct3D 10",
                          "-dx9": "Ask for Direct3D 9", "-windowed": "Ask for a window", "-fullscreen": "Ask for full screen",
@@ -632,11 +638,14 @@ import UniformTypeIdentifiers
             }
         }
         guard !settings.isEmpty else { return nil }
-        settings.append(BCDGameSetting(id: "command", title: "What starts", kind: .info, value: entry.commandPreview))
+        settings.append(BCDGameSetting(id: "command", title: "What starts", kind: .info,
+                                       value: dock ? "Steam starts the game (BCD Dock)" + (entry.arguments.isEmpty ? "" : " with " + entry.arguments) : entry.commandPreview))
         let warning = entry.usesLaunchOptions && !entry.runsInDesktop && (entry.isBatch || entry.startServices == true)
         return BCDGameSettingGroup(id: "launch", title: "Launch", symbol: "play.rectangle", settings: settings,
                                    note: warning ? "Started on its own, Wine stops as soon as its first program ends: a batch file that starts the game and exits ends the game too. Choose In a Wine desktop." : nil,
-                                   headline: entry.runsInDesktop ? "In a Wine desktop" : (entry.arguments.isEmpty ? "On its own" : "On its own · " + entry.arguments))
+                                   headline: entry.runsInDesktop ? "In a Wine desktop"
+                                       : dock ? (entry.arguments.isEmpty ? "Through Steam" : "Through Steam · " + entry.arguments)
+                                       : (entry.arguments.isEmpty ? "On its own" : "On its own · " + entry.arguments))
     }
 
     // MARK: Steam

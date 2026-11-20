@@ -41,6 +41,16 @@ do {
     check(BCDDllComponents.isDllName("d3d9.dll") && !BCDDllComponents.isDllName("d3d9") && !BCDDllComponents.isDllName("a b.dll") && !BCDDllComponents.isDllName("a;b.dll") && !BCDDllComponents.isDllName("é.dll"),
           "DLL names")
     check(BCDGameSetupPage.parseOff("dsound.dll; MFPLAT.dll bad name,x") == (["dsound.dll", "mfplat.dll"], ["bad", "name", "x"]), "the Switched off field", "\(BCDGameSetupPage.parseOff("dsound.dll; MFPLAT.dll bad name,x"))")
+
+    // 2026-11-20: the game's own copy first (WINEDLLOVERRIDES n,b), for mod loaders
+    check(BCDDllComponents.nativeFirst("video64=;comdlg32=n,b;dinput8,version=native,builtin;x=b,n;y= N , B ") == ["comdlg32", "dinput8", "version", "y"],
+          "own copy first: n,b and native,builtin entries (spaces and case allowed), not b,n and not off", "\(BCDDllComponents.nativeFirst("video64=;comdlg32=n,b;dinput8,version=native,builtin;x=b,n;y= N , B "))")
+    check(BCDDllComponents.switchedOff("video64=;dinput8=n,b") == ["video64"], "an n,b entry is not switched off")
+    check(BCDDllComponents.settingNativeFirst("video64=;comdlg32=n,b;x=b", to: ["dinput8.dll", "dinput8.dll", "version.dll"]) == "video64=;x=b;dinput8.dll,version.dll=n,b",
+          "own copy first: the other entries stay as written, the n,b ones are replaced by one entry", BCDDllComponents.settingNativeFirst("video64=;comdlg32=n,b;x=b", to: ["dinput8.dll", "dinput8.dll", "version.dll"]))
+    check(BCDDllComponents.settingNativeFirst("dinput8=n,b", to: []) == "", "nothing left: the line goes")
+    check(BCDDllComponents.settingOff("dinput8.dll=n,b", to: ["dsound.dll"]) == "dinput8.dll=n,b;dsound.dll=", "switching a DLL off keeps the n,b entry")
+    check(BCDDllComponents.bare("DInput8.DLL") == "dinput8" && BCDDllComponents.bare("dinput8") == "dinput8", "dsound and dsound.dll are the same DLL")
 }
 
 // ------------------------------------------------------------------------------ launch chips
@@ -60,6 +70,10 @@ do {
     check(BCDLaunchFlags.has("-force-d3d11-singlethreaded", "-force-d3d11") == false, "and is not found as it")
     check(BCDLaunchFlags.toggled("/d3d9 -windowed", "/d3d9") == "-windowed", "a second tap takes /d3d9 out")
     check(BCDLaunchFlags.toggled("-dx11 -windowed", "-dx12") == "-windowed -dx12" && BCDLaunchFlags.toggled("-windowed", "-fullscreen") == "-fullscreen", "the old exclusions still hold")
+    check(quick.contains { $0.value == "-vulkan" } && quick.contains { $0.value == "-force-vulkan" }, "the Vulkan picks are offered (2026-11-20)")
+    check(BCDLaunchFlags.toggled("-dx11 -windowed", "-vulkan") == "-windowed -vulkan" && BCDLaunchFlags.toggled("-vulkan", "-dx12") == "-dx12",
+          "-vulkan and a Direct3D flag take each other out")
+    check(BCDLaunchFlags.toggled("-force-d3d11", "-force-vulkan") == "-force-vulkan", "Unity: one graphics API at a time, Vulkan included")
 }
 
 // ------------------------------------------------------------------------------ FEX presets
@@ -130,6 +144,12 @@ do {
     s.dll.runtimes = ["OpenAL", "XNA Framework 4.0"]
     comp = BCDGameSetupPage.componentsSection(s)
     check(find(comp, "setup.dll-off")!.value == "dsound.dll" && comp.headline == "1 set to Wine's own · 1 switched off", "the off list", comp.headline ?? "")
+    check(find(comp, "setup.dll-native-first")?.value == "" && find(comp, "setup.dll-native-first")?.heading == "Mod loaders", "the own-copy-first field, empty")
+    s.dll.nativeFirst = ["dinput8.dll", "version.dll"]
+    comp = BCDGameSetupPage.componentsSection(s)
+    check(find(comp, "setup.dll-native-first")!.value == "dinput8.dll;version.dll" && comp.headline == "1 set to Wine's own · 1 switched off · 2 game's own first",
+          "the own-copy-first list and the headline", comp.headline ?? "")
+    s.dll.nativeFirst = []
     check(find(comp, "setup.runtimes")!.value == "OpenAL, XNA Framework 4.0" && find(comp, "setup.runtimes")!.kind == .info, "installed runtimes")
     s.dll.runtimes = nil
     check(find(BCDGameSetupPage.componentsSection(s), "setup.runtimes")!.value == "None installed yet", "runtimes: the installer never ran")

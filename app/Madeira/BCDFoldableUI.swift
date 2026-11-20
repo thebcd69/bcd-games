@@ -89,3 +89,29 @@ final class BCDFoldableProbeView: UIView {
         BCDFoldableSceneClass.follow(scene: scene, width: Double(window.bounds.width))
     }
 }
+
+/// The touchpad below the fold (BCDTabletopTouchpad, BCDFoldable.swift; 2026-11-20): a faint surface where the pad is, under the
+/// on-screen controls, so that the screen below the fold reads as a touchpad in the tabletop pose. It takes no touch: the game view
+/// underneath handles them (MetalBackedView.padBegins). `area` is the region below the fold, `screen` the controls window's size.
+struct BCDTabletopTouchpadSurface: View {
+    let area: CGRect
+    let screen: CGSize
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 22, style: .continuous)
+            .fill(Color.white.opacity(0.045))
+            .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+            .overlay(alignment: .bottom) {
+                Text("Touchpad")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.white.opacity(0.32))
+                    .padding(.bottom, 10)
+            }
+            .padding(12)
+            .frame(width: area.width, height: area.height)
+            .offset(x: area.minX, y: area.minY)
+            .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}

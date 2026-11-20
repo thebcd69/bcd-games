@@ -49,7 +49,8 @@ extension BCDEpic: BCDContentDriver {
 
     // MARK: Install, play, uninstall
 
-    func install(_ app: String) {
+    /// `drive`: the external drive's name when the player chose External drive (2026-11-20), nil for this device.
+    func install(_ app: String, drive: String? = nil) {
         guard Self.enabled, Self.installEnabled, BCDEpicCatalog.validAppName(app), installs[app] == nil else { return }
         guard signedIn else { tell(BCDEpicError.signedOut.errorDescription ?? ""); return }
         guard let item = item(app), item.kind == .game else {
@@ -63,7 +64,9 @@ extension BCDEpic: BCDContentDriver {
             return
         }
         start()
-        BCDEpicLog.write("[epic-install] install asked app=\(BCDEpicLog.app(app))")
+        // A job keeps the place it was asked for through pause and a restart; a resume (drive nil) keeps it too.
+        if let drive, queue.job(key(app)) == nil { Self.setTarget(app, drive: drive) }
+        BCDEpicLog.write("[epic-install] install asked app=\(BCDEpicLog.app(app)) place=\(Self.target(app) == nil ? "device" : "drive")")
         queue.enqueue(key(app), title: title)
     }
 
@@ -136,7 +139,16 @@ extension BCDEpic: BCDContentDriver {
         guard var record = installs[app] else { return .failure(.init(message: "This Epic game isn't installed.")) }
         // Build 632: a cloud-save sync of this game (only ever running when the player turned it on) finishes first.
         if BCDEpicCloud.shared.isSyncing(app) { return .failure(.init(message: "BCD is syncing this game's saves with Epic Cloud. Try again in a moment.")) }
-        guard let folder = record.hostFolder, FileManager.default.fileExists(atPath: folder.appendingPathComponent(record.launchPath).path) else {
+        let there = { record.hostFolder.map { FileManager.default.fileExists(atPath: $0.appendingPathComponent(record.launchPath).path) } ?? false }
+        // 2026-11-20: a game on an external drive: the drive is opened again when it is not (as Play does for other games there).
+        if let drive = BCDEpicInstall.driveName(record.root), !there() {
+            ExternalDrives.shared.mountAll()
+            if !there() {
+                BCDEpicLog.write("[epic-launch] play refused app=\(BCDEpicLog.app(app)) reason=drive-missing")
+                return .failure(.init(message: "This game is on \(drive), and BCD can't reach it. Plug the drive in and try again. If it still fails, open Settings › Storage › External drives, tap \(drive) and choose Reconnect."))
+            }
+        }
+        guard there() else {
             return .failure(.init(message: "BCD can't find this game's files. Uninstall it, then install it again."))
         }
         let existing = record.entryID.flatMap { id in LibraryModel.shared.entries.first { $0.id == id } }
@@ -170,6 +182,15 @@ extension BCDEpic: BCDContentDriver {
         guard LibraryModel.shared.current == nil, wine_process_is_running() == 0 else {
             tell("Close the game before uninstalling it.")
             return
+        }
+        // 2026-11-20: a game on an external drive is removed only while the drive is there: its record stays otherwise.
+        if let drive = BCDEpicInstall.driveName(record.root) {
+            if !ExternalDrives.isConnected(drive) { ExternalDrives.shared.mountAll() }
+            guard ExternalDrives.isConnected(drive), (try? ExternalDrives.nativeURL(record.root.folder, write: true)) != nil else {
+                tell("\(record.title) is on \(drive), which is not connected. Plug it in, then uninstall the game.")
+                BCDEpicLog.write("[epic-install] uninstall kept app=\(BCDEpicLog.app(app)) reason=drive-missing")
+                return
+            }
         }
         if let entryID = record.entryID { LibraryModel.shared.remove(entryID) }
         BCDEpicInstall.delete(app, base: Self.folder)
@@ -212,6 +233,8 @@ extension BCDEpic: BCDContentDriver {
 
     func plan(for key: BCDContentKey, stored: BCDContentPlan?) async throws -> BCDContentPlan {
         guard let item = item(key.id), item.kind == .game else { throw BCDEpicContentError.noBuild }
+        let drive = Self.target(key.id).flatMap(BCDEpicInstall.driveName)
+        if let drive { try Self.openDrive(drive) }
         let title = item.title ?? key.id
         let api = self.api
         let loaded: BCDEpicContent.Loaded
@@ -237,6 +260,7 @@ extension BCDEpic: BCDContentDriver {
         let folder = BCDContentPaths.folderName(item.folderName ?? "") ?? BCDContentPaths.folderName(title) ?? "Epic game"
         do {
             let made = try await BCDEpicContent.plan(key, title: title, folder: folder, loaded: loaded, item: item)
+            if let drive { try Self.fitsDrive(drive, plan: made.plan) }
             try await savePending(made.info, manifest: loaded.file)
             return made.plan
         } catch let refused as BCDEpicRefused {
@@ -260,7 +284,8 @@ extension BCDEpic: BCDContentDriver {
         })
     }
 
-    func root(for key: BCDContentKey) -> BCDInstallRoot { Self.root }
+    /// An installed game's own root (updates and repairs stay where it is), a job's chosen drive, else the device's.
+    func root(for key: BCDContentKey) -> BCDInstallRoot { installs[key.id]?.root ?? Self.target(key.id) ?? Self.root }
 
     /// Eight chunks in flight (about 300 KiB each), and every file checked against its SHA-1 when its chunks are in.
     func options(for plan: BCDContentPlan) -> BCDContentOptions {
@@ -272,7 +297,7 @@ extension BCDEpic: BCDContentDriver {
 
     func finish(_ plan: BCDContentPlan, stage: URL) async throws {
         guard let info = pendingInfo(plan.key.id) else { throw BCDEpicContentError.badAsset("pending") }
-        let root = Self.root, base = Self.folder
+        let root = root(for: plan.key), base = Self.folder
         var record = try await Task.detached(priority: .utility) {
             try BCDEpicInstall.finish(plan, info: info, pendingManifest: BCDEpicInstall.pendingManifestFile(info.app, base: base),
                                       stage: stage, root: root, base: base)
@@ -288,10 +313,69 @@ extension BCDEpic: BCDContentDriver {
             refusals.save(Self.refusalsFile)
         }
         try? FileManager.default.removeItem(at: BCDEpicInstall.pendingInfoFile(record.app, base: base))
+        Self.setTarget(record.app, drive: nil)   // the record holds the root now
     }
 
     func cancelled(_ key: BCDContentKey) {
         removePending(key.id)
+        Self.setTarget(key.id, drive: nil)
+    }
+
+    // MARK: External drive (2026-11-20)
+
+    /// The drive a queued or running job installs to: its name in a small file beside Epic's records (kept through pause and a
+    /// restart, as Steam's steam-install-targets), or nil for this device. The name is the drive's own folder name, nothing else.
+    static func targetFile(_ app: String) -> URL { folder.appendingPathComponent("targets/\(app).drive") }
+
+    static func target(_ app: String) -> BCDInstallRoot? {
+        guard BCDEpicCatalog.validAppName(app), let data = try? Data(contentsOf: targetFile(app)), data.count <= 512,
+              let name = String(data: data, encoding: .utf8) else { return nil }
+        let root = BCDEpicInstall.driveRoot(name)
+        return BCDEpicInstall.driveName(root) == nil ? nil : root
+    }
+
+    static func setTarget(_ app: String, drive: String?) {
+        guard BCDEpicCatalog.validAppName(app) else { return }
+        let file = targetFile(app)
+        guard let drive else { try? FileManager.default.removeItem(at: file); return }
+        try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? Data(drive.utf8).write(to: file, options: .atomic)
+    }
+
+    /// The jobs meant for a drive the player removed in Settings: they go back to this device (as Steam's forgetTargets).
+    static func forgetTargets(onDrive name: String) {
+        let files = (try? FileManager.default.contentsOfDirectory(at: folder.appendingPathComponent("targets", isDirectory: true),
+                                                                  includingPropertiesForKeys: nil)) ?? []
+        for file in files where file.pathExtension == "drive" && (try? Data(contentsOf: file)) == Data(name.utf8) {
+            try? FileManager.default.removeItem(at: file)
+        }
+    }
+
+    /// Before a job for a drive plans or resumes: the drive is opened again when it is not, and Epic's folder is made on the drive
+    /// itself (never through a link that leads nowhere, which would put the game on the device). A drive out of reach or read-only
+    /// stops the job with words the player can act on.
+    static func openDrive(_ name: String) throws {
+        if !ExternalDrives.isConnected(name) { ExternalDrives.shared.mountAll() }
+        do {
+            guard ExternalDrives.isConnected(name) else { throw ExternalStorageError.unavailable }
+            let folder = try ExternalDrives.nativeURL(BCDEpicInstall.driveRoot(name).folder, write: true)
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        } catch let error as CocoaError where error.code == .fileWriteVolumeReadOnly {
+            BCDEpicLog.write("[epic-install] drive read-only")
+            throw BCDContentError.refused("\(name) is read-only (an NTFS drive is, on iPhone and iPad). Stop the download and install the game on this device, or use an exFAT or APFS drive.")
+        } catch {
+            BCDEpicLog.write("[epic-install] drive missing reason=\(BCDEpicLog.reason(error))")
+            throw BCDContentError.refused("\(name) is not connected. Plug it in and tap Try again, or stop the download and install the game on this device.")
+        }
+    }
+
+    /// A FAT32 drive holds no file of 4 GB or more: such a game stops before a chunk is fetched.
+    static func fitsDrive(_ name: String, plan: BCDContentPlan) throws {
+        guard let largest = plan.files.map(\.size).max(), largest >= 1 << 32,
+              let folder = try? ExternalDrives.nativeURL(BCDEpicInstall.driveRoot(name).folder),
+              let type = folder.fileSystemType?.lowercased(), ["msdos", "fat", "fat32", "vfat"].contains(type) else { return }
+        BCDEpicLog.write("[epic-install] drive fat32 largest=\(largest)")
+        throw BCDContentError.refused("This game has a file of 4 GB or more, which \(name) (FAT32) cannot hold. Stop the download and install it on this device, or use an exFAT or APFS drive.")
     }
 
     // MARK: Covers

@@ -159,6 +159,30 @@ enum BCDTabletop {
     }
 }
 
+/// The touchpad below the fold (2026-11-20, the owner, after a PlayStation 4 emulator: "the top half is the game, the bottom half a
+/// touchpad"). In the tabletop pose (BCDTabletop) a gesture whose first finger lands below the fold drives the pointer the way a
+/// laptop's trackpad does, whatever pointer mode the session uses and while the on-screen controller is shown too: one finger moves
+/// the pointer over the game above, a tap clicks, two fingers right-click and scroll, holding then moving drags; in Mouse-look it turns
+/// the camera. The on-screen controller's own controls below the fold stay controls. Part of the foldable iPhone support: nothing
+/// asks this unless `BCDFoldable.active`, and only a fold across the screen gives a region below it. On unless the player turns it off
+/// (Settings › Graphics › Foldable iPhone); off, the region below the fold is what it was before.
+enum BCDTabletopTouchpad {
+    static let key = "bcd.foldable.touchpad"
+
+    /// On unless the stored answer is "0".
+    static func resolve(_ stored: String?) -> Bool { stored?.trimmingCharacters(in: .whitespaces) != "0" }
+    static var stored: String? { UserDefaults.standard.string(forKey: key) }
+    static func store(_ on: Bool) { UserDefaults.standard.set(on ? "1" : "0", forKey: key) }
+    static var on: Bool { resolve(stored) }
+
+    /// Whether a gesture that starts at `point` (window points) is the touchpad's: the touchpad is on, the pose has a region below
+    /// the fold, and the point lies in it.
+    static func owns(_ point: CGPoint, below: CGRect?, on: Bool) -> Bool {
+        guard on, let below, !below.isEmpty else { return false }
+        return below.contains(point)
+    }
+}
+
 /// When the iPad layout does not fit. BCD's library draws its iPad layout (a top bar of tabs and chips, a game page with a 320 pt side
 /// panel, 36 pt gutters) for a regular x regular window. Apple says the inner display is regular x regular in every pose, but its portrait
 /// pose is 626 pt wide (or 669): there the top bar runs out of both edges and the game page's panel off the right (previewed with

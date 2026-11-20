@@ -447,6 +447,8 @@ enum MadeiraDock {
         "session-offline-entitled", "session-offline-listed", "session-offline-timeout-state",
         "session-offline-fallback", "session-offline-ready",
         "launch-client-error", "launch-option-index", "launch-option-invalid", "launch-option-missing",
+        // 2026-11-20 (tools/patch-dock-user-args.py): the length of the Launch arguments handed to LaunchApp (-1: too long, dropped)
+        "launch-user-args-length",
         "launch-update-wait", "launch-update-retry", "launch-update-ready",
         "launch-config-wait", "launch-config-gave-up", "launch-session-wait", "launch-session-gave-up",
         "ceg-request", "ceg-request-result", "ceg-request-busy", "ceg-server-result", "ceg-job-result",
@@ -599,7 +601,7 @@ enum MadeiraDock {
     }
 
     /// The host's environment for one launch.
-    static func configure(_ game: DockGame, launchOption: UInt32 = 0) {
+    static func configure(_ game: DockGame, launchOption: UInt32 = 0, arguments: String = "") {
         launchedGame = game
         for key in ["MADEIRA_STEAM_HOST_PROBE", "MADEIRA_STEAM_HOST_SESSION", "MADEIRA_STEAM_HOST_LOGIN", "MADEIRA_STEAM_HOST_LAUNCH"] {
             setenv(key, "1", 1)
@@ -615,6 +617,11 @@ enum MadeiraDock {
         friendsRequested = SteamOnlineStatus.current != .offline
         SteamLog.event("[dock-launch] friends=\(friendsRequested ? 1 : 0)")
         setenv("MADEIRA_STEAM_HOST_LAUNCH_OPTION", String(launchOption), 1)
+        // 2026-11-20 (a Discord request: Steam launch options): the game's Launch arguments go to Valve's LaunchApp as its user arguments,
+        // as Steam's own Launch Options do (tools/patch-dock-user-args.py). None: the variable goes and the host passes "" as before.
+        let userArguments = arguments.trimmingCharacters(in: .whitespacesAndNewlines)   // the page saved them as plain text (LaunchArgumentText)
+        if userArguments.isEmpty { unsetenv("MADEIRA_STEAM_HOST_ARGUMENTS") } else { setenv("MADEIRA_STEAM_HOST_ARGUMENTS", userArguments, 1) }
+        SteamLog.event("[dock-launch] user-arguments=\(userArguments.isEmpty ? 0 : userArguments.utf8.count)")
         // madeira-bcd (build 666, pull request #51 by pauloec): Grim Dawn's SteamOS/Linux compatibility executable (launch key 1,
         // compat/Grim Dawn.exe in Steam's app info) uses C-style Lua comments, which only BCD's lua-c-comments LuaJIT parses
         // (build/wineserver/luajit_compat.c); every other launch clears the switch. A game's own bcd.cfg line still wins.

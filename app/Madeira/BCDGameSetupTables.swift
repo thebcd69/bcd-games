@@ -122,6 +122,44 @@ enum BCDDllComponents {
         if !off.isEmpty { keep.append(off.joined(separator: ",") + "=") }
         return keep.joined(separator: ";")
     }
+
+    // MARK: The game's own copy first (2026-11-20)
+
+    /// A mode that loads the game's own copy first and Wine's when the game has none: what a mod loader's DLL needs (an ASI loader's
+    /// dinput8.dll or version.dll), the Steam launch option WINEDLLOVERRIDES="dinput8=n,b" of Proton guides.
+    static func isNativeFirst(_ mode: Substring) -> Bool {
+        let m = mode.trimmingCharacters(in: .whitespaces).lowercased().replacingOccurrences(of: " ", with: "")
+        return m == "n,b" || m == "native,builtin"
+    }
+
+    /// The DLLs the line loads from the game's folder first (entries with mode n,b or native,builtin).
+    static func nativeFirst(_ overrides: String?) -> [String] {
+        var out: [String] = []
+        for entry in entries(overrides) {
+            guard let eq = entry.firstIndex(of: "="), isNativeFirst(entry[entry.index(after: eq)...]) else { continue }
+            out += entry[..<eq].split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }.filter { !$0.isEmpty }
+        }
+        return out
+    }
+
+    /// The line with its "own copy first" entries replaced by `names` (the others stay as written); "" when nothing is left.
+    static func settingNativeFirst(_ overrides: String?, to names: [String]) -> String {
+        var keep: [String] = []
+        for entry in entries(overrides) {
+            if let eq = entry.firstIndex(of: "="), isNativeFirst(entry[entry.index(after: eq)...]) { continue }
+            keep.append(entry)
+        }
+        var seen = Set<String>(), first: [String] = []
+        for name in names where seen.insert(name).inserted { first.append(name) }
+        if !first.isEmpty { keep.append(first.joined(separator: ",") + "=n,b") }
+        return keep.joined(separator: ";")
+    }
+
+    /// "dsound" and "dsound.dll" name the same DLL in WINEDLLOVERRIDES.
+    static func bare(_ name: String) -> String {
+        let n = name.lowercased()
+        return n.hasSuffix(".dll") ? String(n.dropLast(4)) : n
+    }
 }
 
 // MARK: - FEX presets

@@ -70,6 +70,23 @@ enum BCDEpicInstall {
     /// (the records keep a drive and a folder, the engine takes a root per job).
     static let root = BCDInstallRoot(drive: "C", folder: "Program Files/Epic Games")
 
+    /// 2026-11-20: Epic's folder on an external drive (Settings › Storage › External drives), reached through the drive's
+    /// C:\External\<name> link, so the record, the library entry and the engine take it as any root of drive C. The default
+    /// stays `root`; a game goes here only when the player chooses External drive on its page.
+    static func driveRoot(_ name: String) -> BCDInstallRoot { BCDInstallRoot(drive: "C", folder: "External/\(name)/Epic Games") }
+
+    /// The drive's name of a root on an external drive, nil for the device's.
+    static func driveName(_ root: BCDInstallRoot) -> String? {
+        let parts = root.folder.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+        guard root.drive == "C", parts.count == 3, parts[0] == "External", parts[2] == "Epic Games",
+              BCDContentPaths.folderName(parts[1]) == parts[1] else { return nil }
+        return parts[1]
+    }
+
+    /// A root a record may hold: the device's, or Epic's folder on a drive (a record naming another folder is not loaded, so an
+    /// uninstall can only ever remove a folder under one of these).
+    static func validRoot(_ root: BCDInstallRoot) -> Bool { root == Self.root || driveName(root) != nil }
+
     /// The install folder's name: the catalog's own, then "<name> (Epic)", "(Epic 2)", ... when a folder of
     /// that name is already there.
     static func folderName(preferred: String, in root: URL) -> String {
@@ -139,7 +156,7 @@ enum BCDEpicInstall {
             guard let data = try? Data(contentsOf: folder.appendingPathComponent(name)),
                   let record = try? decoder.decode(BCDEpicInstallRecord.self, from: data),
                   name == record.app + ".json", BCDEpicCatalog.validAppName(record.app),
-                  BCDContentPaths.folderName(record.folder) == record.folder else { continue }
+                  BCDContentPaths.folderName(record.folder) == record.folder, validRoot(record.root) else { continue }
             out[record.app] = record
         }
         return out

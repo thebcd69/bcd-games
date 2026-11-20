@@ -159,7 +159,7 @@ facade = code(sources["BCDEpic.swift"])
 check("JSONEncoder().encode(cache).write(to: Self.folder.appendingPathComponent(\"library.json\"), options: .atomic)" in facade
       and facade.count(".write(to:") == 1, "the facade writes the list's cache and nothing else")
 driver = code(sources["BCDEpicDriver.swift"])
-check(driver.count(".write(to:") == 3 and "JSONEncoder().encode(info).write(to: BCDEpicInstall.pendingInfoFile(info.app, base: base), options: .atomic)" in driver
+check(driver.count(".write(to:") == 4 and "try? Data(drive.utf8).write(to: file, options: .atomic)" in driver and "JSONEncoder().encode(info).write(to: BCDEpicInstall.pendingInfoFile(info.app, base: base), options: .atomic)" in driver
       and "manifest.write(to: BCDEpicInstall.pendingManifestFile(info.app, base: base), options: .atomic)" in driver
       and "data.write(to: file, options: .atomic)" in driver and 'url.scheme == "https"' in driver,
       "the driver writes the install's pending facts, the manifest it was made from and a game's public pictures (https only), nothing with a token")
@@ -216,6 +216,8 @@ ALLOWED = [r"status", r"verifyStatus", r"BCDEpicLog\.millis\(since: \w+\)", r"BC
            r"installs\.count", r"refusals\.entries\.count", r"refusal\.code", r"BCDEpicRules\.sanitized\(refusal\.code\)", r"record\.deploymentID == nil \? 0 : 1",
            r'hosts\.prefix\(4\)\.joined\(separator: ","\)', r"shape", r"found\.downloadBytes", r"found\.installBytes", r"found\.eos \? 1 : 0",
            r'BCDEpicRules\.sanitized\(found\.refusal\?\.code \?\? "none"\)', r"why", r"total", r"wanted\.count", r'own \? "epic" : "yours"', r'action == \.update \? "update" : "verify"', r"data\.count", r"info\.featureLevel",
+           # 2026-11-20 (an Epic game on an external drive): the place word and the largest file's size.
+           r'Self\.target\(app\) == nil \? "device" : "drive"', r"largest",
            # Round 668 (merge N008): the first eight bytes of a manifest file neither reader took, as hex (a format, not personal data).
            r'data\.prefix\(8\)\.map \{ String\(format: "%02x", \$0\) \}\.joined\(\)',
            # Milestone 2: steps, statuses, timings, counts and short reasons of a signed-in start; the host's report (numbers only, pinned by the harness).
@@ -358,8 +360,10 @@ check(driver.index("guard Self.installEnabled else { return }", wire_start) < dr
 root_sites = [p.name for p in sorted(APP.rglob("*.swift")) if '"Program Files/Epic Games"' in code(p.read_text())]
 check(root_sites == ["BCDEpicInstall.swift"] and code(sources["BCDEpicInstall.swift"]).count('BCDInstallRoot(drive: "C", folder: "Program Files/Epic Games")') == 1,
       "the install root (C:\\Program Files\\Epic Games) is named in one place", root_sites)
-check(not re.search(r"\bExternalDrive\w*|hostDrive", "".join(code(sources[n]) for n in FILES)),
-      "no external drive code (the ExternalDrive type of the ext-ssd branch) is imported or depended on")
+check(not re.search(r"\bExternalDrive\b|hostDrive", "".join(code(sources[n]) for n in FILES))
+      and [n for n in FILES if "ExternalDrives." in code(sources[n])] == ["BCDEpicDriver.swift", "BCDLiveStoreEpic.swift"],
+      "no external drive code of the ext-ssd branch (its ExternalDrive type) is depended on; BCD's ExternalDrives (2026-11-20, an Epic game "
+      "on an external drive) only in the driver and the store's hooks", [n for n in FILES if "ExternalDrives." in code(sources[n])])
 for name in M1_FILES:
     c = code(sources[name])
     check(not re.search(r"AUTH_LOGIN|AUTH_PASSWORD|AUTH_TYPE|epicuserid|epicusername|epicovt|exchange_?code|exchangeCode|oauth/exchange|ownershipToken\(|accountID|displayName", c),

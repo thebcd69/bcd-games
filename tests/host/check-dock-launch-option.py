@@ -245,7 +245,7 @@ start = start[:start.index('\n    }\n') + 6]
 check('startDock hands Valve\'s client SteamDirectStart.dockLaunch(chosen: profile?.steamLaunchOption, ...) and logs its lines',
       'SteamDirectStart.dockLaunch(chosen: profile?.steamLaunchOption, options: options, installFolder: installFolder)' in start
       and 'let launchOption = dockLaunch.index' in start and 'for line in dockLaunch.lines { LogStore.shared.log(line) }' in start
-      and 'MadeiraDock.configure(game, launchOption: launchOption)' in start)
+      and 'MadeiraDock.configure(game, launchOption: launchOption, arguments: profile?.arguments ?? "")' in start)
 check('startDock logs the .bat preview right after the launch option lines, with the key it hands on (round 623)',
       'for line in SteamDirectStart.batchPreview(options: options, key: launchOption, installFolder: installFolder) { LogStore.shared.log(line) }' in start
       and start.index('for line in dockLaunch.lines') < start.index('SteamDirectStart.batchPreview(') < start.index('await SteamOwnedLibrary.shared.prepareDock()'))

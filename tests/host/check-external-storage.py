@@ -189,7 +189,10 @@ check("the game page's External drive install goes to the drive's SteamLibrary",
       "guard let target = ExternalDrives.shared.externalInstallTarget else {" in live_store
       and "download(appID, library: target.library)" in live_store and "download(appID, library: SteamInstallPaths.libraryRelative)" in live_store)
 page = read("app/Madeira/BCDGamePage.swift")
-check("only a Steam game offers the drive", "let drive = game.store == .steam ? system.externalDriveName : nil" in page)
+check("only a Steam game and (2026-11-20) an Epic game offer the drive; only Steam's goes there first",
+      "let drive = game.store.installsOnDrive ? system.externalDriveName : nil" in page
+      and "let external = drive != nil && system.installsToExternal && game.store == .steam" in page
+      and "var installsOnDrive: Bool { self == .steam || self == .epic }" in read("app/Madeira/BCDStore.swift"))
 page_live = read("app/Madeira/BCDGamePageLive.swift")
 location = body(page_live, "    private func locationGroup(")
 check("Move to is offered for Steam games and games from Files only (a store's records name its folder)",
@@ -233,7 +236,8 @@ check("the settings screen (also built in the preview) names no engine type",
 live = read("app/Madeira/BCDSettingsLive.swift")
 check("drive changes wait for a running game and a move; removing a drive also for downloads, cloud syncs and Workshop jobs",
       "wine_process_is_running() == 0 && LibraryModel.shared.current == nil && GameMover.shared.moving == nil" in live
-      and "!SteamOwnedLibrary.shared.hasStorageWork else {" in body(drives, "    @MainActor func remove(_ id: UUID) {"))
+      and "!SteamOwnedLibrary.shared.hasStorageWork, !BCDContentQueue.shared.hasWork else {" in body(drives, "    @MainActor func remove(_ id: UUID) {")
+      and "BCDEpic.forgetTargets(onDrive: folder.name)" in body(drives, "    @MainActor func remove(_ id: UUID) {"))
 check("the picker's in-place identity fix is still armed around the picker",
       "BCDExternalPickerFix.shared.beginSession()" in live and "BCDExternalPickerFix.shared.endSession()" in live)
 check("picking a drive again opens its registration (its games keep their place)",

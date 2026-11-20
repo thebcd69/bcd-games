@@ -28,6 +28,9 @@ enum BCDStoreFront: String, CaseIterable, Codable, Hashable {
         case .local: return "Local"
         }
     }
+    /// The stores whose games the game page offers to install on an external drive (Settings › Storage › External drives):
+    /// Steam's, and Epic's from 2026-11-20.
+    var installsOnDrive: Bool { self == .steam || self == .epic }
 }
 
 enum BCDInstallPlace: String, Codable, Hashable {

@@ -705,9 +705,9 @@ enum BCDLaunchFlags {
     static let flags = ["-dx11", "-dx12", "-dx10", "-dx9", "-windowed", "-fullscreen", "-nosplash"]
     /// Flags of which one at a time makes sense: asking for one takes the others out.
     private static let exclusive: [Set<String>] = [
-        ["-dx9", "-dx10", "-dx11", "-dx12"],
+        ["-dx9", "-dx10", "-dx11", "-dx12", "-vulkan"],
         ["-windowed", "-fullscreen"],
-        ["-force-dx9", "-force-d3d9", "-force-d3d11"],
+        ["-force-dx9", "-force-d3d9", "-force-d3d11", "-force-vulkan"],
     ]
 
     /// The quick picks under Launch arguments (round 604; Winlator's list of arguments that fix older and Unity games, and
@@ -723,6 +723,9 @@ enum BCDLaunchFlags {
         BCDGameChip(value: "-dx12", note: "Ask for Direct3D 12."),
         BCDGameChip(value: "-dx10", note: "Ask for Direct3D 10."),
         BCDGameChip(value: "-dx9", note: "Ask for Direct3D 9."),
+        // 2026-11-20 (a Discord request: The Talos Principle in Vulkan from the start): the game also needs a Vulkan driver.
+        BCDGameChip(value: "-vulkan", note: "Ask for Vulkan. The game also needs Vulkan (experimental) on in Graphics."),
+        BCDGameChip(value: "-force-vulkan", note: "Unity: Vulkan. The game also needs Vulkan (experimental) on in Graphics."),
         BCDGameChip(value: "-windowed", note: "Ask for a window."),
         BCDGameChip(value: "-fullscreen", note: "Ask for full screen."),
         BCDGameChip(value: "-popupwindow", note: "Unity: a borderless window."),
@@ -950,9 +953,10 @@ struct BCDGamePagePlan: Equatable {
                 break
             }
             // A Steam game can also go to the external drive (Settings › Storage › External drives); the drive Settings chose
-            // for Steam installs comes first, this device second. Other stores install on this device.
-            let drive = game.store == .steam ? system.externalDriveName : nil
-            let external = drive != nil && system.installsToExternal
+            // for Steam installs comes first, this device second. An Epic game too (2026-11-20), this device first. Other stores
+            // install on this device.
+            let drive = game.store.installsOnDrive ? system.externalDriveName : nil
+            let external = drive != nil && system.installsToExternal && game.store == .steam
             main = Choice(action: .install(external ? .externalDrive : .device), title: "Install", symbol: "arrow.down.circle.fill")
             if drive != nil {
                 others.append(external ? Choice(action: .install(.device), title: "This device", symbol: "internaldrive")
