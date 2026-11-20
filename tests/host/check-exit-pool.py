@@ -57,7 +57,16 @@ check("nothing is looked up or touched without a switch (find_key and the exit h
       "if (ios_exit_pool_key != -1 || (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on())) return;" in block
       and "if (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on()) return;" in block)
 check("libobjc's functions come from dlsym (no link dependency, no header), and the key is used only for exactly one changed slot that the pop cleared again",
-      block.count("dlsym( RTLD_DEFAULT,") == 3 and "if (n == 1 && !tsd[found])" in block and "if (ios_exit_pool_skip_on() && key >= 40 && tsd[key])" in block)
+      block.count("dlsym( RTLD_DEFAULT,") == 6 and "if (n == 1 && !tsd[found])" in block and "if (ios_exit_pool_skip_on() && key >= 40 && tsd[key])" in block)
+# madeira-bcd (2026-11-17): libobjc may keep a pool's first objects in further direct slots instead of a page (the macos-15
+# runner: 44 and 45, with the pool's own slot 43 left at 0x1). find_key autoreleases one probe object to see them, keeps only the slots
+# the pop gives back, and the exit clears them with the pool's slot.
+check("find_key also records the slots of a pool's first objects (one autoreleased probe, only those the pop clears) and the exit clears them",
+      'dlsym( RTLD_DEFAULT, "objc_autorelease" )' in block and 'get_class( "NSObject" )' in block
+      and "if (40 + k != found && !before[k] && tsd[40 + k]) more |= 1u << k;" in block
+      and "if (((more >> k) & 1) && tsd[40 + k]) more &= ~(1u << k);" in block
+      and block.index("pop( token );") < block.index("ios_exit_pool_more = more;")
+      and "if ((more >> k) & 1) tsd[40 + k] = NULL;" in block[block.index("tsd[key] = NULL;"):])
 check("the exit wrapper calls the hook once, after ios_thread_qos_exit and just before pthread_exit; start_thread calls find_key once, after the TEB is published",
       src.count("ios_exit_pool_at_exit();") == 1 and src.count("ios_exit_pool_find_key();") == 1
       and src.index("ios_thread_qos_exit( (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread );") < src.index("ios_exit_pool_at_exit();")
