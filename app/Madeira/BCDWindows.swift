@@ -108,11 +108,11 @@ enum BCDProgramsRules {
             switch f.first {
             case "R" where f.count >= 4:
                 let path = f[3...].joined(separator: "\t")
-                out.append(BCDRunningProgram(name: BCDWindowRules.program(path), path: path, running: true, helper: f[1] == "1",
+                out.append(BCDRunningProgram(name: BCDWindowRules.program(path), path: path, running: true, helper: (Int(f[1]) ?? 0) & 1 != 0,
                                              seconds: Double(f[2]) ?? 0, status: nil))
             case "E" where f.count >= 6:
                 let path = f[5...].joined(separator: "\t")
-                out.append(BCDRunningProgram(name: BCDWindowRules.program(path), path: path, running: false, helper: f[1] == "1",
+                out.append(BCDRunningProgram(name: BCDWindowRules.program(path), path: path, running: false, helper: (Int(f[1]) ?? 0) & 1 != 0,
                                              seconds: Double(f[4]) ?? 0, status: UInt32(f[2], radix: 16)))
             default:
                 break

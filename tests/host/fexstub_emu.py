@@ -1,8 +1,8 @@
 """Helpers for the FEX overlay checks that run Module.S under emulation: assemble
 the patched ARM64EC Module.S as an AArch64 ELF object with the host clang, link
-its .text in memory, and run a stub with Python's unicorn module. Both tools
-are optional; `missing()` names what is absent so a check can skip only its
-emulation part.
+its .text in memory, and run a stub with Python's unicorn module, or, where it is
+not installed, with tests/host/a64mini.py (round 670). The clang is optional;
+`missing()` names what is absent so a check can skip only its emulation part.
 """
 from pathlib import Path
 import os
@@ -26,10 +26,13 @@ REGIONS = ((TEXT, 0x100000), (STUBS, 0x1000), (DATA, 0x100000), (FRAME, 0x2000),
 SIZES = {'IosXpFex': 4496 * 8, 'IosAliasEntries': 256 * 32}
 
 
+# Round 670: without unicorn the stubs run on tests/host/a64mini.py (checked by tests/host/check-a64mini.py), so the checks
+# no longer skip their emulation on the macOS runner; FEXSTUB_ENGINE=mini uses it even where unicorn is installed.
+ENGINE = os.environ.get('FEXSTUB_ENGINE', '')
+
+
 def missing():
     """None when the emulation can run, else what is missing."""
-    if Uc is None:
-        return 'Python unicorn'
     if not shutil.which(os.environ.get('CLANG', 'clang')):
         return 'an AArch64 clang'
     return None
@@ -116,9 +119,30 @@ def blank_memory():
     return {base: bytearray(size) for base, size in REGIONS if base not in (TEXT, STUBS)}
 
 
-def run(code, data, entry, state, stops, count=2000):
+def run_mini(code, data, entry, state, stops, count=2000):
+    """run() on tests/host/a64mini.py: the same regions, initial state and results."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('a64mini', Path(__file__).resolve().parent / 'a64mini.py')
+    mini = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mini)
+    mem = {base: bytearray(size) for base, size in REGIONS}
+    mem[TEXT][:len(code)] = code
+    mem[STUBS][:] = struct.pack('<I', 0xd4200020) * (len(mem[STUBS]) // 4)  # brk #1
+    for base, blob in state['mem'].items():
+        mem[base][:len(blob)] = blob
+    if data and not any(base == DATA for base in state['mem']):
+        mem[DATA][:len(data)] = data
+    pc, regs, nzcv, _, steps = mini.run(list(mem.items()), entry, state['regs'], state['sp'], stops,
+                                        nzcv=state.get('nzcv', 0x20000000), fpcr=0, tpidrro=state.get('tpidrro', TSD), count=count)
+    out = {base: bytearray(mem[base][:len(blob)]) for base, blob in state['mem'].items()}
+    return pc, regs, nzcv, out, steps
+
+
+def run(code, data, entry, state, stops, count=2000, engine=None):
     """Run from `entry` with state {'mem': {base: bytearray}, 'regs': [x0..x30], 'sp': sp, 'tpidrro': ..., 'nzcv': ...}
     until a stop address; returns (stop, regs + [sp], nzcv, memory, steps)."""
+    if (engine or ENGINE) == 'mini' or Uc is None:
+        return run_mini(code, data, entry, state, stops, count)
     uc = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
     uc.ctl_set_cpu_model(A64.UC_CPU_ARM64_MAX)  # LSE
     for base, size in REGIONS:

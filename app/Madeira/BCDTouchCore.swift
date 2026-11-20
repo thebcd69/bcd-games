@@ -38,6 +38,9 @@ enum BCDTouchAction: Hashable {
     var isPad: Bool { padName != nil }
     var keyStick: BCDKeyStick? { if case .keyStick(let s) = self { return s }; return nil }
     var isControllerStick: Bool { padName == "LS" || padName == "RS" }
+    /// madeira-bcd (build 666, issue #45): it can hold (BCDTouchItem.latch): a key, a mouse button or a controller button;
+    /// never a stick (its thumb is its state), the keyboard button or an unbound control.
+    var latchable: Bool { !isStick && self != .keyboard && self != .none }
     /// Drawn as a stick: a ring with a knob that follows the thumb.
     var isStick: Bool { keyStick != nil || isControllerStick }
 
@@ -170,6 +173,9 @@ struct BCDTouchItem: Identifiable, Hashable {
     var customShape: BCDTouchCustomShape? = nil
     /// The player's own words on it in place of its label (BCDTouchText.clean); nil: its label.
     var customText: String? = nil
+    /// madeira-bcd (build 666, issue #45): one press holds its key or button and the next lets go (BCD's editor:
+    /// Tap to hold); only where its action can hold (BCDTouchAction.latchable).
+    var latch = false
 }
 
 extension BCDTouchItem {
@@ -180,6 +186,8 @@ extension BCDTouchItem {
     var ownShape: BCDTouchShape? { action.isStick ? nil : customShape?.drawn }
     /// The words drawn in place of its label; nil: its label (a stick keeps its own).
     var words: String? { action.isStick ? nil : customText }
+    /// It holds from one press to the next: set, and its action can.
+    var holds: Bool { latch && action.latchable }
 }
 
 // MARK: - Size and where touches count
@@ -374,6 +382,16 @@ final class BCDTouchPress {
     private let tap: () -> Void
     /// The drawn state changed: pressed, and a key stick's direction.
     var changed: ((Bool, Int) -> Void)?
+    /// madeira-bcd (build 666, issue #45): the control holds (BCDTouchItem.holds): a lifted finger leaves the key down and
+    /// the next press lets go (that press's lift then does nothing). Turned off while held, it lets go.
+    var latches = false {
+        didSet { if oldValue && !latches && down && !touching { end() } }
+    }
+    /// A finger is on the control.
+    private var touching = false
+    /// The press that let a held key go: its lift does nothing.
+    private var swallow = false
+    private var holding: Bool { latches && action.latchable }
 
     init(action: BCDTouchAction, diameter: Double, send: @escaping (BCDTouchEvent) -> Void, tap: @escaping () -> Void = {}) {
         self.action = action
@@ -383,6 +401,14 @@ final class BCDTouchPress {
     }
 
     func begin() {
+        touching = true
+        if down && holding && !swallow {   // build 666: the press that lets a held control go
+            swallow = true
+            BCDTouchRules.press(action, down: false).forEach(send)
+            down = false
+            changed?(down, direction)
+            return
+        }
         guard !down else { return }
         down = true
         if action.keyStick == nil {
@@ -402,7 +428,18 @@ final class BCDTouchPress {
         changed?(down, direction)
     }
 
+    /// The finger left (BCDTouchKeyView.lift): a holding control stays down; the press that let it go does nothing more.
+    func lift() {
+        touching = false
+        if swallow { swallow = false; return }
+        if holding && down { return }
+        end()
+    }
+
+    /// Lets go, whatever the control holds (the window went, the app was interrupted, the action changed).
     func end() {
+        touching = false
+        swallow = false
         guard down else { return }
         if let stick = action.keyStick {
             BCDTouchRules.stickChange(from: direction, to: -1, keys: stick.keys).forEach(send)

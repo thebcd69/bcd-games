@@ -1799,7 +1799,16 @@ static void ios_audio_io_auto_window(const void *stream, uint32_t *windows, uint
                                      uint32_t short_passes, double wrote_s, double secs, uint32_t rate, uint32_t dev_rate, uint32_t channels)
 {
     const char *own;
+    static _Atomic int bed_logged;   /* the ml2304 line below, once per run */
 
+    /* Round 668 (G1, merge N022; Days Gone 4N2KES and MTNBQ0, build 665): a stream of more than 8 channels is Wine's spatial-audio bed, which
+     * ios_audio_underrun_window leaves alone by design (no IO buffer request helps it). Say so once when it starves the same way (9 in 10 passes
+     * short), so the log tells it from the queue-limited clients above: its answer is the game's MADEIRA_AUDIO_SPATIAL = 0.
+     * Log only. */
+    if (channels > 8 && passes >= 100 && (uint64_t)short_passes * 10 >= (uint64_t)passes * 9
+        && !atomic_exchange_explicit(&bed_logged, 1, memory_order_relaxed))
+        fprintf(stderr, "[ios_audio] ml2304 stream=%p queue shorter than one pass in %u of %u passes but %u channels (Wine's spatial-audio "
+                        "bed): left alone; MADEIRA_AUDIO_SPATIAL=0 gives the game a plain stream\n", stream, short_passes, passes, channels);
     if (!ios_audio_underrun_window(pad_max, cb_max, passes, short_passes, wrote_s, secs, rate, dev_rate, channels)) { *windows = 0; return; }
     if (++*windows < 2) return;
     own = getenv("MADEIRA_AUDIO_IO_MS");   /* the game's own value (any, 0 too) settles the IO buffer at the start of the session */

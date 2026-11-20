@@ -39,7 +39,7 @@ def check(what, cond, detail=""):
 
 
 def ipa(path, extra=None, plist=None):
-    pl = plist or {"CFBundleIdentifier": "com.example.app", "MadeiraRepo": "someone/fork",
+    pl = plist or {"CFBundleIdentifier": "com.thebcd69.bcd", "MadeiraRepo": "someone/fork",
                    "MadeiraCommit": "0123456789abcdef0123456789abcdef01234567", "MadeiraBuilt": "2026-10-17T12:00:00Z"}
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("Payload/", b"")
@@ -96,7 +96,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check("any other Microsoft-signed Windows file: refused and nothing written",
           r.returncode != 0 and not (t / "msdll-out.ipa").exists() and "Microsoft-signed" in r.stderr, r.stdout + r.stderr)
 
-    ipa(t / "clean.ipa")
+    ipa(t / "clean.ipa", {"Payload/App.app/PlugIns/H.appex/Info.plist": plistlib.dumps({"CFBundleIdentifier": "com.thebcd69.bcd.JITHelper"})})
     r = run(t / "clean.ipa", t / "out.ipa")
     check("a clean IPA is written", r.returncode == 0 and (t / "out.ipa").exists(), r.stdout + r.stderr)
     if (t / "out.ipa").exists():
@@ -104,7 +104,7 @@ with tempfile.TemporaryDirectory() as tmp:
         pl = plistlib.loads(zo.read("Payload/App.app/Info.plist"))
         check("MadeiraRepo and MadeiraCommit are gone; the other keys stay",
               "MadeiraRepo" not in pl and "MadeiraCommit" not in pl
-              and pl.get("MadeiraBuilt") == "2026-10-17T12:00:00Z" and pl.get("CFBundleIdentifier") == "com.example.app")
+              and pl.get("MadeiraBuilt") == "2026-10-17T12:00:00Z" and pl.get("CFBundleIdentifier") == "com.thebcd69.bcd")
         check("Info.plist stays a binary plist", zo.read("Payload/App.app/Info.plist").startswith(b"bplist"))
         same = all(zi.read(n) == zo.read(n) and zi.getinfo(n).external_attr == zo.getinfo(n).external_attr
                    for n in zi.namelist() if not n.endswith("Info.plist"))
@@ -117,9 +117,23 @@ with tempfile.TemporaryDirectory() as tmp:
           r.returncode != 0 and not (t / "named-out.ipa").exists() and "needle #1 in Payload/App.app/credits.txt" in r.stdout)
     check("the report never prints a needle", "secret" not in (r.stdout + r.stderr).lower())
 
-    ipa(t / "team.ipa", plist={"CFBundleIdentifier": "TEAMID1234.com.example.app"})
+    ipa(t / "team.ipa", plist={"CFBundleIdentifier": "com.thebcd69.bcd", "MadeiraNote": "TEAMID1234"})
     r = run(t / "team.ipa", t / "team-out.ipa")
     check("a needle inside Info.plist: refused", r.returncode != 0 and not (t / "team-out.ipa").exists())
+
+    # Owner, 2026-11-16 (strict): the public IPA keeps com.thebcd69.bcd; the owner's signing App ID never reaches it.
+    ipa(t / "ownid.ipa", plist={"CFBundleIdentifier": "com.someone.signer"})
+    r = run(t / "ownid.ipa", t / "ownid-out.ipa")
+    check("an app whose bundle identifier is not com.thebcd69.bcd (a private OTA's App ID): refused and nothing written",
+          r.returncode != 0 and not (t / "ownid-out.ipa").exists() and "bundle identifier" in r.stderr, r.stdout + r.stderr)
+    ipa(t / "ownext.ipa", {"Payload/App.app/PlugIns/H.appex/Info.plist": plistlib.dumps({"CFBundleIdentifier": "com.someone.signer.JITHelper"})})
+    r = run(t / "ownext.ipa", t / "ownext-out.ipa")
+    check("an extension with another identity: refused", r.returncode != 0 and not (t / "ownext-out.ipa").exists(), r.stdout + r.stderr)
+    ipa(t / "bcd2.ipa", plist={"CFBundleIdentifier": "com.thebcd69.bcd2"})
+    r = run(t / "bcd2.ipa", t / "bcd2-out.ipa")
+    check("BCD2's identity is not the public one either: refused (the release publishes BCD only)", r.returncode != 0, r.stdout + r.stderr)
+    tool = TOOL.read_text()
+    check("the identity rule is in the tool", 'PUBLIC_ID = "com.thebcd69.bcd"' in tool)
 
     apple = Path("/usr/bin/true").read_bytes()
     ipa(t / "signed.ipa", {"Payload/App.app/App": apple,

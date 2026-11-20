@@ -100,6 +100,10 @@ else:
         cc = tc / "i686-w64-mingw32-gcc"
         if not cc.exists():
             print("skip: no llvm-mingw toolchain here for the i386 compile")
+        elif not (wine / "build-i386/include/objidlbase.h").exists():
+            # A fresh tree (the M5 Max's first build 672): this step runs before Wine's i386 build has generated its headers
+            # (objidlbase.h ...); every later build has them, as the Intel VM always did.
+            print("skip: Wine's i386 headers are not generated yet (wine/build-i386/include) for the i386 compile")
         else:
             (tree / "patched.c").write_text(once)
             args = [str(cc), "-D__STDC__", "-c", "-o", str(tree / "x.o"), str(tree / "patched.c"),

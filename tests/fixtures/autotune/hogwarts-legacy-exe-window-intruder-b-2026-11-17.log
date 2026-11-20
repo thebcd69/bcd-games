@@ -1,0 +1,198 @@
+[02:54:38.440] [INFO] Checking entitlements...
+[02:54:38.441] [INFO] [build] v0.1.665 (665)
+[02:54:38.441] [INFO] [device] model=iPhone19,7 idiom=phone os=iOS Version 27.2.1 (Build 24B156) ram=11600MB available=8169MB cores=6
+[02:54:38.441] [INFO] [device] address-map=[0x100928000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[02:54:38.442] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=5d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[02:54:38.448] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-07:00 free-disk=22GB stikdebug-url=0
+[02:54:38.451] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[02:54:42.382] [INFO] [steam-start] app=990080 direct source=steam args=1 folder=program
+[02:54:42.383] [INFO] Requesting JIT with Built-in StikJIT...
+[02:54:43.723] [INFO] [bcd] library launch Hogwarts Legacy: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[02:54:43.725] [INFO] Session log: logs/HogwartsLegacy.exe-2026-11-17_02-54-43.txt
+[02:54:43.787] [INFO] Running full Wine sequence...
+[02:54:43.787] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100928000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[02:54:43.791] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X64_IMAGE_NOCOPY=1 exe-window-mb=512 pool-split=1
+[02:54:43.807] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[02:54:43.810] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[02:54:43.810] [INFO] Allocating 896MB JIT pool via debugger...
+[02:54:43.810] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[02:54:43.811] [INFO] [jit-debugger] attached=1 at the pool request
+[02:54:43.811] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[02:54:43.811] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[02:54:43.812] [ERR] [exe-window] could not widen the executable window to 512MB (kr=3): something holds the range above it; the window stays 128MB. A game whose program needs more than that stops with c0000018: quit BCD and open it again for a new memory layout
+[02:54:44.346] [INFO] RX pool at 0x148000000
+[02:54:44.359] [OK] [pool-split] JIT pool = RX [0x148000000,0x159000000) 272MB + [0x15c898000,0x16e898000) 288MB as one 560MB span; pool offsets [0x11000000,0x14898000) (56MB, the main thread's stack) are never handed out
+[02:54:44.359] [OK] JIT pool ready (debugger still attached).
+[02:54:44.360] [INFO] BRK suspension lasted 0.55s
+[02:54:44.361] [INFO] Detaching debugger...
+[02:54:44.364] [OK] Debugger detached.
+[02:54:44.366] [OK] [early-detach] rev=ml524 took 5 ms
+[02:54:44.367] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.585s rev=ml526
+[02:54:44.396] [wineserver] send_client_fd: fd=46 handle=0x3a2 msg_fd_unix=42 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   pool-split = 1
+[game-cfg]   exe-window-mb = 512
+[madeira-env] game MADEIRA_X64_IMAGE_NOCOPY=1
+[WineProc] Target exe: C:\Program Files (x86)\Steam\steamapps\common\Hogwarts Legacy\HogwartsLegacy.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=44 reply=49/50 wait=51/52 rev=ml586
+[02:54:44.602] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=44 reply=49/50 wait=51/52 rev=ml586
+[Wine init_process] reply_pipe=50, sending init_first_thread...
+[02:54:44.602] [Wine init_process] reply_pipe=50, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=990080
+ml992: os_proc_available_memory=7577 MB + phys_footprint=614 MB = 8192 MB (hw.memsize says 11600 MB)
+ml985: preferred base 0x140000000+0x4b000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x4c000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\HogwartsLegacy.exe" 0x118f00000+0x4b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x118f00000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x118f00000+0x14000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x118f14000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x118f14000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x118f20000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148004000 used=0x13c000/0x26898000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14813f000 used=0x56b000/0x26898000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14813f000)
+[window] 0x7048000000..0x7400000000 regions=83 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x148568000 used=0x69c000/0x26898000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148568000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14869c000 used=0x764000/0x26898000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14869c000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x148764000 used=0xa64000/0x26898000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148764000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module HogwartsLegacy.exe (hogwartslegacy.exe-1335beae14fea44a): 118F00000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[window] 0x120454000..0x7806898000 regions=71883 occupied=462230 MB of 487012 MB free=41270 MB maxhole=16488 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=655 MB (peak 655) internal=653 MB compressed=0 MB external=77 MB reusable=6 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=850 peb=0x71ffff0000
+[jit-pool] image 0x71fe140000+0x220000 (user32.dll) → pool 0x148a68000 used=0xc90000/0x26898000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a68000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE140000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE050000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF20000
+[free-delay] #1 release of 0x7027110000+0x100000 held for 2000 ms (1 in flight)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[x64-image] L"\\??\\C:\\windows\\system32\\msvcp140_2.dll" 0x71fd150000+0x44000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #22 0x71fd150000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #23 0x71fd150000+0x30000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #24 0x71fd180000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71fcfa0000+0x80000 (vcruntime140.dll) → pool 0x149d90000 used=0x1e14000/0x26898000 tramp+0x4000
+[x64-image] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll" 0x71fcf90000+0xc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71fcf40000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71FCF40000
+[jit-pool] image 0x71fceb0000+0x90000 (xinput1_3.dll) → pool 0x149e14000 used=0x1ea8000/0x26898000 tramp+0x4000
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x149e14000)
+D 24 Load module XINPUT1_3.DLL (xinput1_3.dll-1e6b91746098a307): 71FCEB0000
+[jit-pool] image 0x71fce20000+0x90000 (hid.dll) → pool 0x149ea8000 used=0x1f3c000/0x26898000 tramp+0x4000
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x149ea8000)
+D 24 Load module hid.dll (hid.dll-c3a5177fc021edec): 71FCE20000
+[jit-pool] image 0x71fcd40000+0xe0000 (setupapi.dll) → pool 0x149f3c000 used=0x2020000/0x26898000 tramp+0x4000
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x149f3c000)
+D 24 Load module setupapi.dll (setupapi.dll-eb860a5cf96d3e18): 71FCD40000
+[jit-pool] image 0x71fccc0000+0x80000 (cfgmgr32.dll) → pool 0x14a020000 used=0x20a4000/0x26898000 tramp+0x4000
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a020000)
+D 24 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71FCCC0000
+[jit-pool] image 0x71fcbd0000+0xf0000 (rpcrt4.dll) → pool 0x14a0a4000 used=0x2198000/0x26898000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x14a0a4000)
+D 24 Load module rpcrt4.dll (rpcrt4.dll-5ef8bc180117faf4): 71FCBD0000
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe\" Phoenix -SaveToUserDir \"-UserDir=Hogwarts Legacy\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe" t+  0.961s rev=ml526
+[session-log] Steam game HogwartsLegacy.exe: logs/HogwartsLegacy.exe-2026-11-17_02-54-44.txt
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe\" Phoenix -SaveToUserDir \"-UserDir=Hogwarts Legacy\"" (fd=88, unixdir=98, dup_unixdir=106) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x1737a000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x1737a000 REFUSED status=0xc0000018 image_flags=0 charact=0x23 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x1737c000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe" 0x120460000+0x1737a000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14a198000)
+wine: failed to create main module for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hogwarts Legacy\\Phoenix\\Binaries\\Win64\\HogwartsLegacy.exe", status c0000018
+002c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000018) syscalls=0 unix_calls=574
+[Wine ntdll/server] process_exit_wrapper(-1073741800): closing child fd_socket=105
+[pool-freechk] POISONED AT FREE off=0x2198000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[Wine ntdll/server] process_exit_wrapper(-1073741800)
+[Wine child thread] child exited with code -1073741800
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000018) syscalls=0 unix_calls=579
+[unwind] term ml661 begin rip=71fe6f0690 rsp=7038b9fed8 window=[7038b9fed8..703939fed8) max=32
+[unwind] term ml661 #00 pc=71fe6f0690 rsp=7038b9fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=c0000018 rbp=7038b9ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml662   rbp=7038b9ff60: d0ffb938 70000000 ac1cf018 01000000 180000c0 00000000 00000000 00000000
+[unwind] term ml661 #01 pc=118f090a5 rsp=7038b9fee0  (exe)+0x90a5
+[unwind] term ml662 #01 nv: rbx=c0000018 rbp=7038b9ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml661 #02 pc=118f09070 rsp=7038b9ff10  (exe)+0x9070
+[unwind] term ml661 #03 pc=118f01cac rsp=7038b9ff70  (exe)+0x1cac
+[unwind] term ml662   global @+0x69 -> 118f15338 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=1486cdb0c rsp=7038b9ffb0  <no module — STOP>
+[unwind] term ml661 end
+[vfree] ml842 # base=0x7c00290000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c02410000 size=0x0 type=0x8000 tid=0024
+[vfree] ml842 # base=0x7c01410000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #1 0x7c01410000+0x1000000 tid=0024 live=0 rev=ml435
+[vfree] ml842 # base=0x16e894000 size=0x0 type=0x8000 tid=0024
+[jit-pool] tail FREE rx=0x16e894000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000018) syscalls=0 unix_calls=585
+[unwind] term ml661 begin rip=14808216c rsp=7038b9fc48 window=[7038b9fc48..703939fc48) max=32
+[unwind] term ml661 #00 pc=14808216c rsp=7038b9fc48  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+2b0:   ? 71fceb0000  xinput1_3.dll+0x0
+[term-stack] ml660 sp+3f0:   ? 71fce20000  hid.dll+0x0
+[term-stack] ml660 sp+530:   ? 71fcd40000  setupapi.dll+0x0
+[term-stack] ml660 sp+670:   ? 71fccc0000  cfgmgr32.dll+0x0
+[term-stack] ml660 sp+7b0:   ? 71fcbd0000  rpcrt4.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741800)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741800)
+[WineProc] Wine exited with code -1073741800 (caught by longjmp)
+[WineProc] stopping wineserver...
+[xp] 02:54:45.233 +0.60 dt=324 cpu=11 (thr 11) P=1 E=10 run=12 pgw=-1.0 GHz P=1.24 E=0.89 Minst=14 IPC=1.41 mJ=1 pin=0 rdKB=0 fpMB=1049
+[02:54:45.289] [INFO] [session] length=1s play=0s frames=0 stalls=0/0s peak=1049MB limit=8191MB thermal=nominal lpm=0 res=1280x720 cap=30 game=Hogwarts Legacy
+[02:54:45.298] [INFO] [exit-report] status=0xc0000018
+[frontend] returned to library
+[xp] 02:54:45.496 +0.85 dt=253 cpu=405 (thr 359) P=122 E=283 run=442 pgw=-1.0 GHz P=4.07 E=2.40 Minst=5247 IPC=4.47 mJ=601 pin=0 rdKB=0 fpMB=1064
+[xp] 02:54:45.822 +1.19 dt=337 cpu=326 (thr 333) P=1 E=324 run=329 pgw=-1.0 GHz P=3.76 E=2.63 Minst=4401 IPC=5.13 mJ=158 pin=0 rdKB=0 fpMB=1063
+[xp] 02:54:46.111 +1.47 dt=289 cpu=173 (thr 173) P=3 E=170 run=173 pgw=-1.0 GHz P=2.92 E=2.63 Minst=2258 IPC=4.95 mJ=84 pin=0 rdKB=0 fpMB=1063
+[xp] 02:54:46.434 +1.80 dt=323 cpu=10 (thr 10) P=0 E=10 run=11 pgw=-1.0 GHz P=0.00 E=1.00 Minst=19 IPC=1.92 mJ=1 pin=0 rdKB=0 fpMB=1063
+[footprint] rev=ml358 phys=1068 MB (peak 1068) internal=1066 MB compressed=0 MB external=103 MB reusable=6 MB (cycle=2)
+[xp] 02:54:46.716 +2.08 dt=281 cpu=61 (thr 60) P=0 E=61 run=63 pgw=-1.0 GHz P=0.00 E=1.54 Minst=149 IPC=1.59 mJ=6 pin=0 rdKB=0 fpMB=1068
+[02:54:46.905] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1068 MB (peak 1068) internal=1067 MB compressed=0 MB external=104 MB reusable=6 MB (cycle=3)
+[xp] 02:54:49.420 +4.78 dt=306 cpu=28 (thr 28) P=0 E=28 run=33 pgw=-1.0 GHz P=0.00 E=1.24 Minst=46 IPC=1.33 mJ=2 pin=0 rdKB=0 fpMB=1058
+[xp] 02:54:49.747 +5.11 dt=327 cpu=68 (thr 68) P=24 E=45 run=65 pgw=-1.0 GHz P=2.15 E=1.49 Minst=236 IPC=2.00 mJ=17 pin=0 rdKB=0 fpMB=1054
+[xp] 02:54:50.052 +5.42 dt=304 cpu=81 (thr 81) P=71 E=10 run=104 pgw=-1.0 GHz P=4.32 E=2.28 Minst=1005 IPC=3.04 mJ=267 pin=0 rdKB=0 fpMB=1059
+[xp] 02:54:50.371 +5.74 dt=319 cpu=36 (thr 35) P=0 E=36 run=38 pgw=-1.0 GHz P=0.00 E=1.16 Minst=89 IPC=2.09 mJ=3 pin=0 rdKB=0 fpMB=1059
+[xp] 02:54:50.629 +5.99 dt=258 cpu=29 (thr 29) P=0 E=29 run=32 pgw=-1.0 GHz P=0.00 E=1.09 Minst=43 IPC=1.38 mJ=2 pin=0 rdKB=0 fpMB=1059
+[footprint] rev=ml358 phys=1059 MB (peak 1068) internal=1058 MB compressed=0 MB external=112 MB reusable=11 MB (cycle=4)
+[xp] 02:54:50.907 +6.27 dt=279 cpu=57 (thr 58) P=11 E=46 run=75 pgw=-1.0 GHz P=1.78 E=1.43 Minst=145 IPC=1.70 mJ=11 pin=0 rdKB=0 fpMB=1059
+ pin=0 rdKB=0 fpMB=1059
+GHz P=1.74 E=2.10 Minst=739 IPC=3.50 mJ=34 pin=0 rdKB=0 fpMB=1060

@@ -125,10 +125,18 @@ _recs = json.loads((R / "recommended/recommendations.json").read_text())
 _io = sorted(r["id"] for r in _recs["rules"] if "MADEIRA_AUDIO_IO_MS" in json.dumps(r))
 # Round 626 (agent T S8): Murder Miners' row asks for the same 5 ms buffer.
 # Night round 2026-11-11 (agent T3 S5): Quake II's and Resonance's rows ask for the same 5 ms buffer (XAudio2 clients that queue 960 frames under iOS's 1024).
+# Round 670 (owner 2026-11-18, I1): one auto-tune rule names the key, audio-short-passes-played, a whenPlayed rule: its line is only
+# suggested after a session that played, and reaches a start only after the player's yes (docs/AUTO-TUNE.md). No other rule may.
+_rules_src = (R / "build/tools/autotune_rules.py").read_text()
+_start = _rules_src.index('"id": "audio-short-passes-played"')
+_block = _rules_src[_rules_src.rindex("{", 0, _start):_rules_src.index("\n    },", _start)]
+_rules_without_suggestion = _rules_src.replace(_block, "")
+check("the one rule with the IO buffer key is the suggestion after a session that played (whenPlayed), with 5 ms",
+      '"whenPlayed": True' in _block and '"lines": ["env.MADEIRA_AUDIO_IO_MS = 5"]' in _block and _rules_src.count("MADEIRA_AUDIO_IO_MS") == _block.count("MADEIRA_AUDIO_IO_MS"))
 check("only Dead Rising's, Murder Miners', Quake II's and Resonance's lists set the IO buffer (5 ms, build 625); no list sets the period and no auto-tune rule sets either",
       # round 660 (M029): Mewgenics v3 (NZ3EFT, XX0KAV)
       _io == ["dead-rising", "mewgenics", "murder-miners", "quake-ii", "resonance"] and all({"line": "env.MADEIRA_AUDIO_IO_MS = 5", "minBuild": 625} in next(r for r in _recs["rules"] if r["id"] == i)["config"] for i in _io)
-      and "MADEIRA_AUDIO_PERIOD_MS" not in text and "MADEIRA_AUDIO_IO_MS" not in (R / "build/tools/autotune_rules.py").read_text())
+      and "MADEIRA_AUDIO_PERIOD_MS" not in text and "MADEIRA_AUDIO_IO_MS" not in _rules_without_suggestion)
 
 print("PASS: audio period" if ok else "FAIL: audio period")
 sys.exit(0 if ok else 1)

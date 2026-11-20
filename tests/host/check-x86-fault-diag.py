@@ -75,10 +75,11 @@ check('one call site for the int3, two for the access violation (round 624: the 
 # code, from FEX's frame; and the [wow-low-rip] branch's, before the pc is moved to the dispatcher's call
 bn1 = signal_src.index('ios_x86_fault_branch_nowhere(')
 bn2 = signal_src.index('ios_x86_fault_branch_nowhere(', bn1 + 1)
-check('round 630: the Mach thread\'s branch-to-nowhere call is the else of the JIT access-violation call, for EXC_BAD_ACCESS below 64 KB, '
-      'with FEX\'s frame and State.rip',
-      signal_src.index('ios_x86_fault_av( &state, xf_teb, cs[0], (uint64_t)fault_addr, -1 );') < bn1
-      and 'else if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)' in signal_src[bn1 - 700:bn1]
+check('round 669 (SD-1): the Mach thread\'s branch-to-nowhere call comes FIRST, for EXC_BAD_ACCESS below 64 KB, with FEX\'s frame and State.rip; '
+      'the JIT access-violation call is its else (FEX\'s null-read thunk runs in the pool and took the fault before)',
+      bn1 < signal_src.index('ios_x86_fault_av( &state, xf_teb, cs[0], (uint64_t)fault_addr, -1 );')
+      and 'if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)' in signal_src[bn1 - 1200:bn1]
+      and 'else if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && ios_av_args_pc_is_jit(' in signal_src[bn1:bn1 + 1500]
       and signal_src[bn1:bn1 + 90].startswith('ios_x86_fault_branch_nowhere( &state, xf_teb, st28, cs[0], "null-call" );'))
 low = signal_src[signal_src.index('"[wow-low-rip] guest branch to %p: pc set to the dispatcher\'s call %p so the "'):]
 check('round 630: the [wow-low-rip] branch reports the caller before the pc moves, from FEX\'s frame at x28, behind the switch',
@@ -265,11 +266,21 @@ check('the bundled lists that carry the switch are exactly Most Wanted, Undergro
                           # round 660 M023 (agent K7R): The Witcher 3 v4, the full report of the DirectX 12 build's fault (G7), from build 652
                           + [('the-witcher-3', 'env.MADEIRA_X86_FAULT_DUMP = 1', 652)]
                           # owner decision 2026-11-15 (M022, M142): Football Manager 27 v4 says where its protection-layer stop is, from build 598
-                          + [('football-manager-27', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]),
+                          + [('football-manager-27', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]
+                          # round 668: FFT v4 (G2 S13), GTA III v2 (N068), Enshrouded and The Coffin of Andy and Leyley (new rows)
+                          + [('final-fantasy-tactics-ivalice-chronicles', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('grand-theft-auto-iii', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('enshrouded', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('the-coffin-of-andy-and-leyley', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]
+                          # round 669: Hogwarts Legacy v3 and SWGR v3 (A S11, S2), Alice and Dead Rising 2 (A S3, S6), Sleeping Dogs (C SD-1b, from 669)
+                          + [('hogwarts-legacy', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('star-wars-galactic-racer', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('alice-madness-returns', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('dead-rising-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('sleeping-dogs-2012', 'env.MADEIRA_X86_FAULT_DUMP = 1', 669)]
+                          # round 669 (agent D): Digimon Time Stranger, Dumpster Gang, OutRun 2006, One Piece PW3
+                          + [('digimon-story-time-stranger', 'env.MADEIRA_X86_FAULT_DUMP = 1', 652), ('dumpster-gang', 'env.MADEIRA_X86_FAULT_DUMP = 1', 652), ('outrun-2006-coast-2-coast', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('one-piece-pirate-warriors-3', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]
+                          # round 677 (agent A1 S11): Thief: Deadly Shadows, beside its d3d8to9 line
+                          + [('thief-deadly-shadows', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]),
       str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs
 cc = os.environ.get('CC', 'cc')
+# the window base the compiled runs use (WIN in MAIN): 0x15000000000 on arm64 macOS, 0x5000000000 on Intel
+WINS = '0x15000000000' if os.uname().machine == 'arm64' else '0x5000000000'
 PRELUDE = r'''
 #include <assert.h>
 #include <stdint.h>
@@ -321,7 +332,13 @@ void ios_x86f_alloc_ring_dump( uint32_t fault ) { fprintf( stderr, "[x86-fault] 
 
 # the window of the 592 log of Most Wanted: speed.exe 0x400000 (block at 0x81ab75), ntdll 0xfff40000, TEB32 0x302000, PEB32 0x311000
 MAIN = r'''
+/* arm64 macOS reserves 0x1000000000-0x7000000000 in every process (the M5 Max, build 672): the window moves to
+   0x15000000000 there; on the Intel host it stays at 0x5000000000. */
+#if defined(__aarch64__)
+#define WIN 0x15000000000ULL
+#else
 #define WIN 0x5000000000ULL
+#endif
 #define TEB64_G 0x300000u
 #define TEB32_G 0x302000u
 #define PEB32_G 0x311000u
@@ -333,8 +350,22 @@ MAIN = r'''
 
 static uint64_t alloc_at(uint64_t a, size_t n)
 {
-    mach_vm_address_t m = a;
-    if (mach_vm_allocate(mach_task_self(), &m, n, VM_FLAGS_FIXED) != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
+    /* Host page by host page (M5 Max, build 672: 16 KB pages there, 4 KB on the Intel VM): the window's pieces sit at
+       4 KB offsets, so two may share a host page; a page an earlier piece already mapped is fine. */
+    const uint64_t pg = vm_page_size, lo = a & ~(pg - 1), hi = (a + n + pg - 1) & ~(pg - 1);
+    for (uint64_t p = lo; p < hi; p += pg)
+    {
+        mach_vm_address_t m = p;
+        kern_return_t k = mach_vm_allocate(mach_task_self(), &m, pg, VM_FLAGS_FIXED);
+        if (k == KERN_NO_SPACE)
+        {   /* taken as already there only when it is a read-write page (one an earlier piece of this program mapped) */
+            mach_vm_address_t q = p; mach_vm_size_t qs = 0; vm_region_basic_info_data_64_t ri;
+            mach_msg_type_number_t rc = VM_REGION_BASIC_INFO_COUNT_64; mach_port_t ro;
+            if (mach_vm_region(mach_task_self(), &q, &qs, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&ri, &rc, &ro) == KERN_SUCCESS
+                && q <= p && (ri.protection & 3) == 3) continue;
+        }
+        if (k != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
+    }
     return a;
 }
 static void w32(uint64_t a, uint32_t v) { memcpy((void *)a, &v, 4); }
@@ -509,6 +540,21 @@ int main(int argc, char **argv)
         printf("nowhere-done reads=%lu\n", g_reads);
         return 0;
     }
+    if (!strcmp(s, "jump")) {
+        /* round 669 (agent C SD-1; Sleeping Dogs 4WEW0M): a jmp or ret to 0xFFFFFFFE: the dword at ESP is 0 (no call); *(x28) is the
+         * translated block, whose entry FEX's block table gives as BLOCK */
+        static uint64_t frame[16];
+        uint64_t fr = (uint64_t)(uintptr_t)frame;
+        frame[0] = 0x16e31ad70ULL; frame[4] = 0x11; frame[5] = 0x22; frame[8] = 0x127fe40; frame[9] = 0x127fe80;
+        w32(WIN + 0x127fe40, 0);
+        fake_exact = BLOCK;
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0xfffffffe, "null-call");
+        fake_exact = 0;
+        frame[0] = 0;
+        if (ios_x86_fault_enabled()) ios_x86_fault_branch_nowhere(&w.st, w.teb64, fr, 0xfffffffe, "null-call");    /* no block: one line */
+        printf("jump-done\n");
+        return 0;
+    }
     return 0;
 }
 '''
@@ -554,7 +600,7 @@ else:
                 print(r.stderr)
             check('the headline: the fault address, the block and its module+RVA, the registers of the 592 log',
                   ls and ls[0].startswith('[x86-fault] #1 a 32-bit guest faulted at guest 0xb514ab6a in the block that starts at guest 0x0081ab75 (speed.exe+0x41ab75), '
-                                          'window 0x5000000000, 2 modules in the PEB32 list;')
+                                          'window ' + WINS + ', 2 modules in the PEB32 list;')
                   and 'EAX=0xa6a0110 ECX=0xb514ab6a EDX=0x0 EBX=0x0 ESI=0x0 EDI=0xa6a00c0 EBP=0x127fdf4 ESP=0x127fddc' in ls[0], r.stderr)
             check('the fault address minus each register shows the pattern: -EDI=0xaaaaaaaa, and -ECX=0x0',
                   any('fault address minus each register (mod 2^32):' in l and '-EDI=0xaaaaaaaa' in l and '-ECX=0x0' in l and '-EAX=0xaaaaaa5a' in l for l in ls), r.stderr)
@@ -593,7 +639,7 @@ else:
                   [l for l in ls if l.startswith('[x86-fault]   views around ')] == ['[x86-fault]   views around fault=0xb514ab6a:',
                                                                                  '[x86-fault]   views around EBP=0x0127fdf4:',
                                                                                  '[x86-fault]   views around EDI=0x0a6a00c0:']
-                  and len([l for l in allv if l.startswith('[fault-rgn] (fake) addr=0x50b514ab6a')]) == 1, r.stderr)
+                  and len([l for l in allv if l.startswith('[fault-rgn] (fake) addr=%#x' % (int(WINS, 16) + 0xb514ab6a))]) == 1, r.stderr)
             check('round 624 (D2 S8 d2): the allocations before the fault, after the views', any(l.startswith('[x86-fault]   WoW64 allocations and frees before the fault (fake) 0xb514ab6a') for l in ls), r.stderr)
             check('round 624 (D2 S8 d3): the image holds the fault address at speed.exe+0x200, the one place',
                   any(l.startswith('[x86-fault]   the image speed.exe holds the fault address 0xb514ab6a as a dword at 1 place(s): speed.exe+0x200 (') for l in ls), r.stderr)
@@ -609,7 +655,7 @@ else:
             check('round 624 (A-S12): the exact EIP from FEX\'s block table names the faulting instruction, State.rip is said to be the last block entry',
                   ls and ls[0].startswith('[x86-fault] #1 a 32-bit guest faulted at guest 0xb514ab6a at EIP 0x0081ab7a (speed.exe+0x41ab7a) '
                                           '[exact: the block table of FEX for host pc 0x')
-                  and 'State.rip=0x0081ab75 is only the last block entry], window 0x5000000000, 2 modules in the PEB32 list;' in ls[0]
+                  and 'State.rip=0x0081ab75 is only the last block entry], window ' + WINS + ', 2 modules in the PEB32 list;' in ls[0]
                   and not any('note:' in l for l in ls), r.stderr)
             check('...the code window is the instruction\'s ("eip"), its bytes at +0 are the faulting mov eax,[ecx], and the PE identity is the program\'s',
                   any(l.startswith('[x86-fault]   code eip: 256 bytes before and 160 after guest 0x0081ab7a (speed.exe+0x41ab7a)') for l in allv)
@@ -644,6 +690,18 @@ else:
                   and any(l == '[x86-fault]   WoW64 allocations and frees before the fault (fake) 0x262c1234' for l in allv)
                   and sum(1 for l in allv if 'WoW64 allocations and frees before the fault (fake)' in l) == 1
                   and 'nowhere-done' in r.stdout, r.stderr[-1500:])
+            r = run('jump', MADEIRA_X86_FAULT_DUMP='1')
+            allv = r.stderr.splitlines()
+            check('round 669 (SD-1): a jump to 0xFFFFFFFE without a call is reported from the block that jumped: its entry, the registers and the '
+                  'code window labelled block; without a block one line says so',
+                  any(l.startswith('[x86-fault] null-call: a 32-bit guest branched to 0xfffffffe, where no code is; the dword at ESP=0x0127fe40 is '
+                                   '0x00000000 (the return address when a call went there); no call: the report below is around the block that jumped')
+                      for l in allv)
+                  and any(l.startswith('[x86-fault] #1 a 32-bit guest left the block that starts at guest 0x0081ab75') and 'EAX=0x11 ECX=0x22' in l
+                          and 'ESP=0x127fe40' in l for l in allv)
+                  and any(l.startswith('[x86-fault]   code block ') for l in allv)
+                  and any(l == '[x86-fault] null-call: the block that jumped could not be named (no block)' for l in allv)
+                  and 'jump-done' in r.stdout, r.stderr[-2500:])
             r = run('nowhere')
             check('round 630: without the switch the branch-to-nowhere path prints and reads nothing',
                   r.stderr == '' and r.stdout.strip() == 'nowhere-done reads=0', r.stderr + r.stdout)
@@ -651,7 +709,7 @@ else:
             ls = lines(r)
             allv = r.stderr.splitlines()
             check('an int3: its own headline (not a fault), the registers of the Underground 2 log, and the code window labelled int3 with the cc at +0',
-                  ls and ls[0].startswith('[x86-fault] #1 a 32-bit guest executed int3 at guest 0x004405a9 (speed.exe+0x405a9), window 0x5000000000, 2 modules')
+                  ls and ls[0].startswith('[x86-fault] #1 a 32-bit guest executed int3 at guest 0x004405a9 (speed.exe+0x405a9), window ' + WINS + ', 2 modules')
                   and 'EAX=0x0 ECX=0x0 EDX=0x82804c EBX=0x6 ESI=0xaa EDI=0xa6a00c0 EBP=0x127fdf4 ESP=0x127fddc' in ls[0]
                   and not any('fault address minus' in l for l in ls)
                   and any(l.startswith('[x86-fault]   code int3 +0: cc ') for l in allv), r.stderr)
@@ -698,13 +756,33 @@ typedef unsigned long long UINT64; typedef size_t SIZE_T; typedef unsigned int U
 typedef struct { struct { void *UniqueProcess, *UniqueThread; } ClientId; } TEB;
 static TEB teb = { { 0, (void *)0x9c } };
 static TEB *NtCurrentTeb( void ) { return &teb; }
+#if defined(__aarch64__)   /* the window of MAIN (arm64 macOS reserves 0x1000000000-0x7000000000) */
+static ULONG_PTR win = 0x15000000000ULL;
+#else
 static ULONG_PTR win = 0x5000000000ULL;
+#endif
 ULONG_PTR ios_wow_base( void ) { return win; }
 static unsigned int now_ms = 1000;
 static unsigned int ios_vh_ms( void ) { return now_ms; }
+int ios_x86_fault_switch( void ) { return 1; }
 @RING@
-int main( void )
+int main( int argc, char **argv )
 {
+    if (argc > 1)
+    {   /* build 666 (issue #53): the large allocations and the line that says where the fault address came from */
+        ios_x86f_ring_note( win + 0x10010000, 0x40000000, 0x2000, 0x04, 0, 0 );   /* a 1 GB reserve inside the window */
+        for (unsigned i = 0; i < 70; i++) ios_x86f_ring_note( win + 0x60000000 + i * 0x10000, 0x1000, 0x1000, 0x04, 0, 0 );   /* rolls the 64-ring */
+        ios_x86f_ring_note( win + 0x70000000, 0x180000, 0x1000, 0x04, 0, 0 );     /* 1.5 MB, the newest */
+        ios_x86f_jumbo_note( 0x3bc00000, 0x40000000, 0 );                          /* RMKNG6: an outside jumbo, guest-visible 0x3bc00000 */
+        ios_x86f_alloc_ring_dump( 0x30000000 );                                    /* inside the 1 GB reserve, which only the big ring still has */
+        ios_x86f_alloc_ring_dump( 0x7bc00000 );                                    /* the outside jumbo's base + 1 GB */
+        ios_x86f_alloc_ring_dump( 0xb8c00000 );                                    /* a computed address */
+        ios_x86f_alloc_ring_dump( 0x70000010 );                                    /* inside the newest allocation */
+        /* round 669 (B S2 d1; Isaac): a 4 MB VirtualAlloc2 placement outside the window; the program writes at its low 32 bits + 0x10 */
+        ios_x86f_ring_note( 0x71b3a40000ULL, 0x400000, 0x3000, 0x04, 0, 0 );
+        ios_x86f_alloc_ring_dump( 0xb3a40010 );
+        return 0;
+    }
     ios_x86f_alloc_ring_dump( 0x1234 );                                         /* nothing yet */
     /* Unreal Gold EQ6DMS: the 64 KB texture view, a 756 KB view released before the storm; the fault one row past the end */
     ios_x86f_ring_note( win + 0x07a30000, 0x10000, 0x3000, 0x04, 0, 0 );
@@ -734,7 +812,32 @@ if sys.platform == 'darwin' and shutil.which(cc):
         check('round 624: the allocation ring of virtual_ios.c compiles on the host (ASan, UBSan, -Werror)', c.returncode == 0, c.stderr[-3000:])
         if c.returncode == 0:
             r = subprocess.run([str(d / 'r')], capture_output=True, text=True, env=dict(os.environ, ASAN_OPTIONS='symbolize=0'))
-            out = [l for l in r.stderr.splitlines() if l.startswith('[x86-fault]')]
+            allout = [l for l in r.stderr.splitlines() if l.startswith('[x86-fault]')]
+            # build 666: the large-allocation lines and the "where from" line follow every dump; the round 624/630 checks read the rest
+            new_lines = ('[x86-fault]   allocations and frees of 1 MB or more', '[x86-fault]     big #', '[x86-fault]   the fault address ',
+                         '[x86-fault]   allocations and frees OUTSIDE', '[x86-fault]     out #')   # round 669 (B S2 d1)
+            out = [l for l in allout if not l.startswith(new_lines)]
+            check('build 666: every dump ends with the large allocations and one line that says where the fault address came from',
+                  sum(l.startswith('[x86-fault]   the fault address ') for l in allout) == sum(l.startswith('[x86-fault]   WoW64') for l in allout) == 5
+                  and '[x86-fault]   the fault address 0x00001234 lies in none of the recorded allocations, large allocations, jumbo reserves or outside placements (a computed address)' in allout,
+                  '\n'.join(allout[:4]))
+            r2 = subprocess.run([str(d / 'r'), 'big'], capture_output=True, text=True, env=dict(os.environ, ASAN_OPTIONS='symbolize=0'))
+            big = [l for l in r2.stderr.splitlines() if l.startswith('[x86-fault]   the fault address ')]
+            check('build 666: a fault inside a 1 GB reserve the 64-ring has lost is found in the big ring; the outside jumbo base + 1 GB, a computed '
+                  'address and the newest allocation are each named',
+                  len(big) == 5
+                  and big[0] == '[x86-fault]   the fault address 0x30000000 lies inside allocation big #0 (0x10010000+0x40000000)'
+                  and big[1] == '[x86-fault]   the fault address 0x7bc00000 lies at the guest-visible base of jumbo reserve #1 + 0x40000000 (0x3bc00000+0x40000000, OUTSIDE its window)'
+                  and big[2] == '[x86-fault]   the fault address 0xb8c00000 lies in none of the recorded allocations, large allocations, jumbo reserves or outside placements (a computed address)'
+                  and big[3] == '[x86-fault]   the fault address 0x70000010 lies inside allocation #71 (0x70000000+0x180000)', '\n'.join(big) + r2.stderr[-1500:])
+            outl = [l for l in r2.stderr.splitlines() if l.startswith('[x86-fault]     out #')]
+            check('round 669 (B S2 d1): a placement outside the window is kept apart and a fault at its low 32 bits is named; the main path records '
+                  'it and the Ex path (VirtualAlloc2) too, with the switch',
+                  big[4] == '[x86-fault]   the fault address 0xb3a40010 lies at the low 32 bits of the OUTSIDE placement out #0 (host 0x71b3a40000+0x400000, '
+                            'type=0x3000): a pointer the program was handed outside its window and cut'
+                  and outl == ['[x86-fault]     out #0 alloc 0x71b3a40000+0x400000 type=0x3000 tid=009c 0 ms ago (low 32 bits 0xb3a40000)  <== the fault is inside its low 32 bits']
+                  and 'if (ios_x86_fault_switch()) ios_x86f_ring_note( (UINT64)(ULONG_PTR)*ret, *size_ptr, type, protect, 0, (UINT64)(ULONG_PTR)jumbo_hint );'
+                      in vsrc[vsrc.index('NTSTATUS ios_nt_impl_NtAllocateVirtualMemoryEx('):], '\n'.join(big) + '\n' + '\n'.join(outl))
             check('an empty ring says so', out[0].endswith('(0 in all, the last 0, guest addresses): none recorded'), '\n'.join(out[:3]))
             check('Unreal Gold\'s shape: the fault is 16 bytes past the texture view\'s end and inside the view released after it; an address outside the window is not kept',
                   out[1].endswith('(2 in all, the last 2, guest addresses):')

@@ -133,7 +133,7 @@ check('CI runs this check', 'run: python3 tests/host/check-dxcompiler-optin.py' 
 # ---------------------------------------------------------------- the app: policy, bridge, catalog
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 case = policy[policy.index('case "MADEIRA_OPTIN_DLLS":'):policy.index('case "MADEIRA_WG_VPROC":')]
-check('a downloaded list may name dxcompiler', '|| $0 == "dxcompiler"' in case and 'coremessaging, combase, or dxcompiler")' in case)
+check('a downloaded list may name dxcompiler', '|| $0 == "dxcompiler"' in case and 'coremessaging, combase, or dxcompiler, or mscms")' in case)
 bridge = (root / 'app/Madeira/WineProcessBridge.m').read_text()
 blk = bridge[bridge.index('const char *optList = getenv("MADEIRA_OPTIN_DLLS");'):]
 check('the bridge links any shipped <name>-optin.dll the game lists as <name>.dll in sysx64 (where an x64 program finds it) and '
@@ -143,7 +143,7 @@ check('the bridge links any shipped <name>-optin.dll the game lists as <name>.dl
 gen = (root / 'build/tools/gen-config-catalog.py').read_text()
 opt = gen[gen.index('"env.MADEIRA_OPTIN_DLLS": {'):gen.index('"env.MADEIRA_WINTYPES": {')]
 check('the catalog says what dxcompiler is and that auto-tune adds it', 'dxcompiler is not one of Wine\'s' in opt
-      and '"tools/build-dxcompiler.sh"' in opt and 'combase, dxcompiler and (with' in opt)
+      and '"tools/build-dxcompiler.sh"' in opt and 'combase, dxcompiler, mscms and (with' in opt)
 
 # ---------------------------------------------------------------- auto-tune: the rule and its fixture
 spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')

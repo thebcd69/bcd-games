@@ -168,6 +168,11 @@ for rid in ("jetboard-joust", "stardew-valley"):
 night_gl = ["angry-birds", "brotato", "buckshot-roulette", "deponia-the-complete-journey", "doom-64", "freshwomen-season-1", "gp-bikes",
             "into-the-breach", "kof-xiv-steam", "noita", "polybius", "sc-jogos-barro-gt"]
 night_gl += ["day-of-the-tentacle-remastered"]   # round 660 (M062): a row of minBuild 660, so its plain line needs no minBuild of its own
+night_gl += ["baldurs-gate-ii-enhanced-edition"]   # round 668 (G1, merge N021; M6XHZQ): glGetString(GL_VERSION) read from the GL-absent stub
+night_gl += ["x-plane-12"]   # round 668: the owner's X-Plane 12 test, "Couldn't find pixel format!"
+night_gl += ["goldsrc-hl-exe"]   # round 668 (G3, merge N074): hw.dll is OpenGL first; v2
+night_gl += ["legacy-of-kain-soul-reaver-1-2-remastered", "unrailed-2-back-on-track"]   # round 669 (B S12, S3)
+night_gl += ["quaver"]   # round 668 (K1 S9): v3, no OpenGL context without a backend (5AZNE6, VVV7PX); zink drew 1,790 frames (44QPTA)
 check("no other list rule turns OpenGL on, and none turns it on without minBuild 632 (KOF XIV's experiment: 652)",
       sorted(r["id"] for r in lst["rules"] if any("gl-backend" in (c["line"] if isinstance(c, dict) else c) for c in r["config"]))
       == sorted(list(want) + ["jetboard-joust", "stardew-valley"] + night_gl)

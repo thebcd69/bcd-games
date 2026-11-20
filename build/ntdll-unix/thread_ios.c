@@ -2601,6 +2601,8 @@ int ios_teb_free_lookup( uintptr_t addr, char *out, size_t outsz )
 /***********************************************************************
  *           exit_thread
  */
+extern int ios_teb_in_dead_window( const void *teb );   /* virtual_ios.c, round 668 */
+
 static DECLSPEC_NORETURN void exit_thread( int status )
 {
     static void *prev_teb;
@@ -2641,6 +2643,17 @@ static DECLSPEC_NORETURN void exit_thread( int status )
             if (said++ < 8)
                 dprintf( 2, "[thread-reap] ml2290 the previous exited thread's TEB %p is this exiting thread's own (a reused window): "
                             "not joined, not freed\n", (void *)teb );
+        }
+        else if (ios_teb_in_dead_window( teb ))
+        {
+            /* madeira-bcd round 668 (A1 S13, G2 S10; ATMD3Z, AEKXPC, D6J99X): the previous TEB lies in a 32-bit window that
+             * was torn down when its process ended (round 620 wrote this down for AEKXPC; never applied). Its memory is gone:
+             * reading pthread_id faulted (exit_thread+0x138, "[teb-uaf]"). Its thread ended long ago and the teardown freed
+             * the block, so there is nothing to join or free. Every other hand-off is unchanged. */
+            static int said;
+            if (said++ < 8)
+                dprintf( 2, "[thread-reap] ml668 the previous exited thread's TEB %p lies in a 32-bit window that is no longer "
+                            "live: not read, not joined, not freed\n", (void *)teb );
         }
         else if (thread_data->pthread_id)
         {

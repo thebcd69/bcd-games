@@ -1,0 +1,546 @@
+[16:33:46.042] [INFO] Checking entitlements...
+[16:33:46.043] [INFO] [build] v0.1.665 (665)
+[16:33:46.043] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2.1 (Build 24B156) ram=11443MB available=12266MB cores=9
+[16:33:46.043] [INFO] [device] address-map=[0x1003a8000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[16:33:46.044] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[16:33:46.051] [INFO] [device] settings: low-power=0 thermal=serious screen=2064x2752@2.0x max-fps=120 utc-offset=-08:00 free-disk=11GB stikdebug-url=1
+[16:33:46.054] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:33:47.591] [INFO] Requesting JIT with Built-in StikJIT...
+[16:33:49.104] [INFO] [epic-launch] start app=be..f4 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[16:33:49.107] [INFO] [bcd] library launch Spider-Man.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off lc=0
+[16:33:49.108] [INFO] Session log: logs/Spider-Man.exe-2026-11-16_16-33-49.txt
+[16:33:49.120] [INFO] Running full Wine sequence...
+[16:33:49.120] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1003a8000,0x8000000000) 512GB available=12237MB low-power=0 thermal=serious
+[16:33:49.121] [INFO] [game-cfg] async-submit=1 env.FEX_HALFBARRIERTSOENABLED=1 env.FEX_MEMCPYSETTSOENABLED=0 env.FEX_MULTIBLOCK=1 env.FEX_TSOENABLED=1 env.FEX_VECTORTSOENABLED=0 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X64_IMAGE_NOCOPY=1 low-graphics-tip=1 mip0-full=1 pso-warm=2 quiet-log=1 vram-mb=6144 write-buffer-immediate=1
+[16:33:49.123] [INFO] [msiexec64] Epic game: msiexec in system32 for this session
+[16:33:49.127] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[16:33:49.128] [INFO] Allocating 896MB JIT pool via debugger...
+[16:33:49.128] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:33:49.128] [INFO] [jit-debugger] attached=1 at the pool request
+[16:33:49.128] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=2
+[16:33:49.129] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[16:33:49.130] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[16:33:49.806] [INFO] RX pool at 0x148000000
+[16:33:49.824] [OK] JIT pool ready (debugger still attached).
+[16:33:49.825] [INFO] BRK suspension lasted 0.70s
+[16:33:49.826] [INFO] Detaching debugger...
+[16:33:49.830] [OK] Debugger detached.
+[16:33:49.831] [OK] [early-detach] rev=ml524 took 5 ms
+[16:33:49.833] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.734s rev=ml526
+[16:33:49.861] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/7a6d43670b07ffc5.cfg (read)
+[game-cfg]   mip0-full = 1
+[game-cfg]   quiet-log = 1
+[game-cfg]   write-buffer-immediate = 1
+[game-cfg]   pso-warm = 2
+[game-cfg]   low-graphics-tip = 1
+[game-cfg]   async-submit = 1
+[game-cfg]   vram-mb = 6144
+[madeira-env] game MADEIRA_X64_IMAGE_NOCOPY=1
+[madeira-env] game FEX_MULTIBLOCK=1
+[WineProc] Target exe: C:\Program Files\Epic Games\MarvelsSpiderManRemaster\Spider-Man.exe (bundle=arm64ec-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[16:33:50.067] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11618 MB + phys_footprint=669 MB = 12288 MB (hw.memsize says 11443 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11443 MB), so it is a sentinel, not a limit
+ml985: map_image_view size=0x85cc000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85cc000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x85cc000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\Spider-Man.exe" 0x121c00000+0x85cc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x121c00000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x121c00000+0x37c4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x1253c4000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x1253c4000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x127938000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148004000 used=0x13c000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14813f000 used=0x56b000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14813f000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x148568000 used=0x69c000/0x27000000 tramp+0x4000
+[window] 0x7048000000..0x7400000000 regions=92 occupied=8216 MB of 15232 MB free=7015 MB maxhole=7015 MB@0x7048000000 rev=ml787 (periodic)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148568000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14869c000 used=0x764000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14869c000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x148764000 used=0xa64000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148764000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Spider-Man.exe (spider-man.exe-8480596ad0c6c771): 121C00000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\amd_ags_x64.dll" 0x71fe330000+0x2e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module amd_ags_x64.dll (amd_ags_x64.dll-cbfa8e2bfce01472): 71FE330000
+[jit-pool] image 0x71fe110000+0x220000 (user32.dll) → pool 0x148a68000 used=0xc90000/0x27000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a68000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE110000
+[window] 0x121c00000..0x7817000000 regions=80096 occupied=462370 MB of 487252 MB free=41634 MB maxhole=16752 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=829 MB (peak 829) internal=825 MB compressed=0 MB external=81 MB reusable=4 MB (cycle=1)
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE020000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDF70000
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-client.dll" 0x71fdcc0000+0x7a000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\GFSDK_SSAO_D3D11.win64.dll" 0x71fd4c0000+0x189000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] winhttp.dll: OK, 8 .text pages executable (copy @0x149894000)
+[copy-verify] jsproxy.dll: OK, 1 .text pages executable (copy @0x149948000)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x1499ec000)
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x14acc8000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\gattaca.dll" 0x71fbc80000+0x45000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\EOSSDK-Win64-Shipping.dll" 0x71fa540000+0x1637000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #1 release of 0x7028de0000+0x200000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7028fe0000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70293e0000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7029be0000+0xfd0000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x702abb0000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x702bb80000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x702cb50000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x702db20000+0xfd0000 held for 2000 ms (8 in flight)
+[image-reload] unmapped image 0x71f9f20000+0xc0000: 1 pool copy marked
+[xp-names] m2273470 "wine-x18-exc"
+[xp] 16:33:50.629 +0.51 dt=256 cpu=263 (thr 259) P=263 E=0 run=271 pgw=-1.0 GHz P=4.15 E=2.11 Minst=3893 IPC=3.57 mJ=1219 pin=1 rdKB=0 fpMB=950
+[jumbo#1] +0ms tid=170287000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe444f00 grip=0x0 size=0x7fc00000 (2044 MB) hint=0x0 -> 0x7038820000 st=0x0 | granted=2044 MB ok=1 fail=0
+[bigres] tid=0024 #1 size=0x153ff000 (339 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=339 MB
+[swap] ml1077 backed 0x70b8420000+0x153fc000 (file off 0 MB): 339 MB in 1 extents, peak 339 MB, 0 refused
+[swap] ml1077 backed 0x7033a30000+0x3c0c000 (file off 339 MB): 400 MB in 2 extents, peak 400 MB, 0 refused
+[swap] ml1077 backed 0x70cd820000+0x4630000 (file off 400 MB): 470 MB in 3 extents, peak 470 MB, 0 refused
+[swap] ml1077 backed 0x70d1e60000+0x25c8000 (file off 470 MB): 508 MB in 4 extents, peak 508 MB, 0 refused
+[swap] ml1077 backed 0x70d4430000+0x1000000 (file off 508 MB): 524 MB in 5 extents, peak 524 MB, 0 refused
+[swap] ml1077 backed 0x7038e20000+0x4200000 (file off 524 MB): 590 MB in 6 extents, peak 590 MB, 0 refused
+[bigres] tid=0024 #2 size=0x33c00000 (828 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=1167 MB
+[jumbo#2] +2ms tid=170287000 wtid=0024 peb=0x71ffff0000 nrip=0x1237c390a grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7109030000 st=0x0 | granted=3068 MB ok=2 fail=0
+[srv-conn-done] dport=1213 event=|HUP err=61 fd=159 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[bigres] tid=0024 #3 size=0x2a800000 (680 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=1847 MB
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-handler.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\Spider-Man.exe\" --capture-image --ga-app-id=<uuid> --ki"...
+[phase] spawn:L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-handler.exe" t+  1.675s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-handler.exe\" --no-identify-client-via-url --no-upload-annotations \"--binary-path=C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\Spider-Man.exe\" --capture-image --ga-app-id=<uuid> --ki"... (fd=295, unixdir=296, dup_unixdir=300) cwd=L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\"
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 64 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[xp] 16:33:50.881 +0.76 dt=251 cpu=277 (thr 186) P=276 E=1 run=284 pgw=-1.0 GHz P=4.22 E=2.34 Minst=4471 IPC=3.82 mJ=1381 pin=2009 rdKB=0 fpMB=1162
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x14db40000)
+0068:err:win:ios_child_desktop_fixup [child-desktop] pid=0060 peb=0x10936c000 tid=0068: no desktop window (status 0xc0000008, thread desktop 0x14); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[image-reload] unmapped image 0x71f6a80000+0xb0000: 1 pool copy marked
+ml985: map_image_view size=0x85cc000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85cc000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x85cc000 rev=ajan5-motor
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={0,0,132,38} surface=0x1037f09b0 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x10028 class='crashpad_SessionEndWatcher' text="" rev=ml853
+[win-pos] #2 hwnd=0x1002c after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x1002c class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x1002c after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x1002c class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x10028 after=0x0 flags=00000018 vis={0,0,132,38} surface=0x1037f09b0 rev=ml505 style=04c00000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10028 class='crashpad_SessionEndWatcher' text="" rev=ml853
+ml985: map_image_view size=0x85cc000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85cc000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x85cc000 rev=ajan5-motor
+ml985: map_image_view size=0x85cc000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x85cc000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x85cc000 rev=ajan5-motor
+[dns] madeira-bcd begin #1 "crs.api.wwsga.me" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #1 "crs.api.wwsga.me" = 0 after 1 ms (6 result(s))
+0064:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe" cmdline=L"\"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe\" --pid=32 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Insomniac Games\\Marvel's Spider-Man Remastered\\crs\\temp\\<uuid>\\crash-report\" --save-event=0x98 --cancel-event="...
+[phase] spawn:L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe" t+  1.863s rev=ml526
+0064:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe\" --pid=32 --duration=5 \"--file=C:\\users\\mobile\\AppData\\Roaming\\Insomniac Games\\Marvel's Spider-Man Remastered\\crs\\temp\\<uuid>\\crash-report\" --save-event=0x98 --cancel-event="... (fd=351, unixdir=352, dup_unixdir=356) cwd=L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\"
+[nls-getptr] type=11 id=437 peb=0x10db74000
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000001B0 status=00000000 native_pc=00000071FFD32DAC is_ec=1 -> returned rip=00000071FFD32DAC rsp=0000007182270000 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000001B0 status=00000000 native_pc=00000071FDCC1130 is_ec=0 -> returned rip=00000071FDCC1130 rsp=0000007182270000 flags=00100003
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x40000000
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #9 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #41 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #42 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #43 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #44 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #45 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #46 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #47 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #48 handle=00000000000001B0 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100002
+[nls-getptr] type=11 id=20127 peb=0x10db74000
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 7C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10db74000
+[nls-getptr] type=11 id=437 peb=0x10db74000
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-conn-done] dport=443 event=OUT err=0 fd=349 peer=YES path=REAL-kernel-completion rev=ml576
+006c:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+006c:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x15105c000)
+E 98 [thr-term] rev=ml435 deinit #1 tid=0x98
+[xp] 16:33:51.141 +1.02 dt=261 cpu=518 (thr 216) P=438 E=80 run=565 pgw=-1.0 GHz P=4.19 E=2.90 Minst=7846 IPC=3.79 mJ=2191 pin=65 rdKB=0 fpMB=1587
+E A0 [thr-term] rev=ml435 deinit #2 tid=0xa0
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+E 9C [thr-term] rev=ml435 deinit #3 tid=0x9c
+E A8 [thr-term] rev=ml435 deinit #4 tid=0xa8
+E B0 [thr-term] rev=ml435 deinit #5 tid=0xb0
+E B8 [thr-term] rev=ml435 deinit #6 tid=0xb8
+[vkmt] tid=0024 D3DKMTEnumAdapters2 -> 0, 0 adapters (registered GPU is not in the list; env.MADEIRA_KMT_ADAPTER = 1 lists it)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x40000040
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+E BC [thr-term] rev=ml435 deinit #11 tid=0xbc
+E C4 [thr-term] rev=ml435 deinit #12 tid=0xc4
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+007c:err:module:load_dll [dll-missing] rev=ml336 #1 L"EVR.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+007c:err:module:import_dll Library EVR.dll (which is needed by L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe") not found
+007c:err:module:loader_init Importing dlls for L"C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\crs-video.exe" failed, status c0000135
+007c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=5521
+[unwind] term ml661 begin rip=0 rsp=0 window=[0..800000) max=32
+[unwind] term ml661 #00 pc=0 rsp=0  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=355
+[pool-freechk] POISONED AT FREE off=0x6898000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa60c000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa4e8000 size=0x124000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa444000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa404000 size=0x30000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa2c0000 size=0x144000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x8644000 size=0x984000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x8560000 size=0xe4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x84dc000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x6f30000 size=0xc8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x6ff8000 size=0x300000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x80d8000 size=0x134000 cur=0x3 max=0x3  <== narrowed during the module's life
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[jit-pool] tail FREE rx=0x16dffc000 size=0x1000000 -> free-list rev=ml438
+[vkmt] tid=0024 D3DKMTEnumAdapters2(NULL) -> 0, room for 34 adapters (size query)
+[vkmt] tid=0024 D3DKMTEnumAdapters2 -> 0, 0 adapters (registered GPU is not in the list; env.MADEIRA_KMT_ADAPTER = 1 lists it)
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[vkmt] tid=0024 D3DKMTEnumAdapters2(NULL) -> 0, room for 34 adapters (size query)
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\sl.pcl.dll" 0x71f4120000+0x29000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0024:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\sl.reflex.dll" 0x71f3fb0000+0x2b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/Documents/Marvel's Spider-Man Remastered/Marvel's Spider-Man Remastered.log
+[guest-log] #1 tid=0024 00:33:51:303 (00000036) > [Render] Enumerating adapters:
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x40000080
+[guest-log] #2 tid=0024 00:33:51:303 (00000036) > [Render] 	Adapter 0:
+[guest-log] #3 tid=0024 00:33:51:303 (00000036) > [Monitor] 		Description             : Apple M5 GPU
+[guest-log] #4 tid=0024 00:33:51:303 (00000036) > [Monitor] 		Vendor                  : nVidia (10de)
+[guest-log] #5 tid=0024 00:33:51:303 (00000036) > [Monitor] 		Device                  : 2544
+[guest-log] #6 tid=0024 00:33:51:303 (00000036) > [Monitor] 		Sub system              : 0
+[guest-log] #12 tid=0024 00:33:51:303 (00000036) > [Render] Loading NVAPI...
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007031BCA110, feature level 0xb000, create)
+[guest-log] #21 tid=0024 [madeira-d3d12] D3D12CreateDevice(adapter=0000007031BCA110, feature level 0xb000, create)
+[jit-pool] image 0x71f2830000+0xc0000 (rsaenh.dll) → pool 0x1526a0000 used=0xa764000/0x27000000 tramp+0x4000
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\D3DCompiler_47.dll" 0x71f2420000+0x404000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[madeira-d3d12] D3D12CreateDevice(adapter=0000007031BCA110, feature level 0xb000, create)
+[madeira-d3d12] command queue: type 0
+[xp] ml1128 role W = thread 2273517 (win tid 00cc)
+[vmode] synthesized CURRENT = 904x680 @60Hz
+[vmode] synthesized CURRENT = 904x680 @60Hz
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\amd_fidelityfx_dx12.dll" 0x71f1dc0000+0x660000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+ml985: map_image_view size=0x46b6000 base=0x6ffff48a0000 info_base=0x180000000 map_addr=0x6ffff48a0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\libxess.dll" 0x71edd60000+0x46b6000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[xp] 16:33:51.464 +1.35 dt=323 cpu=647 (thr 410) P=519 E=129 run=749 pgw=-1.0 GHz P=4.23 E=2.92 Minst=10356 IPC=4.03 mJ=2767 pin=2 rdKB=0 fpMB=1573
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x400000c0
+[vkmt] tid=0024 CloseAdapter hAdapter=0x400000c0 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x40000100
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000100 -> 0
+[madeira-d3d12] command queue: type 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=90040000:01000000 -> 0 hAdapter=0x40000140
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000140 -> 0
+[madeira-d3d12] command queue: type 0
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\MarvelsSpiderManRemaster\\amd_fidelityfx_dx12.dll" 0x71ed700000+0x660000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module amd_fidelityfx_dx12.dll (amd_fidelityfx_dx12.dll-9cbb15541d94e19a): 71ED700000
+[vmode] synthesized CURRENT = 904x680 @60Hz
+[vmode] synthesized CURRENT = 904x680 @60Hz
+[guest-log] #26 tid=0024 00:33:51:541 (00000036) > [NxApp] Querying GPU Driver Info...
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=0000003c vis={56,116,848,563} surface=0x1037f09b0 rev=ml505 style=84880000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10036 class='GameNxApp' text="" rev=ml853
+[win-pos] #6 hwnd=0x1003e after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x1003e class='IME' text="" rev=ml853
+[win-name] #7 hwnd=0x1003e class='IME' text="Default IME" rev=ml853
+[jit-pool] image 0x71ed660000+0xa0000 (windows.gaming.input.dll) → pool 0x152764000 used=0xa808000/0x27000000 tramp+0x4000
+D 24 Load module windows.gaming.input.dll (windows.gaming.input.dll-3f9af7d1c9377778): 71ED660000
+[jit-pool] image 0x71ed5b0000+0xb0000 (dinput8.dll) → pool 0x152808000 used=0xa8bc000/0x27000000 tramp+0x4000
+D 24 Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71ED5B0000
+[jit-pool] image 0x71ed430000+0x180000 (comctl32.dll) → pool 0x1528bc000 used=0xaa40000/0x27000000 tramp+0x4000
+D 24 Load module COMCTL32.dll (comctl32.dll-8c564d137baf4ee2): 71ED430000
+E 6C [thr-term] rev=ml435 deinit #1 tid=0x6c
+00dc:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00dc status=00000001 caller=00000001486C2474
+E DC [thr-term] rev=ml435 deinit #13 tid=0xdc
+[jit-pool] image 0x71ed3a0000+0x90000 (xinput9_1_0.dll) → pool 0x152a40000 used=0xaad4000/0x27000000 tramp+0x4000
+D 24 Load module xinput9_1_0.dll (xinput9_1_0.dll-356a14f2ff866963): 71ED3A0000
+[jit-pool] image 0x71ed190000+0x90000 (xinput1_4.dll) → pool 0x152ad4000 used=0xab68000/0x27000000 tramp+0x4000
+D 24 Load module xinput1_4.dll (xinput1_4.dll-a6149d3778c50b7d): 71ED190000
+[blit] #1 rop=cc0020  SRC phys=0,0 790x445 vis={0,0,790,445}  DST phys=0,0 790x445 vis={0,0,790,445} rev=ml506
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[blit] #2 rop=cc0020  SRC phys=0,0 790x445 vis={0,0,790,445}  DST phys=0,0 790x445 vis={0,0,790,445} rev=ml506
+[launch-view] dismissed reason=surface logs=0
+[xp] 16:33:51.771 +1.65 dt=307 cpu=167 (thr 143) P=164 E=2 run=183 pgw=-1.0 GHz P=4.10 E=2.37 Minst=2879 IPC=4.24 mJ=862 pin=0 rdKB=0 fpMB=1778 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 16:33:52.023 +1.91 dt=251 cpu=22 (thr 22) P=2 E=20 run=29 pgw=-1.0 GHz P=1.78 E=1.80 Minst=59 IPC=1.48 mJ=5 pin=0 rdKB=0 fpMB=1773 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[footprint] rev=ml358 phys=1798 MB (peak 1798) internal=1746 MB compressed=0 MB external=238 MB reusable=4 MB (cycle=2)
+[xp] 16:33:52.282 +2.16 dt=259 cpu=124 (thr 124) P=85 E=39 run=127 pgw=-1.0 GHz P=3.20 E=1.81 Minst=902 IPC=2.64 mJ=166 pin=0 rdKB=0 fpMB=1798 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[swap] ml1077 stats: 1917 MB file-backed now (peak 1917), 13 extents, file used 1917 of 4096 MB, backs 13 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 1917 MB (peak 1917), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml1060 fast phys=1798 MB compressed=0 MB internal=1746 MB
+[xp] 16:33:52.607 +2.49 dt=325 cpu=44 (thr 44) P=38 E=7 run=51 pgw=-1.0 GHz P=3.82 E=1.20 Minst=412 IPC=2.72 mJ=136 pin=0 rdKB=0 fpMB=1798 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[srv-conn-done] dport=1213 event=|HUP err=61 fd=522 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[xp] 16:33:52.882 +2.77 dt=276 cpu=30 (thr 30) P=0 E=30 run=38 pgw=-1.0 GHz P=0.00 E=1.08 Minst=61 IPC=1.87 mJ=3 pin=0 rdKB=0 fpMB=1798 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[guest-log] #34 tid=0024 00:33:53:105 (00000036) > [NxApp] Querying GPU Driver Info...
+[win-name] #23 hwnd=0x20038 class='GameNxApp' text="Marvel's Spider-Man Remastered v4.630.0.0" rev=ml853
+[win-pos] #24 hwnd=0x20038 after=0x0 flags=80001967 vis={0,0,904,680} surface=0x11a93ec40 rev=ml505 style=96080000 visible=1 parent=0x10020
+[win-name] #24 hwnd=0x20038 class='GameNxApp' text="Marvel's Spider-Man Remastered v4.630.0.0" rev=ml853
+[win-pos] #25 hwnd=0x10052 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #25 hwnd=0x10052 class='Wine IME' text="" rev=ml853
+[win-pos] #26 hwnd=0x10052 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #26 hwnd=0x10052 class='Wine IME' text="" rev=ml853
+[win-pos] #27 hwnd=0x10052 after=0x20038 flags=0000181b vis={0,0,1,1} surface=0x1037f09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #27 hwnd=0x10052 class='Wine IME' text="" rev=ml853
+[win-pos] #28 hwnd=0x20038 after=0xfffffffffffffffe flags=80001807 vis={0,0,904,680} surface=0x11a93ec40 rev=ml505 style=96080000 visible=1 parent=0x10020
+[win-name] #28 hwnd=0x20038 class='GameNxApp' text="Marvel's Spider-Man Remastered v4.630.0.0" rev=ml853
+[win-pos] #29 hwnd=0x20038 after=0x0 flags=80001837 vis={0,0,904,680} surface=0x11a93ec40 rev=ml505 style=96080000 visible=1 parent=0x10020
+[win-name] #29 hwnd=0x20038 class='GameNxApp' text="Marvel's Spider-Man Remastered v4.630.0.0" rev=ml853
+[winios] game window hwnd=0x20038 presents through Metal; its GDI surface is not drawn
+[swap-diag] #1 layer 0x10de6bd00: drawable 800x600 format 80 -> 1808x1360 format 70, set on the iOS main thread (dispatch_sync) ...
+[xp] 16:33:53.154 +3.04 dt=271 cpu=82 (thr 39) P=46 E=36 run=91 pgw=-1.0 GHz P=2.52 E=1.80 Minst=504 IPC=2.78 mJ=67 pin=0 rdKB=0 fpMB=1830 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[madeira-d3d12] shader cache: 1 hits, 0 misses, 0 stored
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+[madeira-d3d12] ml1011 VS via the sm5/dxbc backend: cbTable=-1 argTable=-1 qwords=0 ranges=0, 2 input element(s)
+E 114 [thr-term] rev=ml435 deinit #14 tid=0x114
+[jumbo#3] +2560ms tid=170287000 wtid=0024 peb=0x71ffff0000 nrip=0x71fe444f00 grip=0x14808b050 size=0x40000000 (1024 MB) hint=0x0 -> 0x718fc20000 st=0x0 | granted=4092 MB ok=3 fail=0
+[swap] ml1077 backed 0x718fc20000+0x40000000 (file off 1917 MB): 2941 MB in 14 extents, peak 2941 MB, 0 refused
+[swap] ml1077 backed 0x702f260000+0x800000 (file off 2941 MB): 2949 MB in 15 extents, peak 2949 MB, 0 refused
+[swap] ml1077 backed 0x71cfc20000+0x810000 (file off 2949 MB): 2957 MB in 16 extents, peak 2957 MB, 0 refused
+[madeira-d3d12] command queue: type 3
+[xp] ml1128 role W = thread 2273552 (win tid 013c)
+[bigres] tid=0024 #4 size=0x32000000 (800 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x71ffff0000 total=2647 MB
+[swap] ml1077 backed 0x73ffff0000+0x32000000 (file off 2973 MB): 3773 MB in 19 extents, peak 3773 MB, 0 refused
+[swap] ml1077 backed 0x71d7c10000+0x8000000 (file off 3773 MB): 3901 MB in 20 extents, peak 3901 MB, 0 refused
+[madeira-d3d12] shader cache: 1000 hits, 0 misses, 0 stored
+[madeira-d3d12] shader cache: 2000 hits, 0 misses, 0 stored
+[footprint] rev=ml1060 fast phys=2036 MB compressed=0 MB internal=1984 MB
+[madeira-d3d12] shader cache: 3000 hits, 0 misses, 0 stored
+E 148 [thr-term] rev=ml435 deinit #15 tid=0x148
+[swap] ml1077 backed 0x71e13e0000+0x8000000 (file off 3901 MB): 4029 MB in 21 extents, peak 4029 MB, 0 refused
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x6000000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=412 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[steer] #1 size=0x5000000 reserved_total=2647MB armed=va-pressure -> above ceiling 0x7c88000000
+[madeira-d3d12] shader cache: 4000 hits, 0 misses, 0 stored
+[xp] ml1128 role E = thread 2273551 (win tid 0138)
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x4000000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=416 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=315MB: tex-RT=6MB/3 (peak 6) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=0MB/0 (peak 0) buf-shared=309MB/11 (peak 309)
+[guest-log] #58 tid=00cc [madeira-d3d12] ml1057 live GPU backing (estimated) total=315MB: tex-RT=6MB/3 (peak 6) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/0 (peak 0) tex-sampled=0MB/0 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=0MB/0 (peak 0) buf-shared=309MB/11 (peak 309)
+[guest-log] #59 tid=00cc [madeira-d3d12] ml1072 texture heaps: 0 (0 MB reserved, 0 MB live in them), 0 textures placed, 0 fallbacks, 0 blocks awaiting GPU
+[madeira-d3d12] ml1060 shader libraries created: 486, 6 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 1482 MB = standalone textures 3 (7 MB as Metal sizes them, 6 MB estimated) + texture heaps 0 MB + application heaps 1095 MB + buffers 309 MB + argument ring chunks 0 (0 MB) + the rest 70 MB; frees waiting for the GPU: 0
+[guest-log] #60 tid=00cc [madeira-d3d12] metal-gap: Metal 1482 MB = standalone textures 3 (7 MB as Metal sizes them, 6 MB estimated) + texture heaps 0 MB + application heaps 1095 MB + buffers 309 MB + argument ring chunks 0 (0 MB) + the rest 70 MB; frees waiting for the GPU: 0
+[madeira-d3d12] shader cache: 5000 hits, 0 misses, 0 stored
+[dns] madeira-bcd begin #2 "localhost" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #2 "localhost" = 0 after 0 ms (2 result(s))
+[xp] 16:33:53.467 +3.35 dt=313 cpu=742 (thr 380) P=543 E=199 run=841 pgw=-1.0 GHz P=4.14 E=2.92 Minst=7490 IPC=2.65 mJ=2346 pin=4378 rdKB=0 fpMB=3215 | pres 0/0 thr=0.0 ecl 1/22.7 sig 14/3.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 1/0.1
+[steer] #2 size=0xb714000 reserved_total=2647MB armed=va-pressure -> above ceiling 0x7c8d810000
+0024:err:module:load_dll [dll-missing] rev=ml336 #9 L"hkCompatFormats.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[mem-burst] rev=624 +1183 MB in 251 ms phys=3219 internal=2031 compressed=0 other=1188 | guest commits since the last sample: n=943, 740 MB, biggest 183 MB tid=0024 | swap backed=4080 MB | pool head=171 MB tail=176 MB
+[footprint] rev=ml1060 fast phys=3219 MB compressed=0 MB internal=2031 MB
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x800000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=425 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x800000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=431 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x800000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=431 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x800000 align=0x10000 bottom-up tries=64 skips=64 | seen=0x7027040000..0x73ffff0000 views=432 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x7200000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at emulator stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] FAILED window=0x100000000..0x73ffff0000 size=0x100000 align=0x10000 bottom-up tries=361 skips=285 | seen=0x100000000..0x73ffff0000 views=593 maxgap=0x6ea7000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] FAILED window=0x100000000..0x73ffff0000 size=0x100000 align=0x10000 bottom-up tries=361 skips=285 | seen=0x100000000..0x73ffff0000 views=593 maxgap=0x6ea7000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] FAILED window=0x100000000..0x73ffff0000 size=0x100000 align=0x10000 bottom-up tries=361 skips=285 | seen=0x100000000..0x73ffff0000 views=593 maxgap=0x6ea7000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0xc000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x40000 align=0x10000 top-down tries=64 skips=64 | seen=0x7027000000..0x73ffff0000 views=439 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x73fffb0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x7027000000..0x73ffff0000 size=0x40000 align=0x10000 top-down tries=64 skips=64 | seen=0x7027000000..0x73ffff0000 views=439 maxgap=0x1ffff0000 tailgap=0x0 stop=gaps-exhausted(top-down) | firstfail=0x73fffb0000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[va-scan] FAILED window=0x100000000..0x73ffff0000 size=0x100000 align=0x10000 bottom-up tries=357 skips=293 | seen=0x100000000..0x73ffff0000 views=598 maxgap=0x6ea7000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x100000000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x100000000..0x73ffff0000 for 0x100000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x100000000), largest free 0x72ffff0000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[thr-create] FAILED at kernel stack: status=0xc0000017 pthread=0(-) reserve=0x0 commit=0x1000 creator pid=0020 tid=0024 peb=0x71ffff0000; task threads 92
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=13847
+[unwind] term ml661 begin rip=71fe6f0690 rsp=703881fed8 window=[703881fed8..703901fed8) max=32
+[unwind] term ml661 #00 pc=71fe6f0690 rsp=703881fed8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=703881ff60 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml661 #01 pc=125261de9 rsp=703881fee0  Spider-Man.exe+0x3661de9
+[unwind] term ml661 #03 pc=125213890 rsp=703881ff70  Spider-Man.exe+0x3613890
+[unwind] term ml662   global @+0x69 -> 125402f80 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=1486cdb0c rsp=703881ffb0  <no module — STOP>
+[unwind] term ml661 end
+[guest-log] #61 tid=0024 File 'C:\Program Files\Epic Games\MarvelsSpiderManRemaster\/sl.common.dll' is signed by NVIDIA and the signature was verified.
+[guest-log] #62 tid=0024 File 'C:\Program Files\Epic Games\MarvelsSpiderManRemaster\/sl.dlss.dll' is signed by NVIDIA and the signature was verified.
+[guest-log] #63 tid=0024 File 'C:\Program Files\Epic Games\MarvelsSpiderManRemaster\/sl.dlss_g.dll' is signed by NVIDIA and the signature was verified.
+[guest-log] #64 tid=0024 File 'C:\Program Files\Epic Games\MarvelsSpiderManRemaster\/sl.pcl.dll' is signed by NVIDIA and the signature was verified.
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".............."
+[span-census] FREE #24 0x7c81810000+0x1000000 tid=0024 live=11 rev=ml435
+[span-census] FREE #25 0x7c84800000+0x1000000 tid=0024 live=10 rev=ml435
+[span-census] FREE #26 0x7c86000000+0x1000000 tid=0024 live=9 rev=ml435
+[span-census] FREE #27 0x7c9a010000+0x1000000 tid=0024 live=8 rev=ml435
+[span-census] FREE #28 0x7ca4410000+0x1000000 tid=0024 live=7 rev=ml435
+[jit-pool] tail FREE rx=0x16effc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=13872
+[unwind] term ml661 begin rip=14808216c rsp=703881fc20 window=[703881fc20..703901fc20) max=32
+[unwind] term ml661 #00 pc=14808216c rsp=703881fc20  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? 71fe3c0000  kernelbase.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[store-noalias] #1 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71faca0987 pc=0x148153980 addr=0x50 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1003a8000+0x3294000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x148153980 addr=0x50 x18=0x71fffa0000 type=1 lr=0x14815223c sp=0x71f9edfc40 x16=0x0 x17=0x11c900000
+[guest-code] rev=ml333 pool_rip=0x71faca0987 (PE 0x71faca0987) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xeaa28a x10=0x14833bdf8 x11=0x1484fe1f8 x0=0x7c004d00b0 x2=0x71faca0987 | teb=0x71fffa0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x71faca0987 (block entry 0x71faca0987) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x71fa540000+0x1440000 prot=r-- max=rwx | Wine vprot of the 4 KB pages of host page 0x71faca0000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: none | 32 bytes at rip, loaded image: 48 8b 4f 18 8b f0 48 8b 01 ff 50 18 8b 0d 5f b0 d9 00 33 d2 ff 15 f7 ea 99 00 48 8b 5f 30 48 63 | pool copy: - | image and pool copy not compared
+[fault-host] 148153880: 910ce108 b0001d49 5280004a f9402129 f940110b f940410c b900d3ea f90073f5
+[fault-host] 1481538a0: f940010a d0001001 913f0021 910183e2 52800040 eb0b018f f9007bea f940310a
+[fault-host] 1481538c0: f90093eb 9a8f33eb f9009bec f9008be9 f900a3eb f90083ea f9402108 f900abe8
+[fault-host] 1481538e0: 910343e8 a90623f6 940421e2 f0001d48 f941a108 b40003a8 f0001d48 910d0108
+[fault-host] 148153900: b0001d49 5280006a f9402529 f940110b f940410c b900d3ea f90073f5 f940010a
+[fault-host] 148153920: d0001001 913f0021 910183e2 52800040 eb0b018f f9007bea f940310a f90093eb
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0xcb090009f2c0002a  (x16=0x0 pe=0x71fe8a0000 rva_pc=0x53980)
+[mach_exc] insn_stream PC-12..PC+8: f9400688 f9410500 f9400008 [f940290b] 90001008 f9401508 f9400108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffa0000 TEB=0x71fffa0000 TEB[0x58]=0x7027960990 *(gs_cached+0x58)=0x7027960990
+[x86_live] RAX=0x0 RCX=0x7c004d00b0 RDX=0x71faca0987 RBX=0x1484fe000 RSP=0x703322ff20 RBP=0x703322ffd0 RSI=0x7c0ec01140 RDI=0x7c004f0080
+[x86_live]  R8=0x71faca0987  R9=0x0 R10=0x148151e70 R11=0x20 R12=0x71faca0987 R13=0x7c0ec01000 R14=0x7c0f401000 R15=0x0
+[x86_live] State.RIP=0x71faca0987 callret_sp=0x7c0f401000
+[store-noalias] #2 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71faca0987 pc=0x148153980 addr=0x50 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1003a8000+0x3294000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x148153980 addr=0x50 x18=0x71fffa0000 type=1 lr=0x14815223c sp=0x71f9edfc40 x16=0x0 x17=0x11c900000
+[guest-code] rev=ml333 pool_rip=0x71faca0987 (PE 0x71faca0987) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xeaa28a x10=0x14833bdf8 x11=0x1484fe1f8 x0=0x7c004d00b0 x2=0x71faca0987 | teb=0x71fffa0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[fault-host] 1481538e0: 910343e8 a90623f6 940421e2 f0001d48 f941a108 b40003a8 f0001d48 910d0108
+[fault-host] 148153900: b0001d49 5280006a f9402529 f940110b f940410c b900d3ea f90073f5 f940010a
+[fault-host] 148153920: d0001001 913f0021 910183e2 52800040 eb0b018f f9007bea f940310a f90093eb
+[fault-host] 148153940: 9a8f33eb f9009bec f9008be9 f900a3eb f90083ea f9402108 f900abe8 910343e8
+[fault-host] 148153960: a90623f6 940421c3 f94023f4 90000f4a 9137e14a f9400688 f9410500 f9400008
+[fault-host] 148153980: f940290b 90001008 f9401508 f9400108 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0xcb090009f2c0002a  (x16=0x0 pe=0x71fe8a0000 rva_pc=0x53980)
+[mach_exc] insn_stream PC-12..PC+8: f9400688 f9410500 f9400008 [f940290b] 90001008 f9401508 f9400108
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffa0000 TEB=0x71fffa0000 TEB[0x58]=0x7027960990 *(gs_cached+0x58)=0x7027960990
+[x86_live] RAX=0x0 RCX=0x7c004d00b0 RDX=0x71faca0987 RBX=0x1484fe000 RSP=0x703322ff20 RBP=0x703322ffd0 RSI=0x7c0ec01140 RDI=0x7c004f0080
+[x86_live]  R8=0x71faca0987  R9=0x0 R10=0x148151e70 R11=0x20 R12=0x71faca0987 R13=0x7c0ec01000 R14=0x7c0f401000 R15=0x0
+[x86_live] State.RIP=0x71faca0987 callret_sp=0x7c0f401000
+0034:err:seh:segv_handler SEGV #1: pc=0x148153980 addr=0x50 uctx_x18=0x71fffa0000 disp=0 mach_exc=21935
+0034:err:seh:segv_handler SEGV at pc=0x148153980 addr=0x50 esr=0x92000006 TPIDR_EL0=0x1007 (informational only — TEB is tsd275 below)
+0034:err:seh:segv_handler   x0=0x7c004d00b0 x1=0x71faca0987 x2=0x71faca0987 x3=0x0
+0034:err:seh:segv_handler   x8=0x0 x9=0xeaa28a x10=0x14833bdf8 x16=0x0 x17=0x11c900000 x18=0x71fffa0000 x19=0x71faca0987 x20=0x7c0ec01000
+0034:err:seh:segv_handler   fp=0x703322ffd0 lr=0x14815223c sp=0x71f9edfc40
+0034:err:seh:segv_handler   [teb-tsd] base=0x1705e00e0 offset=0x910 raw=0x71fffa0000 teb_key_val=0x71fffa0000
+0034:err:seh:segv_handler   [guest-state] x28=0x7c0ec01140 rip=0x71faca0987
+0034:err:seh:segv_handler   [guest-exact] ml885 block=0x16408b450 unresolved: hostPC outside block
+0034:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x14825af68 rdx=0x0 rbx=0x4e
+0034:err:seh:segv_handler   [guest-state]   rsp=0x703322ff20 rbp=0x703322ffd0 rsi=0x0 rdi=0x7031a6d750
+0034:err:seh:segv_handler   [guest-state]   r8 =0x0 r9 =0x0 r10=0x11c8ffb00 r11=0x20
+0034:err:seh:segv_handler   [guest-state]   r12=0xfffd r13=0x0 r14=0x7027033b80 r15=0x7031a6d750
+0034:err:seh:segv_handler   [guest-state] plausible-ptr gregs=7/16 (low => uninitialised frame, high => only rsp clobbered)
+0034:err:seh:segv_handler   [fex-fault] pc=libarm64ecfex.dll+0x14980 lr=libarm64ecfex.dll+0x1323c fault-addr=0x50 sp=0x71f9edfc40 fp=0x703322ffd0 teb=0x71fffa0000 rev=r624
+0034:err:seh:segv_handler   [fex-fault]   sp+0x120: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+0034:err:seh:segv_handler   [fex-fault]   sp+0x140: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+0034:err:seh:segv_handler   [fex-fault]   sp+0x160: 0000000000000000 0000000000000000 0000000000000008 0000000000000008
+0034:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x703322ff20  gregs[RSP]=0x703322ff20  NZCV/flags[24]=0x20000000  callret_sp=0x7c0f401000 base=0x7c0f001000  x28=0x7c0ec01140
+0034:err:seh:segv_handler   insn_stream PC-12..PC+8: f9400688 f9410500 f9400008 [f940290b] 90001008 f9401508 f9400108
+0034:err:seh:segv_handler setup_exception for SEGV at pc=0x148153980 addr=0x50 (virtual_handle_fault failed)
+[fault-rgn] addr=0x50 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=0034 code=c0000005 flags=0 addr=0x71fe8b4980 pc=148153980 nparams=2 p0=0 p1=50
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x71fe8b4980 RX from -32, 64 of 64 bytes: f6 23 06 a9 c3 21 04 94 f4 23 40 f9 4a 0f 00 90 4a e1 37 91 88 06 40 f9 00 05 41 f9 08 00 40 f9 0b 29 40 f9 08 10 00 90 08 15 40 f9 08 01 40 f9 00 01 3f d6 60 01 3f d6 e8 03 12 aa 08 03 00 b4 
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x71fe8b4980 (not an anon-JIT page)
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #3 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71fe8b4980 RX from -32, 64 of 64 bytes: f6 23 06 a9 c3 21 04 94 f4 23 40 f9 4a 0f 00 90 4a e1 37 91 88 06 40 f9 00 05 41 f9 08 00 40 f9 0b 29 40 f9 08 10 00 90 08 15 40 f9 08 01 40 f9 00 01 3f d6 60 01 3f d6 e8 03 12 aa 08 03 00 b4 
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71fe8b4980 (not an anon-JIT page)
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #4 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x71fe8b4980 RX from -32, 64 of 64 bytes: f6 23 06 a9 c3 21 04 94 f4 23 40 f9 4a 0f 00 90 4a e1 37 91 88 06 40 f9 00 05 41 f9 08 00 40 f9 0b 29 40 f9 08 10 00 90 08 15 40 f9 08 01 40 f9 00 01 3f d6 60 01 3f d6 e8 03 12 aa 08 03 00 b4 
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x71fe8b4980 (not an anon-JIT page)
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #5 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x71fe8b4980 RX from -32, 64 of 64 bytes: f6 23 06 a9 c3 21 04 94 f4 23 40 f9 4a 0f 00 90 4a e1 37 91 88 06 40 f9 00 05 41 f9 08 00 40 f9 0b 29 40 f9 08 10 00 90 08 15 40 f9 08 01 40 f9 00 01 3f d6 60 01 3f d6 e8 03 12 aa 08 03 00 b4 
+0034:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x71fe8b4980 (not an anon-JIT page)
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #6 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #7 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[store-noalias] #8 rev=ml348 addr=0x50 insn=0xf940290b pc=0x148153980 NO pool/anon alias | region 0x1003a8000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #19 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #21 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #22 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #23 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #24 p0=READ p1=0x50 hostpc=0x148153980 hinsn=0xf940290b rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[redeliv] 256 identical redeliveries pc=0x148153980 addr=0x50 — storm forming rev=ml461
+[xp] 16:33:53.781 +3.66 dt=315 cpu=315 (thr 37) P=314 E=1 run=335 pgw=-1.0 GHz P=4.12 E=2.32 Minst=3819 IPC=2.95 mJ=1408 pin=2328 rdKB=0 fpMB=3402 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[footprint] rev=ml1060 fast phys=3402 MB compressed=0 MB internal=2214 MB
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+D 34 Exception: Code: C0000005 Address: 71FE8B4980 AV READ of 50
+[redeliv] 2000 identical redeliveries pc=0x148153980 addr=0x50 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] terminating process rev=ml465

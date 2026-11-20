@@ -218,6 +218,7 @@ check('the standard list does not have it', NAME not in json.dumps(standard))
 # Round 602 (ajan41): seven lists (Direct3D 8 and 64-bit Direct3D 9 games) were added between this rule and "standard".
 # The Adventures of Elliot (upstream port, build 602) stands last before "standard".
 _r620 = ['forza-horizon-4', 'tiny-tinas-wonderlands', 'far-cry-3', 'barotrauma', 'slay-the-spire-2', 'resident-evil-3', 'marvel-cosmic-invasion',
+         'vampire-crawlers', 'fumes',   # build 666 (issue #25), next to Marvel Cosmic Invasion's WGI row
          'haste', 'big-walk', 'ball-x-pit', 'just-volleyball-demo', 'farming-simulator-22-epic', 'max-payne-3',
          'f1-2020', 'need-for-speed-the-run',   # round 620's new lists (the last two after the Discord reports)
          'bloons-td-6']                         # round 623 (Bloons TD 6, ajan58)
@@ -243,8 +244,19 @@ check('the rule stands before "standard" (the last rule), after it only the roun
          'borderlands-2', 'the-escapists-2', 'dark-souls-remastered',   # round 632 (the Steam CEG fix; D1.8, D1.9, D1.5)
          'the-last-of-us-part-1',   # round 634 (The Last of Us Part I)
          'slime-rancher-2',   # list v44 (2026-11-08, Slime Rancher 2)
-         'far-cry-4']   # build 652 (Far Cry 4)
+         'far-cry-4',   # build 652 (Far Cry 4)
+         'trackmania']   # build 666 (pull request #55)
       + ['dying-light-the-beast', 'eslabong', 'find-the-needle-demo', 'fifa-23', 'grand-theft-auto-vice-city', 'la-noire-steam', 'call-of-duty-world-at-war', 'dishonored', 'buckshot-roulette', 'arctic-drive-demo', 'brotato', 'quake-ii', 'resonance', 'replaced', 'need-for-speed-shift', 'bulletstorm', 'doom-64', 'deponia-the-complete-journey', 'sc-jogos-barro-gt', 'angry-birds', 'into-the-breach', 'freshwomen-season-1', 'gp-bikes', 'polybius', 'noita', 'battlefield-1942', 'mafia-classic', 'killer-instinct', 'the-witcher-2', 'the-elder-scrolls-iv-oblivion', 'astro-tripper', 'baba-is-you', 'fear-and-hunger-2-termina', 'hearts-of-iron-iv', 'inscryption', 'half-sword-demo', 'sonic-generations', 'yakuza-kiwami-3-dark-ties', 'call-of-duty-infinite-warfare', 'call-of-duty-modern-warfare-4', 'bluefield', 'assassins-creed-brotherhood', 'metaphor-refantazio', 'prince-of-persia-the-lost-crown', 'football-manager-other', 'mirrors-edge', 'need-for-speed-most-wanted-2012', 'crash-bandicoot-n-sane-trilogy', 'dark-deception-chapter-1', 'far-cry-3-folder', 'far-cry-4-folder', 'kof-xiv-steam', 'dmc-devil-may-cry', 'football-manager-2020', 'momo-game', 'watch-dogs', 'assassins-creed-black-flag-resynced', 'dragon-ball-fighterz'] + ['firewatch', 'final-fantasy-resonance', 'bugsnax', 'fernbus-simulator', 'unreal-tournament-goty', 'state-of-decay-year-one', 'wreckfest', 'anodyne', 'day-of-the-tentacle-remastered', 'hitman-2016', 'metal-gear-solid-2-mc', 'demons-tilt', 'operator', 'planet-zoo-2', 'planet-coaster-2', 'onimusha-way-of-the-sword', 'meccha-chameleon', 'kingdom-come-deliverance-ii', 'lego-city-undercover', 'persona-3-reload', 'skate2-pc']   # night round 2026-11-11: the new rows, in the list's order; the upstream port of 2026-11-14 (Persona 3 Reload); round 663 (item 7c: skate2-pc, DXC)
+      + ['final-fantasy-xiii', 'one-more-lawn', 'enshrouded', 'the-sims-legacy-collection', 'baldurs-gate-ii-enhanced-edition', 'days-gone',
+         'darwins-paradox', 'game-of-thrones-kingsroad', 'nora-to-koujo-to-noraneko-heart', 'the-coffin-of-andy-and-leyley', 'brawlhalla',
+         'ground-branch', 'x-plane-12']   # round 668: the new rows
+      + ['the-plucky-squire', 'hitman-world-of-assassination', 'alice-madness-returns', 'dead-rising-2', 'catmailco',
+         'legacy-of-kain-soul-reaver-1-2-remastered', 'sleeping-dogs-2012', 'jurassic-world-evolution',
+         'digimon-story-time-stranger', 'dumpster-gang', 'outrun-2006-coast-2-coast', 'one-piece-pirate-warriors-3']   # round 669: the new rows
+      + ['disney-speedstorm', 'devil-may-cry-hd-collection', 'persona-5-royal', 'the-phantom', 'car-for-sale-simulator-2023', 'tears-of-metal',
+         'turbodismount2', 'mega-man-battle-network-legacy-collection-vol-1', 'far-cry-primal', 'demon-slayer-hinokami-chronicles-2',
+         'slime-rancher', 'snapshot', 'the-long-dark', 'windbound-epic', 'frostpunk-epic', 'assassins-creed-mirage', 'thief-deadly-shadows',
+         'nunholy']   # round 677: the new rows
       + ['standard'])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)

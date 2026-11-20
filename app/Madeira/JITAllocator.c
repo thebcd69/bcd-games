@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+ * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 SirDank: code taken from https://github.com/willfaust/Madeira (pull request #362)
  * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 #include "JITAllocator.h"
@@ -715,6 +717,109 @@ void *jit26_prepare_region(void *addr, size_t len) {
     );
     return x0;
 }
+
+/* tagged-pool-region:begin
+ * A normally charged named object, mapped without touching or preparing its pages. This path never
+ * transfers ownership or requests a footprint exemption. Caller must have the
+ * debugger attached and must abort startup if cleanup_error is nonzero. */
+static bool jit_tagged_pool_view_valid(vm_address_t rx, size_t size, vm_prot_t required, vm_prot_t forbidden, vm_prot_t maximum)
+{
+    vm_address_t cursor = rx;
+    const vm_address_t end = rx + size;
+    while (cursor < end) {
+        vm_address_t base = cursor;
+        vm_size_t span = 0;
+        natural_t depth = 0;
+        vm_region_submap_info_data_64_t info = {0};
+        mach_msg_type_number_t count = VM_REGION_SUBMAP_INFO_COUNT_64;
+        kern_return_t kr = vm_region_recurse_64(mach_task_self(), &base, &span, &depth,
+                                               (vm_region_recurse_info_t)&info, &count);
+        if (kr != KERN_SUCCESS || count < VM_REGION_SUBMAP_INFO_COUNT_64 || info.is_submap ||
+            base > cursor || cursor - base >= span ||
+            (info.protection & required) != required ||
+            (info.protection & forbidden) || (info.max_protection & maximum) != maximum)
+            return false;
+        vm_size_t available = span - (cursor - base);
+        cursor += available < end - cursor ? available : end - cursor;
+    }
+    return true;
+}
+
+void *jit_tagged_region(size_t size, int *cleanup_error)
+{
+    const uintptr_t ceiling = UINT64_C(0x1000000000);
+    const mach_port_t task = mach_task_self();
+    mach_port_t entry = MACH_PORT_NULL;
+    memory_object_size_t entry_size = size;
+    vm_address_t rx = 0;
+    bool own_rx = false, own_entry = false, ok = false;
+    kern_return_t kr;
+    int saved_errno = errno;
+    if (!cleanup_error) goto done;
+    *cleanup_error = 0;
+    /* No rounding: selectors and aliases must use exactly the requested size. */
+    if (vm_page_size != JIT_PAGE_SIZE || !size || (size & (JIT_PAGE_SIZE - 1)) || size > ceiling)
+        goto done;
+    kr = mach_make_memory_entry_64(task, &entry_size, 0,
+            MAP_MEM_NAMED_CREATE | MAP_MEM_LEDGER_TAGGED | VM_PROT_ALL, &entry, MACH_PORT_NULL);
+    if (kr != KERN_SUCCESS) goto out;
+    own_entry = entry != MACH_PORT_NULL;
+    if (!own_entry || entry_size != size) goto out;
+    /* RX first: a temporary RW mapping would steal a first-fit target hole. */
+    kr = vm_map(task, &rx, size, 0, VM_FLAGS_ANYWHERE, entry, 0, FALSE,
+                VM_PROT_READ | VM_PROT_EXECUTE, VM_PROT_ALL, VM_INHERIT_NONE);
+    if (kr != KERN_SUCCESS) goto out;
+    own_rx = true;
+    /* StikJIT1.9.0 encodes nine address hex digits. Check the complete interval. */
+    if (!rx || (rx & (JIT_PAGE_SIZE - 1)) || rx >= ceiling || size > ceiling - rx ||
+        !jit_tagged_pool_view_valid(rx, size, VM_PROT_READ | VM_PROT_EXECUTE, VM_PROT_WRITE, VM_PROT_ALL)) goto out;
+    ok = true;
+out:
+    /* Mappings retain the object and its ordinary ledger ownership. Do not hold
+     * a send right for rejected regions until the end of all placement retries. */
+    if (own_entry && (kr = mach_port_deallocate(task, entry)) != KERN_SUCCESS) {
+        *cleanup_error = kr;
+        ok = false;
+        jit_log("[tagged-pool] entry release failed kr=%d; startup must abort", kr);
+    }
+    if (!ok && own_rx && (kr = vm_deallocate(task, rx, size)) != KERN_SUCCESS) {
+        if (!*cleanup_error) *cleanup_error = kr;
+        jit_log("[tagged-pool] RX cleanup failed base=%p bytes=%zu kr=%d; startup must abort", (void *)rx, size, kr);
+    }
+    jit_log("[tagged-pool] raw-created=%d base=%p bytes=%zu cleanup-error=%d charged=normal", ok, (void *)rx, size, *cleanup_error);
+done:
+    errno = saved_errno;
+    return ok ? (void *)rx : NULL;
+}
+/* Borrowed mappings: the caller owns both and must abort this launch on failure.
+ * Never releases memory or falls back; only the final accepted topology calls it. */
+bool jit_tagged_prepare_owned_region(void *rx_ptr, void *rw_ptr, size_t size)
+{
+    const uintptr_t ceiling = UINT64_C(0x1000000000);
+    const uintptr_t rx = (uintptr_t)rx_ptr, rw = (uintptr_t)rw_ptr;
+    int saved_errno = errno;
+    bool ok = false;
+    if (vm_page_size != JIT_PAGE_SIZE || !size || (size & (JIT_PAGE_SIZE - 1)) ||
+        !rx || !rw || (rx & (JIT_PAGE_SIZE - 1)) || (rw & (JIT_PAGE_SIZE - 1)) ||
+        rx >= ceiling || size > ceiling - rx || rw > UINTPTR_MAX - size ||
+        (rw < rx + size && rx < rw + size)) goto out;
+    if (!jit_tagged_pool_view_valid(rx, size, VM_PROT_READ | VM_PROT_EXECUTE, VM_PROT_WRITE, VM_PROT_ALL) ||
+        !jit_tagged_pool_view_valid(rw, size, VM_PROT_READ | VM_PROT_WRITE, VM_PROT_EXECUTE, VM_PROT_READ | VM_PROT_WRITE)) goto out;
+    if (jit26_prepare_region(rx_ptr, size) != rx_ptr) goto out;
+    if (!jit_tagged_pool_view_valid(rx, size, VM_PROT_READ | VM_PROT_EXECUTE, VM_PROT_WRITE, VM_PROT_ALL) ||
+        !jit_tagged_pool_view_valid(rw, size, VM_PROT_READ | VM_PROT_WRITE, VM_PROT_EXECUTE, VM_PROT_READ | VM_PROT_WRITE)) goto out;
+    /* Helper success alone is insufficient: require all fresh markers in BOTH
+     * projections before any generated code or coherence-test write exists. */
+    for (size_t offset = 0; offset < size; offset += JIT_PAGE_SIZE)
+        if (*(const volatile unsigned char *)(rx + offset) != 0x69 ||
+            *(const volatile unsigned char *)(rw + offset) != 0x69) goto out;
+    ok = true;
+out:
+    jit_log("[tagged-pool] prepared=%d RX=%p RW=%p bytes=%zu charged=normal", ok, rx_ptr, rw_ptr, size);
+    errno = saved_errno;
+    return ok;
+}
+/* tagged-pool-region:end */
 
 __attribute__((noinline, optnone))
 void jit26_detach(void) {

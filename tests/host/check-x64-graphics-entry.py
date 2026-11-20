@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Check opt-in graphics wrappers and the linked ARM64EC entry-point ABI.
 
 Without arguments, exercise the production switch and argument forwarding on
@@ -20,6 +22,7 @@ D3D12_METHODS = ('ExecuteCommandLists', 'GetTimestampFrequency', 'GetClockCalibr
 FACTORY_METHODS = {8: 'MakeWindowAssociation', 10: 'CreateSwapChain',
                    15: 'CreateSwapChainForHwnd', 16: 'CreateSwapChainForCoreWindow',
                    24: 'CreateSwapChainForComposition'}
+SWAPCHAIN_METHODS = {8: 'Present', 13: 'ResizeBuffers', 22: 'Present1', 39: 'ResizeBuffers1'}
 
 
 class PE:
@@ -81,10 +84,11 @@ class PE:
     def kind(self, rva):
         return next((kind for lo, size, kind in self.ranges if lo <= rva < lo + size), None)
 
-    def entry(self, method, factory=False):
+    def entry(self, method, factory=False, owner=None):
+        owner = owner or ('MTLDXGIHookFactory' if factory else None)
         names = [n for n in self.symbols if n.startswith('EXP+#') and
-                 (('MTLDXGIHookFactory' in n and str(len(method)) + method in n)
-                  if factory else n == 'EXP+#mad_x64_' + method)]
+                 ((owner in n and str(len(method)) + method in n)
+                  if owner else n == 'EXP+#mad_x64_' + method)]
         assert len(names) == 1, f'{method}: one generated x64 entry required, found {len(names)}'
         name = names[0]
         rva = self.symbols[name]
@@ -121,6 +125,32 @@ class PE:
                 assert self.kind(rva) == 1 and any(v == rva and cls + destructor in n for n, v in self.symbols.items())
             assert self.u64(self.offset(table - 16, 8)) == 0, 'single-interface vtable required'
             print(f'PASS {cls}: COM slots {", ".join(map(str, entries))} preserve the selected ABI')
+
+    def swapchain_slots(self):
+        for flavor in (0, 1):
+            owner = f'MTLD3D11HookSwapChainILb{flavor}EE'
+            entries = {slot: self.entry(method, owner=owner) for slot, method in SWAPCHAIN_METHODS.items()}
+            tables = {}
+            for cls, patchable in [('MTLD3D11HookSwapChain', True), ('MTLD3D11SwapChain', False)]:
+                ident = f'{cls}ILb{flavor}EE'
+                names = [n for n in self.symbols if n == f'_ZTVN4dxmt{len(cls)}{ident}E']
+                assert len(names) == 1, f'{ident}: vtable missing or ambiguous'
+                table = self.symbols[names[0]] + 16
+                assert self.u64(self.offset(table - 16, 8)) == 0, 'single-interface vtable required'
+                values = [self.u64(self.offset(table + slot * 8, 8)) - self.base for slot in range(43)]
+                for slot, rva in enumerate(values):
+                    if patchable and slot in entries:
+                        assert rva == entries[slot], f'{ident}: wrong entry in COM slot {slot}'
+                    else:
+                        assert self.kind(rva) == 1, f'{ident}: slot {slot} must remain native'
+                for slot, destructor in [(41, 'D2Ev'), (42, 'D0Ev')]:
+                    assert any(v == values[slot] and ident + destructor in n for n, v in self.symbols.items()), \
+                        f'{ident}: destructor slot {slot} lost'
+                tables[patchable] = values
+            for slot in range(41):
+                if slot not in entries:
+                    assert tables[True][slot] == tables[False][slot], f'{owner}: unrelated COM slot {slot} changed'
+            print(f'PASS D3D11 swapchain MetalFX={flavor}: 41 COM methods, two destructors, four typed x64 entries')
 
 
 def host_checks():
@@ -436,6 +466,7 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser()
     args.add_argument('--factory')
     args.add_argument('--d3d12')
+    args.add_argument('--d3d11')
     ns = args.parse_args()
     host_checks()
     if ns.factory:
@@ -445,3 +476,5 @@ if __name__ == '__main__':
         pe = PE(ns.d3d12)
         for name in D3D12_METHODS:
             pe.entry(name)
+    if ns.d3d11:
+        PE(ns.d3d11).swapchain_slots()

@@ -47,11 +47,23 @@ def check(cond, what):
         failures.append(what)
 
 
+# build 666 (pull request #55): CI applies tools/patch-wine-overlapped-system-apc.py to the same file after this patch (its helper before
+# NtYieldExecution's comment block and one call at the top of its body); the stock text is the file with both taken out.
+_ovl_spec = importlib.util.spec_from_file_location('overlapped', root / 'tools/patch-wine-overlapped-system-apc.py')
+_ovl = importlib.util.module_from_spec(_ovl_spec)
+_ovl_spec.loader.exec_module(_ovl)
+_OVL_CALL = 'NTSTATUS WINAPI NtYieldExecution(void)\n{\n#ifdef WINE_IOS\n    ios_yield_system_apcs();\n#endif'
+
+
+def unpatch_overlapped(text):
+    return text.replace(_ovl.NATIVE, '').replace(_OVL_CALL, 'NTSTATUS WINAPI NtYieldExecution(void)\n{')
+
+
 def unpatch(text):
     return text.replace(ym.HELPER + ym.HEAD, ym.HEAD).replace(ym.YIELD_NEW, ym.YIELD_OLD)
 
 
-current = src_path.read_text()
+current = unpatch_overlapped(src_path.read_text())
 stock = unpatch(current) if ym.MARKER in current else current
 patched = ym.patch(stock)
 check(patched != stock and patched.count(ym.MARKER) >= 1, 'the patch applies to the submodule\'s unix sync.c')

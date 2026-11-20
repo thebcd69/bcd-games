@@ -9,16 +9,20 @@ release. In the new arena a decommit over them was refused whole
 ([alias-tomb]), and the first store found read-only pages and no alias
 ([store-noalias] ... prot=1 max=3).
 
-In build/ntdll-unix/virtual_ios.c, with the switch on:
-  - delete_view drops the alias records inside the view (ios_alias_release_view);
-  - decommit_pages goes part by part (ios_decommit_alias_split): an alias's
-    part is zeroed through its pool slot only as far as the alias reaches, and
-    the parts between get the plain branch's fresh zero pages.
+In build/ntdll-unix/virtual_ios.c:
+  - the release half, on unless MADEIRA_ALIAS_RELEASE=0 (from build 669; owner
+    2026-11-17, round 668 N111): delete_view drops the alias records inside the
+    view (ios_alias_release_view);
+  - the decommit half, MADEIRA_ALIAS_RELEASE=1 only: decommit_pages goes part by
+    part (ios_decommit_alias_split): an alias's part is zeroed through its pool
+    slot only as far as the alias reaches, and the parts between get the plain
+    branch's fresh zero pages.
 
 Checks:
   - the four functions, cut out of virtual_ios.c and compiled on the host over
     real memory with 16 KB pages, as on iOS:
-      - the switch: unset, '', '0' or 'yes' is off; '1' is on;
+      - the switch: unset, '', 'yes' or '10' give the release half only, '1'
+        both halves, '0' neither; one [alias-mode] line says which;
       - split: each alias zeroed in its own pool slot only (never past it, the
         slot next to it untouched), plain parts zeroed with partial pages at
         the range's own ends, a slot handed out again left alone and named, a
@@ -29,7 +33,7 @@ Checks:
         pool lock released, and not taken at all for a view with no alias;
   - delete_view calls it gated, before unmap_area, never for a system view;
   - decommit_pages tries it first, gated; the old alias, plain and sub-page
-    branches are unchanged, so the switch off is the old code;
+    branches are unchanged, so '0' is the old code;
   - CI runs this check; the settings catalog documents the switch.
 The host compile is skipped when no C compiler is found.
 """
@@ -56,7 +60,9 @@ def function(source, signature):
     return source[start:source.index('\n}\n', start) + 3] + '\n'
 
 
-enabled = function(src, 'static int ios_alias_release_enabled(void)')
+enabled = (function(src, 'static int ios_alias_release_mode(void)') +
+           function(src, 'static int ios_alias_release_enabled(void)') +
+           function(src, 'static int ios_alias_release_view_enabled(void)'))
 release = function(src, 'static void ios_alias_release_view( const void *base, size_t size )')
 foreign = function(src, 'static int ios_pool_foreign_overlap( uintptr_t rw_start, size_t size )')
 split = function(src, 'static const char *ios_decommit_alias_split( char *base, size_t size,')
@@ -310,7 +316,9 @@ int main( int argc, char **argv )
 {
     if (argc > 1 && !strcmp( argv[1], "switch" ))
     {
-        printf( "%d\n", ios_alias_release_enabled() );
+        int view = ios_alias_release_view_enabled(), split = ios_alias_release_enabled();
+        printf( "%d %d\n", view, split );
+        if (n_logs == 1) fputs( last_log, stderr );   /* the mode is read once: one [alias-mode] line */
         return 0;
     }
     guest = mmap( NULL, GSIZE + PAGE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0 );
@@ -339,21 +347,27 @@ int main( int argc, char **argv )
             print(r.stdout.strip())
             check("split: each alias zeroed in its own slot only, plain parts zeroed, a slot handed out "
                   "again left alone; release: the view's aliases dropped, the others kept", r.returncode == 0)
-            seen = {}
-            for value in (None, "", "0", "yes", "1"):
+            seen, lines = {}, {}
+            for value in (None, "", "0", "yes", "1", "10"):
                 env = dict(os.environ)
                 env.pop("MADEIRA_ALIAS_RELEASE", None)
                 if value is not None:
                     env["MADEIRA_ALIAS_RELEASE"] = value
                 s = subprocess.run([exe, "switch"], capture_output=True, text=True, env=env)
                 seen[value] = s.stdout.strip()
-            check("the switch: unset, '', '0' and 'yes' are off; '1' is on",
-                  seen == {None: "0", "": "0", "0": "0", "yes": "0", "1": "1"})
+                lines[value] = [l for l in s.stderr.splitlines() if l.startswith("[alias-mode]")]
+            check("the switch: unset, '', 'yes' and '10' give the release half only; '1' both halves; '0' neither",
+                  seen == {None: "1 0", "": "1 0", "0": "0 0", "yes": "1 0", "1": "1 1", "10": "1 0"})
+            check("one [alias-mode] line per process names the halves",
+                  all(len(v) == 1 for v in lines.values()) and
+                  lines[None][0].startswith("[alias-mode] madeira-bcd release=1 decommit-split=0 (MADEIRA_ALIAS_RELEASE=unset") and
+                  lines["0"][0].startswith("[alias-mode] madeira-bcd release=0 decommit-split=0") and
+                  lines["1"][0].startswith("[alias-mode] madeira-bcd release=1 decommit-split=1"))
         else:
             print(b.stderr[-3000:])
 
 delete = function(src, 'static void delete_view( struct file_view *view )')
-gate = ('    if (!(view->protect & VPROT_SYSTEM) && ios_alias_release_enabled())\n'
+gate = ('    if (!(view->protect & VPROT_SYSTEM) && ios_alias_release_view_enabled())\n'
         '        ios_alias_release_view( view->base, view->size );')
 check("delete_view drops the aliases, gated, never for a system view, before unmap_area",
       delete.count(gate) == 1 and delete.index(gate) < delete.index('unmap_area( view->base, view->size );'))
@@ -385,9 +399,12 @@ check("it logs [alias-release] at most 32 times per kind, then every 1024th",
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "run: python3 tests/host/check-alias-release.py" in wf)
 cat = (R / "app/Madeira/ConfigCatalog.generated.swift").read_text()
-check("the catalog documents env.MADEIRA_ALIAS_RELEASE (default 0)",
+check("the catalog documents env.MADEIRA_ALIAS_RELEASE (unset: released views; 1: also decommits; 0: off)",
       'ConfigOption(key: "env.MADEIRA_ALIAS_RELEASE", title: "Drop a released arena\'s code copies", '
-      'kind: .bool, defaultValue: "0"' in cat)
+      'kind: .choice, defaultValue: ""' in cat)
+check("the release half is the only part on by default; the decommit half stays behind 1",
+      src.count('ios_alias_release_view_enabled()') == 1 and src.count('ios_alias_release_enabled()') == 1 and
+      'return ios_alias_release_mode() == 1;' in src and 'return ios_alias_release_mode() != 0;' in src)
 
 print("PASS: alias release" if ok else "FAILED: alias release")
 sys.exit(0 if ok else 1)

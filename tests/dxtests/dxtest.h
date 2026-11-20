@@ -3,7 +3,8 @@
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
 //
 // dxtest.h: what BCD's Direct3D 9, 10 and 11 test programs share (d3d9_cube.c, d3d10_cube.c,
-// d3d11_cube.c; the Direct3D 12 one is madeira-d3d12/tests/windows/cube_window.c).
+// d3d11_cube.c; the Direct3D 12 one is madeira-d3d12/tests/windows/cube_window.c), and the OpenGL
+// and Vulkan tests too (gl_test.c, vulkan_test.c).
 //
 // Each test is a plain C program for x86-64 Windows that opens a window, draws a spinning
 // textured cube through its API every frame, shows the frame rate in the window title, writes a
@@ -84,13 +85,18 @@ static inline LONG WINAPI dxt_crash_filter(EXCEPTION_POINTERS *ep)
 
 static inline void dxt_crash_log(void) { SetUnhandledExceptionFilter(dxt_crash_filter); }
 
+/* The message boxes' title. The OpenGL and Vulkan tests (gl_test.c, vulkan_test.c) name their own before including this header. */
+#ifndef DXT_BOX_TITLE
+#define DXT_BOX_TITLE "BCD DirectX test"
+#endif
+
 /* A failure the person can read: logged, and shown in a message box (the program ends right after). */
 static void dxt_fail(const char *api, const char *what)
 {
     char text[400];
     dxt_log("%s: FAILED: %s", api, what);
     snprintf(text, sizeof text, "%s\n\nThe %s test could not start.", what, api);
-    MessageBoxA(NULL, text, "BCD DirectX test", MB_OK | MB_ICONERROR);
+    MessageBoxA(NULL, text, DXT_BOX_TITLE, MB_OK | MB_ICONERROR);
 }
 
 /* ------------------------------------------------------------------ window */

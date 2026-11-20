@@ -15,6 +15,7 @@ Needs python3 and a C compiler.
 """
 from pathlib import Path
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -43,10 +44,24 @@ out_fn = function('static int ios_wow_jumbo_outside( ULONG_PTR wb, ULONG_PTR bas
 census = function('static void ios_jumbo_census( void *hint, size_t size, void *result, unsigned st )')
 check('the census prints [jumbo-wow] for a 32-bit caller after a successful placement, 16 lines at most, with the host address, the window and inside=',
       'if (log_this && result && !st && ios_wow_base())' in census and 'wow_said++ < 16' in census and 'window=[0x%lx,0x%lx) inside=%d guest-visible=0x%08x' in census)
-site = 'if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() && ios_wow_base() &&'
-check('the refusal sits once, right after the census of NtAllocateVirtualMemory, only for an unhinted request without limits, and never in the Ex entry point (the emulator\'s)',
-      native.count(site) == 1 and native.count('ios_wow_jumbo_inside_on()') == 1 and
-      native.index('if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL : *ret, (unsigned)st );') < native.index(site) < native.index('/* madeira-bcd: remember a helper\'s large reservation for ios_sc_reap_dead */'))
+site = 'if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 1 && ios_wow_base() &&'
+site2 = 'if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 2 && ios_wow_base() &&'
+census_call = 'if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL : *ret, (unsigned)st );'
+check('the refusal (1) and the retry (2) sit once each, right after the census of NtAllocateVirtualMemory, only for an unhinted request without limits, '
+      'and never in the Ex entry point (the emulator\'s)',
+      native.count(site) == 1 and native.count(site2) == 1 and native.count('ios_wow_jumbo_inside_on()') == 2 and
+      native.index(census_call) < native.index(site2) < native.index(site) < native.index('/* madeira-bcd: remember a helper\'s large reservation for ios_sc_reap_dead */'))
+retry = native[native.index(site2):native.index(site)]
+check('build 666 (issue #53): 2 asks again with the window as the range while the outside one is held, takes an inside answer and releases the '
+      'outside one; any other answer is released and the program keeps the outside one, as without the key',
+      'allocate_virtual_memory( &inside, &in_size, type, protect, 0, IOS_WOW_WINDOW_SIZE - 1, 0, 0 );' in retry
+      and 'if (!ist && !ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)inside, in_size ))' in retry
+      and 'NtFreeVirtualMemory( NtCurrentProcess(), &outside, &fs, MEM_RELEASE );' in retry
+      and '*ret = inside;' in retry and '*size_ptr = in_size;' in retry
+      and 'if (!ist) { void *again = inside; SIZE_T afs = 0; NtFreeVirtualMemory( NtCurrentProcess(), &again, &afs, MEM_RELEASE ); }' in retry
+      and re.search(r'(?<![A-Za-z_])st = ', retry) is None)   # the program's answer stays a success
+tl = native[native.index('void ios_wow_translate_limits( ULONG_PTR *limit_low, ULONG_PTR *limit_high )\n{'):]
+tl = tl[:tl.index('\n}\n') + 3]
 refuse = native[native.index(site):]
 refuse = refuse[:refuse.index('st = STATUS_NO_MEMORY;')]
 check('it releases the range, restores the request and answers STATUS_NO_MEMORY', 'NtFreeVirtualMemory( NtCurrentProcess(), &outside, &fs, MEM_RELEASE );' in refuse and
@@ -62,9 +77,20 @@ typedef uintptr_t ULONG_PTR;
 typedef size_t SIZE_T;
 #define IOS_WOW_WINDOW_SIZE ((ULONG_PTR)1 << 32)
 @FUNCS@
+static ULONG_PTR the_base = 0x7900000000ULL;
+static ULONG_PTR ios_wow_base( void ) { return the_base; }
+#define IOS_WOW_GUEST_FLOOR 0x10000
+@TL@
 int main( int argc, char **argv )
 {
     const ULONG_PTR B = 0x7900000000ULL, B2 = 0x400000000ULL;
+    if (argc > 1 && argv[1][0] == 't')
+    {   /* build 666: the retry's range, the guest 4 GB ceiling, becomes the window */
+        ULONG_PTR lo = 0, hi = IOS_WOW_WINDOW_SIZE - 1;
+        ios_wow_translate_limits( &lo, &hi );
+        printf( "%lx %lx\n", (unsigned long)lo, (unsigned long)hi );
+        return 0;
+    }
     if (argc > 1) { printf( "%d\n", ios_wow_jumbo_inside_on() ); return 0; }
     printf( "%d%d%d%d%d%d%d%d%d\n",
             ios_wow_jumbo_outside( B, 0x703ac00000ULL, 1ULL << 30 ),          /* 4QSSTH: below the window */
@@ -80,7 +106,7 @@ int main( int argc, char **argv )
 }
 '''
 tmp = Path(tempfile.mkdtemp(prefix='madeira-wow-jumbo-'))
-(tmp / 'm.c').write_text(program.replace('@FUNCS@', on_fn + '\n' + out_fn))
+(tmp / 'm.c').write_text(program.replace('@FUNCS@', on_fn + '\n' + out_fn).replace('@TL@', tl))
 cc = os.environ.get('CC', 'cc')
 b = subprocess.run([cc, '-std=gnu11', '-O1', '-Wall', '-Wno-unused-function', str(tmp / 'm.c'), '-o', str(tmp / 'm')], capture_output=True, text=True)
 check('the production helpers compile on the host', b.returncode == 0, b.stdout + b.stderr)
@@ -90,8 +116,10 @@ if b.returncode == 0:
         e.update(env)
         return subprocess.run([str(tmp / 'm')] + list(args), capture_output=True, text=True, env=e).stdout.strip()
 
-    for val, want in ((None, '0'), ('', '0'), ('0', '0'), ('1', '1'), ('11', '0'), ('2', '0')):
-        check('MADEIRA_WOW_JUMBO_INSIDE=%r: %s' % (val, 'on' if want == '1' else 'off'), run('k', **({} if val is None else {'MADEIRA_WOW_JUMBO_INSIDE': val})) == want)
+    for val, want in ((None, '0'), ('', '0'), ('0', '0'), ('1', '1'), ('11', '0'), ('2', '2'), ('3', '0'), ('21', '0')):
+        check('MADEIRA_WOW_JUMBO_INSIDE=%r: %s' % (val, {'0': 'off', '1': 'refuse', '2': 'retry inside'}[want]),
+              run('k', **({} if val is None else {'MADEIRA_WOW_JUMBO_INSIDE': val})) == want)
+    check('the retry\'s range is the window above the guest floor: [B + 0x10000, B + 4 GB - 1]', run('t') == '7900010000 79ffffffff', run('t'))
     check('outside: both Isaac placements, a request that runs past the end, one that starts at the end or just below, no window; inside: the first and last GB and the whole window',
           run() == '110011110', run())
 

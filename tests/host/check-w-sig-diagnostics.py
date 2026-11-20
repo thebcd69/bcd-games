@@ -18,6 +18,7 @@ The diagnostics (every one log only, off unless its key is set or already on a p
 and, by source shape (they run in threads or handlers a host check cannot start): G11 S5 [x86-live] at the ILL (signal_arm64_ios.c), G9 S7 [badrip] slot bytes,
 G6 S13 [xp-names] stacks, T1 S9 MADEIRA_SPIN_DUMP_REGS, G2 S16 MADEIRA_STUCK_WAIT_DIAG (wineserver), the hooks of server_ios.c, and the auto-tune rules and fixtures.
 Needs python3 and a C compiler on a Mac (arm64 or x86_64: arm64 thread state is stood in for)."""
+import platform
 import re
 import shutil
 import subprocess
@@ -118,8 +119,12 @@ HARNESS = r'''
 #include <mach/mach.h>
 #include <mach/mach_vm.h>
 /* stand-ins: arm64 thread state, the engine's JIT bookkeeping, a TEB whose WowTebOffset is at 0x180c */
+/* On an arm64 host (the M5 Max, build 672) the SDK already has arm_thread_state64_t (the same fields) and the accessor
+   macro; the stand-ins are for the Intel host, which has neither. */
+#if !defined(__aarch64__)
 typedef struct { uint64_t __x[29]; uint64_t __fp, __lr, __sp, __pc; uint32_t __cpsr; } arm_thread_state64_t;
 #define __darwin_arm_thread_state64_get_pc(s) ((s).__pc)
+#endif
 #define STDERR_FILENO 2
 void *ios_jit_rx_base_global; size_t ios_jit_pool_size_global;
 static int ios_jit_low_contains( uintptr_t a ) { (void)a; return 0; }
@@ -152,7 +157,11 @@ uintptr_t ios_jit_anon_alias_lookup_rx( uintptr_t a ) { (void)a; return g_alias_
 static uint8_t *window(void)
 {
     /* a 4 GB-aligned window: the spin report derives the window base from the TEB's address */
+#if defined(__aarch64__)   /* arm64 macOS reserves 0x1000000000-0x7000000000 in every process (the M5 Max, build 672) */
+    void *want = (void *)0x12000000000ULL;
+#else
     void *want = (void *)0x2000000000ULL;
+#endif
     uint8_t *w = mmap( want, 0x4000000, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0 );
     return w == want ? w : NULL;
 }
@@ -358,7 +367,7 @@ with tempfile.TemporaryDirectory(prefix="wsig-") as d:
     else:
         check("G1 S10: [spin-code] names the spin (game.exe+0x1000), 32 bytes before and the bucket's bytes, and follows hop 0 through the import slot to the hook stub (winmm.asi+0x500) "
               "naming the import kernel32.dll!Sleep... ",
-              "[spin-code] the thread spins at guest 0x00401000 (game.exe+0x1000), window 0x2000000000, 3 modules in the PEB32 list" in err
+              "[spin-code] the thread spins at guest 0x00401000 (game.exe+0x1000), window %s, 3 modules in the PEB32 list" % ("0x12000000000" if platform.machine() == "arm64" else "0x2000000000") in err
               and "[spin-code]   hop 0: slot 0x01002300 (winmm.asi+0x2300, import kernel32.dll!Sleep) holds 0x01000500 (winmm.asi+0x500)" in err, err[-2500:])
         check("...then hop 1 through the hook stub's own slot to kernel32.dll!GetTickCount's address, and hop 2 ends the chain (ret 4, no jump)",
               "[spin-code]   hop 1: slot 0x01002304 (winmm.asi+0x2304, import kernel32.dll!GetTickCount) holds 0x02000100 (kernel32.dll+0x100)" in err

@@ -235,4 +235,18 @@ enum LogUploadCore {
         progress?(1)
         return (read, packed)
     }
+
+    /// Round 677 (agent R1 S5; Send Logs ES44C0, J5BBE4, RC31BA, G43MB9): the build that wrote the log, from its own "[build] v0.1.N (N)" line in
+    /// the first 256 KB. The upload used the sender's build, so a player who updated and then sent an older run had it filed under the new
+    /// build (633 logs read as 665 in round 677's triage). nil when the log names none (very old builds): the sender's build is used then.
+    static func ownBuild(of log: URL) -> String? {
+        guard let h = try? FileHandle(forReadingFrom: log) else { return nil }
+        defer { try? h.close() }
+        guard let data = try? h.read(upToCount: 256 * 1024), !data.isEmpty else { return nil }
+        let text = String(decoding: data, as: UTF8.self)
+        guard let re = try? NSRegularExpression(pattern: #"\[build\] v0\.1\.(\d+) \((\d+)\)"#),
+              let m = re.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              let r = Range(m.range(at: 2), in: text) else { return nil }
+        return String(text[r])
+    }
 }

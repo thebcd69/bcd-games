@@ -9489,5 +9489,21 @@ BOOL get_gpu_info_from_uuid( const GUID *uuid, LUID *luid, UINT32 *node_mask, ch
     }
 
     unlock_display_devices();
+#ifdef WINE_IOS
+    /* madeira-bcd (round 668; the owner's X-Plane 12 test, build 667, KosmicKrisp): MADEIRA_KMT_ADAPTER=1: the device has one GPU, which
+     * DXGI, madeira_d3d12, NVAPI and D3DKMT report by the LUID made from Metal's registryID. A Vulkan (or GL) device whose UUID no GPU of
+     * `gpus` carries (the virtual-monitor regime lists none, and Vulkan's own set-up lists GPUs without Vulkan) gets that LUID, valid,
+     * so a game that matches its Vulkan device to a DXGI adapter by LUID finds it ("Couldn't find DXGI adapter matching the selected
+     * Vulkan device"). The name stays the driver's. Off (the default): not found, as before. */
+    if (!found && madeira_kmt_adapter_enabled() && madeira_kmt_adapter_luid( luid ))
+    {
+        static int said;
+        *node_mask = 1;
+        found = TRUE;
+        if (!said++)
+            dprintf( 2, "[vkmt] madeira-bcd kmt-adapter=1: a Vulkan/GL device UUID no GPU carries gets the adapter LUID %08x:%08x "
+                        "(valid), as DXGI reports it\n", (unsigned)luid->HighPart, (unsigned)luid->LowPart );
+    }
+#endif
     return found;
 }

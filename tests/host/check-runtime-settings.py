@@ -149,7 +149,7 @@ check('var fastSync: Bool?' in entry and 'var semaphoreFastPath: Bool?' in entry
 check('Self.toggle("fastsync", "Fast synchronization"' in page and 'Self.toggle("semaphores", "Fast semaphore waits (experimental)"' in page
       and 'let fastsync = SyncEngine.current == .fastsync' in page and page.count(', locked: lock),') == 2,
       'game page: Fast synchronization and Fast semaphore waits, locked unless the engine is Fastsync')
-check('choose it in Settings › Memory & sync to change it.' in page, 'game page: a note says where to choose Fastsync')
+check('choose it in Settings › Memory & performance to change it.' in page, 'game page: a note says where to choose Fastsync')
 check('if SyncEngine.current == .fastsync {' in apply_env and 'setenv("MADEIRA_FASTSYNC", fastSync == false ? "0" : mode, 1)' in apply_env
       and 'if let sem = semaphoreFastPath { setenv("MADEIRA_FASTSYNC_SEM", sem ? "1" : "0", 1) }' in apply_env
       and 'else { unsetenv("MADEIRA_FASTSYNC_SEM") }' in apply_env,

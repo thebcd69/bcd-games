@@ -1,0 +1,238 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Fri, 13 Nov 2026 12:13:04 +0100
+Subject: [PATCH] kk: a draw the geometry heap has no room for draws nothing
+
+poly_heap_alloc_offs cannot fail: an overflow of the heap is a printf
+and an abort, and KosmicKrisp's MSL makes printf_abort a plain return.
+The kernel then leaves its outputs as the memory held them: the
+tessellation prefix sum its indirect draw (pool memory, not cleared) and
+a null index buffer the next pass writes indices through, the indirect
+tessellation setup its grid sizes, the strip unroll its draw (and its
+first lane skips the barrier the others wait at), the indirect geometry
+shader setup its buffers. The GPU then faults or hangs on them. The
+heap is 128 MiB and reset before each draw that uses it, so one draw of
+about a thousand quad patches tessellated at factor 64 overflows it.
+
+Each of those kernels now checks first that what it will allocate fits
+(poly_heap_fits, with 64-bit sums): the tessellation prefix sum for the
+index buffer and every patch's points (a patch has no more points than
+indices: poly_tess_heap_bytes), the indirect tessellation setup for its
+patch buffers, the unroll for its index buffer, the geometry shader
+setup for its three buffers. One that does not fit writes an empty draw
+and empty grids, and the tessellation pass skips a draw left with a null
+index buffer; poly_heap_mark_overflow still moves the heap's bottom past
+its end, so MESA_KK_DEBUG=fault's ring shows the overflow. A dropped
+draw is missing geometry in one frame instead of a lost device.
+
+Linear: PLA-880
+Class: upstream-bug
+Evidence: build/mesa-host-test/kk-fault-test.c (the guard's sums); PLA-880 (The Witcher 3 1.32's lost device at its first tessellated frame, to be confirmed on the phone)
+Offered-upstream: no
+---
+ src/kosmickrisp/libkk/kk_geometry.cl     | 14 +++++++-
+ src/kosmickrisp/libkk/kk_tessellation.cl | 14 ++++++++
+ src/kosmickrisp/libkk/kk_tessellator.cl  | 15 ++++++++
+ src/poly/cl/restart.h                    | 15 +++++++-
+ src/poly/geometry.h                      | 46 ++++++++++++++++++++++++
+ 5 files changed, 102 insertions(+), 2 deletions(-)
+
+diff --git a/src/kosmickrisp/libkk/kk_geometry.cl b/src/kosmickrisp/libkk/kk_geometry.cl
+index bde238d..34a12f0 100644
+--- a/src/kosmickrisp/libkk/kk_geometry.cl
++++ b/src/kosmickrisp/libkk/kk_geometry.cl
+@@ -26,6 +26,19 @@ libkk_prefix_sum_tess(global struct poly_tess_params *p)
+ 
+    /* The last element of an inclusive prefix sum is the total sum */
+    uint total = p->nr_patches > 0 ? p->counts[p->nr_patches - 1] : 0;
++   global uint32_t *desc = p->out_draws;
++
++   /* Playport (PLA-880): the index buffer and every patch's points fit, or
++    * the draw draws nothing and its tessellation pass writes nothing (a null
++    * index buffer, libkk_tess_*) */
++   uint64_t want_B = poly_tess_heap_bytes(total, p->nr_patches);
++   if (!poly_heap_fits(p->heap->bottom, p->heap->size, want_B)) {
++      poly_heap_mark_overflow(p->heap, want_B);
++      p->index_buffer = 0;
++      for (uint i = 0; i < 5; i++)
++         desc[i] = 0;
++      return;
++   }
+ 
+    /* Allocate 4-byte indices */
+    uint32_t elsize_B = sizeof(uint32_t);
+@@ -34,7 +47,6 @@ libkk_prefix_sum_tess(global struct poly_tess_params *p)
+    p->index_buffer = (global uint32_t *)(((uintptr_t)p->heap->base) + alloc_B);
+ 
+    /* ...and now we can generate the API indexed draw */
+-   global uint32_t *desc = p->out_draws;
+ 
+    desc[0] = total;              /* count */
+    desc[1] = 1;                  /* instance_count */
+diff --git a/src/kosmickrisp/libkk/kk_tessellation.cl b/src/kosmickrisp/libkk/kk_tessellation.cl
+index bb2d06e..e8d444a 100644
+--- a/src/kosmickrisp/libkk/kk_tessellation.cl
++++ b/src/kosmickrisp/libkk/kk_tessellation.cl
+@@ -44,6 +44,20 @@ libkk_tess_setup_indirect(
+    uint vb_size = poly_tcs_in_size(count * instance_count, vertex_outputs);
+    alloc += vb_size;
+ 
++   /* Playport (PLA-880): the patches' buffers fit in the heap, or every
++    * grid is empty and the prefix sum sees no patches: the draw draws
++    * nothing */
++   uint64_t want_B = (uint64_t)unrolled_patches * (p->tcs_stride_el * 4u + 8u) +
++                     vb_size + 16u;
++   if (!poly_heap_fits(p->heap->bottom, p->heap->size, want_B)) {
++      poly_heap_mark_overflow(p->heap, want_B);
++      p->nr_patches = 0;
++      p->patches_per_instance = 0;
++      for (uint i = 0; i < 9; i++)
++         grids[i] = 0;
++      return;
++   }
++
+    /* Allocate all patch calculations in one go */
+    global uchar *blob = poly_heap_alloc(p->heap, alloc);
+ 
+diff --git a/src/kosmickrisp/libkk/kk_tessellator.cl b/src/kosmickrisp/libkk/kk_tessellator.cl
+index fc6e8da..837ee24 100644
+--- a/src/kosmickrisp/libkk/kk_tessellator.cl
++++ b/src/kosmickrisp/libkk/kk_tessellator.cl
+@@ -6,11 +6,22 @@
+ 
+ #include "poly/cl/tessellator.h"
+ 
++/* Playport (PLA-880): libkk_prefix_sum_tess found no room in the heap for the
++ * draw's indices and points and left it a null index buffer: the pass that
++ * writes them does nothing */
++static inline bool
++tess_skipped(constant struct poly_tess_params *p, enum poly_tess_mode tess_mode)
++{
++   return tess_mode == POLY_TESS_MODE_WITH_COUNTS && !p->index_buffer;
++}
++
+ KERNEL(1)
+ libkk_tess_isoline(constant struct poly_tess_params *p,
+                    enum poly_tess_mode tess_mode)
+ {
+    uint patch = cl_global_id.x;
++   if (tess_skipped(p, tess_mode))
++      return;
+    poly_tess_isoline_process(p, patch, tess_mode);
+ }
+ 
+@@ -19,6 +30,8 @@ libkk_tess_tri(constant struct poly_tess_params *p,
+                enum poly_tess_mode tess_mode)
+ {
+    uint patch = cl_global_id.x;
++   if (tess_skipped(p, tess_mode))
++      return;
+    poly_tess_tri_process(p, patch, tess_mode);
+ }
+ 
+@@ -27,5 +40,7 @@ libkk_tess_quad(constant struct poly_tess_params *p,
+                 enum poly_tess_mode tess_mode)
+ {
+    uint patch = cl_global_id.x;
++   if (tess_skipped(p, tess_mode))
++      return;
+    poly_tess_quad_process(p, patch, tess_mode);
+ }
+diff --git a/src/poly/cl/restart.h b/src/poly/cl/restart.h
+index bddf4f5..e69e616 100644
+--- a/src/poly/cl/restart.h
++++ b/src/poly/cl/restart.h
+@@ -142,7 +142,16 @@ poly_setup_unroll_for_draw(global struct poly_heap *heap,
+     * is the unrolled size when the input has no restarts.
+     */
+    uint max_prims = u_decomposed_prims_for_vertices(mode, in_draw[0]);
+-   uint max_verts = max_prims * mesa_vertices_per_prim(mode);
++   uint64_t max_verts = (uint64_t)max_prims * mesa_vertices_per_prim(mode);
++
++   /* Playport (PLA-880): an index buffer that does not fit draws nothing */
++   uint64_t want_B = align64(max_verts * out_index_size_B, 16u);
++   if (!poly_heap_fits(heap->bottom, heap->size, want_B)) {
++      poly_heap_mark_overflow(heap, want_B);
++      for (uint i = 0; i < 5; i++)
++         out_draw[i] = 0;
++      return 0;
++   }
+    uint alloc_size = max_verts * out_index_size_B;
+ 
+    /* Allocate unrolled index buffer.
+@@ -196,6 +205,10 @@ poly_unroll_geometry(global uint32_t *out_draw,
+       out_ptr = sub_group_broadcast(out_ptr, 0);
+    }
+ 
++   /* Playport (PLA-880): no room in the heap; every lane leaves together */
++   if (!out_ptr)
++      return;
++
+    uintptr_t in_ptr = (uintptr_t)(poly_index_buffer(
+       index_buffer, index_buffer_range_el, in_draw[2], in_index_size_B));
+    uint in_range_el = poly_index_buffer_range_el(
+diff --git a/src/poly/geometry.h b/src/poly/geometry.h
+index 42ae4a4..c7d7f0f 100644
+--- a/src/poly/geometry.h
++++ b/src/poly/geometry.h
+@@ -115,7 +115,40 @@ struct poly_heap {
+ static_assert(sizeof(struct poly_heap) == 4 * 4,
+               "struct poly_heap must be 4 words");
+ 
++/* Playport (PLA-880): poly_heap_alloc_offs cannot fail. A heap overflow is a
++ * printf and an abort, which KosmicKrisp's MSL makes a plain return, so the
++ * kernel's outputs (an indirect draw, grid sizes, an index buffer address)
++ * keep whatever the memory held and the GPU then faults or hangs on them. A
++ * kernel that can drop its draw instead asks first whether its bytes fit,
++ * with each allocation rounded up to 16 bytes as poly_heap_alloc_offs does. */
++static inline bool
++poly_heap_fits(uint32_t bottom_B, uint32_t size_B, uint64_t want_B)
++{
++   return bottom_B <= size_B && want_B <= (uint64_t)(size_B - bottom_B);
++}
++
++/* The most a tessellated draw takes from the heap once its index count is
++ * known: its index buffer (total_indices 4-byte indices, one allocation) and
++ * each patch's domain points (8 bytes each, one allocation a patch). A patch
++ * has no more points than indices: every point the tessellator emits is a
++ * vertex of one of its triangles, lines or points. */
++static inline uint64_t
++poly_tess_heap_bytes(uint32_t total_indices, uint32_t nr_patches)
++{
++   return (uint64_t)total_indices * (4u + 8u) + 16u * ((uint64_t)nr_patches + 1u);
++}
++
+ #ifdef __OPENCL_VERSION__
++/* Playport (PLA-880): an allocation that did not fit still moves bottom past
++ * the end, so the heap shows that it overflowed (MESA_KK_DEBUG=fault reads
++ * bottom before each reset), while its caller writes nothing */
++static inline void
++poly_heap_mark_overflow(global struct poly_heap *heap, uint64_t want_B)
++{
++   uint add = (uint)min(want_B, (uint64_t)heap->size) + 16u;
++   atomic_fetch_add((volatile atomic_uint *)(&heap->bottom), add);
++}
++
+ static inline uint
+ poly_heap_alloc_offs(global struct poly_heap *heap, uint size_B)
+ {
+@@ -634,6 +667,19 @@ poly_gs_setup_indirect_inner(uint64_t index_buffer, uint vertex_count,
+    uint vertex_buffer_size =
+       poly_tcs_in_size(vertex_count * instance_count, vs_outputs);
+ 
++   /* Playport (PLA-880): all of them fit, or the draw runs nothing */
++   uint64_t want_B = align64((uint64_t)vertex_buffer_size, 16u);
++   if (is_prefix_summing)
++      want_B += align64((uint64_t)p->input_primitives * p->count_buffer_stride, 16u);
++   if (shape == POLY_GS_SHAPE_DYNAMIC_INDEXED)
++      want_B += align64((uint64_t)p->draw.index_count * 4u, 16u);
++   if (!poly_heap_fits(heap->bottom, heap->size, want_B)) {
++      poly_heap_mark_overflow(heap, want_B);
++      poly_vertex_params_set_draw(vp, 0, 0);
++      poly_geometry_params_set_draw(p, prim, shape, max_indices, 0, 0);
++      return;
++   }
++
+    if (is_prefix_summing) {
+       p->count_buffer = poly_heap_alloc(
+          heap, p->input_primitives * p->count_buffer_stride);

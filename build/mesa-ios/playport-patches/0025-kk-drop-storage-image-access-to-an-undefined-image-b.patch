@@ -1,0 +1,145 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sun, 18 Oct 2026 02:06:56 +0200
+Subject: [PATCH] kk: drop storage image access to an undefined image before
+ descriptor lowering
+
+Patch 0037 removes sampling of an OpUndef image. The same image can
+also be read, written or queried as a storage image (OpImageRead,
+OpImageWrite, OpImageQuerySize), and spirv_to_nir makes it the same
+deref cast of an undef. Each of those crashes before or in descriptor
+lowering, with no KosmicKrisp code involved:
+
+- an image_deref_load segfaults in nir_shader_gather_info, which
+  kk_preprocess_nir calls first: it takes the image's variable for a
+  subpass check, and there is none;
+- an image_deref_store or image_deref_size segfaults in the runtime's
+  descriptor heap lowering (vk_nir_lower_descriptor_heaps, run by
+  vk_pipeline.c on every pipeline), whose nir_rewrite_image_intrinsic
+  reads the missing variable's format and access.
+
+Extend 0037's pass to image_deref intrinsics: one whose image deref is
+a cast of an undef is removed, its result (a load, a query or an
+atomic) undefined, as SPIR-V allows. As in 0037, in Vulkan's SPIR-V an
+image has no origin other than a variable or OpUndef (none goes through
+OpPhi or OpSelect, none is a null constant), so shaders whose images all
+come from descriptors are untouched. An atomic needs a texel pointer
+into an undefined image pointer, which spirv_to_nir refuses ("expected
+'pointer'"), so none reaches NIR; the pass covers it all the same.
+
+Mesa main (335d5698, checked on 2026-10-18) has neither change. No captured title
+does this; a hand-written shader found it.
+
+Class: upstream-bug
+Evidence: docs/evidence/2026-10-17-rdr2-vulkan-needs.md
+Offered-upstream: no
+---
+ .../vulkan/kk_nir_lower_descriptors.c         | 60 +++++++++++++++----
+ src/kosmickrisp/vulkan/kk_shader.c            |  5 +-
+ 2 files changed, 51 insertions(+), 14 deletions(-)
+
+diff --git a/src/kosmickrisp/vulkan/kk_nir_lower_descriptors.c b/src/kosmickrisp/vulkan/kk_nir_lower_descriptors.c
+index b535b40..86c9268 100644
+--- a/src/kosmickrisp/vulkan/kk_nir_lower_descriptors.c
++++ b/src/kosmickrisp/vulkan/kk_nir_lower_descriptors.c
+@@ -522,10 +522,10 @@ try_lower_intrin(nir_builder *b, nir_intrinsic_instr *intrin,
+    }
+ }
+ 
+-/* Whether a texture or sampler deref is SPIR-V's OpUndef: a cast of an undef,
+- * not a chain from a descriptor variable. In Vulkan's SPIR-V an image or
+- * sampler has no other origin (none goes through OpPhi or OpSelect, none is a
+- * null constant). */
++/* Whether a texture, sampler or storage image deref is SPIR-V's OpUndef: a
++ * cast of an undef, not a chain from a descriptor variable. In Vulkan's SPIR-V
++ * an image or sampler has no other origin (none goes through OpPhi or
++ * OpSelect, none is a null constant). */
+ static bool
+ deref_is_undef(nir_deref_instr *deref)
+ {
+@@ -541,7 +541,7 @@ deref_is_undef(nir_deref_instr *deref)
+ }
+ 
+ static bool
+-remove_undef_texture(nir_builder *b, nir_tex_instr *tex, UNUSED void *data)
++remove_undef_texture(nir_builder *b, nir_tex_instr *tex)
+ {
+    for (unsigned i = 0; i < tex->num_srcs; i++) {
+       if (tex->src[i].src_type != nir_tex_src_texture_deref &&
+@@ -558,17 +558,53 @@ remove_undef_texture(nir_builder *b, nir_tex_instr *tex, UNUSED void *data)
+    return false;
+ }
+ 
+-/* Sampling or querying an undefined image, or with an undefined sampler,
+- * gives an undefined result: the instruction goes, before anything looks for
+- * its descriptor. Left in, the runtime's descriptor heap lowering takes the
+- * undefined image for a heap pointer at offset 0, and lower_tex then aborts
+- * on the sampler deref beside it.
++/* An image_deref_* intrinsic (each has an image dimension, and its image
++ * deref as its first source) on an undefined image: a load, query or atomic
++ * gets an undefined result, a store goes. */
++static bool
++remove_undef_image_access(nir_builder *b, nir_intrinsic_instr *intrin)
++{
++   if (!nir_intrinsic_has_image_dim(intrin))
++      return false;
++   nir_deref_instr *deref = nir_src_as_deref(intrin->src[0]);
++   if (deref == NULL || !deref_is_undef(deref))
++      return false;
++   if (nir_intrinsic_infos[intrin->intrinsic].has_dest) {
++      b->cursor = nir_before_instr(&intrin->instr);
++      nir_def_replace(&intrin->def, nir_undef(b, intrin->def.num_components,
++                                              intrin->def.bit_size));
++   } else {
++      nir_instr_remove(&intrin->instr);
++   }
++   return true;
++}
++
++static bool
++remove_undef_image_use(nir_builder *b, nir_instr *instr, UNUSED void *data)
++{
++   switch (instr->type) {
++   case nir_instr_type_tex:
++      return remove_undef_texture(b, nir_instr_as_tex(instr));
++   case nir_instr_type_intrinsic:
++      return remove_undef_image_access(b, nir_instr_as_intrinsic(instr));
++   default:
++      return false;
++   }
++}
++
++/* Sampling, reading, writing or querying an undefined image, or sampling with
++ * an undefined sampler, has an undefined result: the instruction goes, before
++ * anything looks for its descriptor or variable. Left in, the runtime's
++ * descriptor heap lowering takes the undefined image for a heap pointer at
++ * offset 0 and lower_tex then aborts on the sampler deref beside it, and
++ * nir_shader_gather_info (a storage image read) and the heap lowering (a
++ * write or a size query) dereference the image's missing variable.
+  */
+ bool
+ kk_nir_remove_undef_textures(nir_shader *nir)
+ {
+-   return nir_shader_tex_pass(nir, remove_undef_texture,
+-                              nir_metadata_control_flow, NULL);
++   return nir_shader_instructions_pass(nir, remove_undef_image_use,
++                                       nir_metadata_control_flow, NULL);
+ }
+ 
+ static bool
+diff --git a/src/kosmickrisp/vulkan/kk_shader.c b/src/kosmickrisp/vulkan/kk_shader.c
+index e48ac4e..e59b17b 100644
+--- a/src/kosmickrisp/vulkan/kk_shader.c
++++ b/src/kosmickrisp/vulkan/kk_shader.c
+@@ -95,8 +95,9 @@ static void
+ kk_preprocess_nir(UNUSED struct vk_physical_device *vk_pdev, nir_shader *nir,
+                   UNUSED const struct vk_pipeline_robustness_state *rs)
+ {
+-   /* First, before the runtime lowers descriptor heaps (vk_pipeline.c,
+-    * vk_shader.c) or anything reads a texture's descriptor. */
++   /* First, before nir_shader_gather_info below, the runtime's descriptor
++    * heap lowering (vk_pipeline.c, vk_shader.c) or anything else reads an
++    * image's variable or descriptor. */
+    NIR_PASS(_, nir, kk_nir_remove_undef_textures);
+ 
+    /* Gather info before preprocess_nir but after some general lowering, so

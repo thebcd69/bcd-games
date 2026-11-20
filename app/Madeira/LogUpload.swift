@@ -146,9 +146,14 @@ enum LogUpload {
             // more goes without most of its repeated diagnostics (BCDLogThin.swift); the file on the device stays whole.
             var thin = UserDefaults.standard.bool(forKey: BCDLogThinner.switchKey) ? BCDLogThinner.plan(log) : nil
             if let thin { LogStore.shared.log("[bcd-logs] \(log.lastPathComponent) goes thinned: " + thin.note.prefix(160)) }
+            // Round 677 (agent R1 S5): the build in the upload's header is the log's own (a player who updated and then sent an older run
+            // had it filed under the new build); a line at the top says so when the two differ. The screenshot keeps the sender's build.
+            let sender = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+            let build = LogUploadCore.ownBuild(of: log) ?? sender
+            let buildNote = build != sender ? ["[bcd-logs] sent from build \(sender); this log is of build \(build)"] : []
             do {
                 say("Compressing…")
-                packed = try LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace, head: thin.map { [$0.note] } ?? [],
+                packed = try LogUploadCore.pack(log, to: gz, comment: comment, trailer: trace, head: (thin.map { [$0.note] } ?? []) + buildNote,
                                                 keep: thin == nil ? nil : { thin!.thinner.keep($0) }) { f in say("Compressing… \(Int(f * 100))%") }
             } catch {
                 try? FileManager.default.removeItem(at: gz)
@@ -163,7 +168,6 @@ enum LogUpload {
             req.httpMethod = "POST"
             req.setValue("application/gzip", forHTTPHeaderField: "Content-Type")
             req.setValue(intake, forHTTPHeaderField: "X-BCD-Intake")
-            let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
             let os = ProcessInfo.processInfo.operatingSystemVersion
             for (k, v) in ["Build": build, "Game": game, "Device": deviceModel,
                            "Os": "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)",

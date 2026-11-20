@@ -54,6 +54,41 @@ enum SteamAuthAPI {
         return data
     }
 
+    /// madeira-bcd (build 666, issue #39): a poll the network interrupted is not a failed sign-in. Approving the sign-in in the Steam
+    /// app on the same iPhone, or opening the QR link there, puts BCD in the background, and the poll request in flight comes back as
+    /// "network connection lost" (-1005) when BCD returns: six players' logs of builds 630-659 end their sign-in that way, one of them
+    /// eight times in four minutes (KTD3HS: "[steam-signin] sign-in failed method=qr reason=url--1005", each a moment before the
+    /// app's foreground update check), and the sheet said "You're offline". These errors make the poll wait and ask again.
+    static func isTransientNetworkError(_ error: Error) -> Bool {
+        guard let url = error as? URLError else { return false }
+        switch url.code {
+        case .networkConnectionLost, .notConnectedToInternet, .timedOut, .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed,
+             .dataNotAllowed, .internationalRoamingOff, .callIsActive, .backgroundSessionWasDisconnected:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// A poll request (PollAuthSessionStatus) that outlasts a short loss of the network: after a transient error (above) it waits
+    /// `interval` seconds (at least one) and asks again, up to `patience` times in a row; past that the error ends the poll as it did
+    /// before build 666, so a phone that is really offline still hears so (after about half a minute at Steam's 5-second interval).
+    /// Any other error, and cancellation, end it at once.
+    static func pollCall(_ method: String, body: Data, interval: Double, patience: Int = 6, flow: String) async throws -> Data {
+        var misses = 0
+        while true {
+            do {
+                return try await call(method, body: body)
+            } catch {
+                guard isTransientNetworkError(error), misses < patience else { throw error }
+                misses += 1
+                let code = (error as? URLError)?.code.rawValue ?? 0
+                SteamLog.event("[steam-signin] poll interrupted method=\(flow) reason=url-\(code), asking again (\(misses) of \(patience))")
+                try await Task.sleep(nanoseconds: UInt64(max(1, interval) * 1_000_000_000))
+            }
+        }
+    }
+
     /// EResult values Steam returns from the authentication service.
     static func error(for code: UInt32) -> SteamError {
         switch code {

@@ -127,11 +127,14 @@ HOOKS = {
         "guard let state = AutoTune.enabled ? AutoTune.state(path) : nil else { return nil }",
         # Porthole port, item 10 (AutoTuneAsk.swift): "Ask before trying a fix": the fix that waits for the player's yes on the page,
         # the page's Try the suggested fix, and Undo forgets the answers too. Read only while Settings › Auto-tune is on.
-        "let waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []",
+        "var waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []",
         "if !waiting.isEmpty { status = AutoTuneAsk.pageStatus(waiting) }",
         "AutoTuneAsk.forget(path)   // madeira-bcd (Porthole port, item 10): the player's answers go with the lines",
         "guard let path = entry(for: game)?.windowsPath, AutoTune.enabled else { return }",
         "AutoTuneAsk.approve(AutoTune.state(path), path)",
+        # Round 670 (owner 2026-11-18, I1): the page's Try the suggested fix also takes a suggestion for a game that played (after the
+        # guard above).
+        "if AutoTune.state(path).suggestion?.isEmpty == false { AutoTune.approveSuggestion(path); return }",
     ],
 }
 for swift in sorted(APP.glob("*.swift")):
@@ -275,8 +278,8 @@ known = set(re.findall(r'ConfigOption\(key: "([^"]+)"', catalog)) | set(cat.OVER
 NOT_FROM_LAYER = {"metalfx-upscale", "fps-limit", "env.MADEIRA_PAD_MODE", "pool", "wx", "usd-time", "d3d9", "metal-validation"}
 LINE = re.compile(r"^([A-Za-z0-9._-]+) = (\S.*)$")
 FIELDS = {"id", "lines", "priority", "all", "any", "none", "outcomes", "session", "api", "ramMinMB", "ramMaxMB",
-          "minStage", "maxStage", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "listUpgradeFailure", "noRetry", "reason",
-          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "swapCapHit", "partialUserKeys", "bcCensusMinPct", "lead"}
+          "minStage", "maxStage", "maxBuild", "imageMaxMB", "exeMaxMB", "exeMinMB", "memoryMinPct", "upgrade", "listUpgrade", "listUpgradeFailure", "noRetry", "reason",
+          "evidence", "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "swapCapHit", "partialUserKeys", "bcCensusMinPct", "lead", "whenPlayed"}
 ids = [r["id"] for r in rules]
 check("rule ids are unique", len(ids) == len(set(ids)))
 for r in rules:
@@ -300,6 +303,10 @@ for r in rules:
     if "ranOnly" in r and (r["ranOnly"] is not True or r.get("evaluateWhenRan") is not True):
         # Round 624 (Fallout 4 voices): ranOnly narrows an evaluateWhenRan rule to sessions that played.
         bad.append("ranOnly is true and only on an evaluateWhenRan rule")
+    if "whenPlayed" in r and (r["whenPlayed"] is not True or not r.get("lines") or any(k in r for k in (
+            "fixedIn", "noFix", "evaluateWhenRan", "ranOnly", "outcomes", "upgrade", "listUpgrade", "listUpgradeFailure", "partialUserKeys", "noRetry"))):
+        # Round 670 (owner 2026-11-18, I1): a rule for a session that played suggests lines; it has lines and none of the failure fields.
+        bad.append("whenPlayed is true, with lines and none of the failure-only fields")
     if "swapCapHit" in r and r["swapCapHit"] is not True:
         # Round 630 (agent T2 S12): a rule that needs the swap file to have reached its cap says true; there is no "false".
         bad.append("swapCapHit is true when present")
@@ -384,7 +391,7 @@ def build(tmp, name, sources):
     return exe if b.returncode == 0 else None
 
 
-KEYS = ("outcome", "stage", "matched", "dialogs", "status", "next")
+KEYS = ("outcome", "stage", "matched", "dialogs", "status", "next", "suggest")   # "suggest": round 670 (I1), absent when nothing is suggested
 
 
 def uk(exp):
@@ -401,7 +408,8 @@ with tempfile.TemporaryDirectory(prefix="madeira-autotune-") as tmp:
                 prior = json.loads(exp_path.read_text()) if exp_path.exists() else {"end": {}, "note": ""}
                 out = json.loads(subprocess.run([str(replay), "--end", json.dumps(prior["end"])] + uk(prior) + [str(FIX / (name + ".log"))],
                                                 capture_output=True, text=True).stdout)
-                prior.update({k: out[k] for k in KEYS})
+                prior.update({k: out[k] for k in KEYS if k in out})
+                if "suggest" not in out: prior.pop("suggest", None)
                 exp_path.write_text(json.dumps(prior, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
                 print(f"blessed {name}: {out['outcome']}, stage {out['stage']}, matched {out['matched']}, next {out['next']}")
         def replay_fixture(p):

@@ -49,6 +49,9 @@ struct DockProcess: Equatable {
     /// Seconds since it ended / how long it lived, for a process that ended.
     var endedAgo: Double = 0
     var lived: Double = 0
+    /// Round 668 (G2 S3; Enshrouded): this process started a crash uploader before it ended (the engine's helper field has 4 added):
+    /// it is the one that crashed, whatever its exit code (Enshrouded's crash handler ends the game with 42).
+    var crashReported: Bool = false
 
     /// The file name, lower case: what the user's log line says (never the folder).
     var fileName: String {
@@ -153,7 +156,7 @@ enum DockGameEndRules {
         // Night round 2026-11-11 (G2 S11, T2 S-IS1): with any status, not only 0: a crash handler's exit code 1 (Black Mesa), an odd code of
         // the game's own (Isaac, 0x58203a6e). The other conditions below are unchanged: nothing of the game runs, the host finished.
         let shortCleanExit = !rendered && last.lived < shortExitSeconds
-        guard anyStatus || isCrash(last.status) || shortCleanExit else { return .none }
+        guard anyStatus || isCrash(last.status) || last.crashReported || shortCleanExit else { return .none }
         func wait(_ why: String) -> Verdict { .wait(status: last.status, file: last.fileName, why: why) }
         if !table.complete { return wait("table-incomplete") }
         if table.untracked > 0 { return wait("untracked-process") }
@@ -162,8 +165,19 @@ enum DockGameEndRules {
         let state = host()
         if !state.gameRan { return wait("host-never-saw-the-game-run") }
         if !state.gameOver { return wait("host-still-counts-the-game") }
-        if !state.finished { return wait("host-not-finished") }
+        if !state.finished && !hostCrashed(table) { return wait("host-not-finished") }
         return .end(status: last.status, file: last.fileName, lived: last.lived)
+    }
+
+    /// Round 668 (G2 S2; Enshrouded 0GS36Y 9DE6YV A0BJFQ WF49CA 7Q88YK, Exo7 2KWYNH, Dressmaker: 16 archive logs of build 665): after a
+    /// game ended badly, Valve's client crashed the Dock host while it shut down (its tier0 unregistered a device notification twice:
+    /// sechost.dll+0x18098), before the host wrote `probe-result`, so the session waited for a report that would never come. A host
+    /// that is gone with an error status (c0000005) and does not run again has finished as far as the session is concerned. A host
+    /// that ended cleanly always writes its report first, so it is not asked about here; one that still runs keeps the wait.
+    static let dockHostFile = "dockhost.exe"
+    static func hostCrashed(_ table: DockProcessTable) -> Bool {
+        let hosts = table.processes.filter { $0.fileName == dockHostFile }
+        return !hosts.isEmpty && !hosts.contains(where: { $0.running }) && hosts.contains(where: { isCrash($0.status) })
     }
 
     /// The words the player sees when a program ended the session by closing within `shortExitSeconds` without a picture (not an error
@@ -264,12 +278,12 @@ enum DockGameEndRules {
             switch f.first ?? "" {
             case "R" where f.count == 4:
                 guard let helper = Int(f[1]), Double(f[2]) != nil else { table.complete = false; continue }
-                table.processes.append(DockProcess(path: f[3], helper: helper != 0, running: true))
+                table.processes.append(DockProcess(path: f[3], helper: helper & 1 != 0, running: true, crashReported: helper & 4 != 0))
             case "E" where f.count == 6:
                 guard let helper = Int(f[1]), let status = UInt32(f[2], radix: 16),
                       let ago = Double(f[3]), let lived = Double(f[4]) else { table.complete = false; continue }
-                table.processes.append(DockProcess(path: f[5], helper: helper != 0, running: false, status: status,
-                                                   endedAgo: ago, lived: lived))
+                table.processes.append(DockProcess(path: f[5], helper: helper & 1 != 0, running: false, status: status,
+                                                   endedAgo: ago, lived: lived, crashReported: helper & 4 != 0))
             case "U" where f.count == 2:
                 table.untracked = Int(f[1]) ?? 1
             default:

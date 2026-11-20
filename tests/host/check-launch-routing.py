@@ -27,8 +27,10 @@ upstream_ec = """BOOL use_arm64ec = (force_ec && *force_ec == '1') ||
                            (strchr(madeira_exe, '\\\\') != NULL);"""
 assert upstream_ec in thread, "the session-core heuristic is upstream's, verbatim"
 assigns = re.findall(r"use_arm64ec\s*=[^=][^;]*;", thread)
-# round 579 (tests/host/check-cmd-bundle.py): the second NO is the cmd.exe override, behind madeira_target_is_cmd.
-assert assigns[1:] == ["use_arm64ec = NO;", "use_arm64ec = NO;"], assigns
+# round 579 (tests/host/check-cmd-bundle.py): the last NO is the cmd.exe override, behind madeira_target_is_cmd; build 666 (issue #44):
+# the one before it is the native ARM64 override, behind madeira_target_is_native_arm64 (a 0xaa64 program outside C:\windows).
+assert assigns[1:] == ["use_arm64ec = NO;", "use_arm64ec = NO;", "use_arm64ec = NO;"], assigns
+assert "if (madeira_target_is_native_arm64(madeira_exe, target_machine)) {" in thread, "a native ARM64 program changes the core too"
 assert "if (is_i386_target) use_arm64ec = NO;" in thread, "an i386 target changes the core"
 assert "if (madeira_target_is_cmd(madeira_exe)) {" in thread, "and so does cmd.exe, which only aarch64-windows ships"
 assert "const BOOL is_i386_target = has_i386_set && target_machine == MADEIRA_IMAGE_FILE_MACHINE_I386;" in thread

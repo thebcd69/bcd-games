@@ -216,7 +216,9 @@ others = [r["id"] for r in recs["rules"] if r["id"] not in ("darksiders-ii-death
                                                            "grand-theft-auto-vice-city", "battlefield-1942", "mafia-classic", "hitman-contracts",   # night round 2026-11-11: env.MADEIRA_D3D8 = d3d9
                                                            "baba-is-you",   # night round 2026-11-11 (G1 S11): a 64-bit Direct3D 9 game of an installed copy
                                                            "need-for-speed-shift",   # night round 2026-11-11 (G8 S13, D S19): the last-calls ring
-                                                           "far-cry-4")   # build 652: env.MADEIRA_D3D9_X64 = dxmt
+                                                           "far-cry-4",   # build 652: env.MADEIRA_D3D9_X64 = dxmt
+                                                           "final-fantasy-xiii", "anodyne",   # round 668: the D3D9 last-calls ring (FF XIII K1 S6, Anodyne T1)
+                                                           "thief-deadly-shadows")   # round 677 (A1 S11): env.MADEIRA_D3D8 = d3d9
           and "d3d9" in json.dumps(r["config"]).lower()]
 check("no other list names d3d9 (the Direct3D 9 default of build 602 comes from the game's folder, BCDGraphicsDefaults.swift, not from a list)", others == [])
 print("note: the list's own version is not bumped here (the release does it); the rule's lines carry minBuild 595, so older builds skip it")

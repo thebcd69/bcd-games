@@ -65,6 +65,9 @@ check('the hold happens only inside that flag, once', host_block is not None and
       and host_block.start() > sc.index('func startThroughHost') and sc.index('LibraryEntry.holdEpicHostStart(') > host_block.start())
 if host_block:
     hb = host_block.group(1)
+    # round 668 (R1 S2): the hold carries the desktop flag of Epic's Rockstar route, and the restore sets MADEIRA_DESKTOP again
+    check('the hold carries the Rockstar route\'s desktop flag and the restore puts MADEIRA_DESKTOP back',
+          'desktop: desktop && !entry.runsInDesktop)' in sc and 'if hold.desktop { setenv("MADEIRA_DESKTOP", "1", 1) }' in library)
     check('...with the program and arguments of the setenv lines beside it (the host, or explorer.exe with the /desktop=shell host line)',
           'exe: desktop ? "explorer.exe" : Self.hostProgram' in hb and 'args: desktop ? "/desktop=shell,\\(entry.resolution) \\"\\(Self.hostProgram)\\" --epic" : "--epic"' in hb
           and 'setenv("MADEIRA_EXE", "explorer.exe", 1)' in sc and 'setenv("MADEIRA_ARGS", "/desktop=shell,\\(entry.resolution) \\"\\(Self.hostProgram)\\" --epic", 1)' in sc
@@ -80,8 +83,8 @@ check('LibraryEntry.applyEnvironment restores right after its configureLaunch, f
 check('configureLaunch itself is not changed (it still sets the game\'s program; only applyEnvironment puts the host back)',
       'let command = desktop == true ? (exe: "explorer.exe", args: launchArguments) : launchCommand\n        setenv("MADEIRA_EXE", command.exe, 1)\n        setenv("MADEIRA_ARGS", LaunchArgumentText.plain(command.args), 1)' in lc)   # round 632: the arguments' dashes and quotes (check-launch-argument-text.py)
 # check-epic's invariants for this file
-check('BCDEpicStart.swift still sets the environment in five places only and unsets only BCD_HOST_REQUEST',
-      len([l for l in sc.splitlines() if re.search(r'(?<![un])\bsetenv\(', l)]) == 5
+check('BCDEpicStart.swift still sets the environment in six places only (round 668: the Rockstar route\'s MADEIRA_DESKTOP = 1) and unsets only BCD_HOST_REQUEST',
+      len([l for l in sc.splitlines() if re.search(r'(?<![un])\bsetenv\(', l)]) == 6 and sc.count('setenv("MADEIRA_DESKTOP", "1", 1)') == 1
       and sorted(set(re.findall(r'unsetenv\("(\w+)"\)', sc))) == ['BCD_HOST_REQUEST'])
 check('the policy allows BCD_EPIC_HOST_START with 0 or 1 only', '"BCD_EPIC_HOST_START",' in policy
       and re.search(r'case "MADEIRA_WINTYPES", "MADEIRA_X64_MACHINE", "MADEIRA_TINY_WINDOW_FIX", "BCD_EPIC_HOST_START"(, "[A-Z_0-9]+")*:[^\n]*\n(\s*//[^\n]*\n)*\s*guard value == "0" \|\| value == "1"', policy) is not None)
@@ -96,8 +99,9 @@ carriers = sorted(r['id'] for r in lists['rules'] if 'BCD_EPIC_HOST_START' in js
 # Round 630 (agent R S11): GTA V Enhanced and Legacy outside Steam (an Epic copy lost BCD Host's start the same way); the key is read only
 # by the Epic start (BCDEpicStart), so the rows' other copies are untouched.
 # Round 631 (agent R3 S6; 6XG0C2): Red Dead Redemption 2 outside Steam too (Epic's RDR2 starts the same Rockstar chain).
-check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic), (round 630) GTA V and (round 631) RDR2 outside Steam lists set it, from build 598',
-      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'gta5e-other', 'gta5l-other', 'rdr2-other'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
+# Round 677 (agents G4 S6, G2 S1): Windbound and Frostpunk from the Epic store (MZN07P, APCRNF: a 64-bit EOS game whose host start left no report).
+check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic), (round 630) GTA V, (round 631) RDR2 outside Steam, (round 669) Jurassic World Evolution and (round 677) Windbound and Frostpunk (Epic) lists set it, from build 598',
+      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'frostpunk-epic', 'gta5e-other', 'gta5l-other', 'jurassic-world-evolution', 'rdr2-other', 'windbound-epic'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
       next(r for r in lists['rules'] if r['id'] == i)['config'] for i in carriers))
 rules = (R / 'build/tools/autotune_rules.py').read_text()
 check('auto-tune: the rule epic-host-start-lost adds the line after an Epic game with the EOS SDK left with exit code 1 although the start line chose the host and the host left no report, never twice',

@@ -14,6 +14,9 @@ madeira-bcd (ajan62, X9; upstream Madeira ml2290): the raw hand-off of every oth
 the thread that is exiting (the 608 failure outside EA: GTA V Legacy's launcher setup, vcredist chains), and
 env.MADEIRA_THREAD_REAP_CHECKED = 1 (default off) takes the checked hand-off for every process. The build-631 branch is kept below as
 the negative control.
+
+Round 668 (A1 S13, G2 S10; ATMD3Z, AEKXPC, Far Cry 3 D6J99X): a previous TEB inside a 32-bit window that was torn down is neither
+read, joined nor freed (ios_teb_in_dead_window); the case runs the production branch on a PROT_NONE TEB.
 """
 from pathlib import Path
 import shutil
@@ -96,6 +99,9 @@ static void virtual_free_teb(TEB *t) {
 }
 /* night round 2026-11-11 (A4 S6): the production raw hand-off records the TEB it is about to free in a log-only ring; the check runs the hand-off without it. */
 static void ios_teb_free_note(TEB *t) { (void)t; }
+/* round 668 (A1 S13): the production raw hand-off asks virtual_ios.c whether the previous TEB lies in a torn-down 32-bit window */
+static const void *dead_window_teb;
+static int ios_teb_in_dead_window(const void *t) { return t && t == dead_window_teb; }
 static int test_join(pthread_t id, void **value) {
     assert(!vm_depth); assert(id != pthread_self()); joins++;
     if (force_join_error) return force_join_error;
@@ -138,6 +144,11 @@ static void self_case_production(void) {
     void *prev_teb=current_teb; TEB *teb;
 ''' + legacy + r'''
 }
+/* round 668: the production raw branch when the previous TEB lies in a window that was torn down (PROT_NONE) */
+static void dead_window_production(TEB *previous) {
+    void *prev_teb=previous; TEB *teb;
+''' + legacy + r'''
+}
 #undef pthread_join
 #undef virtual_free_teb
 static void *worker(void *arg) { return arg; }
@@ -177,6 +188,15 @@ int main(void) {
     puts("PASS negative control: the build-631 branch releases the live stack despite self-join EDEADLK");
     self_case_production(); assert(old_failed_joins==1 && old_live_releases==1);
     puts("PASS the production raw branch on the same situation joins nothing and frees nothing (the 608 failure outside EA)");
+    {
+        /* round 668 (ATMD3Z, AEKXPC, D6J99X): the previous TEB is in a torn-down window; reading it would fault (PROT_NONE here) */
+        long pg=sysconf(_SC_PAGESIZE);
+        TEB *torn=mmap(NULL,pg,PROT_NONE,MAP_PRIVATE|MAP_ANON,-1,0); assert(torn!=MAP_FAILED);
+        dead_window_teb=torn;
+        dead_window_production(torn); assert(old_failed_joins==1 && old_live_releases==1);
+        dead_window_teb=NULL; munmap(torn,pg);
+        puts("PASS the production raw branch never reads a previous TEB in a torn-down window (round 668)");
+    }
     reset(); init(&old,0x31c,0x324,new_worker()); init(&live,0x330,0x338,pthread_self());
     current_teb=&live; seed(&old); ios_ea_reap_exited_thread(&live);
     assert(joins==1 && frees==1 && last_freed==&old);

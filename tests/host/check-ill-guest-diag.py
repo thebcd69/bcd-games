@@ -71,6 +71,9 @@ check('only for the address of a 64-bit guest (above the first 64 KB, below 2^47
 
 # ---------------------------------------------------------------- 2. compiled runs
 cc = os.environ.get('CC', 'cc')
+# The guest window of the compiled runs (GB). arm64 macOS reserves 0x1000000000-0x7000000000 in every process (the M5 Max,
+# build 672), so there it sits at 0x16000000000; on the Intel host it stays at 0x6000000000. The alias view is GB + 4 GB.
+GB = 0x16000000000 if os.uname().machine == 'arm64' else 0x6000000000
 PRELUDE = r'''
 #include <stdint.h>
 #include <stdio.h>
@@ -101,38 +104,52 @@ uintptr_t ios_jit_anon_alias_lookup(uintptr_t a)
 MAIN = r'''
 static uint8_t *page(uint64_t at, size_t n)
 {
-    mach_vm_address_t m = at;
-    if (mach_vm_allocate(mach_task_self(), &m, n, VM_FLAGS_FIXED) != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
-    return (uint8_t *)m;
+    /* Host page by host page (M5 Max, build 672: 16 KB pages there, 4 KB on the Intel VM): the window's pieces sit at
+       4 KB offsets, so two may share a host page; a page an earlier piece already mapped is fine. */
+    const uint64_t pg = vm_page_size, lo = at & ~(pg - 1), hi = (at + n + pg - 1) & ~(pg - 1);
+    for (uint64_t p = lo; p < hi; p += pg)
+    {
+        mach_vm_address_t m = p;
+        kern_return_t k = mach_vm_allocate(mach_task_self(), &m, pg, VM_FLAGS_FIXED);
+        if (k == KERN_NO_SPACE)
+        {   /* taken as already there only when it is a read-write page (one an earlier piece of this program mapped) */
+            mach_vm_address_t q = p; mach_vm_size_t qs = 0; vm_region_basic_info_data_64_t ri;
+            mach_msg_type_number_t rc = VM_REGION_BASIC_INFO_COUNT_64; mach_port_t ro;
+            if (mach_vm_region(mach_task_self(), &q, &qs, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&ri, &rc, &ro) == KERN_SUCCESS
+                && q <= p && (ri.protection & 3) == 3) continue;
+        }
+        if (k != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
+    }
+    return (uint8_t *)(uintptr_t)at;
 }
 
 int main(int argc, char **argv)
 {
     const char *s = argc > 1 ? argv[1] : "";
-    uint8_t *g = page(0x6000000000ULL, 0x8000), *a = page(0x6100000000ULL, 0x8000);
+    uint8_t *g = page(GB, 0x8000), *a = page((GB + 0x100000000ULL), 0x8000);
     /* the guest view: the block's address 0x6000001e0 sits 0x1e0 into the first page; bytes ramp 0,1,2,... so every row is checkable */
     for (unsigned i = 0; i < 0x4000; i++) { g[i] = (uint8_t)i; a[i] = (uint8_t)i; }
-    g_guest_lo = 0x6000000000ULL; g_alias_lo = 0x6100000000ULL;
+    g_guest_lo = GB; g_alias_lo = (GB + 0x100000000ULL);
     if (!strcmp(s, "plain")) {
         g_guest_lo = 0;                                                      /* no alias covers it */
-        ios_ill_guest_bytes(0x60000001e0ULL, 0x169ff84e8ULL);
+        ios_ill_guest_bytes((GB + 0x1e0ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "same")) {
-        ios_ill_guest_bytes(0x60000001e0ULL, 0x169ff84e8ULL);
+        ios_ill_guest_bytes((GB + 0x1e0ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "diff")) {
         a[0x1e0 + 5] = 0xff;                                                 /* the alias differs five bytes into the block */
-        ios_ill_guest_bytes(0x60000001e0ULL, 0x169ff84e8ULL);
+        ios_ill_guest_bytes((GB + 0x1e0ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "diff-before")) {
         a[0x1e0 - 3] = 0xee;                                                 /* ...or three bytes before it */
-        ios_ill_guest_bytes(0x60000001e0ULL, 0x169ff84e8ULL);
+        ios_ill_guest_bytes((GB + 0x1e0ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "edge")) {
         /* the block is at the very start of a mapped range: the 16 bytes before it are not there */
-        uint8_t *e = page(0x6300000000ULL, 0x4000);
+        uint8_t *e = page((GB + 0x300000000ULL), 0x4000);
         for (unsigned i = 0; i < 0x4000; i++) e[i] = (uint8_t)(i + 1);
         g_guest_lo = 0;
-        ios_ill_guest_bytes(0x6300000000ULL, 0x169ff84e8ULL);
+        ios_ill_guest_bytes((GB + 0x300000000ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "cap")) {
         g_guest_lo = 0;
-        for (int i = 0; i < 5; i++) ios_ill_guest_bytes(0x60000001e0ULL, 0x169ff84e8ULL);
+        for (int i = 0; i < 5; i++) ios_ill_guest_bytes((GB + 0x1e0ULL), 0x169ff84e8ULL);
     } else if (!strcmp(s, "bad")) {
         ios_ill_guest_bytes(0, 0x169ff84e8ULL);
         ios_ill_guest_bytes(0x1000, 0x169ff84e8ULL);
@@ -142,7 +159,7 @@ int main(int argc, char **argv)
         puts("bad-done");
     } else if (!strcmp(s, "unmapped")) {
         g_guest_lo = 0;
-        ios_ill_guest_bytes(0x6f00000000ULL, 0x169ff84e8ULL);                  /* nothing there: all ?? */
+        ios_ill_guest_bytes((GB + 0xf00000000ULL), 0x169ff84e8ULL);                  /* nothing there: all ?? */
     }
     return 0;
 }
@@ -155,7 +172,7 @@ else:
     with tempfile.TemporaryDirectory(prefix='illguest-') as d:
         d = Path(d)
         (d / 'h.c').write_text(PRELUDE + '\n' + av_header + '\n' + header + '\n' + MAIN)
-        c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-Wno-unused-function', str(d / 'h.c'), '-o', str(d / 'h')],
+        c = subprocess.run([cc, '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-Wno-unused-function', '-DGB=%#xULL' % GB, str(d / 'h.c'), '-o', str(d / 'h')],
                            capture_output=True, text=True)
         check('the production header compiles (host cc, -Wall -Wextra -Werror)', c.returncode == 0, c.stderr[-3000:])
         if c.returncode == 0:
@@ -169,13 +186,13 @@ else:
             r = run('plain')
             ls = lines(r)
             check('a plain page: one headline with the 64 bytes (16 before the block, 48 from it), the block address, the host pc and "64 of 64 readable"',
-                  len(ls) == 2 and ls[0].startswith('[ill-guest] #1 FEX could not translate the block at guest 0x60000001e0 (host pc 0x169ff84e8)')
+                  len(ls) == 2 and ls[0].startswith('[ill-guest] #1 FEX could not translate the block at guest %#x (host pc 0x169ff84e8)' % (GB + 0x1e0))
                   and '(64 of 64 readable): ' + ramp in ls[0], r.stderr)
             check('...and says that no anonymous RWX alias covers it', 'no anonymous RWX alias covers that address' in ls[1], r.stderr)
             r = run('same')
             ls = lines(r)
             check('an alias that agrees: "the two views agree" with the alias pointer', len(ls) == 2 and 'the two views agree' in ls[1]
-                  and 'alias pointer 0x61000001e0' in ls[1], r.stderr)
+                  and 'alias pointer %#x' % (GB + 0x1000001e0) in ls[1], r.stderr)
             r = run('diff')
             ls = lines(r)
             check('an alias that differs five bytes into the block: DIFFERENT, +5, the alias bytes with ff at that place',

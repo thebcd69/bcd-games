@@ -577,11 +577,15 @@ static void bcd_gl_session_setup(NSString *bundlePath)
 /* madeira-bcd (Windows Vulkan, docs/BUILDING.md 6c; Madeira #353, #400 and #462, see THIRD-PARTY-NOTICES.md): the game's `vulkan` key (bcd.cfg, or
  * the game's own file, which wins) turns Vulkan on for the programs of THIS session (x64; 32-bit ones too from build 660, below):
  *   moltenvk     winevulkan on MoltenVK, the gl/ folder's libMoltenVK.dylib (the one Zink uses)
+ *   moltenvk-patched  the same on the second, patched MoltenVK, gl/libMoltenVK_patched.dylib (build 669; build/moltenvk-ios/build-patched.sh: v1.4.2 plus
+ *                newer MoltenVK work and the Enshrouded changes of bcd-games pull request #57), when this build has it; otherwise Vulkan stays off and the
+ *                log says so, the plain MoltenVK is never taken instead. Zink gets this library too in such a session (build/win32u-unix/opengl_ios.c),
+ *                because two MoltenVKs in one process define the same Objective-C classes. Nothing but this word ever loads it.
  *   kosmickrisp  the same on gl/libvulkan_kosmickrisp.dylib (Mesa's KosmicKrisp, build/mesa-ios/build-kosmickrisp-bcd.sh), when the build
  *                bundles it and the device can run it: the library is written against Metal 4, so it needs iOS 26 and a GPU of the
  *                Metal 4 family (bcd_kosmickrisp_usable). Otherwise Vulkan stays off and the log says why; MoltenVK is never taken instead.
  *                Its shader cache goes to Library/Caches/KosmicKrisp for the session (MESA_SHADER_CACHE_DIR, when nothing else set one).
- * Only these two words count. Unset, empty, "off" or anything else: Vulkan stays off, MADEIRA_VULKAN_LIBRARY is not exported, the prefix
+ * Only these three words count. Unset, empty, "off" or anything else: Vulkan stays off, MADEIRA_VULKAN_LIBRARY is not exported, the prefix
  * gets no winevulkan.dll and keeps the farm's vulkan-1.dll stand-in (tools/build-stub-dlls.py: a game that probes finds no Vulkan driver,
  * as always), and win32u lists no Vulkan GPU (build/win32u-unix/vulkan_ios.c): the session is what it was before. On: MADEIRA_VULKAN_LIBRARY
  * names the library and system32 and sysx64 (both in every session since build 660) get links to the bundle's vulkan/arm64ec-windows/winevulkan.dll and
@@ -598,6 +602,35 @@ static const char *bcd_kosmickrisp_unusable(void)
         return "this device's GPU is not of the Metal 4 family";
     }
     return "KosmicKrisp needs iOS 26 or later";
+}
+
+/* madeira-bcd (2026-11-20, the owner's choice: nothing that works may break): does this device's GPU sample BC textures itself?
+ * The question DXMT asks before it expands a BC texture to RGBA8 on the CPU (supportsBCTextureCompression: NO on A13-A16 phones,
+ * the bc=0 of the [device] log line, DeviceCapability.swift). Asked once per app process. */
+static bool bcd_gpu_samples_bc(void)
+{
+    static int answer = -1;
+    if (answer < 0) {
+        bool yes = false;
+        if (@available(iOS 16.4, *)) {
+            id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+            yes = device && device.supportsBCTextureCompression;
+        }
+        answer = yes ? 1 : 0;
+    }
+    return answer == 1;
+}
+
+/* madeira-bcd (2026-11-20): is MADEIRA_MIP_CLAMP_AUTO level 2? Read exactly as DXMT's mip_clamp::AutoLevel reads it
+ * (tools/patch-dxmt-bc-half.py): "2" with spaces or tabs around it; any other value is not. */
+static bool bcd_mip_clamp_auto_level2(const char *v)
+{
+    if (!v) return false;
+    while (*v == ' ' || *v == '\t') v++;
+    if (*v != '2') return false;
+    v++;
+    while (*v == ' ' || *v == '\t') v++;
+    return *v == '\0';
 }
 
 /* The shader cache variables this file set for a KosmicKrisp session, so that the session's end removes exactly those (the OpenGL
@@ -676,8 +709,9 @@ static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSStri
         for (char *c = want; *c; c++) if (*c >= 'A' && *c <= 'Z') *c += 'a' - 'A';
         if (!strcmp(want, "moltenvk")) lib = [bundlePath stringByAppendingPathComponent:@"gl/libMoltenVK.dylib"];
         else if (!strcmp(want, "kosmickrisp")) lib = [bundlePath stringByAppendingPathComponent:@"gl/libvulkan_kosmickrisp.dylib"];
+        else if (!strcmp(want, "moltenvk-patched")) lib = [bundlePath stringByAppendingPathComponent:@"gl/libMoltenVK_patched.dylib"];
         else if (strcmp(want, "off") && strcmp(want, "0") && strcmp(want, "no"))
-            dprintf(STDERR_FILENO, "[WineProc] vulkan=%s is not moltenvk or kosmickrisp: Vulkan stays off\n", want);
+            dprintf(STDERR_FILENO, "[WineProc] vulkan=%s is not moltenvk, moltenvk-patched or kosmickrisp: Vulkan stays off\n", want);
     }
     /* madeira-bcd (KosmicKrisp): a bundled library this device cannot load is as good as none; the reason goes into the log. */
     if (lib && !strcmp(want, "kosmickrisp") && access(lib.fileSystemRepresentation, R_OK) == 0) {
@@ -686,6 +720,13 @@ static void bcd_vulkan_session_setup(NSFileManager *fm, NSString *prefix, NSStri
             dprintf(STDERR_FILENO, "[WineProc] vulkan=kosmickrisp: Vulkan stays off, %s\n", why);
             lib = nil;
         }
+    }
+    /* madeira-bcd (patched MoltenVK, build 669): the second MoltenVK is built by a step that only warns when it fails, so a build may not have it;
+     * the session's Vulkan then stays off with the reason in the log, and the plain MoltenVK is never taken instead (as for KosmicKrisp). */
+    if (lib && !strcmp(want, "moltenvk-patched") && access(lib.fileSystemRepresentation, R_OK) != 0) {
+        dprintf(STDERR_FILENO, "[WineProc] vulkan=moltenvk-patched: Vulkan stays off, this build does not have the patched MoltenVK "
+                "(gl/libMoltenVK_patched.dylib); the other MoltenVK is not taken instead\n");
+        lib = nil;
     }
     if (!lib) {
         unsetenv("MADEIRA_VULKAN_LIBRARY");
@@ -945,6 +986,7 @@ void madeira_seed_prefix_if_needed(const char *prefix_path) {
  * target take exactly the code path they took before.
  * ========================================================================= */
 #define MADEIRA_IMAGE_FILE_MACHINE_I386 0x014c
+#define MADEIRA_IMAGE_FILE_MACHINE_ARM64 0xaa64   /* madeira-bcd (build 666): madeira_target_is_native_arm64 */
 
 /* build/ntdll-unix/virtual_ios.c: nonzero when this session's MAIN image is
  * 32-bit. The unix side reserves the process's guest window before its first
@@ -1034,6 +1076,18 @@ static BOOL madeira_target_is_cmd(const char *exe)
 {
     return exe && (strcasecmp(exe, "cmd.exe") == 0 ||
                    strcasecmp(exe, "C:\\windows\\system32\\cmd.exe") == 0);
+}
+
+/* madeira-bcd (build 666, issue #44 by Kyworn: WoW Forever's Wow-ARM64.exe and a 9 KB ARM64 probe, build 630): a program of the
+ * player's own whose PE header says ARM64 (machine 0xaa64; an ARM64X image says so too) is a native ARM64 process, and the
+ * name heuristic above sends every full Windows path to arm64ec-windows, whose kernel32.dll such a process cannot load: "wine:
+ * could not load kernel32.dll, status c000007b" before the program runs, the failure cmd.exe had before round 579. It runs on
+ * the aarch64-windows core, as it does when a Wine desktop starts it. Only a program outside C:\windows: the probe reads a
+ * system32 name through the links the previous session left (another core's file), so Wine's own programs keep their answer.
+ * A pure function, compiled by tests/host/check-cmd-bundle.py. */
+static BOOL madeira_target_is_native_arm64(const char *exe, uint16_t machine)
+{
+    return exe && machine == MADEIRA_IMAGE_FILE_MACHINE_ARM64 && strncasecmp(exe, "C:\\windows\\", 11) != 0;
 }
 
 /* C:\windows\syswow64: the i386 farm, the Windows name for this pattern. A
@@ -2283,8 +2337,18 @@ static void *wine_process_thread(void *arg) {
                     fprintf(stderr, "[game-cfg] %s (%s)\n", gameCfg, gtext ? "read" : "MISSING");
                 for (NSString *raw in [gtext componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
                     NSString *t = [raw stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-                    if (t.length && ![t hasPrefix:@"#"] && ![t hasPrefix:@"env."])
+                    if (t.length && ![t hasPrefix:@"#"] && ![t hasPrefix:@"env."]) {
                         fprintf(stderr, "[game-cfg]   %s\n", t.UTF8String);
+                        /* madeira-bcd (round 669; the owner's X-Plane 12 file had "MADEIRA_KMT_ADAPTER = 1"): a setting key is lower case
+                         * with dashes; an upper-case NAME with underscores is an environment variable written without "env.", which
+                         * nothing reads. Said once per such line; nothing else changes. */
+                        NSRange eq = [t rangeOfString:@"="];
+                        NSString *k = eq.location == NSNotFound ? @"" :
+                            [[t substringToIndex:eq.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                        if ([k rangeOfString:@"^[A-Z][A-Z0-9]*_[A-Z0-9_]+$" options:NSRegularExpressionSearch].location != NSNotFound)
+                            fprintf(stderr, "[game-cfg] %s is read by nothing: an environment line starts with \"env.\" (env.%s)\n",
+                                    k.UTF8String, [t stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].UTF8String);
+                    }
                 }
                 for (NSString *raw in [gtext componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
                     NSString *line = [raw stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -2361,7 +2425,7 @@ static void *wine_process_thread(void *arg) {
                 }
                 /* Fastsync is the default sync engine: with neither inproc-sync nor
                  * env.MADEIRA_FASTSYNC in bcd.cfg, Wine gets MADEIRA_FASTSYNC=auto,
-                 * the value Settings > Sync engine > Fastsync writes. Never overrides a
+                 * the value Settings › Memory & performance › Thread sync › Fastsync (standard) writes. Never overrides a
                  * value already set (a game's own fastsync switch sets 0). */
                 if (madeira_cfg_sync_engine() == MADEIRA_SYNC_FASTSYNC && !getenv("MADEIRA_FASTSYNC")) {
                     setenv("MADEIRA_FASTSYNC", "auto", 0);
@@ -2541,6 +2605,11 @@ static void *wine_process_thread(void *arg) {
                 is_i386_target ? " (i386: WoW64)" :
                 target_machine == MADEIRA_IMAGE_FILE_MACHINE_I386 ? " (i386, but the bundle has no i386-windows)" : "");
         if (is_i386_target) use_arm64ec = NO;
+        if (madeira_target_is_native_arm64(madeira_exe, target_machine)) {   /* madeira-bcd (build 666, issue #44) */
+            if (use_arm64ec)
+                dprintf(STDERR_FILENO, "[WineProc] native ARM64 program (machine 0xaa64): the aarch64-windows core runs it (arm64ec-windows ends in c000007b)\n");
+            use_arm64ec = NO;
+        }
         if (madeira_target_is_cmd(madeira_exe)) {   /* madeira-bcd cmd-bundle: cmd.exe is aarch64-only, see madeira_target_is_cmd */
             if (use_arm64ec)
                 dprintf(STDERR_FILENO, "[WineProc] cmd.exe exists only in aarch64-windows: that core runs it (the name heuristic's arm64ec-windows ends in c000007b)\n");
@@ -2846,10 +2915,25 @@ static void *wine_process_thread(void *arg) {
              * 2026-10-15 merge; d3d11-src.dll is built again because it is the
              * only 64-bit d3d11.dll that carries BCD's Direct3D 11 patches
              * (CopyStructureCount without a buffer: F1 2020; render target views
-             * on a buffer: Frostbite 2 games). */
+             * on a buffer: Frostbite 2 games).
+             * 2026-11-20 (the owner's choice of that day: nothing that works may break): env.MADEIRA_MIP_CLAMP_AUTO = 2 links the
+             * same file, but only on a GPU that cannot sample BC textures (bcd_gpu_samples_bc: A13-A16 phones). There DXMT expands
+             * every BC texture to RGBA8, and only d3d11-src.dll carries level 2 (tools/patch-dxmt-bc-half.py: single-level BC
+             * textures at half size near the memory limit). On a GPU that samples BC the committed d3d11.dll stays: its ml2000
+             * clamp takes any value but 0/false/off/no as on, so it reads 2 as 1, and a game whose row moved from = 1 to = 2 starts
+             * exactly as before there. The game's own MADEIRA_D3D11_SRC (0 too) wins over this. */
             {
                 const char *d3d11Src = getenv("MADEIRA_D3D11_SRC");
-                if (d3d11Src && d3d11Src[0] == '1') {
+                bool halfBC = false;
+                if (bcd_mip_clamp_auto_level2(getenv("MADEIRA_MIP_CLAMP_AUTO"))) {
+                    if (d3d11Src)
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MIP_CLAMP_AUTO=2 with the game's MADEIRA_D3D11_SRC=%s: that value decides\n", d3d11Src);
+                    else if (bcd_gpu_samples_bc())
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MIP_CLAMP_AUTO=2 on a GPU that samples BC textures: the committed d3d11.dll is kept (it reads 2 as 1)\n");
+                    else
+                        halfBC = true;
+                }
+                if ((d3d11Src && d3d11Src[0] == '1') || halfBC) {
                     NSString *ecDir = [bundlePath stringByAppendingPathComponent:@"arm64ec-windows"];
                     NSString *srcDll = [ecDir stringByAppendingPathComponent:@"d3d11-src.dll"];
                     if ([fm fileExistsAtPath:srcDll]) {
@@ -2861,8 +2945,14 @@ static void *wine_process_thread(void *arg) {
                             [fm removeItemAtPath:dst error:nil];
                             [fm createSymbolicLinkAtPath:dst withDestinationPath:srcDll error:nil];
                         }
-                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_D3D11_SRC=1: d3d11.dll -> d3d11-src.dll (DXMT source build with BCD's Direct3D 11 patches; %s)\n",
-                                use_arm64ec ? "system32 + sysx64" : "sysx64 only");
+                        if (halfBC)
+                            dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MIP_CLAMP_AUTO=2 on a GPU without BC sampling: d3d11.dll -> d3d11-src.dll (DXMT source build with BCD's Direct3D 11 patches; %s)\n",
+                                    use_arm64ec ? "system32 + sysx64" : "sysx64 only");
+                        else
+                            dprintf(STDERR_FILENO, "[WineProc] MADEIRA_D3D11_SRC=1: d3d11.dll -> d3d11-src.dll (DXMT source build with BCD's Direct3D 11 patches; %s)\n",
+                                    use_arm64ec ? "system32 + sysx64" : "sysx64 only");
+                    } else if (halfBC) {
+                        dprintf(STDERR_FILENO, "[WineProc] MADEIRA_MIP_CLAMP_AUTO=2 but this build has no d3d11-src.dll -- the committed d3d11.dll is kept (it reads 2 as 1)\n");
                     } else {
                         dprintf(STDERR_FILENO, "[WineProc] MADEIRA_D3D11_SRC=1 but this build has no d3d11-src.dll -- upstream's d3d11.dll stays\n");
                     }
@@ -3881,6 +3971,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_TINY_WINDOW_FIX"); /* madeira-bcd: likewise (American Truck Simulator's tiny window) */
     unsetenv("MADEIRA_OPTIN_DLLS");   /* madeira-bcd: likewise */
     unsetenv("MADEIRA_GL_BACKEND"); unsetenv("MADEIRA_GL_DIR");   /* madeira-bcd (OpenGL): likewise (the game's gl-backend key) */
+    unsetenv("MADEIRA_LUAJIT_C_COMMENTS");
     unsetenv("MADEIRA_VULKAN_LIBRARY");   /* madeira-bcd (Windows Vulkan): likewise (the game's vulkan key) */
     /* madeira-bcd (KosmicKrisp): and the shader cache variables a vulkan = kosmickrisp session got from this file, only those */
     if (g_kk_cache_dir_set) { unsetenv("MESA_SHADER_CACHE_DIR"); g_kk_cache_dir_set = 0; }
@@ -3906,6 +3997,7 @@ static void wine_session_end(void)
     unsetenv("MADEIRA_UBI_CEF"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
     unsetenv("MADEIRA_KILL_REAP"); /* madeira-bcd: likewise (the game starter's ended copy) */
     unsetenv("MADEIRA_SELF_WRITE"); /* madeira-bcd: likewise (a game's own 0 must not reach a later game) */
+    unsetenv("MADEIRA_SELF_WRITE_PRIVATE"); /* madeira-bcd (build 666): likewise */
     unsetenv("MADEIRA_APC_BUSY_QUEUE"); /* madeira-bcd: likewise (the Dock sets it for a Ubisoft game's session, ContentView.startDock) */
     unsetenv("MADEIRA_APC_DEFER_ISSUER"); /* madeira-bcd: likewise (build 660; a game's own line must not reach a later game) */
     unsetenv("MADEIRA_TAIL_CARVE_EXEC_CHECK"); /* madeira-bcd: likewise */

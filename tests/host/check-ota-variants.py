@@ -202,7 +202,11 @@ else:
 assert "python3 tests/host/check-ota-variants.py" in workflow
 signer = (ROOT / "tools/sign-and-publish-ota.sh").read_text()
 assert signer.count('python3 "$OTA_HELPER" mail') == 1
-assert signer.index('for name in "${NAMES[@]}"; do\n  s3 cp') < signer.index('python3 "$OTA_HELPER" mail')
+assert signer.index('for name in "${NAMES[@]}"; do\n  for try in 1 2 3 4 5; do\n    if [ -n "${OTA_IPA_UPLOADER:-}" ]') < signer.index('python3 "$OTA_HELPER" mail')
+# the local part-resumable uploader is never used on GitHub; there the IPA goes with aws s3 cp as before
+assert '[ -n "${OTA_IPA_UPLOADER:-}" ] && [ "${GITHUB_ACTIONS:-}" != true ]' in signer
+# an IPA that fails all its tries stops the script before the mail (no two-button mail for a missing app)
+assert 'did not upload after 5 tries"; exit 1; }' in signer
 print("PASS: one archive, one paired signing invocation and one email invocation; shell syntax valid")
 
 # Run the actual shell orchestration with local tool doubles. The macOS-only
@@ -240,6 +244,9 @@ elif tool == 'security':
     elif args[0] == 'import': record(['certificate-import'])
 elif tool == 'plistbuddy':
     path = Path(args[-1]); value = plistlib.loads(path.read_bytes()); command = args[args.index('-c')+1]
+    if command.startswith('Set :'):
+        key, new = command.removeprefix('Set :').split(' ', 1); value[key] = new
+        path.write_bytes(plistlib.dumps(value)); sys.exit(0)
     for part in command.removeprefix('Print :').split(':'):
         value = value[int(part)] if isinstance(value,list) else value[part]
     if '-x' in args: sys.stdout.buffer.write(plistlib.dumps(value))
@@ -287,7 +294,12 @@ with tempfile.TemporaryDirectory(prefix='madeira-ota-flow-') as directory:
             z.writestr(f'Payload/{name}.app/Extensions/MemoryHost.appex/Info.plist',
                        plistlib.dumps(dict(CFBundleIdentifier=identifier+'.MemoryHost')))
         inputs.append(ipa)
-    for mode in ('success', 'second-sign-fails', 'second-upload-fails'):
+    for flag in ('SIGN_PRIMARY_PROFILE_BUNDLE_ID', 'SIGN_USE_PROFILE_BUNDLE_ID'):
+        # Owner, 2026-11-16 (strict): on GitHub the App ID options are refused before anything is signed.
+        refused = subprocess.run(['bash', str(script), str(inputs[0]), '413', str(inputs[1])], capture_output=True, text=True,
+                                 env=dict(os.environ, PATH=str(commands)+os.pathsep+os.environ['PATH'], GITHUB_ACTIONS='true', **{flag: '1'}))
+        assert refused.returncode == 1 and 'never on GitHub' in refused.stdout + refused.stderr, refused.stdout + refused.stderr
+    for mode in ('success', 'second-sign-fails', 'second-upload-fails', 'primary-profile-id'):
         case = tmp / mode; case.mkdir()
         bucket = case / 'bucket'; bucket.mkdir()
         (bucket / 'Development.p12').write_bytes(b'fixture, not signing material')
@@ -298,7 +310,11 @@ with tempfile.TemporaryDirectory(prefix='madeira-ota-flow-') as directory:
                    R2_BUCKET='bucket', SIGN_P12_PASSWORD='fixture', OTA_MAIL_USER='fixture@example.test',
                    OTA_MAIL_APP_PASSWORD='fixture', OTA_MAIL_TO='fixture@example.test',
                    FAIL_SIGN='1' if mode=='second-sign-fails' else '',
-                   FAIL_UPLOAD='1' if mode=='second-upload-fails' else '')
+                   FAIL_UPLOAD='1' if mode=='second-upload-fails' else '',
+                   SIGN_PRIMARY_PROFILE_BUNDLE_ID='1' if mode=='primary-profile-id' else '',
+                   # the local signing flow (~/madeira-local/sign-local.sh) runs outside CI; this check itself runs in CI
+                   # (GITHUB_ACTIONS=true), where the App ID option is refused (the loop above)
+                   GITHUB_ACTIONS='')
         result = subprocess.run(['bash',str(script),str(inputs[0]),'413',str(inputs[1])],
                                 env=env, capture_output=True, text=True)
         assert 'https://fixture.invalid/' not in result.stdout + result.stderr
@@ -315,8 +331,20 @@ with tempfile.TemporaryDirectory(prefix='madeira-ota-flow-') as directory:
                     assert z.read(f'Payload/{name}.app/embedded.mobileprovision') == b'fixture, not a provisioning profile'
                 assert ['verify',identifier] in calls
             assert len(list(bucket.glob('*.html'))) == 3
+        elif mode == 'primary-profile-id':
+            # The owner's local OTA (2026-11-16): Madeira and its extensions take the profile's App ID, Madeira2 keeps its own.
+            if result.returncode: raise AssertionError(result.stderr)
+            assert mailed == [['mail',['Madeira','Madeira2']]]
+            expected = {'Madeira': 'test', 'Madeira2': dict(ota.VARIANTS)['Madeira2']}
+            for name, identifier in expected.items():
+                with zipfile.ZipFile(bucket / 'ota' / f'{name}-0.1.413.ipa') as z:
+                    assert plistlib.loads(z.read(f'Payload/{name}.app/Info.plist'))['CFBundleIdentifier'] == identifier
+                    assert plistlib.loads(z.read(f'Payload/{name}.app/Extensions/MemoryHost.appex/Info.plist'))['CFBundleIdentifier'] == \
+                        identifier + '.MemoryHost'
+                assert ['verify', identifier] in calls
+            assert ['verify', dict(ota.VARIANTS)['Madeira']] not in calls
         else:
             assert result.returncode and not mailed
             assert not list(bucket.glob('*.html'))
             if mode == 'second-sign-fails': assert not (bucket/'ota').exists()
-    print('PASS: actual shell flow imports one certificate, signs both identities and sends one mail; a second signing/upload failure sends none; private URLs stay out of output (local tool doubles)')
+    print('PASS: actual shell flow imports one certificate, signs both identities and sends one mail; a second signing/upload failure sends none; private URLs stay out of output (local tool doubles); SIGN_PRIMARY_PROFILE_BUNDLE_ID=1 gives Madeira alone the profile App ID, and on GitHub both App ID options are refused')

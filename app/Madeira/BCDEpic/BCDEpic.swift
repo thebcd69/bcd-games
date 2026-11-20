@@ -100,6 +100,8 @@ import Foundation
     var offlineOnce: UUID?
     /// A signed-in start has begun and its files and report are not yet cleaned up.
     var hostRan = false
+    /// Round 669 (agent E S2): whether this start held BCD Host's values (env.BCD_EPIC_HOST_START), so the end can tell "the host stopped" from "the host never ran".
+    var hostHeld = false
     /// The exact values of that start, kept in memory only for the search after its session (BCDEpicAudit).
     var auditSecrets: (code: String, id: String, token: String?)?
     /// The game's own folder, for that search (its log files).

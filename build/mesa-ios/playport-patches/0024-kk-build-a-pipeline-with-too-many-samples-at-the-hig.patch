@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sat, 17 Oct 2026 22:10:16 +0200
+Subject: [PATCH] kk: build a pipeline with too many samples at the highest
+ supported count
+
+Red Dead Redemption 2's Vulkan renderer builds 96 graphics pipelines
+with rasterizationSamples 8 on a device that reports 1, 2 and 4 sample
+counts; its images are made with 4. KosmicKrisp handed 8 to Metal as
+the pipeline's raster sample count, and to an attachment-less render
+pass as its default, which the device does not support: Metal requires
+the pipeline's count to match its attachments', and no attachment can
+have 8 samples here.
+
+Clamp the count Metal sees, for the pipeline and for a render pass
+without attachments, to the highest sample count the device supports
+that is not above the requested one. The other choice, failing the
+pipeline's creation, is no better for an application that uses invalid
+counts: it would get an error from vkCreateGraphicsPipelines at load,
+where a game may give up, for a pipeline it can only draw into the
+4-sample images it has. A valid application never asks for an
+unsupported count, so it sees no change. Shader compilation keeps the
+requested count: it only asks whether the count is above 1, and a
+static sample mask's bits past the fourth sample select nothing.
+
+Class: feature
+Evidence: docs/evidence/2026-10-17-rdr2-vulkan-needs.md
+Offered-upstream: no
+---
+ src/kosmickrisp/vulkan/kk_shader.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/src/kosmickrisp/vulkan/kk_shader.c b/src/kosmickrisp/vulkan/kk_shader.c
+index d77b204..e48ac4e 100644
+--- a/src/kosmickrisp/vulkan/kk_shader.c
++++ b/src/kosmickrisp/vulkan/kk_shader.c
+@@ -1647,10 +1647,25 @@ kk_msl_data_copy(struct msl_compile_data *dst,
+    dst->entrypoint_name = ralloc_strdup(NULL, src->entrypoint_name);
+ }
+ 
++/* The highest sample count the device supports, up to samples. An
++ * application may build a pipeline with a rasterizationSamples it cannot
++ * render with (Red Dead Redemption 2 builds 8-sample pipelines when the
++ * device reports 4, and makes its images with 4); Metal needs a raster sample
++ * count the device supports. The pipeline then matches the images the
++ * application can make, rather than failing to build. */
++static uint32_t
++kk_supported_raster_sample_count(const struct kk_physical_device *pdev,
++                                 uint32_t samples)
++{
++   while (samples > 1 && !(pdev->info.supported_sample_counts & samples))
++      samples >>= 1;
++   return samples;
++}
++
+ static void
+ gather_graphics_pipeline_create_info(
+-   const struct vk_graphics_pipeline_state *state, struct kk_shader **shaders,
+-   uint32_t shader_count)
++   struct kk_device *dev, const struct vk_graphics_pipeline_state *state,
++   struct kk_shader **shaders, uint32_t shader_count)
+ {
+    assert(state && shader_count >= 2 &&
+           "state, vertex and fragment shaders are a must");
+@@ -1696,7 +1711,8 @@ gather_graphics_pipeline_create_info(
+    info->vs.sample_count = 1u;
+    if (info->vs.has_ms) {
+       const struct vk_multisample_state *ms = state->ms;
+-      info->vs.sample_count = ms->rasterization_samples;
++      info->vs.sample_count = kk_supported_raster_sample_count(
++         kk_device_physical(dev), ms->rasterization_samples);
+    }
+ 
+    /* We need to store all other stage sources in the vertex too otherwise we
+@@ -2325,7 +2341,7 @@ kk_compile_shaders(struct vk_device *device, uint32_t shader_count,
+          kk_compile_compute_pipeline(dev, &s->msl_data[MESA_SHADER_COMPUTE],
+                                      local_size_threads, &s->pipeline.cs);
+    } else {
+-      gather_graphics_pipeline_create_info(state, shaders, total_shaders);
++      gather_graphics_pipeline_create_info(dev, state, shaders, total_shaders);
+       result = kk_compile_graphics_pipeline(dev, shaders[0]);
+ 
+       /* Free generated fragment and geometry shaders, and put the

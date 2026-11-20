@@ -28,6 +28,14 @@ struct AutoTuneAlert: ViewModifier {
                 Button("It froze") { offers.offer = nil; AutoTune.answer("froze") }
                 Button("It closed by itself") { offers.offer = nil; AutoTune.answer("closed-by-itself") }
                 Button("I closed BCD", role: .cancel) { offers.offer = nil; AutoTune.answer("i-closed") }
+            } else if offer.state.asksSuggestion {
+                // Round 670 (owner 2026-11-18, I1): the game played and auto-tune suggests a line; nothing changes without the player's yes.
+                Button("Try it next start") { AutoTune.approveSuggestion(offer.windowsPath); offers.offer = nil }
+                Button("Stop for this game", role: .destructive) {
+                    AutoTune.setOn(offer.windowsPath, false)
+                    offers.offer = nil
+                }
+                Button("Not now", role: .cancel) { AutoTune.declineSuggestion(offer.windowsPath); offers.offer = nil }
             } else if AutoTuneAsk.asks(offer) {
                 // madeira-bcd (Porthole port, item 10): "Ask before trying a fix" is on and a fix waits for the player's yes.
                 Button("Try it next start") { AutoTuneAsk.approve(offer.state, offer.windowsPath); offers.offer = nil }

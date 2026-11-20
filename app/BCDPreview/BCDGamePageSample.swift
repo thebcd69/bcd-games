@@ -134,7 +134,7 @@ import SwiftUI
                 toggle("winevcrt", "Wine's C++ runtime"),
                 BCDGameSetting(id: "fastsync", title: "Fast synchronization", kind: .toggle, value: "1", defaultValue: "1",
                                note: "Fastsync handles this game's events inside its own process.",
-                               locked: "This belongs to Fastsync: choose it in Settings › Memory & sync to change it."),
+                               locked: "This belongs to Fastsync: choose it in Settings › Memory & performance to change it."),
             ]),
             BCDGameSettingGroup(id: "controls", title: "Controls", symbol: "gamecontroller", settings: [
                 toggle("touch", "Touch controls", note: "Buttons on the screen over the game."),

@@ -1,0 +1,234 @@
+[18:37:49.711] [INFO] Checking entitlements...
+[18:37:49.711] [INFO] [build] v0.1.665 (665)
+[18:37:49.712] [INFO] [device] model=iPad14,3 idiom=pad os=iPadOS Version 27.2.1 (Build 24B156) ram=7535MB available=8168MB cores=8
+[18:37:49.712] [INFO] [device] address-map=[0x100540000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[18:37:49.713] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[18:37:49.724] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2388@1.7195876288659795x max-fps=120 utc-offset=+03:30 free-disk=11GB stikdebug-url=0
+[18:37:49.727] [INFO] [device] gpu="Apple M2 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[18:37:53.234] [INFO] Requesting JIT with Built-in StikJIT...
+[18:38:23.669] [INFO] [epic-launch] start app=b2..60 signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[18:38:23.676] [INFO] [bcd] library launch Frostpunk.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[18:38:23.704] [INFO] Running full Wine sequence...
+[18:38:23.704] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100540000,0x8000000000) 512GB available=8157MB low-power=0 thermal=nominal
+[18:38:23.706] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[18:38:23.708] [INFO] [msiexec64] Epic game: msiexec in system32 for this session
+[18:38:23.708] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[18:38:23.714] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[18:38:23.714] [INFO] Allocating 896MB JIT pool via debugger...
+[18:38:23.714] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[18:38:23.715] [INFO] [jit-debugger] attached=1 at the pool request
+[18:38:23.715] [INFO] [jit-age] attach age=28s source=enable-jit method=builtin thermal=0
+[18:38:23.715] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[18:38:23.717] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[18:38:24.657] [INFO] RX pool at 0x148000000
+[18:38:24.677] [OK] JIT pool ready (debugger still attached).
+[18:38:24.678] [INFO] BRK suspension lasted 0.96s
+[18:38:24.680] [INFO] Detaching debugger...
+[18:38:24.685] [OK] Debugger detached.
+[18:38:24.687] [OK] [early-detach] rev=ml524 took 7 ms
+[18:38:25.420] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=662MB limit=8191MB thermal=nominal lpm=0 api=D3D11/64 res=1144x800 cap=60 game=Frostpunk
+[18:38:25.527] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.857s rev=ml526
+[18:38:25.571] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[hwinput] keyboard focus: program (app active)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 12 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/86f59a647648428d.cfg (read)
+[WineProc] Target exe: C:\Program Files\Epic Games\Frostpunk\Frostpunk.exe (bundle=arm64ec-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1150 pool: 12 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 2694 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x71a7000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[18:38:26.479] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[18:38:26.479] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7518 MB + phys_footprint=673 MB = 8192 MB (hw.memsize says 7535 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7535 MB), so it is a sentinel, not a limit
+ml985: map_image_view size=0x45a5000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=13825 MB of 15232 MB free=1422 MB maxhole=1421 MB@0x71a7004000 rev=ml787 (periodic)
+[jit-pool] image 0x140000000+0x45a5000 (Frostpunk.exe) → pool 0x148004000 used=0x45ac000/0x27000000 tramp+0x0
+[copy-verify] Frostpunk.exe: OK, 1887 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14c5ac000 used=0x46e4000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14c5ac000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x71a7000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x121c74000..0x7997000000 regions=80043 occupied=468299 MB of 493395 MB free=47991 MB maxhole=22896 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=814 MB (peak 814) internal=812 MB compressed=0 MB external=78 MB reusable=10 MB (cycle=1)
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14c6e7000 used=0x4b13000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14c6e7000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x14cb10000 used=0x4c44000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14cb10000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14cc44000 used=0x4d0c000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14cc44000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x14cd0c000 used=0x500c000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14cd0c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Frostpunk.exe (frostpunk.exe-4b571aea254cf421): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FE2C0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE0A0000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FDFB0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDF00000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 0 data import(s) bound
+[free-delay] #1 release of 0x71a8090000+0x100000 held for 2000 ms (1 in flight)
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141d7c000+0x1000: 485 slot(s), 1 data import(s) bound
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14e478000)
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x14e56c000)
+D 24 Load module DINPUT8.dll (dinput8.dll-fa63f814948e9838): 71FCD90000
+[copy-verify] comctl32.dll: OK, 35 .text pages executable (copy @0x14e620000)
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x14e7a4000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x14e8c8000)
+[copy-verify] bcrypt.dll: OK, 4 .text pages executable (copy @0x14f47c000)
+D 24 Load module EOSSDK-Win64-Shipping.dll (eossdk-win64-shipping.dll-d9474b2c619c4bc7): 71FAFC0000
+[x64-data-imp] ml1245 importer pe=0x71fafc0000 IAT window 0x71fb862000+0x1000: 484 slot(s), 4 data import(s) bound
+[jit-pool] image 0x71f9f90000+0x160000 (opengl32.dll) → pool 0x151330000 used=0x9494000/0x27000000 tramp+0x4000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71F9F90000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[xp] 18:38:27.211 +0.57 dt=263 cpu=202 (thr 202) P=202 E=0 run=205 pgw=-1.0 GHz P=3.31 E=2.00 Minst=2927 IPC=4.38 mJ=665 pin=1034 rdKB=33660 fpMB=946
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71f9ee0000+0xb0000 (uxtheme.dll) → pool 0x151494000 used=0x9548000/0x27000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F9EE0000
+[image-reload] unmapped image 0x71f9ee0000+0xb0000: 1 pool copy marked
+[jit-pool] image 0x71f9f40000+0x4e000 (CONCRT140.dll) → pool 0x151548000 used=0x9598000/0x27000000 tramp+0x0
+D 24 Load module concrt140.dll (concrt140.dll-7f763053e9ad6c3f): 71F9F40000
+[jit-pool] image 0x71f9f30000+0xc000 (VCRUNTIME140_1.dll) → pool 0x151598000 used=0x95a4000/0x27000000 tramp+0x0
+D 24 Load module VCRUNTIME140_1.dll (vcruntime140_1.dll-5a9959dd5994c948): 71F9F30000
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............."
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9f90000) -> 64-bit table (0x103f4c708)
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=4 first=0000000141C76C10
+[xp-names] m1932161 "wine-x18-exc"
+[xp] 18:38:27.507 +0.87 dt=295 cpu=295 (thr 295) P=295 E=0 run=301 pgw=-1.0 GHz P=3.32 E=2.06 Minst=3582 IPC=3.65 mJ=1053 pin=44 rdKB=1200 fpMB=961
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x16dffc000 size=0x1000000 -> free-list rev=ml438
+[xp] 18:38:27.803 +1.16 dt=296 cpu=302 (thr 302) P=301 E=0 run=302 pgw=-1.0 GHz P=3.34 E=1.68 Minst=3781 IPC=3.76 mJ=1092 pin=0 rdKB=0 fpMB=1082
+[xp] 18:38:28.064 +1.43 dt=262 cpu=265 (thr 265) P=265 E=0 run=270 pgw=-1.0 GHz P=3.34 E=1.66 Minst=3511 IPC=3.97 mJ=1022 pin=0 rdKB=0 fpMB=1090
+[xp] 18:38:28.344 +1.71 dt=280 cpu=284 (thr 284) P=284 E=0 run=285 pgw=-1.0 GHz P=3.30 E=1.73 Minst=3762 IPC=4.01 mJ=1074 pin=0 rdKB=0 fpMB=1098
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[xp] 18:38:28.615 +1.98 dt=271 cpu=272 (thr 272) P=272 E=0 run=283 pgw=-1.0 GHz P=3.22 E=1.69 Minst=3828 IPC=4.38 mJ=1015 pin=257 rdKB=3424 fpMB=1114
+[footprint] rev=ml358 phys=1122 MB (peak 1122) internal=1119 MB compressed=0 MB external=127 MB reusable=10 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml1060 fast phys=1133 MB compressed=0 MB internal=1130 MB
+[free-delay] #2 release of 0x71adcb0000+0x100000 held for 2000 ms (1 in flight)
+[jit-pool] image 0x71f9e70000+0xc0000 (rsaenh.dll) → pool 0x1515a4000 used=0x9668000/0x27000000 tramp+0x4000
+D 24 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71F9E70000
+[image-reload] unmapped image 0x71f9e70000+0xc0000: 1 pool copy marked
+[jit-pool] image 0x71f9e70000+0xc0000 (rsaenh.dll) → pool 0x1515a4000 used=0x9668000/0x27000000 tramp+0x4000
+D 24 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71F9E70000
+[footprint] rev=ml1060 fast phys=1179 MB compressed=0 MB internal=1176 MB
+[free-delay] #3 release of 0x71a8740000+0x3a0000 held for 2000 ms (2 in flight)
+[footprint] rev=ml358 phys=1180 MB (peak 1180) internal=1177 MB compressed=0 MB external=128 MB reusable=10 MB (cycle=3)
+[dns] madeira-bcd begin #1 "api.epicgames.dev" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #1 "api.epicgames.dev" = 0 after 12 ms (2 result(s))
+E 30 [thr-term] rev=ml435 deinit #1 tid=0x30
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=55860 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=443 event=OUT err=0 fd=264 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=55861 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=55862 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=443 event=OUT err=0 fd=272 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-conn-done] dport=443 event=OUT err=0 fd=270 peer=YES path=REAL-kernel-completion rev=ml576
+[footprint] rev=ml358 phys=1183 MB (peak 1183) internal=1180 MB compressed=0 MB external=129 MB reusable=10 MB (cycle=4)
+E 2C [thr-term] rev=ml435 deinit #2 tid=0x2c
+E 28 [thr-term] rev=ml435 deinit #3 tid=0x28
+[free-delay] #4 release of 0x71abf10000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #5 release of 0x71a91c0000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x71a9d70000+0x100000 held for 2000 ms (3 in flight)
+[free-delay] #7 release of 0x71a90a0000+0x100000 held for 2000 ms (4 in flight)
+[free-delay] #8 release of 0x71a98f0000+0x100000 held for 2000 ms (5 in flight)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=3809
+[unwind] term ml661 begin rip=14cba11d4 rsp=71a781fe28 window=[71a781fe28..71a801fe28) max=32
+[unwind] term ml661 #00 pc=14cba11d4 rsp=71a781fe28  ucrtbase.dll+0x911d4
+[unwind] term ml662 #00 nv: rbx=1 rbp=71a781fe50 rsi=0 rdi=0 r12=71a8d3be20 r13=14cba11bc r14=71a8d3be20 r15=14cbf1000
+[unwind] term ml662   rbp=71a781fe50: 00000000 00000000 00000000 00000000 b0dc5d4c 01000000 a4dc5d4c 01000000
+[unwind] term ml662   r12=71a8d3be20: d81bc441 01000000 14fec341 01000000 5081d541 01000000 7081d541 01000000
+[unwind] term ml661 #01 pc=71a781fde0 rsp=71a781fe30  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+140: CALL 141c40e64  Frostpunk.exe+0x1c40e64
+0024:err:seh:call_seh_handlers [exc] ml811 code=4001000a addr=000000014CD24110 flags=0 nparams=4 tid=0024 hit=2
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".............."
+0024:err:seh:call_seh_handlers [exc] ml811 code=40010006 addr=000000014CD24110 flags=0 nparams=2 tid=0024 hit=2
+[span-census] FREE #1 0x7c11010000+0x1000000 tid=0024 live=3 rev=ml435
+[span-census] FREE #2 0x7c0d810000+0x1000000 tid=0024 live=2 rev=ml435
+[span-census] FREE #3 0x7c0a010000+0x1000000 tid=0024 live=1 rev=ml435
+[span-census] FREE #4 0x7c01410000+0x1000000 tid=0024 live=0 rev=ml435
+[jit-pool] tail FREE rx=0x16effc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=3829
+[unwind] term ml661 begin rip=14c62a16c rsp=71a781fc80 window=[71a781fc80..71a801fc80) max=32
+[unwind] term ml661 #00 pc=14c62a16c rsp=71a781fc80  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+148:   ? 71fd170000  AnselSDK64.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[18:38:34.206] [INFO] [session] length=10s play=0s frames=0 stalls=0/0s peak=1193MB limit=8191MB thermal=nominal lpm=0 api=D3D11/64 res=1144x800 cap=60 game=Frostpunk
+[frontend] returned to library
+[18:38:34.227] [INFO] [bcd-host] no report
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1453 MB compressed=0 MB external=133 MB reusable=9 MB (cycle=5)
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml1060 fast phys=1218 MB compressed=0 MB internal=1470 MB
+[footprint] rev=ml1060 fast phys=1249 MB compressed=0 MB internal=1501 MB
+[footprint] rev=ml1060 fast phys=1279 MB compressed=0 MB internal=1531 MB
+[18:38:35.949] [INFO] Detaching debugger...
+[footprint] rev=ml1060 fast phys=1298 MB compressed=20 MB internal=1530 MB
+[footprint] rev=ml358 phys=1200 MB (peak 1201) internal=1432 MB compressed=20 MB external=133 MB reusable=10 MB (cycle=6)
+[footprint] rev=ml358 phys=1184 MB (peak 1201) internal=1416 MB compressed=20 MB external=133 MB reusable=11 MB (cycle=7)
+[footprint] rev=ml358 phys=1169 MB (peak 1201) internal=1401 MB compressed=20 MB external=133 MB reusable=26 MB (cycle=8)
+[footprint] rev=ml358 phys=1161 MB (peak 1201) internal=1393 MB compressed=20 MB external=133 MB reusable=19 MB (cycle=9)
+[footprint] rev=ml358 phys=1161 MB (peak 1201) internal=1393 MB compressed=20 MB external=133 MB reusable=19 MB (cycle=10)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=44% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f8be220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f9d2fc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1702049e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16faeab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=5% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16febefc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16ffd6b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=0x0 lr=0x0 sp=0x0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "AudioSession - RootQueue" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x58 sp=0x170436f20 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1166 MB (peak 1201) internal=1398 MB compressed=20 MB external=144 MB reusable=19 MB (cycle=11)
+[xp] 18:38:47.791 +21.15 dt=326 cpu=33 (thr 32) P=0 E=33 run=35 pgw=-1.0 GHz P=0.00 E=1.13 Minst=44 IPC=1.19 mJ=2 pin=0 rdKB=0 fpMB=1166
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[xp] 18:38:48.063 +21.42 dt=272 cpu=101 (thr 102) P=61 E=40 run=122 pgw=-1.0 GHz P=2.04 E=1.63 Minst=323 IPC=1.70 mJ=56 pin=19 rdKB=556 fpMB=1167
+[xp] 18:38:48.348 +21.71 dt=285 cpu=76 (thr 74) P=25 E=50 run=82 pgw=-1.0 GHz P=1.48 E=1.59 Minst=174 IPC=1.48 mJ=17 pin=6 rdKB=208 fpMB=1167
+[18:38:48.064] [xp] 18:38:48.063 +21.42 dt=272 cpu=101 (thr 102) P=61 E=40 run=122 pgw=-1.0 GHz P=2.04 E=1.63 Minst=323 IPC=1.70 mJ=56 pin=19 rdKB=556 fpMB=1167
+[18:38:48.349] [xp] 18:38:48.348 +21.71 dt=285 cpu=76 (thr 74) P=25 E=50 run=82 pgw=-1.0 GHz P=1.48 E=1.59 Minst=174 IPC=1.48 mJ=17 pin=6 rdKB=208 fpMB=1167
+[18:38:48.650] [xp] 18:38:48.649 +22.01 dt=301 cpu=321 (thr 322) P=20 E=301 run=330 pgw=-1.0 GHz P=1.72 E=2.42 Minst=2259 IPC=2.96 mJ=167 pin=2 rdKB=96 fpMB=1168

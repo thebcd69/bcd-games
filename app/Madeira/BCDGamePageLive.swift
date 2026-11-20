@@ -249,17 +249,27 @@ import UniformTypeIdentifiers
         return false
     }()
 
-    /// The Vulkan driver of a game, where there is a choice (kosmicKrispUsable): Off, MoltenVK, KosmicKrisp. It is the game's `vulkan` line.
+    /// madeira-bcd (patched MoltenVK, build 669): gl/libMoltenVK_patched.dylib is in this build (build/moltenvk-ios/build-patched.sh; its CI step only
+    /// warns when it fails, so a build may not have it). WineProcessBridge.m asks the same at a start and keeps Vulkan off, with a log line, where it is missing.
+    static let patchedMoltenVKBundled: Bool = {
+        guard let folder = Bundle.main.resourceURL?.appendingPathComponent("gl", isDirectory: true) else { return false }
+        return FileManager.default.isReadableFile(atPath: folder.appendingPathComponent("libMoltenVK_patched.dylib").path)
+    }()
+
+    /// The Vulkan driver of a game, where there is a choice (kosmicKrispUsable): Off, MoltenVK, MoltenVK (patched, where this build has it), KosmicKrisp.
+    /// It is the game's `vulkan` line.
     private static func vulkanChoice(_ profile: GameProfile) -> BCDGameSetting {
         let value = profile.get("vulkan") ?? ""
         var choices = [BCDGameChoice(value: "", label: "Off"), BCDGameChoice(value: "moltenvk", label: "MoltenVK"),
                        BCDGameChoice(value: "kosmickrisp", label: "KosmicKrisp")]
+        if patchedMoltenVKBundled { choices.insert(BCDGameChoice(value: "moltenvk-patched", label: "MoltenVK (patched)"), at: 2) }
         if !choices.contains(where: { $0.value == value }) { choices.append(BCDGameChoice(value: value, label: value)) }
         return BCDGameSetting(id: "vulkan.driver", title: "Vulkan (experimental)", kind: .choice(choices), value: value, defaultValue: "",
                               note: "For a game that needs Vulkan, 64-bit (Detroit: Become Human) or 32-bit: Wine's Vulkan on Metal, drawn into the game's window. "
-                                + "MoltenVK is the one to try first. KosmicKrisp is Mesa's newer driver (iOS 26): it has geometry shaders and transform "
-                                + "feedback, which MoltenVK lacks, and is less tried. Off, the game finds no Vulkan driver, as before. "
-                                + "Takes effect at the game's next start.")
+                                + "MoltenVK is the one to try first. MoltenVK (patched) is MoltenVK with later fixes and the changes made for Enshrouded; it is "
+                                + "less tried, and OpenGL through Zink in the same game uses it too. KosmicKrisp is Mesa's newer driver (iOS 26): it has "
+                                + "geometry shaders and transform feedback, which MoltenVK lacks, and is less tried. Off, the game finds no Vulkan driver, "
+                                + "as before. Takes effect at the game's next start.")
     }
 
     /// A choice kept in the game's own file; a value typed into the file by hand is listed too.
@@ -385,7 +395,7 @@ import UniformTypeIdentifiers
             // madeira-bcd (KosmicKrisp): where this build bundles Mesa's KosmicKrisp and the device can run it (iOS 26, a Metal 4 GPU), the switch
             // is a choice of the Vulkan driver instead (Self.vulkanChoice, the same line of the game's file). Everywhere else: the switch, as before.
             Self.kosmicKrispUsable ? Self.vulkanChoice(profile) :
-            Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk",
+            Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk" || profile.get("vulkan") == "moltenvk-patched",
                         note: "For a game that needs Vulkan, 64-bit (Detroit: Become Human) or 32-bit: Wine's Vulkan on Metal (MoltenVK), drawn into the game's window. Off, the game finds no Vulkan driver, as before. Takes effect at the game's next start."),
             Self.toggle("nvidia", "Show the game an NVIDIA card", LibraryPrefs.nvidia(entry.windowsPath),
                         note: "For games that stop with \"no graphics card\" or \"failed to get GPU driver info\": Windows then reports an NVIDIA card and driver."),
@@ -393,7 +403,7 @@ import UniformTypeIdentifiers
             Self.line(BCDGPUCards.key, "Look like this GPU", profile, BCDGPUCards.choices,
                       note: "The graphics card the game is told it has: its name, maker and model, the same in Direct3D 9, 10, 11 and 12 and in Windows. For a game that quits with \"unsupported GPU\" or only knows some makers. Nothing runs faster: the phone's GPU does the drawing. NVIDIA GeForce RTX 3060 is the card the switch above reports, and a card chosen here wins over that switch. A game may then load the maker's own helper libraries. From the next start."),
             Self.line(BCDGPUCards.memoryKey, "Video memory", profile, BCDGPUCards.memoryChoices(RuntimeMemorySyncSettings.vramChoices),
-                      note: "The video memory the game is told it has. Games size their texture pools from it, so more than this phone can hold can end with iOS closing the game; Automatic follows what the phone can afford. Settings › Memory sets it for every game. From the next start."),
+                      note: "The video memory the game is told it has. Games size their texture pools from it, so more than this phone can hold can end with iOS closing the game; Automatic follows what the phone can afford. Settings › Memory & performance sets it for every game. From the next start."),
         ])
     }
 
@@ -402,7 +412,7 @@ import UniformTypeIdentifiers
     private func compatibility(_ entry: LibraryEntry) -> BCDGameSettingGroup {
         let path = entry.windowsPath
         let fastsync = SyncEngine.current == .fastsync
-        let lock = fastsync ? nil : "This belongs to Fastsync: choose it in Settings › Memory & sync to change it."
+        let lock = fastsync ? nil : "This belongs to Fastsync: choose it in Settings › Memory & performance to change it."
         let cpus = [BCDGameChoice(value: "0", label: "This device's")] + [1, 2, 4, 6].map { BCDGameChoice(value: "\($0)", label: "\($0)") }
         var settings = [
             Self.toggle("avx", "AVX and AVX2", LibraryPrefs.avx(path),
@@ -780,7 +790,7 @@ import UniformTypeIdentifiers
         }
         let missing = !direct && !dock.clientInstalled
         return BCDGameSettingGroup(id: "steam", title: "Steam", symbol: "arrow.down.app", settings: settings,
-                                   note: missing ? "BCD Dock needs Valve's client components first: download them in Settings › Steam › BCD Dock." : nil,
+                                   note: missing ? "BCD Dock needs Valve's client components first: download them in Settings › BCD Dock." : nil,
                                    headline: direct ? "The game's own program" : "Through BCD Dock")
     }
 
@@ -949,8 +959,13 @@ import UniformTypeIdentifiers
         default: status = "Play once: the first start is the baseline."
         }
         // madeira-bcd (Porthole port, item 10): Ask before trying a fix: the fix that waits for the player's yes.
-        let waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []
+        var waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []
         if !waiting.isEmpty { status = AutoTuneAsk.pageStatus(waiting) }
+        // Round 670 (owner 2026-11-18, I1): the game played and auto-tune suggests a line; the page keeps it after Not now too.
+        if tuned.on, waiting.isEmpty, let lines = state.suggestion, !lines.isEmpty {
+            waiting = lines
+            status += " " + "Auto-tune suggests trying \(lines.joined(separator: "; ")) at the next start: it may make the game run better. Nothing changes until you choose Try the suggested fix."
+        }
         d.tuning = BCDGameTuning(on: tuned.on, status: tuned.on || history ? status : nil, canUndo: history, found: state.kept, history: steps,
                                  waiting: waiting)
         if tuned.on && history { d.settings = "Auto-tune on" }   // on for every game now: the label says so only once it has a search or kept lines, so "Recommended" and "Your own" stay visible
@@ -1108,8 +1123,8 @@ import UniformTypeIdentifiers
             // Windows Vulkan (docs/VULKAN.md): the switch is the line `vulkan = moltenvk` in the game's own file.
             setLine(game, "vulkan", on ? "moltenvk" : "")
         case "vulkan.driver":
-            // madeira-bcd (KosmicKrisp): the driver choice (Self.vulkanChoice) writes the same line; anything but the two drivers takes it out.
-            setLine(game, "vulkan", value == "moltenvk" || value == "kosmickrisp" ? value : "")
+            // madeira-bcd (KosmicKrisp): the driver choice (Self.vulkanChoice) writes the same line; anything but the three drivers takes it out.
+            setLine(game, "vulkan", value == "moltenvk" || value == "moltenvk-patched" || value == "kosmickrisp" ? value : "")
         case "framegen":
             if #available(iOS 26.0, *) {
                 setLine(game, "env.MADEIRA_FRAMEGEN", on ? "1" : "")
@@ -1318,6 +1333,8 @@ import UniformTypeIdentifiers
     /// madeira-bcd (Porthole port, item 10): Try the suggested fix (Ask before trying a fix).
     func approveTuning(_ game: BCDGame) {
         guard let path = entry(for: game)?.windowsPath, AutoTune.enabled else { return }
+        // Round 670 (I1): a suggestion for a game that played becomes the next start's line; otherwise the waiting fix gets its yes.
+        if AutoTune.state(path).suggestion?.isEmpty == false { AutoTune.approveSuggestion(path); return }
         AutoTuneAsk.approve(AutoTune.state(path), path)
     }
 

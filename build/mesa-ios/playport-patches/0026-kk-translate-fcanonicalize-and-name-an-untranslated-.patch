@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sun, 18 Oct 2026 09:49:26 +0200
+Subject: [PATCH] kk: translate fcanonicalize, and name an untranslated ALU op
+ in the MSL
+
+nir_opt_algebraic turns x * 1.0, x + -0.0, fmin(x, x), fneg(fneg(x))
+and the like into fcanonicalize. It removes every fcanonicalize unless
+the shader flushes denormals of that size, or the result is used only
+as a float. KosmicKrisp reports no flush-to-zero mode
+(shaderDenormFlushToZeroFloat16/32 false), but spirv_to_nir takes a
+DenormFlushToZero execution mode with only a warning. vkd3d-proton
+declares FP32 flush-to-zero when a driver reports it; replayed under a
+profile that does, 297 of Red Dead Redemption 2's 3,564 DX12 MSL
+libraries had an fcanonicalize whose result is stored as bits.
+
+alu_to_msl had no case for it. Its default printed "ALU <op>", with no
+operand, into the MSL, and Apple's Metal compiler rejects every such
+library ("expected ';' after expression"). Translate fcanonicalize as
+its source: Metal has no canonicalize, and no reported mode asks for
+the flush. The default now prints "Unknown ALU <op>", like an unknown
+intrinsic's "Unknown intrinsic <name>": it is still not valid MSL, so
+the library fails to compile and the pipeline fails to build, and the
+text names what was missing.
+
+No other ALU op is left untranslated by KosmicKrisp's lowering for the
+features it reports: the rest are other drivers' ops, are produced only
+under compiler options KosmicKrisp does not set, are lowered by those it
+sets, or come only from OpenCL or from features it does not report
+(64-bit floats, bfloat16, 8-bit floats, Intel integer functions 2).
+
+Mesa main (9a1e58da, checked on 2026-10-18) has neither change.
+
+Class: upstream-bug
+Evidence: docs/evidence/2026-10-17-rdr2-vulkan-needs.md
+Offered-upstream: no
+---
+ src/kosmickrisp/compiler/nir_to_msl.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/kosmickrisp/compiler/nir_to_msl.c b/src/kosmickrisp/compiler/nir_to_msl.c
+index 63d2ec1..274823e 100644
+--- a/src/kosmickrisp/compiler/nir_to_msl.c
++++ b/src/kosmickrisp/compiler/nir_to_msl.c
+@@ -616,6 +616,12 @@ alu_to_msl(struct nir_to_msl_ctx *ctx, nir_alu_instr *instr)
+       alu_src_to_msl(ctx, instr, 0);
+       break;
+    case nir_op_mov:
++   /* fcanonicalize flushes denormals only under a flush-to-zero float mode,
++    * and nir_opt_algebraic removes it in every other shader. KosmicKrisp
++    * reports no flush-to-zero mode, so a shader that declares one anyway
++    * (spirv_to_nir accepts it with a warning) gets its source unchanged:
++    * Metal has no canonicalize. */
++   case nir_op_fcanonicalize:
+       alu_src_to_msl(ctx, instr, 0);
+       break;
+    case nir_op_b2f32:
+@@ -634,7 +640,9 @@ alu_to_msl(struct nir_to_msl_ctx *ctx, nir_alu_instr *instr)
+       alu_src_to_msl(ctx, instr, 2);
+       break;
+    default:
+-      P(ctx, "ALU %s", nir_op_infos[instr->op].name);
++      /* Not valid MSL, so the library fails to compile and the pipeline
++       * fails to build, as with an unknown intrinsic. */
++      P(ctx, "Unknown ALU %s", nir_op_infos[instr->op].name);
+    }
+ }
+ 

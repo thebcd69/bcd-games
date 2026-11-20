@@ -1,0 +1,291 @@
+[09:03:18.096] [INFO] Checking entitlements...
+[09:03:18.097] [INFO] [build] v0.1.665 (665)
+[09:03:18.097] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 26.6.1 (Build 23G83) ram=11616MB available=6122MB cores=6
+[09:03:18.097] [INFO] [device] address-map=[0x102400000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[09:03:18.098] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=1 wildcard=0 lc=1
+[09:03:18.107] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-05:00 free-disk=382GB stikdebug-url=1
+[09:03:18.111] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[09:03:21.652] [INFO] Requesting JIT with StikDebug...
+[09:03:21.659] [INFO] Opening StikDebug to enable JIT...
+[09:03:30.827] [INFO] [bcd-ui] play local
+[09:03:30.852] [INFO] [bcd] library launch Fables.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[09:03:30.869] [INFO] Running full Wine sequence...
+[09:03:30.869] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102400000,0xfc0000000) 63GB available=6112MB low-power=0 thermal=nominal
+[09:03:30.870] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[09:03:30.879] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[09:03:30.879] [INFO] Allocating 896MB JIT pool via debugger...
+[09:03:30.879] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[09:03:30.880] [INFO] [jit-debugger] attached=1 at the pool request
+[09:03:30.880] [INFO] [jit-age] attach age=3s source=enable-jit method=stikdebug thermal=0
+[09:03:30.881] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[09:03:33.396] [INFO] RX pool at 0x300000000
+[09:03:33.449] [OK] JIT pool ready (debugger still attached).
+[09:03:33.450] [INFO] BRK suspension lasted 2.57s
+[09:03:33.452] [INFO] Detaching debugger...
+[09:03:33.455] [OK] Debugger detached.
+[09:03:33.456] [OK] [early-detach] rev=ml524 took 5 ms
+[09:03:33.457] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.621s rev=ml526
+[09:03:33.500] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] PE probe: machine=0x14c (i386: WoW64)
+[WineProc] Target exe: C:\The Wolf Among Us\Fables.exe (bundle=aarch64-windows)
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x102900000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x47ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x47ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x47fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x47ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x47ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[fdtrace] pipes tid=0000 peb=0x47ffd0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[09:03:33.843] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5203 MB + phys_footprint=940 MB = 6144 MB (hw.memsize says 11616 MB)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x3ffef0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+[jit-pool] image 0x3ffe80000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x3ffab0000+0x3c4000 (libwow64fex.dll) → pool 0x300192000 used=0x55e000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 121 .text pages executable (copy @0x300192000)
+ml957: libwow64fex.dll backing 0x3ffab0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x3ff990000+0x120000 (ucrtbase.dll) → pool 0x30055c000 used=0x680000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x30055c000)
+[jit-pool] image 0x3ff8f0000+0xa0000 (KERNEL32.dll) → pool 0x300680000 used=0x728000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300680000)
+[jit-pool] image 0x3ff780000+0x170000 (kernelbase.dll) → pool 0x300728000 used=0x8a8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300728000)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[jit-pool] image 0x3ff700000+0x80000 (wow64win.dll) → pool 0x3008a8000 used=0x92c000/0x38000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x3008a8000)
+[jit-pool] image 0x3ff670000+0x90000 (win32u.dll) → pool 0x30092c000 used=0x9c0000/0x38000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x30092c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=fables.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300519ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ffab0000) -> 64-bit table (0x11346c708)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Fables.exe (fables.exe-a5b2a0917ce1f006): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903096a83d3d6c4): 4FFF40000
+[window] 0x126c00000..0xb30000000 regions=100001 occupied=7851 MB of 41108 MB free=33256 MB maxhole=31974 MB@0x361960000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=963 MB (peak 963) internal=961 MB compressed=0 MB external=116 MB reusable=3 MB (cycle=1)
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ce221c): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728ab630ec): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+D 24 Load module USER32.dll (user32.dll-7d7be97280c21be3): 47BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5aa25e81): 47B9F0000
+D 24 Load module DINPUT8.dll (dinput8.dll-fa6b381494cd9519): 47B3E0000
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x128820000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[unixlib] opengl32 (GL-absent stub table) (module 0x47ad40000) -> wow64 table (0x113474708)
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=2 p0=83 p1=47acf129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=2 p0=2 p1=47acf10a0
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x3000 protect=0x40
+[alias-own] ml640 #1 0x403f30000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x3009c0000 rw=0x3389c0000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=0000003c vis={30,30,830,480} surface=0x112eb09b0 rev=ml505 style=04ca0000 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x2002a class='ATL:00B1B348' text="" rev=ml853
+[win-pos] #2 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x112eb09b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x112eb09b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x2002a after=0x0 flags=00000018 vis={30,30,830,480} surface=0x112eb09b0 rev=ml505 style=04ca0000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x2002a class='ATL:00B1B348' text="Game Window" rev=ml853
+[win-pos] #5 hwnd=0x2002a after=0x0 flags=0000101e vis={30,30,162,68} surface=0x112eb09b0 rev=ml505 style=04ca0000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x2002a class='ATL:00B1B348' text="The Wolf Among Us" rev=ml853
+D 24 Load module winemetal.dll (winemetal.dll-5ddc50961490ef8a): 479C80000
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[winios] game window hwnd=0x2002a presents through Metal; its GDI surface is not drawn
+[winios] game window hwnd=0x2002a not drawn (presents through Metal)
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[win-pos] #6 hwnd=0x2002a after=0xffffffffffffffff flags=80000174 vis={0,0,1024,768} surface=0x10d9d9380 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6 hwnd=0x2002a class='ATL:00B1B348' text="The Wolf Among Us" rev=ml853
+[win-pos] #7 hwnd=0x2002a after=0x0 flags=80001807 vis={0,0,1024,768} surface=0x10d9d9380 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #7 hwnd=0x2002a class='ATL:00B1B348' text="The Wolf Among Us" rev=ml853
+[win-pos] #8 hwnd=0x1003a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #8 hwnd=0x1003a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #9 hwnd=0x1003a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #9 hwnd=0x1003a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #10 hwnd=0x2003e after=0x0 flags=0000003c vis={0,0,1,1} surface=0x112eb09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #10 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[win-pos] #11 hwnd=0x2003e after=0x0 flags=00000018 vis={0,0,1,1} surface=0x112eb09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #11 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[win-pos] #12 hwnd=0x2003e after=0x2003e flags=0000181b vis={0,0,1,1} surface=0x112eb09b0 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #12 hwnd=0x2003e class='Wine IME' text="" rev=ml853
+[stale-heal]   3 slot(s) in the copy of 0x3ffab0000 (libwow64fex.dll) -> 0x300073294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+D 24 Load module wbemprox.dll (wbemprox.dll-327d7b2744ccc61f): 479C40000
+D 24 Load module winspool.drv (winspool.drv-1d97ce048ba0711d): 479C00000
+D 24 Load module compstui.dll (compstui.dll-6ca7db67abe6d56e): 479BD0000
+[exc-disp] dispatch tid=0024 code=406d1388 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=4 p0=1000 p1=402ec4758
+[exc-disp] dispatch tid=003c code=406d1388 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=4 p0=1000 p1=40b53fd14
+[xp-names] m68745 "wine-x18-exc"
+[xp] 09:03:34.500 +0.59 dt=281 cpu=289 (thr 269) P=284 E=5 run=303 pgw=-1.0 GHz P=3.27 E=2.23 Minst=4479 IPC=4.76 mJ=759 pin=0 rdKB=0 fpMB=1116
+[xp] 09:03:34.816 +0.91 dt=317 cpu=322 (thr 322) P=321 E=1 run=405 pgw=-1.0 GHz P=3.15 E=1.08 Minst=3054 IPC=3.03 mJ=617 pin=0 rdKB=0 fpMB=1116
+[xp] 09:03:35.141 +1.23 dt=325 cpu=333 (thr 333) P=332 E=2 run=420 pgw=-1.0 GHz P=3.15 E=1.26 Minst=3105 IPC=2.96 mJ=628 pin=0 rdKB=0 fpMB=1116
+[xp] 09:03:35.465 +1.55 dt=324 cpu=333 (thr 332) P=331 E=2 run=421 pgw=-1.0 GHz P=3.16 E=1.67 Minst=3074 IPC=2.93 mJ=617 pin=0 rdKB=0 fpMB=1116
+[xp] 09:03:35.772 +1.86 dt=306 cpu=313 (thr 313) P=311 E=1 run=395 pgw=-1.0 GHz P=3.16 E=1.16 Minst=2912 IPC=2.96 mJ=583 pin=0 rdKB=0 fpMB=1116
+[footprint] rev=ml358 phys=1119 MB (peak 1119) internal=1117 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=2)
+[xp] 09:03:36.083 +2.17 dt=311 cpu=404 (thr 404) P=398 E=5 run=520 pgw=-1.0 GHz P=3.23 E=2.03 Minst=3279 IPC=2.53 mJ=727 pin=0 rdKB=0 fpMB=1119
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml358 phys=1121 MB (peak 1121) internal=1119 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=3)
+[footprint] rev=ml358 phys=1123 MB (peak 1123) internal=1120 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=4)
+[footprint] rev=ml358 phys=1124 MB (peak 1124) internal=1122 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=5)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=335 full-path-hits=91 component-lookups=1038 shortcut-hits=463 misses=162 scans=575 entries-scanned=25340 us-in-lookup=124339 (1% of the window) slowest=0.471 ms ...9A/Documents/wine/dosdevices/c:/windows/syswow64/shell32.dll
+[footprint] rev=ml358 phys=1125 MB (peak 1125) internal=1123 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=6)
+[footprint] rev=ml358 phys=1126 MB (peak 1126) internal=1124 MB compressed=0 MB external=119 MB reusable=3 MB (cycle=7)
+[exc-disp] dispatch tid=0024 code=406d1388 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=4 p0=1000 p1=402ec529c
+[exc-disp] dispatch tid=003c code=406d1388 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=4 p0=1000 p1=40b53fd14
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbe758db): 479B90000
+D 54 Load module avrt.dll (avrt.dll-cbfea88ff16d14eb): 479B70000
+E 24 NoExec instruction in entry block: 14CF4E8
+E 24 [iOS-noexec] status=NOEXEC BlockEntry=0x14cf4e8 GuestRIP=0x14cf4e8 repeat=1 rev=ml486
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x337ffc354 NO pool/anon alias | region 0x102400000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[entry-fail] rev=ajan2-tani #1 NoExec block (null-read thunk): guest RIP=0x14cf4e8 (32-bit guest, window base 0x400000000) RSP=0x14cf4cc host pc=0x337ffc354 lr=0x337ffc1d8
+[entry-fail]   guest bytes -32..-1: 7e a4 3e 7b e8 f4 4c 01 5c f9 4c 01 40 f9 4c 01 69 bf 3e 7b b0 41 3e 7b e8 f4 4c 01 5c f9 4c 01 | +0..+15: 4c 04 00 00 dc 3e 57 9e 34 77 d2 11 8d 4a 23 90 
+[entry-fail]   [RSP]=0x14cf4e8 (32-bit guest)  bytes before it (the call): 7e a4 3e 7b e8 f4 4c 01 5c f9 4c 01 40 f9 4c 01 69 bf 3e 7b b0 41 3e 7b e8 f4 4c 01 5c f9 4c 01 
+[entry-fail]   session LdrSystemDllInitBlock: ntdll_handle=0xfff40000 KiUserExceptionDispatcher=0xfff8ef08 KiUserApcDispatcher=0xfff8ef18 KiUserCallbackDispatcher=0xfff8f340 LdrInitializeThunk=0xfff8f9f0; RIP equals none of its dispatcher fields
+[noexec-who] rev=624 rip=0x14cf4e8 tid=0024 last-unmap {none in the history} last-map {none in the history} now: a view 0x400cd0000+0x800000 protect=0x23 (VirtualAlloc)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x337ffc354 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x337ffc354 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x337ffc354 addr=0x0 x18=0x47ffc0000 type=1 lr=0x337ffc1d8 sp=0x1273ff350 x16=0x30006ac60 x17=0x1273feb60
+[guest-code] rev=ml333 pool_rip=0x14cf4e8 (PE 0x14cf4e8) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x14cf4cc x9=0x4 x10=0x0 x11=0x50001 x0=0xd32001380 x2=0x0 | teb=0x47ffc0000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 337ffc254: aa1c03e1 58010f64 d63f0080 d2c00093 b9440b84 d51b4204 d53b4404 b27f0484
+[fault-host] 337ffc274: b943cf87 b34618e4 d51b4404 91070384 4cdf2c90 4cdf2c94 a9421f84 a9431b85
+[fault-host] 337ffc294: a9442788 a9452f8a 29426f9a d61f0000 d4400000 d4400000 d53b4400 927df000
+[fault-host] 337ffc2b4: d51b4400 d53b4200 b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a
+[fault-host] 337ffc2d4: 91070380 4c9f2c10 4c9f2c14 d4400000 d53b4400 927df000 d51b4400 d53b4200
+[fault-host] 337ffc2f4: b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4400 927df000 d51b4400
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x30029aabc = libwow64fex.dll+0x108abc copy_owner=0x0
+[exit-stk] sp+0xa8: 0x30029aa40 = libwow64fex.dll+0x108a40 copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x30029aa38 = libwow64fex.dll+0x108a38 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x47ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x14cf4cc RCX=0xd32001380 RDX=0x0 RBX=0x14cf26c RSP=0x80000000 RBP=0x0 RSI=0x3000c6000 RDI=0x14cf4b0
+[x86_live]  R8=0x0  R9=0x1273fef88 R10=0x0 R11=0x1 R12=0x400000000 R13=0x14cf4e8 R14=0x14cf4e8 R15=0x14cf0ec
+[x86_live] State.RIP=0x0 callret_sp=0x0
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x337ffc354 NO pool/anon alias | region 0x102400000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[noexec-who] rev=624 rip=0x14cf4e8 tid=0024 last-unmap {none in the history} last-map {none in the history} now: a view 0x400cd0000+0x800000 protect=0x23 (VirtualAlloc)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x337ffc354 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x337ffc354 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x337ffc354 addr=0x0 x18=0x47ffc0000 type=1 lr=0x337ffc1d8 sp=0x1273ff350 x16=0x30006ac60 x17=0x1273feb60
+[guest-code] rev=ml333 pool_rip=0x14cf4e8 (PE 0x14cf4e8) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x14cf4cc x9=0x4 x10=0x0 x11=0x50001 x0=0xd32001380 x2=0x0 | teb=0x47ffc0000 peb=0x47ffd0000 peb->EcCodeBitMap=0x0
+[fault-host] 337ffc2b4: d51b4400 d53b4200 b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a
+[fault-host] 337ffc2d4: 91070380 4c9f2c10 4c9f2c14 d4400000 d53b4400 927df000 d51b4400 d53b4200
+[fault-host] 337ffc2f4: b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10
+[fault-host] 337ffc314: 4c9f2c14 d4200000 d53b4400 927df000 d51b4400 d53b4200 b9040b80 a9021f84
+[fault-host] 337ffc334: a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14 52800001
+[fault-host] 337ffc354: f9400021 d53b4400 927df000 d51b4400 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4400 927df000 d51b4400
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[exit-stk] sp+0x48: 0x30029aabc = libwow64fex.dll+0x108abc copy_owner=0x0
+[exit-stk] sp+0xa8: 0x30029aa40 = libwow64fex.dll+0x108a40 copy_owner=0x0
+[exit-stk] sp+0x1c8: 0x30029aa38 = libwow64fex.dll+0x108a38 copy_owner=0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x47ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x14cf4cc RCX=0xd32001380 RDX=0x0 RBX=0x14cf26c RSP=0x80000000 RBP=0x0 RSI=0x3000c6000 RDI=0x14cf4b0
+[x86_live]  R8=0x0  R9=0x1273fef88 R10=0x0 R11=0x1 R12=0x400000000 R13=0x14cf4e8 R14=0x14cf4e8 R15=0x14cf0ec
+[x86_live] State.RIP=0x0 callret_sp=0x0
+0024:err:seh:segv_handler SEGV #1: pc=0x337ffc354 addr=0x0 uctx_x18=0x47ffc0000 disp=0 mach_exc=1374
+0024:err:seh:segv_handler SEGV at pc=0x337ffc354 addr=0x0 esr=0x92000006 TPIDR_EL0=0x1004 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0xd32001380 x1=0x0 x2=0x0 x3=0x1273fef88
+0024:err:seh:segv_handler   x8=0x14cf4cc x9=0x4 x10=0x0 x16=0x30006ac60 x17=0x1273feb60 x18=0x47ffc0000 x19=0x400000000 x20=0x14cf4e8
+0024:err:seh:segv_handler   fp=0x0 lr=0x337ffc1d8 sp=0x1273ff350
+0024:err:seh:segv_handler   [teb-tsd] base=0x16df730e0 offset=0x8d8 raw=0x47ffc0000 teb_key_val=0x47ffc0000
+0024:err:seh:segv_handler   [guest-state] x28=0xd32001140 rip=0x14cf4e8
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x337716ae0 unresolved: hostPC outside block
+0024:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x14cf9f0 rdx=0x1 rbx=0x14cf95c
+0024:err:seh:segv_handler   [guest-state]   rsp=0x14cf4cc rbp=0x4 rsi=0x0 rdi=0x50001
+0024:err:seh:segv_handler   [guest-state]   r8 =0x0 r9 =0x0 r10=0x0 r11=0x0
+0024:err:seh:segv_handler   [guest-state]   r12=0x0 r13=0x0 r14=0x0 r15=0x0
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=0/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-24  a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14 52800001
+0024:err:seh:segv_handler   [emit-dump]   +0    f9400021 d53b4400 927df000 d51b4400 d53b4200 b9040b80
+0024:err:seh:segv_handler   [emit-dump]   +24   a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380
+0024:err:seh:segv_handler   [rsp-trunc] cpuarea=0x0 implausible (TSD275 not a wine TEB) -- skipping deref rev=ml558
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4400 927df000 d51b4400
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x337ffc354 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+wine: Unhandled page fault on execute access to 014CF4E8 at address 014CF4E8 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=973
+[term-stack] 32-bit sp+000: ret fff8e14c ntdll.dll+0x4e14c (an indirect call before it)
+[term-stack] 32-bit sp+004: ret fff8f9b8 ntdll.dll+0x4f9b8 (a direct call before it)
+[term-stack] 32-bit sp+034: ret fff8f9a4 ntdll.dll+0x4f9a4 (a direct call before it)
+[term-code] 32-bit terminate: EIP 0x002a0000 (no module (an anonymous page)+0x0); EAX=0000002c ECX=014cffa0 EDX=fff8ef00 ESI=00000000 EDI=00000000; 47 modules (MADEIRA_X86_FAULT_DUMP)
+[srv-kill] kill_thread tid=0048 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=004c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0054 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0058 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=005c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0060 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[09:03:47.369] [INFO] [session] length=16s play=0s frames=0 stalls=0/0s peak=1196MB limit=6143MB thermal=nominal lpm=0 api=D3D9/32 res=1408x648 cap=60 game=Fables
+[09:03:47.380] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=1200 MB (peak 1200) internal=1199 MB compressed=0 MB external=123 MB reusable=3 MB (cycle=8)
+[09:03:49.458] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1199 MB compressed=0 MB external=124 MB reusable=3 MB (cycle=9)
+[footprint] rev=ml358 phys=1201 MB (peak 1201) internal=1199 MB compressed=0 MB external=124 MB reusable=3 MB (cycle=10)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=10% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d9fdc90 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16da86b40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e22c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x404070000 cpu=0% wait pc=libsystem_kernel.dylib`__select+0x8 lr=Madeira`NtDelayExecution+0x368 sp=0x13186fb00 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x34 pc=0x3000692b4 user-sp=0x13206f020 user-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16db124f0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16df72fc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x1c sp=0x16de5ac40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "AudioSession - RootQueue" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x40 sp=0x16e3eef20 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1202 MB (peak 1202) internal=1200 MB compressed=0 MB external=124 MB reusable=3 MB (cycle=11)
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[footprint] rev=ml358 phys=1205 MB (peak 1205) internal=1203 MB compressed=0 MB external=130 MB reusable=3 MB (cycle=12)
+[xp] 09:03:56.486 +22.57 dt=255 cpu=42 (thr 43) P=0 E=42 run=44 pgw=-1.0 GHz P=0.00 E=1.18 Minst=104 IPC=2.08 mJ=4 pin=0 rdKB=0 fpMB=1205
+[xp] 09:03:56.747 +22.84 dt=261 cpu=35 (thr 35) P=0 E=35 run=40 pgw=-1.0 GHz P=0.00 E=1.10 Minst=63 IPC=1.65 mJ=3 pin=0 rdKB=0 fpMB=1205
+[xp] 09:03:57.041 +23.13 dt=294 cpu=56 (thr 56) P=23 E=33 run=72 pgw=-1.0 GHz P=1.86 E=1.46 Minst=151 IPC=1.66 mJ=21 pin=4 rdKB=164 fpMB=1205
+[09:03:56.748] [xp] 09:03:56.747 +22.84 dt=261 cpu=35 (thr 35) P=0 E=35 run=40 pgw=-1.0 GHz P=0.00 E=1.10 Minst=63 IPC=1.65 mJ=3 pin=0 rdKB=0 fpMB=1205
+[09:03:57.041] [xp] 09:03:57.041 +23.13 dt=294 cpu=56 (thr 56) P=23 E=33 run=72 pgw=-1.0 GHz P=1.86 E=1.46 Minst=151 IPC=1.66 mJ=21 pin=4 rdKB=164 fpMB=1205
+[09:03:57.295] [xp] 09:03:57.294 +23.38 dt=253 cpu=104 (thr 104) P=2 E=103 run=123 pgw=-1.0 GHz P=1.21 E=1.87 Minst=513 IPC=2.64 mJ=20 pin=4 rdKB=128 fpMB=1206

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 NevesHenry: cdnRotationEnabled, taken from https://github.com/willfaust/Madeira (pull request #620, commit ffd0ae51), November 2026.
 // Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `dlc`, and the DLC request a download carries
 // (`run`). A game nothing was chosen for, with no DLC installed, downloads as before.
 // Modified by BCD (thebcd69), 2026-11-05: a game's version (beta branches): the game's branches (`SteamOwnedGame.branches`), `refreshBranches`,
@@ -309,7 +310,14 @@ final class SteamOwnedLibrary: ObservableObject {
     private lazy var gate = SteamConnectionGate(close: { [session] in await session.suspend() },
                                                 reopen: { [session] in session.resume() })
     private lazy var fetcher = SteamLibraryFetcher(session: session)
-    private lazy var downloader = DepotDownloader(session: session)
+    /// On by default (upstream Madeira #620). env.MADEIRA_STEAM_CDN_ROTATE = 0 restores ordering the content servers by
+    /// failure count first: one failure sends a server behind every server with none. Read once, when the downloader is made.
+    static var cdnRotationEnabled: Bool { SteamSignIn.flag("MADEIRA_STEAM_CDN_ROTATE", default: true) }
+    private lazy var downloader: DepotDownloader = {
+        let downloader = DepotDownloader(session: session)
+        downloader.rotatesContentServers = Self.cdnRotationEnabled
+        return downloader
+    }()
     /// BCD's DLC support (BCDSteamDLC/): the owned DLC of a game, the player's choice, and the DLC part of each download.
     private(set) lazy var dlc = SteamDLCService(fetcher: fetcher, choicesFile: Self.supportFolder.appendingPathComponent("steam-dlc.json"),
                                                 canConnect: { [unowned self] in Self.enabled && self.signedIn && !self.inSession },
@@ -521,7 +529,7 @@ final class SteamOwnedLibrary: ObservableObject {
 
     // MARK: Steam Cloud (docs/STEAM_CLOUD.md)
 
-    /// Steam Cloud is on unless Settings › Steam Cloud saves turns it off, kept in
+    /// Steam Cloud is on unless Settings › Accounts › Steam Cloud saves turns it off, kept in
     /// bcd.cfg as `env.MADEIRA_STEAM_CLOUD = 0` (SteamCloudSetting). Off: no checks, no section.
     static var cloudEnabled: Bool { enabled && SteamSignIn.flag("MADEIRA_STEAM_CLOUD", default: true) }
     /// `env.MADEIRA_STEAM_CLOUD_AUTO = 0`: compare only; nothing is copied
@@ -1583,6 +1591,21 @@ final class SteamOwnedLibrary: ObservableObject {
         // Round 660 (M101; Lust Goddess PX0YJF): a reply that does not parse said only "SteamError"; the parser's own words are fixed texts
         // (SteamProtoMessages.swift), so the line reads "failed reason=proto-it-ends-inside-a-number-field".
         case SteamError.protobufError(let why): return "proto-" + why.replacingOccurrences(of: " ", with: "-")
+        // madeira-bcd (Porthole 1.3.1): a Steam Cloud file that did not check out says what arrived
+        case let cloud as SteamCloudTransfer.FetchError: return "cloud-\(cloud.kind) \(cloud.detail)"
+        // Round 669 (log gap, PH report 2026-11-17): 515 cloud lines and others said only "reason=SteamError" or "SteamFileError"; each
+        // case now has a fixed word (no account text: a sign-in failure's own words are not logged).
+        case SteamError.authenticationFailed: return "auth-failed"
+        case SteamError.invalidCredentials: return "credentials"
+        case SteamError.rateLimited: return "rate-limited"
+        case SteamError.accountDisabled: return "account-disabled"
+        case SteamError.rsaKeyFetchFailed: return "rsa-key"
+        case SteamError.qrCodeExpired: return "qr-expired"
+        case SteamError.authSessionExpired: return "session-expired"
+        case SteamError.invalidMessage: return "invalid-message"
+        case SteamError.appInfoNotFound: return "no-app-info"
+        case SteamError.decryptionFailed: return "decrypt"
+        case SteamFileError.invalid(let why): return "file-" + why.replacingOccurrences(of: " ", with: "-")
         case let url as URLError: return "url-\(url.code.rawValue)"
         default: return String(describing: type(of: error))
         }

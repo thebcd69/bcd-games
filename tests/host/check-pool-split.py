@@ -169,7 +169,12 @@ assert take.index('poolMid = nil') > take.index('let b = vm_address_t(bitPattern
 assert 'VM_FLAGS_OVERWRITE' not in mid_take
 assert swift.index('poolMid = nil   // pool-mid') < swift.index('var pairSecond: (base: vm_address_t, size: vm_address_t)? = nil'), \
     'reset before pool-pair, which takes B (and M) early'
-assert swift.count('poolMid = nil') == 4
+# build 666 (pull request #55): two more, both only with pool-tagged on (its reset before placement and its cleanup defer)
+assert swift.count('poolMid = nil') == 6 and 'if taggedPool { poolMid = nil }' in swift \
+    and 'if let mid = poolMid { _ = releasePoolMapping(mid.base, vm_size_t(mid.size)); poolMid = nil }' in swift
+# releasePoolMapping is vm_deallocate (the result too); with pool-tagged on a failed release also stops further attempts
+rpm = swift_func('@discardableResult private static func releasePoolMapping(')
+assert 'let result = vm_deallocate(mach_task_self_, base, size)' in rpm and 'if taggedPool && result != KERN_SUCCESS {' in rpm and rpm.rstrip().endswith('return result\n    }')
 holes = swift_func('private static func splitHoles(')
 assert 'poolHole = below ?? above' in holes and 'poolHole2 = below == nil ? nil : above' in holes
 assert swift.count('"pool-RW-alias-mid"') == 2, 'M gets its own no-footprint request'
@@ -177,10 +182,10 @@ assert 'if let mid = poolMid { lowRegions.append((rx: mid.base, size: mid.size))
 assert ("rwSplit = mapLowAlias([(rx: rxAddrV, size: vm_address_t(poolSize)), (rx: mid.base, size: mid.size),\n"
         "                                           (rx: second.base, size: second.size)], tag: \"[pool-mid]\")") in swift
 released = swift[swift.index('if rwSplit == nil {\n                        let dkr'):][:400]
-assert 'vm_deallocate(mach_task_self_, mid.base, vm_size_t(mid.size))' in released and 'poolMid = nil' in released, \
+assert 'releasePoolMapping(mid.base, vm_size_t(mid.size))' in released and 'poolMid = nil' in released, \
     'a failed three-region alias gives M back and maps A and B as before'
 gone = swift[swift.index('the pool stays \\(poolSize >> 20)MB in one region", level: .error)'):][:300]
-assert 'vm_deallocate(mach_task_self_, mid.base, vm_size_t(mid.size))' in gone, 'M goes with B'
+assert 'releasePoolMapping(mid.base, vm_size_t(mid.size))' in gone, 'M goes with B'
 hole2_env = content[content.index('if let hole2 = StikJITHelper.poolHole2 {'):][:300]
 assert 'setenv("WINE_IOS_JIT_HOLE2", String(format: "%lx:%lx", hole2.off, hole2.end), 1)' in hole2_env
 assert 'unsetenv("WINE_IOS_JIT_HOLE2")' in hole2_env

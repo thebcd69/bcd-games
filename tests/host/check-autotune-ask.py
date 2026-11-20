@@ -85,7 +85,8 @@ check("the words: the ask's own while a fix waits, else the result's as always",
 # ---- 3. page, Settings, CI
 check("the game page: the waiting fix in the status line and a Try the suggested fix row (only while one waits)",
       "var waiting: [String] = []" in page and "if !tuning.waiting.isEmpty {" in page and "model.request(.approveTuning)" in page
-      and "func approveTuning(_ game: BCDGame) {}" in page and "let waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []" in page_live)
+      and "func approveTuning(_ game: BCDGame) {}" in page and "var waiting = tuned.on ? AutoTuneAsk.waiting(state, path) : []" in page_live   # var since round 670 (I1: a suggestion fills it too)
+      and "if tuned.on, waiting.isEmpty, let lines = state.suggestion, !lines.isEmpty {" in page_live)
 check("Settings › Logs › After a crash has the switch, off by default, under Auto-tune and only while it is on",
       'title: "Ask before trying a fix"' in sections and sections.index('"autotune"), title: "Auto-tune"') < sections.index('"askfix")')
       and "if backend.crashTuning {" in sections and "var asksBeforeFix: Bool { false }" in sections

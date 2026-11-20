@@ -139,6 +139,9 @@ c_table = r'''
 typedef unsigned short WCHAR;
 typedef struct { unsigned short Length; unsigned short MaximumLength; WCHAR *Buffer; } UNICODE_STRING;
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+/* round 668: the child table asks which process spawns (ios_child_slot_take marks a crash uploader's parent) */
+static void *harness_spawner_peb;
+void *ios_jit_current_peb(void) { return harness_spawner_peb; }
 ''' + table + r'''
 static int failed;
 static void expect(int cond, const char *what) { printf("%s: %s\n", cond ? "PASS" : "FAIL", what); if (!cond) failed++; }
@@ -149,7 +152,7 @@ static int spawn(const char *path)
     size_t n = strlen(path), i;
     for (i = 0; i < n; i++) buf[i] = (unsigned char)path[i];
     u.Length = (unsigned short)(n * sizeof(WCHAR)); u.MaximumLength = u.Length; u.Buffer = buf;
-    return ios_child_slot_take(&u);
+    return ios_child_slot_take(&u, NULL);
 }
 static void *peb_of(int n) { return (void *)(uintptr_t)(0x10000 + 0x1000 * n); }
 static int start(const char *path, int n)

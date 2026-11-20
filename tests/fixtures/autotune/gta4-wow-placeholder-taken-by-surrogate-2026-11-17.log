@@ -1,0 +1,275 @@
+[16:07:43.972] [INFO] Checking entitlements...
+[16:07:43.973] [INFO] [build] v0.1.665 (665)
+[16:07:43.973] [INFO] [device] model=iPhone19,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11543MB available=8164MB cores=6
+[16:07:43.973] [INFO] [device] address-map=[0x100994000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[16:07:43.974] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=364d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=0 wildcard=0 lc=0
+[16:07:43.990] [INFO] [device] settings: low-power=0 thermal=nominal screen=1206x2622@3.0x max-fps=120 utc-offset=+01:00 free-disk=350GB stikdebug-url=0
+[16:07:43.993] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:07:45.556] [INFO] Requesting JIT with Built-in StikJIT...
+[16:07:54.938] [INFO] [bcd] library launch Grand Theft Auto IV: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[16:07:54.974] [INFO] [madeira-dock] launch option 0
+[16:07:54.974] [INFO] [madeira-dock] launch option 0 entry: program=GTAIV/PlayGTAIV.exe arguments="" oslist= osarch= type=none dlc=0 beta=0 workingDir=1
+[16:07:54.982] [INFO] [dock-launch] friends=0
+[16:07:54.983] [INFO] [dock-launch] image-retire=1
+[16:07:54.983] [INFO] [dock-launch] image-map-guard=1
+[16:07:54.983] [INFO] [dock-offline] enabled=1 network=up request=0 account-saved=1 game-started-online=0
+[16:07:55.035] [INFO] [dock-installers] app=12210 results reason=next-start succeeded=2 failed=0 recorded-values=4 services=started ended=1 statuses=<ip>=0,101103150=0
+[16:07:55.124] [INFO] [dock-installers] app=12210 program=<ip> file=Social-Club-Setup.exe status=done key=HKLM\Software\Rockstar Games\Steam\SDK recorded=1 minimum=1 machine=0x8664
+[16:07:55.153] [INFO] [dock-installers] app=12210 program=101103150 file=Rockstar-Games-Launcher.exe status=done key=HKLM\Software\Rockstar Games\Steam\Launcher recorded=1 minimum=1 machine=0x8664
+[16:07:55.153] [INFO] [dock-installers] app=12210 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[16:07:55.193] [INFO] [madeira-dock] starting the host for app 12210; Valve's client authenticates and authorizes the launch
+[16:07:55.201] [INFO] Running full Wine sequence...
+[16:07:55.201] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100994000,0x8000000000) 512GB available=8124MB low-power=0 thermal=nominal
+[16:07:55.202] [INFO] [game-cfg] env.MADEIRA_DOCK_GAME_SCM=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=0 env.MADEIRA_GUEST_LOG=all env.MADEIRA_GUEST_LOG_LIMIT=800 env.MADEIRA_OPTIN_DLLS=tbs env.MADEIRA_POOL_HEAD_RESERVE_MB=128 env.MADEIRA_POOL_LAZY_WINDOWS=1 env.MADEIRA_POOL_LOW_IMAGES=1 env.MADEIRA_POOL_RECYCLE_IMAGES=1 env.MADEIRA_SC_ALIGN1G=1 env.MADEIRA_SC_PA_POOLS=2 env.MADEIRA_SPAWN_BLOCK=RockstarErrorHandler env.MADEIRA_SRV_POLLOUT_GUARD=1 env.MADEIRA_WOW_MIN_FREE_GB=2 env.MADEIRA_WOW_PLACEHOLDER_SLOTS=1 env.MADEIRA_X64_IMAGE_NOCOPY=1 pool-low=1 pool-page-fit=1 pool-split=1
+[16:07:55.203] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): GTAIV.exe names dxgi (Grand Theft Auto IV, remembered)
+[16:07:55.207] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[16:07:55.207] [INFO] Allocating 896MB JIT pool via debugger...
+[16:07:55.207] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:07:55.207] [INFO] [jit-debugger] attached=1 at the pool request
+[16:07:55.207] [INFO] [jit-age] attach age=8s source=enable-jit method=builtin thermal=0
+[16:07:55.208] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[16:07:55.209] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 627MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[16:07:55.815] [INFO] RX pool at 0x148000000
+[16:07:56.096] [INFO] [pool-low] region C 0x12ea18000+277MB (free runs below the window: 0x126a18000+405MB; 128MB of the run left free for the low images, pool-low-margin = 128)
+[16:07:56.397] [OK] [pool-split] JIT pool = RX [0x148000000,0x16f36c000) 627MB + [0x16f9e4000,0x180000000) 262MB as one 889MB span; pool offsets [0x2736c000,0x279e4000) (6MB, the main thread's stack) are never handed out
+[16:07:56.400] [ERR] [pool-low] region C RX [0x12ea18000,0x140000000) 277MB, RW [0x7900000000,0x79115e8000) at the pool's distance 0x77d15e8000 (one RW reservation from 0x7900000000); FEX code buffers come from C first, the pool span is left to the image copies (no-footprint REFUSED)
+[16:07:56.400] [OK] JIT pool ready (debugger still attached).
+[16:07:56.401] [INFO] BRK suspension lasted 1.19s
+[16:07:56.402] [INFO] Detaching debugger...
+[16:07:56.406] [OK] Debugger detached.
+[16:07:56.407] [OK] [early-detach] rev=ml524 took 6 ms
+[16:07:56.408] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.230s rev=ml526
+[16:07:56.437] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/4a6656e6fe06b92e.cfg (read)
+[game-cfg]   pool-low = 1
+[game-cfg]   pool-page-fit = 1
+[game-cfg]   pool-split = 1
+[madeira-env] game MADEIRA_SC_PA_POOLS=2
+[madeira-env] game MADEIRA_X64_IMAGE_NOCOPY=1
+[madeira-env] game MADEIRA_GUEST_LOG_LIMIT=800
+[madeira-env] game MADEIRA_SRV_POLLOUT_GUARD=1
+[madeira-env] game MADEIRA_POOL_LAZY_WINDOWS=1
+[madeira-env] game MADEIRA_SC_ALIGN1G=1
+[WineProc] Target exe: explorer.exe (bundle=aarch64-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_OPTIN_DLLS: tbs.dll -> tbs-optin.dll (Wine's tbs.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] MADEIRA_WOW_PLACEHOLDER_SLOTS=1: 1 window(s) reserved at the session start rev=r630
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] B=0x7100000000: window body after failed reservations (OCCUPIED 0x7100000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x7100000000 REJECTED: 4GB+guard unavailable and the page at 0x7200000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x7200000000 are free, next region 0x7400000000 (+0x1ffffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x7200000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x7200000000..0x7300000000 (guard owned)
+[pool-head] code-buffer budget targets 128 MB of image headroom (region C and recycled buffers unchanged)
+0028:err:module:LdrShutdownThread [detach-probe] ml843 tid=0028 top=0000000000000000 area=0000000000000000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.653s rev=ml526
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.696s rev=ml526
+0048:err:module:LdrShutdownThread [detach-probe] ml843 tid=0048 top=000000012D7C0000 area=00000001202A0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0054:err:module:LdrShutdownThread [detach-probe] ml843 tid=0054 top=000000012D740000 area=00000001207A0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+005c:err:module:LdrShutdownThread [detach-probe] ml843 tid=005c top=000000012D6C0000 area=0000000120BA0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0070:err:module:LdrShutdownThread [detach-probe] ml843 tid=0070 top=000000012D640000 area=00000001211A0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+00a0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\services.exe" cmdline=L"\"C:\\windows\\system32\\services.exe\""
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  5.495s rev=ml526
+[phase] spawn:L"C:\\windows\\system32\\rpcss.exe" t+  5.693s rev=ml526
+0088:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\PlayGTAIV.exe" t+  5.784s rev=ml526
+[session-log] Steam game PlayGTAIV.exe: logs/PlayGTAIV.exe-2026-11-17_16-08-00.txt
+[16:08:01.098] [INFO] [dock-report] friends-available=0
+[16:08:01.098] [INFO] [dock-report] game-scm=2
+[16:08:01.098] [INFO] [dock-report] launch-client-discovery-published=1
+00ec:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -skipPatcherCheck -steamAppId=12210 -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\" @args.txt"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+  6.025s rev=ml526
+[16:08:02.261] [INFO] [dock-offline] Valve's client can log this account on offline: saved
+[16:08:02.702] [INFO] [dock-report] launch-client-error=0
+[16:08:02.702] [INFO] [dock-report] launch-game-running=1
+00f4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+  8.012s rev=ml526
+[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=0 RegQueryValueExW(pid, cb=4)=0 type=4 cb=4 pid=52 | OpenProcess(0x400)=0 GetExitCodeProcess=0 exit=259 (259 = running) | open without the WOW flag (0x20019)=0
+[steam-api]   OpenProcess(52): opens, exit status 259 (259 = still running)
+00c8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\""
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+  8.559s rev=ml526
+010c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=22845
+[jit-pool] tail FREE rx=0x131a24000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+010c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=22851
+[pool-freechk] POISONED AT FREE off=0xbd4c000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xbe84000 size=0x42c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xc2b0000 size=0x134000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xc3e4000 size=0xc8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xc4ac000 size=0x300000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xcdb8000 size=0x984000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xdf38000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xe070000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xe104000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xe188000 size=0x124000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xe2ac000 size=0xb4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xe360000 size=0xf4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[16:08:04.703] [INFO] [dock-game-end] rockstarservice.exe ended with status 0x0; the session goes on for now (game-still-runs)
+[rb-tex] madeira-bcd new readback #1: fmt 80 500x400 level 0 (texture 500x400, 1 mips)
+[jit-pool] tail FREE rx=0x132a2c000 size=0x1000000 -> free-list rev=ml438 [pool-low] region C
+[guest-log] #100 tid=0100 [2026-11-17 15:08:10.371] [DISPLAY] [bgsvc] [svc_mem] Service reports allocation success: 419430400 bytes
+[guest-log] #101 tid=0100 [2026-11-17 15:08:10.371] [DISPLAY] [bgsvc] [svc_mem] Attempting to map shared mem...
+[guest-log] #102 tid=0100 [2026-11-17 15:08:10.371] [DISPLAY] [bgsvc] [svc_mem] Successfully mapped shared mem.
+[guest-log] #103 tid=0100 [2026-11-17 15:08:10.586] [DISPLAY] [Admin] [idownloader] Completed download of 'https://rgl-prod.ros.rockstargames.com/launcher/11/LauncherServices/App.asmx/RetrieveFileChunkNoAuthMulti' (status: 0/200)
+[guest-log] #104 tid=0100 [2026-11-17 15:08:14.469] [DISPLAY] [Workr] [downloadprogress] Dl: D|193293768|5|7|0|0
+[guest-log] #105 tid=0100 [2026-11-17 15:08:14.486] [DISPLAY] [Workr] [titleupdater] Doing chunk checks for launcher...
+[guest-log] #123 tid=0100 [2026-11-17 15:08:21.458] [DISPLAY] [Workr] [lifecycle] Restart args: -skipPatcherCheck -steamAppId=12210 -steamLocation "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto IV\GTAIV" @args.txt -upgrade
+00f4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" stop"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 26.934s rev=ml526
+[jit-pool] tail REUSE rx=0x131a24000 size=0x4000 (asked 0x4000) free_left=11 rev=ml438 [pool-low] region C
+[jit-pool] tail REUSE rx=0x131a28000 size=0x1000000 (asked 0x1000000) free_left=11 rev=ml438 [pool-low] region C (a dead process's buffer)
+01c4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=251960
+[jit-pool] tail FREE rx=0x131a24000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+00f4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe\" -skipPatcherCheck -steamAppId=12210 -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\" @args.txt -upgrade"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe" t+ 27.593s rev=ml526
+[jit-pool] tail FREE rx=0x130a20000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+[jit-pool] tail FREE rx=0x12fa1c000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+[jit-pool] tail FREE rx=0x132a28000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+01e0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\ThirdParty\\Crashpad\\RockstarErrorHandler.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\ThirdParty\\Crashpad\\RockstarErrorHandler.exe\" \"--attachment=attachment_RockstarXboxHelper.log=C:\\users\\mobile\\Documents\\Rockstar Games\\Launcher\\RockstarXboxHelper.log\" \"--attachment=attachment_launcher.log=C:\\users\\mobile\\AppDa"...
+01e0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\" start"
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 29.590s rev=ml526
+01d4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe\""
+[phase] spawn:L"C:\\Program Files\\Rockstar Games\\Launcher\\RockstarService.exe" t+ 30.142s rev=ml526
+[jit-pool] tail FREE rx=0x130a20000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+[16:08:26.667] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[16:08:28.925] [INFO] [session] length=33s partial=1 play=0s frames=0 stalls=0/0s peak=3276MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Grand Theft Auto IV: The Complete Edition
+01e0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files\\Rockstar Games\\Social Club\\SocialClubHelper.exe" cmdline=L"\"C:\\Program Files\\Rockstar Games\\Social Club\\SocialClubHelper.exe\"  --allow-file-access-from-files --disable-spell-checking --disable-extensions --gpu-rasterization-msaa-sample-count=0 --canvas-msaa-sample-count --lang=en --do-not-de-elevate --disable-pinch --off-screen-rendering-en"...
+[sc-cef] cmdline-tail: ... Club\Launcher\Renderer\\" --disable-features=PartitionAllocBackupRefPtr --single-process --js-flags=--jitless --no-proxy-server
+[jit-pool] tail FREE rx=0x132a2c000 size=0x1000000 -> free-list rev=ml438 [pool-low] region C
+[jumbo#1] +0ms tid=71173f7000 wtid=0304 peb=0x10929c000 nrip=0x71dd094f00 grip=0x0 size=0x800000000 (32768 MB) hint=0xa9000000000 -> 0x7800000000 st=0x0 | granted=32768 MB ok=1 fail=0
+[jumbo#2] +0ms tid=71173f7000 wtid=0304 peb=0x10929c000 nrip=0x71cbff585a grip=0x0 size=0x400000000 (16384 MB) hint=0x3aa321850000 -> 0x7400000000 st=0x0 | granted=49152 MB ok=2 fail=0
+[jumbo#3] +18ms tid=71173f7000 wtid=0304 peb=0x10929c000 nrip=0x71dd337690 grip=0x157dc3050 size=0x800000000 (32768 MB) hint=0x3a0000000000 -> 0x7000000000 st=0x0 | granted=81920 MB ok=3 fail=0
+[jumbo#4] +0ms tid=71173f7000 wtid=0304 peb=0x10929c000 nrip=0x71cf1c690a grip=0x157dc3050 size=0x400000000 (16384 MB) hint=0x1a2fac620000 -> 0x7600000000 st=0x0 | granted=98304 MB ok=4 fail=0
+[jit-pool] tail FREE rx=0x130a24000 size=0x1000000 -> free-list rev=ml438 [pool-low] region C
+[jumbo#5] +3697ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71cf1c690a grip=0x0 size=0x800000000 (32768 MB) hint=0x6aa400000000 -> 0x7800000000 st=0x0 | granted=131072 MB ok=5 fail=0
+[pool-owner] searching 269 module copies for 5 granted pool bases...
+[jumbo#17] +1ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644ac0 grip=0x0 size=0x200000000 (8192 MB) hint=0xfa00000000 -> 0x7a00000000 st=0x0 | granted=139264 MB ok=6 fail=11
+[sc-cef] layout 2: SocialClubHelper.exe's 1 GB reserve on a 4 GB boundary (no free aligned slot in the band): 0x7700000000 (MADEIRA_SC_ALIGN1G)
+[jumbo#44] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644b3f grip=0x0 size=0x200000000 (8192 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=140288 MB ok=7 fail=37
+[jumbo#45] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644ac0 grip=0x0 size=0x200000000 (8192 MB) hint=0xf600000000 -> 0x0 st=0xc0000018 | granted=140288 MB ok=7 fail=38
+[jumbo#46] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644b3f grip=0x0 size=0x200000000 (8192 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=140288 MB ok=7 fail=39
+[jumbo#47] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644ac0 grip=0x0 size=0x200000000 (8192 MB) hint=0xc800000000 -> 0x0 st=0xc0000018 | granted=140288 MB ok=7 fail=40
+[jumbo#48] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644b3f grip=0x0 size=0x200000000 (8192 MB) hint=0x0 -> 0x0 st=0xc0000017 | granted=140288 MB ok=7 fail=41
+[jumbo#49] +0ms tid=7101f9c000 wtid=03f4 peb=0x10929c000 nrip=0x71ce644ac0 grip=0x0 size=0x200000000 (8192 MB) hint=0x15800000000 -> 0x0 st=0xc0000018 | granted=140288 MB ok=7 fail=42
+[pool-low] region C has 0x35d4000 of 0x115e8000 left, not enough for carve 0x8000000: it goes to the pool tail (freed C carves are still reused first)
+[jit-pool] tail FREE rx=0x12fa20000 size=0x1000000 -> free-list rev=ml438 [pool-low] region C
+[rb-tex] madeira-bcd new readback #661: fmt 70 256x256 level 0 (texture 256x256, 1 mips)
+[rb-tex] madeira-bcd new readback #663: fmt 70 10x10 level 0 (texture 16x16, 1 mips)
+[rb-tex] madeira-bcd new readback #664: fmt 70 200x200 level 0 (texture 256x256, 1 mips)
+[pool-low] region C has 0x35d4000 of 0x115e8000 left, not enough for carve 0x4000000: it goes to the pool tail (freed C carves are still reused first)
+[rb-tex] madeira-bcd new readback #666: fmt 70 1x1 level 0 (texture 1x1, 1 mips)
+[rb-tex] madeira-bcd new readback #667: fmt 70 80x60 level 0 (texture 128x64, 1 mips)
+[rb-tex] madeira-bcd new readback #669: fmt 70 178x15 level 0 (texture 256x16, 1 mips)
+[rb-tex] madeira-bcd new readback #671: fmt 70 200x50 level 0 (texture 256x64, 1 mips)
+[rb-tex] madeira-bcd new readback #680: fmt 70 500x100 level 0 (texture 512x128, 1 mips)
+[rb-tex] madeira-bcd new readback #681: fmt 70 400x200 level 0 (texture 512x256, 1 mips)
+[rb-tex] madeira-bcd new readback #682: fmt 70 720x16 level 0 (texture 1024x16, 1 mips)
+[sc-cef] r631 layout 2: V8 table slot 0 [0x7740000000,+512 MB) could not be reserved (st=0xc0000018)
+[sc-cef] r652 V8 table slot 0 busy (st=0xc0000018): view 0x7740010000+0x3ff0000 of owner 0x10929c000 stands in [0x7740000000,+512 MB); the next slot is tried
+[16:08:56.849] [INFO] detach-wait: presents=290 running=1 elapsed=60s
+[16:09:03.659] [INFO] [session] length=68s partial=1 play=27s frames=381 avg=14.1 low1=4.0 worst=826ms stalls=0/0s peak=4353MB limit=6655MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Grand Theft Auto IV: The Complete Edition
+[16:09:12.277] [INFO] [session] length=77s partial=1 play=36s frames=489 avg=13.7 low1=4.0 worst=877ms stalls=0/0s peak=4353MB limit=6655MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Grand Theft Auto IV: The Complete Edition
+[16:09:26.987] [INFO] detach-wait: presents=714 running=1 elapsed=90s
+[guest-log] #446 tid=01e8 [2026-11-17 15:09:27.206] [DISPLAY] [ 1232] [gamelaunch] Launch Path: C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto IV\GTAIV\GTAIV.exe
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+ 99.525s rev=ml526
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+04e8:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+033c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\dllhost.exe" cmdline=L"C:\\windows\\syswow64\\dllhost.exe /PROCESSID:{<uuid>}"
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+ 99.696s rev=ml526
+[thread-stacks]   bt[3] Madeira`NtCreateUserProcess+0x3a2c
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+04f0:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+033c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\dllhost.exe" cmdline=L"C:\\windows\\syswow64\\dllhost.exe /PROCESSID:{<uuid>}"
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+102.862s rev=ml526
+[guest-log] #634 tid=01e8 [2026-11-17 15:09:39.762] [DISPLAY] [ 1232] [gamelaunch] Launching game...
+04d0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\GTAIV.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\GTAIV.exe\" -skipPatcherCheck -steamLocation \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\" @args.txt -upgrade -useSteam -steamAppId=12210 -scEnableOverlayV3 -useNativeInput"...
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Grand Theft Auto IV\\GTAIV\\GTAIV.exe" t+104.565s rev=ml526
+[session-log] Steam game GTAIV.exe: logs/GTAIV.exe-2026-11-17_16-09-39.txt
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+04f8:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+[wow-window] refused: map too small (3136 MB free VA; a window needs 4096 MB plus MADEIRA_WOW_MIN_FREE_GB=2 left over)
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x0 reserve=c0000017
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+[guest-log] #648 tid=01e8 [2026-11-17 15:09:41.214] [ ERROR ] [ 1232] [error] * Extra:     GTAIV.exe
+[guest-log] #649 tid=01e8 [2026-11-17 15:09:41.214] [ ERROR ] [ 1232] [error] * Localised: Unable to launch GTAIV.exe. If you continue to have problems playing the game, please contact Rockstar Games Customer Support at https://support.rockstargames.com.
+[guest-log] #650 tid=01e8 [2026-11-17 15:09:41.215] [ ERROR ] [ 1232] [launcher] Displaying error message: Unable to launch GTAIV.exe. If you continue to have problems playing the game, please contact Rockstar Games Customer Support at https://support.rockstargames.com.
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+[rb-tex] madeira-bcd new readback #685: fmt 80 940x318 level 0 (texture 940x318, 1 mips)
+033c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\dllhost.exe" cmdline=L"C:\\windows\\syswow64\\dllhost.exe /PROCESSID:{<uuid>}"
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+106.062s rev=ml526
+[guest-log] #655 tid=01e8 [2026-11-17 15:09:41.288] [DISPLAY] [Main ] [cloudsaveop] Identifying potential cloud save conflicts for app 'gta4'
+[guest-log] #656 tid=01e0 [00071618] Identifying conflicts
+[guest-log] #657 tid=01e8 [2026-11-17 15:09:41.318] [DISPLAY] [Main ] [rline_pc] /launcher/11/launcherservices/Achievements.asmx/GetAchievementsProgress 200 | 0 | <uuid>
+[guest-log] #658 tid=01e0 [00071763] Loading achievement details for 55 achievements
+[guest-log] #659 tid=01e8 [2026-11-17 15:09:41.773] [DISPLAY] [x 2e0] [rline_pc] /launcher/11/launcherservices/cloudsave.asmx/GetCloudSaveManifest 200 | 0 | <uuid>
+[guest-log] #695 tid=01e8 [2026-11-17 15:09:41.899] [DISPLAY] [ 1232] [gamelaunch] Game launch thread: ended
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+0508:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+0210:err:seh:bus_handler BUS->AV: unreadable target addr=0x0 pc=0x71e26115d0 rw=0 rev=ml420
+0210:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=456498
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+033c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\dllhost.exe" cmdline=L"C:\\windows\\syswow64\\dllhost.exe /PROCESSID:{<uuid>}"
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+109.186s rev=ml526
+[16:09:44.705] [INFO] [dock-game-end] rockstarservice.exe ended with status 0xc0000005; the session goes on for now (game-still-runs)
+[jit-pool] tail FREE rx=0x12fa1c000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+01ec:err:module:LdrShutdownThread [detach-probe] ml843 tid=01ec top=0000000000000000 area=0000000000000000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+0514:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+033c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\syswow64\\dllhost.exe" cmdline=L"C:\\windows\\syswow64\\dllhost.exe /PROCESSID:{<uuid>}"
+[phase] spawn:L"C:\\windows\\syswow64\\dllhost.exe" t+112.350s rev=ml526
+[jit-pool] tail REUSE rx=0x133a2c000 size=0x8000000 (asked 0x8000000) free_left=18 rev=ml438 [pool-low] region C (a dead process's buffer)
+[wow-window] session global peb=0x7200310000 was the released window's — put back to the session PEB 0x12ea00000
+[wow-window] B=0x7100000000 REJECTED: the 4GB range is not free (OCCUPIED 0x7100000000+0x4000 prot=3/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x7200000000..0x7300000000 guard=owned
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x7200000000 reserve=0
+[wow-window] slot 0 B=0x7200000000 bound to peb=0x7200310000
+051c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x7200400000 transfer=0x7200402980 window=0x7200000000 guest_base=0x400000
+[wow-window] slot 0 B=0x7200000000 released (owner peb=0x7200310000 exited); torn down when the next 32-bit process starts
+0060:err:module:LdrShutdownThread [detach-probe] ml843 tid=0060 top=000000012D680000 area=0000000120DA0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0074:err:module:LdrShutdownThread [detach-probe] ml843 tid=0074 top=000000012D600000 area=00000001213A0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0084:err:module:LdrShutdownThread [detach-probe] ml843 tid=0084 top=000000012D580000 area=00000001219A0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+0088:err:module:LdrShutdownThread [detach-probe] ml843 tid=0088 top=000000012D540000 area=0000000121BA0000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+[jit-pool] tail FREE rx=0x12ea18000 size=0x4000 -> free-list rev=ml438 [pool-low] region C
+[16:09:52.204] [INFO] [dock-report] launch-discovery-restored=1
+[16:09:52.204] [INFO] [dock-report] launch-game-ended=1
+[16:09:52.204] [INFO] [dock-report] probe-result=0
+[steam-host] ml1830 friends-available=0
+04d8:err:module:LdrShutdownThread [detach-probe] ml843 tid=04d8 top=0000000000000000 area=0000000000000000 tls-blocks=32 hits=0 (before FLS/detach cleanup)
+[16:09:52.674] [INFO] [madeira-dock] host finished (result 0)
+[16:09:57.068] [INFO] detach-wait: presents=1438 running=1 elapsed=120s
+[16:10:27.219] [INFO] detach-wait: presents=1438 running=1 elapsed=150s
+[16:10:57.294] [INFO] detach-wait: presents=1438 running=1 elapsed=180s
+[16:11:27.438] [INFO] detach-wait: presents=1438 running=1 elapsed=211s
+[16:11:57.558] [INFO] detach-wait: presents=1438 running=1 elapsed=241s
+[frontend] graceful close requested
+[16:12:27.722] [INFO] detach-wait: presents=1438 running=1 elapsed=271s
+[16:12:33.670] [INFO] [session] length=278s partial=1 play=66s frames=1437 avg=21.8 low1=6.8 low01=1.2 worst=877ms stalls=0/0s peak=4646MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Grand Theft Auto IV: The Complete Edition

@@ -106,6 +106,14 @@ check("OpenAdapterFromGdiDisplayName's virtual adapter takes the LUID only with 
       and "else if (!list_empty( &gpus ) && first)" in vl
       and "pthread_mutex_lock( &display_lock );\n        ios_virtual_luid_locked( &luid_desc.AdapterLuid );" in gdi)
 reg = func(sp, "static void ios_register_virtual_gpu(void)")
+# Round 668 (the owner's X-Plane 12 test): a Vulkan/GL device UUID no GPU carries gets the adapter LUID, valid, with the switch only.
+gi = sp[sp.index("BOOL get_gpu_info_from_uuid( const GUID *uuid, LUID *luid, UINT32 *node_mask, char *name )"):]
+gi = gi[:gi.index("\n}\n")]
+check("get_gpu_info_from_uuid: with the switch, a UUID no GPU carries gets the adapter LUID (valid, node mask 1); without it, not found as before",
+      "if (!found && madeira_kmt_adapter_enabled() && madeira_kmt_adapter_luid( luid ))" in gi
+      and gi.index("unlock_display_devices();") < gi.index("if (!found && madeira_kmt_adapter_enabled()")
+      and gi.count("found = TRUE;") == 2 and "*node_mask = 1;" in gi.split("if (!found && madeira_kmt_adapter_enabled()")[1]
+      and "unicodez_to_ascii" not in gi.split("if (!found && madeira_kmt_adapter_enabled()")[1])
 check("registry GPU: switch LUID, else a fresh one; switch size, else 4096 MB",
       "kmt = madeira_kmt_adapter_enabled() && madeira_kmt_adapter_luid( &gpu.luid );" in reg
       and "if (!kmt) NtAllocateLocallyUniqueId( &gpu.luid );" in reg
@@ -469,6 +477,71 @@ check("catalog lists env.MADEIRA_KMT_ADAPTER, off by default",
 check("catalog keeps vram-mb in DXMT with its note",
       re.search(r'key: "vram-mb".*category: "Direct3D 9/10/11 \(DXMT\)", note: "ml1095: bcd.cfg vram-mb = N[."]', cat)   # round 660 (M117): the note goes on
       is not None)
+
+# Round 669: the owner's X-Plane 12 file had "MADEIRA_KMT_ADAPTER = 1" without "env.", which nothing read; the session now says so (log only).
+_bridge = (R / "app/Madeira/WineProcessBridge.m").read_text() if "R" in globals() else (Path(__file__).resolve().parents[2] / "app/Madeira/WineProcessBridge.m").read_text()
+check("a game-file line NAME = value with an upper-case NAME is named in the log as an env line without env. (nothing else changes)",
+      '[k rangeOfString:@"^[A-Z][A-Z0-9]*_[A-Z0-9_]+$" options:NSRegularExpressionSearch].location != NSNotFound' in _bridge
+      and 'is read by nothing: an environment line starts with \\"env.\\" (env.%s)' in _bridge)
+
+# 2026-11-17 (the owner's X-Plane 12 test KCJ7BB, build 669): with the switch the zink GL backend answers GL_DEVICE_LUID_EXT /
+# GL_DEVICE_NODE_MASK_EXT with the adapter LUID (win32u installs p_query_renderer for EGL devices only, none on iOS), so X-Plane's
+# Vulkan device and OpenGL bridge report the same GPU. Without the switch nothing is installed (Zink answers, as before).
+_gl = (Path(__file__).resolve().parents[2] / "build/win32u-unix/opengl_ios.c").read_text()
+_a = _gl.index("static void (*pz_glGetUnsignedBytevEXT)( GLenum, GLubyte * );")
+_b = _gl.index('    return "";   /* desktop OpenGL only: no ES profiles */\n}\n', _a) + len('    return "";   /* desktop OpenGL only: no ES profiles */\n}\n')
+_seg = _gl[_a:_b]
+check("opengl_ios.c includes madeira_kmt.h and installs p_query_renderer only inside zink_init_wgl_extensions under madeira_kmt_adapter_enabled()",
+      '#include "madeira_kmt.h"' in _gl and _gl.count("p_query_renderer = ") == 1
+      and "if (madeira_kmt_adapter_enabled())\n    {\n        funcs->p_query_renderer = zink_kmt_query_renderer;" in _seg
+      and "ios_driver_funcs" not in _seg)
+_wine_gl = wine / "dlls/win32u/opengl.c"
+if _wine_gl.exists():
+    _w = _wine_gl.read_text()
+    check("win32u installs its own p_query_renderer only for EGL devices (empty list on iOS: no EGL compiled), after the driver's init",
+          "if (!list_empty( &devices_egl ))" in _w and "display_funcs.p_query_renderer = win32u_query_renderer;" in _w
+          and _w.index("driver_funcs->p_init_wgl_extensions( &display_funcs )") < _w.index("display_funcs.p_query_renderer = win32u_query_renderer;"))
+_c = r"""
+#include <stdio.h>
+#include <string.h>
+typedef int BOOL; typedef unsigned int UINT; typedef unsigned int GLenum; typedef unsigned char GLubyte; typedef int GLint;
+typedef struct { unsigned int LowPart; int HighPart; } LUID;
+#define TRUE 1
+#define FALSE 0
+#define GL_DEVICE_LUID_EXT 0x9599
+#define GL_DEVICE_NODE_MASK_EXT 0x959A
+#define ERR(...) fprintf(stderr, __VA_ARGS__)
+struct opengl_funcs { BOOL (*p_query_renderer)( UINT, void * ); };
+static int on, have_luid, zink_calls;
+static int madeira_kmt_adapter_enabled(void) { return on; }
+static int madeira_kmt_adapter_luid( LUID *l ) { if (have_luid) { l->LowPart = 0x01000000; l->HighPart = (int)0xcb040000; } return have_luid; }
+static void zink_luid( GLenum p, GLubyte *d ) { zink_calls++; memset( d, 0, 8 ); }
+static void *pOSMesaGetProcAddress( const char *n ) { return strcmp( n, "glGetUnsignedBytevEXT" ) ? NULL : (void *)zink_luid; }
+SEG
+int main(void)
+{
+    struct opengl_funcs f = {0}; unsigned char b[8]; GLint m = 7; LUID want = { 0x01000000, (int)0xcb040000 };
+    on = 0; zink_init_wgl_extensions( &f ); if (f.p_query_renderer) return 1;              /* off: nothing installed */
+    on = 1; have_luid = 1; zink_init_wgl_extensions( &f ); if (!f.p_query_renderer) return 2;
+    memset( b, 0xee, 8 ); if (!f.p_query_renderer( GL_DEVICE_LUID_EXT, b ) || memcmp( b, &want, 8 )) return 3;
+    if (!f.p_query_renderer( GL_DEVICE_NODE_MASK_EXT, &m ) || m != 1) return 4;
+    if (f.p_query_renderer( 0x1234, &m )) return 5;
+    if (zink_calls) return 6;
+    have_luid = 0; memset( b, 0xee, 8 ); m = 7;
+    if (!f.p_query_renderer( GL_DEVICE_LUID_EXT, b ) || zink_calls != 1 || b[0] != 0) return 7;   /* no LUID: Zink answers */
+    if (f.p_query_renderer( GL_DEVICE_NODE_MASK_EXT, &m ) || m != 7) return 8;                      /* FALSE: opengl32 asks Zink */
+    return 0;
+}
+""".replace("SEG", _seg)
+with tempfile.TemporaryDirectory() as _t:
+    _src = Path(_t) / "gl_kmt.c"; _src.write_text(_c)
+    _bin = Path(_t) / "gl_kmt"
+    _r = subprocess.run(["cc", "-std=c11", "-Wall", "-Wno-unused-function", "-o", str(_bin), str(_src)], capture_output=True, text=True)
+    check("zink_kmt_query_renderer compiles on the host" + ("" if _r.returncode == 0 else ": " + _r.stderr[:400]), _r.returncode == 0)
+    if _r.returncode == 0:
+        _x = subprocess.run([str(_bin)], capture_output=True, text=True)
+        check("zink GL query: off installs nothing; on answers the adapter LUID and node mask 1, leaves other names alone; without a "
+              "Metal LUID the LUID query goes to Zink and the node mask to opengl32's fallback (exit %d)" % _x.returncode, _x.returncode == 0)
 
 print("PASS" if ok else "FAILED")
 sys.exit(0 if ok else 1)

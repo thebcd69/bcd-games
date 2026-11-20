@@ -26,7 +26,7 @@ not asserted), the fallbacks (switch off, directory removed or replaced while op
 2. compiled on the host against Wine's list.h: arrays are kept apart per process id, come back intact, a flushed id starts empty,
 pid 0 is left alone, 5,000 random steps against a model; (c) the sources: every reader goes through the helper, the cwd is touched
 only on the fallback, the hook is called once in server_init_process_done after the fastsync flush; (d) on the pinned Wine source
-BCD's twelve file.c patch scripts still apply after the fork's commits, in the workflow's order; (e) the workflow runs this check.
+BCD's fourteen file.c patch scripts still apply after the fork's commits, in the workflow's order; (e) the workflow runs this check.
 """
 from pathlib import Path
 import os
@@ -513,12 +513,12 @@ with tempfile.TemporaryDirectory() as tmp:
               'steps agree with the model; nothing leaks (AddressSanitizer)',
               run.returncode == 0 and 'RESULT OK' in run.stdout, run.stdout[-300:] + run.stderr[-1500:])
 
-# ---- (d) BCD's thirteen file.c patch scripts after the fork's commits, in the workflow's order
+# ---- (d) BCD's fourteen file.c patch scripts after the fork's commits, in the workflow's order
 order = ['guest-log', 'guest-log-tag', 'guest-log-service', 'guest-log-renpy', 'guest-log-trace', 'guest-log-redact', 'file-trace',
-         'file-census', 'globalroot', 'app-local-dll', 'file-info-fstat', 'hide-host-version-plist', 'dir-storm']
+         'file-census', 'globalroot', 'app-local-dll', 'file-info-fstat', 'hide-host-version-plist', 'dir-storm', 'file-xattr-one-list']
 wf_order = [m.group(1) for m in re.finditer(r'python3 tools/patch-wine-([a-z-]+)\.py wine/dlls/ntdll/unix/file\.c', wf)]
 # tools/patch-wine-guest-log-secrets.py (W07) may sit after the account-name script; nothing else may be added or moved
-check('the workflow applies exactly these thirteen scripts to file.c, in this order (and the sign-in-value script after the account names, when present)',
+check('the workflow applies exactly these fourteen scripts to file.c, in this order (and the sign-in-value script after the account names, when present)',
       [s_ for s_ in wf_order if s_ not in ('guest-log-secrets', 'guest-log-ring')] == order and (('guest-log-secrets' not in wf_order) or
                                                                        wf_order.index('guest-log-secrets') == wf_order.index('guest-log-redact') + 1)
       # round 660 (M032): the mirror's ring of 16 lines comes right after the sign-in values

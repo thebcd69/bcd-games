@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 NevesHenry: ContentHostHealth's rotation, taken from https://github.com/willfaust/Madeira (pull request #620, commit ffd0ae51), November 2026.
 // Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `install(... dlc:)` takes the depots of the DLC the
 // player chose and records them; without DLC (`SteamDLCRequest.none`, the default) it is the install it was.
 // Portions copyright 2026 ft7t8drgwf-wq and llamajose: code taken from https://github.com/willfaust/Madeira (pull requests #490, #491, #493, #505 and #524)
@@ -91,6 +92,9 @@ final class DepotDownloader {
     private let maxConcurrentChunks = 8
     private let attemptsPerChunk = 5
     private let hostPoolSize = 6
+    /// Whether a content server leaves the chunk rotation only after repeated
+    /// failures (ContentHostHealth). Set by the owner from its switch (upstream #620, NevesHenry).
+    var rotatesContentServers = true
 
     private nonisolated static let http: URLSession = {
         let config = URLSessionConfiguration.ephemeral
@@ -172,7 +176,7 @@ final class DepotDownloader {
         // 1. Keys, manifests and per-host authorization for every depot.
         let prepStarted = Date()
         manifestStats = ManifestStats()
-        let health = ContentHostHealth()
+        let health = ContentHostHealth(rotates: rotatesContentServers)
         ChunkDigestCheck.shared.begin()
         let pool = Array(hosts.prefix(hostPoolSize))
         var plans: [DepotPlan] = []
@@ -1457,23 +1461,42 @@ final class ChunkDigestCheck: @unchecked Sendable {
 }
 
 final class ContentHostHealth: @unchecked Sendable {
+    /// madeira-bcd (upstream pull request #620, NevesHenry, ffd0ae51): a server with only an occasional failure stays
+    /// in the rotation; moving it back after one failure sent every first attempt to the servers with none, and since only a
+    /// server that is tried can recover, the install ended up on one server. Failures after which a server is demoted:
+    static let demoteAfter = 3
+
     private let lock = NSLock()
     private var failures: [String: Int] = [:]
     private var reported = 0
+    private let rotates: Bool
+
+    /// `rotates: false` orders by failure count first, as before (the owner's switch, SteamOwnedLibrary).
+    init(rotates: Bool = true) {
+        self.rotates = rotates
+    }
 
     func order(_ hosts: [String], seed: Int) -> [String] {
         guard !hosts.isEmpty else { return hosts }
         let rotated = (0..<hosts.count).map { hosts[($0 + seed) % hosts.count] }
         lock.lock(); let counts = failures; lock.unlock()
+        let demoteAfter = Self.demoteAfter
+        // Sort key: servers below the demotion point keep the seed rotation;
+        // demoted ones follow, fewest failures first, then in rotation order.
+        func key(_ entry: (offset: Int, element: String)) -> (Int, Int, Int) {
+            let count = counts[entry.element] ?? 0
+            if !rotates { return (count, entry.offset, 0) }
+            return count >= demoteAfter ? (1, count, entry.offset) : (0, 0, entry.offset)
+        }
         return rotated.enumerated()
-            .sorted { ((counts[$0.element] ?? 0), $0.offset) < ((counts[$1.element] ?? 0), $1.offset) }
+            .sorted { key($0) < key($1) }
             .map(\.element)
     }
 
     func recordFailure(_ host: String, reason: String) {
         lock.lock()
         failures[host, default: 0] += 1
-        let report = failures[host] == 3 && reported < 8
+        let report = failures[host] == Self.demoteAfter && reported < 8
         if report { reported += 1 }
         lock.unlock()
         if report {
@@ -1578,7 +1601,7 @@ extension DepotDownloader {
         var auth: [String: String] = [:]
         for host in pool { auth[host] = await cdnAuthFragment(depotID: appID, appID: appID, host: host) }
         let plan = DepotPlan(depotID: appID, manifestGID: manifestGID, key: key, manifest: manifest, hosts: pool, auth: auth,
-                             declaredSize: UInt64(manifest.totalUncompressedSize), health: ContentHostHealth())
+                             declaredSize: UInt64(manifest.totalUncompressedSize), health: ContentHostHealth(rotates: rotatesContentServers))
         let prepared = try await Task.detached(priority: .userInitiated) {
             try Self.prepare(plans: [plan], installURL: folder, journalDir: journalDir)
         }.value

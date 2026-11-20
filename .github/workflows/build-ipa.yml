@@ -141,6 +141,12 @@ jobs:
       - name: Check the graphics, sound, video and input tests
         run: python3 tests/host/check-bcd-tests.py
 
+      # BCD's OpenGL and Vulkan test programs (tests/dxtests/gl_test.c, vulkan_test.c; Start menu "OpenGL test", "Vulkan test", 64-bit and
+      # 32-bit): the SPIR-V of the Vulkan one (vk_shaders.h, made from vk_cube.spvasm with SPIRV-Tools) and its structure, the sources, the
+      # message that says how to turn OpenGL or Vulkan on, and where they ship (check-bcd-tests.py rebuilds and compares the binaries).
+      - name: Check the OpenGL and Vulkan tests
+        run: python3 tests/host/check-vk-gl-tests.py
+
       # 7-Zip in the Start menu (round 603): the pinned release of the project (SHA-256, licence text), the RAR code left out of the
       # object lists the build reads from 7-Zip's own makefiles, the two tracked programs (x86-64, imports a Wine session has, no RAR
       # code), the notices. BCD_CHECK_7ZIP_BUILD=1 builds both again and compares them with the tracked ones.
@@ -437,6 +443,11 @@ jobs:
       # binary that calls it compiled; the opt-in fault report) are in BCD_PATCHES, replayed on the pinned and on a chain-patched copy.
       - name: Check the Direct3D 10/11 fixes of d3d11-src.dll
         run: python3 tests/host/check-d3d11-src-fixes.py
+
+      # Round 677 (the owner's decision of 2026-11-19; agent G3 S1): value 2 of MADEIRA_MIP_CLAMP_AUTO in d3d11-src.dll, single-level BC
+      # textures at half size near the memory limit on a GPU without BC (Shroom and Gloom, Schedule I, Nunholy).
+      - name: Check single-level BC textures at half size
+        run: python3 tests/host/check-dxmt-bc-half.py
 
       # madeira-bcd (2026-11-15, owner's decision): the 64-bit DXMT set built from BCD's pin (d3d11-src, dxgi-src, d3d10core-src,
       # winemetal-src and the internal shaders compiled from the pin), chosen only by env.MADEIRA_DXMT_FRESH = 1; with the key off
@@ -835,6 +846,11 @@ jobs:
       - name: Check x18 arith
         run: python3 tests/host/check-x18-arith.py
 
+      # Round 677 (G3 S3; Alien Tenant KFW5H1/YJBGY1): opengl32's stores of x18 take two tries, so an iOS preemption between the TEB load and
+      # the store no longer sends a GL call to the unix side with teb == NULL; the trampoline is run on an arm64 Mac.
+      - name: Check the two-try store of x18
+        run: python3 tests/host/check-x18-store-retry.py
+
       # ===== Group 2: 20 checks whose test was brought up to date with the code in round 624 =====
 
       # tools/patch-wine-cpu-error-diag.py applies once to the committed user32/wow64 files ([msgbox-origin], [pf-xmmi64] log only).
@@ -1117,6 +1133,13 @@ jobs:
       # the soft-grant loop against the original (switch off = the old grants), the spawn gate and the command line.
       - name: Check the EA app's Chromium
         run: python3 tests/host/check-ea-cef.py
+
+      # X-Plane 12 (send log MX3R0X, build 670): env.MADEIRA_CEF_POOL_IMAGES = x-plane.exe,cefclient.exe runs a program's own Chromium the way the EA
+      # app's runs (the same routing, compiled in check-ea-cef.py): the list grammar (ios_cef_images.h, compiled, with a differential run against a
+      # reference), the browser and helper kinds and the browser's command line on X-Plane's real lines, the catalog, the list policy (compiled
+      # with swiftc), the auto-tune rule and its fixture.
+      - name: Check the Chromium host list (X-Plane 12)
+        run: python3 tests/host/check-cef-pool-images.py --require-swift
 
       # madeira-bcd: env.MADEIRA_UBI_CEF (on unless 0): Ubisoft Connect's browser (upc.exe) gets Chromium's process-count switches,
       # and a checked libcef.dll build keeps them (two bytes changed in memory); the command line, the locator and the rewrite.
@@ -1572,7 +1595,7 @@ jobs:
 
       # madeira-bcd (KosmicKrisp; docs/VULKAN.md): Mesa's Vulkan on Metal 4 as a third dylib in app/Madeira/gl/, for a game whose own file says
       # vulkan = kosmickrisp (iOS 26 and a Metal 4 GPU; every other game and every other device never loads it). build-kosmickrisp-bcd.sh fetches the
-      # sources by checksum or commit (Mesa b39d173c with the Playport authors' 19 patches; SPIRV-Tools and SPIRV-LLVM-Translator for the build
+      # sources by checksum or commit (Mesa b39d173c with the Playport authors' 31 patches and BCD's four; SPIRV-Tools and SPIRV-LLVM-Translator for the build
       # machine's compilers) and needs Homebrew's llvm. The result is cached on the scripts and the patches. A failure here only warns: no list and
       # no auto-tune rule turns this driver on, and a bundle without it keeps Vulkan off for such a game and says so in the log.
       - name: Check the KosmicKrisp build routes
@@ -1585,7 +1608,7 @@ jobs:
             app/Madeira/gl/libvulkan_kosmickrisp.dylib
             app/Madeira/gl/libvulkan_kosmickrisp.version
             app/Madeira/licenses/KosmicKrisp-Mesa-license.rst
-          key: kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}
+          key: kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kk-stale-source.sh', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}
 
       - name: Build KosmicKrisp for iOS
         id: kkbuild
@@ -1601,14 +1624,61 @@ jobs:
             app/Madeira/gl/libvulkan_kosmickrisp.dylib
             app/Madeira/gl/libvulkan_kosmickrisp.version
             app/Madeira/licenses/KosmicKrisp-Mesa-license.rst
-          key: kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}
+          key: kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kk-stale-source.sh', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}
 
       # A build whose KosmicKrisp step failed must not carry a library of an earlier recipe: the package then has none.
       - name: Drop a stale KosmicKrisp after a failed build
         if: steps.kkcache.outputs.cache-hit != 'true' && steps.kkbuild.outcome != 'success'
         run: |
           rm -f app/Madeira/gl/libvulkan_kosmickrisp.dylib app/Madeira/gl/libvulkan_kosmickrisp.version app/Madeira/licenses/KosmicKrisp-Mesa-license.rst
+          rm -f app/Madeira/gl/libvulkan_kosmickrisp_real.dylib
           echo "::warning::KosmicKrisp was not built: vulkan = kosmickrisp stays off in this build"
+
+      # Round 668 (bcd-games #57, RageMC; build/mesa-ios/kk-retry): the KosmicKrisp a game loads becomes a small shim that re-exports the real
+      # library (libvulkan_kosmickrisp_real.dylib) and retries the Metal 4 compiles iOS's compiler service drops under memory pressure
+      # (XPC_ERROR_CONNECTION_INTERRUPTED: "Failed to create MTLLibrary", then Enshrouded ended itself), runs at most 4 at once, at the size
+      # optimisation level, with a 4G shader cache. Only a game with vulkan = kosmickrisp loads it. After the cache steps, so the cached
+      # library stays the real one and Mesa is not rebuilt for it; a failed run leaves the real library in place.
+      - name: Put the kk-retry shim in front of KosmicKrisp
+        continue-on-error: true
+        run: bash build/mesa-ios/kk-retry/build.sh
+
+      # Round 669 (bcd-games #57, RageMC; MoltenVK commits after v1.4.2, open MoltenVK pull requests and github.com/nivogli/MoltenVK; build/moltenvk-ios/
+      # build-patched.sh): a second, PATCHED MoltenVK as gl/libMoltenVK_patched.dylib, for a game whose own file says vulkan = moltenvk-patched (Zink
+      # takes it too in such a session, so one MoltenVK runs in the process). libMoltenVK.dylib, built above from the unmodified v1.4.2, stays the
+      # library of vulkan = moltenvk and of Zink, and its cache key does not hash this script or its patches. A failure here only warns: no list and
+      # no auto-tune rule turns this library on, and a bundle without it keeps Vulkan off for such a game and says so in the log (never the other
+      # MoltenVK instead). After the OpenGL and KosmicKrisp steps, so that neither cached set depends on it.
+      - name: Restore patched MoltenVK (second Vulkan library)
+        id: mvkpcache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            app/Madeira/gl/libMoltenVK_patched.dylib
+            app/Madeira/gl/libMoltenVK_patched.version
+          key: moltenvk-patched-v1-${{ hashFiles('build/moltenvk-ios/build-patched.sh', 'build/moltenvk-ios/patches/*.patch') }}
+
+      - name: Build patched MoltenVK for iOS
+        id: mvkpbuild
+        if: steps.mvkpcache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: bash build/moltenvk-ios/build-patched.sh
+
+      - name: Save patched MoltenVK
+        if: steps.mvkpcache.outputs.cache-hit != 'true' && steps.mvkpbuild.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            app/Madeira/gl/libMoltenVK_patched.dylib
+            app/Madeira/gl/libMoltenVK_patched.version
+          key: moltenvk-patched-v1-${{ hashFiles('build/moltenvk-ios/build-patched.sh', 'build/moltenvk-ios/patches/*.patch') }}
+
+      # A build whose patched MoltenVK step failed must not carry a library of an earlier recipe (or a half-written one): the package then has none.
+      - name: Drop a stale patched MoltenVK after a failed build
+        if: steps.mvkpcache.outputs.cache-hit != 'true' && steps.mvkpbuild.outcome != 'success'
+        run: |
+          rm -f app/Madeira/gl/libMoltenVK_patched.dylib app/Madeira/gl/libMoltenVK_patched.dylib.tmp app/Madeira/gl/libMoltenVK_patched.version
+          echo "::warning::The patched MoltenVK was not built: vulkan = moltenvk-patched stays off in this build"
 
       # A game's own *.log lines (errors, GPU / driver / display lines) in the
       # session log as [guest-log] -- the mirror this fork's wine had before the
@@ -1725,6 +1795,15 @@ jobs:
           python3 tests/host/check-wine-dir-storm.py
           python3 tools/patch-wine-dir-storm.py wine/dlls/ntdll/unix/file.c
 
+      # madeira-bcd (engine review 2026-11-18): get_file_info and fd_get_file_info read two extended attributes of one file and listed the
+      # file's attribute names before each read; one list now answers both (half of every directory listing was the second list: Valve's CEG
+      # job of a Dock start lists system32 about 14 times a second). The same values, results and errno; env MADEIRA_XATTR_ONE_LIST = 0 lists
+      # once per name again.
+      - name: Patch wine to list a file's extended attributes once
+        run: |
+          python3 tests/host/check-file-xattr-one-list.py
+          python3 tools/patch-wine-file-xattr-one-list.py wine/dlls/ntdll/unix/file.c
+
       # madeira-bcd (build 632, upstream Madeira 0.2.0 / Wine fork commits 9a64361cc + 3e1dcdfda; Terraria "Failed to load asset: PixelShader",
       # six logs, builds 576-592): NtQueryDirectoryFile reads a directory by its absolute path instead of through the cwd every pseudo-process
       # shares, and each process id has its own directory cache array. Fork commits (no script); this proves BCD's file.c scripts above still
@@ -1823,6 +1902,9 @@ jobs:
           python3 tests/host/check-image-patch-trace.py
           python3 tests/host/check-iat-sync-owner.py
 
+      - name: Check the NtProtect early store (an OldProtect inside the protected range)
+        run: python3 tests/host/check-ntprotect-early-store.py
+
       - name: Check virtual storage device contracts
         run: python3 tests/host/check-storage-device.py
 
@@ -1919,8 +2001,8 @@ jobs:
 
       # madeira-bcd (night round 2026-11-11, Garry's Mod GYG6SG, T2 S-GM1): env.MADEIRA_DNS_REFUSE_CRASH = 1 makes the wrapper above answer
       # crash.steampowered.com with EAI_NONAME at once (Valve's crash upload blocked a Dock start for 150 s on a network that drops the host).
-      # Opt-in (the policy default is in the script); every other name is looked up as before.
-      - name: Patch wine so the DNS wrapper can refuse Valve's crash upload host (opt-in)
+      # On by default from build 674 (the owner's test on 673; env.MADEIRA_DNS_REFUSE_CRASH = 0 turns it off); every other name is looked up as before.
+      - name: Patch wine so the DNS wrapper refuses Valve's crash upload host (on by default)
         run: |
           python3 tests/host/check-wine-dns-refuse-crash.py
           python3 tools/patch-wine-dns-refuse-crash.py wine/dlls/ws2_32/unixlib.c
@@ -2079,6 +2161,15 @@ jobs:
       - name: Patch wine so non-alertable sleeps can run I/O completions
         run: python3 tools/patch-wine-sleep-kernel-apc.py wine/dlls/ntdll/unix/sync.c
 
+      # madeira-bcd (build 666, pull request #55 by bogsen): env.MADEIRA_OVERLAPPED_SYSTEM_APC = 1 (default off): a nonblocking
+      # GetOverlappedResult(Ex) poll that finds the I/O still pending yields once, and NtYieldExecution delivers the thread's queued
+      # system I/O completions (never a user APC), so UplayService's poll loop sees its reads finish (Trackmania). Applied to the 64-bit
+      # unix ntdll (sync.c) and the i386 farm's kernelbase; dlls/kernelbase/file.c is put back after the farm, like the farm-only patches,
+      # and the 64-bit side runs only in kernelbase-optin.dll (tools/build-wine-extra-dlls.sh, env.MADEIRA_OPTIN_DLLS = kernelbase): the
+      # shipped kernelbase.dll is never rebuilt. Checked by "Check nonblocking I/O completion delivery".
+      - name: Enable opt-in overlapped I/O completion checkpoints
+        run: python3 tools/patch-wine-overlapped-system-apc.py wine
+
       # madeira-bcd: env.MADEIRA_WOA_RECHECK = 1 (default off): an infinite RtlWaitOnAddress in the 32-bit ntdll (the i386 farm's)
       # waits in one-second slices and returns when a waker removed its entry but the alert never came; the unix side keeps the
       # [waiters] registry's park across the slices, and without the switch waits a slice out as the infinite wait it stands for.
@@ -2131,6 +2222,10 @@ jobs:
           grep -q wine_vk_client_ptr wine/dlls/winevulkan/vulkan_thunks.c
           grep -q host_alloc wine/dlls/win32u/vulkan.c
 
+      # Engine review 2026-11-17: the unix side is compiled with -Wno-implicit-function-declaration, so an undeclared function that returns
+      # 64 bits is silently cut to 32 (mach_absolute_time in signal_arm64_ios.c was). Every undeclared call must be a known int/void one.
+      - name: Check undeclared calls of the unix side (no 64-bit result cut to 32)
+        run: python3 tests/host/check-implicit-64bit-calls.py --require-wine
       - name: Build ntdll-unix
         # Keep going so one run reports every broken stage (and caches FEX and
         # LLVM). "Verify all linked archives exist" still fails the job before
@@ -2501,10 +2596,9 @@ jobs:
           path: toolchains/llvm-mingw-20260421-ucrt-macos-universal
           key: llvm-mingw-20260421-ucrt-macos-universal
 
-      # madeira-bcd (OpenGL, LOVE games such as Balatro): a GC64 LuaJIT (build/luajit-x64) the wineserver maps in place of a game's own lua51.dll
-      # when that is an x64 LuaJIT that needs memory below 2 GB, which iOS never gives (build/wineserver/luajit_compat.c; only in a session whose game
-      # has gl-backend on). The source is fetched at its pinned commit. A failure only loses that substitution (the game keeps its own DLL, as before),
-      # so it does not fail the build.
+      # Bundle stock GC64 LuaJIT for LÖVE games and a second variant for
+      # games whose Lua scripts use C-style comments. The loader selects the
+      # variant for the session (build/wineserver/luajit_compat.c).
       - name: Restore GC64 LuaJIT (LOVE games)
         id: lovecache
         uses: actions/cache/restore@v4
@@ -2512,8 +2606,9 @@ jobs:
           path: |
             app/Madeira/compat/love/lua51.dll
             app/Madeira/compat/love/lua51.dll.version
+            app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       - name: Build the GC64 LuaJIT (LOVE games)
         if: steps.lovecache.outputs.cache-hit != 'true' && env.MINGW_OK == '1'
@@ -2521,14 +2616,15 @@ jobs:
         run: bash build/luajit-x64/build.sh
 
       - name: Save GC64 LuaJIT (LOVE games)
-        if: steps.lovecache.outputs.cache-hit != 'true' && hashFiles('app/Madeira/compat/love/lua51.dll') != ''
+        if: steps.lovecache.outputs.cache-hit != 'true' && hashFiles('app/Madeira/compat/love/lua51.dll') != '' && hashFiles('app/Madeira/compat/lua-c-comments/lua51.dll') != ''
         uses: actions/cache/save@v4
         with:
           path: |
             app/Madeira/compat/love/lua51.dll
             app/Madeira/compat/love/lua51.dll.version
+            app/Madeira/compat/lua-c-comments/lua51.dll
             app/Madeira/licenses/LuaJIT-MIT.txt
-          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh') }}
+          key: luajit-gc64-v1-${{ hashFiles('build/luajit-x64/build.sh', 'build/luajit-x64/*.patch') }}
 
       # env.MADEIRA_DXGI_BUDGET_EVENTS = 1 (opt-in): the budget-change events
       # tools/patch-dxgi-budget-events.py adds to dxgi-src.dll, checked (and
@@ -2817,6 +2913,11 @@ jobs:
           sed -i '' 's/MATCHES "Darwin"/MATCHES "Darwin|iOS"/' \
             toolchains/llvm-project/llvm/cmake/modules/AddLLVM.cmake
           grep -n 'Darwin|iOS' toolchains/llvm-project/llvm/cmake/modules/AddLLVM.cmake | head
+          # The same for -Wl,-z,defs on shared libraries (libLTO.dylib): Xcode 27's ld refuses "-z" (build 672, the M5 Max);
+          # older Xcode ignored it. Static libraries, the ones DXMT links, are not affected.
+          sed -i '' 's/CMAKE_SYSTEM_NAME MATCHES "Darwin|FreeBSD|OpenBSD|DragonFly|AIX|SunOS|OS390"/CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS|FreeBSD|OpenBSD|DragonFly|AIX|SunOS|OS390"/' \
+            toolchains/llvm-project/llvm/cmake/modules/HandleLLVMOptions.cmake
+          grep -n 'Darwin|iOS|FreeBSD' toolchains/llvm-project/llvm/cmake/modules/HandleLLVMOptions.cmake | head
 
           # stage 1: host llvm-tblgen only (use Xcode clang, not brew's newer one)
           cmake -S toolchains/llvm-project/llvm -B toolchains/llvm-host-build -G Ninja \
@@ -3176,6 +3277,9 @@ jobs:
       # ([swapchain-rotation]). Same two DLLs as above.
       - name: Patch DXMT swap chain rotation
         run: python3 tools/patch-dxmt-d11-swapchain-rotation.py
+
+      - name: Patch DXMT opt-in x64 swapchain entries
+        run: python3 tools/patch-dxmt-x64-swapchain-entry.py
 
       # The Witness, Rise/Shadow of the Tomb Raider, Transformers, Danganronpa (night round 2026-11-11, G10 S9): a texture over Direct3D 11's
       # limits (16384 / 2048 slices; 3D 2048) reached Metal, whose validation aborts the process; it gets E_INVALIDARG as on Windows
@@ -3688,6 +3792,17 @@ jobs:
       # first compare an unpatched ntdll with the committed one byte for byte. The 64-bit ntdll gets it through tools/build-wine-fresh-dlls.sh.
       - name: Patch wine with the loader's import diagnostics (i386 farm only)
         run: python3 tools/patch-wine-loader-import-diag.py wine
+      # round 669 (agent B S7; Doki Doki Literature Club N8E7GN): [import-miss] says what was searched for an import that was not found (log only, 8 a
+      # process); env.MADEIRA_IMPORT_APPDIR = 1 (default off) searches the program's own folder once more. Same file, put back with it.
+      - name: Patch wine with the loader's missing-import line and the keyed application-folder search (i386 farm only)
+        run: python3 tools/patch-wine-loader-import-appdir.py wine
+      # round 669 (agent D S4; The Wolf Among Us 4VHH72): a program's DirectInput callbacks are called through Wine's enum_callback_wrapper, so a cdecl
+      # callback (Telltale's 32-bit games) cannot unbalance the stack of Wine's ANSI shims. Same machine code for a stdcall callback; i386 farm only,
+      # put back with the other farm-only files.
+      - name: Patch wine so DirectInput's callbacks to the program restore the stack (i386 farm only)
+        run: |
+          python3 tests/host/check-dinput-cdecl-callbacks.py
+          python3 tools/patch-wine-dinput-cdecl-callbacks.py wine
 
       # WoW64's 32-bit Windows farm (app/Madeira/i386-windows), which upstream
       # builds from the pinned wine and DXMT (build/wine-i386) and does not
@@ -3732,6 +3847,8 @@ jobs:
           git -C wine checkout -- dlls/ntdll/env.c dlls/kernelbase/process.c dlls/ntdll/exception.c dlls/kernelbase/debug.c dlls/msvcrt/main.c
           git -C wine checkout -- dlls/ntdll/heap.c
           git -C wine checkout -- dlls/ntdll/loader.c
+          git -C wine checkout -- dlls/dinput   # round 669: tools/patch-wine-dinput-cdecl-callbacks.py
+          git -C wine checkout -- dlls/kernelbase/file.c   # build 666: the overlapped poll (i386 farm here; arm64ec only in kernelbase-optin.dll)
 
       # madeira-bcd: DXMT's Direct3D 9 frontend compiled for arm64ec (tools/build-d3d9-x64-dll.sh), shipped as
       # arm64ec-windows/d3d9-dxmt.dll NEXT TO Wine's d3d9.dll, which stays the default: a 64-bit game gets it as its d3d9.dll only
@@ -3950,6 +4067,14 @@ jobs:
       - name: Check D3D12 bundles
         run: python3 tests/host/check-d3d12-bundles.py
 
+      # madeira-bcd (build 666, issue #36): a released D3D12 texture waits for the GPU (skate., Mina the Hollower, Ghost of Tsushima).
+      - name: Check D3D12 texture release after the GPU
+        run: python3 tests/host/check-d3d12-tex-defer.py
+
+      # madeira-bcd (build 666, issue #35): a copy between an uncompressed and a block-compressed texture, one texel per block (skate.).
+      - name: Check D3D12 texel-to-block copies
+        run: python3 tests/host/check-d3d12-t2t-reinterp.py
+
       # madeira-bcd (build 652), night round 2026-11-11, madeira-d3d12: block-compressed footprints in whole blocks (Satisfactory's assertion), a view of
       # the other sample count (Age of Wonders 4's Metal abort), RG32Uint texture atomics only on Apple9+ (REANIMAL, Oar'some Adventures, RDR2), fence flags (skate2),
       # a texture beyond Metal's size limits refused with E_INVALIDARG (Shadow of the Tomb Raider's Metal abort).
@@ -4059,6 +4184,9 @@ jobs:
           python3 tests/host/check-fault-guard-guest-rip.py
           python3 tests/host/check-recovery-log-sample.py
           python3 tests/host/check-pool-split-retry.py
+          python3 tests/host/check-pool-tagged.py
+          python3 tests/host/check-tagged-pool-region.py
+          python3 tests/host/check-fex-zero-file.py
           python3 tests/host/check-user-va-gb.py
           # round 631: totalphys-cap only lowers the reported memory (RDR2 on 16 GB iPads)
           python3 tests/host/check-totalphys-cap.py
@@ -4390,6 +4518,8 @@ jobs:
       # madeira-bcd: exe-window-mb: room at 0x140000000 for a large fixed-address program (Hogwarts Legacy).
       - name: Check exe window
         run: python3 tests/host/check-exe-window.py
+      - name: Check the executable window's fallback below a mapping (round 669, Hogwarts Legacy)
+        run: python3 tests/host/check-exe-window-fallback.py
 
       # madeira-bcd: D3DXCreateVolumeTextureFromResourceEx (GTA IV).
       - name: Check d3dx9 volume textures from resources
@@ -4524,6 +4654,9 @@ jobs:
       # madeira-bcd: env.MADEIRA_SLEEP_KERNEL_APC (tools/patch-wine-sleep-kernel-apc.py).
       - name: Check sleep-kernel-apc
         run: python3 tests/host/check-sleep-kernel-apc.py
+
+      - name: Check nonblocking I/O completion delivery
+        run: python3 tests/host/check-overlapped-system-apc.py
 
       # madeira-bcd: env.MADEIRA_WOA_RECHECK (tools/patch-wine-woa-recheck.py).
       - name: Check woa-recheck
@@ -4699,6 +4832,44 @@ jobs:
       - name: Check KosmicKrisp
         run: python3 tests/host/check-kosmickrisp.py
 
+      # Round 668 (bcd-games #57): the kk-retry shim in front of KosmicKrisp: its sources and credit, its CI step, and build.sh against a
+      # stand-in library in a scratch tree (macOS).
+      - name: Check the kk-retry shim
+        run: python3 tests/host/check-kk-retry.py
+
+      # Round 669 (X-Plane 12): KosmicKrisp's in-process opaque fds (playport patch 0020, env.MADEIRA_KK_OPAQUE_FD), Wine's win32
+      # sharing on them and Zink on the session's KosmicKrisp (env.MADEIRA_ZINK_VULKAN): the patch's gates, its handle registry
+      # compiled on the host, Wine's extension mapping, the list policy, the catalog, the row and the rule.
+      - name: Check KosmicKrisp's opaque fds
+        run: python3 tests/host/check-kk-opaque-fd.py
+
+      # Build 673 (X-Plane 12): KosmicKrisp reports blending for SNORM color formats with env.MADEIRA_KK_SNORM_BLEND = 1 (playport
+      # patch 0033): the patch's one condition, the key compiled on the host, the list policy, the catalog, the row and the rule.
+      - name: Check KosmicKrisp's SNORM blending
+        run: python3 tests/host/check-kk-snorm-blend.py
+
+      # Build 674 (X-Plane 12): KosmicKrisp logs the MSL source Metal refused, the first three, at most 800 lines each, between
+      # [kk-msl-fail] begin/end lines (playport patch 0034; X-Plane's compute shader writes a multisampled storage image).
+      - name: Check KosmicKrisp's refused MSL log
+        run: python3 tests/host/check-kk-msl-fail.py
+
+      # Build 675 (X-Plane 12): KosmicKrisp binds multisampled storage images read-only and leaves stores to them out with
+      # env.MADEIRA_KK_MS_STORE_DROP = 1 (playport patch 0035; Metal cannot write a multisampled texture): the patch's branches, the
+      # key compiled on the host, Metal's own answer, the list policy, the catalog, the row and the rule.
+      - name: Check KosmicKrisp's multisampled storage stores
+        run: python3 tests/host/check-kk-ms-store-drop.py
+
+      # Build 676: a KosmicKrisp source tree whose patches are not the series any more is unpacked again (markers hold each
+      # patch's SHA-256; build 676 shipped 675's library after 0035 was corrected under the same name).
+      - name: Check KosmicKrisp's source tree follows the patch series
+        run: python3 tests/host/check-kk-stale-source.py
+
+      # Round 669 (bcd-games #57): the patched MoltenVK as a second, opt-in Vulkan library (`vulkan = moltenvk-patched`): the script and its pins, the
+      # CI steps, the session setup, Zink's library, the list's policy, the catalog, the packaging check and the credits (and, on this Mac only, the
+      # patches against the pinned sources). Without the word nothing changes.
+      - name: Check the patched MoltenVK
+        run: python3 tests/host/check-moltenvk-patched.py
+
       # madeira-bcd (round 626, Splatterhouse YWX9P5): a fixed section view beyond the address limit is refused (Wine answered a
       # success-class status with no view behind it), and big refused fixed views name the kernel's regions ([map-block]).
       - name: Check that a fixed view beyond the address limit is refused
@@ -4750,6 +4921,15 @@ jobs:
       # (MADEIRA_FEX_EC_EXIT_LEAN=0 keeps ExitFunctionEC).
       - name: Check fex-ec-exit-lean
         run: python3 tests/host/check-fex-ec-exit-lean.py
+
+      # madeira-bcd (round 670, engine review I10): MADEIRA_FEX_EC_EXIT_POOL=1 installs ExitFunctionECJitPool, the lean exit
+      # with a hint for targets already inside a pool copy (default off); both stubs run from the same states.
+      - name: Check fex-ec-exit-pool
+        run: python3 tests/host/check-fex-ec-exit-pool.py
+
+      # madeira-bcd (round 670): the AArch64 interpreter the FEX stub checks run on where unicorn is missing.
+      - name: Check a64mini
+        run: python3 tests/host/check-a64mini.py
 
       # round 632 (125hz's FEX 68bb21cf4 + e6055c96e, opt-in): env.MADEIRA_SMC_HOT_PAGE (hot self-modifying-code pages, 64-bit and 32-bit
       # module) and env.MADEIRA_CALLRET_RESET_RATE; both off unless the key names a number.
@@ -5057,6 +5237,8 @@ jobs:
               raise SystemExit('Required ARM64EC EC-bitmap cache module was not built; refusing the fallback IPA')
           if b'ec-exit-lean-v1 madeira-bcd' not in module:
               raise SystemExit('Required ARM64EC lean JIT exit module was not built; refusing the fallback IPA')
+          if b'ec-exit-pool-v1 madeira-bcd' not in module:
+              raise SystemExit('Required ARM64EC pool-target exit hint module was not built; refusing the fallback IPA')
           if b'ec-ret-direct-v1 madeira-bcd' not in module:
               raise SystemExit('Required ARM64EC direct return module was not built; refusing the fallback IPA')
           if b'callret-small-v1 madeira-bcd' not in module:
@@ -5065,9 +5247,14 @@ jobs:
           PYEOF
           # Verify the linked x64 entries; never silently ship a fallback DLL
           # that accepts the option but lacks the required interop ABI.
+          D3D11_CHECK=app/Madeira/arm64ec-windows/d3d11.dll
+          if [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ]; then
+            D3D11_CHECK=app/Madeira/arm64ec-windows/d3d11-src.dll
+          fi
           python3 tests/host/check-x64-graphics-entry.py \
             --factory app/Madeira/arm64ec-windows/dxgi-src.dll \
-            --d3d12 app/Madeira/arm64ec-windows/madeira_d3d12.dll
+            --d3d12 app/Madeira/arm64ec-windows/madeira_d3d12.dll \
+            --d3d11 "$D3D11_CHECK"
           # Likewise tools/build-d3d11-dll.sh (env.MADEIRA_D3D11_SRC). Round 620: BCD's Direct3D 11
           # patches reach a 64-bit game only through d3d11-src.dll, and recommended lists ask for it
           # (F1 2020), so an IPA in which no 64-bit d3d11.dll carries them is refused.
@@ -5274,8 +5461,9 @@ jobs:
           command -v cabextract >/dev/null 2>&1 || brew install cabextract
           command -v msiextract >/dev/null 2>&1 || brew install msitools
 
-          curl -fL --retry 3 --retry-delay 2 -o /tmp/vcr.exe \
-            https://aka.ms/vs/17/release/vc_redist.x64.exe
+          # tools/fetch-cached.sh: the plain curl call here; on the owner's Mac (BCD_DOWNLOAD_CACHE) only when Microsoft's copy changed
+          bash tools/fetch-cached.sh /tmp/vcr.exe https://aka.ms/vs/17/release/vc_redist.x64.exe \
+            -fL --retry 3 --retry-delay 2
           if [ ! -s /tmp/vcr.exe ]; then
             echo "::warning::VC_redist.x64.exe download failed -- MSVC games will not start"
             exit 0
@@ -5392,8 +5580,9 @@ jobs:
       - name: Check the 32-bit MFC download and its session links
         shell: bash
         run: |
-          curl -fsSL --retry 3 --retry-delay 2 --proto '=https' --proto-redir '=https' --max-filesize 134217728 -o /tmp/vcr-x86.exe \
-            https://aka.ms/vs/17/release/vc_redist.x86.exe || { rm -f /tmp/vcr-x86.exe; echo "::warning::vc_redist.x86.exe not downloaded: the MFC check uses its synthetic package"; }
+          # tools/fetch-cached.sh: the plain curl call here; on the owner's Mac (BCD_DOWNLOAD_CACHE) only when Microsoft's copy changed
+          bash tools/fetch-cached.sh /tmp/vcr-x86.exe https://aka.ms/vs/17/release/vc_redist.x86.exe \
+            -fsSL --retry 3 --retry-delay 2 --proto '=https' --proto-redir '=https' --max-filesize 134217728 || { rm -f /tmp/vcr-x86.exe; echo "::warning::vc_redist.x86.exe not downloaded: the MFC check uses its synthetic package"; }
           python3 tests/host/check-mfc32.py --require-swift
 
       # madeira-bcd (upstream port 2026-10-25): PrefixExtractor.c refuses '..' components, absolute paths and a bad tar size field;
@@ -5470,10 +5659,44 @@ jobs:
       - name: Check the executable window from the game's folder and the pool above it
         run: python3 tests/host/check-exe-window-auto.py --require-swift
 
+      # Round 677 (the owner's decision; agent S1 S1-S8): Wine's wintypes.dll for a program that imports the WinRT buffer API set.
+      - name: Check wintypes for programs that import the WinRT buffer API set
+        run: python3 tests/host/check-wintypes-auto.py
+
       # madeira-bcd (upstream port 2026-10-25): env.MADEIRA_THIN_RESERVE = 1 gives 1-2 GB read-write reserves a thin head (a game that
       # reserves dozens of 1 GB blocks and commits little); off unless set; the switch run on the host, the hooks read.
       - name: Check thin reservations
         run: python3 tests/host/check-thin-reserve.py
+
+      # Build 669 (upstream Madeira pull requests #622 Vugar, #611 NevesHenry, #615 Russell Barton, #620 NevesHenry): the address scan's floor,
+      # a failed WoW64 parameter allocation ends only that process, DEP options only for a WoW64 caller, Steam content-server rotation.
+      - name: Check the address scan floor
+        run: python3 tests/host/check-va-scan-floor.py
+      # Engine review 2026-11-17: the scan's other end. On a map that does not end on a power of two (454 GB, 17 GB) the scan windows
+      # reach above the map and every top-down placement tried 160,000 to 240,000 refused mappings (env.MADEIRA_VA_SCAN_CEILING, default on).
+      - name: Check the address scan ceiling
+        run: python3 tests/host/check-va-scan-ceiling.py
+      # Engine review 2026-11-18: NtProtectVirtualMemory's image sync looked every word of the region up in the whole mapping table
+      # (2.2 s for a 134 MB .text). A word outside the span of the mapped images is no longer looked up (env.MADEIRA_IAT_SYNC_SPAN,
+      # default on); the production loop is run on the host next to the same loop without the test.
+      - name: Check the image sync span
+        run: python3 tests/host/check-iat-sync-span.py
+      - name: Check the refused allocation's record starts clean (round 669)
+        run: python3 tests/host/check-alloc-fail-record.py
+      - name: Check the WoW64 parameter allocation failure
+        run: python3 tests/host/check-wow64-params-alloc.py
+      - name: Check DEP options only for a WoW64 caller
+        run: python3 tests/host/check-dep-caller.py
+      - name: Check Steam content-server rotation
+        run: python3 tests/host/check-steam-cdn-host-rotation.py
+      - name: Check Steam Cloud downloads (second fetch, other packings, what arrived)
+        run: python3 tests/host/check-steam-cloud-fetch.py
+
+      # Round 669 (owner 2026-11-17, N112): env.MADEIRA_UNITY_SMALL_VA = 1 gives Unity's 511 MB pieces 256 MB-aligned windows with real heads
+      # inside a 4 GB-class FEX arena (build/ntdll-unix/ios_unity_va.h compiled and run on the host; every hook in virtual_ios.c skipped
+      # while no head is held, which is always without the key).
+      - name: Check Unity windows in the emulator's arena
+        run: python3 tests/host/check-unity-small-va.py
 
       # madeira-bcd tls-index-sync: the loader's TLS slot for a module reaches the pool copy it runs from; the parse and the copy on a
       # synthetic image, and where the protect-time sync calls it.

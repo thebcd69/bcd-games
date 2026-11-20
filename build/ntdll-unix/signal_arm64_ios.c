@@ -484,6 +484,12 @@ volatile int ios_exc_msg_count = 0;
  * the receive loop already put the round trip at ~33us; this makes it a live
  * number for THIS workload so the W^X change has a before/after to beat.
  * t0 is stamped at message receipt and consumed by the store emulator. */
+/* madeira-bcd: mach_absolute_time() returns 64 bits, and no header this file includes declares it (mach/mach_time.h is left out: the
+ * receive loop declares mach_timebase_info itself). The build's -Wno-implicit-function-declaration then made every call here one that
+ * returns int: the low 32 bits of the tick count, sign-extended. The count's bit 31 flips every 89.5 s at the 24 MHz timebase, so every
+ * 89.5 s one [fault-cost] sample was dropped as implausible (the "underflow" ml685 guards against) and the [perf-hint] rate below saw a
+ * time that jumped backwards or by 6e18 ns and started its three-in-a-row count again. Declared, the calls return the whole count. */
+extern uint64_t mach_absolute_time( void );
 volatile unsigned long long ios_store_fault_t0 = 0;
 volatile unsigned long long ios_store_fault_ticks = 0;
 volatile unsigned long long ios_store_fault_n = 0;
@@ -3278,9 +3284,12 @@ static void *ios_mach_exception_thread( void *arg )
                 {
                     const char *plain = getenv( "MADEIRA_WOW_RWX_PLAIN" );
                     hint_done = 1;
+                    /* Round 670 (engine review I1): the line names the 64-bit key too; it named only the 32-bit one, which does nothing for a
+                     * 64-bit program (Jetboard Joust, Slay the Spire 2). Log text only; the rule table reads the unchanged first words. */
                     dprintf(STDERR_FILENO, "[perf-hint] r624 emulated stores keep faulting at 20000 a second or more "
                             "(MADEIRA_WOW_RWX_PLAIN=%s): env.MADEIRA_WOW_RWX_PLAIN = 1 in the game's settings (or the Desktop's, "
-                            "for a program started there) makes a 32-bit Mono program's code memory plain\n", plain ? plain : "(unset)");
+                            "for a program started there) makes a 32-bit Mono program's code memory plain, "
+                            "env.MADEIRA_X64_RWX_PLAIN = 1 a 64-bit .NET or Mono program's\n", plain ? plain : "(unset)");
                 }
             }
         }
@@ -7590,26 +7599,30 @@ skip_reclaim_band: ;
                             else
                                 dprintf( STDERR_FILENO, "[rsp-trunc]   x86 @rip UNREADABLE\n" );
 
-                            /* ajan21-loglar (build 598): the opt-in report for a 32-bit guest's access violation (Need for Speed Most Wanted,
-                             * speed.exe+0x1ab7a): env.MADEIRA_X86_FAULT_DUMP = 1; log only, JIT code only (ios_x86_fault_diag.h). */
-                            if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && ios_av_args_pc_is_jit( __darwin_arm_thread_state64_get_pc( state ) ))
-                            {
-                                uintptr_t xf_teb = 0;
-                                void *xf_tramp = NULL;
-
-                                ios_lookup_thread( thread, &xf_teb, &xf_tramp );
-                                ios_x86_fault_av( &state, xf_teb, cs[0], (uint64_t)fault_addr, -1 );
-                            }
-                            /* round 630 (agents O3 S10/S15; Vampire ZGERG3, Jet Set Radio 2EZCT8): a fault outside JIT code at a low address
-                             * after the guest branched where no code is (a NULL call; a refused block's null-read thunk): the report
-                             * around the return address at ESP names the call (ios_x86_fault_diag.h). Log only, with the dump key. */
-                            else if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)
+                            /* round 630 (agents O3 S10/S15; Vampire ZGERG3, Jet Set Radio 2EZCT8): a fault at a low address after the guest
+                             * branched where no code is (a NULL call; a refused block's null-read thunk): the report around the return address
+                             * at ESP names the call (ios_x86_fault_diag.h). Log only, with the dump key.
+                             * Round 669 (agent C SD-1; Sleeping Dogs 4WEW0M): tested FIRST. FEX's null-read thunk runs in the JIT pool, so the
+                             * access-violation branch below took this fault and returned at once (a 32-bit guest's access is always window base
+                             * plus its address, never below 0x10000), and the dump key printed nothing for this stop. */
+                            if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && (uint64_t)fault_addr < 0x10000)
                             {
                                 uintptr_t xf_teb = 0;
                                 void *xf_tramp = NULL;
 
                                 ios_lookup_thread( thread, &xf_teb, &xf_tramp );
                                 ios_x86_fault_branch_nowhere( &state, xf_teb, st28, cs[0], "null-call" );
+                            }
+
+                            /* ajan21-loglar (build 598): the opt-in report for a 32-bit guest's access violation (Need for Speed Most Wanted,
+                             * speed.exe+0x1ab7a): env.MADEIRA_X86_FAULT_DUMP = 1; log only, JIT code only (ios_x86_fault_diag.h). */
+                            else if (ios_x86_fault_enabled() && req->exception == EXC_BAD_ACCESS && ios_av_args_pc_is_jit( __darwin_arm_thread_state64_get_pc( state ) ))
+                            {
+                                uintptr_t xf_teb = 0;
+                                void *xf_tramp = NULL;
+
+                                ios_lookup_thread( thread, &xf_teb, &xf_tramp );
+                                ios_x86_fault_av( &state, xf_teb, cs[0], (uint64_t)fault_addr, -1 );
                             }
 
                             /* iOS-Madeira ml333: is the guest code we EXECUTE the guest code that was

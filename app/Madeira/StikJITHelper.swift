@@ -1,3 +1,5 @@
+// Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+// under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 wamei: code taken from https://github.com/willfaust/Madeira (commits bbe0b12 and 20c5218)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 import UIKit
@@ -346,25 +348,52 @@ enum StikJITHelper {
     /// since (malloc, Metal, IOSurface).
     private static var earlyPoolReleased = false
 
-    /// madeira-bcd exe-window-auto (off unless `exe-window-auto = 1` in the game's file or bcd.cfg): the window
-    /// a game's own fixed-base exe needs, measured from its PE header before a BCD Dock session starts
-    /// (fixedBaseWindowMB, ContentView.startDock). 0: not asked, or nothing larger than the 128MB window was
-    /// found. Read once by the next allocatePool, then cleared, so it never carries over to another game.
-    /// An `exe-window-mb` in the game's file wins over it.
+    /// madeira-bcd exe-window-auto (on by default from round 677; `exe-window-auto = 0` in the game's file or bcd.cfg turns it off): the
+    /// window a game's own fixed-base exe needs, measured from its PE header before the session starts (fixedBaseWindowMB:
+    /// ContentView.startDock for a BCD Dock start, BCDLaunch.applyLibrary for a library start). 0: not asked, or nothing larger than the
+    /// 128MB window was found. Read once by the next allocatePool, then cleared, so it never carries over to another game.
+    /// An `exe-window-mb` in the game's file (a list row's, auto-tune's or the player's) wins over it.
     static var exeWindowAutoMB = 0
+
+    /// Round 677 (the owner, 2026-11-19, from agent S1's S1-S2): exe-window-auto is on unless the value says off. Every fixed-base program
+    /// above the 128 MB window failed its first start with c0000018 (P5R, MMBN, Far Cry Primal, Demon Slayer 2 in round 677) until a list
+    /// row or auto-tune's second start gave it a window; the measure gives it at the first start. It only acts when a program in the
+    /// game's folder is fixed-base, based at 0x140000000 and larger than 128 MB, which cannot load today without a wider window.
+    static func exeWindowAutoWanted(_ value: String?) -> Bool {
+        let v = (value ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return !["0", "off", "false", "no"].contains(v)
+    }
 
     /// madeira-bcd: the largest executable window (MB, 16MB steps) that an exe
     /// under `folder` needs: one whose relocations are stripped (or that has no
     /// relocation directory), based in [0x140000000, 0x180000000), ending above
     /// the 128MB window. Only the first 4KB of each exe are read. nil when none
     /// needs more than 128MB.
+    /// Round 669 (S9): the window an `exe-window-mb` request can still have when a mapping lies inside the range it asked for: the
+    /// largest 16 MB multiple below that mapping, if it is at least exeWindowFallbackFloorMB. nil when the mapping is not inside the
+    /// wanted range, when the room is smaller, or when the request is under 256 MB (a program that size needs the whole of it).
+    static func exeWindowFallbackMB(wantMB: Int, haveMB: Int, windowBase: UInt, firstMappedBase: UInt) -> Int? {
+        guard wantMB >= 256, haveMB > 0, wantMB > haveMB,
+              firstMappedBase > windowBase + (UInt(haveMB) << 20),
+              firstMappedBase < windowBase + (UInt(wantMB) << 20) else { return nil }
+        let room = Int((firstMappedBase - windowBase) >> 20) & ~15
+        return room >= exeWindowFallbackFloorMB(wantMB: wantMB, haveMB: haveMB) ? room : nil
+    }
+
+    /// The smallest fallback window: 64 MB more than the window had, and three quarters of the size asked for.
+    static func exeWindowFallbackFloorMB(wantMB: Int, haveMB: Int) -> Int { max(haveMB + 64, wantMB * 3 / 4) }
+
     static func fixedBaseWindowMB(in folder: URL) -> (mb: Int, exe: String)? {
         let winBase: UInt64 = 0x140000000, ceiling: UInt64 = 0x180000000
         guard let walker = FileManager.default.enumerator(at: folder, includingPropertiesForKeys: nil,
                                                           options: [.skipsHiddenFiles, .skipsPackageDescendants]) else { return nil }
         var best: (end: UInt64, exe: String)? = nil
         var seen = 0
+        var walked = 0
         for case let url as URL in walker {
+            // Round 677: the measure runs on every start now; a folder of more than 60,000 entries is not walked further.
+            walked += 1
+            if walked > 60_000 { break }
             guard url.pathExtension.lowercased() == "exe" else { continue }
             seen += 1
             if seen > 256 { break }
@@ -400,6 +429,10 @@ enum StikJITHelper {
     /// The debugger stays attached so Wine can use BRK to prepare PE code pages.
     static func allocatePool(poolSize requestedPoolSize: Int = 128 * 1024 * 1024) -> (rx: UnsafeMutableRawPointer, rw: UnsafeMutableRawPointer, size: Int)? {
         var poolSize = requestedPoolSize      // ml1036: may shrink to fit, see the hole census below
+        guard !taggedRestartRequired else {
+            poolFailure = "Tagged JIT preparation or cleanup failed. Quit BCD before trying again."
+            return nil
+        }
         poolFailure = nil
         exeWindowWidenFailedMB = nil
         let exeWindowAuto = exeWindowAutoMB      // madeira-bcd exe-window-auto: this request's, then cleared (it never reaches another game)
@@ -410,6 +443,12 @@ enum StikJITHelper {
         // elsewhere the request still goes to the debugger protocol, and the trap fallback below
         // turns an unanswered one into a clean refusal.
         let debuggerAttached = isDebuggerTraced()
+        taggedPool = (MadeiraConfig.gameValue("pool-tagged") ?? MadeiraConfig.get("pool-tagged")) == "1"
+        if taggedPool && !debuggerAttached {
+            poolFailure = "The experimental tagged JIT pool needs an attached debugger. Enable JIT and try again."
+            return nil
+        }
+        if taggedPool { LogStore.shared.log("[pool-tagged] normally charged backing; placement and requested sizes unchanged") }
         noDebugger = !debuggerAttached && SigningStatus.current.debugged && JITNoDebuggerPool.takeForPool()
         defer { releaseNoDebuggerEntries() }
         LogStore.shared.log("Allocating \(poolSize / 1024 / 1024)MB JIT pool " + (noDebugger ? "without a debugger..." : "via debugger..."))
@@ -476,7 +515,7 @@ enum StikJITHelper {
                 // pins nothing useful and costs 16MB of the scarcest VA we have
                 // (the low gap must hold the pool AND the 0x140000000 window).
                 if addr >= pinTarget {
-                    vm_deallocate(mach_task_self_, addr, vm_size_t(chunkSize))
+                    releasePoolMapping(addr, vm_size_t(chunkSize))
                     LogStore.shared.log(String(format: "JIT-pool frontier already at 0x%lx — no pin needed", Int(addr)))
                     break
                 }
@@ -571,7 +610,7 @@ enum StikJITHelper {
                     + "RX allocation - a fixed-base main image can now load where it must; "
                     + "ntdll releases it on demand", level: .success)
             } else {
-                if krWin == KERN_SUCCESS { vm_deallocate(mach_task_self_, winAddr, vm_size_t(exeWinSize)) }
+                if krWin == KERN_SUCCESS { releasePoolMapping(winAddr, vm_size_t(exeWinSize)) }
                 LogStore.shared.log("ml1034: could NOT reserve the executable window (kr=\(krWin)) BEFORE "
                     + "RX - something else already holds 0x140000000; a non-relocatable image will be "
                     + "displaced and its absolute pointers will be stale", level: .error)
@@ -653,7 +692,7 @@ enum StikJITHelper {
             LogStore.shared.log(String(format: "ml1234: the early pool placeholder 0x%lx+%luMB was released by an earlier pool request in this run; not unmapped again",
                                        Int(earlyPoolBase), Int(earlyPoolSize >> 20)))
         } else if earlyPoolBase != 0 {
-            vm_deallocate(mach_task_self_, earlyPoolBase, vm_size_t(earlyPoolSize))
+            releasePoolMapping(earlyPoolBase, vm_size_t(earlyPoolSize))
             earlyPoolReleased = true
             LogStore.shared.log(String(format: "ml1040: released the early pool placeholder 0x%lx+%luMB for the debugger",
                                        Int(earlyPoolBase), Int(earlyPoolSize >> 20)))
@@ -696,10 +735,47 @@ enum StikJITHelper {
                 setenv("WINE_IOS_EXE_WINDOW", String(format: "%lx:%lx", Int(exeWinBase), Int(exeWinSize)), 1)
                 LogStore.shared.log("[exe-window] executable window widened to [0x140000000,+\(mb)MB) for this game (\(setting))", level: .success)
             } else {
-                if kr == KERN_SUCCESS { vm_deallocate(mach_task_self_, extra, vm_size_t(want - exeWinSize)) }
+                if kr == KERN_SUCCESS { releasePoolMapping(extra, vm_size_t(want - exeWinSize)) }
                 exeWindowWidenFailedMB = mb
-                LogStore.shared.log("[exe-window] could not widen the executable window to \(mb)MB (kr=\(kr)): something holds the range above it; the window stays 128MB. "
-                    + "A game whose program needs more than that stops with c0000018: quit BCD and open it again for a new memory layout", level: .error)
+                // Round 669 (S9; Hogwarts Legacy 6EW662, EAQKAS, build 665): one small mapping iOS had put above the window (a 1 MB
+                // malloc region at 0x15dd00000 / 0x159d00000) made the whole request fail (kr=3), the window stayed 128 MB and the 371.5 MiB
+                // program stopped with c0000018. Take the free part below the first mapping when it can still hold a large program
+                // (exeWindowFallbackMB); this runs only where the old path failed with certainty.
+                let haveMB = Int(exeWinSize >> 20)
+                var firstMapped: vm_address_t = exeWinBase + exeWinSize
+                var regionSize: vm_size_t = 0
+                var regionInfo = vm_region_basic_info_data_64_t()
+                var regionCount = mach_msg_type_number_t(MemoryLayout<vm_region_basic_info_data_64_t>.size / MemoryLayout<Int32>.size)
+                var regionObject: mach_port_t = 0
+                let regionKr = withUnsafeMutablePointer(to: &regionInfo) {
+                    $0.withMemoryRebound(to: Int32.self, capacity: Int(regionCount)) {
+                        vm_region_64(mach_task_self_, &firstMapped, &regionSize, VM_REGION_BASIC_INFO_64, $0, &regionCount, &regionObject)
+                    }
+                }
+                var widened = 0
+                if regionKr == KERN_SUCCESS,
+                   var fit = StikJITHelper.exeWindowFallbackMB(wantMB: mb, haveMB: haveMB, windowBase: UInt(exeWinBase), firstMappedBase: UInt(firstMapped)) {
+                    let floorMB = StikJITHelper.exeWindowFallbackFloorMB(wantMB: mb, haveMB: haveMB)
+                    while fit >= floorMB {
+                        var again: vm_address_t = exeWinBase + exeWinSize
+                        let size = (vm_address_t(fit) << 20) - exeWinSize
+                        let kr2 = vm_allocate(mach_task_self_, &again, vm_size_t(size), 0 /* VM_FLAGS_FIXED */)
+                        if kr2 == KERN_SUCCESS && again == exeWinBase + exeWinSize { widened = fit; break }
+                        if kr2 == KERN_SUCCESS { releasePoolMapping(again, vm_size_t(size)) }
+                        fit -= 16
+                    }
+                }
+                if widened > 0 {
+                    exeWindowWidenFailedMB = nil   // the exit text then compares the program with this window (ExitWords.windowTooSmall)
+                    exeWinSize = vm_address_t(widened) << 20
+                    setenv("WINE_IOS_EXE_WINDOW", String(format: "%lx:%lx", Int(exeWinBase), Int(exeWinSize)), 1)
+                    // "[0x140000000,+NMB)" is the phrase ExitWords reads the window's size from.
+                    LogStore.shared.log(String(format: "[exe-window] executable window widened to [0x140000000,+%dMB) for this game (\(setting) asked for %dMB, kr=%d; "
+                        + "the mapping at 0x%lx holds the rest)", widened, mb, Int(kr), Int(firstMapped)), level: .success)
+                } else {
+                    LogStore.shared.log("[exe-window] could not widen the executable window to \(mb)MB (kr=\(kr)): something holds the range above it; the window stays 128MB. "
+                        + "A game whose program needs more than that stops with c0000018: quit BCD and open it again for a new memory layout", level: .error)
+                }
             }
         }
         var censusLargest: vm_address_t = 0   // night round 2026-11-11 (G9 S2a): the census's largest hole, for the BAD POOL step-down below
@@ -822,7 +898,7 @@ enum StikJITHelper {
                                     plugs.append((a, vm_size_t(h.size)))
                                     LogStore.shared.log(String(format: "[pool-split] ml1036 pair: plugged lower run 0x%lx+%luMB so first-fit lands at 0x%lx",
                                                                Int(h.base), Int(h.size >> 20), Int(pa.base)))
-                                } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                                } else { releasePoolMapping(a, vm_size_t(h.size)) }
                             }
                         }
                     }
@@ -852,11 +928,12 @@ enum StikJITHelper {
             if holesCut && pairA == nil, let target = holes.first(where: { $0.size >= vm_address_t(poolSize) }) {
                 for h in uncutHoles where h.base < target.base && h.size >= vm_address_t(poolSize) {
                     var a = h.base
-                    if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */) == KERN_SUCCESS && a == h.base {
+                    let claimResult = vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */)
+                    if claimResult == KERN_SUCCESS && a == h.base {
                         plugs.append((a, vm_size_t(h.size)))
                         LogStore.shared.log(String(format: "ml1036: pool-window-cut: plugged uncut hole 0x%lx+%luMB so first-fit lands at 0x%lx",
                                                    Int(h.base), Int(h.size >> 20), Int(target.base)))
-                    } else if a != h.base { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                    } else if a != h.base && (!taggedPool || claimResult == KERN_SUCCESS) { releasePoolMapping(a, vm_size_t(h.size)) }
                 }
             }
             // ml1040: the debugger allocates first-fit. If a LOWER hole also fits
@@ -881,11 +958,12 @@ enum StikJITHelper {
             if pairA == nil && earlyPoolBase != 0 && windowHeld && aboveFits {
                 for h in holes where h.base + h.size <= earlyPoolBase && h.size >= vm_address_t(poolSize) {
                     var a = h.base
-                    if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */) == KERN_SUCCESS && a == h.base {
+                    let claimResult = vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */)
+                    if claimResult == KERN_SUCCESS && a == h.base {
                         plugs.append((a, vm_size_t(h.size)))
                         LogStore.shared.log(String(format: "ml1040: plugged lower hole 0x%lx+%luMB so first-fit lands above the window",
                                                    Int(h.base), Int(h.size >> 20)))
-                    } else if a != h.base { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                    } else if a != h.base && (!taggedPool || claimResult == KERN_SUCCESS) { releasePoolMapping(a, vm_size_t(h.size)) }
                 }
             }
         }
@@ -894,6 +972,22 @@ enum StikJITHelper {
         // first-fit request below; nothing under it is free, so the request lands at its start.
         if let plan = reservePlan { poolSize = PoolReserve.releaseSlice(plan) }
         var rxPtrOpt: UnsafeMutableRawPointer? = nil
+        var taggedSecond: (base: vm_address_t, size: vm_address_t)? = nil
+        var lowRegion: (base: vm_address_t, size: vm_address_t)? = nil
+        var taggedAlias: (base: vm_address_t, size: vm_size_t)? = nil
+        var taggedPublished = false
+        if taggedPool { poolMid = nil }
+        defer {
+            if taggedPool && !taggedPublished {
+                if let alias = taggedAlias { _ = releasePoolMapping(alias.base, alias.size) }
+                if let low = lowRegion { _ = releasePoolMapping(low.base, vm_size_t(low.size)) }
+                if let mid = poolMid { _ = releasePoolMapping(mid.base, vm_size_t(mid.size)); poolMid = nil }
+                if let second = taggedSecond { _ = releasePoolMapping(second.base, vm_size_t(second.size)) }
+                if let rx = rxPtrOpt { _ = releasePoolMapping(vm_address_t(bitPattern: rx), vm_size_t(poolSize)) }
+                poolTaken = false
+                StikJITHelper.poolLow = nil
+            }
+        }
         var requestUnanswered = false
         // Night round 2026-11-11 (G9 S2a, 78BPN7 and the archive's guest-window BAD POOL logs): the size of each try; a try after a placement in the
         // guest window asks for 16 MB less each time when the pool was sized to the census's hole with no slack (PoolRetryRules.stepDown).
@@ -935,7 +1029,8 @@ enum StikJITHelper {
             }
         }
         // ml1040: the plugs existed only to steer first-fit; give the VA back.
-        for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
+        for (a, sz) in plugs { releasePoolMapping(a, sz) }
+        if taggedPool && poolFailure != nil { return nil }
         if let plan = reservePlan { PoolReserve.finish(plan, rx: rxPtrOpt, size: poolSize) }   // madeira-bcd pool-reserve: all but the window back
         // madeira-bcd pool-pair: region A must sit at the run chosen by the census and
         // region B must be taken now. Otherwise fall back to the single-region pool the
@@ -948,6 +1043,8 @@ enum StikJITHelper {
                 pairSecond = takeSecondRegion(above: got + vm_address_t(poolSize), want: requestedPoolSize - poolSize, pageFit: pageFit,
                                               exeWindow: (exeWinBase, exeWinSize))
             }
+            taggedSecond = pairSecond
+            if taggedPool && poolFailure != nil { return nil }
             if let second = pairSecond {
                 let midNote = poolMid.map { String(format: ", region M 0x%lx+%luMB (pool-mid)", Int($0.base), Int($0.size >> 20)) } ?? ""
                 LogStore.shared.log(String(format: "[pool-split] ml1036 pair placed: region A 0x%lx+%luMB, region B 0x%lx+%luMB%@, "
@@ -965,8 +1062,9 @@ enum StikJITHelper {
                     // needs: give it back first. Region A at its run stays held until the
                     // replacement is good (it cannot be in the way: it is above the window).
                     if got != pa.base {
-                        let dkr = vm_deallocate(mach_task_self_, got, vm_size_t(poolSize))
+                        let dkr = releasePoolMapping(got, vm_size_t(poolSize))
                         LogStore.shared.log("[pool-split] ml1036 pair: region released (kr=\(dkr))")
+                        if taggedPool && dkr != KERN_SUCCESS { return nil }
                         rxPtrOpt = nil
                     }
                     var replaced = false
@@ -974,12 +1072,18 @@ enum StikJITHelper {
                         let qa = Int(bitPattern: q)
                         let qGuest = qa + pairSingle > guestLo && qa < guestHi
                         if qa >= goodLow && !qGuest && !overlapsExeWindow(vm_address_t(qa), vm_address_t(pairSingle)) {
-                            if let old = rxPtrOpt { vm_deallocate(mach_task_self_, vm_address_t(bitPattern: old), vm_size_t(poolSize)) }
+                            if let old = rxPtrOpt {
+                                let dkr = releasePoolMapping(vm_address_t(bitPattern: old), vm_size_t(poolSize))
+                                if taggedPool && dkr != KERN_SUCCESS {
+                                    _ = releasePoolMapping(vm_address_t(bitPattern: q), vm_size_t(pairSingle))
+                                    return nil
+                                }
+                            }
                             rxPtrOpt = q
                             poolSize = pairSingle
                             replaced = true
                         } else {
-                            let dkr = vm_deallocate(mach_task_self_, vm_address_t(qa), vm_size_t(pairSingle))
+                            let dkr = releasePoolMapping(vm_address_t(qa), vm_size_t(pairSingle))
                             LogStore.shared.log(String(format: "BAD POOL placement 0x%lx for the %luMB fallback — released (kr=%d)",
                                                        qa, pairSingle >> 20, dkr), level: .error)
                         }
@@ -998,6 +1102,7 @@ enum StikJITHelper {
                 }
             }
         }
+        if taggedPool && poolFailure != nil { return nil }
         guard let rxPtr = rxPtrOpt else {
             // madeira-bcd ios18-jit (2026-10-18): every way out here refuses the launch and leaves
             // BCD up with the reason (ContentView shows it). The old BAD POOL path called exit(0)
@@ -1170,27 +1275,28 @@ enum StikJITHelper {
         poolLow = nil
         let lowValue = (MadeiraConfig.gameValue("pool-low") ?? MadeiraConfig.get("pool-low") ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        var lowRegion: (base: vm_address_t, size: vm_address_t)? = nil
+
         if ["1", "on", "true", "yes"].contains(lowValue) {
             lowRegion = takeLowRegion(poolRx: rxAddrV, exeWindow: (exeWinBase, exeWinSize), pageFit: pageFit)
         }
+        if taggedPool && poolFailure != nil { return nil }
         // Region C is taken and its alias failed: give it back, the pool works as without it.
         func dropLowRegion(_ why: String) {
             guard let low = lowRegion else { return }
-            let dkr = vm_deallocate(mach_task_self_, low.base, vm_size_t(low.size))
+            let dkr = releasePoolMapping(low.base, vm_size_t(low.size))
             LogStore.shared.log("[pool-low] \(why) -- region C released (kr=\(dkr)); code buffers stay in the pool",
                                 level: .error)
-            lowRegion = nil
+            if !taggedPool || dkr == KERN_SUCCESS { lowRegion = nil }
         }
         // The pool and C are mapped: say so and keep C for ContentView.
         func lowReady(_ rwBase: vm_address_t, _ low: (base: vm_address_t, size: vm_address_t), _ rw: vm_address_t) {
-            let exemptC = jit_make_region_no_footprint(UnsafeMutableRawPointer(bitPattern: rwBase)!, Int(low.size),
+            let exemptC = poolExemption(UnsafeMutableRawPointer(bitPattern: rwBase)!, Int(low.size),
                                                        "pool-RW-alias-low")
             LogStore.shared.log(String(format: "[pool-low] region C RX [0x%lx,0x%lx) %luMB, RW [0x%lx,0x%lx) at the pool's "
                 + "distance 0x%lx (one RW reservation from 0x%lx); FEX code buffers come from C first, the pool span is "
                 + "left to the image copies (no-footprint %@)",
                 Int(low.base), Int(low.base + low.size), Int(low.size >> 20), Int(rwBase), Int(rwBase + low.size),
-                Int(rw) - Int(rxAddrV), Int(rwBase), exemptC ? "applied" : "REFUSED"),
+                Int(rw) - Int(rxAddrV), Int(rwBase), taggedPool ? "not requested; normally charged" : (exemptC ? "applied" : "REFUSED")),
                 level: exemptC ? .success : .error)
             StikJITHelper.poolLow = (rx: Int(low.base), size: Int(low.size))
         }
@@ -1221,6 +1327,8 @@ enum StikJITHelper {
                 LogStore.shared.log("[pool-split] the pool got its full \(poolSize >> 20)MB in one region — no split needed")
             } else if let second = pairSecond ?? takeSecondRegion(above: rxAddrV + vm_address_t(poolSize), want: requestedPoolSize - poolSize, pageFit: pageFit,
                                                                   exeWindow: (exeWinBase, exeWinSize)) {
+                taggedSecond = second
+                if taggedPool && poolFailure != nil { return nil }
                 if pageFit {
                     LogStore.shared.log("[pool-split] page-fit A=\(poolSize >> 10)KB B=\(second.size >> 10)KB usable=\((vm_address_t(poolSize) + second.size + (poolMid?.size ?? 0)) >> 10)KB budget=\(requestedPoolSize >> 10)KB; native mappings retained")
                 }
@@ -1231,6 +1339,7 @@ enum StikJITHelper {
                     if let mid = poolMid { lowRegions.append((rx: mid.base, size: mid.size)) }
                     lowRegions.append((rx: second.base, size: second.size))
                     if let rwLow = mapLowAlias(lowRegions) {
+                        taggedAlias = (rwLow, vm_size_t(second.base + second.size - low.base))
                         let span = Int(second.base + second.size - rxAddrV)
                         let holeEnd = Int(second.base - rxAddrV)
                         let rw = rwLow + (rxAddrV - low.base)
@@ -1239,10 +1348,11 @@ enum StikJITHelper {
                             + "RW=[\(String(format: "%p", Int(rw))),\(String(format: "%p", Int(rw) + span))) "
                             + "offset=0x\(String(Int(rw) - Int(rxAddrV), radix: 16)) windowHeld=\(windowHeld) rwOverlap=false",
                             level: .success)
-                        let exemptA = jit_make_region_no_footprint(rwPtr, poolSize, "pool-RW-alias")
-                        let exemptB = jit_make_region_no_footprint(rwPtr + holeEnd, Int(second.size), "pool-RW-alias-2")
-                        let exemptM = poolMid.map { jit_make_region_no_footprint(rwPtr + Int($0.base - rxAddrV), Int($0.size), "pool-RW-alias-mid") } ?? true
-                        LogStore.shared.log("[no-footprint] pool applied=\(exemptA && exemptB && exemptM)", level: exemptA && exemptB && exemptM ? .success : .error)
+                        guard prepareTaggedPool(lowRegions, aliasBase: rwLow) else { return nil }
+                        let exemptA = poolExemption(rwPtr, poolSize, "pool-RW-alias")
+                        let exemptB = poolExemption(rwPtr + holeEnd, Int(second.size), "pool-RW-alias-2")
+                        let exemptM = poolMid.map { poolExemption(rwPtr + Int($0.base - rxAddrV), Int($0.size), "pool-RW-alias-mid") } ?? true
+                        LogStore.shared.log(taggedPool ? "[pool-tagged] normally charged; no exemption requested" : "[no-footprint] pool applied=\(exemptA && exemptB && exemptM)", level: exemptA && exemptB && exemptM ? .success : .error)
                         splitHoles(aSize: poolSize, bOff: holeEnd, rxBase: rxAddrV)
                         if poolMid == nil {
                         LogStore.shared.log(String(format: "[pool-split] JIT pool = RX [0x%lx,0x%lx) %luMB + [0x%lx,0x%lx) %luMB as one "
@@ -1258,10 +1368,13 @@ enum StikJITHelper {
                         LogStore.shared.log(poolReadyText, level: .success)
                         poolTaken = true
                         poolWithoutDebugger = noDebugger
-                        guard floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: span) else { return nil }   // madeira-bcd pool-floor
+                        guard taggedPool || floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: span) else { return nil }   // madeira-bcd pool-floor
+                        taggedPublished = true
                         return (rx: rxPtr, rw: rwPtr, size: span)
                     }
+                    if taggedPool && poolFailure != nil { return nil }
                     dropLowRegion("no RW alias for the split pool with region C")
+                    if taggedPool && poolFailure != nil { return nil }
                 }
                 // pool-mid: A, M and B in one RW reservation; without M (or if that
                 // mapping fails, M then given back) the two-region alias as before
@@ -1269,8 +1382,10 @@ enum StikJITHelper {
                 if let mid = poolMid {
                     rwSplit = mapLowAlias([(rx: rxAddrV, size: vm_address_t(poolSize)), (rx: mid.base, size: mid.size),
                                            (rx: second.base, size: second.size)], tag: "[pool-mid]")
+                    if taggedPool && poolFailure != nil { return nil }
                     if rwSplit == nil {
-                        let dkr = vm_deallocate(mach_task_self_, mid.base, vm_size_t(mid.size))
+                        let dkr = releasePoolMapping(mid.base, vm_size_t(mid.size))
+                        if taggedPool && dkr != KERN_SUCCESS { return nil }
                         poolMid = nil
                         LogStore.shared.log("[pool-split] pool-mid: no RW alias for three regions — third region released (kr=\(dkr))",
                                             level: .error)
@@ -1279,7 +1394,9 @@ enum StikJITHelper {
                 if rwSplit == nil {
                     rwSplit = mapSplitAlias(rxA: rxAddrV, sizeA: vm_address_t(poolSize), rxB: second.base, sizeB: second.size)
                 }
+                if taggedPool && poolFailure != nil { return nil }
                 if let rw = rwSplit {
+                    taggedAlias = (rw, vm_size_t(second.base + second.size - rxAddrV))
                     let span = Int(second.base + second.size - rxAddrV)
                     let holeEnd = Int(second.base - rxAddrV)
                     let rwPtr = UnsafeMutableRawPointer(bitPattern: rw)!
@@ -1288,10 +1405,14 @@ enum StikJITHelper {
                         + "offset=0x\(String(Int(rw) - Int(rxAddrV), radix: 16)) windowHeld=\(windowHeld) rwOverlap=false",
                         level: .success)
                     // one exemption request per region: they are separate VM objects
-                    let exemptA = jit_make_region_no_footprint(rwPtr, poolSize, "pool-RW-alias")
-                    let exemptB = jit_make_region_no_footprint(rwPtr + holeEnd, Int(second.size), "pool-RW-alias-2")
-                    let exemptM = poolMid.map { jit_make_region_no_footprint(rwPtr + Int($0.base - rxAddrV), Int($0.size), "pool-RW-alias-mid") } ?? true
-                    LogStore.shared.log("[no-footprint] pool applied=\(exemptA && exemptB && exemptM)", level: exemptA && exemptB && exemptM ? .success : .error)
+                    var acceptedRegions: [(rx: vm_address_t, size: vm_address_t)] = [(rxAddrV, vm_address_t(poolSize))]
+                    if let mid = poolMid { acceptedRegions.append((mid.base, mid.size)) }
+                    acceptedRegions.append((second.base, second.size))
+                    guard prepareTaggedPool(acceptedRegions, aliasBase: rw) else { return nil }
+                    let exemptA = poolExemption(rwPtr, poolSize, "pool-RW-alias")
+                    let exemptB = poolExemption(rwPtr + holeEnd, Int(second.size), "pool-RW-alias-2")
+                    let exemptM = poolMid.map { poolExemption(rwPtr + Int($0.base - rxAddrV), Int($0.size), "pool-RW-alias-mid") } ?? true
+                    LogStore.shared.log(taggedPool ? "[pool-tagged] normally charged; no exemption requested" : "[no-footprint] pool applied=\(exemptA && exemptB && exemptM)", level: exemptA && exemptB && exemptM ? .success : .error)
                     splitHoles(aSize: poolSize, bOff: holeEnd, rxBase: rxAddrV)
                     if poolMid == nil {
                     LogStore.shared.log(String(format: "[pool-split] JIT pool = RX [0x%lx,0x%lx) %luMB + [0x%lx,0x%lx) %luMB as one "
@@ -1306,14 +1427,18 @@ enum StikJITHelper {
                     LogStore.shared.log(poolReadyText, level: .success)
                     poolTaken = true
                     poolWithoutDebugger = noDebugger
-                    guard floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: span) else { return nil }   // madeira-bcd pool-floor
+                    guard taggedPool || floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: span) else { return nil }   // madeira-bcd pool-floor
+                    taggedPublished = true
                     return (rx: rxPtr, rw: rwPtr, size: span)
                 }
-                let dkr = vm_deallocate(mach_task_self_, second.base, vm_size_t(second.size))
+                let dkr = releasePoolMapping(second.base, vm_size_t(second.size))
+                if taggedPool && dkr != KERN_SUCCESS { return nil }
+                taggedSecond = nil
                 LogStore.shared.log("[pool-split] no RW alias for the split pool — second region released (kr=\(dkr)); "
                     + "the pool stays \(poolSize >> 20)MB in one region", level: .error)
                 if let mid = poolMid {   // pool-mid: the third region goes with it
-                    _ = vm_deallocate(mach_task_self_, mid.base, vm_size_t(mid.size))
+                    let dkr = releasePoolMapping(mid.base, vm_size_t(mid.size))
+                    if taggedPool && dkr != KERN_SUCCESS { return nil }
                     poolMid = nil
                 }
             }
@@ -1322,22 +1447,27 @@ enum StikJITHelper {
         // madeira-bcd pool-low: C and the one-region pool in one RW reservation (C first)
         if let low = lowRegion {
             if let rwLow = mapLowAlias([(rx: low.base, size: low.size), (rx: rxAddrV, size: vm_address_t(poolSize))]) {
+                taggedAlias = (rwLow, vm_size_t(rxAddrV + vm_address_t(poolSize) - low.base))
                 let rw = rwLow + (rxAddrV - low.base)
                 let rwPtr = UnsafeMutableRawPointer(bitPattern: rw)!
                 LogStore.shared.log("ml977: RX=[\(String(format: "%p", Int(rxAddrV))),\(String(format: "%p", Int(rxAddrV) + poolSize))) "
                     + "RW=[\(String(format: "%p", Int(rw))),\(String(format: "%p", Int(rw) + poolSize))) "
                     + "offset=0x\(String(Int(rw) - Int(rxAddrV), radix: 16)) windowHeld=\(windowHeld) rwOverlap=false",
                     level: .success)
-                let exempt = jit_make_region_no_footprint(rwPtr, poolSize, "pool-RW-alias")
-                LogStore.shared.log("[no-footprint] pool applied=\(exempt)", level: exempt ? .success : .error)
+                guard prepareTaggedPool([(low.base, low.size), (rxAddrV, vm_address_t(poolSize))], aliasBase: rwLow) else { return nil }
+                let exempt = poolExemption(rwPtr, poolSize, "pool-RW-alias")
+                LogStore.shared.log(taggedPool ? "[pool-tagged] normally charged; no exemption requested" : "[no-footprint] pool applied=\(exempt)", level: exempt ? .success : .error)
                 lowReady(rwLow, low, rw)
                 LogStore.shared.log(poolReadyText, level: .success)
                 poolTaken = true
                 poolWithoutDebugger = noDebugger
-                guard floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: poolSize) else { return nil }   // madeira-bcd pool-floor
+                guard taggedPool || floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: poolSize) else { return nil }   // madeira-bcd pool-floor
+                taggedPublished = true
                 return (rx: rxPtr, rw: rwPtr, size: poolSize)
             }
+            if taggedPool && poolFailure != nil { return nil }
             dropLowRegion("no RW alias for the pool with region C")
+            if taggedPool && poolFailure != nil { return nil }
         }
         // ml1037: the hint used to be 0x150000000 ("just above the window"), and
         // the alias duly took the 500MB hole there -- the very hole the RX pool
@@ -1358,7 +1488,8 @@ enum StikJITHelper {
             kr1 = remapRW(&rwAddr, vm_size_t(poolSize), VM_FLAGS_ANYWHERE, rx: vm_address_t(bitPattern: rxPtr),
                           &curProt, &maxProt)
         } else if kr1 == KERN_SUCCESS && !rwAliasKeep(rwAddr) {
-            vm_deallocate(mach_task_self_, rwAddr, vm_size_t(poolSize))
+            let dkr = releasePoolMapping(rwAddr, vm_size_t(poolSize))
+            if taggedPool && dkr != KERN_SUCCESS { return nil }
             rwAddr = 0x7000000000
             kr1 = remapRW(&rwAddr, vm_size_t(poolSize), VM_FLAGS_ANYWHERE, rx: vm_address_t(bitPattern: rxPtr),
                           &curProt, &maxProt)
@@ -1406,11 +1537,12 @@ enum StikJITHelper {
             + "windowHeld=\(windowHeld) rwOverlap=\(rwOverlaps)",
             level: rwOverlaps ? .error : .success)
 
+        taggedAlias = (rwAddr, vm_size_t(poolSize))
         // Set RW protection
         let kr2 = vm_protect(mach_task_self_, rwAddr, vm_size_t(poolSize), 0, VM_PROT_READ | VM_PROT_WRITE)
         guard kr2 == KERN_SUCCESS else {
             LogStore.shared.log("vm_protect(RW) failed: \(kr2)", level: .error)
-            vm_deallocate(mach_task_self_, rwAddr, vm_size_t(poolSize))
+            if !taggedPool { _ = releasePoolMapping(rwAddr, vm_size_t(poolSize)) }
             poolFailure = "The JIT memory couldn't be made writable (vm_protect error \(kr2)). Quit and reopen BCD to try again. "
                 + "If the problem comes back, please share the diagnostic log."
             return nil
@@ -1431,17 +1563,19 @@ enum StikJITHelper {
         // ml360's run showed mach_make_memory_entry_64(READ|WRITE) over the
         // debugger's RX pages fails with KERN_PROTECTION_FAILURE. Same vm
         // object either way; the RW alias actually permits the access.
-        let exempt = jit_make_region_no_footprint(rwPtr, poolSize, "pool-RW-alias")
+        guard prepareTaggedPool([(rxAddrV, vm_address_t(poolSize))], aliasBase: rwAddr) else { return nil }
+        let exempt = poolExemption(rwPtr, poolSize, "pool-RW-alias")
         // ml359: log the verdict through LogStore.log (which appends to the
         // file) — the ml358 run lost it because the jit_log callback only fed
         // the UI view. Detail (kr / footprint delta) is in the jit_log lines.
-        LogStore.shared.log("[no-footprint] pool applied=\(exempt)", level: exempt ? .success : .error)
+        LogStore.shared.log(taggedPool ? "[pool-tagged] normally charged; no exemption requested" : "[no-footprint] pool applied=\(exempt)", level: exempt ? .success : .error)
 
         LogStore.shared.log(poolReadyText, level: .success)
         poolTaken = true
         poolWithoutDebugger = noDebugger
 
-        guard floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: poolSize) else { return nil }   // madeira-bcd pool-floor
+        guard taggedPool || floorAliasChecked(floorOff, rx: rxPtr, rw: rwPtr, size: poolSize) else { return nil }   // madeira-bcd pool-floor
+        taggedPublished = true
         return (rx: rxPtr, rw: rwPtr, size: poolSize)
     }
 
@@ -1451,15 +1585,18 @@ enum StikJITHelper {
     /// launch is refused. Without pool-floor = 0 nothing runs.
     private static func floorAliasChecked(_ floorOff: Bool, rx: UnsafeMutableRawPointer, rw: UnsafeMutableRawPointer,
                                           size: Int) -> Bool {
-        guard floorOff else { return true }
+        guard !taggedPool || poolFailure == nil else { return false }
+        guard floorOff || taggedPool else { return true }
         var detail = [CChar](repeating: 0, count: 160)
         let ok = bcd_pool_rw_rx_selftest(rx, rw, UInt(size), &detail, UInt(detail.count)) != 0
         LogStore.shared.log("[pool-floor] RW->RX self-test " + (ok ? "passed: " : "FAILED: ") + String(cString: detail)
             + String(format: " (pool RX 0x%lx, RW 0x%lx)", Int(bitPattern: rx), Int(bitPattern: rw)), level: ok ? .success : .error)
         if !ok {
+            if taggedPool { taggedRestartRequired = true }
             poolTaken = false
-            poolFailure = "BCD's JIT memory failed its check (pool-floor = 0). Remove pool-floor = 0 from this game's "
-                + "settings, then quit BCD (swipe it away in the app switcher) and open it again."
+            poolFailure = taggedPool ? "The tagged JIT memory failed its sharing check. Disable pool-tagged, quit BCD and try again."
+                : "BCD's JIT memory failed its check (pool-floor = 0). Remove pool-floor = 0 from this game's "
+                    + "settings, then quit BCD (swipe it away in the app switcher) and open it again."
         }
         return ok
     }
@@ -1601,11 +1738,15 @@ enum StikJITHelper {
             for h in freeRuns(0x100000000, best.base, minSize: size) {
                 var a = h.base
                 if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* VM_FLAGS_FIXED */) == KERN_SUCCESS {
-                    if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                    if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { releasePoolMapping(a, vm_size_t(h.size)) }
                 }
             }
             let got = requestRegion(Int(size), region: "B")
-            for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
+            for (a, sz) in plugs { releasePoolMapping(a, sz) }
+            if taggedPool && poolFailure != nil {
+                if let p = got { _ = releasePoolMapping(vm_address_t(bitPattern: p), vm_size_t(size)) }
+                return nil
+            }
             guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
                 LogStore.shared.log("[pool-split] the debugger did not allocate the second region (\(size >> 20)MB) — the pool "
                     + "stays one region", level: .error)
@@ -1613,7 +1754,7 @@ enum StikJITHelper {
             }
             let b = vm_address_t(bitPattern: p)
             if b < aEnd || b + size > ceiling || (aEnd < exeWindow.base + exeWindow.size && b > exeWindow.base) {
-                let dkr = vm_deallocate(mach_task_self_, b, vm_size_t(size))
+                let dkr = releasePoolMapping(b, vm_size_t(size))
                 if dkr == KERN_SUCCESS && attempt + 1 < attempts {
                     LogStore.shared.log(String(format: "[pool-split] attempt %d: the second region landed at 0x%lx, not in the run at 0x%lx — "
                         + "released; checking the lower free runs again (pool-split-retry = 1)", attempt + 1, Int(b), Int(best.base)),
@@ -1644,11 +1785,16 @@ enum StikJITHelper {
                 for h in freeRuns(0x100000000, run.base, minSize: msize) {
                     var a = h.base
                     if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* VM_FLAGS_FIXED */) == KERN_SUCCESS {
-                        if a == h.base { mplugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                        if a == h.base { mplugs.append((a, vm_size_t(h.size))) } else { releasePoolMapping(a, vm_size_t(h.size)) }
                     }
                 }
                 let mgot = requestRegion(Int(msize), region: "B-mid")
-                for (a, sz) in mplugs { vm_deallocate(mach_task_self_, a, sz) }
+                for (a, sz) in mplugs { releasePoolMapping(a, sz) }
+                if taggedPool && poolFailure != nil {
+                    if let p = mgot { _ = releasePoolMapping(vm_address_t(bitPattern: p), vm_size_t(msize)) }
+                    _ = releasePoolMapping(b, vm_size_t(size))
+                    return nil
+                }
                 if let mp = mgot, mp != UnsafeMutableRawPointer(bitPattern: 0) {
                     let m = vm_address_t(bitPattern: mp)
                     if m >= run.base && m + msize <= run.base + run.size {
@@ -1657,7 +1803,7 @@ enum StikJITHelper {
                             + "0x%lx+%luMB between the regions (pool-mid = 1)",
                             Int(m), Int(msize >> 20), Int(run.base), Int(run.size >> 20)), level: .success)
                     } else {
-                        let dkr = vm_deallocate(mach_task_self_, m, vm_size_t(msize))
+                        let dkr = releasePoolMapping(m, vm_size_t(msize))
                         LogStore.shared.log(String(format: "[pool-split] pool-mid: the third region landed at 0x%lx, not in the run "
                             + "at 0x%lx — released (kr=%d)", Int(m), Int(run.base), dkr), level: .error)
                     }
@@ -1675,7 +1821,7 @@ enum StikJITHelper {
                 if a == g.base {
                     _ = vm_protect(mach_task_self_, a, vm_size_t(g.size), 1, VM_PROT_NONE)
                     held += Int(g.size)
-                } else { vm_deallocate(mach_task_self_, a, vm_size_t(g.size)) }
+                } else { releasePoolMapping(a, vm_size_t(g.size)) }
             }
         }
         LogStore.shared.log(String(format: "[pool-split] second debugger region 0x%lx+%luMB (free runs above the pool: %@); "
@@ -1739,11 +1885,15 @@ enum StikJITHelper {
         for h in plugRuns {
             var a = h.base
             if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* VM_FLAGS_FIXED */) == KERN_SUCCESS {
-                if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { vm_deallocate(mach_task_self_, a, vm_size_t(h.size)) }
+                if a == h.base { plugs.append((a, vm_size_t(h.size))) } else { releasePoolMapping(a, vm_size_t(h.size)) }
             }
         }
         let got = requestRegion(Int(size), region: "C")
-        for (a, sz) in plugs { vm_deallocate(mach_task_self_, a, sz) }
+        for (a, sz) in plugs { releasePoolMapping(a, sz) }
+        if taggedPool && poolFailure != nil {
+            if let p = got { _ = releasePoolMapping(vm_address_t(bitPattern: p), vm_size_t(size)) }
+            return nil
+        }
         guard let p = got, p != UnsafeMutableRawPointer(bitPattern: 0) else {
             LogStore.shared.log("[pool-low] the debugger did not allocate region C (\(size >> 20)MB) -- code buffers stay "
                 + "in the pool", level: .error)
@@ -1751,7 +1901,7 @@ enum StikJITHelper {
         }
         let c = vm_address_t(bitPattern: p)
         if c < lowFloor || c + size > exeWindow.base || c + size > poolRx {
-            let dkr = vm_deallocate(mach_task_self_, c, vm_size_t(size))
+            let dkr = releasePoolMapping(c, vm_size_t(size))
             LogStore.shared.log(String(format: "[pool-low] region C landed at 0x%lx, not below the window in the run at 0x%lx -- "
                 + "released (kr=%d); code buffers stay in the pool", Int(c), Int(best.base), dkr), level: .error)
             return nil
@@ -1777,6 +1927,7 @@ enum StikJITHelper {
     /// Returns the reservation's base, or nil with nothing left mapped.
     private static func mapLowAlias(_ regions: [(rx: vm_address_t, size: vm_address_t)],
                                     tag: String = "[pool-low]") -> vm_address_t? {
+        guard !taggedRestartRequired && (!taggedPool || poolFailure == nil) else { return nil }
         guard let first = regions.first, let last = regions.last, regions.count >= 2 else { return nil }
         let span = last.rx + last.size - first.rx
         var rw: vm_address_t = rwAliasHint()
@@ -1787,7 +1938,8 @@ enum StikJITHelper {
             rw = 0x7000000000
             kr = vm_allocate(mach_task_self_, &rw, vm_size_t(span), VM_FLAGS_ANYWHERE)
         } else if kr == KERN_SUCCESS && !rwAliasKeep(rw) {
-            vm_deallocate(mach_task_self_, rw, vm_size_t(span))
+            let dkr = releasePoolMapping(rw, vm_size_t(span))
+            if taggedPool && dkr != KERN_SUCCESS { return nil }
             rw = 0x7000000000
             kr = vm_allocate(mach_task_self_, &rw, vm_size_t(span), VM_FLAGS_ANYWHERE)
         }
@@ -1810,14 +1962,16 @@ enum StikJITHelper {
             let krRW = krMap == KERN_SUCCESS
                 ? vm_protect(mach_task_self_, a, vm_size_t(r.size), 0, VM_PROT_READ | VM_PROT_WRITE)
                 : krMap
-            if krMap != KERN_SUCCESS || krRW != KERN_SUCCESS || a != want {
+            let coherent = !taggedPool || (krMap == KERN_SUCCESS && krRW == KERN_SUCCESS && a == want &&
+                (maxProt & (VM_PROT_READ | VM_PROT_WRITE)) == (VM_PROT_READ | VM_PROT_WRITE))
+            if krMap != KERN_SUCCESS || krRW != KERN_SUCCESS || a != want || !coherent {
                 failed = String(format: "region 0x%lx+%luMB: remap %d, protect %d, at 0x%lx not 0x%lx",
                                 Int(r.rx), Int(r.size >> 20), krMap, krRW, Int(a), Int(want))
                 break
             }
         }
         if let why = failed {
-            vm_deallocate(mach_task_self_, rw, vm_size_t(span))
+            releasePoolMapping(rw, vm_size_t(span))
             LogStore.shared.log(String(format: "%@ RW alias at 0x%lx failed (%@)", tag, Int(rw), why), level: .error)
             return nil
         }
@@ -1825,7 +1979,12 @@ enum StikJITHelper {
         for i in 1..<regions.count {
             let gapLo = regions[i - 1].rx + regions[i - 1].size
             if regions[i].rx > gapLo {
-                _ = vm_protect(mach_task_self_, rw + (gapLo - first.rx), vm_size_t(regions[i].rx - gapLo), 1, VM_PROT_NONE)
+                let krHole = vm_protect(mach_task_self_, rw + (gapLo - first.rx), vm_size_t(regions[i].rx - gapLo), 1, VM_PROT_NONE)
+                if taggedPool && krHole != KERN_SUCCESS {
+                    poolFailure = "BCD couldn't protect a gap in tagged JIT memory. Quit BCD before trying again."
+                    _ = releasePoolMapping(rw, vm_size_t(span))
+                    return nil
+                }
             }
         }
         return rw
@@ -1837,6 +1996,7 @@ enum StikJITHelper {
     /// nil with nothing left mapped.
     private static func mapSplitAlias(rxA: vm_address_t, sizeA: vm_address_t,
                                       rxB: vm_address_t, sizeB: vm_address_t) -> vm_address_t? {
+        guard !taggedRestartRequired && (!taggedPool || poolFailure == nil) else { return nil }
         let span = rxB + sizeB - rxA
         // ml1037: the alias goes high, where it always lived (0x7000000000);
         // 0x7900000000 for Social Club layout 2 (rwAliasHint).
@@ -1849,7 +2009,8 @@ enum StikJITHelper {
             rw = 0x7000000000
             kr = vm_allocate(mach_task_self_, &rw, vm_size_t(span), VM_FLAGS_ANYWHERE)
         } else if kr == KERN_SUCCESS && !rwAliasKeep(rw) {
-            vm_deallocate(mach_task_self_, rw, vm_size_t(span))
+            let dkr = releasePoolMapping(rw, vm_size_t(span))
+            if taggedPool && dkr != KERN_SUCCESS { return nil }
             rw = 0x7000000000
             kr = vm_allocate(mach_task_self_, &rw, vm_size_t(span), VM_FLAGS_ANYWHERE)
         }
@@ -1874,8 +2035,11 @@ enum StikJITHelper {
             ? max(vm_protect(mach_task_self_, rw, vm_size_t(sizeA), 0, VM_PROT_READ | VM_PROT_WRITE),
                   vm_protect(mach_task_self_, b, vm_size_t(sizeB), 0, VM_PROT_READ | VM_PROT_WRITE))
             : krB
-        guard krA == KERN_SUCCESS, krB == KERN_SUCCESS, krRW == KERN_SUCCESS, a == rw, b == rw + (rxB - rxA) else {
-            vm_deallocate(mach_task_self_, rw, vm_size_t(span))
+        let coherent = !taggedPool || (krA == KERN_SUCCESS && krB == KERN_SUCCESS && krRW == KERN_SUCCESS &&
+            a == rw && b == rw + (rxB - rxA) && krHole == KERN_SUCCESS &&
+            (maxProt & (VM_PROT_READ | VM_PROT_WRITE)) == (VM_PROT_READ | VM_PROT_WRITE))
+        guard krA == KERN_SUCCESS, krB == KERN_SUCCESS, krRW == KERN_SUCCESS, a == rw, b == rw + (rxB - rxA), coherent else {
+            releasePoolMapping(rw, vm_size_t(span))
             LogStore.shared.log(String(format: "[pool-split] RW alias at 0x%lx failed (remap %d/%d, protect %d, hole %d)",
                                        Int(rw), krA, krB, krRW, krHole), level: .error)
             return nil
@@ -1889,11 +2053,68 @@ enum StikJITHelper {
         noDebugger ? "JIT pool ready (built without a debugger)." : "JIT pool ready (debugger still attached)."
     }
 
+    // Final successful alias topology only. No layout fallback after this point.
+    private static func prepareTaggedPool(_ regions: [(rx: vm_address_t, size: vm_address_t)], aliasBase: vm_address_t) -> Bool {
+        guard taggedPool else { return true }
+        func failed() -> Bool {
+            taggedRestartRequired = true
+            poolFailure = "Tagged JIT preparation failed. Quit BCD before trying again."
+            return false
+        }
+        guard !taggedRestartRequired, poolFailure == nil, let first = regions.first,
+              regions.count <= 4, aliasBase != 0, aliasBase & 0x3fff == 0 else { return failed() }
+        var previousEnd = first.rx
+        for r in regions {
+            guard r.rx != 0, r.rx & 0x3fff == 0, r.size != 0, r.size & 0x3fff == 0,
+                  r.size <= vm_address_t(Int.max), r.rx >= previousEnd,
+                  r.rx < 0x1000000000, r.size <= 0x1000000000 - r.rx else { return failed() }
+            previousEnd = r.rx + r.size
+        }
+        let span = previousEnd - first.rx
+        guard span <= vm_address_t.max - aliasBase,
+              aliasBase + span <= first.rx || aliasBase >= previousEnd else { return failed() }
+        // Validate every region before preparing any: no hole or dropped tuple.
+        for r in regions {
+            let rw = aliasBase + (r.rx - first.rx)
+            BCDBrkTrail.begin(site: #line, size: Int(r.size), attempt: nil, region: "tagged-final")
+            let prepared = jit_tagged_prepare_owned_region(UnsafeMutableRawPointer(bitPattern: r.rx)!,
+                                                           UnsafeMutableRawPointer(bitPattern: rw)!, Int(r.size))
+            BCDBrkTrail.end()
+            guard prepared else { return failed() }
+        }
+        for r in regions {
+            let rw = aliasBase + (r.rx - first.rx)
+            guard floorAliasChecked(true, rx: UnsafeMutableRawPointer(bitPattern: r.rx)!,
+                                    rw: UnsafeMutableRawPointer(bitPattern: rw)!, size: Int(r.size)) else {
+                return failed()
+            }
+        }
+        return true
+    }
+
+    private static var taggedPool = false
+    private static var taggedRestartRequired = false
+
+    @discardableResult private static func releasePoolMapping(_ base: vm_address_t, _ size: vm_size_t) -> kern_return_t {
+        let result = vm_deallocate(mach_task_self_, base, size)
+        if taggedPool && result != KERN_SUCCESS {
+            taggedRestartRequired = true
+            poolFailure = "BCD couldn't release tagged JIT memory (error \(result)). Quit BCD before trying again."
+        }
+        return result
+    }
+
+    private static func poolExemption(_ address: UnsafeMutableRawPointer, _ size: Int, _ label: UnsafePointer<CChar>) -> Bool {
+        if taggedPool { return true } // Deliberately skipped; caller logs normal charging.
+        return jit_make_region_no_footprint(address, size, label)
+    }
+
     /// One RX region of `size` bytes where the kernel's first fit puts it: the debugger's
     /// `_M` (BRK #0xf00d, x16 = 1, answered by madeira-jit.js), or for the debugger-less pool
     /// a memory entry BCD maps RX itself (jit_nodebug_region), so the census and its plugs
     /// steer both the same way. nil when neither gave one.
     private static func requestRegion(_ size: Int, attempt: Int? = nil, region: String, site: Int = #line) -> UnsafeMutableRawPointer? {
+        guard !taggedRestartRequired && (!taggedPool || poolFailure == nil) else { return nil }
         guard noDebugger else {
             // madeira-bcd (round 624, agent R S2): the process stops inside this BRK until the debugger answers and may be killed there;
             // the record is on disk first (BCDBrkTrail, BCDSessionRecorderLive.swift). `site` is the caller's line (#line as a default).
@@ -1901,6 +2122,16 @@ enum StikJITHelper {
             defer { StikJITHelper.requestWatchEnd(watch) }
             BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)
             defer { BCDBrkTrail.end() }
+            if taggedPool {
+                var cleanup: Int32 = 0
+                let result = jit_tagged_region(size, &cleanup)
+                if cleanup != 0 {
+                    taggedRestartRequired = true
+                    poolFailure = "BCD couldn't clean up tagged JIT memory (error \(cleanup)). Quit BCD before trying again."
+                    return nil
+                }
+                return result
+            }
             return jit26_prepare_region(nil, size)
         }
         var entry: mach_port_t = 0
@@ -1916,6 +2147,7 @@ enum StikJITHelper {
     /// vm_remap of unsigned RX pages).
     private static func remapRW(_ address: inout vm_address_t, _ size: vm_size_t, _ flags: Int32, rx: vm_address_t,
                                 _ cur: inout vm_prot_t, _ max: inout vm_prot_t) -> kern_return_t {
+        if taggedPool && poolFailure != nil { return KERN_FAILURE }
         if let region = noDebuggerEntries[rx] {
             return jit_nodebug_map_alias(region.entry, &address, Int(min(size, region.size)), flags)
         }

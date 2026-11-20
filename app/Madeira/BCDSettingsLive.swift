@@ -1323,6 +1323,8 @@ struct BCDLiveSwitch {
         "LuaJIT-MIT.txt": "LuaJIT · MIT license",
         // KosmicKrisp (build 660): Mesa's Vulkan on Metal 4 (build/mesa-ios/build-kosmickrisp-bcd.sh copies the second into the bundle with the library).
         "MIT-Mesa-KosmicKrisp.txt": "Mesa KosmicKrisp · MIT license", "KosmicKrisp-Mesa-license.rst": "Mesa KosmicKrisp · the licenses of its parts",
+        // Round 668 (bcd-games #57): the kk-retry shim in front of KosmicKrisp, by RageMC.
+        "MIT-kk-retry.txt": "kk-retry (KosmicKrisp) · MIT license",
     ]
 }
 

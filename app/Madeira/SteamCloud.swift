@@ -4,6 +4,8 @@
 // under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
 // under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 The Porthole authors: the second fetch of a cut-short file, the failure details and the other packings
+// (SteamCloudTransfer.fetch / checked / otherPackings), after https://github.com/tylerkaska112/Porthole 1.3.1 (6d4d1aa), November 2026.
 //
 // Steam Cloud saves for games in Madeira Dock's Steam library
 // (docs/STEAM_CLOUD.md). Written from Steam's published service messages
@@ -477,21 +479,90 @@ enum SteamCloudTransfer {
         }
         var request = URLRequest(url: url)
         for header in info.headers { request.setValue(header.value, forHTTPHeaderField: header.name) }
-        let (body, response) = try await http.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-            throw SteamFileError.invalid("Steam Cloud returned an error (HTTP \((response as? HTTPURLResponse)?.statusCode ?? 0)).")
-        }
-        var file = body
-        if info.fileSize != info.rawSize || (body.count != Int(info.rawSize) && body.starts(with: [0x50, 0x4b, 0x03, 0x04])) {
-            guard let unpacked = unzipFirstEntry(body, rawSize: Int(info.rawSize)) else {
-                throw SteamFileError.invalid("A file from Steam Cloud couldn't be decompressed.")
+        func get() async throws -> Data {
+            let (body, response) = try await http.data(for: request)
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+                throw SteamFileError.invalid("Steam Cloud returned an error (HTTP \((response as? HTTPURLResponse)?.statusCode ?? 0)).")
             }
-            file = unpacked
+            return body
         }
-        guard Data(Insecure.SHA1.hash(data: file)) == expectedSHA else {
-            throw SteamFileError.invalid("A file from Steam Cloud failed its integrity check.")
+        var body = try await get()
+        var outcome = checked(body, info: info, expectedSHA: expectedSHA)
+        // madeira-bcd (Porthole 1.3.1, 6d4d1aa): a link that was cut short (fewer bytes than Steam said it serves) is fetched once more
+        // before the file is given up on.
+        if case .failure = outcome, info.fileSize > 0, body.count != Int(info.fileSize) {
+            body = try await get()
+            outcome = checked(body, info: info, expectedSHA: expectedSHA)
         }
-        return file
+        return try outcome.get()
+    }
+
+    /// madeira-bcd (Porthole 1.3.1): what arrived when a cloud file does not check out, for the log (the player sees `userText`).
+    struct FetchError: LocalizedError {
+        let kind: String
+        let detail: String
+        let userText: String
+        var errorDescription: String? { userText }
+    }
+
+    /// The file's bytes, checked against Steam's SHA-1. As before: the bytes as served, or the zip's first entry when Steam says the
+    /// served form differs from the file. Only when that fails (madeira-bcd, Porthole 1.3.1): the other ways Steam may have packed it
+    /// (a zlib stream, gzip, bare deflate), each kept only if its SHA-1 is the one Steam listed.
+    static func checked(_ body: Data, info: SteamCloudDownloadInfo, expectedSHA: Data) -> Result<Data, Error> {
+        func ok(_ d: Data) -> Bool { Data(Insecure.SHA1.hash(data: d)) == expectedSHA }
+        let rawSize = Int(info.rawSize)
+        var unpackFailed = false
+        if info.fileSize != info.rawSize || (body.count != rawSize && body.starts(with: [0x50, 0x4b, 0x03, 0x04])) {
+            if let unpacked = unzipFirstEntry(body, rawSize: rawSize) {
+                if ok(unpacked) { return .success(unpacked) }
+            } else { unpackFailed = true }
+        } else if ok(body) { return .success(body) }
+        for candidate in otherPackings(body, rawSize: rawSize) {
+            if let data = candidate(), ok(data) { return .success(data) }
+        }
+        let head = body.prefix(8).map { String(format: "%02x", $0) }.joined()
+        let detail = "served=\(body.count) head=\(head.isEmpty ? "-" : head) steam-served=\(info.fileSize) raw=\(info.rawSize)"
+        return .failure(unpackFailed
+            ? FetchError(kind: "decompress", detail: detail, userText: "A file from Steam Cloud couldn't be decompressed.")
+            : FetchError(kind: "checksum", detail: detail, userText: "A file from Steam Cloud failed its integrity check."))
+    }
+
+    /// zlib (78 xx, header and Adler-32 around a deflate stream), gzip (1f 8b 08 and its header) and bare deflate, each decoded into
+    /// exactly `rawSize` bytes (at most maxFileBytes).
+    private static func otherPackings(_ body: Data, rawSize: Int) -> [() -> Data?] {
+        guard rawSize > 0, rawSize <= maxFileBytes, body.count >= 2 else { return [] }
+        let b = [UInt8](body.prefix(10))
+        var list: [() -> Data?] = []
+        if b[0] & 0x0F == 8, b[0] >> 4 <= 7, (UInt16(b[0]) << 8 | UInt16(b[1])) % 31 == 0, body.count > 6 {
+            list.append { inflate(body.dropFirst(2).dropLast(4), rawSize: rawSize) }
+            list.append { inflate(body.dropFirst(2), rawSize: rawSize) }
+        }
+        if b.count >= 10, b[0] == 0x1f, b[1] == 0x8b, b[2] == 8 {
+            list.append {
+                let all = [UInt8](body), flags = all[3]
+                var at = 10
+                if flags & 4 != 0, all.count >= at + 2 { at += 2 + (Int(all[at]) | Int(all[at + 1]) << 8) }   // FEXTRA
+                if flags & 8 != 0 { while at < all.count, all[at] != 0 { at += 1 }; at += 1 }             // FNAME
+                if flags & 16 != 0 { while at < all.count, all[at] != 0 { at += 1 }; at += 1 }            // FCOMMENT
+                if flags & 2 != 0 { at += 2 }                                                            // FHCRC
+                return at < all.count ? inflate(Data(all[at...]), rawSize: rawSize) : nil
+            }
+        }
+        list.append { inflate(body, rawSize: rawSize) }
+        return list
+    }
+
+    /// A raw deflate stream (Compression's ZLIB is RFC 1951) decoded into exactly `rawSize` bytes, or nil.
+    private static func inflate(_ data: Data, rawSize: Int) -> Data? {
+        guard !data.isEmpty else { return nil }
+        var out = Data(count: rawSize)
+        let written = out.withUnsafeMutableBytes { dst -> Int in
+            data.withUnsafeBytes { src -> Int in
+                guard let d = dst.bindMemory(to: UInt8.self).baseAddress, let s = src.bindMemory(to: UInt8.self).baseAddress else { return 0 }
+                return compression_decode_buffer(d, rawSize, s, data.count, nil, COMPRESSION_ZLIB)
+            }
+        }
+        return written == rawSize ? out : nil
     }
 
     /// Puts downloaded bytes in place. An existing file is first copied under

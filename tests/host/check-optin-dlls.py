@@ -46,8 +46,8 @@ check('each is built only where no <name>.dll ships, and MADEIRA_OPTIN_BUILD=0 s
       '"${MADEIRA_OPTIN_BUILD:-1}" != 0' in opt and 'shipped "$d" && continue' in opt and
       'targets="$targets dlls/$d/arm64ec-windows/$d.dll"; OPT="$OPT $d"' in opt)
 check('the guard "nothing to build" counts them (and setupapi-optin.dll, SDL; dcomp-optin.dll, DCO, round 624; combase-optin.dll, CMB, round 2026-11-11; '
-      'kernel32-usd.dll, KUD, build 663)',
-      '$WER$WTY$OPT$SDL$DCO$CMB$KUD" ]' in build)
+      'kernel32-usd.dll, KUD, build 663; the ARM64EC cmd.exe, ECC, round 668)',
+      '$WER$WTY$OPT$SDL$DCO$CMB$KUD$ECC" ]' in build)
 ship = build[build.index('for d in $OPT; do'):]
 ship = ship[:ship.index('\ndone\n') + 6]
 check('each ships as <name>-optin.dll, stripped and padded, never as <name>.dll',
@@ -190,7 +190,7 @@ if (wine / 'dlls/msi/Makefile.in').exists():
 launchers = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
 check('only the EA app\'s launcher entry names them',
       launchers.count('"env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr,dxva2"') == 1 and
-      not any('mspatcha' in json.dumps(r) for r in recs['rules'] if r['id'] != 'hearts-of-iron-iv'))   # night round 2026-11-11 (G5 S11): the Paradox launcher's installer needs the same set
+      not any('mspatcha' in json.dumps(r) for r in recs['rules'] if r['id'] not in ('hearts-of-iron-iv', 'brawlhalla', 'need-for-speed-most-wanted-2012')))   # round 677 (A1 S2): NFS 2012's EA background service runs with the EA app's set   # night round 2026-11-11 (G5 S11): the Paradox launcher's installer needs the same set; round 668 (N007): Brawlhalla's Adobe AIR.dll imports msi.dll
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('RecommendationsPolicy lets a downloaded list name oledlg, fwpuclnt and sensapi',
       '["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0)' in policy and 'wmadmod, or oledlg, fwpuclnt, sensapi' in policy)
@@ -286,6 +286,22 @@ for n, (rid, line, spelled, fixture) in NEW6.items():
     check('fixture %s has that line and its .expect names the rule' % fixture,
           fxp.exists() and any(spelled in l for l in fxp.read_text(errors='replace').split('\n'))
           and ('"%s"' % rid) in (root / 'tests/fixtures/autotune' / (fixture + '.expect')).read_text())
+# Round 668 (G1, merge N007): mscms, which Adobe AIR.dll imports with msi.dll (Brawlhalla 8C0WRA, H91CMC); built from dlls/mscms, whose
+# imports are lcms2 (the arm64ec configure's LCMS2_PE_LIBS, linked in), shlwapi and advapi32.
+check('OPTIN_WANT also lists mscms (round 668), and no mscms.dll ships in the 64-bit set',
+      'mscms' in names and not re.search(r'\bmscms\b', want) and not (shipdir / 'mscms.dll').exists())
+if (wine / 'dlls/mscms/Makefile.in').exists():
+    mk = (wine / 'dlls/mscms/Makefile.in').read_text()
+    imports = re.search(r'^IMPORTS\s*=\s*(.*)$', mk, re.M).group(1).split()
+    check('Wine builds mscms.dll from dlls/mscms; its imports %s are lcms2 (linked in) and DLLs that ship' % imports,
+          re.search(r'^MODULE\s*=\s*mscms\.dll$', mk, re.M) and
+          all(i == '$(LCMS2_PE_LIBS)' or (shipdir / (i + '.dll')).exists() for i in imports))
+ra = rules_by_id.get('air-runtime-msi-mscms')
+check('auto-tune has air-runtime-msi-mscms: the five msi DLLs and mscms, no retry, only for Adobe AIR.dll\'s mscms import, not again once linked',
+      ra and ra['lines'] == ['env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr,mscms'] and ra.get('noRetry') is True and ra['priority'] == 10
+      and ra['all'] == [{'has': ['err:module:import_dll Library mscms.dll (which is needed by', 'Adobe AIR.dll']}]
+      and ra['none'] == [{'has': ['MADEIRA_OPTIN_DLLS: mscms.dll -> mscms-optin.dll']}])
+check('its fixture proves it', '"air-runtime-msi-mscms"' in (root / 'tests/fixtures/autotune/brawlhalla-air-msi-mscms-2026-11-16.expect').read_text())
 # mfplay: Unreal's media player; the game plays, so only a fixedIn rule (ranOnly) can speak for the session (a line rule needs a failed one)
 rm = rules_by_id.get('unreal-wmfmedia-no-mfplay')
 check('auto-tune has unreal-wmfmedia-no-mfplay: fixedIn 652, no lines, for a session that played only, quiet once mfplay is linked',
@@ -302,7 +318,7 @@ check('auto-tune has paradox-launcher-installer-msi: the five msi DLLs, only for
 check('its fixture proves it', '"paradox-launcher-installer-msi"' in (root / 'tests/fixtures/autotune/paradox-launcher-wiutil-qzb4qb-2026-11-08.expect').read_text())
 check('RecommendationsPolicy lets a downloaded list name the new libraries and combase',
       '["msvcp_win", "bluetoothapis", "gameinput", "ntdsapi", "mfplay", "avicap32", "coremessaging", "combase"].contains($0)' in policy
-      and 'or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase, or dxcompiler")' in policy)
+      and 'or msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase, or dxcompiler, or mscms")' in policy)
 # the catalog note names them
 check('the catalog note names the libraries and combase', 'msvcp_win (DRAGON BALL FighterZ' in gen and 'combase is the second name BCD ships for every game' in gen)
 wf = (root / '.github/workflows/build-ipa.yml').read_text()

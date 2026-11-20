@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+// under GPL-3.0-only and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 
@@ -39,7 +41,7 @@ extension SteamAppInfo {
     /// of `installDepots()` without its DLC rule. A depot another app owns (`depotfromapp`) is left out
     /// of the DLC's depots: Valve records such depots as shared ones, which BCD's DLC support does not do.
     private func ordinaryRules(_ d: DepotInfo, os: String, language: String) -> Bool {
-        d.supports(os: os) && !d.isSharedInstall && d.publicManifestID != nil && !d.lowViolence &&
+        d.supports(os: os) && !d.isProvidedRedistributable && d.publicManifestID != nil && !d.lowViolence &&
             (d.language.isEmpty || d.language.caseInsensitiveCompare(language) == .orderedSame)
     }
 

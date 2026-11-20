@@ -1,0 +1,522 @@
+[20:51:56.828] [INFO] Checking entitlements...
+[20:51:56.828] [INFO] [build] v0.1.665 (665)
+[20:51:56.829] [INFO] [device] model=iPhone19,4 idiom=phone os=iOS Version 27.2.1 (Build 24B91034) ram=11570MB available=6120MB cores=6
+[20:51:56.829] [INFO] [device] address-map=[0x104084000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[20:51:56.829] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[20:51:56.843] [INFO] [device] settings: low-power=0 thermal=nominal screen=1125x2001@3.0x max-fps=120 utc-offset=-06:00 free-disk=222GB stikdebug-url=1
+[20:51:56.846] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:52:00.578] [INFO] [bcd-ui] play local
+[20:52:00.581] [INFO] Requesting JIT with Built-in StikJIT...
+[20:52:01.989] [INFO] [bcd] library launch Alien Tenant Wants Horny Energy.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[20:52:02.018] [INFO] Running full Wine sequence...
+[20:52:02.019] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104084000,0x8000000000) 512GB available=8162MB low-power=0 thermal=nominal
+[20:52:02.020] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 gl-backend=zink
+[20:52:02.028] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:52:02.028] [INFO] Allocating 896MB JIT pool via debugger...
+[20:52:02.028] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:52:02.029] [INFO] [jit-debugger] attached=1 at the pool request
+[20:52:02.029] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[20:52:02.029] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[20:52:02.031] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:52:02.641] [INFO] RX pool at 0x148000000
+[20:52:02.656] [OK] JIT pool ready (debugger still attached).
+[20:52:02.656] [INFO] BRK suspension lasted 0.63s
+[20:52:02.657] [INFO] Detaching debugger...
+[20:52:02.661] [OK] Debugger detached.
+[20:52:02.663] [OK] [early-detach] rev=ml524 took 6 ms
+[20:52:02.672] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.675s rev=ml526
+[20:52:02.703] [wineserver] send_client_fd: fd=36 handle=0x3a2 msg_fd_unix=33 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/62ff05b0c1d98aa2.cfg (read)
+[game-cfg]   gl-backend = zink
+[WineProc] Target exe: C:\Alien Tenant Wants Horny Energy\Alien Tenant Wants Horny Energy.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[20:52:02.950] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=34 reply=39/40 wait=41/42 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7587 MB + phys_footprint=604 MB = 8192 MB (hw.memsize says 11570 MB)
+ml985: map_image_view size=0x69f1000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22e limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x140000000+0x69f1000 (godot.windows.template_release.x86_64.exe) → pool 0x148004000 used=0x69f8000/0x23000000 tramp+0x0
+[copy-verify] godot.windows.template_release.x86_64.exe: OK, 5084 .text pages executable (copy @0x148004000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14e9f8000 used=0x6b30000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14e9f8000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x124400000..0x7803000000 regions=71838 occupied=462071 MB of 486892 MB free=41252 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=821 MB (peak 821) internal=818 MB compressed=0 MB external=71 MB reusable=2 MB (cycle=1)
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14eb33000 used=0x6f5f000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14eb33000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x14ef5c000 used=0x7090000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14ef5c000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14f090000 used=0x7158000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14f090000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x14f158000 used=0x7458000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14f158000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Alien Tenant Wants Horny Energy.exe (alien tenant wants horny energy.exe-309a90aeff758151): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x670: 189 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x670: 189 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x1670: 684 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x1670: 684 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x670: 189 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692a990+0x670: 189 slot(s), 0 data import(s) bound
+D 24 Load module oleaut32.dll (oleaut32.dll-ed3f8116102cb254): 71FE230000
+D 24 Load module ole32.dll (ole32.dll-424c26e02d7b7d0d): 71FE110000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE060000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDFE0000
+[copy-verify] avrt.dll: OK, 1 .text pages executable (copy @0x15010c000)
+[copy-verify] bcrypt.dll: OK, 4 .text pages executable (copy @0x150190000)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x150224000)
+[copy-verify] dwmapi.dll: OK, 1 .text pages executable (copy @0x15035c000)
+[copy-verify] dwrite.dll: OK, 19 .text pages executable (copy @0x1503f0000)
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14692b000+0x1000: 495 slot(s), 5 data import(s) bound
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=5 first=00000001434550A0
+[copy-verify] dinput8.dll: OK, 8 .text pages executable (copy @0x1516e8000)
+[image-reload] unmapped image 0x71fbd20000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[xp] 20:52:03.614 +0.54 dt=267 cpu=275 (thr 275) P=275 E=0 run=275 pgw=-1.0 GHz P=4.84 E=2.15 Minst=6098 IPC=4.58 mJ=1685 pin=0 rdKB=0 fpMB=924
+[jit-pool] tail FREE rx=0x169ffc000 size=0x1000000 -> free-list rev=ml438
+[xp-names] m1750955 "wine-x18-exc"
+[xp] 20:52:03.865 +0.79 dt=251 cpu=271 (thr 256) P=266 E=5 run=275 pgw=-1.0 GHz P=4.82 E=2.43 Minst=5792 IPC=4.46 mJ=1541 pin=0 rdKB=4916 fpMB=1136
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[guest-log] file <container>/Documents/wine/drive_c/users/mythic/AppData/Roaming/AlienTenantWantsHornyEnergy/logs/godot2026-11-19T02.52.04.log
+[guest-log] #1 tid=0024 OpenGL API 4.1 (Core Profile) Mesa 25.0.7 - Compatibility - Using Device: Mesa - zink Vulkan 1.4(Apple A20 Pro GPU (MOLTENVK))
+[guest-log] #2 tid=0024 WARNING: Failed to get source name for adapterId: 0x0000000000000000, id: 30
+[guest-log] #3 tid=0024    at: _get_sdr_white_level_for_hmonitor (platform/windows/display_server_windows.cpp:1720)
+[xp] 20:52:04.177 +1.10 dt=312 cpu=299 (thr 299) P=299 E=0 run=305 pgw=-1.0 GHz P=4.81 E=2.03 Minst=6054 IPC=4.22 mJ=1760 pin=93 rdKB=17936 fpMB=1197
+[xp] 20:52:04.444 +1.37 dt=267 cpu=268 (thr 268) P=268 E=0 run=269 pgw=-1.0 GHz P=4.86 E=2.09 Minst=5823 IPC=4.47 mJ=1531 pin=0 rdKB=0 fpMB=1205
+[xp] 20:52:04.767 +1.70 dt=323 cpu=319 (thr 319) P=318 E=0 run=318 pgw=-1.0 GHz P=4.83 E=2.19 Minst=6767 IPC=4.40 mJ=1867 pin=0 rdKB=0 fpMB=1224
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"wintab32.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71faae0000+0xfc000 (nvapi64.dll) → pool 0x152b75000 used=0xac79000/0x23000000 tramp+0x4000
+D 24 Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71FAAE0000
+[win-pos] #3 hwnd=0x10032 after=0x0 flags=8000003c vis={-4,-30,1284,724} surface=0x1074cc9b0 rev=ml505 style=06cf0000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10032 class='Engine' text="" rev=ml853
+[win-pos] #4 hwnd=0x10038 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1074cc9b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10038 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10038 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1074cc9b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10038 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x10032 after=0x0 flags=80000018 vis={-4,-30,1284,724} surface=0x1074cc9b0 rev=ml505 style=06cf0000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x10032 class='Engine' text="" rev=ml853
+[win-name] #7 hwnd=0x10032 class='Engine' text="" rev=ml853
+[jit-pool] image 0x71fa980000+0x160000 (opengl32.dll) → pool 0x152c78000 used=0xadf4000/0x23000000 tramp+0x1c000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254cec9d3): 71FA980000
+[unixlib] opengl32 (winios WGL) (module 0x71fa980000) -> 64-bit table (0x107382c28)
+0024:err:wgl:zink_init [winios-gl] zink Vulkan library: libMoltenVK.dylib
+0024:err:wgl:zink_init [winios-gl] ml1341 Metal compile timeout 20 s (MADEIRA_GL_COMPILE_TIMEOUT=0: MoltenVK's default, no limit)
+0024:err:wgl:shader_cache_init [winios-gl] ml1342 shader cache at Library/Caches/mesa-shader-cache/387c3c0c2d5239b687cd84114282c0d0 (4 MB used, limit 256M; MADEIRA_GL_SHADER_CACHE=0 turns it off)
+0024:err:wgl:zink_init [winios-gl] zink: test context says zink Vulkan 1.4(Apple A20 Pro GPU (MOLTENVK)) | 4.1 (Core Profile) Mesa 25.0.7
+0024:err:wgl:perf_init [winios-gl] ml1340 perf line on, once a second at most (MADEIRA_GL_PERF)
+0024:err:wgl:winios_OpenGLInit [winios-gl] desktop OpenGL (zink) driver ready (6 pixel formats)
+[winios] game window hwnd=0x10032 presents through Metal; its GDI surface is not drawn
+0044:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0044 status=00000001 caller=000000014F0B6474
+E 44 [thr-term] rev=ml435 deinit #1 tid=0x44
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[xp] 20:52:05.069 +2.00 dt=302 cpu=301 (thr 274) P=289 E=12 run=307 pgw=-1.0 GHz P=4.80 E=2.55 Minst=6139 IPC=4.33 mJ=1737 pin=615 rdKB=13668 fpMB=1336
+[jit-pool] image 0x71fa860000+0xa0000 (mmdevapi.dll) → pool 0x152df4000 used=0xae98000/0x23000000 tramp+0x4000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): 71FA860000
+[footprint] rev=ml358 phys=1353 MB (peak 1353) internal=1299 MB compressed=0 MB external=122 MB reusable=2 MB (cycle=2)
+[jit-pool] image 0x71fa7d0000+0x90000 (version.dll) → pool 0x152e98000 used=0xaf2c000/0x23000000 tramp+0x4000
+D 24 Load module version.dll (version.dll-f3f7d5759bd2c065): 71FA7D0000
+E 54 [thr-term] rev=ml435 deinit #2 tid=0x54
+[20:52:05.222] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[steer] #1 size=0x2010000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c2f410000
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg-mismatch] QueryDisplayConfig flags=0x2 answered success with 0 paths 0 modes (room for 1 paths 2 modes offered; 1 monitor(s) without a source skipped) after GetDisplayConfigBufferSizes said 1 paths 2 modes: a program that trusts the sizes call and reads the result finds no monitor; env.MADEIRA_VDCFG_PATH = 1 lists the virtual monitor's path
+[guest-log] file <container>/Documents/wine/drive_c/users/mythic/AppData/Roaming/AlienTenantWantsHornyEnergy/logs/godot.log
+[free-delay] #1 release of 0x7034880000+0x170000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70349f0000+0x790000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7037120000+0x170000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7037290000+0x790000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7037a20000+0x170000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x7039fb0000+0x790000 held for 2000 ms (6 in flight)
+[footprint] rev=ml358 phys=1645 MB (peak 1645) internal=1607 MB compressed=0 MB external=124 MB reusable=2 MB (cycle=3)
+[free-delay] #7 release of 0x7037b90000+0x200000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x703a740000+0x400000 held for 2000 ms (8 in flight)
+[jit-pool] image 0x71fa610000+0xc0000 (rsaenh.dll) → pool 0x152f2c000 used=0xaff0000/0x23000000 tramp+0x4000
+D 24 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FA610000
+[image-reload] unmapped image 0x71fa610000+0xc0000: 1 pool copy marked
+[jit-pool] image 0x71fa610000+0xc0000 (rsaenh.dll) → pool 0x152f2c000 used=0xaff0000/0x23000000 tramp+0x4000
+D 24 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FA610000
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[win-name] #23 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[win-pos] #24 hwnd=0x10032 after=0x0 flags=40001036 vis={-4,-30,1224,690} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #24 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[ptr-map] the picture is window hwnd=0x10032's client (0,0 1220x686) on a 1280x720 screen: points on it go there (window frame)
+[hwinput] keyboard focus: program (program cursor)
+[win-pos] #25 hwnd=0x10032 after=0x0 flags=40000815 vis={26,0,1254,720} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #25 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[ptr-map] the picture is window hwnd=0x10032's client (30,30 1220x686) on a 1280x720 screen: points on it go there (window frame)
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=56597 dport=47584 nb=1 ret=-1 plen=16 rev=ml478
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml358 phys=1808 MB (peak 1808) internal=1714 MB compressed=0 MB external=126 MB reusable=2 MB (cycle=4)
+[footprint] rev=ml358 phys=1786 MB (peak 1808) internal=1696 MB compressed=0 MB external=127 MB reusable=2 MB (cycle=5)
+[win-pos] #26 hwnd=0x10032 after=0xfffffffffffffffe flags=40001827 vis={26,0,1254,720} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #26 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[win-pos] #27 hwnd=0x10032 after=0x0 flags=40001837 vis={26,0,1254,720} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #27 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[win-pos] #28 hwnd=0x10032 after=0x0 flags=40001817 vis={26,0,1254,720} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #28 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[win-pos] #29 hwnd=0x10032 after=0x0 flags=40001817 vis={26,0,1254,720} surface=0x1149e1ec0 rev=ml505 style=16cf0000 visible=1 parent=0x10020
+[win-name] #29 hwnd=0x10032 class='Engine' text="Alien Tenant Wants Horny Energy" rev=ml853
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x161ffc000 size=0x8000000 -> free-list rev=ml438
+[ios_audio] ml2303 slot=0 first audible buffer 8.06 s after create_stream (peak 0.002; endpoint running, mute=0, paused=0, held=0, halt=0)
+[footprint] rev=ml358 phys=1870 MB (peak 1870) internal=1711 MB compressed=0 MB external=128 MB reusable=2 MB (cycle=6)
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (314,329) hit win=00010032 thread=0x123db8f00
+[file-census] r624 11s: case-sensitive=1 full-path-tries=8370 full-path-hits=3153 component-lookups=16043 shortcut-hits=5699 misses=10250 scans=10344 entries-scanned=106655 us-in-lookup=1003532 (8% of the window) slowest=0.442 ms .../c:/users/mythic/AppData/Roaming/AlienTenantWantsHornyEnergy
+[xp-api-top] 20:52:15.779 4096 samples: msvcrt.dll+0x2e4e8=1032951/s msvcrt.dll+0x2e4c8=1018300/s kernelbase.dll+0x6c248=457868/s kernelbase.dll+0x6d470=429786/s ntdll.dll+0x23c0c=429786/s msvcrt.dll+0x5197c=345538/s msvcrt.dll+0x55c70=315014/s ntdll.dll+0x68788=242976/s ntdll.dll+0x68bc8=199020/s msvcrt.dll+0x2e58c=113551/s msvcrt.dll+0x56bb8=109888/s msvcrt.dll+0x2e470=58607/s ntdll.dll+0x680ec=58607/s ntdll.dll+0x6886c=35408/s opengl32.dll+0x340b4=20757/s opengl32.dll+0x8f54c=20757/s ntdll.dll+0x6784c=10989/s opengl32.dll+0x93d10=9768/s ntdll.dll+0x668d4=9768/s opengl32.dll+0x10650=7326/s opengl32.dll+0x1e830=6105/s kernelbase.dll+0x1e1fc=6105/s ntdll.dll+0x71aac=6105/s opengl32.dll+0x21e18=4884/s msvcrt.dll+0x574b8=4884/s user32.dll+0x949cc=3663/s opengl32.dll+0x91524=3663/s user32.dll+0x52c7c=3663/s
+[xp-api-top] 20:52:16.955 4096 samples: msvcrt.dll+0x2e4e8=1714846/s msvcrt.dll+0x2e4c8=1610282/s msvcrt.dll+0x2e58c=406148/s msvcrt.dll+0x5197c=258658/s msvcrt.dll+0x55c70=191517/s msvcrt.dll+0x574b8=45128/s kernelbase.dll+0x6d470=37423/s kernelbase.dll+0x6c248=29718/s ntdll.dll+0x23c0c=28617/s msvcrt.dll+0x56bb8=27517/s ntdll.dll+0x68788=23114/s opengl32.dll+0x8f54c=15409/s ntdll.dll+0x68bc8=15409/s opengl32.dll+0x340b4=11007/s opengl32.dll+0x93d10=8805/s kernelbase.dll+0x1e1fc=6604/s ntdll.dll+0x6784c=6604/s ntdll.dll+0x67dcc=6604/s ntdll.dll+0x680ec=6604/s opengl32.dll+0x1e830=5503/s msvcrt.dll+0x2e470=5503/s opengl32.dll+0x91524=4403/s opengl32.dll+0x10650=4403/s ntdll.dll+0x668d4=4403/s msvcrt.dll+0x2a1e4=3302/s ntdll.dll+0x663e4=3302/s ntdll.dll+0x6886c=3302/s opengl32.dll+0x20250=2201/s
+[xp-api-top] 20:52:18.145 4096 samples: msvcrt.dll+0x2e4e8=1643531/s msvcrt.dll+0x2e4c8=1382581/s msvcrt.dll+0x5197c=621475/s msvcrt.dll+0x55c70=271251/s msvcrt.dll+0x2e58c=212881/s msvcrt.dll+0x56bb8=65238/s kernelbase.dll+0x6c248=53792/s kernelbase.dll+0x6d470=48070/s ntdll.dll+0x23c0c=46925/s ntdll.dll+0x68788=38914/s opengl32.dll+0x340b4=28613/s opengl32.dll+0x8f54c=27468/s ntdll.dll+0x6886c=26324/s msvcrt.dll+0x574b8=25179/s ntdll.dll+0x680ec=24035/s ntdll.dll+0x68bc8=22890/s opengl32.dll+0x91524=16023/s kernelbase.dll+0x1e1fc=14879/s opengl32.dll+0x93d10=12590/s msvcrt.dll+0x2e470=9156/s opengl32.dll+0x1e830=8012/s opengl32.dll+0x10650=8012/s msvcrt.dll+0x1b5d4=6867/s ntdll.dll+0x663e4=6867/s ntdll.dll+0x67dcc=6867/s ntdll.dll+0x71aac=6867/s opengl32.dll+0x21e18=5723/s opengl32.dll+0x32500=5723/s
+[xp-api-top] 20:52:19.301 4096 samples: msvcrt.dll+0x2e4c8=353233/s msvcrt.dll+0x7c508=259038/s msvcrt.dll+0x2e4e8=204090/s ntdll.dll+0x67dcc=176315/s ntdll.dll+0x6784c=164842/s msvcrt.dll+0x55c70=162427/s kernelbase.dll+0x6c248=120764/s ntdll.dll+0x23c0c=118348/s kernelbase.dll+0x6d470=115933/s msvcrt.dll+0x5197c=83327/s opengl32.dll+0x8f54c=67628/s msvcrt.dll+0x56bb8=49513/s opengl32.dll+0x340b4=48305/s msvcrt.dll+0x2e58c=43475/s msvcrt.dll+0x574b8=39852/s opengl32.dll+0x93d10=35021/s ntdll.dll+0x68bc8=32002/s opengl32.dll+0x1e830=31399/s msvcrt.dll+0x2a79c=26568/s opengl32.dll+0x10650=25964/s msvcrt.dll+0x28d18=23549/s msvcrt.dll+0x28d08=21134/s ntdll.dll+0x68788=20530/s msvcrt.dll+0x53d50=17511/s ntdll.dll+0x680ec=17511/s ntdll.dll+0x71aac=17511/s msvcrt.dll+0x2e470=15699/s opengl32.dll+0x20250=14492/s
+[xp-api-top] 20:52:20.552 3407 samples: ntdll.dll+0x67dcc=17284/s kernelbase.dll+0x6c248=17182/s ntdll.dll+0x23c0c=16568/s kernelbase.dll+0x6d470=16057/s ntdll.dll+0x6784c=15904/s opengl32.dll+0x8f54c=8591/s opengl32.dll+0x340b4=8080/s msvcrt.dll+0x2e4e8=7313/s msvcrt.dll+0x2e4c8=7159/s msvcrt.dll+0x5197c=6085/s opengl32.dll+0x93d10=5779/s opengl32.dll+0x10650=4551/s opengl32.dll+0x1e830=4142/s msvcrt.dll+0x56bb8=2761/s ntdll.dll+0x71aac=2455/s opengl32.dll+0x91524=2352/s msvcrt.dll+0x55c70=2199/s ntdll.dll+0x6886c=2199/s opengl32.dll+0x21e18=1994/s opengl32.dll+0x20250=1892/s ntdll.dll+0x680ec=1892/s msvcrt.dll+0x53d50=1688/s opengl32.dll+0x12e48=1381/s mmdevapi.dll+0x135e4=1176/s opengl32.dll+0x32500=1074/s opengl32.dll+0x873b8=1074/s mmdevapi.dll+0x1345c=972/s kernelbase.dll+0x68958=972/s
+[xp-api-top] 20:52:21.719 1899 samples: opengl32.dll+0x340b4=8834/s opengl32.dll+0x8f54c=8614/s ntdll.dll+0x67dcc=7243/s ntdll.dll+0x6784c=6913/s ntdll.dll+0x23c0c=6749/s kernelbase.dll+0x6c248=6200/s opengl32.dll+0x93d10=6036/s kernelbase.dll+0x6d470=5487/s opengl32.dll+0x10650=4554/s opengl32.dll+0x1e830=4060/s opengl32.dll+0x20250=2743/s msvcrt.dll+0x2e4c8=2469/s ntdll.dll+0x71aac=2414/s opengl32.dll+0x21e18=2304/s ntdll.dll+0x680ec=2250/s opengl32.dll+0x91524=2140/s msvcrt.dll+0x2e4e8=2140/s msvcrt.dll+0x5197c=1975/s ntdll.dll+0x6886c=1756/s msvcrt.dll+0x56bb8=1262/s opengl32.dll+0x12e48=1207/s opengl32.dll+0x32500=1152/s mmdevapi.dll+0x1345c=1152/s opengl32.dll+0x1345c=1043/s mmdevapi.dll+0x135e4=933/s user32.dll+0x4b324=933/s kernelbase.dll+0x68958=823/s msvcrt.dll+0x55c70=768/s
+[store-noalias] #1 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e89000 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x1238 hostpc=0x105e89000 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x152c9af24 pc=0x105e89000 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 [first] rev=ml555
+[rip-leak] guest RIP 0x152c9af24 IS POOL addr = PE 0x71fa9a2f24 (module base 0x71fa980000 rva 0x22f24)
+[mach_exc] UNHANDLED #1 pc=0x105e89000 addr=0x1238 x18=0x71fffe0000 type=1 lr=0x105dc6298 sp=0x12490fcd0 x16=0x105e88ffc x17=0x152d19a4c
+[guest-code] rev=ml333 pool_rip=0x152c9af24 (PE 0x152c9af24) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0x0 x10=0x12490fcd0 x11=0x908 x0=0x702380ec40 x2=0x702380ec40 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[fault-host] 105e88f00: 2d410400 2d420c02 aa0003f3 d63f0100 f9400260 12800001 d2800002 d2800003
+[fault-host] 105e88f20: 97ffb75f 52800000 a9417bfd a8c24ff4 d65f03c0 52800040 72b80000 d65f03c0
+[fault-host] 105e88f40: f9400008 f9491d08 f949e508 b4000228 a9be4ff4 a9017bfd 910043fd 2d410400
+[fault-host] 105e88f60: 2d420c02 aa0003f3 d63f0100 f9400260 12800001 d2800002 d2800003 97ffb748
+[fault-host] 105e88f80: 52800000 a9417bfd a8c24ff4 d65f03c0 52800040 72b80000 d65f03c0 f9400008
+[fault-host] 105e88fa0: f9491d08 f949e909 b4000249 a9be4ff4 a9017bfd 910043fd 29410408 29420c02
+[mach_exc] insn_stream PC-12..PC+8: 72b80000 d65f03c0 f9400008 [f9491d08] f949ed09 b4000229 a9be4ff4
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`ext_glBlendEquation+0x4 lr=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`__wine_unix_call_dispatcher+0x78
+[mach_exc] bt[1] 0x7024190800 ?`?+0x7024190800
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702384fc50 *(gs_cached+0x58)=0x702384fc50
+[x86_live] RAX=0x0 RCX=0x702380ec40 RDX=0x1c8 RBX=0x14680a7b0 RSP=0x7eb28 RBP=0x702380ed00 RSI=0x0 RDI=0x702380f100
+[x86_live]  R8=0x702380ec40  R9=0xc R10=0x702380ed10 R11=0x0 R12=0x12490fcd0 R13=0x702a9a96f0 R14=0x702380f460 R15=0x702cd70040
+[x86_live] State.RIP=0x152c9af24 callret_sp=0x7c01001000
+[store-noalias] #2 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e89000 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x1238 hostpc=0x105e89000 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x152c9af24 pc=0x105e89000 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x105e89000 addr=0x1238 x18=0x71fffe0000 type=1 lr=0x105dc6298 sp=0x12490fcd0 x16=0x105e88ffc x17=0x152d19a4c
+[guest-code] rev=ml333 pool_rip=0x152c9af24 (PE 0x152c9af24) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0x0 x10=0x12490fcd0 x11=0x908 x0=0x702380ec40 x2=0x702380ec40 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[fault-host] 105e88f60: 2d420c02 aa0003f3 d63f0100 f9400260 12800001 d2800002 d2800003 97ffb748
+[fault-host] 105e88f80: 52800000 a9417bfd a8c24ff4 d65f03c0 52800040 72b80000 d65f03c0 f9400008
+[fault-host] 105e88fa0: f9491d08 f949e909 b4000249 a9be4ff4 a9017bfd 910043fd 29410408 29420c02
+[fault-host] 105e88fc0: aa0003f3 aa0803e0 d63f0120 f9400260 12800001 d2800002 d2800003 97ffb730
+[fault-host] 105e88fe0: 52800000 a9417bfd a8c24ff4 d65f03c0 52800040 72b80000 d65f03c0 f9400008
+[fault-host] 105e89000: f9491d08 f949ed09 b4000229 a9be4ff4 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 72b80000 d65f03c0 f9400008 [f9491d08] f949ed09 b4000229 a9be4ff4
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`ext_glBlendEquation+0x4 lr=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`__wine_unix_call_dispatcher+0x78
+[mach_exc] bt[1] 0x7024190800 ?`?+0x7024190800
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702384fc50 *(gs_cached+0x58)=0x702384fc50
+[x86_live] RAX=0x0 RCX=0x702380ec40 RDX=0x1c8 RBX=0x14680a7b0 RSP=0x7eb28 RBP=0x702380ed00 RSI=0x0 RDI=0x702380f100
+[x86_live]  R8=0x702380ec40  R9=0xc R10=0x702380ed10 R11=0x0 R12=0x12490fcd0 R13=0x702a9a96f0 R14=0x702380f460 R15=0x702cd70040
+[x86_live] State.RIP=0x152c9af24 callret_sp=0x7c01001000
+0024:err:seh:segv_handler SEGV #1: pc=0x105e89000 addr=0x1238 uctx_x18=0x71fffe0000 disp=0 mach_exc=13039
+0024:err:seh:segv_handler SEGV at pc=0x105e89000 addr=0x1238 esr=0x92000006 TPIDR_EL0=0x1 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0x702380ec40 x1=0x1c8 x2=0x702380ec40 x3=0xc
+0024:err:seh:segv_handler   x8=0x0 x9=0x0 x10=0x12490fcd0 x16=0x105e88ffc x17=0x152d19a4c x18=0x71fffe0000 x19=0x12490fcd0 x20=0x702a9a96f0
+0024:err:seh:segv_handler   fp=0x702380ed00 lr=0x105dc6298 sp=0x12490fcd0
+0024:err:seh:segv_handler   [teb-tsd] base=0x16c37b0e0 offset=0x908 raw=0x71fffe0000 teb_key_val=0x71fffe0000
+0024:err:seh:segv_handler   [guest-state] x28=0x7c00801140 rip=0x152c9af24
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152c9af24 in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x22f24, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a51b190 unresolved: hostPC outside block
+0024:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x48 rdx=0x143f55840 rbx=0x0
+0024:err:seh:segv_handler   [guest-state]   rsp=0x702380f248 rbp=0x70363e8c50 rsi=0x143f55840 rdi=0x702380f430
+0024:err:seh:segv_handler   [guest-state]   r8 =0x702380f160 r9 =0x3f73e93f00000000 r10=0x17 r11=0x0
+0024:err:seh:segv_handler   [guest-state]   r12=0x702a7d1aa0 r13=0x0 r14=0x0 r15=0x4a00000000
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=8/16 (low => uninitialised frame, high => only rsp clobbered)
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=3% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bd7a220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16be02ad0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16be8ead0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16bf1ab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[20:52:25.432] [OK] Early detach: game presenting and settled
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[rip-profile] ml981 gen=1 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=1 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[20:52:27.433] [INFO] Detaching debugger...
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[srv-input] btn msg=0x201 at (1123,648) hit win=00010032 thread=0x123db8f00
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=42 resident=1832MB dbg=DEBUGGED rev=ml525
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[sock-big] send ERROR fd=157 errno=65 rev=ml464
+[store-noalias] #3 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e99e74 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x1238 hostpc=0x105e99e74 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x152cbdc18 pc=0x105e99e74 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 [first] rev=ml555
+[rip-leak] guest RIP 0x152cbdc18 IS POOL addr = PE 0x71fa9c5c18 (module base 0x71fa980000 rva 0x45c18)
+[mach_exc] UNHANDLED #3 pc=0x105e99e74 addr=0x1238 x18=0x71fffe0000 type=1 lr=0x105dc6298 sp=0x12490fcd0 x16=0x105e99e70 x17=0x152d19b2c
+[guest-code] rev=ml333 pool_rip=0x152cbdc18 (PE 0x152cbdc18) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0x0 x10=0x12490fcd0 x11=0x908 x0=0x702380f638 x2=0x702380f638 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[mach_exc] insn_stream PC-12..PC+8: 72b80000 d65f03c0 f9400008 [f9491d08] f9561d09 b4000149 a9bf7bfd
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`ext_glGetQueryObjectui64v+0x4 lr=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`__wine_unix_call_dispatcher+0x78
+[mach_exc] bt[1] 0x152cbdab8 ?`?+0x152cbdab8
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x702384fc50 *(gs_cached+0x58)=0x702384fc50
+[x86_live] RAX=0x0 RCX=0x702380f638 RDX=0x4d4 RBX=0x702a986060 RSP=0x5bf14 RBP=0x702380f700 RSI=0x0 RDI=0x702380f770
+[x86_live]  R8=0x702380f638  R9=0x0 R10=0x702380f710 R11=0x7026a451c0 R12=0x12490fcd0 R13=0x0 R14=0x146811858 R15=0x143fe7ec0
+[x86_live] State.RIP=0x152cbdc18 callret_sp=0x7c01001000
+[store-noalias] #4 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e99e74 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x1238 hostpc=0x105e99e74 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x152cbdc18 pc=0x105e99e74 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x105e99e74 addr=0x1238 x18=0x71fffe0000 type=1 lr=0x105dc6298 sp=0x12490fcd0 x16=0x105e99e70 x17=0x152d19b2c
+[guest-code] rev=ml333 pool_rip=0x152cbdc18 (PE 0x152cbdc18) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 72b80000 d65f03c0 f9400008 [f9491d08] f9561d09 b4000149 a9bf7bfd
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`ext_glGetQueryObjectui64v+0x4 lr=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`__wine_unix_call_dispatcher+0x78
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152cbdc18 in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x45c18, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a4dae10 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[file-census] r624 24s: case-sensitive=1 full-path-tries=14248 full-path-hits=1636 component-lookups=37844 shortcut-hits=12620 misses=25224 scans=25224 entries-scanned=201776 us-in-lookup=2341135 (9% of the window) slowest=0.495 ms ...Documents/wine/dosdevices/c:/Alien Tenant Wants Horny Energy
+[store-noalias] #5 rev=ml348 addr=0x1238 insn=0xf9491d09 pc=0x105e92c28 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x1238 hostpc=0x105e92c28 hinsn=0xf9491d09 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x152d177b4 pc=0x105e92c28 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 [first] rev=ml555
+[rip-leak] guest RIP 0x152d177b4 IS POOL addr = PE 0x71faa1f7b4 (module base 0x71fa980000 rva 0x9f7b4)
+[mach_exc] UNHANDLED #5 pc=0x105e92c28 addr=0x1238 x18=0x71fffe0000 type=1 lr=0x105dc6298 sp=0x12490fcd0 x16=0x105e92c24 x17=0x53a9
+[guest-code] rev=ml333 pool_rip=0x152d177b4 (PE 0x152d177b4) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 72b80000 d65f03c0 f9400008 [f9491d09] f9503129 b4000269 a9be4ff4
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`ext_glFenceSync+0x4 lr=/private/var/containers/Bundle/Application/<uuid>/Madeira.app/Madeira`__wine_unix_call_dispatcher+0x78
+[store-noalias] #6 rev=ml348 addr=0x1238 insn=0xf9491d09 pc=0x105e92c28 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x1238 hostpc=0x105e92c28 hinsn=0xf9491d09 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x152d177b4 pc=0x105e92c28 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152d177b4 in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x9f7b4, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a515e90 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[store-noalias] #7 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e922b8 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[rip-leak] guest RIP 0x152cac0b4 IS POOL addr = PE 0x71fa9b40b4 (module base 0x71fa980000 rva 0x340b4)
+[store-noalias] #8 rev=ml348 addr=0x1238 insn=0xf9491d08 pc=0x105e922b8 NO pool/anon alias | region 0x104084000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152cac0b4 in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x340b4, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a52f190 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x141574aa2 in image 0x140000000: rva 0x1574aa2, section #0 '.text' rva 0x1000+0x4f6eab0 chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a51b810 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=2 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[steer] #2 size=0x2930000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c38800000
+[rip-leak] guest RIP 0x152c96830 IS POOL addr = PE 0x71fa99e830 (module base 0x71fa980000 rva 0x1e830)
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152c96830 in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x1e830, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a52b680 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[window] 0x7048000000..0x7400000000 regions=1215 occupied=8343 MB of 15232 MB free=6888 MB maxhole=6888 MB@0x704bd90000 rev=ml787 (periodic)
+[window] 0x124400000..0x7803000000 regions=77371 occupied=462885 MB of 486892 MB free=40438 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=42 resident=1894MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x71fffe0000 cpu=29% RUN pc=libsystem_platform.dylib`_platform_memset+0x8c lr=AGXMetalG19P`<redacted>+0x3a0 sp=0x12490ec60 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0xb4 pc=0x152d159b0 user-sp=0x702380f470 user-cand=[ Alien Tenant Wants Horny Energy.exe+0x24ddd1f ]
+[thread-sample] ml876 b2 "" teb=0x71fffe0000 cpu=29% RUN pc=libsystem_platform.dylib`_platform_memset+0x8c lr=libOSMesa.dylib`util_run_tests+0x5340 sp=0x12490fae0 NATIVE (unresolved: hostPC outside block) sp-cand=[ Alien Tenant Wants Horny Energy.exe+0x1470 ]
+[rip-profile] ml981 gen=3 threads=8 samples=1480 buckets=11 span=0x70e915eb70 [0x1152e5c00..0x71fe444770] top: 0x71fe444740=94% 0x143030800=2% 0x1413c5a80=1% 0x143c93b40=0% 0x12490e580=0% 0x71faddbf80=0% 0x1400014c0=0% 0x1415704c0=0%
+[cpu-split] ml1123 native top: IOKit`?+0=6 libsystem_platform.dylib`_platform_memmove+0xa0=3 libOSMesa.dylib`util_run_tests+0xba54=1
+[freeze] alive t+90s beats=3 gaps=0 iter=358 gen=1 threads=41 resident=1852MB dbg=DEBUGGED rev=ml525
+[rip-leak] guest RIP 0x152c98dac IS POOL addr = PE 0x71fa9a0dac (module base 0x71fa980000 rva 0x20dac)
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152c98dac in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x20dac, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=4 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x71fffe0000 cpu=26% RUN pc=libsystem_platform.dylib`_platform_memmove+0xb4 lr=libOSMesa.dylib`OSMesaGetDepthBuffer+0x1cc sp=0x12490fa90 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[window] 0x7048000000..0x7400000000 regions=1215 occupied=8343 MB of 15232 MB free=6888 MB maxhole=6888 MB@0x704bd90000 rev=ml787 (periodic)
+[window] 0x124400000..0x7803000000 regions=77364 occupied=462838 MB of 486892 MB free=40485 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x152c98dac in image 0x71fa980000: POOL copy 0x152c78000 (owner=0x0 mapper=0x71ffff0000) of 0x71fa980000, rva 0x20dac, section #0 '.text' rva 0x10000+0x95419 chars 0x60000020 (R-X CODE), vprot=0
+[freeze] alive t+120s beats=4 gaps=0 iter=477 gen=1 threads=41 resident=1855MB dbg=DEBUGGED rev=ml525
+[rip-profile] ml981 gen=5 threads=8 samples=1484 buckets=24 span=0x70da15a0f0 [0x1242ea680..0x71fe444770] top: 0x71fe444740=94% 0x1413c5a80=2% 0x14002b340=0% 0x12490e580=0% 0x152cbeec0=0% 0x14002ea80=0% 0x14002eb00=0% 0x152d07540=0%
+[rip-profile] ml1112 host 0x1910d8fc0 = libsystem_platform.dylib`_platform_memmove+0x20
+[cpu-split] ml1123 native top: libsystem_platform.dylib`_platform_memmove+0xa0=13 libsystem_kernel.dylib`swtch_pri+0x4=10 IOKit`?+0=5 libsystem_kernel.dylib`__psynch_cvwait+0=2 Madeira`set_context_attribute+0x24=1 libsystem_kernel.dylib`__sysctl+0x28=1 libsystem_malloc.dylib`<redacted>+0x26c=1 libMoltenVK.dylib`_ZN18MVKSmallVectorImplI17VkClearAttachment25mvk_smallvector_allocatorIS0_Li8EEE9push_backEOS0_+0xd0=1 libsystem_platform.dylib`_platform_memmove+0x20=1 libOSMesa.dylib`glFramebufferTextureMultisampleMultiviewOVR+0x104a18=1
+[rip-profile] ml1115 native sample pc=0x1910d8fc0 (_platform_memmove) x16=6728552352 lr=0x126309468 (_ZN35MVKCmdPushDescriptorSetWithTemplate10setContentEP16MVKCommandBufferP28VkDescriptorUpdateTemplate_TP18VkPipelineLayout_TjPKv)
+[file-census] r624 13s: case-sensitive=1 full-path-tries=190 full-path-hits=29 component-lookups=515 shortcut-hits=193 misses=322 scans=322 entries-scanned=2544 us-in-lookup=58648 (0% of the window) slowest=0.630 ms ...Documents/wine/dosdevices/c:/Alien Tenant Wants Horny Energy
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=6 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[freeze] alive t+150s beats=5 gaps=0 iter=596 gen=1 threads=41 resident=1853MB dbg=DEBUGGED rev=ml525
+[rip-leak] guest RIP 0x152d0bd10 IS POOL addr = PE 0x71faa13d10 (module base 0x71fa980000 rva 0x93d10)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[20:54:36.309] [INFO] [session] length=154s partial=1 play=150s frames=8793 avg=59.5 low1=52.8 low01=13.7 worst=2522ms stalls=1/3s peak=2103MB limit=8191MB thermal=nominal lpm=0 res=1280x720 cap=60 game=Alien Tenant
+[freeze] alive t+240s beats=6 gaps=1 iter=613 gen=1 threads=44 resident=1573MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: program (app active)
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a7680 NATIVE (no FEX state) sp-cand=[ ]
+[rip-profile] ml981 gen=7 threads=8 samples=1431 buckets=4 span=0x70be11f049 [0x140325727..0x71fe444770] top: 0x71fe444740=97% 0x141346cc0=1% 0x141346940=0% 0x140325700=0%
+[av-detail] ml613 #19 p0=READ p1=0x1238 hostpc=0x105ec10d8 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0x1238 hostpc=0x105ec10d8 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #21 p0=READ p1=0x1238 hostpc=0x105ebece0 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[rip-leak] guest RIP 0x152d0754c IS POOL addr = PE 0x71faa0f54c (module base 0x71fa980000 rva 0x8f54c)
+[av-detail] ml613 #22 p0=READ p1=0x1238 hostpc=0x105ebece0 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a52f190 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[av-detail] ml613 #23 p0=READ p1=0x1238 hostpc=0x105e89ac8 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[rip-leak] guest RIP 0x152c9c384 IS POOL addr = PE 0x71fa9a4384 (module base 0x71fa980000 rva 0x24384)
+[av-detail] ml613 #24 p0=READ p1=0x1238 hostpc=0x105e89ac8 hinsn=0xf9491d08 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a4a8d30 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[window] 0x7048000000..0x7400000000 regions=1215 occupied=8343 MB of 15232 MB free=6888 MB maxhole=6888 MB@0x704bd90000 rev=ml787 (periodic)
+[window] 0x124400000..0x7803000000 regions=77361 occupied=462836 MB of 486892 MB free=40487 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=8 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=8 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[freeze] alive t+270s beats=7 gaps=1 iter=732 gen=1 threads=41 resident=1591MB dbg=DEBUGGED rev=ml525
+[winios-gl] hwnd 0x10032: 10800 frames presented (1220x686)
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a52f190 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[fault_rip] cnt=27 rip=0x152d0bd10 pc=0x105ec10d8 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+[fault_rip] cnt=28 rip=0x152d0bd10 pc=0x105ec10d8 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[fault_rip] cnt=29 rip=0x152c9af24 pc=0x105e89000 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+[fault_rip] cnt=30 rip=0x152c9af24 pc=0x105e89000 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a51b190 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[winios-gl] hwnd 0x10032: 11400 frames presented (1220x686)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x71fffe0000 cpu=25% RUN pc=libsystem_platform.dylib`_platform_memmove+0xb4 lr=libOSMesa.dylib`OSMesaGetDepthBuffer+0x1cc sp=0x12490fa90 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x71fff60000 cpu=3% RUN pc=0x14ed00140 lr=0x14ed00140 sp=0x71fa78fd80 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x71ffff0000 modules=52 first=Alien Tenant Wants Horny Energy.exe@0x140000000
+[thread-sample] ml876 b3 "" teb=0x71fffe0000 cpu=24% RUN pc=0x14ec4f1cc lr=0x15a52f250 sp=0x702380e9c8 NATIVE (unresolved: hostPC outside block) sp-cand=[ Alien Tenant Wants Horny Energy.exe+0x1570476 Alien Tenant Wants Horny Energy.exe+0x680ab00 Alien Tenant Wants Horny Energy.exe+0x1572d6e Alien Tenant Wants Horny Energy.exe+0x68095f0 Alien Tenant Wants Horny Energy.exe+0x157f9d6 ]
+[thread-sample] ml876 b3 "wine-x18-exc" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c5a89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "Alien Ten:zfq0" teb=0x0 cpu=3% RUN pc=AGXMetalG19P`<redacted>+0xba8 lr=AGXMetalG19P`<redacted>+0x6dc sp=0x16c6de890 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[fault_rip] cnt=31 rip=0x152cfee60 pc=0x105eba3b8 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 [first] rev=ml555
+[rip-leak] guest RIP 0x152cfee60 IS POOL addr = PE 0x71faa06e60 (module base 0x71fa980000 rva 0x86e60)
+[fault_rip] cnt=32 rip=0x152cfee60 pc=0x105eba3b8 addr=0x1238 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104084000+0x3294000 rev=ml555
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a51d170 unresolved: hostPC outside block
+[lowalloc] ml966 REFUSED guest 0x1238 (8 byte span): no live allocation covers it (off-the-end, or translation already retired)
+[fault_rip] cnt=33 rip=0x14157eebb pc=0x14f843218 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[fault_rip] cnt=34 rip=0x14157eebb pc=0x14f843218 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+0024:err:seh:segv_handler   [guest-state] x28=0x7c00801140 rip=0x14157eebb
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x15a051210 unresolved: hostPC outside block
+0024:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x48 rdx=0x143f55840 rbx=0x0
+0024:err:seh:segv_handler   [guest-state]   rsp=0x702380f248 rbp=0x70363e8c50 rsi=0x143f55840 rdi=0x702380f430
+0024:err:seh:segv_handler   [guest-state]   r8 =0x702380f160 r9 =0x3f73e93f00000000 r10=0x17 r11=0x0
+0024:err:seh:segv_handler   [guest-state]   r12=0x702a7d1aa0 r13=0x0 r14=0x0 r15=0x4a00000000
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=8/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-48  9100402f 9100052b 927eed6c 927eed70 d37df189 cb090042
+0024:err:seh:segv_handler   [emit-dump]   +-24  8b09010a 8b090029 91004108 ad7f85e0 f1001210 910081ef
+0024:err:seh:segv_handler   [emit-dump]   +0    ad3f8500 91008108 54ffff61 eb0c017f 54000481 14000028
+0024:err:seh:segv_handler   [emit-dump]   +24   aa0103e9 aa0803ea 14000025 f1002109 54000323 f100613f
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: ad7f85e0 f1001210 910081ef [ad3f8500] 91008108 54ffff61 eb0c017f
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x14f843218 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x71fdf27218 RX from -32, 64 of 64 bytes: 89 f1 7d d3 42 00 09 cb 0a 01 09 8b 29 00 09 8b 08 41 00 91 e0 85 7f ad 10 12 00 f1 ef 81 00 91 00 85 3f ad 08 81 00 91 61 ff ff 54 7f 01 0c eb 81 04 00 54 28 00 00 14 e9 03 01 aa ea 03 08 aa 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x71fdf27218 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 71FDF27218 AV WRITE of 0
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=00000071FDF27218 flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7023810000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on write access to 0000000000000000 at address 00000071FDF27218 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=122865
+[unwind] term ml661 begin rip=14f1d01fc rsp=702380d2d8 window=[702380d2d8..702400d2d8) max=32
+[unwind] term ml661 #00 pc=14f1d01fc rsp=702380d2d8  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+010:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+060:   ? 71ffcf5388  ntdll.dll+0x25388
+[term-stack] ml660 sp+120:   ? 71fe6d6468  kernel32.dll+0x26468
+[term-stack] ml660 sp+128:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+130: CALL 140005661  godot.windows.template_release.x+0x5661
+[term-stack] ml660 sp+138: CALL 14005e432  godot.windows.template_release.x+0x5e432
+[term-stack] ml660 sp+2b0: call* 14157eebb  godot.windows.template_release.x+0x157eebb
+[term-stack] ml660 sp+748: CALL 1429ce681  godot.windows.template_release.x+0x29ce681
+[term-stack] ml660 sp+9f8: CALL 1429ce681  godot.windows.template_release.x+0x29ce681
+[term-stack] ml660 sp+af8: CALL 142f3a5c3  godot.windows.template_release.x+0x2f3a5c3
+[term-stack] ml660 sp+b78: CALL 14058d38f  godot.windows.template_release.x+0x58d38f
+[term-stack] ml660 sp+f60: call* 14157eebb  godot.windows.template_release.x+0x157eebb
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[20:57:29.256] [INFO] [session] length=327s play=287s frames=11790 avg=59.6 low1=54.5 low01=19.3 worst=87041ms stalls=2/90s peak=2103MB limit=8191MB thermal=nominal lpm=0 res=1280x720 cap=60 game=Alien Tenant
+[20:57:29.263] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[ptr-map] off: points map to the whole screen (session ended)
+[rip-profile] ml981 gen=9 threads=7 samples=1400 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=9 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[winios-gl] ml1341 no GL present for 6 s (hwnd 0x10032): 32-bit GL calls since the last present 0 (0 in the last 6 s)
+[winios-gl] ml1343 32-bit GL calls since the last present (0 entry points): | waits: finish 0 flush 0 fence 0 client-wait 0 wait-sync 0 get-sync 0 get-query 0 map 0 map-named 0 read-pixels 0 get-teximage 0
+[footprint] rev=ml358 phys=1820 MB (peak 1939) internal=1479 MB compressed=243 MB external=133 MB reusable=0 MB (cycle=106)
+[footprint] rev=ml358 phys=1820 MB (peak 1939) internal=1480 MB compressed=243 MB external=133 MB reusable=0 MB (cycle=107)
+[xp-api-top] 20:57:38.204 149 samples: ntdll.dll+0x6784c=1344/s msvcrt.dll+0x5197c=1189/s kernelbase.dll+0x68958=1137/s msvcrt.dll+0x56bb8=930/s mmdevapi.dll+0x1345c=879/s mmdevapi.dll+0x135e4=879/s ntdll.dll+0x67dcc=775/s ntdll.dll+0x71aac=310/s mmdevapi.dll+0x14f40=103/s msvcrt.dll+0x574b8=103/s mmdevapi.dll+0x15020=52/s
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[freeze] alive t+300s beats=8 gaps=1 iter=851 gen=1 threads=34 resident=1614MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1817 MB (peak 1939) internal=1480 MB compressed=243 MB external=133 MB reusable=0 MB (cycle=108)
+[xp-api-top] 20:57:39.336 136 samples: ntdll.dll+0x67dcc=1188/s msvcrt.dll+0x5197c=1131/s ntdll.dll+0x6784c=1131/s mmdevapi.dll+0x1345c=1018/s mmdevapi.dll+0x135e4=961/s msvcrt.dll+0x56bb8=961/s kernelbase.dll+0x68958=961/s ntdll.dll+0x71aac=170/s mmdevapi.dll+0x15020=113/s mmdevapi.dll+0x14f40=57/s
+[winios-gl] ml1341 no GL present for 11 s (hwnd 0x10032): 32-bit GL calls since the last present 0 (0 in the last 5 s)
+[winios-gl] ml1343 32-bit GL calls since the last present (0 entry points): | waits: finish 0 flush 0 fence 0 client-wait 0 wait-sync 0 get-sync 0 get-query 0 map 0 map-named 0 read-pixels 0 get-teximage 0
+[xp-api-top] 20:57:40.571 145 samples: ntdll.dll+0x67dcc=1347/s mmdevapi.dll+0x135e4=1140/s msvcrt.dll+0x56bb8=1140/s msvcrt.dll+0x5197c=1088/s mmdevapi.dll+0x1345c=984/s ntdll.dll+0x6784c=777/s kernelbase.dll+0x68958=518/s msvcrt.dll+0x574b8=259/s mmdevapi.dll+0x14f40=104/s mmdevapi.dll+0x15020=104/s ntdll.dll+0x71aac=52/s
+[footprint] rev=ml358 phys=1823 MB (peak 1939) internal=1486 MB compressed=243 MB external=141 MB reusable=0 MB (cycle=109)
+[xp-api-top] 20:57:41.697 136 samples: msvcrt.dll+0x5197c=1251/s ntdll.dll+0x67dcc=1251/s mmdevapi.dll+0x135e4=1080/s msvcrt.dll+0x56bb8=1080/s mmdevapi.dll+0x1345c=910/s ntdll.dll+0x6784c=853/s kernelbase.dll+0x68958=739/s mmdevapi.dll+0x15020=227/s ntdll.dll+0x71aac=227/s mmdevapi.dll+0x14f40=114/s
+[xp-api-top] 20:57:42.919 147 samples: mmdevapi.dll+0x135e4=1309/s ntdll.dll+0x67dcc=1205/s mmdevapi.dll+0x1345c=1152/s msvcrt.dll+0x5197c=1047/s ntdll.dll+0x6784c=838/s msvcrt.dll+0x56bb8=786/s kernelbase.dll+0x68958=628/s mmdevapi.dll+0x15020=314/s msvcrt.dll+0x574b8=157/s ntdll.dll+0x71aac=157/s mmdevapi.dll+0x14f40=105/s
+[footprint] rev=ml358 phys=1823 MB (peak 1939) internal=1486 MB compressed=243 MB external=141 MB reusable=0 MB (cycle=110)
+[xp] 20:57:43.787 +304.48 dt=295 cpu=89 (thr 89) P=26 E=64 run=143 pgw=-1.0 GHz P=2.21 E=1.44 Minst=260 IPC=1.75 mJ=25 pin=1 rdKB=96 fpMB=1824
+[xp] 20:57:44.041 +304.73 dt=253 cpu=15 (thr 15) P=6 E=9 run=28 pgw=-1.0 GHz P=1.63 E=1.50 Minst=50 IPC=2.10 mJ=4 pin=0 rdKB=0 fpMB=1823
+[xp-api-top] 20:57:44.041 133 samples: msvcrt.dll+0x56bb8=1484/s ntdll.dll+0x67dcc=1255/s ntdll.dll+0x6784c=1198/s mmdevapi.dll+0x1345c=1084/s msvcrt.dll+0x5197c=742/s kernelbase.dll+0x68958=685/s mmdevapi.dll+0x135e4=628/s msvcrt.dll+0x574b8=171/s mmdevapi.dll+0x14f40=114/s mmdevapi.dll+0x15020=114/s ntdll.dll+0x71aac=114/s
+[xp] 20:57:44.304 +305.00 dt=264 cpu=153 (thr 153) P=3 E=150 run=184 pgw=-1.0 GHz P=1.67 E=2.07 Minst=1236 IPC=3.92 mJ=45 pin=6 rdKB=208 fpMB=1825
+[20:57:44.304] [xp] 20:57:44.304 +305.00 dt=264 cpu=153 (thr 153) P=3 E=150 run=184 pgw=-1.0 GHz P=1.67 E=2.07 Minst=1236 IPC=3.92 mJ=45 pin=6 rdKB=208 fpMB=1825
+[xp] 20:57:44.571 +305.26 dt=257 cpu=279 (thr 262) P=6 E=273 run=278 pgw=-1.0 GHz P=2.74 E=2.63 Minst=3221 IPC=4.39 mJ=126 pin=12 rdKB=240 fpMB=1831
+[xp] 20:57:44.856 +305.55 dt=295 cpu=290 (thr 307) P=5 E=285 run=297 pgw=-1.0 GHz P=2.48 E=2.63 Minst=3260 IPC=4.27 mJ=140 pin=0 rdKB=0 fpMB=1845
+[waiters]  tid=0030 addr=0x7025165ff0 age=326s INF w0=00000001 w1=00000000
+[waiters]  tid=0034 addr=0x7025166038 age=341s INF w0=00000000 w1=00000000
+[waiters]  tid=0038 addr=0x7025166080 age=341s INF w0=00000000 w1=00000000
+[waiters]  tid=003c addr=0x70251660c8 age=341s INF w0=00000000 w1=00000000
+[waiters]  tid=0040 addr=0x7025166110 age=341s INF w0=00000000 w1=00000000
+[waiters]  tid=002c addr=0x7025165fa8 age=335s INF w0=00000001 w1=00000000
+[footprint] rev=ml358 phys=1856 MB (peak 1939) internal=1520 MB compressed=243 MB external=141 MB reusable=0 MB (cycle=111)
+7) P=5 E=285 run=297 pgw=-1.0 GHz P=2.48 E=2.63 Minst=3260 IPC=4.27 mJ=140 pin=0 rdKB=0 fpMB=1845

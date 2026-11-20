@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+# under GPL-3.0-only and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Steam DLC for the games BCD downloads (app/Madeira/BCDSteamDLC/, BCDGameDLC.swift; docs/STEAM_LIBRARY.md, "DLC").
 
 Never contacts Steam. Part A reads the sources; Part B compiles the DLC rules with the production SteamAppInfo,
@@ -107,8 +109,8 @@ check("no DLC is looked up for a game nothing was chosen for and no DLC is insta
       "if wanted == nil, installed.isEmpty { return .none }" in service and "if wanted == nil, installed.isEmpty { return .none }" in rules)
 check("SteamOwnedLibrary asks the service for the request in run() and passes it to the downloader",
       "let dlcRequest = await dlc.request(for: info, steamApps: steamApps)" in owned and "dlc: dlcRequest)" in owned)
-check("the installDepots() rules themselves are untouched (no DLC depot without a DLC choice)",
-      "d.supports(os: os) && d.dlcAppID == nil && !d.isSharedInstall &&" in read(APP / "SwiftSteam/Library/SteamAppInfo.swift"))
+check("the base install excludes DLC without a choice and supplied Steamworks redistributables",
+      "d.supports(os: os) && d.dlcAppID == nil && !d.isProvidedRedistributable &&" in read(APP / "SwiftSteam/Library/SteamAppInfo.swift"))
 
 # Steam decides ownership; a refused DLC depot never fails the game's install.
 check("a DLC depot Steam gives no key for is left out, not an error",

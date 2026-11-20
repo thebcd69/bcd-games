@@ -92,6 +92,7 @@ import UIKit
     func setAction(_ id: UUID, _ action: BCDTouchAction) { update(id) { $0.action = action } }
     func setScale(_ id: UUID, _ scale: Double) { update(id) { if !$0.locked { $0.scale = BCDTouchGeometry.clampScale(scale) } } }
     func setLocked(_ id: UUID, _ locked: Bool) { update(id) { $0.locked = locked } }
+    func setLatch(_ id: UUID, _ on: Bool) { update(id) { $0.latch = on } }
     func bringToFront(_ id: UUID) { items = BCDTouchLayering.moved(items, id, toFront: true) }
     func sendToBack(_ id: UUID) { items = BCDTouchLayering.moved(items, id, toFront: false) }
     func setPadLink(_ id: UUID, _ name: String?) { update(id) { $0.padLink = name } }

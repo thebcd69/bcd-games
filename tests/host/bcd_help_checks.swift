@@ -178,10 +178,10 @@ func readiness() {
     check("... and with it, nothing is missing", ids([module("a.dll", true, ["mfc140u.dll", "mfc140.dll"])], vc).isEmpty)
     check("... except an MFC file Microsoft's x64 copy does not hold (the debug one), which BCD cannot supply",
           BCDReadiness.evaluate(modules: [module("a.dll", true, ["mfc140ud.dll"])], files: [], provided: vc).map { ($0.id, $0.fixable) }.first! == ("mfc64", false))
-    // Round 625 (the owner's item 26): the 32-bit MFC is downloadable (Settings › Visual C++ › MFC, 32-bit); a game takes it with env.MADEIRA_MFC32 = 1.
+    // Round 625 (the owner's item 26): the 32-bit MFC is downloadable (Settings › Visual C++ runtime › 32-bit MFC); a game takes it with env.MADEIRA_MFC32 = 1.
     let mfc32 = BCDReadiness.evaluate(modules: [module("muv-luv_pf.exe", false, ["mfc140u.dll"])], files: [], provided: vc)
     check("a 32-bit MFC game without the 32-bit MFC is told to download it (the 64-bit runtime does not count)",
-          mfc32.map { ($0.id, $0.fixable) }.first! == ("mfc32", true) && mfc32[0].text.contains("Download the 32-bit MFC in Settings › Visual C++ first"))
+          mfc32.map { ($0.id, $0.fixable) }.first! == ("mfc32", true) && mfc32[0].text.contains("Download the 32-bit MFC in Settings › Visual C++ runtime first"))
     var vc32 = vc; vc32.vcRuntimeX86 = true
     check("... and with it, nothing is missing (the four DLLs of Microsoft's 32-bit package)",
           ids([module("muv-luv_pf.exe", false, ["mfc140u.dll", "mfc140.dll", "mfcm140.dll", "mfcm140u.dll"])], vc32).isEmpty)
@@ -200,6 +200,14 @@ func readiness() {
           && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: bigMap).isEmpty
           && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: BCDReadinessProvided()).isEmpty
           && BCDReadiness.evaluate(modules: [], files: ["game.exe"], provided: noRights).isEmpty)
+    // Round 668 (K1, merge N051): a 454 GB map without extended VA gets the same note; with extended VA, or a 63 GB map, none
+    var map454 = BCDReadinessProvided(); map454.mapGB = 454; map454.extendedVA = false
+    var map454va = BCDReadinessProvided(); map454va.mapGB = 454
+    var map63 = BCDReadinessProvided(); map63.mapGB = 63; map63.extendedVA = false
+    check("a Unity game on a 454 GB map without extended VA gets the small-map note; with extended VA, or on a 63 GB map, none",
+          BCDReadiness.evaluate(modules: [], files: unityFiles, provided: map454).map(\.id) == ["unity-small-map"]
+          && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: map454va).isEmpty
+          && BCDReadiness.evaluate(modules: [], files: unityFiles, provided: map63).isEmpty)
     let wow32 = BCDReadiness.evaluate(modules: [module("Game.exe", false, [])], files: [], provided: noRights, mainFile: "game.exe")
     check("a 32-bit launched program on an install without the limit and extended VA gets the window note; a 64-bit one, a helper, or rights do not",
           wow32.map(\.id) == ["wow-window"] && wow32.first?.fixable == false
@@ -222,6 +230,13 @@ func readiness() {
           && ids([module("g.exe", false, ["steam_api.dll"])], files: ["steam_api.dll"]).isEmpty)
     check("... and a scan that stopped at its limit calls nothing missing (the file may not have been reached)",
           BCDReadiness.evaluate(modules: [module("g.exe", true, ["steam_api64.dll"])], files: [], provided: none, complete: false).isEmpty)
+    // Round 668 (R1, merge N037; Red Dead Redemption 2 G4C8X3): NvLowLatencyVk.dll missing from the game's own copy
+    let noLowLat = BCDReadiness.evaluate(modules: [module("RDR2.exe", true, ["kernel32.dll", "nvlowlatencyvk.dll"])], files: [], provided: none)
+    check("a program that imports NvLowLatencyVk.dll from a folder without it: the copy is incomplete, no fix BCD offers; with the file, or a scan "
+          + "that stopped at its limit, nothing",
+          noLowLat.map { ($0.id, $0.fixable) }.first! == ("nvlowlatency", false) && noLowLat[0].text.contains("RDR2.exe needs nvlowlatencyvk.dll")
+          && ids([module("RDR2.exe", true, ["nvlowlatencyvk.dll"])], files: ["nvlowlatencyvk.dll"]).isEmpty
+          && BCDReadiness.evaluate(modules: [module("RDR2.exe", true, ["nvlowlatencyvk.dll"])], files: [], provided: none, complete: false).isEmpty)
     check(".NET without Wine Mono says to download it; with it, nothing", ids([module("g.exe", false, ["mscoree.dll"])]) == ["mono"]
           && ids([module("g.exe", false, ["mscoree.dll"])], { var p = none; p.wineMono = true; return p }()).isEmpty)
     check("OpenAL, PhysX and the 2010 DirectX files each point at their Start menu runtime",

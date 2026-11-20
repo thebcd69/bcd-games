@@ -36,6 +36,12 @@ import UIKit
 }
 
 extension BCDTouchInput {
+    /// madeira-bcd (build 666, issue #45): a controller button that holds from one press to the next (BCDTouchItem.holds);
+    /// a stand-in without the engine (the preview) gives the ordinary surface.
+    func padSurface(control: UUID, name: String, latches: Bool, changed: @escaping (CGSize, Bool) -> Void) -> AnyView {
+        padSurface(control: control, name: name, changed: changed)
+    }
+
     /// A stand-in without the engine (the preview): the stick's own surface over the zone.
     func floatingPadSurface(control: UUID, name: String, diameter: CGFloat, changed: @escaping (CGSize, Bool) -> Void,
                             landed: @escaping (CGSize?) -> Void) -> AnyView {
@@ -171,12 +177,13 @@ struct BCDTouchControl: View, Equatable {
 
     @ViewBuilder private var surface: some View {
         if let name = item.action.padName {
-            input.padSurface(control: item.id, name: name) { deflection, held in
+            input.padSurface(control: item.id, name: name, latches: item.holds) { deflection, held in
                 vector = deflection
                 down = held
             }
         } else {
-            BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input) { held, toward in
+            BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input,
+                               latches: item.holds) { held, toward in
                 down = held
                 direction = toward
             }
@@ -541,12 +548,14 @@ struct BCDTouchKeySurface: UIViewRepresentable {
     /// The player's own shape; nil: the circle, as always.
     let own: BCDTouchShape?
     let input: BCDTouchInput
+    /// madeira-bcd (build 666, issue #45): it holds from one press to the next (BCDTouchItem.holds).
+    var latches = false
     /// Pressed, and a key stick's direction.
     let changed: (Bool, Int) -> Void
 
     func makeUIView(context: Context) -> BCDTouchKeyView { BCDTouchKeyView() }
     func updateUIView(_ view: BCDTouchKeyView, context: Context) {
-        view.configure(action: action, diameter: diameter, own: own, input: input, changed: changed)
+        view.configure(action: action, diameter: diameter, own: own, input: input, latches: latches, changed: changed)
     }
     static func dismantleUIView(_ view: BCDTouchKeyView, coordinator: ()) { view.finish() }
 }
@@ -570,7 +579,7 @@ final class BCDTouchKeyView: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     deinit { NotificationCenter.default.removeObserver(self) }
 
-    func configure(action: BCDTouchAction, diameter: Double, own: BCDTouchShape?, input: BCDTouchInput,
+    func configure(action: BCDTouchAction, diameter: Double, own: BCDTouchShape?, input: BCDTouchInput, latches: Bool = false,
                    changed: @escaping (Bool, Int) -> Void) {
         self.diameter = diameter
         self.own = own
@@ -579,11 +588,13 @@ final class BCDTouchKeyView: UIView {
             press.rebind(action)
             press.diameter = diameter
             press.changed = changed
+            press.latches = latches
         } else {
             let p = BCDTouchPress(action: action, diameter: diameter,
                                   send: { [weak self] event in self?.input?.send(event) },
                                   tap: { BCDTouchHaptic.tap() })
             p.changed = changed
+            p.latches = latches
             press = p
         }
     }
@@ -615,7 +626,8 @@ final class BCDTouchKeyView: UIView {
 
     private func lift(_ touches: Set<UITouch>) {
         guard let finger, touches.contains(where: { ObjectIdentifier($0) == finger }) else { return }
-        finish()
+        self.finger = nil
+        press?.lift()   // build 666: a holding control stays down (BCDTouchPress.lift); every other one lets go, as before
     }
 
     override func didMoveToWindow() {

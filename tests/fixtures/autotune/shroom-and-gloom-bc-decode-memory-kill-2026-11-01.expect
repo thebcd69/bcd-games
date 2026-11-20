@@ -5,6 +5,7 @@
  },
  "matched": [
   "bc-decode-memory-kill",
+  "bc-half-memory-kill",
   "swap-8gb-memory-kill-sure",
   "swap-8gb-memory-kill",
   "bc-decode-memory-kill-4gb-limit"
@@ -12,7 +13,7 @@
  "next": [
   "dxmt = d3d11.mipClampBC=1"
  ],
- "note": "Shroom and Gloom (Unity IL2CPP, local copy), build 625, iPhone15,3 (A16, bc=0): 512 BC7 textures are expanded to RGBA8 by the CPU and iOS closes the app at 4,089 of 4,096 MB 22 s in. Send Log Z2ZXBM, trimmed. The generic rule tries the BC mip clamp before the swap tier. Round 660 (M044): bc-decode-memory-kill-4gb-limit matches too (a bc=0 GPU, 64 BC resources, killed at the limit); the next line is unchanged.",
+ "note": "Shroom and Gloom (Unity IL2CPP, local copy), build 625, iPhone15,3 (A16, bc=0): 512 BC7 textures are expanded to RGBA8 by the CPU and iOS closes the app at 4,089 of 4,096 MB 22 s in. Send Log Z2ZXBM, trimmed. The generic rule tries the BC mip clamp before the swap tier. Round 660 (M044): bc-decode-memory-kill-4gb-limit matches too (a bc=0 GPU, 64 BC resources, killed at the limit); the next line is unchanged. Round 677 (G3 S1): bc-half-memory-kill matches too and comes after the clamp (same priority, its id sorts after); the next line is unchanged.",
  "outcome": "killed",
  "stage": 3,
  "status": "trying"

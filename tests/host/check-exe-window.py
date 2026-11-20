@@ -38,7 +38,7 @@ check('one fixed allocation right above the window', 'var extra: vm_address_t = 
       'vm_allocate(mach_task_self_, &extra, vm_size_t(want - exeWinSize), 0 /* VM_FLAGS_FIXED */)' in blk and
       'extra == exeWinBase + exeWinSize' in blk)
 check('the new size reaches ntdll, and a failure keeps 128 MB (what it got is given back)',
-      'setenv("WINE_IOS_EXE_WINDOW"' in blk and 'vm_deallocate(mach_task_self_, extra' in blk and
+      'setenv("WINE_IOS_EXE_WINDOW"' in blk and 'releasePoolMapping(extra, vm_size_t(want - exeWinSize))' in blk and   # build 666: vm_deallocate there
       blk.index('exeWinSize = want') < blk.index('setenv("WINE_IOS_EXE_WINDOW"'))
 check('after the early placeholder is released, before the hole census',
       src.index('released the early pool placeholder') < src.index('// madeira-bcd exe-window-mb') <

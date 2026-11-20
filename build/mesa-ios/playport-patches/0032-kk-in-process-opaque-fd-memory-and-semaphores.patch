@@ -1,0 +1,884 @@
+From: BCD <190844990+thebcd69@users.noreply.github.com>
+Subject: [PATCH] kk: in-process opaque fd memory and semaphores (MADEIRA_KK_OPAQUE_FD=1)
+
+madeira-bcd (X-Plane 12, round 669): VK_KHR_external_memory_fd and opaque fd
+semaphores whose handles name the MTLHeap / MTLSharedEvent inside this process,
+for Wine's VK_KHR_external_memory_win32 / _semaphore_win32 and Zink's
+GL_EXT_memory_object_fd / GL_EXT_semaphore_fd. A binary semaphore shared this
+way counts its time points in one shared place (vk_sync_binary). Images on
+such memory are not losslessly compressed. Off unless MADEIRA_KK_OPAQUE_FD=1.
+---
+diff --git a/src/kosmickrisp/vulkan/kk_buffer.c b/src/kosmickrisp/vulkan/kk_buffer.c
+index 73fd1f5..ccd9820 100644
+--- a/src/kosmickrisp/vulkan/kk_buffer.c
++++ b/src/kosmickrisp/vulkan/kk_buffer.c
+@@ -8,7 +8,9 @@
+ #include "kk_buffer.h"
+ 
+ #include "kk_device.h"
++#include "kk_device_memory.h"
+ #include "kk_entrypoints.h"
++#include "kk_opaque_fd.h"
+ #include "kk_physical_device.h"
+ 
+ #include "kosmickrisp/bridge/mtl_bridge.h"
+@@ -133,6 +135,12 @@ kk_GetPhysicalDeviceExternalBufferProperties(
+    case VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_MAPPED_FOREIGN_MEMORY_BIT_EXT:
+       pExternalBufferProperties->externalMemoryProperties = kk_host_mem_props;
+       return;
++   case VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:   /* madeira-bcd */
++      if (!kk_opaque_fd_enabled())
++         goto unsupported;
++      pExternalBufferProperties->externalMemoryProperties =
++         kk_opaque_fd_mem_props;
++      return;
+    default:
+       goto unsupported;
+    }
+diff --git a/src/kosmickrisp/vulkan/kk_device_memory.c b/src/kosmickrisp/vulkan/kk_device_memory.c
+index e658bd7..ff27c3a 100644
+--- a/src/kosmickrisp/vulkan/kk_device_memory.c
++++ b/src/kosmickrisp/vulkan/kk_device_memory.c
+@@ -9,6 +9,7 @@
+ 
+ #include "kk_device.h"
+ #include "kk_entrypoints.h"
++#include "kk_opaque_fd.h"
+ #include "kk_physical_device.h"
+ 
+ #include "kosmickrisp/bridge/mtl_bridge.h"
+@@ -20,6 +21,7 @@
+ 
+ #include <inttypes.h>
+ #include <sys/mman.h>
++#include <unistd.h>
+ 
+ /* Supports mtlheap only */
+ const VkExternalMemoryProperties kk_mtlheap_mem_props = {
+@@ -30,6 +32,15 @@ const VkExternalMemoryProperties kk_mtlheap_mem_props = {
+    .compatibleHandleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT,
+ };
+ 
++/* madeira-bcd: an opaque fd names the memory's MTLHeap inside this process
++ * (kk_opaque_fd.h); only with MADEIRA_KK_OPAQUE_FD=1. */
++const VkExternalMemoryProperties kk_opaque_fd_mem_props = {
++   .externalMemoryFeatures = VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT |
++                             VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT,
++   .exportFromImportedHandleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT,
++   .compatibleHandleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT,
++};
++
+ const VkExternalMemoryProperties kk_host_mem_props = {
+    .externalMemoryFeatures = VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT,
+    .exportFromImportedHandleTypes = 0,
+@@ -96,6 +107,17 @@ kk_AllocateMemory(VkDevice device, const VkMemoryAllocateInfo *pAllocateInfo,
+       pAllocateInfo->pNext, IMPORT_MEMORY_METAL_HANDLE_INFO_EXT);
+    const VkImportMemoryHostPointerInfoEXT *host_info = vk_find_struct_const(
+       pAllocateInfo->pNext, IMPORT_MEMORY_HOST_POINTER_INFO_EXT);
++   /* madeira-bcd: an opaque fd of kk_opaque_fd.h names an MTLHeap, imported
++    * as VkImportMemoryMetalHandleInfoEXT does. */
++   const VkImportMemoryFdInfoKHR *fd_info = vk_find_struct_const(
++      pAllocateInfo->pNext, IMPORT_MEMORY_FD_INFO_KHR);
++   void *ofd_heap = NULL;
++   if (fd_info && fd_info->handleType ==
++                     VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT) {
++      if (!kk_opaque_fd_enabled() ||
++          !kk_ofd_lookup(fd_info->fd, KK_OFD_HEAP, &ofd_heap, NULL, NULL))
++         return vk_error(dev, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++   }
+ 
+    // TODO_KOSMICKRISP Do the actual memory allocation with alignment requirements
+    uint32_t alignment = (1ULL << 12);
+@@ -105,26 +127,32 @@ kk_AllocateMemory(VkDevice device, const VkMemoryAllocateInfo *pAllocateInfo,
+ 
+    mem = vk_device_memory_create(&dev->vk, pAllocateInfo, pAllocator,
+                                  sizeof(*mem));
+-   if (!mem)
++   if (!mem) {
++      if (ofd_heap)
++         mtl_release(ofd_heap);
+       return vk_error(dev, VK_ERROR_OUT_OF_HOST_MEMORY);
++   }
+ 
+-   bool import_metal = metal_info && metal_info->handleType;
++   bool import_metal = (metal_info && metal_info->handleType) || ofd_heap;
+    bool import_host = host_info && host_info->handleType;
+ 
+    if (import_metal || import_host) {
+       mem->bo = CALLOC_STRUCT(kk_bo);
+       if (!mem->bo) {
++         if (ofd_heap)
++            mtl_release(ofd_heap);
+          result = vk_errorf(&dev->vk.base, VK_ERROR_OUT_OF_DEVICE_MEMORY, "%m");
+          goto fail_alloc;
+       }
+ 
+       if (import_metal) {
+-         assert(metal_info->handleType ==
+-                VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT);
++         assert(ofd_heap || metal_info->handleType ==
++                               VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT);
+ 
+          /* We only support heaps since that's the backing for all our memory
+-          * and simplifies implementation */
+-         mem->bo->mtl_handle = mtl_retain(metal_info->handle);
++          * and simplifies implementation (an opaque fd's heap is already
++          * retained by kk_ofd_lookup) */
++         mem->bo->mtl_handle = ofd_heap ? ofd_heap : mtl_retain(metal_info->handle);
+          mem->bo->map =
+             mtl_new_buffer_with_length(mem->bo->mtl_handle, mem->vk.size, 0u);
+          mem->bo->size_B = mtl_heap_get_size(mem->bo->mtl_handle);
+@@ -149,6 +177,10 @@ kk_AllocateMemory(VkDevice device, const VkMemoryAllocateInfo *pAllocateInfo,
+ 
+    *pMem = kk_device_memory_to_handle(mem);
+ 
++   /* A successful import takes the fd (VkImportMemoryFdInfoKHR). */
++   if (ofd_heap)
++      close(fd_info->fd);
++
+    return VK_SUCCESS;
+ 
+ fail_alloc:
+@@ -170,6 +202,9 @@ kk_FreeMemory(VkDevice device, VkDeviceMemory _mem,
+    if (mem->map)
+       kk_bo_unmap(dev, mem->bo, mem->map, false);
+ 
++   if (kk_opaque_fd_enabled())
++      kk_ofd_forget(mem->bo);   /* madeira-bcd: handles it exported */
++
+    kk_destroy_bo(dev, mem->bo);
+ 
+    vk_device_memory_destroy(&dev->vk, pAllocator, &mem->vk);
+@@ -309,6 +344,38 @@ kk_GetMemoryMetalHandleEXT(
+ }
+ #endif /* VK_USE_PLATFORM_METAL_EXT */
+ 
++/* madeira-bcd: VK_KHR_external_memory_fd's opaque fd (kk_opaque_fd.h). */
++VKAPI_ATTR VkResult VKAPI_CALL
++kk_GetMemoryFdKHR(VkDevice device, const VkMemoryGetFdInfoKHR *pGetFdInfo,
++                  int *pFd)
++{
++   VK_FROM_HANDLE(kk_device, dev, device);
++   VK_FROM_HANDLE(kk_device_memory, mem, pGetFdInfo->memory);
++
++   if (pGetFdInfo->handleType != VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT ||
++       !mem->bo->mtl_handle)
++      return vk_error(dev, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++
++   int fd = kk_ofd_export(KK_OFD_HEAP, mem->bo, mem->bo->mtl_handle,
++                          mem->vk.size, NULL);
++   if (fd < 0)
++      return vk_error(dev, VK_ERROR_TOO_MANY_OBJECTS);
++   *pFd = fd;
++   return VK_SUCCESS;
++}
++
++VKAPI_ATTR VkResult VKAPI_CALL
++kk_GetMemoryFdPropertiesKHR(VkDevice device,
++                            VkExternalMemoryHandleTypeFlagBits handleType,
++                            int fd,
++                            VkMemoryFdPropertiesKHR *pMemoryFdProperties)
++{
++   VK_FROM_HANDLE(kk_device, dev, device);
++
++   /* The spec forbids asking this for an opaque fd. */
++   return vk_error(dev, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++}
++
+ VKAPI_ATTR uint64_t VKAPI_CALL
+ kk_GetDeviceMemoryOpaqueCaptureAddress(
+    UNUSED VkDevice device, const VkDeviceMemoryOpaqueCaptureAddressInfo *pInfo)
+diff --git a/src/kosmickrisp/vulkan/kk_device_memory.h b/src/kosmickrisp/vulkan/kk_device_memory.h
+index fee1d21..1b9b2ba 100644
+--- a/src/kosmickrisp/vulkan/kk_device_memory.h
++++ b/src/kosmickrisp/vulkan/kk_device_memory.h
+@@ -27,6 +27,8 @@ VK_DEFINE_NONDISP_HANDLE_CASTS(kk_device_memory, vk.base, VkDeviceMemory,
+ 
+ extern const VkExternalMemoryProperties kk_mtlheap_mem_props;
+ extern const VkExternalMemoryProperties kk_host_mem_props;
++/* madeira-bcd: VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT (kk_opaque_fd.h) */
++extern const VkExternalMemoryProperties kk_opaque_fd_mem_props;
+ 
+ void kk_device_memory_set_label(struct kk_device_memory *dev_mem,
+                                 const char *label);
+diff --git a/src/kosmickrisp/vulkan/kk_image.c b/src/kosmickrisp/vulkan/kk_image.c
+index ccd4349..f75d1e8 100644
+--- a/src/kosmickrisp/vulkan/kk_image.c
++++ b/src/kosmickrisp/vulkan/kk_image.c
+@@ -12,6 +12,7 @@
+ #include "kk_device_memory.h"
+ #include "kk_entrypoints.h"
+ #include "kk_format.h"
++#include "kk_opaque_fd.h"
+ #include "kk_physical_device.h"
+ 
+ #include "kosmickrisp/bridge/mtl_bridge.h"
+@@ -400,6 +401,12 @@ kk_GetPhysicalDeviceImageFormatProperties2(
+       case VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT:
+          ext_mem_props = &kk_mtlheap_mem_props;
+          break;
++      case VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:   /* madeira-bcd */
++         if (!kk_opaque_fd_enabled())
++            return vk_errorf(pdev, VK_ERROR_FORMAT_NOT_SUPPORTED,
++                             "opaque fd memory needs MADEIRA_KK_OPAQUE_FD=1");
++         ext_mem_props = &kk_opaque_fd_mem_props;
++         break;
+       case VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_ALLOCATION_BIT_EXT:
+       case VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_MAPPED_FOREIGN_MEMORY_BIT_EXT: {
+          if (pImageFormatInfo->tiling != VK_IMAGE_TILING_LINEAR) {
+diff --git a/src/kosmickrisp/vulkan/kk_image_layout.c b/src/kosmickrisp/vulkan/kk_image_layout.c
+index 4162bd3..4cc9f64 100644
+--- a/src/kosmickrisp/vulkan/kk_image_layout.c
++++ b/src/kosmickrisp/vulkan/kk_image_layout.c
+@@ -233,6 +233,13 @@ kk_image_layout_init(const struct kk_device *dev, const struct vk_image *image,
+    layout->linear = image->tiling != VK_IMAGE_TILING_OPTIMAL;
+    layout->optimized_layout = kk_image_layout_can_optimize(
+       pdev, image->usage, image->tiling, image->create_flags, format);
++   /* madeira-bcd: an image on memory shared through an opaque fd is placed in
++    * the same MTLHeap by another device with other usage flags (Zink's GL
++    * texture over X-Plane's Vulkan image); without Apple's lossless
++    * compression the layout depends only on the format and size. */
++   if (image->external_handle_types &
++       VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT)
++      layout->optimized_layout = false;
+    layout->usage = vk_image_usage_flags_to_mtl_texture_usage(
+       image->usage, image->create_flags, views_keep_layout,
+       supported_format->atomic);
+diff --git a/src/kosmickrisp/vulkan/kk_opaque_fd.c b/src/kosmickrisp/vulkan/kk_opaque_fd.c
+new file mode 100644
+index 0000000..76bcd56
+--- /dev/null
++++ b/src/kosmickrisp/vulkan/kk_opaque_fd.c
+@@ -0,0 +1,165 @@
++/*
++ * Copyright 2026 BCD contributors
++ * SPDX-License-Identifier: MIT
++ *
++ * madeira-bcd: see kk_opaque_fd.h.
++ */
++#include "kk_opaque_fd.h"
++
++#include "kosmickrisp/bridge/mtl_bridge.h"
++
++#include "vk_sync_binary.h"
++
++#include "util/simple_mtx.h"
++
++#include <fcntl.h>
++#include <limits.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#define KK_OFD_MAGIC 0x3144464f4b4b4342ull /* "BCKKOFD1" */
++#define KK_OFD_MAX   1024
++
++struct kk_ofd_entry {
++   uint64_t key;
++   enum kk_ofd_kind kind;
++   const void *owner;
++   void *mtl;
++   uint64_t size;
++   struct vk_sync_binary_shared *shared;
++};
++
++static simple_mtx_t kk_ofd_mtx = SIMPLE_MTX_INITIALIZER;
++static struct kk_ofd_entry kk_ofd_entries[KK_OFD_MAX];
++static unsigned kk_ofd_count;
++static uint64_t kk_ofd_seq;
++static unsigned kk_ofd_logged;
++
++bool
++kk_opaque_fd_enabled(void)
++{
++   static int enabled = -1;
++
++   if (enabled < 0) {
++      const char *s = getenv("MADEIRA_KK_OPAQUE_FD");
++      int on = s && s[0] == '1' && !s[1];
++      if (on)
++         fprintf(stderr, "[kk-ofd] madeira-bcd MADEIRA_KK_OPAQUE_FD=1: "
++                         "VK_KHR_external_memory_fd and opaque fd semaphores "
++                         "(in-process handles for Wine's win32 sharing and "
++                         "Zink)\n");
++      enabled = on;
++   }
++   return enabled;
++}
++
++int
++kk_ofd_export(enum kk_ofd_kind kind, const void *owner, void *mtl,
++              uint64_t size, struct vk_sync_binary_shared *shared)
++{
++   const char *tmp = getenv("TMPDIR");
++   char path[PATH_MAX];
++   uint64_t header[2];
++   int fd;
++
++   snprintf(path, sizeof(path), "%s/kk-ofd-XXXXXX",
++            tmp && *tmp ? tmp : "/tmp");
++   fd = mkstemp(path);
++   if (fd < 0) {
++      fprintf(stderr, "[kk-ofd] cannot make a handle file in %s\n", path);
++      return -1;
++   }
++   unlink(path);
++   fcntl(fd, F_SETFD, FD_CLOEXEC);
++
++   simple_mtx_lock(&kk_ofd_mtx);
++   if (kk_ofd_count == KK_OFD_MAX) {
++      simple_mtx_unlock(&kk_ofd_mtx);
++      fprintf(stderr, "[kk-ofd] %u handles exported and alive: no more\n",
++              KK_OFD_MAX);
++      close(fd);
++      return -1;
++   }
++   header[0] = KK_OFD_MAGIC;
++   header[1] = ++kk_ofd_seq;
++   if (pwrite(fd, header, sizeof(header), 0) != sizeof(header)) {
++      simple_mtx_unlock(&kk_ofd_mtx);
++      close(fd);
++      return -1;
++   }
++   kk_ofd_entries[kk_ofd_count++] = (struct kk_ofd_entry){
++      .key = header[1],
++      .kind = kind,
++      .owner = owner,
++      .mtl = mtl_retain(mtl),
++      .size = size,
++      .shared = shared,
++   };
++   if (shared)
++      vk_sync_binary_shared_ref(shared);
++   if (kk_ofd_logged < 16) {
++      kk_ofd_logged++;
++      fprintf(stderr, "[kk-ofd] export #%llu %s %llu bytes (%u alive)\n",
++              (unsigned long long)header[1],
++              kind == KK_OFD_HEAP ? "memory" :
++              shared ? "binary semaphore" : "timeline semaphore",
++              (unsigned long long)size, kk_ofd_count);
++   }
++   simple_mtx_unlock(&kk_ofd_mtx);
++   return fd;
++}
++
++bool
++kk_ofd_lookup(int fd, enum kk_ofd_kind kind, void **mtl, uint64_t *size,
++              struct vk_sync_binary_shared **shared)
++{
++   uint64_t header[2];
++   bool found = false;
++
++   if (pread(fd, header, sizeof(header), 0) != sizeof(header) ||
++       header[0] != KK_OFD_MAGIC)
++      return false;
++
++   simple_mtx_lock(&kk_ofd_mtx);
++   for (unsigned i = 0; i < kk_ofd_count; i++) {
++      struct kk_ofd_entry *e = &kk_ofd_entries[i];
++      if (e->key != header[1] || e->kind != kind)
++         continue;
++      *mtl = mtl_retain(e->mtl);
++      if (size)
++         *size = e->size;
++      if (shared) {
++         *shared = e->shared;
++         if (e->shared)
++            vk_sync_binary_shared_ref(e->shared);
++      }
++      found = true;
++      break;
++   }
++   simple_mtx_unlock(&kk_ofd_mtx);
++   if (!found)
++      fprintf(stderr, "[kk-ofd] import #%llu: no such %s (its exporter is "
++                      "gone)\n", (unsigned long long)header[1],
++              kind == KK_OFD_HEAP ? "memory" : "semaphore");
++   return found;
++}
++
++void
++kk_ofd_forget(const void *owner)
++{
++   simple_mtx_lock(&kk_ofd_mtx);
++   for (unsigned i = 0; i < kk_ofd_count;) {
++      struct kk_ofd_entry *e = &kk_ofd_entries[i];
++      if (e->owner != owner) {
++         i++;
++         continue;
++      }
++      mtl_release(e->mtl);
++      if (e->shared)
++         vk_sync_binary_shared_unref(e->shared);
++      kk_ofd_entries[i] = kk_ofd_entries[--kk_ofd_count];
++   }
++   simple_mtx_unlock(&kk_ofd_mtx);
++}
+diff --git a/src/kosmickrisp/vulkan/kk_opaque_fd.h b/src/kosmickrisp/vulkan/kk_opaque_fd.h
+new file mode 100644
+index 0000000..4e199bb
+--- /dev/null
++++ b/src/kosmickrisp/vulkan/kk_opaque_fd.h
+@@ -0,0 +1,47 @@
++/*
++ * Copyright 2026 BCD contributors
++ * SPDX-License-Identifier: MIT
++ *
++ * madeira-bcd: opaque fd handles for memory and semaphores inside one process.
++ *
++ * Metal objects cannot be turned into file descriptors, but every user of these
++ * handles in BCD (Wine's VK_KHR_external_memory_win32 / _semaphore_win32 and
++ * GL_EXT_memory_object / GL_EXT_semaphore through Zink) lives in the same
++ * process and loads this same library. An exported handle is the fd of an
++ * unlinked temporary file holding a key; the key names the MTLHeap or
++ * MTLSharedEvent in a table here. Wine passes such an fd through wineserver and
++ * back (the same open file), so the importer reads the key back with pread.
++ * Off unless MADEIRA_KK_OPAQUE_FD=1 (X-Plane 12's Vulkan/OpenGL bridge).
++ */
++#ifndef KK_OPAQUE_FD_H
++#define KK_OPAQUE_FD_H 1
++
++#include <stdbool.h>
++#include <stdint.h>
++
++struct vk_sync_binary_shared;
++
++enum kk_ofd_kind {
++   KK_OFD_HEAP = 1,  /* a VkDeviceMemory's MTLHeap */
++   KK_OFD_EVENT = 2, /* a semaphore's MTLSharedEvent */
++};
++
++/* MADEIRA_KK_OPAQUE_FD=1, read once. */
++bool kk_opaque_fd_enabled(void);
++
++/* A new fd naming `mtl` (retained by the table until kk_ofd_forget(owner));
++ * `shared` (a binary semaphore's shared point, or NULL) gets one more
++ * reference. -1 when no fd could be made. */
++int kk_ofd_export(enum kk_ofd_kind kind, const void *owner, void *mtl,
++                  uint64_t size, struct vk_sync_binary_shared *shared);
++
++/* What an fd names: the object retained for the caller, its size, and the
++ * shared point with one reference for the caller (NULL when none). False when
++ * the fd is not one of ours or its exporter is gone. The fd stays open. */
++bool kk_ofd_lookup(int fd, enum kk_ofd_kind kind, void **mtl, uint64_t *size,
++                   struct vk_sync_binary_shared **shared);
++
++/* The exporter `owner` is going away: drop its table entries. */
++void kk_ofd_forget(const void *owner);
++
++#endif
+diff --git a/src/kosmickrisp/vulkan/kk_physical_device.c b/src/kosmickrisp/vulkan/kk_physical_device.c
+index 20fa6ef..1ce55d2 100644
+--- a/src/kosmickrisp/vulkan/kk_physical_device.c
++++ b/src/kosmickrisp/vulkan/kk_physical_device.c
+@@ -7,6 +7,8 @@
+ 
+ #include "kk_physical_device.h"
+ 
++#include "kk_opaque_fd.h"
++
+ #include "kk_debug.h"
+ #include "kk_entrypoints.h"
+ #include "kk_image.h"
+@@ -238,6 +240,8 @@ kk_get_device_extensions(const struct kk_instance *instance,
+       .GOOGLE_user_type = true,
+       .KHR_external_fence_fd = true,
+       .KHR_external_semaphore_fd = true,
++      /* madeira-bcd: in-process opaque fds (kk_opaque_fd.h) */
++      .KHR_external_memory_fd = kk_opaque_fd_enabled(),
+ 
+       .AMD_shader_image_load_store_lod = true,
+       .AMD_buffer_marker = true,
+@@ -1276,9 +1280,23 @@ kk_enumerate_physical_devices(struct vk_instance *_instance)
+    };
+    assert(pdev->queue_family_count <= ARRAY_SIZE(pdev->queue_families));
+ 
+-   pdev->sync_binary_type = vk_sync_binary_get_type(&kk_sync_type);
++   /* madeira-bcd: with MADEIRA_KK_OPAQUE_FD=1 the semaphores share their
++    * payload through an opaque fd (kk_opaque_fd.h); otherwise the same types
++    * as before. */
++   const struct vk_sync_type *timeline_type = &kk_sync_type;
++   if (kk_opaque_fd_enabled()) {
++      pdev->sync_timeline_type = kk_sync_type;
++      pdev->sync_timeline_type.import_opaque_fd = kk_timeline_import_opaque_fd;
++      pdev->sync_timeline_type.export_opaque_fd = kk_timeline_export_opaque_fd;
++      timeline_type = &pdev->sync_timeline_type;
++   }
++   pdev->sync_binary_type = vk_sync_binary_get_type(timeline_type);
++   if (kk_opaque_fd_enabled()) {
++      pdev->sync_binary_type.sync.import_opaque_fd = kk_binary_import_opaque_fd;
++      pdev->sync_binary_type.sync.export_opaque_fd = kk_binary_export_opaque_fd;
++   }
+    unsigned st_idx = 0;
+-   pdev->sync_types[st_idx++] = &kk_sync_type;
++   pdev->sync_types[st_idx++] = timeline_type;
+    pdev->sync_types[st_idx++] = &pdev->sync_binary_type.sync;
+    pdev->sync_types[st_idx++] = NULL;
+    assert(st_idx <= ARRAY_SIZE(pdev->sync_types));
+diff --git a/src/kosmickrisp/vulkan/kk_physical_device.h b/src/kosmickrisp/vulkan/kk_physical_device.h
+index 9d815cf..9b288b3 100644
+--- a/src/kosmickrisp/vulkan/kk_physical_device.h
++++ b/src/kosmickrisp/vulkan/kk_physical_device.h
+@@ -79,6 +79,9 @@ struct kk_physical_device {
+ 
+    // Emulated binary sync type
+    struct vk_sync_binary_type sync_binary_type;
++   /* madeira-bcd: kk_sync_type with opaque fd import/export
++    * (MADEIRA_KK_OPAQUE_FD=1, kk_opaque_fd.h) */
++   struct vk_sync_type sync_timeline_type;
+    const struct vk_sync_type *sync_types[3];
+ 
+    struct kk_queue_family queue_families[3];
+diff --git a/src/kosmickrisp/vulkan/kk_sync.c b/src/kosmickrisp/vulkan/kk_sync.c
+index f44200c..95ce40f 100644
+--- a/src/kosmickrisp/vulkan/kk_sync.c
++++ b/src/kosmickrisp/vulkan/kk_sync.c
+@@ -7,9 +7,14 @@
+ #include "kk_sync.h"
+ 
+ #include "kk_device.h"
++#include "kk_opaque_fd.h"
+ 
+ #include "kosmickrisp/bridge/mtl_bridge.h"
+ 
++#include "vk_sync_binary.h"
++
++#include <unistd.h>
++
+ static VkResult
+ kk_timeline_init(struct vk_device *device, struct vk_sync *sync,
+                  uint64_t initial_value)
+@@ -29,6 +34,8 @@ kk_timeline_finish(struct vk_device *device, struct vk_sync *sync)
+ {
+    struct kk_sync_timeline *timeline =
+       container_of(sync, struct kk_sync_timeline, base);
++   if (kk_opaque_fd_enabled())
++      kk_ofd_forget(timeline);   /* madeira-bcd: handles it exported */
+    mtl_release(timeline->mtl_handle);
+ }
+ 
+@@ -82,6 +89,95 @@ kk_timeline_wait(struct vk_device *device, struct vk_sync *sync,
+    return completed != 0 ? VK_SUCCESS : VK_TIMEOUT;
+ }
+ 
++/* madeira-bcd: a timeline's payload is its MTLSharedEvent; an importer waits
++ * and signals the exporter's event. */
++VkResult
++kk_timeline_export_opaque_fd(struct vk_device *device, struct vk_sync *sync,
++                             int *fd)
++{
++   struct kk_sync_timeline *timeline =
++      container_of(sync, struct kk_sync_timeline, base);
++   int handle =
++      kk_ofd_export(KK_OFD_EVENT, timeline, timeline->mtl_handle, 0, NULL);
++
++   if (handle < 0)
++      return vk_error(device, VK_ERROR_TOO_MANY_OBJECTS);
++   *fd = handle;
++   return VK_SUCCESS;
++}
++
++VkResult
++kk_timeline_import_opaque_fd(struct vk_device *device, struct vk_sync *sync,
++                             int fd)
++{
++   struct kk_sync_timeline *timeline =
++      container_of(sync, struct kk_sync_timeline, base);
++   struct vk_sync_binary_shared *shared = NULL;
++   void *event;
++
++   if (!kk_ofd_lookup(fd, KK_OFD_EVENT, &event, NULL, &shared))
++      return vk_error(device, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++   if (shared) {
++      /* a binary semaphore's payload cannot become a timeline */
++      vk_sync_binary_shared_unref(shared);
++      mtl_release(event);
++      return vk_error(device, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++   }
++   kk_ofd_forget(timeline);
++   mtl_release(timeline->mtl_handle);
++   timeline->mtl_handle = event;
++   close(fd);
++   return VK_SUCCESS;
++}
++
++/* madeira-bcd: a binary's payload is its timeline's MTLSharedEvent and the
++ * shared next time point (vk_sync_binary.h), so a signal on one device and the
++ * wait on another count the same points. */
++VkResult
++kk_binary_export_opaque_fd(struct vk_device *device, struct vk_sync *sync,
++                           int *fd)
++{
++   struct vk_sync_binary *binary = container_of(sync, struct vk_sync_binary, sync);
++   struct kk_sync_timeline *timeline =
++      container_of(&binary->timeline, struct kk_sync_timeline, base);
++   struct vk_sync_binary_shared *shared = vk_sync_binary_shared_get(binary);
++   int handle;
++
++   if (!shared)
++      return vk_error(device, VK_ERROR_OUT_OF_HOST_MEMORY);
++   handle =
++      kk_ofd_export(KK_OFD_EVENT, timeline, timeline->mtl_handle, 0, shared);
++   if (handle < 0)
++      return vk_error(device, VK_ERROR_TOO_MANY_OBJECTS);
++   *fd = handle;
++   return VK_SUCCESS;
++}
++
++VkResult
++kk_binary_import_opaque_fd(struct vk_device *device, struct vk_sync *sync,
++                           int fd)
++{
++   struct vk_sync_binary *binary = container_of(sync, struct vk_sync_binary, sync);
++   struct kk_sync_timeline *timeline =
++      container_of(&binary->timeline, struct kk_sync_timeline, base);
++   struct vk_sync_binary_shared *shared = NULL;
++   void *event;
++
++   if (!kk_ofd_lookup(fd, KK_OFD_EVENT, &event, NULL, &shared))
++      return vk_error(device, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++   if (!shared) {
++      /* a timeline's payload has no binary point */
++      mtl_release(event);
++      return vk_error(device, VK_ERROR_INVALID_EXTERNAL_HANDLE);
++   }
++   kk_ofd_forget(timeline);
++   mtl_release(timeline->mtl_handle);
++   timeline->mtl_handle = event;
++   vk_sync_binary_share(binary, shared);
++   close(fd);
++   return VK_SUCCESS;
++}
++
+ const struct vk_sync_type kk_sync_type = {
+    .size = sizeof(struct kk_sync_timeline),
+    .features = VK_SYNC_FEATURE_TIMELINE | VK_SYNC_FEATURE_GPU_WAIT |
+diff --git a/src/kosmickrisp/vulkan/kk_sync.h b/src/kosmickrisp/vulkan/kk_sync.h
+index da4f149..2fa16e3 100644
+--- a/src/kosmickrisp/vulkan/kk_sync.h
++++ b/src/kosmickrisp/vulkan/kk_sync.h
+@@ -20,4 +20,15 @@ struct kk_sync_timeline {
+ 
+ extern const struct vk_sync_type kk_sync_type;
+ 
++/* madeira-bcd: opaque fd semaphores inside one process (kk_opaque_fd.h), set
++ * on the physical device's copies of the types with MADEIRA_KK_OPAQUE_FD=1. */
++VkResult kk_timeline_export_opaque_fd(struct vk_device *device,
++                                      struct vk_sync *sync, int *fd);
++VkResult kk_timeline_import_opaque_fd(struct vk_device *device,
++                                      struct vk_sync *sync, int fd);
++VkResult kk_binary_export_opaque_fd(struct vk_device *device,
++                                    struct vk_sync *sync, int *fd);
++VkResult kk_binary_import_opaque_fd(struct vk_device *device,
++                                    struct vk_sync *sync, int fd);
++
+ #endif
+diff --git a/src/kosmickrisp/vulkan/meson.build b/src/kosmickrisp/vulkan/meson.build
+index f82e80f..3ec9acf 100644
+--- a/src/kosmickrisp/vulkan/meson.build
++++ b/src/kosmickrisp/vulkan/meson.build
+@@ -110,6 +110,7 @@ kk_files = files(
+   'kk_shader.c',
+   'kk_sync.h',
+   'kk_sync.c',
++  'kk_opaque_fd.c',
+   'kk_wsi.h',
+   'kk_wsi.c',
+ )
+diff --git a/src/vulkan/runtime/vk_sync.c b/src/vulkan/runtime/vk_sync.c
+index e5eb134..d311d4c 100644
+--- a/src/vulkan/runtime/vk_sync.c
++++ b/src/vulkan/runtime/vk_sync.c
+@@ -35,6 +35,7 @@
+ #include "vk_log.h"
+ #include "vk_physical_device.h"
+ #include "vk_sync_binary.h"
++#include "util/u_atomic.h"
+ #include "vk_sync_dummy.h"
+ #include "vk_sync_timeline.h"
+ 
+@@ -612,7 +613,7 @@ vk_sync_wait_unwrap(struct vk_device *device,
+    struct vk_sync_binary *binary = vk_sync_as_binary(wait->sync);
+    if (binary) {
+       wait->sync = &binary->timeline;
+-      wait->wait_value = binary->next_point;
++      wait->wait_value = p_atomic_read(vk_sync_binary_point(binary));
+    }
+ 
+    if (vk_sync_type_is_dummy(wait->sync->type)) {
+@@ -663,7 +664,7 @@ vk_sync_signal_unwrap(struct vk_device *device,
+    struct vk_sync_binary *binary = vk_sync_as_binary(signal->sync);
+    if (binary) {
+       signal->sync = &binary->timeline;
+-      signal->signal_value = ++binary->next_point;
++      signal->signal_value = p_atomic_inc_return(vk_sync_binary_point(binary));
+    }
+ 
+    assert(!vk_sync_type_is_dummy(signal->sync->type));
+diff --git a/src/vulkan/runtime/vk_sync_binary.c b/src/vulkan/runtime/vk_sync_binary.c
+index d7ab4c6..4eb821e 100644
+--- a/src/vulkan/runtime/vk_sync_binary.c
++++ b/src/vulkan/runtime/vk_sync_binary.c
+@@ -25,6 +25,9 @@
+ 
+ #include "vk_util.h"
+ #include "util/os_time.h"
++#include "util/u_atomic.h"
++
++#include <stdlib.h>
+ 
+ static struct vk_sync_binary *
+ to_vk_sync_binary(struct vk_sync *sync)
+@@ -47,6 +50,7 @@ vk_sync_binary_init(struct vk_device *device,
+    assert(!(sync->flags & VK_SYNC_IS_TIMELINE));
+ 
+    binary->next_point = (initial_value == 0);
++   binary->shared = NULL;
+ 
+    return vk_sync_init(device, &binary->timeline, btype->timeline_type,
+                        VK_SYNC_IS_TIMELINE, 0 /* initial_value */);
+@@ -59,6 +63,47 @@ vk_sync_binary_finish(struct vk_device *device,
+    struct vk_sync_binary *binary = to_vk_sync_binary(sync);
+ 
+    vk_sync_finish(device, &binary->timeline);
++   if (binary->shared)
++      vk_sync_binary_shared_unref(binary->shared);
++   binary->shared = NULL;
++}
++
++struct vk_sync_binary_shared *
++vk_sync_binary_shared_get(struct vk_sync_binary *binary)
++{
++   if (!binary->shared) {
++      struct vk_sync_binary_shared *shared = calloc(1, sizeof(*shared));
++      if (!shared)
++         return NULL;
++      shared->point = binary->next_point;
++      shared->refs = 1;
++      binary->shared = shared;
++   }
++   return binary->shared;
++}
++
++void
++vk_sync_binary_shared_ref(struct vk_sync_binary_shared *shared)
++{
++   p_atomic_inc(&shared->refs);
++}
++
++void
++vk_sync_binary_shared_unref(struct vk_sync_binary_shared *shared)
++{
++   if (p_atomic_dec_zero(&shared->refs))
++      free(shared);
++}
++
++void
++vk_sync_binary_share(struct vk_sync_binary *binary,
++                     struct vk_sync_binary_shared *shared)
++{
++   struct vk_sync_binary_shared *old = binary->shared;
++
++   binary->shared = shared;
++   if (old)
++      vk_sync_binary_shared_unref(old);
+ }
+ 
+ static VkResult
+@@ -67,7 +112,7 @@ vk_sync_binary_reset(struct vk_device *device,
+ {
+    struct vk_sync_binary *binary = to_vk_sync_binary(sync);
+ 
+-   binary->next_point++;
++   p_atomic_inc(vk_sync_binary_point(binary));
+ 
+    return VK_SUCCESS;
+ }
+@@ -81,7 +126,8 @@ vk_sync_binary_signal(struct vk_device *device,
+ 
+    assert(value == 0);
+ 
+-   return vk_sync_signal(device, &binary->timeline, binary->next_point);
++   return vk_sync_signal(device, &binary->timeline,
++                         p_atomic_read(vk_sync_binary_point(binary)));
+ }
+ 
+ static VkResult
+@@ -102,7 +148,7 @@ vk_sync_binary_wait_many(struct vk_device *device,
+       timeline_waits[i] = (struct vk_sync_wait) {
+          .sync = &binary->timeline,
+          .stage_mask = waits[i].stage_mask,
+-         .wait_value = binary->next_point,
++         .wait_value = p_atomic_read(vk_sync_binary_point(binary)),
+       };
+    }
+ 
+@@ -131,7 +177,8 @@ vk_sync_binary_export_sync_file(struct vk_device *device,
+    VkResult result;
+    struct vk_sync_binary *binary = to_vk_sync_binary(sync);
+ 
+-   result = vk_sync_wait(device, &binary->timeline, binary->next_point, 0,
++   result = vk_sync_wait(device, &binary->timeline,
++                         p_atomic_read(vk_sync_binary_point(binary)), 0,
+                          OS_TIMEOUT_INFINITE);
+    *pFd = -1;
+    return result;
+diff --git a/src/vulkan/runtime/vk_sync_binary.h b/src/vulkan/runtime/vk_sync_binary.h
+index 8a4ceeb..80612a8 100644
+--- a/src/vulkan/runtime/vk_sync_binary.h
++++ b/src/vulkan/runtime/vk_sync_binary.h
+@@ -45,14 +45,53 @@ vk_sync_binary_get_type(const struct vk_sync_type *timeline_type);
+  * point), fences and semaphores created from this type cannot support any of
+  * the sharing APIs.
+  */
++struct vk_sync_binary_shared;
++
+ struct vk_sync_binary {
+    struct vk_sync sync;
+ 
+    uint64_t next_point;
+ 
++   /* madeira-bcd: a payload shared through an opaque fd inside one process
++    * (kosmickrisp's kk_opaque_fd.c): every vk_sync_binary that exported or
++    * imported it counts its time points here instead of in next_point, so a
++    * signal on one device and the wait on another agree. NULL otherwise.
++    */
++   struct vk_sync_binary_shared *shared;
++
+    struct vk_sync timeline;
+ };
+ 
++/* madeira-bcd: the next time point of a shared binary payload and the number of
++ * vk_sync_binary objects (and opaque fd tokens) that hold it. */
++struct vk_sync_binary_shared {
++   uint64_t point;
++   uint32_t refs;
++};
++
++/* The next time point of a binary sync: its own, or the shared payload's. */
++static inline uint64_t *
++vk_sync_binary_point(struct vk_sync_binary *binary)
++{
++   return binary->shared ? &binary->shared->point : &binary->next_point;
++}
++
++/* madeira-bcd: the binary's shared payload, made from its own point the first
++ * time (the binary holds one reference). */
++struct vk_sync_binary_shared *
++vk_sync_binary_shared_get(struct vk_sync_binary *binary);
++
++/* madeira-bcd: count one more holder of a shared payload. */
++void vk_sync_binary_shared_ref(struct vk_sync_binary_shared *shared);
++
++/* madeira-bcd: drop one holder; the last one frees it. */
++void vk_sync_binary_shared_unref(struct vk_sync_binary_shared *shared);
++
++/* madeira-bcd: make the binary use a shared payload; takes over one reference
++ * the caller holds and drops the binary's previous one. */
++void vk_sync_binary_share(struct vk_sync_binary *binary,
++                          struct vk_sync_binary_shared *shared);
++
+ VkResult vk_sync_binary_init(struct vk_device *device,
+                              struct vk_sync *sync,
+                              uint64_t initial_value);

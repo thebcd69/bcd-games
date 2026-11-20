@@ -7,12 +7,13 @@
 Garry's Mod (GYG6SG) and RDR2 (2PGRBB) in BCD Dock waited 150 s for crash.steampowered.com:443 on a network that drops it. Checks:
   - CI applies the patch after the DNS trace patch and before ntdll-unix is built, and runs this check;
   - the patch applies to a copy of the pinned dlls/ws2_32/unixlib.c once (the file path or the Wine directory as argument), a second run changes
-    nothing, a moved wrapper refuses it by name and leaves the file alone; DEFAULT_REFUSE is 0 (opt-in);
-  - the real wrapper, compiled on the host against a fake getaddrinfo: with the key unset or 0 every name, crash.steampowered.com included, reaches the
+    nothing, a moved wrapper refuses it by name and leaves the file alone; DEFAULT_REFUSE is 1 (on by default from build 674);
+  - the real wrapper, compiled on the host against a fake getaddrinfo: with the key 0 every name, crash.steampowered.com included, reaches the
     lookup exactly as before; with MADEIRA_DNS_REFUSE_CRASH=1 the exact name (any case) is refused with EAI_NONAME, the lookup is never made, one
     `refused` line is logged and no thread is started; other names, a longer name that merely starts with it, steampowered.com and a NULL node are
     untouched; the bounded path (MADEIRA_DNS_TIMEOUT_MS) is untouched;
-  - with the default flipped to 1 (the owner's question f13) the same wrapper refuses it unless MADEIRA_DNS_REFUSE_CRASH=0.
+  - the default is 1 from build 674 (the owner's question f13, decided 2026-11-19): unset refuses, 0 looks it up; with the constant set
+    back to 0 (builds 652-673) the same wrapper looks it up unless MADEIRA_DNS_REFUSE_CRASH=1.
 """
 from pathlib import Path
 import importlib.util
@@ -38,14 +39,14 @@ P = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(P)
 
 wf = (root / ".github/workflows/build-ipa.yml").read_text()
-step = wf.index("      - name: Patch wine so the DNS wrapper can refuse Valve's crash upload host (opt-in)\n")
+step = wf.index("      - name: Patch wine so the DNS wrapper refuses Valve's crash upload host (on by default)\n")
 check("CI runs this check and the patch after the DNS trace patch and before ntdll-unix is built",
       "python3 tests/host/check-wine-dns-refuse-crash.py\n          python3 tools/patch-wine-dns-refuse-crash.py wine/dlls/ws2_32/unixlib.c\n" in wf[step:step + 500]
       and wf.index("python3 tools/patch-wine-dns-trace.py wine/dlls/ws2_32/unixlib.c") < step < wf.index("run: bash build/ntdll-unix/build.sh"))
-check("the policy default is opt-in (0)", P.DEFAULT_REFUSE == 0)
+check("the policy default is on (1, from build 674: the owner's test on 673, 2026-11-19)", P.DEFAULT_REFUSE == 1)
 cat = (root / "build/tools/gen-config-catalog.py").read_text()
 i = cat.find('"env.MADEIRA_DNS_REFUSE_CRASH"')
-check("the key is in the settings catalog (default off)", i > 0 and '"default": "0"' in cat[i:i + 700])
+check("the key is in the settings catalog (default on)", i > 0 and '"default": "1"' in cat[i:i + 700])
 
 wine = None
 for cand in (root / "wine", Path(os.environ.get("WINE_SRC", "/nonexistent")), Path.home() / "madeira-bcd/wine"):
@@ -138,11 +139,13 @@ int main( int argc, char **argv )
             p = subprocess.run([str(exe)] + names, capture_output=True, text=True, env=env)
             return p.returncode, p.stdout.splitlines(), p.stderr.splitlines()
         names = ["crash.steampowered.com", "CRASH.SteamPowered.COM", "crash.steampowered.com.example", "steampowered.com", "api.steampowered.com", "NULL"]
-        rc, out, err = run(names)
-        check("key unset (default off): every name, the crash host included, reaches the lookup; no refusal line",
-              rc == 0 and all(" lookups=1 " in l or l.startswith("NULL") for l in out) and not [l for l in err if "refused" in l], (out, err))
         rc, out, err = run(names, "0")
-        check("key 0: the same", rc == 0 and all(" lookups=1 " in l or l.startswith("NULL") for l in out) and not [l for l in err if "refused" in l], (out, err))
+        check("key 0: every name, the crash host included, reaches the lookup; no refusal line (the old behaviour, still one line away)",
+              rc == 0 and all(" lookups=1 " in l or l.startswith("NULL") for l in out) and not [l for l in err if "refused" in l], (out, err))
+        rc, out, err = run(names)
+        check("key unset (default on from build 674): the exact name, in any case, is refused at once; the other names reach the lookup",
+              rc == 0 and [l.split(" lookups=")[1][0] for l in out] == ["0", "0", "1", "1", "1", "1"]
+              and len([l for l in err if "refused #" in l]) == 2, (out, err))
         rc, out, err = run(names, "1")
         refused = [l for l in out if l.startswith(("crash.steampowered.com ", "CRASH.SteamPowered.COM "))]
         check("key 1: the exact name, in any case, is refused with EAI_NONAME and the lookup is never made",
@@ -154,8 +157,8 @@ int main( int argc, char **argv )
               len(others) == 4 and all("ret=0 lookups=1 res=set" in l for l in others if not l.startswith("NULL")) and others[-1].startswith("NULL ret=0 lookups=1"), others)
         rc, out, err = run(["crash.steampowered.com"], "1", {"MADEIRA_DNS_TIMEOUT_MS": "300"})
         check("key 1 with the bounded lookup on: still refused at once, no thread", rc == 0 and out and "lookups=0" in out[0], (out, err))
-        flipped = build(helper.replace("e && e[0] ? e[0] == '1' : 0;", "e && e[0] ? e[0] == '1' : 1;"), "hflip")
-        check("with the default flipped to 1 the same wrapper compiles", isinstance(flipped, Path), flipped)
+        flipped = build(helper.replace("e && e[0] ? e[0] == '1' : 1;", "e && e[0] ? e[0] == '1' : 0;"), "hflip")
+        check("with the default set back to 0 (builds 652-673) the same wrapper compiles", isinstance(flipped, Path), flipped)
         if isinstance(flipped, Path):
             def runf(key=None):
                 env = dict(os.environ)
@@ -163,7 +166,7 @@ int main( int argc, char **argv )
                 if key is not None:
                     env["MADEIRA_DNS_REFUSE_CRASH"] = key
                 return subprocess.run([str(flipped), "crash.steampowered.com"], capture_output=True, text=True, env=env).stdout
-            check("default on: refused unless MADEIRA_DNS_REFUSE_CRASH=0", "lookups=0" in runf() and "lookups=0" in runf("1") and "lookups=1" in runf("0"),
+            check("default 0 (builds 652-673): looked up unless MADEIRA_DNS_REFUSE_CRASH=1", "lookups=1" in runf() and "lookups=0" in runf("1") and "lookups=1" in runf("0"),
                   (runf(), runf("1"), runf("0")))
 
     xcrun = shutil.which("xcrun")

@@ -1,0 +1,82 @@
+[19:13:23.822] [INFO] Checking entitlements...
+[19:13:23.822] [INFO] [build] v0.1.665 (665)
+[19:13:23.823] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 27.2 (Build 24B119) ram=7655MB available=6117MB cores=6
+[19:13:23.823] [INFO] [device] address-map=[0x104efc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[19:13:23.824] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=0 wildcard=0 lc=1
+[19:13:23.846] [INFO] [device] settings: low-power=0 thermal=nominal screen=1290x2796@3.0x max-fps=120 utc-offset=+05:30 free-disk=103GB stikdebug-url=1
+[19:13:23.850] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:13:26.668] [INFO] Requesting JIT with StikDebug...
+[19:13:26.672] [INFO] Opening StikDebug to enable JIT...
+[19:13:57.273] [INFO] [epic-launch] start app=37..9a signed-in=1 ovt=1 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic
+[19:13:57.278] [INFO] [bcd] library launch JWE.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[19:13:57.295] [INFO] Running full Wine sequence...
+[19:13:57.295] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104efc000,0x8000000000) 512GB available=6094MB low-power=0 thermal=nominal
+[19:13:57.297] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 exe-window-mb=512
+[19:13:57.299] [INFO] [msiexec64] Epic game: msiexec in system32 for this session
+[19:13:57.305] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:13:57.305] [INFO] Allocating 896MB JIT pool via debugger...
+[19:13:57.305] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:13:57.306] [INFO] [jit-debugger] attached=1 at the pool request
+[19:13:57.306] [INFO] [jit-age] attach age=21s source=enable-jit method=stikdebug thermal=0
+[19:13:57.307] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[19:13:57.308] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[19:13:57.309] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 320MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[19:13:57.309] [ERR] ⚠️ SMALL JIT POOL (320MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[19:14:01.706] [OK] Debugger detached.
+[19:14:01.707] [OK] [early-detach] rev=ml524 took 53 ms
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   exe-window-mb = 512
+[WineProc] Target exe: C:\Program Files\Epic Games\JurassicWorldEvolution\JWE.exe (bundle=arm64ec-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x64-image] L"\\??\\C:\\Program Files\\Epic Games\\JurassicWorldEvolution\\JWE.exe" 0x140000000+0x1a5c5000: the JIT pool of 320 MB cannot hold the 421 MB copy: running it from the loaded image (NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x16b598000 used=0x13c000/0x14000000 tramp+0x8000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x16b6d3000 used=0x56b000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x16bafc000 used=0x69c000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x16bc30000 used=0x764000/0x14000000 tramp+0x8000
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x16bcf8000 used=0xa64000/0x14000000 tramp+0x10000
+[jit-pool] anon RWX 0x71fe3b0000 size=0x4000 → used=0xa68000/0x14000000 NEW off=0xa64000 tid=0024 peb=0x71ffff0000 rev=ml625
+[jit-pool] image 0x71fe2b0000+0xb0000 (advapi32.dll) → pool 0x16bffc000 used=0xb1c000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fb390000+0xa0000 (imm32.dll) → pool 0x16efb0000 used=0x3ac0000/0x14000000 tramp+0x4000
+[jit-pool] anon RWX 0x7014ed0000 size=0x4000 → used=0x3ac4000/0x14000000 NEW off=0x3ac0000 tid=0024 peb=0x71ffff0000 rev=ml625
+[jit-pool] tail FREE rx=0x17e590000 size=0x1000000 -> free-list rev=ml438
+[jit-pool] image 0x71fb2d0000+0xc0000 (rsaenh.dll) → pool 0x16f058000 used=0x3b88000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fb1a0000+0x130000 (crypt32.dll) → pool 0x16f11c000 used=0x3cc0000/0x14000000 tramp+0x8000
+[jit-pool] image 0x71fb110000+0x90000 (bcrypt.dll) → pool 0x16f254000 used=0x3d54000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fb2d0000+0xc0000 (rsaenh.dll) → pool 0x16f058000 used=0x3b88000/0x14000000 tramp+0x4000
+[jit-pool] image 0x71fb2e0000+0xb0000 (uxtheme.dll) → pool 0x16f2e8000 used=0x3e08000/0x14000000 tramp+0x4000
+[win-pos] #1 hwnd=0x1002a after=0x0 flags=0000003c vis={437,247,987,409} surface=0x115b509b0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x1002a class='CustomerMessageDialog1' text="" rev=ml853
+[win-pos] #2 hwnd=0x10032 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x115b509b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x10032 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10032 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x115b509b0 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10032 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x1002a after=0x0 flags=00000018 vis={437,247,987,409} surface=0x115b509b0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x1002a class='CustomerMessageDialog1' text="" rev=ml853
+[win-pos] #5 hwnd=0x1002a after=0x0 flags=00001967 vis={437,247,987,409} surface=0x10dc033c0 rev=ml505 style=16c80000 visible=1 parent=0x10020
+[win-name] #5 hwnd=0x1002a class='CustomerMessageDialog1' text="" rev=ml853
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #6 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #7 hwnd=0x10034 class='OleMainThreadWndClass' text="" rev=ml853
+[win-name] #16 hwnd=0x1003e class='Button' text="" rev=ml853
+[win-pos] #17 hwnd=0x1003e after=0x1 flags=00000010 vis={451,93,528,118} surface=0x0 rev=ml505 style=40000000 visible=0 parent=0x1002a
+[win-name] #17 hwnd=0x1003e class='Button' text="OK" rev=ml853
+[win-pos] #18 hwnd=0x1003e after=0x0 flags=00001857 vis={451,93,528,118} surface=0x0 rev=ml505 style=50000000 visible=1 parent=0x1002a
+[win-name] #18 hwnd=0x1003e class='Button' text="OK" rev=ml853
+[win-pos] #19 hwnd=0x1002a after=0x0 flags=0000181f vis={437,247,987,409} surface=0x10dc033c0 rev=ml505 style=16c80000 visible=1 parent=0x10020
+[win-name] #19 hwnd=0x1002a class='CustomerMessageDialog1' text="Jurassic Park Evolution" rev=ml853
+[win-pos] #20 hwnd=0x1002a after=0x0 flags=000018bf vis={437,247,987,409} surface=0x115b509b0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #20 hwnd=0x1002a class='CustomerMessageDialog1' text="Jurassic Park Evolution" rev=ml853
+[win-pos] #21 hwnd=0x1002a after=0x0 flags=0000181f vis={437,247,987,409} surface=0x115b509b0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #21 hwnd=0x1002a class='CustomerMessageDialog1' text="Jurassic Park Evolution" rev=ml853
+[win-pos] #22 hwnd=0x1002a after=0x0 flags=0000181f vis={437,247,987,409} surface=0x115b509b0 rev=ml505 style=06c80000 visible=0 parent=0x10020
+[win-name] #22 hwnd=0x1002a class='CustomerMessageDialog1' text="Jurassic Park Evolution" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xffffffff) syscalls=0 unix_calls=11085
+[jit-pool] tail FREE rx=0x17f590000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffffffff) syscalls=0 unix_calls=11153
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1)
+[WineProc] Wine exited with code -1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:14:15.298] [INFO] [session] length=18s play=0s frames=0 stalls=0/0s peak=1053MB limit=6143MB thermal=nominal lpm=0 api=D3D11/64 res=1424x656 cap=60 game=Jurassic World Evolution
+[19:14:15.311] [INFO] [exit-report] status=0xffffffff
+[frontend] returned to library
+[19:14:15.527] [INFO] [bcd-host] no report

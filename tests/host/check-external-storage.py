@@ -205,14 +205,26 @@ check("a failed move removes only its copy", "for item in items { try? fm.remove
 # Settings.
 sections = read("app/Madeira/BCDSettingsSections.swift")
 group = slice_(sections, "    private var externalGames: some View {", "    private var games: [BCDGame] {")
-check("the folder picker is attached to the External drives group",
-      ".fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder])" in group)
-check("the picker asks for folders only", group.count("allowedContentTypes:") == 1)
-check("the saves backup's importer is still alone on the page",
-      sections.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1 and sections.count(".fileImporter(") == 2)
+check("the folder picker is presented from UIKit by chooseExternalFolder, not by a SwiftUI .fileImporter (which never opened for a tester: "
+      "only `picker opened` in the log)",
+      'chooseExternalFolder("opened")' in group and "BCDFolderPicker.present(" in group and ".fileImporter(" not in group)
+check("the picker asks for folders only and reads in place (asCopy: false: no copy to the device)",
+      sections.count("UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)") == 1
+      and sections.count("forOpeningContentTypes:") == 1)
+check("a chosen folder goes to addExternalDrive, and Reconnect opens the same picker",
+      "backend.addExternalDrive(url)" in group.split("BCDFolderPicker.present(")[1].split("closed:")[0]
+      and 'chooseExternalFolder("opened (after reconnect)")' in group)
+saves_group = slice_(sections, 'BCDSettingsGroup(title: "Saves",', "if let tools = backend.prefixToolsView")
+check("the saves backup's importer and share sheet are on the Saves group, and it is the only importer in the file",
+      saves_group.count(".fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip])") == 1
+      and saves_group.count(".sheet(item: $backup") == 1 and sections.count(".fileImporter(") == 1)
+page_tail = slice_(sections, "struct BCDStorageSettings<Backend: BCDStorageBackend>: View {", "    private var room: some View {").split("        .onAppear { backend.refresh() }")[-1]
+check("no importer or sheet is attached to the Storage page's own stack: SwiftUI does not present a .fileImporter that sits below another one "
+      "(BCDPrefixToolsGroup's importer, below the page, never opened)",
+      ".fileImporter(" not in page_tail and ".sheet(" not in page_tail)
 check("the group is shown only where the backend supports it", "if backend.supportsExternalGames { externalGames }" in sections)
 check("the picker's open, answer and close are logged (a silent Open shows in the log)",
-      'noteExternalPicker("opened")' in group and 'noteExternalPicker("answered")' in group and 'noteExternalPicker("closed")' in group)
+      "backend.noteExternalPicker(reason)" in group and 'noteExternalPicker("answered")' in group and 'noteExternalPicker("closed")' in group)
 check("Reconnect tries the saved bookmark before the picker", "backend.reconnectExternalDrive(drive.id) {" in group)
 check("Remove asks first and says the drive's files stay", "The files on the drive are kept." in group)
 code_lines = "\n".join(line for line in sections.splitlines() if not line.lstrip().startswith("//"))

@@ -57,7 +57,9 @@ for p in "$@"; do
     m="$SRC/.madeira-applied-$(basename "$p")"
     if [ ! -f "$m" ]; then
         patch -d "$SRC" -p1 --forward < "$p"
-        touch "$m"
+        # madeira-bcd (build 676): the marker holds the patch's SHA-256, so kk-stale-source.sh can tell a patch changed
+        # under the same name (an empty marker named the file only and kept the old code).
+        shasum -a 256 < "$p" | cut -d' ' -f1 > "$m"
     fi
 done
 

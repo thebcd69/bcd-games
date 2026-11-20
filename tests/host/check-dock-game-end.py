@@ -161,6 +161,27 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
                 == .wait(status: 0xC0000005, file: "dyinglightgame.exe", why: "host-still-counts-the-game"), "Valve's client still counts the game: wait")
         require(verdict(gone, host: DockHostState(gameRan: true, gameOver: true, finished: false))
                 == .wait(status: 0xC0000005, file: "dyinglightgame.exe", why: "host-not-finished"), "the host has not finished: wait")
+        // Round 668 (G2 S3; Enshrouded 9DE6YV): helper field 4 = the process started a crash uploader before it ended
+        let ens = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enshrouded\\enshrouded.exe"
+        let rep = R.parse("E\t4\t2a\t20.0\t200.0\t\(ens)\nE\t1\t0\t15.0\t5.0\t\(ens)\nE\t0\t0\t7.0\t300.0\tC:\\windows\\system32\\dockhost.exe\n")
+        require(rep.complete && rep.processes[0].crashReported && !rep.processes[0].helper && rep.processes[1].helper && !rep.processes[1].crashReported,
+                "helper field 4: started a crash reporter (not a helper); 1: a helper")
+        require(verdict(rep.processes) == .end(status: 0x2a, file: "enshrouded.exe", lived: 200),
+                "the game that started a crash uploader and ended with 42 is a crash: the session ends")
+        require(verdict(R.parse("E\t0\t2a\t20.0\t200.0\t\(ens)\n").processes) == .none,
+                "exit code 42 without a crash uploader stays as before (nothing to say)")
+        // Round 668 (G2 S2; Enshrouded 0GS36Y and 15 more build-665 logs): the host crashed at its shutdown before writing probe-result
+        let hostCrash = ended("C:\\windows\\system32\\dockhost.exe", 0xC0000005, ago: 7)
+        require(verdict([hostCrash, ended(dying, 0xC0000005, ago: 20)], host: DockHostState(gameRan: true, gameOver: true, finished: false))
+                == .end(status: 0xC0000005, file: "dyinglightgame.exe", lived: 30), "the host crashed after the game ended: the session ends")
+        require(verdict([hostCrash, runs("C:\\windows\\system32\\dockhost.exe"), ended(dying, 0xC0000005, ago: 20)],
+                        host: DockHostState(gameRan: true, gameOver: true, finished: false))
+                == .wait(status: 0xC0000005, file: "dyinglightgame.exe", why: "host-not-finished"), "a host that runs again keeps the wait")
+        require(verdict([hostCrash, ended(dying, 0xC0000005, ago: 20)], host: DockHostState(gameRan: true, gameOver: false, finished: false))
+                == .wait(status: 0xC0000005, file: "dyinglightgame.exe", why: "host-still-counts-the-game"),
+                "a crashed host that never counted the game over keeps the wait")
+        require(R.hostCrashed(DockProcessTable(processes: [dockhost])) == false && R.hostCrashed(DockProcessTable(processes: [hostCrash])),
+                "only a host gone with an error status counts as crashed")
 
         // ---- anything of the game still running keeps the session
         require(verdict([dockhost, ended(dying, 0xC0000005, ago: 60), runs(game)]) == .wait(status: 0xC0000005, file: "dyinglightgame.exe", why: "game-still-runs"),
@@ -402,6 +423,9 @@ c_table = r'''
 typedef unsigned short WCHAR;
 typedef struct { unsigned short Length; unsigned short MaximumLength; WCHAR *Buffer; } UNICODE_STRING;
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+/* round 668: the child table asks which process spawns (ios_child_slot_take marks a crash uploader's parent) */
+static void *harness_spawner_peb;
+void *ios_jit_current_peb(void) { return harness_spawner_peb; }
 ''' + table + r'''
 static int failed;
 static void expect(int cond, const char *what) { printf("%s: %s\n", cond ? "PASS" : "FAIL", what); if (!cond) failed++; }
@@ -411,7 +435,7 @@ static int spawn_w(const WCHAR *wide, size_t n)
     UNICODE_STRING u;
     memcpy(buf, wide, n * sizeof(WCHAR));
     u.Length = (unsigned short)(n * sizeof(WCHAR)); u.MaximumLength = u.Length; u.Buffer = buf;
-    return ios_child_slot_take(&u);
+    return ios_child_slot_take(&u, NULL);
 }
 static int spawn(const char *path)
 {
@@ -472,6 +496,44 @@ int main(int argc, char **argv)
     expect(strstr(text, "R\t0\t") && strstr(text, "\tC:\\Program Files (x86)\\Steam\\steamapps\\common\\Dying Light\\DyingLightGame.exe\n"),
            "an R line: the helper flag, the seconds since the start and the image path as it was spawned");
     expect(strstr(text, "R\t1\t") && strstr(text, "CrashReportClient.exe"), "the helper flag is set by the file-name rule");
+
+    /* round 668 (G2 S3; Enshrouded 9DE6YV): the game starts ITSELF as a crash uploader, then ends with 42; the uploader ends with 0 */
+    {
+        static char t2[8192];
+        WCHAR img[300], cmd[400];
+        UNICODE_STRING ui, uc;
+        const char *game = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enshrouded\\enshrouded.exe";
+        const char *line = "\"C:/Program Files (x86)/Steam/steamapps/common/Enshrouded/enshrouded.exe\" --upload-dump \"C:/x/crash.dmp\"";
+        size_t k, ni = strlen(game), nc = strlen(line);
+        int s_ens = start(game, 7), s_up;
+        for (k = 0; k < ni; k++) img[k] = (unsigned char)game[k];
+        for (k = 0; k < nc; k++) cmd[k] = (unsigned char)line[k];
+        ui.Length = ui.MaximumLength = (unsigned short)(ni * sizeof(WCHAR)); ui.Buffer = img;
+        uc.Length = uc.MaximumLength = (unsigned short)(nc * sizeof(WCHAR)); uc.Buffer = cmd;
+        harness_spawner_peb = peb_of(7);
+        s_up = ios_child_slot_take(&ui, &uc);
+        harness_spawner_peb = NULL;
+        ios_child_slot_current = s_up; ios_child_slot_bind_peb(peb_of(8)); ios_child_slot_current = -1;
+        expect(ios_child_slots[s_up].reporter == 1 && ios_child_slots[s_ens].started_reporter == 1,
+               "an --upload-dump child is a helper and marks the process that started it");
+        finish_child(7, 0x2a); finish_child(8, 0);
+        madeira_child_report(t2, sizeof t2);
+        expect(strstr(t2, "E\t4\t2a\t") != NULL, "the game's E line: helper field 4 (started a crash reporter), status 2a");
+        expect(strstr(t2, "E\t1\t0\t") != NULL, "the uploader's E line: a helper, status 0");
+        {
+            UNICODE_STRING plain; WCHAR pw[64]; const char *pl = "\"C:/Games/crash report tool/game.exe\" -windowed";
+            size_t m = strlen(pl);
+            for (k = 0; k < m; k++) pw[k] = (unsigned char)pl[k];
+            plain.Length = plain.MaximumLength = (unsigned short)(m * sizeof(WCHAR)); plain.Buffer = pw;
+            expect(!ios_child_cmdline_reporter(&plain) && !ios_child_cmdline_reporter(NULL),
+                   "words in the program path, or no command line, never make a reporter");
+        }
+        ios_child_slot_release(s_ens); ios_child_slot_release(s_up);
+        /* take the two out of the ring again so the counts below are those of the 32FEAT processes */
+        ios_child_ended_count -= 2;
+        memset(&ios_child_ended[ios_child_ended_count % IOS_CHILD_ENDED], 0, sizeof(ios_child_ended[0]));
+        memset(&ios_child_ended[(ios_child_ended_count + 1) % IOS_CHILD_ENDED], 0, sizeof(ios_child_ended[0]));
+    }
 
     /* build 580 (Crash Bandicoot N. Sane Trilogy 3CH670): "crash" at the start of a game's name does not make it a crash reporter */
     {
@@ -808,6 +870,9 @@ require(len(stubs) == 1 and sorted(re.findall(r'"([^"]+)"', stubs[0])) ==
         ['playgtaiv.exe', 'playgtasanandreas.exe', 'playgtav.exe', 'playrdr.exe', 'playrdr2.exe'],
         'the only program names in the rules are Rockstar\'s five Steam entry programs')
 code = '\n'.join(l for l in code.splitlines() if not l.startswith('    static let rockstarEntryStubs: Set<String> = ['))
+# Round 668 (G2 S2): the second named exception, BCD's own Dock host (never the game): a host gone with an error status has finished.
+require(code.count('    static let dockHostFile = "dockhost.exe"') == 1, "the Dock host's own name is the only other program name in the rules")
+code = '\n'.join(l for l in code.splitlines() if l != '    static let dockHostFile = "dockhost.exe"')
 require(not re.findall(r'"[^"\n]*\.exe"', code) and not re.findall(r'"[^"\n]*\.exe"', additions)
         and not re.findall(r'"[^"\n]*\.exe"', block(bridge, 'int wine_session_dock_game_ended(int32_t status)')),
         'no program names in the rules, the table additions or the bridge function: the game is found by where it lives')

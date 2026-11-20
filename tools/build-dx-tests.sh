@@ -10,6 +10,8 @@
 #   i686,   into i386-windows (C:\windows\syswow64):      d3d9-test-x86 (the same d3d9_cube.c), d3d8-test-x86, ddraw-test-x86,
 #                                                        sound-test-x86, video-test-x86
 # Round 603 added the MIDI test (tests/dxtests/midi_test.c, ajan48's source, winmm only): midi-test-x64 and midi-test-x86.
+# 2026-11-16 added the OpenGL and Vulkan tests (tests/dxtests/gl_test.c, vulkan_test.c; the shaders of the Vulkan one are vk_shaders.h,
+# made offline by tools/gen-vk-test-shaders.py), both bitnesses: gl-test-x64/-x86 and vulkan-test-x64/-x86 (tests/host/check-vk-gl-tests.py).
 # The 32-bit programs are tracked in app/Madeira/i386-windows (git add -f: that folder is otherwise the CI-built Wine farm and
 # ignored), so a build whose compiler is missing still ships them.
 #
@@ -85,6 +87,9 @@ build_one() {
 }
 
 SHIP32="${SHIP32_DIR:-$R/app/Madeira/i386-windows}"
+# The Vulkan test takes Wine's own Vulkan header (wine/include/wine/vulkan.h, what winevulkan is built with): the wine submodule's include
+# folder, searched only for "..." includes so that its windows.h never stands in for the toolchain's. No submodule: the tracked programs stay.
+WINE_INC="${WINE_INC:-$R/wine/include}"
 # 64-bit: C:\windows\system32
 build_one x86_64 frametime-test-x64.exe   frametime_test.c  "$SHIP" -ldxguid -luuid
 build_one x86_64 resolution-test-x64.exe  resolution_test.c "$SHIP" -ldxguid -luuid
@@ -93,6 +98,8 @@ build_one x86_64 video-test-x64.exe       video_test.c      "$SHIP" -lmfuuid -lu
 build_one x86_64 controller-test-x64.exe  controller_test.c "$SHIP" -ldinput8 -ldxguid -luuid
 build_one x86_64 input-test-x64.exe       input_test.c      "$SHIP" -luuid
 build_one x86_64 midi-test-x64.exe        midi_test.c       "$SHIP" -lwinmm -luser32 -lgdi32
+build_one x86_64 gl-test-x64.exe          gl_test.c         "$SHIP" -lgdi32
+build_one x86_64 vulkan-test-x64.exe      vulkan_test.c     "$SHIP" -iquote "$WINE_INC"
 # 32-bit: C:\windows\syswow64 (d3d9_cube.c is the one source of both bitnesses of the Direct3D 9 test)
 build_one i686   d3d9-test-x86.exe        d3d9_cube.c       "$SHIP32" -luuid
 build_one i686   d3d8-test-x86.exe        d3d8_cube.c       "$SHIP32" -luuid
@@ -100,3 +107,5 @@ build_one i686   ddraw-test-x86.exe       ddraw_test.c      "$SHIP32" -ldxguid -
 build_one i686   sound-test-x86.exe       sound_test.c      "$SHIP32" -lwinmm -luuid -lole32
 build_one i686   video-test-x86.exe       video_test.c      "$SHIP32" -lmfuuid -luuid -lole32
 build_one i686   midi-test-x86.exe        midi_test.c       "$SHIP32" -lwinmm -luser32 -lgdi32
+build_one i686   gl-test-x86.exe          gl_test.c         "$SHIP32" -lgdi32
+build_one i686   vulkan-test-x86.exe      vulkan_test.c     "$SHIP32" -iquote "$WINE_INC"

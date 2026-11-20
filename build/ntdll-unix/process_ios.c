@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Russell Barton: code taken from https://github.com/willfaust/Madeira (pull request #615, commit 6cfcc828: DEP options
+ * only for a WoW64 caller) under LGPL-2.1-or-later for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 125hz and Ash Hopkins: code taken from https://github.com/willfaust/Madeira (pull requests #240, #461 and #549)
@@ -79,6 +81,7 @@
 #include "unix_private.h"
 #include "ios_wow.h"
 #include "ios_spawn_swap.h"   /* Modified by BCD (2026-10-24): env.MADEIRA_SPAWN_SWAP, below */
+#include "ios_cef_images.h"   /* madeira-bcd: env.MADEIRA_CEF_POOL_IMAGES (cef_one_kind, below) */
 #include "../bcd_epic_mask.h"   /* Modified by BCD (2026-10-22): Epic's sign-in arguments are masked in the command line printed below */
 #include "wine/condrv.h"
 #include "wine/server.h"
@@ -476,13 +479,14 @@ static pthread_mutex_t ios_child_lock = PTHREAD_MUTEX_INITIALIZER;
  * as before. */
 #define IOS_CHILD_PATH 260
 /* gl (round 624, agent D2 S3): the process made a real call into BCD's OpenGL stub table (ios_child_slot_gl_call). */
-static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; int used; void *peb; int exited; double exited_at; int noted; int gl; } ios_child_slots[IOS_CHILD_SLOTS];
+/* reporter / started_reporter (round 668, G2 S3): started as a crash uploader by its command line / started one (see ios_child_cmdline_reporter). */
+static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; int used; void *peb; int exited; double exited_at; int noted; int gl; int reporter; int started_reporter; } ios_child_slots[IOS_CHILD_SLOTS];
 /* madeira-bcd (round 579, BCD Dock: the game died and the session stayed open): the last processes that ended, with the
  * status each ended with. The slots above are released when a child's boot thread returns (milliseconds after a healthy
  * exit), so the status has to live elsewhere: this ring keeps the last IOS_CHILD_ENDED ends (process_exit_wrapper,
  * through ios_child_slot_note_exit). Read by madeira_child_report (BCD Dock's game-end watch, Library.swift). */
 #define IOS_CHILD_ENDED 64
-static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; double ended_at; int status; int gl; } ios_child_ended[IOS_CHILD_ENDED];
+static struct { char name[64]; char path[IOS_CHILD_PATH]; double started; double ended_at; int status; int gl; int reporter; int started_reporter; } ios_child_ended[IOS_CHILD_ENDED];
 static unsigned ios_child_ended_count;   /* ends ever noted; the ring holds the last IOS_CHILD_ENDED */
 /* spawns that found no free slot: processes this table cannot see (madeira_live_user_processes counts them as running) */
 static unsigned ios_child_untracked;
@@ -535,6 +539,51 @@ static int ios_child_is_helper( const char *name )
     return 0;
 }
 
+/* madeira-bcd round 668 (G2 S3; Enshrouded 9DE6YV A0BJFQ WF49CA): a game's crash handler ended it with exit code 42 after it had started
+ * ITSELF again as a crash uploader ("enshrouded.exe --upload-dump <file>"), which ended with 0. The file-name rule above cannot tell the
+ * uploader from the game (the same image), so BCD Dock's game-end watch took the uploader's clean exit for the game's last word and the
+ * session never ended. A child whose ARGUMENTS (never the program path) ask for a crash dump upload or report is a helper, and the
+ * process that started it is marked as one that started a crash reporter. Narrow on purpose: these exact argument words only. */
+static int ios_child_cmdline_reporter( const UNICODE_STRING *cmdline )
+{
+    static const char *const words[] = { "--upload-dump", "--uploaddump", "--crash-report", "--crashreport", "--crash-upload" };
+    char text[512];
+    unsigned i, n = 0, len, start = 0;
+    int quoted = 0;
+
+    if (!cmdline || !cmdline->Buffer) return 0;
+    len = cmdline->Length / sizeof(WCHAR);
+    /* skip the program token: a quoted path, or up to the first space */
+    if (len && cmdline->Buffer[0] == '"')
+    {
+        start = 1;
+        while (start < len && cmdline->Buffer[start] != '"') start++;
+        start++;
+    }
+    else
+        while (start < len && cmdline->Buffer[start] != ' ') start++;
+    for (i = start; i < len && n < sizeof(text) - 1; i++)
+    {
+        WCHAR c = cmdline->Buffer[i];
+        if (c == '"') { quoted = !quoted; continue; }
+        text[n++] = (c >= 'A' && c <= 'Z') ? (char)(c + 32) : (c >= 32 && c < 127) ? (char)c : '?';
+    }
+    text[n] = 0;
+    (void)quoted;
+    for (i = 0; i < ARRAY_SIZE(words); i++) if (strstr( text, words[i] )) return 1;
+    return 0;
+}
+
+static int ios_child_slot_helper( unsigned i )
+{
+    return ios_child_is_helper( ios_child_slots[i].name ) || ios_child_slots[i].reporter;
+}
+
+static int ios_child_ended_helper( unsigned at )
+{
+    return ios_child_is_helper( ios_child_ended[at].name ) || ios_child_ended[at].reporter;
+}
+
 /* The image path as the process was spawned (a Windows path), printable ASCII only, cut to IOS_CHILD_PATH - 1. Never logged:
  * BCD Dock's game-end watch reads it to tell where a program lives (Library.swift). */
 static void ios_child_path_text( char *out, const UNICODE_STRING *image )
@@ -549,11 +598,13 @@ static void ios_child_path_text( char *out, const UNICODE_STRING *image )
     out[n] = 0;
 }
 
-static int ios_child_slot_take( const UNICODE_STRING *image )
+static int ios_child_slot_take( const UNICODE_STRING *image, const UNICODE_STRING *cmdline )
 {
     char name[64];
     unsigned i, n = 0, start = 0, len = image->Length / sizeof(WCHAR);
-    int slot = -1;
+    int slot = -1, reporter = ios_child_cmdline_reporter( cmdline );
+    extern void *ios_jit_current_peb( void );   /* the PEB ios_child_slot_bind_peb keys the slots by */
+    void *parent = ios_jit_current_peb();
 
     for (i = 0; i < len; i++) if (image->Buffer[i] == '\\' || image->Buffer[i] == '/') start = i + 1;
     for (i = start; i < len && n < sizeof(name) - 1; i++)
@@ -571,12 +622,17 @@ static int ios_child_slot_take( const UNICODE_STRING *image )
         ios_child_slots[i].started = ios_child_now();
         ios_child_slots[i].noted = 0;
         ios_child_slots[i].gl = 0;
+        ios_child_slots[i].reporter = reporter;
+        ios_child_slots[i].started_reporter = 0;
         memcpy( ios_child_slots[i].name, name, n + 1 );
         ios_child_path_text( ios_child_slots[i].path, image );
         slot = i;
         break;
     }
     if (slot < 0) ios_child_untracked++;
+    if (reporter && parent)   /* round 668: the process that started the uploader is the one that crashed */
+        for (i = 0; i < IOS_CHILD_SLOTS; i++)
+            if (ios_child_slots[i].used && ios_child_slots[i].peb == parent) { ios_child_slots[i].started_reporter = 1; break; }
     pthread_mutex_unlock( &ios_child_lock );
     return slot;
 }
@@ -690,6 +746,8 @@ int ios_child_slot_note_exit( void *peb, int status )
             ios_child_ended[at].ended_at = now;
             ios_child_ended[at].status = status;
             ios_child_ended[at].gl = ios_child_slots[i].gl;
+            ios_child_ended[at].reporter = ios_child_slots[i].reporter;
+            ios_child_ended[at].started_reporter = ios_child_slots[i].started_reporter;
             ios_child_slots[i].noted = 1;
             noted = 1;
             break;
@@ -711,7 +769,7 @@ int madeira_live_game_children( char *buf, int len, double max_age )
     pthread_mutex_lock( &ios_child_lock );
     for (i = 0; i < IOS_CHILD_SLOTS; i++)
     {
-        if (!ios_child_slots[i].used || ios_child_slot_gone( i, now ) || ios_child_is_helper( ios_child_slots[i].name )) continue;
+        if (!ios_child_slots[i].used || ios_child_slot_gone( i, now ) || ios_child_slot_helper( i )) continue;
         if (max_age >= 0 && now - ios_child_slots[i].started > max_age) continue;
         count++;
         if (buf && len - used > 1)
@@ -749,7 +807,7 @@ int madeira_live_user_processes( char *buf, int len )
     for (i = 0; i < IOS_CHILD_SLOTS; i++)
     {
         if (!ios_child_slots[i].used || ios_child_slot_gone( i, now )) continue;
-        if (ios_child_is_helper( ios_child_slots[i].name ) || ios_child_is_system( ios_child_slots[i].name )) continue;
+        if (ios_child_slot_helper( i ) || ios_child_is_system( ios_child_slots[i].name )) continue;
         count++;
         if (buf && len - used > 1)
             used += snprintf( buf + used, len - used, "%s%s", used ? " " : "", ios_child_slots[i].name );
@@ -772,7 +830,8 @@ int madeira_live_user_processes( char *buf, int len )
  *   E <helper> <status in hex> <seconds since the end> <seconds it lived> <path>   ended (the last IOS_CHILD_ENDED ends)
  *   U <count>                                                            spawns this table could not track
  *   T                                                                    the text was cut: the snapshot is incomplete
- * <helper> is 1 for a crash reporter or helper by the file-name rule above; where a program lives is judged by the
+ * <helper> is 1 for a crash reporter or helper by the file-name rule above (round 668: or by its command line); 4 is added for a
+ * process that started a crash uploader (it is the one that crashed: Enshrouded's exit code 42). Where a program lives is judged by the
  * library from its path. Returns the number of process lines. Paths go nowhere else (no log line carries them). */
 int madeira_child_report( char *buf, int len )
 {
@@ -787,7 +846,8 @@ int madeira_child_report( char *buf, int len )
     {
         int room = len - used - 4, n;   /* 4 bytes stay free for the cut mark */
         if (!ios_child_slots[i].used || ios_child_slots[i].exited) continue;   /* an ended one is in the ring */
-        n = room > 0 ? snprintf( buf + used, room, "R\t%d\t%.1f\t%s\n", ios_child_is_helper( ios_child_slots[i].name ),
+        n = room > 0 ? snprintf( buf + used, room, "R\t%d\t%.1f\t%s\n",
+                                 ios_child_slot_helper( i ) | (ios_child_slots[i].started_reporter ? 4 : 0),
                                  now - ios_child_slots[i].started, ios_child_slots[i].path ) : -1;
         if (n < 0 || n >= room) { cut = 1; break; }
         used += n; lines++;
@@ -797,7 +857,8 @@ int madeira_child_report( char *buf, int len )
     {
         int room = len - used - 4, n;
         unsigned at = i % IOS_CHILD_ENDED;
-        n = room > 0 ? snprintf( buf + used, room, "E\t%d\t%x\t%.1f\t%.1f\t%s\n", ios_child_is_helper( ios_child_ended[at].name ),
+        n = room > 0 ? snprintf( buf + used, room, "E\t%d\t%x\t%.1f\t%.1f\t%s\n",
+                                 ios_child_ended_helper( at ) | (ios_child_ended[at].started_reporter ? 4 : 0),
                                  (unsigned)ios_child_ended[at].status, now - ios_child_ended[at].ended_at,
                                  ios_child_ended[at].ended_at - ios_child_ended[at].started, ios_child_ended[at].path ) : -1;
         if (n < 0 || n >= room) { cut = 1; break; }
@@ -838,7 +899,7 @@ unsigned int madeira_child_ends_since( unsigned int after, char *buf, int len )
         int room = len - used, n;
         n = snprintf( buf + used, room, "%u\t%x\t%.1f\t%d\t%d\t%s\n", i, (unsigned int)ios_child_ended[at].status,
                       ios_child_ended[at].ended_at - ios_child_ended[at].started, ios_child_ended[at].gl ? 1 : 0,
-                      ios_child_is_helper( ios_child_ended[at].name ), ios_child_ended[at].path );
+                      ios_child_ended_helper( at ), ios_child_ended[at].path );
         if (n < 0 || n >= room) { buf[used] = 0; next = i; break; }   /* no room: this end and the rest next time */
         used += n;
     }
@@ -983,7 +1044,7 @@ static NTSTATUS spawn_process( const RTL_USER_PROCESS_PARAMETERS *params, int so
     args->argv = argv;
     args->argc = argc;
     args->pe_info = *pe_info;
-    args->slot = ios_child_slot_take( &params->ImagePathName );
+    args->slot = ios_child_slot_take( &params->ImagePathName, &params->CommandLine );
 
     if (winedebug) putenv( winedebug );
 
@@ -1526,6 +1587,31 @@ static int ea_cef_kind( const WCHAR *image, int image_len, const WCHAR *cl, int 
     if (!browser && !ios_image_name_is( image, image_len, "eacefsubprocess.exe" )) return EA_NOT_CEF;
     if (sc_switch_end( cl, cl_len, "--type=" ) >= 0) return EA_CHILD;
     return browser ? EA_BROWSER : EA_NOT_CEF;
+}
+
+/* madeira-bcd: a program's own Chromium (env.MADEIRA_CEF_POOL_IMAGES = <browser.exe>[,<helper.exe>...], ios_cef_images.h; set in the game's own file
+ * with env.MADEIRA_SC_PA_POOLS = 2).
+ *
+ * X-Plane 12 (build 670, send log MX3R0X): X-Plane.exe is Chromium Embedded's BROWSER process (libcef.dll and chrome_elf.dll in it, the browser's
+ * thread "CrBrowserMain" is its main thread) and starts cefclient.exe --type=gpu-process (and would start renderers and utility processes). It is the
+ * EA app's case (the kind function above): every Chromium process of this generation needs four 16 GB PartitionAlloc pools, the band has four slots
+ * (virtual_ios.c, "the EA app's Chromium"), so the browser takes them all and runs alone:
+ *   - the browser (the list's first program, started without --type=) gets Social Club's rewrite (sc_browser_cmdline): --single-process,
+ *     PartitionAllocBackupRefPtr off, V8 --jitless unless MADEIRA_JITLESS=0, --no-proxy-server unless it names a proxy, and env.MADEIRA_CEF_FLAGS
+ *     appended verbatim;
+ *   - a --type= child of any program of the list is refused: there is no slot for its pools.
+ * Whether this Chromium takes a switch from the process's command line is not known (cef_settings_t.command_line_args_disabled would drop them, as
+ * for upc.exe); the first start says: no "cefclient.exe --type=" start follows the "[cef-one] ... browser" line when it does, and the threads
+ * Chrome_InProcGpuThread and Chrome_InProcRendererThread appear ([thr-name]). A listed program with --type= is refused, a helper without it is left. */
+enum { CEF_ONE_NOT = 0, CEF_ONE_BROWSER = 1, CEF_ONE_CHILD = 2 };
+
+static int cef_one_kind( const char *list, const WCHAR *image, int image_len, const WCHAR *cl, int cl_len )
+{
+    int kind = (list && image_len > 0) ? ios_cef_listed_kind( list, image, (size_t)image_len ) : IOS_CEF_NOT;
+
+    if (kind == IOS_CEF_NOT) return CEF_ONE_NOT;
+    if (sc_switch_end( cl, cl_len, "--type=" ) >= 0) return CEF_ONE_CHILD;
+    return kind == IOS_CEF_BROWSER ? CEF_ONE_BROWSER : CEF_ONE_NOT;
 }
 
 /* madeira-bcd: env.MADEIRA_CHILD_ARGS = "<exe name> <arguments>" appends the
@@ -2782,6 +2868,72 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
                     dprintf( 2, "[ea-cef] EADesktop.exe browser: command line NOT rewritten "
                                 "(no memory) -- it runs multi-process\n" );
                 }
+            }
+        }
+    }
+
+    /* madeira-bcd: a program's own Chromium (X-Plane 12) -- see cef_one_kind. Nothing below is read unless env.MADEIRA_CEF_POOL_IMAGES is set. */
+    {
+        const char *list = getenv( "MADEIRA_CEF_POOL_IMAGES" );
+        const char *names[IOS_CEF_IMAGES_MAX];
+        size_t name_len[IOS_CEF_IMAGES_MAX];
+        int kind = CEF_ONE_NOT;
+
+        if (list && list[0] && ios_cef_list_parse( list, names, name_len ) <= 0)
+        {
+            static int bad_said;
+            if (!bad_said++)
+                dprintf( 2, "[cef-one] env.MADEIRA_CEF_POOL_IMAGES is not a list of 1 to %d program names (letters, digits, . _ - and .exe at the "
+                            "end, separated by commas): no program is taken from it\n", IOS_CEF_IMAGES_MAX );
+            list = NULL;
+        }
+        if (list && list[0])
+            kind = cef_one_kind( list, params->ImagePathName.Buffer, params->ImagePathName.Length / sizeof(WCHAR),
+                                 params->CommandLine.Buffer, params->CommandLine.Length / sizeof(WCHAR) );
+        if (kind == CEF_ONE_CHILD)
+        {
+            dprintf( 2, "[cef-one] REFUSING a --type= child of the Chromium of %s (%s): its browser runs --single-process, one Chromium process "
+                        "is all the address space holds (a start of this program after the \"browser\" line means the browser's command line "
+                        "did not take --single-process; env.MADEIRA_CEF_POOL_IMAGES unset allows it)\n", list, debugstr_us( &params->ImagePathName ) );
+            return STATUS_ACCESS_DENIED;
+        }
+        if (kind == CEF_ONE_BROWSER)
+        {
+            const char *jl = getenv( "MADEIRA_JITLESS" );
+            const char *extra = getenv( "MADEIRA_CEF_FLAGS" );
+            int cl_len = params->CommandLine.Length / sizeof(WCHAR), how = 0, o = -1;
+            int cap = cl_len + 160 + (extra ? (int)strlen( extra ) : 0);
+            WCHAR *nbuf = malloc( cap * sizeof(WCHAR) );   /* leaks once per launch, as above */
+
+            if (nbuf)
+                o = sc_browser_cmdline( params->CommandLine.Buffer, cl_len, !(jl && jl[0] == '0'), extra, nbuf, cap, &how );
+            if (o >= 0)
+            {
+                char tail[136];
+
+                params->CommandLine.Buffer = nbuf;
+                params->CommandLine.Length = o * sizeof(WCHAR);
+                params->CommandLine.MaximumLength = params->CommandLine.Length + sizeof(WCHAR);
+                ios_cmdline_tail( nbuf, o, tail );
+                dprintf( 2, "[cef-one] %s browser (env.MADEIRA_CEF_POOL_IMAGES=%s): %s; BackupRefPtr off (%s); V8 %s; %s; "
+                            "MADEIRA_CEF_FLAGS %s\n", debugstr_us( &params->ImagePathName ), list,
+                         (how & SC_SINGLE_ADDED) ? "--single-process added" : "already --single-process",
+                         (how & SC_BRP_SPLICED) ? "spliced into its --disable-features list"
+                                                : "new --disable-features switch",
+                         (how & SC_JITLESS_ADDED) ? "--jitless (MADEIRA_JITLESS=0 turns it off)"
+                         : (how & SC_JITLESS_MERGED) ? "--jitless put first in MADEIRA_CEF_FLAGS' --js-flags "
+                                                       "(Chromium keeps only the last one)"
+                         : (how & SC_OWN_JS_FLAGS) ? "flags left as the program set them"
+                                                   : "JIT (MADEIRA_JITLESS=0)",
+                         (how & SC_NOPROXY_ADDED) ? "--no-proxy-server added" : "its own proxy switch kept",
+                         (how & SC_EXTRA_ADDED) ? "appended" : "unset" );
+                dprintf( 2, "[cef-one] cmdline-tail: ...%s\n", tail );
+            }
+            else
+            {
+                free( nbuf );
+                dprintf( 2, "[cef-one] %s browser: command line NOT rewritten (no memory) -- it runs multi-process\n",
+                         debugstr_us( &params->ImagePathName ) );
             }
         }
     }
@@ -5390,7 +5542,11 @@ NTSTATUS WINAPI NtSetInformationProcess( HANDLE handle, PROCESSINFOCLASS class, 
         break;
 
     case ProcessExecuteFlags:
-        if ((is_win64 && !is_wow64()) || size != sizeof(ULONG)) return STATUS_INVALID_PARAMETER;
+        /* dep-caller (upstream Madeira pull request #615, Russell Barton, 6cfcc828): only a WoW64 process has DEP options, as on
+         * Windows. is_wow64() answers for the session once any 32-bit pseudo-process has booted, so it would let a 64-bit caller
+         * through, and virtual_set_force_exec, finding no guest window for it, would re-protect every view of the session (Far Cry 4
+         * loading bink2w64.dll, which lacks NX_COMPAT, beside Ubisoft Connect's 32-bit processes). The calling thread's own TEB decides. */
+        if ((is_win64 && !NtCurrentTeb()->WowTebOffset) || size != sizeof(ULONG)) return STATUS_INVALID_PARAMETER;
         if (execute_flags & MEM_EXECUTE_OPTION_PERMANENT) return STATUS_ACCESS_DENIED;
         else
         {

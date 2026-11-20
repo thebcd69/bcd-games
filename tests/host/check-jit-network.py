@@ -156,5 +156,20 @@ with tempfile.TemporaryDirectory() as tmp:
                 "utun5 172.19.0.1 (a VPN carrying all traffic) and en0 are not")
         srv.close()
 
+# Round 668 (A1 S7; PE0FAY): BCD Dock does not count the network as down while the shortcut's "start cellular" holds cellular data off.
+_jit = (Path(__file__).resolve().parents[2] / 'app/Madeira/JITNetwork.swift').read_text()
+_dock = (Path(__file__).resolve().parents[2] / 'app/Madeira/MadeiraDock.swift').read_text()
+import re as _re
+_k1 = _re.search(r'static let pendingKey = "([^"]+)"', _jit)
+_k2 = _re.search(r'static let jitShortcutPendingKey = "([^"]+)"', _dock)
+_ok = bool(_k1 and _k2 and _k1.group(1) == _k2.group(1))
+print(('PASS' if _ok else 'FAIL') + ': BCD Dock reads the same owed-"done" key the shortcut writes')
+failures += 0 if _ok else 1
+_cfg = _dock[_dock.index('    static func configure(appID: Int) {'):][:1500]
+_ok = ('let held = rawDown && jitCellularHeldOff' in _cfg and 'let offline = enabled && down' in _cfg
+       and 'cellular held off by the JIT shortcut: not counted' in _cfg and 'base = cellular ? "done cellular" : "done"' in _jit)
+print(('PASS' if _ok else 'FAIL') + ': a "down" read while "done cellular" is owed is not counted, and the log line says so')
+failures += 0 if _ok else 1
+
 print('\n%s' % ('ALL PASS' if failures == 0 else '%d FAILURE(S)' % failures))
 sys.exit(0 if failures == 0 else 1)

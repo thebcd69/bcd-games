@@ -56,8 +56,9 @@ check('[x86_obj] @RBX-0x30..-8 follows the @RBX+0..+0x30 row, only for RBX >= 0x
 note = virt[virt.index('static void ios_bigres_note( void *base, size_t size )\n{'):]
 note = note[:note.index('\n}\n') + 3]
 check('every big reservation records the PEB that made it, and a reused slot starts its counts at zero',
-      'static struct { uint64_t base, size, committed; unsigned commits; void *owner; } ios_bigres_tab[IOS_BIGRES_MAX];' in virt
-      and '.owner = ios_jit_current_peb();' in note and '.committed = 0;' in note and '.commits = 0;' in note)
+      'static struct { uint64_t base, size, committed; unsigned commits; void *owner; uint64_t hw; } ios_bigres_tab[IOS_BIGRES_MAX];' in virt
+      and '.owner = ios_jit_current_peb();' in note and '.committed = 0;' in note and '.commits = 0;' in note
+      and '.hw = 0;' in note)   # round 2026-11-17 (K2): the highest commit end of a range, for [bigres-hw]
 check('the owner report runs at a complete "NO GAP FITS" walk and at the two refused jumbo reserves, nowhere else',
       virt.count('ios_va_owners_report( "') == 3 and 'if (!truncated) ios_va_owners_report( "no gap fits" );' in virt
       and 'ios_bigres_report( "jumbo reserve failed" ); ios_va_owners_report( "jumbo reserve failed" );' in virt
@@ -71,7 +72,7 @@ harness = r'''
 #include <string.h>
 #include <unistd.h>
 #define IOS_BIGRES_MAX 48
-static struct { uint64_t base, size, committed; unsigned commits; void *owner; } ios_bigres_tab[IOS_BIGRES_MAX];
+static struct { uint64_t base, size, committed; unsigned commits; void *owner; uint64_t hw; } ios_bigres_tab[IOS_BIGRES_MAX];
 static unsigned ios_bigres_cnt;
 static void *cur_peb;
 static void *ios_jit_current_peb(void) { return cur_peb; }

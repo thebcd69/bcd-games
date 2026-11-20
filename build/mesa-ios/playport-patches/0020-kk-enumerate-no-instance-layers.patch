@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sun, 11 Oct 2026 15:30:00 +0200
+Subject: [PATCH] kk: enumerate no instance layers
+
+A program that loads the driver itself, with no Vulkan loader, asks it
+for the instance layers too; Mesa's Zink does, and gives up when
+vkGetInstanceProcAddr has no vkEnumerateInstanceLayerProperties. The
+loader answers that call itself, so KosmicKrisp never had it. On iOS,
+where Zink dlopens KosmicKrisp's framework (0022), it now answers with
+no layers.
+
+Class: ios-port
+Evidence: docs/evidence/2026-10-11-opengl-zink-route.md
+Offered-upstream: no
+---
+ src/kosmickrisp/vulkan/kk_instance.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/kosmickrisp/vulkan/kk_instance.c b/src/kosmickrisp/vulkan/kk_instance.c
+index 7100d5d..bab4e3f 100644
+--- a/src/kosmickrisp/vulkan/kk_instance.c
++++ b/src/kosmickrisp/vulkan/kk_instance.c
+@@ -243,6 +243,17 @@ vk_icdGetInstanceProcAddr(VkInstance instance, const char *pName)
+    return kk_GetInstanceProcAddr(instance, pName);
+ }
+ 
++/* With no Vulkan loader the program asks the driver itself for the instance
++ * layers (Mesa's Zink does before it creates its instance), and the driver
++ * has none. Through a loader the loader answers and this is not called. */
++VKAPI_ATTR VkResult VKAPI_CALL
++kk_EnumerateInstanceLayerProperties(uint32_t *pPropertyCount,
++                                    VkLayerProperties *pProperties)
++{
++   *pPropertyCount = 0;
++   return VK_SUCCESS;
++}
++
+ /* The two entry points a program that loads the driver itself, with no
+  * Vulkan loader, looks up by name. Wine's win32u does that on iOS (dlsym of
+  * vkGetInstanceProcAddr and vkGetDeviceProcAddr in the library it dlopens),

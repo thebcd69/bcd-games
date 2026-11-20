@@ -41,12 +41,24 @@ core = (R / "app/Madeira/AutoTuneCore.swift").read_text()
 sc = core[core.index("final class AutoTuneLogScanner {"):core.index("    private func markers(_ l: UnsafeRawBufferPointer) {")]
 
 check("the filter sits in front of the unchanged search: a signal is counted only when hasAll finds every needle",
-      "for i in needles.indices where (!filtered || pairsPresent(i)) && Self.hasAll(l, needles[i]) {" in sc
+      "if pairsPresent(i) && Self.hasAll(l, needles[i]) { matched(i, l) }" in sc
+      and "for i in needles.indices where Self.hasAll(l, needles[i]) { matched(i, l) }" in sc
       and "for n in list where find(l, n) == nil { return false }" in sc and "return !list.isEmpty" in sc)
 check("...the line's pairs are noted for the same bytes the search reads (after the 16384-byte cut), for every line",
       sc.index("let l = whole.count > Self.maxLine ? UnsafeRawBufferPointer(rebasing: whole[0..<Self.maxLine]) : whole")
-      < sc.index("if filtered { notePairs(l) }") < sc.index("for i in needles.indices where (!filtered || pairsPresent(i))")
+      < sc.index("if filtered {\n            notePairs(l)") < sc.index("if pairsPresent(i) && Self.hasAll(l, needles[i]) { matched(i, l) }")
       and "for k in 0..<64 { w[k] = 0 }" in sc)
+# Round 668 (G1 S7): the key-pair index. Each signal is filed under ONE of its own pairs (the least crowded bucket), a signal without
+# pairs (needles under two bytes) is asked for every line; a line asks the signals filed under the pairs it holds, once each, in
+# ascending order (the order the unfiltered loop counts them in), and each still has to pass pairsPresent and hasAll.
+check("...the key-pair index: one of the signal's own pairs, the pairless ones always, each candidate once, in signal order",
+      "if a == b { always.append(Int32(i)); continue }" in sc
+      and "for k in a..<b where buckets[Int(bits[k])].count < buckets[best].count { best = Int(bits[k]) }" in sc
+      and "buckets[best].append(Int32(i))" in sc
+      and "if stamp[sig] != lineCount { stamp[sig] = lineCount; cand[nc] = Int32(sig); nc += 1 }" in sc
+      and "for sig in alwaysItems where stamp[Int(sig)] != lineCount { stamp[Int(sig)] = lineCount; cand[nc] = sig; nc += 1 }" in sc
+      and "while b >= 0 && cand[b] > v { cand[b + 1] = cand[b]; b -= 1 }" in sc
+      and "keyStart.deallocate(); keyItems.deallocate(); stamp.deallocate(); cand.deallocate()" in sc)
 check("...a signal's pairs come from its own needles: neighbouring bytes n[at], n[at + 1], at most maxPairs (8) a needle, spread over it",
       "bits.append(Self.pairHash(n[at], n[at + 1]))" in sc and "static let maxPairs = 8" in sc
       and "let pairs = n.count - 1, take = min(pairs, Self.maxPairs)" in sc

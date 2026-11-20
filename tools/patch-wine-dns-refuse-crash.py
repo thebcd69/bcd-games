@@ -14,7 +14,7 @@ With env.MADEIRA_DNS_REFUSE_CRASH = 1 the DNS wrapper (madeira_dns_getaddrinfo, 
 answers an exact, case-insensitive "crash.steampowered.com" with EAI_NONAME (WSAHOST_NOT_FOUND to the program) before any lookup, and logs
 `[dns] madeira-bcd refused #N "crash.steampowered.com" = EAI_NONAME at once (MADEIRA_DNS_REFUSE_CRASH)`; wininet then fails with 12007 at once instead of
 12029 after 75 s. Every other name, and every lookup with the key unset or 0, is exactly what it was. The default below (DEFAULT_REFUSE) is the policy
-switch: 0 = opt-in (this build of the patch); 1 = refuse unless MADEIRA_DNS_REFUSE_CRASH = 0 (owner question f13: a default for every Wine process).
+switch: 0 = opt-in (builds 652-673); 1 = refuse unless MADEIRA_DNS_REFUSE_CRASH = 0 (owner question f13, decided 2026-11-19: on from build 674).
 The ws2_32 unix library is built from the pinned tree, which already carries the wrapper; this script only adds the refusal to it. Idempotent; fails by
 name when the wrapper moved.
 Usage: patch-wine-dns-refuse-crash.py [WINE-DIR | path/to/wine/dlls/ws2_32/unixlib.c]
@@ -24,7 +24,9 @@ import sys
 
 MARKER = "madeira-bcd: dns refuse crash"
 FILE = "dlls/ws2_32/unixlib.c"
-DEFAULT_REFUSE = 0
+# On by default from build 674 (owner 2026-11-19, after his own test on build 673: the name refused at once, Steam logged on and the game
+# started; one of crash.steampowered.com's two addresses had stopped answering on 443 and held every Dock start on 'connecting').
+DEFAULT_REFUSE = 1
 
 FUNC_ANCHOR = ("static int madeira_dns_getaddrinfo( const char *node, const char *service, const struct addrinfo *hints,\n"
                "                                    struct addrinfo **res )\n")

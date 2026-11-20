@@ -195,7 +195,14 @@ enum BCDEpicContent {
             do { data = try await fetchFile(url) } catch is CancellationError { throw CancellationError() } catch { failed += 1; continue }
             let hash = BCDHasher.hex(.sha1, of: data)
             if let expected = build.manifestHash, expected != hash { mismatched += 1; continue }
-            let manifest = try BCDEpicManifest.parse(data)
+            let manifest: BCDEpicManifest
+            do { manifest = try BCDEpicManifest.parse(data) } catch {
+                // Round 668 (merge N008; Bus Simulator 21 0C8N69): which form the file was when neither reader took it (the first eight bytes
+                // of a manifest are not personal data).
+                BCDEpicLog.write("[epic-cdn] manifest not read: reason=\(BCDEpicLog.reason(error)) bytes=\(data.count) "
+                                 + "head=\(data.prefix(8).map { String(format: "%02x", $0) }.joined())")
+                throw error
+            }
             let rest = build.bases.enumerated().filter { $0.offset != index }.map(\.element)
             BCDEpicLog.write("[epic-cdn] manifest from cdn \(index + 1) of \(build.manifestURLs.count) failed=\(failed) mismatched=\(mismatched) "
                              + "level=\(manifest.featureLevel) files=\(manifest.files.count) chunks=\(manifest.chunks.count) bytes=\(data.count) "

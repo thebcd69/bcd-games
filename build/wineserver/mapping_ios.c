@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Paulo Eduardo Correa: code taken from https://github.com/thebcd69/bcd-games (pull request #51 by pauloec)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #462)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
@@ -1229,9 +1231,8 @@ static struct mapping *create_mapping( struct object *root, const struct unicode
         {
             unsigned int err;
             /* Madeira: an x64 LuaJIT that needs memory below 2 GB is mapped from
-             * the bundled GC64 build instead (luajit_compat.c). madeira-bcd: only
-             * in a session whose game has gl-backend on; otherwise it answers -1
-             * at once and nothing below runs. */
+             * the bundled GC64 build in an OpenGL or C-style Lua comments
+             * session. See luajit_compat.c. */
             int compat_fd = madeira_luajit_compat_fd( unix_fd, st.st_size );
             if (compat_fd != -1)
             {

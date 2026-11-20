@@ -1,0 +1,331 @@
+[10:12:44.757] [INFO] Checking entitlements...
+[10:12:44.757] [INFO] [build] v0.1.665 (665)
+[10:12:44.758] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 26.6.1 (Build 23G83) ram=11616MB available=6122MB cores=6
+[10:12:44.758] [INFO] [device] address-map=[0x10201c000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[10:12:44.758] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=1 wildcard=0 lc=1
+[10:12:44.767] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-05:00 free-disk=376GB stikdebug-url=1
+[10:12:44.770] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[10:14:10.832] [INFO] Requesting JIT with StikDebug...
+[10:14:10.848] [INFO] Opening StikDebug to enable JIT...
+[10:14:29.264] [INFO] [bcd-ui] play local
+[10:14:29.280] [INFO] [bcd] library launch Bully.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[10:14:29.302] [INFO] Running full Wine sequence...
+[10:14:29.302] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10201c000,0xfc0000000) 63GB available=6108MB low-power=0 thermal=nominal
+[10:14:29.303] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[10:14:29.380] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[10:14:29.380] [INFO] Allocating 896MB JIT pool via debugger...
+[10:14:29.381] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[10:14:29.381] [INFO] [jit-debugger] attached=1 at the pool request
+[10:14:29.381] [INFO] [jit-age] attach age=12s source=enable-jit method=stikdebug thermal=0
+[10:14:29.382] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[10:14:31.930] [INFO] RX pool at 0x300000000
+[10:14:31.978] [OK] JIT pool ready (debugger still attached).
+[10:14:31.980] [INFO] BRK suspension lasted 2.60s
+[10:14:31.981] [INFO] Detaching debugger...
+[10:14:31.985] [OK] Debugger detached.
+[10:14:31.988] [OK] [early-detach] rev=ml524 took 7 ms
+[10:14:31.990] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.656s rev=ml526
+[10:14:32.037] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/703e894e34e855ef.cfg (read)
+[WineProc] PE probe: machine=0x14c (i386: WoW64)
+[WineProc] Target exe: C:\Bully\Bully Scholarship Edition With Fixes Only\Bully.exe (bundle=aarch64-windows)
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[wow-window] session armed: a 32-bit process is expected
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] placeholder reserved B=0x400000000..0x500000000 (guard owned)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[wow-window] main-process window reserved (i386 main image)
+[valloc] ml959 # base=0x1097d0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x47ffe0000 size=0x10000 type=0x2000 prot=0x1 tid=0000 | req_hint=0x47ffe0000 zero_bits=0x0 limit=0x0
+[valloc] ml959 LIMIT-VIOLATED base=0x47fde0000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x7fffffff limit=0x7fffffff  <== RESULT EXCEEDS THE REQUESTED LIMIT
+[valloc] ml959 # base=0x47ffc0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x47ffc0000 zero_bits=0x0 limit=0x0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x47ffd0000
+[fdtrace] pipes tid=0000 peb=0x47ffd0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[10:14:32.453] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5191 MB + phys_footprint=952 MB = 6144 MB (hw.memsize says 11616 MB)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x1256f0000+0x110000 (ntdll.dll) → pool 0x300004000 used=0x11c000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+[jit-pool] image 0x125680000+0x70000 (wow64.dll) → pool 0x30011c000 used=0x190000/0x38000000 tramp+0x4000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x30011c000)
+[file-fail] ml665 #1 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\windows\system32\wow64cpu.dll
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x1252b0000+0x3c4000 (libwow64fex.dll) → pool 0x300192000 used=0x55e000/0x38000000 tramp+0x4000
+[copy-verify] libwow64fex.dll: OK, 121 .text pages executable (copy @0x300192000)
+ml957: libwow64fex.dll backing 0x1252b0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x125190000+0x120000 (ucrtbase.dll) → pool 0x30055c000 used=0x680000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x30055c000)
+[jit-pool] image 0x1250f0000+0xa0000 (KERNEL32.dll) → pool 0x300680000 used=0x728000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300680000)
+[jit-pool] image 0x124f80000+0x170000 (kernelbase.dll) → pool 0x300728000 used=0x8a8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300728000)
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[window] 0x12e074000..0xb30000000 regions=100001 occupied=7842 MB of 40991 MB free=33149 MB maxhole=31974 MB@0x36196c000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=969 MB (peak 969) internal=969 MB compressed=0 MB external=121 MB reusable=11 MB (cycle=1)
+[jit-pool] image 0x124f00000+0x80000 (wow64win.dll) → pool 0x3008a8000 used=0x92c000/0x38000000 tramp+0x4000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x3008a8000)
+[jit-pool] image 0x124e70000+0x90000 (win32u.dll) → pool 0x30092c000 used=0x9c0000/0x38000000 tramp+0x4000
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x30092c000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=bully.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=0024 #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x47ffd0000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x300519ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x1252b0000) -> 64-bit table (0x112c6c708)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Bully.exe (bully.exe-f7a84bac5f143c35): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903096a83d3d6c4): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+E 24 [dep-off] DEP disabled for this process: a committed readable page becomes executable when the guest first branches into it
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ce221c): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728ab630ec): 47BC40000
+[nls-getptr] type=11 id=1252 peb=0x47ffd0000
+[nls-getptr] type=11 id=437 peb=0x47ffd0000
+D 24 Load module DDRAW.dll (ddraw.dll-edef63215b3db7e4): 47BBD0000
+D 24 Load module wined3d.dll (wined3d.dll-e522ee6d43336633): 47B900000
+[nls-getptr] type=11 id=20127 peb=0x47ffd0000
+[gdi-shared] session table 0x124220000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[unixlib] opengl32 (GL-absent stub table) (module 0x47b7f0000) -> wow64 table (0x112c74708)
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=2 p0=83 p1=47a0c129d
+[exc-disp] dispatch tid=0024 code=40010006 flags=0 addr=0x47bc52f79 pc=300135be8 nparams=2 p0=2 p1=47a0c10a0
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L".\\modloader\\modupdater.asi" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L".\\modloader\\modloader.asi" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[stale-heal]   3 slot(s) in the copy of 0x1252b0000 (libwow64fex.dll) -> 0x300073294 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000000
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000000 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000040
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000080
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000080 -> 0
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000040 -> 0 hDevice=0x400000c0
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=4000003c vis={10,10,142,48} surface=0x1126b09b0 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x2002a class='WineD3D_OpenGL' text="" rev=ml853
+[win-pos] #2 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1126b09b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x10034 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1126b09b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10034 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x2002a after=0x0 flags=40000018 vis={10,10,142,48} surface=0x1126b09b0 rev=ml505 style=04cf0000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x2002a class='WineD3D_OpenGL' text="WineD3D fake window" rev=ml853
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 03268C88.
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000100
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000140
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000180
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+[bigres] tid=0024 #1 size=0x18010000 (384 MB) type=0x2000 prot=0x4 hint=0x0 peb=0x47ffd0000 total=384 MB
+[xp-names] m124905 "wine-x18-exc"
+[xp] 10:14:33.173 +0.64 dt=323 cpu=526 (thr 377) P=445 E=81 run=536 pgw=-1.0 GHz P=3.22 E=2.55 Minst=7526 IPC=4.59 mJ=1264 pin=111 rdKB=10580 fpMB=1075
+[win-pos] #5 hwnd=0x30030 after=0x0 flags=8000003c vis={0,0,1408,648} surface=0x1126b09b0 rev=ml505 style=84000000 visible=0 parent=0x10024
+[win-name] #5 hwnd=0x30030 class='Gamebryo Application' text="" rev=ml853
+[win-pos] #6 hwnd=0x20034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1126b09b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x20034 class='IME' text="" rev=ml853
+[win-name] #7 hwnd=0x20034 class='IME' text="Default IME" rev=ml853
+info:  [d3d9-caps] ... capped at 256 lines; further distinct queries are not printed
+[winios] game window hwnd=0x30030 presents through Metal; its GDI surface is not drawn
+[xp] 10:14:33.467 +0.93 dt=287 cpu=754 (thr 710) P=548 E=206 run=763 pgw=-1.0 GHz P=2.86 E=2.58 Minst=9723 IPC=4.63 mJ=1280 pin=49 rdKB=1780 fpMB=1246
+[10:14:33.547] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[hwinput] keyboard focus: program (app active)
+[xp] 10:14:33.792 +1.26 dt=332 cpu=649 (thr 632) P=602 E=47 run=668 pgw=-1.0 GHz P=2.76 E=2.43 Minst=10367 IPC=5.85 mJ=1382 pin=62 rdKB=1372 fpMB=1236
+[xp] 10:14:34.093 +1.56 dt=301 cpu=581 (thr 581) P=573 E=9 run=583 pgw=-1.0 GHz P=2.75 E=1.79 Minst=9757 IPC=6.13 mJ=1281 pin=0 rdKB=1508 fpMB=1236
+[xp] 10:14:34.373 +1.84 dt=280 cpu=515 (thr 515) P=507 E=8 run=533 pgw=-1.0 GHz P=2.79 E=1.81 Minst=8650 IPC=6.04 mJ=1196 pin=1 rdKB=1608 fpMB=1237
+[guest-stk] sp+0x280 0x3001a9170 = libwow64fex.dll+0x17170
+[guest-stk] sp+0x288 0x3001a9184 = libwow64fex.dll+0x17184
+[guest-stk] sp+0x488 0x30029aabc = libwow64fex.dll+0x108abc
+[guest-stk] sp+0x4e8 0x30029aa40 = libwow64fex.dll+0x108a40
+[guest-stk] sp+0x608 0x30029aa38 = libwow64fex.dll+0x108a38
+[footprint] rev=ml358 phys=1202 MB (peak 1202) internal=1178 MB compressed=0 MB external=127 MB reusable=11 MB (cycle=2)
+[xp] 10:14:34.624 +2.09 dt=251 cpu=336 (thr 336) P=323 E=13 run=343 pgw=-1.0 GHz P=3.23 E=2.24 Minst=5950 IPC=5.55 mJ=945 pin=0 rdKB=2632 fpMB=1204
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml358 phys=1268 MB (peak 1268) internal=1245 MB compressed=0 MB external=128 MB reusable=10 MB (cycle=3)
+[footprint] rev=ml358 phys=1344 MB (peak 1344) internal=1307 MB compressed=0 MB external=129 MB reusable=10 MB (cycle=4)
+[footprint] rev=ml358 phys=1342 MB (peak 1344) internal=1307 MB compressed=0 MB external=129 MB reusable=10 MB (cycle=5)
+D 24 Load module quartz.dll (quartz.dll-0b037268ac7ff5fb): 479640000
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000200
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000240
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000280
+[stale-heal]   1 slot(s) in the copy of 0x1252b0000 (libwow64fex.dll) -> 0x3006bbea4 for peb=0x47ffd0000 (owner=0x0 mapper=0x47ffd0000)
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 2ECA1228.
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000300
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000340
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003f2 -> 0 hAdapter=0x40000380
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000380 -> 0
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000340 -> 0 hDevice=0x400003c0
+[unixlib] winegstreamer (wma + wg_parser, libav*) (module 0x479350000) -> wow64 table (0x112564998)
+[wg-parser] ml1990 connect refused (asf, compressed_out=1): container not in the allowlist
+0024:fixme:quartz:mpeg_splitter_sink_query_accept Unsupported subtype {<uuid>}.
+0024:fixme:quartz:mpeg_splitter_sink_query_accept Unsupported subtype {<uuid>}.
+[wg-parser] ml1990 connect refused (asf, compressed_out=1): container not in the allowlist (repeat #2)
+[wg-parser] ml1990 connect refused (asf, compressed_out=0): container not in the allowlist
+[vkmt] tid=0024 DestroyDevice hDevice=0x400003c0 -> 0
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000340 -> 0
+[launch-view] dismissed reason=present logs=0
+[file-census] r624 10s: case-sensitive=1 full-path-tries=17701 full-path-hits=16728 component-lookups=4730 shortcut-hits=3509 misses=430 scans=1221 entries-scanned=152089 us-in-lookup=489852 (4% of the window) slowest=0.537 ms ...4-D63D955A8B9A/Documents/wine/dosdevices/c:/windows/syswow64
+[footprint] rev=ml358 phys=1459 MB (peak 1459) internal=1364 MB compressed=0 MB external=130 MB reusable=11 MB (cycle=6)
+D 2C Load module iphlpapi.dll (iphlpapi.dll-af232f72e6efc068): 479130000
+D 2C Load module dnsapi.dll (dnsapi.dll-2ed353fb7e92c7ef): 479100000
+D 2C Load module nsi.dll (nsi.dll-4a95f0fb6cc3fd87): 4790E0000
+D 2C Load module netutils.dll (netutils.dll-775477573121f141): 4790C0000
+[dns] madeira-bcd begin #1 "github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #1 "github.com" = 0 after 23 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+D 2C Load module schannel.dll (schannel.dll-b68bcdedbcbf721e): 4791A0000
+[dns] madeira-bcd begin #2 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #2 "api.github.com" = 0 after 16 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #3 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #3 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #4 "github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #4 "github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #5 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #5 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16dde1c90 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.uikit.eventfetch-thread" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e00dca0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e6109e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[dns] madeira-bcd begin #6 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #6 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[10:14:53.795] [OK] Early detach: game presenting and settled
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2093..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #10 "github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #10 "github.com" = 0 after 1 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[10:14:55.797] [INFO] Detaching debugger...
+[dns] madeira-bcd begin #11 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #11 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #12 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #12 "api.github.com" = 0 after 1 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[rip-profile] ml981 gen=1 threads=1 samples=200 buckets=1 span=0x0 [0x2a0002..0x2a0002] top: 0x2a0000=100%
+[cpu-split] ml1123 gen=1 running samples=1: x64 JIT 0%, ARM64EC images 0%, native 100%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`access+0xc=1
+[dns] madeira-bcd begin #13 "github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #13 "github.com" = 0 after 1 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #14 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #14 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #15 "api.github.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #15 "api.github.com" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=133 peer=YES path=REAL-kernel-completion rev=ml576
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-name] #24 hwnd=0x20038 class='#32770' text="" rev=ml853
+[win-name] #27 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+D 2C Load module uxtheme.dll (uxtheme.dll-4e1489634440c3e9): 479160000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[win-name] #28 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #29 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-name] #30 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #31 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #32 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #34 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #35 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #36 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-name] #38 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[win-name] #49 hwnd=0x1005a class='Button' text="Download and install updates now?13.52 MB" rev=ml853
+[win-pos] #50 hwnd=0x1005c after=0x0 flags=0000000c vis={8,294,352,327} surface=0x0 rev=ml505 style=5001250e visible=0 parent=0x20038
+[win-name] #50 hwnd=0x1005c class='Button' text="Cancel" rev=ml853
+[win-pos] #51 hwnd=0x1005e after=0x0 flags=0000000c vis={8,335,188,350} surface=0x0 rev=ml505 style=50012503 visible=0 parent=0x20038
+[win-name] #51 hwnd=0x1005e class='Button' text="Update all downloaded files." rev=ml853
+[win-pos] #52 hwnd=0x10060 after=0x0 flags=0000080d vis={8,358,24,374} surface=0x0 rev=ml505 style=50000003 visible=0 parent=0x20038
+[win-name] #52 hwnd=0x10060 class='Static' text="" rev=ml853
+[win-pos] #53 hwnd=0x10064 after=0x0 flags=0000000c vis={32,358,341,410} surface=0x0 rev=ml505 style=50010000 visible=0 parent=0x20038
+[win-name] #53 hwnd=0x10064 class='SysLink' text="<a href="https://thirteenag.github.io/wfp">https://thirteenag.github.io/wfp</a>??<a href=":disableupdates">Click here if you want to cancel and do not wish to receive any updates in the future</a> " rev=ml853
+[win-pos] #54 hwnd=0x20038 after=0x0 flags=0000000c vis={524,100,884,547} surface=0x1126b09b0 rev=ml505 style=04ca02c4 visible=0 parent=0x10024
+[win-name] #54 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[win-pos] #55 hwnd=0x20038 after=0x0 flags=00001967 vis={524,100,884,547} surface=0x109c54cc0 rev=ml505 style=14ca02c4 visible=1 parent=0x10024
+[win-name] #55 hwnd=0x20038 class='#32770' text="modupdater" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x47ffd0000
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=33 resident=1533MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.1%) over 215 wakes; device short 0.0 ms in 0 of 430 passes (largest pass 1115 frames); ring 2091..4798 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: elsewhere (app inactive)
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2091..4797 frames; worst late wake 0.0 ms; clamped 0 samples
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[10:15:15.253] [INFO] [session] length=45s partial=1 play=11s frames=40 avg=14.2 worst=4255ms stalls=2/8s peak=1548MB limit=6143MB thermal=nominal lpm=0 api=DirectDraw/32 res=1408x648 cap=60 game=Bully: Scholarship Edition
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 1.07 s of audio in 44.03 s (2.4%) over 23 wakes; device short 0.0 ms in 0 of 46 passes (largest pass 1115 frames); ring 2098..4800 frames; worst late wake 41811.7 ms; clamped 0 samples
+[freeze] alive t+86s beats=2 gaps=1 iter=174 gen=1 threads=35 resident=1533MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e6109e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[hwinput] keyboard focus: program (app active)
+[rip-profile] ml981 gen=2 threads=1 samples=200 buckets=1 span=0x0 [0x2a0002..0x2a0002] top: 0x2a0000=100%
+[cpu-split] ml1123 gen=2 running samples=3: x64 JIT 0%, ARM64EC images 0%, native 100%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`access+0xc=3
+[srv-input] btn msg=0x201 at (1,1) hit win=00030030 thread=0x10eeb4300
+[srv-input] btn msg=0x201 at (1,1) hit win=00030030 thread=0x10eeb4300
+[srv-input] btn msg=0x201 at (1,1) hit win=00030030 thread=0x10eeb4300
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 9.52 s of audio in 10.01 s (95.1%) over 205 wakes; device short 0.0 ms in 0 of 409 passes (largest pass 1115 frames); ring 2092..4798 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=28)
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=29)
+[window] 0x12e074000..0xb30000000 regions=100001 occupied=8073 MB of 40991 MB free=32917 MB maxhole=31977 MB@0x36167c000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=30)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=31)
+[srv-input] btn msg=0x201 at (1,1) hit win=00030030 thread=0x10eeb4300
+[srv-input] btn msg=0x201 at (1,1) hit win=00030030 thread=0x10eeb4300
+[srv-input] btn msg=0x201 at (704,324) hit win=00020038 thread=0x10eeb7900
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=32)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[ios_audio] ml1230 pacing stream=0x10eb24f00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2093..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1422 MB (peak 1469) internal=1379 MB compressed=0 MB external=132 MB reusable=11 MB (cycle=33)
+[10:16:18.485] [INFO] [session] length=109s partial=1 play=11s frames=40 avg=14.2 worst=4255ms stalls=2/8s peak=1548MB limit=6143MB thermal=nominal lpm=0 api=DirectDraw/32 res=1408x648 cap=60 game=Bully: Scholarship Edition
+[10:14:52.616] [thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e6109e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[10:14:57.114] [rip-profile] ml981 gen=1 threads=1 samples=200 buckets=1 span=0x0 [0x2a0002..0x2a0002] top: 0x2a0000=100%
+[10:14:57.114] [cpu-split] ml1123 gen=1 running samples=1: x64 JIT 0%, ARM64EC images 0%, native 100%
+[10:14:57.114] [cpu-split] ml1123 image top (PE address/256):
+[10:14:57.115] [cpu-split] ml1123 native top: libsystem_kernel.dylib`access+0xc=1
+[10:14:59.431] [fdtrace] pipes tid=00b0 peb=0x47ffd0000 master=35 reply=133/593 wait=594/595 rev=ml586
+[10:15:00.037] [fdtrace] SILENT-CLOSE fd=133 was reply_rd owner_tid=00b0 owner_peb=0x47ffd0000 gen=212; rereg request_rd tid=002c peb=0x47ffd0000 rev=ml586
+[10:15:00.042] [fdtrace] SILENT-CLOSE fd=510 was request_wr owner_tid=002c owner_peb=0x47ffd0000 gen=211; rereg request_wr tid=002c peb=0x47ffd0000 rev=ml586
+[10:15:00.044] [fdtrace] SILENT-CLOSE fd=594 was wait_rd owner_tid=00b0 owner_peb=0x47ffd0000 gen=214; rereg wait_rd tid=00b4 peb=0x47ffd0000 rev=ml586
+[10:15:00.044] [fdtrace] SILENT-CLOSE fd=595 was wait_wr owner_tid=00b0 owner_peb=0x47ffd0000 gen=215; rereg wait_wr tid=00b4 peb=0x47ffd0000 rev=ml586
+[10:15:00.045] [fdtrace] pipes tid=00b4 peb=0x47ffd0000 master=35 reply=133/593 wait=594/595 rev=ml586
+[10:15:58.202] [thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e6109e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[10:15:58.209] [thread-sample] ml876 b0 "audio_client_timer" teb=0x403520000 cpu=0% wait pc=libsystem_kernel.dylib`mach_wait_until+0x8 lr=Madeira`ios_timer_loop+0x9e4 sp=0x13aa8f980 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0xd pc=0x30029d84c user-sp=0x13b28f050 user-cand=[ ]
+[10:15:58.210] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e126b30 NATIVE (no FEX state) sp-cand=[ ]
+[10:15:58.210] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e8f2b30 NATIVE (no FEX state) sp-cand=[ ]
+[10:15:58.210] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e356b40 NATIVE (no FEX state) sp-cand=[ ]
+[10:15:58.210] [thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16e97efc0 NATIVE (no FEX state) sp-cand=[ ]
+[10:15:59.465] [thread-sample] ml876 burst done
+[10:16:02.856] [rip-profile] ml981 gen=2 threads=1 samples=200 buckets=1 span=0x0 [0x2a0002..0x2a0002] top: 0x2a0000=100%
+[10:16:02.856] [cpu-split] ml1123 gen=2 running samples=3: x64 JIT 0%, ARM64EC images 0%, native 100%
+[10:16:02.856] [cpu-split] ml1123 image top (PE address/256):
+[10:16:02.856] [cpu-split] ml1123 native top: libsystem_kernel.dylib`access+0xc=3
+[10:16:16.764] [xp] 10:16:16.764 +104.23 dt=324 cpu=23 (thr 23) P=0 E=22 run=39 pgw=-1.0 GHz P=1.02 E=0.94 Minst=36 IPC=1.70 mJ=1 pin=0 rdKB=0 fpMB=1422
+[10:16:17.068] [xp] 10:16:17.068 +104.54 dt=304 cpu=25 (thr 24) P=1 E=24 run=33 pgw=-1.0 GHz P=1.21 E=0.89 Minst=36 IPC=1.64 mJ=2 pin=0 rdKB=0 fpMB=1422
+[10:16:17.344] [xp] 10:16:17.344 +104.81 dt=276 cpu=25 (thr 25) P=1 E=24 run=44 pgw=-1.0 GHz P=2.09 E=1.54 Minst=44 IPC=1.11 mJ=3 pin=0 rdKB=0 fpMB=1422
+[10:16:17.669] [xp] 10:16:17.669 +105.14 dt=325 cpu=16 (thr 16) P=0 E=16 run=26 pgw=-1.0 GHz P=3.71 E=1.69 Minst=32 IPC=1.14 mJ=2 pin=0 rdKB=0 fpMB=1422
+[10:16:17.954] [xp] 10:16:17.954 +105.42 dt=284 cpu=12 (thr 12) P=0 E=12 run=17 pgw=-1.0 GHz P=0.00 E=1.41 Minst=19 IPC=1.15 mJ=1 pin=0 rdKB=0 fpMB=1422
+[10:16:18.212] [xp] 10:16:18.212 +105.68 dt=258 cpu=11 (thr 11) P=0 E=11 run=17 pgw=-1.0 GHz P=0.00 E=1.14 Minst=17 IPC=1.31 mJ=1 pin=0 rdKB=0 fpMB=1422

@@ -39,7 +39,8 @@ extension GameRecommendations {
     /// The recommendation for a game in drive_c: a program, or a Steam game's install folder.
     /// A game Madeira has no list for gets the standard one; a path that names nothing, none.
     static func recommendation(windowsPath: String, steamAppID: Int?) -> GameRecommendation? {
-        if let rec = match(windowsPath: windowsPath, steamAppID: steamAppID, fileExists: driveFileExists) { return rec }
+        if let rec = match(windowsPath: windowsPath, steamAppID: steamAppID, fileExists: driveFileExists,
+                           programsIn: drivePrograms) { return rec }
         let parts = windowsPath.replacingOccurrences(of: "/", with: "\\").split(separator: "\\")
         return parts.count > 1 ? standard : nil
     }
@@ -236,6 +237,56 @@ extension GameRecommendations {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: url.deletingLastPathComponent().path)) ?? []
         return names.contains { $0.lowercased() == name }
     }
+
+    /// madeira-bcd (owner 2026-11-17, round 668 N110): the programs (.exe files) in a library Steam game's install folder
+    /// in drive_c, as C:\ paths, for the rules that name only programs (GameRecommendationList.match). Four folder levels
+    /// deep (Unreal's <Game>\Binaries\Win64\<Game>-Win64-Shipping.exe), at most 3,000 entries, and not into the folders
+    /// that hold a game's data or redistributables rather than its programs; read once per folder while its top level
+    /// stays the same (the library asks for every Steam game when it is drawn).
+    static func drivePrograms(_ windowsFolder: String) -> [String] {
+        let folder = windowsFolder.replacingOccurrences(of: "/", with: "\\").trimmingCharacters(in: CharacterSet(charactersIn: "\\"))
+        let path = folder.replacingOccurrences(of: "\\", with: "/")
+        guard path.lowercased().hasPrefix("c:/"), path.count > 3 else { return [] }
+        let root = LibraryModel.drive.appendingPathComponent(String(path.dropFirst(3)), isDirectory: true).resolvingSymlinksInPath()
+        let stamp = (try? FileManager.default.attributesOfItem(atPath: root.path))?[.modificationDate] as? Date
+        let key = folder.lowercased()
+        programsLock.lock()
+        if let hit = programsRead[key], hit.stamp == stamp {
+            programsLock.unlock()
+            return hit.programs
+        }
+        programsLock.unlock()
+        var found: [String] = []
+        // The path-based walk names each entry relative to the root (a URL walk may spell /private/var where the root has /var).
+        if stamp != nil, let walk = FileManager.default.enumerator(atPath: root.path) {
+            var seen = 0
+            while let relative = walk.nextObject() as? String {
+                seen += 1
+                if seen > 3000 { break }
+                let name = (relative as NSString).lastPathComponent.lowercased()
+                if walk.fileAttributes?[.type] as? FileAttributeType == .typeDirectory {
+                    if walk.level >= 4 || name.hasPrefix(".") || programsSkipped.contains(name) || name.hasSuffix("_data") {
+                        walk.skipDescendants()
+                    }
+                    continue
+                }
+                guard name.hasSuffix(".exe") else { continue }
+                found.append(folder + "\\" + relative.replacingOccurrences(of: "/", with: "\\"))
+            }
+        }
+        programsLock.lock()
+        programsRead[key] = (stamp, found)
+        programsLock.unlock()
+        return found
+    }
+
+    private static let programsLock = NSLock()
+    private static var programsRead: [String: (stamp: Date?, programs: [String])] = [:]
+    /// Folders of data and installers, not of a game's programs (lowercased; Unity's <Game>_Data by its suffix).
+    private static let programsSkipped: Set<String> = ["_commonredist", "commonredist", "redist", "redistributables", "directx",
+        "dotnet", "vcredist", "support", "content", "data", "assets", "paks", "movies", "videos", "music", "sound", "sounds",
+        "audio", "textures", "localization", "streamingassets", "shadercache", "engine", "mods", "saves", "logs", "docs",
+        "manual", "screenshots", "__installer", "installer", "installers", "prereqs", "prerequisites"]
 }
 
 // MARK: - A heavy game's one-time graphics tip

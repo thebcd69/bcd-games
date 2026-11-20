@@ -1,0 +1,475 @@
+[14:41:05.935] [INFO] Checking entitlements...
+[14:41:05.936] [INFO] [build] v0.1.665 (665)
+[14:41:05.936] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.2 (Build 24B115) ram=11695MB available=8136MB cores=6
+[14:41:05.936] [INFO] [device] address-map=[0x10227c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[14:41:05.937] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=364d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[14:41:05.957] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-06:00 free-disk=262GB stikdebug-url=0
+[14:41:05.962] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[14:41:07.969] [INFO] [bcd-ui] play local
+[14:41:07.973] [INFO] Requesting JIT with Built-in StikJIT...
+[14:41:09.913] [INFO] [bcd] library launch Spyro.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off lc=0
+[14:41:09.942] [INFO] Running full Wine sequence...
+[14:41:09.942] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x10227c000,0x8000000000) 512GB available=8160MB low-power=0 thermal=nominal
+[14:41:09.944] [INFO] [game-cfg] dxil-tess-max-factor=2 env.MADEIRA_EC_HOOK_TRACE=0 gpu-card=nvidia-gtx1060 vram-mb=6144 win.version=win11
+[14:41:09.952] [INFO] [gpu-card] nvidia-gtx1060: NVIDIA GeForce GTX 1060 6GB 10de:1c03 in DXGI, Direct3D 9 and Windows; nvapi=1; 1 adapter option of the game's DXMT lines replaced
+[14:41:09.954] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[14:41:09.954] [INFO] Allocating 896MB JIT pool via debugger...
+[14:41:09.954] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[14:41:09.954] [INFO] [jit-debugger] attached=1 at the pool request
+[14:41:09.954] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[14:41:09.955] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[14:41:09.956] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[14:41:10.712] [INFO] RX pool at 0x148000000
+[14:41:10.730] [OK] JIT pool ready (debugger still attached).
+[14:41:10.731] [INFO] BRK suspension lasted 0.78s
+[14:41:10.732] [INFO] Detaching debugger...
+[14:41:10.736] [OK] Debugger detached.
+[14:41:10.738] [OK] [early-detach] rev=ml524 took 5 ms
+[14:41:11.118] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=641MB limit=6143MB thermal=nominal lpm=0 res=1168x536 cap=30 game=Spyro™ Reignited Trilogy
+[14:41:11.200] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.298s rev=ml526
+[14:41:11.251] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/e758312c70c621ab.cfg (read)
+[game-cfg]   win.version = win11
+[game-cfg]   dxil-tess-max-factor = 2
+[game-cfg]   vram-mb = 6144
+[game-cfg]   gpu-card = nvidia-gtx1060
+[WineProc] Target exe: C:\Spyro Reignited Trilogy\Spyro.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[14:41:11.494] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7553 MB + phys_footprint=638 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x51000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x54000 rev=ajan5-motor
+[hwinput] keyboard focus: program (app active)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11ba50000+0x51000 (?) → pool 0x148005000 used=0x5d000/0x25000000 tramp+0x0
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148005000)
+ml957: ? backing 0x11ba50000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14805c000 used=0x194000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14805c000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 290)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x148197000 used=0x5c3000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x148197000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x1485c0000 used=0x6f4000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485c0000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x1486f4000 used=0x7bc000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x1486f4000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x1487bc000 used=0xabc000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487bc000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[window] 0x7048000000..0x7400000000 regions=98 occupied=8220 MB of 15232 MB free=7011 MB maxhole=7011 MB@0x7048000000 rev=ml787 (periodic)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Spyro.exe (spyro.exe-ccb0ae47d633f3a6): 11BA50000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE140000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE050000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF20000
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11ba50000 IAT window 0x11ba61000+0x2a8: 81 slot(s), 0 data import(s) bound
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[window] 0x123c00000..0x7805000000 regions=76020 occupied=462187 MB of 486932 MB free=41209 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=697 MB (peak 697) internal=695 MB compressed=0 MB external=95 MB reusable=4 MB (cycle=1)
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x149ec8000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x149f5c000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x149ff0000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a0d4000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Spyro Reignited Trilogy\\Falcon\\Binaries\\Win64\\Spyro-Win64-Shipping.exe" cmdline=L"\"C:\\Spyro Reignited Trilogy\\Falcon/Binaries/Win64/Spyro-Win64-Shipping.exe\" Falcon "
+[phase] spawn:L"C:\\Spyro Reignited Trilogy\\Falcon\\Binaries\\Win64\\Spyro-Win64-Shipping.exe" t+  1.744s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Spyro Reignited Trilogy\\Falcon/Binaries/Win64/Spyro-Win64-Shipping.exe\" Falcon " (fd=80, unixdir=89, dup_unixdir=97) cwd=L"C:\\Spyro Reignited Trilogy\\"
+[Wine child thread] calling wine_ios_child_main...
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 2C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x10f7e8000
+[nls-getptr] type=11 id=437 peb=0x10f7e8000
+E 2C [iOS-xins] tracker=0x14e165fd8 WININET.dll sec=0x71fc0b0000-0x71fc0eb029
+E 2C [iOS-xins] tracker=0x14e165fd8 WININET.dll sec=0x71fc0f0000-0x71fc0f0f90
+D 2C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FC0A0000
+[copy-verify] win32u.dll: OK, 8 .text pages executable (copy @0x14eed4000)
+E 2C [iOS-xins] tracker=0x14e165fd8 WININET.dll sec=0x71fc0b0000-0x71fc0eb029
+E 2C [iOS-xins] tracker=0x14e165fd8 WININET.dll sec=0x71fc0f0000-0x71fc0f0f90
+E 2C [img-map] ml710 #12 intervals-only WININET.dll base=0x71fc0a0000
+[xp] 14:41:12.131 +0.59 dt=295 cpu=302 (thr 302) P=302 E=0 run=306 pgw=-1.0 GHz P=3.75 E=2.25 Minst=6546 IPC=5.78 mJ=1150 pin=1 rdKB=4836 fpMB=916
+[x64-data-imp] ml1245 importer pe=0x123c00000 IAT window 0x125e7a000+0x1000: 496 slot(s), 8 data import(s) bound
+002c:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9fb0000) -> 64-bit table (0x105c88708)
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x10f7e8000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x8); registered the desktop/message classes for this process; retry 0 -> top_window=0x10024 msg_window=0x10026
+[image-reload] unmapped image 0x71f8f00000+0xb0000: 1 pool copy marked
+[copy-verify] CONCRT140.dll: OK, 12 .text pages executable (copy @0x151b2c000)
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"aqProf.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"VtuneApi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"VtuneApi32e.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp-names] m169623 "wine-x18-exc"
+[xp] 14:41:12.437 +0.90 dt=306 cpu=304 (thr 302) P=303 E=1 run=307 pgw=-1.0 GHz P=3.71 E=2.22 Minst=5411 IPC=4.81 mJ=1138 pin=42 rdKB=9056 fpMB=956
+[xp] 14:41:12.758 +1.22 dt=321 cpu=327 (thr 327) P=326 E=1 run=331 pgw=-1.0 GHz P=3.50 E=2.29 Minst=6770 IPC=5.91 mJ=1159 pin=0 rdKB=26984 fpMB=1010
+[xp] 14:41:13.055 +1.51 dt=297 cpu=295 (thr 295) P=294 E=1 run=297 pgw=-1.0 GHz P=3.47 E=2.19 Minst=6401 IPC=6.26 mJ=1097 pin=0 rdKB=9916 fpMB=1027
+[xp] 14:41:13.374 +1.83 dt=318 cpu=154 (thr 130) P=153 E=0 run=155 pgw=-1.0 GHz P=3.30 E=2.21 Minst=2328 IPC=4.58 mJ=425 pin=0 rdKB=448 fpMB=1195
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1283 MB compressed=0 MB external=147 MB reusable=4 MB (cycle=2)
+[xp] 14:41:13.685 +2.14 dt=311 cpu=273 (thr 261) P=271 E=2 run=281 pgw=-1.0 GHz P=3.79 E=2.30 Minst=5146 IPC=5.00 mJ=1182 pin=0 rdKB=2872 fpMB=1285
+[footprint] rev=ml1060 fast phys=1285 MB compressed=0 MB internal=1283 MB
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1284 MB compressed=0 MB external=147 MB reusable=4 MB (cycle=3)
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1284 MB compressed=0 MB external=147 MB reusable=4 MB (cycle=4)
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1284 MB compressed=0 MB external=147 MB reusable=4 MB (cycle=5)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=13666 full-path-hits=260 component-lookups=67951 shortcut-hits=41181 misses=26724 scans=26770 entries-scanned=174956 us-in-lookup=4307154 (43% of the window) slowest=0.623 ms .../Documents/wine/dosdevices/c:/Spyro Reignited Trilogy/Falcon
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1284 MB compressed=0 MB external=147 MB reusable=4 MB (cycle=6)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[hwinput] keyboard focus: program (app active)
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"steamclient64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1303 MB compressed=0 MB internal=1302 MB
+[dns] madeira-bcd begin #1 "localhost" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #1 "localhost" = 0 after 0 ms (2 result(s))
+[footprint] rev=ml1060 fast phys=1413 MB compressed=0 MB internal=1412 MB
+[nls-getptr] type=11 id=10000 peb=0x10f7e8000
+[nls-getptr] type=11 id=10000 peb=0x10f7e8000
+[nls-getptr] type=11 id=10000 peb=0x10f7e8000
+[nls-getptr] type=11 id=10000 peb=0x10f7e8000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml1060 fast phys=1436 MB compressed=0 MB internal=1435 MB
+[free-delay] #1 release of 0x7028760000+0xb20000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7029ee0000+0xd40000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702bfa0000+0x130000 held for 2000 ms (3 in flight)
+[win-pos] #3 hwnd=0x20040 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #3 hwnd=0x20040 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #4 hwnd=0x20040 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #4 hwnd=0x20040 class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #8 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x16aff8000 size=0x1000000 -> free-list rev=ml438
+[vkmt] tid=002c OpenAdapterFromLuid luid=00040000:01000000 -> 0 hAdapter=0x40000000
+[vkmt] tid=002c CreateDevice hAdapter=0x40000000 -> 0 hDevice=0x40000040
+[vkmt] tid=002c DestroyDevice hDevice=0x40000040 -> 0
+E B0 [thr-term] rev=ml435 deinit #1 tid=0xb0
+E B4 [thr-term] rev=ml435 deinit #2 tid=0xb4
+E A4 [thr-term] rev=ml435 deinit #3 tid=0xa4
+E A8 [thr-term] rev=ml435 deinit #4 tid=0xa8
+E AC [thr-term] rev=ml435 deinit #5 tid=0xac
+[free-delay] #4 release of 0x7044ff0000+0x110000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x70423e0000+0x110000 held for 2000 ms (5 in flight)
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[vkmt] tid=002c CloseAdapter hAdapter=0x40000000 -> 0
+[vkmt] tid=002c OpenAdapterFromLuid luid=00040000:01000000 -> 0 hAdapter=0x40000080
+[vkmt] tid=002c CloseAdapter hAdapter=0x40000080 -> 0
+[vkmt] tid=002c OpenAdapterFromLuid luid=00040000:01000000 -> 0 hAdapter=0x400000c0
+[vkmt] tid=002c CreateDevice hAdapter=0x400000c0 -> 0 hDevice=0x40000100
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[footprint] rev=ml1060 fast phys=1471 MB compressed=0 MB internal=1338 MB
+[footprint] rev=ml1060 fast phys=1526 MB compressed=0 MB internal=1395 MB
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16db82230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16dc96ad0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16dd1d920 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e4c89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[file-census] r624 10s: case-sensitive=1 full-path-tries=7489 full-path-hits=310 component-lookups=34167 shortcut-hits=19830 misses=14316 scans=14337 entries-scanned=89171 us-in-lookup=2305709 (21% of the window) slowest=0.557 ms ...9-70DFD18637B2/Documents/wine/dosdevices/c:/windows/system32
+[free-delay] #6 release of 0x7049330000+0x1e0000 held for 2000 ms (1 in flight)
+[free-delay] #7 release of 0x7049610000+0x170000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x7049780000+0x100000 held for 2000 ms (3 in flight)
+E E4 [thr-term] rev=ml435 deinit #6 tid=0xe4
+E F0 [thr-term] rev=ml435 deinit #10 tid=0xf0
+002c:err:module:load_dll [dll-missing] rev=ml336 #9 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #10 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-pos] #5 hwnd=0x20048 after=0x0 flags=8000003c vis={-3,-22,1171,539} surface=0x1056c49b0 rev=ml505 style=04ca0000 visible=0 parent=0x10024
+[win-name] #5 hwnd=0x20048 class='UnrealWindow' text="" rev=ml853
+[win-pos] #6 hwnd=0x10050 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1056c49b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x10050 class='IME' text="" rev=ml853
+[win-name] #7 hwnd=0x10050 class='IME' text="Default IME" rev=ml853
+[win-name] #15 hwnd=0x20048 class='UnrealWindow' text="Spyro Reignited Trilogy  " rev=ml853
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[winios] game window hwnd=0x20048 presents through Metal; its GDI surface is not drawn
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)
+002c:err:module:load_dll [dll-missing] rev=ml336 #11 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[14:41:33.764] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[jit-pool] image 0x71f6a00000+0x1a7000 (libvorbis_64.dll) → pool 0x15322e000 used=0xb3da000/0x25000000 tramp+0x0
+D 2C Load module libvorbis_64.dll (libvorbis_64.dll-28e815dd89bf571d): 71F6A00000
+[jit-pool] image 0x71f69f0000+0xe000 (libvorbisfile_64.dll) → pool 0x1533da000 used=0xb3ee000/0x25000000 tramp+0x0
+D 2C Load module libvorbisfile_64.dll (libvorbisfile_64.dll-92c510c3dda9c57a): 71F69F0000
+[jit-pool] image 0x71f6930000+0xc0000 (xaudio2_7.dll) → pool 0x1533ec000 used=0xb4b0000/0x25000000 tramp+0x4000
+D 2C Load module XAudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): 71F6930000
+[jit-pool] image 0x71f6890000+0xa0000 (mfreadwrite.dll) → pool 0x1534b0000 used=0xb554000/0x25000000 tramp+0x4000
+D 2C Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F6890000
+[rip-profile] ml981 gen=1 threads=1 samples=154 buckets=23 span=0x70d31fa13b [0x123deb685..0x71f6fe57c0] top: 0x1241f9f80=45% 0x124131000=31% 0x123debd00=3% 0x12412ac00=2% 0x123df5ec0=2% 0x12412ab40=1% 0x124133800=1% 0x124133a40=1%
+[cpu-split] ml1123 gen=1 running samples=44: x64 JIT 13%, ARM64EC images 65%, native 20%
+[cpu-split] ml1123 image top (PE address/256): 0x71fc90c200=6 0x71fc6f5500=2 0x71fc722c00=2 0x71fc8ee600=2 0x71ffd4df00=2 0x71fc723500=1 0x71fc388200=1 0x71fc90c000=1 0x71fc90c300=1 0x71fc6f7300=1 0x71ffcf7d00=1 0x71ffd26300=1 0x71fc7f9c00=1 0x71fc8f2e00=1
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__gettid+0x1c=9
+err:   [bc-census] ml653 periodic: 64 BC resources, 455 subresources
+err:   [bc-census] ml653   BC1_TYPELESS n=43 162KB max=512x128 mips=8 arr=6 cube=1 | use def=43 imm=0 dyn=0 stg=0 | data y=0 n=43 | cpu r=0 w=0 | bind srv=43 rt=0 uav=0
+err:   [bc-census] ml653   BC3_TYPELESS n=12 59KB max=64x64 mips=7 arr=1 cube=0 | use def=12 imm=0 dyn=0 stg=0 | data y=0 n=12 | cpu r=0 w=0 | bind srv=12 rt=0 uav=0
+err:   [bc-census] ml653   BC5_UNORM n=9 42KB max=64x64 mips=7 arr=1 cube=0 | use def=9 imm=0 dyn=0 stg=0 | data y=0 n=9 | cpu r=0 w=0 | bind srv=9 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x9
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x34
+err:   [bc-census] ml653   TOTAL logical BC bytes = 264KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 128 BC resources, 895 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 572KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 192 BC resources, 1342 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 1272KB
+err:   [bc-census] ml653 periodic: 256 BC resources, 1781 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 1617KB
+[mem-burst] rev=624 +295 MB in 253 ms phys=3060 internal=2749 compressed=0 other=311 | guest commits since the last sample: n=244, 175 MB, biggest 8 MB tid=0100 | swap backed=0 MB | pool head=181 MB tail=160 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 320 BC resources, 2221 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 1866KB
+[win-pos] #16 hwnd=0x20048 after=0x0 flags=80001827 vis={0,0,1168,536} surface=0x112a5fc00 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #16 hwnd=0x20048 class='UnrealWindow' text="Spyro Reignited Trilogy  " rev=ml853
+[win-pos] #17 hwnd=0x20048 after=0x0 flags=80001c17 vis={0,0,1168,536} surface=0x112a5fc00 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #17 hwnd=0x20048 class='UnrealWindow' text="Spyro Reignited Trilogy  " rev=ml853
+[win-pos] #18 hwnd=0x20048 after=0x0 flags=80001817 vis={0,0,1168,536} surface=0x112a5fc00 rev=ml505 style=94000000 visible=1 parent=0x10024
+[win-name] #18 hwnd=0x20048 class='UnrealWindow' text="Spyro Reignited Trilogy  " rev=ml853
+[win-pos] #19 hwnd=0x20048 after=0x0 flags=80001416 vis={0,0,1920,1080} surface=0x112a5fc00 rev=ml505 style=94000000 visible=1 parent=0x10024
+[ptr-map] the picture is window hwnd=0x20048's client (0,0 1920x1080) on a 1168x536 screen: points on it go there (window frame)
+[win-name] #19 hwnd=0x20048 class='UnrealWindow' text="Spyro Reignited Trilogy  " rev=ml853
+E 104 [thr-term] rev=ml435 deinit #11 tid=0x104
+E 100 [thr-term] rev=ml435 deinit #12 tid=0x100
+[jit-pool] image 0x71f6680000+0x90000 (xinput1_4.dll) → pool 0x153554000 used=0xb5e8000/0x25000000 tramp+0x4000
+D 2C Load module xinput1_4.dll (xinput1_4.dll-a6149d3778c50b7d): 71F6680000
+[win-pos] #20 hwnd=0x100d0 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #20 hwnd=0x100d0 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #21 hwnd=0x100d0 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #21 hwnd=0x100d0 class='__wine_xinput_devnotify' text="" rev=ml853
+0164:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0164 status=00000001 caller=000000014E31A474
+E 164 [thr-term] rev=ml435 deinit #13 tid=0x164
+[jit-pool] image 0x71f6580000+0xc0000 (xaudio2_9.dll) → pool 0x1535e8000 used=0xb6ac000/0x25000000 tramp+0x4000
+D DC Load module XAudio2_9.dll (xaudio2_9.dll-b31aa379071159e6): 71F6580000
+[mem-burst] rev=624 +390 MB in 510 ms phys=3341 internal=2583 compressed=0 other=758 | guest commits since the last sample: n=777, 582 MB, biggest 8 MB tid=0170 | swap backed=0 MB | pool head=182 MB tail=160 MB
+[launch-view] dismissed reason=present logs=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=21 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=21 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[14:41:41.355] [INFO] detach-wait: presents=35 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=88 resident=2752MB dbg=DEBUGGED rev=ml525
+E 178 [thr-term] rev=ml435 deinit #14 tid=0x178
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 214 wakes; device short 1.1 ms in 1 of 430 passes (largest pass 1115 frames); ring 2093..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[vkmt] tid=002c OpenAdapterFromLuid luid=00040000:01000000 -> 0 hAdapter=0x40000140
+[vkmt] tid=002c CloseAdapter hAdapter=0x40000140 -> 0
+[ios_audio] ml1230 pacing stream=0x1130b1d00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[14:41:53.787] [OK] Early detach: game presenting and settled
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4799 frames; worst late wake 0.0 ms; clamped 0 samples
+[14:41:55.791] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e4c89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2: no guest threads found (no plausible RIP at x28+0x18)
+[ios_audio] ml1230 pacing stream=0x1130b1d00 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2094..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 216 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2094..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1130b1d00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 216 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4798 frames; worst late wake 0.1 ms; clamped 0 samples
+[window] 0x7048000000..0x7400000000 regions=7366 occupied=9360 MB of 15232 MB free=5872 MB maxhole=5543 MB@0x709bce0000 rev=ml787 (periodic)
+[window] 0x123c00000..0x7805000000 regions=86200 occupied=464227 MB of 486932 MB free=39168 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=87 resident=2524MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 9.99 s of audio in 10.01 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4799 frames; worst late wake 0.0 ms; clamped 0 samples
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e4c89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b3 "dxmt-encode-thr" teb=0x70437d0000 cpu=3% RUN pc=libsystem_platform.dylib`_platform_memmove+0xcc lr=AGXMetalG18P`<redacted>+0x164 sp=0x12b6ae340 NATIVE (unresolved: header unreadable) sp-cand=[ ]
+[rip-profile] ml981 gen=3: no guest threads found (no plausible RIP at x28+0x18)
+[ios_audio] ml1230 pacing stream=0x1130b1d00 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2094..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 216 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2094..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1130b1d00 lead 60 ms: client wrote 9.99 s of audio in 10.00 s (99.9%) over 216 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4798 frames; worst late wake 0.0 ms; clamped 0 samples
+[spin] ml1140 14:42:32.308 look 1: x64->EC 27849570/s, 97% of the sampled calls for 4 s go to ntdll.dll+0x71aac (0x71ffd41aac)
+[spin] ml1140 thread 014c teb=0x70436f0000 cpu=99% host pc=0x14deb3210 (ARM64EC image copy) lr=0x1640400f8 sp=0x709106f3c8 x23=0xffffff8f58962e54 | guest RIP exact=0x0 (hostPC outside block) State.rip=0x151052e54
+[spin] ml1140   RAX=0x1511df180 RCX=0x7043435760 RDX=0x70434ed6b0 RBX=0x1 RSP=0x709106f3c8 RBP=0xcedf887f RSI=0x70434ed6b0 RDI=0x702bf20000 R8=0x709106f470 R9=0x4 R10=0x84000 R11=0xfffffffff310cb5a R12=0x127217678 R13=0x127217270 R14=0x70289f1280 R15=0x0
+[spin] ml1140   x86 code from RIP-32 (RIP is byte 32): 01 00 00 14 f4 03 00 aa e0 03 13 aa d5 ae 01 94 e0 03 14 aa 38 c8 04 94 20 00 20 d4 65 a3 16 00 ff 83 01 d1 f3 53 02 a9 f5 5b 03 a9 f9 6b 04 a9 fe 2b 00 f9 f3 03 00 aa e0 0a 80 52 e0 00 b0 72 c1 15 00 b4 f4 03 01 aa 42 00 00 b5 63 15 00 35 d5 0b 00 d0 f6 03 02 aa f9 03 04 2a b5 16 40 f9 e3 01 00 34 88 02 40 f9 4a 0b 00 d0 4a b1 17 91 0b 1d 40 f9 a8 02 40 f9 00 01 3f d6 e0 03 14 aa
+[spin] ml1140   return addresses on the x86 stack (a CALL right before them) from RSP=0x709106f3c8: sp+0x0=spyro-win64-shipping.exe+0xa09e4e(call indirect) sp+0xa0=spyro-win64-shipping.exe+0xa01a46(call rel32) sp+0x140=spyro-win64-shipping.exe+0xdf661a(call indirect) sp+0x240=spyro-win64-shipping.exe+0xdf43f1(call rel32) sp+0x290=spyro-win64-shipping.exe+0xf39ce9(call rel32)
+[spin] ml1140   first stack qwords: 124609e4e 0 0 0 1 0 0 0
+[ios_audio] ml1230 pacing stream=0x123a1ae00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 215 wakes; device short 0.0 ms in 0 of 431 passes (largest pass 1115 frames); ring 2092..4799 frames; worst late wake 0.0 ms; clamped 0 samples
+[file-census] r624 62s: case-sensitive=1 full-path-tries=625 full-path-hits=276 component-lookups=1697 shortcut-hits=1004 misses=688 scans=693 entries-scanned=13262 us-in-lookup=131965 (0% of the window) slowest=0.446 ms ...nts/wine/dosdevices/c:/Spyro Reignited Trilogy/Engine/Config
+err:   [bc-census] ml653 periodic: 384 BC resources, 2684 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 7919KB
+[rb-tex] madeira-bcd new readback #1: fmt 115 1x1 level 0 (texture 1x1, 1 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 115 9x1 level 0 (texture 9x1, 1 mips)
+[mem-burst] rev=624 +269 MB in 509 ms phys=3486 internal=2576 compressed=0 other=910 | guest commits since the last sample: n=1454, 592 MB, biggest 85 MB tid=012c | swap backed=0 MB | pool head=182 MB tail=160 MB
+[footprint] rev=ml1060 fast phys=3641 MB compressed=0 MB internal=2724 MB
+err:   [bc-census] ml653 periodic: 576 BC resources, 4083 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 14990KB
+[footprint] rev=ml1060 fast phys=3660 MB compressed=0 MB internal=2750 MB
+err:   [bc-census] ml653 periodic: 640 BC resources, 4638 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 51489KB
+[footprint] rev=ml1060 fast phys=3773 MB compressed=0 MB internal=2803 MB
+[spin] ml1140 14:42:37.839 look 1: x64->EC 16493860/s, 89% of the sampled calls for 4 s go to d3d11.dll+0x6be54 (0x151052e54)
+[spin] ml1140 no Wine thread used 80% of a core at this moment
+err:   [bc-census] ml653 periodic: 704 BC resources, 5213 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 66287KB
+[footprint] rev=ml1060 fast phys=3833 MB compressed=0 MB internal=2831 MB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1392 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1434 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e4c89e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=3863 MB compressed=0 MB internal=2868 MB
+[thread-sample] ml876 b1 "" teb=0x70436f0000 cpu=40% RUN pc=Madeira`__wine_unix_call_dispatcher+0x68 lr=0x150b9015c sp=0x1347bfb90 NATIVE (unresolved: hostPC outside block) sp-cand=[ Spyro-Win64-Shipping.exe+0x5fc0d0 Spyro-Win64-Shipping.exe+0xc7c900 ]
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1497 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-sample] ml876 modmap peb=0x10f7e8000 modules=85 first=Spyro-Win64-Shipping.exe@0x123c00000
+[thread-sample] ml876 b2 "" teb=0x71ffe30000 cpu=1% RUN pc=0x14e222b5c lr=0x14e250d54 sp=0x703e80f040 NATIVE (unresolved: hostPC outside block) sp-cand=[ Spyro-Win64-Shipping.exe+0x1896dd7 Spyro-Win64-Shipping.exe+0x189142e Spyro-Win64-Shipping.exe+0x1897040 Spyro-Win64-Shipping.exe+0x1890e73 Spyro-Win64-Shipping.exe+0x1896d50 Spyro-Win64-Shipping.exe+0x189147e Spyro-Win64-Shipping.exe+0x1896d50 ]
+[thread-sample] ml876 b2 "" teb=0x7043650000 cpu=83% RUN pc=libsystem_kernel.dylib`__ulock_wait2+0x8 lr=libsystem_platform.dylib`os_sync_wait_on_address_with_timeout+0x78 sp=0x13713f9f0 NATIVE (no FEX state) sp-cand=[ Spyro-Win64-Shipping.exe+0x5fc0d0 ] last-syscall id=0xff pc=0x14dcb7634 user-sp=0x70686af350 user-cand=[ Spyro-Win64-Shipping.exe+0x189147e Spyro-Win64-Shipping.exe+0x189147e Spyro-Win64-Shipping.exe+0x1896f60 Spyro-Win64-Shipping.exe+0x1891336 ]
+[thread-sample] ml876 b2 "" teb=0x70436f0000 cpu=36% RUN pc=0x151052e78 lr=0x1511bd1dc sp=0x709106f2c0 NATIVE (unresolved: hostPC outside block) sp-cand=[ Spyro-Win64-Shipping.exe+0x3617678 Spyro-Win64-Shipping.exe+0x3617270 Spyro-Win64-Shipping.exe+0xa09e4e Spyro-Win64-Shipping.exe+0xa01a46 ]
+err:   [bc-census] ml653 periodic: 768 BC resources, 5705 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 67311KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1497 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 832 BC resources, 6149 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 67544KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1497 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=4: no guest threads found (no plausible RIP at x28+0x18)
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=1497 tex<-stg=0 stg<-tex=2 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 896 BC resources, 6585 subresources
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x337
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x46
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x183
+err:   [bc-census] ml653   SRV view fmt 83 (BC5_UNORM) x210
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=5160 CopyResource=0 CopySubresourceRegion=1072 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 67758KB
+[dns] madeira-bcd begin #2 "datarouter.ol.epicgames.com" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #2 "datarouter.ol.epicgames.com" = 0 after 22 ms (8 result(s))
+E 180 [thr-term] rev=ml435 deinit #15 tid=0x180
+[srv-conn-done] dport=443 event=OUT err=0 fd=676 peer=YES path=REAL-kernel-completion rev=ml576
+I 8C [iOS] CompileBlock: REFUSING low/invalid RIP=0x3c
+[av-detail] ml613 #1 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x3c pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x0 addr=0x0 x18=0x71ffe50000 type=1 lr=0x16bff8354 sp=0x71f8960000 x16=0x71f895f6d0 x17=0x14dcc6884
+[guest-code] rev=ml333 pool_rip=0x3c (PE 0x3c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x70a021c5ec x9=0x0 x10=0x0 x11=0x12a900000 x0=0x70a021c590 x2=0x82d8230f | teb=0x71ffe50000 peb=0x10f7e8000 peb->EcCodeBitMap=0x71fecd0000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[thunk-slot] WEDGE pc=0x0 lr_exec=0x16bff8354 lr_va=0x0 (?) x0=0x70a021c590 x1=0x0 x2=0x82d8230f x3=0x678bfff3 x4=0x218826c1 x8=0x70a021c5ec x9=0x0 x10=0x0 x11=0x12a900000 fp=0x703a80f7a8
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x70275a6cf0 *(gs_cached+0x58)=0x70275a6cf0
+[x86_live] RAX=0x70a021c5ec RCX=0x70a021c590 RDX=0x0 RBX=0x4 RSP=0x70a021c5f4 RBP=0x703a80f7a8 RSI=0x81460001 RDI=0x700000000
+[x86_live]  R8=0x82d8230f  R9=0x678bfff3 R10=0x218826c1 R11=0x1e R12=0x703a80f920 R13=0x4 R14=0x70a021c5ac R15=0x40
+[x86_live] State.RIP=0x3c callret_sp=0x7c2c401000
+[av-detail] ml613 #2 p0=EXECUTE p1=0x0 hostpc=0x0 hinsn=0x00000000 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x3c pc=0x0 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x0 addr=0x0 x18=0x71ffe50000 type=1 lr=0x16bff8354 sp=0x71f8960000 x16=0x71f895f6d0 x17=0x14dcc6884
+[guest-code] rev=ml333 pool_rip=0x3c (PE 0x3c) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x70a021c5ec x9=0x0 x10=0x0 x11=0x12a900000 x0=0x70a021c590 x2=0x82d8230f | teb=0x71ffe50000 peb=0x10f7e8000 peb->EcCodeBitMap=0x71fecd0000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[thunk-slot] WEDGE pc=0x0 lr_exec=0x16bff8354 lr_va=0x0 (?) x0=0x70a021c590 x1=0x0 x2=0x82d8230f x3=0x678bfff3 x4=0x218826c1 x8=0x70a021c5ec x9=0x0 x10=0x0 x11=0x12a900000 fp=0x703a80f7a8
+[x86_seg] State.gs_cached=0x71ffe50000 TEB=0x71ffe50000 TEB[0x58]=0x70275a6cf0 *(gs_cached+0x58)=0x70275a6cf0
+[x86_live] RAX=0x70a021c5ec RCX=0x70a021c590 RDX=0x0 RBX=0x4 RSP=0x70a021c5f4 RBP=0x703a80f7a8 RSI=0x81460001 RDI=0x700000000
+[x86_live]  R8=0x82d8230f  R9=0x678bfff3 R10=0x218826c1 R11=0x1e R12=0x703a80f920 R13=0x4 R14=0x70a021c5ac R15=0x40
+[x86_live] State.RIP=0x3c callret_sp=0x7c2c401000
+008c:err:seh:segv_handler SEGV #1: pc=0x0 addr=0x0 uctx_x18=0x71ffe50000 disp=0 mach_exc=24772
+008c:err:seh:segv_handler SEGV at pc=0x0 addr=0x0 esr=0x82000006 TPIDR_EL0=0x1005 (informational only — TEB is tsd275 below)
+008c:err:seh:segv_handler   x0=0x70a021c590 x1=0x0 x2=0x82d8230f x3=0x678bfff3
+008c:err:seh:segv_handler   x8=0x70a021c5ec x9=0x0 x10=0x0 x16=0x71f895f6d0 x17=0x14dcc6884 x18=0x71ffe50000 x19=0x703a80f920 x20=0x4
+008c:err:seh:segv_handler   fp=0x703a80f7a8 lr=0x16bff8354 sp=0x71f8960000
+008c:err:seh:segv_handler   [teb-tsd] base=0x16db840e0 offset=0x910 raw=0x71ffe50000 teb_key_val=0x71ffe50000
+008c:err:seh:segv_handler   [guest-state] x28=0x7c2bc01140 rip=0x3c
+008c:err:seh:segv_handler   [guest-exact] ml885 block=0x1651dcba0 unresolved: hostPC outside block
+008c:err:seh:segv_handler   [guest-state]   rax=0x70a021c5ec rcx=0x70a021c590 rdx=0x0 rbx=0x4
+008c:err:seh:segv_handler   [guest-state]   rsp=0x70a021c5f4 rbp=0x703a80f7a8 rsi=0x81460001 rdi=0x700000000
+008c:err:seh:segv_handler   [guest-state]   r8 =0x82d8230f r9 =0x678bfff3 r10=0x218826c1 r11=0x1e
+008c:err:seh:segv_handler   [guest-state]   r12=0x703a80f920 r13=0x4 r14=0x70a021c5ac r15=0x40
+008c:err:seh:segv_handler   [guest-state] plausible-ptr gregs=7/16 (low => uninitialised frame, high => only rsp clobbered)
+008c:err:seh:segv_handler   arm64x_check_call@0x14dcb2330: d367fd70 b5000650 140370f5 d352fd71 f941b610 d34cfd69 f8717a10 9ac92610
+008c:err:seh:segv_handler     cc[0] is NOT a B (opcode top6=52) — patcher missed it
+008c:err:seh:segv_handler   cpu_area@0x14dcc6884: [0x00]=140322a8aa1503f3 [0x08]=350000a839400268 [0x10]=2a1f03f414000015 [0x18]=3400024839400268
+008c:err:seh:segv_handler               [0x20]=97ffe4beaa1303e0 [0x28]=52807f88140322a4 [0x30]=aa0003f552868089 [0x38]=eb08001fcb160108
+008c:err:seh:segv_handler               [0x40]=540004c2140322a3 [0x48]=aa1303e18b160100 [0x50]=97ffe2b0aa1503e2 [0x58]=b1502940b1502c8
+008c:err:seh:segv_handler setup_exception for SEGV at pc=0x0 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+D 8C Exception: Code: C0000005 Address: 0 AV EXEC of 0
+008c:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=0000000000000000 flags=0 nparams=2 tid=008c hit=1
+008c:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x0
+[unhandled] madeira-bcd code=c0000005 nparams=2 p0=8 p1=0 p2=0 p3=0
+008c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=41388
+[unwind] term ml661 begin rip=3c rsp=70a021c5f4 window=[70a021c5f4..70a0a1c5f4) max=32
+[unwind] term ml661 #00 pc=3c rsp=70a021c5f4  <no module — STOP>
+[unwind] term ml661 end
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=96
+[pool-freechk] POISONED AT FREE off=0x224c000 size=0x3a10000 cur=0x3 max=0x3  <== narrowed during the module's life
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000005) syscalls=0 unix_calls=41393
+[unwind] term ml661 begin rip=71fe6f0690 rsp=702580ff08 window=[702580ff08..702600ff08) max=32
+[unwind] term ml661 #00 pc=71fe6f0690 rsp=702580ff08  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=c0000005 rbp=702580ffd0 rsi=0 rdi=69804879e3fc r12=0 r13=0 r14=c0000005 r15=1
+[unwind] term ml661 #01 pc=11ba55798 rsp=702580ff10  (exe)+0x5798
+[unwind] term ml661 #03 pc=11ba51ab5 rsp=702580ff70  (exe)+0x1ab5
+[unwind] term ml662   global @+0x76 -> 11ba612c8 = 0x00000000 (0)
+[unwind] term ml661 #04 pc=148725b0c rsp=702580ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 11ba55798  (exe)+0x5798
+[term-stack] ml660 sp+030: CALL 11ba55734  (exe)+0x5734
+[term-stack] ml660 sp+060: CALL 11ba51ab5  (exe)+0x1ab5
+[jit-pool] tail FREE rx=0x16cffc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=41399
+[unwind] term ml661 begin rip=1480da16c rsp=702580fc78 window=[702580fc78..702600fc78) max=32
+[pool-freechk] POISONED AT FREE off=0xb5e8000 size=0xc4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xb554000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xb4b0000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xb3ec000 size=0xc4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xb3d8000 size=0x14000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xac58000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xabb4000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xaab0000 size=0x104000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa9fc000 size=0xb4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa9b4000 size=0x48000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0xa878000 size=0x13c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[unwind] term ml661 #00 pc=1480da16c rsp=702580fc78  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+028:   ? 71fe3c0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0a0:   ? 71fe3c0000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0e0: CALL 11ba5744a  (exe)+0x744a
+[term-stack] ml660 sp+118:   ? 11ba53154  (exe)+0x3154
+[term-stack] ml660 sp+290: call* 11ba55798  (exe)+0x5798
+[term-stack] ml660 sp+2c0: CALL 11ba55734  (exe)+0x5734
+[term-stack] ml660 sp+2f0: CALL 11ba51ab5  (exe)+0x1ab5
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1073741819)
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[14:42:40.443] [INFO] [session] length=90s play=67s frames=1779 avg=29.7 low1=22.1 low01=9.3 worst=6551ms stalls=1/7s peak=3920MB limit=8191MB thermal=nominal lpm=0 res=1168x536 cap=30 game=Spyro™ Reignited Trilogy
+[14:42:40.455] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[ptr-map] off: points map to the whole screen (session ended)
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml1060 fast phys=3883 MB compressed=0 MB internal=2893 MB
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=0 pc=0x248857ae8 lr=0x1986b2ff0 sp=0x135f3f9f0 bt: 103ffe0d0 103fbe09c 14df9471c 14deccd34 14dcdca90 14dcb79a0 14df9471c 14dece924
+[footprint] rev=ml358 phys=3883 MB (peak 3883) internal=2894 MB compressed=0 MB external=183 MB reusable=5 MB (cycle=45)
+[freeze] alive t+91s beats=3 gaps=0 iter=357 gen=1 threads=34 resident=3083MB dbg=DEBUGGED rev=ml525
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=0 pc=0x248857ae8 lr=0x1986b2ff0 sp=0x135f3f9f0 bt: 103ffe0d0 103fbe09c 14df9471c 14deccd34 14dcdca90 14dcb79a0 14df9471c 14dece924
+[footprint] rev=ml358 phys=3822 MB (peak 3883) internal=2894 MB compressed=0 MB external=183 MB reusable=5 MB (cycle=46)
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=0 pc=0x248857ae8 lr=0x1986b2ff0 sp=0x135f3f9f0 bt: 103ffe0d0 103fbe09c 14df9471c 14deccd34 14dcdca90 14dcb79a0 14df9471c 14dece924
+[footprint] rev=ml358 phys=3823 MB (peak 3883) internal=2895 MB compressed=0 MB external=183 MB reusable=5 MB (cycle=47)
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14dd97000 NO pool/anon alias | region 0x10227c000+0x3294000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=1 pc=0x14dd97000 lr=0x14deb415c sp=0x71f6f4eeb0 bt: 14dcdca90 14dcb79a0 14df9471c 14dece924 14df93d5c 14ddbb2f0 14df95d88 14dda980c
+[footprint] rev=ml358 phys=3821 MB (peak 3883) internal=2895 MB compressed=0 MB external=183 MB reusable=5 MB (cycle=48)
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=1 pc=0x14dd97000 lr=0x14deb415c sp=0x71f6f4eeb0 bt: 14dcdca90 14dcb79a0 14df9471c 14dece924 14df93d5c 14ddbb2f0 14df95d88 14dda980c
+[footprint] rev=ml358 phys=3821 MB (peak 3883) internal=2896 MB compressed=0 MB external=185 MB reusable=5 MB (cycle=49)
+[census-hold] idx=56 port=0x1ff47 teb=0x70436e0000 tid=0108 HOLDS fexlock @0x7c044f0108 run_state=3 susp=1 pc=0x14dd97000 lr=0x14deb415c sp=0x71f6f4eeb0 bt: 14dcdca90 14dcb79a0 14df9471c 14dece924 14df93d5c 14ddbb2f0 14df95d88 14dda980c
+[footprint] rev=ml358 phys=3816 MB (peak 3883) internal=2898 MB compressed=0 MB external=193 MB reusable=7 MB (cycle=50)
+[xp] 14:42:51.755 +100.21 dt=263 cpu=78 (thr 78) P=34 E=43 run=113 pgw=-1.0 GHz P=1.98 E=1.51 Minst=260 IPC=1.95 mJ=31 pin=4 rdKB=316 fpMB=3816
+[xp] 14:42:52.048 +100.51 dt=293 cpu=87 (thr 87) P=14 E=73 run=109 pgw=-1.0 GHz P=1.57 E=1.75 Minst=407 IPC=2.71 mJ=20 pin=4 rdKB=128 fpMB=3817
+[xp] 14:42:52.380 +100.83 dt=322 cpu=349 (thr 338) P=8 E=340 run=359 pgw=-1.0 GHz P=1.99 E=2.42 Minst=3579 IPC=4.26 mJ=147 pin=1 rdKB=192 fpMB=3822
+[14:42:52.380] [xp] 14:42:52.380 +100.83 dt=322 cpu=349 (thr 338) P=8 E=340 run=359 pgw=-1.0 GHz P=1.99 E=2.42 Minst=3579 IPC=4.26 mJ=147 pin=1 rdKB=192 fpMB=3822
+[14:42:52.649] [xp] 14:42:52.648 +101.11 dt=279 cpu=328 (thr 339) P=58 E=271 run=335 pgw=-1.0 GHz P=3.97 E=2.43 Minst=3529 IPC=3.98 mJ=364 pin=12 rdKB=548 fpMB=3830
+[14:42:52.951] [xp] 14:42:52.950 +101.41 dt=302 cpu=311 (thr 311) P=10 E=301 run=317 pgw=-1.0 GHz P=2.05 E=2.42 Minst=2861 IPC=3.82 mJ=132 pin=0 rdKB=0 fpMB=3842

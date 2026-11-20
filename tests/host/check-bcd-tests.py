@@ -75,14 +75,22 @@ PROGRAMS = {   # name: (source, arch, ship folder, imports allowed beyond kernel
     "input-test-x64.exe": ("input_test.c", "x86_64", "arm64ec-windows", set()),
     "midi-test-x64.exe": ("midi_test.c", "x86_64", "arm64ec-windows", {"winmm.dll"}),      # round 603 (ajan48's source, wired in by ajan49)
     "midi-test-x86.exe": ("midi_test.c", "i686", "i386-windows", {"winmm.dll"}),
+    # 2026-11-16: the OpenGL and Vulkan tests (their own checks: tests/host/check-vk-gl-tests.py); opengl32 and vulkan-1 load at run time
+    "gl-test-x64.exe": ("gl_test.c", "x86_64", "arm64ec-windows", set()),
+    "gl-test-x86.exe": ("gl_test.c", "i686", "i386-windows", set()),
+    "vulkan-test-x64.exe": ("vulkan_test.c", "x86_64", "arm64ec-windows", set()),
+    "vulkan-test-x86.exe": ("vulkan_test.c", "i686", "i386-windows", set()),
 }
+# Wine's own Vulkan header (wine/include/wine/vulkan.h) for the Vulkan test: this tree's wine submodule, or the build tree's
+WINE_INC = next((str(c) for c in (R / "wine/include", Path.home() / "madeira-bcd/wine/include") if (c / "wine/vulkan.h").is_file()), str(R / "wine/include"))
 LIBS = {
     "d3d9_cube.c": ["-luuid"], "d3d8_cube.c": ["-luuid"], "ddraw_test.c": ["-ldxguid", "-luuid"], "frametime_test.c": ["-ldxguid", "-luuid"],
     "resolution_test.c": ["-ldxguid", "-luuid"], "sound_test.c": ["-lwinmm", "-luuid", "-lole32"], "video_test.c": ["-lmfuuid", "-luuid", "-lole32"],
     "controller_test.c": ["-ldinput8", "-ldxguid", "-luuid"], "input_test.c": ["-luuid"], "midi_test.c": ["-lwinmm", "-luser32", "-lgdi32"],
+    "gl_test.c": ["-lgdi32"], "vulkan_test.c": ["-iquote", WINE_INC],
 }
 # graphics, sound, video and input DLLs a program loads at run time (so that a session without one gets a message, not a loader failure)
-RUNTIME_DLL = re.compile(r"^(d3d\d+|ddraw|dxgi|dsound|xaudio2_\d|mfplat|mfreadwrite|mf|xinput[0-9_]*)\.dll$")
+RUNTIME_DLL = re.compile(r"^(d3d\d+|ddraw|dxgi|dsound|xaudio2_\d|mfplat|mfreadwrite|mf|xinput[0-9_]*|opengl32|vulkan-1)\.dll$")
 LOADS = {   # source: the LoadLibraryA names it must have
     "d3d9_cube.c": ["d3d9.dll"], "d3d8_cube.c": ["d3d8.dll"], "ddraw_test.c": ["ddraw.dll"], "frametime_test.c": ["d3d11.dll"], "resolution_test.c": ["d3d11.dll"],
     "sound_test.c": ["dsound.dll", "xaudio2_9.dll"], "video_test.c": ["mfplat.dll", "mfreadwrite.dll"], "controller_test.c": ["xinput1_4.dll", "xinput1_3.dll"],

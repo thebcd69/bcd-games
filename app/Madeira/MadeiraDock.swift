@@ -7,6 +7,8 @@
 // under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 Vugar: code taken from https://github.com/willfaust/Madeira (pull request #572, branch steam-friends-pr-572-replacement)
 // under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 Paulo Eduardo Correa: code taken from https://github.com/thebcd69/bcd-games (pull request #51 by pauloec)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 
 import Foundation
 import Darwin
@@ -196,15 +198,26 @@ enum MadeiraDock {
         return (parts + ["steamapps"]).joined(separator: "/")
     }
 
+    /// Round 677 (agent A1 S5; Send Logs FXERE1 and ABXMM0, build 665): Steam components listed with the games. Play on 228980 started Valve's
+    /// client, which showed its own error box while the Dock waited five minutes; 3340990 ended at once ("this game isn't fully installed").
+    /// Neither has a program. Only these ids: a test on "no program" would also take EA games, whose launch entry is EA's launcher outside the
+    /// install folder.
+    static let steamComponents: [Int: String] = [228980: "Steamworks Common Redistributables", 3340990: "EA app Installer"]
+
     /// Everything a launch needs, checked before any sign-in is handed over.
     /// Night round 2026-11-11 (A1 S7, A2 S7): `clientStatus` says which Valve build is in the prefix; a build the Dock host does not support
     /// (SteamRuntimeFiles.supportedClientSHA256) is refused here with words and the fingerprint in the log, instead of after the whole sign-in
     /// with host result 30 (SQDE4K, T12JFC, AT5CSS). A supported build passes unchanged.
+    /// Round 677 (agent A1 S5): a Steam component listed with the games (steamComponents) is refused with words before anything starts.
     static func validate(_ game: DockGame, drive: URL, bundled: Bool = MadeiraDock.bundled,
                          clientStatus: (URL) -> SteamRuntimeFiles.ClientStatus = SteamRuntimeFiles.clientStatus(drive:)) throws {
         guard bundled else { throw DockError.message("This copy of BCD was built without BCD Dock. Build the Dock host with build/madeira-dock/build.sh.") }
         guard validAppID(game.id), validFolderName(game.installDir) else {
             throw DockError.message("The Steam install record for this game has an invalid App ID or folder name.")
+        }
+        if let name = steamComponents[game.id] {
+            SteamLog.event("[dock-skip] app=\(game.id) component")
+            throw DockError.message("\(name) is a Steam component, not a game: Steam installs it for the games that need it. Start the game itself.")
         }
         switch clientStatus(drive) {
         case .missing:
@@ -299,6 +312,11 @@ enum MadeiraDock {
                 // codes are SteamError.signInExpiredCodes (the library's own "no longer accepts your sign-in" answer).
                 if let code = fields["session-connection-result"], Self.expiredSignInResults.contains(code) {
                     return "Steam no longer accepts your sign-in. Sign out of Steam in Settings, then sign in again."
+                }
+                // Round 668 (A1, merge N049; J4Z2WW, PN74QY and seven archive logs of one phone): EResult 3, no connection: every lookup of
+                // Valve's server names failed inside BCD (the auto-tune rule dock-steam-names-unresolvable says the same).
+                if fields["session-connection-result"] == "3" {
+                    return "Steam's client couldn't reach Valve's servers: no connection got through. This device's network, a VPN, a DNS filter or a content blocker may be blocking Steam. Try another Wi-Fi or mobile data, turn such filters and VPNs off for a moment, then try again."
                 }
                 return "Steam's sign-in didn't complete. Check your connection, then try again."
             }
@@ -538,6 +556,7 @@ enum MadeiraDock {
         if let url = transferURL { try? FileManager.default.removeItem(at: url) }
         unsetenv("MADEIRA_DOCK_AUTH_FILE")
         unsetenv("MADEIRA_DOCK_OFFLINE")
+        unsetenv("MADEIRA_LUAJIT_C_COMMENTS")   // madeira-bcd (build 666, pull request #51): see configure(_:launchOption:)
         // The friends feed and command too: a host that did not end cleanly
         // leaves them, and a later session must not show its list.
         friendsRequested = false
@@ -596,6 +615,14 @@ enum MadeiraDock {
         friendsRequested = SteamOnlineStatus.current != .offline
         SteamLog.event("[dock-launch] friends=\(friendsRequested ? 1 : 0)")
         setenv("MADEIRA_STEAM_HOST_LAUNCH_OPTION", String(launchOption), 1)
+        // madeira-bcd (build 666, pull request #51 by pauloec): Grim Dawn's SteamOS/Linux compatibility executable (launch key 1,
+        // compat/Grim Dawn.exe in Steam's app info) uses C-style Lua comments, which only BCD's lua-c-comments LuaJIT parses
+        // (build/wineserver/luajit_compat.c); every other launch clears the switch. A game's own bcd.cfg line still wins.
+        if game.id == 219990 && launchOption == 1 {
+            setenv("MADEIRA_LUAJIT_C_COMMENTS", "1", 1)
+        } else {
+            unsetenv("MADEIRA_LUAJIT_C_COMMENTS")
+        }
         setenv("MADEIRA_STEAM_HOST_CLIENT_DIR", SteamRuntimeFiles.windowsRoot, 1)
         setenv("MADEIRA_STEAM_HOST_EXPECTED_INSTALL", game.windowsInstallPath, 1)
         // madeira-bcd: the same folder is the program being played for the session's code-buffer budget (virtual_ios.c ios_pool_fg_class).
@@ -743,13 +770,28 @@ enum DockOffline {
     private(set) static var sessionApp: Int?
     private static var sessionMarked = false
 
+    /// Round 668 (A1 S7): the JIT shortcut's owed "done" input, kept on disk by JITNetworkShortcut (JITNetwork.swift, its pendingKey;
+    /// tests/host/check-jit-network.py holds the two names equal). "done cellular..." means "start cellular" switched cellular data off
+    /// and has not switched it back yet.
+    static let jitShortcutPendingKey = "madeiraJITShortcutPendingDone"
+    static var jitCellularHeldOff: Bool {
+        (UserDefaults.standard.string(forKey: jitShortcutPendingKey) ?? "").hasPrefix("done cellular")
+    }
+
     /// Part of MadeiraDock.configure: tells the host when there is no network.
     static func configure(appID: Int) {
         sessionApp = appID
         sessionMarked = false
-        let offline = enabled && networkDown
+        // Round 668 (A1 S7; PE0FAY and 45 archive logs, builds 572-665): the JIT shortcut's "start cellular" holds cellular data off
+        // until its "done", which runs after the JIT pool, a few seconds after this read: a phone that is online read "down", and 9 of
+        // those starts could not work offline at all. Such a "down" is not counted. If the connection really is down, the host still
+        // asks Valve's client for an offline logon after 20 s (madeira-dock session.c, session-offline-fallback).
+        let rawDown = networkDown
+        let held = rawDown && jitCellularHeldOff
+        let down = rawDown && !held
+        let offline = enabled && down
         if offline { setenv("MADEIRA_DOCK_OFFLINE", "1", 1) } else { unsetenv("MADEIRA_DOCK_OFFLINE") }
-        SteamLog.event("[dock-offline] enabled=\(enabled ? 1 : 0) network=\(networkDown ? "down" : "up") request=\(offline ? 1 : 0) account-saved=\(accountSaved != nil ? 1 : 0) game-started-online=\(verified(appID) != nil ? 1 : 0)")
+        SteamLog.event("[dock-offline] enabled=\(enabled ? 1 : 0) network=\(down ? "down" : "up")\(held ? " (cellular held off by the JIT shortcut: not counted)" : "") request=\(offline ? 1 : 0) account-saved=\(accountSaved != nil ? 1 : 0) game-started-online=\(verified(appID) != nil ? 1 : 0)")
     }
 
     /// Follows the host's report (MadeiraDockModel.watchReport): an online start

@@ -74,7 +74,7 @@ struct AutoTuneReplay {
             let enc = JSONEncoder()
             enc.outputFormatting = [.sortedKeys]
             let facts = (try? JSONSerialization.jsonObject(with: enc.encode(scanner.facts))) ?? [:]
-            let out: [String: Any] = [
+            var out: [String: Any] = [
                 "file": url.lastPathComponent,
                 "facts": facts,
                 "outcome": report.outcome,
@@ -85,6 +85,8 @@ struct AutoTuneReplay {
                 "status": state.status,
                 "next": state.candidate ?? [],
             ]
+            // Round 670 (I1): what a session that played suggests (only when there is a suggestion, so the other .expect files stay as they are).
+            if let lines = state.suggestion { out["suggest"] = lines }
             if let d = try? JSONSerialization.data(withJSONObject: out, options: [.sortedKeys]) {
                 print(String(decoding: d, as: UTF8.self))
             }

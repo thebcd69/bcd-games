@@ -1,0 +1,23 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true
+ },
+ "matched": [
+  "bc-decode-memory-kill",
+  "bc-half-memory-kill",
+  "swap-8gb-memory-kill-sure",
+  "swap-8gb-memory-kill",
+  "bc-decode-memory-kill-4gb-limit"
+ ],
+ "next": [
+  "env.MADEIRA_MIP_CLAMP_AUTO = 2"
+ ],
+ "note": "Shroom and Gloom (Unity IL2CPP, Steam 3271280, BCD Dock), build 665, iPhone14,3 (A15, bc=0, 6 GB): auto-tune's dxmt = d3d11.mipClampBC=1 (bc-decode-memory-kill) was in the game's file and iOS still closed the game at 4,087 of 4,095 MB 31 s in: 958 of 960 BC textures have a single level, which the clamp cannot shrink. Send Log 8GQH2M, trimmed. The replay starts from a fresh state, so --user-keys dxmt stands for the clamp already in place; the next step is bc-half-memory-kill: MADEIRA_MIP_CLAMP_AUTO = 2 (build 680: single-level BC textures at half size near the limit; from build 681 the app links d3d11-src.dll for it on a GPU without BC sampling, so the line alone does it). Round 677, agent G3 S1.",
+ "outcome": "killed",
+ "stage": 3,
+ "status": "trying",
+ "userKeys": [
+  "dxmt"
+ ]
+}

@@ -185,7 +185,7 @@ cmb = cmb[:cmb.index("\nfi\n") + 4]
 dco_at, cmb_at = build.index('if [ -n "$DCO" ]; then'), build.index('if [ -n "$CMB" ]; then')
 check("the build builds it only from a tree with the patch's file and next to a shipped combase.dll; MADEIRA_COMBASE_BUILD=0 skips it",
       '"${MADEIRA_COMBASE_BUILD:-1}" != 0' in build and '[ -f "$R/wine/dlls/combase/apartment.c" ] && [ -f "$SHIP/combase.dll" ]' in build
-      and "$DCO$CMB$KUD\" ]" in build)   # build 663: kernel32-usd.dll (KUD) follows it in the "nothing to build" guard
+      and "$DCO$CMB$KUD$ECC\" ]" in build)   # build 663: kernel32-usd.dll (KUD) follows it in the "nothing to build" guard; round 668: the ARM64EC cmd.exe (ECC)
 check("it patches, makes, strips, pads, verifies against the shipped file, ships as combase-optin.dll, restores the tree and the objects",
       cmb.index("patch-wine-combase-implicit-mta.py\" \"$R/wine\"") < cmb.index("make -C \"$B\"") < cmb.index("--strip-debug \"$cb_tmp\"")
       < cmb.index("+ 0x10000") < cmb.index("--verify \"$cb_tmp\" \"$SHIP/combase.dll\"") < cmb.index('mv "$cb_tmp" "$SHIP/combase-optin.dll"')

@@ -20,9 +20,9 @@ struct BCDReadinessModule: Equatable {
 
 /// What this device has for a game to find, as the live side reads it.
 struct BCDReadinessProvided: Equatable {
-    /// Microsoft's Visual C++ 2015-2022 x64 copy (Settings › Visual C++, or bundled): it carries mfc140.dll and mfc140u.dll.
+    /// Microsoft's Visual C++ 2015-2022 x64 copy (Settings › Visual C++ runtime, or bundled): it carries mfc140.dll and mfc140u.dll.
     var vcRuntimeX64 = false
-    /// Round 625 (the owner's item 26): Microsoft's 32-bit MFC (Settings › Visual C++ › MFC, 32-bit): mfc140.dll, mfc140u.dll,
+    /// Round 625 (the owner's item 26): Microsoft's 32-bit MFC (Settings › Visual C++ runtime › 32-bit MFC): mfc140.dll, mfc140u.dll,
     /// mfcm140.dll and mfcm140u.dll, which a 32-bit game gets with env.MADEIRA_MFC32 = 1.
     var vcRuntimeX86 = false
     /// Wine Mono (Settings › .NET Framework).
@@ -87,6 +87,13 @@ enum BCDReadiness {
                     add("steamapi", "\(m.file) needs \(name), which is not in the game's folder. This copy of the game is incomplete: add the "
                         + "missing file (or install the game again) and try again.", fixable: false)
                 }
+                // Round 668 (R1, merge N037; Red Dead Redemption 2 G4C8X3): NVIDIA's low-latency library is a file of the game's own copy,
+                // beside RDR2.exe; without it the program ends with c0000135 before its first window.
+                if complete && name == "nvlowlatencyvk.dll" && !files.contains(name) {
+                    add("nvlowlatency", "\(m.file) needs \(name) (NVIDIA's low-latency library, a small file that is part of the game), which is not "
+                        + "in the game's folder. This copy of the game is incomplete: add the missing file (or install the game again) and try again.",
+                        fixable: false)
+                }
                 if isMFC(name) && !files.contains(name) {
                     if m.is64 {
                         // Microsoft's own copy has mfc140.dll and mfc140u.dll; the other MFC files (debug, language, mfcm) it does not.
@@ -102,7 +109,7 @@ enum BCDReadiness {
                         let carried = mfc32Names.contains(name)
                         if !provided.vcRuntimeX86 || !carried {
                             add("mfc32", carried
-                                ? "\(m.file) is a 32-bit program that wants \(name) (Microsoft's MFC). Download the 32-bit MFC in Settings › Visual C++ first."
+                                ? "\(m.file) is a 32-bit program that wants \(name) (Microsoft's MFC). Download the 32-bit MFC in Settings › Visual C++ runtime first."
                                 : "\(m.file) is a 32-bit program that wants \(name), which Microsoft's 32-bit MFC does not have. BCD cannot supply it.",
                                 fixable: carried)
                         }
@@ -142,8 +149,18 @@ enum BCDReadiness {
                     + "increased memory limit has too little of it, so most Unity games stop at once here. Add the limit with GetMoreRam, or sign BCD "
                     + "with a paid developer account.", fixable: false)
             } else if let gb = provided.mapGB, gb < 40 {
-                add("unity-small-map", "This is a Unity game, and this device gives BCD only \(gb) GB of address space, even with the memory limit, "
-                    + "so most Unity games cannot start on it.", fixable: false)
+                // Round 2026-11-17 (K2, N112): about 4 to 5 GB of that are free, the engine asks for 6 to 17 GB in 511 MB blocks. env.MADEIRA_UNITY_SMALL_VA
+                // (build 669; turned on after such a stop) fits at most 16 blocks: 22 % of the archive's Unity games ask for so few.
+                add("unity-small-map", "This is a Unity game, and this device gives BCD only \(gb) GB of address space, even with the memory limit "
+                    + "(about 4 to 5 GB of it free), so most Unity games cannot start on it. On some of these devices, BCD's automatic settings try a mode after "
+                    + "a stop that fits up to 16 of the game's 511 MB blocks of address space; most Unity games ask for more.", fixable: false)
+            } else if let gb = provided.mapGB, gb > 400, gb < 500, !provided.extendedVA {
+                // Round 668 (K1, merge N051; Hollow Knight G3AFNB, Y5HR3K on 454 GB maps, iPhone SE 2020 / iPad 10th generation class): the map
+                // ends at 454 GB and, without extended VA, has no free 511 MB block left for Unity's engine (the archive's two such Unity sessions,
+                // 0 frames). The 454 GB maps that ran Unity were M-class iPads with extended VA; 63 GB and 512 GB maps are not flagged.
+                add("unity-small-map", "This is a Unity game, and this device's address space (\(gb) GB, without the Extended Virtual Addressing "
+                    + "entitlement) leaves BCD only about 5 GB free, too little for the game's engine, so most Unity games cannot start on it. After a stop, "
+                    + "BCD's automatic settings try a mode that fits up to 16 of the game's 511 MB blocks of address space; most Unity games ask for more.", fixable: false)
             }
         }
         // Round 624 (agent N S13): a 32-bit MAIN program needs a 4 GB block of address space of its own; an install without the limit and without

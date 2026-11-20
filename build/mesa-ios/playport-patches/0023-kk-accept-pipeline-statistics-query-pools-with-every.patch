@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sat, 17 Oct 2026 22:05:18 +0200
+Subject: [PATCH] kk: accept pipeline-statistics query pools, with every
+ counter 0
+
+Red Dead Redemption 2's Vulkan renderer creates a pipeline-statistics
+query pool (8 queries, all 11 counters), begins and ends its queries and
+copies their results, without enabling pipelineStatisticsQuery, which
+KosmicKrisp does not report: Metal has no statistics counters on Apple
+GPUs. That is invalid usage, but other drivers tolerate it, and
+KosmicKrisp reached UNREACHABLE in kk_reports_per_query when the pool was
+created.
+
+Give such a pool one report per enabled counter, as a transform
+feedback pool has two, and record nothing between begin and end: the
+reports keep the zeros of the last reset, and the end makes the query
+available as it does for the other types. Host results and
+vkCmdCopyQueryPoolResults then go through the existing paths: one zero
+per counter, the availability where asked, in 32 or 64 bits.
+pipelineStatisticsQuery stays unreported, so an application that checks
+it still knows the counts are not real.
+
+Class: feature
+Evidence: docs/evidence/2026-10-17-rdr2-vulkan-needs.md
+Offered-upstream: no
+---
+ src/kosmickrisp/vulkan/kk_query_pool.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/kosmickrisp/vulkan/kk_query_pool.c b/src/kosmickrisp/vulkan/kk_query_pool.c
+index 6039fda..4e36bcc 100644
+--- a/src/kosmickrisp/vulkan/kk_query_pool.c
++++ b/src/kosmickrisp/vulkan/kk_query_pool.c
+@@ -41,6 +41,11 @@ kk_reports_per_query(struct kk_query_pool *pool)
+    case VK_QUERY_TYPE_TRANSFORM_FEEDBACK_STREAM_EXT:
+       /* Primitives written, primitives needed */
+       return 2;
++   case VK_QUERY_TYPE_PIPELINE_STATISTICS:
++      /* One per counter. Metal has no statistics counters and the device
++       * reports no pipelineStatisticsQuery; a pool is accepted for
++       * applications that create one anyway, and every counter stays 0. */
++      return util_bitcount(pool->vk.pipeline_statistics);
+    default:
+       UNREACHABLE("Unsupported query type");
+    }
+@@ -72,6 +77,12 @@ kk_pool_is_ts(struct kk_query_pool *pool)
+    return pool->vk.query_type == VK_QUERY_TYPE_TIMESTAMP;
+ }
+ 
++static inline bool
++kk_pool_is_ps(struct kk_query_pool *pool)
++{
++   return pool->vk.query_type == VK_QUERY_TYPE_PIPELINE_STATISTICS;
++}
++
+ /* Only occlusion queries remap their index, into the device's visibility
+  * buffer; every other pool keeps its reports in its own BO. */
+ static uint64_t
+@@ -460,6 +471,11 @@ kk_CmdBeginQueryIndexedEXT(VkCommandBuffer commandBuffer, VkQueryPool queryPool,
+       return;
+    }
+ 
++   /* Pipeline statistics count nothing: the reports keep the zeros of the
++    * last reset, and the end makes them available. */
++   if (kk_pool_is_ps(pool))
++      return;
++
+    cmd->state.gfx.occlusion.mode = flags & VK_QUERY_CONTROL_PRECISE_BIT
+                                       ? MTL_VISIBILITY_RESULT_MODE_COUNTING
+                                       : MTL_VISIBILITY_RESULT_MODE_BOOLEAN;
+@@ -478,7 +494,7 @@ kk_CmdEndQueryIndexedEXT(VkCommandBuffer commandBuffer, VkQueryPool queryPool,
+    if (pool->vk.query_type == VK_QUERY_TYPE_TRANSFORM_FEEDBACK_STREAM_EXT) {
+       assert(index < ARRAY_SIZE(cmd->state.gfx.xfb.query));
+       cmd->state.gfx.xfb.query[index] = 0u;
+-   } else {
++   } else if (!kk_pool_is_ps(pool)) {
+       cmd->state.gfx.occlusion.mode = MTL_VISIBILITY_RESULT_MODE_DISABLED;
+       cmd->state.gfx.dirty |= KK_DIRTY_OCCLUSION;
+    }

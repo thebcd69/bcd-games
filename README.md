@@ -94,14 +94,16 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
 - **.NET games** through Wine Mono, downloaded in the app.
 - **Feedback from the app:** Settings › Feedback to tell us what is broken or what to improve,
   and Send Log after a crash.
-- **iPhone Duo (experimental):** on the foldable iPhone, Settings › Graphics › Foldable iPhone has two
-  switches, both off by default and both changing nothing on other iPhones and iPads. *Duo
-  enhancements* gives BCD a native interface with Liquid Glass, system tabs and a sidebar, search in
-  the Library and controller navigation; the Windows desktop's Start, Open and Stop sit on Home, and
-  downloads resume when the desktop runs in the background. *Foldable iPhone support* starts a game
-  you add at a resolution shaped like the inner display, and the touch controls follow the screen when
-  you fold or unfold the phone. Installed directly, iOS shows BCD in a small window on the inner
-  display; inside LiveContainer it fills the screen. Both switches apply from the next start of BCD.
+- **iPhone Duo:** BCD is built with the iOS 27 SDK and fills both displays of the foldable iPhone,
+  installed directly or inside LiveContainer: the inner display open or half open, and the outer
+  display closed. The interface fits each of them in either orientation. Settings › Graphics ›
+  Foldable iPhone has two more switches (experimental), both off by default and both changing nothing
+  on other iPhones and iPads. *Duo enhancements* gives BCD a native interface with Liquid Glass, system
+  tabs and a sidebar, search in the Library and controller navigation; the Windows desktop's Start,
+  Open and Stop sit on Home, and downloads resume when the desktop runs in the background. *Foldable
+  iPhone support* starts a game you add at a resolution shaped like the inner display, and the touch
+  controls follow the screen when you fold or unfold the phone. Both switches apply from the next
+  start of BCD.
 
 ## Games
 
@@ -283,8 +285,8 @@ layouts, the Amazon Games store and more, listed file by file in THIRD-PARTY-NOT
 **Contributors to BCD:** [mckenna654](https://github.com/mckenna654), [Pardoxum](https://github.com/Pardoxum),
 [le0-VV](https://github.com/le0-VV), [rtmtree](https://github.com/rtmtree), [vancez](https://github.com/vancez),
 [creeper4004](https://github.com/creeper4004), [iqui27](https://github.com/iqui27), [Taala2](https://github.com/Taala2),
-[pauloec](https://github.com/pauloec), [rbarton124](https://github.com/rbarton124) and
-[netheritenee](https://www.reddit.com/user/netheritenee).
+[pauloec](https://github.com/pauloec), [rbarton124](https://github.com/rbarton124), [bogsen](https://github.com/bogsen),
+[RageMC](https://github.com/RageMC), [netheritenee](https://www.reddit.com/user/netheritenee) and [SeeTheBridges](https://github.com/SeeTheBridges).
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by

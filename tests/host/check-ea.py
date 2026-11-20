@@ -72,13 +72,14 @@ written = [app / 'BCDEA/BCDEAMachine.swift', app / 'BCDEA/BCDEAMachineLive.swift
            app / 'BCDStores/BCDStoreCards.swift']
 project = (app.parent / 'Madeira.xcodeproj/project.pbxproj').read_text()
 
-# Madeira's own files that BCD did not change are Madeira's, byte for byte (Madeira 5fda6a0, v0.2.0).
+# Madeira's own files that BCD did not change are Madeira's, byte for byte (Madeira 5fda6a0, v0.2.0; EADownloader.swift at 6ec82989, upstream #594's
+# autorelease pool for repair reads, build 669).
 verbatim = {
-    'SwiftEA/EADownloader.swift': '0b68e329b552918d59afa4d6aa636edf07109f00cb473b3eca84cd171b5317d3',
+    'SwiftEA/EADownloader.swift': 'f6a18811ac1efeba569906861d97f2e2b0bf715bfce010228ecf114544ec8b12',
     'SwiftEA/EALicense.swift': 'd223083b0f1d7daff2ff035bce3cc5bb1632a4e7626862548cdb300202cc7686',
 }
 for name, digest in verbatim.items():
-    require(hashlib.sha256((app / name).read_bytes()).hexdigest() == digest, f'{name}: byte for byte Madeira\'s (5fda6a0)')
+    require(hashlib.sha256((app / name).read_bytes()).hexdigest() == digest, f'{name}: byte for byte Madeira\'s (5fda6a0 / 6ec82989)')
 
 for name in madeira_files + ['EARegistry.swift']:
     path = ea_dir / name

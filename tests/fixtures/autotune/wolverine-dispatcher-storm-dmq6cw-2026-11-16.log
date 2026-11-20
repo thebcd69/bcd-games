@@ -1,0 +1,367 @@
+[22:25:41.691] [INFO] Checking entitlements...
+[22:25:41.692] [INFO] [build] v0.1.659 (659)
+[22:25:41.692] [INFO] [device] model=iPhone14,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=5639MB available=4073MB cores=6
+[22:25:41.693] [INFO] [device] address-map=[0x102120000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[22:25:41.693] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=none appid-match=0 wildcard=0 lc=1
+[22:25:41.707] [INFO] [device] settings: low-power=0 thermal=nominal screen=1284x2778@3.0x max-fps=120 utc-offset=+01:00 free-disk=1GB stikdebug-url=1
+[22:25:41.711] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:25:46.436] [INFO] [bcd-ui] play local
+[22:25:46.443] [INFO] [bcd] library launch X-Men Origins - Wolverine.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[22:25:46.458] [INFO] Running full Wine sequence...
+[22:25:46.459] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102120000,0x8000000000) 512GB available=4055MB low-power=0 thermal=nominal
+[22:25:46.460] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[22:25:46.487] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:25:46.487] [INFO] Allocating 896MB JIT pool via debugger...
+[22:25:46.487] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:25:46.488] [INFO] [jit-debugger] attached=1 at the pool request
+[22:25:46.488] [INFO] [jit-age] attach age=6s source=at-start method=stikdebug thermal=0
+[22:25:46.494] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[22:25:46.496] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 464MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:25:46.496] [ERR] ⚠️ SMALL JIT POOL (464MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[22:25:48.704] [INFO] RX pool at 0x1224f0000
+[22:25:48.740] [OK] JIT pool ready (debugger still attached).
+[22:25:48.741] [INFO] BRK suspension lasted 2.25s
+[22:25:48.743] [INFO] Detaching debugger...
+[22:25:48.748] [OK] Debugger detached.
+[22:25:48.749] [OK] [early-detach] rev=ml524 took 6 ms
+[22:25:48.751] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.303s rev=ml526
+[22:25:48.791] [wineserver] send_client_fd: fd=39 handle=0x3a2 msg_fd_unix=36 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/ccba5386ff329a61.cfg (read)
+[WineProc] Target exe: C:\X-Men Origins Wolverine\X-Men Origins - Wolverine.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[22:25:49.244] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[Wine init_process] reply_pipe=43, sending init_first_thread...
+[22:25:49.244] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3581 MB + phys_footprint=514 MB = 4096 MB (hw.memsize says 5639 MB)
+ml985: preferred base 0x140000000+0x15a000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x15c000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x10b050000+0x15a000 (?) → pool 0x1224f6000 used=0x166000/0x1d000000 tramp+0x0
+[copy-verify] ?: OK, 45 .text pages executable (copy @0x1224f6000)
+ml957: ? backing 0x10b050000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x122654000 used=0x29c000/0x1d000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x122654000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 289)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1138: 533 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1138: 533 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe8b0000+0x41d000 (libarm64ecfex.dll) → pool 0x12278f000 used=0x6c7000/0x1d000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x12278f000)
+[jit-pool] image 0x71fe780000+0x130000 (ucrtbase.dll) → pool 0x122bb4000 used=0x7f8000/0x1d000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x122bb4000)
+[window] 0x148000000..0x77fd000000 regions=29892 occupied=461360 MB of 486224 MB free=41199 MB maxhole=16336 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[footprint] rev=ml358 phys=529 MB (peak 529) internal=527 MB compressed=0 MB external=120 MB reusable=11 MB (cycle=1)
+[jit-pool] image 0x71fe6c0000+0xc0000 (kernel32.dll) → pool 0x122ce8000 used=0x8c0000/0x1d000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x122ce8000)
+[jit-pool] image 0x71fe3d0000+0x2f0000 (kernelbase.dll) → pool 0x122db0000 used=0xbc0000/0x1d000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x122db0000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module X-Men Origins - Wolverine.exe (x-men origins - wolverine.exe-54d52a1d01fb220f): 10B050000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module WSOCK32.dll (wsock32.dll-baa9e16ae0127f28): 71FE2E0000
+D 24 Load module ws2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FE240000
+D 24 Load module iphlpapi.dll (iphlpapi.dll-af2b7f72e65b7df1): 71FE1A0000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE0F0000
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1138: 533 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1138: 533 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1000: 496 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x10b050000 IAT window 0x10b105000+0x1000: 496 slot(s), 0 data import(s) bound
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x123c94000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x123d48000)
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x123e3c000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x123ec0000)
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x123f54000)
+E 24 [iOS-xins] tracker=0x122b59fd8 WININET.dll sec=0x71fd080000-0x71fd0bb029
+E 24 [iOS-xins] tracker=0x122b59fd8 WININET.dll sec=0x71fd0c0000-0x71fd0c0f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FD070000
+E 24 [iOS-xins] tracker=0x122b59fd8 WININET.dll sec=0x71fd080000-0x71fd0bb029
+E 24 [iOS-xins] tracker=0x122b59fd8 WININET.dll sec=0x71fd0c0000-0x71fd0c0f90
+E 24 [img-map] ml710 #25 intervals-only WININET.dll base=0x71fd070000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:ios_eager_delay_resolve [ec-eager-delay:ldrload] L"WININET.dll" -> iphlpapi.dll: resolved=1 failed=0
+E 28 [thr-term] rev=ml435 deinit #1 tid=0x28
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=4000003c vis={0,0,300,100} surface=0x111ff33e8 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10030 class='AutoIt v3' text="" rev=ml853
+[win-pos] #4 hwnd=0x10036 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x111ff33e8 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x111ff33e8 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x10030 after=0x0 flags=40000018 vis={0,0,300,100} surface=0x111ff33e8 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x10030 class='AutoIt v3' text="AutoIt v3" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #7 hwnd=0x10030 after=0x0 flags=4000181f vis={0,0,300,100} surface=0x111ff33e8 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #7 hwnd=0x10030 class='AutoIt v3' text="AutoIt v3" rev=ml853
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\X-Men Origins Wolverine\\ChemicalFlood.bat" cmdline=L"\"C:\\X-Men Origins Wolverine\\ChemicalFlood.bat\""
+[phase] spawn:L"C:\\X-Men Origins Wolverine\\ChemicalFlood.bat" t+  3.352s rev=ml526
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\cmd.exe" cmdline=L"C:\\windows\\system32\\cmd.exe /s/c \"\"C:\\X-Men Origins Wolverine\\ChemicalFlood.bat\"\""
+[phase] spawn:L"C:\\windows\\system32\\cmd.exe" t+  3.354s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\cmd.exe /s/c \"\"C:\\X-Men Origins Wolverine\\ChemicalFlood.bat\"\"" (fd=121, unixdir=123, dup_unixdir=127) cwd=L"C:\\X-Men Origins Wolverine\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x109f00000+0xa0000 (?) → pool 0x1253d8000 used=0x2f8c000/0x1d000000 tramp+0x4000
+0030:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=1)
+[win-pos] #8 hwnd=0x10030 after=0x0 flags=4000181f vis={0,0,300,100} surface=0x111ff33e8 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #8 hwnd=0x10030 class='AutoIt v3' text="AutoIt v3" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=742
+[unwind] term ml661 begin rip=71fe700690 rsp=701d80ff08 window=[701d80ff08..701e00ff08) max=32
+[unwind] term ml661 #00 pc=71fe700690 rsp=701d80ff08  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=0 rbp=701d80ffd0 rsi=0 rdi=6204b40d432e r12=0 r13=0 r14=0 r15=1
+[unwind] term ml662   rbp=701d80ffd0: 00000000 00000000 20e3d022 01000000 d86d6b22 01000000 00000000 00000000
+[unwind] term ml661 #01 pc=10b079160 rsp=701d80ff10  (exe)+0x29160
+[unwind] term ml662 #01 nv: rbx=0 rbp=701d80ffd0 rsi=0 rdi=6204b40d432e r12=0 r13=0 r14=0 r15=1
+[unwind] term ml661 #02 pc=10b0790fc rsp=701d80ff40  (exe)+0x290fc
+[unwind] term ml661 #03 pc=10b075490 rsp=701d80ff70  (exe)+0x25490
+[unwind] term ml662   global @+0x69 -> 10b1061b0 = 0x00000000 (0)
+[nls-getptr] type=11 id=1252 peb=0x102424000
+[nls-getptr] type=11 id=437 peb=0x102424000
+[copy-verify] libarm64ecfex.dll: OK, 132 .text pages executable (copy @0x1255b7000)
+[xp-names] m853136 "wine-x18-exc"
+[xp] 22:25:49.900 +0.60 dt=320 cpu=277 (thr 234) P=259 E=18 run=289 pgw=-1.0 GHz P=2.79 E=1.98 Minst=3005 IPC=3.97 mJ=521 pin=1762 rdKB=36836 fpMB=612
+0030:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x28"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  3.437s rev=ml526
+[nls-getptr] type=11 id=20127 peb=0x102424000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 30 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x102424000
+[nls-getptr] type=11 id=437 peb=0x102424000
+[jit-pool] image 0x71faac0000+0x110000 (msvcrt.dll) → pool 0x126ad0000 used=0x46f4000/0x1d000000 tramp+0x4000
+D 30 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FAAC0000
+[jit-pool] image 0x71fa8a0000+0x220000 (user32.dll) → pool 0x126be4000 used=0x491c000/0x1d000000 tramp+0x8000
+D 30 Load module user32.dll (user32.dll-7d4349728057d260): 71FA8A0000
+[jit-pool] image 0x71fa7b0000+0xf0000 (gdi32.dll) → pool 0x126e0c000 used=0x4a14000/0x1d000000 tramp+0x8000
+D 30 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FA7B0000
+[jit-pool] image 0x71fa710000+0xa0000 (win32u.dll) → pool 0x126f04000 used=0x4ab8000/0x1d000000 tramp+0x4000
+D 30 Load module win32u.dll (win32u.dll-e45aa71e43175410): 71FA710000
+[free-delay] #1 release of 0x701fdb0000+0x100000 held for 2000 ms (1 in flight)
+[jit-pool] image 0x71fa670000+0xa0000 (imm32.dll) → pool 0x126fa8000 used=0x4b5c000/0x1d000000 tramp+0x4000
+D 30 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FA670000
+[jit-pool] image 0x71fa5f0000+0x80000 (cryptbase.dll) → pool 0x12704c000 used=0x4be0000/0x1d000000 tramp+0x4000
+D 30 Load module cryptbase.dll (cryptbase.dll-e47fe560728c2647): 71FA5F0000
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #1 pc=0x1256cf428 fault_addr=0x0 insn=39000230 rn=17 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffc0000
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0x39000230 pc=0x1256cf428 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x0 hostpc=0x1256cf428 hinsn=0x39000230 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x1256cf428 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1256cf428 addr=0x0 x18=0x0 type=1 lr=0x125b419cc sp=0x701f55ffa8 x16=0x1 x17=0x0
+[ec-fault-regs] x8=0x125b80000 x9=0x109f2a44c x10=0x125b419b4 x11=0x125b419b4 x0=0x102424000 x2=0x102424000 | teb=0x71fffc0000 peb=0x102424000 peb->EcCodeBitMap=0x71fecd0000
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x0 at host pc=0x1256cf428; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RDX=0x109f2a44c = (exe)+0x2a44c
+[fault-host] 1256cf328: b40000d0 f9400604 cb040224 f9400a17 eb17009f 54000223 f00015c9 b948a929
+[fault-host] 1256cf348: f0001590 91226210 8b091610 340001a9 d1008210 51000529 f9400604 cb040224
+[fault-host] 1256cf368: f9400a17 eb17009f 54000043 17fffff8 f00015d7 f9044ef0 f9400217 8b0402f1
+[fault-host] 1256cf388: d53bd070 927df210 f9448610 f9403210 f941b610 b40001d0 d352fe37 f8777a10
+[fault-host] 1256cf3a8: d34cfe37 9ad72610 36000130 a8c127e4 b0001550 913b0210 f9400217 910006f7
+[fault-host] 1256cf3c8: f9000217 f9000611 d61f0220 a8c127e4 b0001550 913b0210 f9400a17 910006f7
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0x0  (x16=0x1 pe=0x71fbcb0000 rva_pc=0xcf428)
+[mach_exc] insn_stream PC-12..PC+8: f9448631 f94bc631 52800030 [39000230] d5033bbf f0001510 9130c210
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffc0000 TEB[0x58]=0x701f56e5a0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x125b80000 RCX=0x102424000 RDX=0x109f2a44c RBX=0x0 RSP=0x0 RBP=0x701f55ffd0 RSI=0x0 RDI=0x0
+[x86_live]  R8=0x102424000  R9=0x0 R10=0x0 R11=0x0 R12=0x0 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x0 callret_sp=0x0
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0x39000230 pc=0x1256cf428 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x0 hostpc=0x1256cf428 hinsn=0x39000230 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x1256cf428 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1256cf428 addr=0x0 x18=0x0 type=1 lr=0x125b419cc sp=0x701f55ffa8 x16=0x1 x17=0x0
+[ec-fault-regs] x8=0x125b80000 x9=0x109f2a44c x10=0x125b419b4 x11=0x125b419b4 x0=0x102424000 x2=0x102424000 | teb=0x71fffc0000 peb=0x102424000 peb->EcCodeBitMap=0x71fecd0000
+[fault-host] 1256cf388: d53bd070 927df210 f9448610 f9403210 f941b610 b40001d0 d352fe37 f8777a10
+[fault-host] 1256cf3a8: d34cfe37 9ad72610 36000130 a8c127e4 b0001550 913b0210 f9400217 910006f7
+[fault-host] 1256cf3c8: f9000217 f9000611 d61f0220 a8c127e4 b0001550 913b0210 f9400a17 910006f7
+[fault-host] 1256cf3e8: f9000a17 f9000e11 b0001550 913c0210 910003f1 d3504e31 8b111a10 91210210
+[fault-host] 1256cf408: d2800031 f831021f f81f8ffe d53bd071 927df231 f9448631 f94bc631 52800030
+[fault-host] 1256cf428: 39000230 d5033bbf f0001510 9130c210 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0xdead1  PE[pe+0xc04e0]=0x0  (x16=0x1 pe=0x71fbcb0000 rva_pc=0xcf428)
+[mach_exc] insn_stream PC-12..PC+8: f9448631 f94bc631 52800030 [39000230] d5033bbf f0001510 9130c210
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffc0000 TEB[0x58]=0x701f56e5a0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x125b80000 RCX=0x102424000 RDX=0x109f2a44c RBX=0x0 RSP=0x0 RBP=0x701f55ffd0 RSI=0x0 RDI=0x0
+[x86_live]  R8=0x102424000  R9=0x0 R10=0x0 R11=0x0 R12=0x0 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x0 callret_sp=0x0
+0030:err:seh:segv_handler SEGV #1: pc=0x1256cf428 addr=0x0 uctx_x18=0x0 disp=0 mach_exc=666
+0030:err:seh:segv_handler [x18-decline] #1 pc=0x1256cf428 fault_addr=0x0 insn=39000230 rn=17 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffc0000
+0030:err:seh:segv_handler [x18-decline] #1 insns pc-64..pc+16: [f9000a17 f9000e11 b0001550 913c0210 910003f1 d3504e31 8b111a10 91210210 d2800031 f831021f f81f8ffe d53bd071 927df231 f9448631 f94bc631 52800030 39000230 d5033bbf f0001510 9130c210 c8dffe10]
+0030:err:seh:segv_handler [x18-decline] #1 markers(words=320): brk#CAFE@-1 brk#0@-1 mrs_TPIDRRO@40 msr_TPIDR_EL0@-1
+0030:err:seh:segv_handler [disp-dump] block=0x1256cc000 pc=0x1256cf428 offset=0x3428 (16KB-aligned window)
+0030:err:seh:segv_handler [disp-dump] +3228: 8a0f0231 eb09023f 54fffc01 17ffffe0 000e19f5 f81f0ffe b0ffffc0 9113e000 97fba47e b0ffffc0 91156000 97fba47b b0ffffc0 91161000 97fba478 b0ffffc0 
+0030:err:seh:segv_handler   x8=0x125b80000 x9=0x109f2a44c x10=0x125b419b4 x16=0x1 x17=0x0 x18=0x0 x19=0x0 x20=0x0
+0030:err:seh:segv_handler   [guest-state] x28=0x0 UNREADABLE got=0
+0030:err:seh:segv_handler   [fex-fault] pc=kernel32.dll+0x118428 lr=kernel32.dll+0x319cc fault-addr=0x0 sp=0x701f55ffa8 fp=0x701f55ffd0 teb=0x0 rev=r624
+0030:err:seh:segv_handler setup_exception for SEGV at pc=0x1256cf428 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x71fbdc8428 RX from -32, 64 of 64 bytes: 31 00 80 d2 1f 02 31 f8 fe 8f 1f f8 71 d0 3b d5 31 f2 7d 92 31 4e 44 f9 31 c6 4b f9 30 00 80 52 30 02 00 39 bf 3b 03 d5 10 15 00 f0 10 c2 30 91 10 fe df c8 70 00 00 b4 3f 20 03 d5 fb ff ff 17 
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x71fbdc8428 (not an anon-JIT page)
+[unalign-byte] ml624 #5 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #3 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x1254dd378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x1254dd378 addr=0x0 x18=0x71fffc0000 type=1 lr=0x1254dd228 sp=0x701f55f0c0 x16=0x701f55ec50 x17=0x1254e6884
+[ec-fault-regs] x8=0x0 x9=0x1256cb1f0 x10=0x1256cf428 x11=0x1256cf428 x0=0x4b x2=0xd | teb=0x71fffc0000 peb=0x102424000 peb->EcCodeBitMap=0x71fecd0000
+[mach_exc] insn_stream PC-12..PC+8: f94086ab f0000361 911ec021 [39400108] f9400b6c b940036f f0000262
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x71fffc0000 TEB[0x58]=0x701f56e5a0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x0 RCX=0x4b RDX=0x12554c7b0 RBX=0x701f55fef0 RSP=0x0 RBP=0x701f55ffd0 RSI=0xc0000005 RDI=0x701f55f670
+[x86_live]  R8=0xd  R9=0x8 R10=0x701f55f0c0 R11=0x10 R12=0x12554e000 R13=0x12554c000 R14=0x701f55fb40 R15=0x12554c000
+[x86_live] State.RIP=0x0 callret_sp=0x0
+[unalign-byte] ml624 #6 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #4 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x1254dd378 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x1254dd378 addr=0x0 x18=0x71fffc0000 type=1 lr=0x1254dd228 sp=0x701f55f0c0 x16=0x701f55ec50 x17=0x1254e6884
+[mach_exc] insn_stream PC-12..PC+8: f94086ab f0000361 911ec021 [39400108] f9400b6c b940036f f0000262
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+0030:err:seh:segv_handler   [guest-state] x28=0x0 UNREADABLE got=0
+0030:err:seh:segv_handler   [emit-dump]   +-24  f9476669 910003e4 f9407f4a f94086ab f0000361 911ec021
+0030:err:seh:segv_handler   [emit-dump]   +0    39400108 f9400b6c b940036f f0000262 911fc042 90000283
+0030:err:seh:segv_handler   [emit-dump]   +24   91068063 52800020 52800605 b9002be8 a901a7ea a900afec
+0030:err:seh:segv_handler   [rsp-trunc] cpuarea=0x0 implausible (TSD275 not a wine TEB) -- skipping deref rev=ml558
+0030:err:seh:segv_handler   insn_stream PC-12..PC+8: f94086ab f0000361 911ec021 [39400108] f9400b6c b940036f f0000262
+0030:err:seh:segv_handler setup_exception for SEGV at pc=0x1254dd378 addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x71ffd31378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x71ffd31378 (not an anon-JIT page)
+[unalign-byte] ml624 #7 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #5 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x71ffd31378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x71ffd31378 (not an anon-JIT page)
+[unalign-byte] ml624 #8 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #6 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x71ffd31378 RX from -32, 64 of 64 bytes: c8 02 08 36 48 c6 4b f9 69 66 47 f9 e4 03 00 91 4a 7f 40 f9 ab 86 40 f9 61 03 00 f0 21 c0 1e 91 08 01 40 39 6c 0b 40 f9 6f 03 40 b9 62 02 00 f0 42 c0 1f 91 83 02 00 90 63 80 06 91 20 00 80 52 
+0030:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x71ffd31378 (not an anon-JIT page)
+[unalign-byte] ml624 #9 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #7 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #7 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[unalign-byte] ml624 #10 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[store-noalias] #8 rev=ml348 addr=0x0 insn=0x39400108 pc=0x1254dd378 NO pool/anon alias | region 0x102120000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #8 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[unalign-byte] ml624 #13 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #3 pc=0x1254dd378 fault_addr=0x0 insn=39400108 rn=8 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffc0000
+[unalign-byte] ml624 #14 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+no-teb:err:seh:ios_mach_exception_thread [x18-decline] #4 pc=0x1254dd378 fault_addr=0x0 insn=39400108 rn=8 xRn=0x0 (rn_val==fault_addr? 1) x18=0 teb=0x71fffc0000
+[unalign-byte] ml624 #15 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[unalign-byte] ml624 #16 SKIP backpatch: byte access cannot be unaligned; insn=39400108 pc=0x1254dd378 addr=0x0 -> alias emulator (pc-4 preserved)
+[av-detail] ml613 #19 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #21 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #22 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #23 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[av-detail] ml613 #24 p0=READ p1=0x0 hostpc=0x1254dd378 hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[redeliv] 256 identical redeliveries pc=0x1254dd378 addr=0x0 — storm forming rev=ml461
+[redeliv] 2000 identical redeliveries pc=0x1254dd378 addr=0x0 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] the storm is in a child Windows process (peb=0x102424000, thread teb=0x71fffc0000), not the session's first one: ending that process and that thread only, the app keeps running rev=ajan11
+[redeliv] the storming thread is ended (kr=0) rev=ajan11
+[redeliv] ending only the Windows process cmd.exe (peb=0x102424000, master socket 126): the app and the other processes keep running rev=ajan11
+[pool-freechk] POISONED AT FREE off=0x2ee8000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4b5c000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4ab8000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4a14000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x491c000 size=0xf8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x46f4000 size=0x228000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x39ec000 size=0x984000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x36e8000 size=0x300000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x3620000 size=0xc8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x34ec000 size=0x134000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x30c4000 size=0x428000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x2f8c000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[redeliv] the Windows process cmd.exe (peb=0x102424000) is released: socket, child table, JIT allocations, guest window rev=ajan11
+[unwind] term ml661 #04 pc=122d199cc rsp=701d80ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 10b079160  (exe)+0x29160
+[term-stack] ml660 sp+030: CALL 10b0790fc  (exe)+0x290fc
+[term-stack] ml660 sp+060: CALL 10b075490  (exe)+0x25490
+[vfree] ml842 # base=0x7c05810000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #1 0x7c05810000+0x1000000 tid=0024 live=1 rev=ml435
+[vfree] ml842 # base=0x7c01410000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #2 0x7c01410000+0x1000000 tid=0024 live=0 rev=ml435
+[vfree] ml842 # base=0x13f4ec000 size=0x0 type=0x8000 tid=0024
+[jit-pool] tail FREE rx=0x13f4ec000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=1098
+[unwind] term ml661 begin rip=1226d22fc rsp=701d80fd58 window=[701d80fd58..701e00fd58) max=32
+[unwind] term ml661 #00 pc=1226d22fc rsp=701d80fd58  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: CALL 10b08b612  (exe)+0x3b612
+[term-stack] ml660 sp+038:   ? 10b077110  (exe)+0x27110
+[term-stack] ml660 sp+1b0: call* 10b079160  (exe)+0x29160
+[term-stack] ml660 sp+1e0: CALL 10b0790fc  (exe)+0x290fc
+[term-stack] ml660 sp+210: CALL 10b075490  (exe)+0x25490
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] madeira-bcd: the main process exited but 1 child process(es) it started still run (cmd.exe) -- a launcher started the game; the session goes on until they exit (MADEIRA_WAIT_CHILDREN=0 ends it with the main process)
+[srv-kill] kill_process pid=0020 violent=0 threads: 0024 rev=ml586
+[srv-kill] kill_thread tid=0024 pid=0020 violent=0 rev=ml586
+[xp] 22:25:50.226 +0.92 dt=325 cpu=234 (thr 230) P=211 E=23 run=288 pgw=-1.0 GHz P=2.81 E=1.98 Minst=2038 IPC=3.19 mJ=389 pin=1929 rdKB=92756 fpMB=656
+[xp] 22:25:50.511 +1.21 dt=286 cpu=11 (thr 11) P=0 E=11 run=13 pgw=-1.0 GHz P=3.11 E=0.61 Minst=12 IPC=1.55 mJ=1 pin=0 rdKB=0 fpMB=656
+[xp] 22:25:50.816 +1.51 dt=304 cpu=8 (thr 8) P=0 E=8 run=11 pgw=-1.0 GHz P=0.00 E=0.60 Minst=7 IPC=1.51 mJ=0 pin=0 rdKB=0 fpMB=656
+[xp] 22:25:51.138 +1.83 dt=322 cpu=11 (thr 11) P=0 E=11 run=15 pgw=-1.0 GHz P=0.00 E=0.60 Minst=11 IPC=1.62 mJ=0 pin=0 rdKB=0 fpMB=656
+[footprint] rev=ml358 phys=665 MB (peak 665) internal=663 MB compressed=0 MB external=217 MB reusable=11 MB (cycle=2)
+[xp] 22:25:51.416 +2.11 dt=278 cpu=72 (thr 72) P=29 E=44 run=75 pgw=-1.0 GHz P=3.14 E=1.05 Minst=359 IPC=2.64 mJ=71 pin=0 rdKB=0 fpMB=665
+[WineProc] stopping wineserver...
+[22:25:52.462] [INFO] [session] length=6s play=0s frames=0 stalls=0/0s peak=665MB limit=4095MB thermal=nominal lpm=0 res=1416x656 cap=60 game=X-Men Origins - Wolverine
+[frontend] returned to library
+[footprint] rev=ml358 phys=670 MB (peak 670) internal=669 MB compressed=0 MB external=218 MB reusable=10 MB (cycle=3)
+[22:25:54.341] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=672 MB (peak 672) internal=671 MB compressed=0 MB external=220 MB reusable=10 MB (cycle=4)
+[footprint] rev=ml358 phys=671 MB (peak 672) internal=670 MB compressed=0 MB external=220 MB reusable=11 MB (cycle=5)
+[footprint] rev=ml358 phys=671 MB (peak 672) internal=670 MB compressed=0 MB external=220 MB reusable=11 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% RUN pc=UIFoundation`<redacted>+0x0 lr=UIKitCore`<redacted>+0x3c sp=0x16dcd9d60 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16df96b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16e0acc90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16e50c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x1c sp=0x16e022c40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "AudioSession - RootQueue" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_timedwait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x58 sp=0x16e2def20 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=4% RUN pc=CoreFoundation`CFNumberGetValue+0x64 lr=CoreFoundation`<redacted>+0x30 sp=0x16dcd9180 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16e1c6500 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=CoreFoundation`<redacted>+0x78 lr=CoreFoundation`<redacted>+0x2c sp=0x16e7cd880 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[footprint] rev=ml358 phys=682 MB (peak 682) internal=675 MB compressed=0 MB external=227 MB reusable=11 MB (cycle=13)
+[footprint] rev=ml358 phys=679 MB (peak 682) internal=673 MB compressed=0 MB external=227 MB reusable=14 MB (cycle=14)
+[footprint] rev=ml358 phys=679 MB (peak 682) internal=673 MB compressed=0 MB external=227 MB reusable=14 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=14 resident=914MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=679 MB (peak 682) internal=673 MB compressed=0 MB external=227 MB reusable=14 MB (cycle=16)
+[footprint] rev=ml358 phys=679 MB (peak 682) internal=673 MB compressed=0 MB external=227 MB reusable=14 MB (cycle=17)
+[xp] 22:26:23.549 +34.24 dt=270 cpu=29 (thr 29) P=0 E=29 run=30 pgw=-1.0 GHz P=0.00 E=0.82 Minst=33 IPC=1.40 mJ=1 pin=0 rdKB=0 fpMB=680
+[footprint] rev=ml358 phys=680 MB (peak 682) internal=673 MB compressed=0 MB external=227 MB reusable=14 MB (cycle=18)
+[xp] 22:26:23.867 +34.56 dt=318 cpu=26 (thr 26) P=0 E=26 run=27 pgw=-1.0 GHz P=0.00 E=0.69 Minst=28 IPC=1.53 mJ=1 pin=0 rdKB=0 fpMB=679
+[xp] 22:26:24.170 +34.87 dt=303 cpu=90 (thr 89) P=29 E=62 run=122 pgw=-1.0 GHz P=2.08 E=1.35 Minst=202 IPC=1.41 mJ=25 pin=1 rdKB=0 fpMB=680
+[xp] 22:26:24.464 +35.16 dt=294 cpu=18 (thr 18) P=1 E=17 run=20 pgw=-1.0 GHz P=2.25 E=1.72 Minst=47 IPC=1.51 mJ=3 pin=0 rdKB=0 fpMB=680
+[22:26:24.465] [xp] 22:26:24.464 +35.16 dt=294 cpu=18 (thr 18) P=1 E=17 run=20 pgw=-1.0 GHz P=2.25 E=1.72 Minst=47 IPC=1.51 mJ=3 pin=0 rdKB=0 fpMB=680
+[22:26:24.745] [xp] 22:26:24.745 +35.44 dt=280 cpu=183 (thr 181) P=14 E=169 run=201 pgw=-1.0 GHz P=1.64 E=1.75 Minst=780 IPC=2.44 mJ=39 pin=4 rdKB=100 fpMB=681

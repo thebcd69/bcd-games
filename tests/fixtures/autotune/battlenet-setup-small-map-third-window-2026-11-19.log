@@ -1,0 +1,631 @@
+[22:42:56.952] [INFO] Checking entitlements...
+[22:42:56.953] [INFO] [build] v0.1.665 (665)
+[22:42:56.953] [INFO] [device] model=iPad15,3 idiom=pad os=iPadOS Version 26.6.1 (Build 23G83) ram=7642MB available=8171MB cores=8
+[22:42:56.953] [INFO] [device] address-map=[0x100c8c000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[22:42:56.954] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[22:42:56.965] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+01:00 free-disk=64GB stikdebug-url=1
+[22:42:56.972] [INFO] [device] gpu="Apple M3 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:55:11.153] [INFO] Requesting JIT with StikDebug...
+[22:55:11.184] [INFO] Opening StikDebug to enable JIT...
+[22:55:19.377] [INFO] [bcd] library launch Battle.net-Setup.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=0 metalfx=off lc=0
+[22:55:19.394] [INFO] Running full Wine sequence...
+[22:55:19.395] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100c8c000,0xfc0000000) 63GB available=8146MB low-power=0 thermal=nominal
+[22:55:19.397] [INFO] [game-cfg] env.MADEIRA_CHILD_ARGS=Battle.net.exe --in-process-gpu --disable-gpu-process-for-dx12-info-collection --disable-site-isolation-trials --renderer-process-limit=2 env.MADEIRA_GDI_SHARED_SECTION=1 env.MADEIRA_INT3_X86_DUMP=1 env.MADEIRA_MSIEXEC_SYSTEM32=1 env.MADEIRA_PROTECT_WRITECOPY_AS_RW=1 env.MADEIRA_X86_FAULT_DUMP=1 pool-split=1
+[22:55:19.487] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:55:19.488] [INFO] Allocating 896MB JIT pool via debugger...
+[22:55:19.488] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:55:19.488] [INFO] [jit-debugger] attached=1 at the pool request
+[22:55:19.488] [INFO] [jit-age] attach age=0s source=enable-jit method=stikdebug thermal=0
+[22:55:19.489] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[22:55:21.835] [INFO] RX pool at 0x300000000
+[22:55:21.872] [OK] JIT pool ready (debugger still attached).
+[22:55:21.877] [INFO] BRK suspension lasted 2.39s
+[22:55:21.879] [INFO] Detaching debugger...
+[22:55:21.882] [OK] Debugger detached.
+[22:55:21.884] [OK] [early-detach] rev=ml524 took 5 ms
+[22:55:21.885] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.445s rev=ml526
+[22:55:21.933] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/bcd-game.cfg (read)
+[game-cfg]   pool-split = 1
+[madeira-env] game MADEIRA_PROTECT_WRITECOPY_AS_RW=1
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] Target exe: explorer.exe (bundle=aarch64-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; sysx64 only)
+[WineProc] MADEIRA_D3D8=d3d9: d3d8.dll -> d3d8to9.dll (Direct3D 8 on Direct3D 9, DXMT's; syswow64)
+[WineProc] MADEIRA_OPTIN_DLLS: wmadmod.dll -> wmadmod-optin.dll (Wine's wmadmod.dll for this game)
+[WineProc] MADEIRA_OPTIN_DLLS: mfasfsrcsnk.dll -> mfasfsrcsnk-optin.dll (Wine's mfasfsrcsnk.dll for this game)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x1113e0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[22:55:22.376] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=36 reply=41/42 wait=43/44 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7232 MB + phys_footprint=959 MB = 8192 MB (hw.memsize says 7642 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7642 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11d2b0000+0x70000 (?) → pool 0x300004000 used=0x78000/0x38000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[fex-arena] ml793 PUBLISHED [0xb40000000,0xd40000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcf0000+0x110000 (ntdll.dll) → pool 0x300078000 used=0x190000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[ec-hook] #1 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c0a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #2 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c1038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[ec-hook] #3 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c13a4+0x4: rva 0x113a4, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 16 aa 83 05 00 94 e4 03 00 aa | pool before sync: 21 7b 01 14 e0 03 16 aa 83 05 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #4 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c1a40+0x4: rva 0x11a40, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | pool before sync: 7f 79 01 14 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | jump -> 0 (-) bytes there: -
+[ec-hook] #5 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c0a58+0x4: rva 0x10a58, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | pool before sync: 6a 7d 01 14 e8 d3 00 b9 a8 00 00 f0 08 d5 41 f9 | jump -> 0 (-) bytes there: -
+[ec-hook] #6 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c1038+0x4: rva 0x11038, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 42 6a 40 b9 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | pool before sync: f7 7b 01 14 5f 68 11 71 c0 fb ff 54 5f f8 01 71 | jump -> 0 (-) bytes there: -
+[ec-hook] #7 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c13a4+0x4: rva 0x113a4, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 53 6a 40 b9 e0 03 16 aa 83 05 00 94 e4 03 00 aa | pool before sync: 21 7b 01 14 e0 03 16 aa 83 05 00 94 e4 03 00 aa | jump -> 0 (-) bytes there: -
+[ec-hook] #8 scope=difference view=difference tid=0024 image 0x11d2b0000 (pool copy 0x300004000) 0x11d2c1a40+0x4: rva 0x11a40, section #0 '.text' rva 0x10000+0xe424 chars 0x60000020 (R-X CODE) | PE bytes: 40 4a 40 b9 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | pool before sync: 7f 79 01 14 08 d5 41 f9 00 01 3f d6 40 02 00 b4 | jump -> 0 (-) bytes there: -
+[jit-pool] image 0xfbfc50000+0xa0000 (KERNEL32.dll) → pool 0x300190000 used=0x238000/0x38000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[jit-pool] image 0xfbfae0000+0x170000 (kernelbase.dll) → pool 0x300238000 used=0x3b8000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbfa10000+0xd0000 (rpcrt4.dll) → pool 0x3003b8000 used=0x48c000/0x38000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[jit-pool] image 0xfbf980000+0x90000 (advapi32.dll) → pool 0x30048c000 used=0x520000/0x38000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[window] 0x148000000..0xb40000000 regions=100001 occupied=7713 MB of 40832 MB free=33118 MB maxhole=32230 MB@0x361990000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=967 MB (peak 967) internal=963 MB compressed=4 MB external=69 MB reusable=56 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[gdi-shared] session table 0x129660000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1152x800, winstation visible, input desktop set
+[image-reload] unmapped image 0xfbf260000+0x90000: 1 pool copy marked
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={0,0,100,100} surface=0x1040d49b0 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000018 vis={0,0,100,100} surface=0x1040d49b0 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #3 hwnd=0x10020 after=0x0 flags=8000116a vis={0,0,1152,800} surface=0x1256d2b80 rev=ml505 style=96000000 visible=1 parent=0x0
+[win-name] #3 hwnd=0x10020 class='#32769' text="shell - Wine Desktop" rev=ml853
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[vmode] synthesized CURRENT = 1152x800 @60Hz
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[win-pos] #4 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #4 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-pos] #5 hwnd=0x1002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #5 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+[win-pos] #6 hwnd=0x10032 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #6 hwnd=0x10032 class='WineAppBar' text="WineAppBar" rev=ml853
+[win-name] #7 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\cmd.exe" cmdline=L"cmd /c C:\\bcd-games\\<uuid>.bat"
+[phase] spawn:L"C:\\windows\\system32\\cmd.exe" t+  3.180s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"cmd /c C:\\bcd-games\\<uuid>.bat" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"C:\\bcd-launchers\\"
+[jit-pool] image 0x12a7d0000+0xa0000 (?) → pool 0x301834000 used=0x18d8000/0x38000000 tramp+0x4000
+0038:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x3018d8000)
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x3019f0000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x301a84000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x30"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  3.235s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x30 --headless" (fd=121, unixdir=122, dup_unixdir=128) cwd=L"C:\\bcd-launchers\\"
+[jit-pool] image 0x12ab40000+0x80000 (?) → pool 0x302e10000 used=0x2e94000/0x38000000 tramp+0x4000
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x302fac000)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\reg.exe" cmdline=L"reg query \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrA\"   "
+[phase] spawn:L"C:\\windows\\system32\\reg.exe" t+  3.290s rev=ml526
+[wow-window] session armed: a 32-bit process is expected
+0038:err:process:spawn_process spawn_process: creating child thread for L"reg query \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrA\"   " (fd=137, unixdir=138, dup_unixdir=142) cwd=L"C:\\bcd-launchers\\"
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] B=0x400000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x400000000 reserve=0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+004c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x400400000 transfer=0x4004062b0 window=0x400000000 guest_base=0x400000
+[launch-view] dismissed reason=surface logs=0
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+004c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x13fbc0000+0x3c4000 (libwow64fex.dll) → pool 0x303abe000 used=0x3e8a000/0x38000000 tramp+0x4000
+ml957: libwow64fex.dll backing 0x13fbc0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[guest-log] madeira-bcd text-log mirror: every line, 800 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[guest-log] file <container>/Documents/wine/drive_c/rpm-poison.log
+[guest-log] #1 tid=004c [rpm-sink] alive rev=ml492
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c000000d proc=reg.exe tid=004c size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=004c #1 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x400310000 total=256 MB
+E [wow64-ctor] madeira-bcd: Threads@0x303e45ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+[xp] 22:55:23.037 +0.59 dt=271 cpu=262 (thr 27) P=261 E=1 run=262 pgw=-1.0 GHz P=3.74 E=2.28 Minst=4379 IPC=4.48 mJ=982 pin=64 rdKB=7036 fpMB=1034
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 22:55:23.362 +0.92 dt=324 cpu=327 (thr 327) P=327 E=0 run=324 pgw=-1.0 GHz P=3.76 E=2.30 Minst=5879 IPC=4.78 mJ=1293 pin=0 rdKB=0 fpMB=1034
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x13fbc0000) -> 64-bit table (0x104690708)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 4C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 4C Load module reg.exe (reg.exe-71e582fa8dad260b): 400400000
+D 4C Load module ntdll.dll (ntdll.dll-3903096a83d3d6c4): 4FFF40000
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 4C Load module kernel32.dll (kernel32.dll-3a7c334be1ce221c): 47BED0000
+D 4C Load module kernelbase.dll (kernelbase.dll-1bada4728ab630ec): 47BC40000
+D 4C Load module advapi32.dll (advapi32.dll-e40424e11a0010d3): 47BBF0000
+D 4C Load module sechost.dll (sechost.dll-b367444c07b929be): 47BBC0000
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=467
+[term-stack] 32-bit sp+000: ret fff8e14c ntdll.dll+0x4e14c (an indirect call before it)
+[term-stack] 32-bit sp+004: ret fff6c090 ntdll.dll+0x2c090 (a direct call before it)
+[term-stack] 32-bit sp+018: ret 7bee8c4e kernel32.dll+0x18c4e (a direct call before it)
+[term-stack] 32-bit sp+02c: ret 7baf5dde ucrtbase.dll+0x25dde (an indirect call before it)
+[term-stack] 32-bit sp+04c: ret 00406316 reg.exe+0x6316 (a direct call before it)
+[term-stack] 32-bit sp+064: ret 7bef40c0 kernel32.dll+0x240c0 (an indirect call before it)
+[term-code] 32-bit terminate: EIP 0x003d0000 (no module (an anonymous page)+0x0); EAX=0000002c ECX=00302000 EDX=fff8ef00 ESI=00000001 EDI=00000003; 12 modules (MADEIRA_X86_FAULT_DUMP)
+004c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=468
+[term-code] 32-bit terminate: EIP 0x003d0000 (no module (an anonymous page)+0x0); EAX=0000002c ECX=00000002 EDX=fff8ef00 ESI=00000001 EDI=00000003; 12 modules (MADEIRA_X86_FAULT_DUMP)
+004c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=141
+[pool-freechk] POISONED AT FREE off=0x3930000 size=0x118000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4258000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x41d4000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4054000 size=0x180000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x3fac000 size=0xa8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x3e88000 size=0x124000 cur=0x3 max=0x3  <== narrowed during the module's life
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\reg.exe" cmdline=L"reg query \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrB\"   "
+[phase] spawn:L"C:\\windows\\system32\\reg.exe" t+  4.011s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"reg query \"HKLM\\System\\CurrentControlSet\\Services\\PnkBstrB\"   " (fd=138, unixdir=139, dup_unixdir=146) cwd=L"C:\\bcd-launchers\\"
+[xp] 22:55:23.687 +1.24 dt=325 cpu=116 (thr 28) P=116 E=1 run=124 pgw=-1.0 GHz P=3.66 E=1.81 Minst=1674 IPC=3.95 mJ=442 pin=6 rdKB=9312 fpMB=1067
+[file-wfail] ml669 #8 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp] 22:55:24.005 +1.56 dt=318 cpu=15 (thr 15) P=0 E=15 run=18 pgw=-1.0 GHz P=0.00 E=0.87 Minst=18 IPC=1.36 mJ=1 pin=0 rdKB=0 fpMB=1067
+[xp] 22:55:24.256 +1.81 dt=251 cpu=9 (thr 9) P=0 E=9 run=11 pgw=-1.0 GHz P=0.00 E=0.74 Minst=10 IPC=1.48 mJ=0 pin=0 rdKB=0 fpMB=1067
+[footprint] rev=ml358 phys=1078 MB (peak 1078) internal=1075 MB compressed=4 MB external=120 MB reusable=50 MB (cycle=2)
+[xp] 22:55:24.509 +2.07 dt=253 cpu=29 (thr 28) P=0 E=29 run=29 pgw=-1.0 GHz P=0.00 E=1.39 Minst=41 IPC=1.04 mJ=2 pin=0 rdKB=0 fpMB=1078
+[file-wfail] ml669 #19 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x400000000 reserve=0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+0054:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x400400000 transfer=0x4004062b0 window=0x400000000 guest_base=0x400000
+0054:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0054:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x13f340000+0x3c4000 (libwow64fex.dll) → pool 0x3042ee000 used=0x46ba000/0x38000000 tramp+0x4000
+[footprint] rev=ml358 phys=1080 MB (peak 1080) internal=1077 MB compressed=4 MB external=120 MB reusable=50 MB (cycle=3)
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c000000d proc=reg.exe tid=0054 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=2 rev=ajan5-rockstar
+[bigres] tid=0054 #2 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x400310000 total=512 MB
+E [wow64-ctor] madeira-bcd: Threads@0x304675ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+[file-wfail] ml669 #20 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #21 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 54 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+0054:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=651
+[term-code] 32-bit terminate: EIP 0x003d0000 (no module (an anonymous page)+0x0); EAX=0000002c ECX=00302000 EDX=fff8ef00 ESI=00000001 EDI=00000003; 12 modules (MADEIRA_X86_FAULT_DUMP)
+0054:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=652
+0054:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=143
+[pool-freechk] POISONED AT FREE off=0x42ec000 size=0x3cc000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x3a04000 size=0x74000 cur=0x3 max=0x3  <== narrowed during the module's life
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(1)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\start.exe" cmdline=L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\""
+[phase] spawn:L"C:\\windows\\system32\\start.exe" t+  7.635s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\start.exe \"\\\"\\\"\" \"C:\\windows\\system32\\services.exe\"" (fd=135, unixdir=136, dup_unixdir=143) cwd=L"C:\\bcd-launchers\\"
+[jit-pool] image 0x124600000+0x70000 (?) → pool 0x30412c000 used=0x41a0000/0x38000000 tramp+0x4000
+[file-wfail] ml669 #22 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x305930000)
+[file-wfail] ml669 #23 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+005c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\services.exe" cmdline=L"\"C:\\windows\\system32\\services.exe\" "
+[phase] spawn:L"C:\\windows\\system32\\services.exe" t+  8.205s rev=ml526
+005c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\services.exe\" " (fd=155, unixdir=156, dup_unixdir=160) cwd=L"C:\\bcd-launchers\\"
+[jit-pool] image 0x131000000+0x60000 (?) → pool 0x3059c4000 used=0x5a28000/0x38000000 tramp+0x4000
+[file-wfail] ml669 #24 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=141
+[pool-freechk] POISONED AT FREE off=0x412c000 size=0x74000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x4838000 size=0x118000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x3e54000 size=0xa8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x41a0000 size=0x74000 cur=0x3 max=0x3  <== narrowed during the module's life
+[Wine ntdll/server] process_exit_wrapper(0)
+[ec-hook] #1 scope=other-jump view=pool tid=0064 image 0x131000000 (pool copy 0x3059c4000) 0x131017101+0x7: rva 0x17101, section #0 '.text' rva 0x10000+0x90d4 chars 0x60000020 (R-X CODE) | PE bytes: e9 0f 36 44 6a 40 b9 42 00 00 d0 42 00 29 91 43 | pool before sync: e9 0f 36 05 24 01 14 42 00 00 d0 42 00 29 91 43 | jump -> 0x329a2e715 (no pool copy) bytes there: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+[ec-hook] #2 scope=other-jump view=pool tid=0064 image 0x131000000 (pool copy 0x3059c4000) 0x131017101+0x7: rva 0x17101, section #0 '.text' rva 0x10000+0x90d4 chars 0x60000020 (R-X CODE) | PE bytes: e9 0f 36 44 6a 40 b9 42 00 00 d0 42 00 29 91 43 | pool before sync: e9 0f 36 05 24 01 14 42 00 00 d0 42 00 29 91 43 | jump -> 0x329a2e715 (no pool copy) bytes there: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+[jit-pool] image 0x131230000+0x70000 (?) → pool 0x305d68000 used=0x5ddc000/0x38000000 tramp+0x4000
+[footprint] rev=ml358 phys=1159 MB (peak 1159) internal=1156 MB compressed=4 MB external=168 MB reusable=50 MB (cycle=4)
+[hwinput] keyboard focus: elsewhere (pointer left the game view)
+[hwinput] mouse focus: elsewhere (pointer left the game view)
+[hwinput] keyboard focus: program (app active)
+[hwinput] keyboard focus: elsewhere (pointer left the game view)
+[hwinput] mouse focus: elsewhere (pointer left the game view)
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1159 MB (peak 1159) internal=1157 MB compressed=4 MB external=167 MB reusable=49 MB (cycle=5)
+[wow-window] adopted placeholder B=0x400000000..0x500000000 guard=owned
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x400000000 reserve=0
+[wow-window] slot 0 B=0x400000000 bound to peb=0x400310000
+007c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x400400000 transfer=0x4006ad086 window=0x400000000 guest_base=0x400000
+007c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+007c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[nt-fail] #3 NtAllocateVirtualMemoryEx status=c000000d proc=battle.net-setup.exe tid=007c size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=007c #3 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x400310000 total=768 MB
+E [wow64-ctor] madeira-bcd: Threads@0x304f2dee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 7C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemoryEx #6 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+E 7C [iOS-xins] tracker=0x304f2e018 WININET.dll sec=0x47b1f1000-0x47b224f6c
+D 7C Load module WININET.dll (wininet.dll-7ed1ba985c22d05b): 47B1F0000
+[srv-stuck] tid=0030 teb=0xfbffb0000 age=8931ms op=1 flags=00000002 timeout=9223372036854775807 alertable=0 nhandles=2 caller=0x102a0859c
+[srv-stuck]   tid=0030 suspend=0 rev=ml714
+[srv-stuck]   h[0]=000000c0 obj=0x11b233d40 type=Event raw_obj=0x11b233d40 raw_waiters=0 sync_obj=0x125c556d0 sync_waiters=1 thread_wait=0x11b0c2a80 state=LINKED Event manual=0 signaled=0 cell=7
+[srv-stuck]   h[1]=000000c4 obj=0x11b233b80 type=Event raw_obj=0x11b233b80 raw_waiters=0 sync_obj=0x11d775090 sync_waiters=1 thread_wait=0x11b0c2a80 state=LINKED Event manual=0 signaled=0 cell=8
+[srv-stuck] tid=003c teb=0xfbff90000 age=8905ms op=1 flags=00000003 timeout=9223372036854775807 alertable=1 nhandles=2 caller=0x102a0859c
+[srv-stuck]   tid=003c suspend=0 rev=ml714
+[free-refused] ml1285 #3 addr=0x1 size=0 type=0x8000 status=0xc000000d view=0x0+0 protect=0 valloc=-1 tid=007c
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52244 dport=52243 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #1 "nydus.battle.net" "80" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #1 "nydus.battle.net" = 0 after 9 ms (2 result(s))
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52245 dport=80 nb=1 ret=-1 plen=16 rev=ml478
+[sock-big] send ERROR fd=234 errno=57 rev=ml464
+[sock-big] send ERROR fd=234 errno=57 rev=ml464
+[sock-big] send ERROR fd=234 errno=57 rev=ml464
+[guest-log] file <container>/Documents/wine/drive_c/ProgramData/Battle.net/Setup/bna_2/Logs/battle.net-setup-20261117T215531.log
+[guest-log] #2 tid=007c I 2026-11-17 21:55:31.931592 [Main] {7c} Active screen changed: bootstrap
+[guest-log] #3 tid=00a4 I 2026-11-17 21:55:31.932027 [Main] {a4} Battle.net Setup 2.0.0.4232 started.
+[guest-log] #4 tid=00a4 I 2026-11-17 21:55:31.932832 [Main] {a4} Running from: C:\bcd-launchers\Battle.net-Setup.exe
+[guest-log] #5 tid=00a4 I 2026-11-17 21:55:31.932865 [Main] {a4} Configuration: locale= region=US uid=battle.net
+[guest-log] #6 tid=00a4 I 2026-11-17 21:55:31.933416 [Main] {a4} Running as admin
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52247 dport=52246 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #2 "telemetry-in.battle.net" "443" family=0 flags=0x0 type=1
+[xp-names] m260552 "wine-x18-exc"
+[dns] madeira-bcd end #2 "telemetry-in.battle.net" = 0 after 20 ms (1 result(s))
+[exc-disp] dispatch tid=00b0 code=000006ba flags=0 addr=0x47bc52f79 pc=303ed1be8 nparams=0 p0=0 p1=0
+00b0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00b0 status=00000001 caller=7BEF40C8
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52248 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[sock-big] send ERROR fd=244 errno=57 rev=ml464
+[sock-big] send ERROR fd=244 errno=57 rev=ml464
+[sock-big] send ERROR fd=244 errno=57 rev=ml464
+[srv-conn-done] dport=443 event=OUT err=0 fd=243 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52250 dport=52249 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #3 "telemetry-in.battle.net" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #3 "telemetry-in.battle.net" = 0 after 1 ms (1 result(s))
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52251 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=443 event=OUT err=0 fd=243 peer=YES path=REAL-kernel-completion rev=ml576
+[footprint] rev=ml358 phys=1251 MB (peak 1251) internal=1248 MB compressed=4 MB external=174 MB reusable=29 MB (cycle=6)
+[srv-input] btn msg=0x201 at (462,405) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (462,405) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (462,405) hit win=00010054 thread=0x125fdbc00
+[dns] madeira-bcd begin #4 "us.version.battle.net" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #4 "us.version.battle.net" = 0 after 18 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=243 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #5 "us.version.battle.net" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #5 "us.version.battle.net" = 0 after 1 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=243 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #6 "us.version.battle.net" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #6 "us.version.battle.net" = 0 after 2 ms (1 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=243 peer=YES path=REAL-kernel-completion rev=ml576
+[dns] madeira-bcd begin #8 "level3.blizzard.com" "80" family=2 flags=0x0 type=1
+[dns] madeira-bcd end #8 "level3.blizzard.com" = 0 after 1 ms (2 result(s))
+[dns] madeira-bcd begin #9 "us.cdn.blizzard.com" "80" family=2 flags=0x0 type=1
+[dns] madeira-bcd end #9 "us.cdn.blizzard.com" = 0 after 9 ms (8 result(s))
+[dns] madeira-bcd begin #10 "level3.ssl.blizzard.com" "443" family=2 flags=0x0 type=1
+[dns] madeira-bcd end #10 "level3.ssl.blizzard.com" = 0 after 9 ms (2 result(s))
+[dns] madeira-bcd begin #11 "us.cdn.blizzard.com" "443" family=2 flags=0x0 type=1
+[dns] madeira-bcd end #11 "us.cdn.blizzard.com" = 0 after 0 ms (8 result(s))
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+00a4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00a4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00a4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" cmdline=L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838"
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" t+ 18.560s rev=ml526
+00a4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838" (fd=389, unixdir=390, dup_unixdir=396) cwd=L"C:\\bcd-launchers\\"
+[wow-window] B=0x400000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x500000000: window body after failed reservations (OCCUPIED 0x500000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] B=0x500000000 REJECTED: 4GB+guard unavailable and the page at 0x600000000 is not an inaccessible neighbour (FREE: all 0x4000 bytes from 0x600000000 are free, next region 0xb40000000 (+0x53fffc000 past the end) <-- iOS REFUSED A FREE RANGE)
+[wow-window] B=0x600000000: reserved 4GB + own guard page (+0x4000)
+[wow-window] reserved B=0x600000000..0x700000000 (slot 1) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x600000000 reserve=0
+[wow-window] slot 1 B=0x600000000 bound to peb=0x600310000
+00fc:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x600400000 transfer=0x6004264d9 window=0x600000000 guest_base=0x400000
+00fc:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00fc:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[copy-verify] libwow64fex.dll: OK, 121 .text pages executable (copy @0x304f72000)
+[nt-fail] #4 NtAllocateVirtualMemoryEx status=c000000d proc=agent.exe tid=00fc size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[bigres] tid=00fc #4 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x600310000 total=1024 MB
+E [wow64-ctor] madeira-bcd: Threads@0x3052f9ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[exec-alloc] NtAllocateVirtualMemoryEx #7 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I FC FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemoryEx #8 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+00fc:err:ole:com_get_class_object apartment not initialised
+0070:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0100:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+00fc:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00fc:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00fc:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" cmdline=L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\""
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" t+ 19.503s rev=ml526
+00fc:err:process:spawn_process spawn_process: creating child thread for L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\"" (fd=422, unixdir=425, dup_unixdir=429) cwd=L"C:\\bcd-launchers\\"
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x0 reserve=c0000017
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+00fc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x3) syscalls=0 unix_calls=2518
+00fc:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=2519
+[wow-window] slot 1 B=0x600000000 released (owner peb=0x600310000 exited); torn down when the next 32-bit process starts
+[wow-stack-free] #1 the dead thread 00f0's 32-bit stack (guest 0x1bd0000) is in window 0x400000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x1bd0000 is not a live view -> released at the old address (as before) rev=ajan11
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52309 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52310 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52311 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52312 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52313 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=120 wsfam=2 ufam=2 lport=52314 dport=1120 nb=1 ret=-1 plen=16 rev=ml478
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[sock-big] send ERROR fd=390 errno=32 rev=ml464
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[sock-big] send ERROR fd=390 errno=57 rev=ml464
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f1721d0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.uikit.eventfetch-thread" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f429ca0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f9149e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=12 x8=0x0 x18=0x0 sp=0x16f1721d0
+[thread-stacks] port=0x2f03 "com.apple.uikit.eventfetch-thread" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f429ca0
+[thread-stacks] port=0x58db "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fcbe8e58 x18=0x0 sp=0x16f540c80
+[thread-stacks] port=0x10907 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=16 x8=0x1fcbe8e58 x18=0x0 sp=0x16f284bd0
+[thread-stacks] port=0xd7d3 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fcbe8e58 x18=0x0 sp=0x16f39eab0
+[thread-stacks] port=0x15413 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x1fcbe8e58 x18=0x0 sp=0x16f1f5910
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f9149e0
+[rip-profile] ml981 gen=1 threads=1 samples=194 buckets=3 span=0x7b2aee3c [0x3d0000..0x7b67ee3c] top: 0x3d0000=98% 0x7b67ee00=0% 0x7b67ed00=0%
+[cpu-split] ml1123 gen=1 running samples=13: x64 JIT 15%, ARM64EC images 0%, native 84%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__semwait_signal+0=10 libsystem_pthread.dylib`<redacted>+0x1f4=1
+[22:55:51.940] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=120 gen=1 threads=30 resident=1561MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f9149e0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f9149e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[exc-disp] dispatch tid=00a4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=43cf2f4
+00f4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00f4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00f4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" cmdline=L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838"
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" t+ 48.874s rev=ml526
+00f4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838" (fd=390, unixdir=391, dup_unixdir=400) cwd=L"C:\\bcd-launchers\\"
+[wow-window] B=0x400000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x500000000 REJECTED: the 4GB range is not free (OCCUPIED 0x500000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x600000000..0x700000000 guard=owned
+[wow-window] reserved B=0x600000000..0x700000000 (slot 1) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x600000000 reserve=0
+[wow-window] slot 1 B=0x600000000 bound to peb=0x600310000
+0114:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x600400000 transfer=0x6004264d9 window=0x600000000 guest_base=0x400000
+0114:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0114:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+ml957: libwow64fex.dll backing 0x3ff340000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nt-fail] #5 NtAllocateVirtualMemoryEx status=c000000d proc=agent.exe tid=0114 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=2 rev=ajan5-rockstar
+[bigres] tid=0114 #5 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x600310000 total=1280 MB
+E [wow64-ctor] madeira-bcd: Threads@0x30695dee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3ff340000) -> 64-bit table (0x104690708)
+[exec-alloc] NtAllocateVirtualMemoryEx #9 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 114 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemoryEx #10 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+0114:err:ole:com_get_class_object apartment not initialised
+0070:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0118:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0114:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0114:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+0114:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" cmdline=L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\""
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" t+ 49.754s rev=ml526
+0114:err:process:spawn_process spawn_process: creating child thread for L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\"" (fd=424, unixdir=429, dup_unixdir=433) cwd=L"C:\\bcd-launchers\\"
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x0 reserve=c0000017
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+0114:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x3) syscalls=0 unix_calls=2888
+0114:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=2888
+0114:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(3)
+[Wine ntdll/server] process_exit_wrapper(3): closing child fd_socket=397
+[wow-window] slot 1 B=0x600000000 released (owner peb=0x600310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(3)
+[rip-profile] ml981 gen=2 threads=1 samples=186 buckets=7 span=0x7b2b03fc [0x3d0000..0x7b6803fc] top: 0x3d0000=94% 0x7b6803c0=1% 0x7b67f680=1% 0x7b67ed00=0% 0x32aaab80=0% 0x7b67e980=0% 0x7b67ee00=0%
+[cpu-split] ml1123 gen=2 running samples=25: x64 JIT 32%, ARM64EC images 0%, native 68%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__semwait_signal+0=16 Madeira`sfnt_load_table+0x20=1
+[window] 0x148000000..0xb40000000 regions=100001 occupied=7834 MB of 40832 MB free=32997 MB maxhole=32231 MB@0x3618ec000 rev=ml787 (layerkit-span)
+[22:56:22.091] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=240 gen=1 threads=30 resident=1586MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f9149e0
+[rip-profile] ml981 gen=3: no guest threads found (no plausible RIP at x28+0x18)
+[win-name] #6144 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[win-pos] #6272 hwnd=0x10054 after=0x0 flags=0000001e vis={318,90,726,198} surface=0x111527480 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6272 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[srv-input] btn msg=0x201 at (422,194) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (422,194) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (422,194) hit win=00010054 thread=0x125fdbc00
+[win-pos] #6400 hwnd=0x10054 after=0x0 flags=0000001e vis={318,90,726,198} surface=0x111527480 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6400 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[srv-input] btn msg=0x201 at (539,184) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (539,184) hit win=00010054 thread=0x125fdbc00
+[srv-input] btn msg=0x201 at (539,184) hit win=00010054 thread=0x125fdbc00
+[file-census] r624 10s: case-sensitive=1 full-path-tries=576 full-path-hits=288 component-lookups=1056 shortcut-hits=480 misses=576 scans=576 entries-scanned=3456 us-in-lookup=115424 (1% of the window) slowest=0.191 ms ...31/Documents/wine/dosdevices/c:/ProgramData/Battle.net/Agent
+[srv-input] btn msg=0x201 at (542,331) hit win=00010020 thread=0x125fd9200
+[win-pos] #6528 hwnd=0x10054 after=0x0 flags=0000001e vis={318,90,726,198} surface=0x111527480 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6528 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[win-pos] #6656 hwnd=0x10054 after=0x0 flags=0000001e vis={318,90,726,198} surface=0x111527480 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6656 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[exc-disp] dispatch tid=00f4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=38ff868
+[exc-disp] dispatch tid=00a4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=43cf038
+00f4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00f4:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[exc-disp] dispatch tid=00a4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=43ce7a0
+[exc-disp] dispatch tid=00a4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=0
+00f4:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" cmdline=L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838"
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe" t+ 79.083s rev=ml526
+00f4:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\ProgramData\\Battle.net\\Agent\\Agent.exe\" --locale=enUS --session=15395144251864589838" (fd=234, unixdir=235, dup_unixdir=241) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] B=0x400000000 REJECTED: the slot is in use by a running 32-bit process
+[wow-window] B=0x500000000 REJECTED: the 4GB range is not free (OCCUPIED 0x500000000+0x4000 prot=0/7 shared=0 (and the range continues past this region))
+[wow-window] adopted placeholder B=0x600000000..0x700000000 guard=owned
+[wow-window] reserved B=0x600000000..0x700000000 (slot 1) guard=owned
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x600000000 reserve=0
+[wow-window] slot 1 B=0x600000000 bound to peb=0x600310000
+012c:err:module:wine_ios_child_main [Wine child] i386 image mapped: base=0x600400000 transfer=0x6004264d9 window=0x600000000 guest_base=0x400000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[dns] madeira-bcd begin #12 "telemetry-in.battle.net" "443" family=0 flags=0x0 type=1
+012c:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+012c:err:wow:load_cpu_dll CPU backend wow64cpu.dll not available, falling back to the platform default xtajit.dll
+[data-align] libwow64fex.dll shifted +0x2000 so .data lands on a 16KB page
+[jit-pool] image 0x3feac0000+0x3c4000 (libwow64fex.dll) → pool 0x30696e000 used=0x6d3a000/0x38000000 tramp+0x4000
+[dns] madeira-bcd end #12 "telemetry-in.battle.net" = 0 after 10 ms (1 result(s))
+ml957: libwow64fex.dll backing 0x3feac0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[jit-pool] image 0x3fe9a0000+0x120000 (ucrtbase.dll) → pool 0x301d18000 used=0x1e3c000/0x38000000 tramp+0x4000
+[nls-getptr] type=11 id=10000 peb=0x400310000
+[jit-pool] image 0x3fe900000+0xa0000 (KERNEL32.dll) → pool 0x306d38000 used=0x6de0000/0x38000000 tramp+0x8000
+[jit-pool] image 0x3fe790000+0x170000 (kernelbase.dll) → pool 0x302b90000 used=0x2d10000/0x38000000 tramp+0x10000
+[srv-conn-done] dport=443 event=OUT err=0 fd=229 peer=YES path=REAL-kernel-completion rev=ml576
+[nls-getptr] type=11 id=20127 peb=0x600310000
+[jit-pool] image 0x3fe710000+0x80000 (wow64win.dll) → pool 0x304b0c000 used=0x4b90000/0x38000000 tramp+0x4000
+[jit-pool] image 0x3fe680000+0x90000 (win32u.dll) → pool 0x3037e8000 used=0x387c000/0x38000000 tramp+0x4000
+[nt-fail] #6 NtAllocateVirtualMemoryEx status=c000000d proc=agent.exe tid=012c size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=3 rev=ajan5-rockstar
+[bigres] tid=012c #6 size=0x10000000 (256 MB) type=0x2000 prot=0x1 hint=0x0 peb=0x600310000 total=1536 MB
+E [wow64-ctor] madeira-bcd: Threads@0x306cf5ee0 max_load_factor=1 bucket_count=0 size=0 (1 = the static initialiser ran)
+E [va-profile] ml787 FEX host arena = [0xc00000000, 0xeffffffff]
+[unixlib] libwow64fex.dll (module 0x3feac0000) -> 64-bit table (0x104690708)
+[exec-alloc] NtAllocateVirtualMemoryEx #11 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 12C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemoryEx #12 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x600310000
+[nls-getptr] type=11 id=437 peb=0x600310000
+D 12C Load module coml2.dll (coml2.dll-735e54df17a43d44): 67B3D0000
+D 12C Load module oleaut32.dll (oleaut32.dll-ed26e11610d6a5c2): 67B310000
+D 12C Load module WINTRUST.dll (wintrust.dll-f4cd6b53ba2ec32c): 67BC00000
+[nls-getptr] type=11 id=20127 peb=0x600310000
+D 12C Load module imm32.dll (imm32.dll-d32574d787d740f8): 67A740000
+012c:err:ole:com_get_class_object apartment not initialised
+0070:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0134:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+D 12C Load module imagehlp.dll (imagehlp.dll-8b1026ce1eb01c11): 67A320000
+D 12C Load module rsaenh.dll (rsaenh.dll-6cdd9371ff90182e): 67A2C0000
+012c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+012c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+012c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" cmdline=L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\""
+[phase] spawn:L"C:\\ProgramData\\Battle.net\\Agent\\Agent.9886\\Agent.exe" t+ 79.954s rev=ml526
+012c:err:process:spawn_process spawn_process: creating child thread for L"\"C:/ProgramData/Battle.net/Agent/Agent.9886/Agent.exe\" \"--locale=enUS\" \"--session=15395144251864589838\"" (fd=423, unixdir=426, dup_unixdir=430) cwd=L"C:\\bcd-launchers\\"
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] refused: map too small for another window (2 of at most 2 held; MADEIRA_WOW_SMALL_VA_SLOTS)
+no-teb:err:module:wine_ios_child_main [Wine child] i386 image wine machine=014c window=0x0 reserve=c0000017
+[Wine child] BOOT FAILED at stage 'guest-window-reserve': guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+no-teb:err:module:wine_ios_child_main [Wine child] boot FAILED at stage 'guest-window-reserve' for wine: guest window reserve returned 0xc0000017 — a 32-bit child cannot start without one (the furniture band holds very few 4GB-aligned slots; see [wow-window] lines above)
+012c:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x3) syscalls=0 unix_calls=3282
+012c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x3) syscalls=0 unix_calls=3283
+[term-stack] 32-bit sp+080: ret 004264d0 Agent.exe+0x264d0 (a direct call before it)
+[term-stack] 32-bit sp+0c0: ret 7bef40c0 kernel32.dll+0x240c0 (an indirect call before it)
+[term-stack] 32-bit sp+0c8: ret fff8f033 ntdll.dll+0x4f033 (an indirect call before it)
+[term-stack] 32-bit sp+0cc: ret fff8f033 ntdll.dll+0x4f033 (an indirect call before it)
+[term-stack] 32-bit sp+0d8: ret fff8f033 ntdll.dll+0x4f033 (an indirect call before it)
+[term-stack] 32-bit sp+0ec: ret fff8f9e4 ntdll.dll+0x4f9e4 (a direct call before it)
+012c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(3)
+[Wine ntdll/server] process_exit_wrapper(3): closing child fd_socket=239
+[wow-window] slot 1 B=0x600000000 released (owner peb=0x600310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(3)
+[wow-stack-free] #2 the dead thread 0130's 32-bit stack (guest 0x7e80000) is in window 0x400000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x7e80000 is not a live view -> released at the old address (as before) rev=ajan11
+[win-pos] #6784 hwnd=0x10054 after=0x0 flags=0000001e vis={153,0,891,468} surface=0x1308b5500 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6784 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[win-pos] #6912 hwnd=0x10054 after=0x0 flags=0000001e vis={153,0,891,468} surface=0x1308b5500 rev=ml505 style=940a0000 visible=1 parent=0x10020
+[win-name] #6912 hwnd=0x10054 class='Blizzard Bootstrapper' text="Battle.net Setup" rev=ml853
+[guest-log] #128 tid=007c I 2026-11-17 21:56:40.268189 [Main] {7c} UI State changed to: UISTATE_SHUTDOWN
+[guest-log] #129 tid=007c D 2026-11-17 21:56:40.268347 [Analytics] {7c} Analytics request sent. type=Blizzard.Telemetry.App.Bootstrapper
+[dns] madeira-bcd begin #13 "telemetry-in.battle.net" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #13 "telemetry-in.battle.net" = 0 after 1 ms (1 result(s))
+[guest-log] #130 tid=007c D 2026-11-17 21:56:40.278204 [Main] {7c} Bootstrapper is now ready to shutdown
+[srv-conn-done] dport=443 event=OUT err=0 fd=229 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-input] btn msg=0x201 at (46,765) hit win=00010020 thread=0x125fd9200
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=6 x8=0x0 x18=0x0 sp=0x16f9149e0
+[wow-stack-free] #3 the dead thread 00c8's 32-bit stack (guest 0x43d0000) is in window 0x400000000 (live), the thread freeing its TEB is in window 0x0: the old address 0x43d0000 is not a live view -> released at the old address (as before) rev=ajan11
+[file-census] r624 10s: case-sensitive=1 full-path-tries=705 full-path-hits=368 component-lookups=1324 shortcut-hits=663 misses=648 scans=661 entries-scanned=10052 us-in-lookup=346579 (3% of the window) slowest=1.832 ms ...AEE3-15A65BF3CD31/Documents/wine/dosdevices/c:/bcd-launchers
+[22:56:52.099] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=359 gen=1 threads=27 resident=1570MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f9149e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[srv-input] btn msg=0x201 at (562,571) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (562,571) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (562,571) hit win=00010020 thread=0x125fd9200
+[rip-profile] ml981 gen=4: no guest threads found (no plausible RIP at x28+0x18)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=528 full-path-hits=264 component-lookups=968 shortcut-hits=440 misses=528 scans=528 entries-scanned=3168 us-in-lookup=477244 (4% of the window) slowest=1.692 ms ...AEE3-15A65BF3CD31/Documents/wine/dosdevices/c:/bcd-launchers
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f9149e0
+[file-census] r624 10s: case-sensitive=1 full-path-tries=534 full-path-hits=267 component-lookups=979 shortcut-hits=445 misses=534 scans=534 entries-scanned=3204 us-in-lookup=489904 (4% of the window) slowest=1.446 ms ...AEE3-15A65BF3CD31/Documents/wine/dosdevices/c:/bcd-launchers
+[guest-log] #131 tid=00f4 E 2026-11-17 21:57:08.725266 [Main] {f4} Failed to communicate with Agent after launch, attempts=265
+[guest-log] #132 tid=00f4 E 2026-11-17 21:57:08.730216 [Main] {f4} Agent launch exception, path='C:\ProgramData\Battle.net\Agent\Agent.exe' error=2
+[exc-disp] dispatch tid=00f4 code=e06d7363 flags=1 addr=0x47bc52f79 pc=303ed1be8 nparams=3 p0=19930520 p1=38ff868
+[guest-log] #133 tid=007c I 2026-11-17 21:57:08.739469 [Main] {7c} Bootstrapper work completed. Shutting down.
+007c:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=192
+[wow-window] slot 0 B=0x400000000 released (owner peb=0x400310000 exited); torn down when the next 32-bit process starts
+[Wine ntdll/server] process_exit_wrapper(0)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f9149e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=5: no guest threads found (no plausible RIP at x28+0x18)
+[window] 0x148000000..0xb40000000 regions=100001 occupied=7826 MB of 40832 MB free=33005 MB maxhole=32230 MB@0x361918000 rev=ml787 (layerkit-span)
+[22:57:22.261] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+121s beats=4 gaps=0 iter=478 gen=1 threads=22 resident=1547MB dbg=DEBUGGED rev=ml525
+[thread-stacks] port=0xc0c3 "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16f9149e0
+[thread-stacks] port=0xe2d3 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16facc0e0 x18=0x0 sp=0x12aa6e9c0
+[thread-stacks] port=0xa0c7 "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fbe30e0 x18=0x0 sp=0x13115eb10
+[thread-stacks] port=0x2843 "wine_rpcrt4_server" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fbe80e0 x18=0x0 sp=0x13348e9c0
+[thread-stacks] port=0xbc0b "" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16fbec0e0 x18=0x0 sp=0x1340de910
+[thread-stacks] port=0xd657 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=1 x8=0x11140cc01 x18=0x0 sp=0x16f5ceb30
+[thread-stacks] port=0x69c3 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x10e156481 x18=0x0 sp=0x16fb56b30
+[srv-input] btn msg=0x201 at (101,739) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (101,739) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (101,739) hit win=00010020 thread=0x125fd9200
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=62)
+[srv-input] btn msg=0x201 at (615,358) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (615,358) hit win=00010020 thread=0x125fd9200
+[srv-input] btn msg=0x201 at (615,358) hit win=00010020 thread=0x125fd9200
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=63)
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=64)
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=65)
+[srv-stuck]   h[1]=000000ac obj=0x11d7aed80 type=Event raw_obj=0x11d7aed80 raw_waiters=0 sync_obj=0x123381b30 sync_waiters=1 thread_wait=0x11b0c38e0 state=LINKED Event manual=1 signaled=0 cell=41
+[srv-stuck] tid=0074 teb=0xfbff30000 age=122833ms op=1 flags=00000002 timeout=9223372036854775807 alertable=0 nhandles=1 caller=0x1029ba334
+[srv-stuck]   tid=0074 suspend=0 rev=ml714
+[srv-stuck]   h[0]=000000b8 obj=0x125fde700 type= raw_obj=0x125fde700 raw_waiters=1 sync_obj=0x125fde700 sync_waiters=1 thread_wait=0x125e1cee0 state=LINKED Completion wait completion=0x125fdea00
+[srv-stuck] tid=00ac teb=0x4002a0000 age=22818ms op=1 flags=00000003 timeout=134394262287932250 alertable=1 nhandles=2 caller=0x102a0859c
+[srv-stuck]   (no server thread for tid 00ac)
+[winios-tree] 0x10046 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x10044 'WineDdeServerName' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x2003e 'WineDdeEventClass' "" style=84000000 ex=00000000 vis=0 tid=0024 win={0,0,0,0} client={0,0,0,0}
+[winios-tree] 0x30030 'Shell_TrayWnd' "" style=94000000 ex=08000000 vis=1 tid=0024 win={0,780,1152,800} client={0,780,1152,800}
+[winios-tree] 0x30054 'Wine IME' "" style=84000000 ex=00000080 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[winios-tree] 0x1003a 'IME' "Default IME" style=8c000000 ex=00000000 vis=0 tid=0024 win={0,0,1,1} client={0,0,1,1}
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=66)
+[hwinput] keyboard focus: program (app active)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f9149e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine_rpcrt4_server" teb=0xfbff40000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x13348e9c0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x5b pc=0x305a8d794 user-sp=0x133fcfcf0 user-cand=[ ntdll.dll+0x66f50 ]
+[thread-sample] ml876 b0 "" teb=0xfbff30000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x1340de910 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x9 pc=0x305a8cd54 user-sp=0x1348dff10 user-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16fac6b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16fb56b40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f312b30 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1328 MB (peak 1378) internal=1323 MB compressed=4 MB external=188 MB reusable=36 MB (cycle=67)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=6: no guest threads found (no plausible RIP at x28+0x18)
+[xp] 22:57:36.374 +133.91 dt=279 cpu=26 (thr 26) P=1 E=26 run=35 pgw=-1.0 GHz P=2.77 E=1.77 Minst=42 IPC=0.88 mJ=5 pin=0 rdKB=0 fpMB=1329
+[xp] 22:57:36.630 +134.16 dt=256 cpu=12 (thr 11) P=0 E=12 run=16 pgw=-1.0 GHz P=0.00 E=1.39 Minst=22 IPC=1.31 mJ=1 pin=0 rdKB=0 fpMB=1329
+[xp] 22:57:36.892 +134.42 dt=262 cpu=12 (thr 12) P=0 E=12 run=23 pgw=-1.0 GHz P=0.00 E=1.68 Minst=10 IPC=0.50 mJ=1 pin=0 rdKB=0 fpMB=1329
+[xp] 22:57:37.144 +134.68 dt=252 cpu=9 (thr 9) P=0 E=9 run=13 pgw=-1.0 GHz P=0.00 E=1.57 Minst=9 IPC=0.64 mJ=1 pin=0 rdKB=0 fpMB=1329
+[22:57:37.335] [INFO] [session] length=137s partial=1 play=0s frames=0 stalls=0/0s peak=1412MB limit=8191MB thermal=nominal lpm=0 res=1152x800 cap=60 game=Battle.net setup
+[22:57:36.892] [xp] 22:57:36.892 +134.42 dt=262 cpu=12 (thr 12) P=0 E=12 run=23 pgw=-1.0 GHz P=0.00 E=1.68 Minst=10 IPC=0.50 mJ=1 pin=0 rdKB=0 fpMB=1329
+[22:57:37.144] [xp] 22:57:37.144 +134.68 dt=252 cpu=9 (thr 9) P=0 E=9 run=13 pgw=-1.0 GHz P=0.00 E=1.57 Minst=9 IPC=0.64 mJ=1 pin=0 rdKB=0 fpMB=1329

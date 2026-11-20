@@ -25,6 +25,13 @@ private struct BCDOriginalFrontEnd: View {
     @ObservedObject var store: BCDStore
     @StateObject private var focus: BCDFocus
     @State private var tab: BCDTab
+    /// 2026-11-20 (the iPhone Duo's outer display, 678 pt wide in landscape: the settings button ran off the right edge): the
+    /// screen's width under the top bar, the top bar's own width, and the width the top bar needed the last time it did not fit
+    /// with "Update available" (0: it fits, and the bar is what it always was). While the screen is narrower than that the update
+    /// chip says "Update". Measured, never assumed: a bar that fits is never changed.
+    @State private var shellWidth: CGFloat = 0
+    @State private var topBarWidth: CGFloat = 0
+    @State private var topBarNeeds: CGFloat = 0
     @State private var showSettings = false
     /// The section Settings opens at (the update chip's Updates); nil is its list.
     @State private var settingsSection: BCDSettingsSection?
@@ -69,6 +76,7 @@ private struct BCDOriginalFrontEnd: View {
             else { portraitTitle }
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { shellWidth = $0; fitTopBar() }
             if layout == .phonePortrait { portraitTabs }
             else if hintBarShown { hintBar }
         }
@@ -143,17 +151,35 @@ private struct BCDOriginalFrontEnd: View {
             ForEach(BCDTab.allCases) { item in tabButton(item) }
             if focus.controllerActive { shoulder("RB") }
             Spacer(minLength: 12)
-            statusChips
+            statusChips(tight: topBarTight)
             settingsButton
         }
         .padding(.horizontal, layout.gutter).padding(.top, layout == .pad ? 10 : 6).padding(.bottom, 6)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { topBarWidth = $0; fitTopBar() }
+        // What the bar holds besides the update chip: a change re-measures it with "Update available".
+        .onChange(of: focus.controllerActive) { _, _ in topBarNeeds = 0 }
+        .onChange(of: store.system.jit) { _, _ in topBarNeeds = 0 }
+        .onChange(of: store.downloads.isEmpty) { _, _ in topBarNeeds = 0 }   // the Downloads tab's badge
+    }
+
+    /// The top bar did not fit with "Update available" in a screen this wide or narrower (topBarNeeds).
+    private var topBarTight: Bool { topBarNeeds > 0 && shellWidth < topBarNeeds }
+
+    /// Wider than the screen with the long chip: remember how wide, so the short chip stays until the screen is that wide again.
+    private func fitTopBar() {
+        guard shellWidth > 0, topBarWidth > 0 else { return }
+        if topBarNeeds == 0 {
+            if topBarWidth > shellWidth + 0.5 { topBarNeeds = topBarWidth }
+        } else if shellWidth >= topBarNeeds {
+            topBarNeeds = 0
+        }
     }
 
     private var portraitTitle: some View {
         HStack {
             Text(tab.title).font(BCDStyle.title(30))
             Spacer()
-            statusChips
+            statusChips(tight: false)
             settingsButton
         }
         .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 6)
@@ -177,8 +203,14 @@ private struct BCDOriginalFrontEnd: View {
             }
         }
         .padding(.top, 6)
-        .background(BCDStyle.ground.opacity(0.92).ignoresSafeArea(edges: .bottom))
-        .overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke).frame(height: 1) }
+        // The bar's ground and its line reach both sides of the screen (2026-11-20: upright, the iPhone Duo's outer display keeps
+        // a column on the right for the camera and the status bar, and the bar stopped short of it). An iPhone upright has no
+        // side insets: there nothing moves.
+        .background(alignment: .top) {
+            BCDStyle.ground.opacity(0.92)
+                .overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke).frame(height: 1) }
+                .ignoresSafeArea(edges: [.bottom, .leading, .trailing])
+        }
     }
 
     private func tabButton(_ item: BCDTab) -> some View {
@@ -213,10 +245,12 @@ private struct BCDOriginalFrontEnd: View {
             .accessibilityHidden(true)
     }
 
-    @ViewBuilder private var statusChips: some View {
+    /// `tight`: the top bar did not fit with "Update available" (topBarTight); the update chip says "Update" and the memory chip
+    /// and the controller's name are left out.
+    @ViewBuilder private func statusChips(tight: Bool) -> some View {
         let system = store.system
         HStack(spacing: 8) {
-            BCDUpdateChip(compact: layout == .phonePortrait && system.jit != .on) { settingsSection = .updates; showSettings = true }
+            BCDUpdateChip(compact: (layout == .phonePortrait && system.jit != .on) || tight) { settingsSection = .updates; showSettings = true }
             if layout != .phonePortrait || system.jit != .on {
                 // Its words are never cut (beside "Update available" on a phone it used to shrink to its dot); there the update
                 // chip says "Update" so the title keeps its line.
@@ -234,11 +268,13 @@ private struct BCDOriginalFrontEnd: View {
                     chip
                 }
             }
-            if layout == .pad, let limit = system.memoryLimitBytes {
+            // Tight (the iPhone Duo's inner display held upright, 669 pt): the memory chip, cut to its dot there, goes too.
+            if layout == .pad, !tight, let limit = system.memoryLimitBytes {
                 BCDStatusChip(text: "Memory \(BCDFormat.bytes(limit))",
                               color: system.increasedMemoryLimit ? BCDStyle.mint : BCDStyle.amber)
             }
-            if layout != .phonePortrait, let name = system.controllerName {
+            // In a bar that did not fit (tight) the controller's name, already cut to its icon there, goes too (the Duo's outer display).
+            if layout != .phonePortrait, !tight, let name = system.controllerName {
                 HStack(spacing: 6) {
                     Image(systemName: "gamecontroller.fill")
                     Text(system.controllerBattery.map { "\(name) · \($0)%" } ?? name).lineLimit(1)
@@ -422,8 +458,17 @@ private struct BCDDuoFrontEnd: View {
                 ToolbarItem(placement: .topBarLeading) {
                     jitStatus
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }
+                // 2026-11-20 (the iPhone Duo simulator): in the system's glass the chip's white words sat on a pale lavender
+                // capsule and could hardly be read; without the shared glass the chip is the one Home's own bar shows.
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .primaryAction) {
+                        BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }
+                    }
+                    .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .primaryAction) {
+                        BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }
+                    }
                 }
             }
         }

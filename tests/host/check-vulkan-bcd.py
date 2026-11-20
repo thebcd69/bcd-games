@@ -64,9 +64,12 @@ check("...is decided after the OpenGL key (after the farm passes) and cleared at
       and 'unsetenv("MADEIRA_VULKAN_LIBRARY");   /* madeira-bcd (Windows Vulkan): likewise' in body(bridge, "static void wine_session_end(void)\n{"))
 
 policy = (root / "app/Madeira/GameRecommendationsList.swift").read_text()
-check("a downloaded list may set vulkan only to moltenvk",
-      'if key == "vulkan" {' in policy and 'guard value == "moltenvk" else {' in policy
-      and 'RecommendationsError.policy("\\(path): \\(key) is moltenvk")' in policy)
+# Round 668 (G2 S1, Enshrouded): kosmickrisp too, from build 668 (its list lines carry minBuild 668; check-kosmickrisp.py holds that).
+# Round 669: moltenvk-patched too (its list lines carry minBuild 669; check-moltenvk-patched.py holds that).
+check("a downloaded list may set vulkan to moltenvk, moltenvk-patched or kosmickrisp, nothing else",
+      'if key == "vulkan" {' in policy
+      and 'guard value == "moltenvk" || value == "moltenvk-patched" || value == "kosmickrisp" else {' in policy
+      and 'RecommendationsError.policy("\\(path): \\(key) is moltenvk, moltenvk-patched or kosmickrisp")' in policy)
 
 gen = (root / "build/tools/gen-config-catalog.py").read_text()
 catalog = (root / "app/Madeira/ConfigCatalog.generated.swift").read_text()
@@ -79,8 +82,8 @@ check("...and its two environment names (the library the app exports, Madeira's 
 
 page = (root / "app/Madeira/BCDGamePageLive.swift").read_text()
 d3d = page[page.index("private func direct3D("):page.index("// MARK: Compatibility")]
-check("the game page's Direct3D group has a Vulkan switch, on only when the game's file says moltenvk, after the OpenGL row and before NVIDIA",
-      'Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk",' in d3d
+check("the game page's Direct3D group has a Vulkan switch, on only when the game's file says moltenvk (or moltenvk-patched, build 669), after the OpenGL row and before NVIDIA",
+      'Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk" || profile.get("vulkan") == "moltenvk-patched",' in d3d
       and d3d.index("Self.line(BCDOpenGL.key") < d3d.index('Self.toggle("vulkan"') < d3d.index('Self.toggle("nvidia"'), d3d[:600])
 check("...the switch writes `vulkan = moltenvk` into the game's own file and takes it out when off",
       '        case "vulkan":\n            // Windows Vulkan (docs/VULKAN.md): the switch is the line `vulkan = moltenvk` in the game\'s own file.\n'

@@ -142,11 +142,37 @@ def words_c(rows):
 
 
 MAIN = r'''
+/* arm64 macOS reserves 0x1000000000-0x7000000000 in every process (the M5 Max, build 672): the window moves to
+   0x15000000000 there; on the Intel host it stays at 0x5000000000. */
+#if defined(__aarch64__)
+#define WIN 0x15000000000ULL
+#else
 #define WIN 0x5000000000ULL
+#endif
+/* the host code pool and its neighbour: 0x300000000 on Intel; on arm64 macOS the system libraries reach past it */
+#if defined(__aarch64__)
+#define HOSTAREA 0x20000000000ULL
+#else
+#define HOSTAREA 0x300000000ULL
+#endif
 static uint64_t alloc_at(uint64_t a, size_t n)
 {
-    mach_vm_address_t m = a;
-    if (mach_vm_allocate(mach_task_self(), &m, n, VM_FLAGS_FIXED) != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
+    /* Host page by host page (M5 Max, build 672: 16 KB pages there, 4 KB on the Intel VM): the window's pieces sit at
+       4 KB offsets, so two may share a host page; a page an earlier piece already mapped is fine. */
+    const uint64_t pg = vm_page_size, lo = a & ~(pg - 1), hi = (a + n + pg - 1) & ~(pg - 1);
+    for (uint64_t p = lo; p < hi; p += pg)
+    {
+        mach_vm_address_t m = p;
+        kern_return_t k = mach_vm_allocate(mach_task_self(), &m, pg, VM_FLAGS_FIXED);
+        if (k == KERN_NO_SPACE)
+        {   /* taken as already there only when it is a read-write page (one an earlier piece of this program mapped) */
+            mach_vm_address_t q = p; mach_vm_size_t qs = 0; vm_region_basic_info_data_64_t ri;
+            mach_msg_type_number_t rc = VM_REGION_BASIC_INFO_COUNT_64; mach_port_t ro;
+            if (mach_vm_region(mach_task_self(), &q, &qs, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&ri, &rc, &ro) == KERN_SUCCESS
+                && q <= p && (ri.protection & 3) == 3) continue;
+        }
+        if (k != KERN_SUCCESS) { puts("alloc-failed"); exit(3); }
+    }
     return a;
 }
 static void w32(uint64_t a, uint32_t v) { memcpy((void *)a, &v, 4); }
@@ -164,7 +190,7 @@ static struct world make(const uint32_t *code, size_t words, uint32_t eax, uint3
     static uint64_t pool;
     struct world w;
     memset(&w, 0, sizeof(w));
-    if (!pool) pool = alloc_at(0x300000000ULL + 0x1000000, 0x10000);
+    if (!pool) pool = alloc_at(HOSTAREA + 0x1000000, 0x10000);
     w.pool = pool;
     ios_jit_rx_base_global = (void *)pool; ios_jit_pool_size_global = 0x10000;
     memcpy((void *)(pool + 0x1000 - words * 4), code, words * 4);
@@ -216,7 +242,7 @@ int main(int argc, char **argv)
     }
     if (!strcmp(s, "pair")) {
         unsigned a = 0, b = 0;
-        uint64_t base = alloc_at(0x300000000ULL + 0x2000000, 0x4000);
+        uint64_t base = alloc_at(HOSTAREA + 0x2000000, 0x4000);
         memcpy((void *)(base + 0x100), batman, sizeof(batman));
         printf("batman=%d\n", ios_x87i_find_pair(base + 0x100 + sizeof(batman) - 0x20, &a, &b));
         printf("a=%x b=%x\n", a, b);

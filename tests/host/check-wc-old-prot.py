@@ -165,21 +165,27 @@ check('the header is included exactly once, under WINE_IOS, right before NtProte
       and virtual_src[virtual_src.rindex('#ifdef WINE_IOS', 0, virtual_src.index(inc)):virtual_src.index(inc)].count('#endif') == 0)
 fn_start = virtual_src.index('NTSTATUS WINAPI NtProtectVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T *size_ptr,')
 fn = virtual_src[fn_start:virtual_src.index('\n}\n', fn_start)]
-check('one local, set under the lock right after old is computed, and one call site',
+# Round 668 (G2 S7; FTL MYQWVW, Peggle): an out-parameter inside the range being protected is written before set_protection
+# (tests/host/check-ntprotect-early-store.py); that early store reports the same value, behind the same switch, so there are two
+# call sites now: the early one before set_protection, the usual one in the success branch, which skips what the early one wrote.
+early = fn.index('ios_ntprotect_early_stored = 1;')
+check('one local, set under the lock right after old is computed; the early store (round 668) and the usual one are the two call sites',
       fn.count('int ios_wc_image = 0;') == 1 and fn.count('ios_wc_image = (view->protect & SEC_IMAGE) != 0;') == 1
       and fn.index('old = get_win32_prot( vprot, view->protect );') < fn.index('ios_wc_image = (view->protect & SEC_IMAGE) != 0;') < fn.index('status = set_protection( view, base, size, new_prot );')
-      and fn.count('ios_wc_old_prot_report(') == 1)
-site = fn.index('if (ios_wc_old_prot_enabled())')
-check('the report is behind `if (ios_wc_old_prot_enabled())`, right after `*old_prot = old;` in the success branch, and only the value is touched',
-      fn.index('*old_prot = old;') < site and fn.count('*old_prot = old;') == 1 and fn[site - 400:site].count('*old_prot = old;') == 1
-      and re.search(r'if \(ios_wc_old_prot_enabled\(\)\)\s*\{\s*int wc_changed = 0;\s*\*old_prot = ios_wc_old_prot_report\( old, new_prot, ios_wc_image, ios_wow_base\(\) != 0, 1, &wc_changed \);', fn))
+      and fn.count('ios_wc_old_prot_report(') == 2
+      and fn.index('ios_wc_image = (view->protect & SEC_IMAGE) != 0;') < fn.index('ios_wc_old_prot_report(') < early < fn.index('status = set_protection( view, base, size, new_prot );'))
+site = fn.index('if (ios_wc_old_prot_enabled() && !ios_ntprotect_early_stored)')
+check('the report is behind `if (ios_wc_old_prot_enabled())`, right after `*old_prot = old;` in the success branch (not again after the early store), and only the value is touched',
+      fn.index('*old_prot = old;') < site and fn.count('*old_prot = old;') == 2 and fn[site - 400:site].count('*old_prot = old;') == 1
+      and re.search(r'if \(ios_wc_old_prot_enabled\(\) && !ios_ntprotect_early_stored\)\s*\{\s*int wc_changed = 0;\s*\*old_prot = ios_wc_old_prot_report\( old, new_prot, ios_wc_image, ios_wow_base\(\) != 0, 1, &wc_changed \);', fn)
+      and re.search(r'if \(ios_wc_old_prot_enabled\(\)\)   /\* the same value the store below would report \*/\s*\{\s*int wc_changed = 0;\s*\*old_prot = ios_wc_old_prot_report\( old, new_prot, ios_wc_image, ios_wow_base\(\) != 0, 1, &wc_changed \);', fn))
 block = fn[site:fn.index('#endif', site)]
 forbidden = ('set_protection', 'set_vprot', 'mprotect', 'status =', 'return', 'old =', 'base =', 'size =')
 check('the guarded block assigns only *old_prot (no protection call, no status, no return)', not [f for f in forbidden if f in block], str([f for f in forbidden if f in block]))
 stripped = virtual_src
 stripped = re.sub(r'#ifdef WINE_IOS\n/\* ajan18-bnet-cef \(build 597\): env\.MADEIRA_PROTECT_WRITECOPY_AS_RW.*?#include "ios_wc_old_prot\.h"\n#endif\n\n', '', stripped, flags=re.S)
-stripped = re.sub(r'#ifdef WINE_IOS\n    int ios_wc_image = 0;[^\n]*\n#endif\n', '', stripped)
-stripped = re.sub(r'#ifdef WINE_IOS\n            ios_wc_image = \(view->protect & SEC_IMAGE\) != 0;\n#endif\n', '', stripped)
+stripped = re.sub(r'#ifdef WINE_IOS\n    int ios_wc_image = 0;[^\n]*\n(?:    int ios_ntprotect_early_stored = 0;[^\n]*\n)?#endif\n', '', stripped)   # round 668: + the early store's flag
+stripped = re.sub(r'#ifdef WINE_IOS\n            ios_wc_image = \(view->protect & SEC_IMAGE\) != 0;\n.*?#endif\n', '', stripped, flags=re.S)   # with round 668's early store
 stripped = re.sub(r'#ifdef WINE_IOS\n        /\* ajan18-bnet-cef \(build 597\): the value handed back.*?\n#endif\n\n', '', stripped, flags=re.S)
 leftovers = re.findall(r'[^\n]*(?:ios_wc_|WRITECOPY_AS_RW|wc_changed|\[wc-old\])[^\n]*', stripped)
 check('taking out the four pieces leaves no reference to the fix in virtual_ios.c', not leftovers, str(leftovers[:4]))

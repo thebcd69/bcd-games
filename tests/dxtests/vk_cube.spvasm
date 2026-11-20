@@ -1,0 +1,113 @@
+; SPDX-License-Identifier: GPL-3.0-only
+; Copyright 2026 thebcd69 (BCD)
+; BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+;
+; vk_cube.spvasm: the two shaders of BCD's Vulkan test (vulkan_test.c), in SPIR-V assembly, the same program as cube.hlsl
+; (the Direct3D 10 and 11 tests): the vertex shader takes a position, a texture coordinate and a colour and multiplies the
+; position by one matrix (a 64-byte push constant); the fragment shader multiplies the texture by the colour.
+; tools/gen-vk-test-shaders.py assembles the two parts below (each between its ";; ==== <name>" line and the next) with
+; SPIRV-Tools for Vulkan 1.0, validates them, and writes tests/dxtests/vk_shaders.h; nothing here needs glslang.
+;
+; The matrix is ColMajor with a stride of 16, so the C code's row-major rows (dxtest.h: v * M) are the columns here and
+; M^T * v is the same product.
+
+;; ==== vk_cube_vert
+               OpCapability Shader
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %in_pos %in_uv %in_col %out_uv %out_col %out_position
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %Push "Push"
+               OpMemberName %Push 0 "mvp"
+               OpName %push "push"
+               OpDecorate %in_pos Location 0
+               OpDecorate %in_uv Location 1
+               OpDecorate %in_col Location 2
+               OpDecorate %out_uv Location 0
+               OpDecorate %out_col Location 1
+               OpDecorate %out_position BuiltIn Position
+               OpDecorate %Push Block
+               OpMemberDecorate %Push 0 ColMajor
+               OpMemberDecorate %Push 0 Offset 0
+               OpMemberDecorate %Push 0 MatrixStride 16
+       %void = OpTypeVoid
+     %fnvoid = OpTypeFunction %void
+      %float = OpTypeFloat 32
+     %v2float = OpTypeVector %float 2
+     %v3float = OpTypeVector %float 3
+     %v4float = OpTypeVector %float 4
+     %mat4 = OpTypeMatrix %v4float 4
+       %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+    %float_1 = OpConstant %float 1
+       %Push = OpTypeStruct %mat4
+   %ptr_pc_Push = OpTypePointer PushConstant %Push
+   %ptr_pc_mat4 = OpTypePointer PushConstant %mat4
+   %ptr_in_v2 = OpTypePointer Input %v2float
+   %ptr_in_v3 = OpTypePointer Input %v3float
+   %ptr_in_v4 = OpTypePointer Input %v4float
+   %ptr_out_v2 = OpTypePointer Output %v2float
+   %ptr_out_v4 = OpTypePointer Output %v4float
+       %push = OpVariable %ptr_pc_Push PushConstant
+     %in_pos = OpVariable %ptr_in_v3 Input
+      %in_uv = OpVariable %ptr_in_v2 Input
+     %in_col = OpVariable %ptr_in_v4 Input
+     %out_uv = OpVariable %ptr_out_v2 Output
+    %out_col = OpVariable %ptr_out_v4 Output
+%out_position = OpVariable %ptr_out_v4 Output
+       %main = OpFunction %void None %fnvoid
+      %entry = OpLabel
+         %uv = OpLoad %v2float %in_uv
+               OpStore %out_uv %uv
+        %col = OpLoad %v4float %in_col
+               OpStore %out_col %col
+        %pos = OpLoad %v3float %in_pos
+         %px = OpCompositeExtract %float %pos 0
+         %py = OpCompositeExtract %float %pos 1
+         %pz = OpCompositeExtract %float %pos 2
+        %pos4 = OpCompositeConstruct %v4float %px %py %pz %float_1
+    %mvp_ptr = OpAccessChain %ptr_pc_mat4 %push %int_0
+        %mvp = OpLoad %mat4 %mvp_ptr
+       %clip = OpMatrixTimesVector %v4float %mvp %pos4
+               OpStore %out_position %clip
+               OpReturn
+               OpFunctionEnd
+
+;; ==== vk_cube_frag
+               OpCapability Shader
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %in_uv %in_col %out_color
+               OpExecutionMode %main OriginUpperLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %tex "tex"
+               OpDecorate %in_uv Location 0
+               OpDecorate %in_col Location 1
+               OpDecorate %out_color Location 0
+               OpDecorate %tex DescriptorSet 0
+               OpDecorate %tex Binding 0
+       %void = OpTypeVoid
+     %fnvoid = OpTypeFunction %void
+      %float = OpTypeFloat 32
+     %v2float = OpTypeVector %float 2
+     %v4float = OpTypeVector %float 4
+      %image = OpTypeImage %float 2D 0 0 0 1 Unknown
+    %sampled = OpTypeSampledImage %image
+ %ptr_uc_sampled = OpTypePointer UniformConstant %sampled
+   %ptr_in_v2 = OpTypePointer Input %v2float
+   %ptr_in_v4 = OpTypePointer Input %v4float
+   %ptr_out_v4 = OpTypePointer Output %v4float
+        %tex = OpVariable %ptr_uc_sampled UniformConstant
+      %in_uv = OpVariable %ptr_in_v2 Input
+     %in_col = OpVariable %ptr_in_v4 Input
+  %out_color = OpVariable %ptr_out_v4 Output
+       %main = OpFunction %void None %fnvoid
+      %entry = OpLabel
+         %si = OpLoad %sampled %tex
+         %uv = OpLoad %v2float %in_uv
+      %texel = OpImageSampleImplicitLod %v4float %si %uv
+        %col = OpLoad %v4float %in_col
+        %out = OpFMul %v4float %texel %col
+               OpStore %out_color %out
+               OpReturn
+               OpFunctionEnd

@@ -1,0 +1,128 @@
+From: BCD <190844990+thebcd69@users.noreply.github.com>
+Subject: [PATCH] kk: drop stores to multisampled storage images (MADEIRA_KK_MS_STORE_DROP=1)
+
+madeira-bcd (X-Plane 12, build 675): Metal has no writable multisampled
+texture, and KosmicKrisp reports shaderStorageImageMultisample as
+unsupported. X-Plane 12 stores to one anyway: a compute pass reads a
+multisampled HDR image and, only when a component is infinite, clamps it to
++-65504 and writes it back. Metal refuses the library ("invalid
+access value 'a' for 'texture2d_ms_array'", "no member named 'write'") and
+vkCreateComputePipelines returns VK_ERROR_INVALID_SHADER_NV, which X-Plane
+treats as fatal (gfx_vk_shader.cpp:157). With MADEIRA_KK_MS_STORE_DROP=1 a
+multisampled storage image is bound read-only and stores and fences on it
+are left out ([kk-ms-store-drop]); without the key the MSL is exactly what
+it was. The fence kk_nir_lower_textures adds after a store carries no image
+dimension of its own, so the image handle's dimension decides (build 675
+left that fence in and Metal refused it on the read-only image).
+---
+diff --git a/src/kosmickrisp/compiler/nir_to_msl.c b/src/kosmickrisp/compiler/nir_to_msl.c
+--- a/src/kosmickrisp/compiler/nir_to_msl.c
++++ b/src/kosmickrisp/compiler/nir_to_msl.c
+@@ -9,6 +9,9 @@
+ #include "nir.h"
+ #include "nir_builder.h"
+ 
++#include <stdio.h>
++#include <stdlib.h>
++
+ static const char *
+ get_stage_string(mesa_shader_stage stage)
+ {
+@@ -1029,6 +1032,61 @@
+    }
+ }
+ 
++/* madeira-bcd (X-Plane 12, build 675): Metal has no writable multisampled
++ * texture (texture2d_ms<..., access::read_write> does not compile), and
++ * KosmicKrisp reports shaderStorageImageMultisample as unsupported. X-Plane 12
++ * stores to one anyway: a compute pass that clamps infinite HDR samples to
++ * +-65504 and writes them back. Metal refuses the whole library and the
++ * pipeline fails (VK_ERROR_INVALID_SHADER_NV). With MADEIRA_KK_MS_STORE_DROP=1
++ * a multisampled storage image is bound read-only and stores and fences on it
++ * are left out, so the shader compiles and its reads still work; without the
++ * key the MSL is exactly what it was. */
++static bool
++kk_ms_store_drop_enabled(void)
++{
++   static int enabled = -1;
++
++   if (enabled < 0) {
++      const char *s = getenv("MADEIRA_KK_MS_STORE_DROP");
++      int on = s && s[0] == '1' && !s[1];
++      if (on)
++         fprintf(stderr, "[kk-ms-store-drop] madeira-bcd MADEIRA_KK_MS_STORE_DROP=1: "
++                         "multisampled storage images are read-only, stores "
++                         "to them are left out\n");
++      enabled = on;
++   }
++   return enabled;
++}
++
++/* The image a store or a fence works on is multisampled. The fence
++ * kk_nir_lower_textures adds after a store carries no image dimension of its
++ * own (build 675 left it in, and Metal refused "fence" on the read-only
++ * image), so the handle's dimension decides, as it does for the type. */
++static bool
++kk_ms_image(nir_intrinsic_instr *instr)
++{
++   nir_intrinsic_instr *handle = nir_src_as_intrinsic(instr->src[0]);
++
++   if (handle && handle->intrinsic == nir_intrinsic_load_texture_handle_kk)
++      return nir_intrinsic_image_dim(handle) == GLSL_SAMPLER_DIM_MS;
++   return instr->intrinsic == nir_intrinsic_bindless_image_store &&
++          nir_intrinsic_image_dim(instr) == GLSL_SAMPLER_DIM_MS;
++}
++
++static bool
++kk_ms_store_dropped(nir_intrinsic_instr *instr)
++{
++   static unsigned logged;
++
++   if (!kk_ms_image(instr) || !kk_ms_store_drop_enabled())
++      return false;
++   if (instr->intrinsic == nir_intrinsic_bindless_image_store &&
++       __atomic_fetch_add(&logged, 1, __ATOMIC_RELAXED) < 8)
++      fprintf(stderr, "[kk-ms-store-drop] madeira-bcd: a store to a "
++                      "multisampled storage image is left out\n");
++   return true;
++}
++
+ static void
+ msl_emit_texture_type(struct nir_to_msl_ctx *ctx, nir_intrinsic_instr *instr)
+ {
+@@ -1062,6 +1120,11 @@
+          coherent = ", memory_coherence_device";
+          break;
+       }
++      if (nir_intrinsic_image_dim(instr) == GLSL_SAMPLER_DIM_MS &&
++          access[0] && kk_ms_store_drop_enabled()) {
++         access = ", access::read";
++         coherent = "";
++      }
+       P(ctx, "texture%s%s<%s%s%s>", dim, arrayed,
+         tex_type_name(nir_intrinsic_dest_type(instr)), access, coherent);
+    } else if (instr->intrinsic == nir_intrinsic_load_depth_texture_kk) {
+@@ -1613,6 +1676,10 @@
+       break;
+    case nir_intrinsic_bindless_image_store:
+       P_INDENT(ctx);
++      if (kk_ms_store_dropped(instr)) {
++         P(ctx, "/* madeira-bcd: store to a multisampled image left out (MADEIRA_KK_MS_STORE_DROP) */\n");
++         break;
++      }
+       src_to_msl(ctx, &instr->src[0]);
+       P(ctx, ".write(");
+       src_to_msl(ctx, &instr->src[3]);
+@@ -1647,6 +1714,10 @@
+    }
+    case nir_intrinsic_bindless_image_fence_kk: {
+       P_INDENT(ctx);
++      if (kk_ms_store_dropped(instr)) {
++         P(ctx, "/* madeira-bcd: fence on a multisampled image left out (MADEIRA_KK_MS_STORE_DROP) */\n");
++         break;
++      }
+       src_to_msl(ctx, &instr->src[0]);
+       P(ctx, ".fence();\n");
+       break;
+-- 
+2.47.0

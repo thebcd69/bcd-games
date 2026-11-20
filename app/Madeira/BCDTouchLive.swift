@@ -56,7 +56,7 @@ extension BCDTouchItem {
     init(stored c: TouchControl) {
         self.init(id: c.id, x: c.nx, y: c.ny, scale: c.scale, action: BCDTouchAction(stored: c.action), padLink: c.padBinding,
                   locked: c.locked == true, customShape: BCDTouchCustomShape(name: c.face?.shape, aspect: c.face?.aspect),
-                  customText: BCDTouchText.clean(c.face?.text))
+                  customText: BCDTouchText.clean(c.face?.text), latch: c.latch == true)
     }
 
     var stored: TouchControl {
@@ -69,6 +69,7 @@ extension BCDTouchItem {
         c.padBinding = padLink
         c.locked = locked ? true : nil   // never written as false: a layout with nothing locked is the file it always was
         c.face = TouchControl.Face.from(shape: customShape, text: customText)
+        c.latch = latch ? true : nil   // build 666: never written as false, so a layout without it is the file it always was
         return c
     }
 }
@@ -128,6 +129,11 @@ extension TouchControl {
 
     func padSurface(control: UUID, name: String, changed: @escaping (CGSize, Bool) -> Void) -> AnyView {
         AnyView(TouchPadSurface(control: control, action: name, changed: changed))
+    }
+
+    /// madeira-bcd (build 666, issue #45): a controller button that holds from one press to the next.
+    func padSurface(control: UUID, name: String, latches: Bool, changed: @escaping (CGSize, Bool) -> Void) -> AnyView {
+        AnyView(TouchPadSurface(control: control, action: name, changed: changed, latches: latches))
     }
 
     /// madeira-bcd (Porthole port, item 9): a floating stick's surface over its zone.
@@ -203,6 +209,9 @@ extension TouchControl {
     func setAction(_ id: UUID, _ action: BCDTouchAction) { update(id) { $0.action = action.stored } }
     func setScale(_ id: UUID, _ scale: Double) { update(id) { if $0.locked != true { $0.scale = BCDTouchGeometry.clampScale(scale) } } }
     func setLocked(_ id: UUID, _ locked: Bool) { update(id) { $0.locked = locked ? true : nil } }
+
+    /// build 666 (issue #45): Tap to hold; written only when on.
+    func setLatch(_ id: UUID, _ on: Bool) { update(id) { $0.latch = on ? true : nil } }
 
     /// A shape changes the control's size, so a locked control keeps its own; its words stay as they are.
     func setCustomShape(_ id: UUID, _ shape: BCDTouchCustomShape?) {

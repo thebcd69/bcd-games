@@ -568,7 +568,7 @@ enum SteamPlayCheck {
 
 // MARK: - Steam Cloud
 
-/// Whether Steam Cloud saves sync: Settings › Steam Cloud saves, kept in bcd.cfg as
+/// Whether Steam Cloud saves sync: Settings › Accounts › Steam Cloud saves, kept in bcd.cfg as
 /// env.MADEIRA_STEAM_CLOUD (on unless it is 0; docs/STEAM_CLOUD.md). Turning it back on
 /// syncs the installed games at once.
 @MainActor final class SteamCloudSetting: ObservableObject {

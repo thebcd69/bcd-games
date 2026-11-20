@@ -115,7 +115,9 @@ class SteamCredentialAuth {
             pollRequest.clientID = clientID
             pollRequest.requestID = requestIDData
 
-            let responseData = try await SteamAuthAPI.call("PollAuthSessionStatus", body: pollRequest.serialize())
+            // build 666 (issue #39): a lost connection (the Steam app in front for the approval) waits and asks again
+            let responseData = try await SteamAuthAPI.pollCall("PollAuthSessionStatus", body: pollRequest.serialize(),
+                                                               interval: pollInterval, flow: "password")
             let pollResponse = try CAuthentication_PollAuthSessionStatus_Response.deserialize(from: responseData)
 
             if pollResponse.newClientID != 0 {

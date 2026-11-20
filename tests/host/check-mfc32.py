@@ -307,7 +307,7 @@ check('VCRuntime.x86 is the 32-bit package\'s model, with no bundled copy',
 rl = (APP / 'BCDReadinessLive.swift').read_text()
 rc = (APP / 'BCDReadinessCore.swift').read_text()
 check('readiness: a 32-bit game is told to download the 32-bit MFC until it is there',
-      'p.vcRuntimeX86 = VCRuntime.x86.isAvailable' in rl and 'Download the 32-bit MFC in Settings › Visual C++ first.' in rc
+      'p.vcRuntimeX86 = VCRuntime.x86.isAvailable' in rl and 'Download the 32-bit MFC in Settings › Visual C++ runtime first.' in rc
       and 'static let mfc32Names: Set<String> = ["mfc140.dll", "mfc140u.dll", "mfcm140.dll", "mfcm140u.dll"]' in rc
       and 'BCD does not carry the 32-bit one yet' not in rc)
 st = (APP / 'BCDSettings.swift').read_text()

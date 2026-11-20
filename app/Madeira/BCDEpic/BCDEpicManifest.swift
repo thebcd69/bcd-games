@@ -24,6 +24,13 @@ import Foundation
 //   - file list, one column after another: names, symlink targets, SHA-1s, flags (u8), install tags,
 //     chunk parts (each: its size u32, chunk GUID, offset u32, size u32).
 //   - custom fields (not read).
+//
+// Round 668 (merge N008; Bus Simulator 21, Send Log 0C8N69: "reason=manifest-magic"): older builds are described by Epic's JSON
+// manifest instead (4 of the 34 games docs/research/open-fork-2026-10-18/epic.md surveyed). It holds the same lists keyed by chunk GUID
+// (32 hex digits, four big-endian words), with numbers and hashes as "blobs": three decimal digits per byte, the bytes little-endian;
+// the chunk SHA-1s are hex. It stores no window size (the chunks of that era are 1 MiB) and no body hash (the CDN file's SHA-1 against
+// the asset pointer is the check). The same format facts are read by app/Madeira/BCDEpic/EpicFormats.swift (Akshay CM, after Legendary's
+// json_manifest.py) for cloud saves; this reader is BCD's own, into BCD's types and with BCD's bounds.
 
 enum BCDEpicManifestError: Error, Equatable, LocalizedError {
     case notManifest
@@ -213,6 +220,9 @@ struct BCDEpicManifest {
     /// The manifest in `data` (the file as the CDN serves it). Throws what it cannot read, and
     /// `.encrypted` and `.newer` for what BCD refuses.
     static func parse(_ data: Data) throws -> BCDEpicManifest {
+        if let first = data.first(where: { ![0x20, 0x09, 0x0A, 0x0D, 0xEF, 0xBB, 0xBF].contains($0) }), first == 0x7B {   // "{" (after a BOM)
+            return try parseJSON(data)
+        }
         var header = Cursor(Array(data.prefix(4096)))
         guard data.count >= 41, try header.u32() == 0x44BE_C00C else { throw BCDEpicManifestError.notManifest }
         let headerSize = Int(try header.u32())
@@ -321,6 +331,142 @@ struct BCDEpicManifest {
         manifest.files.reserveCapacity(fileCount)
         for i in 0..<fileCount {
             manifest.files.append(File(name: names[i], symlinkTarget: links[i], sha1: fileShas[i], flags: flags[i], tags: tags[i], parts: parts[i]))
+        }
+        return manifest
+    }
+
+    // MARK: The JSON manifest (round 668, merge N008; see the header)
+
+    /// A blob's bytes: "012255" is [12, 255].
+    static func jsonBlob(_ value: Any?) throws -> [UInt8] {
+        guard let text = value as? String else { throw BCDEpicManifestError.malformed("json-blob") }
+        let digits = Array(text.utf8)
+        guard digits.count % 3 == 0, digits.count <= 3 * 64, digits.allSatisfy({ (0x30...0x39).contains($0) }) else {
+            throw BCDEpicManifestError.malformed("json-blob")
+        }
+        var bytes: [UInt8] = []
+        bytes.reserveCapacity(digits.count / 3)
+        var i = 0
+        while i < digits.count {
+            let value = Int(digits[i] - 0x30) * 100 + Int(digits[i + 1] - 0x30) * 10 + Int(digits[i + 2] - 0x30)
+            guard value < 256 else { throw BCDEpicManifestError.malformed("json-blob") }
+            bytes.append(UInt8(value))
+            i += 3
+        }
+        return bytes
+    }
+
+    /// A blob of at most eight bytes as a little-endian number.
+    static func jsonNumber(_ value: Any?) throws -> UInt64 {
+        let bytes = try jsonBlob(value)
+        guard bytes.count <= 8 else { throw BCDEpicManifestError.malformed("json-number") }
+        var number: UInt64 = 0
+        for (shift, byte) in bytes.enumerated() { number |= UInt64(byte) << (8 * UInt64(shift)) }
+        return number
+    }
+
+    /// A GUID key: 32 hex digits, the four words big-endian as written.
+    static func jsonGUID(_ text: String) throws -> BCDEpicGUID {
+        let chars = Array(text.utf8)
+        guard chars.count == 32 else { throw BCDEpicManifestError.malformed("json-guid") }
+        var words: [UInt32] = []
+        for start in stride(from: 0, to: 32, by: 8) {
+            guard let word = UInt32(String(decoding: chars[start..<start + 8], as: UTF8.self), radix: 16) else {
+                throw BCDEpicManifestError.malformed("json-guid")
+            }
+            words.append(word)
+        }
+        return BCDEpicGUID(a: words[0], b: words[1], c: words[2], d: words[3])
+    }
+
+    /// Forty hex digits, or nil.
+    static func jsonSHA1(_ text: String) -> [UInt8]? {
+        let chars = Array(text.utf8)
+        guard chars.count == 40 else { return nil }
+        var bytes: [UInt8] = []
+        for start in stride(from: 0, to: 40, by: 2) {
+            guard let byte = UInt8(String(decoding: chars[start..<start + 2], as: UTF8.self), radix: 16) else { return nil }
+            bytes.append(byte)
+        }
+        return bytes
+    }
+
+    /// The JSON manifest in `data`: the same lists as the binary one, the same bounds, the same results.
+    static func parseJSON(_ data: Data) throws -> BCDEpicManifest {
+        guard data.count <= maxBody, let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            throw BCDEpicManifestError.malformed("json")
+        }
+        guard let sizes = root["ChunkFilesizeList"] as? [String: Any], let hashes = root["ChunkHashList"] as? [String: Any],
+              let groups = root["DataGroupList"] as? [String: Any], let fileList = root["FileManifestList"] as? [[String: Any]] else {
+            throw BCDEpicManifestError.malformed("json-lists")
+        }
+        // A manifest whose file entries carry the data itself (bIsFileData) has no chunks to fetch.
+        if root["bIsFileData"] as? Bool == true { throw BCDEpicManifestError.malformed("file-data") }
+        let shas = root["ChunkShaList"] as? [String: Any] ?? [:]
+        let level: UInt64 = try root["ManifestFileVersion"].map { try jsonNumber($0) } ?? 13
+        guard level <= UInt64(newestLevel) else { throw BCDEpicManifestError.newer(Int(min(level, 1 << 20))) }
+        guard sizes.count <= maxChunks, fileList.count <= maxFiles else { throw BCDEpicManifestError.malformed("json-counts") }
+
+        var manifest = BCDEpicManifest()
+        manifest.featureLevel = Int(level)
+        func text(_ key: String) -> String { root[key] as? String ?? "" }
+        manifest.appName = text("AppNameString")
+        manifest.buildVersion = text("BuildVersionString")
+        manifest.launchExe = text("LaunchExeString")
+        manifest.launchCommand = text("LaunchCommand")
+        manifest.prereqIDs = (root["PrereqIds"] as? [String] ?? []).prefix(1024).map { $0 }
+        manifest.prereqName = text("PrereqName")
+        manifest.prereqPath = text("PrereqPath")
+        manifest.prereqArgs = text("PrereqArgs")
+
+        // Chunks, in the order of their GUIDs (the JSON object has none of its own).
+        var index: [BCDEpicGUID: Int] = [:]
+        index.reserveCapacity(sizes.count)
+        manifest.chunks.reserveCapacity(sizes.count)
+        for key in sizes.keys.sorted() {
+            let guid = try jsonGUID(key)
+            let fileSize = try jsonNumber(sizes[key])
+            guard fileSize > 0, fileSize <= 1 << 30 else { throw BCDEpicManifestError.malformed("chunk-size") }
+            // No SHA-1 is all zeros, which the content plan treats as "no digest" (the rolling hash and the file's SHA-1 still check).
+            var sha = [UInt8](repeating: 0, count: 20)
+            if let listed = shas[key] {
+                guard let hex = listed as? String, let bytes = jsonSHA1(hex) else { throw BCDEpicManifestError.malformed("chunk-sha") }
+                sha = bytes
+            }
+            let rolling = try jsonNumber(hashes[key])
+            let group = UInt8(truncatingIfNeeded: try jsonNumber(groups[key]))
+            guard index.updateValue(manifest.chunks.count, forKey: guid) == nil else { throw BCDEpicManifestError.malformed("chunk-guid") }
+            manifest.chunks.append(Chunk(guid: guid, rollingHash: rolling, sha1: sha, group: group, window: 1 << 20, fileSize: Int64(fileSize)))
+        }
+
+        var partTotal = 0
+        manifest.files.reserveCapacity(fileList.count)
+        for item in fileList {
+            guard let name = item["Filename"] as? String, let chunkParts = item["FileChunkParts"] as? [[String: Any]] else {
+                throw BCDEpicManifestError.malformed("json-file")
+            }
+            let sha = try jsonBlob(item["FileHash"])
+            guard sha.count == 20 else { throw BCDEpicManifestError.malformed("json-file-hash") }
+            var flags: UInt8 = 0
+            if item["bIsReadOnly"] as? Bool == true { flags |= 1 }
+            if item["bIsCompressed"] as? Bool == true { flags |= 2 }
+            if item["bIsUnixExecutable"] as? Bool == true { flags |= 4 }
+            let tags = item["InstallTags"] as? [String] ?? []
+            guard tags.count <= 4096 else { throw BCDEpicManifestError.malformed("tags") }
+            partTotal += chunkParts.count
+            guard partTotal <= maxParts else { throw BCDEpicManifestError.malformed("parts") }
+            var parts: [Part] = []
+            parts.reserveCapacity(chunkParts.count)
+            for part in chunkParts {
+                guard let key = part["Guid"] as? String else { throw BCDEpicManifestError.malformed("part-guid") }
+                guard let chunk = index[try jsonGUID(key)] else { throw BCDEpicManifestError.malformed("part-guid") }
+                let offset = Int64(try jsonNumber(part["Offset"]))
+                let size = Int64(try jsonNumber(part["Size"]))
+                guard offset >= 0, size >= 0, offset + size <= manifest.chunks[chunk].window else { throw BCDEpicManifestError.malformed("part-range") }
+                parts.append(Part(chunk: chunk, offset: offset, size: size))
+            }
+            manifest.files.append(File(name: name, symlinkTarget: item["SymlinkTarget"] as? String ?? "", sha1: sha, flags: flags,
+                                       tags: tags, parts: parts))
         }
         return manifest
     }

@@ -178,7 +178,7 @@ def replay(paths, end, user_keys=""):
         return [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
 
 
-KEYS = ("outcome", "stage", "matched", "dialogs", "status", "next")
+KEYS = ("outcome", "stage", "matched", "dialogs", "status", "next", "suggest")   # "suggest": round 670 (I1), only when there is one
 
 
 def main():
@@ -196,15 +196,15 @@ def main():
     lines = cut(a.log, needles())
     fixture.write_text("\n".join(lines) + "\n")
     full, cutr = replay([a.log, fixture], end, a.user_keys)
-    diff = [k for k in KEYS + ("monoMissing",) if full[k] != cutr[k]]
+    diff = [k for k in KEYS + ("monoMissing",) if full.get(k) != cutr.get(k)]
     if diff:
         fixture.unlink()
         sys.exit("the cut lost something (%s):\n full: %s\n cut:  %s" % (", ".join(diff),
-                 {k: full[k] for k in diff}, {k: cutr[k] for k in diff}))
+                 {k: full.get(k) for k in diff}, {k: cutr.get(k) for k in diff}))
     expect = {"end": end, "note": a.note}
     if a.user_keys:
         expect["userKeys"] = [k for k in a.user_keys.split(",") if k]
-    expect.update({k: cutr[k] for k in KEYS})
+    expect.update({k: cutr[k] for k in KEYS if k in cutr})
     if cutr["monoMissing"]:
         expect["monoMissing"] = True   # the game page's Wine Mono hint (only a fixture that shows it says so)
     (OUT / (a.name + ".expect")).write_text(json.dumps(expect, indent=1, sort_keys=True, ensure_ascii=False) + "\n")

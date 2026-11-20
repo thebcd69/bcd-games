@@ -272,6 +272,11 @@ enum DockStartStatus {
         if fields["session-offline-logon-result"] == "1" || fields["session-offline-logon-retry"] == "1" {
             return "Signed in offline with Steam's saved sign-in. Checking this game's license…"
         }
+        // Round 668 (A1, merge N049): the host writes Valve's answer to "may this account log on offline?" (madeira-dock session.c); only 1
+        // starts the offline sign-in, any other answer keeps the host waiting for the connection.
+        if fields["session-offline-requested"] == nil, let answer = fields["session-offline-fallback"], answer != "1" {
+            return "Steam's client can't reach Steam's servers and has no saved sign-in for an offline start. Still waiting for the connection; a VPN, a content filter or a DNS profile can block Steam."
+        }
         if fields["session-offline-requested"] != nil || fields["session-offline-fallback"] != nil {
             return "You're offline. Asking Steam for an offline sign-in…"
         }

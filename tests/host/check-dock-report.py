@@ -77,7 +77,10 @@ assert(parse("[steam-host] ml1830 session-authenticated-online=1\n[steam-host] m
 assert(parse("[steam-host] ml1830 probe-result=34\n").failure!.contains("sign-in didn't complete"))
 // Round 620 (Half-Life 2, 6XBJKH): an expired saved sign-in (EResult 15 in callback 102/103) says so, not "check your connection".
 assert(parse("[steam-host] ml1830 session-connection-result=15\n[steam-host] ml1830 probe-result=34\n").failure!.contains("no longer accepts your sign-in"))
-assert(parse("[steam-host] ml1830 session-connection-result=3\n[steam-host] ml1830 probe-result=34\n").failure!.contains("sign-in didn't complete"))
+// Round 668 (A1, merge N049): EResult 3 (no connection) names the network, a VPN or a filter; another code keeps the old sentence.
+assert(parse("[steam-host] ml1830 session-connection-result=3\n[steam-host] ml1830 probe-result=34\n").failure!.contains("couldn't reach Valve's servers"))
+assert(parse("[steam-host] ml1830 session-connection-result=2\n[steam-host] ml1830 probe-result=34\n").failure!.contains("sign-in didn't complete"))
+assert(parse("[steam-host] ml1830 probe-result=34\n").failure!.contains("sign-in didn't complete"))
 assert(parse("[steam-host] ml1830 session-authenticated-online=1\n[steam-host] ml1830 session-connection-result=15\n[steam-host] ml1830 probe-result=34\n").failure!.contains("license check"))
 // Offline start (ml2016): Valve's client decides; each refusal has its own words.
 let offline = parse("[steam-host] ml2016 session-offline-abi=1\n[steam-host] ml2016 session-offline-requested=1\n[steam-host] ml2016 session-offline-can=2\n[steam-host] ml1830 probe-result=50\n")

@@ -102,7 +102,7 @@ int main(void)
 {
     size_t i;
     uint32_t n1 = 0, n2 = 0, n3 = 0;
-    int stream_a, stream_b;
+    int stream_a = 0, stream_b = 0;  /* only their addresses are used; set for Xcode 27 clang -Wuninitialized-const-pointer */
 
     for (i = 0; i < sizeof(W) / sizeof(W[0]); i++) {
         int got = ios_audio_underrun_window(W[i].pad_max, W[i].cb_max, W[i].passes, W[i].shorts, W[i].wrote, W[i].secs, W[i].rate, W[i].dev, W[i].ch);
@@ -139,6 +139,13 @@ int main(void)
     ios_audio_io_auto_window(&stream_b, &n2, 960, 1024, 468, 468, 9.38, 10.0, 48000, 48000, 2);
     ios_audio_io_auto_window(&stream_b, &n2, 960, 1024, 468, 468, 9.38, 10.0, 48000, 48000, 2);
     EXPECT(asks == 1, "a second stream in the signature asks nothing more");
+
+    /* round 668 (merge N022, Days Gone): Wine's 12-channel spatial bed starved in every pass asks nothing and is said once (ml2304); a bed with
+       few short passes says nothing */
+    atomic_store(&g_io_auto_asked, 0); asks = 0; n3 = 0;
+    ios_audio_io_auto_window(&stream_b, &n3, 480, 1024, 469, 30, 10.0, 10.0, 48000, 48000, 12);
+    for (i = 0; i < 5; i++) ios_audio_io_auto_window(&stream_b, &n3, 960, 1024, 469, 469, 2.36, 10.0, 48000, 48000, 12);
+    EXPECT(asks == 0 && n3 == 0 && !atomic_load(&g_io_auto_asked), "Wine's 12-channel spatial bed: nothing asked");
 
     /* the game's own value (any, 0 too) wins, and is said once */
     setenv("MADEIRA_AUDIO_IO_MS", "5", 1);
@@ -190,6 +197,10 @@ int main(void)
                   run.stdout + run.stderr)
             lines = run.stderr.split("\n")
             if not define:
+                check("the spatial bed is said once (ml2304) with its numbers, only for the bed that starved",
+                      sum("ml2304" in l for l in lines) == 1
+                      and any("ml2304 stream=" in l and "queue shorter than one pass in 469 of 469 passes but 12 channels (Wine's spatial-audio bed)" in l
+                              and "MADEIRA_AUDIO_SPATIAL=0 gives the game a plain stream" in l for l in lines), run.stderr)
                 check("the request says ml2300 once, the skip ml2301 twice (the values 5 and 0), with the numbers",
                       sum("ml2300" in l for l in lines) == 4 and sum("ml2301" in l for l in lines) == 2
                       and any("ml2300 stream=" in l and "queue at most 960 frames, largest pass 1024 frames, 468 of 468 passes short, client wrote 93.8%" in l
@@ -228,7 +239,7 @@ note = catalog_py[catalog_py.index('"env.MADEIRA_AUDIO_IO_MS"'):catalog_py.index
 check("the settings catalog's note for env.MADEIRA_AUDIO_IO_MS tells the automatic request and that any value of the key switches it off",
       "automatic request" in note and "Any value of this key in the game's own file, 0 included, switches the automatic request off" in note)
 check("the auto-tune rule audio-short-passes: fixedIn 652, no lines, spoken for a session that played, silent once the request was made",
-      '"id": "audio-short-passes"' in rules_py and '"none": [s("[ios_audio] ml2300"), s("[audio] io buffer asked")]' in rules_py)
+      '"id": "audio-short-passes"' in rules_py and '"none": [s("[ios_audio] ml2300"), s("[audio] io buffer asked"), s("[ios_audio] ml2304")]' in rules_py)   # round 668: not the spatial bed
 check("CI runs this check", "run: python3 tests/host/check-audio-io-auto.py" in workflow)
 
 print("PASS: audio IO buffer request" if ok else "FAIL: audio IO buffer request")

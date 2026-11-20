@@ -608,11 +608,13 @@ struct LibraryEntry: Codable, Identifiable {
     /// game's own config BCDEpic holds the host's two values here and they are set again once, right after that second configureLaunch. Nothing is held
     /// otherwise (the default): the start is exactly what builds 590 to 597 did.
     private static let epicHostLock = NSLock()
-    private static var epicHostHold: (entry: UUID, exe: String, args: String)?
+    private static var epicHostHold: (entry: UUID, exe: String, args: String, desktop: Bool)?
 
-    static func holdEpicHostStart(entry: UUID, exe: String, args: String) {
+    /// `desktop` (round 668, R1 S2): the host runs inside the Wine desktop although the entry itself does not (Epic's Rockstar route), so
+    /// MADEIRA_DESKTOP must survive the second configureLaunch too.
+    static func holdEpicHostStart(entry: UUID, exe: String, args: String, desktop: Bool = false) {
         epicHostLock.lock(); defer { epicHostLock.unlock() }
-        epicHostHold = (entry, exe, args)
+        epicHostHold = (entry, exe, args, desktop)
     }
 
     static func clearEpicHostStart() {
@@ -629,6 +631,7 @@ struct LibraryEntry: Codable, Identifiable {
         guard let hold, hold.entry == entry else { return }
         setenv("MADEIRA_EXE", hold.exe, 1)
         setenv("MADEIRA_ARGS", hold.args, 1)
+        if hold.desktop { setenv("MADEIRA_DESKTOP", "1", 1) }
     }
     // epic-host-hold:end
 

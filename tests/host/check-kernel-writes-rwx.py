@@ -332,7 +332,7 @@ if wine:
     scripts = ['patch-wine-guest-log.py', 'patch-wine-guest-log-tag.py', 'patch-wine-guest-log-service.py', 'patch-wine-guest-log-renpy.py',
                'patch-wine-guest-log-trace.py', 'patch-wine-guest-log-redact.py', 'patch-wine-guest-log-secrets.py', 'patch-wine-guest-log-ring.py', 'patch-wine-file-trace.py',
                'patch-wine-file-census.py', 'patch-wine-globalroot.py', 'patch-wine-app-local-dll.py', 'patch-wine-file-info-fstat.py',
-               'patch-wine-hide-host-version-plist.py', 'patch-wine-dir-storm.py']
+               'patch-wine-hide-host-version-plist.py', 'patch-wine-dir-storm.py', 'patch-wine-file-xattr-one-list.py']
     tmp = Path(tempfile.mkdtemp(prefix='kernel-writes-rwx-scripts-'))
     try:
         copy = tmp / 'file.c'

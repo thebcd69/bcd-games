@@ -1,0 +1,107 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Sun, 11 Oct 2026 21:19:01 +0200
+Subject: [PATCH] kk: keep workaround 6 outside fragment shaders on iOS 27
+
+KosmicKrisp turns workaround 6 (every device memory access coherent)
+off when the system is at least version 27, since macOS 27 fixed the
+Metal coherency bug behind it. The version check holds on iOS 27 too,
+where the bug is not fixed: on an A19 Pro, Cat Mail Co. Demo's Unity 6
+URP scene, drawn through indirect draws whose arguments and instance
+data compute shaders write, lost most of its objects, drew the rest in
+the wrong places and left a blown-out void.
+
+With MESA_KK_DEBUG=os26_workarounds, then
+MESA_KK_DISABLE_WORKAROUNDS=3,6,18, =3 and =6 on top of it, only the
+plays with workaround 6 off drew the scene wrong. Kept on for every
+stage, it more than doubled Portal 2's GPU time a frame; kept for
+compute shaders only, the scene was still wrong. So on iOS it stays on
+for every stage but fragment shaders, unless MESA_KK_DISABLE_WORKAROUNDS
+names it; the pipeline cache key includes the choice.
+
+Class: ios-port
+Evidence: docs/evidence/2026-10-11-unity-urp-vulkan.md
+Offered-upstream: no
+BCD (2026-11-17): applied on BCD's stack without Playport's 0029, so the
+iOS 27 test reads only the OS version (the context line's
+!KK_DEBUG(OS26_WORKAROUNDS) term belongs to 0029). Code otherwise as
+Playport's.
+---
+ docs/drivers/kosmickrisp/workarounds.rst    |  1 +
+ src/kosmickrisp/vulkan/kk_physical_device.c | 14 +++++++++++++-
+ src/kosmickrisp/vulkan/kk_physical_device.h |  3 +++
+ src/kosmickrisp/vulkan/kk_shader.c          |  3 +++
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/docs/drivers/kosmickrisp/workarounds.rst b/docs/drivers/kosmickrisp/workarounds.rst
+index a7f16fa..11e3264 100644
+--- a/docs/drivers/kosmickrisp/workarounds.rst
++++ b/docs/drivers/kosmickrisp/workarounds.rst
+@@ -318,6 +318,7 @@ Hopefully this does not affect performance much.
+ | Log:
+ | 2025-12-08: Workaround implemented and reported to Apple
+ | 2026-06-22: Fixed in macOS 27 Beta (Build 26A5353q)
++| 2026-10-11: Still needed on iOS 27.0 (A19 Pro); kept on there outside fragment shaders
+ 
+ KK_WORKAROUND_5
+ ---------------
+diff --git a/src/kosmickrisp/vulkan/kk_physical_device.c b/src/kosmickrisp/vulkan/kk_physical_device.c
+index 030f5ba..20fa6ef 100644
+--- a/src/kosmickrisp/vulkan/kk_physical_device.c
++++ b/src/kosmickrisp/vulkan/kk_physical_device.c
+@@ -1016,6 +1016,8 @@ kk_physical_device_init_pipeline_cache(struct kk_physical_device *pdev)
+                        sizeof(pdev->info.msl_version));
+    _mesa_blake3_update(&blake3_ctx, &pdev->settings.disabled_workarounds,
+                        sizeof(pdev->settings.disabled_workarounds));
++   _mesa_blake3_update(&blake3_ctx, &pdev->settings.vertex_compute_workaround_6,
++                       sizeof(pdev->settings.vertex_compute_workaround_6));
+    const uint64_t compiler_flags =
+       kk_mesa_debug_flags & KK_DEBUG_FORCE_ROBUSTNESS;
+    _mesa_blake3_update(&blake3_ctx, &compiler_flags, sizeof(compiler_flags));
+@@ -1161,7 +1163,17 @@ kk_parse_environment_options(struct kk_physical_device *pdev)
+    }
+ 
+    /* Workarounds resolved on macOS 27 */
+-   if (ns_is_os_version_at_least(27, 0, 0)) {
++   if (ns_is_os_version_at_least(27, 0, 0) ) {
++#if DETECT_OS_APPLE && TARGET_OS_IPHONE
++      /* Not workaround 6 outside fragment shaders on iOS 27 (A19 Pro):
++       * without coherent device accesses in its compute and vertex shaders,
++       * a Unity 6 scene whose indirect draws compute shaders set up loses
++       * most of its objects and puts the rest in the wrong places (compute
++       * alone is not enough). Fragment shaders too cost a GPU-bound DXVK
++       * title over twice its GPU time, so not those. */
++      settings->vertex_compute_workaround_6 =
++         !(settings->disabled_workarounds & BITFIELD64_BIT(6));
++#endif
+       /* 1-6 */
+       settings->disabled_workarounds |= BITFIELD64_MASK(7);
+ 
+diff --git a/src/kosmickrisp/vulkan/kk_physical_device.h b/src/kosmickrisp/vulkan/kk_physical_device.h
+index bc83782..9d815cf 100644
+--- a/src/kosmickrisp/vulkan/kk_physical_device.h
++++ b/src/kosmickrisp/vulkan/kk_physical_device.h
+@@ -56,6 +56,9 @@ struct kk_env_settings {
+     * not the device's whole life; 0 for the whole life. */
+    uint32_t gpu_capture_frame;
+    uint64_t disabled_workarounds;
++   /* KK_WORKAROUND_6 for every stage but fragment shaders, whatever
++    * disabled_workarounds says: iOS 27 still needs it there */
++   bool vertex_compute_workaround_6;
+ };
+ 
+ struct kk_physical_device {
+diff --git a/src/kosmickrisp/vulkan/kk_shader.c b/src/kosmickrisp/vulkan/kk_shader.c
+index e59b17b..db26815 100644
+--- a/src/kosmickrisp/vulkan/kk_shader.c
++++ b/src/kosmickrisp/vulkan/kk_shader.c
+@@ -1310,6 +1310,9 @@ kk_compile_shader(struct kk_device *dev, nir_shader *nir,
+       .mem_ctx = NULL,
+       .disabled_workarounds = pdev->settings.disabled_workarounds,
+    };
++   if (nir->info.stage != MESA_SHADER_FRAGMENT &&
++       pdev->settings.vertex_compute_workaround_6)
++      translate_options.disabled_workarounds &= ~BITFIELD64_BIT(6);
+    if (nir->info.stage == MESA_SHADER_FRAGMENT) {
+       for (uint32_t i = 0u; i < MAX_DRAW_BUFFERS; ++i) {
+          /* If the attachment is unused, default to 4 to avoid issues with alpha

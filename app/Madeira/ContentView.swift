@@ -2517,17 +2517,19 @@ struct ContentView: View {
             let installFolder = MadeiraDock.drive.appendingPathComponent(game.library + "/common/" + game.installDir)
             // madeira-bcd (2026-10-24): a game whose page chose a Steam launch option (profile.steamLaunchOption) asks for that
             // entry; a game that never did gets exactly the key and the line it got before (SteamDirectStart.dockLaunch).
-            // madeira-bcd exe-window-auto = 1 (the game's file or bcd.cfg; off unless set): measure the game's own fixed-base exe now, so
-            // the JIT pool is placed above it (StikJITHelper.allocatePool reads this once). Off, nothing is measured and the window is
+            // madeira-bcd exe-window-auto (the game's file or bcd.cfg; on unless 0 from round 677): measure the game's own fixed-base exe now,
+            // so the JIT pool is placed above it (StikJITHelper.allocatePool reads this once). Off, nothing is measured and the window is
             // what exe-window-mb says, or 128MB.
             StikJITHelper.exeWindowAutoMB = 0
-            let autoWindow = ((profile.map { GameProfile(windowsPath: $0.windowsPath).get("exe-window-auto") } ?? nil)
-                              ?? MadeiraConfig.get("exe-window-auto") ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            if ["1", "on", "true", "yes"].contains(autoWindow), let need = StikJITHelper.fixedBaseWindowMB(in: installFolder) {
+            let autoWindow = (profile.map { GameProfile(windowsPath: $0.windowsPath).get("exe-window-auto") } ?? nil) ?? MadeiraConfig.get("exe-window-auto")
+            if StikJITHelper.exeWindowAutoWanted(autoWindow), let need = StikJITHelper.fixedBaseWindowMB(in: installFolder) {
                 StikJITHelper.exeWindowAutoMB = need.mb
                 LogStore.shared.log("[exe-window] \(need.exe) is a fixed-base image ending \(need.mb)MB above 0x140000000: "
                     + "the executable window is widened to \(need.mb)MB for this session (exe-window-auto; exe-window-mb in the game's file overrides)")
             }
+            // Round 677 (agent S1 S1-S8): the Steam game's own folder decides Wine's wintypes.dll (BCDWinTypesAuto; the game's file wins).
+            BCDWinTypesAuto.prepare(folder: installFolder,
+                                    gameValue: profile.map { GameProfile(windowsPath: $0.windowsPath).get("env.MADEIRA_WINTYPES") } ?? nil)
             let dockLaunch = SteamDirectStart.dockLaunch(chosen: profile?.steamLaunchOption, options: options, installFolder: installFolder)
             let launchOption = dockLaunch.index
             MadeiraDock.paradoxLauncherSession = options?.first(where: { $0.index == launchOption }).map { MadeiraDock.isParadoxLauncher(executable: $0.executable) } ?? false   // night round 2026-11-11 (D S2)
@@ -2839,6 +2841,10 @@ struct TouchControl: Codable, Identifiable, Equatable {
     /// Optional and written only when set, so a layout saved before it existed, and any layout without
     /// them, is the same file as always.
     var face: Face?
+    /// madeira-bcd (build 666, issue #45): the control holds its key or button from one press to the next (BCD's
+    /// editor: Tap to hold). Optional and written only when set, so a layout saved before it existed, and any layout
+    /// without it, is the same file as always.
+    var latch: Bool?
 }
 
 extension TouchControl {
@@ -3234,10 +3240,16 @@ enum DesktopGDISection {
     /// For every library start, before the session starts: the log line to write, or nil.
     static func apply(_ entry: LibraryEntry) -> String? {
         let shell = applyShell(entry)
-        if entry.desktop == true || (entry.runsInDesktop && entry.bits == 32) {
+        // Round 669 (agent C PES-1; PES 2017 8DSHHJ, PsoBB 8GK3MM and ZNPD87): a 32-bit program started by the services batch (cmd.exe starts
+        // services.exe, then the game) also runs in a session that began 64-bit; with the table in private host memory its gdi32 reads the
+        // table's address cut to 32 bits and faults on its first GDI handle ("[gdi-shared] 32-bit program in a session whose GDI table is
+        // private host memory"). RE5 and F.E.A.R. 2 ran that way only because the cut address happened to be mapped.
+        let servicesBatch32 = entry.servicesScript != nil && entry.bits == 32
+        if entry.desktop == true || (entry.runsInDesktop && entry.bits == 32) || servicesBatch32 {
             setenv("MADEIRA_GDI_SHARED_SECTION", "1", 1)
             setByDesktop = true
-            return "[bcd] " + (entry.desktop == true ? "Desktop" : "Wine-desktop start of a 32-bit program")
+            return "[bcd] " + (entry.desktop == true ? "Desktop" : servicesBatch32 && !entry.runsInDesktop
+                ? "a 32-bit program started by the services batch" : "Wine-desktop start of a 32-bit program")
                 + ": section-backed GDI table for the 32-bit programs started here "
                 + "(MADEIRA_GDI_SHARED_SECTION=1; env.MADEIRA_GDI_SHARED_SECTION = 0 in its Game config turns it off)"
                 + (shell ?? "")

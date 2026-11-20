@@ -96,7 +96,7 @@ func bcdRun(_ action: BCDTouchAction, diameter: Double, path: [CGSize]) -> (step
         steps.append(log)
     }
     log = []
-    press.end()
+    press.lift()   // build 666: BCDTouchKeyView lifts (a control that does not hold lets go, as end() did)
     steps.append(log)
     return (steps, taps)
 }
@@ -235,6 +235,65 @@ require(released.stored == plain && released.stored.locked == nil, "unlocking it
 let oldFile = #"{"id":"6F1B5E2A-1C1D-4B7E-9C84-0A0B0C0D0E0F","nx":0.25,"ny":0.75,"scale":1,"action":{"mouseLeft":{}}}"#
 let oldControl = try! JSONDecoder().decode(TouchControl.self, from: Data(oldFile.utf8))
 require(oldControl.locked == nil && !BCDTouchItem(stored: oldControl).locked, "a control saved before locking existed is not locked")
+
+// build 666 (issue #45): Tap to hold. One more optional key, `latch`, written only when on. A holding control keeps its key down
+// after the finger lifts and the next press lets it go (that press's lift does nothing); turning it off or ending the control
+// (interrupted, gone) lets go; a stick, the keyboard button and an unbound control never hold.
+require(!plainJSON.contains("latch"), "a control without Tap to hold is written without the key")
+var latched = plain
+latched.latch = true
+require(String(data: try! encoder.encode(latched), encoding: .utf8)!.contains("\"latch\":true"), "a holding control is written with it")
+let latchedItem = BCDTouchItem(stored: latched)
+require(latchedItem.latch && latchedItem.holds && !BCDTouchItem(stored: plain).latch, "the view value says whether the control holds")
+require(latchedItem.stored == latched && (try! JSONDecoder().decode(TouchControl.self, from: try! encoder.encode(latched))) == latched,
+        "a holding control comes back unchanged, through the view value and through its own file")
+var unlatched = latchedItem
+unlatched.latch = false
+require(unlatched.stored == plain && unlatched.stored.latch == nil, "turning it off writes no key again")
+require(oldControl.latch == nil && !BCDTouchItem(stored: oldControl).latch, "a control saved before Tap to hold existed does not hold")
+func holdItem(_ a: BCDTouchAction) -> BCDTouchItem { BCDTouchItem(id: UUID(), x: 0.5, y: 0.5, scale: 1, action: a, latch: true) }
+require(holdItem(.key(0x20)).holds && holdItem(.mouseLeft).holds && holdItem(.pad("A")).holds && holdItem(.pad("LT")).holds
+        && !holdItem(.keyStick(.wasd)).holds && !holdItem(.pad("LS")).holds && !holdItem(.pad("RS")).holds
+        && !holdItem(.keyboard).holds && !holdItem(.none).holds,
+        "keys, mouse buttons and controller buttons hold; sticks, the keyboard button and an unbound control do not")
+do {
+    var log: [String] = []
+    let key = BCDTouchPress(action: .key(0x20), diameter: 64, send: { log.append(record($0)) })
+    key.latches = true
+    key.begin(); key.lift()
+    require(log == ["key 32 1"] && key.down, "a holding key stays down after the lift \(log)")
+    key.begin()
+    require(log == ["key 32 1", "key 32 0"] && !key.down, "the next press lets it go \(log)")
+    key.lift()
+    require(log == ["key 32 1", "key 32 0"] && !key.down, "and that press's lift does nothing \(log)")
+    key.begin(); key.lift()
+    require(log == ["key 32 1", "key 32 0", "key 32 1"] && key.down, "a third press holds it again \(log)")
+    key.latches = false
+    require(log == ["key 32 1", "key 32 0", "key 32 1", "key 32 0"] && !key.down, "turned off while held, it lets go \(log)")
+    key.begin(); key.lift()
+    require(log.suffix(2) == ["key 32 1", "key 32 0"] && !key.down, "and then it is pressed only while the finger is on it \(log)")
+    log = []
+    key.latches = true
+    key.begin(); key.lift(); key.end(); key.end()
+    require(log == ["key 32 1", "key 32 0"] && !key.down, "ended while held (interrupted, gone), it lets go once \(log)")
+    log = []
+    key.begin(); key.lift(); key.rebind(.key(0x41))
+    require(log == ["key 32 1", "key 32 0"] && !key.down, "rebound while held, it lets go of its old key \(log)")
+    log = []
+    let mouse = BCDTouchPress(action: .mouseLeft, diameter: 64, send: { log.append(record($0)) })
+    mouse.latches = true
+    mouse.begin(); mouse.lift(); mouse.begin(); mouse.lift()
+    require(log == ["mouse 2", "mouse 4"], "a mouse button holds the same way \(log)")
+    log = []
+    let stick = BCDTouchPress(action: .keyStick(.wasd), diameter: 64, send: { log.append(record($0)) })
+    stick.latches = true
+    stick.begin(); stick.move(dx: 0, dy: -40); stick.lift()
+    require(log == ["key 87 1", "key 87 0"] && !stick.down, "a key stick never holds \(log)")
+    log = []
+    let plainKey = BCDTouchPress(action: .key(0x20), diameter: 64, send: { log.append(record($0)) })
+    plainKey.begin(); plainKey.lift(); plainKey.begin(); plainKey.lift()
+    require(log == ["key 32 1", "key 32 0", "key 32 1", "key 32 0"], "without Tap to hold every lift lets go, as always \(log)")
+}
 
 let layers = (0..<4).map { i in BCDTouchItem(id: UUID(), x: 0.2 * Double(i + 1), y: 0.5, scale: 1, action: .mouseLeft) }
 let ids = layers.map(\.id)

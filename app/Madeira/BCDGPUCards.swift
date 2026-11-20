@@ -45,7 +45,7 @@ struct BCDGPUCard: Identifiable, Equatable {
 enum BCDGPUCards {
     /// The game's line.
     static let key = "gpu-card"
-    /// The game's line for video memory (read by winemetal, DXMT's DXGI and win32u; Settings › Memory sets it for every game).
+    /// The game's line for video memory (read by winemetal, DXMT's DXGI and win32u; Settings › Memory & performance sets it for every game).
     static let memoryKey = "vram-mb"
 
     static let apple: UInt16 = 0x106B, nvidia: UInt16 = 0x10DE, amd: UInt16 = 0x1002, intel: UInt16 = 0x8086
@@ -204,7 +204,7 @@ enum BCDGPUCards {
 
     // MARK: Video memory
 
-    /// The per-game video memory choices (the same sizes Settings › Memory offers, 0 = automatic) as (value, label),
+    /// The per-game video memory choices (the same sizes Settings › Memory & performance offers, 0 = automatic) as (value, label),
     /// worded as Settings words them.
     static func memoryChoices(_ megabytes: [Int]) -> [(String, String)] {
         megabytes.map { mb in

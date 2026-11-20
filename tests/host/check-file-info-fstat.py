@@ -179,12 +179,31 @@ with tempfile.TemporaryDirectory() as t:
         xe = func_body(real_src, "static BOOL xattr_exists( const char **path, int *filedes, const char *name )")
         check(bool(xe), "extracted: static BOOL xattr_exists (the Apple pre-check)")
         pieces.append("#ifdef __APPLE__\n" + xe + "\n#endif")
-        for sig in ("static inline ULONG get_file_attributes( const struct stat *st )",
-                    "static int parse_samba_dos_attrib_data( char *data, int len )",
-                    "static BOOL fd_is_mount_point( int fd, const struct stat *st )",
-                    "static int xattr_fget( int filedes, const char *name, void *value, size_t size )",
-                    "static int fd_get_file_info( HANDLE handle, int fd, unsigned int options,",
-                    "static int madeira_fd_stat_only( HANDLE handle, int fd, unsigned int options, struct stat *st, ULONG *attr )"):
+        # Round 670: in the build, file.c already carries tools/patch-wine-file-xattr-one-list.py (applied before this check), whose
+        # fd_get_file_info calls the one-list helpers: they come along, exactly as the patch wrote them (their #ifdef WINE_IOS block).
+        mark = "/* madeira-bcd: madeira_xattr_pair"
+        if mark in real_src:
+            start = real_src.rindex("#ifdef WINE_IOS\n", 0, real_src.index(mark))
+            end = real_src.index("\n#endif\n", start) + len("\n#endif\n")
+            helper = real_src[start:end]
+            check("madeira_xattr_pair_get(" in helper and helper.count("#ifdef") == 1,
+                  "extracted: the one-list helpers of the xattr patch (build order)")
+        else:
+            helper = None
+        sigs = ["static inline ULONG get_file_attributes( const struct stat *st )",
+                "static int parse_samba_dos_attrib_data( char *data, int len )",
+                "static BOOL fd_is_mount_point( int fd, const struct stat *st )",
+                "static int xattr_fget( int filedes, const char *name, void *value, size_t size )",
+                "static int fd_get_file_info( HANDLE handle, int fd, unsigned int options,",
+                "static int madeira_fd_stat_only( HANDLE handle, int fd, unsigned int options, struct stat *st, ULONG *attr )"]
+        if helper:   # the helpers read through xattr_get and xattr_fget: after both, before fd_get_file_info
+            sigs.insert(sigs.index("static int xattr_fget( int filedes, const char *name, void *value, size_t size )"),
+                        "static int xattr_get( const char *path, const char *name, void *value, size_t size )")
+            sigs.insert(sigs.index("static int fd_get_file_info( HANDLE handle, int fd, unsigned int options,"), helper)
+        for sig in sigs:
+            if sig is helper:
+                pieces.append(helper)
+                continue
             body = func_body(real_src, sig)
             check(bool(body), "extracted: " + sig.split("(")[0])
             pieces.append(body)

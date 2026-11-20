@@ -80,7 +80,9 @@ class SteamQRAuth {
             pollRequest.clientID = clientID
             pollRequest.requestID = requestIDData
 
-            let responseData = try await callSteamAuthAPI(method: "PollAuthSessionStatus", body: pollRequest.serialize())
+            // build 666 (issue #39): a lost connection (the QR link opened in the Steam app) waits and asks again
+            let responseData = try await SteamAuthAPI.pollCall("PollAuthSessionStatus", body: pollRequest.serialize(),
+                                                               interval: pollInterval, flow: "qr")
             let pollResponse = try CAuthentication_PollAuthSessionStatus_Response.deserialize(from: responseData)
 
             // Update client ID if it changed (Steam may rotate it)

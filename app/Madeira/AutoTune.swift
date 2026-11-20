@@ -100,6 +100,28 @@ enum AutoTune {
         if let u = stateURL(windowsPath) { try? FileManager.default.removeItem(at: u) }
     }
 
+    /// Round 670 (owner 2026-11-18, I1): Try it next start (the result, or the game's page): the suggestion is the next start's candidate. "Ask before trying a
+    /// fix" counts this yes too, so the start gets the lines whichever way that switch is.
+    static func approveSuggestion(_ windowsPath: String) {
+        guard enabled else { return }
+        let before = state(windowsPath)
+        guard let lines = before.suggestion, !lines.isEmpty else { return }
+        let after = AutoTuneEngine.approveSuggestion(before)
+        save(after, windowsPath)
+        AutoTuneAsk.approve(after, windowsPath)
+        LogStore.shared.log("[autotune] the player said yes to the suggestion \(lines.joined(separator: "; ")) (\(before.suggestionRule ?? "-")); the next start tries it")
+    }
+
+    /// Round 670 (I1): Not now: the game stays as it is and the result does not ask about this suggestion again (the page keeps it).
+    static func declineSuggestion(_ windowsPath: String) {
+        guard enabled else { return }
+        var s = state(windowsPath)
+        guard let rule = s.suggestionRule else { return }
+        s.suggestionDeclined = rule
+        save(s, windowsPath)
+        LogStore.shared.log("[autotune] the player put off the suggestion \((s.suggestion ?? []).joined(separator: "; ")) (\(rule))")
+    }
+
     static func rules() -> [AutoTuneRule] {
         AutoTuneRules.load(builtIn: AutoTuneBuiltInRules.json, override: overrideURL)
     }
@@ -173,7 +195,10 @@ enum AutoTune {
     /// Main thread only. True: Play is held, `spinner(true)` has run, and `spinner(false)` then `then` run on the main thread once the
     /// verdict landed or the wait ran out; a second Play of that game meanwhile is dropped. False: nothing is pending, or this start already
     /// waited for this verdict once (`then` comes back through here): go straight on.
-    static let playWaitSeconds = 5
+    /// Round 668 (G3 S6; Z8ZHQR build 665, CXPHAB 659): 5 s was too short: the verdict of the killed run landed 14 s after Play (2 min after
+    /// the app start) although the scan itself takes well under a second; the start went on without the swap-tier line again. 30 s, and the
+    /// recovered session's analysis runs at user-initiated priority (recoverUnfinishedSession), with its timing in the log.
+    static let playWaitSeconds = 30
     private static var playHeld: Set<String> = []
     private static var playWaitedFor: [String: ObjectIdentifier] = [:]
 
@@ -226,7 +251,7 @@ enum AutoTune {
         // Night round 2026-11-11 (agent T3 S7): the verdict about the last session of this game may still be being written. The lead did
         // not take the agent's wait (up to 20 s on the main thread, where this runs: the interface would freeze and iOS may end the app);
         // the start says so instead, and the line that verdict prepares reaches the next start. Round 660 (M140): Play now waits for it
-        // off the main thread first (holdPlayForVerdict, at most 5 s); this line is left for a wait that ran out and for other starts.
+        // off the main thread first (holdPlayForVerdict, at most playWaitSeconds); this line is left for a wait that ran out and for other starts.
         if analysisPending(path) {
             LogStore.shared.log("[autotune] \(entry.title): the earlier session's verdict is still being written; this start uses the game's state as it was")
         }
@@ -344,9 +369,15 @@ enum AutoTune {
             return
         }
         pendingEnter(m.windowsPath)   // night round 2026-11-11 (T3 S7)
-        DispatchQueue.global(qos: .utility).async {
+        // Round 668 (G3 S6): user-initiated, not utility: one scan per app start, and a Play right after a kill waits for it.
+        let queued = DispatchTime.now()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let started = DispatchTime.now()
             let end = m.end ?? AutoTuneSessionEnd(sawProcess: true, seconds: 0, killed: true, limitMB: m.limitMB)
             analyse(m, end: end, log: log)
+            let done = DispatchTime.now()
+            LogStore.shared.log("[autotune] the unfinished session's analysis waited \((started.uptimeNanoseconds - queued.uptimeNanoseconds) / 1_000_000) ms "
+                                + "and took \((done.uptimeNanoseconds - started.uptimeNanoseconds) / 1_000_000) ms")
             try? FileManager.default.removeItem(at: pending)
             pendingLeave(m.windowsPath)
         }
@@ -466,9 +497,13 @@ enum AutoTune {
         let readFrom = "; read \(log.lastPathComponent) (\(scanner.lineCount) lines" + (firstSeen.isEmpty ? ")" : "; " + firstSeen.joined(separator: ", ") + ")")
         LogStore.shared.log("[autotune] \(m.title): \(report.outcome) at stage \(report.stage) after \(Int(report.seconds)) s; "
                             + "matched \(report.matched.joined(separator: ",")); status \(after.status); next \(next)"
-                            + verdict + trial + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? "") + readFrom)   // round 624 (E1 S5b)
+                            + verdict + trial + keptNow + (after.skippedNote.map { "; skipped " + $0 } ?? "")   // round 624 (E1 S5b)
+                            + (after.suggestion.map { "; suggests \($0.joined(separator: "; ")) (\(after.suggestionRule ?? "-")"
+                                + (after.asksSuggestion ? ")" : ", put off)") } ?? "")   // round 670 (I1)
+                            + readFrom)
         let offer = AutoTuneOffer(title: m.title, windowsPath: m.windowsPath, report: report, state: after,
-                                  reason: after.candidateRule.flatMap { id in rules.first { $0.id == id }?.reason })
+                                  reason: (after.candidateRule ?? (after.asksSuggestion ? after.suggestionRule : nil))   // round 670 (I1): the suggestion's
+                                      .flatMap { id in rules.first { $0.id == id }?.reason })
         DispatchQueue.main.async {
             // Round 630 (agent U S15b; G3SF3A): a recovered session's analysis ends while the next session of the same game runs. When that
             // session already carries every line the result asks the next start to try, "The next start tries ..." is wrong: no result now;
@@ -500,6 +535,8 @@ struct AutoTuneOffer: Equatable {
 
     var headline: String {
         if ask { return "What happened to \(title)?" }
+        // Round 670 (owner 2026-11-18, I1): a game that played, with a line auto-tune suggests.
+        if state.asksSuggestion { return "\(title) played, and auto-tune has a suggestion" }
         switch state.status {
         case "found": return "\(title) played with the lines auto-tune found"
         case "ok": return "\(title) played"
@@ -541,7 +578,9 @@ struct AutoTuneOffer: Equatable {
                     + "texture setting to Low) and play again.\n\n"
                 // Night round 2026-11-11 (T1 S2; Spider-Man Remastered and Miles Morales, DOA6, Batman: Arkham Knight on phones that give an app 6 GB: 9 logs
                 // closed at 98 to 100 % of the limit in the first minute): the phone class, so the player knows why the lowest preset may not be enough.
-                if let words = Self.sixGBClassWords(title: title, peakMB: report.peakMB, memoryPct: report.memoryPct, ramMB: report.ramMB) {
+                // Round 677 (agent G4 S1; Slay the Spire 2 43MMYA/FHQCGE/TA9C6S on a 6 GB phone whose limit is 4,095 MB): the 4 GB class too.
+                if let words = Self.sixGBClassWords(title: title, peakMB: report.peakMB, memoryPct: report.memoryPct, ramMB: report.ramMB)
+                    ?? Self.fourGBClassWords(title: title, peakMB: report.peakMB, memoryPct: report.memoryPct, ramMB: report.ramMB) {
                     text += words + "\n\n"
                 }
             }
@@ -571,6 +610,17 @@ struct AutoTuneOffer: Equatable {
                 text += " Restart BCD and play again."
             }
         }
+        // Round 670 (owner 2026-11-18, I1): a game that played. A suggested line that did not help went back; a new suggestion is only asked.
+        if state.status == "ok" || state.status == "found" {
+            if let back = state.suggestionReverted, !back.isEmpty {
+                text += " The game did not play better with \(back.joined(separator: "; ")), so auto-tune took it back."
+            }
+            if state.asksSuggestion, let lines = state.suggestion {
+                text += "\n\nAuto-tune suggests a line for the next start: \(lines.joined(separator: "; "))."
+                if let reason { text += " " + reason }
+                text += "\n\nNothing changes until you choose Try it next start (then restart BCD). Not now keeps the game as it is, and its page keeps the suggestion. If the game does not play better with the line, auto-tune takes it back."
+            }
+        }
         return text
     }
     /// Night round 2026-11-11 (T3 S3): the device's memory limit in words, "4 GB" or "2.3 GB", from the peak and how many percent of the limit the last
@@ -596,6 +646,15 @@ struct AutoTuneOffer: Equatable {
         guard gb >= 5.5, gb < 6.8 else { return nil }
         return "This device lets apps use about 6 GB, and \(title) needed more (its memory reached \(peak) MB). A game this size needs a phone that "
             + "gives apps more than 6 GB: an iPad or a 12 GB iPhone has the room."
+    }
+
+    /// Round 677 (agent G4 S1): the same for a phone whose limit is about 4 GB (6 GB phones: 4,095 MB); nil for any other device.
+    static func fourGBClassWords(title: String, peakMB: Int?, memoryPct: Int?, ramMB: Int?) -> String? {
+        guard let peak = peakMB, let pct = memoryPct, (50...110).contains(pct), peak > 0, (ramMB ?? Int.max) <= 8000 else { return nil }
+        let gb = Double(peak) * 100 / Double(pct) / 1024
+        guard gb >= 3.5, gb < 4.6 else { return nil }
+        return "This device lets apps use about 4 GB, and \(title) needed more (its memory reached \(peak) MB). A game this size needs a phone or iPad "
+            + "that gives apps more than 4 GB."
     }
 
     static func outcomeText(_ outcome: String) -> String {

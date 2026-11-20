@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Mon, 12 Oct 2026 07:49:36 +0200
+Subject: [PATCH] kk: custom border colours for Zink
+
+KosmicKrisp exposes VK_EXT_custom_border_color and
+VK_EXT_border_color_swizzle only with MESA_KK_EXPERIMENTAL=custom_border.
+Zink needs them for OpenGL's GL_CLAMP_TO_BORDER colours; without them a
+border sample reads transparent black. The flag is read once per process
+and applies to every instance, so it cannot be set for OpenGL alone.
+
+An instance whose engine is Zink ("mesa zink") now gets both
+extensions. Other instances (DXVK, vkd3d-proton) are unchanged unless
+the flag is set. On an A19 Pro the OpenGL probe reads the
+GL_CLAMP_TO_BORDER colour back right with them, and Portal 2 (DXVK)
+with the flag set showed no steady change in GPU time a frame.
+
+Class: feature
+Evidence: docs/evidence/2026-10-12-zink-followups.md
+Offered-upstream: no
+---
+ src/kosmickrisp/vulkan/kk_physical_device.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/src/kosmickrisp/vulkan/kk_physical_device.c b/src/kosmickrisp/vulkan/kk_physical_device.c
+index a3f1cb8..030f5ba 100644
+--- a/src/kosmickrisp/vulkan/kk_physical_device.c
++++ b/src/kosmickrisp/vulkan/kk_physical_device.c
+@@ -30,6 +30,8 @@
+ #include "vk_drm_syncobj.h"
+ #include "vk_shader_module.h"
+ 
++#include <string.h>
++
+ #if DETECT_OS_APPLE
+ #include <TargetConditionals.h>
+ #endif
+@@ -62,6 +64,13 @@ kk_get_device_extensions(const struct kk_instance *instance,
+                          const struct kk_physical_device *pdev,
+                          struct vk_device_extension_table *ext)
+ {
++   /* Custom border colours are experimental, except for Zink: OpenGL's
++    * GL_CLAMP_TO_BORDER needs them, and they read back right there.
++    */
++   const char *engine = instance->vk.app_info.engine_name;
++   const bool custom_border = KK_EXPERIMENTAL(CUSTOM_BORDER) ||
++                              (engine && !strcmp(engine, "mesa zink"));
++
+    *ext = (struct vk_device_extension_table){
+       /* Vulkan 1.1 */
+       .KHR_16bit_storage = true,
+@@ -189,10 +198,10 @@ kk_get_device_extensions(const struct kk_instance *instance,
+       .EXT_attachment_feedback_loop_layout = true,
+       .EXT_attachment_feedback_loop_dynamic_state = true,
+       .EXT_blend_operation_advanced = true,
+-      .EXT_border_color_swizzle = KK_EXPERIMENTAL(CUSTOM_BORDER),
++      .EXT_border_color_swizzle = custom_border,
+       .EXT_calibrated_timestamps = true,
+       .EXT_conditional_rendering = true,
+-      .EXT_custom_border_color = KK_EXPERIMENTAL(CUSTOM_BORDER),
++      .EXT_custom_border_color = custom_border,
+       .EXT_custom_resolve = true,
+       .EXT_debug_marker = true,
+       .EXT_depth_clip_control = true,

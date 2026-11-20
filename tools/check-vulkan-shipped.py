@@ -6,7 +6,8 @@
 
 A game whose file has `vulkan = moltenvk` runs Wine's winevulkan.dll and vulkan-1.dll (the bundle's vulkan/arm64ec-windows folder; vulkan/i386-windows
 for a 32-bit program), the unix side in libntdll_unix.a (winevulkan_unix_call_funcs, winevulkan_unix_call_wow64_funcs) and libwin32u_unix.a
-(madeira_ios_VulkanInit, the win32u Vulkan layer), and MoltenVK (gl/libMoltenVK.dylib).
+(madeira_ios_VulkanInit, the win32u Vulkan layer), and MoltenVK (gl/libMoltenVK.dylib; the patched second MoltenVK, gl/libMoltenVK_patched.dylib, and
+KosmicKrisp are optional and checked whole when they are there).
 A bundle that lacks a piece is refused here instead of being found on a phone. The farm's stand-in vulkan-1.dll must stay: every other session keeps it.
 Run from the repository root after the build steps (CI: "Verify the Windows Vulkan pieces").
 """
@@ -87,18 +88,68 @@ if kk.is_file():
         errors.append("app/Madeira/licenses/KosmicKrisp-Mesa-license.rst is missing: the library is in the package without Mesa's licence text")
     if not (APP / "legal" / "LICENSES" / "MIT-Mesa-KosmicKrisp.txt").is_file():
         errors.append("app/Madeira/legal/LICENSES/MIT-Mesa-KosmicKrisp.txt is missing: the MIT text and KosmicKrisp's copyright holders")
+    # Round 668 (bcd-games #57, build/mesa-ios/kk-retry): the library a game loads may be the kk-retry shim, which re-exports the real
+    # one, libvulkan_kosmickrisp_real.dylib; then the real one carries the entry points and the shim has to point at it.
+    real = APP / "gl" / "libvulkan_kosmickrisp_real.dylib"
+    shim = b"kk-retry: shim in front of KosmicKrisp" in kk.read_bytes()
+    if shim and not real.is_file():
+        errors.append("app/Madeira/gl/libvulkan_kosmickrisp.dylib is the kk-retry shim, but libvulkan_kosmickrisp_real.dylib is missing")
+    if real.is_file() and not shim:
+        errors.append("app/Madeira/gl/libvulkan_kosmickrisp_real.dylib is in the package, but libvulkan_kosmickrisp.dylib is not the shim that loads it")
+    if shim:
+        kk_note += " behind the kk-retry shim"
     if shutil.which("xcrun"):
-        archs = subprocess.run(["xcrun", "lipo", "-archs", str(kk)], capture_output=True, text=True).stdout.split()
-        if archs != ["arm64"]:
-            errors.append(f"app/Madeira/gl/libvulkan_kosmickrisp.dylib is {' '.join(archs) or 'not a Mach-O'}, want arm64")
-        build = subprocess.run(["xcrun", "vtool", "-show-build", str(kk)], capture_output=True, text=True).stdout.split()
-        minos = build[build.index("minos") + 1] if "minos" in build else "?"
-        if minos != "26.0":
-            errors.append(f"app/Madeira/gl/libvulkan_kosmickrisp.dylib has minos {minos}: the app lets a game use it from iOS 26.0 on (WineProcessBridge.m)")
-        exported = subprocess.run(["xcrun", "nm", "-gU", str(kk)], capture_output=True, text=True).stdout.split()
+        for lib in [kk] + ([real] if shim and real.is_file() else []):
+            name = "app/Madeira/gl/" + lib.name
+            archs = subprocess.run(["xcrun", "lipo", "-archs", str(lib)], capture_output=True, text=True).stdout.split()
+            if archs != ["arm64"]:
+                errors.append(f"{name} is {' '.join(archs) or 'not a Mach-O'}, want arm64")
+            build = subprocess.run(["xcrun", "vtool", "-show-build", str(lib)], capture_output=True, text=True).stdout.split()
+            minos = build[build.index("minos") + 1] if "minos" in build else "?"
+            if minos != "26.0":
+                errors.append(f"{name} has minos {minos}: the app lets a game use it from iOS 26.0 on (WineProcessBridge.m)")
+        entry = real if shim and real.is_file() else kk
+        exported = subprocess.run(["xcrun", "nm", "-gU", str(entry)], capture_output=True, text=True).stdout.split()
         for s in ("_vkGetInstanceProcAddr", "_vkGetDeviceProcAddr"):
             if s not in exported:
-                errors.append(f"app/Madeira/gl/libvulkan_kosmickrisp.dylib does not export {s}: win32u's Vulkan layer could not use it")
+                errors.append(f"app/Madeira/gl/{entry.name} does not export {s}: win32u's Vulkan layer could not use it")
+        if shim:
+            cmds = subprocess.run(["xcrun", "otool", "-l", str(kk)], capture_output=True, text=True).stdout
+            if "name @rpath/libvulkan_kosmickrisp_real.dylib" not in cmds or "LC_REEXPORT_DYLIB" not in cmds or "path @loader_path" not in cmds:
+                errors.append("app/Madeira/gl/libvulkan_kosmickrisp.dylib (the shim) does not re-export @rpath/libvulkan_kosmickrisp_real.dylib "
+                              "with @loader_path in its run paths")
 
-print("\n".join(("FAIL " + e) for e in errors) if errors else "ok   the Windows Vulkan pieces are all in the package; " + kk_note)
+# The patched MoltenVK (vulkan = moltenvk-patched; round 669, build/moltenvk-ios/build-patched.sh) is optional like KosmicKrisp: its CI step only warns
+# when it fails, and a build without it keeps Vulkan off for such a game and says so in the log (never the plain MoltenVK instead). When the library
+# is there it must be whole: a thin arm64 dylib under its own install name (the plain MoltenVK's is another), exporting the two entry points Wine's
+# Vulkan layer loads it by, not the plain library's bytes (a patch that did not apply), with the version file the script writes beside it and no
+# half-written file next to it.
+mp = APP / "gl" / "libMoltenVK_patched.dylib"
+mp_note = "the patched MoltenVK is not in this package (vulkan = moltenvk-patched stays off)"
+if (APP / "gl" / "libMoltenVK_patched.dylib.tmp").exists():
+    errors.append("app/Madeira/gl/libMoltenVK_patched.dylib.tmp is in the package: a half-written library of a failed build")
+if mp.is_file():
+    mp_note = "the patched MoltenVK is in the package"
+    if not (APP / "gl" / "libMoltenVK_patched.version").is_file():
+        errors.append("app/Madeira/gl/libMoltenVK_patched.version is missing beside the library (build/moltenvk-ios/build-patched.sh writes both)")
+    else:
+        mp_note += " (" + (APP / "gl" / "libMoltenVK_patched.version").read_text().strip()[:120] + ")"
+    if mp.stat().st_size < 1_000_000:
+        errors.append(f"app/Madeira/gl/libMoltenVK_patched.dylib is only {mp.stat().st_size} bytes (MoltenVK's is about 4.8 MB)")
+    plain = APP / "gl" / "libMoltenVK.dylib"
+    if plain.is_file() and plain.read_bytes() == mp.read_bytes():
+        errors.append("app/Madeira/gl/libMoltenVK_patched.dylib is the plain libMoltenVK.dylib under another name: the patch did not take")
+    if shutil.which("xcrun"):
+        archs = subprocess.run(["xcrun", "lipo", "-archs", str(mp)], capture_output=True, text=True).stdout.split()
+        if archs != ["arm64"]:
+            errors.append(f"app/Madeira/gl/libMoltenVK_patched.dylib is {' '.join(archs) or 'not a Mach-O'}, want arm64")
+        ident = subprocess.run(["xcrun", "otool", "-D", str(mp)], capture_output=True, text=True).stdout.split()
+        if "@rpath/libMoltenVK_patched.dylib" not in ident:
+            errors.append(f"app/Madeira/gl/libMoltenVK_patched.dylib: install name {ident[-1] if ident else '?'}, want @rpath/libMoltenVK_patched.dylib")
+        exported = subprocess.run(["xcrun", "nm", "-gU", str(mp)], capture_output=True, text=True).stdout.split()
+        for sym in ("_vkGetInstanceProcAddr", "_vkGetDeviceProcAddr"):
+            if sym not in exported:
+                errors.append(f"app/Madeira/gl/libMoltenVK_patched.dylib does not export {sym}: win32u's Vulkan layer could not use it")
+
+print("\n".join(("FAIL " + e) for e in errors) if errors else "ok   the Windows Vulkan pieces are all in the package; " + kk_note + "; " + mp_note)
 sys.exit(1 if errors else 0)

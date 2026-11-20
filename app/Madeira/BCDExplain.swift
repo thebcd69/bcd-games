@@ -32,7 +32,7 @@ enum BCDExplain {
             text: "BCD runs one Windows session at a time, and the last one has not finished closing. Wait a moment and try again; if it keeps saying this, close BCD from the app switcher and open it again.")),
         ("windows is still running", BCDExplanation(
             id: "desktop-running", title: "The Windows desktop is still open",
-            text: "The Windows desktop is a session of its own, and only one session runs at a time. Go back to it from Home with Show Windows and close it, or use Stop, before you start a game.")),
+            text: "The Windows desktop is a session of its own, and only one session runs at a time. Go back to it from Home with Open under Windows desktop and close it, or use Stop, before you start a game.")),
         ("increased memory limit", BCDExplanation(
             id: "memory-limit", title: "The increased memory limit",
             text: "iOS gives every app a memory limit. An app signed with the increased memory limit may use much more, and most Windows games need it. A free Apple account does not add it by itself: GetMoreRam can add it with SideStore or LiveContainer, and a paid developer account adds it when you sign BCD. Without it iOS closes larger games early, whatever their settings.")),

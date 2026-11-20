@@ -1,0 +1,64 @@
+From: BCD <190844990+thebcd69@users.noreply.github.com>
+Subject: [PATCH] kk: log the MSL source Metal refused ([kk-msl-fail])
+
+madeira-bcd (X-Plane 12, build 674): X-Plane's compute pipeline failed with
+VK_ERROR_INVALID_SHADER_NV after Metal refused KosmicKrisp's MSL ("invalid
+access value 'a' for 'texture2d_ms_array'", "no member named 'write'"), and
+the error names lines of a source no log shows. When Metal refuses a library,
+the first three sources are now logged with line numbers ([kk-msl-fail], at
+most 800 lines each). Only on a failure; nothing else changes.
+---
+diff --git a/src/kosmickrisp/bridge/mtl_compiler.m b/src/kosmickrisp/bridge/mtl_compiler.m
+--- a/src/kosmickrisp/bridge/mtl_compiler.m
++++ b/src/kosmickrisp/bridge/mtl_compiler.m
+@@ -4,6 +4,7 @@
+  * SPDX-License-Identifier: MIT
+  */
+ 
++#include <string.h>
+ #include "mtl_compiler.h"
+ #include "mtl_format.h"
+ 
+@@ -33,6 +34,34 @@
+    }
+ }
+ 
++/* madeira-bcd (X-Plane 12, build 674): when Metal refuses a library, the
++ * error names lines of "program_source" that nobody can see. The first three
++ * refused sources are logged with their line numbers ([kk-msl-fail], at most
++ * 800 lines each), so a log names the shader and what it does. Only on a
++ * failure; a library Metal takes is not logged. */
++static void
++kk_msl_fail_dump(const char *src)
++{
++   static int dumped;
++   const char *line = src;
++   unsigned n = 1;
++
++   if (!src || __atomic_fetch_add(&dumped, 1, __ATOMIC_RELAXED) >= 3)
++      return;
++   fprintf(stderr, "[kk-msl-fail] madeira-bcd begin: the source Metal refused\n");
++   while (*line && n <= 800) {
++      const char *end = strchr(line, '\n');
++      int len = end ? (int)(end - line) : (int)strlen(line);
++      fprintf(stderr, "[kk-msl-fail] %4u: %.*s\n", n, len, line);
++      if (!end)
++         break;
++      line = end + 1;
++      n++;
++   }
++   fprintf(stderr, "[kk-msl-fail] madeira-bcd end (%u lines%s)\n", n > 800 ? 800 : n - (*line ? 0 : 1),
++           *line && n > 800 ? ", cut at 800" : "");
++}
++
+ /* Library */
+ mtl_library *
+ mtl_new_library(mtl_compiler *compiler, const char *src,
+@@ -58,6 +87,7 @@
+ 
+       if (lib == nil) {
+          fprintf(stderr, "Failed to create MTLLibrary: %s\n", [error.localizedDescription UTF8String]);
++         kk_msl_fail_dump(src);
+       }
+ 
+       return lib;

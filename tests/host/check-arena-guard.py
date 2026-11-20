@@ -99,6 +99,7 @@ struct teb_stub { struct { void *UniqueThread; } ClientId; };
 static struct teb_stub the_teb __attribute__((unused));
 #define NtCurrentTeb() (&the_teb)
 static int ios_fex_overlap_retry;   /* round 630 (A2 S3): virtual_ios.c declares it right above fex_arena_covers */
+static int ios_usva_placing;   /* round 2026-11-17 (K2): virtual_ios.c declares it next to ios_thin_placing; set while a Unity window's own view is made */
 ''' + covers + guard + r'''
 static int fails;
 static void expect( const char *what, int got, int want, int want_lines )
@@ -138,6 +139,9 @@ int main( int argc, char **argv )
         expect( "a range covering the arena", ios_arena_guard_refuses( (void *)0x7000000000ull, 0x1000000000ull, 0, 0 ), 1, 3 );
         expect( "a range below the arena", ios_arena_guard_refuses( (void *)0x7000000000ull, 0x100000000ull, 0, 0 ), 0, 3 );
         expect( "a range just below the arena", ios_arena_guard_refuses( (void *)0x7c30000000ull, 0x10000000, 0, 0 ), 0, 3 );
+        ios_usva_placing = 1;   /* env.MADEIRA_UNITY_SMALL_VA: the head or growth view of a window is the one fixed request into the arena the guard lets through */
+        expect( "a Unity window's own view inside the arena (build 669)", ios_arena_guard_refuses( (void *)0x7d00000000ull, 0x4000000, 0, 0 ), 0, 3 );
+        ios_usva_placing = 0;
         expect( "a range in the generic area only", ios_arena_guard_refuses( (void *)0x7100000000ull, 0x10000, 0, 0 ), 0, 3 );
         expect( "FEX's own limits (inside the arena)",
                 ios_arena_guard_refuses( (void *)0x7d00000000ull, 0x10000, 0x7c40000000ull, 0x7fffffffffull ), 0, 3 );

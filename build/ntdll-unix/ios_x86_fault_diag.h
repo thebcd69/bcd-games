@@ -365,6 +365,12 @@ static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t t
                  "the PEB32 list; EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
                  num, write < 0 ? "at" : (write ? "writing" : "reading"), (uint32_t)fault_addr, eip, w[0] ? w : "no module",
                  (unsigned long long)base, nmods, eax, ecx, edx, ebx, esi, edi, ebp, esp );
+    else if (fault_addr == -3)   /* round 669 (agent C SD-1): ios_x86_fault_branch_nowhere without a call: the block that jumped */
+        dprintf( STDERR_FILENO,
+                 "[x86-fault] #%d a 32-bit guest left the block that starts at guest 0x%08x (%s) for an address where no code is (a jmp or ret, "
+                 "not a call: the dword at ESP is no return address); the code below starts at that block, window 0x%llx, %u modules in the PEB32 list; "
+                 "EAX=0x%x ECX=0x%x EDX=0x%x EBX=0x%x ESI=0x%x EDI=0x%x EBP=0x%x ESP=0x%x\n",
+                 num, eip, w[0] ? w : "no module", (unsigned long long)base, nmods, eax, ecx, edx, ebx, esi, edi, ebp, esp );
     else if (fault_addr == -2)   /* round 630: ios_x86_fault_branch_nowhere, the return address of the call */
         dprintf( STDERR_FILENO,
                  "[x86-fault] #%d the return address at ESP of a 32-bit call that went where no code is: guest 0x%08x (%s), window 0x%llx, "
@@ -507,7 +513,7 @@ static void ios_x86_fault_report_ex( const arm_thread_state64_t *st, uintptr_t t
                 sites[nsite++] = stack[i];
         from_stack = nsite != 0;
     }
-    ios_x86f_code( base, fault_addr >= 0 ? (state_rip ? "eip" : "block") : fault_addr == -2 ? "ret" : "int3", eip, IOS_X86F_CODE_BEFORE,
+    ios_x86f_code( base, fault_addr >= 0 ? (state_rip ? "eip" : "block") : fault_addr == -2 ? "ret" : fault_addr == -3 ? "block" : "int3", eip, IOS_X86F_CODE_BEFORE,
                    IOS_X86F_CODE_AFTER, mods, nmods );
     for (k = 0; k < nsite; k++)
     {
@@ -616,8 +622,21 @@ static __attribute__((noinline)) void ios_x86_fault_branch_nowhere( const arm_th
     if (__sync_add_and_fetch( &heads, 1 ) > 3) return;
     dprintf( STDERR_FILENO, "[x86-fault] %s: a 32-bit guest branched to 0x%08x, where no code is; the dword at ESP=0x%08x is 0x%08x "
              "(the return address when a call went there)%s\n", how, (unsigned)target, (unsigned)g[4], ret,
-             ret >= 0x10000 ? "; the report below is around it" : "" );
+             ret >= 0x10000 ? "; the report below is around it" : "; no call: the report below is around the block that jumped" );
     if (ret >= 0x10000) ios_x86_fault_report( st, thread_teb, g, (uint64_t)ret, -2, -1 );
+    else
+    {
+        /* round 669 (agent C SD-1; Sleeping Dogs 4WEW0M and eight more, Sniper Elite V2 DZE0MK): a jmp or ret to 0xFFFFFFFE left nothing at
+         * ESP to report around. The translated block that jumped is *(x28) (as [guest-exact] ml885 reads it); FEX's block table gives its
+         * entry RIP, and the report's code window then shows the instructions that computed the target. */
+        extern uint64_t ios_native_rip_from_hostpc( uint64_t, uint64_t, const char ** );
+        uint64_t bb = 0, entry = 0;
+        const char *why = "no block";
+
+        if (ios_av_args_read( frame, &bb, sizeof(bb) ) && bb) entry = ios_native_rip_from_hostpc( bb, bb, &why );
+        if (entry >= 0x10000 && entry <= 0xffffffffULL) ios_x86_fault_report( st, thread_teb, g, entry, -3, -1 );
+        else dprintf( STDERR_FILENO, "[x86-fault] %s: the block that jumped could not be named (%s)\n", how, why );
+    }
     if (target >= 0x10000)
     {
         /* whether the target was ever allocated, freed or mapped, and what was asked for (the ring of virtual_ios.c) */

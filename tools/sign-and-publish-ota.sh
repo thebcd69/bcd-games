@@ -32,7 +32,12 @@
 # signature, the embedded profile and the entitlements change, and every
 # nested dylib/framework is re-signed. For a single-IPA invocation,
 # SIGN_USE_PROFILE_BUNDLE_ID=1 instead renames them to the profile's App ID.
-# Paired builds always retain the requested Madeira and Madeira2 identifiers.
+# Paired builds retain the requested Madeira and Madeira2 identifiers, unless
+# SIGN_PRIMARY_PROFILE_BUNDLE_ID=1: then Madeira alone (and its extensions, as
+# <App ID>.<suffix>) takes the profile's App ID and Madeira2 keeps its own. The
+# owner's local OTA sets it (2026-11-16) so the Files folder picker grants a folder
+# in place (iOS hands it only to an app whose bundle id is its signed App ID); off
+# by default, so CI and every other caller sign exactly as before.
 #
 # Usage: tools/sign-and-publish-ota.sh <Madeira unsigned.ipa> <build number> [Madeira2 unsigned.ipa]
 set -euo pipefail
@@ -42,6 +47,10 @@ BUILD="$2"
 IPA_SECOND="${3:-}"
 DUAL=0
 [ -z "$IPA_SECOND" ] || DUAL=1
+# Owner, 2026-11-16 (strict): GitHub's builds keep their own identifiers, never the owner's signing App ID.
+if [ "${GITHUB_ACTIONS:-}" = "true" ] && { [ "${SIGN_PRIMARY_PROFILE_BUNDLE_ID:-0}" != "0" ] || [ "${SIGN_USE_PROFILE_BUNDLE_ID:-0}" != "0" ]; }; then
+  echo "::error::OTA: the profile's App ID as bundle id is for the owner's local OTA only, never on GitHub"; exit 1
+fi
 OTA_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ota-variants.py"
 
 # Cloudflare R2 instead of B2 (owner's decision 2026-09-30: B2's free plan
@@ -111,9 +120,11 @@ sign() {  # sign <path> [entitlements]
     codesign -f -s "$IDENTITY" --keychain "$KC" "$1"
   fi
 }
-prepare_bundle() {  # prepare_bundle <bundle> <profile-derived id>
-  # A paired publication always keeps the two requested, distinct identifiers.
-  if [ "$DUAL" -eq 0 ] && [ "${SIGN_USE_PROFILE_BUNDLE_ID:-0}" = "1" ]; then
+prepare_bundle() {  # prepare_bundle <bundle> <profile-derived id> <app name>
+  # A paired publication keeps the two requested, distinct identifiers; with
+  # SIGN_PRIMARY_PROFILE_BUNDLE_ID=1 only Madeira's become the profile's.
+  if { [ "$DUAL" -eq 0 ] && [ "${SIGN_USE_PROFILE_BUNDLE_ID:-0}" = "1" ]; } ||
+     { [ "${3:-}" = Madeira ] && [ "${SIGN_PRIMARY_PROFILE_BUNDLE_ID:-0}" = "1" ]; }; then
     /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $2" "$1/Info.plist"
   fi
   rm -rf "$1/_CodeSignature"
@@ -145,10 +156,10 @@ resign_ipa() {  # resign_ipa <unsigned.ipa> <app name>
   for ex in "$app"/PlugIns/*.appex "$app"/Extensions/*.appex; do
     [ -d "$ex" ] || continue
     old="$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$ex/Info.plist")"
-    prepare_bundle "$ex" "$BUNDLE_ID.${old##*.}"
+    prepare_bundle "$ex" "$BUNDLE_ID.${old##*.}" "$name"
     sign "$ex" "$W/ent.plist"
   done
-  prepare_bundle "$app" "$BUNDLE_ID"
+  prepare_bundle "$app" "$BUNDLE_ID" "$name"
   sign "$app" "$W/ent.plist"
   APP_IDS+=("$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$app/Info.plist")")
   codesign --verify --deep --strict "$app"
@@ -227,8 +238,20 @@ fi
 
 # Upload both signed apps first. A second signing/upload failure never sends a
 # misleading two-button email; this script reaches mail only after all uploads.
+# Each IPA gets up to five tries, each in a fresh aws process: on a line that keeps dropping (build 671, 2026-11-18) one process
+# used up its retry budget ("Connection was closed before we received a valid response") although the next try would get through.
 for name in "${NAMES[@]}"; do
-  s3 cp "$W/$name-$VERSION.ipa" "$B/$name-$VERSION.ipa" --content-type application/octet-stream
+  for try in 1 2 3 4 5; do
+    if [ -n "${OTA_IPA_UPLOADER:-}" ] && [ "${GITHUB_ACTIONS:-}" != true ]; then
+      # Local builds only (sign-local.sh): an uploader that retries each part on its own instead of the whole file.
+      "$OTA_IPA_UPLOADER" "$W/$name-$VERSION.ipa" "$EP" "$B2_SIGN_BUCKET" "ota/$name-$VERSION.ipa" && break
+    else
+      s3 cp "$W/$name-$VERSION.ipa" "$B/$name-$VERSION.ipa" --content-type application/octet-stream && break
+    fi
+    [ "$try" -eq 5 ] && { echo "::error::OTA: $name-$VERSION.ipa did not upload after 5 tries"; exit 1; }
+    echo "OTA: $name-$VERSION.ipa upload try $try failed; trying again in 30 s"
+    sleep 30
+  done
 done
 for manifest in "$W/pages"/*.plist; do
   s3 cp "$manifest" "$B/$(basename "$manifest")" --content-type application/xml

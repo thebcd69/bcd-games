@@ -296,7 +296,7 @@ if swift:
         errors = [l for l in r.stderr.splitlines() if "error:" in l or "implicit declaration" in l]
         check(not errors, "driver_ios.c (the window driver) compiles with the build's flags, no implicit declaration", "\n".join(errors[:5]))
     else:
-        check("the Wine tree (WINE_SRC or ~/madeira-bcd/wine, built) was there for the two Wine-side files", not args.require_wine)
+        check(not args.require_wine, "the Wine tree (WINE_SRC or ~/madeira-bcd/wine, built) was there for the two Wine-side files")
     if not args.skip_preview:
         with tempfile.TemporaryDirectory() as tmp:
             r = subprocess.run([sys.executable, str(R / "tools/ui-preview.py"), "--build-only", "--out", tmp], capture_output=True, text=True, timeout=1500)

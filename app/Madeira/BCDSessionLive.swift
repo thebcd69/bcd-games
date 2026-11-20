@@ -48,6 +48,8 @@ struct BCDSessionLiveLayer: View {
     private var watchers = Set<AnyCancellable>()
     private var startingTimer: Timer?
     private var startingGame: BCDGame?
+    /// Round 669 (agent B S13): since when the Dock's Steam sign-in has been under way without an answer.
+    private var dockSignInSince: Date?
     private var hudLive: BCDHUDLive?
     private var logWatch: AnyCancellable?
     private var menuSource: BCDLibraryMenuSource?
@@ -145,7 +147,8 @@ struct BCDSessionLiveLayer: View {
         } else if dock.active {
             let progress = DockInstallers.poll(drive: MadeiraDock.drive)
             let hostDue = DockInstallers.finishedAt ?? model.launchStartedAt
-            let read = BCDDockStart.read(MadeiraDock.pollReport().fields, installers: DockInstallers.script != nil,
+            let fields = MadeiraDock.pollReport().fields
+            let read = BCDDockStart.read(fields, installers: DockInstallers.script != nil,
                                          installerProgress: progress, installsFinished: DockInstallers.finishedAt != nil,
                                          waited: Date().timeIntervalSince(hostDue),
                                          restartHint: DockInstallers.installsOnly ? DockInstallers.closingCountdown() : nil)
@@ -153,6 +156,16 @@ struct BCDSessionLiveLayer: View {
             info.steps = BCDDockStart.steps
             info.notes = read.notes
             if let note = DockInstallers.note { info.notes.append(BCDStartNote(id: "installs-note", text: note)) }
+            // Round 669 (agent B S13; Dungeon Rampage BCPPC5, 12 of its 13 logs): Valve's client sent its sign-in and never got an answer (its
+            // connections to Steam's servers did not finish), and the screen said "Signing you in to Steam…" for minutes.
+            if BCDDockStart.signingIn(fields) {
+                if dockSignInSince == nil { dockSignInSince = Date() }
+            } else {
+                dockSignInSince = nil
+            }
+            if let since = dockSignInSince, Date().timeIntervalSince(since) >= BCDDockStart.signInSlowAfter {
+                info.notes.append(BCDStartNote(id: "signin-slow", text: BCDDockStart.signInSlowText, tone: .warm))
+            }
             if dock.attention {
                 info.notes.append(BCDStartNote(id: "attention", text: "A Steam window may need an answer. Show desktop to see it.",
                                                tone: .warm))

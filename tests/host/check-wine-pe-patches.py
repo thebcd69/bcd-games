@@ -6,6 +6,7 @@
 
   tools/patch-wine-ntdll-rtcs-area.py       the `[rtcs] pre:` argument is not read through a NULL CPU area (source form of the committed binary's 4-byte patch)
   tools/patch-wine-loader-import-diag.py    round 660 M024 (d) / M093: [import-stub] and [delay-fail] detail (log only)
+  tools/patch-wine-loader-import-appdir.py  round 669 (B S7, Doki Doki Literature Club): [import-miss] (log only) and the keyed application-folder search
   tools/patch-wine-msgbox-timeout.py        round 660 M106: MessageBoxTimeoutA/W honour the timeout (keyless)
   tools/patch-wine-wintrust-diag.py         round 660 M072: [wintrust] (log only)
   tools/patch-wine-wow64-token-null-sid.py  source form of tools/patch-wow64-token-null-sid.py (Garry's Mod)
@@ -55,6 +56,7 @@ def pinned(rel):
 SCRIPTS = {
     "patch-wine-ntdll-rtcs-area.py": ["dlls/ntdll/signal_arm64ec.c"],
     "patch-wine-loader-import-diag.py": ["dlls/ntdll/loader.c", "dlls/ntdll/exception.c"],
+    "patch-wine-loader-import-appdir.py": ["dlls/ntdll/loader.c"],
     "patch-wine-msgbox-timeout.py": ["dlls/user32/msgbox.c"],
     "patch-wine-wintrust-diag.py": ["dlls/wintrust/wintrust_main.c", "dlls/wintrust/softpub.c"],
     "patch-wine-wow64-token-null-sid.py": ["dlls/wow64/security.c"],
@@ -63,6 +65,8 @@ SCRIPTS = {
 MOVE = {
     "patch-wine-ntdll-rtcs-area.py": ("dlls/ntdll/signal_arm64ec.c", "get_arm64ec_cpu_area()->InSimulation );", "get_arm64ec_cpu_area( )->InSimulation );"),
     "patch-wine-loader-import-diag.py": ("dlls/ntdll/loader.c", "static BOOL import_dll( WINE_MODREF *wm,", "static BOOL import_dll(  WINE_MODREF *wm,"),
+    "patch-wine-loader-import-appdir.py": ("dlls/ntdll/loader.c", "    if (!status) status = load_dll( load_path, buffer, 0, &wmImp, system );",
+                                           "    if (!status) status = load_dll(  load_path, buffer, 0, &wmImp, system );"),
     "patch-wine-msgbox-timeout.py": ("dlls/user32/msgbox.c", "INT WINAPI MessageBoxTimeoutA( HWND hWnd,", "INT WINAPI MessageBoxTimeoutA(  HWND hWnd,"),
     "patch-wine-wintrust-diag.py": ("dlls/wintrust/softpub.c", "static DWORD WINTRUST_CopyChain(CRYPT_PROVIDER_DATA *data, DWORD signerIdx)", "static DWORD WINTRUST_CopyChain( CRYPT_PROVIDER_DATA *data, DWORD signerIdx)"),
     "patch-wine-wow64-token-null-sid.py": ("dlls/wow64/security.c", "        sid = owner->Owner;\n", "        sid = owner->Owner ;\n"),
@@ -169,6 +173,23 @@ with tempfile.TemporaryDirectory(prefix="wine-pe-patches-") as tmp:
             r3 = subprocess.run([sys.executable, str(sp), str(t2)], capture_output=True, text=True)
             check("%s: a file with a moved anchor is refused by name and left alone" % script,
                   r3.returncode != 0 and "patch-" in (r3.stdout + r3.stderr) and all((t2 / rel).read_text() == before[rel] for rel in files), r3.stdout + r3.stderr)
+
+    # round 669: the application-folder patch applies after the import diagnostics too (the workflow's order), and keeps its search behind the key
+    if "patch-wine-loader-import-appdir.py" in patched and pinned("dlls/ntdll/exception.c"):
+        t = tmp / "order-loader"
+        for rel in ("dlls/ntdll/loader.c", "dlls/ntdll/exception.c"):
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            (t / rel).write_text(pinned(rel))
+        a = subprocess.run([sys.executable, str(root / "tools/patch-wine-loader-import-diag.py"), str(t)], capture_output=True, text=True)
+        b2 = subprocess.run([sys.executable, str(root / "tools/patch-wine-loader-import-appdir.py"), str(t)], capture_output=True, text=True)
+        lt = (t / "dlls/ntdll/loader.c").read_text()
+        helper = lt[lt.index("static NTSTATUS ios_import_miss("):lt.index("static BOOL import_dll(")]
+        check("import-appdir applies after the import diagnostics (the workflow's order); the second search runs only with MADEIRA_IMPORT_APPDIR=1, "
+              "only after load_dll said STATUS_DLL_NOT_FOUND, and the log line is capped at 8",
+              a.returncode == 0 and b2.returncode == 0 and "if (!on || !dir_len) return status;" in helper
+              and helper.index("if (!on || !dir_len) return status;") < helper.index("status = load_dll( alt, libname, 0, pwm, system );")
+              and 'RtlInitUnicodeString( &nm, L"MADEIRA_IMPORT_APPDIR" );' in helper and "if (InterlockedIncrement( &said ) <= 8)" in helper
+              and "    if (status == STATUS_DLL_NOT_FOUND)   /* madeira-bcd: [import-miss]" in lt, a.stderr + b2.stderr + b2.stdout)
 
     # the msgbox patch also applies on the file after tools/patch-wine-cpu-error-diag.py (the workflow's order)
     cpu = root / "tools/patch-wine-cpu-error-diag.py"
@@ -350,6 +371,8 @@ check("the workflow applies the msgbox and wintrust scripts tree-wide and the lo
       "python3 tools/patch-wine-msgbox-timeout.py wine" in wf and "python3 tools/patch-wine-wintrust-diag.py wine" in wf
       and "python3 tools/patch-wine-loader-import-diag.py wine" in wf and "git -C wine checkout -- dlls/ntdll/loader.c" in wf
       and wf.index("patch-wine-loader-import-diag.py wine") < wf.index("Put back the files patched for the i386 farm only")
+      and "python3 tools/patch-wine-loader-import-appdir.py wine" in wf
+      and wf.index("patch-wine-loader-import-diag.py wine") < wf.index("patch-wine-loader-import-appdir.py wine") < wf.index("Put back the files patched for the i386 farm only")
       and "python3 tests/host/check-wine-pe-patches.py" in wf)
 check("no workflow step applies the arm64ec-only or aarch64-only scripts to the shared tree (the extra-DLL builds compare an unpatched ntdll with the committed one)",
       "python3 tools/patch-wine-ntdll-rtcs-area.py" not in wf and "python3 tools/patch-wine-wow64-token-null-sid.py" not in wf)

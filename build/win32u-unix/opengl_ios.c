@@ -61,6 +61,7 @@
 #include "win32u_private.h"
 #include "wine/opengl_driver.h"
 #include "wine/debug.h"
+#include "madeira_kmt.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(wgl);
 
@@ -868,8 +869,50 @@ static HWND drawable_hwnd( struct opengl_drawable *drawable )
     return drawable->client ? drawable->client->hwnd : 0;
 }
 
+/* madeira-bcd (2026-11-17, the owner's X-Plane 12 test KCJ7BB, build 669): with env.MADEIRA_KMT_ADAPTER = 1 the Vulkan device
+ * reports the D3DKMT adapter's LUID (sysparams_ios.c get_gpu_info_from_uuid), but Wine asks the GL driver for GL_DEVICE_LUID_EXT /
+ * GL_DEVICE_NODE_MASK_EXT only through p_query_renderer, which win32u installs for EGL devices alone (none on iOS). The query then
+ * fell through to Zink, whose Vulkan device has no valid LUID: zeros. X-Plane 12 matches its Vulkan device to
+ * its OpenGL bridge by that LUID ("Adapter Local ID doesn't match OpenGL bridge device", then "Failed to find a suitable Vulkan
+ * device"). With the switch the zink backend answers both with the adapter LUID and node mask 1, the values Vulkan and DXGI report;
+ * without it nothing is installed and the query reaches Zink as before. */
+static void (*pz_glGetUnsignedBytevEXT)( GLenum, GLubyte * );
+
+static BOOL zink_kmt_query_renderer( UINT attribute, void *value )
+{
+    static int said;
+    LUID luid;
+
+    switch (attribute)
+    {
+    case GL_DEVICE_LUID_EXT:
+        if (madeira_kmt_adapter_luid( &luid ))
+        {
+            memcpy( value, &luid, sizeof(luid) );
+            if (!said++)
+                ERR( "[winios-gl] kmt-adapter=1: GL_DEVICE_LUID_EXT answers the adapter LUID %08x:%08x, as Vulkan and DXGI\n",
+                     (unsigned)luid.HighPart, (unsigned)luid.LowPart );
+            return TRUE;
+        }
+        /* no adapter LUID (no Metal device): Zink's own answer, as without the switch */
+        if (!pz_glGetUnsignedBytevEXT) pz_glGetUnsignedBytevEXT = pOSMesaGetProcAddress( "glGetUnsignedBytevEXT" );
+        if (pz_glGetUnsignedBytevEXT) pz_glGetUnsignedBytevEXT( attribute, value );
+        return TRUE;
+    case GL_DEVICE_NODE_MASK_EXT:
+        if (!madeira_kmt_adapter_luid( &luid )) return FALSE;   /* FALSE: opengl32 asks Zink's glGetIntegerv */
+        *(GLint *)value = 1;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static const char *zink_init_wgl_extensions( struct opengl_funcs *funcs )
 {
+    if (madeira_kmt_adapter_enabled())
+    {
+        funcs->p_query_renderer = zink_kmt_query_renderer;
+        ERR( "[winios-gl] kmt-adapter=1: GL_DEVICE_LUID_EXT / GL_DEVICE_NODE_MASK_EXT report the D3DKMT adapter\n" );
+    }
     return "";   /* desktop OpenGL only: no ES profiles */
 }
 
@@ -1233,9 +1276,45 @@ static BOOL zink_init(void)
         ERR( "[winios-gl] zink: MADEIRA_GL_DIR is not set\n" );
         return FALSE;
     }
-    /* The Vulkan driver under Zink is MoltenVK (gl/libMoltenVK.dylib); no other Vulkan driver is bundled, so none can be chosen. */
-    snprintf( path, sizeof(path), "%s/libMoltenVK.dylib", dir );
-    ERR( "[winios-gl] zink Vulkan library: libMoltenVK.dylib\n" );
+    /* The Vulkan driver under Zink is MoltenVK (gl/libMoltenVK.dylib).
+     * madeira-bcd (X-Plane 12, round 669): MADEIRA_ZINK_VULKAN=kosmickrisp runs Zink on the session's KosmicKrisp instead, the
+     * library MADEIRA_VULKAN_LIBRARY names (app/Madeira/WineProcessBridge.m sets it only for vulkan = kosmickrisp on a device that can
+     * load it): one Vulkan driver under the game's Vulkan and its OpenGL, so GL_EXT_memory_object_fd / GL_EXT_semaphore_fd can import
+     * the images and semaphores the game's Vulkan device shares (MADEIRA_KK_OPAQUE_FD=1, build/mesa-ios/playport-patches/0032).
+     * Without vulkan = kosmickrisp in the session the key leaves Zink on MoltenVK and says so.
+     * Build 669 (patched MoltenVK, build/moltenvk-ios/build-patched.sh): in a session whose game has vulkan = moltenvk-patched the app exports
+     * that second MoltenVK as MADEIRA_VULKAN_LIBRARY, and Zink takes it too, because two MoltenVKs in one process define the same Objective-C
+     * classes. Every other session, with or without a vulkan key, loads gl/libMoltenVK.dylib exactly as before. */
+    {
+        const char *zink_vk = getenv( "MADEIRA_ZINK_VULKAN" ), *session_vk = getenv( "MADEIRA_VULKAN_LIBRARY" );
+        static const char patched[] = "/libMoltenVK_patched.dylib";
+        size_t session_len = session_vk ? strlen( session_vk ) : 0;
+
+        if (zink_vk && !strcmp( zink_vk, "kosmickrisp" ) && session_vk && strstr( session_vk, "/libvulkan_kosmickrisp.dylib" ))
+        {
+            snprintf( path, sizeof(path), "%s", session_vk );
+            ERR( "[winios-gl] zink Vulkan library: libvulkan_kosmickrisp.dylib (MADEIRA_ZINK_VULKAN=kosmickrisp, the session's Vulkan)\n" );
+        }
+        else if (session_len >= sizeof(patched) - 1 && !strcmp( session_vk + session_len - (sizeof(patched) - 1), patched ))
+        {
+            snprintf( path, sizeof(path), "%s/libMoltenVK_patched.dylib", dir );
+            if (zink_vk && *zink_vk)
+                ERR( "[winios-gl] zink Vulkan library: libMoltenVK_patched.dylib (the session's vulkan = moltenvk-patched: one MoltenVK in the "
+                     "process; MADEIRA_ZINK_VULKAN=%s needs vulkan = kosmickrisp on in this session)\n", zink_vk );
+            else
+                ERR( "[winios-gl] zink Vulkan library: libMoltenVK_patched.dylib (the session's vulkan = moltenvk-patched: one MoltenVK in the "
+                     "process)\n" );
+        }
+        else
+        {
+            snprintf( path, sizeof(path), "%s/libMoltenVK.dylib", dir );
+            if (zink_vk && *zink_vk)
+                ERR( "[winios-gl] zink Vulkan library: libMoltenVK.dylib (MADEIRA_ZINK_VULKAN=%s needs vulkan = kosmickrisp on in this "
+                     "session)\n", zink_vk );
+            else
+                ERR( "[winios-gl] zink Vulkan library: libMoltenVK.dylib\n" );
+        }
+    }
     setenv( "ZINK_VULKAN_LIBRARY", path, 1 );
     setenv( "GALLIUM_DRIVER", "zink", 1 );
     setenv( "MVK_CONFIG_LOG_LEVEL", "1", 0 );   /* MoltenVK: errors only */

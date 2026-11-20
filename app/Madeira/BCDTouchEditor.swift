@@ -49,6 +49,8 @@ struct BCDTouchEditorState: Equatable {
     func setScale(_ id: UUID, _ scale: Double)
     /// A locked control cannot be moved, resized or removed until it is unlocked.
     func setLocked(_ id: UUID, _ locked: Bool)
+    /// build 666 (issue #45): one press holds the control's key or button, the next lets go (BCDTouchItem.latch).
+    func setLatch(_ id: UUID, _ on: Bool)
     /// In front of, or behind, the controls it overlaps.
     func bringToFront(_ id: UUID)
     func sendToBack(_ id: UUID)
@@ -297,6 +299,7 @@ struct BCDTouchInspector: View {
                               text: String(format: "%.1f\u{00D7}", item.scale)) { actions.setScale(item.id, $0) }
                 .disabled(item.locked).opacity(item.locked ? 0.45 : 1)
                 .padding(.horizontal, 14).padding(.bottom, 6)
+            if item.action.latchable { holdRow }
             arrangeRow
             tabBar
             ScrollView {
@@ -343,6 +346,22 @@ struct BCDTouchInspector: View {
             BCDTouchCloseButton { actions.select(nil) }
         }
         .padding(.horizontal, 12).padding(.top, 10).padding(.bottom, 6)
+    }
+
+    /// build 666 (issue #45): Tap to hold. One press holds the key or button (aim in a shooter while the other thumb turns the
+    /// camera), the next lets go; off, the control is pressed only while a finger is on it, as always.
+    private var holdRow: some View {
+        Toggle(isOn: Binding(get: { item.latch }, set: { actions.setLatch(item.id, $0) })) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Tap to hold")
+                    .font(BCDStyle.label(roomy ? 16 : 14)).foregroundStyle(BCDStyle.text)
+                Text("One tap holds it, the next lets go")
+                    .font(BCDStyle.body(roomy ? 13 : 11)).foregroundStyle(BCDStyle.textSoft).lineLimit(1).minimumScaleFactor(0.7)
+            }
+        }
+        .tint(BCDStyle.fuchsia)
+        .padding(.horizontal, 14).padding(.bottom, 6)
+        .accessibilityHint("One tap holds the control, the next lets go")
     }
 
     /// Lock it in place, or put it in front of or behind the controls it overlaps.

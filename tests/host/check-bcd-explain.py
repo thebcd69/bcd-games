@@ -38,7 +38,7 @@ messages = {
     "jit-needed": "JIT has to be enabled before a game can start.",
     "jit-then-play": "JIT is now enabled, but the game didn't start. Tap Play once more.",
     "one-session": "Another session is still running.",
-    "desktop-running": "Windows is still running. On Home, choose Show Windows to return to it, or Stop before starting a game.",
+    "desktop-running": "Windows is still running. On Home, choose Open under Windows desktop to return to it, or Stop before starting a game.",
     "memory-limit": "This install lacks the increased memory limit",
     "drive-missing": "The external drive is not connected. Plug it in, then try again.",
     "steam-signin": "Steam no longer accepts your sign-in. Sign out of Steam in Settings, then sign in again.",

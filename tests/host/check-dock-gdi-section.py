@@ -55,11 +55,13 @@ require(body.index(line) < body.index('MadeiraDock.requestLaunch('), 'before the
 enum_at = content.index('enum DesktopGDISection {')
 desk = content[enum_at:content.index('\n}\n', enum_at)]
 set_line, unset_line = 'setenv("MADEIRA_GDI_SHARED_SECTION", "1", 1)', 'unsetenv("MADEIRA_GDI_SHARED_SECTION")'
-gate = 'if entry.desktop == true || (entry.runsInDesktop && entry.bits == 32) {'
-require(desk.count(set_line) == 1 and desk.count(gate) == 1 and desk.index(gate) < desk.index(set_line),
-        'DesktopGDISection: the section for the library\'s Desktop entry and a 32-bit program started "In a Wine desktop" only (round 624)')
-require('entry.desktop == true ? "Desktop" : "Wine-desktop start of a 32-bit program"' in desk,
-        'DesktopGDISection: the log line says which of the two set it')
+gate = 'if entry.desktop == true || (entry.runsInDesktop && entry.bits == 32) || servicesBatch32 {'
+require(desk.count(set_line) == 1 and desk.count(gate) == 1 and desk.index(gate) < desk.index(set_line)
+        and 'let servicesBatch32 = entry.servicesScript != nil && entry.bits == 32' in desk,
+        'DesktopGDISection: the section for the library\'s Desktop entry, a 32-bit program started "In a Wine desktop" (round 624) and '
+        '(round 669, PES-1) a 32-bit program started by the services batch, only')
+require('entry.desktop == true ? "Desktop" : servicesBatch32 && !entry.runsInDesktop\n                ? "a 32-bit program started by the services batch" : "Wine-desktop start of a 32-bit program"' in desk,
+        'DesktopGDISection: the log line says which of the three set it')
 require(desk.count(unset_line) == 1 and desk.index('if setByDesktop {') < desk.index(unset_line),
         'DesktopGDISection: cleared only when this run\'s Desktop set it')
 lib_at = content.index('private func startLibraryEntry(')

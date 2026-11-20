@@ -68,9 +68,14 @@ check("driver_ios.c: pOpenGLInit is set once, only under getenv(\"MADEIRA_GL_BAC
       and "SET_USER_FUNC(OpenGLInit);" in drv)
 check("... and without it the null driver's answer stays (STATUS_NOT_IMPLEMENTED), as before",
       "static UINT nulldrv_OpenGLInit( UINT version, const struct opengl_funcs *opengl_funcs, const struct opengl_driver_funcs **driver_funcs )\n{\n    return STATUS_NOT_IMPLEMENTED;\n}" in drv)
-check("opengl_ios.c keeps its LGPL header and Madeira's two backends; the KosmicKrisp choice of the Vulkan driver is not in BCD's copy",
+# Round 669 (X-Plane 12): BCD's own key MADEIRA_ZINK_VULKAN=kosmickrisp puts Zink on the session's KosmicKrisp (tests/host/check-kk-opaque-fd.py);
+# upstream's gl-vulkan / MADEIRA_GL_VULKAN choice is still not in BCD's copy, and MoltenVK stays the default.
+zink_block = gl[gl.index("madeira-bcd (X-Plane 12, round 669): MADEIRA_ZINK_VULKAN=kosmickrisp"):gl.index('setenv( "ZINK_VULKAN_LIBRARY", path, 1 );')]
+check("opengl_ios.c keeps its LGPL header and Madeira's two backends; upstream's KosmicKrisp choice (gl-vulkan) is not in BCD's copy, BCD's "
+      "own key names KosmicKrisp only in its block, MoltenVK the default",
       gl.startswith("/* LGPL-2.1-or-later: part of the Wine unix side") and "zink - desktop OpenGL" in gl and "gles - WGL on top of Apple's OpenGL ES" in gl
-      and not re.search(r"kosmic|gl-vulkan|MADEIRA_GL_VULKAN", gl, re.I) and 'snprintf( path, sizeof(path), "%s/libMoltenVK.dylib", dir );' in gl)
+      and not re.search(r"gl-vulkan|MADEIRA_GL_VULKAN", gl, re.I) and not re.search(r"kosmic", gl.replace(zink_block, ""), re.I)
+      and 'snprintf( path, sizeof(path), "%s/libMoltenVK.dylib", dir );' in zink_block)
 check("the driver falls back from zink to gles by itself and says so; without the key's word it is gles",
       'ERR( "[winios-gl] zink unavailable, falling back to OpenGL ES\\n" );' in gl and 'if (backend && !strcmp( backend, "zink" ))' in gl)
 check("win32u's build compiles it after the loop over Wine's files", 'compile_one "$BUILD_DIR/opengl_ios.c" "opengl_ios"' in w32b
@@ -260,8 +265,9 @@ int main( int argc, char **argv )
             p = t / "text.bin"
             p.write_bytes(text)
             r = subprocess.run([str(exe), "need", str(p)], capture_output=True, text=True).stdout.split()
-            check("the trampoline budget counts the store sites only with stores = 1 (3 more sites of 32 bytes), the old sites always",
-                  r == [str(32 * 1 + 0x1000), str(32 * 4 + 0x1000)], r)
+            check("the trampoline budget counts the store sites only with stores = 1 (3 more sites of 40 bytes: the two-try form of round 677), "
+                  "the old sites always (32 bytes)",
+                  r == [str(32 * 1 + 0x1000), str(32 * 1 + 40 * 3 + 0x1000)], r)
 else:
     print("SKIP: no cc here; the ntdll pieces were not compiled")
 

@@ -357,7 +357,8 @@ import os
         game.thirtyTwoBit = entry?.bits == 32
         let folder = installed?.windowsInstallPath ?? "C:\\steamapps\\common\\" + (item.owned?.installDir ?? String(item.id))
         game.recommended = GameRecommendations.match(windowsPath: folder, steamAppID: item.id,
-                                                     fileExists: GameRecommendations.driveFileExists) != nil
+                                                     fileExists: GameRecommendations.driveFileExists,
+                                                     programsIn: GameRecommendations.drivePrograms) != nil
         game.autoTuned = Self.autoTuned(entry?.windowsPath ?? folder)
         let pictures = steamArt(item.id, owned: owned)
         // A cover the player chose for the game (its page) comes first, the store's after it.
@@ -617,7 +618,7 @@ import os
     func play(_ game: BCDGame) {
         let library = LibraryModel.shared
         if library.desktopHome, library.current != nil {
-            library.error = "Windows is still running. On Home, choose Show Windows to return to it, or Stop before starting a game."
+            library.error = "Windows is still running. On Home, choose Open under Windows desktop to return to it, or Stop before starting a game."
             return
         }
         guard !starting, library.current == nil else { return }

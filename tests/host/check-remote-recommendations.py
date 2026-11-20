@@ -466,6 +466,20 @@ check(kind(addLine("breakneck", #"env.MADEIRA_PRELOAD_DLLS = C:\x\evil.dll"#)) =
 check(kind(addLine("breakneck", "dxmt = d3d11.mipClampBC=1")) == .ok && kind(addLine("breakneck", "swap-min-kb = 64")) == .ok,
       "the two app-level keys that are game settings")
 check(kind(addLine("breakneck", "env.MADEIRA_FEX_AVX = 1")) == .ok, "auto-tune's known fix")
+// Round 669 (bcd-games #57): vulkan = moltenvk-patched, the second MoltenVK; its list lines carry minBuild 669
+check(kind(addLine("breakneck", "vulkan = moltenvk")) == .ok && kind(addLine("breakneck", "vulkan = kosmickrisp")) == .ok
+      && kind(addLine("breakneck", "vulkan = moltenvk-patched")) == .ok, "the three Vulkan words")
+check(kind(addLine("breakneck", "vulkan = moltenvk-patch")) == .policy && kind(addLine("breakneck", "vulkan = /gl/libMoltenVK_patched.dylib")) == .policy
+      && kind(addLine("breakneck", "vulkan = off")) == .policy, "any other Vulkan word, a library path, and off (a list turns Vulkan on, never off)")
+check(kind(addLine("breakneck", ["line": "vulkan = moltenvk-patched", "minBuild": 669]), build: 668) == .ok
+      && kind(addLine("breakneck", ["line": "vulkan = moltenvk-patch", "minBuild": 669]), build: 668) == .ok
+      && kind(addLine("breakneck", ["line": "vulkan = moltenvk-patch", "minBuild": 669]), build: 669) == .policy,
+      "a line for build 669 is not read by an older build, whatever it says, and is checked by 669")
+check(kind(addLine("breakneck", ["line": "vulkan = moltenvk-patch", "minBuild": 669]), build: 600, everyLine: true) == .policy,
+      "the publishing tool checks every line, whatever its build")
+check(kind(editRule("breakneck") { rule in
+    rule["config"] = (rule["config"] as! [Any]) + [["line": "vulkan = kosmickrisp", "minBuild": 668, "maxBuild": 668], ["line": "vulkan = moltenvk-patched", "minBuild": 669]]
+}) == .ok, "the same key for builds that do not overlap, the shape an Enshrouded row would take")
 // god-of-war: a row without an opt-in line of its own (the Rockstar rows carry tbs since round 630, and a key may not come twice)
 check(kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = oledlg")) == .ok && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = fwpuclnt,SensApi")) == .ok
       && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = sensapi;oledlg")) == .ok && kind(addLine("god-of-war", "env.MADEIRA_OPTIN_DLLS = oledlg,evil")) == .policy

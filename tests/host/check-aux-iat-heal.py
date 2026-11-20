@@ -296,6 +296,17 @@ defs = {
 }
 assert 0x10000 + defs['K32_SIZE_ALIGNED'] + 2 * defs['NTD_SIZE_ALIGNED'] <= 0x400000
 
+def run_aux(cmd, **kw):
+    """Run the compiled model. Exit 2 with no output is the hinted PE mapping refused: arm64 macOS 27 (the M5 Max, build 672)
+    puts a ~12 GB PROT_NONE reservation at a random address near 0x7b00000000-0x7f00000000 in every process, over the fixture's
+    PE addresses about 1 run in 5. A new process gets a new place, so that case alone is run again (at most 8 times); every
+    other exit, and a 2 that keeps coming, is reported as before."""
+    for _ in range(8):
+        r = subprocess.run(cmd, **kw)
+        if not (r.returncode == 2 and not r.stdout.strip()):
+            return r
+    return r
+
 with tempfile.TemporaryDirectory() as tmp:
     tmp = Path(tmp)
     (tmp / 'k32.img').write_bytes(bytes(k32_img))
@@ -307,16 +318,16 @@ with tempfile.TemporaryDirectory() as tmp:
            '-fsanitize=undefined', str(c), '-o', str(exe)]
     cmd[1:1] = ['-D%s=0x%xul' % (k, v) for k, v in defs.items()]
     subprocess.run(cmd, check=True)
-    out = subprocess.run([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img')], capture_output=True, text=True)
+    out = run_aux([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img')], capture_output=True, text=True)
     print(out.stdout.strip()); print(out.stderr.strip()) if out.returncode else None
     assert out.returncode == 0, 'heal model failed'
     env = dict(os.environ, MADEIRA_AUX_IAT_HEAL='0')
-    out = subprocess.run([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'off'], capture_output=True, text=True, env=env)
+    out = run_aux([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'off'], capture_output=True, text=True, env=env)
     print(out.stdout.strip()); print(out.stderr.strip()) if out.returncode else None
     assert out.returncode == 0, 'switch-off run failed'
     env = dict(os.environ, MADEIRA_AUX_IAT_HEAL_CHILD='0')
     env.pop('MADEIRA_AUX_IAT_HEAL', None)
-    out = subprocess.run([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'child-off'], capture_output=True, text=True, env=env)
+    out = run_aux([str(exe), str(tmp / 'k32.img'), str(tmp / 'ntd.img'), 'child-off'], capture_output=True, text=True, env=env)
     print(out.stdout.strip()); print(out.stderr.strip()) if out.returncode else None
     assert out.returncode == 0, 'child switch-off run failed'
 

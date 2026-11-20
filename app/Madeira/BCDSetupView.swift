@@ -502,7 +502,7 @@ struct OnboardingView: View {
                         dock.prepareClient()
                     }
                 }
-                // A running download keeps going; Settings › Steam › BCD Dock shows it.
+                // A running download keeps going; Settings › BCD Dock shows it.
                 secondary("Later") { model.next() }
             }
         }
@@ -599,7 +599,7 @@ struct OnboardingView: View {
                     note("Settings › JIT lets you switch methods or add a pairing file.", symbol: "bolt.fill")
                 }
                 if model.steps.contains(.dockClient) {
-                    note("Settings › Steam › BCD Dock shows the Steam games installed in BCD and launches them.", symbol: "shippingbox")
+                    note("Settings › BCD Dock shows the Steam games installed in BCD and launches them.", symbol: "shippingbox")
                     note("To play a Steam game: open it in your library, tap Install, then Play.", symbol: "arrow.down.circle")   // round 624 (N S10)
                 }
                 if model.steps.contains(.wineMono) {

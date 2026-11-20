@@ -98,6 +98,17 @@ enum BCDStartingAction: Equatable {
 /// What a BCD Dock start is doing, read from the Dock host's report fields (the same fields and
 /// the same order of precedence as the classic starting screen), as a step and notes.
 enum BCDDockStart {
+    /// Round 669 (agent B S13): Valve's client is signing in (the sign-in was sent) and has no answer yet, online or offline.
+    static func signingIn(_ fields: [String: String]) -> Bool {
+        (fields["session-native-token-submitted"] != nil || fields["session-logon-start-result"] != nil)
+            && fields["session-authenticated-online"] == nil && fields["session-offline-requested"] == nil
+            && fields["session-offline-fallback"] == nil && fields["session-offline-logon-result"] == nil
+    }
+    static let signInSlowAfter = 45.0
+    static let signInSlowText = "Still signing in to Steam. The connection to Steam's servers is slow or blocked here (a VPN, a content filter, "
+        + "a DNS profile or a very slow network can do that). Try another network, or leave BCD open: the first start also needs this "
+        + "sign-in to save an offline sign-in for later."
+
     /// Seconds without the host's first field before the screen says it is slow.
     static let slowAfter = 30.0
     static let steps: [BCDStartStep] = [.starting, .connecting, .signingIn, .checking, .launching]
@@ -134,7 +145,8 @@ enum BCDDockStart {
         if ["ceg-scm", "ceg-request-busy", "ceg-request"].contains(where: { fields[$0] != nil }) && fields["ceg-result"] == nil {
             // Night round 2026-11-11 (A2 S4; Spec Ops: The Line 0TF6NN, XCOM: Enemy Unknown 82Y3VH, 7NVV4P): the host waits up to 5 minutes for the job and the three
             // players left after 32 to 98 s. A minute into the wait the note says it can take several minutes.
-            if waited >= 60, fields["ceg-request"] != nil {
+            // Round 668 (A2, merge N053; AG4D0K, H4A0ZS, QYJ3QB): players still left after 16 and 45 s, before the note: 20 s.
+            if waited >= 20, fields["ceg-request"] != nil {
                 return (.preparing, note("ceg", "Steam is still preparing this game's program. This can take several minutes the first time: keep BCD open.", .warm))
             }
             return (.preparing, note("ceg", "Steam is preparing this game's program."))
@@ -144,6 +156,10 @@ enum BCDDockStart {
         }
         if fields["session-offline-logon-result"] == "1" || fields["session-offline-logon-retry"] == "1" {
             return (.checking, note("offline", "Offline: signed in with Steam's saved sign-in."))
+        }
+        // Round 668 (A1, merge N049): only Valve's answer 1 starts the offline sign-in; any other answer keeps the host waiting.
+        if fields["session-offline-requested"] == nil, let answer = fields["session-offline-fallback"], answer != "1" {
+            return (.signingIn, note("offline", "No connection to Steam's servers, and no saved sign-in for an offline start. Still waiting for the connection."))
         }
         if fields["session-offline-requested"] != nil || fields["session-offline-fallback"] != nil {
             return (.signingIn, note("offline", "No connection. Steam is asked for an offline sign-in."))

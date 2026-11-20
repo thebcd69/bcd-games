@@ -87,6 +87,8 @@ import Glibc
 #else
 import Darwin
 #endif
+// round 669: DockInstallers.inside reads the external folders opened this launch (ExternalDrives.swift)
+enum ExternalDrives { nonisolated(unsafe) static var openedRoots: [(name: String, path: String)] = [] }
 enum SteamSignIn {
     static func flag(_ name: String, default fallback: Bool) -> Bool { getenv(name).map { String(cString: $0) != "0" } ?? fallback }
 }

@@ -16,6 +16,9 @@ in its certificate. Testers re-sign it anyway.
   certificate (a CMS blob): a real signature names its owner. An ad-hoc signature, which
   tools/ota-variants.py adds to carry the entitlements sideloaders filter by (2026-10-18),
   holds none and passes.
+- Refuses an IPA whose app or extension has a bundle identifier other than com.thebcd69.bcd and
+  com.thebcd69.bcd.<name> (owner, 2026-11-16: the owner's signing App ID, which his private OTA
+  carries, never reaches anything public).
 - Drops Microsoft's Visual C++ runtime (Payload/<app>.app/x86_64-vcruntime/*.dll; the owner's
   builds bundle it, its licence lets only licensed Visual Studio users redistribute it, and
   BCD downloads it on the device instead). The folder itself stays. Then refuses any other
@@ -43,6 +46,7 @@ from pathlib import Path
 DROP = ("MadeiraRepo", "MadeiraCommit")
 VCRT_DIR = "/x86_64-vcruntime/"
 DEFAULT_NEEDLES = os.path.expanduser("~/madeira-local/state/alpha-needles.txt")
+PUBLIC_ID = "com.thebcd69.bcd"   # the public IPA's only identity (owner, 2026-11-16)
 
 
 def load_needles(path):
@@ -180,6 +184,15 @@ def main():
     plists = [n for n in names if n.count("/") == 2 and n.startswith("Payload/") and n.endswith(".app/Info.plist")]
     if len(plists) != 1:
         sys.exit(f"make-alpha-ipa: expected one Payload/<app>.app/Info.plist, found {plists}")
+    # Owner, 2026-11-16 (strict): the public package keeps BCD's own identity, never the owner's signing App ID that
+    # his private OTA carries. The app and every extension must be com.thebcd69.bcd or com.thebcd69.bcd.<name>.
+    ids = {}
+    for n in names:
+        if n.startswith("Payload/") and n.endswith("/Info.plist") and (n == plists[0] or ".appex/Info.plist" in n):
+            ids[n] = plistlib.loads(zin.read(n)).get("CFBundleIdentifier", "")
+    foreign = {n: i for n, i in ids.items() if not (i == PUBLIC_ID or i.startswith(PUBLIC_ID + "."))}
+    if foreign:
+        sys.exit(f"make-alpha-ipa: refused, a bundle identifier other than {PUBLIC_ID}: {sorted(foreign)[:3]}")
     buf = io.BytesIO()
     hits, dropped, stripped, microsoft = [], [], [], []
     with zipfile.ZipFile(buf, "w") as zout:

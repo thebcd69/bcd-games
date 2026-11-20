@@ -46,12 +46,20 @@ check("the name heuristic is upstream's, verbatim",
                            (strchr(madeira_exe, '\\\\') != NULL);""")
 i386 = "if (is_i386_target) use_arm64ec = NO;"
 cmd_block = function(thread, "if (madeira_target_is_cmd(madeira_exe))")
+# build 666 (issue #44): a native ARM64 program of the player's own (PE machine 0xaa64, outside C:\windows) takes aarch64 too
+arm64_block = function(thread, "if (madeira_target_is_native_arm64(madeira_exe, target_machine))")
 assigns = re.findall(r"use_arm64ec\s*=[^=][^;]*;", thread)
-check("the core is assigned three times only: the heuristic, the i386 override, the cmd.exe override (NO)",
-      [a.replace("\n", "").replace("  ", "") for a in assigns[1:]] == ["use_arm64ec = NO;", "use_arm64ec = NO;"] and
+check("the core is assigned four times only: the heuristic, the i386 override, the native ARM64 override and the cmd.exe override (NO)",
+      [a.replace("\n", "").replace("  ", "") for a in assigns[1:]] == ["use_arm64ec = NO;", "use_arm64ec = NO;", "use_arm64ec = NO;"] and
       assigns[0].startswith("use_arm64ec = (force_ec"))
-check("the cmd.exe override follows the i386 override and precedes the bundle choice",
-      thread.index(i386) < thread.index("if (madeira_target_is_cmd(madeira_exe))") < thread.index("const char *bundle_subdir"))
+check("the overrides follow the i386 override (ARM64, then cmd.exe) and precede the bundle choice",
+      thread.index(i386) < thread.index("if (madeira_target_is_native_arm64(") < thread.index("if (madeira_target_is_cmd(madeira_exe))")
+      < thread.index("const char *bundle_subdir"))
+check("the native ARM64 override sets aarch64 (NO) only and logs only when it changed the answer",
+      "use_arm64ec = NO;" in arm64_block and "use_arm64ec = YES" not in arm64_block and
+      re.search(r"if \(use_arm64ec\)\s*dprintf\(STDERR_FILENO, \"\[WineProc\] native ARM64 program", arm64_block))
+check("the native ARM64 predicate is called once, with the probed machine", thread.count("madeira_target_is_native_arm64(") == 1 and
+      src.count("madeira_target_is_native_arm64(") == 2)
 check("the override sets aarch64 (NO) only; it says so in the log only when it changed the answer",
       "use_arm64ec = NO;" in cmd_block and "use_arm64ec = YES" not in cmd_block and
       re.search(r"if \(use_arm64ec\)\s*dprintf\(STDERR_FILENO, \"\[WineProc\] cmd\.exe exists only in aarch64-windows", cmd_block))
@@ -60,16 +68,19 @@ check("nothing but the predicate decides it: one call, in that one place", threa
 
 # ---- Part B: the production predicate and statements, against the old decision
 pred = function(src, "static BOOL madeira_target_is_cmd(")
+pred_arm64 = function(src, "static BOOL madeira_target_is_native_arm64(")
 code = r"""
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 typedef int BOOL;
 #define YES 1
 #define NO 0
-""" + pred + r"""
+#define MADEIRA_IMAGE_FILE_MACHINE_ARM64 0xaa64
+""" + pred + pred_arm64 + r"""
 
 /* the OLD decision: the heuristic and the i386 override, as the launch function had them */
 static int core_old(const char *madeira_exe, const char *force_ec, int i386)
@@ -80,12 +91,13 @@ static int core_old(const char *madeira_exe, const char *force_ec, int i386)
     return use_arm64ec;
 }
 
-/* the NEW decision: the same statements and the production cmd.exe block */
-static int core_new(const char *madeira_exe, const char *force_ec, int i386)
+/* the NEW decision: the same statements, the production native ARM64 block (build 666) and the production cmd.exe block */
+static int core_new(const char *madeira_exe, const char *force_ec, int i386, uint16_t target_machine)
 {
     const BOOL is_i386_target = i386;
     """ + heuristic + r"""
     if (is_i386_target) use_arm64ec = NO;
+    """ + arm64_block + r"""
     """ + cmd_block + r"""
     return use_arm64ec;
 }
@@ -101,34 +113,46 @@ int main(void)
         "C:\\windows\\system32\\notepad.exe", "C:\\windows\\system32\\explorer.exe", "C:\\Games\\NeoEE-BCD\\Play NeoEE.bat",
         "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Game\\game.exe", "C:\\Games\\x64\\cmd.exe", "C:\\Games\\game-x64.exe",
         "C:\\windows\\system32\\cmd-x64.exe", "", "a", "x64", "\\", "C:",
+        "C:\\Games\\_forever_\\Wow-ARM64.exe", "C:\\windows\\system32\\start.exe", "C:\\WINDOWS\\system32\\wineboot.exe",
+        "C:\\windowsgames\\arm.exe", "C:\\windows", "wineboot.exe",
     };
+    const uint16_t machines[] = { 0, 0x8664, 0x14c, 0xaa64 };
     const char *forces[] = { NULL, "", "0", "1", "2", "true" };
-    int flipped = 0, same = 0;
+    int flipped = 0, same = 0, arm64_flipped = 0;
     for (size_t e = 0; e < sizeof(exes) / sizeof(exes[0]); e++)
         for (size_t f = 0; f < sizeof(forces) / sizeof(forces[0]); f++)
             for (int i386 = 0; i386 < 2; i386++)
+              for (size_t m = 0; m < sizeof(machines) / sizeof(machines[0]); m++)
             {
-                int o = core_old(exes[e], forces[f], i386), n = core_new(exes[e], forces[f], i386);
+                int o = core_old(exes[e], forces[f], i386), n = core_new(exes[e], forces[f], i386, machines[m]);
                 int cmd = madeira_target_is_cmd(exes[e]);
+                int arm64 = machines[m] == 0xaa64 && strncasecmp(exes[e], "C:\\windows\\", 11) != 0;
                 if (o != n)
                 {
-                    if (!(cmd && o == YES && n == NO))
-                    { printf("FAIL: exe=\"%s\" force=%s i386=%d old=%d new=%d\n", exes[e], forces[f] ? forces[f] : "(null)", i386, o, n); return 1; }
+                    if (!((cmd || arm64) && o == YES && n == NO))
+                    { printf("FAIL: exe=\"%s\" force=%s i386=%d machine=%#x old=%d new=%d\n", exes[e], forces[f] ? forces[f] : "(null)", i386, machines[m], o, n); return 1; }
                     flipped++;
+                    if (!cmd) arm64_flipped++;
                 }
                 else same++;
                 if (cmd && n != NO) { printf("FAIL: cmd.exe stayed arm64ec: \"%s\"\n", exes[e]); return 1; }
+                if (arm64 && n != NO) { printf("FAIL: a native ARM64 program stayed arm64ec: \"%s\"\n", exes[e]); return 1; }
             }
     /* the four logged launches: old = arm64ec (the failure), new = aarch64 */
     if (core_old("C:\\windows\\system32\\cmd.exe", NULL, 0) != YES) { puts("FAIL: the old decision for the logged launch"); return 1; }
-    if (core_new("C:\\windows\\system32\\cmd.exe", NULL, 0) != NO) { puts("FAIL: the new decision for the logged launch"); return 1; }
+    if (core_new("C:\\windows\\system32\\cmd.exe", NULL, 0, 0xaa64) != NO) { puts("FAIL: the new decision for the logged launch"); return 1; }
     /* programs the library starts by themselves keep their cores */
-    if (core_new("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Game\\game.exe", NULL, 0) != YES) { puts("FAIL: a game path"); return 1; }
-    if (core_new("explorer.exe", NULL, 0) != NO) { puts("FAIL: explorer.exe"); return 1; }
-    if (core_new("cube-x64.exe", NULL, 0) != YES) { puts("FAIL: a test x64 program"); return 1; }
-    if (core_new("C:\\Games\\cmd.exe", NULL, 0) != YES) { puts("FAIL: a user's own cmd.exe elsewhere"); return 1; }
-    if (flipped == 0 || same == 0) { puts("FAIL: the grid did not cover both outcomes"); return 1; }
-    printf("grid ok: %d inputs differ (cmd.exe only, arm64ec -> aarch64), %d are identical\n", flipped, same);
+    if (core_new("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Game\\game.exe", NULL, 0, 0x8664) != YES) { puts("FAIL: a game path"); return 1; }
+    if (core_new("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Game\\game.exe", NULL, 0, 0) != YES) { puts("FAIL: an unprobed game path"); return 1; }
+    if (core_new("explorer.exe", NULL, 0, 0) != NO) { puts("FAIL: explorer.exe"); return 1; }
+    if (core_new("cube-x64.exe", NULL, 0, 0) != YES) { puts("FAIL: a test x64 program"); return 1; }
+    if (core_new("C:\\Games\\cmd.exe", NULL, 0, 0x8664) != YES) { puts("FAIL: a user's own cmd.exe elsewhere"); return 1; }
+    /* build 666 (issue #44): WoW Forever's ARM64 client takes aarch64; Wine's own programs in C:\windows keep their answer */
+    if (core_new("C:\\Games\\_forever_\\Wow-ARM64.exe", NULL, 0, 0xaa64) != NO) { puts("FAIL: the native ARM64 game"); return 1; }
+    if (core_new("C:\\windows\\system32\\start.exe", NULL, 0, 0xaa64) != YES) { puts("FAIL: a system32 program read through a stale link"); return 1; }
+    if (flipped == 0 || same == 0 || arm64_flipped == 0) { puts("FAIL: the grid did not cover both outcomes"); return 1; }
+    printf("grid ok: %d inputs differ (cmd.exe, and %d native ARM64 programs outside C:\\windows; arm64ec -> aarch64), %d are identical\n",
+           flipped, arm64_flipped, same);
     return 0;
 }
 """

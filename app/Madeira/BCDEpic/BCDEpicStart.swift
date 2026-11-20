@@ -216,7 +216,17 @@ extension BCDEpic {
         let file = try BCDEpicHostFiles.writeRequest(try request.encoded(), base: Self.folder)
         setenv("BCD_HOST_REQUEST", BCDEpicHostFiles.guestPath(file), 1)
         // The session's first program is BCD Host (inside the Wine desktop when the entry runs there).
-        let desktop = entry.runsInDesktop
+        // Round 668 (R1 S2; Epic GTA V Enhanced 8XM9K8, build 659; all 9 such sessions since build 625 drew no frame): Rockstar's launcher
+        // needs Windows' service manager, and services.exe is a native ARM64 program, which cannot run inside the ARM64EC session a direct
+        // start makes (its first thread died in the emulator's dispatcher; RockstarService.exe install then exited 1 and the installer said
+        // Failed). In the Wine desktop (the aarch64 core) the same chain works: the Dock runs it there (T9BM2B, QX2QBV). So the Rockstar
+        // route runs the host in the Wine desktop; env.BCD_EPIC_SERVICES_DESKTOP = 0 in the game's config keeps the direct start.
+        let rockstarServices = flags.contains(.services) && BCDEpicRules.startsRockstarLauncher(record.exceptionID, program: entry.launchWindowsPath)
+        let desktop = entry.runsInDesktop || (rockstarServices && Self.flag("BCD_EPIC_SERVICES_DESKTOP", entry: entry, fallback: true))
+        if desktop && !entry.runsInDesktop {
+            setenv("MADEIRA_DESKTOP", "1", 1)
+            BCDEpicLog.write("[epic-launch] Rockstar's launcher needs Windows services: the host runs in the Wine desktop (env.BCD_EPIC_SERVICES_DESKTOP = 0 keeps the direct start)")
+        }
         if desktop {
             setenv("MADEIRA_EXE", "explorer.exe", 1)
             setenv("MADEIRA_ARGS", "/desktop=shell,\(entry.resolution) \"\(Self.hostProgram)\" --epic", 1)
@@ -226,9 +236,12 @@ extension BCDEpic {
         }
         // The second configureLaunch (LibraryEntry.applyEnvironment, on the launch worker) put the game's program back in builds 590 to 597; with
         // env.BCD_EPIC_HOST_START = 1 in the game's config the host's values are held for it to set again. Off, nothing changes.
+        hostHeld = false
         if Self.flag("BCD_EPIC_HOST_START", entry: entry, fallback: Self.hostStartDefault) {
+            hostHeld = true   // round 669 (agent E S2): for sessionEnded and the start line
             LibraryEntry.holdEpicHostStart(entry: entry.id, exe: desktop ? "explorer.exe" : Self.hostProgram,
-                                           args: desktop ? "/desktop=shell,\(entry.resolution) \"\(Self.hostProgram)\" --epic" : "--epic")
+                                           args: desktop ? "/desktop=shell,\(entry.resolution) \"\(Self.hostProgram)\" --epic" : "--epic",
+                                           desktop: desktop && !entry.runsInDesktop)
             BCDEpicLog.write("[epic-launch] host start held (env.BCD_EPIC_HOST_START = 1)")
         }
         hostRan = true
@@ -236,7 +249,7 @@ extension BCDEpic {
         auditSecrets = (credentials.exchangeCode, credentials.accountID, tokenText)
         BCDEpicLog.write("[epic-launch] start app=\(BCDEpicLog.app(record.app)) signed-in=1 ovt=\(ovtWindows == nil ? 0 : 1) "
                          + "deployment=\(record.deploymentID == nil ? 0 : 1) host=1 tree=\(flags.contains(.tree) ? 1 : 0) "
-                         + "services=\(flags.contains(.services) ? 1 : 0) desktop=\(desktop ? 1 : 0) arguments=\(own ? "epic" : "yours")")
+                         + "services=\(flags.contains(.services) ? 1 : 0) desktop=\(desktop ? 1 : 0) arguments=\(own ? "epic" : "yours") held=\(hostHeld ? 1 : 0)")
     }
 
     // MARK: After the session
@@ -253,9 +266,14 @@ extension BCDEpic {
         BCDEpicLog.write("[epic-launch] session ended cleaned files=\(removed)")
         // A report that says the host failed before it started the game, or none at all after a session that ended at once (the host did not run).
         let short = Date().timeIntervalSince(LibraryModel.shared.launchStartedAt) < 20
-        if report?.failedBeforeStart == true || (report == nil && short), LibraryModel.shared.error == nil {
+        // Round 669 (agent E S2; Jurassic World Evolution YXH5G8): without the hold the host never ran (the game was the first program), so
+        // "BCD Host stopped before the game started" was not true; the log says what happened instead.
+        if report?.failedBeforeStart == true || (report == nil && short && hostHeld), LibraryModel.shared.error == nil {
             tell(BCDEpicHostFiles.notStartedWords)   // round 624 (Discord forum item 7): not about signing in to Epic
+        } else if report == nil && short {
+            BCDEpicLog.write("[epic-launch] the host was not the first program of this start (env.BCD_EPIC_HOST_START is off); the game ran with Epic's public arguments only")
         }
+        hostHeld = false
         guard let secrets = auditSecrets else { return }
         auditSecrets = nil
         let docs = LibraryModel.documents

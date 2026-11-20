@@ -1,0 +1,143 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Wed, 21 Oct 2026 11:03:04 +0200
+Subject: [PATCH] kk: four small correctness fixes: dispatch counts, an
+ attribute without data, occlusion across a split, the commit log line
+
+kk_CmdDispatchBase skipped a dispatch whose group counts multiply to 0
+in 32 bits, so 65536 x 65536 x 1 was dropped: each count is now tested
+on its own.
+
+A vertex attribute whose buffer is unbound or smaller than its offset
+plus element size got base address 0, and the lowered shader loads
+from the base before any robustness select: a read of GPU address 0.
+It now gets the device's zero page (mesa 0006's zero_page_addr).
+
+A render pass's later encoders (after a barrier, emulation compute or a
+timestamp split it) began with Metal's default visibilityResultType
+Reset, so an occlusion query begun before the split kept only the last
+encoder's samples. The pass descriptor now asks for Accumulate after
+the pass's first encoder starts (a new bridge call,
+mtl_render_pass_descriptor_set_visibility_accumulate); the first still
+resets, and vkCmdResetQueryPool zeroes the slots a query uses.
+
+check_device_lost's count of logged commits ran unlocked on Metal's
+completion threads and logged the first 40 commits of every process in
+release builds too: it is now atomic and those lines need
+MESA_KK_DEBUG=gpu (mesa 0080); an error is always logged.
+
+Linear: PLA-364
+Class: upstream-bug
+Evidence: docs/evidence/2026-10-21-batch2.md
+Offered-upstream: not yet
+BCD (2026-11-17): three of the four fixes (dispatch counts, the zero page
+for an attribute without data, occlusion across an encoder split). The
+commit log line needs Playport's 0080 and is not taken.
+---
+ src/kosmickrisp/bridge/mtl_render_state.h       |  3 +++
+ src/kosmickrisp/bridge/mtl_render_state.m       |  9 +++++++++
+ src/kosmickrisp/bridge/stubs/mtl_render_state.c |  6 ++++++
+ src/kosmickrisp/vulkan/kk_cmd_dispatch.c        |  5 +++--
+ src/kosmickrisp/vulkan/kk_cmd_draw.c            | 14 +++++++++++++-
+ 5 files changed, 34 insertions(+), 3 deletions(-)
+
+diff --git a/src/kosmickrisp/bridge/mtl_render_state.h b/src/kosmickrisp/bridge/mtl_render_state.h
+index 5f96f15..f5998dd 100644
+--- a/src/kosmickrisp/bridge/mtl_render_state.h
++++ b/src/kosmickrisp/bridge/mtl_render_state.h
+@@ -101,6 +101,9 @@ void mtl_render_pass_descriptor_set_sample_positions(
+ 
+ void mtl_render_pass_descriptor_set_visibility_buffer(
+    mtl_render_pass_descriptor *descriptor, mtl_buffer *visibility_buffer);
++/* Playport: visibilityResultType Accumulate, else Reset (Metal's default). */
++void mtl_render_pass_descriptor_set_visibility_accumulate(
++   mtl_render_pass_descriptor *descriptor, bool accumulate);
+ 
+ /* Stencil descriptor */
+ mtl_stencil_descriptor *mtl_new_stencil_descriptor(void);
+diff --git a/src/kosmickrisp/bridge/mtl_render_state.m b/src/kosmickrisp/bridge/mtl_render_state.m
+index 13c06c8..e5a20be 100644
+--- a/src/kosmickrisp/bridge/mtl_render_state.m
++++ b/src/kosmickrisp/bridge/mtl_render_state.m
+@@ -270,6 +270,15 @@
+    }
+ }
+ 
++void
++mtl_render_pass_descriptor_set_visibility_accumulate(mtl_render_pass_descriptor *descriptor,
++                                                     bool accumulate)
++{
++   MTL4RenderPassDescriptor *desc = (MTL4RenderPassDescriptor *)descriptor;
++   desc.visibilityResultType =
++      accumulate ? MTLVisibilityResultTypeAccumulate : MTLVisibilityResultTypeReset;
++}
++
+ /* Stencil descriptor */
+ mtl_stencil_descriptor *
+ mtl_new_stencil_descriptor()
+diff --git a/src/kosmickrisp/bridge/stubs/mtl_render_state.c b/src/kosmickrisp/bridge/stubs/mtl_render_state.c
+index 054608a..0108c9a 100644
+--- a/src/kosmickrisp/bridge/stubs/mtl_render_state.c
++++ b/src/kosmickrisp/bridge/stubs/mtl_render_state.c
+@@ -167,6 +167,12 @@ mtl_render_pass_descriptor_set_visibility_buffer(
+ {
+ }
+ 
++void
++mtl_render_pass_descriptor_set_visibility_accumulate(
++   mtl_render_pass_descriptor *descriptor, bool accumulate)
++{
++}
++
+ /* Stencil descriptor */
+ mtl_stencil_descriptor *
+ mtl_new_stencil_descriptor(void)
+diff --git a/src/kosmickrisp/vulkan/kk_cmd_dispatch.c b/src/kosmickrisp/vulkan/kk_cmd_dispatch.c
+index 4df22e7..91cfcca 100644
+--- a/src/kosmickrisp/vulkan/kk_cmd_dispatch.c
++++ b/src/kosmickrisp/vulkan/kk_cmd_dispatch.c
+@@ -63,8 +63,9 @@ kk_CmdDispatchBase(VkCommandBuffer commandBuffer, uint32_t baseGroupX,
+                    uint32_t groupCountX, uint32_t groupCountY,
+                    uint32_t groupCountZ)
+ {
+-   /* Metal validation dislikes empty disptaches */
+-   if (groupCountX * groupCountY * groupCountZ == 0)
++   /* Metal validation dislikes empty disptaches. Playport: each count on its
++    * own, as the product wraps in 32 bits (65536 x 65536 x 1 is 0). */
++   if (!groupCountX || !groupCountY || !groupCountZ)
+       return;
+ 
+    VK_FROM_HANDLE(kk_cmd_buffer, cmd, commandBuffer);
+diff --git a/src/kosmickrisp/vulkan/kk_cmd_draw.c b/src/kosmickrisp/vulkan/kk_cmd_draw.c
+index 0e87a82..109c5f4 100644
+--- a/src/kosmickrisp/vulkan/kk_cmd_draw.c
++++ b/src/kosmickrisp/vulkan/kk_cmd_draw.c
+@@ -442,6 +442,14 @@ kk_CmdBeginRendering(VkCommandBuffer commandBuffer,
+    if (!no_framebuffer)
+       cs_start_render(cmd);
+ 
++   /* Playport: an encoder that restarts the pass (a barrier, emulation
++    * compute, a timestamp) keeps the occlusion counts the earlier encoders
++    * wrote: with Metal's default Reset a query begun before the split kept
++    * only the last encoder's samples. The pass's first encoder still resets;
++    * without a framebuffer it starts later, from this descriptor, and the
++    * query reset already zeroed its slots. */
++   mtl_render_pass_descriptor_set_visibility_accumulate(pass_descriptor, true);
++
+    /* Store descriptor in case we need to restart the pass at pipeline barrier,
+     * but force loads */
+    for (uint32_t i = 0; i < render->color_att_count; i++) {
+@@ -1444,8 +1452,12 @@ kk_flush_dynamic_state(struct kk_cmd_buffer *cmd)
+             struct vk_vertex_attribute_state attr = dyn->vi->attributes[i];
+             struct kk_addr_range vb = gfx->vb.addr_range[attr.binding];
+ 
++            /* Playport: an attribute without data reads the device's zero
++             * page, not GPU address 0: the shader loads from the base before
++             * any robustness select. */
+             desc->root.draw.attrib_clamps[slot] = kk_calculate_vbo_clamp(
+-               vb.addr, 0, vk_format_to_pipe_format(attr.format), vb.range,
++               vb.addr, kk_cmd_buffer_device(cmd)->zero_page_addr,
++               vk_format_to_pipe_format(attr.format), vb.range,
+                dyn->vi_binding_strides[attr.binding], attr.offset,
+                &desc->root.draw.attrib_base[slot]);
+             desc->root.draw.buffer_strides[attr.binding] =

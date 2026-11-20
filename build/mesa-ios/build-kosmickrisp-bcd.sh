@@ -10,7 +10,7 @@
 #
 # This is BCD's driver of Madeira's two recipes, which do the compiling:
 #   KK_PROFILE=playport (default)  build-playport-kosmickrisp.sh: Mesa at commit b39d173c (26.3.0-devel, fetched by
-#                                  fetch-playport.py with its SHA-256) + the Playport authors' 19 patches (playport-patches/):
+#                                  fetch-playport.py with its SHA-256) + the Playport authors' 31 patches and BCD's 0032 to 0035 (playport-patches/):
 #                                  geometry shaders, transform feedback, the driver's shader cache, the iOS presentation fixes.
 #   KK_PROFILE=release             build-kosmickrisp.sh: Mesa 26.2.4 (the release tarball, by its SHA-256) + the six
 #                                  patches of kosmickrisp-patches/.
@@ -122,11 +122,13 @@ mkdir -p "$KK_WORK" "$OUT" "$R/app/Madeira/licenses"
 
 if [ "$PROFILE" = playport ]; then
     SRC="$KK_WORK/mesa-$MESA_PLAYPORT"
+    sh "$HERE/kk-stale-source.sh" "$SRC" "$HERE/playport-patches"   # build 676: a changed patch means a fresh tree
     PATCHES=$(ls "$HERE"/playport-patches/*.patch | wc -l | tr -d ' ')
     # fetch-playport.py (run by the recipe) downloads the archive of that commit, checks its SHA-256 and unpacks it once.
     bash "$HERE/build-playport-kosmickrisp.sh"
 else
     SRC="$KK_WORK/mesa-$MESA_RELEASE"
+    sh "$HERE/kk-stale-source.sh" "$SRC" "$HERE/kosmickrisp-patches"
     PATCHES=$(ls "$HERE"/kosmickrisp-patches/kosmickrisp-ios-*.patch | wc -l | tr -d ' ')
     if [ ! -f "$SRC/src/kosmickrisp/meson.build" ]; then
         tarball="$KK_WORK/mesa-$MESA_RELEASE.tar.xz"

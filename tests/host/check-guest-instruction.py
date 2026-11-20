@@ -27,6 +27,7 @@ functions = ''.join(function(native, signature) for signature in (
     'static int ios_jit_code_bounds(',
     'static unsigned short ios_jit_mapping_machine(',   # upstream aa70ae1 moved the ml349 read here
     'void *ios_jit_translate_addr_for_owner(',
+    'static void ios_jit_pe_span(',     # the sync loop asks for the span of the mapped images (MADEIRA_IAT_SYNC_SPAN, default on)
     'static int ios_va_is_x86_code(',
     'int ios_jit_guest_code_window(',
 ))
@@ -145,6 +146,8 @@ static int sync_slots(uint64_t *slots, size_t count, void *sync_owner)
     int keep_ok = 0;
     static unsigned char ios_sync_keep[1];
     unsigned long keep_hits = 0;
+    const int span_on = 1;   /* the default: words outside the span of the mapped images are not looked up */
+    uintptr_t span_lo = 0, span_hi = 0;
 ''' + loop + r'''
     (void)x86_first; (void)exec_first; (void)keep_hits; (void)jit_rw_dest;
     return fixup_count;

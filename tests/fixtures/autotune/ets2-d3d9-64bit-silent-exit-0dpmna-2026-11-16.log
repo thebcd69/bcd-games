@@ -1,0 +1,258 @@
+[23:59:14.932] [INFO] Checking entitlements...
+[23:59:14.933] [INFO] [build] v0.1.665 (665)
+[23:59:14.933] [INFO] [device] model=iPhone14,2 idiom=phone os=iOS Version 26.3 (Build 23D127) ram=5667MB available=4073MB cores=6
+[23:59:14.934] [INFO] [device] address-map=[0x104490000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[23:59:14.939] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[23:59:14.958] [INFO] [device] settings: low-power=0 thermal=serious screen=1170x2532@3.0x max-fps=120 utc-offset=+03:00 free-disk=4GB stikdebug-url=1
+[23:59:14.966] [INFO] [device] gpu="Apple A15 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:59:28.996] [INFO] [bcd-ui] play local
+[23:59:28.998] [INFO] Requesting JIT with StikDebug...
+[23:59:29.024] [INFO] Opening StikDebug to enable JIT...
+[23:59:32.779] [INFO] [bcd] library launch eurotrucks2.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[23:59:32.812] [INFO] Running full Wine sequence...
+[23:59:32.813] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104490000,0xfc0000000) 63GB available=4056MB low-power=0 thermal=serious
+[23:59:32.816] [INFO] [game-cfg] dxmt=d3d11.mipClampBC=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_MIP_CLAMP_AUTO=1
+[23:59:33.332] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[23:59:33.342] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[23:59:33.747] [INFO] Allocating 896MB JIT pool via debugger...
+[23:59:33.748] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:59:33.750] [INFO] [jit-debugger] attached=1 at the pool request
+[23:59:33.750] [INFO] [jit-age] attach age=0s source=enable-jit method=stikdebug thermal=2
+[23:59:33.752] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[23:59:37.725] [INFO] RX pool at 0x300000000
+[23:59:37.781] [OK] JIT pool ready (debugger still attached).
+[23:59:37.786] [INFO] BRK suspension lasted 4.03s
+[23:59:37.788] [INFO] Detaching debugger...
+[23:59:37.793] [OK] Debugger detached.
+[23:59:37.795] [OK] [early-detach] rev=ml524 took 7 ms
+[23:59:37.797] [INFO] Starting wineserver...
+[phase] wine-start             t+  4.502s rev=ml526
+[23:59:37.844] [wineserver] send_client_fd: fd=35 handle=0x3a2 msg_fd_unix=32 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/a39905195db2d613.cfg (read)
+[game-cfg]   dxmt = d3d11.mipClampBC=1
+[WineProc] Target exe: C:\Euro.Truck.Simulator.2.v1.25.2.5.Incl.44.DLC\Euro Truck Simulator 2\bin\win_x64\eurotrucks2.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x10cfa0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[23:59:38.341] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=33 reply=38/39 wait=40/41 rev=ml586
+[23:59:38.341] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=33 reply=38/39 wait=40/41 rev=ml586
+[Wine init_process] reply_pipe=39, sending init_first_thread...
+[23:59:38.341] [Wine init_process] reply_pipe=39, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3126 MB + phys_footprint=969 MB = 4096 MB (hw.memsize says 5667 MB)
+ml985: preferred base 0x140000000+0x1327000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x1328000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11e200000+0x1327000 (eurotrucks.exe) → pool 0x300005000 used=0x1331000/0x38000000 tramp+0x0
+[copy-verify] eurotrucks.exe: OK, 864 .text pages executable (copy @0x300005000)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x301330000 used=0x1468000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x301330000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 285)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 285)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 285)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x11e200000 IAT window 0x11ef7f000+0x1350: 602 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11e200000 IAT window 0x11ef7f000+0x1350: 602 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x10cfa0320 insn=0xb9432100
+[window] 0x12d000000..0xb30000000 regions=100001 occupied=7841 MB of 41008 MB free=33166 MB maxhole=31974 MB@0x36198c000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=1009 MB (peak 1009) internal=1007 MB compressed=0 MB external=84 MB reusable=2 MB (cycle=1)
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf6a0000+0x421000 (libarm64ecfex.dll) → pool 0x30146b000 used=0x1897000/0x38000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x30146b000)
+[jit-pool] image 0xfbf570000+0x130000 (ucrtbase.dll) → pool 0x301894000 used=0x19c8000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x301894000)
+[jit-pool] image 0xfbf4b0000+0xc0000 (kernel32.dll) → pool 0x3019c8000 used=0x1a90000/0x38000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x3019c8000)
+[jit-pool] image 0xfbf1c0000+0x2f0000 (kernelbase.dll) → pool 0x301a90000 used=0x1d90000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x301a90000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module eurotrucks2.exe (eurotrucks2.exe-22b74aace589598d): 11E200000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+D 24 Load module steam_api64.dll (steam_api64.dll-3870be10825d367e): FBF120000
+[x64-data-imp] ml1245 importer pe=0xfbf120000 IAT window 0xfbf13a000+0x2b8: 84 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0xfbf120000 IAT window 0xfbf13a000+0x2b8: 84 slot(s), 0 data import(s) bound
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBF070000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBEFF0000
+D 24 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBEEE0000
+[x64-data-imp] ml1245 importer pe=0xfbf120000 IAT window 0xfbf13a000+0x2b8: 84 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0xfbf120000 IAT window 0xfbf13a000+0x2b8: 84 slot(s), 0 data import(s) bound
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x303124000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x303218000)
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x3032ac000)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x3033e0000)
+[copy-verify] comdlg32.dll: OK, 12 .text pages executable (copy @0x303484000)
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0xfbd390000 size=0x1000 type=0x3000 protect=0x40
+[va-scan] FAILED window=0x7400000000..0x1000000000 size=0x3020000 align=0x10000 bottom-up tries=0 skips=0 | seen=0x7400000000..0x1000000000 views=0 maxgap=0x0 tailgap=0x0 stop=window<size@entry(bottom-up) | firstfail=0x0 errno=0(-)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[steer] #1 size=0x3020000 reserved_total=0MB armed=va-pressure -> FAILED, falling back 0x0
+[alias-own] ml640 #1 0xfbd390000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x303bb4000 rw=0x33bbb4000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[bigres] tid=0024 #1 size=0x19000000 (400 MB) type=0x3000 prot=0x4 hint=0x0 peb=0xfbfff0000 total=400 MB
+[xp-names] m337217 "wine-x18-exc"
+[xp] 23:59:39.071 +0.63 dt=316 cpu=296 (thr 273) P=292 E=4 run=303 pgw=-1.0 GHz P=3.12 E=1.64 Minst=3285 IPC=3.58 mJ=767 pin=578 rdKB=9580 fpMB=1399
+[image-reload] unmapped image 0xfbcee0000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-pos] #1 hwnd=0x1002c after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #1 hwnd=0x1002c class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x1002c after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #2 hwnd=0x1002c class='OleMainThreadWndClass' text="" rev=ml853
+[xp] 23:59:39.350 +0.90 dt=279 cpu=267 (thr 267) P=239 E=28 run=358 pgw=-1.0 GHz P=3.03 E=2.01 Minst=2031 IPC=2.60 mJ=552 pin=150 rdKB=5260 fpMB=1793
+[xp] 23:59:39.647 +1.20 dt=297 cpu=421 (thr 421) P=397 E=24 run=555 pgw=-1.0 GHz P=3.03 E=1.98 Minst=2611 IPC=2.09 mJ=775 pin=0 rdKB=11468 fpMB=1793
+[vmode] synthesized CURRENT = 1416x656 @60Hz
+[win-pos] #3 hwnd=0x20032 after=0x0 flags=0000003c vis={702,296,834,334} surface=0x1078d89b0 rev=ml505 style=06c80000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x20032 class='prism3d' text="" rev=ml853
+[win-pos] #4 hwnd=0x1003a after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1078d89b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x1003a class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x1003a after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1078d89b0 rev=ml505 style=8c000000 visible=0 parent=0x10024
+[win-name] #5 hwnd=0x1003a class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x20032 after=0x0 flags=00000018 vis={702,296,834,334} surface=0x1078d89b0 rev=ml505 style=06c80000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x20032 class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+[win-name] #7 hwnd=0x20032 class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x304064000)
+[jit-pool] image 0xfbc6d0000+0x370000 (wined3d.dll) → pool 0x3042e4000 used=0x4658000/0x38000000 tramp+0x4000
+D 24 Load module wined3d.dll (wined3d.dll-e53ebe6d434bb891): FBC6D0000
+[jit-pool] image 0xfbc570000+0x160000 (opengl32.dll) → pool 0x304658000 used=0x47bc000/0x38000000 tramp+0x4000
+D 24 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): FBC570000
+[unixlib] opengl32 (GL-absent stub table) (module 0xfbc570000) -> 64-bit table (0x107e9c708)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000000
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000000 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000040
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000080
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000080 -> 0
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000040 -> 0 hDevice=0x400000c0
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 0000000134DF8040.
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000100
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000100 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000140
+[vkmt] tid=0024 OpenAdapterFromLuid luid=00000000:000003ec -> 0 hAdapter=0x40000180
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000180 -> 0
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000140 -> 0 hDevice=0x400001c0
+0024:err:d3d:wined3d_adapter_gl_init Failed to get a GL context for adapter 0000000134DF8040.
+0024:err:d3d9:d3d9_ios_probe [d3d9-probe] rev=ml700 Direct3DCreate9 called -> d3d9_init FAILED
+[win-name] #16 hwnd=0x40044 class='prism3d' text="wgldetect" rev=ml853
+[jit-pool] image 0xfbc4f0000+0x75000 (OpenAL32.dll) → pool 0x3047be000 used=0x483a000/0x38000000 tramp+0x0
+D 24 Load module swopenal32.dll (swopenal32.dll-3230ae504310b363): FBC4F0000
+[jit-pool] image 0xfbc410000+0xa0000 (mmdevapi.dll) → pool 0x304838000 used=0x48dc000/0x38000000 tramp+0x4000
+D 58 Load module mmdevapi.dll (mmdevapi.dll-57db4935cb1d4a81): FBC410000
+[jit-pool] image 0xfbc380000+0x90000 (version.dll) → pool 0x3048dc000 used=0x4970000/0x38000000 tramp+0x4000
+D 58 Load module version.dll (version.dll-f3f7d5759bd2c065): FBC380000
+[jit-pool] image 0xfbc2c0000+0xc0000 (dsound.dll) → pool 0x304970000 used=0x4a34000/0x38000000 tramp+0x4000
+D 24 Load module dsound.dll (dsound.dll-541ca4d6eb8180ce): FBC2C0000
+E 5C [thr-term] rev=ml435 deinit #1 tid=0x5c
+[xp] 23:59:39.919 +1.47 dt=273 cpu=222 (thr 191) P=214 E=8 run=237 pgw=-1.0 GHz P=3.06 E=1.92 Minst=2041 IPC=3.04 mJ=488 pin=759 rdKB=12176 fpMB=1883
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-name] #23 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #24 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #28 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #32 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #36 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #40 hwnd=0x80044 class='#32770' text="" rev=ml853
+[win-name] #84 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-name] #86 hwnd=0x10062 class='Static' text="Euro Truck Simulator 2 is having a problem and is unable to draw graphics on your computer (no valid graphics device was found).?Suggested steps:??1. Check that your computer and video card meet the " rev=ml853
+[win-name] #88 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[xp] 23:59:40.202 +1.76 dt=282 cpu=32 (thr 31) P=27 E=5 run=37 pgw=-1.0 GHz P=2.53 E=0.81 Minst=241 IPC=3.37 mJ=51 pin=1 rdKB=20 fpMB=1884
+[launch-view] dismissed reason=surface logs=0
+[footprint] rev=ml358 phys=1890 MB (peak 1890) internal=1887 MB compressed=0 MB external=130 MB reusable=2 MB (cycle=2)
+[xp] 23:59:40.529 +2.08 dt=322 cpu=91 (thr 80) P=2 E=89 run=102 pgw=-1.0 GHz P=1.14 E=0.92 Minst=73 IPC=0.87 mJ=4 pin=0 rdKB=0 fpMB=1890
+[footprint] rev=ml358 phys=1889 MB (peak 1890) internal=1886 MB compressed=0 MB external=131 MB reusable=2 MB (cycle=3)
+[srv-input] btn msg=0x201 at (704,470) hit win=00080044 thread=0x129838600
+[srv-input] btn msg=0x201 at (704,470) hit win=00080044 thread=0x129838600
+[srv-input] btn msg=0x201 at (704,470) hit win=00080044 thread=0x129838600
+[win-name] #89 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #90 hwnd=0x80044 after=0x0 flags=0000181f vis={540,163,876,492} surface=0x1078d89b0 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #90 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #91 hwnd=0x80044 after=0x0 flags=0000181f vis={540,163,876,492} surface=0x1078d89b0 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #91 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+[win-pos] #92 hwnd=0x80044 after=0x0 flags=0000181f vis={540,163,876,492} surface=0x1078d89b0 rev=ml505 style=84c801c4 visible=0 parent=0x10024
+[win-name] #92 hwnd=0x80044 class='#32770' text="Euro Truck Simulator 2" rev=ml853
+E 68 [thr-term] rev=ml435 deinit #2 tid=0x68
+E 64 [thr-term] rev=ml435 deinit #3 tid=0x64
+E 60 [thr-term] rev=ml435 deinit #4 tid=0x60
+[win-pos] #93 hwnd=0x90044 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #93 hwnd=0x90044 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #94 hwnd=0x90044 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10026
+[win-name] #94 hwnd=0x90044 class='__wine_xinput_devnotify' text="" rev=ml853
+[win-pos] #95 hwnd=0x20032 after=0x0 flags=000018bf vis={-32000,-32000,-31868,-31962} surface=0x1078d89b0 rev=ml505 style=06c80000 visible=0 parent=0x10024
+[win-name] #95 hwnd=0x20032 class='prism3d' text="Euro Truck Simulator 2" rev=ml853
+E 54 [thr-term] rev=ml435 deinit #5 tid=0x54
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=00000003019EE474
+E 70 [thr-term] rev=ml435 deinit #6 tid=0x70
+E 34 [thr-term] rev=ml435 deinit #13 tid=0x34
+E 4C [thr-term] rev=ml435 deinit #15 tid=0x4c
+E 38 [thr-term] rev=ml435 deinit #14 tid=0x38
+E 48 [thr-term] rev=ml435 deinit #16 tid=0x48
+E 40 [thr-term] rev=ml435 deinit #11 tid=0x40
+E 3C [thr-term] rev=ml435 deinit #17 tid=0x3c
+[image-reload] unmapped image 0xfbce50000+0xb0000: 1 pool copy marked
+[image-reload] unmapped image 0xfbcdb0000+0xa0000: 1 pool copy marked
+[image-reload] unmapped image 0xfbca40000+0xb0000: 1 pool copy marked
+[image-reload] unmapped image 0xfbc6d0000+0x370000: 1 pool copy marked
+[image-reload] unmapped image 0xfbccf0000+0xc0000: 1 pool copy marked
+[vfree] ml842 # base=0xb35681000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0xb35681000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0xb35681000 size=0xf000 type=0x4000 tid=0024
+[vfree] ml842 # base=0xb35681000 size=0xf000 type=0x4000 tid=0024
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=2021
+[unwind] term ml661 begin rip=fbf4f0690 rsp=11ff2fef8 window=[11ff2fef8..12072fef8) max=32
+[unwind] term ml661 #00 pc=fbf4f0690 rsp=11ff2fef8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=134b510f0 rbp=11ff2ffd0 rsi=134b510f0 rdi=134b510e8 r12=134b510f0 r13=0 r14=0 r15=134b6aff8
+[unwind] term ml662   rbx=134b510f0: 47541000 000080a4 47541000 000080a4 47541000 000080a4 47541000 000080a4
+[unwind] term ml662   rbp=11ff2ffd0: 00000000 00000000 68e49e01 03000000 d82d3901 03000000 00000000 00000000
+[unwind] term ml661 #01 pc=11ee725c4 rsp=11ff2ff00  eurotrucks.exe+0xc725c4
+[unwind] term ml661 #02 pc=11eec8b15 rsp=11ff2ff70  eurotrucks.exe+0xcc8b15
+[unwind] term ml661 #03 pc=3019f9b0c rsp=11ff2ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 11ee725c4  eurotrucks.exe+0xc725c4
+[term-stack] ml660 sp+070: CALL 11eec8b15  eurotrucks.exe+0xcc8b15
+[srv-kill] kill_thread tid=0058 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=006c pid=0020 violent=1 rev=ml586
+[jit-pool] tail FREE rx=0x337ffc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=2025
+[unwind] term ml661 begin rip=3013ae16c rsp=11ff2fc40 window=[11ff2fc40..12072fc40) max=32
+[unwind] term ml661 #00 pc=3013ae16c rsp=11ff2fc40  ntdll.dll+0x7e16c
+[unwind] term ml662 #00 nv: rbx=1 rbp=11ff2fcc0 rsi=fbe050000 rdi=0 r12=fbe050000 r13=1 r14=1 r15=10d2fe930
+[unwind] term ml662   rbp=11ff2fcc0: 904ab001 03000000 d8243601 03000000 00000000 00000000 00000000 00000000
+[unwind] term ml662   rsi=fbe050000: 4d5a9000 03000000 04000000 ffff0000 b8000000 00000000 40000000 00000000
+[unwind] term ml661 #01 pc=11ff2fda0 rsp=11ff2fc48  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+130:   ? fbe050000  steam_api64.dll+0x0
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[23:59:44.814] [INFO] [session] length=12s play=0s frames=0 stalls=0/0s peak=1892MB limit=4095MB thermal=serious lpm=0 res=1416x656 cap=60 game=eurotrucks2
+[footprint] rev=ml358 phys=1144 MB (peak 1890) internal=1142 MB compressed=0 MB external=126 MB reusable=2 MB (cycle=4)
+[frontend] returned to library
+[23:59:46.697] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1180 MB (peak 1890) internal=1177 MB compressed=0 MB external=126 MB reusable=1 MB (cycle=5)
+[footprint] rev=ml358 phys=1181 MB (peak 1890) internal=1178 MB compressed=0 MB external=127 MB reusable=1 MB (cycle=6)
+[footprint] rev=ml358 phys=1181 MB (peak 1890) internal=1178 MB compressed=0 MB external=127 MB reusable=1 MB (cycle=7)
+[footprint] rev=ml358 phys=1181 MB (peak 1890) internal=1179 MB compressed=0 MB external=127 MB reusable=1 MB (cycle=8)
+[footprint] rev=ml358 phys=1182 MB (peak 1890) internal=1179 MB compressed=0 MB external=130 MB reusable=1 MB (cycle=9)
+[hwinput] keyboard focus: elsewhere (responder)
+[xp] 23:59:56.531 +18.09 dt=306 cpu=135 (thr 135) P=95 E=40 run=148 pgw=-1.0 GHz P=2.38 E=1.18 Minst=583 IPC=2.14 mJ=115 pin=78 rdKB=1328 fpMB=1182
+[xp] 23:59:56.813 +18.37 dt=281 cpu=15 (thr 13) P=0 E=14 run=16 pgw=-1.0 GHz P=1.08 E=1.72 Minst=24 IPC=0.95 mJ=2 pin=0 rdKB=0 fpMB=1182
+[footprint] rev=ml358 phys=1182 MB (peak 1890) internal=1180 MB compressed=0 MB external=132 MB reusable=1 MB (cycle=10)
+[xp] 23:59:57.069 +18.62 dt=255 cpu=57 (thr 56) P=0 E=57 run=59 pgw=-1.0 GHz P=1.38 E=1.05 Minst=90 IPC=1.50 mJ=4 pin=0 rdKB=0 fpMB=1182
+[xp] 23:59:57.390 +18.94 dt=322 cpu=76 (thr 78) P=17 E=60 run=87 pgw=-1.0 GHz P=1.28 E=1.12 Minst=112 IPC=1.27 mJ=9 pin=0 rdKB=0 fpMB=1183
+[23:59:57.391] [xp] 23:59:57.390 +18.94 dt=322 cpu=76 (thr 78) P=17 E=60 run=87 pgw=-1.0 GHz P=1.28 E=1.12 Minst=112 IPC=1.27 mJ=9 pin=0 rdKB=0 fpMB=1183
+[xp] 23:59:58.272 +19.83 dt=263 cpu=302 (thr 300) P=39 E=263 run=304 pgw=-1.0 GHz P=3.07 E=2.02 Minst=1935 IPC=2.98 mJ=152 pin=0 rdKB=0 fpMB=1188
+nst=1935 IPC=2.98 mJ=152 pin=0 rdKB=0 fpMB=1188

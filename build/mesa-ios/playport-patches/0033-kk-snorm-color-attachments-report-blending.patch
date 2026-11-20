@@ -1,0 +1,68 @@
+From: BCD <190844990+thebcd69@users.noreply.github.com>
+Subject: [PATCH] kk: SNORM color attachments report blending (MADEIRA_KK_SNORM_BLEND=1)
+
+madeira-bcd (X-Plane 12, build 673): KosmicKrisp holds
+VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT back for every SNORM format
+while Khronos issue 4293 is open, although it blends in the fragment shader
+(nir_lower_blend), which already handles SNORM render targets, and Metal's
+table marks R16Snorm blendable. X-Plane 12's Vulkan renderer stops on that
+("Format r16s used as a blended color attachment but doesn't support blending
+capability", gfx_vk_pipeline_graphics.cpp:862, then __fastfail). With
+MADEIRA_KK_SNORM_BLEND=1 SNORM color formats report the bit; without it the
+driver reports exactly what it did.
+---
+diff --git a/src/kosmickrisp/vulkan/kk_image.c b/src/kosmickrisp/vulkan/kk_image.c
+--- a/src/kosmickrisp/vulkan/kk_image.c
++++ b/src/kosmickrisp/vulkan/kk_image.c
+@@ -7,6 +7,9 @@
+ 
+ #include "kk_image.h"
+ 
++#include <stdio.h>
++#include <stdlib.h>
++
+ #include "kk_debug.h"
+ #include "kk_device.h"
+ #include "kk_device_memory.h"
+@@ -23,6 +26,30 @@
+ #include "vk_format.h"
+ #include "wsi_common_private.h"
+ 
++/* madeira-bcd (X-Plane 12, build 673): MADEIRA_KK_SNORM_BLEND=1 reports
++ * VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT for SNORM color formats too.
++ * KosmicKrisp blends in the fragment shader (nir_lower_blend), which already
++ * handles SNORM render targets (inputs clamped to [-1, 1]); the bit is only held
++ * back while Khronos issue 4293 is open. X-Plane 12's Vulkan renderer stops with
++ * "Format r16s used as a blended color attachment but doesn't support blending
++ * capability" without it. Off (the driver as it was) unless the value is 1. */
++static bool
++kk_snorm_blend_enabled(void)
++{
++   static int enabled = -1;
++
++   if (enabled < 0) {
++      const char *s = getenv("MADEIRA_KK_SNORM_BLEND");
++      int on = s && s[0] == '1' && !s[1];
++      if (on)
++         fprintf(stderr, "[kk-snorm-blend] madeira-bcd MADEIRA_KK_SNORM_BLEND=1: "
++                         "SNORM color attachments report blending "
++                         "(nir_lower_blend blends them)\n");
++      enabled = on;
++   }
++   return enabled;
++}
++
+ static VkFormatFeatureFlags2
+ kk_get_image_plane_format_features(struct kk_physical_device *pdev,
+                                    VkFormat vk_format, VkImageTiling tiling,
+@@ -68,7 +95,7 @@
+       features |= VK_FORMAT_FEATURE_2_BLIT_DST_BIT;
+       // TODO_KOSMICKRISP Support snorm formats once the following spec issue is
+       // resolved: https://gitlab.khronos.org/vulkan/vulkan/-/issues/4293
+-      if (!vk_format_is_snorm(vk_format))
++      if (!vk_format_is_snorm(vk_format) || kk_snorm_blend_enabled())
+          features |= VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT;
+    }
+ 
+-- 
+2.47.0

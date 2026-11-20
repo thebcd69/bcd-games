@@ -2,11 +2,16 @@
  "dialogs": [],
  "end": {},
  "matched": [
+  "digimon-256gib-reserve-oversize",
   "reserve-256gib-no-gap"
  ],
- "next": [],
+ "next": [
+  "oversize-reserve = 1",
+  "oversize-reserve-virtual = 1",
+  "oversize-reserve-mb = 4096"
+ ],
  "note": "Digimon Story Time Stranger (BGCT5V, build 622, iPad17,4 M5, 512 GB map, extended VA): 1 s into the start the game's snmalloc pagemap reserves 256 GiB (0x4000000000) in one piece, the map's largest hole is 32 GiB ([mmap-place] NO GAP FITS, [jumbo] kernel-pick reserve failed), the allocator does not check and the next read of its object faults at 0xC9. FINAL FANTASY TACTICS (round 620) asks 0x4003ffffff the same way. No setting changes the request; auto-tune stops (noFix). Round 623.",
  "outcome": "crashed",
  "stage": 2,
- "status": "known"
+ "status": "trying"
 }

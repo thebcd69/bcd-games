@@ -216,5 +216,18 @@ int main(void) {
                                        "root CBV b1 space 8 all; 4 constants b2 space 0 PS; 1 static sampler(s)]"
                   or print(lines.get("desc")))
 
+# Round 668 (G3; Mechstermination Force CV5ZG0): 38 root parameters were refused at 32 and the serializer left the blob pointer as
+# the game passed it (stack garbage, read by GetBufferSize). The limit is D3D12's own (64) and every failure clears the blob first.
+import re as _re
+_m = _re.search(r"#define MAD_ROOT_PARAM_MAX (\d+)", pe)
+check("the root parameter limit is D3D12's own (64), not 32", _m and int(_m.group(1)) >= 64)
+_ser = pe[pe.index("static HRESULT mad_serialize_any("):]
+_ser = _ser[:_ser.index("\n}\n")]
+check("the serializer clears the blob pointer before any refusal",
+      "*blob = NULL;" in _ser and _ser.index("*blob = NULL;") < _ser.index("exceeds the %u this build handles"))
+_lm = _re.search(r"#define MAD_LOC_MAX (\d+)", pe)
+check("the reflection table holds every root parameter plus the static-sampler table", _lm and int(_lm.group(1)) > int(_m.group(1)))
+check("no 32-entry root offset array is left", "UINT offsets[32]" not in pe)
+
 print("PASS" if ok else "FAILED")
 sys.exit(0 if ok else 1)

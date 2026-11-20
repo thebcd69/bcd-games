@@ -80,6 +80,15 @@ struct AutoTuneEngineChecks {
                "its failure still there plus another is not")
         expect(!AutoTuneEngine.better(report("crashed", stage: 3, matched: [spill]), than: report("crashed", stage: 3, matched: [cage])),
                "a different failure alone, with nothing tried, is not")
+        // Round 669 (LAD-1; Yakuza: Like a Dragon J7657R): the AVX line got past the game's own check and the game stopped at a later wall
+        // that scores stage 2 against the box's 3: kept. Any other rule's line is still judged by the stage.
+        let avxCheck = "cpu-check-avx", protectedJump = "protected-program-jump-into-instruction"
+        expect(AutoTuneEngine.better(report("crashed", stage: 2, matched: [protectedJump]), than: report("exited-early", stage: 3, matched: [avxCheck]),
+                                     tried: avxCheck), "the game's own AVX check gone and its modules loaded is progress, at a lower stage")
+        expect(!AutoTuneEngine.better(report("crashed", stage: 1, matched: []), than: report("exited-early", stage: 3, matched: [avxCheck]),
+                                      tried: avxCheck), "...but not before the modules loaded")
+        expect(!AutoTuneEngine.better(report("crashed", stage: 2, matched: [spill]), than: report("crashed", stage: 3, matched: [cage]), tried: cage),
+               "another rule's line at a lower stage is still worse")
 
         // 6. Inconclusive sessions change nothing and do not count.
         var q = AutoTuneState()
@@ -164,12 +173,15 @@ struct AutoTuneEngineChecks {
         let tailSigs = [AutoTuneSignal(has: ["[present] ml1175"]), AutoTuneSignal(has: ["[present] ml1175"], sinceLaunch: true),
                         AutoTuneSignal(has: ["Device error at frame"])]
         let two = AutoTuneLogScanner(signals: tailSigs)
-        two.feed(Data(("[10:00:00.000] [INFO] [prev-tail] [09:59:00.000] [ERR] Device error at frame 12\n"
-                       + "[10:00:00.001] [INFO] [prev-tail] [09:59:01.000] [INFO] [bcd] library launch Old: avx=0\n"
-                       + "[10:00:01.000] [INFO] [bcd] library launch First Game: avx=0\n"
-                       + "warn:  [present] ml1175 commitBeforePresent=1\n"
-                       + "[10:05:00.000] [INFO] [bcd] library launch Second Game: avx=0\n"
-                       + "[10:05:30.000] [INFO] [session] length=22s play=0s frames=0 api=OpenGL/32 game=Second Game\n").utf8))
+        // An array, not a chain of `+`: Xcode 27's type checker gives up on the six-part chain ("unable to type-check
+        // this expression in reasonable time", build 672 on the M5 Max).
+        let twoLog: [String] = ["[10:00:00.000] [INFO] [prev-tail] [09:59:00.000] [ERR] Device error at frame 12\n",
+                                "[10:00:00.001] [INFO] [prev-tail] [09:59:01.000] [INFO] [bcd] library launch Old: avx=0\n",
+                                "[10:00:01.000] [INFO] [bcd] library launch First Game: avx=0\n",
+                                "warn:  [present] ml1175 commitBeforePresent=1\n",
+                                "[10:05:00.000] [INFO] [bcd] library launch Second Game: avx=0\n",
+                                "[10:05:30.000] [INFO] [session] length=22s play=0s frames=0 api=OpenGL/32 game=Second Game\n"]
+        two.feed(Data(twoLog.joined().utf8))
         two.finish()
         expect(two.counts == [1, 0, 0], "a [prev-tail] line counts nowhere; a sinceLaunch count restarts at a launch: \(two.counts)")
         let oneRun = AutoTuneLogScanner(signals: tailSigs)
@@ -776,6 +788,23 @@ struct AutoTuneEngineChecks {
                                        userKeys: [], fingerprint: "l7", log: nil, listValues: ["env.MADEIRA_X64_IMAGE_NOCOPY": "1"])
             expect(l.status == "stuck", "any other rule still treats the list's keys as the user's")
 
+            // Round 677 (agent G3 S1): a BC texture kill on a GPU without BC: the blanket clamp first, then MIP_CLAMP_AUTO = 2 (single-level
+            // textures at half size; from build 681 the app links d3d11-src.dll for it on such a GPU, so it is one line); a list row's "= 1"
+            // becomes "= 2" after a kill, a row that has "= 2" gets nothing new.
+            let bcKill = report("killed", stage: 3, seconds: 31, matched: ["bc-decode-memory-kill", "bc-half-memory-kill"])
+            var bc = AutoTuneEngine.advance(AutoTuneState(retried: true), report: bcKill, rules: rules, userKeys: [], fingerprint: "b1", log: nil)
+            expect(bc.candidateRule == "bc-decode-memory-kill" && bc.candidate == ["dxmt = d3d11.mipClampBC=1"], "the clamp is the first step (\(bc.candidateRule ?? "nil"))")
+            bc = AutoTuneEngine.advance(bc, report: bcKill, rules: rules, userKeys: [], fingerprint: "b1", log: nil)
+            expect(bc.candidateRule == "bc-half-memory-kill" && bc.candidate == ["env.MADEIRA_MIP_CLAMP_AUTO = 2"],
+                   "killed again with the clamp: value 2 is the next step (\(bc.candidateRule ?? "nil"))")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: report("killed", stage: 3, seconds: 31, matched: ["bc-half-memory-kill"]),
+                                       rules: rules, userKeys: [], fingerprint: "b2", log: nil, listValues: ["env.MADEIRA_MIP_CLAMP_AUTO": "1"])
+            expect(l.candidate == ["env.MADEIRA_MIP_CLAMP_AUTO = 2"], "a list row's MIP_CLAMP_AUTO = 1 is raised to 2 after a kill")
+            l = AutoTuneEngine.advance(AutoTuneState(retried: true), report: report("killed", stage: 3, seconds: 31, matched: ["bc-half-memory-kill"]),
+                                       rules: rules, userKeys: [], fingerprint: "b3", log: nil,
+                                       listValues: ["env.MADEIRA_MIP_CLAMP_AUTO": "2"])
+            expect(l.status == "stuck" && l.candidate == nil, "a row that already has value 2: nothing new to try")
+
             // Round 625 (owner's item 21, agent E1 S13-c; Hogwarts Legacy GBQRKH): the two window rules may raise the list's exe-window-mb after their
             // own failure (a crash or an early exit, not only a memory kill), only to a larger number, never a user's key.
             let win = report("crashed", stage: 2, matched: ["exe-window-fixed-base"])
@@ -1337,6 +1366,67 @@ struct AutoTuneEngineChecks {
             let q3 = AutoTuneEngine.advance(kst, report: report("crashed", stage: 3, matched: [second.id]), rules: rules + [second],
                                             userKeys: ["\(o)"], fingerprint: "q", log: nil)
             expect(q3.status == "stuck" && q3.skippedNote == "test-optin-second (a key you set)", "the user's own opt-in line is never added to")
+        }
+
+        // 17. Round 670 (owner 2026-11-18, engine review I1): a session that PLAYED but slowly gets a suggestion, never a line by itself.
+        do {
+            let storm = "x64-store-storm-played", line = "env.MADEIRA_X64_RWX_PLAIN = 1"
+            let played = report("ran", stage: 5, seconds: 300, matched: [storm])
+            if let rule = rules.first(where: { $0.id == storm }) {
+                let sigs = AutoTuneEngine.signals([rule]), ones = Array(repeating: 1, count: AutoTuneEngine.signals([rule]).count)
+                expect(AutoTuneEngine.matches(rule, report: report("ran", stage: 5), counts: ones, signals: sigs)
+                       && AutoTuneEngine.matches(rule, report: report("quit", stage: 4), counts: ones, signals: sigs),
+                       "a whenPlayed rule matches a session that played (ran, quit)")
+                expect(!["crashed", "killed", "hung", "exited-early", "inconclusive"].contains { o in
+                           AutoTuneEngine.matches(rule, report: report(o, stage: 3), counts: ones, signals: sigs) },
+                       "and never a failed or inconclusive one: the failure rules stay as they were")
+            } else { expect(false, "the built-in table has \(storm)") }
+            var p = AutoTuneEngine.advance(AutoTuneState(), report: played, rules: rules, userKeys: [], fingerprint: "p", log: nil)
+            expect(p.status == "ok" && p.candidate == nil && p.layerLines.isEmpty && p.suggestion == [line] && p.suggestionRule == storm
+                   && p.asksSuggestion && p.tried.isEmpty,
+                   "it played: status ok, nothing reaches the next start, the line is only suggested (\(p.status) \(p.suggestion ?? []))")
+            // Not now: asked no more, suggested again by the next session that shows it.
+            p.suggestionDeclined = storm
+            p = AutoTuneEngine.advance(p, report: played, rules: rules, userKeys: [], fingerprint: "p", log: nil)
+            expect(p.suggestion == [line] && !p.asksSuggestion && p.layerLines.isEmpty, "after Not now the page keeps it and the result does not ask")
+            // A key the player set, or the recommended list's, keeps it out.
+            let own = AutoTuneEngine.advance(AutoTuneState(), report: played, rules: rules, userKeys: ["env.MADEIRA_X64_RWX_PLAIN"],
+                                             fingerprint: "p", log: nil)
+            let listed = AutoTuneEngine.advance(AutoTuneState(), report: played, rules: rules, userKeys: [], fingerprint: "p", log: nil,
+                                                listValues: ["env.MADEIRA_X64_RWX_PLAIN": "0"])
+            expect(own.suggestion == nil && listed.suggestion == nil && own.status == "ok", "a key the player or the list set is never suggested")
+            // A session that failed takes the suggestion away, and the failure search is as it always was (the unchanged retry first).
+            let failed = AutoTuneEngine.advance(p, report: report("crashed", stage: 3, matched: [cage]), rules: rules, userKeys: [],
+                                                fingerprint: "p", log: nil)
+            expect(failed.suggestion == nil && failed.candidateRule == "retry", "a failure takes the suggestion away and gets its unchanged retry")
+            // Try it next start: the next start's candidate.
+            var t = AutoTuneEngine.advance(AutoTuneState(), report: played, rules: rules, userKeys: [], fingerprint: "p", log: nil)
+            t = AutoTuneEngine.approveSuggestion(t)
+            expect(t.status == "trying" && t.candidate == [line] && t.candidateRule == storm && t.candidatePlayed == true && t.tried == [storm]
+                   && t.layerLines == [line] && t.suggestion == nil, "the yes makes it the next start's line (\(t.status) \(t.layerLines))")
+            // It played again and the storm is gone: kept.
+            let kept = AutoTuneEngine.advance(t, report: report("ran", stage: 5, seconds: 120), rules: rules, userKeys: [], fingerprint: "p", log: nil)
+            expect(kept.status == "found" && kept.kept == [line] && kept.attempts.last?.kept == true && kept.candidatePlayed == nil
+                   && kept.suggestion == nil, "played without the rule's signals: kept (\(kept.status) \(kept.kept))")
+            // It played but the storm is still there: taken back, nothing kept, not suggested again.
+            let still = AutoTuneEngine.advance(t, report: played, rules: rules, userKeys: [], fingerprint: "p", log: nil)
+            expect(still.status == "ok" && still.kept.isEmpty && still.attempts.last?.kept == false && still.suggestionReverted == [line]
+                   && still.suggestion == nil && still.layerLines.isEmpty, "played with the signals still there: taken back (\(still.status))")
+            // It crashed with the line: taken back, the game is where it was, no failure search starts from the line's own failure.
+            let broke = AutoTuneEngine.advance(t, report: report("crashed", stage: 3, matched: [cage]), rules: rules, userKeys: [],
+                                               fingerprint: "p", log: nil)
+            expect(broke.status == "ok" && broke.kept.isEmpty && broke.candidate == nil && broke.suggestionReverted == [line] && broke.layerLines.isEmpty,
+                   "a failure with the suggested line takes it back and leaves the game as it was (\(broke.status) \(broke.candidateRule ?? "-"))")
+            // The next real failure still gets its unchanged retry (the suggested line is no try of a failure's fixes).
+            let after = AutoTuneEngine.advance(still, report: report("crashed", stage: 3, matched: [cage]), rules: rules, userKeys: [],
+                                               fingerprint: "p", log: nil)
+            expect(after.candidateRule == "retry", "a later failure still gets the unchanged retry (\(after.candidateRule ?? "-"))")
+            // A change of the game's own settings starts a new baseline and drops the suggestion.
+            let fresh = AutoTuneEngine.advance(p, report: report("inconclusive", stage: 1), rules: rules, userKeys: [], fingerprint: "q", log: nil)
+            expect(fresh.status == "baseline" && fresh.suggestion == nil, "the player's own change starts over without the suggestion")
+            if let d = try? JSONEncoder().encode(t), let back = try? JSONDecoder().decode(AutoTuneState.self, from: d) {
+                expect(back == t && back.candidatePlayed == true, "a suggested trial's state round-trips through JSON")
+            } else { expect(false, "the suggested trial's state encodes") }
         }
 
         // 15. State survives JSON (the app saves it between sessions).

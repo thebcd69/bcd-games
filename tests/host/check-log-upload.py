@@ -236,5 +236,26 @@ else:
             check("a line that needs no scrub passes byte for byte, and the prefilter misses nothing a rule changes",
                   all(fx.scrub(l) == l for l in corpus if "Handled self" in l or l.startswith("[xp]") or l.startswith("self-")))
 
+# Round 677 (agent R1 S5): the upload's build is the log's own "[build] v0.1.N (N)" line (ES44C0, J5BBE4, RC31BA, G43MB9: build-633 runs sent
+# from 665 were filed as 665); a line at the top says so when the sender's differs; a log without the line keeps the sender's build.
+up = (R / "app/Madeira/LogUpload.swift").read_text()
+check("the log's own build goes into the header, with a note line when it differs from the sender's",
+      "let build = LogUploadCore.ownBuild(of: log) ?? sender" in up and '"[bcd-logs] sent from build \\(sender); this log is of build \\(build)"' in up
+      and "head: (thin.map { [$0.note] } ?? []) + buildNote" in up)
+if swiftc:
+    with tempfile.TemporaryDirectory() as tmp2:
+        t2 = Path(tmp2)
+        (t2 / "main.swift").write_text("import Foundation\nprint(LogUploadCore.ownBuild(of: URL(fileURLWithPath: CommandLine.arguments[1])) ?? \"nil\")\n")
+        exe2 = t2 / "own"
+        b2 = subprocess.run([swiftc, "-O", "-o", str(exe2), str(R / "app/Madeira/LogUploadCore.swift"), str(t2 / "main.swift")], capture_output=True, text=True)
+        check("ownBuild builds on the host", b2.returncode == 0, b2.stderr[-1500:])
+        if b2.returncode == 0:
+            cases = [("old", "[21:39:25] [INFO] [recs] in use\n[21:39:26.296] [INFO] [build] v0.1.633 (633)\nmore\n", "633"),
+                     ("none", "no build line here\n", "nil"), ("late", "x" * (300 * 1024) + "\n[build] v0.1.665 (665)\n", "nil")]
+            for name, text, want in cases:
+                f = t2 / (name + ".txt"); f.write_text(text)
+                got = subprocess.run([str(exe2), str(f)], capture_output=True, text=True).stdout.strip()
+                check(f"ownBuild of a log ({name}) is {want}", got == want, got)
+
 print("PASS: log upload" if ok else "FAILED: log upload")
 sys.exit(0 if ok else 1)

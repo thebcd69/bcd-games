@@ -167,6 +167,32 @@ check("the preview build leaves the engine side out and keeps the gate and the S
       'ENGINE_BOUND |= {"BCDFoldableLive.swift"}' in prev and "BCDFoldable.swift" not in re.search(r"ENGINE_BOUND = \{[^}]*\}", prev).group(0))
 strings = re.sub(r"//[^\n]*", "", pure + live + row + ui)
 check("no Madeira in what a person reads", "Madeira" not in strings)
+# ---------------------------------------------------------------- 6. the top bar on a narrow landscape screen (2026-11-20)
+# The Duo's outer display is 678 pt wide in landscape: the bar ran off the right edge (the settings button cut), seen in the
+# iPhone Duo simulator. The bar is measured, not guessed: only a bar wider than the screen under it switches the update chip
+# to "Update" and leaves the controller's name out; a bar that fits is the bar it always was (the inner display, pixel for
+# pixel in the simulator, 2026-11-20).
+fe = (APP / "BCDFrontEnd.swift").read_text()
+check("the top bar measures itself and the screen under it",
+      ".onGeometryChange(for: CGFloat.self) { $0.size.width } action: { topBarWidth = $0; fitTopBar() }" in fe
+      and ".onGeometryChange(for: CGFloat.self) { $0.size.width } action: { shellWidth = $0; fitTopBar() }" in fe)
+check("only a bar wider than the screen goes tight, and it comes back once the screen is as wide as it needed",
+      "if topBarWidth > shellWidth + 0.5 { topBarNeeds = topBarWidth }" in fe and "} else if shellWidth >= topBarNeeds {\n            topBarNeeds = 0" in fe
+      and "private var topBarTight: Bool { topBarNeeds > 0 && shellWidth < topBarNeeds }" in fe)
+check("what the bar holds re-measures it (a controller, JIT, the Downloads badge)",
+      all(f".onChange(of: {k}) {{ _, _ in topBarNeeds = 0 }}" in fe for k in ("focus.controllerActive", "store.system.jit", "store.downloads.isEmpty")))
+check("tight: the short update chip, no memory chip, no controller name; the upright phone's title bar is never tight",
+      "statusChips(tight: topBarTight)" in fe and "statusChips(tight: false)" in fe
+      and "BCDUpdateChip(compact: (layout == .phonePortrait && system.jit != .on) || tight)" in fe
+      and "if layout != .phonePortrait, !tight, let name = system.controllerName {" in fe
+      and "if layout == .pad, !tight, let limit = system.memoryLimitBytes {" in fe)
+check("the Duo interface's update chip sits outside the system's shared glass on iOS 26 (it could hardly be read there)",
+      "ToolbarItem(placement: .primaryAction) {\n                        BCDUpdateChip { settingsSection = .updates; settingsRequest += 1; select(.settings) }\n                    }\n                    .sharedBackgroundVisibility(.hidden)" in fe
+      and "if #available(iOS 26.0, *) {" in fe)
+check("upright, the tab bar's ground and line reach both sides; an iPhone without side insets is unchanged",
+      ".ignoresSafeArea(edges: [.bottom, .leading, .trailing])" in fe
+      and ".overlay(alignment: .top) { Rectangle().fill(BCDStyle.stroke).frame(height: 1) }\n                .ignoresSafeArea" in fe)
+
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("the workflow runs this check", "tests/host/check-bcd-foldable.py" in wf)
 sys.exit(0 if ok else 1)

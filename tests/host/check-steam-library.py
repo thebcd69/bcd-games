@@ -6,6 +6,8 @@
 # under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 # Portions copyright 2026 intraducine and David Brookes: code taken from https://github.com/willfaust/Madeira (pull request #464)
 # under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+# Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+# under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """Host checks for the owned Steam library and downloads (docs/STEAM_LIBRARY.md).
 
 Never contacts Steam. It needs swiftc (Linux), cc, python3 with `cryptography`
@@ -646,9 +648,12 @@ import FoundationNetworking
 #endif
 
 nonisolated(unsafe) var loggedEvents: [String] = []
+let loggedEventsLock = NSLock()
 enum SteamLog {
     static func trace(_ m: @autoclosure () -> String) {}
-    static func event(_ m: String) { loggedEvents.append(m) }
+    // The app's SteamLog.event goes to LogStore, which locks; the depot install logs from several tasks at once (M5 Max,
+    // build 674: an unlocked append here was a heap-use-after-free under AddressSanitizer in the "lan-partial" phase).
+    static func event(_ m: String) { loggedEventsLock.lock(); loggedEvents.append(m); loggedEventsLock.unlock() }
 }
 enum MemoryRights { static let lacking = false }   // round 624 (agent N S13): MadeiraDock's result-46 words read it; the install has the limit here
 enum SteamSignIn {
@@ -671,6 +676,8 @@ enum SteamRuntimeFiles {
     static let relativeRoot = "RELATIVE_ROOT"
     static let windowsRoot = "C:\\Program Files (x86)\\Steam"
 }
+// round 669 (Porthole 1.3.1): reason() names a Steam Cloud file that did not check out
+enum SteamCloudTransfer { struct FetchError: Error { let kind: String; let detail: String } }
 enum SteamOwnedLibrary {
     REASON
 }
@@ -983,7 +990,7 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
       "105" { "config" { "oslist" "windows" "osarch" "64" } "manifests" { "public" { "gid" "1005" "download" "80" } } }
       "106" { "config" { "oslist" "windows" "lowviolence" "1" } "manifests" { "public" { "gid" "1006" } } }
       "107" { "dlcappid" "999" "manifests" { "public" { "gid" "1007" } } }
-      "108" { "sharedinstall" "1" "manifests" { "public" { "gid" "1008" } } }
+      "108" { "sharedinstall" "1" "depotfromapp" "228980" "manifests" { "public" { "gid" "1008" } } }
       "109" { "config" { "oslist" "windows" } }
       "110" { "config" { "oslist" "macos" } "manifests" { "public" { "gid" "1010" } } }
       "branches" { "public" { "buildid" "4242" } }
@@ -1047,6 +1054,57 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     var sharing = SteamAppInfo.parse(appID: 7200, from: appVDF(#""common" { "name" "User" "type" "Game" "oslist" "windows" } "depots" { "7109" { "depotfromapp" "7100" } "7201" { "manifests" { "public" "71" } } }"#))!
     require(sharing.depots.first { $0.depotID == 7109 }?.fromApp == 7100 && sharing.installDepots().map(\.depotID) == [7201], "a depot from another app has no manifest of its own")
     require(sharing.inheritDepots(from: owners) == 1 && sharing.installDepots().map(\.depotID) == [7109, 7201], "it inherits the owner's manifest")
+
+    // Trackmania's public PICS (2026-11-14): the launcher installer is a
+    // required shared install, owned by Ubisoft Connect Services, not 228980.
+    let launcherSession = ScriptedSession()
+    launcherSession.appInfo = [
+        2225070: #"""
+        "appinfo" {
+          "common" { "name" "Trackmania" "type" "Game" "oslist" "windows" }
+          "config" { "installdir" "Trackmania" }
+          "depots" {
+            "2225071" { "config" { "oslist" "windows" "osarch" "64" }
+              "manifests" { "public" { "gid" "9066463832979889462" "size" "6897633717" "download" "5809247376" } } }
+            "4099821" { "depotfromapp" "4099820" "sharedinstall" "1" }
+            "228981" { "depotfromapp" "228980" "sharedinstall" "1" }
+          }
+        }
+        """#,
+        4099820: #"""
+        "appinfo" {
+          "common" { "name" "Ubisoft Connect Services" "type" "Tool" }
+          "config" { "installdir" "Ubisoft Connect Services" }
+          "depots" { "4099821" { "manifests" { "public" {
+            "gid" "2926377012241035160" "size" "262728043" "download" "262616384"
+          } } } }
+        }
+        """#
+    ]
+    let launcherFetcher = SteamLibraryFetcher(session: launcherSession)
+    let trackmania = try await launcherFetcher.fetchInstallInfo(appID: 2225070)!
+    require(trackmania.installDepots().map(\.depotID) == [2225071, 4099821], "required shared launcher content is selected; supplied Steamworks runtimes stay out")
+    require(trackmania.depots.first { $0.depotID == 4099821 }?.publicManifestID == 2926377012241035160,
+            "the launcher's sharedinstall flag does not prevent owner manifest resolution")
+    require(trackmania.sharedOwners[4099820]?.installDir == "Ubisoft Connect Services",
+            "the launcher owner is retained for its install record")
+    require(trackmania.downloadSize(for: "windows") == 6071863760 && trackmania.installSize(for: "windows") == 7160361760,
+            "download and installed sizes include the required launcher")
+    require(launcherSession.picsAppRequests.flatMap { $0 }.sorted() == [2225070, 4099820],
+            "resolve the launcher owner, without fetching Steamworks Common Redistributables")
+    // build 666 (BCD narrowed pull request #55): only Ubisoft Connect Services' shared depots join an install; every other
+    // shared install stays out, as before build 666, whichever app it comes from (or none).
+    var unownedShared = info
+    let sharedIndex = unownedShared.depots.firstIndex { $0.depotID == 108 }!
+    unownedShared.depots[sharedIndex].fromApp = nil
+    require(!unownedShared.installDepots().contains { $0.depotID == 108 },
+            "a shared install without an owner stays out, as before build 666")
+    unownedShared.depots[sharedIndex].fromApp = 1716750
+    require(!unownedShared.installDepots().contains { $0.depotID == 108 },
+            "a shared install of another app stays out, as before build 666")
+    unownedShared.depots[sharedIndex].fromApp = 4099820
+    require(unownedShared.installDepots().contains { $0.depotID == 108 } && SteamAppInfo.requiredSharedLaunchers == [4099820],
+            "only Ubisoft Connect Services' shared depots join an install")
 
     // ---- beta branches (SteamBranch): the list, a public beta, a password-protected one, the record
     var beta = SteamAppInfo.parse(appID: 9200, from: appVDF(#"""
@@ -1341,6 +1399,13 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
         require(SteamInstallPaths.isManaged(library: game.library), "it is in the library Madeira manages")
         do { try MadeiraDock.validate(game, drive: drive, bundled: true) ; require(false, "validate needs the client files") }
         catch { require(error.localizedDescription.contains("client"), "Dock's launch check passes the record and stops at the missing client files only") }
+        // Round 677 (agent A1 S5; FXERE1, ABXMM0): a Steam component listed with the games is refused with words before the client is even asked.
+        for (componentID, componentName) in [(228980, "Steamworks Common Redistributables"), (3340990, "EA app Installer")] {
+            let component = DockGame(id: componentID, name: componentName, installDir: game.installDir, library: game.library, installed: true,
+                                      customExecutables: false)
+            do { try MadeiraDock.validate(component, drive: drive, bundled: true); require(false, "a Steam component is not started") }
+            catch { require(error.localizedDescription.contains("is a Steam component, not a game"), "\(componentID): refused as a Steam component, not a game") }
+        }
         require(SteamInstallFiles.buildID(appID: 9000, steamApps: steamApps) == (phase == "beta" ? 1002 : build), "the record's build id")
         // The owner of the shared depot has its own record on disk (checked from Python below); Madeira Dock's list hides an app that only lends depots (cb293856, MadeiraDock.games).
         require(found.first(where: { $0.id == 9100 }) == nil, "the owning app only lends its depot: Madeira Dock's list hides it, its record stays on disk")

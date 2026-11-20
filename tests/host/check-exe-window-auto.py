@@ -7,11 +7,13 @@
 A game whose main program has its relocations stripped can only run at 0x140000000, in the executable window. The window is
 128 MB; a larger program (The Adventures of Elliot's Elliot-Win64-Shipping.exe, 473 MB; MapleStory.exe, 183 MB) overlapped the
 JIT pool and failed to load with c0000018. BCD already widens the window from `exe-window-mb` in the game's own file (and
-auto-tune adds that line after the failure). Two more things were ported, both OFF unless the game's file (or bcd.cfg) sets
-them, because the games that run today have never been through them:
-  - exe-window-auto = 1: a BCD Dock launch reads the PE headers of the programs in the game's folder
-    (StikJITHelper.fixedBaseWindowMB) and widens the window to the largest fixed-address one, in 16 MB steps; an
-    exe-window-mb of the game's own wins;
+auto-tune adds that line after the failure). Two more things were ported:
+  - exe-window-auto: every launch (a BCD Dock launch, and from build 680 a library launch) reads the PE headers of the programs
+    in the game's folder (StikJITHelper.fixedBaseWindowMB) and widens the window to the largest fixed-address one, in 16 MB
+    steps; an exe-window-mb of the game's own wins. On by default from build 680 (the owner, 2026-11-19, round 677 S1-S2: every
+    such program failed its first start until a row or auto-tune's second start gave it a window); 0 in the game's file or
+    bcd.cfg turns it off. It only acts when a fixed-base program larger than the window is in the folder, which cannot load
+    today;
   - pool-above-window = 1: a `pool` line in the game's own file counts, and with pool-split the two runs above the window are
     paired also when the single pool would land above it (in the higher of two runs), with runs of 128 MB or more.
 
@@ -88,9 +90,16 @@ else:
         "hidden": ({".hidden/a.exe": pe(size=300 << 20)}, "none"),
         "empty": ({}, "none"),
     }
+    w0 = stik.index("    static func exeWindowAutoWanted(_ value: String?) -> Bool {")
+    wanted_fn = stik[w0:stik.index("\n    }\n", w0) + 7]
     harness = '''import Foundation
 enum StikJITHelper {
-''' + fn + '''
+''' + fn + wanted_fn + '''
+}
+if CommandLine.arguments[1] == "--wanted" {
+    let values: [String?] = [nil, "", " ", "1", "on", "yes", "true", "0", "off", "OFF", "no", "false", " 0 "]
+    print(values.map { StikJITHelper.exeWindowAutoWanted($0) ? "1" : "0" }.joined())
+    exit(0)
 }
 let folder = URL(fileURLWithPath: CommandLine.arguments[1])
 if let r = StikJITHelper.fixedBaseWindowMB(in: folder) { print("\\(r.mb):\\(r.exe)") } else { print("none") }
@@ -112,12 +121,20 @@ if let r = StikJITHelper.fixedBaseWindowMB(in: folder) { print("\\(r.mb):\\(r.ex
                 check("%s: %s" % (name, want), r.stdout.strip() == want, r.stdout + r.stderr)
             r = subprocess.run([str(t / "m"), str(t / "no-such-folder")], capture_output=True, text=True)
             check("a folder that does not exist gives nothing", r.stdout.strip() == "none", r.stdout + r.stderr)
+            r = subprocess.run([str(t / "m"), "--wanted"], capture_output=True, text=True)
+            check("exe-window-auto is on unless the value says off: unset, empty, 1/on/yes/true on; 0/off/no/false (any case, spaces) off",
+                  r.stdout.strip() == "1111111000000", r.stdout + r.stderr)
 
 # ---- 2. the source
-check("only 4 KB of each program is read, and no more than 256 programs", "fh.read(upToCount: 4096)" in fn and "if seen > 256 { break }" in fn)
-check("ContentView measures only when exe-window-auto is on, and clears the value first",
-      "StikJITHelper.exeWindowAutoMB = 0\n            let autoWindow = " in cv and 'if ["1", "on", "true", "yes"].contains(autoWindow), let need = StikJITHelper.fixedBaseWindowMB(in: installFolder) {' in cv
-      and cv.count("StikJITHelper.fixedBaseWindowMB(") == 1)
+check("only 4 KB of each program is read, no more than 256 programs and 60,000 folder entries",
+      "fh.read(upToCount: 4096)" in fn and "if seen > 256 { break }" in fn and "if walked > 60_000 { break }" in fn)
+lib = (APP / "LibraryBCD.swift").read_text()
+check("ContentView (Dock) and BCDLaunch.applyLibrary (library) measure when exe-window-auto is wanted, and clear the value first",
+      "StikJITHelper.exeWindowAutoMB = 0\n            let autoWindow = " in cv
+      and "if StikJITHelper.exeWindowAutoWanted(autoWindow), let need = StikJITHelper.fixedBaseWindowMB(in: installFolder) {" in cv
+      and cv.count("StikJITHelper.fixedBaseWindowMB(") == 1
+      and "StikJITHelper.exeWindowAutoMB = 0\n        if StikJITHelper.exeWindowAutoWanted(profile.get(\"exe-window-auto\") ?? MadeiraConfig.get(\"exe-window-auto\"))," in lib
+      and "let need = StikJITHelper.fixedBaseWindowMB(in: folder) {" in lib and "LibraryEntry.hostDrive.standardizedFileURL.path" in lib)
 check("allocatePool takes the value once and clears it",
       "let exeWindowAuto = exeWindowAutoMB" in stik and "exeWindowAutoMB = 0\n" in stik[stik.index("let exeWindowAuto = exeWindowAutoMB"):][:200])
 widen = stik[stik.index("let explicitWindowMB = "):stik.index("let want = vm_address_t(mb) << 20")]
@@ -136,8 +153,9 @@ import json
 recs = json.loads((R / "recommended/recommendations.json").read_text())["rules"]
 rules_py = (R / "build/tools/autotune_rules.py").read_text()
 check("no recommended list and no auto-tune rule sets exe-window-auto", "exe-window-auto" not in json.dumps(recs) + rules_py)
-check("pool-above-window is set by The Adventures of Elliot's list (build 603) and by no other list and no auto-tune rule",
-      [r["id"] for r in recs if "pool-above-window" in json.dumps(r["config"])] == ["the-adventures-of-elliot"] and "pool-above-window" not in rules_py)
+check("pool-above-window is set by The Adventures of Elliot's list (build 603), Persona 5 Royal's (round 677, G2 S6: a 416 MB window cut its pool to 304 MB) "
+      "and by no other list and no auto-tune rule",
+      sorted(r["id"] for r in recs if "pool-above-window" in json.dumps(r["config"])) == ["persona-5-royal", "the-adventures-of-elliot"] and "pool-above-window" not in rules_py)
 
 print("PASS: exe window auto" if ok else "FAIL: exe window auto")
 sys.exit(0 if ok else 1)

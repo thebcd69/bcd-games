@@ -490,11 +490,23 @@ static _Atomic int original_commits;
 - (id)commandBufferWithUnretainedReferences { return [FakeCB new]; }
 - (id)commandBufferWithDescriptor:(MTLCommandBufferDescriptor *)d { (void)d; return [FakeCB new]; }
 @end
+/* round 668 (merge N113): a Metal 4 queue as KosmicKrisp commits through it, with both commit methods */
+static _Atomic int original_commits4;
+@interface FakeQueue4 : NSObject
+- (void)commit:(const id _Nonnull *)buffers count:(NSUInteger)count;
+- (void)commit:(const id _Nonnull *)buffers count:(NSUInteger)count options:(id)options;
+@end
+@implementation FakeQueue4
+- (void)commit:(const id _Nonnull *)buffers count:(NSUInteger)count { (void)buffers; atomic_fetch_add(&original_commits4, (int)count); }
+- (void)commit:(const id _Nonnull *)buffers count:(NSUInteger)count options:(id)options { (void)buffers; (void)options; atomic_fetch_add(&original_commits4, (int)count); }
+@end
 @interface FakeDevice : NSObject
 - (id)newCommandQueue;
+- (id)newMTL4CommandQueue;
 @end
 @implementation FakeDevice
 - (id)newCommandQueue { return [FakeQueue new]; }
+- (id)newMTL4CommandQueue { return [FakeQueue4 new]; }
 @end
 id<MTLDevice> bcd_fake_device(void) { return (id<MTLDevice>)[FakeDevice new]; }
 
@@ -519,6 +531,18 @@ static void *once(void *a) {
     return NULL;
 }
 static int finished(int ms) { for (int i = 0; i < ms / 10 && !atomic_load(&done); i++) usleep(10000); return atomic_load(&done); }
+extern int madeira_metal_gate_metal4_count(void);
+static FakeQueue4 *queue4;
+static void *once4(void *a) {
+    (void)a;
+    @autoreleasepool {
+        id bufs[2] = { [NSObject new], [NSObject new] };
+        [queue4 commit:bufs count:2];
+        [queue4 commit:bufs count:1 options:[NSObject new]];
+    }
+    atomic_store(&done, 1);
+    return NULL;
+}
 int main(void) {
     @autoreleasepool {
         int fails = 0;
@@ -538,6 +562,9 @@ int main(void) {
         if (n != 2) { puts("FAIL expected the inheriting subclass and the class with its own commit"); fails++; }
         if (atomic_load(&calls) != atomic_load(&original_commits)) { puts("FAIL a commit was dropped around the install"); fails++; }
         if (madeira_metal_gate_install() != n) { puts("FAIL a second install changed the count"); fails++; }
+        /* round 668: the Metal 4 queue's two commit methods are wrapped too, and the count of Metal 3 classes is unchanged */
+        queue4 = [FakeQueue4 new];
+        if (madeira_metal_gate_metal4_count() != 2) { puts("FAIL the Metal 4 queue's commit:count: and commit:count:options: were not wrapped"); fails++; }
         /* active: off the main thread a commit goes straight through */
         pthread_t th;
         atomic_store(&done, 0);
@@ -557,6 +584,24 @@ int main(void) {
         if (!finished(2000)) { puts("FAIL the waiting commit was not released when the app became active"); fails++; }
         pthread_join(th, NULL);
         if (atomic_load(&calls) != atomic_load(&original_commits)) { puts("FAIL a commit was lost"); fails++; }
+        /* round 668: a Metal 4 commit off the main thread goes through while active, waits while inactive, and is released */
+        atomic_store(&done, 0);
+        pthread_create(&th, NULL, once4, NULL);
+        if (!finished(2000) || atomic_load(&original_commits4) != 3) { puts("FAIL a Metal 4 commit waited while the app was active"); fails++; }
+        pthread_join(th, NULL);
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UIApplicationWillResignActiveNotification" object:nil];
+        atomic_store(&done, 0);
+        pthread_create(&th, NULL, once4, NULL);
+        usleep(400000);
+        if (atomic_load(&done) || atomic_load(&original_commits4) != 3) { puts("FAIL a Metal 4 commit off the main thread did not wait while inactive"); fails++; }
+        {
+            id bufs[1] = { [NSObject new] };
+            [queue4 commit:bufs count:1];
+            if (atomic_load(&original_commits4) != 4) { puts("FAIL the main thread's Metal 4 commit did not go through while inactive"); fails++; }
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UIApplicationDidBecomeActiveNotification" object:nil];
+        if (!finished(2000) || atomic_load(&original_commits4) != 7) { puts("FAIL the waiting Metal 4 commits were not released (or lost)"); fails++; }
+        pthread_join(th, NULL);
         /* by hand */
         madeira_metal_gate_hold(1);
         atomic_store(&done, 0);

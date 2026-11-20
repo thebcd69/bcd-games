@@ -84,8 +84,12 @@ def blk(start):
 
 HARNESS = r'''#import <Foundation/Foundation.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+/* The D3D11_SRC block asks the GPU (2026-11-20): BCD_TEST_GPU_BC=1 stands for a GPU that samples BC; the level reader is the file's own. */
+static bool bcd_gpu_samples_bc(void) { const char *v = getenv("BCD_TEST_GPU_BC"); return v && v[0] == '1'; }
+LEVEL2_FN
 int main(int argc, char **argv) {
   @autoreleasepool {
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -106,7 +110,11 @@ clang = shutil.which("xcrun")
 if not clang or sys.platform != "darwin":
     print("SKIP the block's run: no xcrun/Foundation on this host")
 else:
-    src = HARNESS.replace("FRESH_BLOCK", blk(a)).replace("DXGI_BLOCK", blk(b)).replace("D3D11_BLOCK", blk(c))
+    la = m.find("static bool bcd_mip_clamp_auto_level2(const char *v)")
+    level2 = m[la:m.index("\n}\n", la) + 2] if la > 0 else ""
+    check("WineProcessBridge.m has bcd_mip_clamp_auto_level2 for the D3D11_SRC block", bool(level2))
+    src = (HARNESS.replace("LEVEL2_FN", level2).replace("FRESH_BLOCK", blk(a)).replace("DXGI_BLOCK", blk(b))
+           .replace("D3D11_BLOCK", blk(c)))
     with tempfile.TemporaryDirectory() as t:
         t = pathlib.Path(t)
         (t / "h.m").write_text(src)
@@ -156,6 +164,27 @@ else:
             r, l = scenario("src", {"MADEIRA_D3D11_SRC": "1"}, True)
             check("MADEIRA_D3D11_SRC alone: only d3d11.dll, as before",
                   l == {**committed, ("system32", "d3d11.dll"): "d3d11-src.dll", ("sysx64", "d3d11.dll"): "d3d11-src.dll"}, str(l))
+            # 2026-11-20 (the owner's rule that nothing that works may break): MADEIRA_MIP_CLAMP_AUTO = 2 links d3d11-src.dll only on a GPU
+            # that cannot sample BC, and only when the game sets no MADEIRA_D3D11_SRC of its own (tests/host/check-dxmt-bc-half.py).
+            src_d3d11 = {**committed, ("system32", "d3d11.dll"): "d3d11-src.dll", ("sysx64", "d3d11.dll"): "d3d11-src.dll"}
+            r, l = scenario("bc-yes", {"MADEIRA_MIP_CLAMP_AUTO": "2", "BCD_TEST_GPU_BC": "1"}, True)
+            check("value 2 on a GPU that samples BC: the committed d3d11.dll stays",
+                  l == committed and "samples BC textures: the committed d3d11.dll is kept" in r.stderr, str(l) + r.stderr[-300:])
+            r, l = scenario("bc-no", {"MADEIRA_MIP_CLAMP_AUTO": "2", "BCD_TEST_GPU_BC": "0"}, True)
+            check("value 2 on a GPU without BC: d3d11.dll -> d3d11-src.dll in both farms",
+                  l == src_d3d11 and "MADEIRA_MIP_CLAMP_AUTO=2 on a GPU without BC sampling: d3d11.dll -> d3d11-src.dll" in r.stderr,
+                  str(l) + r.stderr[-300:])
+            r, l = scenario("bc-no-dock", {"MADEIRA_MIP_CLAMP_AUTO": " 2 ", "BCD_TEST_GPU_BC": "0"}, False)
+            check("value ' 2 ' on a GPU without BC in an aarch64 (Dock) session: sysx64 only",
+                  l == {**committed, ("sysx64", "d3d11.dll"): "d3d11-src.dll"}, str(l))
+            r, l = scenario("bc-no-own0", {"MADEIRA_MIP_CLAMP_AUTO": "2", "MADEIRA_D3D11_SRC": "0", "BCD_TEST_GPU_BC": "0"}, True)
+            check("the game's own MADEIRA_D3D11_SRC = 0 wins over value 2", l == committed and "that value decides" in r.stderr, str(l))
+            for v in ("1", "22", "2x", ""):
+                r, l = scenario("bc-no-v" + (v or "empty"), {"MADEIRA_MIP_CLAMP_AUTO": v, "BCD_TEST_GPU_BC": "0"}, True)
+                check(f"MADEIRA_MIP_CLAMP_AUTO {v!r} on a GPU without BC links nothing", l == committed, str(l))
+            r, l = scenario("bc-no-missing", {"MADEIRA_MIP_CLAMP_AUTO": "2", "BCD_TEST_GPU_BC": "0"}, True, have=srcs[1:])
+            check("value 2 on a GPU without BC in a build without d3d11-src.dll: the committed one stays and the log says so",
+                  l == committed and "MADEIRA_MIP_CLAMP_AUTO=2 but this build has no d3d11-src.dll" in r.stderr, r.stderr[-300:])
 
 cat = (R / "app/Madeira/ConfigCatalog.generated.swift").read_text()
 check("the catalog lists env.MADEIRA_DXMT_FRESH, off by default",

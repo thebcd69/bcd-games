@@ -1,0 +1,419 @@
+[23:53:52.453] [INFO] Checking entitlements...
+[23:53:52.453] [INFO] [build] v0.1.665 (665)
+[23:53:52.454] [INFO] [device] model=iPhone19,3 idiom=phone os=iOS Version 27.2.1 (Build 24B156) ram=11594MB available=8153MB cores=6
+[23:53:52.454] [INFO] [device] address-map=[0x1004fc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[23:53:52.454] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=364d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[23:53:52.468] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=-06:00 free-disk=209GB stikdebug-url=0
+[23:53:52.470] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[23:53:55.048] [INFO] [bcd-ui] play local
+[23:53:55.051] [INFO] Requesting JIT with Built-in StikJIT...
+[23:53:56.915] [INFO] [bcd] library launch Hellblade2.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[23:53:56.928] [INFO] Running full Wine sequence...
+[23:53:56.928] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1004fc000,0x8000000000) 512GB available=8164MB low-power=0 thermal=nominal
+[23:53:56.929] [INFO] [game-cfg] d3d12-device9=1 env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_FEX_AVX=1 env.MADEIRA_X64_IMAGE_NOCOPY=1
+[23:53:56.934] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[23:53:56.934] [INFO] Allocating 1152MB JIT pool via debugger...
+[23:53:56.934] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[23:53:56.934] [INFO] [jit-debugger] attached=1 at the pool request
+[23:53:56.934] [INFO] [jit-age] attach age=0s source=enable-jit method=builtin thermal=0
+[23:53:56.935] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[23:53:56.936] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[23:53:57.551] [INFO] RX pool at 0x148000000
+[23:53:57.567] [OK] JIT pool ready (debugger still attached).
+[23:53:57.568] [INFO] BRK suspension lasted 0.63s
+[23:53:57.569] [INFO] Detaching debugger...
+[23:53:57.573] [OK] Debugger detached.
+[23:53:57.575] [OK] [early-detach] rev=ml524 took 6 ms
+[23:53:57.950] [INFO] [session] length=1s partial=1 play=0s frames=0 stalls=0/0s peak=667MB limit=6143MB thermal=nominal lpm=0 res=1168x536 cap=30 game=Hellblade II: Senua’s Saga
+[23:53:58.016] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.133s rev=ml526
+[23:53:58.067] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=23 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 12 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   d3d12-device9 = 1
+[hwinput] keyboard focus: program (app active)
+[WineProc] Target exe: C:\Games\Senua's Saga Hellblade II\Hellblade2.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1150 pool: 12 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 7082 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x71a7000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[Wine init_process] waiting for request_fd from wineserver...
+[23:53:58.562] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[23:53:58.562] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[23:53:58.562] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7520 MB + phys_footprint=671 MB = 8192 MB (hw.memsize says 11594 MB)
+ml985: preferred base 0x140000000+0x3d000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x40000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Hellblade2.exe" 0x117f00000+0x3d000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x117f00000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x117f00000+0x10000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x117f10000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x117f10000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x117f1c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148004000 used=0x13c000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x71a7000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14813f000 used=0x56b000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14813f000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x148568000 used=0x69c000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x148568000)
+[window] 0x7048000000..0x7400000000 regions=109 occupied=13861 MB of 15232 MB free=1386 MB maxhole=1386 MB@0x71a7cf4000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14869c000 used=0x764000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14869c000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x148764000 used=0xa64000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148764000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Hellblade2.exe (hellblade2.exe-b089752db4957457): 117F00000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe140000+0x220000 (user32.dll) → pool 0x148a68000 used=0xc90000/0x27000000 tramp+0x8000
+[copy-verify] user32.dll: OK, 36 .text pages executable (copy @0x148a68000)
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE140000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE050000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF20000
+[window] 0x122000000..0x7997000000 regions=80103 occupied=468383 MB of 493392 MB free=47904 MB maxhole=22896 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=717 MB (peak 717) internal=716 MB compressed=0 MB external=84 MB reusable=3 MB (cycle=1)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[x64-image] L"\\??\\C:\\windows\\system32\\msvcp140_2.dll" 0x71fce00000+0x44000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x14a0f0000)
+[x64-image] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll" 0x71fcc40000+0xc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71fcbf0000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] xinput1_3.dll: OK, 2 .text pages executable (copy @0x14a174000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x14a208000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14a29c000)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Hellblade2-Win64-Shipping.exe" cmdline=L"\"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Hellblade2-Win64-Shipping.exe\" Hellblade2 "
+[phase] spawn:L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Hellblade2-Win64-Shipping.exe" t+  1.787s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Hellblade2-Win64-Shipping.exe\" Hellblade2 " (fd=84, unixdir=95, dup_unixdir=102) cwd=L"C:\\Games\\Senua's Saga Hellblade II\\"
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0xb3eb000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0xb3eb000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xb3ec000 rev=ajan5-motor
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Hellblade2-Win64-Shipping.exe" 0x122000000+0xb3eb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 2C FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x109094000
+[nls-getptr] type=11 id=437 peb=0x109094000
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Noesis.dll" 0x71fb3d0000+0x4cc000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] ws2_32.dll: OK, 5 .text pages executable (copy @0x14b5ec000)
+D 2C Load module SDL2.dll (sdl2.dll-7bd883bb0a36373d): 71FB040000
+002c:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f8c80000) -> 64-bit table (0x103f08708)
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[xp-names] m103312 "wine-x18-exc"
+[xp] 23:53:59.142 +0.54 dt=279 cpu=285 (thr 283) P=284 E=1 run=282 pgw=-1.0 GHz P=4.86 E=1.45 Minst=5719 IPC=4.14 mJ=1650 pin=1 rdKB=0 fpMB=1173
+[jit-pool] tail FREE rx=0x16cff8000 size=0x1000000 -> free-list rev=ml438
+[swap] ml1077 backed 0x71abf90000+0xb8c000 (file off 8796093022208 MB): 11 MB in 1 extents, peak 11 MB, 0 refused
+[swap] ml1077 backed 0x71accd0000+0x9f8000 (file off 8796093022219 MB): 21 MB in 2 extents, peak 21 MB, 0 refused
+[swap] ml1077 backed 0x71b2dd0000+0x369c000 (file off 8796093022229 MB): 76 MB in 3 extents, peak 76 MB, 0 refused
+[swap] ml1077 backed 0x71b7260000+0x2d44000 (file off 8796093022284 MB): 121 MB in 4 extents, peak 121 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[xp] 23:53:59.434 +0.84 dt=292 cpu=480 (thr 301) P=406 E=74 run=523 pgw=-1.0 GHz P=4.79 E=2.54 Minst=8659 IPC=4.06 mJ=2241 pin=0 rdKB=0 fpMB=1333
+[xp] 23:53:59.748 +1.15 dt=314 cpu=321 (thr 315) P=320 E=1 run=326 pgw=-1.0 GHz P=4.84 E=1.52 Minst=9802 IPC=6.33 mJ=2294 pin=0 rdKB=0 fpMB=1388
+[xp] 23:54:00.024 +1.43 dt=277 cpu=280 (thr 280) P=279 E=0 run=279 pgw=-1.0 GHz P=4.84 E=1.49 Minst=8881 IPC=6.56 mJ=2021 pin=0 rdKB=0 fpMB=1389
+[xp] 23:54:00.323 +1.73 dt=299 cpu=301 (thr 301) P=300 E=0 run=303 pgw=-1.0 GHz P=4.85 E=1.62 Minst=9604 IPC=6.59 mJ=2199 pin=0 rdKB=0 fpMB=1389
+[xp] 23:54:00.581 +1.98 dt=258 cpu=266 (thr 266) P=263 E=3 run=270 pgw=-1.0 GHz P=4.84 E=2.30 Minst=8302 IPC=6.49 mJ=1913 pin=0 rdKB=0 fpMB=1389
+[footprint] rev=ml358 phys=1398 MB (peak 1398) internal=1464 MB compressed=0 MB external=144 MB reusable=3 MB (cycle=2)
+[swap] ml1077 stats: 66 MB file-backed now (peak 121), 3 extents, file used 0 of 64 MB, backs 4 releases 1 unbacks 0 refused 0 | coverage classic: disk 0 MB of 64 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 66 MB in use (peak 121), 4 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 6475 MB available
+[vkmt] tid=002c OpenAdapterFromLuid luid=6c040000:01000000 -> 0 hAdapter=0x40000000
+002c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[madeira-d3d12] D3D12CreateDevice(adapter=00000071A9C5D6D0, feature level 0xb000, create)."
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071A9C5D6D0, feature level 0xb000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071A9C5D6D0, feature level 0xb000, create)
+[vkmt] tid=002c CloseAdapter hAdapter=0x40000000 -> 0
+002c:err:module:load_dll [dll-missing] rev=ml336 #3 L"nvcuda.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #4 L"mfplay.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #5 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\carbon-mock.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\core2-mocks.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #7 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\carbon-tts-mock.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #8 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Microsoft.CognitiveServices.Speech.extension.mas.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #9 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Microsoft.CognitiveServices.Speech.extension.kws.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #18 L"C:\\Games\\Senua's Saga Hellblade II\\Hellblade2\\Binaries\\Win64\\Microsoft.CognitiveServices.Speech.extension.embedded.sr.runtime.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0x71f6710000+0xc0000: 1 pool copy marked
+[copy-verify] rsaenh.dll: OK, 11 .text pages executable (copy @0x14df68000)
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv153\\Win64\\steamclient64.dll" 0x71f5b60000+0xb69000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[exec-alloc] NtAllocateVirtualMemory #4 req_addr=0x71b6460000 size=0x10000 type=0x3000 protect=0x40
+[alias-own] ml640 #1 0x71b6460000+0x10000 prot=r-x OWNED by live anon JIT alias (rx=0x14e02c000 rw=0x700602c000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-own] ml640 #2 0x71b6460000+0x10000 prot=r-x OWNED by live anon JIT alias (rx=0x14e02c000 rw=0x700602c000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #1 0x71b6460000+0x10000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x71b6460000,0x71b6470000)
+[alias-own] ml640 #3 0x71b6460000+0x10000 prot=r-x OWNED by live anon JIT alias (rx=0x14e02c000 rw=0x700602c000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv153\\Win64\\steam_api64.dll" 0x71f5b10000+0x4d000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alias-own] ml640 #4 0x71b6460000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x14e02c000 rw=0x700602c000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+002c:err:module:load_dll [dll-missing] rev=ml336 #19 L"C:\\Games\\Senua's Saga Hellblade II\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv153\\Win64\\gameoverlayrenderer64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #20 L"C:\\Games\\Senua's Saga Hellblade II\\Engine\\Binaries\\ThirdParty\\Steamworks\\Steamv153\\Win64\\gameoverlayrenderer64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #21 L"gameoverlayrenderer64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #22 L"gameoverlayrenderer64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Engine\\Plugins\\Runtime\\OpenCV\\Binaries\\ThirdParty\\Win64\\opencv_world455.dll" 0x71f2fe0000+0x2aed000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\windows\\system32\\concrt140.dll" 0x71f2a70000+0x4e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[swap] ml1077 backed 0x71c2bd0000+0x2000000 (file off 8796093022229 MB): 98 MB in 4 extents, peak 121 MB, 0 refused
+[swap] ml1077 backed 0x71c4bd0000+0x800000 (file off 8796093022261 MB): 106 MB in 5 extents, peak 121 MB, 0 refused
+002c:err:win:ios_child_desktop_fixup [child-desktop] pid=0028 peb=0x109094000 tid=002c: no desktop window (status 0xc0000008, thread desktop 0x14); registered the desktop/message classes for this process; retry 0 -> top_window=0x10020 msg_window=0x10022
+[nls-getptr] type=11 id=10000 peb=0x109094000
+[nls-getptr] type=11 id=10000 peb=0x109094000
+[nls-getptr] type=11 id=10000 peb=0x109094000
+[nls-getptr] type=11 id=10000 peb=0x109094000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #23 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+[win-pos] #3 hwnd=0x2003c after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #3 hwnd=0x2003c class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #4 hwnd=0x2003c after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #4 hwnd=0x2003c class='OleMainThreadWndClass' text="" rev=ml853
+002c:err:module:load_dll [dll-missing] rev=ml336 #24 L"C:\\windows\\system32\\explorerframe.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\explorerframe.dll"
+[vkmt] tid=002c OpenAdapterFromLuid luid=6c040000:01000000 -> 0 hAdapter=0x40000040
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071BDD15BC0, feature level 0xc000, create)
+[madeira-d3d12] D3D12CreateDevice(adapter=00000071BDD15BC0, feature level 0xc000, create)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 3
+[madeira-d3d12] command queue: type 2
+[madeira-d3d12] command queue: type 2
+[swap] ml1077 backed 0x71c9b80000+0x2000000 (file off 8796093022329 MB): 138 MB in 6 extents, peak 138 MB, 0 refused
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=41MB: tex-RT=1MB/1 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/2 (peak 0) tex-sampled=0MB/16 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/2 (peak 32) buf-shared=8MB/4 (peak 8)
+[madeira-d3d12] ml1057 live GPU backing (estimated) total=41MB: tex-RT=1MB/1 (peak 1) tex-DS=0MB/0 (peak 0) tex-UAV=0MB/2 (peak 0) tex-sampled=0MB/16 (peak 0) tex-MSAA=0MB/0 (peak 0) buf-private=32MB/2 (peak 32) buf-shared=8MB/4 (peak 8)
+[madeira-d3d12] ml1060 shader libraries created: 0, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] ml1060 shader libraries created: 0, 0 MB of metallib (one per pipeline STAGE, never shared between pipelines)
+[madeira-d3d12] metal-gap: Metal 160 MB = standalone textures 3 (1 MB as Metal sizes them, 1 MB estimated) + texture heaps 64 MB + application heaps 32 MB + buffers 40 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 0
+[madeira-d3d12] metal-gap: Metal 160 MB = standalone textures 3 (1 MB as Metal sizes them, 1 MB estimated) + texture heaps 64 MB + application heaps 32 MB + buffers 40 MB + argument ring chunks 0 (0 MB) + the rest 23 MB; frees waiting for the GPU: 0
+[swap] ml1077 backed 0x71d3620000+0x800000 (file off 8796093022269 MB): 146 MB in 7 extents, peak 146 MB, 0 refused
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Engine\\Plugins\\Runtime\\Nvidia\\Streamline\\Binaries\\ThirdParty\\Win64\\sl.interposer.dll" 0x71f2490000+0x85000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+002c:err:module:load_dll [dll-missing] rev=ml336 #25 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+002c:err:module:load_dll [dll-missing] rev=ml336 #26 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+D 2C Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71F2170000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+D 2C Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71F2170000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+D 2C Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71F2170000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+D 2C Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71F2170000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+[jit-pool] image 0x71f2170000+0xfc000 (nvapi64.dll) → pool 0x14e929000 used=0x6a2d000/0x27000000 tramp+0x4000
+D 2C Load module nvapi64.dll (nvapi64.dll-22148bd4b332f7c6): 71F2170000
+[image-reload] unmapped image 0x71f2170000+0xfc000: 1 pool copy marked
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+002c:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[free-delay] #1 release of 0x71d4ba0000+0x800000 held for 2000 ms (1 in flight)
+[x64-image] L"\\??\\C:\\Games\\Senua's Saga Hellblade II\\Engine\\Plugins\\Runtime\\Nvidia\\Streamline\\Binaries\\ThirdParty\\Win64\\sl.common.dll" 0x71f21b0000+0xb4000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 2C Load module sl.common.dll (sl.common.dll-8de4e745a6b68749): 71F21B0000
+[store-noalias] #1 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x6c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1022a9ffc addr=0x71f2170000 x18=0x0 type=1 lr=0x1022a9cb0 sp=0x12119f860 x16=0x149 x17=0x118183000
+[fault-host] 1022a9efc: 53047d08 53137d2b 1217016b 3318010b 2a0a0174 53186135 aa1703e0 a95287e2
+[fault-host] 1022a9f1c: f9409ff6 aa1603e3 9400572e 340000a0 aa0003fc 52800018 52800036 17fffe82
+[fault-host] 1022a9f3c: d0018648 91340108 c85ffd09 91000529 c80afd09 35ffffaa f000b1a8 397b1108
+[fault-host] 1022a9f5c: 361800e8 f000b1a0 913b1000 97fd0732 36180060 aa1703e0 97fff97f 12001ec8
+[fault-host] 1022a9f7c: 51001109 7100f13f 540000e8 5280002a 9ac92149 d280022a f2e2000a ea0a013f
+[fault-host] 1022a9f9c: 54000061 7102011f 54003141 b000b560 91116000 f9400008 d63f0100 5280001c
+[mach_exc] insn_stream PC-12..PC+8: f101031f 54000383 f9405fe8 [39400108] 7101351f 54000301 f9405fe8
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0xc88 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0x93c
+[mach_exc] bt[1] 0x14a43387c ?`?+0x14a43387c
+[x86_seg] State.gs_cached=0x71fffd0000 TEB=0x71fffd0000 TEB[0x58]=0x71a93cfe20 *(gs_cached+0x58)=0x71a93cfe20
+[x86_live] RAX=0x71f2170000 RCX=0x57 RDX=0x71f221f000 RBX=0x1000 RSP=0x6929000 RBP=0x12119fcc0 RSI=0x103bca810 RDI=0x109094000
+[x86_live]  R8=0x109094000  R9=0x0 R10=0x3 R11=0xfffffffffffffffe R12=0x14e929000 R13=0x148000000 R14=0x7000000000 R15=0x7006929000
+[x86_live] State.RIP=0x71fc384630 callret_sp=0x7c05401000
+[store-noalias] #2 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x6c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1022a9ffc addr=0x71f2170000 x18=0x0 type=1 lr=0x1022a9cb0 sp=0x12119f860 x16=0x149 x17=0x118183000
+[fault-host] 1022a9f5c: 361800e8 f000b1a0 913b1000 97fd0732 36180060 aa1703e0 97fff97f 12001ec8
+[fault-host] 1022a9f7c: 51001109 7100f13f 540000e8 5280002a 9ac92149 d280022a f2e2000a ea0a013f
+[fault-host] 1022a9f9c: 54000061 7102011f 54003141 b000b560 91116000 f9400008 d63f0100 5280001c
+[fault-host] 1022a9fbc: f9409be9 f940b7e8 a9002009 52800036 aa1403f8 17fffe5c 52800028 b9012ac8
+[fault-host] 1022a9fdc: f90057f7 8b1702b6 f9003ff8 f900b3f9 340003c8 f101031f 54000383 f9405fe8
+[fault-host] 1022a9ffc: 39400108 7101351f 54000301 f9405fe8 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: f101031f 54000383 f9405fe8 [39400108] 7101351f 54000301 f9405fe8
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0xc88 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0x93c
+[mach_exc] bt[1] 0x14a43387c ?`?+0x14a43387c
+[x86_seg] State.gs_cached=0x71fffd0000 TEB=0x71fffd0000 TEB[0x58]=0x71a93cfe20 *(gs_cached+0x58)=0x71a93cfe20
+[x86_live] RAX=0x71f2170000 RCX=0x57 RDX=0x71f221f000 RBX=0x1000 RSP=0x6929000 RBP=0x12119fcc0 RSI=0x103bca810 RDI=0x109094000
+[x86_live]  R8=0x109094000  R9=0x0 R10=0x3 R11=0xfffffffffffffffe R12=0x14e929000 R13=0x148000000 R14=0x7000000000 R15=0x7006929000
+[x86_live] State.RIP=0x71fc384630 callret_sp=0x7c05401000
+002c:err:seh:segv_handler SEGV #1: pc=0x1022a9ffc addr=0x71f2170000 uctx_x18=0x0 disp=0 mach_exc=7991
+002c:err:seh:segv_handler SEGV at pc=0x1022a9ffc addr=0x71f2170000 esr=0x92000007 TPIDR_EL0=0x1005 (informational only — TEB is tsd275 below)
+002c:err:seh:segv_handler   x0=0x57 x1=0x71f221f000 x2=0x109094000 x3=0x0
+002c:err:seh:segv_handler   x8=0x71f2170000 x9=0x103c74b68 x10=0x71b6460000 x16=0x149 x17=0x118183000 x18=0x0 x19=0x14e929000 x20=0x148000000
+002c:err:seh:segv_handler   fp=0x12119fcc0 lr=0x1022a9cb0 sp=0x12119f860
+002c:err:seh:segv_handler   [teb-tsd] base=0x17024b0e0 offset=0x918 raw=0x71fffd0000 teb_key_val=0x71fffd0000
+002c:err:seh:segv_handler   [guest-state] x28=0x0 UNREADABLE got=0
+[store-noalias] #3 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x94000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x94000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x1022a9ffc addr=0x71f2170000 x18=0x0 type=1 lr=0x1022a9cb0 sp=0x12119f860 x16=0x149 x17=0x118183000
+[mach_exc] insn_stream PC-12..PC+8: f101031f 54000383 f9405fe8 [39400108] 7101351f 54000301 f9405fe8
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0xc88 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0x93c
+[mach_exc] bt[1] 0x14a43387c ?`?+0x14a43387c
+[x86_seg] State.gs_cached=0x71fffd0000 TEB=0x71fffd0000 TEB[0x58]=0x71a93cfe20 *(gs_cached+0x58)=0x71a93cfe20
+[x86_live] RAX=0x71f2170000 RCX=0x57 RDX=0x71f221f000 RBX=0x1000 RSP=0x6929000 RBP=0x12119fcc0 RSI=0x103bca810 RDI=0x109094000
+[x86_live]  R8=0x109094000  R9=0x0 R10=0x20 R11=0x71b65c4780 R12=0x14e929000 R13=0x148000000 R14=0x7000000000 R15=0x7006929000
+[x86_live] State.RIP=0x71fc384630 callret_sp=0x7c05401000
+[store-noalias] #4 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x94000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x94000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x1022a9ffc addr=0x71f2170000 x18=0x0 type=1 lr=0x1022a9cb0 sp=0x12119f860 x16=0x149 x17=0x118183000
+[mach_exc] insn_stream PC-12..PC+8: f101031f 54000383 f9405fe8 [39400108] 7101351f 54000301 f9405fe8
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0xc88 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0x93c
+002c:err:seh:segv_handler   [guest-state] x28=0x0 UNREADABLE got=0
+[store-noalias] #5 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x6c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x1022a9ffc addr=0x71f2170000 x18=0x0 type=1 lr=0x1022a9cb0 sp=0x12119f860 x16=0x149 x17=0x118183000
+[mach_exc] insn_stream PC-12..PC+8: f101031f 54000383 f9405fe8 [39400108] 7101351f 54000301 f9405fe8
+[mach_exc] sym pc=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0xc88 lr=/private/var/containers/Bundle/Application/<uuid>/App.app/Madeira`NtProtectVirtualMemory+0x93c
+[store-noalias] #6 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x6c000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+[store-noalias] #7 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x94000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x71f2170000 insn=0x39400108 pc=0x1022a9ffc NO pool/anon alias | region 0x71f21b0000+0x94000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+002c:err:seh:segv_handler SEGV LOOP FATAL: pc=0x1022a9ffc addr=0x71f2170000 after 5 repeats, forcing thread exit
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #19 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #20 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+002c:err:seh:segv_handler SEGV LOOP FATAL: pc=0x1022a9ffc addr=0x71f2170000 after 5 repeats, forcing thread exit
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #21 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #22 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #23 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x12119f860 (pc=0x1022a9ffc x18=0x0 registry=0x71fffd0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #24 p0=READ p1=0x71f2170000 hostpc=0x1022a9ffc hinsn=0x39400108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+002c:err:seh:segv_handler SEGV LOOP FATAL: pc=0x1022a9ffc addr=0x71f2170000 after 5 repeats, forcing thread exit
+002c:err:seh:segv_handler SEGV LOOP FATAL: pc=0x1022a9ffc addr=0x71f2170000 after 5 repeats, forcing thread exit
+[fault_rip] cnt=45 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+[fault_rip] cnt=46 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+002c:err:seh:segv_handler   PEB[0x40]=0x0 PEB[0x48]=0x0 PEB[0x50]=0x0 PEB[0x58]=0x14b1c4490
+002c:err:seh:segv_handler   PEB[0x60]=0x0 PEB[0x68]=0x71a7bb0000 PEB[0x70]=0x0 PEB[0x78]=0x14a4d6500
+002c:err:seh:segv_handler   PEB->Ldr = 0x14a4d4390
+002c:err:seh:segv_handler   LDR[0x00]=0x100000058 LDR[0x08]=0x0 LDR[0x10]=0x71a93c3af0 LDR[0x18]=0x71b65c4780
+002c:err:seh:segv_handler   LDR[0x20]=0x71a93c3b00 LDR[0x28]=0x71b65c4790 LDR[0x30]=0x71a93c4620 LDR[0x38]=0x71b65c4660
+[fault_rip] cnt=47 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x94000 rev=ml555
+[fault_rip] cnt=48 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x94000 rev=ml555
+[fault_rip] cnt=49 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+[fault_rip] cnt=50 rip=0x71fc384630 pc=0x1022a9ffc addr=0x71f2170000 kr=1(INVALID_ADDRESS) entryprot=1 nowprot=1 region=0x71f21b0000+0x6c000 rev=ml555
+002c:err:seh:segv_handler SEGV LOOP FATAL: pc=0x1022a9ffc addr=0x71f2170000 after 5 repeats, forcing thread exit
+[fault-stuck] BREAKING LOOP: page 0x71f2170000 pc 0x1022a9ffc repeated 50 times -> diverting thread to abort_thread
+[footprint] rev=ml358 phys=1908 MB (peak 1908) internal=1831 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=3)
+[footprint] rev=ml1060 fast phys=1899 MB compressed=0 MB internal=1831 MB
+[footprint] rev=ml358 phys=1899 MB (peak 1908) internal=1831 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=4)
+[footprint] rev=ml358 phys=1899 MB (peak 1908) internal=1831 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=5)
+[footprint] rev=ml358 phys=1899 MB (peak 1908) internal=1831 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f902230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16fa14c90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=1 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[cpu-split] ml1123 gen=1 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[23:54:28.227] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=48 resident=1989MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[cpu-split] ml1123 gen=2 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[window] 0x7048000000..0x7400000000 regions=2192 occupied=14786 MB of 15232 MB free=461 MB maxhole=446 MB@0x71d6370000 rev=ml787 (periodic)
+[window] 0x122000000..0x7997000000 regions=82297 occupied=469573 MB of 493392 MB free=46714 MB maxhole=22896 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 146 MB file-backed now (peak 146), 7 extents, file used 0 of 64 MB, backs 8 releases 1 unbacks 0 refused 0 | coverage classic: disk 0 MB of 64 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 146 MB in use (peak 146), 8 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 6300 MB available
+[23:54:58.355] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=47 resident=1995MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=3 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[23:55:28.502] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=47 resident=1997MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=4 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[window] 0x7048000000..0x7400000000 regions=2192 occupied=14786 MB of 15232 MB free=461 MB maxhole=446 MB@0x71d6370000 rev=ml787 (periodic)
+[window] 0x122000000..0x7997000000 regions=82296 occupied=469577 MB of 493392 MB free=46711 MB maxhole=22896 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[swap] ml1077 stats: 146 MB file-backed now (peak 146), 7 extents, file used 0 of 64 MB, backs 8 releases 1 unbacks 0 refused 0 | coverage classic: disk 0 MB of 64 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 146 MB in use (peak 146), 8 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 6300 MB available
+[23:55:58.652] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+121s beats=4 gaps=0 iter=476 gen=1 threads=47 resident=1999MB dbg=DEBUGGED rev=ml525
+[rip-profile] ml981 gen=5 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[cpu-split] ml1123 gen=5 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x1701309e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "RHIThread" teb=0x71ffe30000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x1323de9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14a45f1c8 user-sp=0x71ce4efd50 user-cand=[ Hellblade2-Win64-Shipping.exe+0xdf4df6 Hellblade2-Win64-Shipping.exe+0xc5cb0b Hellblade2-Win64-Shipping.exe+0x259b70b Hellblade2-Win64-Shipping.exe+0xdf2a17 ]
+[thread-sample] ml876 b2 "RenderThread 0" teb=0x71ffe20000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x1325de9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14a45f1c8 user-sp=0x71cf20fd10 user-cand=[ Hellblade2-Win64-Shipping.exe+0xdf4df6 Hellblade2-Win64-Shipping.exe+0xc5cb0b Hellblade2-Win64-Shipping.exe+0x2599c81 Hellblade2-Win64-Shipping.exe+0x259b767 ]
+[thread-sample] ml876 modmap peb=0x109094000 modules=82 first=Hellblade2-Win64-Shipping.exe@0x122000000
+[thread-sample] ml876 b3 "RHIThread" teb=0x71ffe30000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x1323de9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14a45f1c8 user-sp=0x71ce4efd50 user-cand=[ Hellblade2-Win64-Shipping.exe+0xdf4df6 Hellblade2-Win64-Shipping.exe+0xc5cb0b Hellblade2-Win64-Shipping.exe+0x259b70b Hellblade2-Win64-Shipping.exe+0xdf2a17 ]
+[thread-sample] ml876 b3 "RenderThread 0" teb=0x71ffe20000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x1325de9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x14a45f1c8 user-sp=0x71cf20fd10 user-cand=[ Hellblade2-Win64-Shipping.exe+0xdf4df6 Hellblade2-Win64-Shipping.exe+0xc5cb0b Hellblade2-Win64-Shipping.exe+0x2599c81 Hellblade2-Win64-Shipping.exe+0x259b767 ]
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=6 threads=2 samples=400 buckets=2 span=0x70d65938d5 [0x122d8f2db..0x71f9322bb0] top: 0x122d8f2c0=50% 0x71f9322b80=50%
+[cpu-split] ml1123 gen=6 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[23:56:28.829] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=595 gen=1 threads=46 resident=2001MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1911 MB (peak 1911) internal=1843 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=77)
+[launch-view] dismissed reason=button logs=1
+[footprint] rev=ml358 phys=1910 MB (peak 1911) internal=1841 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=78)
+[footprint] rev=ml358 phys=1910 MB (peak 1911) internal=1841 MB compressed=0 MB external=153 MB reusable=3 MB (cycle=79)
+[waiters]  tid=0070 addr=0x71bdd9b818 age=157s INF w0=00000001 w1=00000002
+[waiters]  tid=00a4 addr=0x71b65c42d8 age=157s INF w0=00000005 w1=00000000
+[footprint] rev=ml358 phys=1913 MB (peak 1913) internal=1845 MB compressed=0 MB external=155 MB reusable=3 MB (cycle=80)
+[frontend] graceful close requested
+[waiters]  tid=0070 addr=0x71bdd9b818 age=159s INF w0=00000001 w1=00000002
+[waiters]  tid=00a4 addr=0x71b65c42d8 age=159s INF w0=00000005 w1=00000000
+[footprint] rev=ml358 phys=1913 MB (peak 1913) internal=1844 MB compressed=0 MB external=155 MB reusable=3 MB (cycle=81)
+[xp] 23:56:41.590 +162.99 dt=257 cpu=10 (thr 10) P=0 E=10 run=15 pgw=-1.0 GHz P=0.00 E=0.83 Minst=20 IPC=2.35 mJ=1 pin=0 rdKB=0 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 23:56:41.892 +163.30 dt=302 cpu=10 (thr 10) P=0 E=10 run=16 pgw=-1.0 GHz P=0.00 E=0.83 Minst=19 IPC=2.30 mJ=1 pin=0 rdKB=0 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 23:56:42.189 +163.59 dt=297 cpu=11 (thr 10) P=0 E=11 run=18 pgw=-1.0 GHz P=0.00 E=0.83 Minst=21 IPC=2.43 mJ=1 pin=0 rdKB=0 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[xp] 23:56:42.512 +163.92 dt=323 cpu=11 (thr 11) P=0 E=11 run=17 pgw=-1.0 GHz P=0.00 E=0.83 Minst=23 IPC=2.45 mJ=1 pin=0 rdKB=0 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 23:56:42.815 +164.22 dt=302 cpu=49 (thr 48) P=10 E=39 run=66 pgw=-1.0 GHz P=2.14 E=1.26 Minst=119 IPC=1.67 mJ=12 pin=1 rdKB=36 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[waiters]  tid=0070 addr=0x71bdd9b818 age=161s INF w0=00000001 w1=00000002
+[waiters]  tid=00a4 addr=0x71b65c42d8 age=161s INF w0=00000005 w1=00000000
+[footprint] rev=ml358 phys=1913 MB (peak 1913) internal=1845 MB compressed=0 MB external=157 MB reusable=3 MB (cycle=82)
+[xp] 23:56:43.137 +164.54 dt=322 cpu=23 (thr 23) P=5 E=18 run=46 pgw=-1.0 GHz P=1.78 E=1.39 Minst=60 IPC=1.78 mJ=5 pin=0 rdKB=0 fpMB=1913 | pres 0/0 thr=0.0 ecl 0/0.0 sig 0/0.0 wait 0/0.0 prs=0.0 (flush 0.0 lat 0/0.0 draw 0.0 cmt 0.0) pool=0.0 caller-ecl 0/0.0
+[23:56:43.278] [INFO] [session] length=166s partial=1 play=0s frames=0 stalls=0/0s peak=1914MB limit=8191MB thermal=nominal lpm=0 res=1168x536 cap=30 game=Hellblade II: Senua’s Saga

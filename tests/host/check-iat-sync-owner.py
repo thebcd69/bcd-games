@@ -15,7 +15,8 @@ virtual_ios.c) against a model of the mapping table. Checks:
     copy) is unchanged; a region outside every image picks nothing;
   - a NULL-owner copy registered after a child copy still wins for the parent;
   - MADEIRA_IAT_SYNC_OWNER=0: the old first-match rule;
-  - the NtProtectVirtualMemory sync loop only syncs the picked copy.
+  - the NtProtectVirtualMemory sync loop only syncs the picked copy;
+  - round 668 (Hellblade II 3V6QHW): a copy whose image was unmapped picks nothing, in both modes.
 Needs python3 and a C compiler (AddressSanitizer/UBSan when available).
 """
 from pathlib import Path
@@ -87,6 +88,23 @@ int main( int argc, char **argv )
     assert( pick( NT + 0x12ff00, 0x1000, CHILD ) == -1 );    /* runs past the image end */
     assert( pick( hook, 7, MAIN ) == 0 );                    /* parent: session copy */
     assert( pick( hook, 7, NULL ) == 0 );                    /* unknown process: session copy */
+    /* round 668 (Hellblade II 3V6QHW): a copy whose image was unmapped picks nothing; a live copy of the same range wins */
+    {
+        const int saved = ios_jit_mapping_count;
+        struct ios_jit_mapping keep[4];
+        memcpy( keep, ios_jit_mappings, sizeof(keep) );
+        ios_jit_mapping_count = 0;
+        map( 0, 0x71f2170000ull, 0x150800000ull, 0xfc000, NULL );   /* nvapi64.dll's copy, freed */
+        ios_jit_mappings[0].unmapped = 1;
+        assert( pick( 0x71f221f000ull, 0x1000, MAIN ) == -1 );        /* sl.common.dll now sits there */
+        assert( pick( 0x71f221f000ull, 0x1000, CHILD ) == -1 );
+        map( 1, 0x71f2170000ull, 0x151000000ull, 0xfc000, NULL );    /* the same image loaded again */
+        assert( pick( 0x71f221f000ull, 0x1000, MAIN ) == 1 );
+        ios_jit_mappings[0].unmapped = 0;                             /* rebuilt in place: counts again */
+        assert( pick( 0x71f221f000ull, 0x1000, MAIN ) == 0 );
+        memcpy( ios_jit_mappings, keep, sizeof(keep) );
+        ios_jit_mapping_count = saved;
+    }
     if (legacy)
     {
         assert( pick( hook, 7, CHILD ) == 0 );               /* build 327: the parent's copy */
@@ -133,5 +151,6 @@ with tempfile.TemporaryDirectory() as directory:
         print(f'MADEIRA_IAT_SYNC_OWNER={value!r}: ' + result.stdout.strip().splitlines()[-1])
         if mode == 'new':
             assert '[iat-sync-owner]' in result.stderr, result.stderr
+        assert '[iat-sync-skip] ml668' in result.stderr, result.stderr
 print('PASS: the IAT sync writes the pool copy of the process that made the change; '
-      'MADEIRA_IAT_SYNC_OWNER=0 restores the old rule')
+      'MADEIRA_IAT_SYNC_OWNER=0 restores the old rule; an unmapped image copy is never picked')

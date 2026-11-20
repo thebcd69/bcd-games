@@ -109,9 +109,26 @@ static void ios_vulkan_map_instance_extensions(struct vulkan_instance_extensions
     if (extensions->has_VK_KHR_win32_surface) extensions->has_VK_EXT_metal_surface = 1;
 }
 
+/* madeira-bcd (X-Plane 12, round 668/669): with MADEIRA_KK_OPAQUE_FD=1 KosmicKrisp shares memory and semaphores through
+ * opaque fds inside the process (build/mesa-ios/playport-patches/0032), so Wine's VK_KHR_external_memory_win32 and
+ * VK_KHR_external_semaphore_win32 (win32u/vulkan.c, D3DKMT objects) map onto them as on the X11 and Wayland drivers.
+ * X-Plane's Vulkan profile (baseline_desktop_win32) needs them, and its OpenGL plugins import the same images and
+ * semaphores (GL_EXT_memory_object_win32 / _semaphore_win32 over Zink's _fd ones). Without the key nothing is mapped,
+ * as before: KosmicKrisp's own semaphore fds are sync files only, which Wine's win32 semaphores cannot use. */
 static void ios_vulkan_map_device_extensions(struct vulkan_device_extensions *extensions)
 {
-    (void)extensions;
+    static int opaque_fd = -1;
+
+    if (opaque_fd < 0)
+    {
+        const char *s = getenv( "MADEIRA_KK_OPAQUE_FD" );
+        opaque_fd = s && s[0] == '1' && !s[1];
+    }
+    if (!opaque_fd) return;
+    if (extensions->has_VK_KHR_external_memory_win32) extensions->has_VK_KHR_external_memory_fd = 1;
+    if (extensions->has_VK_KHR_external_memory_fd) extensions->has_VK_KHR_external_memory_win32 = 1;
+    if (extensions->has_VK_KHR_external_semaphore_win32) extensions->has_VK_KHR_external_semaphore_fd = 1;
+    if (extensions->has_VK_KHR_external_semaphore_fd) extensions->has_VK_KHR_external_semaphore_win32 = 1;
 }
 
 static const struct vulkan_driver_funcs ios_vulkan_driver_funcs =

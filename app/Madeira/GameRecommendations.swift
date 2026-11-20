@@ -169,8 +169,10 @@ enum GameRecommendations {
     ///   game's install folder ("C:\...\steamapps\common\Red Dead Redemption 2").
     /// - steamAppID: set for a library Steam game.
     /// - fileExists: whether a C:\ path exists (GTA5_Enhanced.exe beside a program).
-    static func match(windowsPath: String, steamAppID: Int?, fileExists: (String) -> Bool) -> GameRecommendation? {
-        active.match(windowsPath: windowsPath, steamAppID: steamAppID, fileExists: fileExists)
+    /// - programsIn: the programs in a library Steam game's install folder (GameRecommendationList.match).
+    static func match(windowsPath: String, steamAppID: Int?, fileExists: (String) -> Bool,
+                      programsIn: ((String) -> [String])? = nil) -> GameRecommendation? {
+        active.match(windowsPath: windowsPath, steamAppID: steamAppID, fileExists: fileExists, programsIn: programsIn)
     }
 
     /// The folder name right under steamapps\common, lowercased, or nil.
@@ -185,7 +187,10 @@ enum GameRecommendations {
 
 extension GameRecommendationList {
     /// The first rule that matches the game (see GameRecommendations.match).
-    func match(windowsPath: String, steamAppID: Int?, fileExists: (String) -> Bool) -> GameRecommendation? {
+    /// - programsIn: the programs (.exe files, as C:\ paths) in a library Steam game's install folder, or nil
+    ///   (GameRecommendations.drivePrograms).
+    func match(windowsPath: String, steamAppID: Int?, fileExists: (String) -> Bool,
+               programsIn: ((String) -> [String])? = nil) -> GameRecommendation? {
         let path = windowsPath.replacingOccurrences(of: "/", with: "\\").trimmingSuffix("\\")
         let parts = path.lowercased().split(separator: "\\").map(String.init)
         guard let last = parts.last else { return nil }
@@ -194,12 +199,34 @@ extension GameRecommendationList {
             // A library Steam game: its App ID, or its install folder right under
             // steamapps\common (not a batch file inside it).
             let installFolder = last == steamFolder ? steamFolder : nil
-            return rules.first { rule in
+            if let rec = rules.first(where: { rule in
                 guard let match = rule.match else { return false }
                 if let steamAppID, match.steamAppIDs.contains(steamAppID) { return true }
                 if let installFolder, match.steamFolders.contains(installFolder) { return true }
                 return false
-            }?.recommendation
+            })?.recommendation { return rec }
+            // madeira-bcd (owner 2026-11-17, round 668 N110): a rule that names only programs (no App ID, no Steam
+            // folder) also reaches a library Steam start, by one of its programs in the game's install folder. The
+            // program's Steam flag and its beside / notBeside files count as for a program start (inSteam).
+            guard steamAppID != nil || installFolder != nil, let programsIn else { return nil }
+            var folders: [String: [String]] = [:]   // a program's lowercased file name: the folders it is in
+            for program in programsIn(path) {
+                let p = program.replacingOccurrences(of: "/", with: "\\")
+                guard let cut = p.lastIndex(of: "\\") else { continue }
+                folders[p[p.index(after: cut)...].lowercased(), default: []].append(String(p[..<cut]))
+            }
+            guard !folders.isEmpty else { return nil }
+            for rule in rules {
+                guard let match = rule.match, match.steamAppIDs.isEmpty, match.steamFolders.isEmpty else { continue }
+                for program in match.programs where program.steam != false {
+                    for folder in folders[program.name] ?? [] {
+                        if let beside = program.beside, !fileExists(folder + "\\" + beside) { continue }
+                        if let notBeside = program.notBeside, fileExists(folder + "\\" + notBeside) { continue }
+                        return rule.recommendation
+                    }
+                }
+            }
+            return nil
         }
         // A program, wherever it was installed: only the game's own programs, so a
         // redistributable inside a game's folder gets nothing.

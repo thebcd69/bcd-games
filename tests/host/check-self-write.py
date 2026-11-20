@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2026 Russell Barton
 # Modified by BCD (thebcd69), 2026-11-11: the switch is off unless exactly 1.
+# Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 """env.MADEIRA_SELF_WRITE (off unless exactly 1): a program's NtWriteVirtualMemory into its own memory is done in ntdll (virtual_ios.c).
 
 The server writes with the target's task port, which iOS pseudo-processes do not have, so a program's WriteProcessMemory into itself
@@ -16,7 +18,9 @@ Checks:
      protect: once) and refused (read-only, also in a host page a neighbour makes writable; guard; uncommitted); a partial count;
      a write stopped at its first page takes the unchanged server request; the switch (only exactly "1" is on; read at each
      call; unset, the write goes to the server as before); the reach (a 32-bit program: its window; a 64-bit program: an image view or its own hook zone, not another process's
-     zone, other memory, a 32-bit window or placeholder, or a range longer than a window); the log, in a fresh process (one line
+     zone, a complete private VirtualAlloc view tagged with its PEB (rechecked before each page's write), but not foreign or
+     unknown-owner memory, sections, system views, placeholders, quarantine, a 32-bit window or a range longer than a window);
+     deterministic unmap/reuse to another owner between admission and either page's write; the log, in a fresh process (one line
      for each process's first write, then at most 16 for writes that stopped or used the protect record);
   2. the wiring: the branch precedes the unchanged server request, for the pseudo-handle only; NtProtectVirtualMemory notes a
      successful change of its own process; the server's port and write path; CI; the catalog; the session end clears the switch.
@@ -49,6 +53,8 @@ def cut(text, start, end="\n}\n"):
 alias_a, alias_b = "#define IOS_JIT_MAX_ANON_ALIASES", "static volatile int ios_jit_anon_alias_count = 0;\n"
 vprot = re.findall(r"^#define VPROT_(?:READ|WRITE|EXEC|WRITECOPY|GUARD|COMMITTED|WRITEWATCH) +0x[0-9a-fA-F]+$", src, re.M)
 CUT = "\n".join(vprot + [
+    *[re.search(r"^#define " + name + r" +0x[0-9a-fA-F]+.*$", src, re.M).group(0)
+      for name in ("VPROT_SYSTEM", "VPROT_PLACEHOLDER", "VPROT_FREE_PLACEHOLDER", "IOS_VIEW_QUARANTINED")],
     src[src.index(alias_a):src.index(alias_b) + len(alias_b)],
     cut(src, "static int get_unix_prot( BYTE vprot )"),
     cut(src, "int ios_jit_anon_alias_find_cover(void *user_va, size_t size, void **rw_out, void **rx_out)"),
@@ -63,10 +69,13 @@ CUT = "\n".join(vprot + [
     "static struct ios_hook_zone ios_hook_zones[IOS_HOOK_ZONES];",
     cut(src, "static int ios_hook_zone_holds( const char *addr, SIZE_T size )"),
     cut(src, "static int ios_wow_addr_in_any_window( const void *addr )"),
+    cut(src, "static inline int is_view_valloc( const struct file_view *view )"),
     re.search(r"^static (?:__thread )?struct \{ ULONG_PTR begin, end; \} ios_self_write_grant;$", src, re.M).group(0),
     cut(src, "static int ios_self_write_enabled(void)"),
     cut(src, "static void ios_self_write_note_protect( const char *base, SIZE_T size, ULONG prot )"),
-    cut(src, "static SIZE_T ios_self_write( char *dst, const char *src, SIZE_T size, unsigned *paths )"),
+    cut(src, "static int ios_self_write_private_enabled(void)"),
+    cut(src, "static int ios_self_write_private_view( const char *addr, SIZE_T size )"),
+    cut(src, "static SIZE_T ios_self_write( char *dst, const char *src, SIZE_T size, unsigned *paths, BOOL private_view )"),
     cut(src, "static void ios_self_write_log( const char *dst, SIZE_T size, SIZE_T done, unsigned paths )"),
     cut(src, "static int ios_self_write_in_reach( const char *addr, SIZE_T size )"),
     cut(src, "NTSTATUS WINAPI NtWriteVirtualMemory( HANDLE process, void *addr, const void *buffer,"),
@@ -91,7 +100,8 @@ typedef unsigned char BYTE; typedef int BOOL; typedef size_t SIZE_T; typedef uin
 typedef int32_t NTSTATUS; typedef void *HANDLE; typedef struct { int unused; } PEB;
 typedef int kern_return_t; typedef unsigned mach_port_t; typedef uint64_t mach_vm_address_t, mach_vm_size_t; typedef uintptr_t vm_offset_t;
 enum { FALSE, TRUE, PAGE_READONLY = 2, PAGE_READWRITE = 4, PAGE_WRITECOPY = 8, PAGE_EXECUTE_READ = 0x20, PAGE_EXECUTE_READWRITE = 0x40,
-       PAGE_EXECUTE_WRITECOPY = 0x80, SEC_IMAGE = 0x1000000, PG = 0x1000, HPG = 0x4000, NPAGES = 64 };
+       PAGE_EXECUTE_WRITECOPY = 0x80, SEC_IMAGE = 0x1000000, SEC_FILE = 0x800000,
+       SEC_RESERVE = 0x4000000, SEC_COMMIT = 0x8000000, PG = 0x1000, HPG = 0x4000, NPAGES = 64 };
 #define WINAPI
 #define STATUS_SUCCESS ((NTSTATUS)0)
 #define STATUS_PARTIAL_COPY ((NTSTATUS)0x8000000D)
@@ -109,6 +119,7 @@ static const UINT_PTR page_mask = PG - 1, host_page_size = HPG, host_page_mask =
 static char *G; static BYTE vp[NPAGES];
 static pthread_mutex_t virtual_mutex, ios_pool_lock = PTHREAD_MUTEX_INITIALIZER;
 static __thread int depth;
+static void (*before_store)(void);
 static int n_server; static uint64_t srv_addr; static SIZE_T srv_size;
 static struct { struct { HANDLE UniqueProcess; } ClientId; } teb = { { (HANDLE)0x30 } };
 static BYTE get_page_vprot( const void *a ) { ULONG_PTR o = (ULONG_PTR)a - (ULONG_PTR)G; return o < NPAGES * PG ? vp[o / PG] : 0; }
@@ -135,21 +146,36 @@ static int kcopy( void *dst, const void *s, size_t len )   /* the kernel copies:
 }
 static kern_return_t mach_vm_read_overwrite( mach_port_t t, mach_vm_address_t a, mach_vm_size_t n, mach_vm_address_t d,
                                              mach_vm_size_t *got )
-{ (void)t; if (kcopy( (void *)(uintptr_t)d, (void *)(uintptr_t)a, n )) return 1; *got = n; return 0; }
+{
+    (void)t;
+    if (kcopy( (void *)(uintptr_t)d, (void *)(uintptr_t)a, n )) return 1;
+    *got = n;
+    if (before_store) before_store();   /* deterministic destination unmap/reuse before the page is locked */
+    return 0;
+}
 static kern_return_t mach_vm_write( mach_port_t t, mach_vm_address_t a, vm_offset_t s, unsigned n )
 { (void)t; if (!depth) abort(); /* every store under virtual_mutex */ return kcopy( (void *)(uintptr_t)a, (void *)s, n ); }
 static int virtual_check_buffer_for_read( const void *p, SIZE_T n ) { (void)p; (void)n; return 1; }
-static int wow32 = 1, view_kind;   /* view_kind: 0 an image view, 1 other memory */
+static int wow32 = 1, view_kind;   /* view_kind: 0 an image view, 1 unknown memory, 2 an explicit private-view fixture */
+static unsigned private_protect, private_flags;
+static void *private_owner;
+static size_t private_first, private_count;
 static ULONG_PTR ios_wow_base( void ) { return wow32 ? (ULONG_PTR)G : 0; }
 static int ios_wow_in_window( const void *a ) { return wow32 && (const char *)a >= G && (const char *)a < G + 48 * PG; }
 static struct { ULONG_PTR base; } ios_wow_windows[2], ios_wow_placeholders[2];
 static unsigned ios_wow_window_count, ios_wow_placeholder_count;
-struct file_view { void *base; size_t size; unsigned protect; };
+struct file_view { void *base; size_t size; unsigned protect, ios_flags; void *ios_owner; };
 static struct file_view *find_view( const void *a, size_t n )
 {
     static struct file_view v;
-    v.base = G; v.size = NPAGES * PG; v.protect = view_kind ? 0 : SEC_IMAGE;
-    return (const char *)a >= G && (const char *)a + n <= G + NPAGES * PG ? &v : NULL;
+    if (!depth) abort();
+    v.base = view_kind == 2 ? G + private_first * PG : G;
+    v.size = view_kind == 2 ? private_count * PG : NPAGES * PG;
+    v.protect = view_kind == 2 ? private_protect : view_kind ? 0 : SEC_IMAGE;
+    v.ios_owner = view_kind == 2 ? private_owner : NULL;
+    v.ios_flags = view_kind == 2 ? private_flags : 0;
+    return (ULONG_PTR)a >= (ULONG_PTR)v.base && n <= ~(ULONG_PTR)0 - (ULONG_PTR)a &&
+           (ULONG_PTR)a + n <= (ULONG_PTR)v.base + v.size ? &v : NULL;
 }
 static PEB pebs[2], *ios_session_peb __attribute__((unused)) = &pebs[0]; static void *cur_peb = &pebs[0];
 static void *ios_jit_current_peb( void ) { return cur_peb; }
@@ -176,11 +202,12 @@ static void host( int hp ) { mprotect_range( G + hp * HPG, HPG, 0, 0 ); }   /* h
 static void layout( int first, int count, BYTE v )
 { memset( vp + first, v, count ); for (int i = first / 4; i <= (first + count - 1) / 4; i++) host( i ); }
 static int writable( const void *a ) { unsigned char b = *(volatile const unsigned char *)a; return !kcopy( (void *)a, &b, 1 ); }
-static SIZE_T sw( void *dst, SIZE_T len ) { return ios_self_write( dst, (char *)data, len, &paths ); }
+static SIZE_T sw( void *dst, SIZE_T len ) { return ios_self_write( dst, (char *)data, len, &paths, FALSE ); }
 static NTSTATUS nw( void *dst, SIZE_T len ) { n = 99; return NtWriteVirtualMemory( NtCurrentProcess(), dst, data, len, &n ); }
 static void reset( void )   /* nothing recorded, every page 0x11 and inaccessible, no server request, no protect record */
 {
     memset( vp, 0, sizeof(vp) ); n_server = 0; srv_addr = 0; srv_size = 0; ios_self_write_grant.begin = ios_self_write_grant.end = 0;
+    before_store = NULL;
     mprotect( G, NPAGES * PG, PROT_READ | PROT_WRITE ); memset( G, 0x11, NPAGES * PG ); mprotect( G, NPAGES * PG, PROT_NONE );
 }
 
@@ -288,6 +315,93 @@ static void test_reach64( void )
     cur_peb = &pebs[0]; view_kind = 0; wow32 = 1;
 }
 
+static int source_reads, swap_on_read;
+static void reuse_as_foreign( void )
+{
+    if (++source_reads == swap_on_read) private_owner = &pebs[1];
+}
+
+static void private_view( size_t first, size_t count )
+{
+    view_kind = 2; private_first = first; private_count = count;
+    private_owner = cur_peb = &pebs[0]; private_protect = private_flags = 0; wow32 = 0;
+}
+
+static void test_private64( void )
+{
+    static const unsigned excluded[] = { SEC_FILE, SEC_RESERVE, SEC_COMMIT, VPROT_SYSTEM,
+                                        VPROT_PLACEHOLDER, VPROT_FREE_PLACEHOLDER };
+    static const BYTE refused[] = { RO, RW | VPROT_GUARD, VPROT_READ | VPROT_WRITE, 0 };
+    unsigned i;
+
+    /* build 666: without env.MADEIRA_SELF_WRITE_PRIVATE = 1 (only exactly "1") a private view is not reached: the server request, as before */
+    unsetenv( "MADEIRA_SELF_WRITE_PRIVATE" );
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 && P(9)[0] == 0x11 );
+    setenv( "MADEIRA_SELF_WRITE_PRIVATE", "2", 1 );
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 2 && P(9)[0] == 0x11 );
+    setenv( "MADEIRA_SELF_WRITE_PRIVATE", "1", 1 );
+
+    /* A trampoline in a free hole below the hook zone still belongs to the process that allocated it. */
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    T( nw( P(9), 5 ) == STATUS_SUCCESS && n == 5 && !n_server && !memcmp( P(9), data, 5 ) );
+    T( nw( P(11) + 0xff0, 16 ) == STATUS_SUCCESS && n == 16 && !n_server );   /* complete coverage at the view's end */
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    T( nw( P(11) + 0xfff, 2 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 && P(11)[0xfff] == 0x11 );
+    T( nw( (void *)(~(ULONG_PTR)0 - 3), 8 ) == STATUS_ACCESS_DENIED && !n && n_server == 2 );
+    T( nw( P(9), 0 ) == STATUS_ACCESS_DENIED && !n && n_server == 3 );
+    T( NtWriteVirtualMemory( (HANDLE)0x44, P(10), data, 5, &n ) == STATUS_ACCESS_DENIED && n_server == 4 &&
+       P(10)[0] == 0x11 );
+
+    reset(); private_view( 32, 4 ); layout( 32, 4, RWX );
+    T( !writable( P(33) ) && nw( P(33) + 8, 5 ) == STATUS_SUCCESS && n == 5 && !n_server &&
+       !memcmp( alias_rw + PG + 8, data, 5 ) && !writable( P(33) ) );
+
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    private_owner = &pebs[1];
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 && P(9)[0] == 0x11 );
+    private_owner = NULL;
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 2 && P(9)[0] == 0x11 );
+    cur_peb = NULL;
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 3 && P(9)[0] == 0x11 );
+    private_owner = cur_peb = &pebs[0];
+    for (i = 0; i < sizeof(excluded) / sizeof(excluded[0]); i++)
+    {
+        private_protect = excluded[i];
+        T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && P(9)[0] == 0x11 );
+    }
+    private_protect = 0; private_flags = IOS_VIEW_QUARANTINED;
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && P(9)[0] == 0x11 );
+
+    /* Existing WOW64-window/placeholder exclusions win even if a view is incorrectly tagged as this owner's. */
+    reset(); private_view( 48, 4 ); layout( 48, 4, RW );
+    T( nw( P(49), 5 ) == STATUS_ACCESS_DENIED && !n && P(49)[0] == 0x11 );
+    reset(); private_view( 16, 4 ); layout( 16, 4, RW );
+    T( nw( P(17), 5 ) == STATUS_ACCESS_DENIED && !n && P(17)[0] == 0x11 );
+
+    for (i = 0; i < sizeof(refused); i++)
+    {
+        reset(); private_view( 8, 4 ); layout( 8, 4, refused[i] );
+        T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 );
+    }
+    reset(); private_view( 8, 4 ); vp[8] = vp[10] = vp[11] = RW; vp[9] = RO; host( 2 );
+    T( writable( P(9) ) && nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && P(9)[0] == 0x11 );
+    reset(); private_view( 8, 4 ); layout( 8, 4, RX ); NOTE( 9, PAGE_EXECUTE_READWRITE );
+    T( nw( P(9), 5 ) == STATUS_SUCCESS && n == 5 && !n_server && !writable( P(9) ) );
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 );   /* protect record remains one-shot */
+
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    before_store = reuse_as_foreign; source_reads = 0; swap_on_read = 1;
+    T( nw( P(9), 5 ) == STATUS_ACCESS_DENIED && !n && n_server == 1 && P(9)[0] == 0x11 );
+    T( source_reads == 1 );   /* originally admitted, then a foreign view replaced it before the first store */
+    reset(); private_view( 8, 4 ); layout( 8, 4, RW );
+    before_store = reuse_as_foreign; source_reads = 0; swap_on_read = 2;
+    T( nw( P(8) + 0xfff, 4 ) == STATUS_PARTIAL_COPY && n == 1 && !n_server &&
+       P(8)[0xfff] == (char)data[0] && P(9)[0] == 0x11 && source_reads == 2 );
+    before_store = NULL; cur_peb = &pebs[0]; view_kind = 0; wow32 = 1;
+    unsetenv( "MADEIRA_SELF_WRITE_PRIVATE" );
+}
+
 static void test_log( void )   /* a fresh process: the log's counters start at 0 */
 {
     int i;
@@ -320,7 +434,7 @@ int main( int argc, char **argv )
     for (i = 0; i < (int)sizeof(data); i++) data[i] = (unsigned char)(i * 7 + 3);
     setenv( "MADEIRA_SELF_WRITE", "1", 1 );   /* off by default; every test but test_switch runs with it on */
     if (argc > 1 && !strcmp( argv[1], "log" )) test_log();
-    else { test_pages(); test_record(); test_nt32(); test_switch(); test_reach64(); }
+    else { test_pages(); test_record(); test_nt32(); test_switch(); test_reach64(); test_private64(); }
     printf( "%s\n", fails ? "HARNESS FAILED" : "harness ok" );
     return fails != 0;
 }
@@ -341,7 +455,7 @@ if cc:
         run = lambda *args: subprocess.run([exe, *args], capture_output=True, text=True, env=env, timeout=120)
         if b.returncode == 0:
             r = run()
-            check("pages, the protect record, NtWriteVirtualMemory, the switch and the reach of a 32-bit and a 64-bit program",
+            check("pages, the protect record, NtWriteVirtualMemory, owned private views and replacement before either page's store",
                   r.returncode == 0 and r.stdout.strip().endswith("harness ok"), r.stdout + r.stderr)
             r = run("log")
             log = [l for l in r.stderr.splitlines() if l.startswith("[self-write]")]
@@ -350,6 +464,25 @@ if cc:
                   and log[1].startswith("[self-write] pid 0031: ") and " rw-view " in log[1] and " protect-record " in log[2]
                   and "STATUS_PARTIAL_COPY" in log[3] and all(", 0 written ( ), stopped at " in l for l in log[4:]),
                   "\n".join(log) + r.stdout + r.stderr[-1500:])
+            # A compiling mutant must fail an assertion, rather than merely crash or stop compiling.
+            for label, old, new in (
+                ("foreign ownership", "view && view->ios_owner == owner && is_view_valloc( view ) &&",
+                 "view && is_view_valloc( view ) &&"),
+                ("per-page replacement", "(!private_view || ios_self_write_private_view( at, len ))",
+                 "(!private_view || TRUE)"),
+                ("the private-view switch", "if (!own && ios_self_write_private_enabled() && ios_self_write_private_view( addr, size ))",
+                 "if (!own && ios_self_write_private_view( addr, size ))"),
+            ):
+                check(label + " negative control has one production anchor", CUT.count(old) == 1)
+                Path(c).write_text(HEAD + CUT.replace(old, new) + TESTS)
+                b = subprocess.run(flags + ["-fsanitize=address,undefined", "-fno-sanitize-recover=undefined",
+                                            "-fno-omit-frame-pointer"], capture_output=True, text=True)
+                check(label + " negative control compiles", b.returncode == 0, b.stderr)
+                if b.returncode == 0:
+                    r = run()
+                    check(label + " negative control is rejected by the regression cases",
+                          r.returncode != 0 and "FAIL line " in r.stdout and "HARNESS FAILED" in r.stdout,
+                          r.stdout + r.stderr)
 
 # ---------------------------------------------------------------- 2. the wiring
 nwvm = cut(src, "NTSTATUS WINAPI NtWriteVirtualMemory( HANDLE process, void *addr, const void *buffer,")
@@ -362,7 +495,7 @@ request = ("        SERVER_START_REQ( write_process_memory )\n        {\n"
 branch = re.search(r"\n    if \(process == NtCurrentProcess\(\) && size && ios_self_write_enabled\(\) &&[^{]*\)\n    \{", nwvm)
 check("NtWriteVirtualMemory: the branch, for the pseudo-handle only, comes before the server request, which is unchanged",
       branch is not None and nwvm.count(request) == 1 and nwvm.count("ios_self_write(") == 1
-      and branch.end() < nwvm.index("ios_self_write( addr, buffer, size, &paths )") < nwvm.index(request))
+      and branch.end() < nwvm.index("ios_self_write( addr, buffer, size, &paths, reach == 2 )") < nwvm.index(request))
 nvp = cut(src, "NTSTATUS WINAPI NtProtectVirtualMemory( HANDLE process, PVOID *addr_ptr, SIZE_T *size_ptr,")
 note, ok_block = "ios_self_write_note_protect( base, size, new_prot );", "\n    if (!status)\n    {\n"
 check("NtProtectVirtualMemory notes a successful change of its own process, with the rounded range",
@@ -383,6 +516,9 @@ check("the catalog documents env.MADEIRA_SELF_WRITE, off by default, in the gene
                     r'sources: \["build/ntdll-unix/virtual_ios\.c"\]\)', cat) is not None)
 bridge = (root / "app/Madeira/WineProcessBridge.m").read_text()
 check("the session end clears the switch", 'unsetenv("MADEIRA_SELF_WRITE");' in cut(bridge, "static void wine_session_end(void)\n{"))
+check("build 666: the session end clears MADEIRA_SELF_WRITE_PRIVATE too, and the catalog documents it (off by default)",
+      'unsetenv("MADEIRA_SELF_WRITE_PRIVATE");' in cut(bridge, "static void wine_session_end(void)\n{")
+      and re.search(r'"env\.MADEIRA_SELF_WRITE_PRIVATE": \{[^}]*"default": "0"', gen) is not None)
 
 print("PASS: self-write" if ok else "FAILED: self-write")
 sys.exit(0 if ok else 1)

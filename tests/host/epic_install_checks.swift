@@ -213,6 +213,62 @@ func manifestPhase() async {
     for name in ["cdl-huge", "cdl-over", "cdl-more", "fml-huge", "fml-over", "fml-more", "meta-short", "meta-long", "part-unknown-guid", "part-offset", "part-size", "string-huge", "string-huge-wide"] {
         check((try? main(file("hostile/" + name + ".bin"))) == nil, "hostile manifest \(name) is refused")
     }
+    // Round 668 (merge N008; Bus Simulator 21 0C8N69, "reason=manifest-magic"): Epic's older JSON manifest, the same lists keyed by
+    // chunk GUID with numbers as blobs (three decimal digits per byte, little-endian).
+    func blob(_ bytes: [UInt8]) -> String { bytes.map { String(format: "%03d", Int($0)) }.joined() }
+    func le(_ value: UInt64, _ count: Int) -> [UInt8] { (0..<count).map { UInt8(truncatingIfNeeded: value >> (8 * UInt64($0))) } }
+    let g1 = "0123456789ABCDEF0011223344556677", g2 = "FEDCBA98765432100A0B0C0D0E0F1011"
+    func jsonManifest(_ change: (inout [String: Any]) -> Void = { _ in }) -> Data {
+        var j: [String: Any] = [
+            "ManifestFileVersion": blob(le(13, 4)), "bIsFileData": false, "AppNameString": "Bus", "BuildVersionString": "1.0-json",
+            "LaunchExeString": "Bus.exe", "LaunchCommand": "-json", "PrereqIds": ["p1"], "PrereqName": "", "PrereqPath": "", "PrereqArgs": "",
+            "ChunkFilesizeList": [g1: blob(le(4000, 8)), g2: blob(le(3000, 8))],
+            "ChunkHashList": [g1: blob(le(0x1122_3344_5566_7788, 8)), g2: blob(le(42, 8))],
+            "ChunkShaList": [g1: String(repeating: "ab", count: 20)],
+            "DataGroupList": [g1: blob([7]), g2: blob([93])],
+            "FileManifestList": [["Filename": "Bus/Bus.exe", "FileHash": blob([UInt8](repeating: 9, count: 20)), "bIsUnixExecutable": true,
+                                  "InstallTags": ["tag"],
+                                  "FileChunkParts": [["Guid": g1, "Offset": blob(le(0, 4)), "Size": blob(le(600_000, 4))],
+                                                     ["Guid": g2, "Offset": blob(le(1000, 4)), "Size": blob(le(2000, 4))]]]],
+        ]
+        change(&j)
+        return try! JSONSerialization.data(withJSONObject: j)
+    }
+    do {
+        let m = try main(Data("\n ".utf8) + jsonManifest())
+        check(m.featureLevel == 13 && m.appName == "Bus" && m.buildVersion == "1.0-json" && m.launchExe == "Bus.exe" && m.launchCommand == "-json"
+              && m.prereqIDs == ["p1"], "a JSON manifest (leading white space): level, names, launch program and command")
+        check(m.chunks.count == 2 && m.chunks.map(\.guid.hex) == [g1, g2] && m.chunks.map(\.fileSize) == [4000, 3000] && m.chunks.allSatisfy { $0.window == 1 << 20 }
+              && m.chunks[0].rollingHash == 0x1122_3344_5566_7788 && m.chunks[0].group == 7 && m.chunks[1].group == 93
+              && m.chunks[0].sha1 == [UInt8](repeating: 0xAB, count: 20) && m.chunks[1].sha1 == [UInt8](repeating: 0, count: 20),
+              "...its chunks: GUIDs in order, file sizes, 1 MiB windows, rolling hashes, groups, SHA-1s (none listed: zeros)")
+        check(m.files.count == 1 && m.files[0].size == 602_000 && m.files[0].parts.map(\.chunk) == [0, 1] && m.files[0].parts[1].offset == 1000
+              && m.files[0].flags == 4 && m.files[0].tags == ["tag"] && m.files[0].sha1 == [UInt8](repeating: 9, count: 20), "...its file: parts, size, flags, tags, SHA-1")
+        check(BCDEpicContent.chunkPath(featureLevel: m.featureLevel, m.chunks[0]) == "ChunksV3/07/1122334455667788_" + g1 + ".chunk",
+              "...and a chunk's CDN path as for a binary manifest of the same level")
+    } catch { check(false, "a JSON manifest: \(error)") }
+    func jsonFails(_ what: String, _ expected: BCDEpicManifestError, _ data: Data) {
+        do { _ = try main(data); check(false, "JSON manifest \(what) was accepted") } catch {
+            check((error as? BCDEpicManifestError) == expected, "JSON manifest \(what) is refused (\(error))")
+        }
+    }
+    jsonFails("that is not JSON", .malformed("json"), Data("{ not json".utf8))
+    jsonFails("without its lists", .malformed("json-lists"), Data("{}".utf8))
+    jsonFails("of file data", .malformed("file-data"), jsonManifest { $0["bIsFileData"] = true })
+    jsonFails("of a newer level", .newer(22), jsonManifest { $0["ManifestFileVersion"] = blob(le(22, 4)) })
+    jsonFails("with a part of an unlisted chunk", .malformed("part-guid"), jsonManifest {
+        $0["FileManifestList"] = [["Filename": "a", "FileHash": blob([UInt8](repeating: 1, count: 20)),
+                                   "FileChunkParts": [["Guid": "00000000000000000000000000000001", "Offset": blob(le(0, 4)), "Size": blob(le(1, 4))]]]]
+    })
+    jsonFails("with a part past its chunk's window", .malformed("part-range"), jsonManifest {
+        $0["FileManifestList"] = [["Filename": "a", "FileHash": blob([UInt8](repeating: 1, count: 20)),
+                                   "FileChunkParts": [["Guid": g1, "Offset": blob(le(1 << 20, 4)), "Size": blob(le(1, 4))]]]]
+    })
+    jsonFails("with a blob that is not digits", .malformed("json-blob"), jsonManifest { $0["ChunkFilesizeList"] = [g1: "12x"] })
+    jsonFails("with a bad GUID", .malformed("json-guid"), jsonManifest { $0["ChunkFilesizeList"] = ["XYZ": blob(le(1, 8))] })
+    jsonFails("with a bad chunk SHA-1", .malformed("chunk-sha"), jsonManifest { $0["ChunkShaList"] = [g1: "zz"] })
+    jsonFails("with an empty chunk", .malformed("chunk-size"), jsonManifest { $0["ChunkFilesizeList"] = [g1: blob(le(0, 8)), g2: blob(le(3000, 8))] })
+
     // A large game's manifest: 60,000 chunks and 20,000 files, read and planned in seconds.
     do {
         let started = Date()

@@ -43,6 +43,8 @@ import zoneinfo
 root = Path(__file__).resolve().parents[2]
 ok = True
 WRONG = {'Asia/Singapore': -480, 'Singapore': -480, 'Asia/Kuala_Lumpur': -480, 'America/Santo_Domingo': 240, 'America/Danmarkshavn': 0}
+# Morocco, whose standard offset the tz data writes two ways; see the zone loop below.
+MOROCCO = {'Africa/Casablanca', 'Africa/El_Aaiun'}
 
 
 def check(what, cond, detail=''):
@@ -209,6 +211,13 @@ if wine:
                     local = now.astimezone(zoneinfo.ZoneInfo(z))
                     std = local.utcoffset() - (local.dst() or datetime.timedelta(0))
                     want = -int(std.total_seconds() // 60)
+                    # Morocco: the tz data writes its rules in two forms (main: +01 with negative DST in Ramadan; rearguard:
+                    # +00 with +1 DST outside it), so "the standard offset" has two readings. macOS 27 shipped the rearguard
+                    # form in 2026b (Python: +00 standard, Wine: Bias -60, the clock's +01) and 2026f changed again (both +00
+                    # on 2026-11-19). Wine's Bias must be one of the two readings: Python's standard offset or the zone's
+                    # UTC offset at this moment; anything else is wrong as for every other zone.
+                    if z in MOROCCO and new_bias == -int(local.utcoffset().total_seconds() // 60):
+                        want = new_bias
                     if new_bias != want:
                         independent_bad.append((z, new_bias, want))
                 except Exception as e:   # a name Python's zoneinfo does not take

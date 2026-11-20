@@ -91,6 +91,23 @@ enum BCDLaunch {
                             // bind failures were all LiveContainer installs); appended last, so readers of the fields before it are unchanged.
                             + " lc=\(getenv("LC_HOME_PATH") != nil ? 1 : 0)")
         if sessionLog { LogStore.shared.startSessionLog(program: program) }
+        // Round 677 (the owner's decision, agent S1 S1-S2): a library start measures the game's folder too (a Dock start does it again in
+        // ContentView.startDock, with its install folder). exe-window-auto = 0 in the game's file or bcd.cfg turns it off; an exe-window-mb
+        // of the game's own wins in allocatePool. Only a folder under C:\ that is not C:\ itself.
+        StikJITHelper.exeWindowAutoMB = 0
+        if StikJITHelper.exeWindowAutoWanted(profile.get("exe-window-auto") ?? MadeiraConfig.get("exe-window-auto")),
+           let exe = LibraryEntry.hostURL(ofWindowsPath: entry.launchWindowsPath) {
+            let folder = exe.deletingLastPathComponent()
+            if folder.standardizedFileURL.path != LibraryEntry.hostDrive.standardizedFileURL.path,
+               let need = StikJITHelper.fixedBaseWindowMB(in: folder) {
+                StikJITHelper.exeWindowAutoMB = need.mb
+                LogStore.shared.log("[exe-window] \(need.exe) is a fixed-base image ending \(need.mb)MB above 0x140000000: "
+                    + "the executable window is widened to \(need.mb)MB for this session (exe-window-auto; exe-window-mb in the game's file overrides)")
+            }
+        }
+        // Round 677 (the owner's decision, agent S1 S1-S8): Wine's wintypes.dll for a program that imports the WinRT buffer API set.
+        BCDWinTypesAuto.prepare(folder: LibraryEntry.hostURL(ofWindowsPath: entry.launchWindowsPath)?.deletingLastPathComponent(),
+                                gameValue: profile.get("env.MADEIRA_WINTYPES"))
     }
 
     /// The size that MetalFX 1.5x brings back to this screen's shape at 720
@@ -175,5 +192,91 @@ enum BCDGameRekey {
         all[new] = value
         all[old] = nil
         defaults.set(all, forKey: key)
+    }
+}
+
+/// Round 677 (the owner, 2026-11-19, from agent S1's S1-S8): a 64-bit program that statically imports Windows' WinRT buffer API set
+/// (api-ms-win-core-winrt-robuffer-l1-1-0.dll, which Wine maps to wintypes.dll) or wintypes.dll itself cannot start without
+/// env.MADEIRA_WINTYPES = 1: Unity IL2CPP's GameAssembly.dll does it, and every archive log with the "import_dll ... robuffer ...
+/// not found" line had no frame (36 of 36; Car For Sale Simulator, Tears of Metal, Turbo Dismount 2, The Long Dark, CatMailCo ...).
+/// Before a start, the program folder's own 64-bit DLLs and EXEs (top level, at most 64 files, headers and the import table only)
+/// are read; when one imports either name and the game's file sets nothing, the key is on for this session (the session's end
+/// unsets it, WineProcessBridge.m). env.MADEIRA_WINTYPES = 0 in the game's file wins (its lines are applied after this).
+enum BCDWinTypesAuto {
+    /// The key this code turned on for the last start, so the next start never inherits it.
+    nonisolated(unsafe) static var setByUs = false
+
+    /// The first program file in `folder` (top level) that imports the WinRT buffer API set or wintypes.dll, and the name it imports.
+    static func importer(in folder: URL) -> (file: String, name: String)? {
+        guard let items = try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil,
+                                                                         options: [.skipsHiddenFiles]) else { return nil }
+        let programs = items.filter { ["dll", "exe"].contains($0.pathExtension.lowercased()) }
+            .sorted { a, b in   // GameAssembly.dll first: the file that has the import in every case seen
+                let ga = a.lastPathComponent.lowercased() == "gameassembly.dll", gb = b.lastPathComponent.lowercased() == "gameassembly.dll"
+                return ga != gb ? ga : a.lastPathComponent < b.lastPathComponent
+            }
+        for url in programs.prefix(64) {
+            if let name = imports(of: url).first(where: { wanted($0) }) { return (url.lastPathComponent, name) }
+        }
+        return nil
+    }
+
+    static func wanted(_ name: String) -> Bool {
+        let n = name.lowercased()
+        return n.hasPrefix("api-ms-win-core-winrt-robuffer-") || n == "wintypes.dll"
+    }
+
+    /// The DLL names a 64-bit (PE32+) program imports statically; [] for anything else or anything unreadable.
+    static func imports(of url: URL) -> [String] {
+        guard let fh = try? FileHandle(forReadingFrom: url) else { return [] }
+        defer { try? fh.close() }
+        func read(_ offset: UInt64, _ count: Int) -> [UInt8] {
+            guard (try? fh.seek(toOffset: offset)) != nil, let d = try? fh.read(upToCount: count) else { return [] }
+            return [UInt8](d)
+        }
+        let h = read(0, 4096)
+        func u16(_ b: [UInt8], _ o: Int) -> Int { o >= 0 && o + 2 <= b.count ? Int(b[o]) | Int(b[o + 1]) << 8 : 0 }
+        func u32(_ b: [UInt8], _ o: Int) -> Int { u16(b, o) | u16(b, o + 2) << 16 }
+        guard h.count >= 0x40, h[0] == 0x4d, h[1] == 0x5a else { return [] }
+        let pe = u32(h, 0x3c)
+        guard pe > 0, pe + 24 + 128 <= h.count, u32(h, pe) == 0x4550 else { return [] }
+        let sections = u16(h, pe + 6), optSize = u16(h, pe + 20), opt = pe + 24
+        guard u16(h, opt) == 0x20b, sections > 0, sections <= 96 else { return [] }      // PE32+ only: the 64-bit set lacks wintypes.dll
+        let importRVA = u32(h, opt + 112 + 8), importSize = u32(h, opt + 112 + 12)
+        guard importRVA > 0, importSize > 0 else { return [] }
+        var table: [(va: Int, size: Int, raw: Int, rawSize: Int)] = []
+        for i in 0..<sections {
+            let s = opt + optSize + i * 40
+            guard s + 40 <= h.count else { break }
+            table.append((u32(h, s + 12), max(u32(h, s + 8), u32(h, s + 16)), u32(h, s + 20), u32(h, s + 16)))
+        }
+        func offset(_ rva: Int) -> UInt64? {
+            for t in table where rva >= t.va && rva < t.va + t.size && rva - t.va < t.rawSize { return UInt64(t.raw + rva - t.va) }
+            return nil
+        }
+        guard let start = offset(importRVA) else { return [] }
+        let descriptors = read(start, min(importSize, 20 * 512))
+        var names: [String] = []
+        var i = 0
+        while i + 20 <= descriptors.count {
+            let nameRVA = u32(descriptors, i + 12)
+            if nameRVA == 0 && u32(descriptors, i) == 0 && u32(descriptors, i + 16) == 0 { break }   // the zero descriptor ends the table
+            if let at = offset(nameRVA) {
+                let raw = read(at, 96)
+                if let end = raw.firstIndex(of: 0), let s = String(bytes: raw[..<end], encoding: .ascii) { names.append(s) }
+            }
+            i += 20
+        }
+        return names
+    }
+
+    /// Before a start: undo our own earlier key, then turn it on for this session if a program in `folder` needs it.
+    static func prepare(folder: URL?, gameValue: String?) {
+        if setByUs { unsetenv("MADEIRA_WINTYPES"); setByUs = false }
+        guard let folder, gameValue == nil, getenv("MADEIRA_WINTYPES") == nil, let hit = importer(in: folder) else { return }
+        setenv("MADEIRA_WINTYPES", "1", 0)
+        setByUs = true
+        LogStore.shared.log("[wintypes-auto] \(hit.file) imports \(hit.name): Wine's wintypes.dll for this session "
+            + "(env.MADEIRA_WINTYPES = 0 in the game's file turns this off)")
     }
 }

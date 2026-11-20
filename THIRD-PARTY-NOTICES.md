@@ -53,8 +53,10 @@ dependency license texts are in `LICENSES/`. See "Why GPL-3.0-or-later" below.
 | **DirectX Shader Compiler (DXC)** 1.9.2609 (Microsoft and the LLVM Team) | University of Illinois/NCSA Open Source Licence; inside it: miniz (MIT; `miniz.c` public domain), Henry Spencer's regex code (its own permissive terms), ConvertUTF (Unicode, Inc.), MD5 (public domain), `regstrlcpy.c` (ISC-style, Todd C. Miller) | **Patched**: one patch, `build/dxc-win/0001-mingw-w64-build.patch`, the MinGW-w64 port of DXC pull request #8265 by **Raed Rizqie** (five commits of 2026-03-11, head `c1d55772d52b54a28c69f713964295d7a407da7f`, offered to the project under its licence; closed unmerged), applied for BCD in November 2026 without the second of its two `StringRef.h` hunks (the removal of the `is_nothrow_constructible` specialisations, which this tag already skips under libc++) and with its MinGW `MS_SUPPORT_VARIABLE_LANGOPTS` define replaced by the out-of-class language-option definitions LLVM's Unix build already has (`LangOptions.cpp`; with the define the compiler read HLSL as C) | The DLL `arm64ec-windows/dxcompiler-optin.dll` (x86-64 Windows), built by `tools/build-dxcompiler.sh` from the project's tag `v1.9.2609` (commit `01b62ad47db7dee3dd33f90e7339cf9e860b3f93`, cloned at build time and checked) with the tracked llvm-mingw; the binary is not committed. Runs as `dxcompiler.dll` only for a game whose file says `env.MADEIRA_OPTIN_DLLS = dxcompiler`: wgpu games compile their Direct3D 12 shaders with it instead of Wine's FXC (round 663). Microsoft's own release binaries and their `dxil.dll` are **not** used (that package's Microsoft Software License Terms restrict it to Windows). Copyright (c) 2003-2015 University of Illinois at Urbana-Champaign; Copyright (C) Microsoft Corporation. Licence texts, as the project ships them: `LICENSES/DirectXShaderCompiler-LICENSE.txt`, `LICENSES/DirectXShaderCompiler-ThirdPartyNotices.txt`; provenance in `build/dxc-win/BCD-SOURCE.txt`. Linked statically against llvm-mingw's runtime (libc++, libunwind: Apache-2.0 with LLVM exception; the MinGW-w64 runtime: `LICENSES/MinGW-w64-runtime.txt`). A separate DLL a Windows program loads; nothing of DXC is linked into BCD. |
 | **Mesa** 25.0.7 (OSMesa, Zink, softpipe; the Mesa project, mesa3d.org) | MIT; individual files carry other permissive licences (the source's `docs/license.rst`, copied into the bundle as `licenses/Mesa-license.rst`) | **Patched**: `build/mesa-ios/patches` (eight patches, offered under Mesa's MIT licence) | Separate dylib `gl/libOSMesa.dylib`, the desktop OpenGL backend of BCD's OpenGL driver (OSMesa draws through Zink): used only by a game whose `gl-backend` is `zink`. Built by `build/mesa-ios/build.sh` from the unmodified 25.0.7 release tarball (SHA-256 in the script) plus those patches; the binary is not committed. Licence text: `LICENSES/MIT-Mesa.txt`. |
 | **MoltenVK** 1.4.2 (Khronos Group; The Brenwill Workshop Ltd) | Apache-2.0; inside it SPIRV-Cross and SPIRV-Tools (Apache-2.0) and cereal (BSD-3-Clause) | Unmodified. | Separate dylib `gl/libMoltenVK.dylib` (Vulkan on Metal), the Vulkan driver Mesa's Zink runs on. Built by `build/moltenvk-ios/build.sh` from the v1.4.2 tag (its commit is pinned in the script) and the dependencies its `fetchDependencies` pins; not committed. The script copies the licence texts of MoltenVK, SPIRV-Cross, SPIRV-Tools and cereal into the bundle's `licenses/` (`MoltenVK-Apache-2.0.txt`, `SPIRV-Cross-Apache-2.0.txt`, `SPIRV-Tools-Apache-2.0.txt`, `cereal-BSD-3-Clause.txt`). |
-| **Mesa KosmicKrisp** (Mesa's Vulkan-on-Metal-4 driver by LunarG and Google, `src/kosmickrisp`; Mesa at commit `b39d173c`, 26.3.0-devel; the Mesa project, mesa3d.org) | MIT; individual files carry other permissive licences (the source's `docs/license.rst`, copied into the bundle as `licenses/KosmicKrisp-Mesa-license.rst`; licence text and copyright holders: `LICENSES/MIT-Mesa-KosmicKrisp.txt`) | **Patched**: `build/mesa-ios/playport-patches` (nineteen patches by the Playport authors, from playportdev/playport `412de5f` as Madeira's branch `playport/kosmickrisp` carries them; they change Mesa code and are offered under Mesa's MIT licence). The other build profile (`KK_PROFILE=release`, not the default) is the unmodified Mesa 26.2.4 release tarball with the six patches of `build/mesa-ios/kosmickrisp-patches` (125hz, Madeira #462; MIT). | Separate dylib `gl/libvulkan_kosmickrisp.dylib` (Vulkan 1.4 on Metal 4): used only by a game whose own file says `vulkan = kosmickrisp`, on iOS 26 or later with a GPU of the Metal 4 family. Built by `build/mesa-ios/build-kosmickrisp-bcd.sh` from the source archive of that commit (its SHA-256 is in `build/mesa-ios/fetch-playport.py`) plus those patches; the binary is not committed, and a build without it keeps Vulkan off for such a game. Build-time tools only, not shipped: LLVM, SPIRV-LLVM-Translator and SPIRV-Tools (they turn Mesa's own OpenCL C kernels into the shader source the library carries). |
-| **LuaJIT** 2.1 (Mike Pall) | MIT | Unmodified source at the commit pinned in `build/luajit-x64/build.sh`, built by it for x86-64 Windows | The DLL `compat/love/lua51.dll` (interpreter only, GC64): loaded in place of a LÖVE game's own `lua51.dll` when that one is an x64 LuaJIT that needs memory below 2 GB, only in a session whose game has `gl-backend` on (`build/wineserver/luajit_compat.c`); the game's file is never changed. The script copies LuaJIT's licence into the bundle as `licenses/LuaJIT-MIT.txt`. |
+| **Mesa KosmicKrisp** (Mesa's Vulkan-on-Metal-4 driver by LunarG and Google, `src/kosmickrisp`; Mesa at commit `b39d173c`, 26.3.0-devel; the Mesa project, mesa3d.org) | MIT; individual files carry other permissive licences (the source's `docs/license.rst`, copied into the bundle as `licenses/KosmicKrisp-Mesa-license.rst`; licence text and copyright holders: `LICENSES/MIT-Mesa-KosmicKrisp.txt`) | **Patched**: `build/mesa-ios/playport-patches` (thirty-one patches by the Playport authors: 0001-0019 from playportdev/playport `412de5f` as Madeira's branch `playport/kosmickrisp` carries them, 0020-0031 from playportdev/playport `06e83ca` (build 669); and BCD's own 0032; they change Mesa code and are offered under Mesa's MIT licence). The other build profile (`KK_PROFILE=release`, not the default) is the unmodified Mesa 26.2.4 release tarball with the six patches of `build/mesa-ios/kosmickrisp-patches` (125hz, Madeira #462; MIT). | Separate dylib `gl/libvulkan_kosmickrisp.dylib` (Vulkan 1.4 on Metal 4): used only by a game whose own file says `vulkan = kosmickrisp`, on iOS 26 or later with a GPU of the Metal 4 family. Built by `build/mesa-ios/build-kosmickrisp-bcd.sh` from the source archive of that commit (its SHA-256 is in `build/mesa-ios/fetch-playport.py`) plus those patches; the binary is not committed, and a build without it keeps Vulkan off for such a game. Build-time tools only, not shipped: LLVM, SPIRV-LLVM-Translator and SPIRV-Tools (they turn Mesa's own OpenCL C kernels into the shader source the library carries). |
+| **kk-retry** (a shim in front of KosmicKrisp; `build/mesa-ios/kk-retry/kk_retry.m`, `build.sh`, `test_mac.m`; bcd-games pull request #57 by **RageMC**, 2026-11-16) | MIT (`LICENSES/MIT-kk-retry.txt`, Copyright (c) 2026 RageMC) | **Modified by BCD** (marked in each file's header): a marker the build step reads, the slow-compile dump capped at eight files a run, the install made in a temporary folder and run as its own CI step after the KosmicKrisp cache | When KosmicKrisp is in the build, `gl/libvulkan_kosmickrisp.dylib` is this shim and re-exports the real library, `gl/libvulkan_kosmickrisp_real.dylib`: it retries the Metal 4 compiles iOS's compiler service drops under memory pressure, runs at most four at once, at the size optimisation level, with a 4G shader cache. Used only by a game with `vulkan = kosmickrisp`. The same pull request gave the five memory lines of the `enshrouded` list row (helper memory, pool margin, swap file, video memory). |
+| **MoltenVK, patched** (a second dylib, `gl/libMoltenVK_patched.dylib`; `build/moltenvk-ios/build-patched.sh`, `patches/0001-moltenvk-enshrouded.patch`, `patches/spirv-cross-0001-instance-relative-patch-id.patch`; bcd-games pull request #57 by **RageMC**, 2026-11-16) | Apache-2.0 (the same texts as the unmodified MoltenVK above: `MoltenVK-Apache-2.0.txt`, `SPIRV-Cross-Apache-2.0.txt`); every source of the patch is Apache-2.0 too: MoltenVK itself (The Khronos Group and MoltenVK's contributors; `CONTRIBUTING.md` of the patch is CC-BY-4.0 and is not built), `github.com/nivogli/MoltenVK` (Apache-2.0 as GitHub shows it) and the open pull requests to MoltenVK | **Modified** (Apache-2.0 section 4(b): this row and the patch are the notice that the files were changed): MoltenVK v1.4.2 (commit `db66022`) with the patch applied to the working tree, SPIRV-Cross at `aa217aeb` with one patch committed on top; the script is Connor Gow's `build.sh` (#462) with RageMC's patch steps, written again by BCD (a folder of its own, stamps, the library under its own install name, a build that fails leaves the IPA without it) | Built in BCD from build 669 and used only by a game with `vulkan = moltenvk-patched` (and by that game's Zink OpenGL, so that one MoltenVK runs in the process); `gl/libMoltenVK.dylib` stays the library of `vulkan = moltenvk`. What the patch holds and who wrote it, line by line: "The patched MoltenVK, file by file" below. |
+| **LuaJIT** 2.1 (Mike Pall) | MIT | Source at the commit pinned in `build/luajit-x64/build.sh` with two patches (MIT) by Paulo Eduardo Correa (pauloec, pull request #51, November 2026): `c-style-comments-diagnostic.patch` (a debug message when the lexer meets `/*` or `//`) and `c-style-comments.patch` (it parses them as comments), built by that script for x86-64 Windows | The DLL `compat/love/lua51.dll` (interpreter only, GC64): loaded in place of a LÖVE game's own `lua51.dll` when that one is an x64 LuaJIT that needs memory below 2 GB, only in a session whose game has `gl-backend` on (`build/wineserver/luajit_compat.c`); the game's file is never changed. The optional `compat/lua-c-comments/lua51.dll` is built with `build/luajit-x64/c-style-comments.patch` (MIT) for games that use C-style Lua comments. The script copies LuaJIT's licence into the bundle as `licenses/LuaJIT-MIT.txt`. |
 | **7-Zip** 26.05 (Igor Pavlov) | LGPL-2.1-or-later; BSD 3-clause for its LZFSE and Zstandard decoders (`CPP/7zip/Compress/LzfseDecoder.cpp`, `C/ZstdDec.c`); BSD 2-clause for `C/Xxh64.c`; parts public domain. The RAR decoders carry the "unRAR licence restriction" and are **not built** | Unmodified source (`third-party/7zip`, the project's `7z2605-src.tar.xz`, SHA-256 `0b6080b8c3e7a579161d2d495224c0e51c467576cb4c7048b0ab485ef44cc22e`), built by `tools/build-7zip.py` as the two separate Windows programs `arm64ec-windows/7zFM.exe` (the File Manager) and `7z.exe` (the command-line program) | An archive manager in the Wine desktop's Start menu ("7-Zip" folder); BCD's runtime installer also unpacks NVIDIA's PhysX package with `7z.exe`. Built with 7-Zip's own `DISABLE_RAR` / `DISABLE_RAR_COMPRESS` code selection, so `.rar` archives are not supported and the unRAR restriction does not apply to anything BCD ships. Copyright (C) 1999-2026 Igor Pavlov. The project's `License.txt` is kept as received: `LICENSES/7-Zip-License.txt`; provenance and what is excluded: `third-party/7zip/BCD-SOURCE.txt`. The programs are linked statically against llvm-mingw's runtime (libc++, libunwind: Apache-2.0 with LLVM exception; the MinGW-w64 runtime: `LICENSES/MinGW-w64-runtime.txt`). Separate programs started by the user; nothing of 7-Zip is linked into BCD. |
 | **Wine Mono** 11.0.0 | Mono: LGPL or MIT X11 per part; FNA: Ms-PL and MIT; FAudio, FNA3D, MojoShader, SDL3: zlib; winforms, wpf, monoDX, System.Speech and Wine Mono's own code: MIT (`build/wine-mono/COPYING`) | Prebuilt runtime, unmodified except `lib/mono/4.5/mscorlib.dll` (4 IL bytes in `GC.Collect`, `build/wine-mono/bundle.sh`), bundled as `wine-mono/` with that COPYING only in a development build made after `build/wine-mono/fetch.sh`; **release builds do not include it** (the packaging step removes `wine-mono/`). Instead the app downloads it from WineHQ when the user asks (setup or Settings › .NET Framework, `app/Madeira/WineMono.swift`), checks it against the same SHA-256, unpacks it without `lib/mono/*-api` and applies the same mscorlib patch on the device | Runs .NET Framework programs; Wine's mscoree loads it. The x86 tarball from `dl.winehq.org`, SHA-256 pinned in `build/wine-mono/pin.sh`. The compile-time reference assemblies (`lib/mono/*-api`, which include the GPL-licensed ICSharpCode.SharpZipLib) are not bundled. Exact corresponding source: `wine-mono-11.0.0-src.tar.xz` from the same folder; see "Corresponding source" below. |
 
@@ -543,9 +545,12 @@ patches). 215 lines in 6 files, without the patches:
 | `tests/host/check-playport-mesa-profile.py` | whole file | 56 | `07471e3` intraducine 56 |
 
 Files taken whole that are left without a header comment, because the build applies them with `patch`: the six Mesa patches
-`build/mesa-ios/kosmickrisp-patches/kosmickrisp-ios-0001-*.patch` to `0006-*.patch` (125hz, Madeira #462; 652 lines) and the nineteen Mesa
-patches `build/mesa-ios/playport-patches/0001-*.patch` to `0019-*.patch` (the Playport authors, playportdev/playport `412de5f`, each with its
-own `From:` line; 5,022 lines). All twenty-five change Mesa code and are offered under Mesa's licence (MIT), not under the GPL. Five lines of
+`build/mesa-ios/kosmickrisp-patches/kosmickrisp-ios-0001-*.patch` to `0006-*.patch` (125hz, Madeira #462; 652 lines) and the thirty-one Mesa
+patches `build/mesa-ios/playport-patches/0001-*.patch` to `0031-*.patch` (the Playport authors, each with its own `From:` line: `0001` to
+`0019` from playportdev/playport `412de5f`, 5,022 lines; `0020` to `0031` from playportdev/playport `06e83ca` of 2026-11-13, taken for build
+669, 1,327 lines: Playport's Mesa patches 0027, 0032, 0037, 0038, 0039, 0040, 0042, 0093, 0126, 0155, 0030 and 0090 in that order, the last
+two adapted to BCD's series as their messages say). All thirty-seven change Mesa code and are offered under Mesa's licence (MIT), not under
+the GPL. BCD's own `0032-*.patch` (MIT like the files it changes) applies last. Five lines of
 `build/mesa-ios/build-kosmickrisp-bcd.sh` (how SPIRV-LLVM-Translator is built) are from Madeira #476 (intraducine) and credited in its header.
 
 *GOG Galaxy service*: branch `playport/gog` (commit `9d6dad8`, intraducine, 2026-10-28), which carries the Playport authors' code
@@ -623,6 +628,35 @@ Counted as above (355 lines in 10 files: alantangok 107, NevesHenry with intradu
 
 Lines of #604 below the count's threshold are credited in their files' headers too (`SteamProtoMessages.swift`, `DepotManifest.swift`).
 
+Taken on 2026-11-17 (build 669; the owner chose the list of `~/Desktop/Madeira-BCD/upstream-kontrol-2026-11-17.md`): from Madeira's open pull requests,
+#622 (Vugar, `3adceb56`: the free-area scan starts at the address map's floor, `ios_va_map_floor`, and its check), #611 (NevesHenry, `932d2eac`:
+a failed WoW64 parameter allocation ends only that pseudo-process, and its check), #620 (NevesHenry, `ffd0ae51`: content servers leave the chunk
+rotation only after repeated failures, and its check), and three commits of #615 and #594: `ecb4ecc1` (Russell Barton: Dock's install scripts of a
+game on an opened external folder), `6cfcc828` (Russell Barton: DEP options only for a WoW64 caller; BCD wrote its own check, upstream's models
+per-process flags BCD does not have) and `6ec82989` (SirDank with insertfloppy: an autorelease pool around each repair read; `EADownloader.swift`
+is that commit's file byte for byte), under GPL-3.0-or-later with the Madeira Converter Exception (the lines in `build/ntdll-unix`: LGPL-2.1-or-later,
+as those Wine files); BCD's section 7 terms do not apply to these lines. Counted as above (lines added):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/Madeira/BCDEpic/EpicFormats.swift` | portions | 11 | #594 `6ec82989` SirDank and insertfloppy 11 |
+| `app/Madeira/DockInstallers.swift` | portions | 8 | #615 `ecb4ecc1` Russell Barton 8 |
+| `app/Madeira/SteamOwnedLibrary.swift` | portions | 8 | #620 NevesHenry 8 |
+| `app/Madeira/SwiftEA/EADownloader.swift` | portions | 10 | #594 `6ec82989` SirDank and insertfloppy 10 |
+| `app/Madeira/SwiftSteam/Content/DepotDownloader.swift` | portions | 26 | #620 NevesHenry 26 |
+| `build/ntdll-unix/env_ios.c` | portions | 16 | #611 NevesHenry 16 |
+| `build/ntdll-unix/process_ios.c` | portions | 5 | #615 `6cfcc828` Russell Barton 5 |
+| `build/ntdll-unix/virtual_ios.c` | portions | 84 | #622 Vugar 84 |
+| `tests/host/check-dock-installers.py` | portions | 15 | #615 `ecb4ecc1` Russell Barton 15 |
+| `tests/host/check-steam-cdn-host-rotation.py` | whole file | 177 | #620 NevesHenry 177 |
+| `tests/host/check-va-scan-ceiling.py` | portions | 106 | #622 Vugar 106 |
+| `tests/host/check-va-scan-floor.py` | whole file | 270 | #622 Vugar 270 |
+| `tests/host/check-wow64-params-alloc.py` | whole file | 262 | #611 NevesHenry 262 |
+
+The scan's other end is BCD's own (the address map's ceiling, `ios_va_map_ceiling`, engine review of 2026-11-17), written after #622's floor:
+eight of its lines in `virtual_ios.c` are lines of that pull request, and its check `tests/host/check-va-scan-ceiling.py` runs in #622's host
+harness (106 lines). Both are in the table above.
+
 Vulkan for 32-bit programs (2026-11-14, build 660) is BCD's own work on that route and on Wine's own WoW64 Vulkan path; Madeira has no 32-bit
 Vulkan and no Madeira code was taken for it. `tools/patch-wine-vulkan-wow64.py` changes Wine's `dlls/winevulkan` (the generator `make_vulkan`, the
 generated `vulkan_thunks.c`, `vulkan.c`, `vulkan_private.h`) and `dlls/win32u/vulkan.c` in the checked-out tree at build time: the text it writes and
@@ -664,8 +698,8 @@ Wine tree at build time, for the 32-bit ntdll only (the 64-bit ntdll.dll is a co
 
 ### Other people's work in BCD
 
-Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by le0-VV, #11 by vancez, #12 by Pardoxum, #27 by creeper4004, #31 by iqui27 (Henrique Rocha), #33 by Taala2, #43 by pauloec (Paulo Eduardo Correa),
-#46 by rbarton124) and work from rtmtree's
+Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by le0-VV, #11 by vancez, #12 by Pardoxum, #27 by creeper4004, #31 by iqui27 (Henrique Rocha), #33 by Taala2, #43, #49, #50 and #51 by pauloec (Paulo Eduardo Correa),
+#46 by rbarton124, #55 by bogsen (Bogdan Seniuc), #57 by RageMC) and work from rtmtree's
 Persona 3 Reload fork of BCD (helper memory, root certificate enumeration, the bytes at the instruction pointer in the guest log) are credited
 in the files that hold them and in `README-BCD.md`.
 
@@ -677,6 +711,22 @@ healed its kernel32 imports into its own ntdll copy, with the one-condition chan
 rows of `recommended/recommendations.json` (rdr2-steam v16, rdr2-other v7, 22 lines from build 665, listed in the rows' notes); and the
 finding that `env.MADEIRA_NTDLL_SYNC = native` dies at start (the catalog note). The report's other findings (a binary kernel32 timer
 patch, which BCD's own `kernel32-usd.dll` of build 663 replaces) were not taken.
+
+Work from SeeTheBridges's fork of BCD 0.1.634 (`github.com/SeeTheBridges/bcd-games`, GPL-3.0; reported on BCD's Discord in November 2026),
+taken 2026-11-16: the finding that the External drives folder picker never opened on iOS 26 (only `picker opened` in the log), and the
+UIKit picker of commit d20e8e28 (`UIDocumentPickerViewController` for folders, `asCopy: false`). In `app/Madeira/BCDSettingsSections.swift`,
+`BCDFolderPicker` (49 lines) is adapted from the commit's `BCDExternalFolderPicker` (`ExternalGamesPicker.swift`) and
+`chooseExternalFolder` (13 lines) from its `chooseExternalFolder` (`BCDSettingsLive.swift`), moved into the Storage page for BCD's 0.1.653
+storage code; BCD added the check that leaves a picker already up alone. The move of the saves backup's importer and share sheet onto the
+Saves group (which also lets the Windows prefix's "Import an export" open) and the checks in `tests/host/check-external-storage.py` are BCD's.
+The fork's other six commits (build workflow changes) were not taken.
+
+Issues reported to BCD in October and November 2026 whose findings and proposed changes BCD followed in build 666 (BCD wrote the code itself;
+nothing was copied): AltDoug's #36 (a released Direct3D 12 texture kept on the list Metal heaps already waited on until two more command
+buffers complete, and the reclaim draining every ready entry: `mad_release_after_gpu`, `madeira-d3d12/src/pe/madeira_d3d12.c`) and #35 (a copy
+between an uncompressed texture and a block-compressed one through a staging buffer, one texel per block: `exec_copy_reinterpret`, the same
+file), both for skate.; Kyworn's #44 (a native ARM64 program, PE machine 0xaa64, started on the aarch64-windows core: `madeira_target_is_native_arm64`,
+`app/Madeira/WineProcessBridge.m`).
 
 Pull request #46 of `thebcd69/bcd-games` by rbarton124 (Russell Barton), "Ubisoft Connect and its
 games now run on BCD" (taken 2026-11-11, build 652): twenty commits written against 0.1.634 and signed off under the Developer Certificate of Origin (the author says the
@@ -764,16 +814,94 @@ Each file below also carries the author's "Portions copyright" line in its heade
 
 | Pull request | Author | Files and what |
 |---|---|---|
+| #57, 2026-11-16 | RageMC | The patched MoltenVK: `build/moltenvk-ios/build-patched.sh` (from `build.sh` and the pull request's patch steps; BCD wrote it again as an opt-in second library), `build/moltenvk-ios/patches/0001-moltenvk-enshrouded.patch` and `spirv-cross-0001-instance-relative-patch-id.patch` (whole files as received, byte for byte; the first is made of other people's work too, credited file by file below), the Enshrouded settings of the `enshrouded` row of `recommended/recommendations.json` and the kk-retry shim (components table above). BCD's own parts: the `vulkan = moltenvk-patched` word, the library check and log lines in `WineProcessBridge.m`, Zink taking the same library in such a session (`build/win32u-unix/opengl_ios.c`), the list policy, the settings catalog entries, the game page's choice, the CI steps and `tests/host/check-moltenvk-patched.py` |
+| #55, 2026-11-15 | bogsen (Bogdan Seniuc) | Trackmania and Ubisoft Connect: the program's writes into its own private allocations (`build/ntdll-unix/virtual_ios.c` `ios_self_write_private_view`; BCD put it behind `env.MADEIRA_SELF_WRITE_PRIVATE`), the private zero-file backing (`ios_zero_file_*`, `env.MADEIRA_FEX_ZERO_FILE`), `ios_alert_exit_safe` in `server_ios.c`, the nonblocking overlapped poll (`tools/patch-wine-overlapped-system-apc.py`; BCD builds its 64-bit half only into `kernelbase-optin.dll`), the tagged JIT pool (`app/Madeira/JITAllocator.c` `jit_tagged_region`, `jit_tagged_prepare_owned_region`, `JITAllocator.h`, `StikJITHelper.swift` `pool-tagged`), the patchable x64 D3D11 swapchain entries (`tools/patch-dxmt-x64-swapchain-entry.py`, `tools/build-d3d11-dll.sh`), the shared launcher depot (`app/Madeira/SwiftSteam/Library/SteamAppInfo.swift`, `SteamLibraryFetcher.swift`, `BCDSteamDLC/BCDSteamDLC.swift`; BCD narrowed it to Ubisoft Connect Services, app 4099820), their catalog entries (`build/tools/gen-config-catalog.py`) and checks (`tests/host/check-fex-zero-file.py`, `check-overlapped-system-apc.py`, `check-pool-tagged.py`, `check-tagged-pool-region.py`, parts of `check-self-write.py`, `check-pool-split-retry.py`, `check-steam-dlc.py`, `check-steam-library.py`, `check-x64-graphics-entry.py`); the Trackmania settings of `recommended/recommendations.json` (row trackmania v1) |
+| #51, 2026-11-13 | pauloec (Paulo Eduardo Correa) | C-style comments in Lua: `build/luajit-x64/c-style-comments.patch` and `c-style-comments-diagnostic.patch` (MIT), `build/luajit-x64/build.sh` (the two variants), `build/wineserver/luajit_compat.c` (`env.MADEIRA_LUAJIT_C_COMMENTS`), `mapping_ios.c` (a comment), `app/Madeira/MadeiraDock.swift` (Grim Dawn's compatibility launch), the rule `luajit-c-style-comments` of `build/tools/autotune_rules.py` with its three fixtures, `tests/host/check-luajit-compat.py` (parts), the catalog entry |
+| #50, 2026-11-13 | pauloec (Paulo Eduardo Correa) | The rule `bgfx-opengl-no-context` of `build/tools/autotune_rules.py` and its fixture (Heroes of Hammerwatch II) |
+| #49, 2026-11-13 | pauloec (Paulo Eduardo Correa) | The SteamOS/Linux compatibility advice and the current-launch condition of the rules `steamworks-interface-missing-box` and `steamworks-interface-missing` (`build/tools/autotune_rules.py`; the rules themselves were BCD's) and the fixture `grim-dawn-steamworks-dialog-2026-11-13` |
 | #43, 2026-11-04 | pauloec (Paulo Eduardo Correa) | The native iPhone Duo interface: `app/Madeira/BCDFrontEnd.swift` (`BCDDuoFrontEnd`), `BCDLibraryView.swift` (`BCDDuoLibraryView`), `BCDSettings.swift` (`BCDDuoSettingsRoot`), `BCDHomeView.swift` (Windows desktop card, controller navigation), `BCDDownloadsView.swift`, `BCDFocus.swift` (navigators, layer ownership), `BCDFoldable.swift` (`BCDDuoFeatures`, `BCDDuoPageOwner`), `BCDFoldableSettings.swift`, `BCDFoldableUI.swift`, `BCDGamePage.swift` (embedded page), `BCDLiveFrontEnd.swift` (system prompts as menus), `BCDLiveStore.swift`, `BCDMenu.swift`, `BCDSessionLive.swift`, `BCDStyle.swift` (Liquid Glass), `BCDArt.swift`, `BCDSectionKit.swift`, `BCDSettingsCore.swift`, `BCDSettingsSections.swift`, `BCDStore.swift`, `BCDGyroLive.swift`, `BCDInputLive.swift`, `ContentView.swift`, `GamepadInput.swift`, `HardwareInput.swift`, `Library.swift`; the Windows desktop's quit and background compositor: `WineProcessBridge.m/.h`, `WineServerBridge.m/.h`, `Winios/Winios.m/.h`, `build/wineserver/fd_ios.c`, `mach_ios.c`; `tools/patch-dxmt-metal-atomics.py`; host checks `check-duo-controller-navigation.py`, `check-duo-download-session.py`, `check-desktop-quit.py`, `check-dxmt-metal-atomics.py` and edits to six existing checks |
 | #31, 2026-10-27 | iqui27 (Henrique Rocha) | The tabletop pose: `app/Madeira/ContentView.swift` (`FoldTabletop`, the game surface, touch mapping and touch controls below the fold), `BCDFoldable.swift` (`BCDTabletop`), `tests/host/check-bcd-touch.py` |
 | #27, 2026-10-27 | creeper4004 | Colour profiles: `app/Madeira/BCDThemeCore.swift`, `BCDTheme.swift`, `BCDThemes.json`, `BCDSettingsAppearance.swift`, `docs/color-profiles.md`, `tests/host/check-bcd-themes.py`; one-line colour changes in `BCDStyle.swift`, `BCDSettings.swift`, `BCDSettingsCore.swift`, `BCDAccounts.swift`, `BCDComponents.swift`, `BCDControllerScreen.swift`, `BCDFrontEnd.swift`, `BCDGamePage.swift`, `BCDHomeView.swift`, `BCDInGameMenu.swift`, `BCDSectionKit.swift`, `BCDSession.swift`, `BCDSetupView.swift`, `BCDStartingScreen.swift`, `BCDTouchControls.swift`, `BCDTouchEditor.swift`, `MadeiraApp.swift`, `tools/ui-preview.py` |
 | netheritenee's fork, 2026-11-15 | netheritenee | The child-process condition of `ios_jit_heal_aux_iat` in `build/ntdll-unix/virtual_ios.c`; the RDR2 settings of `recommended/recommendations.json` (rdr2-steam v16, rdr2-other v7) |
 | #33, 2026-10-30 | Taala2 | Cross-process TlsFree diagnostics: `build/ntdll-unix/ios_tls_diag_util.h`, `ios_nw_tls_diag.h`, parts of `ios_tls_clear.h`, `virtual_ios.c`, `signal_arm64_ios.c`; `tests/host/check-tls-clear-process.py` |
 
+### The patched MoltenVK, file by file
+
+`build/moltenvk-ios/patches/0001-moltenvk-enshrouded.patch` (bcd-games pull request #57 by RageMC, 2026-11-16) is a patch to MoltenVK v1.4.2. The pull request
+describes it as MoltenVK fixes, the fixes of github.com/nivogli/MoltenVK that were made for Enshrouded, and a few local fixes. BCD compared its added lines with
+the sources, with these findings: it holds almost every commit of KhronosGroup/MoltenVK's main branch after v1.4.2 (main at `5189f8de`, 2026-10-13), four
+pull requests that are still open there (#2860 jamesdolan, #2873 MaxLikesCode, #2887 imellag, #2889 prosperkartik), the commits of nivogli's fork (GitHub account
+nivogli, branch `enshrouded-v19`, 15 commits of 2026-10-26, also sent to MoltenVK as #2891 and #2892), and 401 lines found in none of them, which the pull request
+describes as its own: the check of update-after-bind bindings in `vkGetDescriptorSetLayoutSupport`, indirect-count caps kept per draw site, compressed and multisample
+copy sizes, debug-report handles, and the rest of the Enshrouded profile. `spirv-cross-0001-instance-relative-patch-id.patch` adds the SPIRV-Cross option
+`instance_relative_patch_id` for tessellation's `gl_PrimitiveID` (43 lines, RageMC; the commit's author in the mailbox is "BCD contributors"), on SPIRV-Cross `aa217aeb`
+(KhronosGroup/SPIRV-Cross, Apache-2.0). All of it is Apache-2.0, like the code it changes. Counted as everywhere in this file: the patch's added lines of four
+or more characters (1631 of them in the MoltenVK patch), each under the first source that holds the same text: a commit of MoltenVK's main branch (a name alone is that
+commit's author), an open pull request (`MoltenVK #N name`), nivogli's fork, else RageMC. Together: nivogli (fork) 523; RageMC 401; Isabella Basso 301; Anshul Noori 140; utzcoz 136; dttdrv 21; osy 20; KhronosWebservices 19; MoltenVK #2873 MaxLikesCode 10; MoltenVK #2887 imellag 8; hopesuffers 8; Bill Hollings 7; hstdt 7; Courtney Andrew Richardson 6; David Grinberg 5; squidbus 5; MoltenVK #2860 jamesdolan 3; MoltenVK #2889 prosperkartik 3; Alexander Devaikin 2; Axel Gneiting 2; Denis Korobov 2; Francisco Ramirez de Anton 1; M4rc68 1.
+
+`build/moltenvk-ios/build-patched.sh`, 71 lines of four or more characters outside comments: #462 Connor Gow 18 (lines of `build.sh`); #57 RageMC 1; BCD 52.
+
+| File of MoltenVK in the patch | Kind | Lines | Sources |
+|---|---|---|---|
+| `CMakeLists.txt` | portions | 2 | Bill Hollings 1; Francisco Ramirez de Anton 1 |
+| `CONTRIBUTING.md` | whole file | 19 | KhronosWebservices 19 |
+| `Docs/MoltenVK_Runtime_UserGuide.md` | portions | 4 | utzcoz 3; Anshul Noori 1 |
+| `Docs/Whats_New.md` | portions | 17 | utzcoz 8; Bill Hollings 3; Alexander Devaikin 1; Anshul Noori 1; Courtney Andrew Richardson 1; MoltenVK #2873 MaxLikesCode 1; MoltenVK #2887 imellag 1; MoltenVK #2889 prosperkartik 1 |
+| `ExternalRevisions/SPIRV-Cross_repo_revision` | portions | 1 | M4rc68 1 |
+| `MoltenVK/MoltenVK.xcodeproj/project.pbxproj` | portions | 2 | Bill Hollings 2 |
+| `MoltenVK/MoltenVK/API/mvk_private_api.h` | portions | 2 | Bill Hollings 1; RageMC 1 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdDraw.h` | portions | 33 | Isabella Basso 22; utzcoz 6; RageMC 3; nivogli (fork) 2 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdDraw.mm` | portions | 336 | Isabella Basso 204; RageMC 71; nivogli (fork) 47; utzcoz 8; dttdrv 4; Denis Korobov 2 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdPipeline.h` | portions | 3 | RageMC 2; nivogli (fork) 1 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdPipeline.mm` | portions | 29 | nivogli (fork) 23; RageMC 4; dttdrv 2 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdRendering.h` | portions | 11 | Anshul Noori 7; nivogli (fork) 4 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdRendering.mm` | portions | 5 | Anshul Noori 5 |
+| `MoltenVK/MoltenVK/Commands/MVKCmdTransfer.mm` | portions | 46 | RageMC 46 |
+| `MoltenVK/MoltenVK/Commands/MVKCommand.h` | portions | 8 | nivogli (fork) 8 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandBuffer.h` | portions | 20 | nivogli (fork) 13; RageMC 5; dttdrv 1; hopesuffers 1 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandBuffer.mm` | portions | 90 | nivogli (fork) 61; dttdrv 8; hstdt 7; RageMC 7; hopesuffers 5; Axel Gneiting 2 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandEncoderState.h` | portions | 9 | Anshul Noori 9 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandEncoderState.mm` | portions | 82 | Anshul Noori 70; MoltenVK #2873 MaxLikesCode 9; hopesuffers 2; RageMC 1 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandEncodingPool.h` | portions | 6 | Isabella Basso 6 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandEncodingPool.mm` | portions | 10 | Isabella Basso 10 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandPipelineStateFactoryShaderSource.h` | portions | 95 | nivogli (fork) 51; Isabella Basso 38; RageMC 6 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandResourceFactory.h` | portions | 7 | Isabella Basso 7 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandResourceFactory.mm` | portions | 10 | Isabella Basso 10 |
+| `MoltenVK/MoltenVK/Commands/MVKCommandTypePools.def` | portions | 1 | Anshul Noori 1 |
+| `MoltenVK/MoltenVK/Commands/MVKMTLResourceBindings.h` | portions | 6 | dttdrv 6 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKDescriptorSet.mm` | portions | 2 | MoltenVK #2889 prosperkartik 2 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKDevice.h` | portions | 7 | RageMC 7 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKDevice.mm` | portions | 94 | RageMC 55; utzcoz 28; osy 7; Anshul Noori 3; Isabella Basso 1 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKDeviceFeatureStructs.def` | portions | 4 | utzcoz 3; Anshul Noori 1 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKDeviceMemory.mm` | portions | 25 | osy 13; utzcoz 12 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKImage.h` | portions | 1 | MoltenVK #2887 imellag 1 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKImage.mm` | portions | 58 | RageMC 38; utzcoz 14; MoltenVK #2887 imellag 6 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKInstance.mm` | portions | 4 | utzcoz 2; RageMC 2 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKPerfICount.h` | whole file | 217 | nivogli (fork) 118; RageMC 99 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKPerfTess.h` | whole file | 63 | nivogli (fork) 61; RageMC 2 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKPipeline.h` | portions | 23 | nivogli (fork) 23 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKPipeline.mm` | portions | 103 | nivogli (fork) 53; Anshul Noori 25; utzcoz 15; squidbus 5; RageMC 4; Alexander Devaikin 1 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKPixelFormats.mm` | portions | 5 | utzcoz 5 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKQueryPool.h` | portions | 2 | David Grinberg 2 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKQueryPool.mm` | portions | 3 | David Grinberg 3 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKQueue.mm` | portions | 3 | MoltenVK #2860 jamesdolan 3 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKRenderPass.mm` | portions | 4 | RageMC 4 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKShaderModule.mm` | portions | 59 | nivogli (fork) 58; RageMC 1 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKSwapchain.mm` | portions | 6 | RageMC 6 |
+| `MoltenVK/MoltenVK/GPUObjects/MVKVulkanAPIObject.h` | portions | 4 | RageMC 4 |
+| `MoltenVK/MoltenVK/Layers/MVKExtensions.def` | portions | 5 | utzcoz 3; Anshul Noori 1; Isabella Basso 1 |
+| `MoltenVK/MoltenVK/Utility/MVKConfigMembers.def` | portions | 2 | RageMC 2 |
+| `MoltenVK/MoltenVK/Utility/MVKEnvironment.h` | portions | 31 | RageMC 31 |
+| `MoltenVK/MoltenVK/Utility/MVKStateTracking.h` | whole file | 13 | Anshul Noori 13 |
+| `MoltenVK/MoltenVK/Vulkan/vulkan.mm` | portions | 32 | utzcoz 29; Isabella Basso 2; Anshul Noori 1 |
+| `MoltenVKShaderConverter/MoltenVKShaderConverter/SPIRVToMSLConverter.cpp` | portions | 6 | Courtney Andrew Richardson 5; Anshul Noori 1 |
+| `MoltenVKShaderConverter/MoltenVKShaderConverter/SPIRVToMSLConverter.h` | portions | 1 | Anshul Noori 1 |
+
 ## Code from Porthole (tylerkaska112/Porthole)
 
 Porthole ([tylerkaska112/Porthole](https://github.com/tylerkaska112/Porthole)) is another fork of Madeira, by The Porthole authors. In
-November 2026 BCD took the code listed here from Porthole 1.3.0 (commit `99ec315` of 2026-11-12).
+November 2026 BCD took the code listed here from Porthole 1.3.0 (commit `99ec315` of 2026-11-12) and, for build 669 (2026-11-17), the
+Steam Cloud download row below from Porthole 1.3.1 (commit `6d4d1aa`).
 
 **Licence position.** Porthole's own code is licensed under **GPL-3.0-or-later with the Madeira Converter Exception** (its `LICENSE` and
 `LICENSE-EXCEPTION.md`; its files carry `SPDX-License-Identifier: GPL-3.0-or-later` and `Copyright (C) 2026 The Porthole authors`). BCD took
@@ -816,6 +944,7 @@ names the number in brackets is the lines that follow Porthole's statements, cou
 | `app/Madeira/SwiftAmazon/AmazonAuth.swift` | whole file but its network session | 158 | `app/Sources/Amazon/AmazonAuth.swift`: the sign-in (the login page's address with a PKCE challenge, the code in the address it ends on, the device registration, the refreshed token, the sign-out) and the Keychain store. BCD's changes: the sign-in page is BCD's sign-in sheet instead of a web view of its own, BCD's Keychain name and network session, no SwiftUI, the account is read by `AmazonLibrary`, the messages |
 | `app/Madeira/SwiftAmazon/AmazonAPI.swift` | whole file but `AmazonProgress` | 226 | `app/Sources/Amazon/AmazonLibrary.swift` (`AmazonGame`, `AmazonAPI`: the entitlements and where a build is, the games among the entitlements) and `AmazonInstaller.swift` (the download worker: the folder name, the safe paths, the address that is renewed, the byte meter, every file fetched, checked against its SHA-256 and moved in, the program `fuel.json` names). BCD's changes: a file is fetched whole (no ranged fetcher), BCD's progress type, the record names BCD's library entry, the messages |
 | `app/Madeira/SwiftAmazon/AmazonLibrary.swift` | portions | 22 | `app/Sources/Amazon/AmazonLibrary.swift` and `AmazonInstaller.swift`: reading the account's list and the queue's start, pause and end. The rest is BCD's, shaped like BCD's EA store (the switch, the library entry, Play, the pause for a game session) |
+| `app/Madeira/SteamCloud.swift` | portions | 6 (13) | **Porthole 1.3.1, commit `6d4d1aa`:** `app/Sources/Steam/SteamCloud.swift` (`downloadMissing`, `describe`, `candidates(of:rawSize:)`, `systemDecode`): a cloud file whose download was cut short is fetched once more; a file that does not check out names what arrived (bytes served, its first 8 bytes, Steam's two sizes); other packings (zlib, gzip, bare deflate) tried only after the existing path fails, each kept only if its SHA-1 is Steam's (`SteamCloudTransfer.fetch`, `FetchError`, `checked`, `otherPackings`, `inflate`). BCD's changes: BCD's zip path stays first, no Zstandard or VZip forms, BCD's 256 MB cap, the reason word in `SteamOwnedLibrary.reason` |
 
 `tools/patch-winemetal-vt-interp.py` (BCD's own; Apple's VideoToolbox frame interpolation as an experiment) presents each generated picture
 the way the present-fx row above describes, from a command buffer of its own that is committed before the next drawable is taken. That is

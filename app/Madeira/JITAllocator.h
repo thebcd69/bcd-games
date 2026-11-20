@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+ * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 SirDank: code taken from https://github.com/willfaust/Madeira (pull request #362)
  * under GPL-3.0-or-later and modified for BCD in October 2026. See THIRD-PARTY-NOTICES.md. */
 #ifndef JIT_ALLOCATOR_H
@@ -109,6 +111,11 @@ int jit_txm_in_device_tree(void);
 // prepare a memory region for JIT execution.
 // Returns the prepared address (may differ from input on allocation).
 void *jit26_prepare_region(void *addr, size_t len);
+
+// Fresh normally charged tagged RX; cleanup failure requires restarting the app.
+void *jit_tagged_region(size_t size, int *cleanup_error);
+// Prepare only final unpublished RX/RW aliases. Neither mapping is released here.
+bool jit_tagged_prepare_owned_region(void *rx, void *rw, size_t size);
 
 // iOS 26 BRK-based protocol: Tell the debugger to detach.
 void jit26_detach(void);

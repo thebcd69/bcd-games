@@ -177,7 +177,8 @@ SETENV_LINES = sorted([
     'setenv("MADEIRA_EXE", "explorer.exe", 1)',
     'setenv("MADEIRA_ARGS", "/desktop=shell,\\(entry.resolution) \\"\\(Self.hostProgram)\\" --epic", 1)',
     'setenv("MADEIRA_EXE", Self.hostProgram, 1)',
-    'setenv("MADEIRA_ARGS", "--epic", 1)'])
+    'setenv("MADEIRA_ARGS", "--epic", 1)',
+    'setenv("MADEIRA_DESKTOP", "1", 1)'])   # round 668 (R1 S2): Epic's Rockstar route runs the host in the Wine desktop
 FILE_ACCESS = {"BCDEpic.swift", "BCDEpicDriver.swift", "BCDEpicInstall.swift", "BCDLiveStoreEpic.swift", "BCDEpicHostFiles.swift", "BCDEpicAudit.swift"}
 for name, text in sources.items():
     c = code(text)
@@ -193,7 +194,7 @@ for name, text in sources.items():
         check("LogStore" not in c, f"{name}: no LogStore (logs go through BCDEpicLog)")
 start_code = code(sources["BCDEpicStart.swift"])
 check(sorted(l.strip() for l in start_code.splitlines() if re.search(r"(?<![un])\bsetenv\(", l)) == SETENV_LINES,
-      "a signed-in start sets the environment in five places only: the request's path, and the session's program and arguments (BCD Host, --epic): never a code, an ID, a name or a token")
+      "a signed-in start sets the environment in six places only: the request's path, the session's program and arguments (BCD Host, --epic) and the desktop flag of the Rockstar route: never a code, an ID, a name or a token")
 check(sorted(set(re.findall(r'unsetenv\("(\w+)"\)', start_code))) == ["BCD_HOST_REQUEST"], "...and removes only BCD_HOST_REQUEST")
 
 cache = re.search(r"struct BCDEpicItem: .*?\n}\n", code(sources["BCDEpicCatalog.swift"]), re.S).group(0)
@@ -215,10 +216,12 @@ ALLOWED = [r"status", r"verifyStatus", r"BCDEpicLog\.millis\(since: \w+\)", r"BC
            r"installs\.count", r"refusals\.entries\.count", r"refusal\.code", r"BCDEpicRules\.sanitized\(refusal\.code\)", r"record\.deploymentID == nil \? 0 : 1",
            r'hosts\.prefix\(4\)\.joined\(separator: ","\)', r"shape", r"found\.downloadBytes", r"found\.installBytes", r"found\.eos \? 1 : 0",
            r'BCDEpicRules\.sanitized\(found\.refusal\?\.code \?\? "none"\)', r"why", r"total", r"wanted\.count", r'own \? "epic" : "yours"', r'action == \.update \? "update" : "verify"', r"data\.count", r"info\.featureLevel",
+           # Round 668 (merge N008): the first eight bytes of a manifest file neither reader took, as hex (a format, not personal data).
+           r'data\.prefix\(8\)\.map \{ String\(format: "%02x", \$0\) \}\.joined\(\)',
            # Milestone 2: steps, statuses, timings, counts and short reasons of a signed-in start; the host's report (numbers only, pinned by the harness).
            r"step", r"error\.code\.rawValue", r"name", r"token \? 1 : 0", r"credentials\.ownership == nil \? 0 : 1", r"failure\.logReason", r"removed",
            r"report\.logText", r"BCDEpicRules\.sanitized\(reason\)", r"ovtWindows == nil \? 0 : 1", r"flags\.contains\(\.tree\) \? 1 : 0", r"flags\.contains\(\.services\) \? 1 : 0",
-           r"desktop \? 1 : 0", r"result\.summary", r"files", r"bytes", r"total", r"\$0", r"counts\[\$0\] \?\? 0", r"truncated \? 1 : 0", r"BCDEpicRules\.sanitized\(hit\.label\)", r"hit\.file", r"BCDEpicRules\.sanitized\(info\.exceptionID \?\? \"none\"\)"]
+           r"desktop \? 1 : 0", r"hostHeld \? 1 : 0", r"result\.summary", r"files", r"bytes", r"total", r"\$0", r"counts\[\$0\] \?\? 0", r"truncated \? 1 : 0", r"BCDEpicRules\.sanitized\(hit\.label\)", r"hit\.file", r"BCDEpicRules\.sanitized\(info\.exceptionID \?\? \"none\"\)"]
 
 
 def interpolations(line):

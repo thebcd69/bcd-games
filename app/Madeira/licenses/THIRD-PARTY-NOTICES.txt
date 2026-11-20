@@ -133,9 +133,19 @@ Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend se
   permissive licences (legal/LICENSES/MIT-Mesa-KosmicKrisp.txt, KosmicKrisp-Mesa-license.rst): gl/libvulkan_kosmickrisp.dylib, when this build has it, built from that source with the
   Playport authors' patches (build/mesa-ios/playport-patches, offered under MIT). Used only by a game whose vulkan setting is
   kosmickrisp (iOS 26 or later).
-- LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built from the unmodified source
-  (build/luajit-x64/build.sh), loaded in place of a LOVE game's lua51.dll when that is an x64 LuaJIT needing memory below 2 GB;
-  the game's file is not modified.
+- kk-retry (bcd-games pull request #57 by RageMC), MIT, Copyright (c) 2026 RageMC (legal/LICENSES/MIT-kk-retry.txt), with BCD's
+  changes: gl/libvulkan_kosmickrisp.dylib, when this build has KosmicKrisp, is this shim in front of the real library
+  (gl/libvulkan_kosmickrisp_real.dylib); it retries the Metal compiles iOS drops under memory pressure.
+- MoltenVK, patched (bcd-games pull request #57 by RageMC), Apache-2.0 like MoltenVK (MoltenVK-Apache-2.0.txt, SPIRV-Cross-Apache-2.0.txt):
+  gl/libMoltenVK_patched.dylib, when this build has it: MoltenVK 1.4.2 with changes, which are marked as made by this notice and by the patch
+  files in build/moltenvk-ios/patches: MoltenVK commits and still open pull requests made after 1.4.2 (by Isabella Basso, Anshul Noori,
+  utzcoz, dttdrv, osy, jamesdolan, MaxLikesCode, imellag, prosperkartik and the other authors THIRD-PARTY-NOTICES.md names), the work of
+  nivogli (github.com/nivogli/MoltenVK), and RageMC's own fixes, with SPIRV-Cross plus RageMC's patch. Used only by a game whose vulkan
+  setting is moltenvk-patched, and by that game's Zink OpenGL.
+- LuaJIT 2.1 (Mike Pall), MIT (LuaJIT-MIT.txt): compat/love/lua51.dll, an x86-64 Windows DLL built from the source with a C-style
+  comment diagnostic (build/luajit-x64/c-style-comments-diagnostic.patch), loaded in place of a LOVE game's lua51.dll when that is
+  an x64 LuaJIT needing memory below 2 GB; the game's file is not modified. The optional compat/lua-c-comments/lua51.dll is built
+  with build/luajit-x64/c-style-comments.patch. Both patches are by Paulo Eduardo Correa (pauloec, pull request #51), MIT.
 
 Separate Windows programs built from unmodified third-party source (started from the Start menu; nothing of them is linked into BCD):
 - 7-Zip 26.05 (https://www.7-zip.org/, https://github.com/ip7z/7zip), (C) 1999-2026 Igor Pavlov: arm64ec-windows/7zFM.exe (the File

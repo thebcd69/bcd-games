@@ -20,6 +20,7 @@ check-playport-mesa-profile.py is Madeira's own check of the two build routes. T
     CI's three steps with a failure that only warns, the packaging check, the licence text's place and .gitignore.
 With a built library at app/Madeira/gl/ (a build tree), the packaging rules are run on it too.
 """
+import json
 import re
 import subprocess
 import sys
@@ -84,14 +85,14 @@ check("the game page asks the same question once: the bundled file, iOS 26, a Me
       'appendingPathComponent("libvulkan_kosmickrisp.dylib")' in usable and "if #available(iOS 26.0, *) { return MTLCreateSystemDefaultDevice()?.supportsFamily(.metal4) ?? false }" in usable
       and usable.rstrip().endswith("return false\n    }()") and "import Metal\n" in page, usable)
 check("...the driver choice is offered only there; everywhere else the Direct3D group keeps build 646's switch, in its place",
-      'Self.kosmicKrispUsable ? Self.vulkanChoice(profile) :\n            Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk",' in d3d
+      'Self.kosmicKrispUsable ? Self.vulkanChoice(profile) :\n            Self.toggle("vulkan", "Vulkan (experimental)", profile.get("vulkan") == "moltenvk" || profile.get("vulkan") == "moltenvk-patched",' in d3d
       and d3d.index("Self.line(BCDOpenGL.key") < d3d.index("Self.kosmicKrispUsable ?") < d3d.index('Self.toggle("nvidia"'))
 choice = body(page, "    private static func vulkanChoice(_ profile: GameProfile) -> BCDGameSetting {", "\n    }\n")
-check("...the choice is Off, MoltenVK, KosmicKrisp on the game's own `vulkan` line, with an id of its own",
+check("...the choice is Off, MoltenVK, KosmicKrisp (and, from build 669, MoltenVK (patched) where the build has it) on the game's own `vulkan` line, with an id of its own",
       'BCDGameChoice(value: "", label: "Off"), BCDGameChoice(value: "moltenvk", label: "MoltenVK")' in choice
       and 'BCDGameChoice(value: "kosmickrisp", label: "KosmicKrisp")' in choice and 'BCDGameSetting(id: "vulkan.driver"' in choice
       and '        case "vulkan.driver":' in page
-      and 'setLine(game, "vulkan", value == "moltenvk" || value == "kosmickrisp" ? value : "")' in page
+      and 'setLine(game, "vulkan", value == "moltenvk" || value == "moltenvk-patched" || value == "kosmickrisp" ? value : "")' in page
       and 'setLine(game, "vulkan", on ? "moltenvk" : "")' in page, choice)
 
 gen = (R / "build/tools/gen-config-catalog.py").read_text()
@@ -99,8 +100,13 @@ check("the settings catalog lists the word and what it needs",
       '("kosmickrisp", "Vulkan on Metal 4 (Mesa KosmicKrisp; iOS 26)")' in gen and "it needs iOS 26 " in gen
       and '("moltenvk", "Vulkan on Metal (MoltenVK)")' in gen)
 policy = (R / "app/Madeira/GameRecommendationsList.swift").read_text()
-check("a downloaded list still may set vulkan only to moltenvk (KosmicKrisp is the player's own choice)",
-      'if key == "vulkan" {' in policy and 'guard value == "moltenvk" else {' in policy and '"kosmickrisp"' not in policy)
+# Round 668 (G2 S1; Enshrouded 7Q88YK, PNJPSK): a list may also choose kosmickrisp, for a game MoltenVK cannot run (no drawIndirectCount);
+# its line carries minBuild 668, so an older build, whose policy refuses the word, never reads it.
+check("a downloaded list may set vulkan to moltenvk, to kosmickrisp from build 668 (a game MoltenVK cannot run) and to moltenvk-patched from build 669",
+      'if key == "vulkan" {' in policy and 'guard value == "moltenvk" || value == "moltenvk-patched" || value == "kosmickrisp" else {' in policy
+      and all((c.get("minBuild", 0) if isinstance(c, dict) else 0) >= 668
+              for r in json.loads((R / "recommended/recommendations.json").read_text())["rules"] for c in r["config"]
+              if "vulkan = kosmickrisp" in (c["line"] if isinstance(c, dict) else c)))
 
 mesa = R / "build/mesa-ios"
 wrapper = (mesa / "build-kosmickrisp-bcd.sh").read_text()
@@ -188,9 +194,18 @@ check("the wrapper uses at most 4 jobs by default (an 8-core build machine runs 
 
 patches = sorted(p.name for p in (mesa / "playport-patches").glob("*.patch"))
 release = sorted(p.name for p in (mesa / "kosmickrisp-patches").glob("*.patch"))
-check("19 Playport patches (0001 to 0019, each by the Playport authors) and the six release patches",
-      [p[:4] for p in patches] == [f"{n:04d}" for n in range(1, 20)]
-      and all("From: The Playport authors <dev@playport.dev>" in (mesa / "playport-patches" / p).read_text().split("\n---\n")[0] for p in patches)
+check("31 Playport patches (0001 to 0019 from 412de5f8; 0020 to 0031, round 669, from 06e83ca5: each by the Playport authors), BCD's 0032 "
+      "(round 669, X-Plane 12's opaque fds, tests/host/check-kk-opaque-fd.py), 0033 (build 673, X-Plane 12's SNORM blending, "
+      "tests/host/check-kk-snorm-blend.py), 0034 (build 674, the refused MSL logged, tests/host/check-kk-msl-fail.py) and 0035 last "
+      "(build 675, stores to multisampled storage images left out with a key, tests/host/check-kk-ms-store-drop.py) "
+      "and the six release patches",
+      [p[:4] for p in patches] == [f"{n:04d}" for n in range(1, 36)]
+      and all("From: The Playport authors <dev@playport.dev>" in (mesa / "playport-patches" / p).read_text().split("\n---\n")[0] for p in patches[:31])
+      and patches[31] == "0032-kk-in-process-opaque-fd-memory-and-semaphores.patch"
+      and patches[32] == "0033-kk-snorm-color-attachments-report-blending.patch"
+      and patches[33] == "0034-kk-log-the-msl-source-metal-refused.patch"
+      and patches[34] == "0035-kk-drop-stores-to-multisampled-storage-images.patch"
+      and all((mesa / "playport-patches" / q).read_text().startswith("From: BCD <190844990+thebcd69@users.noreply.github.com>") for q in patches[31:35])
       and len(release) == 6 and all(p.startswith("kosmickrisp-ios-000") for p in release), (patches, release))
 check("...the recipe reads the six from their own folder, so the OSMesa build's patch folder (its cache key) holds only its numbered patches",
       'set -- "$HERE"/kosmickrisp-patches/kosmickrisp-ios-*.patch' in recipe
@@ -201,7 +216,7 @@ check("the library is compiled for iOS 26.0 and later (Metal 4)", cross.count("-
 
 ci = (R / ".github/workflows/build-ipa.yml").read_text()
 step = ci[ci.index("      - name: Restore KosmicKrisp (Mesa's Vulkan on Metal 4)"):ci.index("      # A game's own *.log lines (errors, GPU / driver / display lines) in the")]
-key = "kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}"
+key = "kosmickrisp-v1-${{ hashFiles('build/mesa-ios/build-kosmickrisp-bcd.sh', 'build/mesa-ios/build-kosmickrisp.sh', 'build/mesa-ios/build-playport-kosmickrisp.sh', 'build/mesa-ios/fetch-playport.py', 'build/mesa-ios/kk-stale-source.sh', 'build/mesa-ios/kosmickrisp-ios-arm64.cross', 'build/mesa-ios/kosmickrisp-patches/*.patch', 'build/mesa-ios/playport-patches/*.patch') }}"
 check("CI: restore, build, save on one key of the scripts and the patches; three named files, no globs (the local runner tests each path)",
       step.count(key) == 2 and step.count("app/Madeira/gl/libvulkan_kosmickrisp.dylib\n") == 2 and "*" not in "".join(l for l in step.splitlines() if l.strip().startswith("app/Madeira/")), step[:1500])
 check("...a failed build only warns, saves nothing and leaves no older library in the package",

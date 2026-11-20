@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+ * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 ft7t8drgwf-wq: code taken from https://github.com/willfaust/Madeira (pull request #475)
  * under LGPL-2.1-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /*
@@ -596,6 +598,12 @@ static inline uintptr_t ios_section_state(void)
 static inline void ios_section_set_state( uintptr_t state )
 {
     if (ios_section_key_ready) pthread_setspecific( ios_section_key, (void *)state );
+}
+
+/* Completion checkpoints must not re-enter Wine while a section is held or exit is underway. */
+int ios_alert_exit_safe(void)
+{
+    return ios_section_key_ready && !(ios_section_state() & (IOS_SECTION_DEPTH | IOS_SECTION_ABORT | IOS_SECTION_EXITING));
 }
 
 /* A dead pipe on the current thread. TRUE: fail the request, the thread exits when

@@ -190,6 +190,14 @@ struct AutoTuneGlueChecks {
                && AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 6062, memoryPct: nil, ramMB: 7500) == nil
                && AutoTuneOffer.sixGBClassWords(title: "G", peakMB: 6062, memoryPct: 98, ramMB: nil) == nil,
                "a 12 GB phone (limit 8191), a 4 GB phone, an unknown percentage or an unknown RAM: no 6 GB sentence")
+        // Round 677 (agent G4 S1; Slay the Spire 2 43MMYA: 3911 MB at 95 % of a 4,095 MB limit on a 6 GB phone): the 4 GB class has its sentence.
+        expect(AutoTuneOffer.fourGBClassWords(title: "Slay the Spire 2", peakMB: 3911, memoryPct: 95, ramMB: 5700)
+                == "This device lets apps use about 4 GB, and Slay the Spire 2 needed more (its memory reached 3911 MB). A game this size needs a phone or iPad that gives apps more than 4 GB.",
+               "43MMYA: a 4 GB-limit phone is named")
+        expect(AutoTuneOffer.fourGBClassWords(title: "G", peakMB: 6062, memoryPct: 98, ramMB: 7500) == nil
+               && AutoTuneOffer.fourGBClassWords(title: "G", peakMB: 2244, memoryPct: 95, ramMB: 3800) == nil
+               && AutoTuneOffer.fourGBClassWords(title: "G", peakMB: 3911, memoryPct: nil, ramMB: 5700) == nil,
+               "a 6 GB-limit phone, a 2.3 GB-limit phone or an unknown percentage: no 4 GB sentence")
         // Round 660 (M089): a kill at 95 % of the limit or more says why, with the numbers; below that, or without them, nothing.
         expect(AutoTuneOffer.memoryKillWords(peakMB: 4091, memoryPct: 99)
                 == "iOS ended the game because it used all the memory iOS gives BCD on this device (it reached 4091 MB of about 4 GB). BCD tries other memory settings on the next start.",

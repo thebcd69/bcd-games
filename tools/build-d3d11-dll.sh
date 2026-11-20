@@ -1,4 +1,6 @@
 #!/bin/bash
+# Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+# under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 # Build DXMT's d3d11.dll (dxmt/src/d3d11 + d3d10) for arm64ec from the submodule
 # source, with ID3D11DeviceContext1::SwapDeviceContextState implemented
 # (tools/patch-dxmt-context-state-swap.py, applied to a COPY of the sources),
@@ -139,6 +141,9 @@ done
 #                                             fault, written for GTA V Legacy (64-bit) and never in its d3d11.dll (the reader is #ifndef __i386__).
 #                                             It also edits winemetal_unix.c, so the copy holds src/winemetal (only that edit lands there; this
 #                                             DLL compiles nothing of it and includes the submodule's winemetal headers).
+#   tools/patch-dxmt-bc-half.py               value 2 of MADEIRA_MIP_CLAMP_AUTO / d3d11.mipClampAuto (round 677, G3 S1: Shroom and Gloom,
+#                                             Schedule I, Nunholy): the auto clamp from 256 px, and single-level BC textures at half size on a
+#                                             GPU without BC, within d3d11.mipClampAutoMB of the limit ([bc-half]; values 0, 1 and unset unchanged)
 #   tools/patch-d3d11-src-all-arch.py         the 25 `#if defined(__i386__)` gates of dxmt 1b4f3dc opened: short constant buffers read 0 past
 #                                             their end ([cb-short]), 16-bit index ranges at 2 mod 4 realigned ([idx-align]; env.MADEIRA_IDX_REALIGN
 #                                             = 0 turns it off) and the [vb-align] census, as every 32-bit Direct3D 10/11 game has them. Last, so
@@ -150,12 +155,14 @@ BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skippe
              "patch-dxmt-tess-pso-failed.py" "[mesh-skip] ml870 "
              "patch-dxmt-update-subresource-staging.py" "[update-subresource-staging] skipped #"
              "patch-dxmt-d11-swapchain-rotation.py" "[swapchain-rotation] madeira-bcd: SetRotation("
+             "patch-dxmt-x64-swapchain-entry.py" "[graphics-entry] x64 patchable D3D11 swapchain methods enabled (PE entries)"
              "patch-dxmt-texture-limit.py" "[dxmt-tex-limit] CreateTexture2D refused "
              "patch-dxmt-layer-format.py" "[layer-format] madeira-bcd: back buffer format "
              "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #"
              "patch-dxmt-lsfg.py" "[lsfg] madeira-bcd "
              "patch-dxmt-wsi-tiny-fullscreen.py" "[wsi-fullscreen] a fullscreen swapchain"
              "patch-dxmt-d3d11-fault-info.py" "[fault-enc] madeira-bcd frame "
+             "patch-dxmt-bc-half.py" "[bc-half] madeira-bcd "
              "patch-d3d11-src-all-arch.py" "[cb-short] madeira-bcd #")
 SHIP_HAS_BCD=1
 for ((i = 1; i < ${#BCD_PATCHES[@]}; i += 2)); do
@@ -496,6 +503,9 @@ if [ "$FRESH_SHADERS" = 1 ]; then
     LC_ALL=C grep -aqF "[dxmt-shaders] madeira-bcd" "$OUT/plain/d3d11.dll" && fail "the unpatched build carries the [dxmt-shaders] switch"
 fi
 LC_ALL=C grep -aqF "$VER" "$OUT/d3d11.dll" || fail "the DXMT version string is not in the result"
+# A marker alone cannot prove the generated entry ABI or the 45-word table.
+python3 "$R/tests/host/check-x64-graphics-entry.py" --d3d11 "$OUT/d3d11.dll" \
+    || fail "the x64 D3D11 swapchain entries failed validation"
 
 # The recipe check: the unpatched link against upstream's binary. Same
 # symbols at the same addresses = same code and layout (only the timestamp and

@@ -59,6 +59,8 @@ with tempfile.TemporaryDirectory() as tmp:
         recorded = log.read_text()
         assert "-Dshader-cache=" + ("enabled" if experimental else "disabled") in recorded
         applied = recorded.count("patch:")
-        assert applied == (19 if experimental else 6), (experimental, applied)
+        # 31 Playport patches (0020-0031 added in round 669) + BCD's 0032 (X-Plane 12's opaque fds; tests/host/check-kk-opaque-fd.py)
+        # and 0033 (build 673, X-Plane 12's SNORM blending; tests/host/check-kk-snorm-blend.py) 0034 (build 674, refused MSL logged) and 0035 (build 675, MS storage stores left out with a key)
+        assert applied == (35 if experimental else 6), (experimental, applied)
         assert (work / "out/libvulkan_kosmickrisp.dylib").exists()
-print("PASS: default and experimental build routing; 6/19 patch series; source hash and user-file protection")
+print("PASS: default and experimental build routing; 6/35 patch series; source hash and user-file protection")

@@ -144,9 +144,18 @@ final class StubProtocol: URLProtocol {
     nonisolated(unsafe) static var lastURL: URL?
     nonisolated(unsafe) static var lastMethod: String?
     nonisolated(unsafe) static var lastBody: Data?
+    nonisolated(unsafe) static var failNext = 0          // build 666: the next requests fail with this error first
+    nonisolated(unsafe) static var failCode = URLError.Code.networkConnectionLost
+    nonisolated(unsafe) static var requests = 0
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
+        Self.requests += 1
+        if Self.failNext > 0 {
+            Self.failNext -= 1
+            client?.urlProtocol(self, didFailWithError: URLError(Self.failCode))
+            return
+        }
         Self.lastURL = request.url; Self.lastMethod = request.httpMethod
         if let body = request.httpBody { Self.lastBody = body }
         else if let stream = request.httpBodyStream {
@@ -267,6 +276,27 @@ func expectError(_ expected: SteamError, _ label: String, _ run: () async throws
         await expectError(.rateLimited, "HTTP 429 is a rate limit") { try await SteamAuthAPI.call("X", body: Data()) }
         StubProtocol.status = 503
         await expectError(.authenticationFailed("Steam's sign-in service isn't available at the moment (HTTP 503)."), "other HTTP errors") { try await SteamAuthAPI.call("X", body: Data()) }
+
+        // build 666 (issue #39): a poll the network interrupted waits and asks again; a real failure still ends it.
+        require(SteamAuthAPI.isTransientNetworkError(URLError(.networkConnectionLost)) && SteamAuthAPI.isTransientNetworkError(URLError(.notConnectedToInternet))
+                && SteamAuthAPI.isTransientNetworkError(URLError(.timedOut)), "lost connection, offline and time-out are transient")
+        require(!SteamAuthAPI.isTransientNetworkError(URLError(.cancelled)) && !SteamAuthAPI.isTransientNetworkError(URLError(.badServerResponse))
+                && !SteamAuthAPI.isTransientNetworkError(SteamError.rateLimited) && !SteamAuthAPI.isTransientNetworkError(CancellationError()),
+                "cancellation, a bad answer and Steam's own errors are not")
+        StubProtocol.status = 200; StubProtocol.eresult = "1"; StubProtocol.body = Data([0x08, 0x02])
+        StubProtocol.failNext = 2; StubProtocol.requests = 0
+        let resumed = try await SteamAuthAPI.pollCall("PollAuthSessionStatus", body: Data(), interval: 0, flow: "qr")
+        require(resumed == Data([0x08, 0x02]) && StubProtocol.requests == 3, "two lost connections, then the answer: the poll goes on (\(StubProtocol.requests) requests)")
+        StubProtocol.failNext = 5; StubProtocol.requests = 0
+        do { _ = try await SteamAuthAPI.pollCall("PollAuthSessionStatus", body: Data(), interval: 0, patience: 2, flow: "password"); require(false, "past its patience the poll gives up") }
+        catch let error as URLError { require(error.code == .networkConnectionLost && StubProtocol.requests == 3, "past its patience the poll gives up with the network error") }
+        catch { require(false, "past its patience the poll gives up (\(error))") }
+        StubProtocol.failNext = 0; StubProtocol.status = 503; StubProtocol.requests = 0
+        await expectError(.authenticationFailed("Steam's sign-in service isn't available at the moment (HTTP 503)."), "another error ends the poll at once") {
+            try await SteamAuthAPI.pollCall("PollAuthSessionStatus", body: Data(), interval: 0, flow: "qr")
+        }
+        require(StubProtocol.requests == 1, "and asks only once")
+        StubProtocol.status = 200
 
         // SteamSignIn: the Dock's view of the stored sign-in.
         func jwt(_ claims: String) -> String {

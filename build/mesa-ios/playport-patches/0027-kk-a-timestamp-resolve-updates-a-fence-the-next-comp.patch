@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Wed, 21 Oct 2026 11:18:41 +0200
+Subject: [PATCH] kk: a timestamp resolve updates a fence the next compute
+ encoder waits for
+
+Timestamps are resolved from the counter heap into the query pool's
+buffer by MTL4CommandBuffer resolveCounterHeap, folded in when an
+encoder ends, with nil wait and update fences. vkCmdCopyQueryPool-
+Results then runs libkk_copy_queries in a compute encoder after a
+queue barrier on the blit stage, which Metal does not document as
+covering a resolve outside any encoder: the copy could read the
+unavailable sentinel and report a timestamp the game then reads as
+missing or wrong.
+
+Each resolve now updates the command buffer's ts_fence (made at its
+first resolve, released with it), and the next compute encoder waits
+for it before dispatch and blit, the order Metal documents for the
+resolve's fence arguments. A reset clears the wait.
+
+Linear: PLA-364
+Class: upstream-bug
+Evidence: docs/evidence/2026-10-21-batch2.md
+Offered-upstream: not yet
+---
+ src/kosmickrisp/bridge/mtl_command_buffer.h   |  4 +++-
+ src/kosmickrisp/bridge/mtl_command_buffer.m   |  5 +++--
+ .../bridge/stubs/mtl_command_buffer.c         |  3 ++-
+ src/kosmickrisp/vulkan/kk_cmd_buffer.c        | 20 ++++++++++++++++++-
+ src/kosmickrisp/vulkan/kk_cmd_buffer.h        |  5 +++++
+ 5 files changed, 32 insertions(+), 5 deletions(-)
+
+diff --git a/src/kosmickrisp/bridge/mtl_command_buffer.h b/src/kosmickrisp/bridge/mtl_command_buffer.h
+index 2763b0e..47aca76 100644
+--- a/src/kosmickrisp/bridge/mtl_command_buffer.h
++++ b/src/kosmickrisp/bridge/mtl_command_buffer.h
+@@ -17,10 +17,12 @@ void mtl_begin_command_buffer(mtl_command_buffer *command_buffer,
+                               mtl_command_allocator *allocator);
+ void mtl_end_command_buffer(mtl_command_buffer *command_buffer);
+ 
++/* Playport: update_fence (may be NULL) is updated when the resolve is done. */
+ void mtl_command_resolve_counter_heap(mtl_command_buffer *command_buffer,
+                                       mtl_counter_heap *heap,
+                                       uint32_t first_index, uint32_t count,
+-                                      uint64_t dst_addr);
++                                      uint64_t dst_addr,
++                                      mtl_fence *update_fence);
+ 
+ void mtl_command_buffer_set_label(mtl_command_buffer *cb, const char *label);
+ 
+diff --git a/src/kosmickrisp/bridge/mtl_command_buffer.m b/src/kosmickrisp/bridge/mtl_command_buffer.m
+index 2b342a0..91d1e26 100644
+--- a/src/kosmickrisp/bridge/mtl_command_buffer.m
++++ b/src/kosmickrisp/bridge/mtl_command_buffer.m
+@@ -43,7 +43,8 @@
+ void
+ mtl_command_resolve_counter_heap(mtl_command_buffer *command_buffer,
+                                  mtl_counter_heap *heap, uint32_t first_index,
+-                                 uint32_t count, uint64_t dst_addr)
++                                 uint32_t count, uint64_t dst_addr,
++                                 mtl_fence *update_fence)
+ {
+    @autoreleasepool {
+       id<MTL4CommandBuffer> cmd_buf = (id<MTL4CommandBuffer>)command_buffer;
+@@ -56,7 +57,7 @@
+                         withRange:NSMakeRange(first_index, count)
+                        intoBuffer:range
+                         waitFence:nil
+-                      updateFence:nil];
++                      updateFence:(id<MTLFence>)update_fence];
+    }
+ }
+ 
+diff --git a/src/kosmickrisp/bridge/stubs/mtl_command_buffer.c b/src/kosmickrisp/bridge/stubs/mtl_command_buffer.c
+index 2fe1e3b..d954f6c 100644
+--- a/src/kosmickrisp/bridge/stubs/mtl_command_buffer.c
++++ b/src/kosmickrisp/bridge/stubs/mtl_command_buffer.c
+@@ -25,7 +25,8 @@ mtl_end_command_buffer(mtl_command_buffer *command_buffer)
+ void
+ mtl_command_resolve_counter_heap(mtl_command_buffer *command_buffer,
+                                  mtl_counter_heap *heap, uint32_t first_index,
+-                                 uint32_t count, uint64_t dst_addr)
++                                 uint32_t count, uint64_t dst_addr,
++                                 mtl_fence *update_fence)
+ {
+ }
+ 
+diff --git a/src/kosmickrisp/vulkan/kk_cmd_buffer.c b/src/kosmickrisp/vulkan/kk_cmd_buffer.c
+index 1b210fa..4385d09 100644
+--- a/src/kosmickrisp/vulkan/kk_cmd_buffer.c
++++ b/src/kosmickrisp/vulkan/kk_cmd_buffer.c
+@@ -18,6 +18,7 @@
+ #include "kosmickrisp/bridge/mtl_command_buffer.h"
+ #include "kosmickrisp/bridge/mtl_device.h"
+ #include "kosmickrisp/bridge/mtl_encoder.h"
++#include "kosmickrisp/bridge/mtl_sync.h"
+ #include "kosmickrisp/bridge/vk_to_mtl_map.h"
+ 
+ #include "vk_alloc.h"
+@@ -88,6 +89,8 @@ kk_destroy_cmd_buffer(struct vk_command_buffer *vk_cmd_buffer)
+    cmd->metal.cmd_buf = NULL;
+ 
+    mtl_release(cmd->argument_table);
++   if (cmd->ts_fence)
++      mtl_release(cmd->ts_fence);
+ 
+    vk_command_buffer_finish(&cmd->vk);
+    struct kk_device *dev = kk_cmd_buffer_device(cmd);
+@@ -167,6 +170,7 @@ kk_reset_cmd_buffer_internal(struct kk_cmd_buffer *cmd)
+ 
+    cmd->uploader.bo = NULL;
+    cmd->uploader.offset = 0;
++   cmd->ts_fence_pending = false;
+ 
+    memset(&cmd->state, 0, sizeof(cmd->state));
+    cmd->uses_heap = false;
+@@ -325,6 +329,11 @@ cs_get_compute(struct kk_cmd_buffer *cmd)
+       cmd->metal.compute = mtl_new_compute_command_encoder(cmd->metal.cmd_buf);
+       mtl_compute_set_argument_table(cmd->metal.compute, cmd->argument_table);
+       kk_encoder_update_debug(cmd, cmd->metal.compute);
++      if (cmd->ts_fence_pending) {
++         mtl_wait_for_fence(cmd->metal.compute, cmd->ts_fence,
++                            MTL_STAGE_DISPATCH | MTL_STAGE_BLIT);
++         cmd->ts_fence_pending = false;
++      }
+    }
+ 
+    return cmd->metal.compute;
+@@ -339,9 +348,18 @@ end_encoder(struct kk_cmd_buffer *cmd, mtl_command_encoder *encoder)
+    mtl_release(encoder);
+ 
+    /* Fold the pending timestamp counter-heap resolves into `cmd_buf` */
++   /* Playport: the command-buffer-level resolve is ordered by its fence
++    * arguments, and the compute copy that reads it (libkk_copy_queries) was
++    * left to a queue barrier on the blit stage, which is not documented to
++    * cover it: a copy could read the unavailable sentinel. Each resolve updates
++    * ts_fence, and the next compute encoder waits for it. */
++   if (util_dynarray_num_elements(&cmd->ts_resolves, struct kk_ts_resolve) &&
++       !cmd->ts_fence)
++      cmd->ts_fence = mtl_new_fence(kk_cmd_buffer_device(cmd)->mtl_handle);
+    util_dynarray_foreach(&cmd->ts_resolves, struct kk_ts_resolve, r) {
+       mtl_command_resolve_counter_heap(cmd->metal.cmd_buf, r->heap, r->index,
+-                                       1u, r->dst_addr);
++                                       1u, r->dst_addr, cmd->ts_fence);
++      cmd->ts_fence_pending = cmd->ts_fence != NULL;
+    }
+ 
+    util_dynarray_clear(&cmd->ts_resolves);
+diff --git a/src/kosmickrisp/vulkan/kk_cmd_buffer.h b/src/kosmickrisp/vulkan/kk_cmd_buffer.h
+index fa57bf7..37fd320 100644
+--- a/src/kosmickrisp/vulkan/kk_cmd_buffer.h
++++ b/src/kosmickrisp/vulkan/kk_cmd_buffer.h
+@@ -266,6 +266,11 @@ struct kk_cmd_buffer {
+    } metal;
+    /* Pending timestamp resolves (struct kk_ts_resolve), flushed at cs_end. */
+    struct util_dynarray ts_resolves;
++   /* Playport: the fence those resolves update when folded into the command
++    * buffer, made at the first, and whether a resolve updated it since the
++    * last compute encoder waited for it (cs_get_compute). */
++   mtl_fence *ts_fence;
++   bool ts_fence_pending;
+    /* Timestamps already sampled by the current render encoder. (struct
+     * kk_ts_stage_entry). */
+    struct util_dynarray ts_stage_map;

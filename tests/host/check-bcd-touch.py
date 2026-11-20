@@ -185,7 +185,7 @@ check("AnyView(TouchPadSurface(control: control, action: name, changed: changed)
       "controller controls go through the touch gamepad's own surface, as before")
 control = block(src["BCDTouchControls.swift"], "struct BCDTouchControl: View, Equatable {")
 check(".frame(width: size.width, height: size.height)\n            .overlay { if !editing { surface } }" in control
-      and "input.padSurface(control: item.id, name: name)" in control,
+      and "input.padSurface(control: item.id, name: name, latches: item.holds)" in control,
       "a controller control's surface fills its drawn frame (the classic surface's area)")
 inside = block(src["BCDTouchControls.swift"], "override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {")
 check("<= diameter / 2" in inside, "a key control's surface is its circle (the classic face's area)")
@@ -199,9 +199,24 @@ for what, needle in (("a cancelled touch", "override func touchesCancelled"), ("
 
 # ---- locking and layer order (upstream port 2026-10-25) --------------------------------------
 stored = block(content, "struct TouchControl: Codable, Identifiable, Equatable {")
-check("    var locked: Bool?\n    /// madeira-bcd (2026-11-03)" in stored and stored.rstrip().endswith("    var face: Face?\n}"),
-      "the stored control ends with two optional keys, locked and then face (so a layout written before them, "
-      "or with nothing locked and no look, is the same file)")
+check("    var locked: Bool?\n    /// madeira-bcd (2026-11-03)" in stored and "    var face: Face?\n    /// madeira-bcd (build 666" in stored
+      and stored.rstrip().endswith("    var latch: Bool?\n}"),
+      "the stored control ends with three optional keys, locked, face and latch (so a layout written before them, "
+      "or with nothing locked, no look and nothing held, is the same file)")
+check("c.latch = latch ? true : nil" in live and "func setLatch(_ id: UUID, _ on: Bool) { update(id) { $0.latch = on ? true : nil } }" in live,
+      "build 666: Tap to hold is written only when on")
+key_view = block(src["BCDTouchControls.swift"], "final class BCDTouchKeyView: UIView {")
+check("press?.lift()" in block(key_view, "private func lift(_ touches: Set<UITouch>) {")
+      and "press?.end()" in block(key_view, "func finish() {"),
+      "build 666: a key control's lift goes through BCDTouchPress.lift (it holds or lets go); an interruption still lets go")
+check("input.padSurface(control: item.id, name: name, latches: item.holds)" in control and "latches: item.holds) { held, toward in" in control,
+      "build 666: both surfaces get whether the control holds")
+pad_src = (APP / "TouchGamepad.swift").read_text()
+check('view.latches = latches && floatDiameter == nil && action != "LS" && action != "RS"' in pad_src
+      and "if latches && held == nil && fingers.isEmpty { held = finger.owner; continue }" in pad_src
+      and "if swallowed.remove(ObjectIdentifier(touch)) != nil { continue }" in pad_src
+      and "if let owner = held {   // build 666 (issue #45): this press lets the held button go" in pad_src,
+      "build 666: a controller button holds after the lift and lets go at the next press; never a stick")
 check("guard m.editing, let i = m.index(of: m.selected), m.controls[i].locked != true else { return }" in content,
       "the pinch does not resize a locked control")
 check("update(id) { if $0.locked != true { $0.nx = x; $0.ny = y } }" in live
@@ -218,6 +233,9 @@ inspector = block(src["BCDTouchEditor.swift"], "struct BCDTouchInspector: View {
 check("actions.setLocked(item.id, !item.locked)" in inspector and "actions.bringToFront(item.id)" in inspector
       and "actions.sendToBack(item.id)" in inspector and ".disabled(item.locked)" in inspector,
       "the panel has Lock, To front and To back, and a locked control's size and Remove are off")
+check("if item.action.latchable { holdRow }" in inspector and "actions.setLatch(item.id, $0)" in inspector,
+      "build 666: the panel has Tap to hold for a control that can hold")
+check("func setLatch(" in sample, "the preview model takes Tap to hold too")
 
 # ---- the bar over a game outside the library -----------------------------------------------
 bar = block(src["BCDTouchControls.swift"], "struct BCDTouchPlayBar: View {")
@@ -248,7 +266,7 @@ check("if c.face != nil, let own = c.bcdOwnShape {" in model_hit
       "the overlay window takes a touch in a control's own shape only when it has one; every other control keeps its circle")
 check("if let own { return BCDTouchGeometry.inside(CGPoint(x: dx, y: dy), own, diameter: diameter) }" in inside,
       "a key control with a shape of its own takes touches in that shape on its own surface too")
-check("BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input)" in control
+check("BCDTouchKeySurface(action: item.action, diameter: Double(diameter), own: item.ownShape, input: input,\n" in control
       and "custom: item.customShape, words: item.words)" in control
       and "private var size: CGSize { BCDTouchGeometry.size(item.shape, diameter: Double(diameter)) }" in control,
       "a control is drawn, sized and touched in its own shape (BCDTouchItem.shape, ownShape), with its own words")

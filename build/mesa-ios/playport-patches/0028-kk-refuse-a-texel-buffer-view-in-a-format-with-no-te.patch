@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: The Playport authors <dev@playport.dev>
+Date: Tue, 27 Oct 2026 23:00:50 +0100
+Subject: [PATCH] kk: refuse a texel buffer view in a format with no texel
+ buffer entry
+
+kk_CreateBufferView read kk_get_va_format()'s entry unchecked. A format
+with no entry reports no texel-buffer features, so the Vulkan spec makes
+such a view the application's error, but The Witcher 3's D3D12 renderer
+made one through vkd3d-proton 22 s into its start and the NULL entry was
+read (kk_CreateBufferView+0x50, addr 0xa), killing the game. Name the
+format, its range, the buffer's usage and the features the driver
+reports as `[kk-bufview] refused ...` (16 lines at most), and return
+VK_ERROR_FORMAT_NOT_SUPPORTED.
+
+Linear: PLA-452
+Class: upstream-bug
+Evidence: docs/evidence/2026-10-27-witcher3-short-reserve.md
+Offered-upstream: no
+---
+ src/kosmickrisp/vulkan/kk_buffer_view.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/src/kosmickrisp/vulkan/kk_buffer_view.c b/src/kosmickrisp/vulkan/kk_buffer_view.c
+index c5e73bc..47426d4 100644
+--- a/src/kosmickrisp/vulkan/kk_buffer_view.c
++++ b/src/kosmickrisp/vulkan/kk_buffer_view.c
+@@ -7,6 +7,8 @@
+ 
+ #include "kk_buffer_view.h"
+ 
++#include <stdio.h>
++
+ #include "util/format/u_format.h"
+ 
+ #include "kk_buffer.h"
+@@ -68,6 +70,28 @@ kk_CreateBufferView(VkDevice _device, const VkBufferViewCreateInfo *pCreateInfo,
+    enum pipe_format p_format = vk_format_to_pipe_format(view->vk.format);
+    const struct kk_va_format *supported_format = kk_get_va_format(p_format);
+ 
++   /* Playport (PLA-452): a format with no texel-buffer support has no entry,
++    * and the Vulkan spec makes such a view the application's error. The
++    * Witcher 3's D3D12 renderer made one through vkd3d-proton and the NULL
++    * entry was read here; name it and refuse it instead. */
++   if (!supported_format) {
++      static unsigned refused;
++      if (refused++ < 16)
++         fprintf(stderr,
++                 "[kk-bufview] refused VkFormat %d (%s): no texel buffer format; "
++                 "offset=%llu range=%llu elements=%llu buffer usage=0x%llx "
++                 "features=0x%llx\n",
++                 (int)view->vk.format, util_format_name(p_format),
++                 (unsigned long long)view->vk.offset,
++                 (unsigned long long)view->vk.range,
++                 (unsigned long long)view->vk.elements,
++                 (unsigned long long)view->vk.buffer->usage,
++                 (unsigned long long)kk_get_buffer_format_features(
++                    kk_device_physical(dev), view->vk.format));
++      vk_buffer_view_destroy(&dev->vk, pAllocator, &view->vk);
++      return vk_error(dev, VK_ERROR_FORMAT_NOT_SUPPORTED);
++   }
++
+    /* If we reached here, we support reading at least */
+    enum mtl_texture_usage usage = MTL_TEXTURE_USAGE_SHADER_READ;
+    if (supported_format->texel_buffer.write)

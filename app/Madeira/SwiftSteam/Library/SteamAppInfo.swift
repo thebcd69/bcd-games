@@ -4,6 +4,8 @@
 // Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `dlcList`, the app's `extended.listofdlc`.
 // Modified by BCD (thebcd69), 2026-10-24: a launch entry keeps its `description`, for the Steam launch option choice (SteamDirectStart.dockOptions).
 // Modified by BCD (thebcd69), 2026-11-05: a game's version (beta branches): `branches`, `branch`, the depot manifests of a branch, the
+// Portions copyright 2026 Bogdan Seniuc: code taken from https://github.com/thebcd69/bcd-games (pull request #55 by bogsen)
+// under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // private-branch section, `SteamBranch` (the player's choice). Without a chosen beta every rule below is the one it was.
 // Modified by BCD (thebcd69), 2026-11-05: `workshopVisible`, whether the app has a Steam Workshop (the Workshop page and area).
 // Portions copyright 2026 ft7t8drgwf-wq and wamei: code taken from https://github.com/willfaust/Madeira (pull requests #381, #382 and #490)
@@ -17,6 +19,10 @@ import Foundation
 
 /// App metadata parsed from Steam's product info (PICS).
 struct SteamAppInfo {
+    /// madeira-bcd (build 666): apps whose shared-install depots a game's install takes (DepotInfo.isProvidedRedistributable):
+    /// 4099820 Ubisoft Connect Services (Trackmania's launcher, pull request #55).
+    static let requiredSharedLaunchers: Set<UInt32> = [4099820]
+
     let appID: UInt32
     var name: String = ""
     var type: AppType = .game
@@ -142,9 +148,10 @@ struct SteamAppInfo {
         var publicDownloadBytes: UInt64 = 0
         /// On-disk size from `manifests.public.size`. 0 when absent.
         var publicSizeBytes: UInt64 = 0
-        /// `sharedinstall "1"` marks redistributable depots (DirectX, VC++
-        /// runtimes) that live in Steam's common store, not the game dir;
-        /// they are excluded from size math.
+        /// `sharedinstall "1"` marks depots that live in another app's install:
+        /// the DirectX / VC++ redistributables (Steamworks Common
+        /// Redistributables, app 228980), which Wine supplies, and a few
+        /// launchers a game needs (see `isProvidedRedistributable`).
         var isSharedInstall: Bool = false
         /// `config.language`: empty for common content, otherwise one
         /// language pack ("english", "german", ...).
@@ -154,6 +161,16 @@ struct SteamAppInfo {
         /// `depotfromapp`: the depot belongs to another app, and Valve's client
         /// installs it as that app ("required app N").
         var fromApp: UInt32? = nil
+
+        /// madeira-bcd (build 666, pull request #55 by bogsen, narrowed for BCD): the shared-install depots a Windows install
+        /// leaves out, as every build before 666 left out all of them. The one exception is a launcher a game cannot start
+        /// without (`requiredSharedLaunchers`): Trackmania (2225070) takes Ubisoft Connect from depot 4099821 of Ubisoft
+        /// Connect Services (4099820), a shared install, and stopped before its menu without it. Far Cry 3 and 4 and Assassin's
+        /// Creed IV take Ubisoft Connect from a depot that is not a shared install (1716751 of 1716750) and their shared ones
+        /// are all 228980's (Steam's public app info, 2026-11-15), so their downloads stay as they were, like every other game's.
+        var isProvidedRedistributable: Bool {
+            isSharedInstall && !(fromApp.map { SteamAppInfo.requiredSharedLaunchers.contains($0) } ?? false)
+        }
 
         /// Check if depot is for the specified OS
         func supports(os: String) -> Bool {
@@ -226,7 +243,7 @@ struct SteamAppInfo {
 
     /// The depots a Windows install takes: matching OS, architecture-neutral
     /// or matching osarch, common or requested-language content (by default
-    /// `depotLanguage`), no low-violence alternates, no DLC or shared
+    /// `depotLanguage`), no low-violence alternates, no DLC or provided
     /// redistributables, and only depots that publish a manifest for the chosen
     /// branch (`branch`, else the public one). A
     /// 64-bit selection falls back to 32-bit depots when the app only
@@ -236,7 +253,7 @@ struct SteamAppInfo {
         let language = language ?? depotLanguage
         func select(_ arch: String) -> [DepotInfo] {
             depots.filter { d in
-                d.supports(os: os) && d.dlcAppID == nil && !d.isSharedInstall &&
+                d.supports(os: os) && d.dlcAppID == nil && !d.isProvidedRedistributable &&
                 d.manifestID(branch) != nil && !d.lowViolence &&
                 (d.osarch.isEmpty || d.osarch == arch) &&
                 (d.language.isEmpty || d.language.caseInsensitiveCompare(language) == .orderedSame)
@@ -268,7 +285,7 @@ struct SteamAppInfo {
         if chosen.contains(d.depotID) { return "sel" }
         if !d.supports(os: os) { return "os" }
         if d.dlcAppID != nil { return "dlc" }
-        if d.isSharedInstall { return "shared" }
+        if d.isProvidedRedistributable { return "shared" }
         if d.manifestID(branch) == nil { return "nomanifest" }
         if d.lowViolence { return "lowviolence" }
         if !d.language.isEmpty && d.language.caseInsensitiveCompare(language) != .orderedSame { return "lang" }
@@ -283,7 +300,7 @@ struct SteamAppInfo {
     /// Approximate compressed download size for a platform. Per depot it
     /// prefers the modern `manifests.public.download` figure (present for most
     /// apps since Valve's 2023 PICS change) and falls back to the legacy
-    /// `maxsize`. DLC depots and `sharedinstall` redistributables are not part
+    /// `maxsize`. DLC depots and provided redistributables are not part
     /// of the base install and are left out. Treat the figure as "about".
     func downloadSize(for os: String) -> UInt64 {
         installDepots(os: os).reduce(0) { total, d in

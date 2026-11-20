@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Akshay CM
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Portions copyright 2026 SirDank, insertfloppy: the autorelease pool of EpicCodec.sha1(of:), taken from https://github.com/willfaust/Madeira (pull request #594, commit 6ec82989), November 2026.
 // Modified by BCD (thebcd69), 2026-11-05: the one message a person reads says BCD.
 
 import Compression
@@ -139,15 +140,22 @@ enum EpicCodec {
 
     static func sha1(_ data: Data) -> Data { Data(Insecure.SHA1.hash(data: data)) }
 
+    /// Each read is drained in its own autorelease pool: FileHandle's reads are autoreleased,
+    /// and a repair hashes the whole game without suspending, so without the pool every
+    /// block read stayed in memory until the end (upstream Madeira #594, SirDank and insertfloppy,
+    /// 6ec82989: Satisfactory's 20 GB repair passed 9.5 GB in ten seconds and iOS ended the app).
     static func sha1(of url: URL, progress: (Int) -> Void = { _ in }) throws -> Data {
         let handle = try FileHandle(forReadingFrom: url)
         defer { try? handle.close() }
         var sha = Insecure.SHA1()
         while true {
-            let block = try handle.read(upToCount: 4 << 20) ?? Data()
-            if block.isEmpty { break }
-            sha.update(data: block)
-            progress(block.count)
+            let count: Int = try autoreleasepool {
+                let block = try handle.read(upToCount: 4 << 20) ?? Data()
+                sha.update(data: block)
+                return block.count
+            }
+            if count == 0 { break }
+            progress(count)
         }
         return Data(sha.finalize())
     }

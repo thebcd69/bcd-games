@@ -35,11 +35,13 @@ trail = trail[:trail.index('\n}\n') + 3]
 helper = (app / 'StikJITHelper.swift').read_text()
 req = helper[helper.index('    private static func requestRegion(_ size: Int, attempt: Int? = nil, region: String, site: Int = #line) -> UnsafeMutableRawPointer? {'):]
 req = req[:req.index('\n    }\n') + 7]
-debugger_path = req[req.index('guard noDebugger else {'):req.index('        }\n')]
+debugger_path = req[req.index('guard noDebugger else {'):req.index('\n        }\n')]   # build 666: the closing brace of the guard, a line of its own
 check('only the debugger path records (the debugger-less pool cannot stop the process), "returned" in a defer, the caller\'s line by #line',
       'BCDBrkTrail.begin(site: site, size: size, attempt: attempt, region: region)' in debugger_path and 'defer { BCDBrkTrail.end() }' in debugger_path
       and debugger_path.index('BCDBrkTrail.begin(') < debugger_path.index('return jit26_prepare_region(nil, size)')
-      and req.count('BCDBrkTrail.') == 2 and helper.count('BCDBrkTrail.') == 2)
+      and req.count('BCDBrkTrail.') == 2 and helper.count('BCDBrkTrail.') == 4
+      # build 666 (pull request #55): the tagged pool's final preparation records its BRK too (prepareTaggedPool, region "tagged-final")
+      and 'BCDBrkTrail.begin(site: #line, size: Int(r.size), attempt: nil, region: "tagged-final")' in helper)
 check('the pool loop passes its attempt; every call site names its region (round 630, agent A1 S19: A, A-single, B, B-mid, C)',
       helper.count('requestRegion(attemptSize, attempt: attempt, region: "A")') == 1 and helper.count('requestRegion(') == 6
       and all(helper.count('region: "%s")' % r) == 1 for r in ('A', 'A-single', 'B', 'B-mid', 'C')))

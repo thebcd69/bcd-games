@@ -132,12 +132,16 @@ check("the request itself is unchanged (the same two requestRegion calls, placem
       "if a >= goodLow && !inGuestWindow && !hitsExeWindow {" in pool and pool.count("requestRegion(") == 2
       and code(stik).count("requestRegion(") == 6)
 returns = re.findall(r"\n(\s*)return \(rx: rxPtr, rw: rwPtr, size: (\w+)\)", pool)
-guards = re.findall(r"guard floorAliasChecked\(floorOff, rx: rxPtr, rw: rwPtr, size: (\w+)\) else \{ return nil \}[ \t]*\n\s*return \(rx: rxPtr, rw: rwPtr, size: (\w+)\)", pool)
+# build 666 (pull request #55): `taggedPool ||` in front (the tagged pool ran the same self-test per region in prepareTaggedPool before it
+# could get here) and the tagged pool's "published" mark between the check and the return; without pool-tagged both do nothing
+guards = re.findall(r"guard taggedPool \|\| floorAliasChecked\(floorOff, rx: rxPtr, rw: rwPtr, size: (\w+)\) else \{ return nil \}[^\n]*\n"
+                    r"\s*taggedPublished = true\n\s*return \(rx: rxPtr, rw: rwPtr, size: (\w+)\)", pool)
 check("every pool allocatePool returns passed floorAliasChecked first", len(returns) == 4 and len(guards) == 4
-      and all(a == b for a, b in guards), str(returns))
+      and all(a == b for a, b in guards) and "guard prepareTaggedPool(" in pool, str(returns))
 fac = code(braced(stik, "private static func floorAliasChecked("))
 check("floorAliasChecked does nothing unless pool-floor = 0; a failed self-test refuses the launch",
-      "guard floorOff else { return true }" in fac and "bcd_pool_rw_rx_selftest(" in fac
+      "guard floorOff || taggedPool else { return true }" in fac and "guard !taggedPool || poolFailure == nil else { return false }" in fac
+      and "bcd_pool_rw_rx_selftest(" in fac
       and "poolTaken = false" in fac and "poolFailure =" in fac)
 plan_src = code(braced(stik, "static func planForPool("))
 check("in a build without a reservation planForPool only says so (when pool-bss is set) and returns nil",

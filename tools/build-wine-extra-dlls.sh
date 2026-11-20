@@ -235,7 +235,10 @@ fi
 # function returns FALSE: no capture devices, which is what a phone has to say.
 # coremessaging (agent G7 S6; Momo Game ER8RD6, build 630): Momo Game.exe imports CoreMessaging.dll (Windows 10's messaging and dispatcher-queue
 # library). Wine's imports only combase, which ships; CreateDispatcherQueueController is real, the CoreUI functions are stubs.
-OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc xinputuap httpapi dxdiagn msvcp_win bluetoothapis gameinput ntdsapi mfplay avicap32 coremessaging"
+# mscms (round 668, agent G1, merge N007; Brawlhalla 8C0WRA build 665, H91CMC build 626): the Adobe AIR captive runtime's Adobe AIR.dll imports
+# msi.dll (opt-in since build 630) and mscms.dll (Windows' colour management), which the 64-bit set did not ship (c0000135, AIR's box, exit 4).
+# Wine's mscms imports lcms2 (the arm64ec configure has LCMS2_PE_LIBS), shlwapi and advapi32, which ship.
+OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi ddraw msi mspatcha odbccp32 sxs rstrtmgr glu32 tdh gamingtcui qwave msvproc xinputuap httpapi dxdiagn msvcp_win bluetoothapis gameinput ntdsapi mfplay avicap32 coremessaging mscms"
 OPT=""
 if [ "${MADEIRA_OPTIN_BUILD:-1}" != 0 ]; then
     for d in $OPTIN_WANT; do
@@ -285,7 +288,20 @@ KUD=""
 if [ "${MADEIRA_KERNEL32_USD_BUILD:-1}" != 0 ] && [ -f "$R/wine/dlls/kernel32/sync.c" ] && [ -f "$SHIP/kernel32.dll" ]; then
     KUD=kernel32
 fi
-[ -n "$todo$OGL$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO$CMB$KUD" ] || { echo "nothing to build"; exit 0; }
+# madeira-bcd (round 668, agent G3 S1, merge N006; Quantum Break B4TREC, EC9Y8N, FVJKYE, PA5TPA, build 665): cmd.exe for ARM64EC sessions. The
+# bundle shipped cmd.exe only as a native aarch64 program; in an ARM64EC session (an x64 game) the farm's cross-link pass linked that one into
+# system32, the child had no CPU area, its first call into the plain ARM64 image went through FEX's ExitToX64 with x17 = NULL
+# (xtajit64.dll+0x11c0e8), a redelivery storm followed and BCD ended the child: Quantum Break's launcher runs "cmd.exe /c <file>.bat" and
+# quits. An ARM64EC cmd.exe in arm64ec-windows is what an ARM64EC session's main pass links instead (the cross-link pass skips a name that
+# resolves); an aarch64-core session (a .bat library entry: WineProcessBridge.m madeira_target_is_cmd; every 32-bit game) keeps the aarch64
+# one. Wine's arm64ec configure builds programs/cmd (programs/start is disabled there). Its imports (advapi32, kernel32, kernelbase, ntdll,
+# shell32, ucrtbase, user32) all ship. Stripped and padded like the extra DLLs and checked to be a 0x8664 (ARM64EC) image before it ships;
+# a failed build leaves today's behaviour. A new file next to the frozen set, which stays byte for byte. MADEIRA_EC_CMD_BUILD=0 skips it.
+ECC=""
+if [ "${MADEIRA_EC_CMD_BUILD:-1}" != 0 ] && [ -f "$R/wine/programs/cmd/wcmdmain.c" ] && [ ! -e "$SHIP/cmd.exe" ]; then
+    targets="$targets programs/cmd/arm64ec-windows/cmd.exe"; ECC=cmd
+fi
+[ -n "$todo$OGL$XI$WGI$UCX$NTS$XSE$FBT$ZMP$WER$WTY$OPT$SDL$DCO$CMB$KUD$ECC" ] || { echo "nothing to build"; exit 0; }
 
 # The cached tree may have disabled winegstreamer because macOS has no
 # GStreamer headers. Only its real PE frontend is needed here; the iOS unix
@@ -443,12 +459,18 @@ fi
 if [ -n "$ZMP" ]; then
     kb="$B/dlls/kernelbase/arm64ec-windows/kernelbase.dll"
     ZMPDIAG=0
+    ZMPOVL=0
     if git -C "$R/wine" diff --quiet -- dlls/kernelbase; then
         # madeira-bcd (night round 2026-11-11, G5 S7; Glyphica 8YHNJ0): GetProcessMitigationPolicy says what it did and the opt-in kernelbase exports
         # SetProcessValidCallTargets (tools/patch-wine-zero-mitigation-diag.py); the two files are put back below. A patch that does not apply
         # builds the kernelbase as before.
         python3 "$R/tools/patch-wine-zero-mitigation-diag.py" "$R/wine" && ZMPDIAG=1 \
             || echo "::warning::kernelbase zero-mitigation diagnostic patch did not apply; kernelbase-optin.dll is built without it"
+        # madeira-bcd (build 666, pull request #55 by bogsen): the nonblocking overlapped poll (env.MADEIRA_OVERLAPPED_SYSTEM_APC = 1, default
+        # off) for 64-bit programs, only in this opt-in kernelbase; dlls/kernelbase/file.c is put back below. The script leaves the already
+        # patched unix sync.c as it is.
+        python3 "$R/tools/patch-wine-overlapped-system-apc.py" "$R/wine" && ZMPOVL=1 \
+            || echo "::warning::overlapped poll patch did not apply; kernelbase-optin.dll is built without it"
         rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
         make -C "$B" -j"$JOBS" dlls/kernelbase/arm64ec-windows/kernelbase.dll > "$B.kernelbase-optin.log" 2>&1
         if [ -f "$kb" ] && cp "$kb" "$SHIP/kernelbase-optin.dll.tmp" &&
@@ -456,6 +478,9 @@ if [ -n "$ZMP" ]; then
            python3 "$R/tools/verify-kernelbase-optin.py" "$SHIP/kernelbase-optin.dll.tmp" "$SHIP/kernelbase.dll"; then
             mv "$SHIP/kernelbase-optin.dll.tmp" "$SHIP/kernelbase-optin.dll"
             echo "::notice::kernelbase-optin.dll (the tree's kernelbase; env.MADEIRA_OPTIN_DLLS = kernelbase): built next to the shipped kernelbase.dll"
+            if [ "$ZMPOVL" = 1 ] && ! python3 -c 'import sys; sys.exit("MADEIRA_OVERLAPPED_SYSTEM_APC".encode("utf-16-le") not in open(sys.argv[1], "rb").read())' "$SHIP/kernelbase-optin.dll"; then
+                echo "::warning::kernelbase-optin.dll was built with the overlapped poll patch but does not carry its switch's name"
+            fi
         else
             rm -f "$SHIP/kernelbase-optin.dll.tmp"
             echo "::warning::kernelbase-optin.dll did not build or failed its check; not shipped (env.MADEIRA_OPTIN_DLLS = kernelbase does nothing)"
@@ -465,6 +490,7 @@ if [ -n "$ZMP" ]; then
         echo "::warning::wine/dlls/kernelbase differs from the pin; kernelbase-optin.dll not built"
     fi
     if [ "$ZMPDIAG" = 1 ]; then git -C "$R/wine" checkout -- dlls/kernelbase/process.c dlls/kernelbase/kernelbase.spec; fi
+    if [ "$ZMPOVL" = 1 ]; then git -C "$R/wine" checkout -- dlls/kernelbase/file.c; fi
     rm -f "$kb" "$B"/dlls/kernelbase/arm64ec-windows/*.o
 fi
 # madeira-bcd (build 663): kernel32-usd.dll (see KUD above), from a kernel32 the pin left as it is; sync.c is put back afterwards.
@@ -865,6 +891,32 @@ PY
         echo "::warning::$d-optin.dll did not build; env.MADEIRA_OPTIN_DLLS = $d does nothing"
     fi
 done
+if [ -n "$ECC" ]; then
+    f="$B/programs/cmd/arm64ec-windows/cmd.exe"
+    if [ -f "$f" ]; then
+        cp "$f" "$SHIP/cmd.exe.tmp"
+        "$MINGW/llvm-strip" "$SHIP/cmd.exe.tmp"
+        if python3 - "$SHIP/cmd.exe.tmp" <<'PY'
+import struct, sys
+p = sys.argv[1]; d = open(p, 'rb').read()
+pe = struct.unpack_from('<I', d, 0x3c)[0]
+if d[pe:pe + 4] != b'PE\0\0' or struct.unpack_from('<H', d, pe + 4)[0] != 0x8664:
+    sys.exit(1)
+target = struct.unpack_from('<I', d, pe + 24 + 56)[0] + 0x10000
+if len(d) < target:
+    open(p, 'ab').write(b'\0' * (target - len(d)))
+PY
+        then
+            mv "$SHIP/cmd.exe.tmp" "$SHIP/cmd.exe"
+            echo "::notice::cmd.exe for ARM64EC sessions (Wine's programs/cmd built for arm64ec): built"
+        else
+            rm -f "$SHIP/cmd.exe.tmp"
+            echo "::warning::cmd.exe for ARM64EC sessions is not a 0x8664 image; not shipped (ARM64EC sessions keep the aarch64 cmd.exe)"
+        fi
+    else
+        echo "::warning::cmd.exe for ARM64EC sessions did not build; ARM64EC sessions keep the aarch64 cmd.exe"
+    fi
+fi
 echo "::notice::built $built extra Wine DLLs for arm64ec${failed:+ (failed:$failed)}$([ "$STALE_EXTRAS" = 1 ] && echo " (extras of an earlier run rebuilt: MADEIRA_EXTRAS_REBUILD=1)")"
 [ -n "$failed" ] && grep -m 10 "error" "$B.build.log"
 [ "${MADEIRA_EXTRAS_REBUILD:-0}" = 1 ] && [ -z "$failed" ] && extras_stamp > "$EXTRAS_STAMP_FILE"

@@ -59,6 +59,12 @@ const bcd_start_entry bcd_start_entries[] = {
     { BCD_TESTS,  "DirectX 10 test", "d3d10-cube-x64.exe",  "A spinning cube drawn with Direct3D 10 (64-bit)" },
     { BCD_TESTS,  "DirectX 11 test", "d3d11-cube-x64.exe",  "A spinning cube drawn with Direct3D 11 (64-bit)" },
     { BCD_TESTS,  "DirectX 12 test", "d3d12-cube-x64.exe",  "A spinning cube drawn with Direct3D 12 (64-bit)" },
+    /* The OpenGL and Vulkan tests (tests/dxtests/gl_test.c, vulkan_test.c): the same cube. A session has OpenGL or Vulkan only when
+     * the Windows desktop's own Options turn it on (Direct3D > OpenGL, Vulkan); without it the test says so and how. */
+    { BCD_TESTS,  "OpenGL test",     "gl-test-x64.exe",     "A spinning cube drawn with OpenGL (64-bit)" },
+    { BCD_TESTS,  "OpenGL test (32-bit)", "gl-test-x86.exe", "A spinning cube drawn with OpenGL (32-bit)" },
+    { BCD_TESTS,  "Vulkan test",     "vulkan-test-x64.exe", "A spinning cube drawn with Vulkan (64-bit)" },
+    { BCD_TESTS,  "Vulkan test (32-bit)", "vulkan-test-x86.exe", "A spinning cube drawn with Vulkan (32-bit)" },
     { BCD_TESTS,  "DirectDraw test", "ddraw-test-x86.exe",  "2D surfaces, blits, colour key, palette and a full-screen flip with DirectDraw (32-bit)" },
     { BCD_TESTS,  "Frame time test", "frametime-test-x64.exe", "A Direct3D 11 scene with a frame-time graph: FPS, stutters, 60 or 120 Hz (64-bit)" },
     { BCD_TESTS,  "Resolution and full-screen test", "resolution-test-x64.exe", "Display modes, window resizing, a mode change and back, DXGI full screen (64-bit)" },

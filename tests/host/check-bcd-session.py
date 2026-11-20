@@ -354,6 +354,14 @@ for (fields, installers, progress, finished, waited, hint, step, what) in cases 
 let slow = BCDDockStart.read([:], installers: false, installerProgress: nil, installsFinished: false, waited: 31)
 expect(slow.notes.contains { $0.id == "slow" } && BCDDockStart.read([:], installers: false, installerProgress: nil,
        installsFinished: false, waited: 5).notes.isEmpty, "a slow Dock start says so after 30 s, not before")
+// round 669 (agent B S13): the slow sign-in note's condition: sent and unanswered, online or offline
+expect(BCDDockStart.signingIn(["session-logon-start-result": "1", "probe-start-bits": "1"])
+       && BCDDockStart.signingIn(["session-native-token-submitted": "1"])
+       && !BCDDockStart.signingIn(["session-logon-start-result": "1", "session-authenticated-online": "1"])
+       && !BCDDockStart.signingIn(["session-logon-start-result": "1", "session-offline-fallback": "0"])
+       && !BCDDockStart.signingIn(["session-logon-start-result": "1", "session-offline-requested": "1"])
+       && !BCDDockStart.signingIn(["probe-start-bits": "1"]) && BCDDockStart.signInSlowAfter == 45,
+       "a Steam sign-in that was sent and has no answer, online or offline, is what the slow sign-in note waits on (45 s)")
 let progress = BCDDockStart.read([:], installers: true, installerProgress: "Installing 1 of 2", installsFinished: false, waited: 0)
 expect(progress.notes.first?.text == "Installing 1 of 2", "the installs' own progress is a note")
 let hint = BCDDockStart.read([:], installers: true, installerProgress: nil, installsFinished: true, waited: 0, restartHint: "closing")

@@ -35,7 +35,12 @@ Behaviour (a C harness that compiles the PRODUCTION functions; AddressSanitizer/
     state of the 13:54 log at jumbo#4 the old loop grants 0x7800000000 (base 0x77ffff0000, the log's value) and
     with the flag on it refuses: every slot holds a view or the arena;
   - process_ios.c: ea_cef_kind (EADesktop.exe without --type= is the browser; either image with --type= is a child
-    to refuse; nothing else is EA), and the browser's rewritten command line.
+    to refuse; nothing else is EA), and the browser's rewritten command line;
+  - env.MADEIRA_CEF_POOL_IMAGES (X-Plane 12, send log MX3R0X, build 670; list grammar, process_ios.c and the catalog are in
+    check-cef-pool-images.py): the same compiled routing for a program the list names. ios_ea_cef_app with the list (and with both switches, and with
+    an invalid list: nothing, the process is never read); X-Plane.exe's four asks of the log (the same shapes as the EA app's) become R1, B1, R2, B2 and tile
+    the band, a fifth ask, the helper's soft slots and a second live browser are refused, a restarted browser gets the same layout; the log lines: the EA
+    app's are byte for byte what the original code printed (and the owner's EA 610 log), a listed program's say [cef-one] and its own name.
 Needs python3 and a C compiler.
 """
 from pathlib import Path
@@ -120,8 +125,10 @@ check(reclaim.index('ios_sc_grants_owner_died( peb );') < reclaim.index('ios_ea_
 check('if (!peb || !ios_ea_grant_n) return;' in function(ea_block, 'static void ios_ea_grants_owner_died('),
       'with no EA grant ios_ea_grants_owner_died returns at once')
 app = function(ea_block, 'static int ios_ea_cef_app(void)')
-check(app.index('if (!ios_ea_cef_enabled()) return 0;') < app.index('ios_ea_current_image_is('),
-      'ios_ea_cef_app reads the switch before it looks at the process')
+check(app.index('if (!ios_ea_cef_enabled() && !list) return 0;') < app.index('ios_ea_current_image_is(')
+      and app.index('if (ios_ea_cef_enabled())') < app.index('ios_ea_current_image_is(')
+      and 'const char *list = ios_cef_list();' in app and app.index('const char *list = ios_cef_list();') < app.index('ios_ea_current_image_is('),
+      'ios_ea_cef_app reads both switches (env.MADEIRA_EA_CEF, env.MADEIRA_CEF_POOL_IMAGES) before it looks at the process; the EA names count only with env.MADEIRA_EA_CEF = 1')
 en = function(ea_block, 'static int ios_ea_cef_enabled(void)')
 check('getenv( "MADEIRA_EA_CEF" )' in en and "e && e[0] == '1' && !e[1]" in en, 'the switch is exactly "1"')
 route = function(ea_block, 'static int ios_ea_route(')
@@ -736,6 +743,104 @@ static void process_cases( void )
            "the browser's command line gets --single-process, BackupRefPtr off, --jitless, --no-proxy-server (+ the flags)\n");
 }
 
+
+/* ---- env.MADEIRA_CEF_POOL_IMAGES: X-Plane 12's Chromium (send log MX3R0X, build 670) ----------------------------------- */
+/* the asks of X-Plane.exe in that log: jumbo#1..4, the EA app's four in the same shapes and order */
+static const struct { uint64_t size, hint; } xp_asks[4] = {
+    { 0x400000000ull, 0x5a4c00000000ull }, { 0x400010000ull, 0x7643ffff0000ull },
+    { 0x400000000ull, 0x1fc400000000ull }, { 0x400010000ull, 0x535fffff0000ull } };
+#define XP_EXE   "C:\\Program Files (x86)\\Steam\\steamapps\\common\\X-Plane 12\\X-Plane.exe"
+#define XP_CEF   "C:\\Program Files (x86)\\Steam\\steamapps\\common\\X-Plane 12\\Resources\\dlls\\64\\cef\\win\\cefclient.exe"
+
+static void keyed_app_cases( const char *mode )
+{
+    static const struct { const char *path; int listed; int ea; } imgs[] = {
+        { XP_EXE, 1, 0 }, { "\\??\\c:\\program files (x86)\\steam\\steamapps\\common\\x-plane 12\\X-PLANE.EXE", 1, 0 },
+        { "x-plane.exe", 1, 0 }, { XP_CEF, 2, 0 },
+        { "C:\\Program Files\\Electronic Arts\\EA Desktop\\13.813.1.6327\\EA Desktop\\EADesktop.exe", 0, 1 },
+        { "C:\\Program Files\\Electronic Arts\\EA Desktop\\13.813.1.6327\\EA Desktop\\EACefSubProcess.exe", 0, 2 },
+        { "C:\\Program Files\\Rockstar Games\\Social Club\\SocialClubHelper.exe", 0, 0 },
+        { "C:\\Program Files (x86)\\Steam\\bin\\cef\\cef.win7x64\\steamwebhelper.exe", 0, 0 },
+        { "C:\\Games\\GTA5.exe", 0, 0 }, { "C:\\x\\Not-X-Plane.exe", 0, 0 }, { "C:\\x\\X-Plane.exe.bak", 0, 0 }, { "C:\\x\\x-plane.ex", 0, 0 },
+        { "C:\\x\\cefclient.exe.old", 0, 0 }, { "", 0, 0 } };
+    int i, listed_on = !strcmp( mode, "keyed" ) || !strcmp( mode, "keyed-both" ), ea_on = !strcmp( mode, "keyed-both" );
+
+    for (i = 0; i < (int)(sizeof(imgs) / sizeof(imgs[0])); i++)
+    {
+        int want = listed_on ? imgs[i].listed : 0, got, before = peb_reads;
+        if (ea_on && imgs[i].ea) want = imgs[i].ea;
+        cur_peb = make_peb( 5, imgs[i].path );
+        got = ios_ea_cef_app();
+        if (got != want) FAIL("%s: [%s] -> %d, wanted %d\n", mode, imgs[i].path, got, want);
+        if (!listed_on && !ea_on && peb_reads != before) FAIL("%s: the process was read although neither switch is set\n", mode);
+    }
+    printf( "PASS: ios_ea_cef_app %s: %s\n", mode,
+            !strcmp( mode, "keyed" ) ? "x-plane.exe 1, cefclient.exe 2, the EA app's programs and every other image 0 (EA switch off)"
+            : !strcmp( mode, "keyed-both" ) ? "both switches: the EA app's programs 1 and 2 as before, x-plane.exe 1, cefclient.exe 2"
+            : "an invalid list lists nothing, and the process is never read" );
+}
+
+static void keyed_route_cases( void )
+{
+    uint64_t ret[4], size[4], p, z;
+    NTSTATUS s;
+    int i;
+    PEB *x = make_peb( 4, XP_EXE ), *y = make_peb( 5, XP_EXE );
+
+    boot( 0 );
+    cur_peb = x;
+    if (ios_ea_cef_app() != 1) FAIL("X-Plane.exe is not the browser\n");
+    EXPECT_ROUTE( x, xp_asks[0].size, xp_asks[0].hint, 0x7800000000ull, 0x100000000ull );
+    EXPECT_ROUTE( x, xp_asks[1].size, xp_asks[1].hint, 0x73ffff0000ull, 0x400010000ull );
+    EXPECT_ROUTE( x, xp_asks[2].size, xp_asks[2].hint, 0x7000000000ull, 0x100000000ull );
+    EXPECT_ROUTE( x, xp_asks[3].size, xp_asks[3].hint, 0x7bffff0000ull, 0x100010000ull );
+    ret[0] = 0x7800000000ull; ret[1] = 0x73ffff0000ull; ret[2] = 0x7000000000ull; ret[3] = 0x7bffff0000ull;
+    for (i = 0; i < 4; i++) size[i] = xp_asks[i].size;
+    tile_check( ret, size );
+    for (i = 0; i < 4; i++) if (!ios_ea_grants[i].keyed) FAIL("grant %d is not a listed program's\n", i);
+    if (ios_sc2_held) FAIL("holds left after the four pools: 0x%x\n", ios_sc2_held);
+    if (!route( x, 0x400000000ull, 0x2a8000000000ull, &p, &z, &s ) || s != STATUS_NO_MEMORY) FAIL("a fifth pool\n");
+    if (route( x, 0x7ffff0000ull, 0, &p, &z, &s ) != 0) FAIL("the unhinted over-reserve was decided\n");
+    /* cefclient.exe (the helper, kind 2) is no route's business (the production caller sends only a browser there); its soft grant loop skips every
+     * slot that holds a view, as EACefSubProcess.exe's does: none of the four is free while X-Plane.exe has its pools */
+    cur_peb = make_peb( 6, XP_CEF );
+    if (ios_ea_cef_app() != 2) FAIL("cefclient.exe is not the helper\n");
+    for (i = 0; i < 4; i++)
+    {
+        static const uint64_t slot[4] = { 0x7000000000ull, 0x7400000000ull, 0x7800000000ull, 0x7c00000000ull };
+        if (!ios_ea_slot_busy( slot[i], 0 )) FAIL("the helper's soft slot 0x%llx looks free while the browser has its pools\n", (unsigned long long)slot[i]);
+    }
+    /* X-Plane.exe ends: the next one gets the layout it booted with (views released, holds back) */
+    ios_ea_grants_owner_died( x );
+    if (ios_ea_grant_dead_n != 4) FAIL("dead grants %d\n", ios_ea_grant_dead_n);
+    EXPECT_ROUTE( y, xp_asks[0].size, xp_asks[0].hint, 0x7800000000ull, 0x100000000ull );
+    if (ios_ea_grant_dead_n != 0 || ios_ea_grant_n != 1) FAIL("reap: dead %d grants %d\n", ios_ea_grant_dead_n, ios_ea_grant_n);
+    /* layout 2 not up: the route declines (its text is checked by the caller on stderr) */
+    boot( 0 );
+    ios_sc_layout_mode = 1;
+    if (route( x, xp_asks[0].size, xp_asks[0].hint, &p, &z, &s ) != 0 || ios_ea_grant_n) FAIL("layout 1\n");
+    ios_sc_layout_mode = 2;
+    printf( "PASS: a listed browser's four asks of the MX3R0X log are R1 0x7800000000, B1 0x73ffff0000, R2 0x7000000000, B2 0x7bffff0000, tiling the band; "
+            "a fifth ask, a helper and a second live browser are refused; a restarted browser gets the same layout; without layout 2 the route declines\n" );
+}
+
+/* the lines the log gets: the EA app's are what build 599 printed (the owner's EA 610 log, lines 4496..4644), a listed program's say who it is */
+static void log_cases( const char *mode )
+{
+    const char *path = !strcmp( mode, "log-ea" ) ? "C:\\Program Files\\Electronic Arts\\EA Desktop\\13.813.1.6327\\EA Desktop\\EADesktop.exe" : XP_EXE;
+    PEB *x = make_peb( 4, path ), *y = make_peb( 5, path );
+    uint64_t p, z;
+    NTSTATUS s;
+    int i;
+
+    boot( 0 );
+    cur_peb = x;
+    for (i = 0; i < 4; i++) route( x, xp_asks[i].size, xp_asks[i].hint, &p, &z, &s );
+    route( x, 0x400000000ull, 0x2a8000000000ull, &p, &z, &s );      /* a fifth: refused */
+    ios_ea_grants_owner_died( x );
+    route( y, xp_asks[0].size, xp_asks[0].hint, &p, &z, &s );       /* the restarted browser: reaps the four, takes R1 again */
+}
+
 int main( int argc, char **argv )
 {
     const char *mode = argc > 1 ? argv[1] : "";
@@ -744,6 +849,9 @@ int main( int argc, char **argv )
     else if (!strcmp( mode, "soft" )) soft_cases();
     else if (!strcmp( mode, "app-on" ) || !strcmp( mode, "app-off" )) app_cases( mode );
     else if (!strcmp( mode, "process" )) process_cases();
+    else if (!strcmp( mode, "keyed" ) || !strcmp( mode, "keyed-both" ) || !strcmp( mode, "keyed-bad" )) keyed_app_cases( mode );
+    else if (!strcmp( mode, "keyed-route" )) keyed_route_cases();
+    else if (!strcmp( mode, "log-ea" ) || !strcmp( mode, "log-keyed" )) log_cases( mode );
     else FAIL("mode?\n");
     return 0;
 }
@@ -756,7 +864,8 @@ with tempfile.TemporaryDirectory() as t:
         Path(os.environ['EA_CEF_KEEP']).write_text(harness)
     exe = Path(t) / 'ea'
     r = subprocess.run(['cc', '-std=gnu11', '-O1', '-Wall', '-Wno-unused-function', '-Wno-unused-variable',
-                        '-fsanitize=address,undefined', '-fno-sanitize-recover=all', str(c), '-o', str(exe)],
+                        '-fsanitize=address,undefined', '-fno-sanitize-recover=all', '-I', str(root / 'build/ntdll-unix'),
+                        str(c), '-o', str(exe)],
                        capture_output=True, text=True)
     if r.returncode:
         print(r.stderr)
@@ -774,6 +883,69 @@ with tempfile.TemporaryDirectory() as t:
             out = subprocess.run([str(exe), mode], capture_output=True, text=True, env=env)
             print(out.stdout, end='')
             check(out.returncode == 0, 'harness %s (MADEIRA_EA_CEF=%r)' % (mode, ea), out.stderr[-600:])
+
+        # env.MADEIRA_CEF_POOL_IMAGES (X-Plane 12, send log MX3R0X): the same code for a program the list names
+        listed = 'x-plane.exe,cefclient.exe'
+        keyed_cases = (('keyed', {'MADEIRA_CEF_POOL_IMAGES': listed}),
+                       ('keyed', {'MADEIRA_CEF_POOL_IMAGES': ' X-Plane.EXE , CefClient.exe '}),
+                       ('keyed-both', {'MADEIRA_EA_CEF': '1', 'MADEIRA_CEF_POOL_IMAGES': listed}),
+                       ('keyed-bad', {'MADEIRA_CEF_POOL_IMAGES': 'x-plane,cefclient.exe'}),
+                       ('keyed-bad', {'MADEIRA_CEF_POOL_IMAGES': 'x-plane.exe,,cefclient.exe'}),
+                       ('keyed-bad', {'MADEIRA_CEF_POOL_IMAGES': 'a.exe,b.exe,c.exe,d.exe,e.exe'}),
+                       ('keyed-bad', {'MADEIRA_CEF_POOL_IMAGES': '..\\x-plane.exe'}),
+                       ('keyed-bad', {'MADEIRA_CEF_POOL_IMAGES': ''}),
+                       ('keyed-bad', {'MADEIRA_EA_CEF': '0', 'MADEIRA_CEF_POOL_IMAGES': 'x-plane.exe;cefclient.exe'}),
+                       ('keyed-route', {'MADEIRA_CEF_POOL_IMAGES': listed}))
+        for mode, extra in keyed_cases:
+            env = dict(base_env)
+            env.update(extra)
+            env['ASAN_OPTIONS'] = 'symbolize=0'
+            out = subprocess.run([str(exe), mode], capture_output=True, text=True, env=env)
+            print(out.stdout, end='')
+            check(out.returncode == 0, 'harness %s (%r)' % (mode, extra), out.stderr[-600:])
+            if mode == 'keyed-route':
+                check("[cef-one] x-plane.exe asks for PartitionAlloc's pools, but layout 2 is not up (it needs env.MADEIRA_SC_PA_POOLS = 2 and the JIT pool's "
+                      "RW alias at 0x7900000000): the pools stay unplaced, as without env.MADEIRA_CEF_POOL_IMAGES" in out.stderr,
+                      'without layout 2 a listed browser\'s route declines with a line that names the program and the key', out.stderr[-600:])
+
+        # the log: the EA app's lines are the ones the owner's EA 610 log has (lines 4496, 4503, 4632, 4644); a listed program's say who it is
+        env = dict(base_env)
+        env['MADEIRA_EA_CEF'] = '1'
+        env['ASAN_OPTIONS'] = 'symbolize=0'
+        ea_log = subprocess.run([str(exe), 'log-ea'], capture_output=True, text=True, env=env)
+        want_ea = ['[ea-cef] first regular pool for EADesktop.exe: 0x7800000000 (0x400000000 asked), [0x7800000000,0x7900000000) reserved',
+                   '[ea-cef] first BackupRefPtr pool for EADesktop.exe: 0x73ffff0000 (0x400010000 asked), [0x73ffff0000,0x7800000000) reserved',
+                   '[ea-cef] second regular pool for EADesktop.exe: 0x7000000000 (0x400000000 asked), [0x7000000000,0x7100000000) reserved',
+                   '[ea-cef] second BackupRefPtr pool for EADesktop.exe: 0x7bffff0000 (0x400010000 asked), [0x7bffff0000,0x7d00000000) reserved',
+                   "[ea-cef] EADesktop.exe's reserve 0x400000000 (hint 0x2a8000000000, slots held 0x0, pieces it has 0xf) refused: all four PartitionAlloc pools are given, or the slot of this one is taken by another process",
+                   '[ea-cef] EADesktop.exe (peb=P) exited holding 4 PartitionAlloc pool view(s); they are released when the next EA browser asks',
+                   "[ea-cef] reclaimed a dead EADesktop.exe's first regular pool (peb=P): view 0x7800000000 released and held again",
+                   "[ea-cef] reclaimed a dead EADesktop.exe's second BackupRefPtr pool (peb=P): view 0x7bffff0000 released and held again",
+                   "[ea-cef] reclaimed a dead EADesktop.exe's second regular pool (peb=P): view 0x7000000000 released and held again",
+                   "[ea-cef] reclaimed a dead EADesktop.exe's first BackupRefPtr pool (peb=P): view 0x73ffff0000 released and held again",
+                   '[ea-cef] first regular pool for EADesktop.exe: 0x7800000000 (0x400000000 asked), [0x7800000000,0x7900000000) reserved']
+        peb_re = re.compile(r'\(peb=[^)]*\)')
+        got_ea = [peb_re.sub('(peb=P)', l) for l in ea_log.stderr.split('\n') if l.startswith('[ea-cef]')]
+        check(ea_log.returncode == 0 and got_ea == want_ea, "the EA app's route, refusal, owner-died and reap lines are the ones build 599 printed",
+              (ea_log.returncode, got_ea))
+        env = dict(base_env)
+        env['MADEIRA_CEF_POOL_IMAGES'] = listed
+        env['ASAN_OPTIONS'] = 'symbolize=0'
+        kd_log = subprocess.run([str(exe), 'log-keyed'], capture_output=True, text=True, env=env)
+        got_kd = [peb_re.sub('(peb=P)', l) for l in kd_log.stderr.split('\n') if l.startswith('[cef-one]')]
+        want_kd = ['[cef-one] first regular pool for x-plane.exe: 0x7800000000 (0x400000000 asked), [0x7800000000,0x7900000000) reserved',
+                   '[cef-one] first BackupRefPtr pool for x-plane.exe: 0x73ffff0000 (0x400010000 asked), [0x73ffff0000,0x7800000000) reserved',
+                   '[cef-one] second regular pool for x-plane.exe: 0x7000000000 (0x400000000 asked), [0x7000000000,0x7100000000) reserved',
+                   '[cef-one] second BackupRefPtr pool for x-plane.exe: 0x7bffff0000 (0x400010000 asked), [0x7bffff0000,0x7d00000000) reserved',
+                   "[cef-one] x-plane.exe's reserve 0x400000000 (hint 0x2a8000000000, slots held 0x0, pieces it has 0xf) refused: all four PartitionAlloc pools are given, or the slot of this one is taken by another process",
+                   '[cef-one] x-plane.exe (peb=P) exited holding 4 PartitionAlloc pool view(s); they are released when the next Chromium browser asks',
+                   "[cef-one] reclaimed a dead x-plane.exe's first regular pool (peb=P): view 0x7800000000 released and held again",
+                   "[cef-one] reclaimed a dead x-plane.exe's second BackupRefPtr pool (peb=P): view 0x7bffff0000 released and held again",
+                   "[cef-one] reclaimed a dead x-plane.exe's second regular pool (peb=P): view 0x7000000000 released and held again",
+                   "[cef-one] reclaimed a dead x-plane.exe's first BackupRefPtr pool (peb=P): view 0x73ffff0000 released and held again",
+                   '[cef-one] first regular pool for x-plane.exe: 0x7800000000 (0x400000000 asked), [0x7800000000,0x7900000000) reserved']
+        check(kd_log.returncode == 0 and got_kd == want_kd and not [l for l in kd_log.stderr.split('\n') if l.startswith('[ea-cef]')],
+              "a listed program's route, refusal, owner-died and reap lines carry [cef-one] and its own name, none carries [ea-cef]", (got_kd, kd_log.stderr[-500:]))
 
 print('PASS: check-ea-cef' if not failures else 'FAIL: %d check(s) failed' % failures)
 sys.exit(1 if failures else 0)

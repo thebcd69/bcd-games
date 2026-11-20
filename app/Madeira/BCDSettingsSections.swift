@@ -4,6 +4,9 @@
 // Portions copyright 2026 Russell Barton: code taken from https://github.com/thebcd69/bcd-games (pull request #46 by rbarton124)
 // under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 Paulo Eduardo Correa (pauloec): the native iPhone Duo interface (Liquid Glass, system tabs, controller navigation, Windows desktop on Home), from thebcd69/bcd-games pull request #43; GPL-3.0-only, modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md.
+// Portions copyright 2026 SeeTheBridges: the UIKit folder picker of Settings › Storage › External drives (BCDFolderPicker and
+// chooseExternalFolder), from https://github.com/SeeTheBridges/bcd-games commit d20e8e28 (GPL-3.0); modified for BCD in November 2026.
+// See THIRD-PARTY-NOTICES.md.
 
 import SwiftUI
 import UIKit
@@ -800,6 +803,60 @@ extension BCDStorageBackend {
     func noteExternalPicker(_ what: String) {}
 }
 
+/// The folder picker for Settings › Storage › External drives, presented from UIKit like Controls' "Add a layout from a file"
+/// (BCDControlShareLive.swift). In place, like the importer's: asCopy is false, so the folder is the real one, never a copy, and its
+/// security scope is the one the importer's result had (ExternalDrives.add opens it). Adapted from BCDExternalFolderPicker of
+/// SeeTheBridges/bcd-games (commit d20e8e28, ExternalGamesPicker.swift); BCD added the check that leaves a picker already up alone.
+@MainActor enum BCDFolderPicker {
+    /// Keeps the picker's delegate alive while the picker is up.
+    private static var pending: Delegate?
+
+    /// `answered` gets the chosen folder; `closed` runs once when the picker is gone (an answer, Cancel or a swipe down).
+    /// False when there was no screen to present from. A picker that is already up is left alone (true, nothing more happens).
+    static func present(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) -> Bool {
+        if let earlier = pending?.picker, earlier.presentingViewController != nil || earlier.isBeingPresented { return true }
+        guard var top = keyRoot() else { return false }
+        while let next = top.presentedViewController, !next.isBeingDismissed { top = next }
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)
+        picker.allowsMultipleSelection = false
+        let delegate = Delegate(answered: answered, closed: closed)
+        delegate.picker = picker
+        picker.delegate = delegate
+        picker.presentationController?.delegate = delegate
+        pending = delegate
+        top.present(picker, animated: true)
+        return true
+    }
+
+    private static func keyRoot() -> UIViewController? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        return scene?.keyWindow?.rootViewController
+    }
+
+    private final class Delegate: NSObject, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate {
+        weak var picker: UIDocumentPickerViewController?
+        private var answered: ((URL) -> Void)?
+        private var closed: (() -> Void)?
+        init(answered: @escaping (URL) -> Void, closed: @escaping () -> Void) { self.answered = answered; self.closed = closed }
+
+        private func finish() {
+            let done = closed
+            answered = nil; closed = nil
+            DispatchQueue.main.async { MainActor.assumeIsolated {
+                BCDFolderPicker.pending = nil
+                done?()
+            } }
+        }
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            if let url = urls.first, let answered { answered(url) }
+            finish()
+        }
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) { finish() }
+        func presentationControllerDidDismiss(_ presentationController: UIPresentationController) { if closed != nil { finish() } }
+    }
+}
+
 struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
     @ObservedObject var backend: Backend
     @EnvironmentObject private var store: BCDStore
@@ -807,7 +864,6 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
     @Environment(\.bcdLayout) private var layout
     @State private var backup: BCDShareItems?
     @State private var choosingBackup = false
-    @State private var choosingExternalGames = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -833,6 +889,18 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
                 BCDSettingsActionRow(id: BCDSettingsID.control(.storage, "restore"), title: "Restore from a backup",
                                      symbol: "arrow.uturn.backward.circle", enabled: !backend.savesBusy) { choosingBackup = true }
             }
+            // The share sheet and the restore importer are attached to this group, not to the page: SwiftUI does not present a
+            // .fileImporter that sits below another .fileImporter (the Windows prefix group's, below the page, never opened),
+            // so none of the page's importers may be an ancestor of another.
+            .sheet(item: $backup, onDismiss: { backup.map { $0.urls.forEach(backend.discardBackup) } }) {
+                BCDShareSheet(items: $0.urls)
+            }
+            .fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip]) { result in
+                guard case .success(let url) = result else { return }
+                model.ask(BCDSettingsConfirm(title: "Restore the saves in \(url.lastPathComponent)?",
+                                             message: "Every file in C:\\users with the same name is replaced.",
+                                             choices: [.init(title: "Restore", destructive: true) { backend.restoreSaves(from: url) }]))
+            }
             if let tools = backend.prefixToolsView { tools }   // round 604: BCDPrefixTools.swift
             BCDSettingsGroup(title: "Shared files",
                              footer: "What each takes on this device" + (backend.measuring ? ", measuring now." : ".")
@@ -841,15 +909,6 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             }
         }
         .onAppear { backend.refresh() }
-        .sheet(item: $backup, onDismiss: { backup.map { $0.urls.forEach(backend.discardBackup) } }) {
-            BCDShareSheet(items: $0.urls)
-        }
-        .fileImporter(isPresented: $choosingBackup, allowedContentTypes: [.zip]) { result in
-            guard case .success(let url) = result else { return }
-            model.ask(BCDSettingsConfirm(title: "Restore the saves in \(url.lastPathComponent)?",
-                                         message: "Every file in C:\\users with the same name is replaced.",
-                                         choices: [.init(title: "Restore", destructive: true) { backend.restoreSaves(from: url) }]))
-        }
     }
 
     private var room: some View {
@@ -876,8 +935,8 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
 
     /// Settings › Storage › External drives (from Madeira #464, Settings › External drives): every drive or folder added from
     /// Files, its letter, whether it is connected and its free room; a tap offers Find games, Reconnect and Remove; Steam
-    /// installs picks where a Steam game's Install goes by default. The folder picker is attached here, on the group, not on the
-    /// page: the page already carries the saves backup's importer, and two importers on one view can displace each other.
+    /// installs picks where a Steam game's Install goes by default. The folder picker is the system's, presented from UIKit by
+    /// `chooseExternalFolder` below (a SwiftUI .fileImporter on this group never opened for a tester: only `picker opened` in the log).
     private var externalGames: some View {
         let drives = backend.externalDrives
         return BCDSettingsGroup(title: "External drives",
@@ -887,8 +946,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
                                  title: drives.isEmpty ? "Add a drive or folder" : "Add another drive or folder",
                                  note: drives.isEmpty ? backend.externalGamesMessage : nil, symbol: "externaldrive.badge.plus",
                                  enabled: backend.canChangeExternalDrives) {
-                backend.noteExternalPicker("opened")
-                choosingExternalGames = true
+                chooseExternalFolder("opened")
             }
             if !drives.isEmpty {
                 BCDSettingsValueRow(id: BCDSettingsID.control(.storage, "external-steam"), title: "Steam installs",
@@ -903,16 +961,23 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
                 }
             }
         }
-        .fileImporter(isPresented: $choosingExternalGames, allowedContentTypes: [.folder]) { result in
-            switch result {
-            case .success(let url):
+    }
+
+    /// Opens the folder picker (Add, and Reconnect when iOS no longer opens the saved folder). It is presented from UIKit, not by a
+    /// SwiftUI .fileImporter: SwiftUI did not present the importer that sat on this group, so a folder could not be chosen. The
+    /// log lines are the importer's: opened, answered, closed.
+    private func chooseExternalFolder(_ reason: String) {
+        backend.noteExternalPicker(reason)   // "opened": arms the in-place host-identity fix before iOS builds the picker
+        let shown = BCDFolderPicker.present(
+            answered: { url in
                 backend.noteExternalPicker("answered")
                 backend.addExternalDrive(url)
-            case .failure(let error):
-                backend.noteExternalPicker("failed: \(error.localizedDescription)")
-            }
+            },
+            closed: { backend.noteExternalPicker("closed") })
+        if !shown {
+            backend.noteExternalPicker("failed: no screen to present from")
+            backend.noteExternalPicker("closed")
         }
-        .onChange(of: choosingExternalGames) { _, open in if !open { backend.noteExternalPicker("closed") } }
     }
 
     private func driveRow(_ drive: BCDExternalDrive) -> some View {
@@ -931,8 +996,7 @@ struct BCDStorageSettings<Backend: BCDStorageBackend>: View {
             } else {
                 choices.append(.init(title: "Reconnect") {
                     backend.reconnectExternalDrive(drive.id) {
-                        backend.noteExternalPicker("opened (after reconnect)")
-                        choosingExternalGames = true
+                        chooseExternalFolder("opened (after reconnect)")
                     }
                 })
             }
