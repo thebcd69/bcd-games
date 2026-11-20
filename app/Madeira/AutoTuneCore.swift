@@ -537,6 +537,10 @@ final class AutoTuneLogScanner {
         // 177 archive logs with such a block were scored by it (Cult of the Lamb 4DR32H "hung" from the previous run's GPU errors; Mina
         // the Hollower W6PACT matched metal-texture-double-release through it).
         if Self.find(l, Self.mPrevTail) != nil { return }
+        // madeira-bcd (2026-11-19): the "[prev-end]" line after that tail (BCDSessionCore.endLine) quotes the previous run's last
+        // "[freeze] alive t+", footprint and session lines, so it is that run's too. A session that exited after 6 s was scored "ran"
+        // at stage 5 from the previous run's "alive t+1502s", so no early-exit rule could match.
+        if Self.find(l, Self.mPrevEnd) != nil { return }
         // Night round 2026-11-11 (agents G10 S2, G1 note on 778A58): the sender's own words ("[user-comment] ..." lines at the top of a sent log,
         // LogUploadCore.commentLines) are a person's text, never the game's: Alan Wake 778A58's comment quoted a shader message and matched
         // dxmt-d3d9-vs-ps-interface ("FIX-FAILED") although the log has no such failure. The app's own live log never has these lines.
@@ -709,6 +713,7 @@ final class AutoTuneLogScanner {
     private static let mXpLine = Array("[xp] ".utf8)
     private static let mFpMB = Array(" fpMB=".utf8)
     private static let mPrevTail = Array("[prev-tail]".utf8)
+    private static let mPrevEnd = Array("[prev-end]".utf8)
     /// "[user-comment] " as bytes, not as an Array("...".utf8) literal: tools/autotune-fixture.py keeps every line a literal matches, and a
     /// sender's comment must never reach a fixture because of this marker.
     private static let mUserComment: [UInt8] = [0x5B, 0x75, 0x73, 0x65, 0x72, 0x2D, 0x63, 0x6F, 0x6D, 0x6D, 0x65, 0x6E, 0x74, 0x5D, 0x20]

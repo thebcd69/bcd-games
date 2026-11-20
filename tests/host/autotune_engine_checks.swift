@@ -184,6 +184,17 @@ struct AutoTuneEngineChecks {
         two.feed(Data(twoLog.joined().utf8))
         two.finish()
         expect(two.counts == [1, 0, 0], "a [prev-tail] line counts nowhere; a sinceLaunch count restarts at a launch: \(two.counts)")
+        // The [prev-end] line quotes the previous run's alive beat, footprint and summary; none is this session's.
+        let prevEnd = AutoTuneLogScanner(signals: [AutoTuneSignal(has: ["Device error at frame"])])
+        prevEnd.feed(Data(("[10:00:00.000] [INFO] [prev-end] last footprint \"[footprint] phys=6100MB limit=6144MB\" | last alive "
+                           + "\"[freeze] alive t+1502s presents=90000\" | last summary \"[session] length=1502s play=1490s Device error at frame 3\" "
+                           + "| verdict: memory kill likely (99 % of the limit)\n"
+                           + "[10:00:01.000] [INFO] [bcd] library launch Game: avx=0\n"
+                           + "[10:00:07.000] [INFO] [freeze] alive t+6s presents=0\n").utf8))
+        prevEnd.finish()
+        expect(prevEnd.facts.aliveSeconds == 6 && prevEnd.facts.stage < 5 && prevEnd.facts.lastFootprintMB == nil && prevEnd.counts == [0],
+               "a [prev-end] line is no evidence: alive \(prevEnd.facts.aliveSeconds), stage \(prevEnd.facts.stage), "
+               + "footprint \(prevEnd.facts.lastFootprintMB ?? -1), counts \(prevEnd.counts)")
         let oneRun = AutoTuneLogScanner(signals: tailSigs)
         oneRun.feed(Data("[10:00:01.000] [INFO] [bcd] library launch Game: avx=0\nwarn:  [present] ml1175 commitBeforePresent=1\n".utf8))
         oneRun.finish()
