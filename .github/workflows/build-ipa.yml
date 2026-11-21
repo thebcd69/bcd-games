@@ -5010,6 +5010,10 @@ jobs:
       - name: Check D3D12 attachless split
         run: python3 tests/host/check-d3d12-attachless-split.py
 
+      # ExecuteIndirect signatures with several arguments per record, expanded from CPU-written records (Teardown, build 687): indirect-expand.
+      - name: Check D3D12 indirect expand
+        run: python3 tests/host/check-d3d12-indirect-expand.py
+
       - name: Build madeira_d3d12.dll from source
         env:
           MAD_BUILD_ID: ipa ${{ steps.bn.outputs.n }}

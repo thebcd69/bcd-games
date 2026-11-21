@@ -21302,6 +21302,116 @@ static void STDMETHODCALLTYPE list_ResourceBarrier(ID3D12GraphicsCommandList *Th
         else { c->u.barrier.all = 1; c->u.barrier.cls_noref = BC_ALL; }
     }
 }
+/* madeira-bcd indirect-expand (2026-11-21; Teardown through BCD Dock, build 686, a tester's six sessions on an
+ * iPhone19,2: "half the scene isn't there"). A signature with more than one argument was refused and every draw that
+ * went through it was lost: Teardown makes eleven of them (a root constant buffer view and a draw, 24 and 32 bytes a
+ * record; a constant buffer view, a vertex buffer, an index buffer and an indexed draw, 64 bytes) and draws much of
+ * its world with them. Metal has no per-record root or buffer bindings in an indirect draw; a faithful replay needs
+ * an indirect command buffer filled by a compute pass. Until then: when the argument buffer was written by the CPU
+ * (an UPLOAD or CUSTOM heap the program mapped, as a program that builds its records on the CPU uses), the records
+ * are read here, as the call is recorded, and each becomes the calls the program would have made: its root views and
+ * constants, its vertex and index buffers, then its draw or dispatch. A record whose draw has a zero count draws
+ * nothing, as on Windows. A CPU-written count buffer is honoured; a GPU-written one is not readable here, so every
+ * record is issued (a zeroed record draws nothing). The state the signature set is undefined after the call, as
+ * D3D12 says, so the recorded bindings may stay. A GPU-written argument buffer (a DEFAULT heap) is still skipped, and
+ * the skip line names the reason. tests/host/check-d3d12-indirect-expand.py; bcd.cfg indirect-expand = 0 skips as before. */
+static int g_indirect_expand = -1;
+static unsigned mad_indirect_arg_size(const D3D12_INDIRECT_ARGUMENT_DESC *a) {
+    switch (a->Type) {
+    case D3D12_INDIRECT_ARGUMENT_TYPE_DRAW: return 16;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED: return 20;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH: return 12;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW: return 16;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW: return 16;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT: return a->Constant.Num32BitValuesToSet * 4;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW:
+    case D3D12_INDIRECT_ARGUMENT_TYPE_SHADER_RESOURCE_VIEW:
+    case D3D12_INDIRECT_ARGUMENT_TYPE_UNORDERED_ACCESS_VIEW: return 8;
+    default: return 0;   /* not expanded */
+    }
+}
+/* 1: every record is recorded as plain calls. 0: the call must still be skipped; `why` names the reason for the log. */
+static int mad_indirect_expand(ID3D12GraphicsCommandList *This, struct mad_cmdsig *cs, UINT max_count,
+                               ID3D12Resource *args, UINT64 args_off, ID3D12Resource *count_buf, UINT64 count_off,
+                               const char **why) {
+    struct mad_list *l = (struct mad_list *)This;
+    struct mad_resource *ar = (struct mad_resource *)args;
+    UINT stride = cs->desc.ByteStride, natural = 0, i, n, count = max_count;
+    int compute = 0, draws = 0;
+    static unsigned said_count;
+    if (g_indirect_expand < 0) g_indirect_expand = mad_cfg_int_pe("indirect-expand", 1) ? 1 : 0;   /* bcd.cfg indirect-expand = 0: a multi-argument signature is skipped, as before build 687 */
+    if (!g_indirect_expand) { *why = "indirect-expand = 0"; return 0; }
+    for (i = 0; i < cs->desc.NumArgumentDescs; i++) {
+        unsigned sz = mad_indirect_arg_size(&cs->args[i]);
+        if (!sz) { *why = "an argument type this build does not expand"; return 0; }
+        natural += sz;
+        if (cs->args[i].Type == D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH) compute = 1;
+        if (cs->args[i].Type <= D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH) draws++;
+    }
+    if (draws != 1) { *why = "not exactly one draw or dispatch per record"; return 0; }
+    if (!stride) stride = natural;
+    if (stride < natural) { *why = "a stride shorter than its arguments"; return 0; }
+    if (!mad_ug_cpu_written(ar)) { *why = "a GPU-written argument buffer"; return 0; }
+    if (count_buf) {
+        struct mad_resource *cr = (struct mad_resource *)count_buf;
+        if (mad_ug_cpu_written(cr) && count_off + 4 <= cr->size) {
+            UINT32 cnt;
+            memcpy(&cnt, (const unsigned char *)cr->cpu + count_off, 4);
+            if (cnt < count) count = cnt;
+        } else if (said_count++ < 1) {
+            d3d12_log("[madeira-d3d12] ExecuteIndirect expansion: the count buffer is not CPU-written; issuing all %u records\n", max_count);
+        }
+    }
+    if (args_off >= ar->size) count = 0;
+    else if ((ar->size - args_off) / stride < count) count = (UINT)((ar->size - args_off) / stride);
+    for (n = 0; n < count; n++) {
+        const unsigned char *p = (const unsigned char *)ar->cpu + args_off + (UINT64)n * stride;
+        for (i = 0; i < cs->desc.NumArgumentDescs; i++) {
+            const D3D12_INDIRECT_ARGUMENT_DESC *a = &cs->args[i];
+            switch (a->Type) {
+            case D3D12_INDIRECT_ARGUMENT_TYPE_DRAW: {
+                UINT32 v[4]; memcpy(v, p, 16); p += 16;
+                if (v[0] && v[1]) list_DrawInstanced(This, v[0], v[1], v[2], v[3]);
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED: {
+                UINT32 v[5]; memcpy(v, p, 20); p += 20;
+                if (v[0] && v[1]) list_DrawIndexedInstanced(This, v[0], v[1], v[2], (INT)v[3], v[4]);
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH: {
+                UINT32 v[3]; memcpy(v, p, 12); p += 12;
+                if (v[0] && v[1] && v[2]) list_Dispatch(This, v[0], v[1], v[2]);
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW: {
+                D3D12_VERTEX_BUFFER_VIEW vb; memcpy(&vb, p, 16); p += 16;
+                list_IASetVertexBuffers(This, a->VertexBuffer.Slot, 1, &vb);
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW: {
+                D3D12_INDEX_BUFFER_VIEW ib; memcpy(&ib, p, 16); p += 16;
+                list_IASetIndexBuffer(This, &ib);
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT: {
+                UINT cn = a->Constant.Num32BitValuesToSet;
+                if (compute) list_SetComputeRoot32BitConstants(This, a->Constant.RootParameterIndex, cn, p, a->Constant.DestOffsetIn32BitValues);
+                else list_SetGraphicsRoot32BitConstants(This, a->Constant.RootParameterIndex, cn, p, a->Constant.DestOffsetIn32BitValues);
+                p += cn * 4;
+                break; }
+            case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW:
+            case D3D12_INDIRECT_ARGUMENT_TYPE_SHADER_RESOURCE_VIEW:
+            case D3D12_INDIRECT_ARGUMENT_TYPE_UNORDERED_ACCESS_VIEW: {
+                UINT64 va; UINT index;
+                memcpy(&va, p, 8); p += 8;
+                index = a->Type == D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW ? a->ConstantBufferView.RootParameterIndex
+                      : a->Type == D3D12_INDIRECT_ARGUMENT_TYPE_SHADER_RESOURCE_VIEW ? a->ShaderResourceView.RootParameterIndex
+                      : a->UnorderedAccessView.RootParameterIndex;
+                if (compute) mad_record_croot(l, index, va, 1);
+                else mad_record_root(l, index, va, 1);
+                break; }
+            default: break;
+            }
+        }
+    }
+    return 1;
+}
 /* ml889: ExecuteIndirect. D3D12's argument records are byte-for-byte Metal's
  * indirect argument structs (DRAW_ARGUMENTS == MTLDrawPrimitivesIndirectArguments,
  * DRAW_INDEXED_ARGUMENTS == MTLDrawIndexedPrimitivesIndirectArguments,
@@ -21315,10 +21425,17 @@ static void STDMETHODCALLTYPE list_ExecuteIndirect(ID3D12GraphicsCommandList *Th
     struct mad_cmdsig *cs = (struct mad_cmdsig *)sig;
     struct mad_cmd *c;
     enum mad_ck kind;
-    static unsigned said_multi, said_count, said_big;
+    static unsigned said_multi, said_count, said_big, said_expand;
     if (!cs || !args || !max_count) return;
     if (cs->desc.NumArgumentDescs != 1) {
-        if (said_multi++ < 4) d3d12_log("[madeira-d3d12] ExecuteIndirect: signature with %u argument descs is not implemented; skipped\n", cs->desc.NumArgumentDescs);
+        const char *why = "";
+        if (mad_indirect_expand(This, cs, max_count, args, args_off, count_buf, count_off, &why)) {   /* madeira-bcd indirect-expand */
+            if (said_expand++ < 2)
+                d3d12_log("[madeira-d3d12] ExecuteIndirect: a %u-argument signature (stride %u, %u records at most) is recorded as plain draws from its CPU-written records (madeira-bcd indirect-expand)\n",
+                          cs->desc.NumArgumentDescs, cs->desc.ByteStride, max_count);
+            return;
+        }
+        if (said_multi++ < 4) d3d12_log("[madeira-d3d12] ExecuteIndirect: signature with %u argument descs is not implemented (%s); skipped\n", cs->desc.NumArgumentDescs, why);
         return;
     }
     switch (cs->args[0].Type) {
