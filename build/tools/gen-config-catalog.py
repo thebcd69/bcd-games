@@ -577,13 +577,13 @@ OVERLAY = {
                 "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
     # madeira-bcd indirect-expand (2026-11-21, Teardown): madeira_d3d12.c mad_indirect_expand
     "indirect-expand": {"category": "Direct3D 12", "title": "ExecuteIndirect with several arguments per record: draw from the CPU's records",
-                "kind": "bool", "default": "1",
-                "note": "Default on (build 687). A game that issues indirect draws whose records also change a root view, a constant, a vertex "
-                        "buffer or an index buffer (Teardown draws much of its world this way) used to lose every one of those draws: BCD's "
-                        "Direct3D 12 runtime replays only single-argument signatures. When the game wrote the records on the CPU (an upload "
-                        "heap), BCD now reads them as the call is recorded and issues each record as the plain calls the game would have made, "
-                        "with its draw. Records a GPU wrote (a default heap) are still skipped, and the log line says so. 0: skip them all, as "
-                        "before. [madeira-d3d12] ExecuteIndirect lines in the log.",
+                "kind": "bool", "default": "0",
+                "note": "Default off; turn it on for one game (Teardown). A game that issues indirect draws whose records also change a "
+                        "root view, a constant, a vertex buffer or an index buffer loses every one of those draws: BCD's Direct3D 12 runtime "
+                        "replays only single-argument signatures. 1: when the records are in an upload heap, BCD reads them as the call is "
+                        "recorded and issues each record as the plain calls the game would have made, with its draw. The records are a "
+                        "snapshot taken then: a game that changes them after recording (a list reused every frame) draws stale or missing "
+                        "geometry, which is why it is off by default. At most 8192 records a call. [madeira-d3d12] ExecuteIndirect lines in the log.",
                 "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
     # build 632 (upstream Madeira #516, ajan66): madeira_d3d12.c mad_pso_async_on
     "pso-async": {"category": "Direct3D 12", "title": "Experiment: build new pipelines on background threads",

@@ -21307,14 +21307,22 @@ static void STDMETHODCALLTYPE list_ResourceBarrier(ID3D12GraphicsCommandList *Th
  * went through it was lost: Teardown makes eleven of them (a root constant buffer view and a draw, 24 and 32 bytes a
  * record; a constant buffer view, a vertex buffer, an index buffer and an indexed draw, 64 bytes) and draws much of
  * its world with them. Metal has no per-record root or buffer bindings in an indirect draw; a faithful replay needs
- * an indirect command buffer filled by a compute pass. Until then: when the argument buffer was written by the CPU
- * (an UPLOAD or CUSTOM heap the program mapped, as a program that builds its records on the CPU uses), the records
- * are read here, as the call is recorded, and each becomes the calls the program would have made: its root views and
- * constants, its vertex and index buffers, then its draw or dispatch. A record whose draw has a zero count draws
- * nothing, as on Windows. A CPU-written count buffer is honoured; a GPU-written one is not readable here, so every
- * record is issued (a zeroed record draws nothing). The state the signature set is undefined after the call, as
- * D3D12 says, so the recorded bindings may stay. A GPU-written argument buffer (a DEFAULT heap) is still skipped, and
- * the skip line names the reason. tests/host/check-d3d12-indirect-expand.py; bcd.cfg indirect-expand = 0 skips as before. */
+ * an indirect command buffer filled by a compute pass. Until then, opt in per game (bcd.cfg or the game's file:
+ * indirect-expand = 1): when the argument buffer is an UPLOAD heap (written by the CPU), the records are read here and
+ * each becomes the calls the program would have made: its root views and constants, its vertex and index buffers, then
+ * its draw or dispatch. A record whose draw has a zero count draws nothing, as on Windows.
+ *
+ * The records are a SNAPSHOT taken when the call is RECORDED. D3D12 reads them when the list EXECUTES, so a program that
+ * writes the buffer after recording (a list recorded once and executed every frame while its records change, or records
+ * filled between Close and ExecuteCommandLists) draws stale or empty records here. That is why the switch is off by
+ * default: turn it on only for a game known to fill its records before recording (Teardown does).
+ *
+ * Only UPLOAD heaps: a CUSTOM heap can be written by the GPU. A CPU-written (UPLOAD) count buffer is honoured, read at
+ * record time too; any other count buffer cannot be read here, so every record up to MaxCommandCount is issued, and a
+ * program that leaves stale records past its count draws them. At most 8192 records, as the single-argument path.
+ * The draw or dispatch must be the last argument (D3D12 requires it). The state the signature set is undefined after
+ * the call, as D3D12 says, so the recorded bindings may stay. Anything else is still skipped, and the skip line names
+ * the reason. tests/host/check-d3d12-indirect-expand.py. */
 static int g_indirect_expand = -1;
 static unsigned mad_indirect_arg_size(const D3D12_INDIRECT_ARGUMENT_DESC *a) {
     switch (a->Type) {
@@ -21323,7 +21331,8 @@ static unsigned mad_indirect_arg_size(const D3D12_INDIRECT_ARGUMENT_DESC *a) {
     case D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH: return 12;
     case D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW: return 16;
     case D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW: return 16;
-    case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT: return a->Constant.Num32BitValuesToSet * 4;
+    case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT:   /* 1..64 values: the root constants' limit; 0 or more is not expanded */
+        return a->Constant.Num32BitValuesToSet >= 1 && a->Constant.Num32BitValuesToSet <= 64 ? a->Constant.Num32BitValuesToSet * 4 : 0;
     case D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW:
     case D3D12_INDIRECT_ARGUMENT_TYPE_SHADER_RESOURCE_VIEW:
     case D3D12_INDIRECT_ARGUMENT_TYPE_UNORDERED_ACCESS_VIEW: return 8;
@@ -21336,25 +21345,33 @@ static int mad_indirect_expand(ID3D12GraphicsCommandList *This, struct mad_cmdsi
                                const char **why) {
     struct mad_list *l = (struct mad_list *)This;
     struct mad_resource *ar = (struct mad_resource *)args;
-    UINT stride = cs->desc.ByteStride, natural = 0, i, n, count = max_count;
+    UINT stride = cs->desc.ByteStride, natural = 0, i, n, count = max_count, last = cs->desc.NumArgumentDescs - 1;
     int compute = 0, draws = 0;
-    static unsigned said_count;
-    if (g_indirect_expand < 0) g_indirect_expand = mad_cfg_int_pe("indirect-expand", 1) ? 1 : 0;   /* bcd.cfg indirect-expand = 0: a multi-argument signature is skipped, as before build 687 */
-    if (!g_indirect_expand) { *why = "indirect-expand = 0"; return 0; }
+    static unsigned said_count, said_cap;
+    if (g_indirect_expand < 0) g_indirect_expand = mad_cfg_int_pe("indirect-expand", 0) ? 1 : 0;   /* bcd.cfg or the game's file indirect-expand = 1: records are a snapshot taken at record time (see above) */
+    if (!g_indirect_expand) { *why = "indirect-expand is off"; return 0; }
     for (i = 0; i < cs->desc.NumArgumentDescs; i++) {
         unsigned sz = mad_indirect_arg_size(&cs->args[i]);
-        if (!sz) { *why = "an argument type this build does not expand"; return 0; }
+        if (!sz) { *why = cs->args[i].Type == D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT ? "a root constant argument with 0 or more than 64 values"
+                                                                                     : "an argument type this build does not expand"; return 0; }
         natural += sz;
         if (cs->args[i].Type == D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH) compute = 1;
-        if (cs->args[i].Type <= D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH) draws++;
+        if (cs->args[i].Type <= D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH) {
+            draws++;
+            if (i != last) { *why = "a draw or dispatch that is not the last argument"; return 0; }
+        }
     }
     if (draws != 1) { *why = "not exactly one draw or dispatch per record"; return 0; }
     if (!stride) stride = natural;
     if (stride < natural) { *why = "a stride shorter than its arguments"; return 0; }
-    if (!mad_ug_cpu_written(ar)) { *why = "a GPU-written argument buffer"; return 0; }
+    if (!ar || !ar->cpu || ar->heap != D3D12_HEAP_TYPE_UPLOAD) { *why = "an argument buffer that is not an UPLOAD heap"; return 0; }
+    if (count > 8192) {
+        if (said_cap++ < 4) d3d12_log("[madeira-d3d12] ExecuteIndirect expansion: %u records capped at 8192\n", count);
+        count = 8192;
+    }
     if (count_buf) {
         struct mad_resource *cr = (struct mad_resource *)count_buf;
-        if (mad_ug_cpu_written(cr) && count_off + 4 <= cr->size) {
+        if (cr->cpu && cr->heap == D3D12_HEAP_TYPE_UPLOAD && count_off < cr->size && cr->size - count_off >= 4) {
             UINT32 cnt;
             memcpy(&cnt, (const unsigned char *)cr->cpu + count_off, 4);
             if (cnt < count) count = cnt;
