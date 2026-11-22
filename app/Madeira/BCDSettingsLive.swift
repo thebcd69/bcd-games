@@ -945,18 +945,18 @@ struct BCDTouchEditorHost: View {
 
     private func update(_ path: NWPath, monitor: NWPathMonitor) {
         guard let interface = path.availableInterfaces.first(where: { $0.type == .wifi }),
-              let address = BCDLiveLogServer.ipv4Address(on: interface) else {
+              let network = BCDLiveLogServer.ipv4Network(on: interface) else {
             stop(.failed("Connect to Wi-Fi with an IPv4 address, then turn on live log access again."))
             return
         }
         if let server {
-            if server.address != address || server.interface != interface {
-                stop(.failed("The Wi-Fi address changed. Turn on live log access again."))
+            if server.network != network || server.interface != interface {
+                stop(.failed("The Wi-Fi network changed. Turn on live log access again."))
             }
             return
         }
         do {
-            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, address: address, interface: interface) {
+            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, network: network, interface: interface) {
                 [weak self, weak monitor] result in
                 guard let self, let monitor else { return }
                 DispatchQueue.main.async {

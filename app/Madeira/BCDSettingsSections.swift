@@ -1412,7 +1412,7 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             BCDSettingsGroup(title: "Live logs",
-                             footer: "Anyone with the URL can read the raw log over unencrypted HTTP. Use a trusted Wi-Fi network.") {
+                             footer: "Anyone on this Wi-Fi subnet can read the raw log over unencrypted HTTP. BCD shows the .local hostname when Bonjour finds it.") {
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "live"), title: "Allow live log access",
                                      note: "Stream this run's log while BCD is running.",
                                      isOn: backend.liveLogState.isOn) { backend.setLiveLogAccess($0) }

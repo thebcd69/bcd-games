@@ -2,11 +2,23 @@
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
 
 import Darwin
+import dnssd
 import Foundation
 import Network
 
 /// Serves the current raw log without depending on the UI log reader or its filters.
 final class BCDLiveLogServer: @unchecked Sendable {
+    struct IPv4Network: Equatable {
+        let address: IPv4Address
+        let netmask: IPv4Address
+
+        func contains(_ peer: IPv4Address) -> Bool {
+            zip(zip(address.rawValue, peer.rawValue), netmask.rawValue).allSatisfy { addresses, mask in
+                (addresses.0 & mask) == (addresses.1 & mask)
+            }
+        }
+    }
+
     private final class Client: @unchecked Sendable {
         let connection: NWConnection
         var request = Data()
@@ -16,27 +28,35 @@ final class BCDLiveLogServer: @unchecked Sendable {
     }
 
     private static let endOfHeaders = Data("\r\n\r\n".utf8)
-    private static let endOfLine = Data("\r\n".utf8)
     private static let requestLimit = 4096
     private static let replayBytes: UInt64 = 64 * 1024
+    static let port: NWEndpoint.Port = 8766
     private let queue = DispatchQueue(label: "bcd.live-logs", qos: .utility)
     private let listener: NWListener
     private let logURL: URL
-    let address: IPv4Address
+    let network: IPv4Network
     let interface: NWInterface?
-    private let target = "/api/log?token=\(UUID().uuidString)"
+    private var registration: NWEndpoint?
+    private var hostname: String?
     private var clients: [ObjectIdentifier: Client] = [:]
     private var stopped = false
 
-    init(logURL: URL, address: IPv4Address, interface: NWInterface?,
+    init(logURL: URL, network: IPv4Network, interface: NWInterface?, port: NWEndpoint.Port = BCDLiveLogServer.port,
          status: @escaping @Sendable (Result<URL, NWError>) -> Void) throws {
         self.logURL = logURL
-        self.address = address
+        self.network = network
         self.interface = interface
         let parameters = NWParameters.tcp
         parameters.requiredInterface = interface
-        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(address), port: .any)
+        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(network.address), port: port)
         listener = try NWListener(using: parameters)
+        if let interface {
+            listener.service = NWListener.Service(name: "BCD Live Logs", type: "_http._tcp", domain: "local.",
+                                                  txtRecord: NWTXTRecord(["path": "/api/log"]))
+            listener.serviceRegistrationUpdateHandler = { [weak self] change in
+                self?.updateRegistration(change, interfaceIndex: UInt32(interface.index), status: status)
+            }
+        }
         listener.newConnectionHandler = { [weak self] connection in
             guard let self else { connection.cancel(); return }
             self.accept(connection)
@@ -45,13 +65,7 @@ final class BCDLiveLogServer: @unchecked Sendable {
             guard let self, !self.stopped else { return }
             switch state {
             case .ready:
-                guard let port = self.listener.port,
-                      let url = URL(string: "http://\(address):\(port.rawValue)\(self.target)") else {
-                    self.closeAll()
-                    status(.failure(.posix(.EADDRNOTAVAIL)))
-                    return
-                }
-                status(.success(url))
+                self.reportURL(status)
             case .failed(let error), .waiting(let error):
                 self.closeAll()
                 status(.failure(error))
@@ -66,6 +80,60 @@ final class BCDLiveLogServer: @unchecked Sendable {
 
     func stop() { queue.async { self.closeAll() } }
 
+    private func reportURL(_ status: (Result<URL, NWError>) -> Void) {
+        guard let port = listener.port,
+              let url = URL(string: "http://\(hostname ?? String(describing: network.address)):\(port.rawValue)/api/log") else {
+            closeAll()
+            status(.failure(.posix(.EADDRNOTAVAIL)))
+            return
+        }
+        status(.success(url))
+    }
+
+    private func updateRegistration(_ change: NWListener.ServiceRegistrationChange, interfaceIndex: UInt32,
+                                    status: @escaping @Sendable (Result<URL, NWError>) -> Void) {
+        guard !stopped else { return }
+        switch change {
+        case .add(let endpoint):
+            registration = endpoint
+            DispatchQueue.global(qos: .utility).async { [weak self] in
+                guard let hostname = Self.resolveHostname(endpoint, interfaceIndex: interfaceIndex) else { return }
+                self?.queue.async { [weak self] in
+                    guard let self, !self.stopped, self.registration == endpoint else { return }
+                    self.hostname = hostname
+                    if self.listener.port != nil { self.reportURL(status) }
+                }
+            }
+        case .remove(let endpoint):
+            guard registration == endpoint else { return }
+            registration = nil
+            hostname = nil
+            if listener.port != nil { reportURL(status) }
+        @unknown default:
+            break
+        }
+    }
+
+    // Resolve the service's SRV record to get the device's .local hostname.
+    private static func resolveHostname(_ endpoint: NWEndpoint, interfaceIndex: UInt32) -> String? {
+        guard case let .service(name, type, domain, _) = endpoint else { return nil }
+        var hostname: String?
+        return withUnsafeMutablePointer(to: &hostname) { result in
+            var service: DNSServiceRef?
+            let error = DNSServiceResolve(&service, 0, interfaceIndex, name, type, domain, { _, _, _, error, _, host, _, _, _, context in
+                guard error == kDNSServiceErr_NoError, let host, let context else { return }
+                context.assumingMemoryBound(to: String?.self).pointee = String(cString: host)
+            }, result)
+            guard error == kDNSServiceErr_NoError, let service else { return nil }
+            defer { DNSServiceRefDeallocate(service) }
+            var descriptor = pollfd(fd: DNSServiceRefSockFD(service), events: Int16(POLLIN), revents: 0)
+            guard poll(&descriptor, 1, 2000) > 0, descriptor.revents & Int16(POLLIN) != 0,
+                  DNSServiceProcessResult(service) == kDNSServiceErr_NoError,
+                  let name = result.pointee, name.lowercased().hasSuffix(".local.") else { return nil }
+            return String(name.dropLast())
+        }
+    }
+
     private func closeAll() {
         stopped = true
         listener.cancel()
@@ -79,7 +147,11 @@ final class BCDLiveLogServer: @unchecked Sendable {
     }
 
     private func accept(_ connection: NWConnection) {
-        guard !stopped, clients.count < 4 else { connection.cancel(); return }
+        guard !stopped, clients.count < 4,
+              case .hostPort(.ipv4(let peer), _) = connection.endpoint, network.contains(peer) else {
+            connection.cancel()
+            return
+        }
         let client = Client(connection)
         clients[ObjectIdentifier(connection)] = client
         connection.stateUpdateHandler = { [weak self, weak client] state in
@@ -100,9 +172,8 @@ final class BCDLiveLogServer: @unchecked Sendable {
             guard let self, let client else { return }
             guard error == nil, let data else { self.close(client); return }
             client.request.append(data)
-            if client.request.range(of: Self.endOfHeaders) != nil,
-               let firstLineEnd = client.request.range(of: Self.endOfLine)?.lowerBound {
-                self.respond(to: client, firstLine: client.request.prefix(upTo: firstLineEnd))
+            if let headers = client.request.range(of: Self.endOfHeaders) {
+                self.respond(to: client, headers: client.request.prefix(upTo: headers.lowerBound))
             } else if complete || client.request.count >= Self.requestLimit {
                 self.reject(client, status: "400 Bad Request")
             } else {
@@ -111,10 +182,17 @@ final class BCDLiveLogServer: @unchecked Sendable {
         }
     }
 
-    private func respond(to client: Client, firstLine: Data) {
+    private func respond(to client: Client, headers: Data) {
         client.request = Data()
-        guard firstLine == Data("GET \(target) HTTP/1.1".utf8) || firstLine == Data("GET \(target) HTTP/1.0".utf8) else {
+        let lines = String(decoding: headers, as: UTF8.self).components(separatedBy: "\r\n")
+        let legacy = lines.first == "GET /api/log HTTP/1.0"
+        guard legacy || lines.first == "GET /api/log HTTP/1.1" else {
             reject(client, status: "404 Not Found")
+            return
+        }
+        let hosts = lines.dropFirst().filter { $0.lowercased().hasPrefix("host:") }
+        guard (legacy && hosts.isEmpty) || (hosts.count == 1 && allowsHost(hosts[0].dropFirst(5))) else {
+            reject(client, status: "403 Forbidden")
             return
         }
 
@@ -128,13 +206,21 @@ final class BCDLiveLogServer: @unchecked Sendable {
             return
         }
 
-        let headers = "Content-Type: text/plain; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\nReferrer-Policy: no-referrer\r\n"
-        send(client, data: Self.response("200 OK", headers: headers))
+        let response = "Content-Type: text/plain; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\nReferrer-Policy: no-referrer\r\n"
+        send(client, data: Self.response("200 OK", headers: response))
         // A quiet log still needs to notice when the reader closes its connection.
         client.connection.receive(minimumIncompleteLength: 1, maximumLength: 1) { [weak self, weak client] _, _, _, _ in
             guard let client else { return }
             self?.close(client)
         }
+    }
+
+    private func allowsHost(_ value: Substring) -> Bool {
+        // Match the listener's own addresses to block public DNS rebinding.
+        let parts = value.trimmingCharacters(in: .whitespaces).lowercased().split(separator: ":", omittingEmptySubsequences: false)
+        guard parts.count == 1 || (parts.count == 2 && UInt16(parts[1]) == listener.port?.rawValue) else { return false }
+        let host = parts[0].hasSuffix(".") ? parts[0].dropLast() : parts[0]
+        return host == String(describing: network.address) || String(host) == hostname?.lowercased()
     }
 
     private static func response(_ status: String, headers: String) -> Data {
@@ -180,7 +266,7 @@ final class BCDLiveLogServer: @unchecked Sendable {
             && (openFile.st_dev != currentFile.st_dev || openFile.st_ino != currentFile.st_ino)
     }
 
-    static func ipv4Address(on interface: NWInterface) -> IPv4Address? {
+    static func ipv4Network(on interface: NWInterface) -> IPv4Network? {
         var list: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&list) == 0, let first = list else { return nil }
         defer { freeifaddrs(first) }
@@ -188,12 +274,16 @@ final class BCDLiveLogServer: @unchecked Sendable {
         while let current = entry?.pointee {
             entry = current.ifa_next
             guard String(cString: current.ifa_name) == interface.name,
-                  let address = current.ifa_addr, address.pointee.sa_family == sa_family_t(AF_INET) else { continue }
-            var host = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
-            if getnameinfo(address, socklen_t(address.pointee.sa_len), &host, socklen_t(host.count), nil, 0, NI_NUMERICHOST) == 0 {
-                return IPv4Address(String(cString: host))
-            }
+                  let address = ipv4(current.ifa_addr), let netmask = ipv4(current.ifa_netmask),
+                  netmask.rawValue.contains(where: { $0 != 0 }) else { continue }
+            return IPv4Network(address: address, netmask: netmask)
         }
         return nil
+    }
+
+    private static func ipv4(_ socket: UnsafePointer<sockaddr>?) -> IPv4Address? {
+        guard let socket, socket.pointee.sa_family == sa_family_t(AF_INET) else { return nil }
+        let address = socket.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr }
+        return withUnsafeBytes(of: address) { IPv4Address(Data($0)) }
     }
 }

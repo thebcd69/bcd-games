@@ -27,11 +27,20 @@ func reply(_ message: String) {
 }
 
 let logURL = URL(fileURLWithPath: CommandLine.arguments[1])
+let network = BCDLiveLogServer.IPv4Network(address: .loopback, netmask: IPv4Address("255.0.0.0")!)
+let subnet = BCDLiveLogServer.IPv4Network(address: IPv4Address("192.168.42.65")!,
+                                          netmask: IPv4Address("255.255.255.192")!)
+precondition(subnet.contains(IPv4Address("192.168.42.66")!))
+precondition(!subnet.contains(IPv4Address("192.168.42.63")!))
+precondition(!subnet.contains(IPv4Address("192.168.42.128")!))
+
 var server: BCDLiveLogServer?
-while let command = readLine() {
-    switch command {
+while let line = readLine() {
+    let command = line.split(separator: " ")
+    switch command[0] {
     case "start":
-        server = try BCDLiveLogServer(logURL: logURL, address: .loopback, interface: nil) { result in
+        let port = NWEndpoint.Port(rawValue: UInt16(command[1])!)!
+        server = try BCDLiveLogServer(logURL: logURL, network: network, interface: nil, port: port) { result in
             switch result {
             case .success(let url): reply(url.absoluteString)
             case .failure(let error): fatalError("Listener failed: \(error)")
@@ -42,17 +51,18 @@ while let command = readLine() {
         server = nil
         reply("stopped")
     default:
-        fatalError("Unknown command: \(command)")
+        fatalError("Unknown command: \(line)")
     }
 }
 """
 
 
 @contextmanager
-def request(endpoint, target=None):
+def request(endpoint, target=None, host=None):
     connection = HTTPConnection(endpoint.hostname, endpoint.port, timeout=TIMEOUT)
     try:
-        connection.request("GET", target if target is not None else f"{endpoint.path}?{endpoint.query}")
+        headers = {"Host": host} if host is not None else {}
+        connection.request("GET", target if target is not None else endpoint.path, headers=headers)
         with connection.getresponse() as response:
             yield response
     finally:
@@ -68,19 +78,22 @@ class LiveLogServerTest(unittest.TestCase):
         self.assertTrue(line, f"Server exited during {command}")
         return line.strip()
 
-    def start(self, server):
-        endpoint = urlsplit(self.command(server, "start"))
+    def start(self, server, port=0):
+        endpoint = urlsplit(self.command(server, f"start {port}"))
         self.assertEqual((endpoint.scheme, endpoint.hostname, endpoint.path), ("http", "127.0.0.1", "/api/log"))
-        self.assertGreater(endpoint.port, 0)
-        self.assertTrue(endpoint.query.startswith("token=") and len(endpoint.query) > len("token="))
+        self.assertEqual(endpoint.query, "")
+        if port:
+            self.assertEqual(endpoint.port, port)
+        else:
+            self.assertGreater(endpoint.port, 0)
         return endpoint
 
-    def assert_rejected(self, endpoint, target):
-        with request(endpoint, target) as response:
-            self.assertEqual(response.status, 404)
+    def assert_rejected(self, endpoint, status, *, target=None, host=None):
+        with request(endpoint, target, host) as response:
+            self.assertEqual(response.status, status)
             self.assertEqual(response.read(), b"")
 
-    def test_protected_live_stream(self):
+    def test_lan_live_stream(self):
         with tempfile.TemporaryDirectory(prefix="bcd-live-log-") as directory:
             folder = Path(directory)
             source, binary = folder / "main.swift", folder / "live-log-server"
@@ -94,11 +107,12 @@ class LiveLogServerTest(unittest.TestCase):
             with subprocess.Popen([binary, log], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as server:
                 try:
                     endpoint = self.start(server)
-                    self.assert_rejected(endpoint, "/api/log")
-                    self.assert_rejected(endpoint, "/api/log?token=invalid")
-                    self.assert_rejected(endpoint, f"/another-file?{endpoint.query}")
+                    self.assert_rejected(endpoint, 404, target="/api/log?extra=value")
+                    self.assert_rejected(endpoint, 404, target="/another-file")
+                    self.assert_rejected(endpoint, 403, host="bad.example")
+                    self.assert_rejected(endpoint, 403, host="unrelated.local")
 
-                    with request(endpoint) as first, request(endpoint) as second:
+                    with request(endpoint) as first, request(endpoint, host=endpoint.hostname) as second:
                         for stream in (first, second):
                             self.assertEqual(stream.status, 200)
                             self.assertEqual(stream.headers.get_content_type(), "text/plain")
@@ -128,11 +142,11 @@ class LiveLogServerTest(unittest.TestCase):
                     with self.assertRaises(ConnectionRefusedError):
                         create_connection((endpoint.hostname, endpoint.port), timeout=TIMEOUT).close()
 
-                    next_endpoint = self.start(server)
-                    self.assertNotEqual(next_endpoint.query, endpoint.query)
-                    self.assert_rejected(next_endpoint, f"{endpoint.path}?{endpoint.query}")
+                    next_endpoint = self.start(server, port=endpoint.port)
+                    self.assertEqual(next_endpoint, endpoint)
                     with request(next_endpoint) as stream:
                         self.assertEqual(stream.status, 200)
+                        self.assertEqual(stream.read(len(replacement)), replacement)
                 finally:
                     server.kill()
 

@@ -350,10 +350,9 @@ extension BCDSettingsBackends {
     func setLiveLogAccess(_ on: Bool) {
         var endpoint = URLComponents()
         endpoint.scheme = "http"
-        endpoint.host = "192.0.2.1"
-        endpoint.port = 49152
+        endpoint.host = "iphone.local"
+        endpoint.port = 8766
         endpoint.path = "/api/log"
-        endpoint.queryItems = [URLQueryItem(name: "token", value: "sample")]
         liveLogState = on ? .sharing(endpoint.url!) : .off
     }
     func setExtendedLogging(_ on: Bool) { extendedLogging = on }
