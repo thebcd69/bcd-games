@@ -200,6 +200,9 @@ jobs:
       - name: Check Send logs to BCD
         run: python3 tests/host/check-log-upload.py --require-swift
 
+      - name: Check live log access
+        run: python3 tests/host/check-live-log-server.py
+
       # The performance trace (round 604; BCDPerfTrace*.swift): one line a second, an hour at most, the newest 20 kept, sent after a log's
       # last line when the player turned it on (or a guided debug run did), nothing at all while it is off, and tools/log-facts.py reading it.
       - name: Check the performance trace

@@ -5,6 +5,7 @@
 import SwiftUI
 import UIKit
 import Combine
+import Network
 
 // Settings' live backends: the one part of Settings that touches the engine (it is listed in
 // tools/ui-preview.py's ENGINE_BOUND, so the preview app never compiles it). Every read and
@@ -920,6 +921,66 @@ struct BCDTouchEditorHost: View {
 
 // MARK: - Logs
 
+/// Kept for the app run so closing Settings can leave the stream open during a game.
+@MainActor private final class BCDLiveLogAccess: ObservableObject {
+    static let shared = BCDLiveLogAccess()
+    @Published private(set) var state = BCDLiveLogState.off
+    private var monitor: NWPathMonitor?
+    private var server: BCDLiveLogServer?
+
+    func setEnabled(_ on: Bool) {
+        guard on else { stop(.off); return }
+        guard monitor == nil else { return }
+        let monitor = NWPathMonitor(requiredInterfaceType: .wifi)
+        self.monitor = monitor
+        state = .starting
+        monitor.pathUpdateHandler = { [weak self, weak monitor] path in
+            MainActor.assumeIsolated {
+                guard let self, let monitor, self.monitor === monitor else { return }
+                self.update(path, monitor: monitor)
+            }
+        }
+        monitor.start(queue: .main)
+    }
+
+    private func update(_ path: NWPath, monitor: NWPathMonitor) {
+        guard let interface = path.availableInterfaces.first(where: { $0.type == .wifi }),
+              let address = BCDLiveLogServer.ipv4Address(on: interface) else {
+            stop(.failed("Connect to Wi-Fi with an IPv4 address, then turn on live log access again."))
+            return
+        }
+        if let server {
+            if server.address != address || server.interface != interface {
+                stop(.failed("The Wi-Fi address changed. Turn on live log access again."))
+            }
+            return
+        }
+        do {
+            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, address: address, interface: interface) {
+                [weak self, weak monitor] result in
+                guard let self, let monitor else { return }
+                DispatchQueue.main.async {
+                    guard self.monitor === monitor else { return }
+                    switch result {
+                    case .success(let url): self.state = .sharing(url)
+                    case .failure(let error): self.stop(.failed(error.localizedDescription))
+                    }
+                }
+            }
+        } catch {
+            stop(.failed(error.localizedDescription))
+        }
+    }
+
+    private func stop(_ state: BCDLiveLogState) {
+        monitor?.cancel()
+        monitor = nil
+        server?.stop()
+        server = nil
+        self.state = state
+    }
+}
+
 /// Auto-tune's switch for BCD's Settings (check-autotune.py registers the one line that names it).
 struct BCDLiveSwitch {
     let read: () -> Bool
@@ -932,6 +993,7 @@ struct BCDLiveSwitch {
     /// An install without the increased memory limit: what fixes it, said before a log goes (MemoryRights.swift).
     var sendLogAdvice: String? { MemoryRights.lacking ? MemoryRights.sendLogAdvice : nil }
     private let input = InputSettings.shared
+    private let liveLogs = BCDLiveLogAccess.shared
     private let tune = BCDLiveSwitch(read: { AutoTune.preferred }, write: { AutoTune.preferred = $0 }, running: AutoTune.enabled)   // madeira-bcd: auto-tune's switch in BCD's Settings, on by default
     private var bag = Set<AnyCancellable>()
     private var files: [String: URL] = [:]
@@ -944,7 +1006,11 @@ struct BCDLiveSwitch {
 
     init() {
         input.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        liveLogs.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
+
+    var liveLogState: BCDLiveLogState { liveLogs.state }
+    func setLiveLogAccess(_ on: Bool) { liveLogs.setEnabled(on) }
 
     func refresh() {
         LogUpload.forgetAutomatic()

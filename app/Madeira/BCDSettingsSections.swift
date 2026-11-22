@@ -1336,6 +1336,17 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
     }
 }
 
+enum BCDLiveLogState {
+    case off, starting, sharing(URL), failed(String)
+
+    var isOn: Bool {
+        switch self {
+        case .starting, .sharing: return true
+        case .off, .failed: return false
+        }
+    }
+}
+
 @MainActor protocol BCDLogsBackend: ObservableObject {
     /// Said before a log is sent (an install without the increased memory limit); nil: nothing.
     var sendLogAdvice: String? { get }
@@ -1349,6 +1360,8 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
     func copy(_ code: String)
     /// BCD's own logs, ready for the share sheet.
     func exportable() -> [URL]
+    var liveLogState: BCDLiveLogState { get }
+    func setLiveLogAccess(_ on: Bool)
     var extendedLogging: Bool { get }
     func setExtendedLogging(_ on: Bool)
     func diagnostic(_ item: BCDDiagnostic) -> Bool
@@ -1398,6 +1411,27 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
+            BCDSettingsGroup(title: "Live logs",
+                             footer: "Anyone with the URL can read the raw log over unencrypted HTTP. Use a trusted Wi-Fi network.") {
+                BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "live"), title: "Allow live log access",
+                                     note: "Stream this run's log while BCD is running.",
+                                     isOn: backend.liveLogState.isOn) { backend.setLiveLogAccess($0) }
+                switch backend.liveLogState {
+                case .off:
+                    EmptyView()
+                case .starting:
+                    BCDSettingsInfoRow(title: "Starting live log access…", value: "")
+                case .sharing(let url):
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.logs, "copy-live-url"), title: "Copy live log URL",
+                                         note: url.absoluteString, detail: copied == url.absoluteString ? "Copied" : nil,
+                                         symbol: "doc.on.doc") {
+                        backend.copy(url.absoluteString)
+                        copied = url.absoluteString
+                    }
+                case .failed(let message):
+                    BCDSettingsInfoRow(title: "Live logs unavailable", note: message, value: "")
+                }
+            }
             BCDSettingsGroup(title: "Send a log",
                              footer: "Choose a log to send it. On this device BCD first takes out folder paths, user names, e-mail and IP addresses, then compresses it and sends it; the compressed copy is deleted right after. You get a code: quote it when you report a problem.") {
                 if backend.recent.isEmpty {
