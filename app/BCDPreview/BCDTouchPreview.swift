@@ -21,6 +21,8 @@ import UIKit
 @MainActor final class BCDTouchPreviewModel: ObservableObject, BCDTouchInput, BCDTouchEditorActions, BCDTouchMenuActions {
     @Published var items: [BCDTouchItem] = []
     @Published var selected: UUID?
+    @Published var selectedIDs: Set<UUID> = []
+    private var dragOrigins: [UUID: CGPoint] = [:]
     @Published var visible = true
     @Published var opacity = 0.7
     @Published var layoutScale = 1.0
@@ -41,6 +43,7 @@ import UIKit
         held = [:]
         for item in items { if let name = item.action.padName, let v = names[name] { held[item.id] = v } }
         selected = select.flatMap { name in items.first { $0.action.padName == name }?.id }
+        selectedIDs = selected.map { [$0] } ?? []
         layouts = BCDTouchLayouts(entries: [
             .init(id: "builtin.xbox", name: "Full controller", builtIn: true),
             .init(id: "u1", name: "Custom Layout 1", builtIn: false),
@@ -49,7 +52,8 @@ import UIKit
     }
 
     var editorState: BCDTouchEditorState {
-        BCDTouchEditorState(items: items, selected: selected, layoutScale: layoutScale, layouts: layouts, opacity: opacity,
+        BCDTouchEditorState(items: items, selected: selected, selectedIDs: selectedIDs,
+                            layoutScale: layoutScale, layouts: layouts, opacity: opacity,
                             opacityRange: 0.15...1, playSize: layoutScale,
                             padLinks: padLinks, changed: items != baseline)
     }
@@ -77,20 +81,65 @@ import UIKit
 
     // MARK: Editing
 
-    func select(_ id: UUID?) { selected = id }
+    func select(_ id: UUID?) {
+        selected = id
+        selectedIDs = id.map { [$0] } ?? []
+    }
+    func selectMany(_ ids: Set<UUID>) {
+        selectedIDs = ids.intersection(Set(items.map(\.id)))
+        selected = selectedIDs.count == 1 ? selectedIDs.first : nil
+    }
+    func beginDrag(_ id: UUID) {
+        if !(selectedIDs.count > 1 && selectedIDs.contains(id)) { select(id) }
+        guard items.first(where: { $0.id == id })?.locked != true else { dragOrigins = [:]; return }
+        dragOrigins = Dictionary(uniqueKeysWithValues: items.filter {
+            selectedIDs.contains($0.id) && !$0.locked
+        }.map { ($0.id, CGPoint(x: $0.x, y: $0.y)) })
+    }
+    func drag(_ id: UUID, delta: CGSize, screen: CGSize) {
+        guard !dragOrigins.isEmpty, screen.width > 0, screen.height > 0 else { return }
+        var minX = -Double.infinity, maxX = Double.infinity
+        var minY = -Double.infinity, maxY = Double.infinity
+        for p in dragOrigins.values {
+            minX = max(minX, BCDTouchGeometry.placeRange.lowerBound - Double(p.x))
+            maxX = min(maxX, BCDTouchGeometry.placeRange.upperBound - Double(p.x))
+            minY = max(minY, BCDTouchGeometry.placeRange.lowerBound - Double(p.y))
+            maxY = min(maxY, BCDTouchGeometry.placeRange.upperBound - Double(p.y))
+        }
+        let dx = min(max(Double(delta.width / screen.width), minX), maxX)
+        let dy = min(max(Double(delta.height / screen.height), minY), maxY)
+        for i in items.indices {
+            guard let p = dragOrigins[items[i].id] else { continue }
+            items[i].x = Double(p.x) + dx
+            items[i].y = Double(p.y) + dy
+        }
+    }
+    func endDrag(_ id: UUID, moved: Bool) {
+        dragOrigins = [:]
+        if !moved { select(id) }
+    }
     func move(_ id: UUID, x: Double, y: Double) { update(id) { if !$0.locked { $0.x = x; $0.y = y } } }
     func add() {
         let p = BCDTouchGeometry.addPosition(count: items.count)
         let item = BCDTouchItem(id: UUID(), x: p.x, y: p.y, scale: 1, action: .mouseLeft)
         items.append(item)
-        selected = item.id
+        select(item.id)
     }
     func remove(_ id: UUID) {
         if items.first(where: { $0.id == id })?.locked == true { return }
-        items.removeAll { $0.id == id }; selected = nil
+        items.removeAll { $0.id == id }; select(nil)
     }
     func setAction(_ id: UUID, _ action: BCDTouchAction) { update(id) { $0.action = action } }
     func setScale(_ id: UUID, _ scale: Double) { update(id) { if !$0.locked { $0.scale = BCDTouchGeometry.clampScale(scale) } } }
+    func setGroupAverageScale(_ ids: Set<UUID>, _ average: Double) {
+        let chosen = items.filter { ids.contains($0.id) && !$0.locked }
+        guard !chosen.isEmpty else { return }
+        let current = chosen.map(\.scale).reduce(0, +) / Double(chosen.count)
+        guard current > 0 else { return }
+        for i in items.indices where ids.contains(items[i].id) && !items[i].locked {
+            items[i].scale = BCDTouchGeometry.clampScale(items[i].scale * average / current)
+        }
+    }
     func setLocked(_ id: UUID, _ locked: Bool) { update(id) { $0.locked = locked } }
     func setLatch(_ id: UUID, _ on: Bool) { update(id) { $0.latch = on } }
     func bringToFront(_ id: UUID) { items = BCDTouchLayering.moved(items, id, toFront: true) }
@@ -104,8 +153,8 @@ import UIKit
         layouts.entries.append(.init(id: UUID().uuidString, name: layouts.nextName, builtIn: false))
         layouts.activeID = layouts.entries.last?.id
     }
-    func revert() { items = baseline; selected = nil }
-    func done() { selected = nil }
+    func revert() { items = baseline; select(nil) }
+    func done() { select(nil) }
     func chooseLayout(_ id: String, keepCurrentFirst: Bool) { layouts.activeID = id; layouts.unsaved = false }
     func newLayout(keepCurrentFirst: Bool) { saveAsNewLayout(); items = []; baseline = [] }
     func deleteLayout(_ id: String) { layouts.entries.removeAll { $0.id == id }; layouts.activeID = "builtin.xbox" }
@@ -250,6 +299,7 @@ private struct BCDTouchPreviewCase: View {
             if spec != "touch-menu" && spec != "touch-off" {
                 BCDTouchLayer(items: model.items, screen: screen, layoutScale: model.layoutScale,
                               opacity: editing ? 1 : model.opacity, editing: editing, selected: model.selected,
+                              selectedIDs: model.selectedIDs,
                               input: model, arranging: model, look: BCDTouchLookModel.shared.look)   // -BCDLook body,accent,icons,press (round 604)
             }
             switch spec {

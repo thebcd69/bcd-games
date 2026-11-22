@@ -102,6 +102,8 @@ extension TouchControl {
     /// The controls as they were when the editor opened (Revert, and whether an edited built-in
     /// would be lost on switching). Taken at the same moment as the model's own baseline.
     private var baseline: [TouchControl]
+    /// Initial normalized centres for the selected controls during a single drag.
+    private var dragOrigins: [UUID: CGPoint] = [:]
     private var watch: AnyCancellable?
 
     private init() {
@@ -172,7 +174,8 @@ extension TouchControl {
         if GamepadInput.keyboardMouseAvailable, let a = selected?.action, !a.isPad, a != .none, a != .keyboardToggle {
             links = a.stickKeys != nil ? PadBindings.stickNames : PadBindings.buttonNames
         }
-        return BCDTouchEditorState(items: items, selected: model.selected, layoutScale: model.sizeScale, layouts: layouts,
+        return BCDTouchEditorState(items: items, selected: model.selected, selectedIDs: model.selectedIDs,
+                                   layoutScale: model.sizeScale, layouts: layouts,
                                    opacity: opacity.value, opacityRange: opacity.range,
                                    playSize: inLibrarySession ? model.sizeScale : nil,
                                    padLinks: links, changed: model.controls != baseline)
@@ -185,7 +188,116 @@ extension TouchControl {
 
     // MARK: Arranging and editing
 
-    func select(_ id: UUID?) { if model.selected != id { model.selected = id } }
+    func select(_ id: UUID?) {
+        if model.selected != id { model.selected = id }
+        let ids: Set<UUID> = id.map { [$0] } ?? []
+        if model.selectedIDs != ids { model.selectedIDs = ids }
+        model.alignmentX = nil; model.alignmentY = nil
+    }
+
+    func selectMany(_ ids: Set<UUID>) {
+        let valid = ids.intersection(Set(model.controls.map(\.id)))
+        model.selected = valid.count == 1 ? valid.first : nil
+        model.selectedIDs = valid
+        model.alignmentX = nil; model.alignmentY = nil
+    }
+
+    func beginDrag(_ id: UUID) {
+        model.alignmentX = nil; model.alignmentY = nil
+        if !(model.selectedIDs.count > 1 && model.selectedIDs.contains(id)) { select(id) }
+        guard model.controls.first(where: { $0.id == id })?.locked != true else {
+            dragOrigins = [:]
+            return
+        }
+        dragOrigins = Dictionary(uniqueKeysWithValues: model.controls
+            .filter { model.selectedIDs.contains($0.id) && $0.locked != true }
+            .map { ($0.id, CGPoint(x: $0.nx, y: $0.ny)) })
+    }
+
+    func drag(_ id: UUID, delta: CGSize, screen: CGSize) {
+        guard model.selectedIDs.contains(id), !dragOrigins.isEmpty,
+              screen.width > 0, screen.height > 0 else { return }
+        // Clamp the common translation, not each button independently, to
+        // retain group spacing and BCD's original 3%-97% centre limits.
+        var minDX = -Double.infinity, maxDX = Double.infinity
+        var minDY = -Double.infinity, maxDY = Double.infinity
+        for origin in dragOrigins.values {
+            minDX = max(minDX, BCDTouchGeometry.placeRange.lowerBound - Double(origin.x))
+            maxDX = min(maxDX, BCDTouchGeometry.placeRange.upperBound - Double(origin.x))
+            minDY = max(minDY, BCDTouchGeometry.placeRange.lowerBound - Double(origin.y))
+            maxDY = min(maxDY, BCDTouchGeometry.placeRange.upperBound - Double(origin.y))
+        }
+        var dx = min(max(Double(delta.width / screen.width), minDX), maxDX)
+        var dy = min(max(Double(delta.height / screen.height), minDY), maxDY)
+        let xSnap = snapTranslation(axisX: true, dx: dx, dy: dy, bounds: minDX...maxDX, screen: screen)
+        if let xSnap { dx += xSnap.offset }
+        let ySnap = snapTranslation(axisX: false, dx: dx, dy: dy, bounds: minDY...maxDY, screen: screen)
+        if let ySnap { dy += ySnap.offset }
+        model.alignmentX = xSnap?.line
+        model.alignmentY = ySnap?.line
+        var updated = model.controls
+        for index in updated.indices {
+            guard let origin = dragOrigins[updated[index].id] else { continue }
+            updated[index].nx = Double(origin.x) + dx
+            updated[index].ny = Double(origin.y) + dy
+        }
+        if updated != model.controls { model.controls = updated }
+    }
+
+    /// Align edges or centres only when two controls are near one another.
+    /// The nearest alignment within 7pt wins; no always-on grid is needed.
+    private func snapTranslation(axisX: Bool, dx: Double, dy: Double,
+                                 bounds: ClosedRange<Double>, screen: CGSize)
+        -> (offset: Double, line: CGFloat)? {
+        let length = Double(axisX ? screen.width : screen.height)
+        let otherLength = Double(axisX ? screen.height : screen.width)
+        guard length > 0, otherLength > 0 else { return nil }
+        let moving = model.controls.filter { dragOrigins[$0.id] != nil }
+        let fixed = model.controls.filter { !model.selectedIDs.contains($0.id) }
+        var bestDistance = 7.0
+        var best: (offset: Double, line: CGFloat)?
+        for m in moving {
+            guard let origin = dragOrigins[m.id] else { continue }
+            let movingItem = BCDTouchItem(stored: m)
+            let movingSize = BCDTouchGeometry.size(movingItem.shape, diameter:
+                BCDTouchGeometry.diameter(scale: m.scale, layoutScale: model.sizeScale))
+            let movingCenter = axisX ? (Double(origin.x) + dx) * length : (Double(origin.y) + dy) * length
+            let movingCrossCenter = axisX ? (Double(origin.y) + dy) * otherLength
+                                          : (Double(origin.x) + dx) * otherLength
+            let movingHalf = Double(axisX ? movingSize.width : movingSize.height) / 2
+            let movingCrossHalf = Double(axisX ? movingSize.height : movingSize.width) / 2
+            for target in fixed {
+                let fixedItem = BCDTouchItem(stored: target)
+                let fixedSize = BCDTouchGeometry.size(fixedItem.shape, diameter:
+                    BCDTouchGeometry.diameter(scale: target.scale, layoutScale: model.sizeScale))
+                let fixedCenter = (axisX ? target.nx : target.ny) * length
+                let fixedCrossCenter = (axisX ? target.ny : target.nx) * otherLength
+                let fixedHalf = Double(axisX ? fixedSize.width : fixedSize.height) / 2
+                let fixedCrossHalf = Double(axisX ? fixedSize.height : fixedSize.width) / 2
+                // Do not snap to a control located far away on the other axis.
+                let crossGap = abs(movingCrossCenter - fixedCrossCenter) - movingCrossHalf - fixedCrossHalf
+                if crossGap > 80 { continue }
+                for source in [movingCenter - movingHalf, movingCenter, movingCenter + movingHalf] {
+                    for destination in [fixedCenter - fixedHalf, fixedCenter, fixedCenter + fixedHalf] {
+                        let distance = destination - source
+                        let normalized = distance / length
+                        let translation = (axisX ? dx : dy) + normalized
+                        if abs(distance) <= bestDistance && bounds.contains(translation) {
+                            bestDistance = abs(distance)
+                            best = (normalized, CGFloat(destination))
+                        }
+                    }
+                }
+            }
+        }
+        return best
+    }
+
+    func endDrag(_ id: UUID, moved: Bool) {
+        dragOrigins = [:]
+        model.alignmentX = nil; model.alignmentY = nil
+        if !moved { select(id) }
+    }
 
     func move(_ id: UUID, x: Double, y: Double) {
         update(id) { if $0.locked != true { $0.nx = x; $0.ny = y } }
@@ -197,17 +309,30 @@ extension TouchControl {
         c.nx = p.x
         c.ny = p.y
         model.controls.append(c)
-        model.selected = c.id
+        select(c.id)
     }
 
     func remove(_ id: UUID) {
         if let i = model.index(of: id), model.controls[i].locked == true { return }   // a locked control stays until unlocked
         model.controls.removeAll { $0.id == id }
-        model.selected = nil
+        select(nil)
     }
 
     func setAction(_ id: UUID, _ action: BCDTouchAction) { update(id) { $0.action = action.stored } }
     func setScale(_ id: UUID, _ scale: Double) { update(id) { if $0.locked != true { $0.scale = BCDTouchGeometry.clampScale(scale) } } }
+
+    func setGroupAverageScale(_ ids: Set<UUID>, _ average: Double) {
+        let movable = model.controls.filter { ids.contains($0.id) && $0.locked != true }
+        guard !movable.isEmpty else { return }
+        let before = movable.map(\.scale).reduce(0, +) / Double(movable.count)
+        guard before > 0 else { return }
+        let multiplier = BCDTouchGeometry.clampScale(average) / before
+        var updated = model.controls
+        for index in updated.indices where ids.contains(updated[index].id) && updated[index].locked != true {
+            updated[index].scale = BCDTouchGeometry.clampScale(updated[index].scale * multiplier)
+        }
+        if updated != model.controls { model.controls = updated }
+    }
     func setLocked(_ id: UUID, _ locked: Bool) { update(id) { $0.locked = locked ? true : nil } }
 
     /// build 666 (issue #45): Tap to hold; written only when on.
@@ -255,12 +380,12 @@ extension TouchControl {
     func setLayoutScale(_ value: Double) { model.sizeScale = min(max(value, 0.5), 2) }
 
     func revert() {
-        model.selected = nil
+        select(nil)
         if model.controls != baseline { model.controls = baseline }
     }
 
     func done() {
-        model.selected = nil
+        select(nil)
         model.editing = false
     }
 
@@ -319,7 +444,7 @@ extension TouchControl {
     }
 
     private func pauseEdit() {
-        model.selected = nil
+        select(nil)
         model.editing = false
     }
 
@@ -331,7 +456,7 @@ extension TouchControl {
     /// The layout picker over a game outside the library takes every touch while it is open,
     /// as the editor does (the overlay's window gives the whole screen to an edit).
     func beginPicking() {
-        model.selected = nil
+        select(nil)
         model.editing = true
     }
 
@@ -355,7 +480,8 @@ struct BCDTouchControlsLive: View {
         BCDTouchLayer(items: BCDTouchLive.shared.items, screen: screen, layoutScale: model.sizeScale,
                       // A library game's Control opacity; full while editing.
                       opacity: session && !model.editing ? library.opacity : 1,
-                      editing: model.editing, selected: model.selected,
+                      editing: model.editing, selected: model.selected, selectedIDs: model.selectedIDs,
+                      alignmentX: model.alignmentX, alignmentY: model.alignmentY,
                       input: BCDTouchLive.shared, arranging: BCDTouchLive.shared, look: looks.look,
                       floatingSticks: BCDTouchFeel.floatingSticks)   // madeira-bcd (Porthole port, item 9): off unless the in-game menu turned it on
             .id(feel.revision)

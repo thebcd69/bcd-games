@@ -2917,13 +2917,23 @@ final class TouchControlsModel: ObservableObject {
     @Published var editing = false {            // transient, never persisted
         didSet {
             // ml1970: an ended edit is written back to the custom layout it came from.
-            if !oldValue && editing { editBaseline = controls }
+            if !oldValue && editing {
+                editBaseline = controls
+                selectedIDs = []; alignmentX = nil; alignmentY = nil
+            }
+            if oldValue && !editing {
+                selectedIDs = []; alignmentX = nil; alignmentY = nil
+            }
             if oldValue && !editing { ControlPresetsModel.shared.editingEnded(baseline: editBaseline) }
         }
     }
     /// The Session panel card is open on this window: it takes every touch.
     @Published var sessionPanel = false         // transient
     @Published var selected: UUID?              // transient
+    /// Editor-only marquee selection; never persisted in control profiles.
+    @Published var selectedIDs: Set<UUID> = []   // transient
+    @Published var alignmentX: CGFloat?          // transient guide, not stored
+    @Published var alignmentY: CGFloat?          // transient guide, not stored
     /// ml1970: the named layout (TouchControlPresets.swift) these controls were
     /// loaded from; nil for controls no layout holds.
     @Published var layoutID: String?            { didSet { save() } }
@@ -3132,6 +3142,7 @@ struct TouchControlsOverlay: View {
     @ObservedObject private var feel = BCDTouchFeelModel.shared   // madeira-bcd (round 604): the controls hide when no finger has been on them for the time the player chose
     @ObservedObject private var fold = FoldTabletop.shared
     @State private var pinchBase: Double?
+    @State private var groupPinchBases: [UUID: Double] = [:]
 
     var body: some View {
         GeometryReader { geo in
@@ -3224,16 +3235,29 @@ struct TouchControlsOverlay: View {
     /// BCD (2026-10-18): BCD's bar and editor (BCDTouchLive.swift).
     private var topBar: some View { BCDTouchChromeLive() }
 
-    /// Pinch anywhere scales the SELECTED control. With nothing selected it does
-    /// nothing rather than guessing which one you meant.
+    /// Pinch anywhere to scale the selected control or selected group.
     private var scalePinch: some Gesture {
         MagnificationGesture()
             .onChanged { v in
+                if m.editing && m.selectedIDs.count > 1 {
+                    if groupPinchBases.isEmpty {
+                        groupPinchBases = Dictionary(uniqueKeysWithValues: m.controls
+                            .filter { m.selectedIDs.contains($0.id) && $0.locked != true }
+                            .map { ($0.id, $0.scale) })
+                    }
+                    var updated = m.controls
+                    for i in updated.indices {
+                        guard let base = groupPinchBases[updated[i].id] else { continue }
+                        updated[i].scale = BCDTouchGeometry.clampScale(base * Double(v))
+                    }
+                    if updated != m.controls { m.controls = updated }
+                    return
+                }
                 guard m.editing, let i = m.index(of: m.selected), m.controls[i].locked != true else { return }
                 if pinchBase == nil { pinchBase = m.controls[i].scale }
                 m.controls[i].scale = min(max((pinchBase ?? 1) * Double(v), 0.5), 3.0)
             }
-            .onEnded { _ in pinchBase = nil }
+            .onEnded { _ in pinchBase = nil; groupPinchBases = [:] }
     }
 }
 
