@@ -1439,10 +1439,10 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                                      note: "Stream this run's log while BCD is running. This setting stays on after a restart.",
                                      isOn: backend.liveLogState.isOn) { backend.setLiveLogAccess($0) }
                 preferredPortRow
-                BCDSettingsValueRow(id: BCDSettingsID.control(.logs, "live-history"), title: "Recent log history",
+                BCDSettingsValueRow(id: BCDSettingsID.control(.logs, "live-history"), title: "Endpoint history size",
                                     note: "Amount sent when a reader connects.",
                                     choices: BCDLiveLogPreferences.historyRange.map { BCDSettingsChoice(value: String($0), label: "\($0) MB") },
-                                    value: String(backend.liveLogPreferences.historyMB)) { value in
+                                    value: String(backend.liveLogPreferences.historyMB), showsMenuButton: true) { value in
                     if let count = Int(value) { backend.setLiveLogHistoryMB(count) }
                 }
                 switch backend.liveLogState {
