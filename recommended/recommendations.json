@@ -1,8 +1,32 @@
 {
   "format": 1,
-  "version": 96,
-  "generated": "2026-11-23",
+  "version": 97,
+  "generated": "2026-11-24",
   "rules": [
+    {
+      "id": "turing-complete",
+      "title": "Turing Complete",
+      "version": 1,
+      "minBuild": 713,
+      "match": {
+        "steamAppIDs": [
+          1444480
+        ]
+      },
+      "config": [
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        "env.MESA_GL_VERSION_OVERRIDE = 4.1",
+        "env.MESA_GLSL_VERSION_OVERRIDE = 410",
+        "env.FEX_SMCCHECKS = full",
+        "env.MADEIRA_FEX_EXEC_RECHECK = 1",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "gl-backend = zink"
+      ],
+      "notes": [
+        "Tested on-device with the executable-page recheck and this complete configuration; individual settings have not been tested separately.",
+        "713 is the proposed first supported build after 0.1.712. Align minBuild with the actual first release containing the FEX fix and recommendation policy before signing and publishing."
+      ]
+    },
     {
       "id": "rdr2-steam",
       "title": "Red Dead Redemption 2 (Steam)",

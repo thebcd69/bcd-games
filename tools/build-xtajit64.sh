@@ -260,6 +260,10 @@ python3 "$R/tools/patch-fex-ios-callret-lean.py" "$R/FEX" || echo "::warning::th
 # ExitFunctionECJitPool, the lean JIT exit with a per-thread hint for targets that are already pool addresses (method tables of an
 # image's pool copy), which ExitFunctionECJit walks the whole alias table for. Last, after every overlay that touches Module.cpp.
 python3 "$R/tools/patch-fex-ios-ec-exit-pool.py" "$R/FEX"
+# Turing Complete: opt-in executable SEC_COMMIT section recheck (off by default).
+# Validate the pinned FEX anchor, then patch the temporary build tree before linking.
+python3 "$R/tests/host/check-turing-exec-recheck.py"
+python3 "$R/tools/patch-fex-ios-exec-recheck.py" "$R/FEX/Source/Windows/Common/InvalidationTracker.cpp"
 build
 git -C FEX checkout -- "$CPUF" Source/Windows/ARM64EC/Module.cpp Source/Windows/ARM64EC/Module.S Source/Windows/Common/InvalidationTracker.h Source/Windows/Common/InvalidationTracker.cpp FEXCore/Source/Interface/IR/PassManager.cpp Source/Windows/Common/Priv.h FEXCore/Source/Interface/Core/CPUID.cpp Source/Windows/ARM64EC/IosJitAlias.cpp FEXCore/include/FEXCore/Core/CoreState.h FEXCore/Source/Interface/Core/JIT/BranchOps.cpp Source/Windows/ARM64EC/libarm64ecfex.def FEXCore/include/FEXCore/Debug/InternalThreadState.h FEXCore/Source/Interface/Core/Core.cpp Source/Windows/Common/CallRetStack.h FEXCore/Source/Interface/Core/Dispatcher/Dispatcher.cpp FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.h FEXCore/Source/Interface/Core/ArchHelpers/Arm64Emitter.cpp FEXCore/Source/Interface/Core/JIT/JIT.cpp FEXCore/Source/Interface/Core/JIT/MiscOps.cpp FEXCore/Source/Interface/Core/JIT/AtomicOps.cpp FEXCore/include/FEXCore/Utils/ThreadPoolAllocator.h FEXCore/Source/Interface/IR/IntrusiveIRList.h FEXCore/Source/Interface/IR/IREmitter.h FEXCore/Source/Interface/Core/OpcodeDispatcher.h FEXCore/Source/Interface/Core/OpcodeDispatcher.cpp FEXCore/Source/Interface/Core/Frontend.h FEXCore/Source/Interface/Core/Frontend.cpp FEXCore/Source/Interface/Core/X86Tables/SecondaryTables.cpp FEXCore/Source/Utils/AllocWatch.cpp FEXCore/Source/Interface/Core/JIT/JITClass.h
 git -C FEX/External/rpmalloc checkout -- rpmalloc/rpmalloc.c

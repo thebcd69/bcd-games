@@ -92,6 +92,9 @@ jobs:
       # BCD: the recommended settings online (recommended/recommendations.json, signed with
       # Ed25519; GameRecommendationsSource.swift): the built-in list equals the Swift literals it
       # replaced, signatures, allowed keys, versions, offline and a bad file keep the list in use.
+      - name: Check Turing Complete recommended settings
+        run: python3 tests/host/check-turing-recommendations.py --require-swift
+
       - name: Check online recommended settings
         run: python3 tests/host/check-remote-recommendations.py --require-swift
 
