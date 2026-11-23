@@ -422,6 +422,7 @@ struct RecommendationsPolicy {
     /// (build/tools/autotune_rules.py), nothing else. A new name joins this list in the build
     /// that reads it; a downloaded line that uses it carries that build as its minBuild.
     static let allowedEnvNames: Set<String> = [
+        "FEX_SMCCHECKS", "MADEIRA_FEX_EXEC_RECHECK",   // Turing Complete; rules using these require the first fixed build.
         "BCD_EPIC_HOST_START",
         "_JAVA_OPTIONS", "DOTNET_EnableWriteXorExecute", "DOTNET_GCRegionRange",
         "DXMT_SMALL_RINGS", "DXMT_WSI_MODE_TABLE", "DXMT_WSI_MONITOR_IDENTITY", "FEX_MEMCPYSETTSOENABLED", "FEX_TSOENABLED", "FEX_VECTORTSOENABLED", "FEX_X87REDUCEDPRECISION", "FEX_MULTIBLOCK", "LC_ALL",
@@ -537,7 +538,7 @@ struct RecommendationsPolicy {
         "MADEIRA_D3D12_CAPS_BY_FAMILY",   // build 652 in lists (round 2026-11-11, REANIMAL, agent G8 S2): D3D12's 64-bit atomics and wave operations follow the GPU family, off unless 1; 0 or 1 (checked below)
         "DXMT_DISPLAY_MODE_STATS",   // build 652 in lists (round 2026-11-11, Crash Bandicoot, agent A1 S6): DXMT logs the display-mode list queries ([dxgi-modes] ml1190), a diagnostic; 0 or 1 (checked below)
         "MADEIRA_SPIN_DUMP_REGS",   // build 652 in lists (round 2026-11-11, Control, agent T1 S9): the [spin] report prints guest memory at the busy registers, a diagnostic; 0 or 1 (checked below)
-        "MESA_GL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE",   // build 652 (round 2026-11-11, THE KING OF FIGHTERS XIV, agent G10 S7): the OpenGL version zink advertises (opengl_ios.c sets 4.1 only when unset); 4.2 to 4.6 and 420 to 460 (checked below)
+        "MESA_GL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE",   // OpenGL/GLSL versions advertised by zink; includes explicit 4.1/410 for Turing Complete.
         // build 660 (upstream merge 2026-11-14, the dxmt fork's commits): DXMT's new switches, each off by default (the Vulkan swap chain: on), so
         // that a list can turn one on for a game once testers' logs show it helps, without a build; values checked below
         "DXMT_CMDLIST_KEEP_BLOCK", "DXMT_DYN_KEEP", "DXMT_DYN_KEEP_KB", "DXMT_D9_LATE_READBACK", "MADEIRA_D3D11_LOCAL_SHARE", "DXMT_TYPELESS_COMPRESSION", "DXMT_TYPELESS_PFV", "MADEIRA_DXGI_VK_SWAPCHAIN",
@@ -571,6 +572,14 @@ struct RecommendationsPolicy {
                 throw RecommendationsError.policy("\(path): \(key) is not on the list of environment lines a download may set")
             }
             switch name {
+            case "FEX_SMCCHECKS":
+                guard value == "full" else {
+                    throw RecommendationsError.policy("\(path): FEX_SMCCHECKS is full")
+                }
+            case "MADEIRA_FEX_EXEC_RECHECK":
+                guard value == "0" || value == "1" else {
+                    throw RecommendationsError.policy("\(path): MADEIRA_FEX_EXEC_RECHECK is 0 or 1")
+                }
             case "MADEIRA_OPTIN_DLLS":
                 // Only DLLs BCD ships as <name>-optin.dll (tools/build-wine-extra-dlls.sh: OPTIN_WANT, and setupapi,
                 // the shipped setupapi.dll with a lock round its device node table). mfasfsrcsnk, wmvdecod and
@@ -706,15 +715,15 @@ struct RecommendationsPolicy {
                     throw RecommendationsError.policy("\(path): MADEIRA_THIN_RESERVE_MB is a whole number of MB from 16 to 512")
                 }
             case "MESA_GL_VERSION_OVERRIDE":
-                // build 652 (THE KING OF FIGHTERS XIV): the version zink advertises to a game's OpenGL context, 4.2 to 4.6 (build/win32u-unix/opengl_ios.c
-                // sets 4.1 itself when this is unset; only a higher version makes sense in a list).
-                guard value.range(of: #"^4\.[2-6]$"#, options: .regularExpression) != nil else {
-                    throw RecommendationsError.policy("\(path): MESA_GL_VERSION_OVERRIDE is 4.2 to 4.6")
+                // Keep explicit 4.1 available for the tested Turing Complete preset,
+                // even when another environment setting overrides zink's usual default.
+                guard value.range(of: #"^4\.[1-6]$"#, options: .regularExpression) != nil else {
+                    throw RecommendationsError.policy("\(path): MESA_GL_VERSION_OVERRIDE is 4.1 to 4.6")
                 }
             case "MESA_GLSL_VERSION_OVERRIDE":
-                // build 652: the GLSL version that goes with it, 420 to 460.
-                guard ["420", "430", "440", "450", "460"].contains(value) else {
-                    throw RecommendationsError.policy("\(path): MESA_GLSL_VERSION_OVERRIDE is 420, 430, 440, 450 or 460")
+                // The matching GLSL versions, including explicit 410 for Turing Complete.
+                guard ["410", "420", "430", "440", "450", "460"].contains(value) else {
+                    throw RecommendationsError.policy("\(path): MESA_GLSL_VERSION_OVERRIDE is 410, 420, 430, 440, 450 or 460")
                 }
             case "DXMT_CMDLIST_KEEP_BLOCK", "DXMT_D9_LATE_READBACK", "MADEIRA_D3D11_LOCAL_SHARE", "DXMT_TYPELESS_COMPRESSION", "DXMT_TYPELESS_PFV", "MADEIRA_DXGI_VK_SWAPCHAIN":
                 // build 660 (dxmt fork, upstream merge 2026-11-14): a recycled command list keeps its first block (d3d11_context_impl.cpp), tiny Direct3D 9
